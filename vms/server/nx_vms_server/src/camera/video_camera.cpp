@@ -98,11 +98,10 @@ public:
     std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
         qint64 timeUs, int channel, ImageRequest::RoundMethod roundMethod) const;
 
+    QnConstCompressedVideoDataPtr getIframeByTime(
+        qint64 time, int channel, ImageRequest::RoundMethod roundMethod) const;
 private:
     QnConstCompressedVideoDataPtr getIframeByTimeUnsafe(
-        qint64 time, int channel, ImageRequest::RoundMethod roundMethod) const;
-
-    QnConstCompressedVideoDataPtr getIframeByTime(
         qint64 time, int channel, ImageRequest::RoundMethod roundMethod) const;
 
     std::unique_ptr<QnConstDataPacketQueue> getGopTillTime(qint64 time, int channel) const;
@@ -875,6 +874,20 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
 
     if (auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getFrameSequenceByTime(time, channel, roundMethod);
+    return nullptr;
+}
+
+QnConstCompressedVideoDataPtr QnVideoCamera::getIFrameByTime(
+    StreamIndex streamIndex,
+    qint64 time,
+    int channel,
+    nx::api::ImageRequest::RoundMethod roundMethod) const
+{
+    NX_VERBOSE(this, "%1(%2, %3 us, channel: %4, %5)", __func__,
+        streamIndex, time, channel, roundMethod);
+
+    if (auto gopKeeper = getGopKeeper(streamIndex))
+        return gopKeeper->getIframeByTime(time, channel, roundMethod);
     return nullptr;
 }
 

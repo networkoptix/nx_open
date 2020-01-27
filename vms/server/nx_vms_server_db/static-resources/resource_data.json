@@ -948,7 +948,9 @@
                 "3r global inc.|xpm4m32",
                 "3r global inc.|xst08",
                 "unix|ipm32r32p",
-                "hangzhou hikvision digital technology co., ltd|ds-7732*"
+                "hangzhou hikvision digital technology co., ltd|ds-7732*",
+                "axis|axisp7304*",
+                "axis|axism7104"
             ],
             "analogEncoder": true
         },
@@ -2532,7 +2534,7 @@
         },
         {
             "__comment__": "entropix issues resolution",
-            "keys":["*|DSC-TVC-0200*","DSC-TVC-0200*|*"],
+            "keys":["*|*DSC-TVC-0200*","DSC-TVC-0200*|*"],
             "forcedOnvifParams":
             {
                 "videoEncoders":
@@ -3331,8 +3333,8 @@
             "dahua|psdw5631s-b360",
             "onvif|cmip7553w4-sz",
             "cellinx|nbm2-h6",
-            "*|DSC-TVC-0200*",
-            "DSC-TVC-0200*|ipcam",
+            "*|*DSC-TVC-0200*",
+            "DSC-TVC-0200*|*",
             "vivotek|ma9322*",
             "entropix|*"
             ],

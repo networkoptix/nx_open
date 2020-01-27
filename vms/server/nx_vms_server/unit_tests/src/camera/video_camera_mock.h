@@ -37,6 +37,12 @@ public:
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const override;
 
+    virtual QnConstCompressedVideoDataPtr getIFrameByTime(
+        StreamIndex streamIndex,
+        qint64 time,
+        int channel,
+        nx::api::ImageRequest::RoundMethod roundMethod) const override;
+
     virtual void stopAndCleanup() override;
     virtual bool isSomeActivity() const override;
     virtual void stopIfNoActivity() override;

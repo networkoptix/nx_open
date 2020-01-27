@@ -44,7 +44,7 @@ public:
 
 } // namespace
 
-class MetricsCamerasApi: public ::testing::TestWithParam<int>
+class MetricsCamerasApi: public ::testing::Test
 {
 public:
     static QnSharedResourcePointer<resource::test::CameraMock> m_camera;
@@ -72,7 +72,7 @@ public:
         auto customVideoLayout = QnCustomResourceVideoLayoutPtr(
             new QnCustomResourceVideoLayout(QSize(kChannelCount, 1)));
         for (int i = 0; i < kChannelCount; ++i)
-            customVideoLayout->setChannel(i, 0, i); // arrange multi video layout from left to right
+            customVideoLayout->setChannel(i, 0, i); //< Arrange multi video layout from left to right.
         m_camera->setProperty(ResourcePropertyKey::kVideoLayout, customVideoLayout->toString());
 
 

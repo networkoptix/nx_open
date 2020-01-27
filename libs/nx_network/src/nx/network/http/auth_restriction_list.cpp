@@ -1,6 +1,7 @@
 #include "auth_restriction_list.h"
 
 #include <nx/utils/string.h>
+#include <nx/network/http/custom_headers.h>
 
 namespace nx::network::http {
 
@@ -34,6 +35,9 @@ AuthMethod::Values AuthMethodRestrictionList::getAllowedAuthMethods(
             allowedMethods &= ~rule.methods;
     }
 
+    // Allow auth without csrf for all requests proxied by server to the camera (see: VMS-16773).
+    if (!request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME).isEmpty())
+        allowedMethods |= AuthMethod::allowWithourCsrf;
     return allowedMethods;
 }
 

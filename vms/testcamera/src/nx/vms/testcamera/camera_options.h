@@ -3,6 +3,8 @@
 #include <optional>
 #include <chrono>
 
+#include <QtCore/QString>
+
 namespace nx::vms::testcamera {
 
 /**
@@ -12,6 +14,7 @@ struct CameraOptions
 {
     using OptionalUs = std::optional<std::chrono::microseconds>;
 
+    QString macAddressPrefix;
     bool includePts = false;
     OptionalUs shiftPts;
     bool unloopPts = false;

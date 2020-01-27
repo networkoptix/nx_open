@@ -16,6 +16,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/param.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <utils/license_usage_helper.h>
 
 #include <nx/cloud/db/client/data/auth_data.h>
@@ -991,6 +992,44 @@ struct RemoveUserRoleAccess
                 return ErrorCode::forbidden;
             }
         }
+
+        return ErrorCode::ok;
+    }
+};
+
+struct ModifyAccessRightsChecker
+{
+    ErrorCode operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::AccessRightsData& param)
+    {
+        if (hasSystemAccess(accessData))
+            return ErrorCode::ok;
+
+        const auto& resPool = commonModule->resourcePool();
+        if (auto user = resPool->getResourceById<QnUserResource>(accessData.userId)
+            ;
+            !commonModule->resourceAccessManager()->hasGlobalPermission(
+                user, GlobalPermission::admin))
+        {
+            return ErrorCode::forbidden;
+        }
+
+        auto user = resPool->getResourceById<QnUserResource>(param.userId);
+        if (!user)
+        {
+            if (!commonModule->resourceAccessManager()->userRolesManager()->hasRole(param.userId))
+                return ErrorCode::badRequest;
+            return ErrorCode::ok;
+        }
+
+        // Allow to clear shared resources unconditionally.
+        if (param.resourceIds.empty())
+            return ErrorCode::ok;
+
+        if (user->userRole() == Qn::UserRole::customUserRole)
+            return ErrorCode::forbidden;
 
         return ErrorCode::ok;
     }

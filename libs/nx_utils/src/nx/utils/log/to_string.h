@@ -202,7 +202,8 @@ QString containerString(
 }
 
 template<typename Container>
-QString containerString(const Container& container,
+QString containerString(
+    const Container& container,
     const QString& delimiter = ", ",
     const QString& prefix = "{ ",
     const QString& suffix = " }",

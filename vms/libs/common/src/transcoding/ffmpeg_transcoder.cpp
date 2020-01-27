@@ -108,6 +108,7 @@ void QnFfmpegTranscoder::closeFfmpegContext()
 {
     if (m_formatCtx)
     {
+        av_write_trailer(m_formatCtx);
         if (m_formatCtx->pb)
             m_formatCtx->pb->opaque = 0;
         QnFfmpegHelper::closeFfmpegIOContext(m_formatCtx->pb);
@@ -444,8 +445,6 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
         } while (transcodedData);
     }
 
-    //finalizing container stream
-    av_write_trailer(m_formatCtx);
     closeFfmpegContext();
     return 0;
 }

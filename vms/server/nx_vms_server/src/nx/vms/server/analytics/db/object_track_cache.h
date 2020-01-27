@@ -8,6 +8,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <analytics/common/object_metadata.h>
+#include <nx/vms/server/analytics/abstract_iframe_search_helper.h>
 #include <analytics/db/analytics_db_types.h>
 
 namespace nx::analytics::db {
@@ -48,7 +49,8 @@ public:
      */
     ObjectTrackCache(
         std::chrono::milliseconds aggregationPeriod,
-        std::chrono::milliseconds maxObjectLifetime);
+        std::chrono::milliseconds maxObjectLifetime,
+        nx::vms::server::analytics::AbstractIFrameSearchHelper* helper);
 
     void add(const common::metadata::ConstObjectMetadataPacketPtr& packet);
 
@@ -108,6 +110,7 @@ private:
 
         std::set<std::pair<QString, QString>> allAttributes;
         std::vector<ObjectPosition> allPositionSequence;
+        bool roughBestShot = false;
     };
 
     const std::chrono::milliseconds m_aggregationPeriod;
@@ -115,6 +118,7 @@ private:
     mutable QnMutex m_mutex;
     std::map<QnUuid, ObjectTrackContext> m_tracksById;
     nx::utils::ElapsedTimerPool<QnUuid> m_timerPool;
+    nx::vms::server::analytics::AbstractIFrameSearchHelper* m_iframeHelper = nullptr;
 
     void updateObject(
         const nx::common::metadata::ObjectMetadata& objectMetadata,

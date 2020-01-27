@@ -224,7 +224,7 @@ struct IvaObjectSize: public SettingGroup
     bool operator!=(const IvaObjectSize& rhs) const { return !(*this == rhs); }
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
-    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
     void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
     std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
@@ -547,8 +547,8 @@ struct ObjectDetectionBestShot: public SettingGroup
         "ObjectDetection.BestShot.Face",
         "ObjectDetection.BestShot.LicensePlate",
     };
-    static constexpr const char* kJsonEventName = "ObjectDetection";
-    static constexpr const char* kSunapiEventName = "objectdetection";
+    static constexpr const char* kJsonEventName = "MetaImageTransfer";
+    static constexpr const char* kSunapiEventName = "metaimagetransfer";
 
     ObjectDetectionBestShot(int /*roiIndex*/ = -1): SettingGroup(kServerKeys) {}
     bool operator == (const ObjectDetectionBestShot& rhs) const;

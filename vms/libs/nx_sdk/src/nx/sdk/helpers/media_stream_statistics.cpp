@@ -34,8 +34,6 @@ void MediaStreamStatistics::onData(
     auto removeRange =
         [this](auto left, auto right)
         {
-            if (left >= right)
-                return;
             for (auto itr = left; itr != right; ++itr)
                 m_totalSizeBytes -= itr->size;
             m_data.erase(left, right);
@@ -47,7 +45,8 @@ void MediaStreamStatistics::onData(
 
     // Remove old and future data in case of media stream time has been changed.
     removeRange(toIterator(timestamp + kWindowSize), m_data.end());
-    removeRange(m_data.begin(), toIterator(m_data.back().timestamp - kWindowSize));
+    if (!m_data.empty())
+        removeRange(m_data.begin(), toIterator(m_data.back().timestamp - kWindowSize));
     m_lastDataTimer = steady_clock::now();
 }
 

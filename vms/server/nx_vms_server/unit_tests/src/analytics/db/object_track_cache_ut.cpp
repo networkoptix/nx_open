@@ -7,8 +7,32 @@
 #include <nx/vms/server/analytics/db/object_track_cache.h>
 
 #include "attribute_dictionary.h"
+#include <nx/vms/server/analytics/abstract_iframe_search_helper.h>
+
+class QnResourcePool;
+class QnVideoCameraPool;
 
 namespace nx::analytics::db::test {
+
+static const qint64 kUserDefinedBestShotTime = 2;
+static const qint64 kAutoAlignBestShotTime = 2;
+
+class MocIFrameSearchHelper: public nx::vms::server::analytics::AbstractIFrameSearchHelper
+{
+public:
+    MocIFrameSearchHelper(
+        const QnResourcePool* resourcePool,
+        const QnVideoCameraPool* cameraPool)
+    {}
+
+    virtual qint64 findAfter(
+        const QnUuid& deviceId,
+        nx::vms::api::StreamIndex streamIndex,
+        qint64 timestampUs) const override
+    {
+        return kAutoAlignBestShotTime;
+    }
+};
 
 class AnalyticsDbObjectTrackCache:
     public ::testing::Test
@@ -17,7 +41,8 @@ public:
     AnalyticsDbObjectTrackCache():
         m_aggregationPeriod(std::chrono::hours(1)),
         m_maxObjectLifeTime(std::chrono::hours(10)),
-        m_objectTrackCache(m_aggregationPeriod, m_maxObjectLifeTime),
+        m_iframeHelper(new MocIFrameSearchHelper(nullptr, nullptr)),
+        m_objectTrackCache(m_aggregationPeriod, m_maxObjectLifeTime, m_iframeHelper.get()),
         m_timeShift(nx::utils::test::ClockType::steady)
     {
     }
@@ -88,6 +113,57 @@ protected:
         m_objectTrackCache.add(m_analyticsDataPackets.back());
     }
 
+    void givenSequentialAnalyticsData()
+    {
+        qint64 timestampUs = 0;
+        for (int i = 0; i < 100; ++i)
+        {
+            auto packet = generateRandomPacket(1);
+            if (!m_analyticsDataPackets.empty())
+            {
+                packet->deviceId = m_analyticsDataPackets.back()->deviceId;
+                packet->objectMetadataList.front().trackId =
+                    m_analyticsDataPackets.back()->objectMetadataList.front().trackId;
+                packet->objectMetadataList.front().typeId =
+                    m_analyticsDataPackets.back()->objectMetadataList.front().typeId;
+            }
+
+            packet->timestampUs = timestampUs++;
+            m_analyticsDataPackets.push_back(std::move(packet));
+            m_objectTrackCache.add(m_analyticsDataPackets.back());
+        }
+    }
+
+    void givenUserDefinedBestShot()
+    {
+        auto packet = generateRandomPacket(1);
+        if (!m_analyticsDataPackets.empty())
+        {
+            packet->deviceId = m_analyticsDataPackets.back()->deviceId;
+            packet->objectMetadataList.front().trackId =
+                m_analyticsDataPackets.back()->objectMetadataList.front().trackId;
+            packet->objectMetadataList.front().typeId =
+                m_analyticsDataPackets.back()->objectMetadataList.front().typeId;
+        }
+
+        packet->timestampUs = kUserDefinedBestShotTime;
+        packet->objectMetadataList.at(0).bestShot = true;
+        m_analyticsDataPackets.push_back(std::move(packet));
+        m_objectTrackCache.add(m_analyticsDataPackets.back());
+    }
+
+    void thenBestShotAlignedToIFrame()
+    {
+        ASSERT_EQ(1, m_objectsToInsert.size());
+        ASSERT_EQ(kAutoAlignBestShotTime, m_objectsToInsert[0].bestShot.timestampUs);
+    }
+
+    void thenBestShotMatchToUserDefinedValue()
+    {
+        ASSERT_EQ(1, m_objectsToInsert.size());
+        ASSERT_EQ(kUserDefinedBestShotTime, m_objectsToInsert[0].bestShot.timestampUs);
+    }
+
     void thenTheObjectInsertionIsProvided()
     {
         ASSERT_GT(m_objectsToInsert.size(), 0);
@@ -138,6 +214,7 @@ private:
 
     const std::chrono::seconds m_aggregationPeriod;
     const std::chrono::seconds m_maxObjectLifeTime;
+    std::unique_ptr<MocIFrameSearchHelper> m_iframeHelper;
     db::ObjectTrackCache m_objectTrackCache;
     nx::utils::test::ScopedTimeShift m_timeShift;
     std::vector<ObjectTrackUpdate> m_objectUpdates;
@@ -259,6 +336,27 @@ TEST_F(AnalyticsDbObjectTrackCache, the_object_is_removed_after_maxObjectLifetim
     whenRequestObjectUpdates();
 
     thenNoObjectUpdateIsReported();
+}
+
+TEST_F(AnalyticsDbObjectTrackCache, auto_assign_best_shot)
+{
+    givenSequentialAnalyticsData();
+
+    whenWaitForAggregationPeriod();
+    whenFetchObjectsToInsert();
+
+    thenBestShotAlignedToIFrame();
+}
+
+TEST_F(AnalyticsDbObjectTrackCache, custom_best_shot_time)
+{
+    givenUserDefinedBestShot();
+    givenSequentialAnalyticsData();
+
+    whenWaitForAggregationPeriod();
+    whenFetchObjectsToInsert();
+
+    thenBestShotMatchToUserDefinedValue();
 }
 
 } // namespace nx::analytics::db::test

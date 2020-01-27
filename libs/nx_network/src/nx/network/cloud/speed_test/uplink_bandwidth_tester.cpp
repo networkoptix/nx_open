@@ -2,7 +2,6 @@
 
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/time.h>
 
 #include "http_api_paths.h"
 
@@ -31,6 +30,12 @@ static QByteArray makePayload()
 }
 
 } // namespace
+
+std::string UplinkBandwidthTester::RunningValue::toString() const
+{
+	return lm("{ totalBytesSent = %1, averageBandwidth = %2 bytes per msec }")
+		.args(totalBytesSent, averageBandwidth).toStdString();
+}
 
 UplinkBandwidthTester::UplinkBandwidthTester(
 	const nx::utils::Url& url,
@@ -195,7 +200,7 @@ void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
             (float) it->second.totalBytesSent / duration_cast<milliseconds>(currentDuration).count();
 
 		NX_VERBOSE(this,
-			"Calculated running value for sequence %1, totalBytesSent: %2, running value: %3", 
+			"Calculated running value for sequence %1, totalBytesSent: %2, running value: %3",
 			*sequence, m_testContext.totalBytesSent, it->second);
 
         auto bytesPerMsec = stopEarlyIfAble(*sequence);
@@ -208,7 +213,7 @@ void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
                 "Time left until no more messages are sent: %5",
                 *sequence, *bytesPerMsec, m_testContext.sequence,
                 duration_cast<milliseconds>(timeLeftUntilMessagesAreNotSent));
-			
+
             m_testContext.sendRequests = false;
             return testComplete(*bytesPerMsec);
         }
@@ -252,7 +257,7 @@ void UplinkBandwidthTester::sendRequest()
 			sendRequest();
 		});
 
-	NX_VERBOSE(this, "Sent request %1, totalBytesSent: %2 running value: %3", 
+	NX_VERBOSE(this, "Sent request %1, totalBytesSent: %2 running value: %3",
 		sequence, m_testContext.totalBytesSent,
 		m_testContext.runningValues[sequence]);
 }
@@ -262,10 +267,11 @@ void UplinkBandwidthTester::testComplete(int bytesPerMsec)
     if (m_handler)
     {
         m_testContext = TestContext();
-		// * 8 converts to bits per msec, / 1024 to kilobits per msec, * 1000 to kilobits per sec
-		const auto kilobitsPerSec = ((long long)bytesPerMsec * 8 / 1024) * 1000;
 
-		NX_VERBOSE(this, "Test complete, reporting bytes per msec %1 (%2 kilobits per sec)",
+		// * 1000 to kilobits per sec, * 8 converts to bits per msec, / 1024 to kilobits per msec
+		const auto kilobitsPerSec = ((long long)bytesPerMsec * 1000 * 8) / 1024;
+
+		NX_VERBOSE(this, "Test complete, reporting bytes per msec %1 (%2 Kbps)",
 			bytesPerMsec, (int) kilobitsPerSec);
 
         nx::utils::swapAndCall(m_handler, SystemError::noError, (int) kilobitsPerSec);

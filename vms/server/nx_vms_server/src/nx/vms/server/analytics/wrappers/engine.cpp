@@ -1,10 +1,13 @@
 #include "engine.h"
 
+#include <nx/kit/utils.h>
+
 #include <media_server/media_server_module.h>
 
 #include <core/resource/camera_resource.h>
 
 #include <nx/sdk/analytics/i_engine.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/server/sdk_support/utils.h>
@@ -164,6 +167,9 @@ Engine::ExecuteActionResult Engine::executeAction(Ptr<const IAction> action)
     if (!NX_ASSERT(engine))
         return ExecuteActionResult("INTERNAL ERROR: Missing Engine object");
 
+    if (!NX_ASSERT(action))
+        return ExecuteActionResult("INTERNAL ERROR: Missing IAction object");
+
     const ResultHolder<IAction::Result> result = engine->executeAction(action.get());
 
     if (!result.isOk())
@@ -178,6 +184,18 @@ Engine::ExecuteActionResult Engine::executeAction(Ptr<const IAction> action)
         fromSdkString<QString>(result.value().actionUrl),
         fromSdkString<QString>(result.value().messageToUser)
     };
+
+    const auto engineResourcePtr = engineResource();
+    const QString engineRef = engineResourcePtr
+        ? lm("Engine %1 (%2)").args(engineResourcePtr->getName(), engineResourcePtr->getId())
+        : "unknown Engine";
+    NX_INFO(this,
+        "Executed Analytics Action %1 of %2 on Device %3: actionUrl %4, messageToUser %5.",
+        action->actionId(),
+        engineRef,
+        UuidHelper::toStdString(action->deviceId()),
+        nx::kit::utils::toString(actionResult.actionUrl),
+        nx::kit::utils::toString(actionResult.messageToUser));
 
     if (!actionResult.actionUrl.isEmpty() && !actionResult.messageToUser.isEmpty())
     {

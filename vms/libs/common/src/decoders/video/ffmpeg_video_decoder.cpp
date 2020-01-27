@@ -304,7 +304,6 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //m_context->flags2 |= CODEC_FLAG2_FAST;
     m_frame->data[0] = 0;
     m_spsFound = false;
-    m_dtsQueue.clear();
 }
 
 void QnFfmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
@@ -374,14 +373,7 @@ int QnFfmpegVideoDecoder::decodeVideo(
     int result = avcodec_decode_video2(avctx, picture, got_picture_ptr, avpkt);
     if (result > 0 && m_metrics)
         m_metrics->decodedPixels() += picture->width * picture->height;
-    if (result > 0 && avpkt && avpkt->dts != AV_NOPTS_VALUE)
-        m_dtsQueue.push_back(avpkt->dts);
 
-    if (*got_picture_ptr && !m_dtsQueue.empty())
-    {
-        picture->pkt_dts = m_dtsQueue.front();
-        m_dtsQueue.pop_front();
-    }
     return result;
 }
 

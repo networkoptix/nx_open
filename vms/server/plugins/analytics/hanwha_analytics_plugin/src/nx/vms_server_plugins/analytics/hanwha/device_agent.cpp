@@ -265,12 +265,12 @@ void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPac
 void DeviceAgent::doSetSettings(
     Result<const IStringMap*>* outResult, const IStringMap* sourceMap)
 {
-    //if (!m_serverHasSentInitialSettings)
-    //{
-    //    // we should ignore initial settings
-    //    m_serverHasSentInitialSettings = true;
-    //    return;
-    //}
+    if (!m_serverHasSentInitialSettings)
+    {
+        // we should ignore initial settings
+        m_serverHasSentInitialSettings = true;
+        return;
+    }
 
     int c = sourceMap->count();
     //std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> m_engine->sharedContext(m_sharedId);
@@ -282,14 +282,14 @@ void DeviceAgent::doSetSettings(
     copySettingsFromServerToCamera(errorMap, sourceMap,
         m_settings.shockDetection, sender, m_frameSize, m_channelNumber);
 
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.motion, sender, m_frameSize, m_channelNumber);
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.motion, sender, m_frameSize, m_channelNumber);
 
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.motionDetectionObjectSize, sender, m_frameSize, m_channelNumber);
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.motionDetectionObjectSize, sender, m_frameSize, m_channelNumber);
 
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber); //*
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber); //*
 
     for (int i = 0; i < Settings::kMultiplicity; ++i)
     {
@@ -302,11 +302,11 @@ void DeviceAgent::doSetSettings(
             m_settings.motionDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
     }
 
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber); //*
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber); //*
 
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
 
     //copySettingsFromServerToCamera(errorMap, sourceMap,
     //    m_settings.fogDetection, sender, m_frameSize, m_channelNumber);
@@ -359,11 +359,13 @@ void DeviceAgent::getPluginSideSettings(
     const auto response = new nx::sdk::SettingsResponse();
     m_settings.shockDetection.writeToServer(response);
 
-    //m_settings.motion.writeToServer(response);
+    m_settings.motion.writeToServer(response);
 
-    //m_settings.motionDetectionObjectSize.writeToServer(response);
+//    m_settings.motionDetectionObjectSize.writeToServer(response);
 
-    //m_settings.audioDetection.writeToServer(response);
+//    m_settings.ivaObjectSize.writeToServer(response);
+
+//    m_settings.audioDetection.writeToServer(response);
     *outResult = response;
 }
 
@@ -623,9 +625,11 @@ void DeviceAgent::readCameraSettings()
 
     sunapiReply = loadEventSettings("objectdetection");
     readFromDeviceReply(sunapiReply, &m_settings.objectDetectionGeneral, m_frameSize, m_channelNumber);
-    readFromDeviceReply(sunapiReply, &m_settings.objectDetectionBestShot, m_frameSize, m_channelNumber);
     for (int i = 0; i < Settings::kMultiplicity; ++i)
         readFromDeviceReply(sunapiReply, &m_settings.objectDetectionExcludeArea[i], m_frameSize, m_channelNumber, i);
+
+    sunapiReply = loadEventSettings("metaimagetransfer");
+    readFromDeviceReply(sunapiReply, &m_settings.objectDetectionBestShot, m_frameSize, m_channelNumber);
 
     sunapiReply = loadEventSettings("audiodetection");
     readFromDeviceReply(sunapiReply, &m_settings.audioDetection, m_frameSize, m_channelNumber);

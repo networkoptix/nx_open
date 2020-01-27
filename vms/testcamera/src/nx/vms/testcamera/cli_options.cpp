@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <regex>
 
 #include <QFileInfo>
 
@@ -47,6 +48,8 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
      shortened to the first letter: N, E, W, I, D, V. Default: INFO
  --max-file-size-megabytes[=]<value>
      Load no more than this size of each video file. 0 means no limit. Default: 100.
+ --mac-address-prefix[=]<value>
+     The first two bytes of the desired camera MAC address, separated by '-'. Default: 92-61.
  -I, --local-interface[=]<ipAddressOrHostname>
      Local interface to listen. Can be specified multiple times to form a list. By default, all
      interfaces are listened to.
@@ -284,6 +287,8 @@ static QString optionsToJsonString(const CliOptions& options)
     result += "    \"logLevel\": " + lm("\"%1\"").args(options.logLevel) + ",\n";
     result += "    \"maxFileSizeMegabytes\": "
         + QString::number(options.maxFileSizeMegabytes) + ",\n";
+    result += "    \"macAddressPrefix\": "
+        + QString::fromLatin1(nx::kit::utils::toString(options.macAddressPrefix).c_str()) + ",\n";
     result += "    \"cameraForFile\": " + boolToJson(options.cameraForFile) + ",\n";
     result += "    \"includePts\": " + boolToJson(options.includePts) + ",\n";
     result += "    \"shiftPts\": " + optionalUsToJson(options.shiftPts) + ",\n";
@@ -480,6 +485,8 @@ static void parseOption(
         options->shiftPtsSecondaryPeriod = *v;
     else if (const auto v = parse(argv, argp, nonNegativeIntArg, "--max-file-size-megabytes"))
         options->maxFileSizeMegabytes = *v;
+    else if (const auto v = parse(argv, argp, nonEmptyStringArg, "--mac-address-prefix"))
+        options->macAddressPrefix = *v;
     else if (const auto v = parse(argv, argp, logLevelArg, "--log-level", "-L"))
         options->logLevel = *v;
     else if (arg.startsWith("-"))
@@ -512,8 +519,25 @@ static void validateCameraSet(const CliOptions::CameraSet& cameraSet, const CliO
 }
 
 /** @throws InvalidArgs */
+static void validateMacAddressPrefix(const QString& value)
+{
+    try
+    {
+        std::regex regex("[0-9A-F][0-9A-F]\\-[0-9A-F][0-9A-F]", std::regex_constants::icase);
+        if (!std::regex_match(value.toStdString(), regex))
+            throw InvalidArgs("Invalid value of '--mac-address-prefix'.");
+    }
+    catch (std::regex_error&)
+    {
+        NX_ASSERT(false, "Invalid macAddressPrefix regex.");
+    }
+}
+
+/** @throws InvalidArgs */
 static void validateOptions(const CliOptions& options)
 {
+    validateMacAddressPrefix(options.macAddressPrefix);
+
     if (options.shiftPts.has_value()
         + options.shiftPtsFromNow.has_value()
         + (options.shiftPtsPrimaryPeriod || options.shiftPtsSecondaryPeriod) > 1)
