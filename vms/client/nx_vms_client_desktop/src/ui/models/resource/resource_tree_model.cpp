@@ -1315,14 +1315,15 @@ void QnResourceTreeModel::updateSystemHasManyServers()
                 const auto accessibleVia =
                     resourceAccessProvider()->accessibleVia(accessController()->user(), server);
 
-                const bool isDirectlyShared =
-                    accessibleVia == QnAbstractResourceAccessProvider::Source::shared;
+                using Source = QnAbstractResourceAccessProvider::Source;
+                const bool isNotImplicitAccess = accessibleVia != Source::implicitMonitorAccess
+                    && accessibleVia != Source::none;
 
                 const auto serverNodes = m_nodesByResource.value(server);
                 bool nodeHasChildren = std::any_of(serverNodes.cbegin(), serverNodes.cend(),
                     [](const auto& node) { return node->children().count() > 0; });
 
-                return isDirectlyShared || nodeHasChildren;
+                return isNotImplicitAccess || nodeHasChildren;
             });
     }
 

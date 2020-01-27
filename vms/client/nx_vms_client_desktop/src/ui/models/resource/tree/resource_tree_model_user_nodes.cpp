@@ -260,10 +260,12 @@ bool QnResourceTreeModelUserNodes::showMediaForSubject(const QnResourceAccessSub
     if (media->hasFlags(Qn::server))
     {
         const auto accessibleVia = resourceAccessProvider()->accessibleVia(subject, media);
-        const bool isDirectlyShared =
-            accessibleVia == QnAbstractResourceAccessProvider::Source::shared;
 
-        return isDirectlyShared;
+        using Source = QnAbstractResourceAccessProvider::Source;
+        const bool isNotImplicitAccess = accessibleVia != Source::implicitMonitorAccess
+            && accessibleVia != Source::none;
+
+        return isNotImplicitAccess;
     }
 
     return resourceAccessProvider()->hasAccess(subject, media);
