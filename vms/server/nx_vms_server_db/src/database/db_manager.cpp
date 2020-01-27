@@ -3757,15 +3757,25 @@ void QnDbManager::loadResourceTypeXML(const QString& fileName, ResourceTypeDataL
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly))
         return;
+
     QBuffer xmlData;
     xmlData.setData(f.readAll());
     ResTypeXmlParser parser(data);
     QXmlSimpleReader reader;
     reader.setContentHandler(&parser);
     QXmlInputSource xmlSrc( &xmlData );
-    if(!reader.parse( &xmlSrc )) {
-        qWarning() << "Can't parse XML file " << fileName << "with additional resource types. Check XML file syntax.";
+    if(!reader.parse( &xmlSrc )) 
+    {
+        NX_WARNING(this, "Can't parse XML file '%1' with additional resource types. "
+            "Check XML file syntax.", fileName);
         NX_ASSERT(0, "Can't parse XML file");
+    }
+    else
+    {
+        if (fileName.startsWith(L':'))
+            NX_DEBUG(this, "Successfully load XML file '%1'.", fileName);
+        else
+            NX_INFO(this, "Successfully load additional XML file '%1'.", fileName);
     }
 }
 
