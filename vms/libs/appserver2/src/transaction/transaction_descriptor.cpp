@@ -16,6 +16,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/param.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <utils/license_usage_helper.h>
 
 #include <nx/cloud/db/client/data/auth_data.h>
@@ -1007,26 +1008,27 @@ struct ModifyAccessRightsChecker
             return ErrorCode::ok;
 
         const auto& resPool = commonModule->resourcePool();
-        auto user = resPool->getResourceById<QnUserResource>(accessData.userId);
-        if (!commonModule->resourceAccessManager()->hasGlobalPermission(
-            user, GlobalPermission::admin))
+        if (auto user = resPool->getResourceById<QnUserResource>(accessData.userId)
+            ;
+            !commonModule->resourceAccessManager()->hasGlobalPermission(
+                user, GlobalPermission::admin))
         {
             return ErrorCode::forbidden;
         }
 
-        // Following lines are similar to the QnSharedResourcesManager::setSharedResources security
-        // check assert.
+        auto user = resPool->getResourceById<QnUserResource>(param.userId);
+        if (!user)
+        {
+            if (!commonModule->resourceAccessManager()->userRolesManager()->hasRole(param.userId))
+                return ErrorCode::badRequest;
+            return ErrorCode::ok;
+        }
+
+        // Allow to clear shared resources unconditionally.
         if (param.resourceIds.empty())
             return ErrorCode::ok;
 
-        if (param.userId != accessData.userId)
-        {
-            user = resPool->getResourceById<QnUserResource>(param.userId);
-            if (!user)
-                return ErrorCode::ok;
-        }
-
-        if (const QnResourceAccessSubject subject(user); subject.effectiveId() != subject.id())
+        if (user->userRole() == Qn::UserRole::customUserRole)
             return ErrorCode::forbidden;
 
         return ErrorCode::ok;
