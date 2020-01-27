@@ -1552,8 +1552,8 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc GET /api/getCameraParam
      * Read camera parameters. For instance: brightness, contrast e.t.c. Parameters to read should
      * be specified.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
-     *     or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx),
+     *     or MAC address (not supported for certain cameras), or "Logical Id".
      * %param[opt]:string <any_name> Parameter name to read. Request can contain one or more
      *     parameters.
      * %return:object JSON object with an error code, error string, and the reply on success.
@@ -1568,8 +1568,8 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc POST /api/setCameraParam
      * Sets values of several camera parameters. These parameters are used on the Advanced tab in
      * camera settings. For instance: brightness, contrast, etc.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
-     *     or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx),
+     *     or MAC address (not supported for certain cameras), or "Logical Id".
      * %param:object paramValues Name-to-value map of camera parameters to set.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
@@ -2678,7 +2678,9 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
-     * %param[opt]:uuid deviceId Id of Device.
+     * %param:string deviceId device id (can be obtained from "id" field via
+     *     /ec2/getCamerasEx), or MAC address (not supported for
+     *     certain cameras), or "Logical Id".
      * %param[opt]:string objectTypeId Analytics Object Type id.
      * %param[opt]:string objectTrackId Analytics Object Track id.
      * %param[opt]:integer startTime Milliseconds since epoch (1970-01-01 00:00, UTC).

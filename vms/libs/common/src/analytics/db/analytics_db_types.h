@@ -16,6 +16,8 @@
 #include <motion/motion_detection.h>
 #include <utils/common/byte_array.h>
 
+class QnResourcePool;
+
 namespace nx::analytics::db {
 
 struct ObjectPosition
@@ -170,7 +172,8 @@ private:
 };
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params);
-bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
+bool deserializeFromParams(const QnRequestParamList& params, Filter* filter, 
+    QnResourcePool* resourcePool);
 
 ::std::ostream& operator<<(::std::ostream& os, const Filter& filter);
 QString toString(const Filter& filter);
