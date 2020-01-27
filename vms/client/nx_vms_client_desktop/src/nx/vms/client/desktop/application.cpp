@@ -273,8 +273,8 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     QnGLCheckerInstrument::checkGLHardware();
 
     #if defined(Q_OS_WIN)
-    if (qnRuntime->isVideoWallMode())
-        QWindowsWindowFunctions::setHasBorderInFullScreen(mainWindow->windowHandle(), true);
+        if (qnRuntime->isVideoWallMode())
+            QWindowsWindowFunctions::setHasBorderInFullScreen(mainWindow->windowHandle(), true);
     #endif
 
     mainWindow->show();
