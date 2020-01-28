@@ -50,6 +50,7 @@ private:
     bool updateClientRequest(nx::utils::Url& dstUrl, QnRoute& dstRoute);
     void fixServerUrlSchemeSecurity(nx::utils::Url& dstUrl, QnRoute& dstRoute);
     bool replaceAuthHeader();
+    void replaceCameraRefererHeader(const QnNetworkResourcePtr& camera);
 
     /** Returns false if socket would block in blocking mode */
     bool readSocketNonBlock(

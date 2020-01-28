@@ -1,0 +1,17 @@
+<input [style.display]="lockEmail ? 'none' : 'inline'"
+       [(ngModel)]="value"
+       (keyup)="setValue()"
+       (blur)="onTouchedCallback()"
+       [id]="componentId" [name]="componentId"
+       type="email"
+       class="form-control"
+       required
+       autocomplete="off"
+       maxlength="255">
+
+<input *ngIf="lockEmail"
+       type="text"
+       name="registerEmailLocked"
+       class="form-control"
+       [(ngModel)]="value"
+       readonly>

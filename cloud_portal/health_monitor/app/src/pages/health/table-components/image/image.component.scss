@@ -1,0 +1,41 @@
+@import '../../../../../styles/theme_palette';
+@import '../../../../../styles/theme_variables';
+
+img {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.camera-preview-offline {
+    top: 0 !important;
+}
+
+.hm-camera-preview {
+    color: $light10;
+    font-size: 16px;
+    opacity: 0.6;
+    text-align: center;
+}
+
+.header {
+    color: $dark9;
+    font-size: 13px;
+    height: 16px;
+    margin-bottom: 8px;
+}
+
+.thumbnail-preview {
+    background: $dark1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 120px !important;
+    width: 210px !important;
+
+    &.mini {
+        height: 44px !important;
+        width: 84px !important;
+        margin-bottom: 8px;
+    }
+}

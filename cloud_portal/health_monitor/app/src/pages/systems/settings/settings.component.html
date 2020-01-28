@@ -1,0 +1,28 @@
+<nx-pre-loader type="page" *ngIf="!system"></nx-pre-loader>
+
+<ng-container *ngIf="system && !systemNoAccess">
+    <div class="block-container mt-3">
+        <div class="row">
+            <!-- Calculate height of menu, offset by height of header div and 16px on top and bottom -->
+            <div class="fixed-sidebar col-12 d-flex flex-column ml-md-2 fill-screen-height"
+                 [ngStyle]="{'height': 'calc(100% - ('+ headerHeight + 'px + 32px))'}">
+                <nx-system-merge></nx-system-merge>
+                <nx-pre-loader *ngIf="!menuVisible"></nx-pre-loader>
+                <nx-menu *ngIf="menuVisible" [content]="content"></nx-menu>
+            </div>
+
+            <!-- Offset for the fixed menu -->
+            <div class="col-12 col-md-8 col-xl-7 pt-3 pt-md-0 offset-md-4 offset-xl-3">
+                <router-outlet></router-outlet>
+                <nx-footer *ngIf="footerVisible"></nx-footer>
+            </div>
+        </div>
+    </div>
+</ng-container>
+<div *ngIf="systemNoAccess" class="text-center pt-3">
+        <h1 class="d-flex justify-content-center" translate>Failed to access System</h1>
+        <h3 class="d-flex justify-content-center" [innerHTML]="'FAILED_SYSTEM_DESCR' | translate"></h3>
+        <p class="mt-4 d-flex justify-content-center">
+            <a href="/systems" class="btn btn-primary" translate>Available Systems list</a>
+        </p>
+    </div>

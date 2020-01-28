@@ -1,0 +1,68 @@
+<form *ngIf="LANG" #messageForm="ngForm" name="messageForm" novalidate>
+    <div class="modal-header">
+        <h1 class="modal-title">{{ title }}</h1>
+        <button type="button" class="close"
+                data-dismiss="modal" aria-label="Close"
+                (click)="activeModal.close()" *ngIf="closable">
+            <div class="close-content"><span class="close-icon"></span></div>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <form #feedbackForm="ngForm" name="feedbackForm" novalidate>
+            <div *ngIf="data.email" class="form-group">
+                <label for="to_email" translate>To</label>
+                <div id="to_email" class="form-control-plaintext">
+                    {{data.to}}&nbsp;
+                    <a href="mailto:{{data.email}}?subject={{subjectMessage}}&body=I have a question about {{data.asset}}%0D%0A%0D%0A Link: {{url}}"
+                       target="_blank">
+                        {{data.email}}
+                    </a>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="user_name" translate>Your Name</label>
+                <input type="email" class="form-control"
+                       id="user_name" name="user_name" #user_name="ngModel"
+                       [(ngModel)]="userName"
+                       maxlength="255"
+                       required>
+            </div>
+            <div class="form-group">
+                <label for="user_email" translate>Your Email</label>
+                <input type="email" class="form-control"
+                       id="user_email" name="user_email" #user_email="ngModel"
+                       [(ngModel)]="userEmail"
+                       pattern="{{ config.emailRegex }}" maxlength="255"
+                       required>
+            </div>
+            <div class="form-group" *ngIf="subjects && subjects.length > 1">
+                <label for="subject" translate>Subject</label>
+                <nx-select id="subject"
+                           [selected]="subjects[0]"
+                           [items]="subjects"
+                           (onSelected)="setSubject($event)"></nx-select>
+            </div>
+            <div class="form-group" >
+                <label for="message" translate>Message</label>
+                <textarea class="form-control"
+                          [(ngModel)]="message"
+                          rows="5" id="message"
+                          [placeholder]="placeholder"
+                          name="message" type="text"
+                          required nxFocusMe></textarea>
+            </div>
+            <div *ngIf="data.disclaimer" class="form-group" [innerHTML]="data.disclaimer">
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <nx-process-button [process]="sendMessage"
+                           [form]="feedbackForm"
+                           [actionType]="'primary'"
+                           buttonText="{{ 'Send' | translate }}"></nx-process-button>
+
+        <button type="button" class="btn btn-default" (click)="close()" translate>Cancel</button>
+    </div>
+</form>

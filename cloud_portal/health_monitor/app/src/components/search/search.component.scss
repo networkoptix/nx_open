@@ -1,0 +1,145 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+@import '../../styles/mixins';
+@import '../../styles/typography';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+.nx-search {
+    .btn-text {
+        &:hover {
+            .nav-arrow span {
+                background-color : $dark15 !important;
+            }
+        }
+
+        .nav-arrow {
+            position : relative;
+
+            span {
+                height : 1px;
+
+                &:nth-child(1) {
+                    top  : 10px;
+                    left : 1px;
+                }
+
+                &:nth-child(2) {
+                    top  : 9px;
+                    left : 8px;
+                }
+            }
+        }
+    }
+
+    .search-group {
+        flex-shrink : 20;
+        position    : relative;
+        width       : 100%;
+
+        .icon-search {
+            position : absolute;
+            margin   : 10px 0 0 14px;
+        }
+
+        .search-input {
+            @extend #regular15;
+            color         : $light16;
+            height        : 40px;
+            padding-left  : 48px;
+            padding-right : 40px;
+            border-radius : 2px;
+            border        : 1px solid $light6;
+            background    : transparent;
+
+            &:placeholder-shown {
+                @include placeholder();
+            }
+
+            &:active, &:focus, &.non-empty {
+                background-color : $light1;
+                color            : $dark9;
+                border           : 1px solid $brand_core;
+            }
+
+            &:hover:not(:active):not(:focus) {
+                border : 1px solid $light8;
+            }
+
+            &:-webkit-autofill,
+            &:-webkit-autofill:hover,
+            &:-webkit-autofill:active,
+            &:-webkit-autofill:focus {
+                background-color        : $light1 !important;
+                color                   : $dark9 !important;
+                -webkit-box-shadow      : 0 0 0 1000px $light1 inset !important;
+                -webkit-text-fill-color : $dark9 !important;
+            }
+        }
+
+        .search-clear {
+            position    : absolute;
+            right       : 0;
+            top         : 0;
+            bottom      : 0;
+            line-height : 40px;
+            margin      : auto;
+            cursor      : pointer;
+            width       : 40px;
+            height      : 40px;
+            padding     : 0;
+        }
+    }
+
+    .filter-label {
+        margin-right: 2px; // prevent flex overlap with next button's border
+        white-space: nowrap;
+
+        &:hover {
+            color: $light1;
+        }
+    }
+
+    .drop-container {
+        max-width: 992px;
+
+        .drop {
+            padding: 0 1rem 0 0;
+            min-width: 200px;
+            max-width: 300px;
+
+            @include media-breakpoint-down(sm) {
+                padding-right: 0;
+                max-width: 100%;
+            }
+
+            &:last-of-type {
+                padding-right: 0;
+            }
+
+            &.large {
+                min-width: 300px;
+            }
+
+            .dropdown .dropdown-toggle span {
+                @include ellipsis;
+            }
+        }
+    }
+
+    .search-tags {
+        margin-bottom: 4px !important;
+    }
+
+    .pagination {
+        flex-wrap : wrap;
+
+        li {
+            margin     : 0 4px 4px 0;
+            cursor     : pointer;
+            text-align : center;
+            width      : auto;
+        }
+    }
+}

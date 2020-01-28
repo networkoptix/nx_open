@@ -1,0 +1,412 @@
+import {
+    AfterViewInit, Component, ElementRef,
+    OnDestroy, OnInit, ViewChild,
+    ViewEncapsulation
+}                                              from '@angular/core';
+import { NxConfigService }                     from '../../../services/nx-config';
+import { NxMenuService }                       from '../../../components/menu/menu.service';
+import { NxHealthService }                   from '../health.service';
+import { BehaviorSubject, SubscriptionLike } from 'rxjs';
+import { NxUriService }                      from '../../../services/uri.service';
+import { ActivatedRoute }                      from '@angular/router';
+import { AutoUnsubscribe }                     from 'ngx-auto-unsubscribe';
+import { NxScrollMechanicsService }            from '../../../services/scroll-mechanics.service';
+
+interface Params {
+    [key: string]: any;
+}
+
+@AutoUnsubscribe()
+@Component({
+    selector   : 'nx-system-alerts-component',
+    templateUrl: 'alerts.component.html',
+    styleUrls  : ['alerts.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+})
+export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy {
+
+    CONFIG: any;
+
+    localfilter: any = {};
+    filterModel: any;
+    params: any = {};
+    numFilters: number;
+
+    layoutReady = new BehaviorSubject(false);
+
+    breakpointSubscription: SubscriptionLike;
+    tableReadySubscription: SubscriptionLike;
+    layoutReadySubscription: SubscriptionLike;
+    mobileDetailMode: boolean;
+    desktopDetailMode: boolean;
+    breakpoint: string;
+
+    manifest: any;
+    values: any;
+
+    tableHeaders: any;
+    alerts: any;
+
+    activeTableEntity: any;
+    activePanelEntity: any;
+    activePanelParams: any;
+
+    alertsCount: number;
+    alertCards: any;
+    alertCardCount: number;
+
+    elementTilesHeight: number;
+    elementSearchHeight: number;
+    elementTableHeight: number;
+    containerDimensions: any = [];
+
+    windowSizeSubscription: any;
+
+    fixedLayoutClass: string;
+    tableWrapper: number;
+
+    @ViewChild('tiles', { static: false }) elementTiles: ElementRef;
+    @ViewChild('search', { static: false }) elementSearch: ElementRef;
+    @ViewChild('table', { static: false }) elementTable: ElementRef;
+    @ViewChild('area', { static: false }) area: ElementRef;
+    // @ViewChild('tableContainer', { static: false }) tableContainer: ElementRef;
+
+    constructor(private route: ActivatedRoute,
+                private menuService: NxMenuService,
+                private configService: NxConfigService,
+                private healthService: NxHealthService,
+                private uriService: NxUriService,
+                private scrollMechanicsService: NxScrollMechanicsService,
+    ) {
+        this.CONFIG = this.configService.getConfig();
+        this.filterModel = {
+            selects : []
+        };
+    }
+
+    ngOnInit(): void {
+        this.numFilters = 4;
+
+        this.params = this.route.snapshot.queryParams;
+        this.menuService.setSection('alerts');
+
+        this.addFilterServers();
+        this.addFilterTypes();
+        this.addFilterAlarms();
+
+        this.manifest = this.healthService.manifest;
+        this.values = this.healthService.values;
+
+        this.initializeHeader();
+        this.processAlerts();
+
+        this.alerts = this.healthService
+                          .alertsSearch(this.healthService.alertsValues, this.filterModel);
+        this.countAlerts();
+
+        if (this.params.id && this.params.metric) {
+            const alarm = this.alerts.find((alert) => {
+                return alert.entity === this.params.id && alert.metric === this.params.metric;
+            });
+            this.setActiveEntity(alarm, false);
+        }
+
+        this.layoutReadySubscription = this.layoutReady.subscribe(() => {
+            setTimeout(() => {
+                if (this.elementTable) {
+                    this.tableWrapper = this.elementTable.nativeElement.querySelectorAll('.table-wrapper')[0].offsetWidth;
+                }
+            });
+        })
+
+        this.windowSizeSubscription = this.scrollMechanicsService.windowSizeSubject.subscribe(({ width }) => {
+            if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.lg)) {
+                this.mobileDetailMode = (this.activePanelEntity !== undefined);
+            } else {
+                this.mobileDetailMode = false;
+            }
+
+            this.desktopDetailMode = this.activePanelEntity && this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.xl);
+
+            this.setLayout();
+        });
+
+        this.tableReadySubscription = this.healthService.tableReadySubject.subscribe(ready => {
+            if (ready) {
+                this.setLayout();
+            }
+        });
+    }
+
+    ngAfterViewInit() {
+        this.setLayout();
+    }
+
+    trackItem(index, item) {
+        if (!item) {
+            return undefined;
+        }
+        return item.entity;
+    }
+
+    ngOnDestroy() {}
+
+    modelChanged(model) {
+        this.alerts = this.healthService
+                          .alertsSearch(this.healthService.alertsValues, model);
+        this.countAlerts();
+    }
+
+    resetFilterModel() {
+        if (this.filterModel.selects) {
+            this.filterModel.selects.forEach((filter) => {
+                filter.selected = filter.items[0];
+            });
+        }
+
+        this.filterModel = { ...this.filterModel };
+    }
+
+    addFilterAlarms() {
+        let selected;
+        const alertItems = [
+            { value: '0', name: 'All Alerts' },
+            { value: 'warning', name: 'Only Warnings' },
+            { value: 'error', name: 'Only Errors' }
+        ];
+
+        selected = alertItems.filter((item) => {
+            return this.params.alertType === item.value;
+        })[0];
+
+        this.filterModel.selects.push(
+                {
+                    id      : 'alertType',
+                    label   : '',
+                    css     : 'col-12 col-lg-3 mr-0 mr-lg-2 p-0',
+                    items   : alertItems,
+                    selected: selected || alertItems[0]
+                });
+    }
+
+    addFilterTypes() {
+        const typesItems = [];
+        let selected;
+
+        for (const [key, value] of Object.entries(this.healthService.manifest)) {
+            const val: any = value;
+            if (val.resource !== '') {
+                const item = { value: val.resource, name: val.resource };
+                typesItems.push(item);
+
+                if (this.params.deviceType === val.resource) {
+                    selected = item;
+                }
+            }
+        }
+
+        typesItems.unshift({ value: '0', name: 'All Device Types'});
+
+        this.filterModel.selects.push(
+                {
+                    id      : 'deviceType',
+                    label   : '',
+                    css     : 'col-12 col-lg-3 mr-0 mr-lg-2 p-0',
+                    items   : typesItems,
+                    selected: selected || typesItems[0]
+                });
+    }
+
+    addFilterServers() {
+        const serverItems = [];
+        let selected;
+
+        for (const [key, value] of Object.entries(this.healthService.values.servers)) {
+            const val: any = value;
+            const item = { value: key, name: val._.name.text };
+            serverItems.push(item);
+
+            if (this.params.server === key) {
+                selected = item;
+            }
+        }
+
+        serverItems.unshift({ value: '0', name: 'All Servers' });
+
+        this.filterModel.selects.push(
+                {
+                    id      : 'server',
+                    label   : '',
+                    css     : 'col-12 col-lg-4 mr-0 mr-lg-2 p-0',
+                    items   : serverItems,
+                    selected: selected || serverItems[0]
+                });
+    }
+
+    isFilterEmpty() {
+        let singleselect = false;
+        if (this.filterModel.selects) {
+            this.filterModel.selects.forEach(select => {
+                singleselect = singleselect || (select.selected.value > 0) || (select.selected.value !== '0'); // 0 is default choice
+            });
+        }
+
+        return !singleselect;
+    }
+
+    countAlerts() {
+        this.alertsCount = Object.values(this.alerts).length;
+    }
+
+    processAlerts() {
+        /*
+         * 1.Reduce converts array of alerts into object
+         * [{metric: name, _ :{icon: alarmLevel}}] => { resourceType: {alarmLevel: count} }
+         * 2. Map converts object into array of alerts sorted by resourceTypes
+         * { resourceType: {alarmLevel: count} } => [{resourceType: name,  alarms : [{alarmLevel: count}]}]
+         * Note: alarm levels are sorted alphabetically
+         */
+        const alarmTypes = Object.values(this.healthService.manifest).filter((resource: any) => {
+            return resource.id !== 'systems';
+        }).reduce((obj: any, item: any) => {
+            obj[item.id] = {
+                alarms: {
+                    error: 0,
+                    warning: 0,
+                },
+                name: item.name
+            };
+            return obj;
+        }, {});
+        this.healthService.alertsValues.filter((value: any) => {
+            return value.metric !== 'systems';
+        }).forEach((item) => {
+            alarmTypes[item.metric].alarms[item._.alarm.icon] += 1;
+        });
+        this.alertCards = Object.values(alarmTypes).map((alarmType: any) => {
+            return {
+                alerts: Object.entries(alarmType.alarms).map(([level, count]) => {
+                    // If level is error and type is server convert to offline. Otherwise append an s to level.
+                    const name = level === 'error' && alarmType.name === 'Servers' ? 'Offline' : `${level}s`;
+                    return { count, level, name };
+                }).sort((a: any, b: any) => a.level < b.level ? -1 : 1),
+                name: alarmType.name
+            };
+        });
+        this.alertCardCount = Object.keys(this.alertCards).length;
+    }
+
+    initializeHeader() {
+        this.tableHeaders = {
+            id: 'alerts',
+            values: [{
+                id: '_',
+                name: '',
+                values: [
+                    {
+                        display: 'table',
+                        name: '',
+                        id: 'alarm',
+                    },
+                    {
+                        display: 'table',
+                        name: 'Type',
+                        id: 'type',
+                        formatClass: 'text'
+                    },
+                    {
+                        display: 'table',
+                        name: 'Server',
+                        id: 'server',
+                        formatClass: 'long-text'
+                    },
+                    {
+                        display: 'table',
+                        name: 'Alert',
+                        id: 'message'
+                    }
+                ]
+            }]
+        };
+    }
+
+    setActiveEntity(alarm, updateURI = true) {
+        if (alarm && alarm.entity) {
+            this.layoutReady.next(false);
+            this.activeTableEntity = alarm;
+            this.activePanelEntity = this.values[alarm.metric][alarm.entity];
+            this.activePanelParams = this.healthService.panelParams[alarm.metric];
+
+            if (updateURI) {
+                const queryParams: Params = {};
+                queryParams.id = alarm.entity;
+                queryParams.metric = alarm.metric;
+                this.uriService.updateURI(undefined, queryParams);
+            }
+
+            if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.lg)) {
+                this.mobileDetailMode = true;
+            }
+
+            if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.xl)) {
+                this.desktopDetailMode = true;
+            }
+
+            this.setLayout();
+
+        } else {
+            this.resetActiveEntity();
+        }
+    }
+
+    resetActiveEntity(updateURI = true) {
+        this.activeTableEntity = undefined;
+        this.activePanelEntity = undefined;
+        this.activePanelParams = undefined;
+        this.mobileDetailMode = false;
+        this.desktopDetailMode = false;
+
+        this.setLayout();
+
+        if (updateURI) {
+            const queryParams: Params = {};
+            queryParams.id = undefined;
+            queryParams.metric = undefined;
+            this.uriService.updateURI(undefined, queryParams);
+        }
+    }
+
+    canSeeTable() {
+        return this.tableHeaders && this.healthService.alertsValues && !this.mobileDetailMode;
+    }
+
+    private setLayout() {
+        setTimeout(() => {
+            this.elementSearchHeight = this.elementSearch ? this.elementSearch.nativeElement.offsetHeight : 0;
+            this.elementTilesHeight = this.elementTiles ? this.elementTiles.nativeElement.offsetHeight : 0;
+            this.containerDimensions = [this.elementTilesHeight, this.elementSearchHeight, 17 /*separator = 1px + padding*/];
+
+            if (this.elementTable && this.healthService.tableReady) {
+                const tableWidth = this.elementTable.nativeElement.querySelectorAll('table')[0].offsetWidth;
+                // area available
+                const areaWidth = this.area.nativeElement.offsetWidth;
+                // area available to the table (2/3 + gutters
+                const availAreaWidth = areaWidth / 3 * 2 + 46;
+
+                const isTableFit = (availAreaWidth > tableWidth) && !this.mobileDetailMode;
+                if (this.activeTableEntity && !this.mobileDetailMode) {
+                    this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--with-panel';
+                } else {
+                    this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--no-panel';
+                }
+
+                this.layoutReady.next(true);
+            }
+        });
+
+        if (this.mobileDetailMode && this.activePanelEntity) {
+            this.fixedLayoutClass = 'fixedLayout--no-panel';
+            this.layoutReady.next(true);
+        }
+    }
+}

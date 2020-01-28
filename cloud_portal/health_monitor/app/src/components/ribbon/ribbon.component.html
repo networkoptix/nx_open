@@ -1,0 +1,14 @@
+<div class="clearfix ribbon" *ngIf="showRibbon && !type">
+    <div class="message">{{message}}</div>
+    <div class="action"><a [href]="actionUrl" target="_blank">{{action}}</a></div>
+</div>
+
+<div class="clearfix alert-ribbon ribbon" *ngIf="showRibbon && type === 'alert'">
+    <div class="message">
+        <span>{{message}}</span>
+        <ng-container *ngIf="action">
+            <span>&nbsp;</span>
+            <a [href]="actionUrl" target="_blank">{{action}}</a>
+        </ng-container>
+    </div>
+</div>

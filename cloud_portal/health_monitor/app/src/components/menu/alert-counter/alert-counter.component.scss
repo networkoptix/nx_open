@@ -1,0 +1,10 @@
+@import '../../../../styles/theme_variables';
+@import '../../../styles/typography';
+
+svg-icon {
+  line-height: 20px;
+}
+
+span {
+  @extend #regular13;
+}

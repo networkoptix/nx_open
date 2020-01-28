@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <button type="button" class="close"
+            data-dismiss="modal" aria-label="Close"
+            (click)="close()">
+        <div class="close-content"><span class="close-icon"></span></div>
+    </button>
+    <h1 class="modal-title" translate>Apply changes before leaving this page?</h1>
+</div>
+<div class="modal-footer">
+    <nx-process-button [actionType]="'primary'"
+                       [buttonText]="'Apply' | translate"
+                       [clickFn]="apply"
+                       [process]="applyFunc"
+    ></nx-process-button>
+    <button type="button" class="btn btn-default"
+            (click)="discard()" translate>Discard</button>
+    <button type="button" class="btn btn-default"
+            (click)="close()" translate>Cancel</button>
+</div>

@@ -1,0 +1,93 @@
+<!--<nx-pre-loader type="page" *ngIf="!pagedItems"></nx-pre-loader>-->
+<div class="row p-0 m-0 d-flex">
+
+    <div class="text-placeholder order-1 order-md-0 m-0 p-0 pr-2"
+         *ngIf="!_elements.length" translate>Nothing Found</div>
+</div>
+
+<div class="scroll-wrapper" #nxScrollWrapper >
+
+    <div class="nx-table-wrapper" id="nx-table" #nxTable
+         *ngIf="_elements.length" #dynamicTable
+         [ngStyle]="{'margin-left': healthService.tableReady ? undefined : '-9999px'}">
+
+        <div *ngIf="tableHeader" class="table-header" [innerText]="tableHeader" #tableHeaderElement></div>
+        <div class="table-wrapper" (scroll)="showTooltip($event)">
+            <div [ngStyle]="{'opacity' : showHorizontalTooltip ? '1' : '0'}"
+                 class="horizontalTooltip" translate>Use Shift + Wheel for horizontal scrolling.</div>
+            <table class="table table-hover nx-table" >
+                <thead #thead>
+                <tr class="header-groups" *ngIf="showGroups">
+                        <ng-container *ngFor="let headerGroup of headers.values; index as index; trackBy: trackItem">
+                            <th *ngIf="headerGroup.values.length > 0"
+                                [colSpan]="headerGroup.values.length">
+                                <div *ngIf="headerGroup.name"
+                                     [ngClass]="headerGroup.colorClass"
+                                     [innerText]="headerGroup.name"></div>
+                            </th>
+                        </ng-container>
+                    </tr>
+                    <tr>
+                        <ng-container *ngFor="let headerGroup of headers.values; trackBy: trackItem">
+                            <th *ngFor="let header of headerGroup.values; trackBy: trackItem" class="align-bottom"
+                                (click)="toggleSort(headerGroup.id, header.id, true, header.format)">
+                                <div class="caption d-flex align-items-end" [ngClass]="header.formatClass"
+                                     [title]="header.description || header.name">
+                                    <div class="text-container ellipsis" [innerHTML]="header.name"></div>
+                                    <div class="sort-dir nav-arrow"
+                                         [style.visibility]="(headerGroup.id == selectedGroup && header.id == selectedHeader) ? 'visible' : 'hidden'"
+                                         [ngClass]="{'up': !sortOrderASC}">
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </th>
+                        </ng-container>
+                    </tr>
+                </thead>
+                <tbody #tableBody>
+                    <tr class="table-row-spacer"></tr>
+                    <tr *ngFor="let item of pagedItems; trackBy: trackItem"
+                        [ngClass]="{'selected': item == selectedEntity}"
+                        (click)="setClickedRow(item);">
+
+                        <ng-container *ngFor="let headerGroup of headers.values; first as firstGroup; trackBy: trackItem">
+                            <ng-container *ngFor="let header of headerGroup.values; first as firstHeader; trackBy: trackItem">
+                                <td *ngIf="firstGroup && item[headerGroup.id] && item[headerGroup.id][header.id] && item[headerGroup.id][header.id].icon; else showValue">
+                                    <svg-icon *ngIf="firstHeader"
+                                              [title]="item && item[headerGroup.id] && item[headerGroup.id][header.id] && item[headerGroup.id][header.id].tooltip || ''"
+                                              [svgStyle]="{'width.px': '20', 'pointer-events': 'none'}"
+                                              [src]="CONFIG.icons.dir + item[headerGroup.id][header.id].icon + '.svg'"></svg-icon>
+                                </td>
+                                <ng-template #showValue>
+                                    <td class="ellipsis"
+                                        [title]="getTitle(item, headerGroup.id, header.id)"
+                                        [ngClass]="item && item[headerGroup.id] && item[headerGroup.id][header.id] && item[headerGroup.id][header.id].formatClass">
+                                        <span [innerText]="item && item[headerGroup.id] && item[headerGroup.id][header.id] && [undefined, ''].indexOf(item[headerGroup.id][header.id].text) === -1
+                                                ? item[headerGroup.id][header.id].text : '−'"
+                                              [ngClass]="item && item[headerGroup.id] && item[headerGroup.id][header.id] && item[headerGroup.id][header.id].class || ''">
+                                        </span>
+                                    </td>
+                                </ng-template>
+                            </ng-container>
+                        </ng-container>
+                    </tr>
+                    <tr class="table-row-spacer"></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="vertical-align ml-0 clearfix">
+            <nav aria-label="Cameras table navigation" class="pagination-nav pt-3">
+                <ngb-pagination
+                        *ngIf="healthService.tableReady"
+                        [collectionSize]="_elements.length"
+                        [maxSize]="pagerMaxSize"
+                        [pageSize]="pageSize"
+                        [page]="currentPage"
+                        [rotate]="true"
+                        (pageChange)="setPage($event)"></ngb-pagination>
+            </nav>
+        </div>
+    </div>
+</div>

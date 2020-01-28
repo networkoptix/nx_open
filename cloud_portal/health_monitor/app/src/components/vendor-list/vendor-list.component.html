@@ -1,0 +1,42 @@
+<nx-pre-loader *ngIf="!vendors" type="page"></nx-pre-loader>
+
+<nx-block *ngIf="vendors" id="vendors">
+    <header>
+        {{ vendors.length + remainingVendors }} <span translate>manufacturers</span>
+    </header>
+
+    <nx-section>
+        <div class="mb-2"
+             *ngIf="vendors.length !== allVendors.length"
+             [translate]="'topXByVolume'"
+             [translateParams]="{value: CONFIG.ipvd.vendorsShown}">
+        </div>
+        <div class="float-left mr-1 mb-1" *ngFor="let vendor of vendors; trackBy: trackItem">
+            <nx-tag element="btn"
+                    size="large"
+                    (click)="setVendor(vendor)"
+                    [value]="null">{{vendor.name}} <span *ngIf="debug">({{vendor.count}})</span>
+            </nx-tag>
+        </div>
+        <div class="manufacture-info">
+            <button class="btn btn-default" #buttonElement (click)="toggleVendorsShown(buttonElement)">Show All</button>
+        </div>
+    </nx-section>
+</nx-block>
+
+<nx-block *ngIf="cameras" id="cameras">
+    <header>
+        {{ cameras }} <span translate>devices</span>
+    </header>
+
+    <nx-section>
+        <div class="float-left mr-1 mb-1" *ngFor="let filter of filters">
+            <nx-tag element="btn"
+                    size="large"
+                    (click)="setFilter(filter)"
+                    [value]="null">
+                {{filter.label | translate}}
+            </nx-tag>
+        </div>
+    </nx-section>
+</nx-block>

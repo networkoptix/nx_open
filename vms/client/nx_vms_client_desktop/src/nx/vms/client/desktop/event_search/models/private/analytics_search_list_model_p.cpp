@@ -51,6 +51,9 @@ static constexpr milliseconds kMetadataTimerInterval = 1000ms;
 static constexpr milliseconds kDataChangedInterval = 500ms;
 static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
+static constexpr int kMaxAttributeRepeatCount = 3;
+static constexpr int kMultilineAttributeTopPadding = 2;
+
 milliseconds startTime(const ObjectTrack& track)
 {
     return duration_cast<milliseconds>(microseconds(track.firstAppearanceTimeUs));
@@ -655,22 +658,34 @@ void AnalyticsSearchListModel::Private::advanceTrack(ObjectTrack& track,
 {
     // Currently there's a mess between track.attributes and track.track[i].attributes.
     // There's no clear understanding what to use and what to show.
-    // On GUI side we use just track.attributes for now.
 
     for (const auto& attribute: position.attributes)
     {
-        auto iter = std::find_if(
-            track.attributes.begin(),
-            track.attributes.end(),
+        const auto reverseIter = std::find_if(track.attributes.rbegin(), track.attributes.rend(),
             [&attribute](const nx::common::metadata::Attribute& value)
             {
                 return attribute.name == value.name;
             });
 
-        if (iter != track.attributes.end())
-            iter->value = attribute.value;
-        else
+        if (reverseIter == track.attributes.rend())
+        {
             track.attributes.push_back(attribute);
+            continue;
+        }
+
+        bool hasSameValue = false;
+        for (auto iter = reverseIter; iter != track.attributes.rend(); ++iter)
+        {
+            if (iter->name != attribute.name)
+                break;
+
+            hasSameValue = iter->value == attribute.value;
+            if (hasSameValue)
+                break;
+        }
+
+        if (!hasSameValue)
+            track.attributes.insert(reverseIter.base(), attribute);
     }
 
     track.lastAppearanceTimeUs = position.timestampUs;
@@ -728,15 +743,54 @@ QString AnalyticsSearchListModel::Private::attributes(
             </style>)");
 
     static const auto kTableTemplate = QString("<table cellpadding='0' cellspacing='0'>%1</table>");
-    static const auto kRowTemplate = QString("<tr><th>%1</th>")
+    static const auto kRowTemplate = lm(QString("<tr><th style='padding-top: %3px'>%1</th>")
         + QString("<td width='%1'/>").arg(style::Metrics::kStandardPadding) //< Spacing.
-        + QString("<td>%2</td></tr>");
+        + QString("<td style='padding-top: %3px'>%2</td></tr>"));
+
+    static const auto kAndMoreRowTemplate = lm(QString("<tr><th/>")
+        + QString("<td width='%1'/>").arg(style::Metrics::kStandardPadding) //< Spacing.
+        + QString("<th>%1</th></tr>"));
 
     QString rows;
-    for (const auto& attribute: track.attributes)
+    int padding = 0;
+
+    // TODO: #vkutin Simplify this part. Probably refactor to store attributes in a grouped form.
+    // Otherwise implement template grouping algorithm with unit tests.
+
+    for (auto begin = track.attributes.cbegin(); begin != track.attributes.cend(); )
     {
-        if (!attribute.name.startsWith("nx.sys."))
-            rows += kRowTemplate.arg(attribute.name, attribute.value);
+        if (begin->name.isEmpty() || begin->name.startsWith("nx.sys."))
+            continue;
+
+        auto end = begin + 1;
+        while (end != track.attributes.cend() && end->name == begin->name)
+            ++end;
+
+        const int count = end - begin;
+        if (count > 1)
+        {
+            padding = kMultilineAttributeTopPadding;
+            rows += kRowTemplate.args(begin->name, begin->value, padding);
+
+            const bool excess = count > kMaxAttributeRepeatCount;
+            const auto displayedEnd = excess ? begin + (kMaxAttributeRepeatCount - 1) : end;
+
+            for (auto iter = begin + 1; iter != displayedEnd; ++iter)
+                rows += kRowTemplate.args("", iter->value, 0);
+
+            if (excess)
+            {
+                rows += kAndMoreRowTemplate.args(
+                    tr("... and %n more", "", count - kMaxAttributeRepeatCount + 1));
+            }
+        }
+        else
+        {
+            rows += kRowTemplate.args(begin->name, begin->value, padding);
+            padding = 0;
+        }
+
+        begin = end;
     }
 
     if (rows.isEmpty())

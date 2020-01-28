@@ -1,0 +1,10 @@
+nx-permissions-select {
+    width: 100%;
+    display: block;
+    
+    .dropdown {
+        &-menu {
+            padding-bottom : 4px;
+        }
+    }
+}

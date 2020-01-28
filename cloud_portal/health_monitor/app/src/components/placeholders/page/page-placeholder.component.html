@@ -1,0 +1,18 @@
+<div class="page-placeholder" [ngClass]="{'has-preloader':preloader}">
+    <div class="placeholder-content">
+        <div *ngIf="preloader && !condition" class="placeholder-preloader">
+            <div class="circleG circleG_1"></div>
+            <div class="circleG circleG_2"></div>
+            <div class="circleG circleG_3"></div>
+        </div>
+        <div *ngIf="condition">
+            <div *ngIf="iconClass" class="placeholder-icon" [ngClass]="iconClass"></div>
+            <div *ngIf="!iconClass" class="placeholder-icon">
+                <svg-icon src="static/icons/{{iconName}}.svg"></svg-icon>
+            </div>
+            <h2 *ngIf="placeholderTitle" class="placeholder-title"
+                 [innerHTML]="placeholderTitle"></h2>
+            <div *ngIf="message" class="placeholder-message" [innerHTML]="message"></div>
+        </div>
+    </div>
+</div>

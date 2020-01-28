@@ -1,0 +1,4 @@
+<div class="d-flex align-items-center justify-content-end">
+    <svg-icon *ngIf="count !== 0" [src]="CONFIG.icons.dir + type + '.svg'" [svgStyle]="{'width.px': '20', 'height.px': '20', 'pointer-events': 'none'}"></svg-icon>
+    <span *ngIf="count !== undefined" [innerText]="count" class="pl-1"></span>
+</div>

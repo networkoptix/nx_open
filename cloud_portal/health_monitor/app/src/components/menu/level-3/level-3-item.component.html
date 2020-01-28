@@ -1,0 +1,14 @@
+<a class="menu-level-3"
+   [ngClass]="{'selected': selected, 'item-disabled': !isEnabled }"
+   [id]="item.id"
+   [routerLink]="[itemPath]"
+   [queryParams]="item.query">
+    <div *ngIf="first" class="top-shadow-cover"></div>
+    <div class="ellipsis">
+        <span *ngIf="item.icon" class="menu-level-3-icon glyphicon" [ngClass]="item.icon"></span>
+        <span [innerHTML]="item.label" class="user"></span>
+        <span class="menu-level-3-additional"
+              *ngIf="item.additionalLabel"
+              [innerHTML]="'<span class=\'ml-1 mr-1\'>&ndash;</span>' + item.additionalLabel"></span>
+    </div>
+</a>

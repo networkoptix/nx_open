@@ -1,0 +1,48 @@
+<nx-pre-loader *ngIf=" !system || !system.users || !selectedUser"></nx-pre-loader>
+
+<div *ngIf="system" class="row d-flex align-items-start auth-visible">
+    <div class="col-12">
+        <nx-block *ngIf="selectedUser" header-style="extended">
+            <header>
+                <div class="float-right d-flex">
+                    <span *ngIf="!selectedUser.isEnabled"
+                          class="text-danger" [ngClass]="{'pr-2': selectedUser.canBeEdited}"
+                          translate>User disabled</span>
+                    <nx-switch *ngIf="systemAvailable && selectedUser.canBeEdited && system.currentUser.isAdmin"
+                               [ngModel]="selectedUser.isEnabled"
+                               (ngModelChange)="updateEnabled($event);"
+                    ></nx-switch>
+                </div>
+                <h2 class="user-email mb-2">{{selectedUser.email}}</h2>
+                <span class="user-name">{{selectedUser.fullName}}</span>
+            </header>
+
+            <nx-section>
+                <div *ngIf="selectedUser.canBeEdited && system.currentUser.isAdmin"
+                     class="mr-2 my-2" style="width: 200px">
+
+                    <label for="permissionsSelect" translate>Access level</label>
+                    <nx-permissions-select
+                            id="permissionsSelect"
+                            [disabled]="!systemAvailable"
+                            [user]="selectedUser"
+                            [system]="system"
+                            [roles]="system.accessRoles"
+                            [selected]="selectedUser.role"
+                            (onSelected)="setPermission($event);">
+                    </nx-permissions-select>
+                </div>
+                <div>
+                    <span class="help-block pt-0" [innerHtml]="accessDescription"></span>
+                </div>
+            </nx-section>
+            <nx-section *ngIf="selectedUser.canBeDeleted && system.currentUser.isAdmin">
+                <div class="float-left mr-2">
+                    <button class="btn btn-default"
+                            [disabled]="!systemAvailable"
+                            (click)="removeUser()" translate>Remove User</button>
+                </div>
+            </nx-section>
+        </nx-block>
+    </div>
+</div>

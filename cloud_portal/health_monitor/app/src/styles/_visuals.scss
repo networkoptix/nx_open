@@ -1,0 +1,16 @@
+@import '../../styles/custom/custom_palette';
+@import '../../styles/theme_palette';
+@import '../../styles/theme_variables';
+
+.highlighted {
+    display          : inline;
+    background-color : yellow;
+}
+
+.ellipsis {
+    overflow      : hidden;
+    text-overflow : ellipsis;
+    white-space   : nowrap;
+    max-width     : 100%;
+    line-height   : initial;
+}

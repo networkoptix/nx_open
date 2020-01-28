@@ -1,0 +1,6 @@
+<div class="{{element}} {{size}} {{ badgeType }}" (click)="selectTag()">
+    <ng-content></ng-content>
+    <span *ngIf="selected" class="close-button" (click)="$event.stopPropagation();deselectTag()">
+        <span class="glyphicon tag-close-icon"></span>
+    </span>
+</div>

@@ -1,0 +1,44 @@
+@import 'styles/theme_variables';
+
+// Common
+@import 'src/styles/mixins';
+@import 'src/styles/typography';
+@import 'src/styles/buttons';
+@import 'src/styles/forms';
+@import 'src/styles/inputs';
+@import 'src/styles/labels';
+@import 'src/styles/navs';
+@import 'src/styles/elements';
+@import 'src/styles/visuals';
+@import 'src/styles/tables';
+@import 'src/styles/icons';
+@import 'src/styles/components';
+
+// Components (common)
+@import 'src/dialogs/dialogs';
+@import 'src/components/dropdowns/dropdowns';
+@import 'src/components/toast/toast.component';
+
+nx-app {
+    .headerPadding {
+        padding-top : $navbar-height;
+    }
+    
+    .headerAndRibbonPadding {
+        padding-top : $navbar-height + 32px;
+    }
+    
+    .placeholder {
+        background-color : transparent;
+        
+        &.page {
+            @include media-breakpoint-up(lg) {
+                position : fixed;
+            }
+            top       : 50%;
+            left      : 50%;
+            transform : translate(-50%, -50%);
+            z-index   : -1;
+        }
+    }
+}

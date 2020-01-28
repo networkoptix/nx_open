@@ -191,59 +191,26 @@ Item
     {
         x: navigationMenu.width + 16
         y: 16
-        width: parent.width - x - 16
+        width: parent.width - x - 24
         height: parent.height - 16 - banner.height
         spacing: 16
 
-        RowLayout
+        InformationPanel
         {
-            spacing: 16
-            visible: isDefaultSection && isDeviceDependent
+            id: informationPanel
 
-            Image
-            {
-                source: "qrc:/skin/standard_icons/sp_message_box_information.png"
-            }
+            engineInfo: currentEngineInfo
 
-            Text
-            {
-                wrapMode: Text.WordWrap
-                color: ColorTheme.windowText
-                font.pixelSize: 13
-                font.weight: Font.Bold
-                text: qsTr("This is the built-in functionality")
-            }
-        }
+            visible: isDefaultSection
+            checkable: !isDeviceDependent
 
-        SwitchButton
-        {
-            id: enableSwitch
-            text: qsTr("Enable")
-            Layout.preferredWidth: Math.max(implicitWidth, 120)
-            visible: isDefaultSection && !isDeviceDependent
-
-            Binding
-            {
-                target: enableSwitch
-                property: "checked"
-                value: enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
-                when: currentEngineId !== undefined
-            }
+            checked: currentEngineId !== undefined
+                && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
 
             onClicked:
             {
-                var engines = enabledAnalyticsEngines.slice(0)
-                if (checked)
-                {
-                    engines.push(currentEngineId)
-                }
-                else
-                {
-                    const index = engines.indexOf(currentEngineId)
-                    if (index !== -1)
-                        engines.splice(index, 1)
-                }
-                store.setEnabledAnalyticsEngines(engines)
+                if (currentEngineId !== undefined)
+                    setEngineEnabled(currentEngineId, !checked)
             }
         }
 
@@ -259,7 +226,7 @@ Item
             onValuesEdited:
                 store.setDeviceAgentSettingsValues(currentEngineId, getValues())
 
-            contentEnabled: enableSwitch.checked || isDeviceDependent
+            contentEnabled: informationPanel.checked || isDeviceDependent
             scrollBarParent: scrollBarsParent
         }
     }
@@ -280,5 +247,21 @@ Item
         anchors.bottom: parent.bottom
         text: qsTr("Camera analytics will work only when camera is being viewed."
             + " Enable recording to make it work all the time.")
+    }
+
+    function setEngineEnabled(engineId, enabled)
+    {
+        var engines = enabledAnalyticsEngines.slice(0)
+        if (enabled)
+        {
+            engines.push(engineId)
+        }
+        else
+        {
+            const index = engines.indexOf(engineId)
+            if (index !== -1)
+                engines.splice(index, 1)
+        }
+        store.setEnabledAnalyticsEngines(engines)
     }
 }

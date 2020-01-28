@@ -1,0 +1,104 @@
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+@import '../../../styles/native-theme/theme_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/custom/custom_palette';
+@import '../../../styles/theme_variables';
+
+:host {
+    width: 100%;
+    & > .row {
+        padding-bottom: 16px;
+    }
+}
+
+footer {
+    margin-top: 16px;
+    position: relative;
+    width: 100%;
+    border-top: 1px solid $light5;
+    padding-top: 15px;
+    z-index: 9;
+
+    
+    .row {
+        margin : 0;
+    }
+    
+    .nav > li {
+        position : relative;
+        display  : block;
+        height   : auto;
+        
+        & > span {
+            line-height : 24px;
+            display     : block;
+        }
+    }
+    
+    .nav > li > a,
+    .nav > li > span {
+        position: relative;
+        display: block;
+        font-size: $font-size-sm;
+        padding-right: 12px;
+        padding-bottom: 3px;
+        color: $light16;
+        text-decoration: none;
+
+        &:hover, &:focus {
+            box-shadow       : none;
+            text-decoration  : none !important;
+            background-color : transparent;
+            color            : $dark15;
+        }
+
+        &:active {
+            color: $light16;
+            text-decoration: none;
+        }
+
+        &.copyright {
+            color: $light10;
+            padding: 12px 0 0 0;
+
+            &:hover, &:focus {
+                color: $light13;
+            }
+
+            &:active {
+                color: $light10;
+            }
+        }
+    }
+    
+   @media (max-width: 479px) {
+        ul.nav {
+            flex-direction: column !important;
+
+            & > li > a,
+            & > li > span {
+                width: fit-content;
+            }
+        }
+    }
+    
+    .navbar-nav {
+        flex-direction : row;
+        float          : left;
+    }
+    
+    .navbar-right {
+        float : right;
+    }
+    
+    .navbar-right > li > a, .navbar-right > li > span > a {
+        color : $light8;
+        
+        &:hover {
+            color : $light12;
+        }
+    }
+}

@@ -1,0 +1,15 @@
+@import '../../../../../styles/theme_palette';
+@import '../../../../../styles/theme_variables';
+
+.hm-camera-section {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 177px;
+    padding: 8px 16px 16px 16px;
+    border-bottom: 1px solid $light6;
+}
+
+// prevent image section resize
+nx-pre-loader {
+    height: 120px !important;
+}

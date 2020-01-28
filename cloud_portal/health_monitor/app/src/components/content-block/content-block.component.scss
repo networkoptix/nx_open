@@ -1,0 +1,197 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+@import '../../styles/typography';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+.card {
+    box-shadow   : none;
+    border-color : $light4;
+
+    .sticky1rem {
+        box-shadow: 0 -14px 0 2px $additional_light2;
+        position: sticky;
+        top: 1rem;
+        z-index: 99;
+        margin-top: -2px; // box-shadow eats 2 px at top
+
+        @include media-breakpoint-down(md) {
+            // HM specific code ...
+            box-shadow: none;
+        }
+    }
+
+    &--header {
+        height           : unset;
+        display          : flex;
+        align-items      : center;
+        background-color : $additional_light1;
+        padding          : 0.75rem 1rem;
+        border-bottom    : 1px solid $light3;
+        position         : relative;
+
+        h4 {
+            margin : 0;
+            width  : 100%;
+        }
+
+        &-logo {
+            float               : left;
+            display             : flex;
+            align-items         : center;
+            height              : rem(48px);
+            max-width           : 160px;
+            background-size     : contain;
+            width               : 100%;
+            background-position : left center;
+            background-repeat   : no-repeat;
+        }
+    }
+
+    &--body {
+        padding          : 1rem;
+        background-color : $light1;
+
+        img {
+            max-width : 100%;
+            height    : auto;
+        }
+
+        &-info {
+            .section {
+                margin-bottom: 1rem;
+
+                &.flat {
+                    display         : flex;
+                    justify-content : flex-start;
+                }
+
+                &:last-of-type {
+                    margin-bottom : 0;
+                }
+
+                img {
+                    height      : 1rem;
+                    width       : 1rem;
+                    margin-left : .25rem;
+                    color       : $light12;
+                    font-size   : $font-size-sm;
+                    line-height : 1rem;
+                }
+
+                p:last-of-type {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+
+    &--footer {
+        position         : absolute;
+        width            : 100%;
+        bottom           : 0;
+        padding          : .5rem 1rem 1rem;
+        background-color : $light1;
+        box-shadow       : 0px -22px 22px -6px rgb(255, 255, 255);
+
+        footer {
+            // overwrite standard footer properties
+            position         : relative !important;
+            bottom           : 0;
+            width            : 100%;
+            border           : none;
+            padding          : 0;
+            background-color : $light1;
+            z-index          : 9;
+        }
+    }
+
+    nx-section:first-of-type {
+        .card--body {
+            border-top : none;
+        }
+    }
+
+    &.gray {
+        background-color : $light4;
+        border           : 1px solid $light4;
+        border-bottom    : none;
+
+        .card--header {
+            background-color    : $light4;
+            border-bottom-color : $light6;
+        }
+
+        .card--body {
+            background-color : $light4;
+            border-top       : 1px solid $light6;
+        }
+
+        .card--footer {
+            background-color : $light4;
+        }
+    }
+
+    &.menu {
+        background-color : $light5;
+        border           : 1px solid $light5;
+        border-bottom    : none;
+
+        .card--header {
+            background-color    : $light5;
+            border-bottom-color : $light7;
+        }
+
+        .card--body {
+            background-color : $light5;
+            border-top       : 1px solid $light7;
+        }
+
+        .card--footer {
+            background-color : $light5;
+        }
+
+        &.top {
+            border-radius : 2px 2px 0 0;
+
+            .card--header {
+                border-bottom : none;
+            }
+        }
+    }
+
+    &.fixed-height {
+        height   : rem(300px);
+        overflow : hidden;
+
+        .card--body {
+            overflow: hidden;
+        }
+    }
+
+
+    &.extended-header {
+        .card--header {
+            height  : auto;
+            padding : 1rem;
+        }
+    }
+
+    &.slim-header {
+        .card--header {
+            height  : auto;
+            padding : rem(12px);
+
+            .title {
+                line-height : 15px;
+            }
+
+            .minor-text {
+                @extend #regular11;
+                color      : $light16;
+                margin-top : 5px;
+            }
+        }
+    }
+}
+
+

@@ -1,0 +1,32 @@
+<div class="mb-3 card menu" *ngIf="currentlyMerging">
+    <div class="card-body" *ngIf="isMaster && system.isMine">
+        <div class="position-relative">
+            <nx-pre-loader [type]="'small'"></nx-pre-loader>
+        </div>
+        <br>
+        <div *ngIf="mergeTargetSystem.name" >
+            <div><strong>{{mergeTargetSystem.name}}</strong>
+                is being merged to this system</div>
+            <hr />
+            <div class="merge-info-text light-text" translate>Depending of the size of the database it may take up to several hours.</div>
+        </div>
+        <div *ngIf="!mergeTargetSystem.name" translate>Finishing systems merge</div>
+    </div>
+    <div class="card-body" *ngIf="!isMaster || !system.isMine">
+        <div class="position-relative">
+            <nx-pre-loader [type]="'small'"></nx-pre-loader>
+        </div>
+        <br>
+        <div *ngIf="mergeTargetSystem.name">
+            <div>This system is being merged to
+                <strong>{{mergeTargetSystem.name}}</strong></div>
+            <hr />
+            <div class="merge-info-text light-text">
+                <p translate>Depending of the size of the database it may take up to several hours.</p>
+                <p translate>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
+                <p [innerHTML]=" 'WHEN_MERGE_FINISHES' | translate: { targetSystemName: mergeTargetSystem.name }"></p>
+            </div>
+        </div>
+        <div *ngIf="!mergeTargetSystem.name" translate="">Finishing systems merge</div>
+    </div>
+</div>

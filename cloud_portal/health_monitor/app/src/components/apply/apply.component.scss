@@ -1,0 +1,15 @@
+@import '../../../styles/theme_palette';
+
+.placeholder-text {
+    color  : $light13;
+    
+    &-no-changes {
+        height: 32px;
+        display : flex;
+    }
+}
+
+.warning-text {
+    color : $red-l2;
+}
+

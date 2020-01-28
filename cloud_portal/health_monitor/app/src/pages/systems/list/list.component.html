@@ -1,0 +1,47 @@
+<nx-pre-loader type="page" *ngIf="!systems"></nx-pre-loader>
+
+<div class="container auth-visible" *ngIf="systems">
+
+    <nx-no-systems *ngIf="!systems.length"></nx-no-systems>
+
+    <div class="search-block row border-bottom" *ngIf="showSearch && systems.length">
+        <div class="col-sm-9 col-md-8 col-lg-6 input-overlay">
+            <span class="form-control-static input-overlay-left"><span class="glyphicon glyphicon-search"></span></span>
+            <a href="" *ngIf="search.value" (click)="search.value=''"
+               class="form-control-static input-overlay-right"><span class="glyphicon glyphicon-remove"></span></a>
+            <input type="text"
+                   class="form-control"
+                   [ngModel]="search.value"
+                   (ngModelChange)="setSearch($event)"
+                   placeholder="Search">
+        </div>
+    </div>
+
+    <div *ngIf="systems.length">
+        <h1 class="p-0 mb-3 mt-3">{{search.value && filteredSystems.length}}&nbsp;<span
+                translate>Systems</span>&nbsp;{{search.value && 'found'}}</h1>
+        <div class="row">
+            <div *ngFor="let system of filteredSystems; trackBy: trackItem"
+                 class="col-sm-12 col-md-6 col-lg-4 col-xl-3 mb-3 mb-lg-0 system-button">
+                <div class="card card-condensed hoverable">
+                    <div class="card-body" (click)="openSystem(system)">
+                        <h2 class="d-block" [innerHTML]="system.name | highlight:search.value"></h2>
+                        <span class="user-name"
+                              [innerHTML]="getSystemOwnerName(system, userEmail) | highlight:search.value"></span>
+
+                        <nx-tag style="display: block; margin-top: 24px;"
+                              type="{{CONFIG.systemStatuses[system.stateOfHealth].style || CONFIG.systemStatuses.default.style}}"
+                              *ngIf="system.stateOfHealth != CONFIG.systemStatuses.onlineStatus && LANG.systemStatuses">
+                            {{LANG.systemStatuses[system.stateOfHealth] || system.stateOfHealth | highlight:search.value}}
+                        </nx-tag>
+                        <nx-client-button [system]="system"
+                                          [actionType]="(system) ? 'default' : 'primary'"
+                                          *ngIf="LANG.system && system.stateOfHealth == CONFIG.systemStatuses.onlineStatus"></nx-client-button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nx-footer></nx-footer>
+</div>

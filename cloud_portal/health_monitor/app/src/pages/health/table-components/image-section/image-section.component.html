@@ -1,0 +1,32 @@
+<div *ngIf="thumbnails.length" class="hm-camera-section" #imageWidth>
+    <nx-pre-loader *ngIf="!ready" [type]="'hm-camera-preview'" class="w-100"></nx-pre-loader>
+    <div [ngClass]="{ 'd-none': !ready}" class="align-self-start">
+        <div class="d-flex flex-wrap">
+            <div class="mr-3 mb-2">
+                <nx-health-image (loaded)="thumbnails[0].loaded = $event; showPreloader();"
+                                 [state]="state"
+                                 [time]="thumbnails[0].time | NxHealthDate: 'MM/dd/yyyy, HH:mm'"
+                                 [isPrimary]="true"
+                                 [url]="thumbnails[0].url"></nx-health-image>
+            </div>
+            <div *ngIf="thumbnails.length > 1" class="d-flex flex-wrap" [ngClass]="{'flex-column': !changeRow, 'flex-row': changeRow}">
+                <div *ngFor="let thumbnail of thumbnails.slice(1, 3)"
+                     class="mr-3 align-self-start">
+                    <nx-health-image (loaded)="thumbnail.loaded = $event; showPreloader();"
+                                     [state]="state"
+                                     [time]="thumbnail.time | NxHealthDate: 'MM/dd/yyyy, HH:mm'"
+                                     [url]="thumbnail.url"></nx-health-image>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="thumbnails.length > 3" class="d-flex flex-wrap">
+            <div *ngFor="let thumbnail of thumbnails.slice(3)"
+                 class="mr-3 align-self-start">
+                <nx-health-image (loaded)="thumbnail.loaded = $event; showPreloader();"
+                                 [state]="state"
+                                 [time]="thumbnail.time | NxHealthDate: 'MM/dd/yyyy, HH:mm'"
+                                 [url]="thumbnail.url"></nx-health-image>
+            </div>
+        </div>
+    </div>
+</div>

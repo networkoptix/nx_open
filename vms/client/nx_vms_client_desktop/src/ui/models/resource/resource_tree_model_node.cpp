@@ -73,10 +73,12 @@ bool nodeRequiresChildren(
                     const auto accessibleVia =
                         accessProvider->accessibleVia(accessController->user(), node->resource());
 
-                    const bool isDirectlyShared =
-                        accessibleVia == QnAbstractResourceAccessProvider::Source::shared;
+                    using Source = QnAbstractResourceAccessProvider::Source;
+                    const bool isNotImplicitAccess =
+                        accessibleVia != Source::implicitMonitorAccess
+                        && accessibleVia != Source::none;
 
-                    return !isDirectlyShared;
+                    return !isNotImplicitAccess;
                 }
             }
             return false;

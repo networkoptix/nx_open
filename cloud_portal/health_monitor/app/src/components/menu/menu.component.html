@@ -1,0 +1,52 @@
+
+<div class="nx-menu">
+    <div *ngFor="let item of content.level1" class="level-1-container" [class.selected]="selectedLevel1 == item.id">
+        <nx-level-1-item [item]="item"
+                         [base]="content.base"
+                         [selected]="selectedLevel1 == item.id"
+                         *ngIf="item.id">
+        </nx-level-1-item>
+
+        <div *ngIf="selectedLevel1 == item.id">
+            <div class="container-buttons"
+                 *ngIf="subLevelButtonsFor(item).length">
+                <nx-menu-button
+                    *ngFor="let button of subLevelButtonsFor(item)"
+                    [button]="button"></nx-menu-button>
+            </div>
+
+            <div *ngFor="let subitem of subLevelItemsFor(item); last as isLast; trackBy: trackItem">
+                <nx-level-2-item [item]="subitem"
+                                 [ngClass]="{ 'last-level-2': isLast }"
+                                 [base]="content.base"
+                                 [selected]="selectedLevel2 == subitem.id">
+                </nx-level-2-item>
+
+                <div class="level-3-items">
+                    <div *ngFor="let details of subitem.level3; trackBy: trackItem">
+                        <nx-level-3-item [item]="details"
+                                         [base]="content.base"
+                                         [selected]="selectedLevel3 == details.id">
+                        </nx-level-3-item>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="level-3-items" *ngIf="selectedLevel1 == item.id && item.level3" [ngClass]="{'min-height-level-3': item.level3 && item.level3.length > 4}">
+            <div class="top-shadow"></div>
+            <div class="scroll-area">
+                <div *ngFor="let details of item.level3; last as isLast; first as isFirst; trackBy: trackItem">
+                    <nx-level-3-item [item]="details"
+                                     [ngClass]="{ 'last-level-3': isLast }"
+                                     [base]="content.base"
+                                     [first]="isFirst"
+                                     [selected]="selectedLevel3 == details.id">
+                    </nx-level-3-item>
+                </div>
+                <div class="bottom-shadow-cover"></div>
+            </div>
+            <div class="bottom-shadow"></div>
+        </div>
+    </div>
+</div>

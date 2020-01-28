@@ -34,6 +34,33 @@ echo "Build webadmin" >&2
 npm run build
 mv dist static
 
+FRONT_END_HM="$SOURCE_DIR/../cloud_portal/health_monitor"
+# Check if health monitor exists.
+if [[ -e "$FRONT_END_HM/webpack.health_monitor.js" ]]
+then
+    # Build Health Monitor
+    echo "Building Health Monitor"
+    FRONT_END="../front_end_health_monitor"
+
+    [ -d $FRONT_END ] && rm -rf $FRONT_END
+    mkdir -p $FRONT_END
+
+    echo "Copying health monitor sources to $FRONT_END"
+    cp -r $FRONT_END_HM/{app,health_monitor,webpack.health_monitor*,package.json,ts*} $FRONT_END
+
+    echo "Building Health Monitor"
+    pushd $FRONT_END
+    npm install
+    npm run build
+
+    mv dist/index.html dist/health.html
+    popd
+
+    echo "COPY front end to dist"
+    cp -r $FRONT_END/dist/{app.component.scss,fonts,icons,images,health.html,scripts,scripts,styles,language_compiled.json} static
+    echo "Done with HM"
+fi
+
 # Make translations
 echo "Create translations" >&2
 pushd translation
@@ -42,15 +69,17 @@ popd
 
 # Save the repository info.
 echo "Create version.txt" >&2
-if [ -d "$SOURCE_DIR/../.hg" ]; then
-    hg log -r . --repository "$SOURCE_DIR/.." > static/version.txt
-elif [ -d "$SOURCE_DIR/../.git" ]; then
+
+REP_ROOT_DIR="$SOURCE_DIR/.."
+if [ -d "$REP_ROOT_DIR/.hg" ]; then
+    hg log -r . --repository "$REP_ROOT_DIR" > static/version.txt
+elif [ -d "$REP_ROOT_DIR/.git" ]; then
     format="changeset: %H%nrefs: %D%nparents: %P%nauthor: %aN <%aE>%ndate: %ad%nsummary: %s"
-    git -C "$SOURCE_DIR/.." show -s --format="$format" > static/version.txt
+    git -C "$REP_ROOT_DIR" show -s --format="$format" > static/version.txt
 else
-    echo "Error: Used VCS is not detected. Building without repository is not supported." >&2
-    exit 1
+    echo "Neither git nor hg has been detected in $REP_ROOT_DIR" && exit 1
 fi
+
 cat static/version.txt >&2
 
 #Pack

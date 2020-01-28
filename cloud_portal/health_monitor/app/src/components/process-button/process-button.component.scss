@@ -1,0 +1,116 @@
+@import '../../../styles/native-theme/theme_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/custom/custom_palette';
+@import '../../../styles/theme_variables';
+@import '../../styles/mixins';
+
+nx-process-button {
+    @include keyframe(bubblingG) {
+        0% {
+            opacity:1;
+    	}
+
+    	77% {
+    	    opacity:0;
+    	}
+
+    	100% {
+    	    opacity:0;
+    	}
+    }
+    
+    .process-button {
+        height : 32px; // IE11 cannot calculate it :(
+        display  : inline-block;
+        position : relative;
+        
+        .btn + .btn {
+            margin-left : 0; /* Overwrite for modal-footer bootstrap style */
+        }
+        
+        .processing {
+            visibility : hidden;
+        }
+        
+        .loading {
+            width          : 100%;
+            height         : 100%;
+            position       : absolute;
+            
+            text-align     : center;
+            vertical-align : middle;
+            overflow       : hidden;
+            
+            margin         : auto;
+            padding-right  : 0;
+            padding-left   : 0;
+            
+            div {
+                margin : 0 auto;
+                
+                span {
+                    display           : inline-block;
+                    width             : 8px;
+                    height            : 8px;
+                    margin            : auto 3px;
+                    background        : $brand_contrast;
+                    border-radius     : 8px;
+                    animation         : bubblingG 650ms infinite alternate;
+                    -o-animation      : bubblingG 650ms infinite alternate;
+                    -ms-animation     : bubblingG 650ms infinite alternate;
+                    -webkit-animation : bubblingG 650ms infinite alternate;
+                    -moz-animation    : bubblingG 650ms infinite alternate;
+                }
+            }
+            
+            &.btn-default span {
+                background : $light16;
+            }
+            
+            .dot1 {
+                animation-delay         : 0s;
+                -o-animation-delay      : 0s;
+                -ms-animation-delay     : 0s;
+                -webkit-animation-delay : 0s;
+                -moz-animation-delay    : 0s;
+            }
+            
+            .dot2 {
+                animation-delay         : 0.3s;
+                -o-animation-delay      : 0.3s;
+                -ms-animation-delay     : 0.3s;
+                -webkit-animation-delay : 0.3s;
+                -moz-animation-delay    : 0.3s;
+            }
+            
+            .dot3 {
+                animation-delay         : 0.6s;
+                -o-animation-delay      : 0.6s;
+                -ms-animation-delay     : 0.6s;
+                -webkit-animation-delay : 0.6s;
+                -moz-animation-delay    : 0.6s;
+            }
+        }
+        
+        &.dropdown-process-btn {
+            width         : 100%;
+            margin-top    : 8px;
+            margin-bottom : 12px;
+            
+            .loading {
+                max-width : calc(100% - 24px);
+                margin    : 0 12px;
+                border    : 1px solid $light6;
+            }
+            
+            button {
+                min-width   : calc(100% - 24px);
+                border      : 1px solid $light6;
+                height      : 28px;
+                font-size   : $font-size-base;
+                margin      : 0 12px !important;
+                white-space : nowrap;
+            }
+        }
+    }
+}

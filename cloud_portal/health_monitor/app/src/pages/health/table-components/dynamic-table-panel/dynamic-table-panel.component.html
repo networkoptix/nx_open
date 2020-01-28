@@ -1,0 +1,49 @@
+<div class="panel col-12"
+     *ngIf="activeEntity" #nxPanelView>
+    <nx-block type='gray' header-class="sticky1rem">
+        <header>
+            <div class="panel-title">
+                <span [innerText]="name"></span>
+            </div>
+            <span class="glyphicon close-icon detailsClose"
+                  (click)="closeView()">
+            </span>
+        </header>
+        <ng-container *ngIf="panelParams.id === 'cameras' && !healthService.importedData">
+            <nx-image-section [cameraInfo]="activeEntity"></nx-image-section>
+        </ng-container>
+        <nx-section>
+            <ng-container *ngFor="let paramGroup of panelParams.values">
+                <div *ngIf="paramGroup.id !== '_'" class="pb-3">
+                    <h4 *ngIf="paramGroup.values.length">{{paramGroup.name}}</h4>
+                    <div class="row nx-panel-row align-items-end" *ngFor="let param of paramGroup.values">
+                        <div class="col-7 nx-panel">
+                            <div class="row-title">
+                                <span>{{param.description || param.name || param.id}}</span>
+                            </div>
+                            <div class="row-line"></div>
+                        </div>
+                        <div class="col-5 pl-0 d-flex align-items-end"
+                             *ngIf="activeEntity[paramGroup.id] && activeEntity[paramGroup.id][param.id]; else noValue"
+                             [title]="activeEntity[paramGroup.id][param.id].tooltip">
+                            <span class="row-value"
+                                  [ngClass]="activeEntity[paramGroup.id][param.id].class"
+                                  [innerText]="[undefined, ''].indexOf(activeEntity[paramGroup.id][param.id].text) === -1
+                                  ? activeEntity[paramGroup.id][param.id].text : '−'"></span>
+                            <svg-icon *ngIf="activeEntity[paramGroup.id][param.id].icon"
+                                      [src]="CONFIG.icons.dir + activeEntity[paramGroup.id][param.id].icon + '.svg'"
+                                      [svgStyle]="{'width.px': '20', 'margin-top': '-4px', 'pointer-events': 'none'}"
+                                      style="height: 16px"
+                                      class="pl-1 mt-1 mb-1"></svg-icon>
+                        </div>
+                        <ng-template #noValue>
+                            <div class="col-5 pl-0 d-flex align-items-end">
+                                <span class="row-value">−</span>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </ng-container>
+        </nx-section>
+    </nx-block>
+</div>

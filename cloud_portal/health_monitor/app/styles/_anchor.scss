@@ -1,0 +1,11 @@
+@import 'theme_variables';
+
+a {
+    color           : $brand_core;
+    text-decoration : underline;
+    
+    &:hover {
+        color           : $brand_l1;
+        text-decoration : underline;
+    }
+}

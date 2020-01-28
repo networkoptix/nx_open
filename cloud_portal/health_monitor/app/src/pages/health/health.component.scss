@@ -1,0 +1,167 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+@import '../../styles/typography';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+nx-system-health-component {
+
+  .mainGrid {
+    display: grid;
+    grid-column-gap: 1rem;
+    grid-template-columns: $grid-menu-width $grid-content-width;
+    //border: 1px solid purple;
+    padding: 1rem;
+    height: 100%;
+
+    &.mobileLayout {
+      grid-row-gap: .5rem;
+      grid-template-rows: fit-content(100%) 1fr;
+      grid-template-columns: 100%;
+    }
+
+    &.wideLayout {
+      grid-template-columns: $grid-wide-menu-width $grid-wide-content-width;
+
+      @media (min-width : 1920px) {
+        grid-template-columns : $grid-super-wide-menu-width $grid-super-wide-content-width;
+      }
+    }
+
+    .gridMenu {
+      //border: 1px solid red;
+
+      &Component {
+        //border: 1px solid darkcyan;
+        position: sticky;
+        top: 1rem;
+      }
+    }
+
+    .gridContent {
+      //border: 1px solid green;
+
+      &Component {
+      }
+    }
+  }
+
+  @media screen and (-ms-high-contrast : active), screen and (-ms-high-contrast : none) {
+    .mainGrid {
+      display : flex;
+
+      &.mobileLayout {
+        flex-direction : column;
+
+        .gridMenu {
+          width   : 100%;
+          padding : 0;
+        }
+
+        .gridContent {
+          width : 100%;
+        }
+      }
+
+      .gridMenu {
+        width         : 25%;
+        padding-right : 1rem;
+      }
+
+      .gridContent {
+        width : 75%;
+      }
+    }
+  }
+
+
+
+  .error {
+    font-family: $font-family-medium;
+    color: $red_l2;
+  }
+
+  .warning {
+    font-family: $font-family-medium;
+    color: $yellow_d1;
+  }
+
+  .fixed-sidebar {
+    hr {
+      width: 100%;
+    }
+
+    @include media-breakpoint-down(sm) {
+      height: auto !important;
+    }
+
+    // replicate col-lg-3
+    @include media-breakpoint-up(lg) {
+      position: fixed;
+      left: 0;
+      width: calc((100% - (#{$grid-gutter-width} + #{$scrollbar-height})) / 12 * 3)
+    }
+
+    // replicate col-xl-2
+    @include media-breakpoint-up(xl) {
+      width: calc((100% - (#{$grid-gutter-width} + #{$scrollbar-height})) / 12 * 2);
+    }
+  }
+
+  .menuLinks {
+    div {
+      height: 20px;
+      display: block;
+    }
+
+    a {
+      svg-icon {
+        padding-right: 2px;
+
+        svg {
+          cursor: pointer;
+          margin-top: -2px;
+        }
+      }
+
+      svg * {
+        fill: $light16;
+      }
+
+      &:hover svg * {
+        fill: $dark15;
+      }
+
+      &:focus, &:active {
+        svg * {
+          fill: $light16;
+        }
+      }
+    }
+  }
+
+  .importZone {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+  }
+
+  .pointer-ignore {
+    pointer-events: none;
+  }
+
+  .contentZone {
+    @extend #light14;
+    text-align : center;
+  }
+
+  .importInfo {
+    p {
+      @extend #light13;
+    }
+  }
+}

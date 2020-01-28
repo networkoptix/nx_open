@@ -1,0 +1,62 @@
+<div class="dropdown"
+     [ngClass]="{'show': show}"
+     (nxClickElsewhere)="show = false">
+
+    <button class="inset btn-dropdown-toggle dropdown-toggle-transparent dropdown-toggle"
+            (click)="show = !show"
+            type="button" id="systemsDropdown" data-toggle="dropdown">
+
+        <div class="popup arrow up" [ngClass]="{'center' : !activeSystem}"></div>
+
+        <span [ngClass]="{'nx-d-sm-none':!activeSystem}" class="glyphicon glyphicon-home"></span>
+        <span *ngIf="activeSystem" class="ellipsis">{{activeSystem.name}}</span>
+        <span *ngIf="!activeSystem" class="d-none"
+              [ngClass]="{'nx-d-sm-block':!activeSystem}">{{systemCounter}}&nbsp;<span translate>Systems</span></span>
+        <div class="nav-arrow">
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    <div class="dropdown-menu" [nxArrowNav]="show"
+        [style.display]="show ? 'inline-block' : 'none'"
+        aria-labelledby="systemsDropdown">
+
+        <ul class="dropdown-menu--list">
+            <li *ngIf="activeSystem" class="dropdown-item-container">
+                <div class="d-flex">
+                    <nx-client-button class="w-100"
+                                      customClass="dropdown-process-btn"
+                                      actionType="clear"
+                                      [system]="activeSystem"
+                    ></nx-client-button>
+                </div>
+            </li>
+            <ng-container *ngIf="systems.length > 1">
+                <li class="dropdown-item-container" *ngFor="let system of systems; trackBy: trackItem">
+                    <a class="dropdown-item inset"
+                       [ngClass]="{ 'selected': system == activeSystem }"
+                       (click)="updateURI(system.id)"
+                    >
+                    <span>
+                        <span class="glyphicon glyphicon-home"></span>
+                        <span class="system-name">{{system.name}}</span>
+                        <span class="system-owner">&nbsp;&mdash;&nbsp;{{system.ownerFullName}}</span>
+                    </span>
+                    </a>
+                </li>
+            </ng-container>
+        </ul>
+        <ul class="dropdown-menu--footer" *ngIf="systems.length > 1">
+            <li role="separator" class="dropdown-divider"></li>
+
+            <li class="dropdown-item-container">
+                <a class="dropdown-item inset"
+                   href="/systems"
+                   (click)="show = false; return;">
+                    <span translate>All Systems</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+

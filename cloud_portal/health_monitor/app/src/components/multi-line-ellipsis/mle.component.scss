@@ -1,0 +1,72 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+$brand-white : rgba(255, 255, 255, 1);
+$brand-dark : rgba(84, 88, 90, 1);
+
+.ellipsis {
+    
+    overflow   : hidden;
+    margin-top : 1rem;
+    // these are set in the controller
+    //height      : 75px;
+    //line-height : 25px;
+    
+    &-before {
+        content : "";
+        float   : left;
+        width   : 5px;
+        // this is set in the controller
+        //height  : 75px;
+    }
+    
+    &-after {
+        -webkit-box-sizing : content-box;
+        -moz-box-sizing    : content-box;
+        box-sizing         : content-box;
+        
+        float              : right;
+        position           : relative;
+        // this is set in the controller
+        //top                : -25px;
+        // *****************************
+        left               : 100%;
+        width              : 5em;
+        margin-left        : -5em;
+        padding-right      : 5px;
+        
+        text-align         : right;
+        font-size          : inherit;
+        font-family        : inherit;
+        font-weight        : bold;
+        
+        cursor             : pointer;
+        
+        background         : -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), to($brand-white), color-stop(40%, $brand-white));
+        background         : -moz-linear-gradient(to right, rgba(255, 255, 255, 0), $brand-white 40%, $brand-white);
+        background         : -o-linear-gradient(to right, rgba(255, 255, 255, 0), $brand-white 40%, $brand-white);
+        background         : -ms-linear-gradient(to right, rgba(255, 255, 255, 0), $brand-white 40%, $brand-white);
+        background         : linear-gradient(to right, rgba(255, 255, 255, 0), $brand-white 40%, $brand-white);
+        
+        // if different is needed for different screen sizes
+        //@include respond-to(xs) {
+        //	background : -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), to($brand-dark), color-stop(40%, $brand-dark));
+        //	background : -moz-linear-gradient(to right, rgba(255, 255, 255, 0), $brand-dark 40%, $brand-dark);
+        //	background : -o-linear-gradient(to right, rgba(255, 255, 255, 0), $brand-dark 40%, $brand-dark);
+        //	background : -ms-linear-gradient(to right, rgba(255, 255, 255, 0), white 40%, $brand-dark);
+        //	background : linear-gradient(to right, rgba(255, 255, 255, 0), $brand-dark 40%, $brand-dark)
+        //}
+    }
+    
+    &-body {
+        float       : right;
+        width       : 100%;
+        margin-left : -5px;
+        font-size   : inherit;
+        font-family : inherit;
+    }
+    
+}
+
+
+

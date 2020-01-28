@@ -1,0 +1,50 @@
+@import '../../../../styles/custom/custom_palette';
+@import '../../../../styles/theme_palette';
+@import '../../../../styles/theme_variables';
+@import '../../../styles/typography';
+
+$item_height : 40px;
+
+.menu-level-1 {
+    @extend #medium15;
+    position         : relative;
+    line-height      : $item_height;
+    background-color : $additional_light2;
+    display          : block;
+    text-decoration  : none;
+    padding-left     : $item_height;
+    padding-right    : .5rem;
+    border-radius    : 2px;
+
+    &:hover {
+        background-color : $additional_light3;
+    }
+
+    &:active {
+        background-color : $light5;
+    }
+
+    &-icon {
+        position        : absolute;
+        left            : 0;
+        display         : flex;
+        align-items     : center;
+        justify-content : center;
+        width           : $item_height;
+        height          : $item_height;
+        line-height     : initial;
+    }
+
+    &.selected {
+        background-color : $light5;
+    }
+
+    &-alerts {
+        position        : absolute;
+        right           : 0;
+        top             : 0;
+        display         : flex;
+        align-items     : center;
+        justify-content : center;
+    }
+}

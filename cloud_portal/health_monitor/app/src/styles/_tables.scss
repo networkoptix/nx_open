@@ -1,0 +1,119 @@
+@import '../../styles/native-theme/theme_palette';
+@import '../../styles/custom/custom_palette';
+@import '../../styles/theme_palette';
+@import '../../styles/theme_variables';
+@import 'typography';
+
+.nx-table {
+    table-layout  : auto;
+    white-space   : nowrap;
+    margin-bottom : 0;
+
+    thead {
+        background-color : $additional_light1;
+        border-bottom    : 1px solid $light3;
+
+        th {
+            @extend #medium13;
+            //display        : inline-block;
+            white-space    : normal;
+            padding        : .5rem 0;
+            font-weight    : 500 !important;
+            text-transform : none;
+            overflow-wrap  : break-word;
+            cursor         : pointer;
+            border         : none;
+
+            &:first-of-type {
+                padding-left : .5rem;
+            }
+
+            &.table-title {
+                @extend #regular24;
+
+                .text-placeholder {
+                    font-size : 1.25rem;
+                    color     : $light16;
+                }
+            }
+
+            .caption {
+                position : relative;
+                height   : 2rem;
+
+                .sort-dir {
+                    top: 0;
+                    right    : auto;
+                    position : relative;
+                    bottom   : 0;
+
+                    &:after {
+                        content : ' ';
+                    }
+
+                    &.asc {
+                        &:after {
+                            content : '+';
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    tbody {
+        background-color: $light1;
+
+        tr {
+            //display: block;
+            height : rem(24px);
+
+            &:hover {
+                color      : $dark9;
+                background : transparentize($brand_core, 0.9);
+            }
+
+            &.spacer {
+                height           : .5rem;
+                background-color : white;
+            }
+
+            td {
+                @extend #regular13;
+                display        : table-cell;
+                vertical-align : middle;
+                padding        : rem(4px) 1rem rem(4px) 0;
+                line-height    : 1rem;
+                border         : none;
+
+                &:first-of-type {
+                    padding-left : .5rem;
+                }
+            }
+        }
+    }
+
+    &-header {
+        @extend #regular13;
+        padding          : 0.5rem 1rem;
+        background-color : $additional_light1;
+        border           : 1px solid $light3;
+        border-bottom    : none;
+        line-height      : 16px;
+        text-transform   : none;
+        overflow-wrap    : break-word;
+
+        .results {
+            @extend #medium13;
+            font-weight : 500 !important;
+            line-height : 16px;
+        }
+    }
+}
+
+.table-wrapper {
+      overflow-x       : auto;
+      box-shadow       : none;
+      border           : 1px solid $light4;
+      background-color : $light1;
+    }

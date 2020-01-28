@@ -1,0 +1,13 @@
+<div class="pt-3 placeholder-text" *ngIf="applyVisible">
+    <div *ngIf="show && warn" class="warning-text pb-3">{{ warn }}</div>
+    <div *ngIf="show; else noChanges" class="d-flex">
+        <nx-process-button [process]="save"
+                           [actionType]="'primary min-w-120'"
+                           [form]="form"
+                           buttonText="{{ 'Save' | translate }}"></nx-process-button>
+        <button type="button" class="min-w-80 btn btn-default ml-2" (click)="discard()" translate>Cancel</button>
+    </div>
+    <ng-template #noChanges>
+        <div class="placeholder-text-no-changes" translate>No unsaved changes</div>
+    </ng-template>
+</div>

@@ -1,0 +1,26 @@
+@import '../variables';
+
+nx-multi-select {
+    width   : 100%;
+    display : block;
+    
+    label {
+        display : block;
+    }
+    
+    .dropdown-menu {
+        
+        overflow : auto;
+        
+        &--list {
+            max-height : $dropdown-multi-list-height !important;
+            margin     : 0;
+            margin-top : 4px;
+            overflow   : unset !important;
+        }
+        
+        .dropdown-item--non-checkbox {
+            padding-left : 12px !important;
+        }
+    }
+}
