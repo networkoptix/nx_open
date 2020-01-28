@@ -690,6 +690,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "http://licensing.vmsproxy.com", //< Licensing server does not support https.
         this);
 
+    m_resourceFileUriAdaptor =
+        new QnLexicalResourcePropertyAdaptor<nx::utils::Url>("resourceFileUri", "", this);
+
     m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxEventLogRecords",
         100 * 1000, //< Default value.
@@ -881,6 +884,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         &QnGlobalSettings::downloaderPeersChanged,
         Qt::QueuedConnection);
 
+    connect(
+        m_resourceFileUriAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::resourceFileUriChanged,
+        Qt::QueuedConnection);
+
     AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -925,6 +935,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_downloaderPeersAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
         << m_licenseServerUrlAdaptor
+        << m_resourceFileUriAdaptor
         << m_maxWebMTranscoders
         << m_maxEventLogRecordsAdaptor
         << m_forceLiveCacheForPrimaryStreamAdaptor
@@ -1751,6 +1762,16 @@ void QnGlobalSettings::setLicenseServerUrl(const QString& value)
 QString QnGlobalSettings::licenseServerUrl() const
 {
     return m_licenseServerUrlAdaptor->value();
+}
+
+void QnGlobalSettings::setResourceFileUri(const nx::utils::Url& value)
+{
+    m_resourceFileUriAdaptor->setValue(value);
+}
+
+nx::utils::Url QnGlobalSettings::resourceFileUri() const
+{
+    return m_resourceFileUriAdaptor->value();
 }
 
 void QnGlobalSettings::setLowQualityScreenVideoCodec(const QString& value)

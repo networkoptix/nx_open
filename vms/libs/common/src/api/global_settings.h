@@ -16,6 +16,7 @@
 #include <utils/common/optional.h>
 
 #include <nx/utils/singleton.h>
+#include <nx/utils/url.h>
 
 class QnAbstractResourcePropertyAdaptor;
 
@@ -386,6 +387,9 @@ public:
     QString licenseServerUrl() const;
     void setLicenseServerUrl(const QString& value);
 
+    nx::utils::Url resourceFileUri() const;
+    void setResourceFileUri(const nx::utils::Url& value);
+
 signals:
     void initialized();
 
@@ -420,6 +424,7 @@ signals:
     void downloaderPeersChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
+    void resourceFileUriChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -547,6 +552,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 
