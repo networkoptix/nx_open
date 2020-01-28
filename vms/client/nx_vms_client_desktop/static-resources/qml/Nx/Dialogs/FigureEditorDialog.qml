@@ -15,7 +15,7 @@ Window
 {
     id: dialog
 
-    modality: Qt.WindowModal
+    modality: Qt.ApplicationModal
 
     width: 600
     height: 400
