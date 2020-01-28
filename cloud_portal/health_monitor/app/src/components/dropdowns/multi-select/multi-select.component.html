@@ -1,0 +1,58 @@
+<div class="dropdown"
+     [ngClass]="{'show': show}"
+     (nxClickElsewhere)="show = false">
+
+    <button class="btn btn-dropdown-toggle dropdown-toggle"
+            (click)="show = !show"
+            type="button" data-toggle="dropdown">
+
+        <span [innerHtml]="textSelected" class="ellipsis d-contents d-md-block"></span>
+        <div class="nav-arrow">
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    <div class="dropdown-menu" [nxArrowNav]="show"
+         [style.display]="show ? 'inline-block' : 'none'"
+         aria-labelledby="multiSelect">
+
+        <ul class="dropdown-menu--header" *ngIf="canSearch">
+            <li class="dropdown-item-container">
+                <span class="glyphicon glyphicon-search icon-search"></span>
+                <input id="localFilter"
+                       class="form-control search-input inset"
+                       autocomplete="off"
+                       placeholder="Search"
+                       [ngModel]="filter"
+                       [ngModelOptions]="{debounceTime : 500}"
+                       (ngModelChange)="applyLocalFilter($event)">
+                <span class="glyphicon close-icon search-clear"
+                      [hidden]="filter == ''" (click)="applyLocalFilter('')"></span>
+            </li>
+            <li role="separator" class="dropdown-divider"></li>
+        </ul>
+
+        <ul class="dropdown-menu--header" *ngIf="canSelectAll">
+            <li class="dropdown-item-container">
+                <a class="dropdown-item dropdown-item--non-checkbox inset"
+                   (click)="clearSelected(); show = false;"
+                   href translate>Any</a>
+            </li>
+            <li role="separator" class="dropdown-divider"></li>
+        </ul>
+
+        <ul class="dropdown-menu--list">
+            <li class="dropdown-item-container" *ngFor="let item of items; trackBy: trackItem">
+                <div class="dropdown-item inset">
+                    <nx-checkbox
+                            [componentId]="item.id"
+                            [checked]="item.selected"
+                            (click)="change($event, item)">
+                    </nx-checkbox>
+
+                    <label class="ellipsis" [htmlFor]="item.id">{{item.label.name || item.label}}</label>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,157 @@
+@import '../../../../styles/theme_palette';
+@import '../../../../styles/theme_variables';
+@import '../../../styles/typography';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+nx-system-alerts-component {
+
+    .gridMetricContent {
+        display: grid;
+        grid-column-gap: 1rem;
+        grid-template-columns: fit-content(100%) $grid-panel-width; // <- if table is less than 70% of screen width
+        height: 100%;
+
+        @include media-breakpoint-down(xl) {
+            grid-template-columns: $grid-narrow-table-width $grid-narrow-panel-width;
+        }
+
+        @media (min-width: 1920px) {
+            grid-template-columns: fit-content(100%) $grid-super-wide-panel-width;
+        }
+
+        // if table is more than 70% of screen width
+        &.fixedLayout {
+            &--with-panel {
+                grid-template-columns: $grid-table-width $grid-panel-width;
+
+                @include media-breakpoint-down(xl) {
+                    grid-template-columns: $grid-narrow-table-width $grid-narrow-panel-width;
+                }
+
+                @media (min-width: 1920px) {
+                    grid-template-columns: $grid-super-wide-table-width $grid-super-wide-panel-width;
+                }
+            }
+
+            &--no-panel {
+                grid-template-columns: 100%;
+            }
+        }
+
+        &Component {
+            &Wrapper {
+                position: sticky;
+                top: 1rem;
+            }
+        }
+
+        &PanelComponent {
+            &Wrapper {
+                .all-results-btn {
+                    position: sticky;
+                    top: -2rem;
+                    box-shadow: 0 1rem 0 2px $additional_light2;
+                    z-index: 99;
+                }
+            }
+        }
+    }
+
+    @media screen and (-ms-high-contrast : active), screen and (-ms-high-contrast : none) {
+        .gridMetricContent {
+            display : flex;
+
+            &.fixedLayout {
+                &--with-panel {
+                    .gridMetricContentComponent {
+                        width         : 70%;
+                        padding-right : 1rem;
+
+                        @include media-breakpoint-down(xxl) {
+                            width : 55%;
+                        }
+                    }
+
+                    .gridMetricContentPanelComponent {
+                        width : 30%;
+
+                        @include media-breakpoint-down(lg) {
+                            width : 100%;
+                        }
+                    }
+                }
+
+                &--no-panel {
+                    .gridMetricContentComponent, .gridMetricContentPanelComponent {
+                        width : 100%;
+                    }
+                }
+            }
+        }
+    }
+
+    .card-container {
+        min-width: 135px;
+        max-width: 165px;
+        @include media-breakpoint-down(lg) {
+            min-width: 165px;
+        }
+        // If grid-breakpoint sm is used at a width of 567px the bottom card takes entire row
+        @media (max-width: 566px) {
+            flex-grow: 1;
+            max-width: unset;
+        }
+    }
+
+    .data-wrapper {
+        @include media-breakpoint-down(md) {
+            width: 100%;
+        }
+
+        @media (min-width: 1280px) {
+            min-width: 702px !important;
+        }
+
+        @media (min-width: 1440px) {
+            min-width: 802px !important;
+        }
+
+        @media (min-width: 1920px) {
+            min-width: 900px !important;
+        }
+    }
+
+    .nx-search .drop-container {
+        .drop {
+            max-width : none;
+            flex-grow : 1;
+
+            @include media-breakpoint-down(lg) {
+                min-width : 100px;
+                padding-right: 0;
+            }
+
+            @include media-breakpoint-down(xl) {
+                min-width     : 100px;
+            }
+
+            // "Clear" button
+            &:last-of-type {
+                .btn-text {
+                    @extend #light15;
+                    float         : right !important;
+                    padding-right : 2px; // align visually - table border create a illusion that button text is not aligned
+                }
+            }
+
+            &.large {
+                min-width : 300px;
+                flex-grow : 2;
+
+                @include media-breakpoint-down(xl) {
+                    min-width : 160px;
+                }
+            }
+        }
+    }
+}

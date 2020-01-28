@@ -1,0 +1,72 @@
+<nx-page-placeholder *ngIf="!healthService.ready && !hasServerError && !outdatedVersion"
+                     [condition]="systemReady && system && !system.isOnline"
+                     type="OFFLINE"
+                     preloader="true"
+                     class="page-placeholder">
+</nx-page-placeholder>
+
+<nx-page-placeholder *ngIf="hasServerError"
+                     type="500"
+                     class="page-placeholder">
+</nx-page-placeholder>
+
+<nx-page-placeholder *ngIf="outdatedVersion"
+                     type="NEW_VERSION"
+                     class="page-placeholder">
+</nx-page-placeholder>
+
+<ng-template #healthLinks>
+    <hr class="mt-1"/>
+    <div class="menuLinks px-2">
+        <nx-health-update *ngIf="!importedData.imported" (updateHealth)="updateValues()"></nx-health-update>
+        <div *ngIf="deviceService.isDesktop()" class="mb-3 mt-2">
+            <a href="#" class="btn-text" (click)="exportReport()">
+                <svg-icon [src]="CONFIG.icons.dir + 'download.svg'"
+                          [svgStyle]="{'width.px': '20'}"></svg-icon>Download Full Report</a>
+        </div>
+        <div *ngIf="importedData.imported" class="importInfo">
+            <p>System: {{importedData.system}}</p>
+            <p>Generated: {{importedData.time}}</p>
+        </div>
+    </div>
+    <div class="mt-3 px-2">
+        <p *ngIf="importShow" class="contentZone">Drop report anywhere to import</p>
+    </div>
+</ng-template>
+
+
+<div class="mainGrid"
+     [ngClass]="mediaLayoutClass"
+     *ngIf="healthService.ready">
+
+    <div class="gridMenu">
+        <div class="gridMenuComponent">
+            <nx-menu [content]="menu" class="pb-2 d-block"></nx-menu>
+
+            <ng-template
+                    [ngTemplateOutlet]="healthLinks"
+                    *ngIf="mediaLayoutClass != 'mobileLayout'"
+            ></ng-template>
+        </div>
+    </div>
+    <div class="gridContent">
+        <div class="gridContentComponent">
+            <router-outlet></router-outlet>
+
+            <ng-template
+                    [ngTemplateOutlet]="healthLinks"
+                    *ngIf="mediaLayoutClass == 'mobileLayout'">
+            </ng-template>
+        </div>
+    </div>
+</div>
+
+<ngx-file-drop dropZoneClassName="importZone"
+               accept="json"
+               [directory]="false"
+               [multiple]="false"
+               [showBrowseBtn]="false"
+               (onFileLeave)="fileLeave()"
+               [ngClass]="!importShow ? 'pointer-ignore' : ''"
+               (onFileDrop)="fileDropped($event)">
+</ngx-file-drop>

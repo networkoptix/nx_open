@@ -1,0 +1,62 @@
+@import '../../../../styles/typography';
+@import '../../../../../styles/theme_palette';
+
+.system-settings {
+    .system-owner {
+        @extend #regular13;
+
+        &-bold {
+            font-family: $font-family-bold;
+        }
+    }
+
+    .system-name {
+        font-family : $font-family-medium;
+        line-height: 1.2;
+    }
+
+    
+    .placeholder {
+        @extend #placeholder;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    label {
+        cursor: pointer;
+        &.control-label {
+            color: $dark9;
+            &:hover {
+                color: $dark1;
+            }
+        }
+    }
+
+    .helper-block {
+        @extend #regular12;
+        color       : $light16;
+        margin      : 2px 0 8px 22px;
+        line-height : 16px;
+    }
+
+    .disabled-helper-block, .disabled-label {
+        opacity: 0.3;
+        cursor: default;
+    }
+
+    nx-block div.checkbox-block:last-of-type + .helper-block {
+        margin-bottom: 0;
+    }
+
+    .time-unit-input {
+        width: 70px;
+        margin-right: 8px;
+    }
+
+    .time-unit-select {
+        width: 110px;
+    }
+}

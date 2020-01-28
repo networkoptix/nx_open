@@ -1,0 +1,163 @@
+@import '../../../../../styles/theme_palette';
+@import '../../../../../styles/theme_variables';
+@import '../../../../styles/mixins';
+
+.panel {
+    padding          : 0;
+    background-color : $light4;
+    border-top       : 1px solid transparent;
+    
+    h2 {
+        font-size : 0.9375rem;
+        color     : $dark9;
+    }
+    
+    &.view-scroll-fixed-top {
+        position: fixed;
+        top: 48px + 16px; // header + padding
+    }
+    
+    &.view-scroll-fixed-bottom {
+        position: fixed;
+        bottom: 16px;
+    }
+    
+    .card {
+        margin: 0 !important;
+    }
+    
+    
+    .camview-link {
+        height : 24px;
+        padding-bottom  : 8px;
+    }
+    
+    .info-label {
+        color : $light16;
+    }
+    
+    .analytics-label {
+        line-height : 20px;
+    }
+    
+    .no-linewrap {
+        text-overflow : ellipsis;
+        overflow      : hidden;
+        white-space   : nowrap;
+    }
+    
+    table th, table td {
+        padding : 0;
+        height  : 24px;
+        width   : 50%;
+    }
+    
+    .active-camera-info {
+        & > .row {
+            display     : flex;
+            align-items : center;
+            line-height : 24px;
+            
+            & > div {
+                line-height : 24px;
+            }
+        }
+    }
+    
+    .firmware-info {
+        & > .row {
+            display     : flex;
+            align-items : center;
+            line-height : 20px;
+            
+            & > div {
+                line-height : 20px;
+            }
+        }
+    }
+    
+    header {
+        position : relative;
+        
+        .panel-title {
+            @include ellipsis;
+            width : 90%;
+        }
+        
+        .detailsClose {
+            position     : absolute;
+            top          : 2px;
+            right        : 0;
+            cursor       : pointer;
+            margin-right : 0;
+        }
+    }
+    
+    .blue {
+        color : $blue1;
+    }
+    
+    .firmware-line {
+        stroke       : $brand-primary;
+        stroke-width : 2
+    }
+    
+    .icon {
+        display     : inline-block;
+        height      : 1em; /* default icon height */
+        position    : relative;
+        user-select : none;
+        
+        .icon-canvas {
+            display    : block;
+            height     : 100%;
+            width      : 100%;
+            visibility : hidden;
+        }
+        
+        .icon-svg {
+            height   : 100%;
+            left     : 0;
+            position : absolute;
+            top      : 0;
+            width    : 100%;
+        }
+    }
+    
+    .nx-panel-row {
+        .nx-panel {
+            display : flex;
+            height  : fit-content;
+        
+            .row-title {
+                height      : fit-content;
+                width       : fit-content;
+                float       : left;
+                z-index     : 9;
+                max-width   : calc(100% - 1.5rem); // min with for line -> 16px + right padding (white space)
+                line-height : 16px;
+                margin      : 4px 0;
+            
+                span {
+                    background-color : $light4;
+                    padding-right    : 4px;
+                    word-break       : keep-all;
+                }
+            }
+        
+            .row-line {
+                border-bottom : 1px dotted $light7;
+                width         : calc(100% - 1rem);
+                position      : absolute;
+                bottom        : 6px;
+                height        : 14px;
+            }
+        }
+        
+        .row-value {
+            line-height : 16px;
+            margin      : 4px 0;
+            word-break: break-all;
+        }
+    }
+}

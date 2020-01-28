@@ -1,0 +1,83 @@
+@import '../../../styles/custom/custom_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+@import '../../styles/mixins';
+@import '../../styles/typography';
+
+.close-button {
+    border-radius: 2px;
+    display: flex;
+    justify-content : center;
+    align-items     : center;
+    height          : 32px;
+    width           : 32px;
+    cursor          : pointer;
+
+    .tag-close-icon {
+        margin : 0 !important;
+    }
+}
+
+.badge {
+    @extend #regular12;
+    color            : $light16;
+    font-weight      : 400;
+    background-color : $light4;
+    line-height      : 18px;
+    height           : 20px;
+    padding          : 0 8px;
+    border-radius    : 2px;
+
+    &.large {
+        @extend #regular13;
+        height      : 2rem !important;
+        line-height : 2rem !important;
+        padding     : 0 12px;
+    }
+}
+
+.badge {
+    &.btn {
+        cursor : pointer !important;
+
+        &:hover {
+            background-color : $light5;
+        }
+
+        &:active {
+            background-color : $light6;
+        }
+    }
+}
+
+.badge-selected {
+    @extend #regular13;
+    @include badge-selected($light16, $light17, $light18);
+    cursor : default !important;
+}
+
+.badge-brand-selected {
+    @extend #regular13;
+    @include badge-selected($brand_core, $brand_d1, $brand_d2);
+    cursor : default !important;
+}
+
+$nx-theme-colors :
+    "brand" $brand_core $light1,
+    "default" $light8 $light1,
+    "success" $brand-success $light1,
+    "info" $brand-info $light1,
+    "warning" $brand-warning $light1,
+    "danger" $brand-danger $light1;
+
+@each $name, $bg-color, $fg-color in $nx-theme-colors {
+    .badge-#{$name} {
+        @extend .badge;
+        background-color : $bg-color !important;
+        color: $fg-color !important;
+    }
+    .badge-#{$name}-selected {
+        color: $light1 !important;
+        @include badge-selected($bg-color, darken($bg-color, 10%), darken($bg-color, 15%));
+    }
+}

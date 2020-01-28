@@ -1,0 +1,13 @@
+<div class="position-relative">
+    <label class="switch" [ngClass]="{'disabled': disabled}">
+        <input type="checkbox"
+               [ngClass]="{'selected' : value}"
+               [id]="componentId"
+               [attr.checked]="value ? '': null"
+               [attr.disabled]="disabled ? '' : null"
+               (click)="changeState($event)">
+        <span class="slider round"></span>
+    </label>
+    <span class="bar">&#9475;</span>
+    <span class="circle">&#9675;</span>
+</div>

@@ -1,0 +1,9 @@
+<div class="card">
+    <div class="card-header no-wrap">{{data.name}}</div>
+    <div class="card-body">
+        <div *ngFor="let alert of data.alerts" class="d-flex justify-content-between h-24" [ngClass]="{'muted': !alert.count}">
+            <div class="mr-2 col-1-abs">{{alert.name | titlecase}}</div>
+            <nx-alert-counter class="ml-2" [count]="alert.count" [type]="alert.level"></nx-alert-counter>
+        </div>
+    </div>
+</div>

@@ -148,6 +148,9 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'dialogs/setup.html',
             controller: 'SetupCtrl'
         })
+        .when('/health', {
+            templateUrl: Config.viewsDir + 'health_monitor.html'
+        })
         .when('/', {
             template: '',
             controller: 'MainCtrl'

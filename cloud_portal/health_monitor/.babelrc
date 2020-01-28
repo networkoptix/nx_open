@@ -1,0 +1,6 @@
+{
+	"presets": ["babel-preset-env"],
+	"ignore": [
+		"app/web_common/scripts/vendor/hls.js"
+	]
+}

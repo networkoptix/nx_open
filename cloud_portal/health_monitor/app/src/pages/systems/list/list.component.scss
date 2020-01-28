@@ -1,0 +1,64 @@
+@import '../../../../styles/native-theme/_theme_palette';
+@import '../../../../styles/_theme_palette';
+@import '../../../../styles/custom/_custom_palette';
+@import '../../../styles/_mixins';
+
+//nx-systems-list-component {
+    .input-overlay {
+        input {
+            padding-right : 30px;
+            padding-left  : 30px;
+        }
+        
+        .input-overlay-left {
+            position    : absolute;
+            color       : $light8;
+            left        : 17px;
+            display     : flex;
+            align-items : center;
+        }
+        
+        .input-overlay-right {
+            position    : absolute;
+            color       : $light8;
+            right       : 17px;
+            display     : flex;
+            align-items : center;
+        }
+    }
+    
+    .system-button {
+        user-select : none;
+        cursor      : pointer;
+        overflow    : hidden;
+        
+        h2 {
+            @include ellipsis;
+            
+            line-height   : 24px;
+            margin-bottom : 2px;
+        }
+        
+        .card-condensed {
+            .card-body {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+        
+        .user-name {
+            font-size     : $h6-font-size;
+            line-height   : 16px;
+            display       : block;
+            margin-bottom : 12px;
+        }
+    }
+    
+    .search-block {
+        padding-top    : 10px;
+        padding-bottom : 10px;
+        /*border-top:1px solid $common-border-color;
+        border-bottom:1px solid $common-border-color;*/
+        margin-bottom  : 10px;
+    }
+//}

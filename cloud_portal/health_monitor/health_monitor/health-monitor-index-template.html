@@ -1,0 +1,61 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+
+    <link rel="icon" href="static/images/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="static/images/favicon.ico" type="image/x-icon">
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <link rel="stylesheet" href="fonts/fonts.css"/>
+
+    <% for (key in htmlWebpackPlugin.files.css) { %>
+    <link rel="stylesheet" href="/static<%= htmlWebpackPlugin.files.css[key] %>" />
+    <% } %>
+
+
+</head>
+<body class="loading hm-standalone">
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an outdated browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<noscript>
+    Please, turn on JavaScript in your browser
+</noscript>
+
+<health-monitor-app>
+    <div class="placeholder">
+        <div class="placeholder-content">
+            <div class="placeholder-preloader">
+                <div class="circleG circleG_1"></div>
+                <div class="circleG circleG_2"></div>
+                <div class="circleG circleG_3"></div>
+            </div>
+        </div>
+    </div>
+</health-monitor-app>
+
+<script>
+    var xhttpLanguage = new XMLHttpRequest();
+    xhttpLanguage.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            window.LANG = JSON.parse(this.response);
+        }
+    };
+    xhttpLanguage.open("GET", "/static/language_compiled.json", false);
+    xhttpLanguage.send();
+</script>
+
+<% for (key in htmlWebpackPlugin.files.chunks) { %>
+<script type="text/javascript" src="/static<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
+<% } %>
+
+</body>
+</html>

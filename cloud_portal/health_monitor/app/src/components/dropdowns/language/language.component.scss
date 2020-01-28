@@ -1,0 +1,16 @@
+nx-language-select {
+    width   : 300px;
+    display : block;
+    
+    &.auto {
+        width: auto;
+    }
+    
+    .dropdown-menu {
+        padding-bottom : 4px !important;
+
+        .dropdown-item {
+            cursor : pointer;
+        }
+    }
+}

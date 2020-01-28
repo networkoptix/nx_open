@@ -1,0 +1,412 @@
+@import "~sass-rem";
+
+@import 'native-theme/theme_palette';
+@import 'theme_palette';
+@import 'custom/custom_palette';
+@import 'theme_variables';
+
+@import '~bootstrap/scss/bootstrap';
+
+@import 'theme_override';
+@import '../src/styles/mixins';
+// Components
+@import 'anchor';
+@import 'arrows';
+@import 'checkbox';
+@import 'option';
+// Pages
+@import 'faq';
+
+html {
+    @include rem-baseline;
+    position: relative;
+    min-height: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    min-width : 360px;
+    padding   : 0 !important;
+    height: 100%;
+    margin: 0;
+}
+
+.outerContainer {
+  display: flex; flex-direction: column; height: 100%;
+}
+
+.headerContainer {
+    z-index: 999;
+}
+
+.mainContainer {
+    //flex: 1 1 auto;
+    overflow-y: scroll; /* CLOUD-373: this is hack: we fix vertical scroll to prevent the page from shaking when it appears or disappears*/
+    height: 100%;
+}
+
+[data-whatintent='mouse'] *:focus {
+    outline : none !important;
+}
+
+[data-whatintent='keyboard'] button:focus:not([disabled]):not(.disabled),
+[data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled) {
+    outline : none !important;
+    @extend #outline;
+
+    &.inset {
+        @extend #inset-outline;
+    }
+}
+
+[data-whatinput='keyboard'] input:focus,
+[data-whatinput='keyboard'] input:active {
+    outline : none !important;
+    @extend #outline;
+
+    &.inset {
+        @extend #inset-outline;
+    }
+}
+
+[data-whatinput='keyboard'] input[type=checkbox]:focus:not([disabled]):not(.disabled) {
+    & + .checkmark {
+        outline : none !important;
+        @extend #outline;
+    }
+
+    & + .check {
+        outline : none !important;
+        @extend #outline;
+    }
+    
+    & + .tick {
+        outline : none !important;
+        @extend #outline;
+    }
+}
+
+[data-whatinput='keyboard'] input[type=radio]:focus:not([disabled]):not(.disabled) {
+    & + .checkmark {
+        outline : none !important;
+        @extend #outline;
+    }
+
+    & + .check {
+        outline : none !important;
+        @extend #outline;
+    }
+}
+
+[data-whatintent='keyboard'] .nav-tabs .nav-item a:focus {
+    @extend #inset-outline;
+}
+
+html.webclient-page{
+    overflow: hidden; /* WEB-564: this is another hack: we hide scroll for view page */
+
+    body{
+        margin-bottom: 0;
+    }
+    .navbar{
+        box-shadow: none;
+        margin-bottom: 0;
+    }
+}
+
+.block-container {
+  max-width: $fluid-container-max-width;
+  width: 100%;
+  padding: 0 16px;
+}
+
+a.disabled {
+  /* Make the disabled links grayish*/
+  color: gray;
+  /* And disable the pointer events */
+  pointer-events: none;
+}
+
+.warning-label{
+    color: $brand-danger !important;
+}
+
+.loading .auth-visible,
+.loading .auth-hidden{
+    display: none !important;
+}
+
+.authorized .auth-hidden,
+.authorized .loading-visible{
+    display: none !important;
+}
+
+.anonymous .auth-visible,
+.anonymous .loading-visible{
+    display: none !important;
+}
+
+@include media-breakpoint-up(sm) {
+  .hoverable .hover-visible {
+    visibility: hidden;
+  }
+
+  .hoverable:hover .hover-visible {
+    visibility: visible;
+  }
+}
+
+.process-loading{
+  border:none;
+  box-shadow:none;
+}
+
+.border-left{
+  border-left:1px solid $common-border-color;
+}
+
+.border-right{
+  border-right:1px solid $common-border-color;
+}
+.border-top{
+  border-top:1px solid $common-border-color;
+}
+.border-bottom{
+  border-bottom:1px solid $common-border-color;
+}
+.light-color{
+  color:    $gray-light;
+}
+
+.preloader{
+    display: none;
+}
+
+.process-loading{
+    position: relative;
+}
+
+.process-loading>*{
+    visibility:hidden;
+}
+
+.process-loading > .preloader {
+    display          : block;
+    visibility       : visible;
+    position         : absolute;
+    width            : 100%;
+    height           : 100%;
+    min-height       : 144px;
+    z-index          : 100;
+    padding-top      : 80px;
+    text-align       : center;
+    background-color : $body-bg;
+}
+
+.process-loading>.preloader>img{
+    width:64px;
+    height:64px;
+}
+
+/* inline mode for portal: no header, dialogs behave like full-screen pages */
+.inline-portal header{
+    display: none;
+}
+
+.inline-portal>.container{
+    padding:0;
+}
+
+.inline-portal .modal{
+    overflow-y: hidden;
+}
+
+.inline-portal .modal-dialog{
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.inline-portal .modal-content{
+    box-shadow: none;
+    border: none;
+    height:100%;
+    border-radius:0;
+}
+
+
+.inline-portal .modal-header .close{
+    display: none;
+}
+
+//.ellipsis {
+//    overflow      : hidden;
+//    text-overflow : ellipsis;
+//    white-space   : nowrap;
+//    max-width     : 100%;
+//    line-height   : initial;
+//}
+//
+//@mixin ellipsis{
+//  overflow: hidden;
+//  text-overflow: ellipsis;
+//  white-space: nowrap;
+//  max-width: 100%;
+//  line-height: initial;
+//}
+
+//.btn-wrapper {
+//  display: inline-block;
+//  padding-top: 12px;
+//  padding-left: 8px;
+//}
+
+//.buttons-panel {
+//    padding-bottom: 15px;
+//
+//    & > .btn {
+//        margin-right: 0.5rem;
+//    }
+//}
+
+//@include media-breakpoint-up(sm) {
+//  .buttons-panel {
+//    float: right;
+//    padding-top: 15px;
+//    display: flex;
+//  }
+//}
+
+.inline-block{
+  display: inline-block;
+}
+
+.alert-top {
+    position  : fixed;
+    top       : 34px;
+    left      : 50%;
+    transform : translateX(-50%);
+    z-index   : 1100;
+    
+    @include media-breakpoint-down(sm) {
+        min-width : 100%;
+    }
+    
+    @include media-breakpoint-up(sm) {
+        min-width : 600px;
+    }
+    
+    &.ng-animate {
+        transition : 0.5s linear all;
+        
+        &.ng-enter {
+            opacity : 0;
+        }
+        
+        &.ng-enter-active {
+            opacity : 1;
+        }
+        
+        &.ng-leave {
+            opacity : 1;
+        }
+        
+        &.ng-leave-active {
+            opacity : 0;
+        }
+    }
+}
+
+@include media-breakpoint-up(sm) {
+  // Automatically set modal's width for larger viewports
+  .modal-dialog .alert-top {
+    top: -74px;
+  }
+}
+
+.image-link {
+    @include ellipsis;
+    text-decoration: none !important;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        .glyphicon {
+            background-position-y: -16px;
+        }
+    }
+}
+
+h1.process-success {
+    line-height: 1.5;
+    display: flex;
+    justify-content: center;
+}
+
+h1 .badge {
+    margin-left: 8px;
+}
+
+.inactive{
+    opacity:0.7;
+    cursor: pointer;
+}
+
+.disabled{
+    color  : $light10;
+    cursor : default !important;
+}
+
+@include media-breakpoint-up(md) {
+    .flex-md{
+        display:flex;
+        align-items:stretch;
+    }
+
+    .border-left-md{
+      border-left:1px solid $common-border-color;
+    }
+}
+
+.help-topic{
+    margin-top:10px;
+}
+
+//.two-columns{
+//    -moz-column-count: 2;
+//    /* Firefox */
+//    -webkit-column-count: 2;
+//    /* Safari and Chrome */
+//    column-count: 2;
+//}
+
+.min-w-80 {
+    min-width: 80px;
+}
+
+.min-w-120 {
+    min-width: 120px;
+}
+
+.wide-button {
+  width: 102px;
+}
+
+.help-block-no-height {
+  min-height: 0px !important;
+}
+
+.light-label {
+  font-weight: initial;
+  padding-left: 4px;
+}
+
+.light-text {
+  color: $light16;
+  font-size: 13px;
+}
+span.marked {
+    background-color: $light4;
+}

@@ -1,0 +1,370 @@
+@import '../../styles/custom/custom_palette';
+@import '../../styles/theme_palette';
+@import '../../styles/theme_variables';
+@import 'mixins';
+@import 'typography';
+@import '~bootstrap/scss/mixins';
+
+#button {
+    @extend #medium14;
+    height        : 2rem;
+    border-radius : $border-radius-base;
+    font-weight   : inherit;
+    padding       : 0 1rem;
+    border        : none;
+    display       : flex;
+    align-items   : center;
+    transition    : none;
+    max-width     : 278px;
+    text-overflow : ellipsis;
+    overflow      : hidden;
+    line-height   : 1rem;
+    justify-content: center;
+    text-decoration: none;
+
+    &:hover,
+    &:active,
+    &.active,
+    &:focus,
+    &.focus {
+        box-shadow : none;
+    }
+
+    &:disabled {
+        opacity : 0.3;
+
+        & * {
+            pointer-events : none;
+        }
+    }
+}
+
+// Overwrite Boostrap section ************
+button, .btn {
+    @extend #button;
+}
+
+.btn.btn-big {
+    height : 40px;
+}
+
+.btn.btn-default, .btn.btn-dropdown-toggle {
+    color            : $dark9 !important;
+    background-color : $light4 !important;
+    box-shadow       : inset 0 -1px 0 0 $light7;
+    font-family      : $font-family-medium;
+
+    &:hover:not([disabled]):not(.disabled) {
+        background-color : $light5 !important;
+        box-shadow       : inset 0 -1px 0 0 $light8;
+    }
+
+    &:active,
+    &.active {
+        background-color : $light6 !important;
+        box-shadow       : inset 0 1px 0 0 $light8 !important;
+    }
+}
+
+.btn.btn-primary {
+    color            : $light1 !important;
+    background-color : $brand_core !important;
+    border-color     : transparent !important;
+    box-shadow       : inset 0 -1px 0 0 $brand_d2;
+
+    &:hover:not([disabled]):not(.disabled) {
+        background-color : $brand_d1 !important;
+        box-shadow       : inset 0 -1px 0 0 $brand_d3;
+    }
+
+    &:focus,
+    &.focus {
+
+    }
+
+    &:active,
+    &.active {
+        background-color : $brand_d2 !important;
+        box-shadow       : inset 0 1px 0 0 $brand_d4 !important;
+    }
+}
+
+.btn.btn-lg {
+    padding       : 10px 16px;
+    font-size     : 15px;
+    line-height   : 1.3333333;
+    border-radius : 4px;
+}
+
+.btn.btn-toggle {
+    color            : $dark9;
+    background-color : $light4;
+    max-width        : 180px;
+    display          : flex;
+    align-content    : center;
+    justify-content  : center;
+
+    input {
+        position : absolute;
+        opacity  : 0;
+    }
+
+    &:hover:not([disabled]):not(.disabled) {
+        background-color : $light5;
+    }
+
+    &:active,
+    &.active {
+        background-color : $light6 !important;
+    }
+
+    &.selected {
+        color            : $light1;
+        background-color : $light16 !important;
+    }
+}
+
+.btn.btn-menu {
+    height           : 28px;
+    color            : $dark9;
+    border           : 1px solid $light10;
+    background-color : transparent;
+    max-width        : 180px;
+    display          : flex;
+    align-content    : center;
+    justify-content  : center;
+    border-radius    : $border-radius-base !important;
+}
+
+.btn.btn-clear {
+    color            : $dark9;
+    background-color : transparent;
+    max-width        : 215px;
+    display          : flex;
+    align-content    : center;
+    justify-content  : center;
+    border-radius    : $border-radius-base !important;
+
+    input {
+        position : absolute;
+        opacity  : 0;
+    }
+
+    .glyphicon-close {
+        opacity: 1 !important;
+    }
+
+    &:hover:not([disabled]):not(.disabled) {
+        background-color : rgba($light16, .1);
+    }
+
+    &:active,
+    &.active {
+        background-color : rgba($light16, .15) !important;
+    }
+}
+
+// (END) Overwrite Boostrap section ******
+
+.btn-back {
+    padding-left : 0;
+
+    .back-arrow {
+        width               : 20px;
+        height              : 20px;
+        background-image    : url('/static/images/tutorial_arrow.png') !important;
+        background-repeat   : no-repeat;
+        background-size     : 20px 20px;
+        background-position : center;
+        transform           : scaleX(-1);
+        float               : left;
+        margin-left         : .5rem;
+        margin-right        : .5rem;
+
+        @media only screen and (-webkit-min-device-pixel-ratio : 2), only screen and (min-device-pixel-ratio : 2) {
+            background-image : url('/static/images/tutorial_arrow@2x.png') !important;
+        }
+    }
+}
+
+.btn-dropdown-toggle {
+    background-color : transparent;
+}
+
+.btn-tag {
+    @extend #regular13;
+    color            : $light16;
+    font-weight      : 400;
+    white-space      : nowrap;
+    background-color : $light4;
+    max-width        : none;
+
+    &:hover {
+        background-color : $light5;
+    }
+
+    &:active {
+        background-color : $light6;
+    }
+}
+
+.btn-tag-selected {
+    @extend #regular13;
+    @include badge-selected($light16, $light17, $light18);
+    padding   : 0 40px 0 12px !important;
+    position  : relative;
+    max-width : none;
+    cursor    : default !important;
+
+    & > span {
+        margin  : 0;
+        padding : 0;
+    }
+
+    &:hover {
+        color: $light1;
+    }
+
+    .close-button {
+        position        : absolute;
+        right           : 0;
+        bottom          : 0;
+        border-radius   : 2px;
+        display         : flex;
+        justify-content : center;
+        align-items     : center;
+        height          : 40px;
+        width           : 40px;
+        cursor          : pointer;
+
+        &:hover {
+
+        }
+
+        .tag-close-icon {
+            margin : 0 !important;
+        }
+    }
+}
+
+.btn.btn-danger {
+    color : $light1 !important;
+}
+
+.btn.btn-arrow {
+    position      : relative;
+    padding-left  : 40px !important;
+    padding-right : 12px !important;
+    max-width     : none;
+
+    .nav-arrow {
+        height : 20px;
+        float  : left;
+        right  : auto;
+        left   : 8px;
+        bottom : 10px;
+
+        span {
+            background-color : $light16;
+        }
+    }
+
+    &.has-icon {
+        padding-left : 20px;
+    }
+
+    & > span {
+        margin : 0;
+        padding : 0 1px; // flex messes up caption width
+    }
+
+    &.selected {
+        @include badge-selected($light16, $light17, $light18);
+
+        .nav-arrow {
+            span {
+                background-color : $light1;
+            }
+        }
+    }
+}
+
+.btn-text {
+    .nav-arrow {
+        height       : 20px;
+        float        : left;
+        right        : 0;
+        margin-right : 2px;
+
+        span {
+            background-color : $light16;
+        }
+    }
+
+    &.has-icon {
+        padding-left : 25px;
+        position: relative;
+    }
+
+    span {
+        @extend #regular13;
+        color : $light16 !important;
+
+        &.close {
+            left : 0;
+            width  : 16px;
+            height : 16px;
+
+            &:before, &:after {
+                background-color: $light16;
+            }
+        }
+    }
+
+    &:hover {
+        span {
+            color           : $dark15 !important;
+            text-decoration : none;
+
+            &.close {
+                &:before, &:after {
+                    background-color : $dark15;
+                }
+            }
+        }
+    }
+
+    &:active {
+        span {
+            color : $light16 !important;
+
+            &.close {
+                &:before, &:after {
+                    color : $light16 !important;
+                }
+            }
+        }
+    }
+}
+
+.btn-collapse {
+    @include media-breakpoint-down(md) {
+        padding : 0 .75rem;
+    }
+
+    .glyphicon {
+        display : block;
+        margin: 0;
+        @include media-breakpoint-up(md) {
+            display : none;
+        }
+    }
+
+    .btn-caption {
+        display : none;
+        @include media-breakpoint-up(md) {
+            display : block;
+        }
+    }
+}
+

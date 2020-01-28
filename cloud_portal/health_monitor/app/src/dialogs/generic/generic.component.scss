@@ -1,0 +1,28 @@
+.modal-title {
+    max-width: 480px;
+}
+
+.modal-title.closable {
+    max-width: 440px !important;
+}
+
+.modal-footer.stacked {
+    flex-direction: column;
+    align-items: flex-start;
+
+    & > :first-child {
+        margin-bottom: 0.5rem;
+    }
+
+    & > :not(:first-child) {
+        margin-left: 0 !important;
+    }
+
+    button {
+        max-width: 100%;
+    }
+}
+
+.long-cancel-button > .btn-default {
+    max-width: 360px;
+}

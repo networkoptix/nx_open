@@ -1,0 +1,90 @@
+@import '../../styles/mixins';
+
+:host {
+    min-height: 0;
+}
+
+.nx-menu {
+    border-radius : 0 0 2px 2px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    overflow-y: auto;
+
+    .level-1-container {
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+    }
+
+    .selected {
+        flex-shrink: 1;
+        min-height: 40px;
+    }
+
+    nx-level-1-item {
+    }
+    
+    nx-level-2-item {
+        width   : 100%;
+        display : flex;
+        flex-direction: column;
+    }
+
+    .min-height-level-3 {
+        min-height: 120px !important;
+    }
+
+    .level-3-items {
+        min-height: fit-content;
+        overflow-y: auto;
+
+        .top-shadow {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            box-shadow: 0 0 2px 2px $light7;
+            z-index: 1;
+        }
+
+        .bottom-shadow {
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 0 2px 2px $light7;
+            z-index: 1;
+        }
+
+        .bottom-shadow-cover {
+            position: absolute;
+            bottom: 0;
+            background: $light5;
+            width: 100%;
+            height: 4px;
+            z-index: 2;
+        }
+
+        .scroll-area {
+            position: relative;
+        }
+    }
+
+    nx-level-3-item {
+        display: block;
+    }
+    
+    .container-buttons {
+        background-color : $light5;
+        padding          : 0 .75rem .5rem;
+    }
+    
+    .last-level-2 {
+        padding-bottom   : .5rem;
+        background-color : $light4;
+    }
+
+    .last-level-3 {
+        padding-bottom   : .5rem;
+        background-color : $light5;
+    }
+}

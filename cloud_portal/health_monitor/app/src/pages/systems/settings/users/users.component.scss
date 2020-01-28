@@ -1,0 +1,36 @@
+@import '../../../../styles/mixins';
+@import '../../../../styles/typography';
+
+.user-name {
+    @include ellipsis;
+    //width     : 20%;
+    // max-width : 175px;
+    @extend #regular13;
+}
+
+.user-email {
+    @include ellipsis;
+    //width     : 30%;
+    // max-width : 240px;
+    font-family : $font-family-medium;
+    line-height: 1.2;
+}
+
+.user-role {
+    @include ellipsis;
+    //width     : 20%;
+    max-width : 120px;
+}
+
+.button-cell {
+    padding-right : 6px !important;
+    padding-left  : 6px !important;
+    text-align    : center;
+}
+
+.help-block {
+    display          : block;
+    background-color : transparent;
+    color            : $light16;
+    padding          : .5rem 0 0;
+}

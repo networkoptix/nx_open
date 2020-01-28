@@ -1,0 +1,119 @@
+<div class="nx-search">
+    <div class="row m-0" [ngClass]="{'mb-2' : layout == 'selectors'}">
+        <div class="col-12 p-0" *ngIf="layout != 'selectors'">
+            <div class="d-block d-md-inline-flex flex-md-row w-100">
+                <div class="search-group" [ngClass]="{'mr-3' : layout == 'full'}">
+                    <span class="glyphicon glyphicon-search icon-search"></span>
+                    <input [ngModel]="localFilter.query"
+                           (ngModelChange)="onSearchType($event)"
+                           [ngClass]="{'non-empty': localFilter.query && localFilter.query != ''}"
+                           [maxLength]="CONFIG.search.maxLength"
+                           type="text"
+                           class="form-control search-input"
+                           name="query"
+                           autocomplete="off"
+                           [placeholder]="placeholder"/>
+
+                    <button class="search-clear btn btn-clear" [hidden]="!localFilter.query" (click)="resetQuery()">
+                        <span class="glyphicon-close"></span>
+                    </button>
+                </div>
+                <div class="float-left btn btn-big btn-tag-selected mt-3 mt-md-0 mr-1"
+                        *ngIf="numberFilters != 0 && layout == 'full'">
+
+                    <span class="filter-label" [innerHTML]="filterSelected" dir="auto"></span>
+                    <span class="close-button" (click)="resetFilters()">
+                        <span class="glyphicon tag-close-icon"></span>
+                    </span>
+                </div>
+
+                <div class="btn btn-arrow btn-big btn-tag float-left mt-3 mt-md-0"
+                        [ngClass]="{'selected' : showAdvancedOptions}"
+                        (click)="toggleOptions()"
+                        *ngIf="layout == 'full'">
+
+                    <div class="nav-arrow">
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span translate>Advanced Search</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row col-12 m-0 p-0"
+             [ngClass]="{'mt-3' : layout != 'selectors'}"
+             [hidden]="!showAdvancedOptions && layout != 'selectors'"
+              *ngIf="localFilter.tags && localFilter.tags.length || localFilter.selects && localFilter.selects.length || localFilter.multiselects && localFilter.multiselects.length">
+
+            <div class="drop-container row col-12 m-0 p-0"
+                 [ngClass]="{'mt-3 flex-row' : layout != 'selectors'}"
+                 [ngStyle]="{'max-width': layout == 'selectors' ? '100%': '992px'}"
+                 *ngIf="localFilter.selects && localFilter.selects.length || localFilter.multiselects && localFilter.multiselects.length">
+
+                <div class="drop {{select.css || ''}}"
+                     *ngFor="let select of localFilter.selects"
+                     [ngClass]="{'mb-2' : layout == 'selectors', 'mb-3' : layout != 'selectors', 'col-lg-12': layoutMod}">
+
+                    <label style="text-transform: capitalize" *ngIf="select.label != ''">{{ select.label }}</label>
+                    <nx-select [name]="select.label"
+                               [items]="select.items"
+                               [(ngModel)]="select.selected"
+                               (ngModelChange)="onModelChange($event)"
+                               [selected]="select.selected ? select.selected : null">
+                    </nx-select>
+                </div>
+
+                <div class="drop mb-3" *ngFor="let multiselect of localFilter.multiselects"
+                     [ngClass]="{'mb-2' : layout == 'selectors', 'mb-3' : layout != 'selectors'}">
+                    <label style="text-transform: capitalize">{{ multiselect.label }}</label>
+                    <nx-multi-select [name]="multiselect.label"
+                                     [items]="multiselect.items"
+                                     [(ngModel)]="multiselect.selected"
+                                     (ngModelChange)="onModelChange($event)"
+                                     canSelectAll>
+                    </nx-multi-select>
+                </div>
+
+                <div class="drop col-12 col-lg-1"
+                     style="min-width: auto;"
+                     [ngClass]="{'mb-2': numberFilters}"
+                     *ngIf="layout == 'selectors'">
+                    <button class="float-right float-md-left btn btn-text has-icon"
+                            *ngIf="numberFilters"
+                            (click)="resetFilters()">
+                        <span class="close"></span>
+                        <span translate>Clear</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="search-tags m-0 p-0"
+                 [ngClass]="{'mt-2' : layout != 'full', 'mt-3': layout == 'full'}"
+                 *ngIf="localFilter.tags && localFilter.tags.length">
+
+                <div class="col-12 p-0">
+                    <div class="form-group m-0">
+                        <label *ngIf="layout == 'full'">Features</label>
+                        <nav aria-label="Cameras table navigation">
+                            <ul class="pagination m-0">
+                                <li class="tags ml-0" *ngFor="let tag of localFilter.tags">
+                                    <nx-tag
+                                            element="btn"
+                                            control="tag"
+                                            size="large"
+                                            [name]="tag.label"
+                                            [(ngModel)]="tag.value"
+                                            (ngModelChange)="onModelChange(true)"
+                                            [value]="tag.value">
+                                        {{ tag.label }}
+                                    </nx-tag>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

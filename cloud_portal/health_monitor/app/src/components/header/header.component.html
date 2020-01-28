@@ -1,0 +1,94 @@
+<header *ngIf="viewHeader">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="app-header-left">
+                <ul *ngIf="activeSystem" class="nav navbar-nav navbar-left auth-visible d-block d-md-none">
+                    <li>
+                        <nx-active-system [activeSystem]="activeSystem"></nx-active-system>
+                    </li>
+                </ul>
+
+                <ul *ngIf="active.integrations || active.ipvd"
+                    class="nav navbar-nav navbar-left d-block d-md-none">
+                    <li>
+                        <nx-nav-location [location]="active"></nx-nav-location>
+                    </li>
+                </ul>
+
+                <div class="navbar-header">
+                    <a class="inset navbar-brand asset-name add-version ml-sm-0 d-block" [href]="user.email ? '/systems' : '/'">
+                        <img src="{{CONFIG.previewPath}}/static/images/logo.png">
+                    </a>
+                </div>
+
+                <ul *ngIf="active.integrations" class="nav navbar-nav d-none d-md-flex">
+                    <li class="active">
+                        <a class="inset" href="" translate>Integrations</a>
+                    </li>
+                </ul>
+
+                <ul *ngIf="active.ipvd" class="nav navbar-nav d-none d-md-flex">
+                    <li class="active">
+                        <a class="inset" href="" translate>Supported IP Video Devices</a>
+                    </li>
+                </ul>
+
+                <ul *ngIf="navVisible && activeSystem && !active.integrations && !active.ipvd"
+                    class="nav navbar-nav auth-visible d-none d-md-flex">
+
+                    <li [ngClass]="{ 'active' :active.view }">
+                        <a class="inset" href="/systems/{{activeSystem.id}}/view" translate>View</a>
+                    </li>
+                    <li [ngClass]="{ 'active' :active.settings}">
+                        <a class="inset" href="/systems/{{activeSystem.id}}" translate>Settings</a>
+                    </li>
+                    <li [ngClass]="{ 'active' :active.information}"
+                        *ngIf="canSeeInfo">
+                        <a class="inset" href="/systems/{{activeSystem.id}}/health" translate>Information</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="app-header-right">
+                <ul class="nav navbar-nav navbar-right auth-hidden">
+                    <li>
+                        <span>
+                            <a href="/register" class="btn btn-primary btn-collapse">
+                                <span class="glyphicon glyphicon-create-user"></span>
+                                <span class="btn-caption" translate>Create Account</span>
+                            </a>
+                        </span>
+                        <span>
+                            <a href="" class="btn btn-default btn-collapse" (click)="login()">
+                                <span class="glyphicon glyphicon-login"></span>
+                                <span class="btn-caption" translate>Log In</span>
+                            </a>
+                        </span>
+                        <span *ngIf="!this.loginState">
+                            <nx-language-select
+                                    class="auto"
+                                    short="true" altStyle="true"
+                                    instantReload="true" instantApply="true"></nx-language-select>
+                        </span>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right auth-visible" *ngIf="dropdownsVisible">
+                    <li *ngIf="systemCounter" class="collapse-second">
+                        <nx-systems
+                                [endpoint]="active"
+                                [systems]="systems"
+                                [activeSystem]="activeSystem">
+                        </nx-systems>
+                    </li>
+
+                    <li class="vertical-bar"></li>
+
+                    <li class="collapse-first">
+                        <nx-account-settings-select></nx-account-settings-select>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>

@@ -1,0 +1,247 @@
+{
+  "compareConfig": {
+    "testPairs": [
+      {
+        "reference": "../../backstop_data/bitmaps_reference/0_0_nav_0_phone.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/0_0_nav_0_phone.png",
+        "selector": "nav",
+        "fileName": "0_0_nav_0_phone.png",
+        "label": "Homepage",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/0_1_bodycontainernth-of-type1_0_phone.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/0_1_bodycontainernth-of-type1_0_phone.png",
+        "selector": "body .container:nth-of-type(1)",
+        "fileName": "0_1_bodycontainernth-of-type1_0_phone.png",
+        "label": "Homepage",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/0_2_footer_0_phone.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/0_2_footer_0_phone.png",
+        "selector": "footer",
+        "fileName": "0_2_footer_0_phone.png",
+        "label": "Homepage",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/0_0_nav_1_tablet_v.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/0_0_nav_1_tablet_v.png",
+        "selector": "nav",
+        "fileName": "0_0_nav_1_tablet_v.png",
+        "label": "Homepage",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/0_1_bodycontainernth-of-type1_1_tablet_v.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/0_1_bodycontainernth-of-type1_1_tablet_v.png",
+        "selector": "body .container:nth-of-type(1)",
+        "fileName": "0_1_bodycontainernth-of-type1_1_tablet_v.png",
+        "label": "Homepage",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/0_2_footer_1_tablet_v.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/0_2_footer_1_tablet_v.png",
+        "selector": "footer",
+        "fileName": "0_2_footer_1_tablet_v.png",
+        "label": "Homepage",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/0_0_nav_2_tablet_h.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/0_0_nav_2_tablet_h.png",
+        "selector": "nav",
+        "fileName": "0_0_nav_2_tablet_h.png",
+        "label": "Homepage",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/0_1_bodycontainernth-of-type1_2_tablet_h.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/0_1_bodycontainernth-of-type1_2_tablet_h.png",
+        "selector": "body .container:nth-of-type(1)",
+        "fileName": "0_1_bodycontainernth-of-type1_2_tablet_h.png",
+        "label": "Homepage",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/0_2_footer_2_tablet_h.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/0_2_footer_2_tablet_h.png",
+        "selector": "footer",
+        "fileName": "0_2_footer_2_tablet_h.png",
+        "label": "Homepage",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/1_0_header_0_phone.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/1_0_header_0_phone.png",
+        "selector": "header",
+        "fileName": "1_0_header_0_phone.png",
+        "label": "Register Form",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/1_1_containernameregisterForm_0_phone.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/1_1_containernameregisterForm_0_phone.png",
+        "selector": ".container[name = registerForm]",
+        "fileName": "1_1_containernameregisterForm_0_phone.png",
+        "label": "Register Form",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/1_2_footer_0_phone.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/1_2_footer_0_phone.png",
+        "selector": "footer",
+        "fileName": "1_2_footer_0_phone.png",
+        "label": "Register Form",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/1_0_header_1_tablet_v.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/1_0_header_1_tablet_v.png",
+        "selector": "header",
+        "fileName": "1_0_header_1_tablet_v.png",
+        "label": "Register Form",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/1_1_containernameregisterForm_1_tablet_v.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/1_1_containernameregisterForm_1_tablet_v.png",
+        "selector": ".container[name = registerForm]",
+        "fileName": "1_1_containernameregisterForm_1_tablet_v.png",
+        "label": "Register Form",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/1_2_footer_1_tablet_v.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/1_2_footer_1_tablet_v.png",
+        "selector": "footer",
+        "fileName": "1_2_footer_1_tablet_v.png",
+        "label": "Register Form",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/1_0_header_2_tablet_h.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/1_0_header_2_tablet_h.png",
+        "selector": "header",
+        "fileName": "1_0_header_2_tablet_h.png",
+        "label": "Register Form",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/1_1_containernameregisterForm_2_tablet_h.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/1_1_containernameregisterForm_2_tablet_h.png",
+        "selector": ".container[name = registerForm]",
+        "fileName": "1_1_containernameregisterForm_2_tablet_h.png",
+        "label": "Register Form",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/1_2_footer_2_tablet_h.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/1_2_footer_2_tablet_h.png",
+        "selector": "footer",
+        "fileName": "1_2_footer_2_tablet_h.png",
+        "label": "Register Form",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_0_header_0_phone.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_0_header_0_phone.png",
+        "selector": "header",
+        "fileName": "2_0_header_0_phone.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_1_containernameregisterForm_0_phone.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_1_containernameregisterForm_0_phone.png",
+        "selector": ".container[name = registerForm]",
+        "fileName": "2_1_containernameregisterForm_0_phone.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_2_password-input_0_phone.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_2_password-input_0_phone.png",
+        "selector": "password-input",
+        "fileName": "2_2_password-input_0_phone.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_3_footer_0_phone.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_3_footer_0_phone.png",
+        "selector": "footer",
+        "fileName": "2_3_footer_0_phone.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_0_header_1_tablet_v.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_0_header_1_tablet_v.png",
+        "selector": "header",
+        "fileName": "2_0_header_1_tablet_v.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_1_containernameregisterForm_1_tablet_v.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_1_containernameregisterForm_1_tablet_v.png",
+        "selector": ".container[name = registerForm]",
+        "fileName": "2_1_containernameregisterForm_1_tablet_v.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_2_password-input_1_tablet_v.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_2_password-input_1_tablet_v.png",
+        "selector": "password-input",
+        "fileName": "2_2_password-input_1_tablet_v.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_3_footer_1_tablet_v.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_3_footer_1_tablet_v.png",
+        "selector": "footer",
+        "fileName": "2_3_footer_1_tablet_v.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_0_header_2_tablet_h.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_0_header_2_tablet_h.png",
+        "selector": "header",
+        "fileName": "2_0_header_2_tablet_h.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_1_containernameregisterForm_2_tablet_h.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_1_containernameregisterForm_2_tablet_h.png",
+        "selector": ".container[name = registerForm]",
+        "fileName": "2_1_containernameregisterForm_2_tablet_h.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_2_password-input_2_tablet_h.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_2_password-input_2_tablet_h.png",
+        "selector": "password-input",
+        "fileName": "2_2_password-input_2_tablet_h.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      },
+      {
+        "reference": "../../backstop_data/bitmaps_reference/2_3_footer_2_tablet_h.png",
+        "test": "../../backstop_data/bitmaps_test/20160614-192021/2_3_footer_2_tablet_h.png",
+        "selector": "footer",
+        "fileName": "2_3_footer_2_tablet_h.png",
+        "label": "Register Password",
+        "misMatchThreshold": 0.1
+      }
+    ]
+  },
+  "lastConfigHash": "5cc1672ce321af5357faac2a37bd1286aa1d02a7"
+}

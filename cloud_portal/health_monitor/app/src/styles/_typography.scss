@@ -1,0 +1,157 @@
+@import '../../styles/custom/custom_palette';
+@import '../../styles/theme_palette';
+@import '../../styles/theme_variables';
+
+@mixin font-source($fontfamily: $font-family-regular, $size: false, $colour: false, $weight: false,  $lh: false) {
+    font-family: $fontfamily;
+    @if $size {
+        font-size: $size;
+    }
+    @if $colour {
+        color: $colour;
+    }
+    @if $weight {
+        font-weight: $weight;
+    }
+    @if $lh {
+        line-height: $lh;
+    }
+}
+
+h1, h2 {
+    @include font-source($font-family-light, $h1-font-size, $font-color-medium);
+    margin-top    : $line-height-computed;
+    margin-bottom : $line-height-computed;
+    padding       : 0;
+    display       : flex;
+    align-items   : center;
+}
+
+h2 {
+    @include font-source($font-family-light, $h2-font-size, $font-color-medium);
+    margin      : 0;
+    padding     : 0;
+}
+
+h3 {
+    @include font-source($font-family-regular, $h3-font-size, $font-color-regular);
+    margin-top    : ($line-height-computed / 2);
+    margin-bottom : ($line-height-computed / 4);
+}
+
+h4 {
+    @include font-source($font-family-medium, $h4-font-size, $font-color-medium);
+}
+
+h5 {
+    @include font-source($font-family-medium, $h5-font-size, $font-color-medium);
+}
+
+h6 {
+    @include font-source($font-family-medium, $h6-font-size, $font-color-medium);
+}
+
+.h7 {
+    @include font-source($font-family-regular, $h6-font-size, $font-color-regular);
+}
+
+h1 > .label {
+    font-size      : 60%;
+    vertical-align : 33%;
+}
+
+#regular32 {
+    @include font-source($font-family-regular, $font-size-xxlg, $font-color-regular);
+}
+
+#medium32 {
+    @include font-source($font-family-medium, $font-size-xxlg, $font-color-medium);
+}
+
+#regular24 {
+    @include font-source($font-family-regular, $font-size-xlg, $font-color-regular);
+}
+
+#medium24 {
+    @include font-source($font-family-medium, $font-size-xlg, $font-color-medium);
+}
+
+#regular20 {
+    @include font-source($font-family-regular, $font-size-20, $font-color-regular);
+}
+
+#regular18 {
+    @include font-source($font-family-regular, $h3-font-size, $font-color-regular);
+}
+
+#medium18 {
+    @include font-source($font-family-medium, $h3-font-size, $font-color-medium);
+}
+
+#light18 {
+    @include font-source($font-family-light, $h3-font-size, $font-color-light);
+}
+
+#regular15 {
+    @include font-source($font-family-regular, $h4-font-size, $font-color-regular);
+}
+
+#medium15 {
+    @include font-source($font-family-medium, $h4-font-size, $font-color-medium);
+}
+
+#light15 {
+    @include font-source($font-family-light, $h4-font-size, $font-color-light);
+}
+
+#regular14 {
+    @include font-source($font-family-regular, $h6-font-size, $font-color-regular);
+}
+
+#medium14 {
+    @include font-source($font-family-medium, $h6-font-size, $font-color-medium);
+}
+
+#light14 {
+    @include font-source($font-family-light, $h6-font-size, $font-color-light);
+}
+
+#medium13 {
+    @include font-source($font-family-medium, $font-size-base, $font-color-medium);
+}
+
+#regular13 {
+    @include font-source($font-family-regular, $font-size-base, $font-color-regular);
+}
+
+#light13 {
+    @include font-source($font-family-light, $font-size-base, $font-color-light);
+}
+
+#regular12 {
+    @include font-source($font-family-regular, $font-size-sm, $font-color-regular);
+}
+
+#light12 {
+    @include font-source($font-family-light, $font-size-sm, $font-color-light);
+}
+
+#regular11 {
+    @include font-source($font-family-regular, $font-size-ssm, $font-color-regular);
+}
+
+#medium11 {
+    @include font-source($font-family-medium, $font-size-ssm, $font-color-medium);
+}
+
+#light11 {
+    @include font-source($font-family-light, $font-size-ssm, $font-color-light);
+}
+
+p {
+    margin-bottom : 0.5rem;
+}
+
+#placeholder {
+    @include font-source($font-family-regular, $font-size-base, $light17);
+}

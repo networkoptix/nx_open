@@ -1,0 +1,16 @@
+<nx-process-button
+        [customClass]="customClass"
+        [process]="openClient" *ngIf="system && LANG.system"
+        [actionType]="actionType ? actionType : 'default'"
+        title="{{system.stateMessage}}"
+        [buttonDisabled]="!system.isOnline && system.stateOfHealth !== CONFIG.systemStatuses.onlineStatus"
+        (click)="$event.stopPropagation();"
+        [buttonText]="LANG.system.openClient"></nx-process-button>
+
+<nx-process-button
+        [customClass]="customClass"
+        [process]="openClient" *ngIf="!system && LANG.system"
+        [actionType]="'primary'"
+        [buttonDisabled]="false"
+        (click)="$event.stopPropagation();"
+        [buttonText]="LANG.system.openClientNoSystem"></nx-process-button>

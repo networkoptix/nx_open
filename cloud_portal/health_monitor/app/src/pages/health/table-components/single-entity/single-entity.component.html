@@ -1,0 +1,31 @@
+<nx-block class="pb-3 d-block" *ngFor="let paramGroup of copyParams.values; first as isFirst">
+    <header>
+        <span *ngIf="isFirst">{{entityName}}&nbsp;</span>
+        <span>{{paramGroup.name}}</span>
+    </header>
+    <nx-section>
+        <div class="row d-flex align-items-end mb-1" *ngFor="let param of paramGroup.values">
+            <ng-container *ngIf="! (copyParams.id == 'systems' && param.id == 'name')">
+                <div class="col-5 pr-0">
+                    <div class="row-name">
+                        <span>{{param.description || param.name || param.id}}</span>
+                    </div>
+                </div>
+                <div class="col-7"
+                     *ngIf="entity[paramGroup.id] && entity[paramGroup.id][param.id]; else noValue"
+                     [title]="entity[paramGroup.id][param.id].tooltip">
+                            <span [ngClass]="entity[paramGroup.id][param.id].class"
+                                  [innerText]="[undefined, ''].indexOf(entity[paramGroup.id][param.id].text) === -1
+                                  ? entity[paramGroup.id][param.id].text : '−'"></span>
+                    <svg-icon class="pl-1"
+                              *ngIf="entity[paramGroup.id][param.id].icon"
+                              [svgStyle]="{'width.px': '20', 'pointer-events': 'none'}"
+                              [src]="CONFIG.icons.dir + entity[paramGroup.id][param.id].icon + '.svg'"></svg-icon>
+                </div>
+                <ng-template #noValue>
+                    <div class="col-5">−</div>
+                </ng-template>
+            </ng-container>
+        </div>
+    </nx-section>
+</nx-block>

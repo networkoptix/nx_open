@@ -1,0 +1,32 @@
+@import '../../../../../styles/theme_palette';
+@import '../../../../../styles/theme_variables';
+@import '../../../../components/tag/tag.component';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+nx-single-entity{
+    display: block;
+
+    .row-name {
+        position: relative;
+
+        span {
+            position: relative;
+            z-index: 2;
+            background-color: $light1;
+            padding-right: 8px;
+        }
+
+        &:after {
+            content: "";
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            right: 0;
+            border-bottom: 1px solid $light3;
+            z-index: 1;
+            min-width: 16px;
+        }
+    }
+}

@@ -1,0 +1,50 @@
+@import '../../../styles/custom/custom_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+@import '../../styles/typography';
+
+.ribbon {
+    @extend #regular13;
+    color            : $light1;
+    background-color : $brand_d1;
+    line-height      : 1rem;
+    border-top       : 1px solid $brand_d2;
+    border-bottom    : 1px solid $brand_d2;
+    padding          : .5rem 1rem;
+    display          : flex;
+    align-items      : center;
+
+    .message {
+        flex : 70%;
+    }
+
+    .action {
+        flex       : 30%;
+        text-align : right;
+
+        a {
+            @extend #regular13;
+            color           : $light1;
+            text-decoration : underline;
+
+            &:hover {
+                opacity : .8;
+            }
+        }
+    }
+}
+
+.alert-ribbon {
+    border-top: 1px solid #EEDC9E;
+    border-bottom: 1px solid #EEDC9E;
+    background-color: #FFEEB5 !important;
+
+    .message {
+        color: $dark9;
+        text-align: center;
+    }
+
+    a:hover {
+        opacity: .8;
+    }
+}

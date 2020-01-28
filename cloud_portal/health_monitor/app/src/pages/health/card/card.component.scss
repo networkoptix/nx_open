@@ -1,0 +1,27 @@
+@import '../../../../styles/theme_palette';
+@import '../../../../styles/theme_variables';
+@import '../../../styles/typography';
+
+.card {
+    height: 100%;
+}
+
+.card-header {
+    @extend #medium15;
+    padding          : 12px 16px;
+    background-color : $additional_light1;
+    border-bottom    : 1px solid $light4;
+    line-height      : 24px;
+}
+
+.card-body {
+    padding: 8px 16px;
+}
+
+.h-24 {
+    height: 24px;
+}
+
+.muted {
+    opacity: 0.5;
+}

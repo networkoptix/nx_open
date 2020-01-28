@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<title>Actions/Color/Alert</title>
+<desc>Created with Sketch.</desc>
+<g fill="none" fill-rule="evenodd">
+<g transform="translate(2 3)">
+<g fill="#F02C2C" fill-rule="nonzero">
+<path d="m8.7654 0.19789 0.13845 0.086751c0.17761 0.12482 0.32636 0.28537 0.43572 0.47141l6.4568 10.984c0.4228 0.71928 0.16574 1.6356-0.57416 2.0466-0.23315 0.12951-0.49703 0.19764-0.76555 0.19764h-12.914c-0.85219 0-1.543-0.67157-1.543-1.5 0-0.26104 0.070077-0.51756 0.2033-0.74421l6.4568-10.984c0.39793-0.67697 1.2563-0.93815 1.9727-0.62387l0.13253 0.06571z"/>
+</g>
+<rect x="7.2" y="10.4" width="1.6" height="1.6" fill="#fff"/>
+<polygon points="8.8 4 7.2 4 7.2 9 8.8 9" fill="#fff" fill-rule="nonzero"/>
+</g>
+</g>
+</svg>

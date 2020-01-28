@@ -1,0 +1,93 @@
+@import '../../../../styles/theme_palette';
+@import '../../../../styles/theme_variables';
+@import '../../../styles/mixins';
+@import '../../../styles/typography';
+
+.menu-level-3 {
+    @extend #medium13;
+    position         : relative;
+    background-color : $light5;
+    border-radius    : 0;
+    text-decoration  : none;
+    padding-left     : .75rem;
+    padding-right    : .75rem;
+    display          : block;
+    white-space      : nowrap;
+    overflow         : hidden;
+    line-height      : 26px;
+
+    &:hover {
+        &, * {
+            background-color: $light6 !important;
+        }
+    }
+
+    &:active {
+        &, * {
+            background-color: $light7 !important;
+        }
+    }
+
+    & > div {
+        line-height: 26px;
+    }
+
+    .top-shadow-cover {
+        left: 0;
+        position: absolute;
+        background: $light5;
+        width: 100%;
+        height: 4px;
+        z-index: 2;
+    }
+
+    &-icon {
+        float               : left;
+        margin-right        : .5rem;
+        display             : flex;
+        align-items         : center;
+        justify-content     : center;
+        width               : 18px;
+        height              : 26px;
+        background-position : -99px -135px;
+    }
+
+    &.selected {
+        &, * {
+            color: $light1 !important;
+            background-color: $light16 !important;
+            min-height: auto;
+        }
+
+        .menu-level-3-icon {
+            background-position : -123px -135px;
+        }
+
+        .menu-level-3-additional {
+            font-family : $font-family-regular;
+        }
+    }
+
+    &.item-disabled {
+        color : $light13;
+    }
+
+    .ellipsis {
+        @include ellipsis;
+        line-height : inherit;
+    }
+
+    //span {
+    //    color : $light16;
+    //}
+}
+
+.menu-level-3-additional {
+    color : $light13;
+    font-family: $font-family-regular;
+}
+
+//.menu-level-3 {
+//    color        : blue;
+//    padding-left : 20px;
+//}

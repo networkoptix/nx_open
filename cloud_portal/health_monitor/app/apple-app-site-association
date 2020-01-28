@@ -1,0 +1,14 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "%IOS_APPLICATION_ID%",
+                "paths": [
+                    "/client*",
+                    "/cloud*"
+                ]
+            }
+        ]
+    }
+}

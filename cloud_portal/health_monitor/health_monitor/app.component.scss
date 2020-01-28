@@ -1,0 +1,19 @@
+// A5 styles
+
+// Common
+@import '../app/src/styles/typography';
+@import '../app/src/styles/buttons';
+@import '../app/src/styles/forms';
+@import '../app/src/styles/inputs';
+@import '../app/src/styles/labels';
+@import '../app/src/styles/navs';
+@import '../app/src/styles/elements';
+@import '../app/src/styles/visuals';
+@import '../app/src/styles/tables';
+@import '../app/src/styles/icons';
+@import '../app/src/styles/components';
+
+// Components (common)
+@import '../app/src/dialogs/dialogs';
+@import '../app/src/components/dropdowns/dropdowns';
+@import '../app/src/components/toast/toast.component';

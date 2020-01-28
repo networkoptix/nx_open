@@ -1,0 +1,74 @@
+<div [ngSwitch]="metricValuesLen" class="h-100">
+
+    <nx-page-placeholder
+            *ngSwitchCase="0"
+            placeholderTitle="No {{metricName}}"
+
+            class="section-placeholder">
+    </nx-page-placeholder>
+
+
+    <div class="gridMetricContent" #area
+         [ngClass]="fixedLayoutClass"
+         *ngSwitchDefault>
+
+        <div class="gridMetricContentComponent"
+             *ngIf="selectedData && selectedValues"
+             [hidden]="mobileDetailMode && activeEntity">
+
+            <div class="gridMetricContentComponentWrapper">
+                <div *ngIf="metricValuesLen === 1" class="col-12 col-xl-7 col-xxxl-5 p-0">
+                    <nx-single-entity
+                            [params]="selectedPanelData"
+                            [entity]="objectValues(selectedValues)[0]">
+                    </nx-single-entity>
+                </div>
+                <div *ngIf="metricValuesLen > 1" class="p-0" #tableContainer
+                     [ngClass]="{'data-wrapper' : !activeEntity}">
+
+                    <div class="mb-3 p-0" #search
+                         *ngIf="!mobileDetailMode && metricValuesLen > 1">
+
+                        <nx-search
+                                name="filterModel"
+                                [ngModel]="filterModel"
+                                (ngModelChange)="modelChanged($event)"
+                                layout="compact"
+                                [placeholder]="LANG.search.Search"
+                                ngDefaultControl>
+                        </nx-search>
+                    </div>
+                    <nx-dynamic-table
+                            [dimensions]="containerDimensions"
+                            [headers]="selectedData"
+                            [elements]="selectedValues"
+                            (onRowClick)="setActiveEntity($event)"
+                            [activeEntity]="activeEntity">
+                    </nx-dynamic-table>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="gridMetricContentPanelComponent" *ngIf="activeEntity && layoutReady">
+            <div class="gridMetricContentPanelComponentWrapper pb-3">
+                <div class="mb-3 all-results-btn"
+                     [style.display]="!mobileDetailMode ? 'none' : 'block'">
+
+                    <hr class="pb-3 m-0">
+                    <button class="btn btn-default btn-back" (click)="resetActiveEntity()">
+                        <span class="back-arrow"></span>
+                        <span translate>All results</span>
+                    </button>
+                </div>
+
+                <nx-dynamic-table-panel-component
+                        [activeEntity]="activeEntity"
+                        [panelParams]="selectedPanelData"
+                        (onCloseView)="resetActiveEntity()">
+                </nx-dynamic-table-panel-component>
+            </div>
+        </div>
+    </div>
+</div>

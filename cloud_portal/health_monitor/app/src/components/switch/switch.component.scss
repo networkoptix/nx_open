@@ -1,0 +1,89 @@
+@import "../../../styles/theme_variables";
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 33px;
+  height: 17px;
+  
+  & input {
+    opacity : 0;
+    width   : 0;
+    height  : 0;
+  }
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $red_l2;
+  -webkit-transition: .4s;
+  transition: .4s;
+  
+  &:before {
+    position           : absolute;
+    content            : "";
+    height             : 15px;
+    width              : 15px;
+    left               : 1px;
+    bottom             : 1px;
+    background-color   : white;
+    -webkit-transition : .4s;
+    transition         : .4s;
+    z-index            : 1;
+  }
+}
+
+input.selected + .slider {
+  background-color: $brand-success;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px $brand-success;
+}
+
+input.selected + .slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.slider-icon {
+  position: absolute;
+  color: $additional_light1;
+
+  pointer-events: None;
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+
+.bar {
+  @extend .slider-icon;
+  font-size: 9px;
+  bottom: 11px;
+  left: 4px;
+}
+
+.circle {
+  @extend .slider-icon;
+  color: $red_d2;
+  font-size: 19px;
+  font-weight: bold;
+  bottom: 7px;
+  right: 3px;
+}

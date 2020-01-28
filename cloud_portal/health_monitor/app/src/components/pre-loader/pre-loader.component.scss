@@ -1,0 +1,30 @@
+.placeholder {
+    &-wrapper {
+        height   : 200px;
+        position : relative;
+    }
+    
+    &-content {
+        height    : 30px;
+        display   : flex;
+        transform : translateY(-50%);
+    }
+
+    &.small {
+        .placeholder-content {
+            margin-right: 0.25rem;
+        }
+        .placeholder-preloader {
+            margin: auto 0;
+        }
+        .circleG {
+            margin-left: 0 !important;
+            margin-right: 4px !important;
+            height: 10px !important;
+            width: 10px !important;
+        }
+    }
+    &.hm-camera-preview{
+        height: 177px;
+    }
+}
