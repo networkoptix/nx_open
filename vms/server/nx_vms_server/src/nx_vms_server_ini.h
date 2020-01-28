@@ -57,6 +57,8 @@ struct Ini: public nx::kit::IniConfig
         "it was supposed to install the update.");
 
     NX_INI_FLAG(0, disableArchiveIntegrityWatcher, "Disables media files integrity check.");
+
+    NX_INI_INT(100, stopTimeoutS, "Timeout to wait on server stop before crash.");
 };
 
 inline Ini& ini()
