@@ -25,6 +25,8 @@ StackLayout
             x: parent ? parent.width - width : 0
             height: parent ? parent.height : 0
             visible: view.visible
+            opacity: enabled ? 1.0 : 0.3
+            enabled: size < 0.9999
         }
 
         contentItem: AlignedColumn
