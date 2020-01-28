@@ -86,25 +86,9 @@ void MetadataHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QStr
 
 QList<QRegion> MetadataHelper::regionsFromFilter(const QString& filter, int channelCount) const
 {
-    const auto motionRegionList = filter.trimmed().isEmpty()
-        ? QList<QRegion>()
-        : QJson::deserialized<QList<QRegion>>(filter.toUtf8());
-
-    const auto wholeFrameRegionList =
-        [](int channelCount)
-    {
-        static const QRegion kWholeFrame(
-            QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
-
-        QList<QRegion> result;
-        result.reserve(channelCount);
-        std::fill_n(std::back_inserter(result), channelCount, kWholeFrame);
-        return result;
-    };
-
-    return motionRegionList.isEmpty()
-        ? wholeFrameRegionList(channelCount)
-        : motionRegionList;
+    if (filter.isEmpty())
+        return QList<QRegion>();
+    return QJson::deserialized<QList<QRegion>>(filter.toUtf8());
 }
 
 } // namespace nx::vms::server::metadata

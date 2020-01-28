@@ -87,14 +87,19 @@ QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
         }
         else
         {
-            for (int i = 0; i < motionRegions.size(); ++i)
+            const auto layout = res->getVideoLayout();
+            int channels = 1;
+            if (const auto layout = res->getVideoLayout())
+                channels = layout->channelCount();
+            for (int i = 0; i < channels; ++i)
             {
                 auto archive = getArchive(res, i);
                 if (archive)
                 {
+                    const auto region = motionRegions.size() > i ? motionRegions[i] : QRegion();
                     timePeriods.push_back(archive->matchPeriod(
                         {
-                            motionRegions[i],
+                            region,
                             std::chrono::milliseconds(request.startTimeMs),
                             std::chrono::milliseconds(request.endTimeMs),
                             request.detailLevel,

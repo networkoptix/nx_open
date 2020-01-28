@@ -471,7 +471,22 @@ inline void setBit(quint8* data, int x, int y)
     data[offset] |= 0x80 >> (y&7);
 }
 
-void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart, int* maskEnd)
+void addDataToMask(const QRect& rect, char* mask, int* maskStart, int* maskEnd)
+{
+    if (maskStart)
+        *maskStart = qMin((rect.left() * Qn::kMotionGridHeight + rect.top()) / 128, *maskStart);
+    if (maskEnd)
+        *maskEnd = qMax((rect.right() * Qn::kMotionGridHeight + rect.bottom()) / 128, *maskEnd);
+    for (int x = rect.left(); x <= rect.right(); ++x)
+    {
+        for (int y = rect.top(); y <= rect.bottom(); ++y)
+        {
+            setBit((quint8*)mask, x, y);
+        }
+    }
+}
+
+void QnMetaDataV1::createMask(const QRegion& region, char* mask, int* maskStart, int* maskEnd)
 {
     if (maskStart)
         *maskStart = 0;
@@ -479,21 +494,11 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
         *maskEnd = 0;
     memset(mask, 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8);
 
-    for (int i = 0; i < region.rectCount(); ++i)
-    {
-        QRect rect = region.rects().at(i).intersected(kMaxGridRect);
-        if (maskStart)
-            *maskStart = qMin((rect.left() * Qn::kMotionGridHeight + rect.top()) / 128, *maskStart);
-        if (maskEnd)
-            *maskEnd = qMax((rect.right() * Qn::kMotionGridHeight + rect.bottom()) / 128, *maskEnd);
-        for (int x = rect.left(); x <= rect.right(); ++x)
-        {
-            for (int y = rect.top(); y <= rect.bottom(); ++y)
-            {
-                setBit((quint8*) mask, x,y);
-            }
-        }
-    }
+    if (region.isEmpty())
+        addDataToMask(kMaxGridRect, mask, maskStart, maskEnd);
+
+    for (const QRect& rect : region.rects())
+        addDataToMask(rect.intersected(kMaxGridRect), mask, maskStart, maskEnd);
 }
 
 void QnMetaDataV1::serialize(QIODevice* ioDevice) const
