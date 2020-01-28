@@ -5,6 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <utils/common/connective.h>
 
 #include "../redux/camera_settings_dialog_state.h"
@@ -19,9 +20,18 @@ namespace {
 
 AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& engine)
 {
+    const auto plugin = engine->getParentResource().dynamicCast<AnalyticsPluginResource>();
+    if (!plugin)
+        return {};
+
+    const auto pluginManifest = plugin->manifest();
+
     return AnalyticsEngineInfo {
         engine->getId(),
         engine->getName(),
+        pluginManifest.description,
+        pluginManifest.version,
+        pluginManifest.vendor,
         engine->manifest().deviceAgentSettingsModel,
         engine->isDeviceDependent()
     };
