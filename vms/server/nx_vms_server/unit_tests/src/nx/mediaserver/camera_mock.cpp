@@ -184,7 +184,11 @@ bool CameraMock::setProperty(const QString& key, const QString& value, PropertyO
     if (!isSetProprtyEnabled)
         return false;
 
+    if (m_properties[key] == value)
+        return false;
+
     m_properties[key] = value;
+    emit propertyChanged(toSharedPointer(this), key);
     return true;
 }
 

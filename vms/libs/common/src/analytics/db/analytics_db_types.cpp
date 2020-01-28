@@ -15,6 +15,7 @@
 #include "analytics_db_utils.h"
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log_main.h>
+#include <api/helpers/camera_id_helper.h>
 
 using namespace nx::common::metadata;
 
@@ -330,12 +331,19 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
     params->insert(lit("sortOrder"), QnLexical::serialized(filter.sortOrder));
 }
 
-bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
+bool deserializeFromParams(const QnRequestParamList& params, Filter* filter, 
+    QnResourcePool* resourcePool)
 {
     const auto kLogTag = nx::utils::log::Tag(std::string("nx::analytics::db::Filter"));
 
     for (const auto& deviceIdStr: params.allValues(lit("deviceId")))
-        filter->deviceIds.push_back(QnUuid::fromStringSafe(deviceIdStr));
+    {
+        // Convert flexibleId to UUID
+        const QnUuid uuid = resourcePool
+            ? nx::camera_id_helper::flexibleIdToId(resourcePool, deviceIdStr)
+            : QnUuid::fromStringSafe(deviceIdStr);
+        filter->deviceIds.push_back(uuid);
+    }
 
     for (const auto& objectTypeId: params.allValues(lit("objectTypeId")))
         filter->objectTypeId.push_back(objectTypeId);

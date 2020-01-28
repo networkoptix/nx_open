@@ -245,7 +245,7 @@ Ptr<ObjectMetadataPacket> parseObjectMetadataXml(
         std::time_t epoch_time = std::chrono::system_clock::to_time_t(moment);
         std::string t = std::ctime(&epoch_time);
 
-        timestampAttribute = makePtr<Attribute>(nx::sdk::IAttribute::Type::local_time_point,
+        timestampAttribute = makePtr<Attribute>(nx::sdk::IAttribute::Type::string,
             "timestamp", timePointToString(moment));
     }
     const QDomElement transformation = getChildElement(frame, "Transformation");

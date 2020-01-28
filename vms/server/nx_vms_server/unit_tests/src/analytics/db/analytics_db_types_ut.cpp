@@ -40,7 +40,7 @@ protected:
         serializeFilter();
 
         Filter restoredFilter;
-        deserializeFromParams(m_serializedFilter, &restoredFilter);
+        deserializeFromParams(m_serializedFilter, &restoredFilter, nullptr);
 
         ASSERT_EQ(m_filter, restoredFilter);
     }

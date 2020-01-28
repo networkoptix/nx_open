@@ -15,6 +15,7 @@
 #include "stub_analytics_plugin_ini.h"
 #include "objects/vehicles.h"
 #include "objects/human_face.h"
+#include "objects/stone.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -165,6 +166,10 @@ std::string Engine::manifestString() const
         {
             "id": ")json" + kMotionVisualizationObjectType + R"json(",
             "name": "Motion visualization object"
+        },
+        {
+            "id": ")json" + kStoneObjectType + R"json(",
+            "name": "Stone"
         }
     ],
     "groups": [
@@ -283,6 +288,12 @@ std::string Engine::manifestString() const
                                 "name": ")json" + kGenerateBicyclesSetting + R"json(",
                                 "caption": "Generate bicycles",
                                 "defaultValue": true
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateStonesSetting + R"json(",
+                                "caption": "Generate stones",
+                                "defaultValue": false
                             },
                             {
                                 "type": "SpinBox",

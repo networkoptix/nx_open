@@ -1007,26 +1007,24 @@ struct ModifyAccessRightsChecker
         if (hasSystemAccess(accessData))
             return ErrorCode::ok;
 
-        const auto& resPool = commonModule->resourcePool();
-        if (auto user = resPool->getResourceById<QnUserResource>(accessData.userId)
-            ;
-            !commonModule->resourceAccessManager()->hasGlobalPermission(
-                user, GlobalPermission::admin))
+        if (!commonModule->resourceAccessManager()->hasGlobalPermission(
+            accessData, GlobalPermission::admin))
         {
             return ErrorCode::forbidden;
         }
 
-        auto user = resPool->getResourceById<QnUserResource>(param.userId);
+        // We can clear shared resources even after user or role is deleted.
+        if (param.resourceIds.empty())
+            return ErrorCode::ok;
+
+        // To set shared resources the param.userId must contain a valid user or role.
+        auto user = commonModule->resourcePool()->getResourceById<QnUserResource>(param.userId);
         if (!user)
         {
             if (!commonModule->resourceAccessManager()->userRolesManager()->hasRole(param.userId))
                 return ErrorCode::badRequest;
             return ErrorCode::ok;
         }
-
-        // Allow to clear shared resources unconditionally.
-        if (param.resourceIds.empty())
-            return ErrorCode::ok;
 
         if (user->userRole() == Qn::UserRole::customUserRole)
             return ErrorCode::forbidden;

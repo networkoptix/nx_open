@@ -152,6 +152,7 @@ private:
                 || generatePedestrians
                 || generateHumanFaces
                 || generateBicycles
+                || generateStones
                 || blinkingObjectPeriodMs.load() != std::chrono::milliseconds::zero());
         }
 
@@ -161,6 +162,7 @@ private:
         std::atomic<bool> generatePedestrians{true};
         std::atomic<bool> generateHumanFaces{true};
         std::atomic<bool> generateBicycles{true};
+        std::atomic<bool> generateStones{false};
 
         std::atomic<std::chrono::milliseconds> blinkingObjectPeriodMs{
             std::chrono::milliseconds::zero()};

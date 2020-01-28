@@ -322,7 +322,7 @@ static const int UDT_INTERNET_TRAFIC_TIMER = 24 * 60 * 60 * 1000; //< Once a day
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 
 class MediaServerProcess;
-static MediaServerProcess* serviceMainInstance = nullptr;
+static std::atomic<MediaServerProcess*> serviceMainInstance = nullptr;
 void stopServer(int signal);
 static bool gRestartFlag = false;
 
@@ -1019,6 +1019,7 @@ MediaServerProcess::~MediaServerProcess()
     quit();
     stop();
     m_staticCommonModule.reset();
+    serviceMainInstance = nullptr;
 }
 
 void MediaServerProcess::initResourceTypes()
@@ -1107,7 +1108,15 @@ void MediaServerProcess::stopSync()
 
 void MediaServerProcess::stopAsync()
 {
-    QTimer::singleShot(0, this, SLOT(stopSync()));
+    // ATTENTION: This method is also called from a signal handler, thus, no logging is allowed.
+
+    static std::atomic<bool> wasCalled = false;
+    if (wasCalled)
+        return;
+    wasCalled = true;
+
+    if (serviceMainInstance)
+        QTimer::singleShot(0, this, SLOT(stopSync()));
 }
 
 int MediaServerProcess::getTcpPort() const
@@ -1528,7 +1537,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/storageStatus
      * Check whether the specified location could be used as a server storage path and report the location details.
-     * If the location is already used as the server storage report the details storage ID and status are expected in response.
+     * If the location is already used as the server storage report, the details, storage id and status are expected in
+     * response.
      * %param:string path Folder to check.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
@@ -1552,8 +1562,8 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc GET /api/getCameraParam
      * Read camera parameters. For instance: brightness, contrast e.t.c. Parameters to read should
      * be specified.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
-     *     or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx),
+     *     or MAC address (not supported for certain cameras), or "Logical Id".
      * %param[opt]:string <any_name> Parameter name to read. Request can contain one or more
      *     parameters.
      * %return:object JSON object with an error code, error string, and the reply on success.
@@ -1568,8 +1578,8 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc POST /api/setCameraParam
      * Sets values of several camera parameters. These parameters are used on the Advanced tab in
      * camera settings. For instance: brightness, contrast, etc.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
-     *     or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx),
+     *     or MAC address (not supported for certain cameras), or "Logical Id".
      * %param:object paramValues Name-to-value map of camera parameters to set.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
@@ -2678,7 +2688,9 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
-     * %param[opt]:uuid deviceId Id of Device.
+     * %param:string deviceId device id (can be obtained from "id" field via
+     *     /ec2/getCamerasEx), or MAC address (not supported for
+     *     certain cameras), or "Logical Id".
      * %param[opt]:string objectTypeId Analytics Object Type id.
      * %param[opt]:string objectTrackId Analytics Object Track id.
      * %param[opt]:integer startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
@@ -4651,97 +4663,136 @@ static QByteArray loadDataFromUrl(nx::utils::Url url)
     return QByteArray();
 }
 
-void MediaServerProcess::loadResourceParamsData()
+static QString loadDataFromDb(ec2::AbstractResourceManagerPtr manager)
 {
-    const std::array<const char*,2> kUrlsToLoadResourceData =
-    {
-        "http://resources.vmsproxy.com/resource_data.json",
-        "http://beta.vmsproxy.com/beta-builds/daily/resource_data.json"
-    };
-
-    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
-
-    using namespace nx::vms::api;
-    QString source;
-    ResourceParamWithRefData param;
-    param.name = Qn::kResourceDataParamName;
-
-    nx::utils::SoftwareVersion dataVersion;
-    QString oldValue;
     nx::vms::api::ResourceParamWithRefDataList data;
     manager->getKvPairsSync(QnUuid(), &data);
     for (const auto& param: data)
     {
         if (param.name == Qn::kResourceDataParamName)
+            return param.value;
+    }
+    return QString();
+}
+
+// Updates local data only without saving to DB.
+static bool overrideResourceParamsDataByUrl(const nx::utils::Url& url, QnResourceDataPool* pool)
+{
+    if (url.isEmpty())
+        return false;
+    if (url.isValid() && !url.host().isEmpty()) //< To pass asserts in AsyncClient::doRequest
+    {
+        if (const auto data = loadDataFromUrl(url); !data.isEmpty())
         {
-            oldValue = param.value;
-            dataVersion = QnResourceDataPool::getVersion(param.value.toUtf8());
-            break;
+            if (pool->validateData(data))
+            {
+                NX_INFO(NX_SCOPE_TAG, "Updating local resource_data.json from %1", url);
+                pool->loadData(data);
+                return true;
+            }
+            NX_WARNING(NX_SCOPE_TAG, "Ignore invalid resource_data.json from %1", url);
+        }
+        else
+        {
+            NX_WARNING(NX_SCOPE_TAG, "Ignore empty resource_data.json from %1", url);
         }
     }
+    else
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Ignore invalid resourceFileUri setting %1", url);
+    }
+    return false;
+}
+
+// Updates local data only without saving to DB.
+static bool overrideResourceParamsDataByLocalFile(QnResourceDataPool* pool)
+{
+    const auto source = QCoreApplication::applicationDirPath() + "/resource_data.json";
+    if (const auto data = loadDataFromFile(source); !data.isEmpty())
+    {
+        if (pool->validateData(data))
+        {
+            NX_INFO(NX_SCOPE_TAG, "Updating local resource_data.json from %1", source);
+            pool->loadData(data);
+            return true;
+        }
+        NX_WARNING(NX_SCOPE_TAG, "Skip invalid resource_data.json from %1", source);
+    }
+    return false;
+}
+
+static std::optional<std::tuple<QString, QByteArray, nx::utils::SoftwareVersion>>
+    findOnlineResourceParamsData(
+        const nx::utils::SoftwareVersion& currentVersion, QnResourceDataPool* pool)
+{
+    static const std::array<const char*, 2> kUrlsToLoadResourceData =
+    {
+        "http://resources.vmsproxy.com/resource_data.json",
+        "http://beta.vmsproxy.com/beta-builds/daily/resource_data.json"
+    };
+    for (const auto& url: kUrlsToLoadResourceData)
+    {
+        auto data = loadDataFromUrl(url);
+        if (!data.isEmpty())
+        {
+            auto version = QnResourceDataPool::getVersion(data);
+            if (version > currentVersion)
+            {
+                if (pool->validateData(data))
+                    return std::make_tuple(QString(url), std::move(data), std::move(version));
+                NX_WARNING(NX_SCOPE_TAG, "Skip invalid resource_data.json from %1", data);
+            }
+            else
+            {
+                NX_DEBUG(NX_SCOPE_TAG,
+                    "Skip internet resource_data.json. Current version %1, internet %2",
+                    currentVersion,
+                    version);
+            }
+        }
+    }
+    return std::nullopt;
+}
+
+void MediaServerProcess::loadResourceParamsData()
+{
+    auto pool = commonModule()->resourceDataPool();
+    if (overrideResourceParamsDataByUrl(commonModule()->globalSettings()->resourceFileUri(), pool))
+        return;
+    if (overrideResourceParamsDataByLocalFile(pool))
+        return;
+
+    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
+    QString source;
+    const QByteArray oldValue = loadDataFromDb(manager).toUtf8();
+    auto dataVersion = QnResourceDataPool::getVersion(oldValue);
 
     static const QString kBuiltinFileName(":/resource_data.json");
-    const auto builtinVersion = QnResourceDataPool::getVersion(loadDataFromFile(kBuiltinFileName));
+    auto newValue = loadDataFromFile(kBuiltinFileName);
+    const auto builtinVersion = QnResourceDataPool::getVersion(newValue);
     if (builtinVersion > dataVersion)
     {
-        dataVersion = builtinVersion;
         source = kBuiltinFileName;
-        param.value = loadDataFromFile(source); //< Default value.
+        dataVersion = builtinVersion;
+    }
+    else
+    {
+        newValue.clear();
     }
 
     if (serverModule()->settings().onlineResourceDataEnabled())
     {
-        for (const auto& url: kUrlsToLoadResourceData)
+        if (const auto online = findOnlineResourceParamsData(dataVersion, pool))
         {
-            const auto internetValue = loadDataFromUrl(url);
-            QString internetVersion;
-            if (!internetValue.isEmpty())
-            {
-                const auto internetVersion = QnResourceDataPool::getVersion(internetValue);
-                if (internetVersion > dataVersion)
-                {
-                    if (serverModule()->commonModule()->resourceDataPool()->validateData(internetValue))
-                    {
-                        param.value = internetValue;
-                        source = url;
-                        dataVersion = internetVersion;
-                        break;
-                    }
-                    else
-                    {
-                        NX_WARNING(this, "Skip invalid resource_data.json from %1", internetValue);
-                    }
-                }
-                else
-                {
-                    NX_DEBUG(this, "Skip internet resource_data.json. Current version %1, internet %2", dataVersion, internetVersion);
-                }
-            }
+            std::tie(source, newValue, dataVersion) = *online;
         }
     }
 
-    if (!param.value.isEmpty() && oldValue != param.value)
+    if (!newValue.isEmpty() && oldValue != newValue)
     {
         NX_INFO(this, "Update system wide resource_data.json from %1", source);
-
         // Update data in the database if there is no value or get update from the HTTP request.
-        ResourceParamWithRefDataList params;
-        params.push_back(param);
-        manager->saveSync(params);
-    }
-
-    const auto externalResourceFileName =
-        QCoreApplication::applicationDirPath() + "/resource_data.json";
-    auto externalFile = loadDataFromFile(externalResourceFileName);
-    if (!externalFile.isEmpty())
-    {
-        // Update local data only without saving to DB if external static file is defined.
-        NX_INFO(this, "Update local resource_data.json from %1", externalResourceFileName);
-        param.value = externalFile;
-        ResourceParamWithRefDataList params;
-        params.push_back(param);
-        manager->saveSync(params);
-        m_serverMessageProcessor->resetPropertyList(params);
+        manager->saveSync({{QnUuid(), Qn::kResourceDataParamName, std::move(newValue)}});
     }
 }
 
@@ -4943,6 +4994,10 @@ void MediaServerProcess::run()
 
     initializeUpnpPortMapper();
 
+    connect(
+        commonModule()->globalSettings(),
+        &QnGlobalSettings::resourceFileUriChanged,
+        [this] { loadResourceParamsData(); });
     loadResourceParamsData();
     loadResourcesFromDatabase();
 
@@ -5135,7 +5190,7 @@ protected:
     virtual void stop() override
     {
         if (serviceMainInstance)
-            serviceMainInstance->stopSync();
+            serviceMainInstance.load()->stopSync();
     }
 
 private:
@@ -5147,10 +5202,13 @@ private:
 void stopServer(int /*signal*/)
 {
     gRestartFlag = false;
-    if (serviceMainInstance) {
-        //output to console from signal handler can cause deadlock
-        //qWarning() << "got signal" << signal << "stop server!";
-        serviceMainInstance->stopAsync();
+    if (serviceMainInstance)
+    {
+        // Output to the console from a signal handler can cause deadlock.
+        //qWarning() << "Got signal" << signal << ", stop server!";
+
+        // TODO: Potential deadlock - the signal may come when the event queue mutex is locked.
+        serviceMainInstance.load()->stopAsync();
     }
 }
 
@@ -5159,7 +5217,7 @@ void restartServer(int restartTimeout)
     gRestartFlag = true;
     if (serviceMainInstance) {
         qWarning() << "restart requested!";
-        QTimer::singleShot(restartTimeout, serviceMainInstance, SLOT(stopAsync()));
+        QTimer::singleShot(restartTimeout, serviceMainInstance.load(), SLOT(stopAsync()));
     }
 }
 
@@ -5167,7 +5225,7 @@ void restartServer(int restartTimeout)
 bool changePort(quint16 port)
 {
     if (serviceMainInstance)
-        return serviceMainInstance->changePort(port);
+        return serviceMainInstance.load()->changePort(port);
     else
         return false;
 }

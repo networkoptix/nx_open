@@ -10,7 +10,7 @@ template<typename ResourceType>
 bool isServerOffline(const ResourceType& r)
 {
     const auto server = r->commonModule()->resourcePool()->getResourceById(r->getParentId());
-    return server->getStatus() == Qn::Offline;
+    return !server || server->getStatus() == Qn::Offline;
 }
 
 template<typename ResourceType>

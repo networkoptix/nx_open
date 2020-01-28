@@ -70,7 +70,7 @@ bool QnMultiserverAnalyticsLookupObjectTracks::deserializeRequest(
     if (!deserializeOutputFormat(params, outputFormat))
         return false;
 
-    if (!deserializeFromParams(params, filter))
+    if (!deserializeFromParams(params, filter, m_commonModule->resourcePool()))
     {
         NX_INFO(this, lm("Failed to parse filter"));
         return false;
