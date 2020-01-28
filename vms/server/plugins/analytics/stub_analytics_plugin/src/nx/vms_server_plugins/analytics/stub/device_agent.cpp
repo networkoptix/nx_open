@@ -33,6 +33,7 @@
 #include "objects/vehicles.h"
 #include "objects/pedestrian.h"
 #include "objects/human_face.h"
+#include "objects/stone.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -848,6 +849,7 @@ void DeviceAgent::parseSettings()
     m_deviceAgentSettings.generatePedestrians = toBool(settingValue(kGeneratePedestriansSetting));
     m_deviceAgentSettings.generateHumanFaces = toBool(settingValue(kGenerateHumanFacesSetting));
     m_deviceAgentSettings.generateBicycles = toBool(settingValue(kGenerateBicyclesSetting));
+    m_deviceAgentSettings.generateStones = toBool(settingValue(kGenerateStonesSetting));
 
     assignIntegerSetting(kBlinkingObjectPeriodMsSetting,
         &m_deviceAgentSettings.blinkingObjectPeriodMs);
@@ -890,6 +892,7 @@ void DeviceAgent::updateObjectGenerationParameters()
     setIsObjectTypeGenerationNeeded<Pedestrian>(m_deviceAgentSettings.generatePedestrians);
     setIsObjectTypeGenerationNeeded<HumanFace>(m_deviceAgentSettings.generateHumanFaces);
     setIsObjectTypeGenerationNeeded<Bicycle>(m_deviceAgentSettings.generateBicycles);
+    setIsObjectTypeGenerationNeeded<Stone>(m_deviceAgentSettings.generateStones);
 }
 
 void DeviceAgent::updateEventGenerationParameters()

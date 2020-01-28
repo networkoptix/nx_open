@@ -22,6 +22,7 @@
 
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/analytics/object_coordinates_translator.h>
 
 #include <nx/analytics/metadata_logger.h>
 
@@ -83,6 +84,7 @@ private:
     QnAbstractDataReceptor* m_metadataSink = nullptr;
     nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;
     nx::analytics::MetadataLogger m_metadataLogger;
+    ObjectCoordinatesTranslator m_objectCoordinatesTranslator;
 };
 
 } // namespace nx::vms::server::analytics

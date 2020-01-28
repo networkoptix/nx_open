@@ -30,10 +30,14 @@ using namespace nx::vms::api::analytics;
 using namespace nx::vms_server_plugins::utils;
 
 MetadataHandler::MetadataHandler(
-    QnMediaServerModule* serverModule, QnVirtualCameraResourcePtr device, QnUuid engineId):
+    QnMediaServerModule* serverModule,
+    QnVirtualCameraResourcePtr device,
+    QnUuid engineId)
+    :
     ServerModuleAware(serverModule),
     m_resource(device), m_engineId(engineId),
-    m_metadataLogger("outgoing_metadata_", m_resource->getId(), m_engineId)
+    m_metadataLogger("outgoing_metadata_", m_resource->getId(), m_engineId),
+    m_objectCoordinatesTranslator(device)
 {
     connect(this,
         &MetadataHandler::sdkEventTriggered,
@@ -122,7 +126,8 @@ void MetadataHandler::handleObjectMetadataPacket(
         objectMetadata.typeId = item->typeId();
         objectMetadata.trackId = fromSdkUuidToQnUuid(item->trackId());
         const auto box = item->boundingBox();
-        objectMetadata.boundingBox = QRectF(box.x, box.y, box.width, box.height);
+        objectMetadata.boundingBox =
+            m_objectCoordinatesTranslator.translate(QRectF(box.x, box.y, box.width, box.height));
 
         NX_VERBOSE(this, "%1(): x %2, y %3, width %4, height %5, typeId %6, id %7",
             __func__, box.x, box.y, box.width, box.height,
