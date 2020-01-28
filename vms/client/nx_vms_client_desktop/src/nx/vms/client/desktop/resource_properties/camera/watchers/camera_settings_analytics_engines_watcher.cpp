@@ -21,10 +21,9 @@ namespace {
 AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& engine)
 {
     const auto plugin = engine->getParentResource().dynamicCast<AnalyticsPluginResource>();
-    if (!plugin)
-        return {};
-
-    const auto pluginManifest = plugin->manifest();
+    const auto pluginManifest = NX_ASSERT(plugin)
+        ? plugin->manifest()
+        : api::analytics::PluginManifest{};
 
     return AnalyticsEngineInfo {
         engine->getId(),
