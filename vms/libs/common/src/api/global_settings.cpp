@@ -706,7 +706,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         this);
 
     m_resourceFileUriAdaptor =
-        new QnLexicalResourcePropertyAdaptor<QString>("resourceFileUri", "", this);
+        new QnLexicalResourcePropertyAdaptor<nx::utils::Url>("resourceFileUri", "", this);
 
     m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxEventLogRecords",
@@ -1801,12 +1801,12 @@ QString QnGlobalSettings::licenseServerUrl() const
     return m_licenseServerUrlAdaptor->value();
 }
 
-void QnGlobalSettings::setResourceFileUri(const QString& value)
+void QnGlobalSettings::setResourceFileUri(const nx::utils::Url& value)
 {
     m_resourceFileUriAdaptor->setValue(value);
 }
 
-QString QnGlobalSettings::resourceFileUri() const
+nx::utils::Url QnGlobalSettings::resourceFileUri() const
 {
     return m_resourceFileUriAdaptor->value();
 }

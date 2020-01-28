@@ -16,6 +16,7 @@
 #include <utils/common/optional.h>
 
 #include <nx/utils/singleton.h>
+#include <nx/utils/url.h>
 
 class QnAbstractResourcePropertyAdaptor;
 
@@ -394,8 +395,8 @@ public:
     QString licenseServerUrl() const;
     void setLicenseServerUrl(const QString& value);
 
-    QString resourceFileUri() const;
-    void setResourceFileUri(const QString& value);
+    nx::utils::Url resourceFileUri() const;
+    void setResourceFileUri(const nx::utils::Url& value);
 
 signals:
     void initialized();
@@ -562,7 +563,7 @@ private:
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::map<QString, int>>* m_specificFeaturesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_resourceFileUriAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

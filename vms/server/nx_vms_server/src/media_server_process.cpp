@@ -4663,104 +4663,136 @@ static QByteArray loadDataFromUrl(nx::utils::Url url)
     return QByteArray();
 }
 
-void MediaServerProcess::loadResourceParamsData()
+static QString loadDataFromDb(ec2::AbstractResourceManagerPtr manager)
 {
-    QByteArray overrideData;
-    QString overrideSource;
-    if (overrideSource = commonModule()->globalSettings()->resourceFileUri()
-        ;
-        !overrideSource.isEmpty())
-    {
-        overrideData = loadDataFromUrl(overrideSource);
-    }
-    else
-    {
-        overrideSource = QCoreApplication::applicationDirPath() + "/resource_data.json";
-        overrideData = loadDataFromFile(overrideSource);
-    }
-    if (!overrideData.isEmpty() && commonModule()->resourceDataPool()->validateData(overrideData))
-    {
-        NX_INFO(this, "Updating local resource_data.json from %1", overrideSource);
-        // Update local data only without saving to DB.
-        commonModule()->resourceDataPool()->loadData(overrideData);
-        return;
-    }
-
-    const std::array<const char*,2> kUrlsToLoadResourceData =
-    {
-        "http://resources.vmsproxy.com/resource_data.json",
-        "http://beta.vmsproxy.com/beta-builds/daily/resource_data.json"
-    };
-
-    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
-
-    using namespace nx::vms::api;
-    QString source;
-    ResourceParamWithRefData param;
-    param.name = Qn::kResourceDataParamName;
-
-    nx::utils::SoftwareVersion dataVersion;
-    QString oldValue;
     nx::vms::api::ResourceParamWithRefDataList data;
     manager->getKvPairsSync(QnUuid(), &data);
     for (const auto& param: data)
     {
         if (param.name == Qn::kResourceDataParamName)
+            return param.value;
+    }
+    return QString();
+}
+
+// Updates local data only without saving to DB.
+static bool overrideResourceParamsDataByUrl(const nx::utils::Url& url, QnResourceDataPool* pool)
+{
+    if (url.isEmpty())
+        return false;
+    if (url.isValid() && !url.host().isEmpty()) //< To pass asserts in AsyncClient::doRequest
+    {
+        if (const auto data = loadDataFromUrl(url); !data.isEmpty())
         {
-            oldValue = param.value;
-            dataVersion = QnResourceDataPool::getVersion(param.value.toUtf8());
-            break;
+            if (pool->validateData(data))
+            {
+                NX_INFO(NX_SCOPE_TAG, "Updating local resource_data.json from %1", url);
+                pool->loadData(data);
+                return true;
+            }
+            NX_WARNING(NX_SCOPE_TAG, "Ignore invalid resource_data.json from %1", url);
+        }
+        else
+        {
+            NX_WARNING(NX_SCOPE_TAG, "Ignore empty resource_data.json from %1", url);
         }
     }
+    else
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Ignore invalid resourceFileUri setting %1", url);
+    }
+    return false;
+}
+
+// Updates local data only without saving to DB.
+static bool overrideResourceParamsDataByLocalFile(QnResourceDataPool* pool)
+{
+    const auto source = QCoreApplication::applicationDirPath() + "/resource_data.json";
+    if (const auto data = loadDataFromFile(source); !data.isEmpty())
+    {
+        if (pool->validateData(data))
+        {
+            NX_INFO(NX_SCOPE_TAG, "Updating local resource_data.json from %1", source);
+            pool->loadData(data);
+            return true;
+        }
+        NX_WARNING(NX_SCOPE_TAG, "Skip invalid resource_data.json from %1", source);
+    }
+    return false;
+}
+
+static std::optional<std::tuple<QString, QByteArray, nx::utils::SoftwareVersion>>
+    findOnlineResourceParamsData(
+        const nx::utils::SoftwareVersion& currentVersion, QnResourceDataPool* pool)
+{
+    static const std::array<const char*, 2> kUrlsToLoadResourceData =
+    {
+        "http://resources.vmsproxy.com/resource_data.json",
+        "http://beta.vmsproxy.com/beta-builds/daily/resource_data.json"
+    };
+    for (const auto& url: kUrlsToLoadResourceData)
+    {
+        auto data = loadDataFromUrl(url);
+        if (!data.isEmpty())
+        {
+            auto version = QnResourceDataPool::getVersion(data);
+            if (version > currentVersion)
+            {
+                if (pool->validateData(data))
+                    return std::make_tuple(QString(url), std::move(data), std::move(version));
+                NX_WARNING(NX_SCOPE_TAG, "Skip invalid resource_data.json from %1", data);
+            }
+            else
+            {
+                NX_DEBUG(NX_SCOPE_TAG,
+                    "Skip internet resource_data.json. Current version %1, internet %2",
+                    currentVersion,
+                    version);
+            }
+        }
+    }
+    return std::nullopt;
+}
+
+void MediaServerProcess::loadResourceParamsData()
+{
+    auto pool = commonModule()->resourceDataPool();
+    if (overrideResourceParamsDataByUrl(commonModule()->globalSettings()->resourceFileUri(), pool))
+        return;
+    if (overrideResourceParamsDataByLocalFile(pool))
+        return;
+
+    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
+    QString source;
+    const QByteArray oldValue = loadDataFromDb(manager).toUtf8();
+    auto dataVersion = QnResourceDataPool::getVersion(oldValue);
 
     static const QString kBuiltinFileName(":/resource_data.json");
-    const auto builtinVersion = QnResourceDataPool::getVersion(loadDataFromFile(kBuiltinFileName));
+    auto newValue = loadDataFromFile(kBuiltinFileName);
+    const auto builtinVersion = QnResourceDataPool::getVersion(newValue);
     if (builtinVersion > dataVersion)
     {
-        dataVersion = builtinVersion;
         source = kBuiltinFileName;
-        param.value = loadDataFromFile(source); //< Default value.
+        dataVersion = builtinVersion;
+    }
+    else
+    {
+        newValue.clear();
     }
 
     if (serverModule()->settings().onlineResourceDataEnabled())
     {
-        for (const auto& url: kUrlsToLoadResourceData)
+        if (const auto online = findOnlineResourceParamsData(dataVersion, pool))
         {
-            const auto internetValue = loadDataFromUrl(url);
-            QString internetVersion;
-            if (!internetValue.isEmpty())
-            {
-                const auto internetVersion = QnResourceDataPool::getVersion(internetValue);
-                if (internetVersion > dataVersion)
-                {
-                    if (serverModule()->commonModule()->resourceDataPool()->validateData(internetValue))
-                    {
-                        param.value = internetValue;
-                        source = url;
-                        dataVersion = internetVersion;
-                        break;
-                    }
-                    else
-                    {
-                        NX_WARNING(this, "Skip invalid resource_data.json from %1", internetValue);
-                    }
-                }
-                else
-                {
-                    NX_DEBUG(this, "Skip internet resource_data.json. Current version %1, internet %2", dataVersion, internetVersion);
-                }
-            }
+            std::tie(source, newValue, dataVersion) = *online;
         }
     }
 
-    if (!param.value.isEmpty() && oldValue != param.value)
+    if (!newValue.isEmpty() && oldValue != newValue)
     {
         NX_INFO(this, "Update system wide resource_data.json from %1", source);
-
         // Update data in the database if there is no value or get update from the HTTP request.
-        ResourceParamWithRefDataList params;
-        params.push_back(param);
-        manager->saveSync(params);
+        manager->saveSync({{QnUuid(), Qn::kResourceDataParamName, std::move(newValue)}});
     }
 }
 
