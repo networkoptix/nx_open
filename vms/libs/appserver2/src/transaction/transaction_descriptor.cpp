@@ -1013,6 +1013,11 @@ struct ModifyAccessRightsChecker
             return ErrorCode::forbidden;
         }
 
+        // We can clear shared resources even after user or role is deleted.
+        if (param.resourceIds.empty())
+            return ErrorCode::ok;
+
+        // To set shared resources the param.userId must contain a valid user or role.
         auto user = commonModule->resourcePool()->getResourceById<QnUserResource>(param.userId);
         if (!user)
         {
@@ -1020,10 +1025,6 @@ struct ModifyAccessRightsChecker
                 return ErrorCode::badRequest;
             return ErrorCode::ok;
         }
-
-        // Allow to clear shared resources unconditionally.
-        if (param.resourceIds.empty())
-            return ErrorCode::ok;
 
         if (user->userRole() == Qn::UserRole::customUserRole)
             return ErrorCode::forbidden;
