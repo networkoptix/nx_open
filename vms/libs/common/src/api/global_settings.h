@@ -350,6 +350,9 @@ public:
 
     int maxWebMTranscoders() const;
 
+    bool isWebSocketEnabled() const;
+    void setWebSocketEnabled(bool value);
+
     bool isEdgeRecordingEnabled() const;
     void setEdgeRecordingEnabled(bool enabled);
 
@@ -546,6 +549,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_webSocketEnabledAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads = nullptr;
