@@ -186,9 +186,11 @@ nx::core::resource::DeviceType QnSecurityCamResource::deviceType() const
         return DeviceType::encoder;
     if (isMultiSensorCamera())
         return DeviceType::multisensorCamera;
-    if (!hasVideo())
+    if (hasVideo())
+        return DeviceType::camera;
+    if (hasCameraCapabilities(Qn::AudioTransmitCapability))
         return DeviceType::hornSpeaker;
-    return DeviceType::camera;
+    return DeviceType::unknown;
 }
 
 QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
