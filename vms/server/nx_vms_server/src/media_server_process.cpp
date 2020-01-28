@@ -322,7 +322,7 @@ static const int UDT_INTERNET_TRAFIC_TIMER = 24 * 60 * 60 * 1000; //< Once a day
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 
 class MediaServerProcess;
-static MediaServerProcess* serviceMainInstance = nullptr;
+static std::atomic<MediaServerProcess*> serviceMainInstance = nullptr;
 void stopServer(int signal);
 static bool gRestartFlag = false;
 
@@ -1019,6 +1019,7 @@ MediaServerProcess::~MediaServerProcess()
     quit();
     stop();
     m_staticCommonModule.reset();
+    serviceMainInstance = nullptr;
 }
 
 void MediaServerProcess::initResourceTypes()
@@ -1107,7 +1108,15 @@ void MediaServerProcess::stopSync()
 
 void MediaServerProcess::stopAsync()
 {
-    QTimer::singleShot(0, this, SLOT(stopSync()));
+    // ATTENTION: This method is also called from a signal handler, thus, no logging is allowed.
+
+    static std::atomic<bool> wasCalled = false;
+    if (wasCalled)
+        return;
+    wasCalled = true;
+
+    if (serviceMainInstance)
+        QTimer::singleShot(0, this, SLOT(stopSync()));
 }
 
 int MediaServerProcess::getTcpPort() const
@@ -5149,7 +5158,7 @@ protected:
     virtual void stop() override
     {
         if (serviceMainInstance)
-            serviceMainInstance->stopSync();
+            serviceMainInstance.load()->stopSync();
     }
 
 private:
@@ -5161,10 +5170,13 @@ private:
 void stopServer(int /*signal*/)
 {
     gRestartFlag = false;
-    if (serviceMainInstance) {
-        //output to console from signal handler can cause deadlock
-        //qWarning() << "got signal" << signal << "stop server!";
-        serviceMainInstance->stopAsync();
+    if (serviceMainInstance)
+    {
+        // Output to the console from a signal handler can cause deadlock.
+        //qWarning() << "Got signal" << signal << ", stop server!";
+
+        // TODO: Potential deadlock - the signal may come when the event queue mutex is locked.
+        serviceMainInstance.load()->stopAsync();
     }
 }
 
@@ -5173,7 +5185,7 @@ void restartServer(int restartTimeout)
     gRestartFlag = true;
     if (serviceMainInstance) {
         qWarning() << "restart requested!";
-        QTimer::singleShot(restartTimeout, serviceMainInstance, SLOT(stopAsync()));
+        QTimer::singleShot(restartTimeout, serviceMainInstance.load(), SLOT(stopAsync()));
     }
 }
 
@@ -5181,7 +5193,7 @@ void restartServer(int restartTimeout)
 bool changePort(quint16 port)
 {
     if (serviceMainInstance)
-        return serviceMainInstance->changePort(port);
+        return serviceMainInstance.load()->changePort(port);
     else
         return false;
 }

@@ -84,7 +84,6 @@ public:
     MediaServerProcess(int argc, char* argv[], bool serviceMode = false);
     ~MediaServerProcess();
 
-    void stopObjects();
     void run();
     int getTcpPort() const;
 
@@ -157,6 +156,7 @@ private slots:
     void at_serverPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 private:
+    void stopObjects();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraChangesIfNeeded();
     void moveHandlingCameras();
