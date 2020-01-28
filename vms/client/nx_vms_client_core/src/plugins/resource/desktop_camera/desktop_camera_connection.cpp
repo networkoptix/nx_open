@@ -242,8 +242,10 @@ std::unique_ptr<nx::network::AbstractStreamSocket> QnDesktopCameraConnection::ta
     std::unique_ptr<nx::network::http::HttpClient>& httpClient)
 {
     auto buffer = httpClient->fetchMessageBodyBuffer();
-    return std::make_unique<nx::network::BufferedStreamSocket>(
-        std::move(httpClient->takeSocket()), buffer);
+    auto socket = httpClient->takeSocket();
+    socket->setNonBlockingMode(false);
+    auto result = std::make_unique<nx::network::BufferedStreamSocket>(std::move(socket), buffer);
+    return result;
 }
 
 void QnDesktopCameraConnection::pleaseStop()
@@ -311,7 +313,7 @@ void QnDesktopCameraConnection::run()
 
         QElapsedTimer timeout;
         timeout.start();
-        while (!m_needStop && processor->isConnected())
+        while (!m_needStop && processor && processor->isConnected())
         {
             if (processor->readRequest())
             {
