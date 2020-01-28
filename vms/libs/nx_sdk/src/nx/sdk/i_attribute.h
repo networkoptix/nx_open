@@ -16,7 +16,6 @@ public:
         number,
         boolean,
         string,
-        local_time_point, //< std::chrono::time_point<std::chrono::system_clock>
         // TODO: Consider adding other specific types like Coordinates, Temperature.
     };
 
