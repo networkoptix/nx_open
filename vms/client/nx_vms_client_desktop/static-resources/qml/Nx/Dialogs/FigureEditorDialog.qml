@@ -249,7 +249,7 @@ Window
     {
         editor.deserialize(json)
         if (!editor.hasFigure)
-            editor.color = palette.colors[Math.floor(Math.random() * palette.colors.length)]
+            editor.color = palette.colors[0]
         palette.color = editor.color
     }
 }
