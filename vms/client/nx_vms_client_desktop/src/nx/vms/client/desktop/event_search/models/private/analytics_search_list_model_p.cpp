@@ -754,6 +754,9 @@ QString AnalyticsSearchListModel::Private::attributes(
     QString rows;
     int padding = 0;
 
+    // TODO: #vkutin Simplify this part. Probably refactor to store attributes in a grouped form.
+    // Otherwise implement template grouping algorithm with unit tests.
+
     for (auto begin = track.attributes.cbegin(); begin != track.attributes.cend(); )
     {
         if (begin->name.isEmpty() || begin->name.startsWith("nx.sys."))
