@@ -540,11 +540,11 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
         *maskEnd = 0;
     memset(mask, 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8);
 
-    for (int i = 0; i < region.rectCount(); ++i)
-    {
-        QRect rect = region.rects().at(i).intersected(kMaxGridRect);
-        addDataToMask(rect, mask, maskStart, maskEnd);
-    }
+    if (region.isEmpty())
+        addDataToMask(kMaxGridRect, mask, maskStart, maskEnd);
+
+    for (const QRect& rect: region.rects())
+        addDataToMask(rect.intersected(kMaxGridRect), mask, maskStart, maskEnd);
 }
 
 void QnMetaDataV1::createMask(const QRectF& rectF, char* mask, int* maskStart, int* maskEnd)
