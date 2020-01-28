@@ -241,7 +241,7 @@ QWebEngineView* WebEngineView::createWindow(QWebEnginePage::WebWindowType type)
 
     auto window = new QMainWindow(nullptr, flags);
 
-    static constexpr QSize kMinumumWindowSize(120, 0); //< Leave some space for window controls.
+    static constexpr QSize kMinumumWindowSize(214, 0); //< Leave some space for window controls.
     window->setMinimumSize(kMinumumWindowSize);
 
     auto webView = new WebEngineView(window, this);
