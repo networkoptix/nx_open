@@ -394,6 +394,9 @@ public:
     QString licenseServerUrl() const;
     void setLicenseServerUrl(const QString& value);
 
+    QString resourceFileUri() const;
+    void setResourceFileUri(const QString& value);
+
 signals:
     void initialized();
 
@@ -428,6 +431,7 @@ signals:
     void downloaderPeersChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
+    void resourceFileUriChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -558,6 +562,7 @@ private:
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::map<QString, int>>* m_specificFeaturesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_resourceFileUriAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

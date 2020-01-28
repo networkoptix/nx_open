@@ -4656,6 +4656,27 @@ static QByteArray loadDataFromUrl(nx::utils::Url url)
 
 void MediaServerProcess::loadResourceParamsData()
 {
+    QByteArray overrideData;
+    QString overrideSource;
+    if (overrideSource = commonModule()->globalSettings()->resourceFileUri()
+        ;
+        !overrideSource.isEmpty())
+    {
+        overrideData = loadDataFromUrl(overrideSource);
+    }
+    else
+    {
+        overrideSource = QCoreApplication::applicationDirPath() + "/resource_data.json";
+        overrideData = loadDataFromFile(overrideSource);
+    }
+    if (!overrideData.isEmpty() && commonModule()->resourceDataPool()->validateData(overrideData))
+    {
+        NX_INFO(this, "Updating local resource_data.json from %1", overrideSource);
+        // Update local data only without saving to DB.
+        commonModule()->resourceDataPool()->loadData(overrideData);
+        return;
+    }
+
     const std::array<const char*,2> kUrlsToLoadResourceData =
     {
         "http://resources.vmsproxy.com/resource_data.json",
@@ -4731,20 +4752,6 @@ void MediaServerProcess::loadResourceParamsData()
         ResourceParamWithRefDataList params;
         params.push_back(param);
         manager->saveSync(params);
-    }
-
-    const auto externalResourceFileName =
-        QCoreApplication::applicationDirPath() + "/resource_data.json";
-    auto externalFile = loadDataFromFile(externalResourceFileName);
-    if (!externalFile.isEmpty())
-    {
-        // Update local data only without saving to DB if external static file is defined.
-        NX_INFO(this, "Update local resource_data.json from %1", externalResourceFileName);
-        param.value = externalFile;
-        ResourceParamWithRefDataList params;
-        params.push_back(param);
-        manager->saveSync(params);
-        m_serverMessageProcessor->resetPropertyList(params);
     }
 }
 
@@ -4946,6 +4953,10 @@ void MediaServerProcess::run()
 
     initializeUpnpPortMapper();
 
+    connect(
+        commonModule()->globalSettings(),
+        &QnGlobalSettings::resourceFileUriChanged,
+        [this] { loadResourceParamsData(); });
     loadResourceParamsData();
     loadResourcesFromDatabase();
 
