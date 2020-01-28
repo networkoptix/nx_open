@@ -20,6 +20,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/url.h>
 
 #include "api/app_server_connection.h"
 #include "core/resource/network_resource.h"
@@ -313,6 +314,24 @@ void ProxyConnectionProcessor::cleanupProxyInfo(nx::network::http::Request* requ
         QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority);
 }
 
+void ProxyConnectionProcessor::replaceCameraRefererHeader(const QnNetworkResourcePtr& camera)
+{
+    Q_D(ProxyConnectionProcessor);
+
+    static constexpr auto kRefererHeader = "Referer";
+
+    const auto referer = nx::network::http::getHeaderValue(d->request.headers, kRefererHeader);
+    if (referer.isEmpty())
+        return;
+
+    // Some cameras require Referer header to match their network address.
+    nx::utils::Url newReferer(referer);
+    newReferer.setHost(camera->getHostAddress());
+    newReferer.setPort(camera->httpPort());
+    nx::network::http::insertOrReplaceHeader(&d->request.headers,
+        nx::network::http::HttpHeader(kRefererHeader, newReferer.toEncoded()));
+}
+
 bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRoute& dstRoute)
 {
     Q_D(ProxyConnectionProcessor);
@@ -406,7 +425,10 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
         {
             cleanupProxyInfo(&d->request);
             if (QnNetworkResourcePtr camera = resourcePool()->getResourceById<QnNetworkResource>(cameraGuid))
+            {
                 dstRoute.addr = nx::network::SocketAddress(camera->getHostAddress(), camera->httpPort());
+                replaceCameraRefererHeader(camera);
+            }
         }
         else if (isStandardProxyNeeded(commonModule(), d->request))
         {
