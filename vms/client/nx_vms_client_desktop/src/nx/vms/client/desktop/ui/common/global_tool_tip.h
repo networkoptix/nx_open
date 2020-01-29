@@ -12,6 +12,8 @@ class GlobalToolTipAttached: public QObject
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
     Q_PROPERTY(bool showOnHover READ showOnHover WRITE setShowOnHover
         NOTIFY showOnHoverChanged)
+    Q_PROPERTY(bool stickToItem READ stickToItem WRITE setStickToItem
+        NOTIFY stickToItemChanged)
     Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)
 
 public:
@@ -19,16 +21,19 @@ public:
     virtual ~GlobalToolTipAttached() override;
 
     QString text() const;
-    void setText(const QString& text);
+    void setText(const QString& value);
 
     bool isVisible() const;
-    void setVisible(bool visible);
+    void setVisible(bool value);
 
     bool showOnHover() const;
-    void setShowOnHover(bool showOnHover);
+    void setShowOnHover(bool value);
+
+    bool stickToItem() const; //< Whether the tooltip moves if it's invoker item moves.
+    void setStickToItem(bool value);
 
     int delay() const;
-    void setDelay(int delay);
+    void setDelay(int value);
 
     Q_INVOKABLE void show(const QString& text, int delay = -1);
     Q_INVOKABLE void hide();
@@ -37,6 +42,7 @@ signals:
     void textChanged();
     void visibleChanged();
     void showOnHoverChanged();
+    void stickToItemChanged();
     void delayChanged();
 
 private:
