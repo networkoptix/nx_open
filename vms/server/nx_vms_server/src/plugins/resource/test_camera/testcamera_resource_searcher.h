@@ -38,8 +38,7 @@ public:
 
 private:
     void sendBroadcast();
-    bool updateSocketList();
-    void clearSocketList();
+    bool updateSocketListIfNeeded();
 
     void processDiscoveryResponseMessage(
         const QByteArray& discoveryResponseMessage,
@@ -53,23 +52,13 @@ private:
         int mediaPort,
         const QString& testcameraAddress) const;
 
+    bool readDiscoveryResponse(
+        nx::network::AbstractDatagramSocket* socket,
+        QnResourceList* resources,
+        std::set<nx::utils::MacAddress>* processedMacAddresses) const;
+
 private:
-    struct DiscoverySocket
-    {
-        DiscoverySocket(
-            nx::network::AbstractDatagramSocket* socket, const QHostAddress& address)
-            :
-            socket(socket), address(address)
-        {
-        }
-
-        ~DiscoverySocket() {}
-
-        nx::network::AbstractDatagramSocket* const socket;
-        const QHostAddress address;
-    };
-
-    std::vector<DiscoverySocket> m_discoverySockets;
+    std::vector<std::unique_ptr<nx::network::AbstractDatagramSocket>> m_discoverySockets;
     qint64 m_socketUpdateTime = 0;
 };
 
