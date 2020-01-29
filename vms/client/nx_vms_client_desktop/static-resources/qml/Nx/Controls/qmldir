@@ -20,6 +20,7 @@ Scrollable 1.0 Scrollable.qml
 Banner 1.0 Banner.qml
 ToolTip 1.0 ToolTip.qml
 TextArea 1.0 TextArea.qml
+TextButton 1.0 TextButton.qml
 LinearPaletteColorPicker 1.0 LinearPaletteColorPicker.qml
 
 ArrowIcon 1.0 ArrowIcon.qml
