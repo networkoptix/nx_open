@@ -116,3 +116,9 @@ bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
         return false;
     }
 }
+
+QnHelpHandler& QnHelpHandler::instance()
+{
+    static QnHelpHandler helpHandler;
+    return helpHandler;
+}

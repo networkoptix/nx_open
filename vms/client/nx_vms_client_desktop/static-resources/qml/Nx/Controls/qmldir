@@ -4,6 +4,8 @@ Button 1.0 Button.qml
 FlatButton 1.0 FlatButton.qml
 SwitchButton 1.0 SwitchButton.qml
 AutoScalableItem 1.0 AutoScalableItem.qml
+ContextHintButton 1.0 ContextHintButton.qml
+ContextHintLabel 1.0 ContextHintLabel.qml
 TextField 1.0 TextField.qml
 TextFieldWithWarning 1.0 TextFieldWithWarning.qml
 SpinBox 1.0 SpinBox.qml

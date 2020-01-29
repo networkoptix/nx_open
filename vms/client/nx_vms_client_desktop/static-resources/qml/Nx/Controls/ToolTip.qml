@@ -10,13 +10,11 @@ ToolTip
     font.pixelSize: 13
     leftPadding: 8
     rightPadding: 8
-    topPadding: 0
-    bottomPadding: 0
+    topPadding: 2
+    bottomPadding: 5
     margins: 0
 
     delay: 500
-
-    implicitHeight: 24
 
     background: Item
     {
@@ -45,11 +43,13 @@ ToolTip
         font: control.font
         color: ColorTheme.colors.dark4
         verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
+        horizontalAlignment: Text.AlignLeft
+        textFormat: Text.RichText //< For some reason Text.AutoText works very unreliable.
     }
 
     enter: Transition
     {
+        // Fade in.
         NumberAnimation
         {
             property: "opacity"
@@ -61,7 +61,17 @@ ToolTip
     {
         SequentialAnimation
         {
-            PauseAnimation { duration: 300 }
+            // Ensure that the fade in is finished.
+            NumberAnimation
+            {
+                property: "opacity"
+                to: 1
+                duration: 100
+            }
+
+            PauseAnimation { duration: 200 }
+
+            // Fade out.
             NumberAnimation
             {
                 property: "opacity"
