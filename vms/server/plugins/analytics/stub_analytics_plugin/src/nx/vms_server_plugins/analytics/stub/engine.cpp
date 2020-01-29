@@ -522,7 +522,7 @@ std::string Engine::manifestString() const
                     {
                         "type": "PolygonFigure",
                         "name": "testPolygon",
-                        "caption": "Polygon"
+                        "caption": "Polygon (points are plugin side)"
                     },
                     {
                         "type": "BoxFigure",

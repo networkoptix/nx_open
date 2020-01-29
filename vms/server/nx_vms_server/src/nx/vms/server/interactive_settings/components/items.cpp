@@ -324,13 +324,65 @@ Button::Button(QObject* parent):
 //-------------------------------------------------------------------------------------------------
 // ROI components.
 
+BaseFigure::BaseFigure(const QString& figureType, QObject* parent):
+    ValueItem(figureType, parent)
+{
+}
+
+/*static*/ QJsonObject BaseFigure::mergeFigures(
+    const QJsonObject& currentFigureValue, const QJsonObject& newFigureValue)
+{
+    QJsonObject result = currentFigureValue;
+    for (auto it = newFigureValue.begin(); it != newFigureValue.end(); ++it)
+    {
+        if (it->isNull() || it->isUndefined())
+            continue;
+
+        const QString propertyKey = it.key();
+        if (it->isObject())
+        {
+            result[propertyKey] =
+                mergeFigures(result[propertyKey].toObject(), it.value().toObject());
+        }
+        else
+        {
+            result[propertyKey] = it.value();
+        }
+    }
+
+    return result;
+}
+
+void BaseFigure::setValue(const QVariant& value)
+{
+    QJsonObject valueJsonObject;
+    if (value.canConvert<QString>())
+    {
+        QJsonDocument jsonDocument = QJsonDocument::fromJson(value.toString().toUtf8());
+        if (jsonDocument.isObject())
+            valueJsonObject = jsonDocument.object();
+        else
+            return;
+    }
+    else if (value.canConvert<QVariantMap>())
+    {
+        valueJsonObject = QJsonValue::fromVariant(value).toObject();
+    }
+    else
+    {
+        return;
+    }
+
+    m_value.setValue(mergeFigures(QJsonValue::fromVariant(m_value).toObject(), valueJsonObject));
+}
+
 LineFigure::LineFigure(QObject* parent):
-    ValueItem(QStringLiteral("LineFigure"), parent)
+    BaseFigure(QStringLiteral("LineFigure"), parent)
 {
 }
 
 PolygonFigure::PolygonFigure(QObject* parent):
-    ValueItem(QStringLiteral("BoxFigure"), parent)
+    BaseFigure(QStringLiteral("BoxFigure"), parent)
 {
 }
 
@@ -344,7 +396,7 @@ void PolygonFigure::setMaxPoints(int maxPoints)
 }
 
 BoxFigure::BoxFigure(QObject* parent):
-    ValueItem(QStringLiteral("PolygonFigure"), parent)
+    BaseFigure(QStringLiteral("PolygonFigure"), parent)
 {
 }
 
