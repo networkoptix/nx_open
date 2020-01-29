@@ -281,7 +281,7 @@ TEST_F(DeviceFileCatalogTest, mergeRecordingStatistics)
     ASSERT_NE(0, stats.recordedBytes);
     ASSERT_NE(0, stats.recordedSecs);
 
-    // #TODO #rvasilenko Elaborate on this frame.
+    // #TODO #rvasilenko Elaborate on this test.
 }
 
 TEST_F(DeviceFileCatalogTest, recordedMonthList)
