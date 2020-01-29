@@ -289,13 +289,14 @@ void DeviceAgent::doSetSettings(
         m_settings.motionDetectionObjectSize, sender, m_frameSize, m_channelNumber);
 
     copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber); //*
+        m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber);
 
     for (int i = 0; i < Settings::kMultiplicity; ++i)
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.motionDetectionIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
+            m_settings.motionDetectionIncludeArea[i], sender, m_frameSize, m_channelNumber, i);
     }
+
     for (int i = 0; i < Settings::kMultiplicity; ++i)
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
@@ -303,52 +304,49 @@ void DeviceAgent::doSetSettings(
     }
 
     copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber); //*
+        m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber);
 
     copySettingsFromServerToCamera(errorMap, sourceMap,
         m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
 
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.fogDetection, sender, m_frameSize, m_channelNumber);
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.fogDetection, sender, m_frameSize, m_channelNumber);
 
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.faceDetectionGeneral, sender, m_frameSize, m_channelNumber);
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.objectDetectionGeneral, sender, m_frameSize, m_channelNumber);
 
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.objectDetectionGeneral, sender, m_frameSize, m_channelNumber);
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.objectDetectionBestShot, sender, m_frameSize, m_channelNumber);
 
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.objectDetectionBestShot, sender, m_frameSize, m_channelNumber);
+    for (int i = 0; i < 8; ++i)
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.objectDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+    }
 
-    //for (int i = 0; i < 8; ++i)
-    //{
-    //    copySettingsFromServerToCamera(errorMap, sourceMap,
-    //        m_settings.objectDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
-    //}
+    for (int i = 0; i < 8; ++i)
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.ivaLine[i], sender, m_frameSize, m_channelNumber, i);
+    }
 
-    //for (int i = 0; i < 8; ++i)
-    //{
-    //    copySettingsFromServerToCamera(errorMap, sourceMap,
-    //        m_settings.ivaLine[i], sender, m_frameSize, m_channelNumber, i); //*
-    //}
+    for (int i = 0; i < 8; ++i)
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.ivaIncludeArea[i], sender, m_frameSize, m_channelNumber, i);
+    }
 
-    //for (int i = 0; i < 8; ++i)
-    //{
-    //    copySettingsFromServerToCamera(errorMap, sourceMap,
-    //        m_settings.ivaIncludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
-    //}
+    for (int i = 0; i < 8; ++i)
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.ivaExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+    }
 
-    //for (int i = 0; i < 8; ++i)
-    //{
-    //    copySettingsFromServerToCamera(errorMap, sourceMap,
-    //        m_settings.ivaExcludeArea[i], sender, m_frameSize, m_channelNumber, i); //*
-    //}
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.audioDetection, sender, m_frameSize, m_channelNumber);
 
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.audioDetection, sender, m_frameSize, m_channelNumber);
-
-    //copySettingsFromServerToCamera(errorMap, sourceMap,
-    //    m_settings.soundClassification, sender, m_frameSize, m_channelNumber);
+    copySettingsFromServerToCamera(errorMap, sourceMap,
+        m_settings.soundClassification, sender, m_frameSize, m_channelNumber);
 
     *outResult = errorMap.releasePtr();
 }
@@ -361,11 +359,42 @@ void DeviceAgent::getPluginSideSettings(
 
     m_settings.motion.writeToServer(response);
 
-//    m_settings.motionDetectionObjectSize.writeToServer(response);
+    m_settings.motionDetectionObjectSize.writeToServer(response);
 
-//    m_settings.ivaObjectSize.writeToServer(response);
+    m_settings.ivaObjectSize.writeToServer(response);
 
-//    m_settings.audioDetection.writeToServer(response);
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
+        m_settings.motionDetectionIncludeArea[i].writeToServer(response);
+
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
+        m_settings.motionDetectionExcludeArea[i].writeToServer(response);
+
+    m_settings.tamperingDetection.writeToServer(response);
+
+    m_settings.defocusDetection.writeToServer(response);
+
+    m_settings.fogDetection.writeToServer(response);
+
+    m_settings.objectDetectionGeneral.writeToServer(response);
+
+    m_settings.objectDetectionBestShot.writeToServer(response);
+
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
+        m_settings.objectDetectionExcludeArea[i].writeToServer(response);
+
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
+        m_settings.ivaLine[i].writeToServer(response);
+
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
+        m_settings.ivaIncludeArea[i].writeToServer(response);
+
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
+        m_settings.ivaExcludeArea[i].writeToServer(response);
+
+    m_settings.audioDetection.writeToServer(response);
+
+    m_settings.soundClassification.writeToServer(response);
+
     *outResult = response;
 }
 
@@ -620,8 +649,8 @@ void DeviceAgent::readCameraSettings()
     sunapiReply = loadEventSettings("fogdetection");
     readFromDeviceReply(sunapiReply, &m_settings.fogDetection, m_frameSize, m_channelNumber);
 
-    sunapiReply = loadEventSettings("facedetection");
-    readFromDeviceReply(sunapiReply, &m_settings.faceDetectionGeneral, m_frameSize, m_channelNumber);
+    //sunapiReply = loadEventSettings("facedetection");
+    //readFromDeviceReply(sunapiReply, &m_settings.faceDetectionGeneral, m_frameSize, m_channelNumber);
 
     sunapiReply = loadEventSettings("objectdetection");
     readFromDeviceReply(sunapiReply, &m_settings.objectDetectionGeneral, m_frameSize, m_channelNumber);

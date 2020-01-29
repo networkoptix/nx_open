@@ -88,12 +88,93 @@ std::optional<std::vector<PluginPoint>> WidthHeightToPluginPoints(Width width, H
 
 enum class Direction { Right, Left, Both };
 
+template<typename SettingType>
+std::optional<SettingType> fromServerString(const char* source);
+
+template<>
+inline std::optional<Direction> fromServerString<Direction>(const char* source)
+{
+    std::optional<Direction> result;
+    if (!source)
+        return result;
+
+    if (strcmp(source, "right") == 0)
+        result = Direction::Right;
+
+    else if (strcmp(source, "left") == 0)
+        result = Direction::Left;
+
+    else if (strcmp(source, "absent") == 0)
+        result = Direction::Both;
+
+    /*
+     GUI Team has not implemented direction support yet, so we consider all directions to be
+     bidirectional. This should be fixed later.
+    */
+    result = Direction::Both;
+    return result;
+}
+
+inline std::string toServerString(Direction direction)
+{
+    switch (direction)
+    {
+    case Direction::Right: return "right";
+    case Direction::Left: return "left";
+    case Direction::Both: return "absent";
+    }
+    //NX_ASSERT(false, "unexpected Direction value");
+    return "";
+
+}
+
+struct NamedLineFigure
+{
+    std::vector<PluginPoint> points;
+    Direction direction = Direction();
+    std::string name;
+
+    bool operator==(const NamedLineFigure& rhs) const
+        { return points == rhs.points && direction == rhs.direction && name == rhs.name; }
+
+    static std::optional<NamedLineFigure> fromServerString(const char* source);
+    std::string toServerString() const;
+};
+
+struct UnnamedBoxFigure
+{
+    Width width;
+    Height height;
+    static std::optional<UnnamedBoxFigure> fromServerString(const char* source);
+    std::string toServerString() const;
+};
+
+struct UnnamedPolygon
+{
+    std::vector<PluginPoint> points;
+
+    bool operator==(const UnnamedPolygon& rhs) const { return points == rhs.points; }
+    static std::optional<UnnamedPolygon> fromServerString(const char* source);
+    std::string toServerString() const;
+};
+
+struct NamedPolygon
+{
+    std::vector<PluginPoint> points;
+    std::string name;
+
+    bool operator==(const NamedPolygon& rhs) const { return points == rhs.points && name == rhs.name; }
+    static std::optional<NamedPolygon> fromServerString(const char* source);
+    std::string toServerString() const;
+};
+
 /**
  * Parse the json string (received from server) that contains points. The points have two
  * coordinates of type double.
  * \return vector of points (may be empty). nullopt - if json is broken.
  */
-std::optional<std::vector<PluginPoint>> ServerStringToPluginPoints(const char* value);
+std::optional<std::vector<PluginPoint>> ServerStringToPluginPoints(
+    const char* source, std::string* label = nullptr, Direction* direction = nullptr);
 
 std::optional<Width> ServerStringToWidth(const char* value);
 
@@ -107,7 +188,8 @@ std::optional<Direction> ServerStringToDirection(const char* value);
  */
 std::string pluginPointsToSunapiString(const std::vector<PluginPoint>& points, FrameSize frameSize);
 
-std::string pluginPointsToServerJson(const std::vector<PluginPoint>& points);
+std::string pluginPointsToServerString(const std::vector<PluginPoint>& points,
+    const std::string* label = nullptr, const Direction* direction = nullptr);
 
 //-------------------------------------------------------------------------------------------------
 

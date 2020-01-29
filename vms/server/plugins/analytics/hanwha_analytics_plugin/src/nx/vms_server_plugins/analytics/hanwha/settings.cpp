@@ -170,6 +170,26 @@ std::string SettingGroup::serverKey(int keyIndex) const
     return result;
 }
 
+template<class E>
+std::string SettingGroup::key(E keyIndexE) const
+{
+    const int keyIndex = (int)keyIndexE;
+    NX_ASSERT(keyIndex < serverKeyCount);
+
+    std::string result(serverKeys[keyIndex]);
+    if (serverIndex() >= 0)
+        result.replace(result.find("#"), 1, std::to_string(serverIndex()));
+
+    return result;
+}
+
+template<class E>
+const char* SettingGroup::value(const nx::sdk::IStringMap* sourceMap, E keyIndexE)
+{
+    const std::string key = this->key(keyIndexE);
+    return sourceMap->value(key.c_str());
+}
+
 void SettingGroup::replanishErrorMap(
     nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const
 {
@@ -289,7 +309,7 @@ std::string serverWrite(std::pair<Width, Height> pair)
 {
     std::optional<std::vector<PluginPoint>> points = WidthHeightToPluginPoints(
         pair.first, pair.second);
-    std::string result = pluginPointsToServerJson(*points);
+    std::string result = pluginPointsToServerString(*points);
     return result;
 }
 
@@ -354,6 +374,41 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize fra
         throw DeviceValueError();
 }
 
+void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, std::vector<PluginPoint>* result)
+{
+    NX_ASSERT(key);
+
+    const auto& points = json[key];
+    if (!points.is_array())
+        throw DeviceValueError{};
+
+    result->reserve(points.array_items().size());
+    for (const nx::kit::Json& point : points.array_items())
+    {
+        if (!point["x"].is_number() || !point["y"].is_number())
+            throw DeviceValueError{};
+
+        const int ix = point["x"].int_value();
+        const int iy = point["y"].int_value();
+        result->emplace_back(frameSize.xAbsoluteToRelative(ix), frameSize.yAbsoluteToRelative(iy));
+    }
+}
+
+void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, UnnamedBoxFigure* result)
+{
+    PluginPoint point;
+    sunapiReadOrThrow(json, key, frameSize, &point);
+    result->width = point.x;
+    result->height = point.y;
+}
+
+void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, UnnamedPolygon* result)
+{
+    std::vector<PluginPoint> points;
+    sunapiReadOrThrow(json, key, frameSize, &points);
+    result->points = points;
+}
+
 void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, Width* result)
 {
     PluginPoint point;
@@ -366,26 +421,6 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize fra
     PluginPoint point;
     sunapiReadOrThrow(json, key, frameSize, &point);
     *result = point.y;
-}
-
-void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, std::vector<PluginPoint>* result)
-{
-    NX_ASSERT(key);
-
-    const auto& points = json[key];
-    if (!points.is_array())
-        throw DeviceValueError{};
-
-    result->reserve(points.array_items().size());
-    for (const nx::kit::Json& point: points.array_items())
-    {
-        if (!point["x"].is_number() || !point["y"].is_number())
-            throw DeviceValueError{};
-
-        const int ix = point["x"].int_value();
-        const int iy = point["y"].int_value();
-        result->emplace_back(frameSize.xAbsoluteToRelative(ix), frameSize.yAbsoluteToRelative(iy));
-    }
 }
 
 void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, Direction* result)
@@ -456,16 +491,6 @@ std::string concat(std::vector<const char*> items, char c = ',')
 
 //-------------------------------------------------------------------------------------------------
 
-#define NX_READ_FROM_SERVER_OR_THROW(SOURCE_MAP, FIELD_NAME) serverReadOrThrow( \
-    SOURCE_MAP->value(serverKey((int)ServerParamIndex::FIELD_NAME).c_str()), \
-    &FIELD_NAME)
-
-#define NX_WRITE_TO_SERVER(DESTINATION_MAP, FIELD_NAME) \
-    DESTINATION_MAP->setValue(serverKey((int)ServerParamIndex::FIELD_NAME).c_str(), \
-    serverWrite(FIELD_NAME));
-
-//-------------------------------------------------------------------------------------------------
-
 bool ShockDetection::operator==(const ShockDetection& rhs) const
 {
     return initialized == rhs.initialized
@@ -476,20 +501,21 @@ bool ShockDetection::operator==(const ShockDetection& rhs) const
 }
 
 void ShockDetection::readFromServerOrThrow(
-    const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+    const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, thresholdLevel);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, sensitivityLevel);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+    deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
+    deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
     initialized = true;
 }
 
-void ShockDetection::writeToServer(
-    nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
+void ShockDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
-    NX_WRITE_TO_SERVER(settingsDestination, enabled);
-    NX_WRITE_TO_SERVER(settingsDestination, thresholdLevel);
-    NX_WRITE_TO_SERVER(settingsDestination, sensitivityLevel);
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::enabled), serialize(enabled));
+    result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
+    result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
 }
 
 void ShockDetection::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -506,7 +532,7 @@ std::string ShockDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int
     if (initialized)
     {
         query
-            << "msubmenu=" << "shockdetection"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&Enable=" << buildBool(enabled)
@@ -526,15 +552,17 @@ bool Motion::operator==(const Motion& rhs) const
         ;
 }
 
-void Motion::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void Motion::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, detectionType);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::detectionType), &detectionType);
     initialized = true;
 }
 
-void Motion::writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
+void Motion::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
-    NX_WRITE_TO_SERVER(settingsDestination, detectionType);
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::detectionType), serialize(detectionType));
 }
 
 void Motion::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -563,38 +591,34 @@ std::string Motion::buildCameraWritingQuery(FrameSize /*frameSize*/, int channel
 bool MotionDetectionObjectSize::operator==(const MotionDetectionObjectSize& rhs) const
 {
     return initialized == rhs.initialized
-        && minWidth == rhs.minWidth
-        && minHeight == rhs.minHeight
-        && maxWidth == rhs.maxWidth
-        && maxHeight == rhs.maxHeight
+        && minDimentions.width == rhs.minDimentions.width
+        && minDimentions.height == rhs.minDimentions.height
+        && maxDimentions.width == rhs.maxDimentions.width
+        && maxDimentions.height == rhs.maxDimentions.height
         ;
 }
 
-void MotionDetectionObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void MotionDetectionObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, minWidth);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, minHeight);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, maxWidth);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, maxHeight);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::minDimentions), &minDimentions);
+    deserializeOrThrow(value(sourceMap, KeyIndex::maxDimentions), &maxDimentions);
     initialized = true;
 }
 
 void MotionDetectionObjectSize::writeToServer(
-    nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
+    nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
-    settingsDestination->setValue("MotionDetection.MinObjectSize.Points",
-        serverWrite(std::pair(minWidth, minHeight)));
-    settingsDestination->setValue("MotionDetection.MaxObjectSize.Points",
-        serverWrite(std::pair(maxWidth, maxHeight)));
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::minDimentions), serialize(minDimentions));
+    result->setValue(key(KeyIndex::maxDimentions), serialize(maxDimentions));
 }
 
 void MotionDetectionObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
     nx::kit::Json objectSizeInfo = getObjectSizeInfo(channelInfo, "MotionDetection");
-    sunapiReadOrThrow(objectSizeInfo, "MinimumObjectSizeInPixels", frameSize, &minWidth);
-    sunapiReadOrThrow(objectSizeInfo, "MinimumObjectSizeInPixels", frameSize, &minHeight);
-    sunapiReadOrThrow(objectSizeInfo, "MaximumObjectSizeInPixels", frameSize, &maxWidth);
-    sunapiReadOrThrow(objectSizeInfo, "MaximumObjectSizeInPixels", frameSize, &maxHeight);
+    sunapiReadOrThrow(objectSizeInfo, "MinimumObjectSizeInPixels", frameSize, &minDimentions);
+    sunapiReadOrThrow(objectSizeInfo, "MaximumObjectSizeInPixels", frameSize, &maxDimentions);
     initialized = true;
 }
 
@@ -602,9 +626,9 @@ std::string MotionDetectionObjectSize::buildMinObjectSize(FrameSize frameSize) c
 {
     std::stringstream stream;
     stream
-        << frameSize.xRelativeToAbsolute(minWidth)
+        << frameSize.xRelativeToAbsolute(minDimentions.width)
         << ','
-        << frameSize.yRelativeToAbsolute(minHeight);
+        << frameSize.yRelativeToAbsolute(minDimentions.height);
     return stream.str();
 }
 
@@ -612,9 +636,9 @@ std::string MotionDetectionObjectSize::buildMaxObjectSize(FrameSize frameSize) c
 {
     std::stringstream stream;
     stream
-        << frameSize.xRelativeToAbsolute(maxWidth)
+        << frameSize.xRelativeToAbsolute(maxDimentions.width)
         << ','
-        << frameSize.yRelativeToAbsolute(maxHeight);
+        << frameSize.yRelativeToAbsolute(maxDimentions.height);
     return stream.str();
 }
 
@@ -624,7 +648,7 @@ std::string MotionDetectionObjectSize::buildCameraWritingQuery(FrameSize frameSi
     if (initialized)
     {
         query
-            << "msubmenu=" << "videoanalysis2"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&DetectionType.MotionDetection.MinimumObjectSizeInPixels="
@@ -641,37 +665,33 @@ std::string MotionDetectionObjectSize::buildCameraWritingQuery(FrameSize frameSi
 bool IvaObjectSize::operator==(const IvaObjectSize& rhs) const
 {
     return initialized == rhs.initialized
-        && minWidth == rhs.minWidth
-        && minHeight == rhs.minHeight
-        && maxWidth == rhs.maxWidth
-        && maxHeight == rhs.maxHeight
+        && minDimentions.width == rhs.minDimentions.width
+        && minDimentions.height == rhs.minDimentions.height
+        && maxDimentions.width == rhs.maxDimentions.width
+        && maxDimentions.height == rhs.maxDimentions.height
         ;
 }
 
-void IvaObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void IvaObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, minWidth);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, minHeight);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, maxWidth);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, maxHeight);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::minDimentions), &minDimentions);
+    deserializeOrThrow(value(sourceMap, KeyIndex::maxDimentions), &maxDimentions);
     initialized = true;
 }
 
-void IvaObjectSize::writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
+void IvaObjectSize::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
-    settingsDestination->setValue("IVA.MinObjectSize.Points",
-        serverWrite(std::pair(minWidth, minHeight)));
-    settingsDestination->setValue("IVA.MaxObjectSize.Points",
-        serverWrite(std::pair(maxWidth, maxHeight)));
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::minDimentions), serialize(minDimentions));
+    result->setValue(key(KeyIndex::maxDimentions), serialize(maxDimentions));
 }
 
 void IvaObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
     nx::kit::Json objectSizeInfo = getObjectSizeInfo(channelInfo, "IntelligentVideo");
-    sunapiReadOrThrow(objectSizeInfo, "MinimumObjectSizeInPixels", frameSize, &minWidth);
-    sunapiReadOrThrow(objectSizeInfo, "MinimumObjectSizeInPixels", frameSize, &minHeight);
-    sunapiReadOrThrow(objectSizeInfo, "MaximumObjectSizeInPixels", frameSize, &maxWidth);
-    sunapiReadOrThrow(objectSizeInfo, "MaximumObjectSizeInPixels", frameSize, &maxHeight);
+    sunapiReadOrThrow(objectSizeInfo, "MinimumObjectSizeInPixels", frameSize, &minDimentions);
+    sunapiReadOrThrow(objectSizeInfo, "MaximumObjectSizeInPixels", frameSize, &maxDimentions);
     initialized = true;
 }
 
@@ -679,9 +699,9 @@ std::string IvaObjectSize::buildMinObjectSize(FrameSize frameSize) const
 {
     std::stringstream stream;
     stream
-        << frameSize.xRelativeToAbsolute(minWidth)
+        << frameSize.xRelativeToAbsolute(minDimentions.width)
         << ','
-        << frameSize.yRelativeToAbsolute(minHeight);
+        << frameSize.yRelativeToAbsolute(minDimentions.height);
     return stream.str();
 }
 
@@ -689,9 +709,9 @@ std::string IvaObjectSize::buildMaxObjectSize(FrameSize frameSize) const
 {
     std::stringstream stream;
     stream
-        << frameSize.xRelativeToAbsolute(maxWidth)
+        << frameSize.xRelativeToAbsolute(maxDimentions.width)
         << ','
-        << frameSize.yRelativeToAbsolute(maxHeight);
+        << frameSize.yRelativeToAbsolute(maxDimentions.height);
     return stream.str();
 }
 
@@ -701,7 +721,7 @@ std::string IvaObjectSize::buildCameraWritingQuery(FrameSize frameSize, int chan
     if (initialized)
     {
         query
-            << "msubmenu=" << "videoanalysis2"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&DetectionType.IntelligentVideo.MinimumObjectSizeInPixels="
@@ -718,20 +738,30 @@ std::string IvaObjectSize::buildCameraWritingQuery(FrameSize frameSize, int chan
 bool MotionDetectionIncludeArea::operator==(const MotionDetectionIncludeArea& rhs) const
 {
     return initialized == rhs.initialized
-        && points == rhs.points
+        && unnamedPolygon == rhs.unnamedPolygon
         && thresholdLevel == rhs.thresholdLevel
         && sensitivityLevel == rhs.sensitivityLevel
         && minimumDuration == rhs.minimumDuration
         ;
 }
 
-void MotionDetectionIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
+void MotionDetectionIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, points);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, thresholdLevel);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, sensitivityLevel);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, minimumDuration);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
+    deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
+    deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
+    deserializeOrThrow(value(sourceMap, KeyIndex::minimumDuration), &minimumDuration);
     initialized = true;
+}
+
+void MotionDetectionIncludeArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::unnamedPolygon), serialize(unnamedPolygon));
+    result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
+    result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
+    result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
 }
 
 void MotionDetectionIncludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -745,7 +775,7 @@ void MotionDetectionIncludeArea::readFromCameraOrThrow(const nx::kit::Json& chan
             return;
         }
 
-        sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &points);
+        sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &unnamedPolygon);
         sunapiReadOrThrow(roiInfo, "ThresholdLevel", frameSize, &thresholdLevel);
         sunapiReadOrThrow(roiInfo, "SensitivityLevel", frameSize, &sensitivityLevel);
         sunapiReadOrThrow(roiInfo, "Duration", frameSize, &minimumDuration);
@@ -757,14 +787,14 @@ std::string MotionDetectionIncludeArea::buildCameraWritingQuery(FrameSize frameS
     std::ostringstream query;
     if (initialized)
     {
-        if (!points.empty())
+        if (!unnamedPolygon.points.empty())
         {
             const std::string prefix = "&ROI."s + std::to_string(deviceIndex());
             query
-                << "msubmenu=" << "videoanalysis2"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << pluginPointsToSunapiString(points, frameSize)
+                << prefix << ".Coordinate=" << pluginPointsToSunapiString(unnamedPolygon.points, frameSize)
                 << prefix << ".ThresholdLevel=" << thresholdLevel
                 << prefix << ".SensitivityLevel=" << sensitivityLevel
                 << prefix << ".Duration=" << minimumDuration
@@ -786,14 +816,21 @@ std::string MotionDetectionIncludeArea::buildCameraWritingQuery(FrameSize frameS
 bool MotionDetectionExcludeArea::operator==(const MotionDetectionExcludeArea& rhs) const
 {
     return initialized == rhs.initialized
-        && points == rhs.points
+        && unnamedPolygon == rhs.unnamedPolygon
         ;
 }
 
-void MotionDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
+void MotionDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, points);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
     initialized = true;
+}
+
+void MotionDetectionExcludeArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::unnamedPolygon), serialize(unnamedPolygon));
 }
 
 void MotionDetectionExcludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -804,7 +841,7 @@ void MotionDetectionExcludeArea::readFromCameraOrThrow(const nx::kit::Json& chan
         *this = MotionDetectionExcludeArea(this->nativeIndex());
         return;
     }
-    sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &points);
+    sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &unnamedPolygon);
     initialized = true;
 }
 
@@ -813,20 +850,20 @@ std::string MotionDetectionExcludeArea::buildCameraWritingQuery(FrameSize frameS
     std::ostringstream query;
     if (initialized)
     {
-        if (!points.empty())
+        if (!unnamedPolygon.points.empty())
         {
             const std::string prefix = "&ROI."s + std::to_string(deviceIndex());
             query
-                << "msubmenu=" << "videoanalysis2"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << pluginPointsToSunapiString(points, frameSize)
+                << prefix << ".Coordinate=" << pluginPointsToSunapiString(unnamedPolygon.points, frameSize)
                 ;
         }
         else
         {
             query
-                << "msubmenu=" << "videoanalysis2"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "remove"
                 << "&Channel=" << channelNumber
                 << "&ROIIndex=" << deviceIndex()
@@ -849,14 +886,25 @@ bool TamperingDetection::operator==(const TamperingDetection& rhs) const
         ;
 }
 
-void TamperingDetection::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
+void TamperingDetection::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, thresholdLevel);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, sensitivityLevel);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, minimumDuration);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, exceptDarkImages);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+    deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
+    deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
+    deserializeOrThrow(value(sourceMap, KeyIndex::minimumDuration), &minimumDuration);
+    deserializeOrThrow(value(sourceMap, KeyIndex::exceptDarkImages), &exceptDarkImages);
     initialized = true;
+}
+
+void TamperingDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::enabled), serialize(enabled));
+    result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
+    result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
+    result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
+    result->setValue(key(KeyIndex::exceptDarkImages), serialize(exceptDarkImages));
 }
 
 void TamperingDetection::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -875,7 +923,7 @@ std::string TamperingDetection::buildCameraWritingQuery(FrameSize /*frameSize*/,
     if (initialized)
     {
         query
-            << "msubmenu=" << "tamperingdetection"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&Enable=" << buildBool(enabled)
@@ -899,13 +947,23 @@ bool DefocusDetection::operator==(const DefocusDetection& rhs) const
         ;
 }
 
-void DefocusDetection::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void DefocusDetection::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, thresholdLevel);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, sensitivityLevel);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, minimumDuration);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+    deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
+    deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
+    deserializeOrThrow(value(sourceMap, KeyIndex::minimumDuration), &minimumDuration);
     initialized = true;
+}
+
+void DefocusDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::enabled), serialize(enabled));
+    result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
+    result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
+    result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
 }
 
 void DefocusDetection::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -923,7 +981,7 @@ std::string DefocusDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, i
     if (initialized)
     {
         query
-            << "msubmenu=" << "defocusdetection"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&Enable=" << buildBool(enabled)
@@ -946,13 +1004,23 @@ bool FogDetection::operator==(const FogDetection& rhs) const
         ;
 }
 
-void FogDetection::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void FogDetection::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, thresholdLevel);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, sensitivityLevel);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, minimumDuration);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+    deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
+    deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
+    deserializeOrThrow(value(sourceMap, KeyIndex::minimumDuration), &minimumDuration);
     initialized = true;
+}
+
+void FogDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::enabled), serialize(enabled));
+    result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
+    result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
+    result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
 }
 
 void FogDetection::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -970,7 +1038,7 @@ std::string FogDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int c
     if (initialized)
     {
         query
-            << "msubmenu=" << "fogdetection"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&Enable=" << buildBool(enabled)
@@ -984,6 +1052,9 @@ std::string FogDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int c
 
 //-------------------------------------------------------------------------------------------------
 
+#if 0
+Face detection event is now built in object detection event.
+
 bool FaceDetectionGeneral::operator==(const FaceDetectionGeneral& rhs) const
 {
     return initialized == rhs.initialized
@@ -992,11 +1063,19 @@ bool FaceDetectionGeneral::operator==(const FaceDetectionGeneral& rhs) const
         ;
 }
 
-void FaceDetectionGeneral::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void FaceDetectionGeneral::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, sensitivityLevel);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+    deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
     initialized = true;
+}
+
+void FaceDetectionGeneral::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::enabled), serialize(enabled));
+    result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
 }
 
 void FaceDetectionGeneral::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -1012,7 +1091,7 @@ std::string FaceDetectionGeneral::buildCameraWritingQuery(FrameSize /*frameSize*
     if (initialized)
     {
         query
-            << "msubmenu=" << "facedetection"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&Enable=" << buildBool(enabled)
@@ -1021,6 +1100,8 @@ std::string FaceDetectionGeneral::buildCameraWritingQuery(FrameSize /*frameSize*
     }
     return query.str();
 }
+
+#endif
 
 //-------------------------------------------------------------------------------------------------
 
@@ -1036,15 +1117,27 @@ bool ObjectDetectionGeneral::operator==(const ObjectDetectionGeneral& rhs) const
         ;
 }
 
-void ObjectDetectionGeneral::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void ObjectDetectionGeneral::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, person);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, vehicle);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, face);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, licensePlate);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, minimumDuration);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+    deserializeOrThrow(value(sourceMap, KeyIndex::person), &person);
+    deserializeOrThrow(value(sourceMap, KeyIndex::vehicle), &vehicle);
+    deserializeOrThrow(value(sourceMap, KeyIndex::face), &face);
+    deserializeOrThrow(value(sourceMap, KeyIndex::licensePlate), &licensePlate);
+    deserializeOrThrow(value(sourceMap, KeyIndex::minimumDuration), &minimumDuration);
     initialized = true;
+}
+
+void ObjectDetectionGeneral::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::enabled), serialize(enabled));
+    result->setValue(key(KeyIndex::person), serialize(person));
+    result->setValue(key(KeyIndex::vehicle), serialize(vehicle));
+    result->setValue(key(KeyIndex::face), serialize(face));
+    result->setValue(key(KeyIndex::licensePlate), serialize(licensePlate));
+    result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
 }
 
 void ObjectDetectionGeneral::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -1083,7 +1176,7 @@ std::string ObjectDetectionGeneral::buildCameraWritingQuery(FrameSize /*frameSiz
     if (initialized)
     {
         query
-            << "msubmenu=" << "objectdetection"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&Enable=" << buildBool(enabled)
@@ -1106,13 +1199,23 @@ bool ObjectDetectionBestShot::operator==(const ObjectDetectionBestShot& rhs) con
         ;
 }
 
-void ObjectDetectionBestShot::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void ObjectDetectionBestShot::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, person);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, vehicle);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, face);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, licensePlate);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::person), &person);
+    deserializeOrThrow(value(sourceMap, KeyIndex::vehicle), &vehicle);
+    deserializeOrThrow(value(sourceMap, KeyIndex::face), &face);
+    deserializeOrThrow(value(sourceMap, KeyIndex::licensePlate), &licensePlate);
     initialized = true;
+}
+
+void ObjectDetectionBestShot::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::person), serialize(person));
+    result->setValue(key(KeyIndex::vehicle), serialize(vehicle));
+    result->setValue(key(KeyIndex::face), serialize(face));
+    result->setValue(key(KeyIndex::licensePlate), serialize(licensePlate));
 }
 
 void ObjectDetectionBestShot::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -1149,7 +1252,7 @@ std::string ObjectDetectionBestShot::buildCameraWritingQuery(FrameSize /*frameSi
     if (initialized)
     {
         query
-            << "msubmenu=" << "metaimagetransfer"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&ObjectTypes=" << buildObjectTypes()
@@ -1163,13 +1266,20 @@ std::string ObjectDetectionBestShot::buildCameraWritingQuery(FrameSize /*frameSi
 bool ObjectDetectionExcludeArea::operator==(const ObjectDetectionExcludeArea& rhs) const
 {
     return initialized == rhs.initialized
-        && points == rhs.points
+        && unnamedPolygon == rhs.unnamedPolygon
         ;
 }
-void ObjectDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
+void ObjectDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, points);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
     initialized = true;
+}
+
+void ObjectDetectionExcludeArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::unnamedPolygon), serialize(unnamedPolygon));
 }
 
 void ObjectDetectionExcludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -1180,7 +1290,7 @@ void ObjectDetectionExcludeArea::readFromCameraOrThrow(const nx::kit::Json& chan
         *this = ObjectDetectionExcludeArea(this->nativeIndex());
         return;
     }
-    sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &points);
+    sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &unnamedPolygon);
     initialized = true;
 }
 
@@ -1189,20 +1299,20 @@ std::string ObjectDetectionExcludeArea::buildCameraWritingQuery(FrameSize frameS
     std::ostringstream query;
     if (initialized)
     {
-        if (!points.empty())
+        if (!unnamedPolygon.points.empty())
         {
             const std::string prefix = "&ExcludeArea."s + std::to_string(deviceIndex());
             query
-                << "msubmenu=" << "objectdetection"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << pluginPointsToSunapiString(points, frameSize)
+                << prefix << ".Coordinate=" << pluginPointsToSunapiString(unnamedPolygon.points, frameSize)
                 ;
         }
         else
         {
             query
-                << "msubmenu=" << "objectdetection"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "remove"
                 << "&Channel=" << channelNumber
                 << "&ExcludeAreaIndex=" << deviceIndex()
@@ -1217,25 +1327,31 @@ std::string ObjectDetectionExcludeArea::buildCameraWritingQuery(FrameSize frameS
 bool IvaLine::operator==(const IvaLine& rhs) const
 {
     return initialized == rhs.initialized
-        && points == rhs.points
-        && name == rhs.name
+        && namedLineFigure == rhs.namedLineFigure
         && person == rhs.person
         && vehicle == rhs.vehicle
         && crossing == rhs.crossing
-        && direction == rhs.direction
         ;
 }
 
-void IvaLine::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
+void IvaLine::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, points);
-    if (!points.empty())
-        NX_READ_FROM_SERVER_OR_THROW(settingsSource, direction);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, name);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, person);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, vehicle);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, crossing);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::namedLineFigure), &namedLineFigure);
+    deserializeOrThrow(value(sourceMap, KeyIndex::person), &person);
+    deserializeOrThrow(value(sourceMap, KeyIndex::vehicle), &vehicle);
+    deserializeOrThrow(value(sourceMap, KeyIndex::crossing), &crossing);
+
     initialized = true;
+}
+
+void IvaLine::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::namedLineFigure), serialize(namedLineFigure));
+    result->setValue(key(KeyIndex::person), serialize(person));
+    result->setValue(key(KeyIndex::vehicle), serialize(vehicle));
+    result->setValue(key(KeyIndex::crossing), serialize(crossing));
 }
 
 void IvaLine::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -1247,9 +1363,9 @@ void IvaLine::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize 
         return;
     }
 
-    sunapiReadOrThrow(lineInfo, "Coordinates", frameSize, &points);
-    sunapiReadOrThrow(lineInfo, "Mode", frameSize, &direction);
-    sunapiReadOrThrow(lineInfo, "RuleName", frameSize, &name);
+    sunapiReadOrThrow(lineInfo, "Coordinates", frameSize, &namedLineFigure.points);
+    sunapiReadOrThrow(lineInfo, "Mode", frameSize, &namedLineFigure.direction);
+    sunapiReadOrThrow(lineInfo, "RuleName", frameSize, &namedLineFigure.name);
     sunapiReadOrThrow(lineInfo, "ObjectTypeFilter", frameSize, &person, "Person");
     sunapiReadOrThrow(lineInfo, "ObjectTypeFilter", frameSize, &vehicle, "Vehicle");
 
@@ -1276,11 +1392,11 @@ std::string IvaLine::buildMode() const
 {
     if (!crossing)
         return "Off";
-    if (direction == Direction::Right)
+    if (namedLineFigure.direction == Direction::Right)
         return "Right";
-    if (direction == Direction::Left)
+    if (namedLineFigure.direction == Direction::Left)
         return "Left";
-    if (direction == Direction::Both)
+    if (namedLineFigure.direction == Direction::Both)
         return "BothDirections";
 
     NX_ASSERT(false);
@@ -1292,15 +1408,15 @@ std::string IvaLine::buildCameraWritingQuery(FrameSize frameSize, int channelNum
     std::ostringstream query;
     if (initialized)
     {
-        if (!points.empty())
+        if (!namedLineFigure.points.empty())
         {
             const std::string prefix = "&Line."s + std::to_string(deviceIndex());
             query
-                << "msubmenu=" << "videoanalysis2"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << pluginPointsToSunapiString(points, frameSize)
-                << prefix << ".RuleName=" << name
+                << prefix << ".Coordinate=" << pluginPointsToSunapiString(namedLineFigure.points, frameSize)
+                << prefix << ".RuleName=" << namedLineFigure.name
                 << prefix << ".ObjectTypeFilter=" << buildFilter()
                 << prefix << ".Mode=" << buildMode()
                 ;
@@ -1308,7 +1424,7 @@ std::string IvaLine::buildCameraWritingQuery(FrameSize frameSize, int channelNum
         else
         {
             query
-                << "msubmenu=" << "videoanalysis2"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "remove"
                 << "&Channel=" << channelNumber
                 << "&LineIndex=" << deviceIndex();
@@ -1322,8 +1438,7 @@ std::string IvaLine::buildCameraWritingQuery(FrameSize frameSize, int channelNum
 bool IvaIncludeArea::operator==(const IvaIncludeArea& rhs) const
 {
     return initialized == rhs.initialized
-        && points == rhs.points
-        && name == rhs.name
+        && namedPolygon == rhs.namedPolygon
         && person == rhs.person
         && vehicle == rhs.vehicle
         && intrusion == rhs.intrusion
@@ -1337,21 +1452,37 @@ bool IvaIncludeArea::operator==(const IvaIncludeArea& rhs) const
         ;
 }
 
-void IvaIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
+void IvaIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, points);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, name);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, person);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, vehicle);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, intrusion);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enter);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, exit);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, appear);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, loitering);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, intrusionDuration);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, appearDuration);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, loiteringDuration);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::namedPolygon), &namedPolygon);
+    deserializeOrThrow(value(sourceMap, KeyIndex::person), &person);
+    deserializeOrThrow(value(sourceMap, KeyIndex::vehicle), &vehicle);
+    deserializeOrThrow(value(sourceMap, KeyIndex::intrusion), &intrusion);
+    deserializeOrThrow(value(sourceMap, KeyIndex::enter), &enter);
+    deserializeOrThrow(value(sourceMap, KeyIndex::exit), &exit);
+    deserializeOrThrow(value(sourceMap, KeyIndex::appear), &appear);
+    deserializeOrThrow(value(sourceMap, KeyIndex::loitering), &loitering);
+    deserializeOrThrow(value(sourceMap, KeyIndex::intrusionDuration), &intrusionDuration);
+    deserializeOrThrow(value(sourceMap, KeyIndex::appearDuration), &appearDuration);
+    deserializeOrThrow(value(sourceMap, KeyIndex::loiteringDuration), &loiteringDuration);
     initialized = true;
+}
+
+void IvaIncludeArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::namedPolygon), serialize(namedPolygon));
+    result->setValue(key(KeyIndex::person), serialize(person));
+    result->setValue(key(KeyIndex::vehicle), serialize(vehicle));
+    result->setValue(key(KeyIndex::intrusion), serialize(intrusion));
+    result->setValue(key(KeyIndex::enter), serialize(enter));
+    result->setValue(key(KeyIndex::exit), serialize(exit));
+    result->setValue(key(KeyIndex::appear), serialize(appear));
+    result->setValue(key(KeyIndex::loitering), serialize(loitering));
+    result->setValue(key(KeyIndex::intrusionDuration), serialize(intrusionDuration));
+    result->setValue(key(KeyIndex::appearDuration), serialize(appearDuration));
+    result->setValue(key(KeyIndex::loiteringDuration), serialize(loiteringDuration));
 }
 
 void IvaIncludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -1364,8 +1495,8 @@ void IvaIncludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, Fra
         return ;
     }
 
-    sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &points);
-    sunapiReadOrThrow(roiInfo, "RuleName", frameSize, &name);
+    sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &namedPolygon.points);
+    sunapiReadOrThrow(roiInfo, "RuleName", frameSize, &namedPolygon.name);
     sunapiReadOrThrow(roiInfo, "ObjectTypeFilter", frameSize, &person, "Person");
     sunapiReadOrThrow(roiInfo, "ObjectTypeFilter", frameSize, &vehicle, "Vehicle");
 
@@ -1421,16 +1552,16 @@ std::string IvaIncludeArea::buildCameraWritingQuery(FrameSize frameSize, int cha
     std::ostringstream query;
     if (initialized)
     {
-        if (!points.empty())
+        if (!namedPolygon.points.empty())
         {
             const std::string prefix = "&DefinedArea."s + std::to_string(deviceIndex());
             query
-                << "msubmenu=" << "videoanalysis2"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << pluginPointsToSunapiString(points, frameSize)
+                << prefix << ".Coordinate=" << pluginPointsToSunapiString(namedPolygon.points, frameSize)
                 << prefix << ".Type=" << "Inside"
-                << prefix << ".RuleName=" << name
+                << prefix << ".RuleName=" << namedPolygon.name
                 << prefix << ".ObjectTypeFilter=" << buildFilter()
                 << prefix << ".Mode=" << buildMode()
                 << prefix << ".IntrusionDuration=" << intrusionDuration
@@ -1441,7 +1572,7 @@ std::string IvaIncludeArea::buildCameraWritingQuery(FrameSize frameSize, int cha
         else
         {
                 query
-                << "msubmenu=" << "videoanalysis2"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "remove"
                 << "&Channel=" << channelNumber
                 << "&DefinedAreaIndex=" << deviceIndex();
@@ -1455,14 +1586,21 @@ std::string IvaIncludeArea::buildCameraWritingQuery(FrameSize frameSize, int cha
 bool IvaExcludeArea::operator==(const IvaExcludeArea& rhs) const
 {
     return initialized == rhs.initialized
-        && points == rhs.points
+        && unnamedPolygon == rhs.unnamedPolygon
         ;
 }
 
-void IvaExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int roiIndex)
+void IvaExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, points);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
     initialized = true;
+}
+
+void IvaExcludeArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::unnamedPolygon), serialize(unnamedPolygon));
 }
 
 void IvaExcludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -1473,7 +1611,7 @@ void IvaExcludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, Fra
         *this = IvaExcludeArea(this->nativeIndex());
         return;
     }
-    sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &points);
+    sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &unnamedPolygon.points);
     initialized = true;
 }
 
@@ -1482,21 +1620,21 @@ std::string IvaExcludeArea::buildCameraWritingQuery(FrameSize frameSize, int cha
     std::ostringstream query;
     if (initialized)
     {
-        if (!points.empty())
+        if (!unnamedPolygon.points.empty())
         {
             const std::string prefix = "&DefinedArea."s + std::to_string(deviceIndex());
             query
-                << "msubmenu=" << "videoanalysis2"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << pluginPointsToSunapiString(points, frameSize)
+                << prefix << ".Coordinate=" << pluginPointsToSunapiString(unnamedPolygon.points, frameSize)
                 << prefix << ".Type=" << "Outside"
                 ;
         }
         else
         {
             query
-                << "msubmenu=" << "videoanalysis2"
+                << "msubmenu=" << kSunapiEventName
                 << "&action=" << "remove"
                 << "&Channel=" << channelNumber
                 << "&DefinedAreaIndex=" << deviceIndex()
@@ -1516,17 +1654,19 @@ bool AudioDetection::operator==(const AudioDetection& rhs) const
         ;
 }
 
-void AudioDetection::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void AudioDetection::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, thresholdLevel);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+    deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
     initialized = true;
 }
 
-void AudioDetection::writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
+void AudioDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
-    NX_WRITE_TO_SERVER(settingsDestination, enabled);
-    NX_WRITE_TO_SERVER(settingsDestination, thresholdLevel);
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::enabled), serialize(enabled));
+    result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
 }
 
 void AudioDetection::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
@@ -1542,7 +1682,7 @@ std::string AudioDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int
     if (initialized)
     {
         query
-            << "msubmenu=" << "audiodetection"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&Enable=" << buildBool(enabled)
@@ -1567,27 +1707,29 @@ bool SoundClassification::operator==(const SoundClassification& rhs) const
         ;
 }
 
-void SoundClassification::readFromServerOrThrow(const nx::sdk::IStringMap* settingsSource, int /*roiIndex*/)
+void SoundClassification::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, enabled);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, noisefilter);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, thresholdLevel);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, scream);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, gunshot);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, explosion);
-    NX_READ_FROM_SERVER_OR_THROW(settingsSource, crashingGlass);
+    using namespace basicServerSettingsIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+    deserializeOrThrow(value(sourceMap, KeyIndex::noisefilter), &noisefilter);
+    deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
+    deserializeOrThrow(value(sourceMap, KeyIndex::scream), &scream);
+    deserializeOrThrow(value(sourceMap, KeyIndex::gunshot), &gunshot);
+    deserializeOrThrow(value(sourceMap, KeyIndex::explosion), &explosion);
+    deserializeOrThrow(value(sourceMap, KeyIndex::crashingGlass), &crashingGlass);
     initialized = true;
 }
 
-void SoundClassification::writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
+void SoundClassification::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
-    NX_WRITE_TO_SERVER(settingsDestination, enabled);
-    NX_WRITE_TO_SERVER(settingsDestination, noisefilter);
-    NX_WRITE_TO_SERVER(settingsDestination, thresholdLevel);
-    NX_WRITE_TO_SERVER(settingsDestination, scream);
-    NX_WRITE_TO_SERVER(settingsDestination, gunshot);
-    NX_WRITE_TO_SERVER(settingsDestination, explosion);
-    NX_WRITE_TO_SERVER(settingsDestination, crashingGlass);
+    using namespace basicServerSettingsIo;
+    result->setValue(key(KeyIndex::enabled), serialize(enabled));
+    result->setValue(key(KeyIndex::noisefilter), serialize(noisefilter));
+    result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
+    result->setValue(key(KeyIndex::scream), serialize(scream));
+    result->setValue(key(KeyIndex::gunshot), serialize(gunshot));
+    result->setValue(key(KeyIndex::explosion), serialize(explosion));
+    result->setValue(key(KeyIndex::crashingGlass), serialize(crashingGlass));
 }
 
 void SoundClassification::readFromCameraOrThrow(
@@ -1628,7 +1770,7 @@ std::string SoundClassification::buildCameraWritingQuery(FrameSize /*frameSize*/
     if (initialized)
     {
         query
-            << "msubmenu=" << "audioanalysis"
+            << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&Enable=" << buildBool(enabled)
