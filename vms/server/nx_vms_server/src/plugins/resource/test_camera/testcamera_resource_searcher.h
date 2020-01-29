@@ -46,6 +46,9 @@ private:
         QnResourceList* resources,
         std::set<nx::utils::MacAddress>* processedMacAddresses) const;
 
+    void sendDiscoveryMessage(
+        nx::network::AbstractDatagramSocket* socket, const QString& addr, int port) const;
+
     QnTestCameraResourcePtr createDiscoveredTestCameraResource(
         const nx::utils::MacAddress& macAddress,
         const QString& videoLayoutString,

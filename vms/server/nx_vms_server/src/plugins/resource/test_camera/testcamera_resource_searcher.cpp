@@ -50,13 +50,15 @@ bool QnTestCameraResourceSearcher::updateSocketListIfNeeded()
     return true;
 }
 
-static void sendDiscoveryMessage(nx::network::AbstractDatagramSocket* socket, const QString& addr)
+void QnTestCameraResourceSearcher::sendDiscoveryMessage(
+    nx::network::AbstractDatagramSocket* socket, const QString& addr, int port) const
 {
-    const QByteArray testCameraFindMessage = ini().discoveryMessage + QByteArray("\n");
+    const QByteArray discoveryMessage = ini().discoveryMessage + QByteArray("\n");
 
-    socket->sendTo(
-        testCameraFindMessage.constData(), testCameraFindMessage.size(),
-        addr, ini().discoveryPort);
+    NX_VERBOSE(this, "Sending discovery message to %1:%2.", addr, port);
+
+    if (!socket->sendTo(discoveryMessage.constData(), discoveryMessage.size(), addr, port))
+        NX_VERBOSE(this, "Failed sending discovery message to %1:%2.", addr, port);
 }
 
 void QnTestCameraResourceSearcher::sendBroadcast()
@@ -66,7 +68,7 @@ void QnTestCameraResourceSearcher::sendBroadcast()
     NX_VERBOSE(this, "Broadcasting discovery messages to %1 sockets.", m_discoverySockets.size());
 
     for (const auto& socket: m_discoverySockets)
-        sendDiscoveryMessage(socket.get(), nx::network::BROADCAST_ADDRESS);
+        sendDiscoveryMessage(socket.get(), nx::network::BROADCAST_ADDRESS, ini().discoveryPort);
 }
 
 bool QnTestCameraResourceSearcher::readDiscoveryResponse(
@@ -211,7 +213,7 @@ QnTestCameraResourcePtr QnTestCameraResourceSearcher::createDiscoveredTestCamera
         ? ""
         : (" with video layout " + nx::kit::utils::toString(videoLayoutString));
 
-    NX_INFO(this, "Added testcamera %1%2 with URL %3", resource, videoLayoutLogMessage, url);
+    NX_INFO(this, "Created testcamera %1%2 with URL %3", resource, videoLayoutLogMessage, url);
 
     return resource;
 }
@@ -238,8 +240,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(
     result = QnVirtualCameraResourcePtr(new QnTestCameraResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
-    NX_DEBUG(this, "Create test camera resource [%1], type id: [%2]",
-        result, resourceTypeId);
+    NX_DEBUG(this, "Created testcamera resource %1, typeId %2.", result, resourceTypeId);
     return result;
 }
 
@@ -251,11 +252,11 @@ QString QnTestCameraResourceSearcher::manufacturer() const
 QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils::Url& url,
     const QAuthenticator& /*authenticator*/, bool isSearchAction)
 {
-    NX_DEBUG(this, "%1(%2, authenticator, isSearchAction: %3)",
+    NX_VERBOSE(this, "%1(%2, authenticator, isSearchAction: %3)",
         __func__, nx::kit::utils::toString(url.toStdString()), isSearchAction ? "true" : "false");
 
     const auto socket = nx::network::SocketFactory::createDatagramSocket();
-    sendDiscoveryMessage(socket.get(), url.host());
+    sendDiscoveryMessage(socket.get(), url.host(), url.port(/*defaultPort*/ ini().discoveryPort));
 
     socket->setRecvTimeout(1s);
 
