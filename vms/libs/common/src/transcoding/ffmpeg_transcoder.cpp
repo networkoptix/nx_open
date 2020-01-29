@@ -105,7 +105,8 @@ void QnFfmpegTranscoder::closeFfmpegContext()
 {
     if (m_formatCtx)
     {
-        av_write_trailer(m_formatCtx);
+        if (m_initialized)
+            av_write_trailer(m_formatCtx);
         if (m_formatCtx->pb)
             m_formatCtx->pb->opaque = 0;
         QnFfmpegHelper::closeFfmpegIOContext(m_formatCtx->pb);
