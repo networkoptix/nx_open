@@ -23,6 +23,7 @@ Control
             : "qrc:///skin/buttons/context_info.png"
 
         baselineOffset: 12.5
+        opacity: enabled ? 1.0 : 0.4
 
         MouseArea
         {
