@@ -10,6 +10,7 @@
 #include "frame_metadata.h"
 #include <utils/media/utils.h>
 #include <utils/media/h264_utils.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace media {
@@ -93,7 +94,7 @@ SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(
 
 void SeamlessVideoDecoderPrivate::updateSar(const QnConstCompressedVideoDataPtr& frame)
 {
-    switch (frame->context->getCodecId())
+    switch (frame->compressionType)
     {
         case AV_CODEC_ID_H264:
         {
@@ -102,6 +103,8 @@ void SeamlessVideoDecoderPrivate::updateSar(const QnConstCompressedVideoDataPtr&
                 return;
             sar = sps.getSar();
         }
+        default:
+            NX_WARNING(this, "SAR parser not implemented for codec %1", frame->compressionType);
     }
 }
 
