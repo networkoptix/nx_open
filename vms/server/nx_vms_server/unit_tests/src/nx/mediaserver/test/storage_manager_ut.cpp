@@ -8,6 +8,7 @@
 
 #include "media_server_module_fixture.h"
 #include <media_server/media_server_module.h>
+
 namespace nx {
 namespace vms::server {
 namespace test {

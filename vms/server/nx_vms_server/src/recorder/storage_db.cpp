@@ -449,9 +449,9 @@ void QnStorageDb::putRecordsToCatalog(
         cameraUuidIt->get_left(),
         (QnServer::ChunksCatalog) catalogIndex,
         QnServer::StoragePool::None));
-    std::sort(chunks.begin(), chunks.end());
 
-    newFileCatalog->assignChunksUnsafe(chunks.begin(), chunks.end());
+    std::sort(chunks.begin(), chunks.end());
+    newFileCatalog->addChunks(chunks);
     deviceFileCatalog->push_back(newFileCatalog);
 }
 

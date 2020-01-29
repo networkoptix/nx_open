@@ -95,7 +95,7 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
         return ChunkKey();
     }
     int nextFileIndex = fromCatalog->findNextFileIndex(fromTimeMs);
-    auto chunk = fromCatalog->chunkAt(nextFileIndex);
+    auto chunk = fromCatalog->chunkAt(nextFileIndex).value_or(nx::vms::server::Chunk());
     if (syncData)
     {
         syncData->currentIndex = syncData->startIndex

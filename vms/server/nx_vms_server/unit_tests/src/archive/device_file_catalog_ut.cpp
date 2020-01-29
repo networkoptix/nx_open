@@ -1,9 +1,12 @@
+#include "media_server_module_fixture.h"
+
 #include <gtest/gtest.h>
 
 #include <recorder/device_file_catalog.h>
 #include <recording/time_period_list.h>
 #include <recorder/chunks_deque.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/test_support/utils.h>
 
 namespace nx {
 namespace test {
@@ -139,72 +142,235 @@ TEST(DeviceFileCatalog, mergeData)
     ASSERT_EQ(kRecordsToTest * 3 + 1, catalog.size());
 }
 
-//TEST(DeviceFileCatalog, ChunksDeque_insertRemove)
-//{
-//    nx::vms::server::Chunk storage1Chunk, storage2Chunk;
-//    nx::vms::server::ChunksDeque chunksDeque;
-//    const int count = 5;
-//    const int storage1Index = 0;
-//    const int storage2Index = 1;
-//
-//    storage1Chunk.storageIndex = storage1Index;
-//    storage2Chunk.storageIndex = storage2Index;
-//
-//    for (int i = 0; i < count; ++i)
-//        chunksDeque.insert(chunksDeque.end(), storage1Chunk);
-//
-//    ASSERT_TRUE(chunksDeque.hasArchive(storage1Index));
-//    ASSERT_FALSE(chunksDeque.hasArchive(storage2Index));
-//
-//    for (int i = 0; i < count; ++i)
-//        chunksDeque.insert(chunksDeque.end(), storage2Chunk);
-//
-//    ASSERT_TRUE(chunksDeque.hasArchive(storage1Index));
-//    ASSERT_TRUE(chunksDeque.hasArchive(storage2Index));
-//
-//
-//    for (int i = 0; i < count; ++i)
-//        chunksDeque.erase(chunksDeque.begin());
-//
-//    ASSERT_FALSE(chunksDeque.hasArchive(storage1Index));
-//    ASSERT_TRUE(chunksDeque.hasArchive(storage2Index));
-//
-//    for (int i = 0; i < count; ++i)
-//        chunksDeque.erase(chunksDeque.begin());
-//
-//    ASSERT_FALSE(chunksDeque.hasArchive(storage1Index));
-//    ASSERT_FALSE(chunksDeque.hasArchive(storage2Index));
-//}
-//
-//TEST(DeviceFileCatalog, ChunksDeque_reCalcPresence)
-//{
-//    DeviceFileCatalog::Chunk storage1Chunk, storage2Chunk;
-//    DeviceFileCatalog::ChunksDeque chunksDeque;
-//    const int count = 5;
-//    const int storage1Index = 0;
-//    const int storage2Index = 1;
-//
-//    storage1Chunk.storageIndex = storage1Index;
-//    storage2Chunk.storageIndex = storage2Index;
-//
-//    for (int i = 0; i < count; ++i)
-//        chunksDeque.insert(chunksDeque.end(), storage1Chunk);
-//
-//    ASSERT_TRUE(chunksDeque.hasArchive(storage1Index));
-//    ASSERT_FALSE(chunksDeque.hasArchive(storage2Index));
-//
-//    std::vector<DeviceFileCatalog::Chunk> chunksForMerge;
-//    chunksForMerge.push_back(storage2Chunk);
-//    chunksForMerge.push_back(storage2Chunk);
-//
-//    int oldSize = chunksDeque.size();
-//    chunksDeque.resize(chunksDeque.size() + chunksForMerge.size());
-//    std::copy(chunksForMerge.cbegin(), chunksForMerge.cend(), chunksDeque.begin() + oldSize);
-//    ASSERT_FALSE(chunksDeque.hasArchive(storage2Index));
-//
-//    chunksDeque.reCalcArchivePresence();
-//    ASSERT_TRUE(chunksDeque.hasArchive(storage2Index));
-//}
+using namespace nx::vms::server;
+
+class DeviceFileCatalogTest: public MediaServerModuleFixture
+{
+protected:
+    static std::deque<Chunk> generateChunks(int count, int startTimeMs = 0)
+    {
+        std::deque<Chunk> result;
+        for (int i = 0; i < count; ++i)
+        {
+            result.push_back(Chunk(
+                /* startTimeMs */ i * 10 + startTimeMs,
+                /* storageIndex */ i % 2,
+                /* fileIndex */ i,
+                /* duration */ i * 5000,
+                /* timeZone */ 3,
+                /* fileSizeHi */ 0,
+                /* fileSizeLow */ i * 100));
+        }
+
+        return result;
+    }
+
+    DeviceFileCatalogPtr createCatalog(bool withChunks = false, int64_t startTimeMs = 0)
+    {
+        auto result = DeviceFileCatalogPtr(new ::DeviceFileCatalog(
+            &serverModule(), "", QnServer::HiQualityCatalog, QnServer::StoragePool::Normal));
+
+        if (withChunks)
+        {
+            const auto chunks = generateChunks(10, startTimeMs);
+            result->addChunks(chunks);
+            assertEquality(result, chunks);
+            assertPresence(result, chunks);
+        }
+
+        return result;
+    }
+
+    static void assertPresence(const DeviceFileCatalogPtr& catalog, const std::deque<Chunk>& chunks)
+    {
+        ASSERT_EQ(accumDuration(chunks, 0), catalog->occupiedDuration(0));
+        ASSERT_EQ(accumDuration(chunks, 1), catalog->occupiedDuration(1));
+        ASSERT_EQ(accumSpace(chunks, 0), catalog->occupiedSpace(0));
+        ASSERT_EQ(accumSpace(chunks, 1), catalog->occupiedSpace(1));
+    }
+
+    static void assertEquality(const DeviceFileCatalogPtr& catalog, const std::deque<Chunk>& chunks)
+    {
+        ASSERT_EQ(chunks.size(), catalog->size());
+        ASSERT_EQ(chunks, catalog->getChunks());
+        for (size_t i = 0; i < catalog->size(); ++i)
+            ASSERT_EQ(chunks[i], catalog->chunkAt(i).value());
+    }
+
+    static std::chrono::milliseconds accumDuration(const std::deque<Chunk>& chunks, int storageIndex)
+    {
+        return std::chrono::milliseconds(std::accumulate(
+            chunks.cbegin(), chunks.cend(), 0LL,
+            [storageIndex](int64_t v, const auto& c2)
+            {
+                return c2.storageIndex == storageIndex ? v + c2.durationMs : v;
+            }));
+    }
+
+    static int64_t accumSpace(const std::deque<Chunk>& chunks, int storageIndex)
+    {
+        return std::accumulate(
+            chunks.cbegin(), chunks.cend(), 0LL,
+            [storageIndex](int64_t v, const auto& c2)
+            {
+                return c2.storageIndex == storageIndex ? v + c2.getFileSize() : v;
+            });
+    }
+};
+
+TEST_F(DeviceFileCatalogTest, getChunks)
+{
+    const auto chunks = generateChunks(10);
+    auto catalog = createCatalog();
+    catalog->addChunks(chunks);
+    ASSERT_EQ(chunks, catalog->getChunks());
+    ASSERT_EQ(chunks.size(), catalog->size());
+}
+
+TEST_F(DeviceFileCatalogTest, addChunk_chunkAt)
+{
+    auto catalog = createCatalog(/* withChunks */ true);
+    const auto newChunk = Chunk(
+        catalog->getChunks()[2].startTimeMs + 1, /* storageIndex */ 0, /* fileIndex */ 1,
+        /* duration */ 5, /* timeZone */ 3);
+
+    catalog->addChunk(newChunk);
+    ASSERT_EQ(11, catalog->size());
+    ASSERT_EQ(newChunk.startTimeMs, catalog->chunkAt(3).value().startTimeMs);
+
+    const auto catalogChunks = catalog->getChunks().toDeque();
+    ASSERT_EQ(11, catalogChunks.size());
+    ASSERT_EQ(newChunk.startTimeMs, catalogChunks[3].startTimeMs);
+
+    assertPresence(catalog, catalogChunks);
+    assertEquality(catalog, catalogChunks);
+}
+
+TEST_F(DeviceFileCatalogTest, takeChunks)
+{
+    auto catalog = createCatalog(/* withChunks */ true);
+    const size_t size = catalog->size();
+    const auto chunks = catalog->takeChunks();
+    ASSERT_EQ(size, chunks.size());
+    ASSERT_EQ(0, catalog->size());
+    ASSERT_EQ(std::deque<Chunk>(), catalog->getChunks());
+}
+
+TEST_F(DeviceFileCatalogTest, removeChunks)
+{
+    auto catalog = createCatalog(/* withChunks */ true);
+    auto chunks = catalog->getChunks().toDeque();
+    chunks.erase(std::remove_if(
+        chunks.begin(), chunks.end(),
+        [](const auto& c) { return c.storageIndex == 0; }), chunks.end());
+
+    catalog->removeChunks(0);
+    assertEquality(catalog, chunks);
+    assertPresence(catalog, chunks);
+}
+
+TEST_F(DeviceFileCatalogTest, mergeRecordingStatistics)
+{
+    auto catalog1 = createCatalog(/* withChunks */ true);
+    auto catalog2 = createCatalog(/* withChunks */ true, /* startTimeMs */ 10000);
+    const auto stats = catalog1->mergeRecordingStatisticsData(
+        *catalog2,
+        /* bitrateAnalyzePeriodMs */ 0,
+        [](int) { return QnStorageResourcePtr(); });
+
+    ASSERT_NE(0, stats.recordedBytes);
+    ASSERT_NE(0, stats.recordedSecs);
+
+    // #TODO #rvasilenko Elaborate on this frame.
+}
+
+TEST_F(DeviceFileCatalogTest, recordedMonthList)
+{
+    auto catalog = createCatalog();
+    QDate d1 = QDate(2000, 2, 13);
+    catalog->addChunk(Chunk(
+        /* startTimeMs */ QDateTime(d1).toMSecsSinceEpoch() + 100,
+        /* storageIndex */ 0,
+        /* fileIndex */ 0,
+        /* duration */ 50000,
+        /* timeZone */ 3,
+        /* fileSizeHi */ 0,
+        /* fileSizeLow */ 300));
+
+    auto d2 = d1.addMonths(2);
+    catalog->addChunk(Chunk(
+        /* startTimeMs */ QDateTime(d2).toMSecsSinceEpoch() + 100,
+        /* storageIndex */ 0,
+        /* fileIndex */ 0,
+        /* duration */ 50000,
+        /* timeZone */ 3,
+        /* fileSizeHi */ 0,
+        /* fileSizeLow */ 300));
+
+    const auto recordedMonths = catalog->recordedMonthList();
+    ASSERT_EQ(2, recordedMonths.size());
+    ASSERT_TRUE(std::all_of(
+        recordedMonths.cbegin(), recordedMonths.cend(),
+        [d1, d2](const auto& d) {return d.month() == d1.month() || d.month() == d2.month(); } ));
+}
+
+TEST_F(DeviceFileCatalogTest, setDifference)
+{
+    const auto chunks = generateChunks(1000);
+    auto catalog1 = createCatalog();
+    auto catalog2 = createCatalog();
+    std::deque<Chunk> diffDeque;
+
+    // Push every chunk to the first catalog, every other - to the second one and accumulate
+    // difference in a separate container.
+    for (size_t i = 0; i < chunks.size(); ++i)
+    {
+        catalog1->addChunk(chunks[i]);
+        if (i % 2 == 0)
+            catalog2->addChunk(chunks[i]);
+        else
+            diffDeque.push_back(chunks[i]);
+    }
+
+    ASSERT_EQ(diffDeque, catalog1->setDifference(*catalog2));
+}
+
+TEST_F(DeviceFileCatalogTest, chunksBefore)
+{
+    const auto chunks = generateChunks(1000);
+    auto catalog = createCatalog();
+    catalog->addChunks(chunks);
+    const auto cutoffTimepoint = chunks[500].startTimeMs;
+    std::deque<Chunk> referenceDeque;
+    std::copy_if(
+        chunks.cbegin(), chunks.cend(), std::back_inserter(referenceDeque),
+        [cutoffTimepoint](const auto& c)
+        {
+            return c.startTimeMs < cutoffTimepoint && c.storageIndex == 0;
+        });
+
+    ASSERT_EQ(referenceDeque, catalog->chunksBefore(cutoffTimepoint, 0));
+}
+
+TEST_F(DeviceFileCatalogTest, chunksBefore_EmptyCatalog)
+{
+    auto catalog = createCatalog();
+    ASSERT_EQ(std::deque<Chunk>(), catalog->chunksBefore(0, 0));
+}
+
+TEST_F(DeviceFileCatalogTest, chunksBefore_wholeCatalog)
+{
+    const auto chunks = generateChunks(1000);
+    auto catalog = createCatalog();
+    catalog->addChunks(chunks);
+    const auto cutoffTimepoint = chunks[chunks.size() - 1].startTimeMs;
+    std::deque<Chunk> referenceDeque;
+    std::copy_if(
+        chunks.cbegin(), chunks.cend(), std::back_inserter(referenceDeque),
+        [cutoffTimepoint](const auto& c) { return c.storageIndex == 0; });
+
+    ASSERT_EQ(referenceDeque, catalog->chunksBefore(cutoffTimepoint, 0));
+}
 
 } // test
 } // nx

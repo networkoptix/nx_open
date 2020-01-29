@@ -136,8 +136,6 @@ public:
         const QList<QnServer::ChunksCatalog> &catalogs);
     QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalyzePeriodMs);
 
-    void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
-
     QnStorageResourcePtr getOptimalStorageRoot();
 
     nx::vms::server::StorageResourceList getStorages() const;
@@ -259,11 +257,11 @@ private:
     void replaceChunks(
         const QnTimePeriod& rebuildPeriod,
         const QnStorageResourcePtr &storage,
-        const DeviceFileCatalogPtr &newCatalog,
+        DeviceFileCatalogPtr&& newCatalog,
         const QString& cameraUniqueId,
         QnServer::ChunksCatalog catalog);
 
-    void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
+    // void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
     QMap<QString, QSet<int>> deserializeStorageFile();
     void clearUnusedMetadata();
     //void clearCameraHistory();
@@ -279,8 +277,6 @@ private:
     //QMap<QnUuid, QnRecordingStatsData> getChunkStatisticsInternal(qint64 startTime, qint64 endTime, QnServer::ChunksCatalog catalog);
     QnRecordingStatsData getChunkStatisticsByCamera(qint64 bitrateAnalyzePeriodMs, const QString& uniqueId);
 
-    // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalyzePeriodMs
-    QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalyzePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
     void clearAnalyticsEvents(const QMap<QnUuid, qint64>& dataToDelete);
     void forciblyClearAnalyticsEvents();
     QMap<QnUuid, qint64> calculateOldestDataTimestampByCamera();
