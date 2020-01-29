@@ -1099,7 +1099,7 @@ void MediaServerProcess::stopSync()
     pleaseStop();
     quit();
 
-    const std::chrono::seconds kStopTimeout(100);
+    const std::chrono::seconds kStopTimeout(ini().stopTimeoutS);
     if (!wait(kStopTimeout))
         NX_CRITICAL(false, lm("Server was unable to stop within %1").arg(kStopTimeout));
 

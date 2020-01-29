@@ -35,6 +35,8 @@ public:
 
     virtual ~QnTCPConnectionProcessorPrivate()
     {
+        if (socket)
+            socket->pleaseStopSync();
         delete [] tcpReadBuffer;
     }
 
