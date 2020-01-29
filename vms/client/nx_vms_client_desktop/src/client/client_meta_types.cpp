@@ -21,6 +21,7 @@
 #include <ui/customization/customization.h>
 #include <ui/customization/palette_data.h>
 #include <ui/customization/pen_data.h>
+#include <ui/help/help_handler.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -194,6 +195,14 @@ void QnClientMetaTypes::registerQmlTypes()
         lit("Cannot create instance of WorkbenchContext."));
     qmlRegisterUncreatableType<QnWorkbenchLayout>("nx.client.desktop", 1, 0, "WorkbenchLayout",
         lit("Cannot create instance of WorkbenchLayout."));
+
+    qmlRegisterSingletonType<QnHelpHandler>("nx.vms.client.desktop", 1, 0, "HelpHandler",
+        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+        {
+            auto helpHandler = &QnHelpHandler::instance();
+            qmlEngine->setObjectOwnership(helpHandler, QQmlEngine::CppOwnership);
+            return helpHandler;
+        });
 
     ui::scene::Instrument::registerQmlType();
     CursorManager::registerQmlType();

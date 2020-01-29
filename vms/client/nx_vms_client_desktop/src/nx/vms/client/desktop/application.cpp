@@ -178,8 +178,7 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     /* Initialize sound. */
     nx::audio::AudioDevice::instance()->setVolume(qnSettings->audioVolume());
 
-    QnHelpHandler helpHandler;
-    qApp->installEventFilter(&helpHandler);
+    qApp->installEventFilter(&QnHelpHandler::instance());
 
     // Hovered QComboBox changes its value when user scrolls a mouse wheel, even if the ComboBox
     // is not focused. It leads to weird and undesirable UI behaviour in some parts of the client.

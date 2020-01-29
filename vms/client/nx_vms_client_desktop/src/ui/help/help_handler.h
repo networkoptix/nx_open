@@ -8,6 +8,7 @@
 class QnHelpHandler: public QObject
 {
     Q_OBJECT
+
 public:
     QnHelpHandler(QObject* parent = nullptr);
     virtual ~QnHelpHandler();
@@ -17,7 +18,10 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
-    static void openHelpTopic(int topic);
+    Q_INVOKABLE static void openHelpTopic(int topic);
+
+    static QnHelpHandler& instance();
+
 protected:
     static QUrl urlForTopic(int topic);
 
