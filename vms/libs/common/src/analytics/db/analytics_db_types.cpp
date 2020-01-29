@@ -339,10 +339,11 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter,
     for (const auto& deviceIdStr: params.allValues(lit("deviceId")))
     {
         // Convert flexibleId to UUID
-        const QnUuid uuid = resourcePool
-            ? nx::camera_id_helper::flexibleIdToId(resourcePool, deviceIdStr)
-            : QnUuid::fromStringSafe(deviceIdStr);
-        filter->deviceIds.push_back(uuid);
+        auto uuid = nx::camera_id_helper::flexibleIdToId(resourcePool, deviceIdStr);
+        if (uuid.isNull())
+            uuid = QnUuid::fromStringSafe(deviceIdStr); //< Not have camera in resourcePool.
+        if(!uuid.isNull())
+            filter->deviceIds.push_back(uuid);
     }
 
     for (const auto& objectTypeId: params.allValues(lit("objectTypeId")))

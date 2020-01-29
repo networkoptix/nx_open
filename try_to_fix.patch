@@ -1,0 +1,81 @@
+diff --git a/vms/libs/common/src/nx/streaming/media_data_packet.cpp b/vms/libs/common/src/nx/streaming/media_data_packet.cpp
+index 0dff8178188..d67eb41d118 100644
+--- a/vms/libs/common/src/nx/streaming/media_data_packet.cpp
++++ b/vms/libs/common/src/nx/streaming/media_data_packet.cpp
+@@ -540,11 +540,11 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
+         *maskEnd = 0;
+     memset(mask, 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8);
+ 
+-    for (int i = 0; i < region.rectCount(); ++i)
+-    {
+-        QRect rect = region.rects().at(i).intersected(kMaxGridRect);
+-        addDataToMask(rect, mask, maskStart, maskEnd);
+-    }
++    if (region.isEmpty())
++        addDataToMask(kMaxGridRect, mask, maskStart, maskEnd);
++
++    for (const QRect& rect: region.rects())
++        addDataToMask(rect.intersected(kMaxGridRect), mask, maskStart, maskEnd);
+ }
+ 
+ void QnMetaDataV1::createMask(const QRectF& rectF, char* mask, int* maskStart, int* maskEnd)
+diff --git a/vms/server/nx_vms_server/src/motion/motion_helper.cpp b/vms/server/nx_vms_server/src/motion/motion_helper.cpp
+index ad4a221bcde..066949f5c42 100644
+--- a/vms/server/nx_vms_server/src/motion/motion_helper.cpp
++++ b/vms/server/nx_vms_server/src/motion/motion_helper.cpp
+@@ -87,14 +87,20 @@ QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
+         }
+         else
+         {
+-            for (int i = 0; i < motionRegions.size(); ++i)
++            const auto layout = res->getVideoLayout();
++            int channels = 1;
++            if (const auto layout = res->getVideoLayout())
++                channels = layout->channelCount();
++
++            for (int i = 0; i < channels; ++i)
+             {
+                 auto archive = getArchive(res, i);
+                 if (archive)
+                 {
++                    const auto region = motionRegions.size() > i ? motionRegions[i] : QRegion();
+                     timePeriods.push_back(archive->matchPeriod(
+                         {
+-                            motionRegions[i],
++                            region,
+                             std::chrono::milliseconds(request.startTimeMs),
+                             std::chrono::milliseconds(request.endTimeMs),
+                             request.detailLevel,
+diff --git a/vms/server/nx_vms_server/src/nx/vms/server/metadata/metadata_helper.cpp b/vms/server/nx_vms_server/src/nx/vms/server/metadata/metadata_helper.cpp
+index c6227318bf2..bb655348803 100644
+--- a/vms/server/nx_vms_server/src/nx/vms/server/metadata/metadata_helper.cpp
++++ b/vms/server/nx_vms_server/src/nx/vms/server/metadata/metadata_helper.cpp
+@@ -86,25 +86,9 @@ void MetadataHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QStr
+ 
+ QList<QRegion> MetadataHelper::regionsFromFilter(const QString& filter, int channelCount) const
+ {
+-    const auto motionRegionList = filter.trimmed().isEmpty()
+-        ? QList<QRegion>()
+-        : QJson::deserialized<QList<QRegion>>(filter.toUtf8());
+-
+-    const auto wholeFrameRegionList =
+-        [](int channelCount)
+-    {
+-        static const QRegion kWholeFrame(
+-            QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+-
+-        QList<QRegion> result;
+-        result.reserve(channelCount);
+-        std::fill_n(std::back_inserter(result), channelCount, kWholeFrame);
+-        return result;
+-    };
+-
+-    return motionRegionList.isEmpty()
+-        ? wholeFrameRegionList(channelCount)
+-        : motionRegionList;
++    if (filter.isEmpty())
++        return QList<QRegion>();
++    return QJson::deserialized<QList<QRegion>>(filter.toUtf8());
+ }
+ 
+ } // namespace nx::vms::server::metadata

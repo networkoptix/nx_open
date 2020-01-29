@@ -79,6 +79,8 @@ QnUuid flexibleIdToId(
     const QnResourcePool* resourcePool,
     const QString& flexibleId)
 {
+    if (!resourcePool)
+        return QnUuid();
     auto camera = findCameraByFlexibleId(resourcePool, flexibleId);
     return camera ? camera->getId() : QnUuid();
 }

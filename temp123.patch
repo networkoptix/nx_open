@@ -1,0 +1,261 @@
+diff --git a/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/detail/media_paths_filter.cpp b/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/detail/media_paths_filter.cpp
+index 6e228d6cb5d..eab057dcdcc 100644
+--- a/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/detail/media_paths_filter.cpp
++++ b/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/detail/media_paths_filter.cpp
+@@ -37,7 +37,7 @@ public:
+         m_path(path),
+         m_filterConfig(filterConfig)
+     {
+-        if (m_filterConfig.isWindows)
++        if (m_filterConfig.isWindows && 0)
+         {
+             amendPath();
+             return;
+@@ -111,23 +111,20 @@ Filter::Filter(FilterConfig filterConfig) :
+     m_filterConfig(std::move(filterConfig))
+ {}
+ 
+-QStringList Filter::get() const
++QStringList Filter::mediaPathList() const
+ {
+     QStringList result;
+     NX_VERBOSE(this, "Candidates: %1", containerString(m_filterConfig.partitions));
+-    for (const auto& partition : filteredPartitions())
+-        result.push_back(amendPath(partition.path));
++    for (const auto& partition: filteredPartitions())
++        result.push_back(amendPath(partition));
+ 
+     if (m_filterConfig.isMultipleInstancesAllowed)
+         appendServerGuidPostFix(&result);
+ 
+-    std::sort(result.begin(), result.end());
+-    result.erase(std::unique(result.begin(), result.end()), result.end());
+-
+     return result;
+ }
+ 
+-QList<nx::vms::server::PlatformMonitor::PartitionSpace> Filter::filteredPartitions() const
++std::set<QString> Filter::filteredPartitions() const
+ {
+     auto partitions = m_filterConfig.partitions;
+     if (!m_filterConfig.isRemovableDrivesAllowed)
+@@ -136,7 +133,10 @@ QList<nx::vms::server::PlatformMonitor::PartitionSpace> Filter::filteredPartitio
+     if (!m_filterConfig.isNetworkDrivesAllowed)
+         filterOut(&partitions, nx::vms::server::PlatformMonitor::NetworkPartition);
+ 
+-    return partitions;
++    std::set<QString> result;
++    for (const auto& p: partitions)
++        result.insert(p.path);
++    return result;
+ }
+ 
+ QString Filter::amendPath(const QString& path) const
+@@ -146,7 +146,7 @@ QString Filter::amendPath(const QString& path) const
+ 
+ void Filter::appendServerGuidPostFix(QStringList* paths) const
+ {
+-    for (QString& path : *paths)
++    for (QString& path: *paths)
+         path = closeDirPath(path) + m_filterConfig.serverUuid.toString();
+ }
+ 
+diff --git a/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/detail/media_paths_filter.h b/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/detail/media_paths_filter.h
+index 11c1ca7ac70..ef91be8efa2 100644
+--- a/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/detail/media_paths_filter.h
++++ b/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/detail/media_paths_filter.h
+@@ -12,11 +12,11 @@ class Filter
+ {
+ public:
+     explicit Filter(FilterConfig filterConfig);
+-    QStringList get() const;
++    QStringList mediaPathList() const;
++    std::set<QString> filteredPartitions() const;
+ private:
+     FilterConfig m_filterConfig;
+ 
+-    QList<nx::vms::server::PlatformMonitor::PartitionSpace> filteredPartitions() const;
+     void appendServerGuidPostFix(QStringList* paths) const;
+     QString amendPath(const QString& path) const;
+ };
+diff --git a/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/media_paths.cpp b/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/media_paths.cpp
+index 1a343343260..b6d2bd54dab 100644
+--- a/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/media_paths.cpp
++++ b/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/media_paths.cpp
+@@ -7,9 +7,15 @@ namespace fs {
+ namespace media_paths {
+ 
+ struct FilterConfig;
++
+ QStringList getMediaPaths(FilterConfig filterConfig)
+ {
+-    return detail::Filter(std::move(filterConfig)).get();
++    return detail::Filter(std::move(filterConfig)).mediaPathList();
++}
++
++std::set<QString> getPartitions(FilterConfig filterConfig)
++{
++    return detail::Filter(std::move(filterConfig)).filteredPartitions();
+ }
+ 
+ } // namespace media_paths
+diff --git a/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/media_paths.h b/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/media_paths.h
+index 5b0e8e10887..ac8a4c6e680 100644
+--- a/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/media_paths.h
++++ b/vms/server/nx_vms_server/src/nx/vms/server/fs/media_paths/media_paths.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+ #include <QtCore/QStringList>
++#include <set>
+ 
+ namespace nx {
+ namespace vms::server {
+@@ -9,6 +10,7 @@ namespace media_paths {
+ 
+ struct FilterConfig;
+ QStringList getMediaPaths(FilterConfig filterConfig);
++std::set<QString> getPartitions(FilterConfig filterConfig);
+ 
+ } // namespace media_paths
+ } // namespace fs
+diff --git a/vms/server/nx_vms_server/src/plugins/storage/file_storage/file_storage_resource.cpp b/vms/server/nx_vms_server/src/plugins/storage/file_storage/file_storage_resource.cpp
+index 2574d37bc74..c61ade856a7 100644
+--- a/vms/server/nx_vms_server/src/plugins/storage/file_storage/file_storage_resource.cpp
++++ b/vms/server/nx_vms_server/src/plugins/storage/file_storage/file_storage_resource.cpp
+@@ -254,19 +254,14 @@ qint64 QnFileStorageResource::getDeviceSizeByLocalPossiblyNonExistingPath(const
+     return result;
+ }
+ 
+-void QnFileStorageResource::setIsSystemFlagIfNeeded()
++void QnFileStorageResource::updateIsSystemFlag()
+ {
+-    if (*m_isSystem.lock())
+-        return;
+-
+     const QString sysPath = sysDrivePath(m_serverModule);
+-    const bool isSystem = !sysPath.isNull() && getDevicePath(m_serverModule, getUrl()).startsWith(sysPath);
++    m_isSystem = !sysPath.isNull() && getDevicePath(m_serverModule, getUrl()).startsWith(sysPath);
+     NX_DEBUG(
+         this,
+         "Setting isSystem flag for storage '%1'. System drive path: '%2'. Result: %3",
+-        nx::utils::url::hidePassword(getUrl()), sysPath, isSystem);
+-
+-    *m_isSystem.lock() = isSystem;
++        nx::utils::url::hidePassword(getUrl()), sysPath, m_isSystem);
+ }
+ 
+ Qn::StorageInitResult QnFileStorageResource::initStorageDirectory(const QString& url)
+@@ -322,8 +317,7 @@ bool QnFileStorageResource::isValid() const
+ 
+ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
+ {
+-    if (isValid())
+-        return Qn::StorageInit_Ok;
++    NX_VERBOSE(this, "[initOrUpdate] for storage %1 begin", nx::utils::url::hidePassword(getUrl()));
+ 
+     QString url = getUrl();
+     if (!NX_ASSERT(!url.isEmpty()))
+@@ -332,14 +326,19 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
+         return Qn::StorageInit_WrongPath;
+     }
+ 
+-    return url.contains("://") ? initRemoteStorage(url) : initStorageDirectory(url);
++    auto result = url.contains("://") ? initRemoteStorage(url) : initStorageDirectory(url);
++    if (result != Qn::StorageInit_Ok)
++        return result;
++
++    if (result = testWrite(); result != Qn::StorageInit_Ok)
++        return result;
++
++    return checkMountedStatus();
+ }
+ 
+ bool QnFileStorageResource::isSystem() const
+ {
+-    QnMutexLocker lock(&m_mutex);
+-    const auto lockedIsSystem = *m_isSystem.lock();
+-    return lockedIsSystem ? *lockedIsSystem : false;
++    return m_isSystem;
+ }
+ 
+ bool QnFileStorageResource::checkWriteCap() const
+@@ -616,6 +615,11 @@ Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& url)
+ void QnFileStorageResource::setUrl(const QString& url)
+ {
+     QnStorageResource::setUrl(url);
++    
++    if (m_state == Qn::StorageInit_Ok)
++    {
++        int gg = 4;
++    }
+     m_state = Qn::StorageInit_CreateFailed;
+ }
+ 
+@@ -850,11 +854,16 @@ bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
+             result.replace('\\', '/');
+             return result;
+         };
++    auto partitions = getPartitions(pathConfig);
+ 
+-    const auto mediaPaths = getMediaPaths(pathConfig);
++#if 0
+     return std::any_of(
+         mediaPaths.cbegin(), mediaPaths.cend(),
+         [path = normalize(path)](const auto& p) { return normalize(p).startsWith(path); });
++#endif
++    return std::any_of(
++        partitions.cbegin(), partitions.cend(),
++        [path = normalize(path)](const auto& p) { return path.startsWith(normalize(p)); });
+ }
+ 
+ Qn::StorageInitResult QnFileStorageResource::testWrite() const
+@@ -864,20 +873,12 @@ Qn::StorageInitResult QnFileStorageResource::testWrite() const
+ 
+ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
+ {
+-    NX_VERBOSE(this, "[initOrUpdate] for storage %1 begin", nx::utils::url::hidePassword(getUrl()));
+-    if (m_state == Qn::StorageInit_Ok //< Checking mounted status only if storage has already been initialized
+-        && (m_state = checkMountedStatus()) != Qn::StorageInit_Ok)
+-        return m_state;
+-
+-    if (m_state = initOrUpdateInternal(); m_state != Qn::StorageInit_Ok)
+-        return m_state;
+-
+-    if (m_state = testWrite(); m_state != Qn::StorageInit_Ok)
+-        return m_state;
+-
+-    m_cachedTotalSpace = rootTool()->totalSpace(getFsPath());
+-    setIsSystemFlagIfNeeded();
+-
++    m_state = initOrUpdateInternal();
++    if (m_state == Qn::StorageInit_Ok)
++    {
++        m_cachedTotalSpace = rootTool()->totalSpace(getFsPath());
++        updateIsSystemFlag();
++    }
+     return m_state;
+ }
+ 
+diff --git a/vms/server/nx_vms_server/src/plugins/storage/file_storage/file_storage_resource.h b/vms/server/nx_vms_server/src/plugins/storage/file_storage/file_storage_resource.h
+index f4830376e7a..1aea17caa3a 100644
+--- a/vms/server/nx_vms_server/src/plugins/storage/file_storage/file_storage_resource.h
++++ b/vms/server/nx_vms_server/src/plugins/storage/file_storage/file_storage_resource.h
+@@ -108,7 +108,7 @@ private:
+         QIODevice::OpenMode openMode,
+         int bufferSize);
+ 
+-    void setIsSystemFlagIfNeeded();
++    void updateIsSystemFlag();
+     Qn::StorageInitResult initStorageDirectory(const QString& url);
+     Qn::StorageInitResult initRemoteStorage(const QString& url);
+     Qn::StorageInitResult checkMountedStatus() const;
+@@ -132,7 +132,7 @@ private:
+     mutable int m_capabilities;
+     QString m_localPath;
+     mutable std::atomic<int64_t> m_cachedTotalSpace{-1};
+-    nx::utils::Lockable<std::optional<bool>> m_isSystem;
++    std::atomic<bool> m_isSystem;
+     QnMediaServerModule* m_serverModule = nullptr;
+ };
+ typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
