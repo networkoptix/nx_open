@@ -355,6 +355,8 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         }
 
         camera->setUserEnabledAnalyticsEngines(state.analytics.enabledEngines());
+
+        // TODO: FIXME! #vkutin Implement state.analytics.streamByEngineId storing.
     }
 
     if (state.devicesDescription.isWearable == CombinedValue::All)

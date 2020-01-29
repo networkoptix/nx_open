@@ -28,6 +28,8 @@ namespace nx::vms::client::desktop {
 
 struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 {
+    using StreamIndex = nx::vms::api::StreamIndex;
+
     enum class RecordingHint
     {
         // Brush was changed (mode, fps, quality).
@@ -130,7 +132,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     struct IoModuleSettings
     {
         UserEditable<QnIOPortDataList> ioPortsData;
-        UserEditable<vms::api::IoModuleVisualStyle> visualStyle;
+        UserEditable<nx::vms::api::IoModuleVisualStyle> visualStyle;
     };
     IoModuleSettings singleIoModuleSettings;
 
@@ -176,8 +178,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         UserEditableMultiple<nx::core::ptz::PresetType> preferredPtzPresetType;
         UserEditableMultiple<bool> forcedPtzPanTiltCapability;
         UserEditableMultiple<bool> forcedPtzZoomCapability;
-        UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
-        UserEditableMultiple<vms::api::StreamIndex> forcedMotionStreamType;
+        UserEditableMultiple<nx::vms::api::RtpTransportType> rtpTransportType;
+        UserEditableMultiple<StreamIndex> forcedMotionStreamType;
         CombinedValue motionStreamOverridden = CombinedValue::None;
         UserEditableMultiple<bool> remoteMotionDetectionEnabled;
 
@@ -278,6 +280,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         QHash<QnUuid, QJsonObject> settingsModelByEngineId;
         bool loading = false;
         QnUuid currentEngineId;
+
+        QHash<QnUuid, UserEditable<StreamIndex>> streamByEngineId;
     };
     AnalyticsSettings analytics;
 
@@ -310,7 +314,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     bool isMotionDetectionStreamEnabled() const
     {
         return !settingsOptimizationEnabled || expert.dualStreamingDisabled.equals(false)
-            || expert.forcedMotionStreamType.equals(nx::vms::api::StreamIndex::primary);
+            || expert.forcedMotionStreamType.equals(StreamIndex::primary);
     }
 
     bool isMotionDetectionEnabled() const

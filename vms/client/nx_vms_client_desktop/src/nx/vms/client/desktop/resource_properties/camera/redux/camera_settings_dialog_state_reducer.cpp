@@ -566,6 +566,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.motionAlert = {};
     state.analytics.enabledEngines = {};
     state.analytics.settingsValuesByEngineId = {};
+    state.analytics.streamByEngineId = {};
     state.enableMotionDetection = {};
 
     state.deviceType = firstCamera
@@ -713,6 +714,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
             false);
 
         state.analytics.enabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
+
+        // TODO: FIXME! #vkutin Implement state.analytics.streamByEngineId loading.
     }
 
     fetchFromCameras<bool>(state.recording.enabled, cameras,
@@ -1497,6 +1500,14 @@ State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
     }
 
     state.analytics.enabledEngines.setUser(actualValue);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setAnalyticsStreamIndex(
+    State state, const QnUuid& engineId, State::StreamIndex value)
+{
+    state.analytics.streamByEngineId[engineId].setUser(value);
     state.hasChanges = true;
     return state;
 }

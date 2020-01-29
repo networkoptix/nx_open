@@ -103,6 +103,9 @@ Item
                 settingsView.loadModel({}, {})
             }
 
+            if (currentEngineId)
+                streamComboBox.currentIndex = store.analyticsStreamIndex(currentEngineId)
+
             banner.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
         }
     }
@@ -213,20 +216,15 @@ Item
         InformationPanel
         {
             id: informationPanel
-
-            Layout.fillWidth: true
-
-            engineInfo: currentEngineInfo
-
             visible: isDefaultSection
-            checkable: !isDeviceDependent
-
-            checked: currentEngineId !== undefined
-                && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
+            checkable: !isDeviceDependent && !!currentEngineId
+            checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
+            engineInfo: currentEngineInfo
+            Layout.fillWidth: true
 
             onClicked:
             {
-                if (currentEngineId !== undefined)
+                if (currentEngineId)
                     setEngineEnabled(currentEngineId, !checked)
             }
         }
@@ -236,15 +234,55 @@ Item
             id: settingsView
 
             enabled: !loading
-
-            Layout.fillHeight: true
+            contentEnabled: informationPanel.checked || isDeviceDependent
+            scrollBarParent: scrollBarsParent
             Layout.fillWidth: true
+            Layout.fillHeight: true
 
             onValuesEdited:
                 store.setDeviceAgentSettingsValues(currentEngineId, getValues())
 
-            contentEnabled: informationPanel.checked || isDeviceDependent
-            scrollBarParent: scrollBarsParent
+            headerItem: ColumnLayout
+            {
+                spacing: 16
+
+                Panel
+                {
+                    id: commonSettings
+
+                    title: "General Settings"
+                    visible: commonContent.height > 0
+                    Layout.fillWidth: true
+
+                    GridLayout
+                    {
+                        id: commonContent
+
+                        columns: 2
+                        columnSpacing: 8
+                        flow: GridLayout.LeftToRight
+
+                        ContextHintLabel
+                        {
+                            text: qsTr("Camera stream")
+                            contextHintText: qsTr("Select video stream from the camera for analysis")
+                            color: ColorTheme.windowText
+                        }
+
+                        ComboBox
+                        {
+                            id: streamComboBox
+                            model: ["Primary", "Secondary"]
+
+                            onCurrentIndexChanged:
+                            {
+                                if (currentEngineId)
+                                    store.setAnalyticsStreamIndex(currentEngineId, currentIndex)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
