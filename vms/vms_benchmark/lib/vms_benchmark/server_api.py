@@ -363,8 +363,10 @@ class ServerApi:
 
             logging.info(f'Archive start time for camera {camera_id}: {min_start_time_ms} ms.')
             return min_start_time_ms
-        except Exception:
+        except Exception as e:
             logging.exception('Exception while parsing the response of /ec2/recordedTimePeriods:')
             raise exceptions.ServerApiError(
                 "Unable to request recorded periods from the Server: "
-                f"Invalid response of /ec2/recordedTimePeriods.")
+                    f"Invalid response of /ec2/recordedTimePeriods.",
+                original_exception=e
+            )
