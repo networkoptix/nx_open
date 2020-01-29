@@ -267,6 +267,7 @@
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/vms/server/fs/media_paths/media_paths.h>
 #include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
+#include <nx/vms/server/resource_params.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/server/root_fs.h>
 #include <system_log/raid_event_ini_config.h>
@@ -312,7 +313,6 @@ static bool gRestartFlag = false;
 
 namespace {
 
-static const std::chrono::seconds kResourceDataReadingTimeout(5);
 const QString YES = "yes";
 const QString NO = "no";
 const QString MEDIATOR_ADDRESS_UPDATE = "mediatorAddressUpdate";
@@ -4482,29 +4482,6 @@ void MediaServerProcess::loadResourcesFromDatabase()
         moveHandlingCameras();
 }
 
-static QByteArray loadDataFromFile(const QString& fileName)
-{
-    QFile file(fileName);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return file.readAll();
-    return QByteArray();
-}
-
-static QByteArray loadDataFromUrl(nx::utils::Url url)
-{
-    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
-    httpClient->setResponseReadTimeout(kResourceDataReadingTimeout);
-    httpClient->setMessageBodyReadTimeout(kResourceDataReadingTimeout);
-    if (httpClient->doGet(url)
-        && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
-    {
-        const auto value = httpClient->fetchEntireMessageBody();
-        if (value)
-            return *value;
-    }
-    return QByteArray();
-}
-
 static QByteArray loadDataFromDb(ec2::AbstractResourceManagerPtr manager)
 {
     nx::vms::api::ResourceParamWithRefDataList data;
@@ -4517,109 +4494,46 @@ static QByteArray loadDataFromDb(ec2::AbstractResourceManagerPtr manager)
     return QByteArray();
 }
 
-// Update local data only without saving to DB.
-static bool updateResourceParamsData(
-    const QString& source, const QByteArray& data, QnResourceDataPool* pool)
-{
-    if (pool->loadData(data))
-    {
-        NX_INFO(NX_SCOPE_TAG, "Updated local resource_data.json from %1", source);
-        return true;
-    }
-    NX_WARNING(NX_SCOPE_TAG, "Ignore invalid resource_data.json from %1", source);
-    return false;
-}
-
-static bool overrideResourceParamsDataByUrl(const nx::utils::Url& url, QnResourceDataPool* pool)
-{
-    if (url.isEmpty())
-        return false;
-    if (!url.isValid() || url.host().isEmpty()) //< To pass asserts in AsyncClient::doRequest
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Ignore invalid resourceFileUri setting %1", url);
-        return false;
-    }
-    const auto data = loadDataFromUrl(url);
-    if (data.isEmpty())
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Ignore empty resource_data.json from %1", url);
-        return false;
-    }
-    return updateResourceParamsData(url.toString(), data, pool);
-}
-
-static bool overrideResourceParamsDataByLocalFile(QnResourceDataPool* pool)
-{
-    const auto source = QCoreApplication::applicationDirPath() + "/resource_data.json";
-    const auto data = loadDataFromFile(source);
-    return !data.isEmpty() && updateResourceParamsData(source, data, pool);
-}
-
-static std::optional<std::tuple<QString, QByteArray, nx::utils::SoftwareVersion>>
-    findOnlineResourceParamsData(
-        const nx::utils::SoftwareVersion& currentVersion, QnResourceDataPool* pool)
-{
-    static const std::array<const char*, 2> kUrlsToLoadResourceData =
-    {
-        "http://resources.vmsproxy.com/resource_data.json",
-        "http://beta.vmsproxy.com/beta-builds/daily/resource_data.json"
-    };
-    for (const auto& url: kUrlsToLoadResourceData)
-    {
-        auto data = loadDataFromUrl(url);
-        if (!data.isEmpty())
-        {
-            auto version = QnResourceDataPool::getVersion(data);
-            if (version > currentVersion)
-            {
-                if (pool->validateData(data))
-                    return std::make_tuple(QString(url), std::move(data), std::move(version));
-                NX_WARNING(NX_SCOPE_TAG, "Skip invalid resource_data.json from %1", url);
-            }
-            else
-            {
-                NX_DEBUG(NX_SCOPE_TAG,
-                    "Skip internet resource_data.json from %1. Current version %2, internet %3",
-                    url, currentVersion, version);
-            }
-        }
-    }
-    return std::nullopt;
-}
-
 void MediaServerProcess::loadResourceParamsData()
 {
-    auto pool = commonModule()->resourceDataPool();
-    if (overrideResourceParamsDataByUrl(commonModule()->globalSettings()->resourceFileUri(), pool))
-        return;
-    if (overrideResourceParamsDataByLocalFile(pool))
-        return;
-
     auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
-    QString source;
-    const QByteArray oldValue = loadDataFromDb(manager);
-    auto dataVersion = QnResourceDataPool::getVersion(oldValue);
+    const QByteArray dataFromDB = loadDataFromDb(manager);
 
-    static const QString kBuiltinFileName(":/resource_data.json");
-    auto newValue = loadDataFromFile(kBuiltinFileName);
-    const auto builtinVersion = QnResourceDataPool::getVersion(newValue);
-    if (builtinVersion > dataVersion)
-    {
-        source = kBuiltinFileName;
-        dataVersion = builtinVersion;
-    }
-    else
-    {
-        newValue.clear();
-    }
+    std::vector<std::variant<QString, nx::utils::Url, ResourceParams>> sources = {
+        QCoreApplication::applicationDirPath() + "/resource_data.json",
+        commonModule()->globalSettings()->resourceFileUri(),
+        nx::utils::Url("http://beta.vmsproxy.com/beta-builds/daily/resource_data.json"),
+    };
+    if (!dataFromDB.isEmpty())
+        sources.push_back(ResourceParams{"server DB", dataFromDB});
+    sources.push_back(QString(":/resource_data.json"));
 
-    if (const auto online = findOnlineResourceParamsData(dataVersion, pool))
-        std::tie(source, newValue, dataVersion) = *online;
-
-    if (!newValue.isEmpty() && oldValue != newValue)
+    nx::utils::SoftwareVersion chosenVersion;
+    QString chosenSource;
+    const auto isGreaterVersion =
+        [this, &chosenVersion, &chosenSource](const ResourceParams& params)
+        {
+            auto version = QnResourceDataPool::getVersion(params.data);
+            if (version <= chosenVersion)
+            {
+                NX_DEBUG(this,
+                    "Skip resource_data.json version %1 from %2. Version %3 from %4 is greater.",
+                    version, params.source, chosenVersion, chosenSource);
+                return false;
+            }
+            if (!commonModule()->resourceDataPool()->validateData(params.data))
+            {
+                NX_WARNING(this, "Skip invalid resource_data.json from %1", params.source);
+                return false;
+            }
+            chosenVersion = std::move(version);
+            chosenSource = params.source;
+            return true;
+    };
+    if (auto params = ResourceParams::load(sources, isGreaterVersion); params.data != dataFromDB)
     {
-        NX_INFO(this, "Update system wide resource_data.json from %1", source);
-        manager->saveSync({{QnUuid(), Qn::kResourceDataParamName, std::move(newValue)}});
+        NX_INFO(this, "Update system wide resource_data.json from %1", params.source);
+        manager->saveSync({{QnUuid(), Qn::kResourceDataParamName, std::move(params.data)}});
     }
 }
 

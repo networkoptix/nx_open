@@ -690,8 +690,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "http://licensing.vmsproxy.com", //< Licensing server does not support https.
         this);
 
-    m_resourceFileUriAdaptor =
-        new QnLexicalResourcePropertyAdaptor<nx::utils::Url>("resourceFileUri", "", this);
+    m_resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::utils::Url>(
+        "resourceFileUri", "http://resources.vmsproxy.com/resource_data.json", this);
 
     m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxEventLogRecords",
