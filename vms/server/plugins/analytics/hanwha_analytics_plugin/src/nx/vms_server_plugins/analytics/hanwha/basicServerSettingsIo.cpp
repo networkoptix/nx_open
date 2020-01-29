@@ -1,5 +1,3 @@
-#pragma once
-
 #include "basicServerSettingsIo.h"
 
 #include <nx/utils/log/log.h>
@@ -195,7 +193,7 @@ void deserializeOrThrow(const char* source, std::vector<PluginPoint>* destinatio
     throw ServerValueError();
 }
 
-std::string serialize(const std::vector<PluginPoint>& value)
+std::string serialize(const std::vector<PluginPoint>& /*value*/)
 {
     return {};
 }

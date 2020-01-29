@@ -4,6 +4,7 @@
 #include <string_view>
 #include <optional>
 #include <algorithm>
+#include <cstring>
 
 #include <nx/kit/json.h>
 

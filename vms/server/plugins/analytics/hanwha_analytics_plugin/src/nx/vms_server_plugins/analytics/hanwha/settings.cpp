@@ -423,7 +423,7 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize fra
     *result = point.y;
 }
 
-void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, Direction* result)
+void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, Direction* result)
 {
     NX_ASSERT(key);
 
@@ -745,7 +745,7 @@ bool MotionDetectionIncludeArea::operator==(const MotionDetectionIncludeArea& rh
         ;
 }
 
-void MotionDetectionIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
+void MotionDetectionIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace basicServerSettingsIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
@@ -820,7 +820,7 @@ bool MotionDetectionExcludeArea::operator==(const MotionDetectionExcludeArea& rh
         ;
 }
 
-void MotionDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
+void MotionDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace basicServerSettingsIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
@@ -886,7 +886,7 @@ bool TamperingDetection::operator==(const TamperingDetection& rhs) const
         ;
 }
 
-void TamperingDetection::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
+void TamperingDetection::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace basicServerSettingsIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
@@ -1269,7 +1269,7 @@ bool ObjectDetectionExcludeArea::operator==(const ObjectDetectionExcludeArea& rh
         && unnamedPolygon == rhs.unnamedPolygon
         ;
 }
-void ObjectDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
+void ObjectDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace basicServerSettingsIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
@@ -1334,7 +1334,7 @@ bool IvaLine::operator==(const IvaLine& rhs) const
         ;
 }
 
-void IvaLine::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
+void IvaLine::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace basicServerSettingsIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::namedLineFigure), &namedLineFigure);
@@ -1452,7 +1452,7 @@ bool IvaIncludeArea::operator==(const IvaIncludeArea& rhs) const
         ;
 }
 
-void IvaIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
+void IvaIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace basicServerSettingsIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::namedPolygon), &namedPolygon);
@@ -1590,7 +1590,7 @@ bool IvaExcludeArea::operator==(const IvaExcludeArea& rhs) const
         ;
 }
 
-void IvaExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int roiIndex)
+void IvaExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace basicServerSettingsIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
