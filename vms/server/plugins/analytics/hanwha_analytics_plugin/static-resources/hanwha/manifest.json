@@ -21,7 +21,7 @@
         {
             "id": "nx.hanwha.ObjectDetection.Head",
             "name": "Head tracking",
-            "internalName": "Head"
+            "internalName": "Head_"
         },
         {
             "id": "nx.hanwha.ObjectDetection.Vehicle",
@@ -601,12 +601,6 @@
                                 "caption": "Line 1"
                             },
                             {
-                                "type": "TextField",
-                                "name": "IVA.Line1.Name",
-                                "caption": "Name",
-                                "defaultValue": ""
-                            },
-                            {
                                 "type": "CheckBox",
                                 "name": "IVA.Line1.Person",
                                 "caption": "Person",
@@ -635,12 +629,6 @@
                                 "type": "LineFigure",
                                 "name": "IVA.Line2.Points",
                                 "caption": "Line 2"
-                            },
-                            {
-                                "type": "TextField",
-                                "name": "IVA.Line2.Name",
-                                "caption": "Name",
-                                "defaultValue": ""
                             },
                             {
                                 "type": "CheckBox",
@@ -673,12 +661,6 @@
                                 "caption": "Line 3"
                             },
                             {
-                                "type": "TextField",
-                                "name": "IVA.Line3.Name",
-                                "caption": "Name",
-                                "defaultValue": ""
-                            },
-                            {
                                 "type": "CheckBox",
                                 "name": "IVA.Line3.Person",
                                 "caption": "Person",
@@ -707,12 +689,6 @@
                                 "type": "LineFigure",
                                 "name": "IVA.Line4.Points",
                                 "caption": "Line 4"
-                            },
-                            {
-                                "type": "TextField",
-                                "name": "IVA.Line4.Name",
-                                "caption": "Name",
-                                "defaultValue": ""
                             },
                             {
                                 "type": "CheckBox",
@@ -752,12 +728,6 @@
                                 "maxPoints": 8,
                                 "name": "IVA.IncludeArea1.Points",
                                 "caption": "Area 1"
-                            },
-                            {
-                                "type": "TextField",
-                                "name": "IVA.IncludeArea1.Name",
-                                "caption": "Name",
-                                "defaultValue": ""
                             },
                             {
                                 "type": "CheckBox",
@@ -840,12 +810,6 @@
                                 "caption": "Area 2"
                             },
                             {
-                                "type": "TextField",
-                                "name": "IVA.IncludeArea2.Name",
-                                "caption": "Name",
-                                "defaultValue": ""
-                            },
-                            {
                                 "type": "CheckBox",
                                 "name": "IVA.IncludeArea2.Person",
                                 "caption": "Person",
@@ -926,12 +890,6 @@
                                 "caption": "Area 3"
                             },
                             {
-                                "type": "TextField",
-                                "name": "IVA.IncludeArea3.Name",
-                                "caption": "Name",
-                                "defaultValue": ""
-                            },
-                            {
                                 "type": "CheckBox",
                                 "name": "IVA.IncludeArea3.Person",
                                 "caption": "Person",
@@ -1010,12 +968,6 @@
                                 "maxPoints": 8,
                                 "name": "IVA.IncludeArea4.Points",
                                 "caption": "Area 4"
-                            },
-                            {
-                                "type": "TextField",
-                                "name": "IVA.IncludeArea4.Name",
-                                "caption": "Name",
-                                "defaultValue": ""
                             },
                             {
                                 "type": "CheckBox",
