@@ -73,9 +73,8 @@ struct ObjectTrack
     /** Device object has been detected on. */
     QnUuid id;
     QnUuid deviceId;
-    QString objectTypeId;
-    /** Persistent object attributes. E.g., license plate number. */
-    nx::common::metadata::Attributes attributes;
+    QString objectTypeId; //< TODO: #rvasilenko Rename to bestShotObjectTypeId
+    nx::common::metadata::Attributes attributes; //< TODO: #rvasilenko Rename to bestShotAttributes
     qint64 firstAppearanceTimeUs = 0;
     qint64 lastAppearanceTimeUs = 0;
     ObjectRegion objectPosition;
@@ -172,7 +171,7 @@ private:
 };
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params);
-bool deserializeFromParams(const QnRequestParamList& params, Filter* filter, 
+bool deserializeFromParams(const QnRequestParamList& params, Filter* filter,
     QnResourcePool* resourcePool);
 
 ::std::ostream& operator<<(::std::ostream& os, const Filter& filter);

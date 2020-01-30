@@ -39,6 +39,9 @@ using Attributes = std::vector<Attribute>;
 //-------------------------------------------------------------------------------------------------
 static constexpr int kCoordinateDecimalDigits = 4;
 
+// TODO: #rvasilenko: This struct should NOT be used bot best shots, because it was originally
+// designed to match IObjectMetadata, and best shots are yielded by a plugin as
+// IObjectTrackBestShotPacket which has no relation to IObjectMetadata.
 struct ObjectMetadata
 {
     QString typeId;
