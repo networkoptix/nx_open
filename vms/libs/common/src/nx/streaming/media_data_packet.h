@@ -302,6 +302,11 @@ public:
         char* mask,
         int* maskStart = 0,
         int* maskEnd = 0);
+    static void createMask(
+        const QRect& rect,
+        char* mask,
+        int* maskStart = 0,
+        int* maskEnd = 0);
 
     virtual QnMetaDataV1* clone(
         QnAbstractAllocator* allocator = QnSystemAllocator::instance()) const override;

@@ -494,11 +494,20 @@ void QnMetaDataV1::createMask(const QRegion& region, char* mask, int* maskStart,
         *maskEnd = 0;
     memset(mask, 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8);
 
-    if (region.isEmpty())
-        addDataToMask(kMaxGridRect, mask, maskStart, maskEnd);
-
     for (const QRect& rect : region.rects())
         addDataToMask(rect.intersected(kMaxGridRect), mask, maskStart, maskEnd);
+}
+
+void QnMetaDataV1::createMask(const QRect& data, char* mask, int* maskStart, int* maskEnd)
+{
+    if (maskStart)
+        *maskStart = 0;
+    if (maskEnd)
+        *maskEnd = 0;
+    memset(mask, 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8);
+
+    QRect rect = data.intersected(kMaxGridRect);
+    addDataToMask(rect, mask, maskStart, maskEnd);
 }
 
 void QnMetaDataV1::serialize(QIODevice* ioDevice) const
