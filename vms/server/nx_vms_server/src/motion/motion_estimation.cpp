@@ -1241,7 +1241,7 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
                 m_frameBuffer[prevIdx],
                 m_frameDeltaBuffer);
         }
-        analyzeMotionAmount(m_frameDeltaBuffer);
+        analyzeMotionAmount(m_frameDeltaBuffer, m_frames[idx]->pkt_dts);
     #endif
 
 #if 0
