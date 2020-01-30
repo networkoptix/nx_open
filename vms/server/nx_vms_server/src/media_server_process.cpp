@@ -1108,12 +1108,12 @@ void MediaServerProcess::stopSync()
 
 void MediaServerProcess::stopAsync()
 {
-    // ATTENTION: This method is also called from a signal handler, thus, no logging is allowed.
+    // ATTENTION: This method is also called from a signal handler, thus, IO operations of any kind
+    // are prohibited because of potential deadlocks.
 
-    static std::atomic<bool> wasCalled = false;
-    if (wasCalled)
+    static std::atomic_flag wasCalled = /*false*/ ATOMIC_FLAG_INIT;
+    if (wasCalled.test_and_set())
         return;
-    wasCalled = true;
 
     if (serviceMainInstance)
         QTimer::singleShot(0, this, SLOT(stopSync()));
@@ -5192,8 +5192,8 @@ void stopServer(int /*signal*/)
     gRestartFlag = false;
     if (serviceMainInstance)
     {
-        // Output to the console from a signal handler can cause deadlock.
-        //qWarning() << "Got signal" << signal << ", stop server!";
+        // ATTENTION: This method is called from a signal handler, thus, IO operations of any kind
+        // are prohibited because of potential deadlocks.
 
         // TODO: Potential deadlock - the signal may come when the event queue mutex is locked.
         serviceMainInstance.load()->stopAsync();
