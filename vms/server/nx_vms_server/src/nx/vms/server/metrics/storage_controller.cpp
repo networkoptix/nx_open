@@ -36,7 +36,7 @@ void StorageController::start()
                 const auto addOrUpdate =
                     [this, storage, resourcePool]()
                     {
-                        if (resourcePool->getResourceById(storage->getId()))
+                        if (resourcePool->getResourceById(storage->getParentId()))
                             add(storage, moduleGUID());
                     };
 
