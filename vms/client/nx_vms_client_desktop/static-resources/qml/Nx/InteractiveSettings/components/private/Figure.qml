@@ -178,7 +178,11 @@ LabeledItem
                 Button
                 {
                     text: qsTr("Delete")
-                    onClicked: figure = null
+                    onClicked:
+                    {
+                        figure = null
+                        figureNameEdit.text = ""
+                    }
                     visible: preview.hasFigure
                     backgroundColor: ColorTheme.colors.red_core
                 }
@@ -189,6 +193,7 @@ LabeledItem
         {
             id: showOnCameraCheckBox
             text: qsTr("Display on camera")
+            enabled: preview.hasFigure
             onCheckedChanged: valueChanged()
             topPadding: 0
         }
@@ -226,11 +231,6 @@ LabeledItem
 
     function getValue()
     {
-        // Our agreement is that figure without points is an invalid figure. It should not be sent
-        // to server.
-        if (!figure || !figure.points || figure.points.length === 0)
-            return null
-
         // Clone the figure object and fill the rest of fields.
         var obj = {
             "figure": JSON.parse(JSON.stringify(figure)),
