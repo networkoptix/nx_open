@@ -761,11 +761,16 @@ QString AnalyticsSearchListModel::Private::attributes(
             ++end;
 
         const int count = end - begin;
-        const auto value = count > 1
-            ? kMultiValuesTemplate.args(begin->value, tr("+%n values", "", count - 1), darkerColor)
-            : begin->value;
+        if (count > 1)
+        {
+            rows += kRowTemplate.args(begin->name, kMultiValuesTemplate.args(begin->value,
+                tr("+%n values", "", count - 1), darkerColor).toQString()).toQString();
+        }
+        else
+        {
+            rows += kRowTemplate.args(begin->name, begin->value);
+        }
 
-        rows += kRowTemplate.args(begin->name, value);
         begin = end;
     }
 
