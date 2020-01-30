@@ -40,17 +40,8 @@ public:
         m_metadataByTimestamp.insert(metadata->timestamp, metadata);
     }
 
-    QnAbstractCompressedMetadataPtr findMetadata(const qint64 timestamp) const
-    {
-        const auto& metadataList = findMetadataInRange(timestamp, timestamp + 1, 1);
-        if (metadataList.isEmpty())
-            return {};
-
-        return metadataList.first();
-    }
-
     QList<QnAbstractCompressedMetadataPtr> findMetadataInRange(
-        const qint64 startTimestamp, const qint64 endTimestamp, int maxCount) const
+        const qint64 startTimestamp, const qint64 endTimestamp, bool isForward, int maxCount) const
     {
         QnMutexLocker lock(&m_mutex);
 
@@ -59,19 +50,42 @@ public:
 
         QList<QnAbstractCompressedMetadataPtr> result;
 
-        auto it = std::lower_bound(
-            m_metadataByTimestamp.keyBegin(),
-            m_metadataByTimestamp.keyEnd(),
-            startTimestamp).base();
-
-        while (maxCount > 0 && it != m_metadataByTimestamp.end()
-            && (*it)->timestamp < endTimestamp)
+        if (isForward)
         {
-            if (NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers."))
-                result.append(*it);
+            auto it = std::lower_bound(
+                m_metadataByTimestamp.keyBegin(),
+                m_metadataByTimestamp.keyEnd(),
+                startTimestamp).base();
 
-            ++it;
-            --maxCount;
+            while (maxCount > 0 && it != m_metadataByTimestamp.end()
+                && (*it)->timestamp < endTimestamp)
+            {
+                if (NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers."))
+                    result.append(*it);
+
+                ++it;
+                --maxCount;
+            }
+        }
+        else
+        {
+            auto it = std::lower_bound(
+                m_metadataByTimestamp.keyBegin(),
+                m_metadataByTimestamp.keyEnd(),
+                endTimestamp).base();
+
+            while (maxCount > 0 && it != m_metadataByTimestamp.begin())
+            {
+                --it;
+                if (NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers."))
+                {
+                    if ((*it)->timestamp < startTimestamp)
+                        break;
+
+                    result.prepend(*it);
+                    --maxCount;
+                }
+            }
         }
 
         return result;
@@ -196,13 +210,22 @@ QnAbstractCompressedMetadataPtr CachingMetadataConsumer::metadata(
     if (!cache)
         return QnAbstractCompressedMetadataPtr();
 
-    return cache->findMetadata(timestamp.count());
+    auto list = cache->findMetadataInRange(0, timestamp.count() + 1, false, 1);
+    if (list.size())
+    {
+        const auto& ptr = list.first();
+        if (ptr->containTime(timestamp.count()))
+            return ptr;
+    }
+
+    return {};
 }
 
 QList<QnAbstractCompressedMetadataPtr> CachingMetadataConsumer::metadataRange(
     microseconds startTimestamp,
     microseconds endTimestamp,
     int channel,
+    PickingPolicy pickingPolicy,
     int maximumCount) const
 {
     if (channel >= d->cachePerChannel.size())
@@ -212,7 +235,9 @@ QList<QnAbstractCompressedMetadataPtr> CachingMetadataConsumer::metadataRange(
     if (!cache)
         return QList<QnAbstractCompressedMetadataPtr>();
 
-    return cache->findMetadataInRange(startTimestamp.count(), endTimestamp.count(), maximumCount);
+    return cache->findMetadataInRange(
+        startTimestamp.count(), endTimestamp.count(),
+        pickingPolicy == PickingPolicy::TakeFirst, maximumCount);
 }
 
 void CachingMetadataConsumer::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)

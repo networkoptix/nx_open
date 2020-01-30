@@ -19,10 +19,17 @@ public:
 
     QnAbstractCompressedMetadataPtr metadata(
         std::chrono::microseconds timestamp, int channel) const;
+
+    enum class PickingPolicy
+    {
+        TakeFirst,
+        TakeLast,
+    };
     QList<QnAbstractCompressedMetadataPtr> metadataRange(
         std::chrono::microseconds startTimestamp,
         std::chrono::microseconds endTimestamp,
         int channel,
+        PickingPolicy pickingPolicy,
         int maximumCount) const;
 
 protected:

@@ -42,7 +42,8 @@ QList<ObjectMetadataPacketPtr> ConsumingAnalyticsMetadataProvider::metadataRange
     int maximumCount) const
 {
     const auto& metadataList = d->metadataConsumer->metadataRange(
-        startTimestamp, endTimestamp, channel, maximumCount);
+        startTimestamp, endTimestamp, channel,
+        nx::media::CachingMetadataConsumer::PickingPolicy::TakeFirst, maximumCount);
 
     QList<ObjectMetadataPacketPtr> result;
     for (const auto& metadata: metadataList)
