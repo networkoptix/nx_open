@@ -51,9 +51,6 @@ static constexpr milliseconds kMetadataTimerInterval = 1000ms;
 static constexpr milliseconds kDataChangedInterval = 500ms;
 static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
-static constexpr int kMaxAttributeRepeatCount = 3;
-static constexpr int kMultilineAttributeTopPadding = 2;
-
 milliseconds startTime(const ObjectTrack& track)
 {
     return duration_cast<milliseconds>(microseconds(track.firstAppearanceTimeUs));
@@ -743,61 +740,39 @@ QString AnalyticsSearchListModel::Private::attributes(
             </style>)");
 
     static const auto kTableTemplate = QString("<table cellpadding='0' cellspacing='0'>%1</table>");
-    static const auto kRowTemplate = lm(QString("<tr><th style='padding-top: %3px'>%1</th>")
+    static const auto kMultiValuesTemplate = lm("%1 <span style='color: %3'>(%2)</span>");
+    static const auto kRowTemplate = lm(QString("<tr><th>%1</th>")
         + QString("<td width='%1'/>").arg(style::Metrics::kStandardPadding) //< Spacing.
-        + QString("<td style='padding-top: %3px'>%2</td></tr>"));
-
-    static const auto kAndMoreRowTemplate = lm(QString("<tr><th/>")
-        + QString("<td width='%1'/>").arg(style::Metrics::kStandardPadding) //< Spacing.
-        + QString("<th>%1</th></tr>"));
+        + QString("<td>%2</td></tr>"));
 
     QString rows;
-    int padding = 0;
-
-    // TODO: #vkutin Simplify this part. Probably refactor to store attributes in a grouped form.
-    // Otherwise implement template grouping algorithm with unit tests.
+    const QString darkerColor = QPalette().color(QPalette::WindowText).name();
 
     for (auto begin = track.attributes.cbegin(); begin != track.attributes.cend(); )
     {
         if (begin->name.isEmpty() || begin->name.startsWith("nx.sys."))
+        {
+            ++begin;
             continue;
+        }
 
         auto end = begin + 1;
         while (end != track.attributes.cend() && end->name == begin->name)
             ++end;
 
         const int count = end - begin;
-        if (count > 1)
-        {
-            padding = kMultilineAttributeTopPadding;
-            rows += kRowTemplate.args(begin->name, begin->value, padding);
+        const auto value = count > 1
+            ? kMultiValuesTemplate.args(begin->value, tr("+%n values", "", count - 1), darkerColor)
+            : begin->value;
 
-            const bool excess = count > kMaxAttributeRepeatCount;
-            const auto displayedEnd = excess ? begin + (kMaxAttributeRepeatCount - 1) : end;
-
-            for (auto iter = begin + 1; iter != displayedEnd; ++iter)
-                rows += kRowTemplate.args("", iter->value, 0);
-
-            if (excess)
-            {
-                rows += kAndMoreRowTemplate.args(
-                    tr("... and %n more", "", count - kMaxAttributeRepeatCount + 1));
-            }
-        }
-        else
-        {
-            rows += kRowTemplate.args(begin->name, begin->value, padding);
-            padding = 0;
-        }
-
+        rows += kRowTemplate.args(begin->name, value);
         begin = end;
     }
 
     if (rows.isEmpty())
         return QString();
 
-    const auto color = QPalette().color(QPalette::WindowText);
-    return kCss.arg(color.name()) + kTableTemplate.arg(rows);
+    return kCss.arg(darkerColor) + kTableTemplate.arg(rows);
 }
 
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
