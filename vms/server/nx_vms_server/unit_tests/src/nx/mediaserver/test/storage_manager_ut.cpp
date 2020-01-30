@@ -135,6 +135,12 @@ protected:
         ASSERT_TRUE(m_failedStorage.dynamicCast<StorageStub>());
     }
 
+    void assertNoSignalReceived()
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        ASSERT_FALSE(m_failureSignalReceived);
+    }
+
     void assertSettingSetCorrectly()
     {
         ASSERT_EQ(minSystemFreeSpace, m_server->serverModule()->settings().minSystemStorageFreeSpace());
@@ -198,8 +204,8 @@ TEST_F(FtStorageManager, checkSystemStorageSpace_NoEmitIfEnoughSpace)
 {
     minSystemFreeSpace = 10;
     startServer();
-
-    // #TODO #akulikov Implement.
+    createStorageManager(/* systemStorageFreeSpace */ 15);
+    assertNoSignalReceived();
 }
 
 } // namespace test

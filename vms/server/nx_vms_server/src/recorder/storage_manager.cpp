@@ -1703,11 +1703,9 @@ void QnStorageManager::checkSystemStorageSpace()
 {
     for (const auto& storage: getStorages())
     {
-        qDebug() << "checkSystemStorageSpace called: storage: " << storage->getFreeSpace() << "isSystem:" << storage->isSystem() << "min space setting:" << serverModule()->settings().minSystemStorageFreeSpace();
         if (storage->isOnline() && storage->isSystem()
             && storage->getFreeSpace() < serverModule()->settings().minSystemStorageFreeSpace())
         {
-            qDebug() << "checkSystemStorageSpace emitting";
             emit storageFailure(storage, nx::vms::api::EventReason::systemStorageFull);
         }
     }
