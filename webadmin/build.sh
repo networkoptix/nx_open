@@ -34,23 +34,29 @@ echo "Build webadmin" >&2
 npm run build
 mv dist static
 
+SKINS="$SOURCE_DIR/../cloud_portal/skins"
 FRONT_END_HM="$SOURCE_DIR/../cloud_portal/health_monitor"
 # Check if health monitor exists.
 if [[ -e "$FRONT_END_HM/webpack.health_monitor.js" ]]
 then
     # Build Health Monitor
     echo "Building Health Monitor"
-    FRONT_END="../front_end_health_monitor"
+    HEALTH_MONITOR="../health_monitor"
+    FRONT_END="$HEALTH_MONITOR/health_monitor"
 
-    [ -d $FRONT_END ] && rm -rf $FRONT_END
-    mkdir -p $FRONT_END
+    [ -d $HEALTH_MONITOR ] && rm -rf $HEALTH_MONITOR
+    mkdir -p $HEALTH_MONITOR
 
-    echo "Copying health monitor sources to $FRONT_END"
-    cp -r $FRONT_END_HM/{app,health_monitor,webpack.health_monitor*,package.json,ts*} $FRONT_END
+    echo "Copying skins"
+    cp -r $SKINS $HEALTH_MONITOR
+
+    echo "Copying health monitor sources to $HEALTH_MONITOR"
+    cp -r $FRONT_END_HM $HEALTH_MONITOR
 
     echo "Building Health Monitor"
     pushd $FRONT_END
     npm install
+    npm run setSkin blue
     npm run build
 
     mv dist/index.html dist/health.html
