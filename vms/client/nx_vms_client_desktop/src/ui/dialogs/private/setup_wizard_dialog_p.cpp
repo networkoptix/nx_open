@@ -60,7 +60,12 @@ void QnSetupWizardDialogPrivate::load(const QUrl& url)
             QQuickItem* webView = m_quickWidget->rootObject();
             if (!webView)
                 return;
-            webView->setProperty("url", url);
+            // Setup dialog JavaScript is going to close itself via window.close(),
+            // so the url should be opened by JavaScript.
+            // Otherwise the browser will deny it with the following error:
+            //    Scripts may close only the windows that were opened by it.
+            const QString script = QString("window.open(\'%1\')").arg(url.toString());
+            QMetaObject::invokeMethod(webView, "runJavaScript", Q_ARG(QString, script));
         };
 
     if (m_quickWidget->status() != QQuickWidget::Ready)
