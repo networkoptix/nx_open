@@ -254,6 +254,9 @@ QnMediaServerModule::QnMediaServerModule(
 
         ));
 
+    m_context->normalStorageManager->startAuxTimerTasks();
+    m_context->backupStorageManager->startAuxTimerTasks();
+
     const bool isRootToolEnabled = !settings().ignoreRootTool();
     m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
         isRootToolEnabled,

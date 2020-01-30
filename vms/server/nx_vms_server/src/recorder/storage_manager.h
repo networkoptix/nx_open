@@ -27,6 +27,7 @@
 #include <unordered_map>
 #include "api/model/rebuild_archive_reply.h"
 #include "api/model/recording_stats_reply.h"
+#include <api/model/storage_status_reply.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <recorder/camera_info.h>
 #include <recorder/space_info.h>
@@ -142,7 +143,7 @@ public:
                         storage->getFreeSpace() > storage->getSpaceLimit();
             });
 
-    QnStorageResourceList getStorages() const;
+    virtual QnStorageResourceList getStorages() const;
 
     /*
      * Return writable storages with checkBox 'usedForWriting'
@@ -162,7 +163,6 @@ public:
     void clearSpace(bool forced=false);
     bool clearSpaceForFile(const QString& path, qint64 size);
     bool canAddChunk(qint64 timeMs, qint64 size);
-    void checkSystemStorageSpace();
     void checkMetadataStorageSpace();
 
     bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays, qint64 targetFreeSpace);
@@ -184,6 +184,7 @@ public:
     void setRebuildInfo(const QnStorageScanData& data);
     QnStorageScanData rebuildInfo() const;
     bool needToStopMediaScan() const;
+    void startAuxTimerTasks();
 
     void initDone();
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
@@ -288,9 +289,9 @@ private:
     bool hasArchive(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
-    void startAuxTimerTasks();
     void checkWritableStoragesExist();
     Qn::StorageStatuses storageStatusInternal(const QnStorageResourcePtr& storage);
+    void checkSystemStorageSpace();
 
 private:
     nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;
@@ -342,4 +343,7 @@ private:
 
     nx::utils::StandaloneTimerManager m_auxTasksTimerManager;
     std::optional<bool> m_hasWritableStorages;
+
+protected:
+    virtual std::chrono::milliseconds checkSystemFreeSpaceInterval() const;
 };
