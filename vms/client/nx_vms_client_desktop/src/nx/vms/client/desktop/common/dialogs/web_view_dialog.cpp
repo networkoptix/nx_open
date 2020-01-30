@@ -43,7 +43,7 @@ WebViewDialog::WebViewDialog(const QUrl& url, QWidget* parent):
     mainLayout->addWidget(buttonBox);
 
     // Set some resonable size to avoid completely shrinked dialog.
-    setBaseSize(kBaseDialogSize);
+    resize(kBaseDialogSize);
 
     webWidget->load(url);
 }
