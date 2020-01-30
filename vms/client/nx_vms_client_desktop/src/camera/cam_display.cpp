@@ -523,7 +523,6 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
         if (queueLen <= 0)
         {
-            NX_ASSERT(queueLen == 0, "Negative value must never be here. Safety check.");
 		    // This function is used for LIVE mode and archive playback with external synchronization
             // like Hanwha NVR. Don't increase buffer for archive mode to make item synchronization more
             /// precise.

@@ -174,14 +174,11 @@ Window
                 onColorChanged: editor.color = color
             }
 
-            Button
+            TextButton
             {
-                anchors.verticalCenter: parent.verticalCenter
-                flat: true
                 text: qsTr("Clear")
-                iconUrl: "qrc:/skin/text_buttons/refresh.png"
-                leftPadding: 0
-                rightPadding: 16
+                icon.source: "qrc:/skin/text_buttons/refresh.png"
+                anchors.verticalCenter: parent.verticalCenter
                 onClicked: editor.clear()
             }
         }
