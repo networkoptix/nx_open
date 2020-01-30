@@ -714,6 +714,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_resourceFileUriAdaptor =
         new QnLexicalResourcePropertyAdaptor<nx::utils::Url>("resourceFileUri", "", this);
 
+    m_resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::utils::Url>(
+        "resourceFileUri", "http://resources.vmsproxy.com/resource_data.json", this);
+
     m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxEventLogRecords",
         100 * 1000, //< Default value.

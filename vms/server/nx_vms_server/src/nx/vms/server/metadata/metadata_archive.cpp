@@ -417,7 +417,15 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
     int maskStart, maskEnd;
 
     NX_ASSERT(!useSSE2() || ((std::ptrdiff_t)mask) % 16 == 0);
-    QnMetaDataV1::createMask(filter.region, (char*)mask, &maskStart, &maskEnd);
+    if (filter.region.isEmpty())
+    {
+        QnMetaDataV1::createMask(QRect(
+            0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight), (char*)mask, &maskStart, &maskEnd);
+    }
+    else
+    {
+        QnMetaDataV1::createMask(filter.region, (char*)mask, &maskStart, &maskEnd);
+    }
 
     QnTimePeriodList rez;
     QFile metadataFile, indexFile;

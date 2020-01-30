@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.195",
+    "version": "1.0.1.196",
     "data": [
         {
             "keys": [
@@ -2702,7 +2702,10 @@
         },
         {
             "keys": [
-                "HIKVISION|DS-2DF5220S-DE4/W"
+                "HIKVISION|DS-2DF5220S-DE4/W"б,
+                "HIKVISION|DS-2TD4237*",
+                "HIKVISION|DS-2TD4136*",
+                "HIKVISION|DS-2TD4166*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {

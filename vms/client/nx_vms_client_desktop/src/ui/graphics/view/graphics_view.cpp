@@ -22,14 +22,13 @@ QnGraphicsView::~QnGraphicsView()
 
 void QnGraphicsView::paintEvent(QPaintEvent* event)
 {
-    auto context = QOpenGLContext::currentContext();
-    if (!context)
-    {
-        if (const auto glWidget = qobject_cast<QOpenGLWidget*>(viewport()))
-            glWidget->makeCurrent();
+    // Always make QOpenGLWidget context to be the current context.
+    // This is what item paint functions expect and doing otherwise
+    // may lead unpredictable behavior.
+    if (const auto glWidget = qobject_cast<QOpenGLWidget*>(viewport()))
+        glWidget->makeCurrent();
 
-        NX_ASSERT(QOpenGLContext::currentContext());
-    }
+    NX_ASSERT(QOpenGLContext::currentContext());
 
     base_type::paintEvent(event);
 }
