@@ -792,14 +792,31 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     m_isNewMask = false;
 }
 
-void QnMotionEstimation::analyzeMotionAmount(quint8* frame)
+void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTime)
 {
+    // Rect color change threshold to detect global luma.
+    static const quint8 kGlobalLumaMask = 8;
+
+    // Should detect motion on most part of the frame to detect global luma.
+    static const qreal kGlobalLumaThreshold = 0.75;
+
+    // Block motion for this time after global luma.
+    static const qint64 kGlobalLumaTimeUs = 1000000 * 2;
+
+    const int totalSquareCount = m_scaledWidth * Qn::kMotionGridHeight;
+    quint8* endPtr = frame + totalSquareCount;
+    int globalLumaCounter = 0;
+
     // 1. filtering. If a lot of motion around current pixel, mark it too, also remove motion if diff < mask
     quint8* curPtr = frame;
     quint8* dstPtr = m_filteredFrame;
     const quint8* maskPtr = m_scaledMask;
 
-    for (int y = 0; y < Qn::kMotionGridHeight; ++y) {
+    for (int y = 0; y < Qn::kMotionGridHeight; ++y) 
+    {
+        if (*curPtr > kGlobalLumaMask)
+            globalLumaCounter++;
+
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
         maskPtr++;
@@ -808,12 +825,17 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame)
 
     for (int x = 1; x < m_scaledWidth-1; ++x)
     {
+        if (*curPtr > kGlobalLumaMask)
+            globalLumaCounter++;
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
         maskPtr++;
         dstPtr++;
         for (int y = 1; y < Qn::kMotionGridHeight-1; ++y)
         {
+            if (*curPtr > kGlobalLumaMask)
+                globalLumaCounter++;
+
             if (*curPtr <= *maskPtr)
             {
                 int aroundMotionAmount =(int(curPtr[-1] > maskPtr[-1]) +
@@ -837,18 +859,40 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame)
             maskPtr++;
             dstPtr++;
         }
+        if (*curPtr > kGlobalLumaMask)
+            globalLumaCounter++;
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
         maskPtr++;
         dstPtr++;
     }
 
-    for (int y = 0; y < Qn::kMotionGridHeight; ++y) {
+    for (int y = 0; y < Qn::kMotionGridHeight; ++y) 
+    {
+        if (*curPtr > kGlobalLumaMask)
+            globalLumaCounter++;
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
         maskPtr++;
         dstPtr++;
     }
+
+    if (m_config.allowGlobalLumaFiltering)
+    {
+        if (globalLumaCounter > totalSquareCount* kGlobalLumaThreshold)
+        {
+            m_changeGlobalLumaTime = frameTime;
+            NX_DEBUG(this, "global luma change = %1. Block motion for %2 seconds", 
+                globalLumaCounter / (qreal)totalSquareCount, kGlobalLumaTimeUs / 1000000.0);
+            return; //< Ignore motion by global luma change.
+        }
+        else if (m_changeGlobalLumaTime != AV_NOPTS_VALUE 
+            && frameTime < m_changeGlobalLumaTime + kGlobalLumaTimeUs)
+        {
+            return;  //< Motion is blocked for some period of time after global luma change.
+        }
+    }
+    m_changeGlobalLumaTime = AV_NOPTS_VALUE;
 
     // 2. Determine linked areas
     int currentLinkIndex = 1;
@@ -1169,7 +1213,7 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
                 getFrame_avgY_array_x_x(
                     m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx], m_xStep);
             }
-            analyzeMotionAmount(m_frameBuffer[idx]);
+            analyzeMotionAmount(m_frameBuffer[idx], m_frames[idx]->pkt_dts);
         }
     #else
         if (m_totalFrames == 0)
