@@ -71,11 +71,6 @@ static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 
 const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024LL;
-#ifdef __arm__
-const qint64 kMinSystemStorageFreeSpace = 500 * 1000 * 1000LL;
-#else
-const qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
-#endif
 const qint64 kMinMetadataStorageFreeSpace = 1024 * 1024;
 
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
@@ -641,8 +636,6 @@ QnStorageManager::QnStorageManager(
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
     m_removeEmtyDirTimer.invalidate();
-
-    startAuxTimerTasks();
 }
 
 int64_t QnStorageManager::calculateNxOccupiedSpace(int storageIndex) const
@@ -1708,11 +1701,10 @@ void QnStorageManager::updateCameraHistory() const
 
 void QnStorageManager::checkSystemStorageSpace()
 {
-    QnStorageManager::StorageMap storageRoots = getAllStorages();
-    for (const auto& storage: getAllStorages())
+    for (const auto& storage: getStorages())
     {
-        if (storage->getStatus() == Qn::Online && storage->isSystem()
-            && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
+        if (storage->isOnline() && storage->isSystem()
+            && storage->getFreeSpace() < serverModule()->settings().minSystemStorageFreeSpace())
         {
             emit storageFailure(storage, nx::vms::api::EventReason::systemStorageFull);
         }
@@ -2570,6 +2562,11 @@ void QnStorageManager::checkWritableStoragesExist()
     }
 }
 
+std::chrono::milliseconds QnStorageManager::checkSystemFreeSpaceInterval() const
+{
+    return std::chrono::minutes(1);
+}
+
 void QnStorageManager::startAuxTimerTasks()
 {
     if (m_role == QnServer::StoragePool::Normal)
@@ -2587,7 +2584,6 @@ void QnStorageManager::startAuxTimerTasks()
         kWriteInfoFilesInterval,
         kWriteInfoFilesInterval);
 
-    static const std::chrono::minutes kCheckSystemStorageSpace(1);
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId)
         {
@@ -2595,8 +2591,8 @@ void QnStorageManager::startAuxTimerTasks()
             if (m_role == QnServer::StoragePool::Normal)
                 checkMetadataStorageSpace();
         },
-        kCheckSystemStorageSpace,
-        kCheckSystemStorageSpace);
+        checkSystemFreeSpaceInterval(),
+        checkSystemFreeSpaceInterval());
 
     static const std::chrono::minutes kCheckStorageSpace(1);
     m_auxTasksTimerManager.addNonStopTimer(

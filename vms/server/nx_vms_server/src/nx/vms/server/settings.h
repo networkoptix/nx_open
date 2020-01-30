@@ -420,7 +420,10 @@ public:
 
     Option<int> retryCountToMakeCameraOffline{ this, "retryCountToMakeCameraOffline", 3,
         "How many discovery loops should pass before mark missed camera offline"
-        };
+    };
+
+    Option<qint64> minSystemStorageFreeSpace{
+        this, "minSystemStorageFreeSpace", kMinSystemStorageFreeSpace, ""};
 
 #if defined(__arm__)
     static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB
@@ -434,6 +437,13 @@ public:
     static constexpr std::chrono::hours kDbBackupPeriodHrs{24 * 7};
     static constexpr int kDefaultHlsRemovedLiveChunksToKeep = -1;
     static constexpr std::chrono::seconds kDefaultVacuumIntervalSecacuumIntervalSec{3600 * 24};
+
+#ifdef __arm__
+    static constexpr qint64 kMinSystemStorageFreeSpace = 500 * 1000 * 1000LL;
+#else
+    static constexpr qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
+#endif
+
 };
 
 } // namespace nx::vms::server
