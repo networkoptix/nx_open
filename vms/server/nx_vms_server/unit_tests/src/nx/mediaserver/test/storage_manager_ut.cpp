@@ -17,7 +17,7 @@ namespace test {
 class TestStorageManager: public QnStorageManager
 {
 public:
-    QnStorageResourceList storages;
+    nx::vms::server::StorageResourceList storages;
 
     using QnStorageManager::QnStorageManager;
 
@@ -27,31 +27,31 @@ private:
         return std::chrono::seconds(1);
     }
 
-    virtual QnStorageResourceList getStorages() const override
+    virtual StorageResourceList getStorages() const override
     {
         return storages;
     }
 };
 
-class StorageStub: public QnStorageResource
+class StorageStub: public StorageResource
 {
 public:
     bool isSystemFlag = false;
     qint64 freeSpace = -1;
 
     StorageStub(
-        QnCommonModule* commonModule,
+        QnMediaServerModule* serverModule,
         bool isSystem,
         qint64 freeSpace)
         :
-        QnStorageResource(commonModule),
+        StorageResource(serverModule),
         isSystemFlag(isSystem),
         freeSpace(freeSpace)
     {}
 
     virtual bool isSystem() const override { return isSystemFlag; }
     virtual bool isOnline() const override { return true; }
-    virtual QIODevice *open(const QString& /* fileName */, QIODevice::OpenMode /* openMode */) override { return nullptr; }
+    virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override { return nullptr; }
     virtual int getCapabilities() const override { return -1; }
     virtual qint64 getFreeSpace() override { return freeSpace; }
     virtual qint64 getTotalSpace() const override { return -1; }
@@ -177,11 +177,11 @@ private:
     std::atomic<bool> m_failureSignalReceived = false;
     QnStorageResourcePtr m_failedStorage;
 
-    QnStorageResourceList createStorages(qint64 systemStorageFreeSpace) const
+    nx::vms::server::StorageResourceList createStorages(qint64 systemStorageFreeSpace) const
     {
-        return QnStorageResourceList{
-            QnStorageResourcePtr(new StorageStub(m_server->commonModule(), /* isSystem */ false, /* freeSpace */ 5)),
-            QnStorageResourcePtr(new StorageStub(m_server->commonModule(), /* isSystem */ true, /* freeSpace */ systemStorageFreeSpace))};
+        return nx::vms::server::StorageResourceList{
+            StorageResourcePtr(new StorageStub(m_server->serverModule(), /* isSystem */ false, /* freeSpace */ 5)),
+            StorageResourcePtr(new StorageStub(m_server->serverModule(), /* isSystem */ true, /* freeSpace */ systemStorageFreeSpace))};
     }
 };
 
