@@ -92,7 +92,7 @@ const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(2
 const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(5);
 const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(1);
 const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
-const std::chrono::milliseconds kSyncTimeEpsilonDefault(100);
+const std::chrono::milliseconds kSyncTimeEpsilonDefault(200);
 
 const QString kEnableEdgeRecording(lit("enableEdgeRecording"));
 const QString kEnableWebSocketKey(lit("webSocketEnabled"));
