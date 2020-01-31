@@ -272,10 +272,15 @@ void MessageBus::createOutgoingConnections(
                 continue;
             }
 
-            if (remoteConnection.unauthorizedTimer.isValid() &&
-                !remoteConnection.unauthorizedTimer.hasExpired(m_intervals.unauthorizedConnectTimeout))
+            if (remoteConnection.lastConnectionErrorTimer.isValid() &&
+                !remoteConnection.lastConnectionErrorTimer.hasExpired(m_intervals.remotePeerReconnectTimeout))
             {
-                continue;
+                // Connection to this peer have been closed recently
+                if (remoteConnection.connectErrorCounter > 1 
+                    || remoteConnection.lastConnectionState == ConnectionBase::State::Unauthorized)
+                {
+                    continue;
+                }
             }
 
             {
@@ -543,23 +548,32 @@ void MessageBus::at_stateChanged(
                 emitPeerFoundLostSignals();
                 startReading(connection);
             }
+
+            for (auto& removeUrlInfo: m_remoteUrls)
+            {
+                if (removeUrlInfo.peerId == remoteId)
+                    removeUrlInfo.connectErrorCounter = 0;
+            }
+
             emit newDirectConnectionEstablished(connection.data());
             if (connection->remotePeer().peerType == PeerType::cloudServer)
                 sendInitialDataToCloud(connection);
 
             break;
         case Connection::State::Unauthorized:
+        case Connection::State::forbidden:
+        case Connection::State::Error:
             for (auto& removeUrlInfo: m_remoteUrls)
             {
                 if (removeUrlInfo.peerId == remoteId)
-                    removeUrlInfo.unauthorizedTimer.restart();
+                {
+                    removeUrlInfo.lastConnectionErrorTimer.restart();
+                    removeUrlInfo.lastConnectionState = connection->state();
+                    ++removeUrlInfo.connectErrorCounter;
+                }
             }
-        case Connection::State::forbidden:
-        case Connection::State::Error:
-        {
             removeConnectionUnsafe(weakRef);
             break;
-        }
         default:
             break;
     }

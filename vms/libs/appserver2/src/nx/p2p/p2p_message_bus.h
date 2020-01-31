@@ -211,7 +211,8 @@ public:
 
         std::chrono::milliseconds outConnectionsInterval = std::chrono::seconds(1);
 
-        std::chrono::milliseconds unauthorizedConnectTimeout = std::chrono::seconds(10);
+        // Delay to reconnect if 2 attempts failed in a row
+        std::chrono::milliseconds remotePeerReconnectTimeout = std::chrono::seconds(10);
     };
 
     void setDelayIntervals(const DelayIntervals& intervals);
@@ -256,7 +257,9 @@ private:
 
         QnUuid peerId;
         nx::utils::Url url;
-        nx::utils::ElapsedTimer unauthorizedTimer;
+        nx::utils::ElapsedTimer lastConnectionErrorTimer;
+        ConnectionBase::State lastConnectionState = ConnectionBase::State::NotDefined;
+        int connectErrorCounter = 0;
     };
 
     std::vector<RemoteConnection> m_remoteUrls;

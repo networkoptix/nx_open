@@ -8,11 +8,13 @@
 #include <nx/p2p/transport/i_p2p_transport.h>
 #include <nx/vms/utils/transaction_data_to_string.h>
 #include <api/global_settings.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
 
 int commitIntervalMs = 1000;
 static const int kMaxSelectDataSize = 1024 * 32;
+static const int kMaxFullInfoRequests = 20;
 
 } // namespace
 
@@ -94,6 +96,8 @@ struct SendTransactionToTransportFastFuction
 };
 
 // ---------------------- ServerpMessageBus --------------
+
+QSemaphore ServerMessageBus::m_maxFullInfoRequests(kMaxFullInfoRequests);
 
 ServerMessageBus::ServerMessageBus(
     vms::api::PeerType peerType,
@@ -506,7 +510,22 @@ void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connectio
 {
     sendRuntimeData(connection, m_lastRuntimeInfo.keys());
 
+    m_maxFullInfoRequests.acquire();
+    auto scopedGuard = nx::utils::makeScopeGuard(
+        []() 
+        { 
+            m_maxFullInfoRequests.release(); 
+        });
+
     {
+        if (connection->state() >= ConnectionBase::State::Error)
+        {
+            NX_WARNING(this, 
+                "Connection to the client peer %1 have been closed while "
+                "waiting for fullInfo data.", connection->remoteAddr());
+            return; //< Already closed.
+        }
+
         QnTransaction<vms::api::FullInfoData> tran(commonModule()->moduleGUID());
         tran.command = ApiCommand::getFullInfo;
         if (!readFullInfoData(connection.staticCast<Connection>()->userAccessData(),
