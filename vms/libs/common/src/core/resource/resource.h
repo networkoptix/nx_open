@@ -60,7 +60,7 @@ public:
     Qn::ResourceStatus getPreviousStatus() const;
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local);
 
-    bool isOnline() const { return isOnline(getStatus()); }
+    virtual bool isOnline() const { return isOnline(getStatus()); }
     static bool isOnline(Qn::ResourceStatus status)
     {
         return status == Qn::Online || status == Qn::Recording;

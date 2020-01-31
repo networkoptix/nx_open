@@ -56,21 +56,22 @@ ResourceParamsData ResourceParamsData::getWithGreaterVersion(
         if (data.value.isEmpty())
             continue;
         auto version = QnResourceDataPool::getVersion(data.value);
-        if (version <= resultVersion)
+        if (!result.value.isEmpty() && version <= resultVersion)
         {
             NX_DEBUG(NX_SCOPE_TAG,
                 "Skip resource_data.json version %1 from %2. Version %3 from %4 is greater.",
                 version, data.location, resultVersion, result.location);
             continue;
         }
-        if (!QnResourceDataPool::validateData(data.value))
+        if (!NX_ASSERT(QnResourceDataPool::validateData(data.value),
+            "Skip invalid resource_data.json from %1", data.location))
         {
-            NX_WARNING(NX_SCOPE_TAG, "Skip invalid resource_data.json from %1", data.location);
             continue;
         }
         resultVersion = std::move(version);
         result = data;
     }
+    NX_ASSERT(!result.value.isEmpty());
     return result;
 }
 

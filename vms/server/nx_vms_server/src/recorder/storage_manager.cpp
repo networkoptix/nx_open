@@ -70,11 +70,6 @@ static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 
 const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024LL;
-#ifdef __arm__
-const qint64 kMinSystemStorageFreeSpace = 500 * 1000 * 1000LL;
-#else
-const qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
-#endif
 
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
@@ -755,8 +750,6 @@ QnStorageManager::QnStorageManager(
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
     m_removeEmtyDirTimer.invalidate();
-
-    startAuxTimerTasks();
 
     connect(
         this, &QnStorageManager::newCatalogCreated,
@@ -1719,11 +1712,11 @@ void QnStorageManager::updateCameraHistory() const
 
 void QnStorageManager::checkSystemStorageSpace()
 {
-    for (const auto& storage: getAllStorages())
+    for (const auto& storage: getStorages())
     {
-        if (storage->getStatus() == Qn::Online
+        if (storage->isOnline()
             && storage->isSystem()
-            && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
+            && storage->getFreeSpace() < serverModule()->settings().minSystemStorageFreeSpace())
         {
             emit storageFailure(storage, nx::vms::api::EventReason::systemStorageFull);
         }
@@ -2375,6 +2368,11 @@ void QnStorageManager::checkWritableStoragesExist()
     }
 }
 
+std::chrono::milliseconds QnStorageManager::checkSystemFreeSpaceInterval() const
+{
+    return std::chrono::minutes(1);
+}
+
 void QnStorageManager::startAuxTimerTasks()
 {
     if (m_role == QnServer::StoragePool::Normal)
@@ -2391,11 +2389,10 @@ void QnStorageManager::startAuxTimerTasks()
         [this](nx::utils::TimerId) { m_camInfoWriter.writeAll(); },
         kCameraInfoUpdateInterval, kCameraInfoUpdateInterval);
 
-    static const std::chrono::minutes kCheckSystemStorageSpace(1);
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId) { checkSystemStorageSpace(); },
-        kCheckSystemStorageSpace,
-        kCheckSystemStorageSpace);
+        checkSystemFreeSpaceInterval(),
+        checkSystemFreeSpaceInterval());
 
     static const std::chrono::minutes kCheckStorageSpace(1);
     m_auxTasksTimerManager.addNonStopTimer(
