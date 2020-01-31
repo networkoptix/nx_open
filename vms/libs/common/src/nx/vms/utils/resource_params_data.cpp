@@ -71,7 +71,6 @@ ResourceParamsData ResourceParamsData::getWithGreaterVersion(
         resultVersion = std::move(version);
         result = data;
     }
-    NX_ASSERT(!result.value.isEmpty());
     return result;
 }
 
