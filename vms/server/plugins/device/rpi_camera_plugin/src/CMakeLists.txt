@@ -41,4 +41,3 @@ set_target_properties(rpi_camera_plugin PROPERTIES
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
 )
-
