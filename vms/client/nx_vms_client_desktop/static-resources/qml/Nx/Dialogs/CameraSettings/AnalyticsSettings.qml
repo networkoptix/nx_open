@@ -205,80 +205,74 @@ Item
         }
     }
 
-    ColumnLayout
+    SettingsView
     {
+        id: settingsView
+
         x: navigationMenu.width + 16
         y: 16
         width: parent.width - x - 24
         height: parent.height - 16 - banner.height
-        spacing: 16
 
-        InformationPanel
+        enabled: !loading
+        contentEnabled: informationPanel.checked || isDeviceDependent
+        scrollBarParent: scrollBarsParent
+
+        onValuesEdited:
+            store.setDeviceAgentSettingsValues(currentEngineId, getValues())
+
+        headerItem: ColumnLayout
         {
-            id: informationPanel
-            visible: isDefaultSection
-            checkable: !isDeviceDependent && !!currentEngineId
-            checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
-            engineInfo: currentEngineInfo
-            Layout.fillWidth: true
+            spacing: 16
 
-            onClicked:
+            InformationPanel
             {
-                if (currentEngineId)
-                    setEngineEnabled(currentEngineId, !checked)
-            }
-        }
+                id: informationPanel
 
-        SettingsView
-        {
-            id: settingsView
+                checkable: !isDeviceDependent && !!currentEngineId
+                checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
+                engineInfo: currentEngineInfo
+                Layout.fillWidth: true
 
-            enabled: !loading
-            contentEnabled: informationPanel.checked || isDeviceDependent
-            scrollBarParent: scrollBarsParent
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            onValuesEdited:
-                store.setDeviceAgentSettingsValues(currentEngineId, getValues())
-
-            headerItem: ColumnLayout
-            {
-                spacing: 16
-
-                Panel
+                onClicked:
                 {
-                    id: commonSettings
+                    if (currentEngineId)
+                        setEngineEnabled(currentEngineId, !checked)
+                }
+            }
 
-                    title: "General Settings"
-                    visible: commonContent.height > 0
-                    Layout.fillWidth: true
+            Panel
+            {
+                id: commonSettings
 
-                    GridLayout
+                title: "General Settings"
+                visible: commonContent.height > 0
+                Layout.fillWidth: true
+
+                GridLayout
+                {
+                    id: commonContent
+
+                    columns: 2
+                    columnSpacing: 8
+                    flow: GridLayout.LeftToRight
+
+                    ContextHintLabel
                     {
-                        id: commonContent
+                        text: qsTr("Camera stream")
+                        contextHintText: qsTr("Select video stream from the camera for analysis")
+                        color: ColorTheme.windowText
+                    }
 
-                        columns: 2
-                        columnSpacing: 8
-                        flow: GridLayout.LeftToRight
+                    ComboBox
+                    {
+                        id: streamComboBox
+                        model: ["Primary", "Secondary"]
 
-                        ContextHintLabel
+                        onCurrentIndexChanged:
                         {
-                            text: qsTr("Camera stream")
-                            contextHintText: qsTr("Select video stream from the camera for analysis")
-                            color: ColorTheme.windowText
-                        }
-
-                        ComboBox
-                        {
-                            id: streamComboBox
-                            model: ["Primary", "Secondary"]
-
-                            onCurrentIndexChanged:
-                            {
-                                if (currentEngineId)
-                                    store.setAnalyticsStreamIndex(currentEngineId, currentIndex)
-                            }
+                            if (currentEngineId)
+                                store.setAnalyticsStreamIndex(currentEngineId, currentIndex)
                         }
                     }
                 }

@@ -30,10 +30,8 @@ StackLayout
             enabled: size < 0.9999
         }
 
-        contentItem: AlignedColumn
+        contentItem: Column
         {
-            id: column
-
             width:
             {
                 return view.verticalScrollBar && view.verticalScrollBar.parent === view
@@ -62,6 +60,12 @@ StackLayout
                     value: headerContainer
                 }
             }
+
+            AlignedColumn
+            {
+                id: column
+                width: parent.width
+            }
         }
     }
 
@@ -71,4 +75,3 @@ StackLayout
             children[currentIndex].scrollBarParent = scrollBarParent
     }
 }
-
