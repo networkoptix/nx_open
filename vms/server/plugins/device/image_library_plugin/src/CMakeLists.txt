@@ -17,6 +17,7 @@ target_link_libraries(image_library_plugin PRIVATE nx_kit)
 target_include_directories(image_library_plugin PRIVATE ../../../src) #< SDK headers.
 
 if(WIN32)
+    string(APPEND CMAKE_CXX_FLAGS " /MP") #< Use all CPU cores by MSVC.
     target_compile_definitions(image_library_plugin PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
     target_compile_options(image_library_plugin PRIVATE -Wno-deprecated-declarations)

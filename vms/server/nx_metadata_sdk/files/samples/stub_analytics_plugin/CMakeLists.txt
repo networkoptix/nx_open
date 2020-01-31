@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.3.2)
 project(stub_analytics_plugin)
 
 set(metadataSdkDir "" CACHE PATH "Path to unpacked VMS Metadata SDK zip.")
-
 if(metadataSdkDir STREQUAL "")
     set(metadataSdkDir ${CMAKE_CURRENT_LIST_DIR}/../..) #< Assume building samples inside the SDK.
     if(NOT EXISTS ${metadataSdkDir}/src/nx/sdk OR NOT EXISTS ${metadataSdkDir}/nx_kit/src/nx/kit)
@@ -26,6 +25,10 @@ endif()
 set(CMAKE_SKIP_BUILD_RPATH ON)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN")
+
+if(WIN32)
+    string(APPEND CMAKE_CXX_FLAGS " /MP") #< Use all CPU cores by MSVC.
+endif()    
 
 if(WIN32)
     set(API_IMPORT_MACRO "__declspec(dllimport)")

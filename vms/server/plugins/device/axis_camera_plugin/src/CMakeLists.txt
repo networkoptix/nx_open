@@ -19,6 +19,7 @@ target_link_libraries(axis_camera_plugin PRIVATE
 target_include_directories(axis_camera_plugin PRIVATE ../../../src) #< SDK headers.
 
 if(WIN32)
+    string(APPEND CMAKE_CXX_FLAGS " /MP") #< Use all CPU cores by MSVC.
     target_compile_definitions(axis_camera_plugin PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 
