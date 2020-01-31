@@ -339,7 +339,7 @@ void RoiFiguresOverlayWidget::Private::drawPolygon(
 void RoiFiguresOverlayWidget::Private::drawDirectionMark(
     QPainter* painter, const QPointF& position, qreal angle, const QColor& color, QWidget* widget)
 {
-    const auto glWidget = qobject_cast<QOpenGLWidget*>(q->parentWidget());
+    const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
     QnGlNativePainting::begin(glWidget, painter);
 
     const auto functions =
