@@ -68,12 +68,12 @@ private:
         else
         {
             const int logicalId = layout->logicalId();
-            if (logicalId == 0)
+            if (logicalId == 0 || layout == m_excludedLayout)
             {
                 if (m_logicalIds.remove(layout))
                     updateStore();
             }
-            else if (layout != m_excludedLayout)
+            else
             {
                 m_logicalIds.insert(layout, logicalId);
                 updateStore();
