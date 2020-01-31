@@ -78,7 +78,7 @@ struct PluginsIniConfig: public nx::kit::IniConfig
 
     // --------------------------------------------------------------------------------------------
 
-    NX_INI_FLAG(1, shouldMethodTimeoutViolationTriggerAnAssertion,
+    NX_INI_FLAG(0, shouldMethodTimeoutViolationTriggerAnAssertion,
         "If set an assertion is triggereed if method execution takes more time than the limits\n"
         "below. Otherwise debug-level message is written into the logs and a plugin event is\n"
         "triggered.");
