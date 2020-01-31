@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/vms/api/analytics/stream_type.h>
+#include <nx/vms/api/types/motion_types.h>
 
 extern "C" {
 
