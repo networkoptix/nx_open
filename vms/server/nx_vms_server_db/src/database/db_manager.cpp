@@ -2189,6 +2189,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20200122_fix_https_camera_urls.sql")))
         return fixHttpsCameraUrls() && resyncIfNeeded(ResyncCameras);
 
+    if (updateName.endsWith(lit("/99_20200131_remove_default_license_server_values.sql")))
+        return resyncIfNeeded(ResyncGlobalSettings);
+
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
 }
