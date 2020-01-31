@@ -335,6 +335,10 @@ public:
         "Ignore root tool executable presence (if set to true, the Server will try to execute all "
         "commands that require root access directly)."};
 
+    Option<int> recordingChunkDurationSec{ this, "recordingChunkDurationSec", 60,
+        "average file duration in seconds for recording"};
+
+
 #if defined(Q_OS_LINUX)
     Option<QString> varDir{this, "varDir",
         QString("/opt/%1/mediaserver/var").arg(QnAppInfo::linuxOrganizationName()),

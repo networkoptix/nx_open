@@ -99,7 +99,7 @@ class QnRecordingManager:
 {
     Q_OBJECT
 public:
-    static const int RECORDING_CHUNK_LEN = 60; // seconds
+    int recordingChunkDurationSec() const;
 
     QnRecordingManager(
         QnMediaServerModule* serverModule,
