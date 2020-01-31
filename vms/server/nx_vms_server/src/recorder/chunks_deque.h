@@ -35,7 +35,12 @@ public:
     const Chunk& at(size_t index) const { return m_deque[index]; }
     size_t size() const { return m_deque.size(); }
     bool empty() const { return m_deque.empty(); }
-    const std::deque<Chunk>& chunks() const { return m_deque; }
+
+    /**
+     * Returns inner container by copy. It's almost never what you want to use except for tests.
+     * Deque-like functions (front(), back(), begin() e.t.c.) should be preferred in production code.
+     */
+    std::deque<Chunk> toDeque() const { return m_deque; }
 
     ConstIterator begin() const { return m_deque.begin(); }
     ConstIterator end() const { return m_deque.end(); }
@@ -56,6 +61,10 @@ public:
 private:
     std::unordered_map<int, Presence> m_archivePresence;
     std::deque<Chunk> m_deque;
+
+    friend bool operator==(const ChunksDeque& d1, const ChunksDeque& d2);
+    friend bool operator==(const std::deque<Chunk>& d1, const ChunksDeque& d2);
+    friend bool operator==(const ChunksDeque& d1, const std::deque<Chunk>& d2);
 
     void chunkAdded(const Chunk& chunk);
     void chunkRemoved(const Chunk& chunk);

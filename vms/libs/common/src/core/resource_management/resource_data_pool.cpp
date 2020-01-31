@@ -155,7 +155,7 @@ bool QnResourceDataPool::loadInternal(const QString &fileName)
     return loadData(file.readAll());
 }
 
-bool QnResourceDataPool::validateData(const QByteArray& data) const
+bool QnResourceDataPool::validateData(const QByteArray& data)
 {
     QJsonObject map;
     QList<QnResourceDataPoolChunk> chunks;

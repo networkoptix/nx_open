@@ -735,8 +735,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
         {
             QSqlQuery query(sqlDb);
             ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
-            const nx::vms::server::Chunk chunk =
-                referenceCatalogs[i]->getChunksUnsafe().at(j);
+            const nx::vms::server::Chunk chunk = *referenceCatalogs[i]->chunkAt(j);
 
             query.addBindValue(referenceCatalogs[i]->cameraUniqueId()); // unique_id
             query.addBindValue(referenceCatalogs[i]->getCatalog()); // role
@@ -761,7 +760,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
         {
             sdb->addRecord(
                 referenceCatalogs[i]->cameraUniqueId(), referenceCatalogs[i]->getCatalog(),
-                referenceCatalogs[i]->getChunksUnsafe().at(j));
+                *referenceCatalogs[i]->chunkAt(j));
         }
     }
 
@@ -779,10 +778,9 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
                     && c->getCatalog() == referenceCatalogs[i]->getCatalog();
             });
         ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
-        auto left = (*mergedIt)->getChunksUnsafe();
-        auto right = referenceCatalogs[i]->getChunksUnsafe();
-        ASSERT_TRUE(left == right);
-
+        auto left = (*mergedIt)->getChunks();
+        auto right = referenceCatalogs[i]->getChunks();
+        ASSERT_EQ(left, right);
     }
 }
 
@@ -869,9 +867,8 @@ TEST_F(MediaDbTest, StorageDB)
          catalogIt != dbChunkCatalogs.cend();
          ++catalogIt)
     {
-        for (auto chunkIt = (*catalogIt)->getChunksUnsafe().cbegin();
-             chunkIt != (*catalogIt)->getChunksUnsafe().cend();
-             ++chunkIt)
+        const auto chunks = (*catalogIt)->getChunks();
+        for (auto chunkIt = chunks.cbegin(); chunkIt != chunks.cend(); ++chunkIt)
         {
             TestChunkManager::TestChunkCont::iterator tcmIt =
                 std::find_if(

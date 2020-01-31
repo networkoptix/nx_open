@@ -468,6 +468,25 @@ void DeviceAgent::getPluginSideSettings(
 {
     const auto response = new SettingsResponse();
     response->setValue("pluginSideTestSpinBox", "100");
+    response->setValue("testPolygon", R"json(
+        {
+            "figure": {
+                "points": [
+                    [
+                        0.138,
+                        0.551
+                    ],
+                    [
+                        0.775,
+                        0.429
+                    ],
+                    [
+                        0.748,
+                        0.844
+                    ]
+                ]
+            }
+        })json");
 
     *outResult = response;
 }
@@ -842,6 +861,8 @@ void DeviceAgent::parseSettings()
                     << ". Expected an integer.";
             }
         };
+
+    std::string somestuff = settingValue("testPolygon");
 
     m_deviceAgentSettings.generateEvents = toBool(settingValue(kGenerateEventsSetting));
     m_deviceAgentSettings.generateCars = toBool(settingValue(kGenerateCarsSetting));

@@ -139,7 +139,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
         int chunkIndex = currentCatalog->findFileIndex(time, findMethod);
         while (1)
         {
-            currentChunk = currentCatalog->chunkAt(chunkIndex);
+            currentChunk = currentCatalog->chunkAt(chunkIndex).value_or(nx::vms::server::Chunk());
 
             if (currentChunk.startTimeMs == -1)
                 break;

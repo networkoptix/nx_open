@@ -223,7 +223,7 @@ protected:
         const auto serverCatalogIt = m_serverCatalog[QnServer::LowQualityCatalog].find(cameraName);
         ASSERT_NE(m_serverCatalog[quality].cend(), serverCatalogIt);
 
-        const auto& serverChunks = serverCatalogIt.value()->getChunksUnsafe();
+        const auto serverChunks = serverCatalogIt.value()->getChunks();
         ASSERT_EQ(generatedChunks.size(), serverChunks.size());
         for (int i = 0; i < (int) serverChunks.size(); ++i)
             ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].startTimeMs);

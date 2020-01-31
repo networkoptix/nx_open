@@ -95,6 +95,7 @@ const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
 const std::chrono::milliseconds kSyncTimeEpsilonDefault(100);
 
 const QString kEnableEdgeRecording(lit("enableEdgeRecording"));
+const QString kEnableWebSocketKey(lit("webSocketEnabled"));
 const bool kEnableEdgeRecordingDefault(true);
 
 const QString kMaxRemoteArchiveSynchronizationThreads(
@@ -650,6 +651,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kEnableEdgeRecordingDefault,
         this);
 
+    m_webSocketEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kEnableWebSocketKey,
+        /*default value*/ true,
+        this);
+
     m_maxRemoteArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
         kMaxRemoteArchiveSynchronizationThreads,
         kMaxRemoteArchiveSynchronizationThreadsDefault,
@@ -702,11 +708,14 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 
     m_licenseServerUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "licenseServer",
-        "http://licensing.vmsproxy.com", //< Licensing server does not support https.
+        "https://licensing.vmsproxy.com",
         this);
 
     m_resourceFileUriAdaptor =
         new QnLexicalResourcePropertyAdaptor<nx::utils::Url>("resourceFileUri", "", this);
+
+    m_resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::utils::Url>(
+        "resourceFileUri", "http://resources.vmsproxy.com/resource_data.json", this);
 
     m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxEventLogRecords",
@@ -945,6 +954,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_cloudConnectUdpHolePunchingEnabledAdaptor
         << m_cloudConnectRelayingEnabledAdaptor
         << m_edgeRecordingEnabledAdaptor
+        << m_webSocketEnabledAdaptor
         << m_maxRemoteArchiveSynchronizationThreads
         << m_targetUpdateInformationAdaptor
         << m_installedUpdateInformationAdaptor
@@ -1679,6 +1689,16 @@ void QnGlobalSettings::setEdgeRecordingEnabled(bool enabled)
 QByteArray QnGlobalSettings::targetUpdateInformation() const
 {
     return m_targetUpdateInformationAdaptor->value();
+}
+
+bool QnGlobalSettings::isWebSocketEnabled() const
+{
+    return m_webSocketEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setWebSocketEnabled(bool enabled)
+{
+    m_webSocketEnabledAdaptor->setValue(enabled);
 }
 
 void QnGlobalSettings::setTargetUpdateInformation(const QByteArray& updateInformation)

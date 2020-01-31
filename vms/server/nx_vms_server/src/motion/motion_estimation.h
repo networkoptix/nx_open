@@ -21,6 +21,7 @@ public:
     struct Config
     {
         DecoderConfig decoderConfig;
+        bool allowGlobalLumaFiltering = true;
     };
 
 public:
@@ -71,7 +72,7 @@ private:
     void scaleMask(quint8* mask, quint8* scaledMask);
     void reallocateMask(int width, int height);
     void postFiltering();
-    void analyzeMotionAmount(quint8* frame);
+    void analyzeMotionAmount(quint8* frame, qint64 frameTimeUs);
     void scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer,uint8_t* prevFrameBuffer, uint8_t* deltaBuffer);
 
 private:
@@ -112,4 +113,5 @@ private:
     nx::metrics::Storage* m_metrics = nullptr;
 
     QnMetaDataV1Ptr m_lastMotionData;
+    qint64 m_lastGlobalLumaChangeTimeUs = AV_NOPTS_VALUE;
 };

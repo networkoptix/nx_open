@@ -22,7 +22,7 @@ public:
 
     ~LoggerCollection()
     {
-        m_destroyed = true;
+        m_isDestroyed = true;
     }
 
     std::shared_ptr<AbstractLogger> main()
@@ -63,8 +63,12 @@ public:
 
     std::shared_ptr<AbstractLogger> get(const Tag& tag, bool exactMatch) const
     {
-        if (m_destroyed)
-            return nullptr;
+        if (m_isDestroyed)
+        {
+            // Likely we are on the static deinitialization phase - log everything to stderr.
+            return std::make_shared<Logger>(
+                std::set<Filter>(), Level::verbose, std::make_unique<StdOut>());
+        }
 
         QnMutexLocker lock(&m_mutex);
         if (exactMatch)
@@ -107,7 +111,7 @@ private:
 
 private:
     /** Helps avoid crashing if a method is called during the static deinitialization phase. */
-    bool m_destroyed = false;
+    std::atomic<bool> m_isDestroyed{false};
 
     mutable QnMutex m_mutex;
     std::shared_ptr<AbstractLogger> m_mainLogger;
@@ -192,7 +196,10 @@ Level maxLevel()
 
 bool isToBeLogged(Level level, const Tag& tag)
 {
-    return getLogger(tag)->isToBeLogged(level, tag);
+    const auto& logger = getLogger(tag);
+    if (!logger)
+        return true;
+    return logger->isToBeLogged(level, tag);
 }
 
 bool showPasswords()

@@ -7,6 +7,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QFileInfo>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/move_only_func.h>
 
 #include <unordered_map>
 #include <set>
@@ -83,13 +84,16 @@ public:
     void updateChunkDuration(nx::vms::server::Chunk& chunk);
     QString fileDir(const nx::vms::server::Chunk& chunk) const;
     QString fullFileName(const nx::vms::server::Chunk& chunk) const;
-    nx::vms::server::Chunk chunkAt(int index) const;
     bool isLastChunk(qint64 startTimeMs) const;
     bool containTime(qint64 timeMs, qint64 eps = 5 * 1000) const;
     bool containTime(const QnTimePeriod& period) const;
 
+    /** Returns AV_NOPTS_VALUE in case if the catalog is empty */
     qint64 minTime() const;
+
+    /** Returns AV_NOPTS_VALUE in case if the catalog is empty */
     qint64 maxTime() const;
+
     //bool lastFileDuplicateName() const;
     qint64 firstTime() const;
     QnServer::ChunksCatalog getCatalog() const { return m_catalog; }
@@ -138,23 +142,55 @@ public:
     static std::deque<nx::vms::server::Chunk> mergeChunks(
         const std::deque<nx::vms::server::Chunk>& chunks1,
         const std::deque<nx::vms::server::Chunk>& chunks2);
+
+    bool addChunk(const nx::vms::server::Chunk& chunk);
     void addChunks(const nx::vms::server::ChunksDeque& chunks);
     void addChunks(const std::deque<Chunk>& chunk);
 
-    void assignChunksUnsafe(
-        std::deque<Chunk>::const_iterator begin,
-        std::deque<Chunk>::const_iterator end);
+    /**
+     * Return a deque of chunks such that they exist in *this, but don't exist in the other.
+     */
+    std::deque<Chunk> setDifference(const DeviceFileCatalog& other) const;
 
-    bool fromCSVFile(const QString& fileName);
+    /**
+     * Returns inner deque by copy. Make sure it is what you really want. It is always better to use
+     * specialized functions like addChunks(), mergeChunks(), setDifference(), e.t.c.
+     */
+    ChunksDeque getChunks() const;
+
+    /** Moves inner deque out. Fast but leaves *this in inoperable state. */
+    ChunksDeque takeChunks();
+
+    /** Removes all chunks with specified storage index. */
+    void removeChunks(int storageIndex);
+
+    /**
+     * Merges *this recording statistics with other's. Gets the whole archive statistics except
+     * bitrate. It's analyzed for the last records of archive only in
+     * range <= bitrateAnalyzePeriodMs.
+     * Both catalogs MUST NOT be empty.
+     */
+    QnRecordingStatsData mergeRecordingStatisticsData(
+        const DeviceFileCatalog& other,
+        qint64 bitrateAnalyzePeriodMs,
+        nx::utils::MoveOnlyFunc<QnStorageResourcePtr(int)> storageRoot) const;
+
+    /** Returns a set all 1st day of the month dates starting from 1/1/1970 present in the catalog. */
+    QSet<QDate> recordedMonthList() const;
+
+    /** Returns chunks for those startTimeMs < 'timepointMs' and storageIndex == 'storageIndex' */
+    std::deque<Chunk> chunksBefore(int64_t timepointMs, int storageIndex) const;
+
+    void replaceChunks(int storageIndex, const nx::vms::server::ChunksDeque &newCatalog);
+
+    std::optional<nx::vms::server::Chunk> chunkAt(int index) const;
+
     QnServer::ChunksCatalog getRole() const;
     QnRecordingStatsData getStatistics(qint64 bitrateAnalyzePeriodMs) const;
 
     QnServer::StoragePool getStoragePool() const;
     qint64 getSpaceByStorageIndex(int storageIndex) const;
     bool hasArchive(int storageIndex) const;
-
-    // only for unit tests, don't use in production.
-    const std::deque<Chunk>& getChunksUnsafe() const { return m_chunks.chunks(); }
 
     int64_t occupiedSpace(int storageIndex = -1) const;
     std::chrono::milliseconds occupiedDuration(int storageIndex = -1) const;
@@ -164,41 +200,17 @@ public:
     void setHasArchiveRotated(bool value) { m_hasArchiveRotated = value; }
 private:
 
-    bool csvMigrationCheckFile(const nx::vms::server::Chunk& chunk, QnStorageResourcePtr storage);
-    bool addChunk(const nx::vms::server::Chunk& chunk);
-    QSet<QDate> recordedMonthList();
-
     nx::vms::server::Chunk chunkFromFile(const QnStorageResourcePtr &storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName);
-    void replaceChunks(int storageIndex, const nx::vms::server::ChunksDeque &newCatalog);
-    void removeChunks(int storageIndex);
     void removeRecord(int idx);
     int detectTimeZone(qint64 startTimeMs, const QString& fileName);
-
-    friend class QnStorageManager;
 
     QnStorageManager *getMyStorageMan() const;
 private:
 
     mutable QnMutex m_mutex;
-    //QFile m_file;
     nx::vms::server::ChunksDeque m_chunks;
-    QString m_cameraUniqueId;
-
-    typedef QVector<QPair<int, bool> > CachedDirInfo;
-    struct IOCacheEntry
-    {
-        CachedDirInfo dirInfo;
-        QFileInfoList entryList;
-
-        IOCacheEntry() { dirInfo.resize(4); }
-    };
-
-    typedef QMap<int, IOCacheEntry > IOCacheMap;
-    IOCacheMap m_prevPartsMap[4];
-
-    //bool m_duplicateName;
-    //QMap<int,QString> m_prevFileNames;
+    const QString m_cameraUniqueId;
     const QnServer::ChunksCatalog m_catalog;
     qint64 m_recordingChunkTime;
     QnMutex m_IOMutex;

@@ -4,6 +4,11 @@
 
 namespace nx::vms::server {
 
+bool operator==(const ChunksDeque::Presence& p1, const ChunksDeque::Presence& p2)
+{
+    return p1.space == p2.space && p1.duration == p2.duration;
+}
+
 int64_t ChunksDeque::occupiedSpace(int storageIndex) const
 {
     if (storageIndex < 0)
@@ -132,6 +137,21 @@ void ChunksDeque::set_union(ConstIterator begin, ConstIterator end)
     sourceData.swap(m_deque);
     std::set_union(sourceData.begin(), sourceData.end(), begin, end, std::back_inserter(m_deque));
     allAdded();
+}
+
+bool operator==(const ChunksDeque& d1, const ChunksDeque& d2)
+{
+    return d1.m_deque == d2.m_deque && d1.m_archivePresence == d2.m_archivePresence;
+}
+
+bool operator==(const std::deque<Chunk>& d1, const ChunksDeque& d2)
+{
+    return d1 == d2.m_deque;
+}
+
+bool operator==(const ChunksDeque& d1, const std::deque<Chunk>& d2)
+{
+    return d1.m_deque == d2;
 }
 
 } // namespace nx::vms::server

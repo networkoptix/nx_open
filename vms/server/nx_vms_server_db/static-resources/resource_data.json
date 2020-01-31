@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.193",
+    "version": "1.0.1.196",
     "data": [
         {
             "keys": [
@@ -194,7 +194,8 @@
                 "ACTI|B915",
                 "*|ACTi-915",
                 "ACTi|Z*", "Z*|ACTi",
-                "ACTi Corporation|Z*", "Z*|ACTi Corporation"
+                "ACTi Corporation|Z*", "Z*|ACTi Corporation",
+                "Arecont Vision|AV20CPD-118"
             ],
             "forceONVIF": true
         },
@@ -2701,7 +2702,10 @@
         },
         {
             "keys": [
-                "HIKVISION|DS-2DF5220S-DE4/W"
+                "HIKVISION|DS-2DF5220S-DE4/W"б,
+                "HIKVISION|DS-2TD4237*",
+                "HIKVISION|DS-2TD4136*",
+                "HIKVISION|DS-2TD4166*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {

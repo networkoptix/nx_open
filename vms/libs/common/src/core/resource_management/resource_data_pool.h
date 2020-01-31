@@ -31,7 +31,7 @@ public:
     QnResourceData data(const QString& _vendor, const QString& model, const QString& firmware = QString()) const;
 
     static nx::utils::SoftwareVersion getVersion(const QByteArray& data);
-    bool validateData(const QByteArray& data) const;
+    static bool validateData(const QByteArray& data);
     bool loadFile(const QString &fileName);
     bool loadData(const QByteArray& data);
     void clear();

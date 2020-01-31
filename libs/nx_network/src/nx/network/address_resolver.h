@@ -130,7 +130,7 @@ protected:
     };
 
     typedef std::map<
-        std::tuple<int /*ipVersion*/, HostAddress>,
+        std::tuple<int /*ipVersion*/, HostAddress, NatTraversalSupport>,
         HostAddressInfo> HostInfoMap;
     typedef HostInfoMap::iterator HaInfoIterator;
 

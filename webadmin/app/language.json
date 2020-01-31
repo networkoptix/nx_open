@@ -82,6 +82,7 @@
         "emailSignature": "Email signature",
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Enable edge recording",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP search base",
@@ -143,7 +144,7 @@
     },
     "info":{
         "tabs":{
-            "healthMonitoring": "Health monitoring",
+            "graphs": "Graphs",
             "storage": "Storage",
             "log": "Log"
         }

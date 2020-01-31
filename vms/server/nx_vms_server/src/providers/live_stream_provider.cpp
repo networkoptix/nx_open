@@ -83,7 +83,10 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
 {
     QnMotionEstimation::Config config;
     if (serverModule())
+    {
         config.decoderConfig.mtDecodePolicy = serverModule()->settings().multiThreadDecodePolicy();
+        config.allowGlobalLumaFiltering = serverModule()->settings().allowGlobalLumaFiltering();
+    }
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
         m_motionEstimation.emplace_back(

@@ -74,7 +74,7 @@ void AddressResolver::resolveAsync(
 
     QnMutexLocker lk(&m_mutex);
     auto info = m_info.emplace(
-        std::make_tuple(ipVersion, hostName),
+        std::make_tuple(ipVersion, hostName, natTraversalSupport),
         HostAddressInfo(isCloudHostName(&lk, hostName.toString()))).first;
     info->second.checkExpirations();
     if (info->second.isResolved(natTraversalSupport))

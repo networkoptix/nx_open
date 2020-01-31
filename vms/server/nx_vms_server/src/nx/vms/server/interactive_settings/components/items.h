@@ -375,7 +375,21 @@ public:
 //-------------------------------------------------------------------------------------------------
 // ROI components.
 
-class LineFigure: public ValueItem
+class BaseFigure: public ValueItem
+{
+    Q_OBJECT
+
+public:
+    BaseFigure(const QString& figureType, QObject* parent = nullptr);
+    virtual void setValue(const QVariant& value) override;
+
+private:
+    static QJsonObject mergeFigures(
+        const QJsonObject& currentFigureValue,
+        const QJsonObject& newFigureValue);
+};
+
+class LineFigure: public BaseFigure
 {
     Q_OBJECT
     Q_PROPERTY(QString allowedDirections MEMBER m_allowedDirections)
@@ -387,13 +401,13 @@ private:
     QString m_allowedDirections;
 };
 
-class BoxFigure: public ValueItem
+class BoxFigure: public BaseFigure
 {
 public:
     BoxFigure(QObject* parent = nullptr);
 };
 
-class PolygonFigure: public ValueItem
+class PolygonFigure: public BaseFigure
 {
     Q_OBJECT
     Q_PROPERTY(int maxPoints READ maxPoints WRITE setMaxPoints NOTIFY maxPointsChanged)

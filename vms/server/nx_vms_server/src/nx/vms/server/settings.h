@@ -326,6 +326,10 @@ public:
         "Multiple thread decoding policy {auto, disabled, enabled}, used for RTSP streaming with "
         "transcoding and motion estimation."
     };
+    Option<bool> allowGlobalLumaFiltering{ this, "allowGlobalLumaFiltering",
+        true,
+        "Allow global luminance change detection across whole frame for motion estimation"
+    };
 
     Option<bool> ignoreRootTool{this, "ignoreRootTool", false,
         "Ignore root tool executable presence (if set to true, the Server will try to execute all "

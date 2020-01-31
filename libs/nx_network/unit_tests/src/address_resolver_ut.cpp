@@ -220,7 +220,7 @@ protected:
         ResolveResult resolveResult;
         std::get<1>(resolveResult) = m_resolver.resolveSync(
             m_hostNameToResolve,
-            NatTraversalSupport::disabled,
+            m_natTraversalSupport,
             m_ipVersionToUse);
         std::get<0>(resolveResult) = SystemError::getLastOSErrorCode();
         m_resolveResults.push(std::move(resolveResult));
@@ -229,6 +229,16 @@ protected:
     void whenResolve(const QString& hostName)
     {
         m_hostNameToResolve = hostName;
+        m_natTraversalSupport = NatTraversalSupport::disabled;
+
+        whenResolve();
+    }
+
+    void whenResolveWithCloudEnabled(const QString& hostName)
+    {
+        m_hostNameToResolve = hostName;
+        m_natTraversalSupport = NatTraversalSupport::enabled;
+
         whenResolve();
     }
 
@@ -236,6 +246,12 @@ protected:
     {
         m_prevResolveResult = m_resolveResults.pop();
         ASSERT_EQ(SystemError::noError, std::get<0>(m_prevResolveResult));
+    }
+
+    void thenResolveFailed(SystemError::ErrorCode expected)
+    {
+        m_prevResolveResult = m_resolveResults.pop();
+        ASSERT_EQ(expected, std::get<0>(m_prevResolveResult));
     }
 
     void andResolvedTo(const HostAddress& hostAddress)
@@ -248,6 +264,15 @@ protected:
                 return entry.type == AddressType::direct && entry.host == hostAddress;
             });
         ASSERT_TRUE(entryIter != entries.end());
+    }
+
+    void andResolvedTo(const AddressEntry& expected)
+    {
+        const auto& entries = std::get<1>(m_prevResolveResult);
+
+        ASSERT_NE(
+            entries.end(),
+            std::find(entries.begin(), entries.end(), expected));
     }
 
     void assertDnsResolverHasNotBeenInvoked()
@@ -314,6 +339,7 @@ private:
     nx::utils::SyncQueue<ResolveResult> m_resolveResults;
     ResolveResult m_prevResolveResult;
     std::atomic<bool> m_handlerCompleted{false};
+    NatTraversalSupport m_natTraversalSupport = NatTraversalSupport::disabled;
 
     SystemError::ErrorCode saveHostNameWithoutResolving(
         const QString& hostName,
@@ -365,6 +391,20 @@ TEST_F(AddressResolver, localhost_is_resolved_properly_ipv6)
     thenResolveSucceeded();
     andResolvedTo(HostAddress(in4addr_loopback));
     andResolvedTo(HostAddress(in6addr_loopback, 0));
+}
+
+TEST_F(AddressResolver, cloud_address_is_not_reported_if_not_asked)
+{
+    const auto cloudHostname = QnUuid::createUuid().toSimpleString();
+
+    whenResolveWithCloudEnabled(cloudHostname);
+    thenResolveSucceeded();
+    andResolvedTo(AddressEntry(AddressType::cloud, HostAddress(cloudHostname)));
+
+    // Resolving without cloud support.
+    // The cached resolve result should be invalidated since we changed the query.
+    whenResolve(cloudHostname);
+    thenResolveFailed(SystemError::hostNotFound);
 }
 
 TEST_F(AddressResolver, resolving_same_name_with_different_ip_version)

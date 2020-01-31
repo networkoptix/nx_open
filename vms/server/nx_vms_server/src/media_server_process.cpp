@@ -277,6 +277,7 @@
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/server/root_fs.h>
 #include <system_log/raid_event_ini_config.h>
+#include <nx/vms/utils/resource_params_data.h>
 
 #include <nx/vms/server/update/update_manager.h>
 #include <nx_vms_server_ini.h>
@@ -1099,7 +1100,7 @@ void MediaServerProcess::stopSync()
     pleaseStop();
     quit();
 
-    const std::chrono::seconds kStopTimeout(100);
+    const std::chrono::seconds kStopTimeout(ini().stopTimeoutS);
     if (!wait(kStopTimeout))
         NX_CRITICAL(false, lm("Server was unable to stop within %1").arg(kStopTimeout));
 
@@ -1108,12 +1109,12 @@ void MediaServerProcess::stopSync()
 
 void MediaServerProcess::stopAsync()
 {
-    // ATTENTION: This method is also called from a signal handler, thus, no logging is allowed.
+    // ATTENTION: This method is also called from a signal handler, thus, IO operations of any kind
+    // are prohibited because of potential deadlocks.
 
-    static std::atomic<bool> wasCalled = false;
-    if (wasCalled)
+    static std::atomic_flag wasCalled = /*false*/ ATOMIC_FLAG_INIT;
+    if (wasCalled.test_and_set())
         return;
-    wasCalled = true;
 
     if (serviceMainInstance)
         QTimer::singleShot(0, this, SLOT(stopSync()));
@@ -4640,159 +4641,40 @@ void MediaServerProcess::loadResourcesFromDatabase()
         moveHandlingCameras();
 }
 
-static QByteArray loadDataFromFile(const QString& fileName)
-{
-    QFile file(fileName);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return file.readAll();
-    return QByteArray();
-}
-
-static QByteArray loadDataFromUrl(nx::utils::Url url)
-{
-    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
-    httpClient->setResponseReadTimeout(kResourceDataReadingTimeout);
-    httpClient->setMessageBodyReadTimeout(kResourceDataReadingTimeout);
-    if (httpClient->doGet(url)
-        && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
-    {
-        const auto value = httpClient->fetchEntireMessageBody();
-        if (value)
-            return *value;
-    }
-    return QByteArray();
-}
-
-static QString loadDataFromDb(ec2::AbstractResourceManagerPtr manager)
+static QByteArray loadDataFromDb(ec2::AbstractResourceManagerPtr manager)
 {
     nx::vms::api::ResourceParamWithRefDataList data;
     manager->getKvPairsSync(QnUuid(), &data);
     for (const auto& param: data)
     {
         if (param.name == Qn::kResourceDataParamName)
-            return param.value;
+            return param.value.toUtf8();
     }
-    return QString();
-}
-
-// Updates local data only without saving to DB.
-static bool overrideResourceParamsDataByUrl(const nx::utils::Url& url, QnResourceDataPool* pool)
-{
-    if (url.isEmpty())
-        return false;
-    if (url.isValid() && !url.host().isEmpty()) //< To pass asserts in AsyncClient::doRequest
-    {
-        if (const auto data = loadDataFromUrl(url); !data.isEmpty())
-        {
-            if (pool->validateData(data))
-            {
-                NX_INFO(NX_SCOPE_TAG, "Updating local resource_data.json from %1", url);
-                pool->loadData(data);
-                return true;
-            }
-            NX_WARNING(NX_SCOPE_TAG, "Ignore invalid resource_data.json from %1", url);
-        }
-        else
-        {
-            NX_WARNING(NX_SCOPE_TAG, "Ignore empty resource_data.json from %1", url);
-        }
-    }
-    else
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Ignore invalid resourceFileUri setting %1", url);
-    }
-    return false;
-}
-
-// Updates local data only without saving to DB.
-static bool overrideResourceParamsDataByLocalFile(QnResourceDataPool* pool)
-{
-    const auto source = QCoreApplication::applicationDirPath() + "/resource_data.json";
-    if (const auto data = loadDataFromFile(source); !data.isEmpty())
-    {
-        if (pool->validateData(data))
-        {
-            NX_INFO(NX_SCOPE_TAG, "Updating local resource_data.json from %1", source);
-            pool->loadData(data);
-            return true;
-        }
-        NX_WARNING(NX_SCOPE_TAG, "Skip invalid resource_data.json from %1", source);
-    }
-    return false;
-}
-
-static std::optional<std::tuple<QString, QByteArray, nx::utils::SoftwareVersion>>
-    findOnlineResourceParamsData(
-        const nx::utils::SoftwareVersion& currentVersion, QnResourceDataPool* pool)
-{
-    static const std::array<const char*, 2> kUrlsToLoadResourceData =
-    {
-        "http://resources.vmsproxy.com/resource_data.json",
-        "http://beta.vmsproxy.com/beta-builds/daily/resource_data.json"
-    };
-    for (const auto& url: kUrlsToLoadResourceData)
-    {
-        auto data = loadDataFromUrl(url);
-        if (!data.isEmpty())
-        {
-            auto version = QnResourceDataPool::getVersion(data);
-            if (version > currentVersion)
-            {
-                if (pool->validateData(data))
-                    return std::make_tuple(QString(url), std::move(data), std::move(version));
-                NX_WARNING(NX_SCOPE_TAG, "Skip invalid resource_data.json from %1", data);
-            }
-            else
-            {
-                NX_DEBUG(NX_SCOPE_TAG,
-                    "Skip internet resource_data.json. Current version %1, internet %2",
-                    currentVersion,
-                    version);
-            }
-        }
-    }
-    return std::nullopt;
+    return QByteArray();
 }
 
 void MediaServerProcess::loadResourceParamsData()
 {
-    auto pool = commonModule()->resourceDataPool();
-    if (overrideResourceParamsDataByUrl(commonModule()->globalSettings()->resourceFileUri(), pool))
-        return;
-    if (overrideResourceParamsDataByLocalFile(pool))
-        return;
-
-    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
-    QString source;
-    const QByteArray oldValue = loadDataFromDb(manager).toUtf8();
-    auto dataVersion = QnResourceDataPool::getVersion(oldValue);
-
-    static const QString kBuiltinFileName(":/resource_data.json");
-    auto newValue = loadDataFromFile(kBuiltinFileName);
-    const auto builtinVersion = QnResourceDataPool::getVersion(newValue);
-    if (builtinVersion > dataVersion)
-    {
-        source = kBuiltinFileName;
-        dataVersion = builtinVersion;
-    }
-    else
-    {
-        newValue.clear();
-    }
-
+    using Data = nx::vms::utils::ResourceParamsData;
+    std::vector<Data> datas;
+    QString local = QCoreApplication::applicationDirPath() + "/resource_data.json";
+    if (QFile::exists(local))
+        datas.push_back(Data::load(QFile(local)));
     if (serverModule()->settings().onlineResourceDataEnabled())
     {
-        if (const auto online = findOnlineResourceParamsData(dataVersion, pool))
-        {
-            std::tie(source, newValue, dataVersion) = *online;
-        }
+        datas.push_back(Data::load(commonModule()->globalSettings()->resourceFileUri()));
+        datas.push_back(Data::load(
+            nx::utils::Url("http://beta.vmsproxy.com/beta-builds/daily/resource_data.json")));
     }
+    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
+    const QByteArray dataFromDB = loadDataFromDb(manager);
+    datas.push_back({"server DB", dataFromDB});
+    datas.push_back(Data::load(QFile(":/resource_data.json")));
 
-    if (!newValue.isEmpty() && oldValue != newValue)
+    if (auto data = Data::getWithGreaterVersion(datas); data.value != dataFromDB)
     {
-        NX_INFO(this, "Update system wide resource_data.json from %1", source);
-        // Update data in the database if there is no value or get update from the HTTP request.
-        manager->saveSync({{QnUuid(), Qn::kResourceDataParamName, std::move(newValue)}});
+        NX_INFO(this, "Update system wide resource_data.json from %1", data.location);
+        manager->saveSync({{QnUuid(), Qn::kResourceDataParamName, std::move(data.value)}});
     }
 }
 
@@ -5204,8 +5086,8 @@ void stopServer(int /*signal*/)
     gRestartFlag = false;
     if (serviceMainInstance)
     {
-        // Output to the console from a signal handler can cause deadlock.
-        //qWarning() << "Got signal" << signal << ", stop server!";
+        // ATTENTION: This method is called from a signal handler, thus, IO operations of any kind
+        // are prohibited because of potential deadlocks.
 
         // TODO: Potential deadlock - the signal may come when the event queue mutex is locked.
         serviceMainInstance.load()->stopAsync();

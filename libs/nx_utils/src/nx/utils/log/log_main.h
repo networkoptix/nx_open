@@ -97,7 +97,7 @@ public:
             m_logger.reset();
     }
 
-    void log(const QString& message)
+    void log(const QString& message) const
     {
         // Avoid crashing during the static deinitialization phase - log to stderr instead.
         if (!m_logger)

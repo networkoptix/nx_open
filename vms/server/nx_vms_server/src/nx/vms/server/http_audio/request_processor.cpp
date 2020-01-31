@@ -140,6 +140,19 @@ void AudioRequestProcessor::startAudioReceiving(
     while (httpProvider->isRunning() && !needToStop())
         std::this_thread::sleep_for(kIdleTime);
 
+    result = audioStreamPool()->startStopStreamToResource(
+        httpProvider,
+        camera->resource()->getId(),
+        QnAudioStreamerPool::Action::Stop,
+        errorMessage);
+
+    if (!result)
+    {
+        NX_WARNING(this, "Failed to stop streaming audio to camera: %1, error: %2",
+            camera->resource(), errorMessage);
+        return;
+    }
+
     httpProvider->pleaseStop();
 }
 

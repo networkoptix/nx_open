@@ -307,7 +307,7 @@ qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
 nx::vms::server::Chunk QnServerArchiveDelegate::findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod)
 {
     int index = catalog->findFileIndex(time, findMethod);
-    return catalog->chunkAt(index);
+    return catalog->chunkAt(index).value_or(nx::vms::server::Chunk());
 }
 
 bool QnServerArchiveDelegate::getNextChunk(nx::vms::server::TruncableChunk& chunk,

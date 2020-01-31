@@ -89,6 +89,7 @@
             smtpTimeout: {type: 'number'},
             smtpPassword: {type: 'password'},
             smtpUser: {type: 'text'},
+            webSocketEnabled: {type: 'checkbox'},
             updateNotificationsEnabled: {type: 'checkbox'},
             arecontRtspEnabled: {type: 'checkbox'},
             backupNewCamerasByDefault: {type: 'checkbox'},

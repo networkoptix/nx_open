@@ -22,7 +22,9 @@ static bool hasPermission(const QnRestConnectionProcessor* processor)
 
 static QString levelString(const std::shared_ptr<AbstractLogger>& logger)
 {
-    LevelSettings settings(logger->defaultLevel(), logger->levelFilters());
+    if (!NX_ASSERT(logger))
+        return "";
+    const LevelSettings settings(logger->defaultLevel(), logger->levelFilters());
     return settings.toString();
 }
 
