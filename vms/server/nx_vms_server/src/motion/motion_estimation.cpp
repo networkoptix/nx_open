@@ -792,16 +792,16 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     m_isNewMask = false;
 }
 
-void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTime)
+void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTimeUs)
 {
     // Rect color change threshold to detect global luma.
-    static const quint8 kGlobalLumaMask = 8;
+    static const quint8 kGlobalLumaValueThreshold = 8;
 
     // Should detect motion on most part of the frame to detect global luma.
-    static const qreal kGlobalLumaThreshold = 0.75;
+    static const qreal kGlobalLumaSquareThreshold = 0.75;
 
     // Block motion for this time after global luma.
-    static const qint64 kGlobalLumaTimeUs = 1000000 * 2;
+    static const qint64 kGlobalLumaDurationUs = 1000000 * 2;
 
     const int totalSquareCount = m_scaledWidth * Qn::kMotionGridHeight;
     quint8* endPtr = frame + totalSquareCount;
@@ -814,7 +814,7 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTime)
 
     for (int y = 0; y < Qn::kMotionGridHeight; ++y) 
     {
-        if (*curPtr > kGlobalLumaMask)
+        if (*curPtr > kGlobalLumaValueThreshold)
             globalLumaCounter++;
 
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
@@ -825,7 +825,7 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTime)
 
     for (int x = 1; x < m_scaledWidth-1; ++x)
     {
-        if (*curPtr > kGlobalLumaMask)
+        if (*curPtr > kGlobalLumaValueThreshold)
             globalLumaCounter++;
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
@@ -833,7 +833,7 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTime)
         dstPtr++;
         for (int y = 1; y < Qn::kMotionGridHeight-1; ++y)
         {
-            if (*curPtr > kGlobalLumaMask)
+            if (*curPtr > kGlobalLumaValueThreshold)
                 globalLumaCounter++;
 
             if (*curPtr <= *maskPtr)
@@ -859,7 +859,7 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTime)
             maskPtr++;
             dstPtr++;
         }
-        if (*curPtr > kGlobalLumaMask)
+        if (*curPtr > kGlobalLumaValueThreshold)
             globalLumaCounter++;
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
@@ -869,7 +869,7 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTime)
 
     for (int y = 0; y < Qn::kMotionGridHeight; ++y) 
     {
-        if (*curPtr > kGlobalLumaMask)
+        if (*curPtr > kGlobalLumaValueThreshold)
             globalLumaCounter++;
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
@@ -879,20 +879,21 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTime)
 
     if (m_config.allowGlobalLumaFiltering)
     {
-        if (globalLumaCounter > totalSquareCount* kGlobalLumaThreshold)
+        if (globalLumaCounter > totalSquareCount * kGlobalLumaSquareThreshold)
         {
-            m_changeGlobalLumaTime = frameTime;
-            NX_DEBUG(this, "global luma change = %1. Block motion for %2 seconds", 
-                globalLumaCounter / (qreal)totalSquareCount, kGlobalLumaTimeUs / 1000000.0);
+            m_lastGlobalLumaChangeTimeUs = frameTimeUs;
+            NX_DEBUG(this, 
+                "Detect global luminance changing. Square = %1. Block motion for %2ms", 
+                globalLumaCounter / (qreal) totalSquareCount, kGlobalLumaDurationUs / 1000);
             return; //< Ignore motion by global luma change.
         }
-        else if (m_changeGlobalLumaTime != AV_NOPTS_VALUE 
-            && frameTime < m_changeGlobalLumaTime + kGlobalLumaTimeUs)
+        else if (m_lastGlobalLumaChangeTimeUs != AV_NOPTS_VALUE 
+            && frameTimeUs < m_lastGlobalLumaChangeTimeUs + kGlobalLumaDurationUs)
         {
             return;  //< Motion is blocked for some period of time after global luma change.
         }
     }
-    m_changeGlobalLumaTime = AV_NOPTS_VALUE;
+    m_lastGlobalLumaChangeTimeUs = AV_NOPTS_VALUE;
 
     // 2. Determine linked areas
     int currentLinkIndex = 1;
