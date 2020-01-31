@@ -30,6 +30,12 @@ bool AnalyticsEventsReceptor::canAcceptData() const
 
 void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
 {
+    if (data->isSpecialTimeValue())
+    {
+        NX_WARNING(this, "Ignore analytics metadata with timestamp %1", data->timestamp);
+        return;
+    }
+
     QnCompressedMetadataPtr metadataPacket =
         std::dynamic_pointer_cast<QnCompressedMetadata>(data);
     if (!metadataPacket)

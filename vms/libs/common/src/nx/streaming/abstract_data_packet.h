@@ -13,6 +13,11 @@ struct QnAbstractDataPacket
     virtual ~QnAbstractDataPacket() = default;
 
     qint64 timestamp = DATETIME_INVALID; //< TODO: Rename to timestampUs.
+
+    bool isSpecialTimeValue() const
+    {
+        return timestamp < 0 || timestamp == DATETIME_NOW;
+    }
 };
 
 typedef std::shared_ptr<QnAbstractDataPacket> QnAbstractDataPacketPtr;
