@@ -55,10 +55,27 @@ then
 
     echo "Building Health Monitor"
     pushd $FRONT_END
-    npm install
-    npm run setSkin blue
-    npm run build
 
+    echo "Node version"
+    npm -v
+    echo
+
+    echo "Installing npm packages"
+    npm install
+    echo "npm Packages Installed"
+    echo
+
+    npm run setSkin blue
+
+    echo "Current path"
+    pwd
+
+    echo "Building health monitor"
+    npm run build
+    echo "Health monitor built"
+    echo
+
+    echo "Renaming index.html to health.html."
     mv dist/index.html dist/health.html
     popd
 
