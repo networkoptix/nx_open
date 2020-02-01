@@ -1666,9 +1666,11 @@ QnRecordingStatsData QnStorageManager::getChunkStatisticsByCamera(qint64 bitrate
     auto catalogLow = m_devFileCatalog[QnServer::LowQualityCatalog].value(uniqueId);
 
     if (catalogHi && !catalogHi->isEmpty() && catalogLow && !catalogLow->isEmpty())
+    {
         return catalogHi->mergeRecordingStatisticsData(
             *catalogLow, bitrateAnalyzePeriodMs,
             [this](int storageIndex) { return storageRoot(storageIndex); });
+    }
 
     if (catalogHi && !catalogHi->isEmpty())
         return catalogHi->getStatistics(bitrateAnalyzePeriodMs);
