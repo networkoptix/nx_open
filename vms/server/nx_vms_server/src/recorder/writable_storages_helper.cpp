@@ -89,8 +89,7 @@ std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::toInfos(
     const StorageResourceList& storages, const QnStorageManager* owner)
 {
     std::vector<SpaceInfo> result;
-    const auto candidates = unique(storages);
-    for (const auto& storage: candidates)
+    for (const auto& storage: storages)
     {
         try
         {
@@ -158,42 +157,6 @@ std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::online(
     std::copy_if(
         infos.cbegin(), infos.cend(), std::back_inserter(result),
         [](const auto& info) { return info.storage->isOnline(); });
-    return result;
-}
-
-StorageResourceList WritableStoragesHelper::unique(const StorageResourceList& candidates)
-{
-    auto result = candidates;
-    std::sort(
-        result.begin(), result.end(),
-        [](const auto& storage1, const auto& storage2)
-        {
-            return storage1->getUrl() < storage2->getUrl();
-        });
-
-    auto last = std::unique(
-        result.begin(), result.end(),
-        [](const auto& storage1, const auto& storage2)
-        {
-            return storage1->getUrl() == storage2->getUrl();
-        });
-
-    result.erase(last, result.end());
-    NX_ASSERT(candidates.size() == result.size());
-    if (candidates.size() != result.size())
-    {
-        QString diffString;
-        for (const auto& storage: candidates)
-        {
-            if (!result.contains(storage))
-            {
-                diffString +=
-                    QString("(%1) ").arg(nx::utils::url::hidePassword(storage->getUrl()));
-            }
-        }
-        NX_WARNING(typeid(WritableStoragesHelper), "Found duplicate storages: %1", diffString);
-    }
-
     return result;
 }
 

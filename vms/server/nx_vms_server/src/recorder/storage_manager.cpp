@@ -2293,7 +2293,23 @@ QSet<QnStorageResourcePtr> QnStorageManager::getClearableStorages() const
 StorageResourceList QnStorageManager::getAllWritableStorages(
     const StorageResourceList& additional) const
 {
-    return WritableStoragesHelper(this).list(m_storageRoots.values() + additional);
+    auto existing = getStorages();
+    const auto filterOutExisting =
+        [](const auto& existing, auto additional)
+        {
+            additional.erase(std::remove_if(
+                    additional.begin(), additional.end(),
+                    [&existing](const auto& a)
+                    {
+                        return std::any_of(
+                            existing.cbegin(), existing.cend(),
+                            [&a](const auto& e) { return e->getUrl() == a->getUrl(); });
+                    }),
+                additional.end());
+            return additional;
+        };
+
+    return WritableStoragesHelper(this).list(existing + filterOutExisting(existing, additional));
 }
 
 void QnStorageManager::testStoragesDone()
