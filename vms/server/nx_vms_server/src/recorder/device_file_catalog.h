@@ -183,7 +183,8 @@ public:
 
     void replaceChunks(int storageIndex, const nx::vms::server::ChunksDeque &newCatalog);
 
-    std::optional<nx::vms::server::Chunk> chunkAt(int index) const;
+    /** Returns chunk at 'index' or default Chunk if 'index' is out of range. */
+    nx::vms::server::Chunk chunkAt(int index) const;
 
     QnServer::ChunksCatalog getRole() const;
     QnRecordingStatsData getStatistics(qint64 bitrateAnalyzePeriodMs) const;

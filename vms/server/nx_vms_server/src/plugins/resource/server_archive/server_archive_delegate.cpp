@@ -307,7 +307,7 @@ qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
 nx::vms::server::Chunk QnServerArchiveDelegate::findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod)
 {
     int index = catalog->findFileIndex(time, findMethod);
-    return catalog->chunkAt(index).value_or(nx::vms::server::Chunk());
+    return catalog->chunkAt(index);
 }
 
 bool QnServerArchiveDelegate::getNextChunk(nx::vms::server::TruncableChunk& chunk,
@@ -574,7 +574,7 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
             m_newQualityCatalog = (quality == MEDIA_Quality_Low ? m_catalogLow[i] : m_catalogHi[i]);
             m_newQualityChunk = findChunk(m_newQualityCatalog, timeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
             m_newQualityChunkStoragePool = m_newQualityCatalog->getStoragePool();
-            if (m_newQualityChunk.startTimeMs == -1)
+            if (m_newQualityChunk.isNull())
                 continue; // requested quality is absent at all
 
             if (m_newQualityCatalog == m_currentChunkCatalog[i])
