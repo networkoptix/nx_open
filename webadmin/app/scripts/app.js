@@ -149,7 +149,13 @@ angular.module('webadminApp', [
             controller: 'SetupCtrl'
         })
         .when('/health', {
-            templateUrl: Config.viewsDir + 'health_monitor.html'
+            templateUrl: Config.viewsDir + 'health_monitor.html',
+            resolve: {
+                test: ['mediaserver', function ( mediaserver ) {
+                    var user = mediaserver.getUser( true );
+                    return user.isAdmin || user.isOwner;
+                }]
+            }
         })
         .when('/', {
             template: '',

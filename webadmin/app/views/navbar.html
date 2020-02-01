@@ -34,7 +34,7 @@
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-click="nav.show = !nav.show" ng-href="#/developers/">For Developers</a></li>
-                <li ng-hide="settings.liteClient" ng-class="{active:isActive('/health')}">
+                <li ng-if="user.isOwner || user.isAdmin" ng-class="{active:isActive('/health')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-click="nav.show = !nav.show" ng-href="#/health/">Information</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}">
@@ -64,7 +64,7 @@
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/developers/">For
                         Developers</a></li>
-                <li ng-hide="settings.liteClient" ng-class="{active:isActive('/health')}">
+                <li ng-if="user.isOwner || user.isAdmin" ng-class="{active:isActive('/health')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-href="#/health/">Information</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}">
