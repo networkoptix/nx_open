@@ -1,6 +1,8 @@
 #include "object_track_cache.h"
 #include "nx_vms_server_ini.h"
 
+#include <nx/vms/api/types/motion_types.h>
+
 namespace nx::analytics::db {
 
 ObjectTrackCache::ObjectTrackCache(
@@ -215,7 +217,7 @@ void ObjectTrackCache::updateObject(
     if (trackContext.track.objectTypeId.isEmpty())
         trackContext.track.objectTypeId = objectMetadata.typeId;
 
-    auto assignBestShotFromPacket = 
+    auto assignBestShotFromPacket =
         [](auto& track, const auto& packet, const auto& boundingBox)
         {
             track.bestShot.timestampUs = packet.timestampUs;

@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <recorder/device_file_catalog.h>
-#include <recorder/storage_manager.h>
 #include <nx/core/access/access_types.h>
 #include <server/server_globals.h>
 #include <common/common_module.h>
@@ -9,61 +8,11 @@
 #include "media_server_module_fixture.h"
 #include <media_server/media_server_module.h>
 #include <test_support/mediaserver_launcher.h>
+#include <test_support/storage_utils.h>
 
 namespace nx {
 namespace vms::server {
 namespace test {
-
-class TestStorageManager: public QnStorageManager
-{
-public:
-    nx::vms::server::StorageResourceList storages;
-
-    using QnStorageManager::QnStorageManager;
-
-private:
-    virtual std::chrono::milliseconds checkSystemFreeSpaceInterval() const override
-    {
-        return std::chrono::seconds(1);
-    }
-
-    virtual StorageResourceList getStorages() const override
-    {
-        return storages;
-    }
-};
-
-class StorageStub: public StorageResource
-{
-public:
-    bool isSystemFlag = false;
-    qint64 freeSpace = -1;
-
-    StorageStub(
-        QnMediaServerModule* serverModule,
-        bool isSystem,
-        qint64 freeSpace)
-        :
-        StorageResource(serverModule),
-        isSystemFlag(isSystem),
-        freeSpace(freeSpace)
-    {}
-
-    virtual bool isSystem() const override { return isSystemFlag; }
-    virtual bool isOnline() const override { return true; }
-    virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override { return nullptr; }
-    virtual int getCapabilities() const override { return -1; }
-    virtual qint64 getFreeSpace() override { return freeSpace; }
-    virtual qint64 getTotalSpace() const override { return -1; }
-    virtual Qn::StorageInitResult initOrUpdate() { return Qn::StorageInit_WrongPath; }
-    virtual bool removeFile(const QString& /* url */) { return false; }
-    virtual bool removeDir(const QString& /* url */) override { return false; }
-    virtual bool renameFile(const QString& /* oldName */, const QString& /* newName */) { return false; }
-    virtual FileInfoList getFileList(const QString& /* dirName */) override { return FileInfoList(); }
-    virtual bool isFileExists(const QString& /* url */) override { return false; }
-    virtual bool isDirExists(const QString& /* url */) override { return false; }
-    virtual qint64 getFileSize(const QString& /* url */) const override { return false; }
-};
 
 void addChunk(
     nx::vms::server::ChunksDeque& chunks,
@@ -132,7 +81,7 @@ protected:
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
         ASSERT_TRUE(m_failedStorage->isSystem());
-        ASSERT_TRUE(m_failedStorage.dynamicCast<StorageStub>());
+        ASSERT_TRUE(m_failedStorage.dynamicCast<test_support::StorageStub>());
     }
 
     void assertNoSignalReceived()
@@ -154,7 +103,7 @@ protected:
 
     void createStorageManager(int64_t systemStorageFreeSpace)
     {
-        m_storageManager.reset(new TestStorageManager(
+        m_storageManager.reset(new test_support::StorageManagerStub(
             m_server->serverModule(), nullptr, QnServer::StoragePool::Normal));
 
         m_storageManager->storages = createStorages(systemStorageFreeSpace);
@@ -173,15 +122,28 @@ protected:
 
 private:
     std::unique_ptr<MediaServerLauncher> m_server;
-    std::unique_ptr<TestStorageManager> m_storageManager;
+    std::unique_ptr<test_support::StorageManagerStub> m_storageManager;
     std::atomic<bool> m_failureSignalReceived = false;
     QnStorageResourcePtr m_failedStorage;
 
     nx::vms::server::StorageResourceList createStorages(qint64 systemStorageFreeSpace) const
     {
         return nx::vms::server::StorageResourceList{
-            StorageResourcePtr(new StorageStub(m_server->serverModule(), /* isSystem */ false, /* freeSpace */ 5)),
-            StorageResourcePtr(new StorageStub(m_server->serverModule(), /* isSystem */ true, /* freeSpace */ systemStorageFreeSpace))};
+            createStorage(/* isSystem */ false, /* freeSpace */ 5),
+            createStorage(/* isSystem */ true, /* freeSpace */ systemStorageFreeSpace)};
+    }
+
+    StorageResourcePtr createStorage(bool isSystem, int64_t freeSpace) const
+    {
+        return StorageResourcePtr(new test_support::StorageStub(
+            m_server->serverModule(),
+            /*url*/ "",
+            /*totalSpace*/ 0,
+            freeSpace,
+            /*spaceLimit*/ 0,
+            isSystem,
+            /*isOnline*/ true,
+            /*isUsedForWriting*/ false));
     }
 };
 

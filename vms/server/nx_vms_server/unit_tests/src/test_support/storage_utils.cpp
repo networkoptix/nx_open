@@ -109,120 +109,12 @@ QnStorageResourcePtr addStorage(
     return storage;
 }
 
-class StorageFixtureResource: public StorageResource
-{
-public:
-    StorageFixtureResource(
-        QnMediaServerModule* serverModule, const QString& url, int64_t totalSpace,
-        int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline, bool isUsedForWriting)
-        :
-        StorageResource(serverModule), m_url(url), m_totalSpace(totalSpace),
-        m_freeSpace(freeSpace), m_isSystem(isSystem), m_isOnline(isOnline)
-    {
-        setSpaceLimit(spaceLimit);
-        setUsedForWriting(isUsedForWriting);
-        setIdUnsafe(QnUuid::createUuid());
-    }
-
-    virtual QIODevice* openInternal(const QString& /*fileName*/, QIODevice::OpenMode /*openMode*/) override
-    {
-        return nullptr;
-    }
-
-    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& /*dirName*/) override
-    {
-        return QnAbstractStorageResource::FileInfoList();
-    }
-
-    virtual qint64 getFileSize(const QString& /*url*/) const override
-    {
-        return -1LL;
-    }
-
-    virtual bool removeFile(const QString& /*url*/) override
-    {
-        return true;
-    }
-
-    virtual bool removeDir(const QString& /*url*/) override
-    {
-        return true;
-    }
-
-    virtual bool renameFile(const QString& /*oldName*/, const QString& /*newName*/) override
-    {
-        return true;
-    }
-
-    virtual bool isFileExists(const QString& /*url*/) override
-    {
-        return true;
-    }
-
-    virtual bool isDirExists(const QString& /*url*/) override
-    {
-        return true;
-    }
-
-    virtual qint64 getFreeSpace() override
-    {
-        return m_freeSpace;
-    }
-
-    virtual qint64 getTotalSpace() const override
-    {
-        return m_totalSpace;
-    }
-
-    virtual int getCapabilities() const override
-    {
-        return ListFile | RemoveFile | ReadFile | WriteFile | DBReady;
-    }
-
-    virtual Qn::StorageInitResult initOrUpdate() override
-    {
-        return Qn::StorageInit_Ok;
-    }
-
-    virtual void setUrl(const QString& url) override
-    {
-        m_url = url;
-    }
-
-    virtual QString getUrl() const override
-    {
-        return m_url;
-    }
-
-    virtual bool isSystem() const override
-    {
-        return m_isSystem;
-    }
-
-    virtual QString getPath() const override
-    {
-        return QnStorageResource::getPath();
-    }
-
-    virtual Qn::ResourceStatus getStatus() const override
-    {
-        return m_isOnline ? Qn::ResourceStatus::Online : Qn::ResourceStatus::Offline;
-    }
-
-private:
-    QString m_url;
-    int64_t m_totalSpace = -1;
-    int64_t m_freeSpace = -1;
-    bool m_isSystem = false;
-    bool m_isOnline = false;
-};
-
-StorageResourcePtr addStorageFixture(
+StorageResourcePtr addStorageStub(
     MediaServerLauncher* server, QnMediaServerModule* serverModule, const QString& url,
     int64_t totalSpace, int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline,
     bool isUsedForWriting)
 {
-    auto storage = StorageResourcePtr(new StorageFixtureResource(
+    auto storage = StorageResourcePtr(new StorageStub(
         serverModule, url, totalSpace, freeSpace, spaceLimit, isSystem, isOnline, isUsedForWriting));
     server->serverModule()->normalStorageManager()->addStorage(storage);
     return storage;
