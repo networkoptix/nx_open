@@ -1,23 +1,23 @@
-@import 'styles/theme_variables';
+@import 'styles/_theme_variables';
 
 // Common
-@import 'src/styles/mixins';
-@import 'src/styles/typography';
-@import 'src/styles/buttons';
-@import 'src/styles/forms';
-@import 'src/styles/inputs';
-@import 'src/styles/labels';
-@import 'src/styles/navs';
-@import 'src/styles/elements';
-@import 'src/styles/visuals';
-@import 'src/styles/tables';
-@import 'src/styles/icons';
-@import 'src/styles/components';
+@import 'src/styles/_mixins';
+@import 'src/styles/_typography';
+@import 'src/styles/_buttons';
+@import 'src/styles/_forms';
+@import 'src/styles/_inputs';
+@import 'src/styles/_labels';
+@import 'src/styles/_navs';
+@import 'src/styles/_elements';
+@import 'src/styles/_visuals';
+@import 'src/styles/_tables';
+@import 'src/styles/_icons';
+@import 'src/styles/_components';
 
 // Components (common)
-@import 'src/dialogs/dialogs';
-@import 'src/components/dropdowns/dropdowns';
-@import 'src/components/toast/toast.component';
+@import './src/dialogs/dialogs';
+@import './src/components/dropdowns/dropdowns';
+@import './src/components/toast/toast.component';
 
 nx-app {
     .headerPadding {

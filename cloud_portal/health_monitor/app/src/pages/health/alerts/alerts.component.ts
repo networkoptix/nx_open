@@ -34,6 +34,7 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
 
     layoutReady = new BehaviorSubject(false);
 
+    queryParamSubscription: SubscriptionLike;
     breakpointSubscription: SubscriptionLike;
     tableReadySubscription: SubscriptionLike;
     layoutReadySubscription: SubscriptionLike;
@@ -90,6 +91,10 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
         this.params = this.route.snapshot.queryParams;
         this.menuService.setSection('alerts');
 
+        if (!this.healthService.alertsValues) {
+            return;
+        }
+
         this.addFilterServers();
         this.addFilterTypes();
         this.addFilterAlarms();
@@ -117,7 +122,7 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
                     this.tableWrapper = this.elementTable.nativeElement.querySelectorAll('.table-wrapper')[0].offsetWidth;
                 }
             });
-        })
+        });
 
         this.windowSizeSubscription = this.scrollMechanicsService.windowSizeSubject.subscribe(({ width }) => {
             if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.lg)) {
@@ -134,6 +139,14 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
         this.tableReadySubscription = this.healthService.tableReadySubject.subscribe(ready => {
             if (ready) {
                 this.setLayout();
+            }
+        });
+
+        this.queryParamSubscription = this.route.queryParamMap.subscribe(params => {
+            if (params.keys.length === 0) {
+                this.alerts = {...this.healthService.alertsValues || {}};
+                this.resetActiveEntity();
+                this.resetFilterModel();
             }
         });
     }
@@ -165,6 +178,7 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
         }
 
         this.filterModel = { ...this.filterModel };
+        this.countAlerts();
     }
 
     addFilterAlarms() {
@@ -390,8 +404,8 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
                 const tableWidth = this.elementTable.nativeElement.querySelectorAll('table')[0].offsetWidth;
                 // area available
                 const areaWidth = this.area.nativeElement.offsetWidth;
-                // area available to the table (2/3 + gutters
-                const availAreaWidth = areaWidth / 3 * 2 + 46;
+                // area available to the table (- gutter)
+                const availAreaWidth = areaWidth - NxHealthService.PANEL_WIDTH - 16;
 
                 const isTableFit = (availAreaWidth > tableWidth) && !this.mobileDetailMode;
                 if (this.activeTableEntity && !this.mobileDetailMode) {

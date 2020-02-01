@@ -62,7 +62,7 @@
             <header>
                 <h4 translate>System Settings</h4>
             </header>
-            <div class="placeholder" *ngIf="system && !system.isOnline; else systemSettings">
+            <div class="placeholder" *ngIf="system && !system.isAvailable; else systemSettings">
                 <svg-icon
                     [svgStyle]="{ 'width.px': '64', 'pointer-events': 'none' }"
                     [src]="CONFIG.icons.dir + 'system_settings_placeholder.svg'"></svg-icon>
@@ -144,7 +144,7 @@
             <header>
                 <h4 translate>Security</h4>
             </header>
-            <div class="placeholder" *ngIf="system && !system.isOnline; else securitySettings">
+            <div class="placeholder" *ngIf="system && !system.isAvailable; else securitySettings">
                 <svg-icon
                     [svgStyle]="{ 'width.px': '64', 'pointer-events': 'none' }"
                     [src]="CONFIG.icons.dir + 'system_settings_placeholder.svg'"></svg-icon>
@@ -228,7 +228,8 @@
                                     <span translate>Limit session duration to</span>
                                 </label>
                             </div>
-                            <div *ngIf="settingsWatchers.sessionLimitToggle.value" class="row ml-4 mt-2">
+                            <div *ngIf="settingsWatchers.sessionLimitToggle && settingsWatchers.sessionLimitToggle.value" 
+                                class="row ml-4 mt-2">
                                 <input #timeUnitTracker
                                         [(ngModel)]="timeUnitCount"
                                         (change)="updateTimeUnitWatcher()"

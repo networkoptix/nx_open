@@ -273,11 +273,9 @@ export class NxHeaderComponent implements OnInit, OnDestroy {
                             this.stopActiveSubscription();
                             this.system = this.systemService.createSystem(this.user.email, this.activeSystem.id);
 
-                            this.infoSubscription = this.system.infoSubject.subscribe(() => {
-                                this.canSeeInfo = this.system.canViewInfo();
+                            this.system.getInfoAndPermissions(false).catch(_ => {}).then(system => {
+                                this.canSeeInfo = (this.CONFIG.healthMonitoringEnabled || system.info.capabilities && system.info.capabilities.vms_metrics) && this.system.canViewInfo();
                             });
-
-                            this.system.getInfoAndPermissions(false).catch(_ => {});
                         }
                     } else {
                         this.stopActiveSubscription();

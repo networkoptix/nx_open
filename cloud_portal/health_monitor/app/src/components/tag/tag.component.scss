@@ -30,6 +30,7 @@
 
     &.large {
         @extend #regular13;
+        color       : $light16;
         height      : 2rem !important;
         line-height : 2rem !important;
         padding     : 0 12px;

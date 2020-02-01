@@ -24,7 +24,7 @@ export class NxScrollMechanicsService {
     elementTableWidthSubject = new BehaviorSubject(0);
     elementViewWidthSubject = new BehaviorSubject(0);
     offsetSubject = new BehaviorSubject(undefined);
-    mediaSubject = new BehaviorSubject('');
+    panelSubject = new BehaviorSubject(false);
 
     public static SCROLL_OFFSET: number = 48 + 16; // header + padding
     public static MEDIA = GRID_BREAKPOINTS;
@@ -62,6 +62,10 @@ export class NxScrollMechanicsService {
         const rect = el.getBoundingClientRect();
 
         return rect.top + window.pageYOffset;
+    }
+
+    panelVisible(value) {
+        this.panelSubject.next(value);
     }
 
     mediaQueryMax(media) {

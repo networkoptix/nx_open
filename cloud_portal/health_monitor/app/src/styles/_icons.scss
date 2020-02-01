@@ -145,3 +145,17 @@
     height              : 96px !important;
     background-position : 0px -316px;
 }
+
+.web-icon-close {
+    @include web-icon;
+    width               : 10px !important;
+    height              : 10px !important;
+    background-position : -73px -49px;
+}
+
+.web-icon-search{
+    @include web-icon;
+    width: 20px !important;
+    height: 20px !important;
+    background-position: -50px -26px;
+}

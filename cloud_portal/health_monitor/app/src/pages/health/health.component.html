@@ -1,5 +1,5 @@
 <nx-page-placeholder *ngIf="!healthService.ready && !hasServerError && !outdatedVersion"
-                     [condition]="systemReady && system && !system.isOnline"
+                     [condition]="system && !system.isOnline"
                      type="OFFLINE"
                      preloader="true"
                      class="page-placeholder">
@@ -22,7 +22,9 @@
         <div *ngIf="deviceService.isDesktop()" class="mb-3 mt-2">
             <a href="#" class="btn-text" (click)="exportReport()">
                 <svg-icon [src]="CONFIG.icons.dir + 'download.svg'"
-                          [svgStyle]="{'width.px': '20'}"></svg-icon>Download Full Report</a>
+                          [svgStyle]="{'width.px': '20'}"></svg-icon>
+                <span>Download Full Report</span>
+            </a>
         </div>
         <div *ngIf="importedData.imported" class="importInfo">
             <p>System: {{importedData.system}}</p>

@@ -402,6 +402,7 @@ export class NxConfigService {
             integrationFilterItems        : '',
             integrationFilterLimitation   : '',
             integrationStoreEnabled       : '',
+            healthMonitoringEnabled       : '',
             publicDownloads               : '',
             publicReleases                : '',
             trafficRelayHost              : '',

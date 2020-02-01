@@ -193,17 +193,19 @@ button, .btn {
 
 .btn-tag {
     @extend #regular13;
-    color            : $light16;
+    color            : $light16 !important;
     font-weight      : 400;
     white-space      : nowrap;
     background-color : $light4;
     max-width        : none;
 
     &:hover {
+        color            : $light16;
         background-color : $light5;
     }
 
     &:active {
+        color            : $light16;
         background-color : $light6;
     }
 }
@@ -290,6 +292,8 @@ button, .btn {
 }
 
 .btn-text {
+    text-decoration: none;
+
     .nav-arrow {
         height       : 20px;
         float        : left;
@@ -322,6 +326,8 @@ button, .btn {
     }
 
     &:hover {
+        text-decoration : none;
+
         span {
             color           : $dark15 !important;
             text-decoration : none;

@@ -76,6 +76,7 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
     elementWidth: any;
     showHorizontalTooltip: boolean;
     hideTooltip: any;
+    mobileDetailMode: boolean;
 
     resizeSubscription: SubscriptionLike;
 
@@ -107,6 +108,8 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         this.showHorizontalTooltip = false;
 
         this.resizeSubscription = this.scrollMechanicsService.windowSizeSubject.subscribe(() => {
+            this.mobileDetailMode = this.activeEntity && this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.lg);
+
             if (this.dataTable) {
                 setTimeout(() => this.scrollMechanicsService.setElementTableWidth(this.dataTable.nativeElement.offsetWidth));
             }
@@ -121,23 +124,24 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        let setPage;
-        let setIndex;
         let resetURI;
         let setDimensions;
 
         if (changes.activeEntity && !changes.activeEntity.firstChange) {
             this.selectedEntity = changes.activeEntity.currentValue;
+            if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.lg)) {
+                this.mobileDetailMode = !!this.selectedEntity;
+            }
             // TODO: Try to remove timeout in CLOUD-4233
             setTimeout(() => {
-                if (this.dataTable) {
+                if (this.dataTable && !this.mobileDetailMode) {
                     this.scrollMechanicsService.setElementTableWidth(this.dataTable.nativeElement.offsetWidth);
                 }
             });
 
             if (!changes.activeEntity.firstChange && !this.healthService.tableReady) {
                 setDimensions = true;
-                setIndex = this.startIndex || 0;
+                this.setPage(undefined, this.startIndex || 0);
             }
         }
 
@@ -153,16 +157,14 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         if (changes.elements) {
             this._elements = Object.values(changes.elements.currentValue);
             if (!changes.elements.firstChange) {
-                setPage = 1;
                 resetURI = true;
                 if (this.dataTable) {
                     const tableWrapper = this.dataTable.nativeElement.querySelectorAll('.table-wrapper')[0];
                     tableWrapper.scrollLeft = 0;
                 }
 
-                if (!this.healthService.tableReady) {
-                    setDimensions = true;
-                }
+                this.setPage(1);
+                setDimensions = true;
             }
         }
 
@@ -172,7 +174,6 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
             JSON.stringify(changes.dimensions.currentValue) !== JSON.stringify(changes.dimensions.previousValue)) { // break circular dep
 
             setDimensions = true;
-            setIndex = this.startIndex;
         }
 
         if (setDimensions) {
@@ -182,10 +183,6 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
                     this.setTableDimensions();
                 }
             });
-        }
-
-        if (setPage !== undefined || setIndex !== undefined) {
-            this.setPage(setPage, setIndex);
         }
 
         if (resetURI) {
@@ -224,7 +221,10 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
 
         // TODO: Remove in CLOUD-4233
         setTimeout(() => {
-            this.scrollMechanicsService.setElementTableWidth(this.dataTable.nativeElement.offsetWidth);
+            if (this.dataTable.nativeElement.offsetWidth !== 0) {
+                this.scrollMechanicsService.setElementTableWidth(this.dataTable.nativeElement.offsetWidth);
+            }
+
             this.healthService.tableReady = true;
         }, 100);
 
@@ -314,9 +314,17 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
 
     setPage(page: number, startIndex?) {
         // TODO: possible optimization - we may not need snapshot params here
+        if (this.mobileDetailMode) {
+            return;
+        }
+
         this.params = { ...this.route.snapshot.queryParams };
         if (page) {
-            if (this.currentPage !== page) {
+            const numPages = Math.ceil(this._elements.length / this.pageSize);
+            // outsmarting pagination component which fire (pageChange) if currentPage > numPages
+            // which causes panel to be disposed on window resize if table resize and we're on last page -- TT
+            // for more details -> ask me no later than 3 hours after I commit the code
+            if (this.currentPage !== page && this.currentPage <= numPages) {
                 this.setClickedRow(undefined);
             }
             this.currentPage = page;

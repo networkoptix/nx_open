@@ -10,6 +10,8 @@ export class NxHealthService {
     private static TYPES = 'deviceType';
     private static SERVERS = 'server';
 
+    static PANEL_WIDTH = 350;
+
     manifestSubject = new BehaviorSubject(undefined);
     valuesSubject = new BehaviorSubject(undefined);
     alarmsSubject = new BehaviorSubject(undefined);
@@ -128,7 +130,9 @@ export class NxHealthService {
         if (header.format) {
             const format = header.format;
             const valueFormats = this.CONFIG.healthMonitoring.valueFormats;
-            if (valueFormats[format]) {
+            if (Array.isArray(retValue)) {
+                retValue = retValue.join(',\n');
+            } else if (valueFormats[format]) {
                 retValue = roundInt(retValue * valueFormats[format].multiplier);
                 formatDisplay = valueFormats[format].display || header.format;
                 retValue = `${retValue} ${formatDisplay}`;
@@ -157,19 +161,15 @@ export class NxHealthService {
         let items: any = {};
 
         function filterItem(c, queryTerms) {
-            let result;
-
-            queryTerms.forEach(queryTerm => {
+            return queryTerms.every(queryTerm => {
                 if (queryTerm.indexOf('-') > -1) {
                     // If dash in query -> perform exact match
-                    result = (c.searchTags.includes(queryTerm));
+                    return (c.searchTags.includes(queryTerm));
                 } else {
                     // If no dash in query -> include results with and without dash
-                    result = (c.searchTags.replace(/-/g, '').includes(queryTerm));
+                    return (c.searchTags.replace(/-/g, '').includes(queryTerm));
                 }
             });
-
-            return result;
         }
 
         if (filter.query === '') {

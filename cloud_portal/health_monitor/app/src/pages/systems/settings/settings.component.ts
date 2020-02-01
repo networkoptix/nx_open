@@ -359,14 +359,19 @@ export class NxSystemSettingsComponent implements OnInit, OnDestroy {
     }
 
     cleanUrl() {
-        return this.router.navigate(['/systems', this.systemId]);
+        return this.router.navigate([this.CONFIG.redirectAuthorised, this.systemId]);
     }
 
     connectionLost() {
         this.dialogs.notify(this.LANG.errorCodes.lostConnection.replace('{{systemName}}',
             this.system.info.name || this.LANG.errorCodes.thisSystem), 'warning');
-        if (this.systemsService.systems.length > 1) {
-            setTimeout(() => this.router.navigate(['/systems']), this.CONFIG.alertTimeout);
+        if (this.systemsService.systems.length > 1 || this.settingsService.mergeTarget) {
+            let route = this.CONFIG.redirectAuthorised;
+            if (this.settingsService.mergeTarget) {
+                route = `${route}/${this.settingsService.mergeTarget}`;
+                this.settingsService.mergeTarget = '';
+            }
+            setTimeout(() => this.router.navigate([route]), this.CONFIG.alertTimeout);
         }
     }
 }

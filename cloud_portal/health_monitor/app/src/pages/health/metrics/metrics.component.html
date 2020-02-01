@@ -7,12 +7,11 @@
             class="section-placeholder">
     </nx-page-placeholder>
 
-
     <div class="gridMetricContent" #area
          [ngClass]="fixedLayoutClass"
          *ngSwitchDefault>
 
-        <div class="gridMetricContentComponent"
+        <div class="gridMetricContentComponent" #areaTable
              *ngIf="selectedData && selectedValues"
              [hidden]="mobileDetailMode && activeEntity">
 
@@ -27,7 +26,7 @@
                      [ngClass]="{'data-wrapper' : !activeEntity}">
 
                     <div class="mb-3 p-0" #search
-                         *ngIf="!mobileDetailMode && metricValuesLen > 1">
+                         *ngIf="metricValuesLen > 1">
 
                         <nx-search
                                 name="filterModel"
@@ -51,8 +50,11 @@
             </div>
         </div>
 
-        <div class="gridMetricContentPanelComponent" *ngIf="activeEntity && layoutReady">
-            <div class="gridMetricContentPanelComponentWrapper pb-3">
+        <div class="gridMetricContentPanelComponent"
+             *ngIf="activeEntity"
+             [ngStyle]="{'visibility': layoutReady ? undefined : 'hidden'}">
+
+            <div class="gridMetricContentPanelComponentWrapper pb-3" #metricPanel>
                 <div class="mb-3 all-results-btn"
                      [style.display]="!mobileDetailMode ? 'none' : 'block'">
 
