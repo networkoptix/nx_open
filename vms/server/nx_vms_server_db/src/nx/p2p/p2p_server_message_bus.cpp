@@ -97,8 +97,6 @@ struct SendTransactionToTransportFastFuction
 
 // ---------------------- ServerpMessageBus --------------
 
-QSemaphore ServerMessageBus::m_maxFullInfoRequests(kMaxFullInfoRequests);
-
 ServerMessageBus::ServerMessageBus(
     vms::api::PeerType peerType,
     QnCommonModule* commonModule,
@@ -509,33 +507,31 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
 void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
 {
     sendRuntimeData(connection, m_lastRuntimeInfo.keys());
-
-    m_maxFullInfoRequests.acquire();
-    auto scopedGuard = nx::utils::makeScopeGuard(
-        []() 
-        { 
-            m_maxFullInfoRequests.release(); 
-        });
-
+    qint64 totalSendBuffer = 0;
+    for (const auto& connection: m_connections.values())
     {
-        if (connection->state() >= ConnectionBase::State::Error)
-        {
-            NX_WARNING(this, 
-                "Connection to the client peer %1 have been closed while "
-                "waiting for fullInfo data.", connection->remoteAddr());
-            return; //< Already closed.
-        }
-
-        QnTransaction<vms::api::FullInfoData> tran(commonModule()->moduleGUID());
-        tran.command = ApiCommand::getFullInfo;
-        if (!readFullInfoData(connection.staticCast<Connection>()->userAccessData(),
-            connection->remotePeer(), &tran.params))
-        {
-            emit removeConnectionAsync(connection);
-            return;
-        }
-        sendTransactionImpl(connection, tran, TransportHeader());
+        if (connection->remotePeer().isClient())
+            totalSendBuffer += connection->sendBufferSize();
     }
+    if (totalSendBuffer > globalSettings()->maxP2pQueueSizeForAllClientsBytes())
+    {
+        NX_WARNING(this,
+            "Too many unsent data to clients. New client connection %1 is remporary rejected",
+            connection->remoteAddr());
+        emit removeConnectionAsync(connection);
+        return;
+    }
+
+    QnTransaction<vms::api::FullInfoData> tran(commonModule()->moduleGUID());
+    tran.command = ApiCommand::getFullInfo;
+    if (!readFullInfoData(connection.staticCast<Connection>()->userAccessData(),
+        connection->remotePeer(), &tran.params))
+    {
+        emit removeConnectionAsync(connection);
+        return;
+    }
+
+    sendTransactionImpl(connection, tran, TransportHeader());
 }
 
 bool ServerMessageBus::readFullInfoData(

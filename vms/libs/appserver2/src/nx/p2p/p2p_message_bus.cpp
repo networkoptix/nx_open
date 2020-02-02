@@ -21,6 +21,7 @@
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/qmetaobject_helper.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx {
 namespace p2p {
@@ -263,7 +264,7 @@ void MessageBus::createOutgoingConnections(
         int pos = m_lastOutgoingIndex % m_remoteUrls.size();
         ++m_lastOutgoingIndex;
 
-        const RemoteConnection& remoteConnection = m_remoteUrls[pos];
+        RemoteConnection& remoteConnection = m_remoteUrls[pos];
         if (!m_connections.contains(remoteConnection.peerId) &&
             !m_outgoingConnections.contains(remoteConnection.peerId))
         {
@@ -272,15 +273,20 @@ void MessageBus::createOutgoingConnections(
                 continue;
             }
 
-            if (remoteConnection.lastConnectionErrorTimer.isValid() &&
-                !remoteConnection.lastConnectionErrorTimer.hasExpired(m_intervals.remotePeerReconnectTimeout))
-            {
-                // Connection to this peer have been closed recently
-                if (remoteConnection.connectErrorCounter > 1 
-                    || remoteConnection.lastConnectionState == ConnectionBase::State::Unauthorized)
+            // Connection to this peer have been closed recently
+
+            nx::utils::remove_if(
+                remoteConnection.disconnectTimes,
+                [this](const auto& timer)
                 {
-                    continue;
-                }
+                    return timer.hasExpired(m_intervals.remotePeerReconnectTimeout);
+                });
+
+            if (remoteConnection.disconnectTimes.size() >= 2
+                || (remoteConnection.disconnectTimes.size() >= 1 
+                && remoteConnection.lastConnectionState == ConnectionBase::State::Unauthorized))
+            {
+                continue;
             }
 
             {
@@ -549,12 +555,6 @@ void MessageBus::at_stateChanged(
                 startReading(connection);
             }
 
-            for (auto& removeUrlInfo: m_remoteUrls)
-            {
-                if (removeUrlInfo.peerId == remoteId)
-                    removeUrlInfo.connectErrorCounter = 0;
-            }
-
             emit newDirectConnectionEstablished(connection.data());
             if (connection->remotePeer().peerType == PeerType::cloudServer)
                 sendInitialDataToCloud(connection);
@@ -567,9 +567,9 @@ void MessageBus::at_stateChanged(
             {
                 if (removeUrlInfo.peerId == remoteId)
                 {
-                    removeUrlInfo.lastConnectionErrorTimer.restart();
+                    removeUrlInfo.disconnectTimes.push_back(nx::utils::ElapsedTimer());
+                    removeUrlInfo.disconnectTimes.last().restart();
                     removeUrlInfo.lastConnectionState = connection->state();
-                    ++removeUrlInfo.connectErrorCounter;
                 }
             }
             removeConnectionUnsafe(weakRef);

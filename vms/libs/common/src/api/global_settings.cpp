@@ -58,7 +58,9 @@ const QString kProxyConnectTimeout("proxyConnectTimeoutSec");
 const int kProxyConnectTimeoutDefault = 5;
 
 const QString kMaxP2pQueueSizeBytesName("maxP2pQueueSizeBytes");
+const QString kMaxP2pQueueSizeForAllClientsBytesName("maxP2pAllClientsSizeBytes");
 const int kMaxP2pQueueSizeBytesDefault = 1024 * 1024 * 50;
+const qint64 kMaxP2pQueueSizeForAllClientsBytesDefault = 1024 * 1024 * 1024;
 const QString kMaxRecorderQueueSizeBytesName("maxRecordQueueSizeBytes");
 const int kMaxRecorderQueueSizeBytesDefault = 1024 * 1024 * 24;
 const QString kMaxRecorderQueueSizePacketsName("maxRecordQueueSizeElements");
@@ -608,6 +610,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxP2pQueueSizeBytesDefault,
         this);
 
+    m_maxP2pQueueSizeForAllClientsBytes = new QnLexicalResourcePropertyAdaptor<qint64>(
+        kMaxP2pQueueSizeForAllClientsBytesName,
+        kMaxP2pQueueSizeForAllClientsBytesDefault,
+        this);
+
     m_maxRecorderQueueSizeBytes = new QnLexicalResourcePropertyAdaptor<int>(
         kMaxRecorderQueueSizeBytesName,
         kMaxRecorderQueueSizeBytesDefault,
@@ -947,6 +954,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_arecontRtspEnabledAdaptor
         << m_sequentialFlirOnvifSearcherEnabledAdaptor
         << m_maxP2pQueueSizeBytes
+        << m_maxP2pQueueSizeForAllClientsBytes
         << m_maxRecorderQueueSizeBytes
         << m_maxRecorderQueueSizePackets
         << m_rtpFrameTimeoutMs
@@ -1659,6 +1667,11 @@ void QnGlobalSettings::setMaxRtspConnectDuration(std::chrono::seconds newValue)
 int QnGlobalSettings::maxP2pQueueSizeBytes() const
 {
     return m_maxP2pQueueSizeBytes->value();
+}
+
+qint64 QnGlobalSettings::maxP2pQueueSizeForAllClientsBytes() const
+{
+    return m_maxP2pQueueSizeForAllClientsBytes->value();
 }
 
 int QnGlobalSettings::maxRecorderQueueSizeBytes() const

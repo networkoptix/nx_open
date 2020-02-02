@@ -111,7 +111,6 @@ private:
     QElapsedTimer m_dbCommitTimer;
     QElapsedTimer m_wantToSubscribeTimer;
     std::atomic_flag m_restartPending = ATOMIC_FLAG_INIT;
-    static QSemaphore m_maxFullInfoRequests;
 };
 
 } // namespace p2p

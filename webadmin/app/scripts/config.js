@@ -90,6 +90,7 @@
             smtpPassword: {type: 'password'},
             smtpUser: {type: 'text'},
             webSocketEnabled: {type: 'checkbox'},
+            maxP2pAllClientsSizeBytes: {type: 'number'},
             updateNotificationsEnabled: {type: 'checkbox'},
             arecontRtspEnabled: {type: 'checkbox'},
             backupNewCamerasByDefault: {type: 'checkbox'},

@@ -257,9 +257,8 @@ private:
 
         QnUuid peerId;
         nx::utils::Url url;
-        nx::utils::ElapsedTimer lastConnectionErrorTimer;
+        QVector<nx::utils::ElapsedTimer> disconnectTimes;
         ConnectionBase::State lastConnectionState = ConnectionBase::State::NotDefined;
-        int connectErrorCounter = 0;
     };
 
     std::vector<RemoteConnection> m_remoteUrls;
