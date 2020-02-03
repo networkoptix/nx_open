@@ -256,12 +256,6 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
         nx::kit::debug::intentionallyCrash(message.c_str());
     }
 
-    if (const auto uncf =
-        videoFrame->queryInterface<nx::sdk::analytics::IUncompressedVideoFrame>())
-    {
-        std::cout << "width: " << uncf->width() << ", height: " << uncf->height() << std::endl;
-    }
-
     ++m_frameCounter;
 
     const int64_t frameTimestamp = videoFrame->timestampUs();
@@ -285,6 +279,9 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
         return false;
     }
 
+    NX_OUTPUT << "Received compressed video frame, resolution: "
+        << videoFrame->width() << "x" << videoFrame->height();
+
     processVideoFrame(videoFrame, __func__);
     processFrameMotion(videoFrame->metadataList());
     return true;
@@ -297,6 +294,9 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
         NX_PRINT << "ERROR: Received uncompressed video frame, contrary to manifest.";
         return false;
     }
+
+    NX_OUTPUT << "Received uncompressed video frame, resolution: "
+        << videoFrame->width() << "x" << videoFrame->height();
 
     processVideoFrame(videoFrame, __func__);
     processFrameMotion(videoFrame->metadataList());
