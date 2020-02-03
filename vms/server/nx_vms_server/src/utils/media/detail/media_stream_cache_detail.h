@@ -114,7 +114,7 @@ private:
     nx::utils::Subscription<quint64 /*currentPacketTimestampUSec*/> m_onKeyFrame;
     nx::utils::Subscription<> m_onDiscontinue;
 
-    void clearCacheIfNeeded(QnMutexLockerBase* const lk);
+    void clearCacheIfNeeded();
 };
 
 }
