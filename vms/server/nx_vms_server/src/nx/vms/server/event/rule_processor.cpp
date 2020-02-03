@@ -786,10 +786,8 @@ void RuleProcessor::at_resourceMonitor(const QnResourcePtr& resource,  bool isAd
 
         if (rule->eventType() == vms::api::EventType::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResourcesByIds<nx::vms::server::resource::Camera>(
-                rule->eventResources());
-            if (resList.isEmpty() ||            //< Listening to all cameras.
-                resList.contains(camResource))
+            if (rule->eventResources().isEmpty() || //< Listening to all cameras.
+                rule->eventResources().contains(camResource->getId()))
             {
                 if (isAdded)
                     camResource->inputPortListenerAttached();
