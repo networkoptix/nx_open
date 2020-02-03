@@ -216,7 +216,8 @@
                                 </label>
                             </ng-container>
                             <div class="d-flex checkbox-block align-items-center mt-1" 
-                                *ngIf="settingsWatchers.sessionLimitMinutes !== undefined">
+                                *ngIf="settingsWatchers.sessionLimitMinutes !== undefined"
+                                (click)="setDefaultIfNotInitialized()">
                                 <nx-checkbox
                                     name="sessionLimitMinutes"
                                     componentId="sessionLimitMinutes"

@@ -13,8 +13,8 @@
 
         <div *ngIf="tableHeader" class="table-header" [innerText]="tableHeader" #tableHeaderElement></div>
         <div class="table-wrapper" (scroll)="showTooltip($event)">
-            <div [ngStyle]="{'opacity' : showHorizontalTooltip ? '1' : '0'}"
-                 class="horizontalTooltip" translate>Use Shift + Wheel for horizontal scrolling.</div>
+            <div *ngIf="showHorizontalTooltip"
+                 class="horizontalTooltip d-none d-lg-block" translate>Use Shift + Wheel for horizontal scrolling.</div>
             <table class="table table-hover nx-table" >
                 <thead #thead>
                 <tr class="header-groups" *ngIf="showGroups">

@@ -81,22 +81,23 @@ footer {
             & > li > a,
             & > li > span {
                 width: fit-content;
+                width : -moz-fit-content;
             }
         }
     }
-    
+
     .navbar-nav {
         flex-direction : row;
         float          : left;
     }
-    
+
     .navbar-right {
         float : right;
     }
-    
+
     .navbar-right > li > a, .navbar-right > li > span > a {
         color : $light8;
-        
+
         &:hover {
             color : $light12;
         }

@@ -216,11 +216,15 @@ export class NxSystemAdminComponent implements OnInit, OnDestroy {
             this.saveSettings,
             () => {
                 this.applyService.reset();
-                if (this.settingsWatchers.sessionLimitMinutes) {
-                    this.timeUnitCount = this.settingsWatchers.sessionLimitMinutes.originalValue
+                const sw = this.settingsWatchers;
+                if (sw.sessionLimitMinutes && sw.sessionLimitMinutes.value) {
+                    this.timeUnitCount = sw.sessionLimitMinutes.originalValue
                         || this.limitSessionTimeUnits[0].default;
-                    this.selectedTimeUnit = this.limitSessionTimeUnits.find((e: any) => {
-                        return e.value === this.settingsWatchers.sessionLimitUnit.originalValue;
+                    if (this.timeUnitCount % 60 === 0) {
+                        this.timeUnitCount /= 60;
+                    }
+                    this.selectedTimeUnit = this.limitSessionTimeUnits.find(e => {
+                        return e.value === sw.sessionLimitUnit.value;
                     });
                 }
             },
@@ -309,18 +313,16 @@ export class NxSystemAdminComponent implements OnInit, OnDestroy {
                     curr = parseInt(curr);
                     sw.sessionLimitToggle.value = Boolean(curr);
                     this.timeUnitCount = curr;
-                    if (curr % 60 === 0) {
+                    sw[setting].value = this.timeUnitCount;
+                    if (this.timeUnitCount % 60 === 0) {
                         this.timeUnitCount /= 60;
                         sw.sessionLimitUnit.value = this.hours;
                     } else {
                         sw.sessionLimitUnit.value = this.minutes;
                     }
-
-                    sw[setting].value = this.timeUnitCount || 0;
-                    this.timeUnitCount = this.timeUnitCount || this.limitSessionTimeUnits[0].default;
                     this.selectedTimeUnit = this.limitSessionTimeUnits.find(e => {
-                                                return e.value === sw.sessionLimitUnit.value;
-                                            });
+                        return e.value === sw.sessionLimitUnit.value;
+                    });
                 }
             }
         });
@@ -477,6 +479,13 @@ export class NxSystemAdminComponent implements OnInit, OnDestroy {
             this.timeUnitCount /= 60;
         }
         sw.sessionLimitMinutes.value = this.timeUnitCount;
+    }
+
+    setDefaultIfNotInitialized() {
+        if (this.timeUnitCount === 0 || this.timeUnitCount === null) {
+            this.timeUnitCount = this.selectedTimeUnit.default;
+            this.settingsWatchers.sessionLimitMinutes.value = this.selectedTimeUnit.default;
+        }
     }
 
     ngOnDestroy() {}

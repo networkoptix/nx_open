@@ -20,8 +20,9 @@ nx-dynamic-table {
   }
 
   .nx-table-wrapper {
-    max-width: 100%;
-    width: fit-content;
+    max-width : 100%;
+    width     : fit-content;
+    width     : -moz-fit-content;
 
     @include media-breakpoint-down(lg) {
       width: auto;
