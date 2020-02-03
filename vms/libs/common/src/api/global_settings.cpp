@@ -718,9 +718,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "https://licensing.vmsproxy.com",
         this);
 
-    m_resourceFileUriAdaptor =
-        new QnLexicalResourcePropertyAdaptor<nx::utils::Url>("resourceFileUri", "", this);
-
     m_resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::utils::Url>(
         "resourceFileUri", "http://resources.vmsproxy.com/resource_data.json", this);
 
