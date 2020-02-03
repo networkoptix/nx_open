@@ -1,17 +1,23 @@
 #include <gtest/gtest.h>
 
-#include <nx/client/core/utils/geometry.h>
+#include <common/common_module.h>
+#include <common/static_common_module.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <ui/style/globals.h>
 
+#include <nx/client/core/utils/geometry.h>
+#include <nx/core/access/access_types.h>
 #include <nx/vms/client/desktop/resource_properties/layout/redux/layout_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/layout/redux/layout_settings_dialog_state_reducer.h>
-
-#include <ui/style/globals.h>
+#include <nx/vms/client/desktop/resource_properties/layout/redux/layout_settings_dialog_store.h>
+#include <nx/vms/client/desktop/resource_properties/layout/watchers/layout_logical_ids_watcher.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
 
 using State = LayoutSettingsDialogState;
+using Store = LayoutSettingsDialogStore;
 using Reducer = LayoutSettingsDialogStateReducer;
 
 struct BackgroundSetup
@@ -206,6 +212,68 @@ class LayoutSettingsDialogStateReducerBackgroundTest:
 {
 };
 
+class LayoutSettingsDialogStateInteractionTest: public LayoutSettingsDialogStateReducerTest
+{
+    using base_type = LayoutSettingsDialogStateReducerTest;
+
+protected:
+    Store& store() { return *m_store; }
+    const State& state() const { return m_store->state(); }
+
+    void loadLayout(const QnLayoutResourcePtr& layout)
+    {
+        m_store->loadLayout(layout);
+        m_logicalIdsWatcher->setExcludedLayout(layout);
+    }
+
+    QnLayoutResourcePtr addLayout(const QString& name, int logicalId = 0)
+    {
+        auto layout = QnLayoutResourcePtr(new QnLayoutResource(m_environment->commonModule.get()));
+        layout->setIdUnsafe(QnUuid::createUuid());
+        layout->setName(name);
+        layout->setLogicalId(logicalId);
+        m_environment->commonModule->resourcePool()->addResource(layout);
+        return layout;
+    }
+
+    /**
+     * Setup the test fixture. Will be called before each fixture is run.
+     */
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+        m_environment.reset(new Environment());
+        m_store.reset(new Store());
+        m_logicalIdsWatcher.reset(new LayoutLogicalIdsWatcher(
+            m_store.get(), m_environment->commonModule.get()));
+    }
+
+    /**
+     * Tears down the test fixture. Will be called after each fixture is run.
+     */
+    virtual void TearDown() override
+    {
+        m_logicalIdsWatcher.reset();
+        m_store.reset();
+        m_environment.reset();
+        base_type::TearDown();
+    }
+
+private:
+    struct Environment
+    {
+        const QScopedPointer<QnStaticCommonModule> staticCommon{new QnStaticCommonModule()};
+        const QScopedPointer<QnGlobals> globals{new QnGlobals()};
+        const QScopedPointer<QnCommonModule> commonModule{new QnCommonModule(
+            true, nx::core::access::Mode::cached)};
+    };
+
+private:
+    QScopedPointer<Environment> m_environment;
+    QScopedPointer<Store> m_store;
+    QScopedPointer<LayoutLogicalIdsWatcher> m_logicalIdsWatcher;
+};
+
 TEST_F(LayoutSettingsDialogStateReducerTest, defaultSize)
 {
     State state = Reducer::clearBackgroundImage({});
@@ -330,6 +398,72 @@ TEST_F(LayoutSettingsDialogStateReducerTest, keepAreaOnImageChange)
     state = Reducer::setPreview(std::move(state), makeImage(kSquareAspectRatio));
 
     ASSERT_EQ(backgroundSize(state), kExampleBackgroundSize);
+}
+
+TEST_F(LayoutSettingsDialogStateInteractionTest, generateLogicalId)
+{
+    const auto layout1 = addLayout("Layout 1", 1);
+    const auto layout3 = addLayout("Layout 3", 3);
+
+    const auto layout2 = addLayout("Layout 2", 0);
+    loadLayout(layout2);
+    ASSERT_EQ(state().logicalId, 0);
+    store().generateLogicalId();
+    ASSERT_EQ(state().logicalId, 2);
+    ASSERT_FALSE(state().isDuplicateLogicalId());
+    layout2->setLogicalId(state().logicalId);
+    ASSERT_FALSE(state().isDuplicateLogicalId());
+
+    const auto layout4 = addLayout("Layout 4", 0);
+    loadLayout(layout4);
+    ASSERT_EQ(state().logicalId, 0);
+    store().generateLogicalId();
+    ASSERT_EQ(state().logicalId, 4);
+    ASSERT_FALSE(state().isDuplicateLogicalId());
+    layout4->setLogicalId(state().logicalId);
+    ASSERT_FALSE(state().isDuplicateLogicalId());
+}
+
+TEST_F(LayoutSettingsDialogStateInteractionTest, logicalIdsWatcherState)
+{
+    using ids = decltype(state().otherLogicalIds);
+
+    const auto layout1 = addLayout("Layout 1", 1);
+    const auto layout2 = addLayout("Layout 2", 0);
+    const auto layout3 = addLayout("Layout 3", 3);
+    const auto layout4 = addLayout("Layout 4", 2);
+
+    loadLayout(layout1);
+    ASSERT_EQ(state().otherLogicalIds, ids({3, 2}));
+
+    loadLayout(layout2);
+    ASSERT_EQ(state().otherLogicalIds, ids({1, 2, 3}));
+
+    loadLayout(layout3);
+    ASSERT_EQ(state().otherLogicalIds, ids({1, 2}));
+
+    loadLayout(layout4);
+    ASSERT_EQ(state().otherLogicalIds, ids({1, 3}));
+
+    loadLayout(layout2);
+    ASSERT_EQ(state().otherLogicalIds, ids({1, 2, 3}));
+    ASSERT_FALSE(state().isDuplicateLogicalId());
+    store().setLogicalId(2);
+    ASSERT_EQ(state().logicalId, 2);
+    ASSERT_TRUE(state().isDuplicateLogicalId());
+
+    layout4->resourcePool()->removeResource(layout4);
+    ASSERT_EQ(state().otherLogicalIds, ids({1, 3}));
+    ASSERT_FALSE(state().isDuplicateLogicalId());
+    layout2->setLogicalId(state().logicalId);
+    ASSERT_EQ(state().otherLogicalIds, ids({1, 3}));
+    ASSERT_FALSE(state().isDuplicateLogicalId());
+
+    auto layout5 = addLayout("Layout 5", 5);
+    ASSERT_EQ(state().otherLogicalIds, ids({1, 3, 5}));
+
+    loadLayout(layout5);
+    ASSERT_EQ(state().otherLogicalIds, ids({1, 2, 3}));
 }
 
 } // namespace test

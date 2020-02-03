@@ -10,7 +10,7 @@ namespace nx::vms::client::desktop {
 
 struct LayoutSettingsDialogState;
 
-class LayoutSettingsDialogStore: public QObject
+class NX_VMS_CLIENT_DESKTOP_API LayoutSettingsDialogStore: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

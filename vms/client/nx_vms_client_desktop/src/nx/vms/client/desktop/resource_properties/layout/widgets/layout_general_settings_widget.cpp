@@ -72,9 +72,7 @@ void LayoutGeneralSettingsWidget::loadState(const LayoutSettingsDialogState& sta
     ui->fixedWidthSpinBox->setValue(state.fixedSize.width());
     ui->fixedHeightSpinBox->setValue(state.fixedSize.height());
 
-    const bool duplicateLogicalId =
-        state.otherLogicalIds.find(state.logicalId) != state.otherLogicalIds.cend();
-
+    const bool duplicateLogicalId = state.isDuplicateLogicalId();
     ui->logicalIdWarningLabel->setVisible(duplicateLogicalId);
     setWarningStyleOn(ui->logicalIdSpinBox, duplicateLogicalId);
 }
