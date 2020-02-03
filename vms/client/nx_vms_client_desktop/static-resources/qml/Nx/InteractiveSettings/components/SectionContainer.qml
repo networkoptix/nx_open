@@ -12,9 +12,12 @@ StackLayout
     property string name: ""
     property Item childrenItem: column
     property StackLayout sectionsItem: control
-    property alias contentEnabled: column.enabled
     property Item scrollBarParent: null
     property Item extraHeaderItem: null
+
+    property bool contentEnabled: parent && parent.hasOwnProperty("contentEnabled")
+        ? parent.contentEnabled
+        : true
 
     Scrollable
     {
@@ -64,7 +67,9 @@ StackLayout
             AlignedColumn
             {
                 id: column
+
                 width: parent.width
+                enabled: control.contentEnabled
             }
         }
     }

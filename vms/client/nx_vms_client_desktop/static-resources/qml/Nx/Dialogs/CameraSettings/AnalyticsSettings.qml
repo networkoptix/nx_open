@@ -248,6 +248,7 @@ Item
                 title: "General Settings"
                 visible: commonContent.height > 0
                 Layout.fillWidth: true
+                enabled: settingsView.contentEnabled
 
                 GridLayout
                 {
