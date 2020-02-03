@@ -293,7 +293,7 @@ Item
                     })
 
                     switchPageAnimation.stop();
-                    if (animate || (opacity == 0)) //< Opacity is 0 on first show
+                    if (animate || (opacity < 1)) //< Opacity is less than 1 on first show
                     {
                         switchPageAnimation.pageIndex = index;
                         switchPageAnimation.start();
