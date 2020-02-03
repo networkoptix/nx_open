@@ -233,7 +233,7 @@ LabeledItem
     {
         // Clone the figure object and fill the rest of fields.
         var obj = {
-            "figure": JSON.parse(JSON.stringify(figure)),
+            "figure": figure ? JSON.parse(JSON.stringify(figure)) : null,
             "label": figureNameEdit.text,
             "showOnCamera": showOnCameraCheckBox.checked
         }
