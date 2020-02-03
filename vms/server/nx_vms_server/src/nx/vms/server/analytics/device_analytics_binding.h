@@ -63,6 +63,8 @@ public:
 
     std::optional<StreamRequirements> streamRequirements() const;
 
+    void recalculateStreamRequirements();
+
 protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 

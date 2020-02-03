@@ -2927,25 +2927,19 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:object reply Object with DeviceAgent settings model and values.
-     *         %param:object reply.model Settings model, as in DeviceAgent manifest.
-     *         %param:object reply.values Name-value map with setting values, using JSON types
-     *             according to each setting type.
+     *         %struct DeviceAnalyticsSettingsResponse
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
      * Applies passed settings values to the corresponding DeviceAgent (which is a device-engine
      * pair).
-     * %param:string engineId Unique id of an Analytics Engine.
-     * %param:string deviceId Id of a device.
-     * %param:object settings Name-value map with setting values, using JSON types according to
-     *     each setting type.
+     * %param:object JSON object containing request parameters
+     *      %struct DeviceAnalyticsSettingsRequest
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:object reply Object with DeviceAgent settings model and values that the
-     *         DeviceAgent returns after the values have been supplied.
-     *         %param:object reply.model Settings model, as in DeviceAgent manifest.
-     *         %param:object reply.values Name-value map with setting values, using JSON types
-     *             according to each setting type.
+     *         DeviceAgent returns after the values have been applied.
+     *         %struct DeviceAnalyticsSettingsResponse
      */
     reg("ec2/deviceAnalyticsSettings",
         new nx::vms::server::rest::DeviceAnalyticsSettingsHandler(serverModule()));

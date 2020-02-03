@@ -13,17 +13,77 @@
 #include <nx/vms/server/interactive_settings/json_engine.h>
 
 #include <nx/vms/api/analytics/settings_response.h>
+#include <nx/vms/api/analytics/device_analytics_settings_data.h>
 
 namespace nx::vms::server::rest {
 
 using namespace nx::network;
+using DeviceAnalyticsSettingsRequest = nx::vms::api::analytics::DeviceAnalyticsSettingsRequest;
+using DeviceAnalyticsSettingsResponse = nx::vms::api::analytics::DeviceAnalyticsSettingsResponse;
+
+std::map<QString, QString> extractCommonRequestParametersFromBody(const QByteArray& body)
+{
+    std::map<QString, QString> result;
+
+    bool success = false;
+    if (const auto settingsRequest =
+        QJson::deserialized(body, DeviceAnalyticsSettingsRequest(), &success);
+        success)
+    {
+        if (!settingsRequest.deviceId.isNull())
+            result[kDeviceIdParameter] = settingsRequest.deviceId;
+
+        if (!settingsRequest.analyticsEngineId.isNull())
+            result[kAnalyticsEngineIdParameter] = settingsRequest.analyticsEngineId.toString();
+    }
+
+    return result;
+}
+
+std::map<QString, QString> extractCommonRequestParameters(
+    const JsonRestRequest& request, const QByteArray& body = QByteArray())
+{
+    std::map<QString, QString> result;
+
+    const QnRequestParams& requestQueryParameters = request.params;
+    if (requestQueryParameters.contains(kDeviceIdParameter))
+        result[kDeviceIdParameter] = requestQueryParameters[kDeviceIdParameter];
+
+    if (requestQueryParameters.contains(kAnalyticsEngineIdParameter))
+        result[kAnalyticsEngineIdParameter] = requestQueryParameters[kAnalyticsEngineIdParameter];
+
+    if (body.isEmpty())
+        return result;
+
+    const std::map<QString, QString> parametersFromBody =
+        extractCommonRequestParametersFromBody(body);
+
+    for (const auto& [key, value]: parametersFromBody)
+        result[key] = value;
+
+    return result;
+}
 
 class DeviceIdRetriever: public ::DeviceIdRetriever
 {
     virtual QString retrieveDeviceId(const nx::network::http::Request& request) const override
     {
         const QUrlQuery urlQuery(request.requestLine.url.query());
-        return urlQuery.queryItemValue(kDeviceIdParameter);
+        QString deviceId = urlQuery.queryItemValue(kDeviceIdParameter);
+
+        if (deviceId.isEmpty())
+            return deviceId;
+
+        const std::map<QString, QString> commonParameters = extractCommonRequestParametersFromBody(
+            request.messageBody);
+
+        if (const auto it = commonParameters.find(kDeviceIdParameter);
+            it != commonParameters.cend())
+        {
+            return it->second;
+        }
+
+        return QString();
     }
 };
 
@@ -34,8 +94,14 @@ DeviceAnalyticsSettingsHandler::DeviceAnalyticsSettingsHandler(QnMediaServerModu
 
 JsonRestResponse DeviceAnalyticsSettingsHandler::executeGet(const JsonRestRequest& request)
 {
-    if (const auto& error = checkCommonInputParameters(request.params))
-        return *error;
+    const std::map<QString, QString> commonRequestParameters =
+        extractCommonRequestParameters(request);
+
+    const CommonRequestEntities commonRequestEntities =
+        extractCommonRequestEntities(commonRequestParameters);
+
+    if (commonRequestEntities.errorResponse)
+        return *commonRequestEntities.errorResponse;
 
     const auto analyticsManager = serverModule()->analyticsManager();
     if (!analyticsManager)
@@ -45,21 +111,26 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executeGet(const JsonRestReques
         return makeResponse(QnRestResult::InternalServerError, message);
     }
 
-    const QString& deviceId = request.params[kDeviceIdParameter];
-    const QString& engineId = request.params[kAnalyticsEngineIdParameter];
-
-    return makeSettingsResponse(analyticsManager, engineId, deviceId);
+    return makeSettingsResponse(analyticsManager, commonRequestEntities);
 }
 
 JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
     const JsonRestRequest& request,
     const QByteArray& body)
 {
-    if (const auto& error = checkCommonInputParameters(request.params))
-        return *error;
+    const std::map<QString, QString> commonRequestParameters =
+        extractCommonRequestParameters(request, body);
+
+    const CommonRequestEntities commonRequestEntities =
+        extractCommonRequestEntities(commonRequestParameters);
+
+    if (commonRequestEntities.errorResponse)
+        return *commonRequestEntities.errorResponse;
 
     bool success = false;
-    const auto& settings = QJson::deserialized(body, QJsonObject(), &success);
+    const auto& settingsRequest =
+        QJson::deserialized(body, DeviceAnalyticsSettingsRequest(), &success);
+
     if (!success)
     {
         const QString message("Unable to deserialize request");
@@ -75,34 +146,52 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
         return makeResponse(QnRestResult::InternalServerError, message);
     }
 
-    const QString& deviceId = request.params[kDeviceIdParameter];
-    const QString& engineId = request.params[kAnalyticsEngineIdParameter];
+    if (settingsRequest.analyzedStreamIndex != nx::vms::api::StreamIndex::undefined)
+    {
+        commonRequestEntities.device->setAnalyzedStreamIndex(
+            commonRequestEntities.engine->getId(),
+            settingsRequest.analyzedStreamIndex);
 
-    analyticsManager->setSettings(deviceId, engineId, settings);
-    return makeSettingsResponse(analyticsManager, engineId, deviceId);
+        commonRequestEntities.device->saveProperties();
+    }
+
+    analyticsManager->setSettings(
+        commonRequestParameters.at(kDeviceIdParameter),
+        commonRequestParameters.at(kAnalyticsEngineIdParameter),
+        settingsRequest.settingsValues);
+
+    return makeSettingsResponse(analyticsManager, commonRequestEntities);
 }
 
-std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInputParameters(
-    const QnRequestParams& parameters) const
+DeviceAnalyticsSettingsHandler::CommonRequestEntities
+    DeviceAnalyticsSettingsHandler::extractCommonRequestEntities(
+        const std::map<QString, QString>& parameters) const
 {
-    if (!parameters.contains(kDeviceIdParameter))
+    CommonRequestEntities result;
+    const auto deviceIdIt = parameters.find(kDeviceIdParameter);
+    if (deviceIdIt == parameters.cend() || deviceIdIt->second.isEmpty())
     {
         NX_WARNING(this, "Missing parameter %1", kDeviceIdParameter);
-        return makeResponse(
+        result.errorResponse = makeResponse(
             QnRestResult::Error::MissingParameter,
             QStringList{kDeviceIdParameter});
+
+        return result;
     }
 
-    if (!parameters.contains(kAnalyticsEngineIdParameter))
+    const auto analyticsEngineIdIt = parameters.find(kAnalyticsEngineIdParameter);
+    if (analyticsEngineIdIt == parameters.cend() || analyticsEngineIdIt->second.isEmpty())
     {
         NX_WARNING(this, "Missing parameter %1", kAnalyticsEngineIdParameter);
-        return makeResponse(
+        result.errorResponse = makeResponse(
             QnRestResult::Error::MissingParameter,
             QStringList{kAnalyticsEngineIdParameter});
+
+        return result;
     }
 
-    const QString& deviceId = parameters[kDeviceIdParameter];
-    const QString& engineId = parameters[kAnalyticsEngineIdParameter];
+    const QString& deviceId = deviceIdIt->second;
+    const QString& engineId = analyticsEngineIdIt->second;
 
     const auto device = nx::camera_id_helper::findCameraByFlexibleId(
         serverModule()->resourcePool(),
@@ -112,7 +201,9 @@ std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInput
     {
         const auto message = lm("Unable to find device by id %1").args(deviceId);
         NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
+        result.errorResponse = makeResponse(QnRestResult::Error::CantProcessRequest, message);
+
+        return result;
     }
 
     if (device->flags().testFlag(Qn::foreigner))
@@ -122,7 +213,9 @@ std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInput
                 device->getParentId(), moduleGUID());
 
         NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
+        result.errorResponse = makeResponse(QnRestResult::Error::CantProcessRequest, message);
+
+        return result;
     }
 
     const auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
@@ -132,16 +225,20 @@ std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInput
     {
         const auto message = lm("Unable to find analytics engine by id %1").args(engineId);
         NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
+        result.errorResponse = makeResponse(QnRestResult::Error::CantProcessRequest, message);
+
+        return result;
     }
 
-    return std::nullopt;
+    result.device = device;
+    result.engine = engine;
+
+    return result;
 }
 
 JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     const nx::vms::server::analytics::Manager* analyticsManager,
-    const QString& engineId,
-    const QString& deviceId) const
+    const CommonRequestEntities& commonRequestEntities) const
 {
     NX_ASSERT(analyticsManager);
     if (!analyticsManager)
@@ -152,20 +249,19 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     }
 
     JsonRestResponse result(http::StatusCode::ok);
-    nx::vms::api::analytics::SettingsResponse response;
+    nx::vms::api::analytics::DeviceAnalyticsSettingsResponse response;
 
-    response.values = analyticsManager->getSettings(deviceId, engineId);
+    const QnUuid deviceId = commonRequestEntities.device->getId();
+    const QnUuid engineId = commonRequestEntities.engine->getId();
 
-    const auto device = sdk_support::find<QnVirtualCameraResource>(serverModule(), deviceId);
-    if (!device)
-    {
-        const auto message = lm("Unable to find the Device with id %1").args(deviceId);
-        NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
-    }
+    response.settingsValues = analyticsManager->getSettings(
+        deviceId.toString(), engineId.toString());
+
+    response.analyzedStreamIndex =
+        commonRequestEntities.device->analyzedStreamIndex(engineId);
 
     const std::optional<QJsonObject> settingsModel =
-        device->deviceAgentSettingsModel(QnUuid::fromStringSafe(engineId));
+        commonRequestEntities.device->deviceAgentSettingsModel(engineId);
 
     if (!settingsModel)
     {
@@ -176,7 +272,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
         return makeResponse(QnRestResult::Error::CantProcessRequest, message);
     }
 
-    response.model = *settingsModel;
+    response.settingsModel = *settingsModel;
     result.json.setReply(response);
 
     return result;

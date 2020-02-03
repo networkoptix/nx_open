@@ -65,6 +65,8 @@ std::map<QnUuid, std::set<QString>> filterByActiveEngines(
 
 } // namespace
 
+using AnalyzedStreamIndexMap = QMap<QnUuid, nx::vms::api::StreamIndex>;
+
 const QString QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty(
     "compatibleAnalyticsEngines");
 
@@ -76,6 +78,9 @@ const QString QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty(
 
 const QString QnVirtualCameraResource::kDeviceAgentManifestsProperty(
     "deviceAgentManifests");
+
+const QString QnVirtualCameraResource::kAnalyzedStreamIndexes(
+    "analyzedStreamIndexes");
 
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -774,6 +779,49 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
     setProperty(
         kDeviceAgentManifestsProperty,
         QString::fromUtf8(QJson::serialized(manifests)));
+}
+
+nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid engineId) const
+{
+    const QString serializedProperty = getProperty(kAnalyzedStreamIndexes);
+
+    bool success = false;
+    const auto analyzedStreamIndexMap =
+        QJson::deserialized(serializedProperty.toUtf8(), AnalyzedStreamIndexMap(), &success);
+
+    if (success && analyzedStreamIndexMap.contains(engineId))
+        return analyzedStreamIndexMap[engineId];
+
+    const QnResourcePool* const resourcePool = this->resourcePool();
+    if (!resourcePool)
+        return kDefaultAnalyzedStreamIndex;
+
+    const auto engineResource = resourcePool->getResourceById(engineId)
+        .dynamicCast<nx::vms::common::AnalyticsEngineResource>();
+
+    if (!engineResource)
+        return kDefaultAnalyzedStreamIndex;
+
+    const nx::vms::api::analytics::EngineManifest manifest = engineResource->manifest();
+    if (manifest.preferredStream != nx::vms::api::StreamIndex::undefined)
+        return manifest.preferredStream;
+
+    return kDefaultAnalyzedStreamIndex;
+}
+
+void QnVirtualCameraResource::setAnalyzedStreamIndex(
+    QnUuid engineId, nx::vms::api::StreamIndex streamIndex)
+{
+    const QString serializedProperty = getProperty(kAnalyzedStreamIndexes);
+
+    auto analyzedStreamIndexMap = QJson::deserialized(
+        serializedProperty.toUtf8(), AnalyzedStreamIndexMap());
+
+    analyzedStreamIndexMap[engineId] = streamIndex;
+
+    setProperty(
+        kAnalyzedStreamIndexes,
+        QString::fromUtf8(QJson::serialized(analyzedStreamIndexMap)));
 }
 
 bool QnVirtualCameraResource::hasDualStreamingInternal() const

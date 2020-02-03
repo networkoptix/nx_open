@@ -76,6 +76,7 @@ private:
     void subscribeToRulesChanges();
 
     bool isDeviceAlive() const;
+    void updateAnalyzedStreamIndexes();
     void updateStreamProviderRequirements();
 
     // Collects and merges stream requirements from all the plugins.

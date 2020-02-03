@@ -146,7 +146,7 @@ void AnalyticsSettingsManager::Private::refreshSettings(
             [this, agentId, newRawValues](
                 bool success,
                     rest::Handle requestId,
-                    const nx::vms::api::analytics::SettingsResponse &result)
+                    const nx::vms::api::analytics::DeviceAnalyticsSettingsResponse& result)
             {
                 NX_VERBOSE(this, "Received reply %1 (success: %2)", requestId, success);
                 if (!pendingRefreshRequests.removeOne(requestId))
@@ -157,7 +157,7 @@ void AnalyticsSettingsManager::Private::refreshSettings(
                     return;
 
                 dataByAgentIdRef(agentId).rawValues = newRawValues;
-                setSettings(agentId, result.model, result.values);
+                setSettings(agentId, result.settingsModel, result.settingsValues);
             }),
         thread());
 
@@ -349,7 +349,7 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
                 [this, agentId](
                     bool success,
                     rest::Handle requestId,
-                    const nx::vms::api::analytics::SettingsResponse& result)
+                    const nx::vms::api::analytics::DeviceAnalyticsSettingsResponse& result)
                 {
                     if (!d->pendingApplyRequests.removeOne(requestId))
                         return;
@@ -357,7 +357,7 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
                     if (success)
                     {
                         if (d->hasSubscription(agentId))
-                            d->setSettings(agentId, result.model, result.values);
+                            d->setSettings(agentId, result.settingsModel, result.settingsValues);
                     }
 
                     if (!isApplyingChanges())

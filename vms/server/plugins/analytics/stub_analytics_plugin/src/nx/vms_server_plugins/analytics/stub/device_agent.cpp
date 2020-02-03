@@ -256,6 +256,12 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
         nx::kit::debug::intentionallyCrash(message.c_str());
     }
 
+    if (const auto uncf =
+        videoFrame->queryInterface<nx::sdk::analytics::IUncompressedVideoFrame>())
+    {
+        std::cout << "width: " << uncf->width() << ", height: " << uncf->height() << std::endl;
+    }
+
     ++m_frameCounter;
 
     const int64_t frameTimestamp = videoFrame->timestampUs();

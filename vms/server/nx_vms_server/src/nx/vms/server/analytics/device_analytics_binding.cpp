@@ -339,7 +339,10 @@ std::optional<StreamRequirements> DeviceAnalyticsBinding::calculateStreamRequire
         requiredStreamTypes |= StreamType::compressedVideo;
     }
 
-   return StreamRequirements{requiredStreamTypes, avPixelFormat, manifest.preferredStream};
+    return StreamRequirements{
+        requiredStreamTypes,
+        avPixelFormat,
+        m_device->analyzedStreamIndex(m_engine->getId())};
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)
@@ -503,6 +506,12 @@ std::optional<StreamRequirements> DeviceAnalyticsBinding::streamRequirements() c
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_cachedStreamRequirements;
+}
+
+void DeviceAnalyticsBinding::recalculateStreamRequirements()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_cachedStreamRequirements = calculateStreamRequirements();
 }
 
 bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
