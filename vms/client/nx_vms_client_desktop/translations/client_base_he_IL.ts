@@ -1320,7 +1320,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
         <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
         <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
@@ -1329,7 +1329,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>הסיסמה לא תכיל %n תווים או יותר רצופים ביחד.</numerusform>
         <numerusform>הסיסמה לא צריכה להכיל %n תווים או יותר רצופים ביחד.</numerusform>
         <numerusform>הסיסמה לאי כולה להכיל %n תווים או יותר רצופים ביחד.</numerusform>
@@ -1338,7 +1338,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
         <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
         <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
@@ -4253,7 +4253,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>הגדר עבור כל %n מצלמות</numerusform>
         <numerusform>הגדר עבור כל %n מצלמות</numerusform>
         <numerusform>הגדר עבור כל %n מצלמות</numerusform>
@@ -9270,7 +9270,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
         <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
         <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>

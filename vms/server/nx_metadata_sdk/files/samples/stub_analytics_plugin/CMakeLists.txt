@@ -27,7 +27,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN")
 
 if(WIN32)
-    string(APPEND CMAKE_CXX_FLAGS " /MP") #< Use all CPU cores by MSVC.
+    #string(APPEND CMAKE_CXX_FLAGS " /MP") #< Use all CPU cores by MSVC.
 endif()    
 
 if(WIN32)

@@ -12,7 +12,7 @@ target_include_directories(test_storage_plugin PRIVATE ../../../src) #< SDK head
 target_include_directories(test_storage_plugin PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(WIN32)
-    string(APPEND CMAKE_CXX_FLAGS " /MP") #< Use all CPU cores by MSVC.
+#    string(APPEND CMAKE_CXX_FLAGS " /MP") #< Use all CPU cores by MSVC.
     target_compile_definitions(test_storage_plugin PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 
