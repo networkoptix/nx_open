@@ -206,6 +206,9 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         return result;
     }
 
+    if (m_pleaseStop)
+        return result;
+
     if (!m_gotSomeFrame)
     {
         NX_VERBOSE(this, "No frame has arrived since the stream was opened, device %1 (%2)",
