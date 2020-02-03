@@ -60,7 +60,7 @@ Window
         id: cursorManager
     }
 
-    Shortcut 
+    Shortcut
     {
         sequence: StandardKey.Cancel
         onActivated: dialog.close()
