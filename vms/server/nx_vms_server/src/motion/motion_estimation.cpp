@@ -1262,8 +1262,7 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     m_numFrame++;
 #endif // 0
 
-    if (m_totalFrames == 0)
-        m_totalFrames++;
+    m_totalFrames++;
 
     return true;
 }
