@@ -86,9 +86,9 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
 
     // Enable checkbox if no cameras has forced audio and at least one camera supports audio.
     ui->enableAudioCheckBox->setEnabled(
-        state.devicesDescription.supportsAudio != CombinedValue::None &&
-        state.devicesDescription.isAudioForced == CombinedValue::None &&
-        state.settingsOptimizationEnabled);
+        state.devicesDescription.supportsAudio != CombinedValue::None
+        && state.devicesDescription.isAudioForced == CombinedValue::None
+        && state.settingsOptimizationEnabled);
 
     ui->editStreamsPanel->setVisible(state.singleCameraProperties.editableStreamUrls);
     ui->overEditStreamsLine->setVisible(state.singleCameraProperties.editableStreamUrls);
