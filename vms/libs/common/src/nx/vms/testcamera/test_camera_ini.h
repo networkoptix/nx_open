@@ -25,7 +25,8 @@ struct Ini: public nx::kit::IniConfig
         "Prefix for the message that is sent by testcamera to the Server when the Camera gets\n"
         "discovered. Must be specified without a trailing newline.");
 
-    NX_INI_STRING("", logFramesFile, "If not empty, log video frames to this file.");
+    NX_INI_STRING("", logFramesFile, "If not empty, log video frames to this file (absolute or\n"
+        "relative to .ini dir).");
 
     NX_INI_FLAG(0, printOptions, "Print parsed command-line options to stderr.");
 
@@ -45,8 +46,8 @@ struct Ini: public nx::kit::IniConfig
         "Timeout for reading Camera discovery message from the socket, in milliseconds.");
 
     NX_INI_FLAG(1, logReceivingDiscoveryMessageErrorAsVerbose,
-        "Whether to log errors of receiving discovery messages using VERBOSE log level. If set,\n"
-        "log them using ERROR log level.");
+        "Whether to log errors of receiving discovery messages using VERBOSE log level. If not\n"
+        "set, log them using ERROR log level.");
 };
 
 inline Ini& ini()

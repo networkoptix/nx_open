@@ -1,5 +1,6 @@
 #include "frame_logger.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QString>
 #include <QtCore/QFileInfo>
 
@@ -14,9 +15,22 @@ static QString currentDateTime()
     return QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz");
 }
 
+/** @return Empty string in case no logging has been requested. */
+static QString obtainLogFramesFilename()
+{
+    const QString logFramesFile = QDir::cleanPath(ini().logFramesFile);
+    if (logFramesFile.isEmpty())
+        return "";
+
+    if (QDir::isAbsolutePath(logFramesFile))
+        return logFramesFile;
+
+    return nx::kit::IniConfig::iniFilesDir() + logFramesFile;
+}
+
 FrameLogger::FrameLogger()
 {
-    const QString logFramesFilename = ini().logFramesFile;
+    const QString logFramesFilename = obtainLogFramesFilename();
     if (logFramesFilename.isEmpty())
         return;
 
