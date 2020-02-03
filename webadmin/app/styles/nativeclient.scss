@@ -42,3 +42,59 @@ body.inline-webadmin{
   color: $light5;
   background-color: $dark10;
 }
+
+.checkbox {
+  margin-left : 22px;
+  .text {
+    color       : #A5B7C0;
+  }
+
+  & input:hover ~ .checkmark {
+    svg polygon.box,
+    svg polyline.box {
+      stroke : $light_l2;
+    }
+
+    & ~ .text {
+      color : $light_l2;
+    }
+  }
+
+  & input:active ~ .checkmark {
+    svg polygon.box,
+    svg polyline.box {
+      stroke : #E1E7EA !important;
+    }
+
+    & ~ .text {
+      color : #E1E7EA !important;
+    }
+  }
+
+  & input:checked ~ .checkmark {
+    svg polygon.box,
+    svg polyline.tick,
+    svg polyline.box {
+      stroke : #E1E7EA !important;
+    }
+
+    & ~ .text {
+      color : #E1E7EA !important;
+    }
+  }
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  & svg polygon.box {
+    stroke            : #A5B7C0;
+  }
+
+  & svg polyline.box {
+    stroke            : #A5B7C0;
+  }
+
+  & svg polyline.tick {
+    stroke            : #A5B7C0;
+  }
+}
