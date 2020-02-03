@@ -1,6 +1,8 @@
 #pragma once
 
-#include <QtCore/QStringList>
+#include <QtCore/QList>
+
+#include <nx/vms/server/fs/media_paths/detail/media_paths_filter.h>
 
 namespace nx {
 namespace vms::server {
@@ -8,7 +10,7 @@ namespace fs {
 namespace media_paths {
 
 struct FilterConfig;
-QStringList getMediaPaths(FilterConfig filterConfig);
+QList<Partition> getMediaPartitions(const FilterConfig& filterConfig);
 
 } // namespace media_paths
 } // namespace fs
