@@ -1160,7 +1160,6 @@ int QnRtspClient::readBinaryResponse(std::vector<QnByteArray*>& demuxedData, int
     int copyLen = qMin(dataLen, m_responseBufferLen);
     channelNumber = m_responseBuffer[1];
     quint8* data = prepareDemuxedData(demuxedData, channelNumber, dataLen);
-    //quint8* data = (quint8*) dataVect->data() + dataVect->size() - dataLen;
 
     memcpy(data, m_responseBuffer, copyLen);
     if (m_responseBufferLen > copyLen)
