@@ -528,6 +528,7 @@ void fromResourceToApi(const QnLicensePtr& src, DetailedLicenseData& dst)
     dst.orderType = src->orderType();
     dst.company = src->regionalSupport().company;
     dst.support = src->regionalSupport().address;
+    dst.deactivations = src->deactivationsCount();
 }
 
 void fromResourceListToApi(const QnLicenseList& src, LicenseDataList& dst)

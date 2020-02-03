@@ -38,10 +38,12 @@ struct NX_VMS_API DetailedLicenseData: Data
 
     /** Regional support data: contact address. */
     QString support;
+
+    int deactivations = 0;
 };
 #define DetailedLicenseData_Fields \
     (key)(name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)(signature)\
-    (orderType)(company)(support)
+    (orderType)(company)(support)(deactivations)
 
 } // namespace api
 } // namespace vms

@@ -93,6 +93,12 @@ public:
      */
     RegionalSupport regionalSupport() const;
 
+    /** Each license can be deactivated at most this number of times. */
+    static constexpr int kMaximumDeactivationsCount = 3;
+
+    /** Actual deactivations count. */
+    int deactivationsCount() const;
+
     virtual Qn::LicenseType type() const;
 
     bool isInfoMode() const;
@@ -140,6 +146,8 @@ private:
     QString m_orderType;
 
     RegionalSupport m_regionalSupport;
+
+    int m_deactivationsCount = 0;
 
     // Is partial v1 license valid (signature1 is used)
     bool m_isValid1 = false;
