@@ -8,13 +8,11 @@
 #include <nx/p2p/transport/i_p2p_transport.h>
 #include <nx/vms/utils/transaction_data_to_string.h>
 #include <api/global_settings.h>
-#include <nx/utils/scope_guard.h>
 
 namespace {
 
 int commitIntervalMs = 1000;
 static const int kMaxSelectDataSize = 1024 * 32;
-static const int kMaxFullInfoRequests = 20;
 
 } // namespace
 

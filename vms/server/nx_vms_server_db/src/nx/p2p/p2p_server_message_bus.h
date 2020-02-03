@@ -2,8 +2,6 @@
 
 #include <nx/p2p/p2p_message_bus.h>
 
-#include <QtCore/QSemaphore>
-
 namespace ec2 { namespace detail { class QnDbManager; }}
 
 namespace nx {
