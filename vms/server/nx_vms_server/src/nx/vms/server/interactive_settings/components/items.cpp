@@ -356,7 +356,12 @@ BaseFigure::BaseFigure(const QString& figureType, QObject* parent):
 void BaseFigure::setValue(const QVariant& value)
 {
     QJsonObject valueJsonObject;
-    if (value.canConvert<QString>())
+    if (value.canConvert<std::nullptr_t>()) //< Must be handled first.
+    {
+        m_value.setValue(nullptr);
+        return;
+    }
+    else if (value.canConvert<QString>())
     {
         QJsonDocument jsonDocument = QJsonDocument::fromJson(value.toString().toUtf8());
         if (jsonDocument.isObject())
