@@ -11,6 +11,8 @@ LabeledItem
     property string validationRegexFlags: ""
     property string validationErrorMessage: ""
 
+    signal valueChanged()
+
     contentItem: TextFieldWithWarning
     {
         readonly property var validationRegex:
@@ -21,6 +23,7 @@ LabeledItem
         warningText: validationErrorMessage
 
         textField.onEditingFinished: updateWarning()
+        onTextChanged: valueChanged()
 
         function updateWarning()
         {
