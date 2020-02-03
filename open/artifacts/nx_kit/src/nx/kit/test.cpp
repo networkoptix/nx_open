@@ -237,19 +237,39 @@ static const ParsedCmdLineArgs& parsedCmdLineArgs()
     static constexpr char kPathSeparator[] = "/";
 #endif
 
+/** @return Empty string if the variable is empty, is longer than 1024 bytes, or does not exist. */
+static std::string getEnvVar(const std::string& envVarName)
+{
+    #if defined(_WIN32)
+        char envVarValue[1024]{0};
+        size_t size;
+        if (getenv_s(&size, envVarValue, sizeof(envVarValue), envVarName.c_str()) != 0 || envVarValue[0] == '\0')
+            return "";
+        return envVarValue;
+    #else
+        // On Linux, getenv() is thread-safe.
+        const char* const envVarValue = getenv(envVarName.c_str());
+        if (!envVarValue)
+            return "";
+        return envVarValue;
+    #endif
+}
+
 /** @return System temp dir, ending with the path separator. */
 static std::string systemTempDir()
 {
     #if defined(ANDROID) || defined(__ANDROID__)
         return "/sdcard/";
     #elif defined(_WIN32)
-        char env[1024]{0};
-        size_t size;
-        if (getenv_s(&size, env, sizeof(env), "TEMP") != 0 || env[0] == '\0')
+        const std::string tempEnvVar = getEnvVar("TEMP");
+        if (tempEnvVar.empty())
             return ".\\"; //< Use current dir if the system temp is not available.
-        return std::string(env) + kPathSeparator;
+        return tempEnvVar + kPathSeparator;
     #else // Assuming Linux or MacOS systems.
-        return "/tmp/";
+        const std::string tmpdirEnvVar = getEnvVar("TMPDIR");
+        if (tmpdirEnvVar.empty())
+            return "/tmp/";
+        return tmpdirEnvVar + kPathSeparator;
     #endif
 }
 
