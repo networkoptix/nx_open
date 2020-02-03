@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <streaming/streaming_params.h>
+#include <transcoding/transcoding_utils.h>
 
 namespace nx::rtsp {
 
@@ -36,7 +37,7 @@ bool UrlParams::parse(const QUrlQuery& query)
     QString codecStr = query.queryItemValue("codec");
     if (!codecStr.isEmpty())
     {
-        codec = findEncoderCodecId(codecStr);
+        codec = nx::transcoding::findEncoderCodecId(codecStr);
         if (codec == AV_CODEC_ID_NONE)
         {
             error = QString("Requested codec is not supported: [%1]").arg(codecStr);
@@ -77,31 +78,6 @@ bool UrlParams::parse(const QUrlQuery& query)
         onvifReplay = true;
 
     return true;
-}
-
-AVCodecID findEncoderCodecId(const QString& codecName)
-{
-    QString codecLower = codecName.toLower();
-    AVCodec* avCodec = avcodec_find_encoder_by_name(codecLower.toUtf8().constData());
-    if (avCodec)
-        return avCodec->id;
-
-    // Try to check codec substitutes if requested codecs not found.
-    static std::map<std::string, std::vector<std::string>> codecSubstitutesMap
-    {
-        { "h264", {"libopenh264"} },
-    };
-    auto substitutes = codecSubstitutesMap.find(codecLower.toUtf8().constData());
-    if (substitutes == codecSubstitutesMap.end())
-        return AV_CODEC_ID_NONE;
-
-    for(auto& substitute: substitutes->second)
-    {
-        avCodec = avcodec_find_encoder_by_name(substitute.c_str());
-        if (avCodec)
-            return avCodec->id;
-    }
-    return AV_CODEC_ID_NONE;
 }
 
 } // namespace nx::rtsp

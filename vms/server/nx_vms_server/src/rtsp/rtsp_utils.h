@@ -32,8 +32,6 @@ private:
     QString error;
 };
 
-AVCodecID findEncoderCodecId(const QString& codecName);
-
 QSize parseResolution(const QString& str);
 
 } // namespace nx::rtsp
