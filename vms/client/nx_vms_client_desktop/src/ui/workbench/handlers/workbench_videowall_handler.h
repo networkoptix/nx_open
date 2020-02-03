@@ -82,8 +82,12 @@ private:
     void openVideoWallItem(const QnVideoWallResourcePtr& videoWall);
     void closeInstanceDelayed();
 
-    bool canStartControlMode() const;
+    /** Check if current client instance can start controlling the given videowall layout. */
+    bool canStartControlMode(const QnUuid& layoutId) const;
+
+    /** Enable/disable videowall direct control mode on the currently opened layout. */
     void setControlMode(bool active);
+
     void updateMode();
 
     void sendMessage(const QnVideoWallControlMessage& message, bool cached = false);

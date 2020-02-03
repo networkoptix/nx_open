@@ -32,7 +32,7 @@ struct NX_VMS_API RuntimeData: DataWithVersion
     /** Guid of the videowall instance for the running videowall clients. */
     QnUuid videoWallInstanceGuid;
 
-    /** Videowall item id, governed by the current client instance's control session. */
+    /** Videowall layout id, governed by the current client instance's control session. */
     QnUuid videoWallControlSession;
 
     QVector<QString> hardwareIds;
