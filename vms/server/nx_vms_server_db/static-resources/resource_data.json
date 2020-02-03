@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.197",
+    "version": "1.0.1.198",
     "data": [
         {
             "keys": [
@@ -3778,8 +3778,15 @@
                 "Geovision|GV-BX2700",
                 "GV-BX2700|Geovision"
             ],
-            "onvifIgnoreMedia2":  true,
+            "onvifIgnoreMedia2": true,
             "trustToVideoSourceSize": false
+        },
+        {
+            "_comment1": "Camera that should not use Media2 (and should not try to detect Media2 support)",
+            "keys": [
+                "pelco|IBP531-1ER"
+            ],
+            "onvifIgnoreMedia2": true
         },
         {
             "_comment1": "Mapping for firmware: IPC_HCMN2108-B0009P30D1809",
