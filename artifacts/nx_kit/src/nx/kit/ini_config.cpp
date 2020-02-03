@@ -503,15 +503,19 @@ void IniConfig::Impl::createDefaultIniFile(std::ostream* output)
 
     for (const auto& param: m_params)
     {
+        bool isDescriptionMultiline = false;
         std::string description = param->description;
         if (!description.empty())
         {
             description += " ";
             nx::kit::utils::stringInsertAfterEach(&description, '\n', "# ");
+            isDescriptionMultiline = description.find('\n') != std::string::npos;
         }
 
         file << "# " << description << "Default: " << param->defaultValueStr() << "\n";
-        file << param->name << "=" << param->defaultValueStr() << "\n";
+        if (isDescriptionMultiline)
+            file << "#\n";
+        file << "#" << param->name << "=" << param->defaultValueStr() << "\n";
         file << "\n";
     }
 }

@@ -102,15 +102,15 @@ const std::vector<std::string>& getProcessCmdLineArgs()
     return args;
 }
 
-template<int sizeOfChar> struct HexFormatString {};
-template<> struct HexFormatString<1> { static constexpr const char* value = "%02X"; };
-template<> struct HexFormatString<2> { static constexpr const char* value = "%04X"; };
-template<> struct HexFormatString<4> { static constexpr const char* value = "%08X"; };
+template<int sizeOfChar> struct HexEscapeString {};
+template<> struct HexEscapeString<1> { static constexpr const char* value = "\\x%02X"; };
+template<> struct HexEscapeString<2> { static constexpr const char* value = "\\u%04X"; };
+template<> struct HexEscapeString<4> { static constexpr const char* value = "\\U%08X"; };
 
 template<typename Char>
-static std::string hexFormatString()
+static std::string hexEscapeString()
 {
-    return HexFormatString<sizeof(Char)>::value;
+    return HexEscapeString<sizeof(Char)>::value;
 }
 
 template<typename Char>
@@ -120,7 +120,7 @@ template<typename Char>
 static std::string toStringFromChar(Char c)
 {
     if (!isAsciiPrintable(c))
-        return format("'\\x" + hexFormatString<Char>() + "'", (Unsigned<Char>) c);
+        return format("'" + hexEscapeString<Char>() + "'", (Unsigned<Char>) c);
     if (c == '\'')
         return "'\\''";
 
@@ -144,10 +144,12 @@ std::string toStringFromPtr(const Char* s)
                 (result += '\\') += (char) *p;
             else if (*p == '\n')
                 result += "\\n";
+            else if (*p == '\r')
+                result += "\\r";
             else if (*p == '\t')
                 result += "\\t";
             else if (!isAsciiPrintable(*p))
-                result += format("\\x" + hexFormatString<Char>() + "\"\"", (Unsigned<Char>) *p);
+                result += format(hexEscapeString<Char>() + "\"\"", (Unsigned<Char>) *p);
             else
                 result += (char) *p;
         }
