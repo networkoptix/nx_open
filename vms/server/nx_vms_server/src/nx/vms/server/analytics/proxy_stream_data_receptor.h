@@ -4,6 +4,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/server/analytics/stream_data_receptor.h>
+#include <nx/vms/api/types/motion_types.h>
 
 namespace nx::vms::server::analytics {
 
