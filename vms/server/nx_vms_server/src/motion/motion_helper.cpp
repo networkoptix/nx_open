@@ -87,7 +87,6 @@ QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
         }
         else
         {
-            const auto layout = res->getVideoLayout();
             int channels = 1;
             if (const auto layout = res->getVideoLayout())
                 channels = layout->channelCount();
