@@ -214,6 +214,8 @@ Item
         {
             id: informationPanel
 
+            Layout.fillWidth: true
+
             engineInfo: currentEngineInfo
 
             visible: isDefaultSection
