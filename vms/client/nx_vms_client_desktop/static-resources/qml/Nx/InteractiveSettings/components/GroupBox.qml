@@ -14,5 +14,17 @@ GroupBox
     property alias childrenItem: control.contentItem
 
     width: parent.width
-    contentItem: AlignedColumn {}
+
+    contentItem: AlignedColumn
+    {
+        id: column
+
+        Binding
+        {
+            target: column
+            property: "labelWidthHint"
+            value: control.parent.labelWidth - control.x - column.x
+            when: control.parent && control.parent.hasOwnProperty("labelWidth")
+        }
+    }
 }

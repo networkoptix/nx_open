@@ -2,33 +2,26 @@ import QtQuick 2.0
 
 Column
 {
-    property real maxCaptionWidth: 300
+    property real labelWidthHint: 0
+
+    readonly property real kLabelWidthFraction: 0.3
+
+    readonly property real labelWidth: labelWidthHint < 64
+            ? width * kLabelWidthFraction
+            : labelWidthHint
 
     spacing: 8
 
-    onChildrenChanged: { alignCaptions() }
+    onChildrenChanged: { alignLabels() }
+    onLabelWidthChanged: { alignLabels() }
 
-    function alignCaptions()
+    function alignLabels()
     {
-        var maxWidth = 0
-
         for (var i = 0; i < children.length; ++i)
         {
             var item = children[i]
-            if (item.hasOwnProperty("implicitCaptionWidth"))
-            {
-                item.implicitCaptionWidthChanged.connect(alignCaptions)
-                maxWidth = Math.max(maxWidth, item.implicitCaptionWidth)
-            }
-        }
-
-        maxWidth = Math.min(maxWidth, maxCaptionWidth)
-
-        for (i = 0; i < children.length; ++i)
-        {
-            item = children[i]
-            if (item.hasOwnProperty("captionWidth"))
-                item.captionWidth = maxWidth
+            if (item.hasOwnProperty("labelWidth"))
+                item.labelWidth = labelWidth
         }
     }
 }

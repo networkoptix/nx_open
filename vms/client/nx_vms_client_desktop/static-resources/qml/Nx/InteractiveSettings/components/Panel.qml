@@ -22,8 +22,18 @@ Panel
 
     contentItem: AlignedColumn
     {
+        id: column
+
         clip: true
         height: control.contentHeight
+
+        Binding
+        {
+            target: column
+            property: "labelWidthHint"
+            value: control.parent.labelWidth - control.x - x
+            when: control.parent && control.parent.hasOwnProperty("labelWidth")
+        }
     }
 
     states: State

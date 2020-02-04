@@ -13,12 +13,11 @@ FocusScope
     property real spacing: 8
     property alias labelY: label.y
 
-    // This property is used to calculate labels column width.
-    readonly property alias implicitCaptionWidth: label.implicitWidth
-    property alias captionWidth: label.width
+    readonly property alias implicitLabelWidth: label.implicitWidth
+    property alias labelWidth: label.width
     property alias caption: label.text
 
-    implicitHeight: Math.max(label.implicitHeight, contentItem ? contentItem.implicitHeight : 0)
+    implicitHeight: Math.max(label.y + label.implicitHeight, contentItem ? contentItem.implicitHeight : 0)
     implicitWidth: label.width + (contentItem ? contentItem.implicitWidth + spacing : 0)
 
     width: parent.width
