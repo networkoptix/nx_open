@@ -401,7 +401,6 @@ public:
     void setLicenseServerUrl(const QString& value);
 
     nx::utils::Url resourceFileUri() const;
-    void setResourceFileUri(const nx::utils::Url& value);
 
 signals:
     void initialized();
@@ -437,7 +436,6 @@ signals:
     void downloaderPeersChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
-    void resourceFileUriChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;

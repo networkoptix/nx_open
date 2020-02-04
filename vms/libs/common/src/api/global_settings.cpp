@@ -917,13 +917,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         &QnGlobalSettings::downloaderPeersChanged,
         Qt::QueuedConnection);
 
-    connect(
-        m_resourceFileUriAdaptor,
-        &QnAbstractResourcePropertyAdaptor::valueChanged,
-        this,
-        &QnGlobalSettings::resourceFileUriChanged,
-        Qt::QueuedConnection);
-
     AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -1829,11 +1822,6 @@ void QnGlobalSettings::setLicenseServerUrl(const QString& value)
 QString QnGlobalSettings::licenseServerUrl() const
 {
     return m_licenseServerUrlAdaptor->value();
-}
-
-void QnGlobalSettings::setResourceFileUri(const nx::utils::Url& value)
-{
-    m_resourceFileUriAdaptor->setValue(value);
 }
 
 nx::utils::Url QnGlobalSettings::resourceFileUri() const

@@ -2,6 +2,9 @@
 
 @echo off
 
+:: NOTE: If cmake cannot find Qt, add the following arg to this script (will be passed to cmake):
+:: "-DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>"
+
 :: Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 set BASE_DIR_WITH_BACKSLASH=%~dp0
 set BASE_DIR=%BASE_DIR_WITH_BACKSLASH:~0,-1%
@@ -12,7 +15,7 @@ echo on
 @echo off
 
 for /d %%S in (%BASE_DIR%\samples\*) do (
-    call :build_sample %%S || @goto :error
+    call :build_sample %%S %1 %2 %3 %4 %5 %6 %7 %8 || @goto :error
 )
 
 echo Samples built successfully, see the binaries in %BUILD_DIR%
@@ -28,7 +31,7 @@ exit /b
         cd "%SAMPLE_BUILD_DIR%" || @exit /b
         
         :: Not using %* to allow using `shift`.
-        cmake "%SOURCE_DIR%\src" -Ax64 -Tv140,host=x64 %1 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
+        cmake "%SOURCE_DIR%\src" -Ax64 -Tv140,host=x64 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
         cmake --build . || @exit /b
     @echo off
     set ARTIFACT=%SAMPLE_BUILD_DIR%\Debug\%SAMPLE%.dll
