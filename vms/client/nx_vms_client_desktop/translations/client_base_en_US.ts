@@ -3604,22 +3604,6 @@ to %1</source>
 <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
-        <source>Screens Allowed:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Control Sessions Allowed:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Archive Streams Allowed:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Generic:</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>License Type</source>
         <translation></translation>
     </message>
@@ -3628,12 +3612,32 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Features:</source>
+        <source>Locked to Hardware ID</source>
         <translation></translation>
     </message>
     <message>
-        <source>Locked to Hardware ID</source>
-        <translation></translation>
+        <source>Generic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deactivations Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screens Allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control Sessions Allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Streams Allowed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6803,19 +6807,11 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Video Wall license required</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>To enable this feature, please activate a Video Wall license.</source>
         <translation></translation>
     </message>
     <message>
         <source>Failed to apply changes</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To enable Video Wall, please activate a Video Wall license.</source>
         <translation></translation>
     </message>
     <message numerus="yes">
@@ -6871,6 +6867,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Activate one more license to start Video Wall.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Activate License...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7498,6 +7498,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Unknown track</source>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>+%n values</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

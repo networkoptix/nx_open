@@ -4,15 +4,7 @@
 <context>
     <name>AnalyticsSettings</name>
     <message>
-        <source>Enable</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This is the built-in functionality</source>
         <translation></translation>
     </message>
 </context>
@@ -21,6 +13,13 @@
     <message>
         <source>Click on video to start box.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ContextHintButton</name>
+    <message>
+        <source>Click to read more</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -85,6 +84,17 @@
     <message>
         <source>Cancel</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>InformationPanel</name>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vendor</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
