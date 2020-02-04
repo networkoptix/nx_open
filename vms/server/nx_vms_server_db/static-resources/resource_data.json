@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.201",
+    "version": "1.0.1.203",
     "data": [
         {
             "keys": [
@@ -195,8 +195,7 @@
                 "*|ACTi-915",
                 "ACTi|Z*", "Z*|ACTi",
                 "ACTi Corporation|Z*", "Z*|ACTi Corporation",
-                "Arecont Vision|AV20CPD-118",
-                "ISD|DWC-MPTZ*"
+                "Arecont Vision|AV20CPD-118"
             ],
             "forceONVIF": true
         },
