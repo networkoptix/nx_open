@@ -17,6 +17,7 @@ for /d %%S in (%BASE_DIR%\samples\*) do (
 
 :: Run unit tests if needed.
 if [%1] == [--no-tests] echo NOTE: Unit tests were not run. & goto :skip_tests
+shift
 echo on
     :: Currently, nx_kit and nx_sdk unit tests are built in the scope of stub_analytics_plugin.
     cd "%BUILD_DIR%/stub_analytics_plugin" || @goto :error
@@ -38,7 +39,8 @@ exit /b
         mkdir "%SAMPLE_BUILD_DIR%" || @exit /b
         cd "%SAMPLE_BUILD_DIR%" || @exit /b
         
-        cmake "%SOURCE_DIR%" -Ax64 -Tv140,host=x64 || @exit /b
+        :: Not using %* to allow using `shift`.
+        cmake "%SOURCE_DIR%" -Ax64 -Tv140,host=x64 %1 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
         cmake --build . || @exit /b
     @echo off
     set ARTIFACT=%SAMPLE_BUILD_DIR%\Debug\%SAMPLE%.dll
