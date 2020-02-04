@@ -4658,9 +4658,7 @@ void MediaServerProcess::loadResourceParamsData()
         datas.push_back(Data::load(
             nx::utils::Url("http://beta.vmsproxy.com/beta-builds/daily/resource_data.json")));
     }
-    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
-    const QByteArray dataFromDB = loadDataFromDb(manager);
-    datas.push_back({"server DB", dataFromDB});
+    datas.push_back({"server DB", dataFromDb});
     datas.push_back(Data::load(QFile(":/resource_data.json")));
 
     if (auto data = Data::getWithGreaterVersion(datas); data.value != dataFromDb)
