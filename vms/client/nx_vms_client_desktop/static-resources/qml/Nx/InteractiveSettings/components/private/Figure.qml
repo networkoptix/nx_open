@@ -20,6 +20,8 @@ LabeledItem
     {
         spacing: 12
 
+        baselineOffset: figureNameEdit.baselineOffset
+
         TextField
         {
             id: figureNameEdit
