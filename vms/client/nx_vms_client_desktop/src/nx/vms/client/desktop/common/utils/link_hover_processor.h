@@ -13,6 +13,8 @@ namespace nx::vms::client::desktop {
  */
 class LinkHoverProcessor: public QObject
 {
+    Q_OBJECT
+
 public:
     explicit LinkHoverProcessor(QLabel* parent);
 

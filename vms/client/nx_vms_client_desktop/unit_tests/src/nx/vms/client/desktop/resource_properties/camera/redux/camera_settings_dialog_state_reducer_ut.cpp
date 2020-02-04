@@ -114,13 +114,6 @@ TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)
     ASSERT_EQ(s.recording.minDays.value(), nx::vms::api::kDefaultMinArchiveDays);
 
     // Unchecking automatic min days when fixed value is set: keeps fixed value.
-    s = {};
-    s.recording.minDays.value.setBase(kTestDaysBig);
-    s = Reducer::setMinRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_FALSE(s.recording.minDays.automatic.valueOr(true));
-    ASSERT_EQ(s.recording.minDays.value(), kTestDaysBig);
-
-    // Unchecking automatic min days when fixed value is set: keeps fixed value.
     // Checks that min days value stays lesser or equal than fixed max days value.
     s = {};
     s.recording.minDays.value.setBase(kTestDaysBig);
@@ -147,6 +140,28 @@ TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)
     s = Reducer::setMinRecordingDaysValue(std::move(s), kTestDaysBig);
     ASSERT_EQ(s.recording.minDays.value(), kTestDaysBig);
     ASSERT_LE(s.recording.minDays.value(), s.recording.maxDays.value());
+}
+
+// Setup fixed value of recording min days, leaving max days as auto.
+TEST_F(CameraSettingsDialogStateReducerTest, setFixedRecordingMinDays)
+{
+    static constexpr int kDefaultDays = -nx::vms::api::kDefaultMaxArchiveDays;
+    static constexpr int kTestDaysBig = nx::vms::api::kDefaultMaxArchiveDays + 1;
+
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    // Unchecking 'auto' must keep previously saved (as negative) value.
+    camera->setMinDays(-kTestDaysBig);
+
+    State initial = Reducer::loadCameras({}, {camera});
+    ASSERT_TRUE(initial.recording.minDays.automatic());
+
+    State unchecked = Reducer::setMinRecordingDaysAutomatic(std::move(initial), false);
+    ASSERT_FALSE(unchecked.recording.minDays.automatic.valueOr(true));
+    ASSERT_EQ(unchecked.recording.minDays.value(), kTestDaysBig);
+
+    CameraSettingsDialogStateConversionFunctions::applyStateToCameras(unchecked, {camera});
+    State reloaded = Reducer::loadCameras(std::move(unchecked), {camera});
+    ASSERT_EQ(reloaded.recording.minDays.value(), kTestDaysBig);
 }
 
 // Schedule brush should be correctly initialized after loadCameras.
