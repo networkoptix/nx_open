@@ -4482,34 +4482,51 @@ void MediaServerProcess::loadResourcesFromDatabase()
         moveHandlingCameras();
 }
 
-static QByteArray loadDataFromDb(ec2::AbstractResourceManagerPtr manager)
+static std::pair<QString, QByteArray> loadResourceParamsSettingsFromDb(
+    ec2::AbstractResourceManagerPtr manager)
 {
     nx::vms::api::ResourceParamWithRefDataList data;
     manager->getKvPairsSync(QnUuid(), &data);
+    std::pair<QString, QByteArray> result;
+    int found = 0;
     for (const auto& param: data)
     {
-        if (param.name == Qn::kResourceDataParamName)
-            return param.value.toUtf8();
+        if (param.name == "resourceFileUri")
+        {
+            result.first = param.value;
+            found |= 1;
+            if (found == 3)
+                return result;
+        }
+        else if (param.name == Qn::kResourceDataParamName)
+        {
+            result.second = param.value.toUtf8();
+            found |= 2;
+            if (found == 3)
+                return result;
+        }
     }
-    return QByteArray();
+    return result;
 }
 
 void MediaServerProcess::loadResourceParamsData()
 {
     using Data = nx::vms::utils::ResourceParamsData;
+    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
+    const auto [resourceFileUriFromDb, dataFromDb] = loadResourceParamsSettingsFromDb(manager);
     std::vector<Data> datas;
     QString local = QCoreApplication::applicationDirPath() + "/resource_data.json";
     if (QFile::exists(local))
         datas.push_back(Data::load(QFile(local)));
-    datas.push_back(Data::load(commonModule()->globalSettings()->resourceFileUri()));
+    datas.push_back(Data::load(resourceFileUriFromDb.isEmpty()
+        ? commonModule()->globalSettings()->resourceFileUri()
+        : nx::utils::Url(resourceFileUriFromDb)));
     datas.push_back(Data::load(
         nx::utils::Url("http://beta.vmsproxy.com/beta-builds/daily/resource_data.json")));
-    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
-    const QByteArray dataFromDB = loadDataFromDb(manager);
-    datas.push_back({"server DB", dataFromDB});
+    datas.push_back({"server DB", dataFromDb});
     datas.push_back(Data::load(QFile(":/resource_data.json")));
 
-    if (auto data = Data::getWithGreaterVersion(datas); data.value != dataFromDB)
+    if (auto data = Data::getWithGreaterVersion(datas); data.value != dataFromDb)
     {
         NX_INFO(this, "Update system wide resource_data.json from %1", data.location);
         manager->saveSync({{QnUuid(), Qn::kResourceDataParamName, std::move(data.value)}});
@@ -4688,10 +4705,6 @@ void MediaServerProcess::run()
 
     initializeUpnpPortMapper();
 
-    connect(
-        commonModule()->globalSettings(),
-        &QnGlobalSettings::resourceFileUriChanged,
-        [this] { loadResourceParamsData(); });
     loadResourceParamsData();
     loadResourcesFromDatabase();
 
