@@ -19,12 +19,12 @@ Panel
 
     width: parent.width
     contentHeight: contentItem ? contentItem.implicitHeight : 0
+    clip: true
 
     contentItem: AlignedColumn
     {
         id: column
 
-        clip: true
         height: control.contentHeight
 
         Binding

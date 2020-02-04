@@ -22,7 +22,7 @@ FocusScope
 
     implicitHeight: isBaselineAligned
         ? Math.max(label.y + label.height, contentItem.y + contentItem.height)
-        : Math.max(label.height, contentItem ? contentItem.height : 0)
+        : Math.max(Math.min(label.height, 28), contentItem ? contentItem.height : 0)
 
     width: parent.width
 
