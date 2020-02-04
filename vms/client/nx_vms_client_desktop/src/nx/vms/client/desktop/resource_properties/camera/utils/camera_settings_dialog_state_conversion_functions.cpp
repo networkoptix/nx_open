@@ -29,32 +29,10 @@ void setRecordingDays(
     const State::RecordingDays& maxDays,
     const Cameras& cameras)
 {
-    if (!minDays.automatic.hasValue() && !maxDays.automatic.hasValue())
-        return;
-
-    const auto absoluteDays =
-        [](int compositeValue) { return qMax(qAbs(compositeValue), 1); };
-
     for (const auto& camera: cameras)
     {
-        const int prevMinDays = camera->minDays();
-        const int prevMaxDays = camera->maxDays();
-
-        const bool autoMinDays = minDays.automatic.valueOr(prevMinDays < 0);
-        const bool autoMaxDays = maxDays.automatic.valueOr(prevMaxDays < 0);
-        int newMinDays = minDays.value.valueOr(absoluteDays(prevMinDays));
-        int newMaxDays = maxDays.value.valueOr(absoluteDays(prevMaxDays));
-
-        if (newMaxDays < newMinDays)
-        {
-            if (maxDays.value.hasValue())
-                newMinDays = newMaxDays;
-            else
-                newMaxDays = newMinDays;
-        }
-
-        camera->setMinDays(autoMinDays ? -newMinDays : newMinDays);
-        camera->setMaxDays(autoMaxDays ? -newMaxDays : newMaxDays);
+        camera->setMinDays(minDays.automatic() ? -minDays.value() : minDays.value());
+        camera->setMaxDays(maxDays.automatic() ? -maxDays.value() : maxDays.value());
     }
 }
 
