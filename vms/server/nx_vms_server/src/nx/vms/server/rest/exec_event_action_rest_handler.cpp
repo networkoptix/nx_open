@@ -27,6 +27,7 @@ JsonRestResponse QnExecuteEventActionRestHandler::executePost(
     }
 
     nx::vms::event::AbstractActionPtr businessAction;
+    // TODO: #api Deserialization errors for `params` field are ignored in ec2::fromApiToResource().
     ec2::fromApiToResource(action, businessAction);
     businessAction->setReceivedFromRemoteHost(true);
     serverModule()->eventMessageBus()->at_actionReceived(businessAction);
