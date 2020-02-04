@@ -210,8 +210,11 @@ QnAbstractCompressedMetadataPtr CachingMetadataConsumer::metadata(
     if (!cache)
         return QnAbstractCompressedMetadataPtr();
 
-    auto list = cache->findMetadataInRange(0, timestamp.count() + 1, false, 1);
-    if (list.size())
+    auto list = cache->findMetadataInRange(
+        0, timestamp.count() + 1, //< Look for the data in a range from the beginning to timestamp.
+        false, 1); //< Take the newest one of them (the one that's in the back of the queue buffer).
+
+    if (!list.empty())
     {
         const auto& ptr = list.first();
         if (ptr->containTime(timestamp.count()))
