@@ -16,6 +16,7 @@
 @import 'option';
 // Pages
 @import 'faq';
+@import '../web_common/styles/common';
 
 html {
     @include rem-baseline;
