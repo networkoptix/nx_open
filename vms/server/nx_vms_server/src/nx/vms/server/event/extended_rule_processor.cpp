@@ -82,6 +82,7 @@
 #include <nx/vms/server/nvr/i_service.h>
 #include <nx_vms_server_ini.h>
 #include <nx/network/http/http_client.h>
+#include <nx/vms/utils/app_info.h>
 
 namespace {
 
@@ -945,7 +946,7 @@ struct PushNotification
             body += event.description + "\n";
 
         payload.url = lm("%1://%2/client/%3/view/?timestamp=%4").args(
-            nx::branding::nativeUriProtocol(), settings->cloudHost(),
+            nx::vms::utils::AppInfo::nativeUriProtocol(), settings->cloudHost(),
             settings->cloudSystemId(), event.eventTimestampUsec / 1000);
         if (!event.eventResourceId.isNull())
         {
