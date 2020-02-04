@@ -89,7 +89,12 @@ one that comes with the Server (see Server installation files), otherwise an unp
 may take place. If cmake cannot find Qt, add the following arg to a build_samples* script (will be
 passed to cmake):
 ```
-build_samples* -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
+# Windows:
+# Note the quotes - otherwise, .bat interpreter will split the arg into two by "=".
+build_samples.bat "-DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>"
+
+# Linux:
+build_samples.sh -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
 ```
         
 On Windows, after CMake generation phase, Visual Studio GUI can be used to compile a sample:

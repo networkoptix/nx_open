@@ -90,7 +90,7 @@ else()
             -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${toolchainFile}.cmake
         )
     endif()
-    
+
     if(targetDevice STREQUAL "linux_arm32")
         set(extraArgs ${extraArgs}
             --with-rpi-samples
@@ -108,7 +108,9 @@ add_custom_command(OUTPUT ${zip_file} ${server_resource_zip_file}
     COMMAND ${CMAKE_COMMAND} -E echo
         "  Building samples - see ${sample_build_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
-        ${sample_build_script} ${extraArgs} ${compilingOptions} -DCMAKE_PREFIX_PATH=${QT_DIR}
+        # The quotes are needed to avoid cmd splitting the arg by `=`.
+        # The trailing space is needed to make cmake pass the argument in quotes.
+        ${sample_build_script} ${extraArgs} ${compilingOptions} "-DCMAKE_PREFIX_PATH=${QT_DIR} "
         >${sample_build_log} 2>&1
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir}-build #< Delete sdk build dir.
 
