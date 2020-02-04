@@ -41,8 +41,8 @@
             <span class="text">vagy</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Hozzáadás meglévő rendszerhez</button><br>
-        <small>(ha {{Config.productName}} már be lett állítva)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -384,7 +384,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
-    <h2>Rendszer készen áll a használatra</h2>
+    <h2>A rendszer használatra kész</h2>
     <p>Szerver címe</p>
     <h4>{{serverAddress}}</h4>
     <p>Adminisztrátor bejelentkezés</p>

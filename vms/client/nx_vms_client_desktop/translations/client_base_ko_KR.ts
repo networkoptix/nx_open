@@ -986,6 +986,14 @@ to view more bookmarks</source>
       <source>Page...</source>
       <translation>페이지...</translation>
     </message>
+    <message>
+      <source>Connect to this Server</source>
+      <translation type="unfinished">Connect to this Server</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation type="unfinished">Pin</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1477,6 +1485,10 @@ to view more bookmarks</source>
     <message>
       <source>Built for %1-%2 with %3.</source>
       <translation>%1-%2 %3 위해 만들어진.</translation>
+    </message>
+    <message>
+      <source>Regional support</source>
+      <translation type="unfinished">Regional support</translation>
     </message>
   </context>
   <context>
@@ -2006,26 +2018,8 @@ to view more bookmarks</source>
       <translation>시작</translation>
     </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>최소 한개 선택</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>최소 한개 선택</translation>
-    </message>
-    <message>
       <source>Occurs</source>
       <translation>발생</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>선택된 카메라</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more cameras</source>
-      <translation>
-        <numerusform>선택카메라 및 %n개의 카메라</numerusform>
-      </translation>
     </message>
     <message>
       <source>N/A</source>
@@ -2056,6 +2050,36 @@ to view more bookmarks</source>
       <translation>
         <numerusform>%n 서버</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User</source>
+      <translation>사용자</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation type="unfinished">Source Server</translation>
+    </message>
+    <message>
+      <source>Source Camera</source>
+      <translation type="unfinished">Source Camera</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select at least one Device</source>
+      <translation type="unfinished">Select at least one Device</translation>
+    </message>
+    <message>
+      <source>Select at least one Camera</source>
+      <translation type="unfinished">Select at least one Camera</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation type="unfinished">Select Server</translation>
     </message>
   </context>
   <context>
@@ -2179,6 +2203,13 @@ to view more bookmarks</source>
     <message>
       <source>Interval of Action</source>
       <translation>동작 간격</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation type="unfinished">Servers that support buzzer</translation>
     </message>
   </context>
   <context>
@@ -3068,6 +3099,10 @@ to %1</source>
         <numerusform>의 이벤트 로그 %1 - %n 이벤트 발견</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Description</source>
+      <translation>상세설명</translation>
+    </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
@@ -3206,6 +3241,13 @@ to %1</source>
     <message>
       <source>Select cameras to setup failover priority</source>
       <translation>failover 우선순위 카메라 선택</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation type="unfinished">Servers that support fan diagnostic</translation>
     </message>
   </context>
   <context>
@@ -3525,22 +3567,6 @@ to %1</source>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
-      <source>Screens Allowed:</source>
-      <translation>화면 허용:</translation>
-    </message>
-    <message>
-      <source>Control Sessions Allowed:</source>
-      <translation>제어 세션 허용:</translation>
-    </message>
-    <message>
-      <source>Archive Streams Allowed:</source>
-      <translation>저장 스트림 허용:</translation>
-    </message>
-    <message>
-      <source>Generic:</source>
-      <translation>일반:</translation>
-    </message>
-    <message>
       <source>License Type</source>
       <translation>인증키 방식</translation>
     </message>
@@ -3549,12 +3575,32 @@ to %1</source>
       <translation>인증키</translation>
     </message>
     <message>
-      <source>Features:</source>
-      <translation>기능:</translation>
-    </message>
-    <message>
       <source>Locked to Hardware ID</source>
       <translation>하드웨어 ID에 잠김</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation type="unfinished">Generic</translation>
+    </message>
+    <message>
+      <source>Deactivations Left</source>
+      <translation type="unfinished">Deactivations Left</translation>
+    </message>
+    <message>
+      <source>Features</source>
+      <translation type="unfinished">Features</translation>
+    </message>
+    <message>
+      <source>Screens Allowed</source>
+      <translation type="unfinished">Screens Allowed</translation>
+    </message>
+    <message>
+      <source>Control Sessions Allowed</source>
+      <translation type="unfinished">Control Sessions Allowed</translation>
+    </message>
+    <message>
+      <source>Archive Streams Allowed</source>
+      <translation type="unfinished">Archive Streams Allowed</translation>
     </message>
   </context>
   <context>
@@ -3852,12 +3898,8 @@ to %1</source>
       <translation>파일 열기 실패!</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 ID를 이메일로 보내주십시오.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 ID를 보내주십시오.</translation>
+      <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
+      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
     </message>
   </context>
   <context>
@@ -4407,6 +4449,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation type="unfinished">Servers that support PoE monitoring</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
@@ -4655,16 +4704,8 @@ to %1</source>
       <translation>달력일수</translation>
     </message>
     <message>
-      <source>less than an hour</source>
-      <translation>1시간 이하</translation>
-    </message>
-    <message>
       <source>%1 Mbps</source>
       <translation>%1 Mbps</translation>
-    </message>
-    <message>
-      <source>empty</source>
-      <translation>비었음</translation>
     </message>
     <message>
       <source>Device</source>
@@ -4685,10 +4726,6 @@ to %1</source>
     <message>
       <source>Current Bitrate</source>
       <translation>현재 비트 레이트</translation>
-    </message>
-    <message>
-      <source>no data for forecast</source>
-      <translation>예측할 데이터가 없습니다</translation>
     </message>
   </context>
   <context>
@@ -5132,6 +5169,10 @@ to %1</source>
     <message>
       <source>Plugins</source>
       <translation>플러그인</translation>
+    </message>
+    <message>
+      <source>PoE</source>
+      <translation type="unfinished">PoE</translation>
     </message>
   </context>
   <context>
@@ -5711,12 +5752,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>usb</translation>
     </message>
     <message>
-      <source>unknown</source>
-      <translation>알 수 없음</translation>
-    </message>
-    <message>
       <source>%1 TB</source>
       <translation>%1TB</translation>
+    </message>
+    <message>
+      <source>smb</source>
+      <translation type="unfinished">smb</translation>
     </message>
   </context>
   <context>
@@ -6408,13 +6449,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>QnWebPage</name>
-    <message>
-      <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation>다운로드&lt;br&gt;시작</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6497,6 +6531,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>비디오월이 서버에서 제거되어 종료합니다.</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the selected server</source>
+      <translation type="unfinished">Failed to connect to the selected server</translation>
     </message>
   </context>
   <context>
@@ -6703,20 +6741,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>새 매트릭스 %1</translation>
     </message>
     <message>
-      <source>Video Wall license required</source>
-      <translation>비디오 월 라이센스 필요</translation>
-    </message>
-    <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
       <translation>이 기능을 사용 하려면 비디오 월 라이센스를 활성화 하십시오.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
       <translation>변경 내용을 저장 하지 못했습니다.</translation>
-    </message>
-    <message>
-      <source>To enable Video Wall, please activate a Video Wall license.</source>
-      <translation>이 기능을 사용 하려면 비디오 월 라이센스를 활성화 하십시오.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
@@ -6769,6 +6799,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>비디오월 제어 세션을 시작 하려면 하나 이상의 라이선스를 활성화 해야 합니다.</translation>
+    </message>
+    <message>
+      <source>Activate License...</source>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
@@ -7218,15 +7252,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n 사용자</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>TimelineCursorLayout</name>
     <message>
       <source>Live</source>
@@ -7377,6 +7402,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unknown track</source>
       <translation>알 수없는 트랙</translation>
+    </message>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8242,6 +8273,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
+    <message>
+      <source>The proxy %1 requires a username and password.</source>
+      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+    </message>
+    <message>
+      <source>Select folder to upload</source>
+      <translation type="unfinished">Select folder to upload</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
@@ -8329,6 +8371,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
       <translation>빠른 식별 및 액세스를 위해 레이아웃에 할당 할 수있는 사용자 지정 번호</translation>
+    </message>
+    <message>
+      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
+      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
     </message>
   </context>
   <context>
@@ -8740,6 +8786,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>알 수없는 플러그인 진단 이벤트</translation>
     </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8773,6 +8823,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>일부 사용자는 선택한 레이아웃에 액세스 할 수 없습니다. 그 사용자들은 기능을 사용할 수 없습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PasswordDialog</name>
+    <message>
+      <source>Sign In</source>
+      <translation type="unfinished">Sign In</translation>
     </message>
   </context>
   <context>
@@ -8872,6 +8929,67 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This OS version is no longer supported.</source>
       <translation>이 OS 버전은 더 이상 지원되지 않습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
+    <message>
+      <source>%1 Mbps</source>
+      <translation>%1 Mbps</translation>
+    </message>
+    <message>
+      <source>Disconnected</source>
+      <translation type="unfinished">Disconnected</translation>
+    </message>
+    <message>
+      <source>Connected</source>
+      <translation type="unfinished">Connected</translation>
+    </message>
+    <message>
+      <source>Powered</source>
+      <translation type="unfinished">Powered</translation>
+    </message>
+    <message>
+      <source>Unexpected</source>
+      <translation type="unfinished">Unexpected</translation>
+    </message>
+    <message>
+      <source>Empty</source>
+      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+      <translation type="unfinished">Empty</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device %1 &gt;</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation type="unfinished">&lt; Unknown device %1 &gt;</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>포트:</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>카메라</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
+    <message>
+      <source>Speed</source>
+      <translation>속도</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>상태</translation>
+    </message>
+    <message>
+      <source>Power</source>
+      <translation type="unfinished">Power</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device &gt;</source>
+      <translation type="unfinished">&lt; Unknown device &gt;</translation>
     </message>
   </context>
   <context>
@@ -9013,6 +9131,23 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
       <translation>관리자가 아님 사용자 만 라이브, 아카이브 및 내 보낸 비디오 위에 워터 마크가 표시됩니다. 당신과 다른 관리자에게는 보이지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Only client-server video traffic can be encrypted</source>
+      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n 카메라들</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There are no compatible servers</source>
+      <translation type="unfinished">There are no compatible servers</translation>
     </message>
   </context>
   <context>
@@ -9359,13 +9494,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::WebWidget</name>
-    <message>
-      <source>Failed to load page</source>
-      <translation>페이지 불러오기 실패</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -9601,10 +9729,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
-      <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation>자신에 대한 정보와 라이센스 비활성화 이유를 입력하십시오.</translation>
-    </message>
-    <message>
       <source>Next</source>
       <translation>다음</translation>
     </message>
@@ -9643,6 +9767,19 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Other Reason</source>
       <translation>기타 이유</translation>
+    </message>
+    <message>
+      <source>Please enter your contact information and the reason for deactivating your license</source>
+      <translation type="unfinished">Please enter your contact information and the reason for deactivating your license</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n 사용자</numerusform>
+      </translation>
     </message>
   </context>
   <context>

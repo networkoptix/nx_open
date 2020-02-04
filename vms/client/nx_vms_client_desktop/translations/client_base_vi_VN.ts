@@ -986,6 +986,14 @@ to view more bookmarks</source>
       <source>Page...</source>
       <translation>Trang...</translation>
     </message>
+    <message>
+      <source>Connect to this Server</source>
+      <translation type="unfinished">Connect to this Server</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation type="unfinished">Pin</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1477,6 +1485,10 @@ to view more bookmarks</source>
     <message>
       <source>Built for %1-%2 with %3.</source>
       <translation>Được xây dựng cho%1-%2% với %3.</translation>
+    </message>
+    <message>
+      <source>Regional support</source>
+      <translation type="unfinished">Regional support</translation>
     </message>
   </context>
   <context>
@@ -2006,26 +2018,8 @@ to view more bookmarks</source>
       <translation>Bắt đầu</translation>
     </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>Chọn ít nhất một thiết bị</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Chọn ít nhất một máy ảnh</translation>
-    </message>
-    <message>
       <source>Occurs</source>
       <translation>Xảy ra</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Máy ảnh nguồn</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more cameras</source>
-      <translation>
-        <numerusform>Nguồn và %n camera hơn</numerusform>
-      </translation>
     </message>
     <message>
       <source>N/A</source>
@@ -2056,6 +2050,36 @@ to view more bookmarks</source>
       <translation>
         <numerusform>%n Máy chủ</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User</source>
+      <translation>Người sử dụng</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation type="unfinished">Source Server</translation>
+    </message>
+    <message>
+      <source>Source Camera</source>
+      <translation type="unfinished">Source Camera</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select at least one Device</source>
+      <translation type="unfinished">Select at least one Device</translation>
+    </message>
+    <message>
+      <source>Select at least one Camera</source>
+      <translation type="unfinished">Select at least one Camera</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation type="unfinished">Select Server</translation>
     </message>
   </context>
   <context>
@@ -2179,6 +2203,13 @@ to view more bookmarks</source>
     <message>
       <source>Interval of Action</source>
       <translation>Khoảng thời gian hành động</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation type="unfinished">Servers that support buzzer</translation>
     </message>
   </context>
   <context>
@@ -3068,6 +3099,10 @@ to %1</source>
         <numerusform>Nhật ký sự kiện cho %1 - %n sự kiện được tìm thấy</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Description</source>
+      <translation>Miêu tả</translation>
+    </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
@@ -3206,6 +3241,13 @@ to %1</source>
     <message>
       <source>Select cameras to setup failover priority</source>
       <translation>Chọn camera để thiết lập ưu tiên chuyển đổi dự phòng</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation type="unfinished">Servers that support fan diagnostic</translation>
     </message>
   </context>
   <context>
@@ -3525,22 +3567,6 @@ to %1</source>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
-      <source>Screens Allowed:</source>
-      <translation>Màn hình cho phép:</translation>
-    </message>
-    <message>
-      <source>Control Sessions Allowed:</source>
-      <translation>Buổi kiểm soát cho phép:</translation>
-    </message>
-    <message>
-      <source>Archive Streams Allowed:</source>
-      <translation>Lưu trữ các dòng cho phép:</translation>
-    </message>
-    <message>
-      <source>Generic:</source>
-      <translation>Chung:</translation>
-    </message>
-    <message>
       <source>License Type</source>
       <translation>Loại giấy phép</translation>
     </message>
@@ -3549,12 +3575,32 @@ to %1</source>
       <translation>Key bản quyền</translation>
     </message>
     <message>
-      <source>Features:</source>
-      <translation>Các tính năng:</translation>
-    </message>
-    <message>
       <source>Locked to Hardware ID</source>
       <translation>Khóa ID phần cứng</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation type="unfinished">Generic</translation>
+    </message>
+    <message>
+      <source>Deactivations Left</source>
+      <translation type="unfinished">Deactivations Left</translation>
+    </message>
+    <message>
+      <source>Features</source>
+      <translation type="unfinished">Features</translation>
+    </message>
+    <message>
+      <source>Screens Allowed</source>
+      <translation type="unfinished">Screens Allowed</translation>
+    </message>
+    <message>
+      <source>Control Sessions Allowed</source>
+      <translation type="unfinished">Control Sessions Allowed</translation>
+    </message>
+    <message>
+      <source>Archive Streams Allowed</source>
+      <translation type="unfinished">Archive Streams Allowed</translation>
     </message>
   </context>
   <context>
@@ -3852,12 +3898,8 @@ to %1</source>
       <translation>Không thể mở tập tin</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Vui lòng gửi email với key và ID phần cứng %1 đã kích hoạt.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Vui lòng gửi email với key và ID phần cứng %1 đã kích hoạt.</translation>
+      <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
+      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
     </message>
   </context>
   <context>
@@ -4407,6 +4449,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation type="unfinished">Servers that support PoE monitoring</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
@@ -4655,16 +4704,8 @@ to %1</source>
       <translation>Lịch ngày</translation>
     </message>
     <message>
-      <source>less than an hour</source>
-      <translation>ít hơn một giờ</translation>
-    </message>
-    <message>
       <source>%1 Mbps</source>
       <translation>%1 Mbps</translation>
-    </message>
-    <message>
-      <source>empty</source>
-      <translation>trống</translation>
     </message>
     <message>
       <source>Device</source>
@@ -4685,10 +4726,6 @@ to %1</source>
     <message>
       <source>Current Bitrate</source>
       <translation>Bitrate hiện tại</translation>
-    </message>
-    <message>
-      <source>no data for forecast</source>
-      <translation>không có dữ liệu dự báo</translation>
     </message>
   </context>
   <context>
@@ -5132,6 +5169,10 @@ to %1</source>
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>PoE</source>
+      <translation type="unfinished">PoE</translation>
     </message>
   </context>
   <context>
@@ -5710,12 +5751,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>usb</translation>
     </message>
     <message>
-      <source>unknown</source>
-      <translation>không xác định</translation>
-    </message>
-    <message>
       <source>%1 TB</source>
       <translation>%1 Tb</translation>
+    </message>
+    <message>
+      <source>smb</source>
+      <translation type="unfinished">smb</translation>
     </message>
   </context>
   <context>
@@ -6407,13 +6448,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
-    <name>QnWebPage</name>
-    <message>
-      <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation>TẢI XUỐNG&lt;br&gt;ĐÃ BẮT ĐẦU</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6496,6 +6530,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Video Wall bị xóa trên máy chủ và sẽ bị đóng.</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the selected server</source>
+      <translation type="unfinished">Failed to connect to the selected server</translation>
     </message>
   </context>
   <context>
@@ -6702,20 +6740,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Mới ma trận %1</translation>
     </message>
     <message>
-      <source>Video Wall license required</source>
-      <translation>Yêu cầu bản quyền Video Wall</translation>
-    </message>
-    <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
       <translation>Để kích hoạt tính năng này, vui lòng kích hoạt bản quyền Video Wall.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
       <translation>Không thể lưu các thay đổi</translation>
-    </message>
-    <message>
-      <source>To enable Video Wall, please activate a Video Wall license.</source>
-      <translation>Để kích hoạt tính năng này, vui lòng kích hoạt bản quyền Video Wall.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
@@ -6768,6 +6798,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>Kích hoạt thêm bản quyền để bắt đầu phiên điều khiển Video Wall.</translation>
+    </message>
+    <message>
+      <source>Activate License...</source>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
@@ -7217,15 +7251,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n người dùng</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>TimelineCursorLayout</name>
     <message>
       <source>Live</source>
@@ -7376,6 +7401,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Unknown track</source>
       <translation>Theo dõi không xác định</translation>
+    </message>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8241,6 +8272,17 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
+    <message>
+      <source>The proxy %1 requires a username and password.</source>
+      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+    </message>
+    <message>
+      <source>Select folder to upload</source>
+      <translation type="unfinished">Select folder to upload</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
@@ -8328,6 +8370,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
       <translation>Dãy số tùy chọn có thể được gán cho bố cục để nhận dạng và truy cập nhanh</translation>
+    </message>
+    <message>
+      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
+      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
     </message>
   </context>
   <context>
@@ -8739,6 +8785,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>Sự kiện chẩn đoán plugin không xác định</translation>
     </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8772,6 +8822,13 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Một số người dùng không có quyền truy cập vào bố trí đã chọn. Hành động sẽ không làm việc cho họ.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PasswordDialog</name>
+    <message>
+      <source>Sign In</source>
+      <translation type="unfinished">Sign In</translation>
     </message>
   </context>
   <context>
@@ -8871,6 +8928,67 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>This OS version is no longer supported.</source>
       <translation>Phiên bản HĐH này không còn được hỗ trợ.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
+    <message>
+      <source>%1 Mbps</source>
+      <translation>%1 Mbps</translation>
+    </message>
+    <message>
+      <source>Disconnected</source>
+      <translation type="unfinished">Disconnected</translation>
+    </message>
+    <message>
+      <source>Connected</source>
+      <translation type="unfinished">Connected</translation>
+    </message>
+    <message>
+      <source>Powered</source>
+      <translation type="unfinished">Powered</translation>
+    </message>
+    <message>
+      <source>Unexpected</source>
+      <translation type="unfinished">Unexpected</translation>
+    </message>
+    <message>
+      <source>Empty</source>
+      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+      <translation type="unfinished">Empty</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device %1 &gt;</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation type="unfinished">&lt; Unknown device %1 &gt;</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Cổng</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Máy ảnh</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
+    <message>
+      <source>Speed</source>
+      <translation>Tốc độ</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Trạng thái</translation>
+    </message>
+    <message>
+      <source>Power</source>
+      <translation type="unfinished">Power</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device &gt;</source>
+      <translation type="unfinished">&lt; Unknown device &gt;</translation>
     </message>
   </context>
   <context>
@@ -9012,6 +9130,23 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
       <translation>Hình mờ sẽ được hiển thị qua các video trực tiếp, lưu trữ và xuất cho những người dùng không phải là quản trị viên. Bạn và các quản trị viên khác sẽ không nhìn thấy họ.</translation>
+    </message>
+    <message>
+      <source>Only client-server video traffic can be encrypted</source>
+      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n camera</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There are no compatible servers</source>
+      <translation type="unfinished">There are no compatible servers</translation>
     </message>
   </context>
   <context>
@@ -9358,13 +9493,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::WebWidget</name>
-    <message>
-      <source>Failed to load page</source>
-      <translation>Không thể tải trang</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -9600,10 +9728,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
-      <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation>Xin vui lòng điền vào các thông tin về bản thân và lý do không sử dụng bản quyền nữa</translation>
-    </message>
-    <message>
       <source>Next</source>
       <translation>Kế tiếp</translation>
     </message>
@@ -9642,6 +9766,19 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Other Reason</source>
       <translation>Lý do khác</translation>
+    </message>
+    <message>
+      <source>Please enter your contact information and the reason for deactivating your license</source>
+      <translation type="unfinished">Please enter your contact information and the reason for deactivating your license</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n Người dùng</numerusform>
+      </translation>
     </message>
   </context>
   <context>

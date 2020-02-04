@@ -4,16 +4,22 @@
   <context>
     <name>AnalyticsSettings</name>
     <message>
-      <source>Enable</source>
-      <translation>Enable</translation>
-    </message>
-    <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
     </message>
+  </context>
+  <context>
+    <name>Box</name>
     <message>
-      <source>This is the built-in functionality</source>
-      <translation type="unfinished">This is the built-in functionality</translation>
+      <source>Click on video to start box.</source>
+      <translation>انقر على فيديو لبدء مربع.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ContextHintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation type="unfinished">Click to read more</translation>
     </message>
   </context>
   <context>
@@ -36,6 +42,85 @@
     <message>
       <source>Click to setup</source>
       <translation>Click to setup</translation>
+    </message>
+  </context>
+  <context>
+    <name>Figure</name>
+    <message>
+      <source>No shape</source>
+      <translation>لا شكل</translation>
+    </message>
+    <message>
+      <source>click to add</source>
+      <translation>انقر للإضافة</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Edit</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>حذف</translation>
+    </message>
+    <message>
+      <source>Display on camera</source>
+      <translation>عرض على كاميرا</translation>
+    </message>
+    <message>
+      <source>Figure</source>
+      <translation>الشكل</translation>
+    </message>
+  </context>
+  <context>
+    <name>FigureEditorDialog</name>
+    <message>
+      <source>Clear</source>
+      <translation>امسح</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>موافق</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>إلغاء</translation>
+    </message>
+  </context>
+  <context>
+    <name>InformationPanel</name>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation type="unfinished">Vendor</translation>
+    </message>
+  </context>
+  <context>
+    <name>Line</name>
+    <message>
+      <source>Click on video to start line.</source>
+      <translation>انقر على فيديو لبدء خط.</translation>
+    </message>
+    <message>
+      <source>Click arrows to toggle the desired directions.</source>
+      <translation>انقر فوق الأسهم لتبديل الاتجاهات المطلوبة.</translation>
+    </message>
+    <message>
+      <source>Line is not valid. Remove self-intersections to proceed.</source>
+      <translation>الخط غير صالح. إزالة التقاطعات الذاتية للمتابعة.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -77,6 +162,35 @@
     <message>
       <source>Server is offline</source>
       <translation>Server is offline</translation>
+    </message>
+  </context>
+  <context>
+    <name>PolyFigure</name>
+    <message>
+      <source>Delete</source>
+      <translation>حذف</translation>
+    </message>
+  </context>
+  <context>
+    <name>Polygon</name>
+    <message>
+      <source>Click on video to start polygon.</source>
+      <translation>انقر على فيديو لبدء شكل.</translation>
+    </message>
+    <message>
+      <source>Polygon is not valid. Remove self-intersections to proceed.</source>
+      <translation>الشكل غير صالح. إزالة التقاطعات الذاتية للمتابعة.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+        <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+      </translation>
     </message>
   </context>
   <context>

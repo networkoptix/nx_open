@@ -77,6 +77,7 @@
         "emailSignature": "メールの署名",
         "emailSupportEmail": "サポート Eメール",
         "enableEdgeRecording": "エッジ記録を有効にする",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "イベントログの期間（日）",
         "ldapAdminDn": "LDAP管理DN",
         "ldapSearchBase": "LDAP検索ベース",
@@ -85,6 +86,7 @@
         "localSystemId": "ローカルシステムID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "同期時間とインターネット時間の最大差（ミリ秒）",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "同期時刻とローカル時刻の最大差（ミリ秒）",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "レコードキューの最大サイズ（バイト）",
         "maxRecordQueueSizeElements": "レコードキューの最大サイズ（要素）",
         "maxRemoteArchiveSynchronizationThreads": "最大リモートアーカイブ同期スレッド",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "時刻同期有効",
         "primaryTimeServer": "プライマリ時刻同期サーバ",
         "osTimeChangeCheckPeriodMs": "OSの時刻変更チェック期間",
-        "syncTimeExchangePeriod": "同期時間周期",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "ウェアラブルカメラアーカイブの最大同期スレッド",
         "updateNotificationsEnabled": "更新の通知有効",
         "upnpPortMappingEnabled": "UPNPポートマッピング有効",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "ヘルスモニタリング",
+            "graphs": "Graphs",
             "storage": "ストレージ",
             "log": "ログ"
         }

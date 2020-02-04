@@ -41,8 +41,8 @@
             <span class="text"> tai </span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Lisää olemassa olevaan järjestelmään</button><br>
-        <small>(jos {{Config.productName}} on jo asetettu)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -475,7 +475,7 @@
             <div class="text-center"><b>Käyttämällä {{Config.productName}} sovellusta</b></div>
             <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Kirjautuminen</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Kirjaudu sisään</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">Salasana</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>

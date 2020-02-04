@@ -41,8 +41,8 @@
             <span class="text">eller</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Legg til i eksisterende system</button><br>
-        <small>(if {{Config.productName}} allerede er konfigurert)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -317,7 +317,7 @@
                     forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
                     forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
             <div class="help-block">
-                Alle feltene er påkrevd
+                Alle felt må fylles ut
             </div>
         </div>
 

@@ -2,6 +2,126 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ar" sourcelanguage="en">
   <context>
+    <name>ArchiveDuration</name>
+    <message>
+      <source>no data for forecast</source>
+      <translation>لا توجد بيانات للتنبؤ</translation>
+    </message>
+    <message>
+      <source>empty</source>
+      <translation>فارغ</translation>
+    </message>
+    <message>
+      <source>less than an hour</source>
+      <translation>أقل من ساعة</translation>
+    </message>
+  </context>
+  <context>
+    <name>HumanReadable</name>
+    <message numerus="yes">
+      <source>Bytes</source>
+      <comment>Full suffix for displaying bytes</comment>
+      <translation>
+        <numerusform>بايتات</numerusform>
+        <numerusform>بايتات</numerusform>
+        <numerusform>بايتات</numerusform>
+        <numerusform>بايتات</numerusform>
+        <numerusform>بايتات</numerusform>
+        <numerusform>بايتات</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>B</source>
+      <comment>Suffix for displaying bytes</comment>
+      <translation>B</translation>
+    </message>
+    <message numerus="yes">
+      <source>Kilobytes</source>
+      <comment>Full suffix for displaying kilobytes</comment>
+      <translation>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+        <numerusform>كيلوبايت</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>KB</source>
+      <comment>Suffix for displaying kilobytes</comment>
+      <translation>ك ب</translation>
+    </message>
+    <message numerus="yes">
+      <source>Megabytes</source>
+      <comment>Full suffix for displaying megabytes</comment>
+      <translation>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+        <numerusform>ميجابيت</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>MB</source>
+      <comment>Suffix for displaying megabytes</comment>
+      <translation>م. ب</translation>
+    </message>
+    <message numerus="yes">
+      <source>Gigabytes</source>
+      <comment>Full suffix for displaying gigabytes</comment>
+      <translation>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+        <numerusform>غيغا بايت</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>GB</source>
+      <comment>Suffix for displaying gigabytes</comment>
+      <translation>جيجابايت</translation>
+    </message>
+    <message numerus="yes">
+      <source>Terabytes</source>
+      <comment>Full suffix for displaying terabytes</comment>
+      <translation>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+        <numerusform>تيرابايت</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>TB</source>
+      <comment>Suffix for displaying terabytes</comment>
+      <translation>تيرابايت</translation>
+    </message>
+    <message numerus="yes">
+      <source>Petabytes</source>
+      <comment>Full suffix for displaying petabytes</comment>
+      <translation>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+        <numerusform>بيتابايت</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>PB</source>
+      <comment>Suffix for displaying petabytes</comment>
+      <translation>بيتابايت</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -875,13 +995,6 @@
     </message>
   </context>
   <context>
-    <name>QnLocalSystemDescription</name>
-    <message>
-      <source>New Server</source>
-      <translation>New Server</translation>
-    </message>
-  </context>
-  <context>
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
@@ -1065,10 +1178,182 @@
     </message>
   </context>
   <context>
-    <name>QnSystemDescription</name>
+    <name>QnTimeStrings</name>
     <message>
-      <source>Unnamed System</source>
-      <translation>نظام بدون اسم</translation>
+      <source>ms</source>
+      <comment>Suffix for displaying milliseconds</comment>
+      <translation>ملي ثانية</translation>
+    </message>
+    <message>
+      <source>s</source>
+      <comment>Suffix for displaying seconds</comment>
+      <translation>ثانية</translation>
+    </message>
+    <message>
+      <source>m</source>
+      <comment>Suffix for displaying minutes</comment>
+      <translation>د</translation>
+    </message>
+    <message>
+      <source>h</source>
+      <comment>Suffix for displaying hours</comment>
+      <translation>س</translation>
+    </message>
+    <message>
+      <source>d</source>
+      <comment>Suffix for displaying days</comment>
+      <translation>يوم</translation>
+    </message>
+    <message>
+      <source>w</source>
+      <comment>Suffix for displaying weeks</comment>
+      <translation>اسبوع</translation>
+    </message>
+    <message>
+      <source>M</source>
+      <comment>Suffix for displaying months</comment>
+      <translation>د</translation>
+    </message>
+    <message>
+      <source>y</source>
+      <comment>Suffix for displaying years</comment>
+      <translation>سنه</translation>
+    </message>
+    <message>
+      <source>msec</source>
+      <comment>Long suffix for displaying milliseconds</comment>
+      <translation>مللي ثانية</translation>
+    </message>
+    <message>
+      <source>sec</source>
+      <comment>Long suffix for displaying seconds</comment>
+      <translation>ثانية</translation>
+    </message>
+    <message>
+      <source>min</source>
+      <comment>Long suffix for displaying minutes</comment>
+      <translation>دقيقة</translation>
+    </message>
+    <message>
+      <source>hrs</source>
+      <comment>Long suffix for displaying hours</comment>
+      <translation>ساعة</translation>
+    </message>
+    <message>
+      <source>days</source>
+      <comment>Long suffix for displaying days</comment>
+      <translation>أيام</translation>
+    </message>
+    <message>
+      <source>wks</source>
+      <comment>Long suffix for displaying weeks</comment>
+      <translation>أسابيع</translation>
+    </message>
+    <message>
+      <source>mos</source>
+      <comment>Long suffix for displaying months</comment>
+      <translation>أشهر</translation>
+    </message>
+    <message>
+      <source>yrs</source>
+      <comment>Long suffix for displaying years</comment>
+      <translation>سنوات</translation>
+    </message>
+    <message numerus="yes">
+      <source>milliseconds</source>
+      <comment>Full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>ميلي ثانيه</numerusform>
+        <numerusform>ميلي ثانيه</numerusform>
+        <numerusform>ميلي ثانيه</numerusform>
+        <numerusform>ميلي ثانيه</numerusform>
+        <numerusform>ميلي ثانيه</numerusform>
+        <numerusform>ميلي ثانيه</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>seconds</source>
+      <comment>Full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>ثوانٍ</numerusform>
+        <numerusform>ثوانٍ</numerusform>
+        <numerusform>ثوانٍ</numerusform>
+        <numerusform>ثوانٍ</numerusform>
+        <numerusform>ثوانٍ</numerusform>
+        <numerusform>ثوانٍ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>minutes</source>
+      <comment>Full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>دقائق</numerusform>
+        <numerusform>دقائق</numerusform>
+        <numerusform>دقائق</numerusform>
+        <numerusform>دقائق</numerusform>
+        <numerusform>دقائق</numerusform>
+        <numerusform>دقائق</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>hours</source>
+      <comment>Full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>ساعات</numerusform>
+        <numerusform>ساعات</numerusform>
+        <numerusform>ساعات</numerusform>
+        <numerusform>ساعات</numerusform>
+        <numerusform>ساعات</numerusform>
+        <numerusform>ساعات</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>days</source>
+      <comment>Full suffix for displaying days</comment>
+      <translation>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>weeks</source>
+      <comment>Full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>أسابيع</numerusform>
+        <numerusform>أسابيع</numerusform>
+        <numerusform>أسابيع</numerusform>
+        <numerusform>أسابيع</numerusform>
+        <numerusform>أسابيع</numerusform>
+        <numerusform>أسابيع</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>months</source>
+      <comment>Full suffix for displaying months</comment>
+      <translation>
+        <numerusform>أشهر</numerusform>
+        <numerusform>أشهر</numerusform>
+        <numerusform>أشهر</numerusform>
+        <numerusform>أشهر</numerusform>
+        <numerusform>أشهر</numerusform>
+        <numerusform>أشهر</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>years</source>
+      <comment>Full suffix for displaying years</comment>
+      <translation>
+        <numerusform>سنوات</numerusform>
+        <numerusform>سنوات</numerusform>
+        <numerusform>سنوات</numerusform>
+        <numerusform>سنوات</numerusform>
+        <numerusform>سنوات</numerusform>
+        <numerusform>سنوات</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1287,10 +1572,6 @@
     <message>
       <source>License Issue</source>
       <translation type="unfinished">License Issue</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation type="unfinished">Archive backup finished</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
@@ -1761,6 +2042,35 @@
     <message>
       <source>RAID error. %1.</source>
       <translation type="unfinished">RAID error. %1.</translation>
+    </message>
+    <message>
+      <source>Buzzer</source>
+      <translation>صوت</translation>
+    </message>
+    <message>
+      <source>Archive Backup Finished</source>
+      <translation>اكتمل أرشيف النسخ الاحتياطي</translation>
+    </message>
+    <message>
+      <source>PoE over Budget</source>
+      <translation>PoE فوق الحد المسموح</translation>
+    </message>
+    <message>
+      <source>Fan Error</source>
+      <translation>خطأ مروحة</translation>
+    </message>
+    <message>
+      <source>PoE over budget at %1</source>
+      <translation>PoE فوق الحد المسموح على %1</translation>
+    </message>
+    <message>
+      <source>Fan error at %1</source>
+      <translation>خطأ المروحة في %1</translation>
+    </message>
+    <message>
+      <source>Reason: Power limit exceeded (%1)</source>
+      <comment>%1 is consumption</comment>
+      <translation type="unfinished">Reason: Power limit exceeded (%1)</translation>
     </message>
   </context>
   <context>

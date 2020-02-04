@@ -42,7 +42,7 @@
             <span class="line"></span>
         </div>
         <button class="btn btn-default" ng-click="skip()">既存のシステムに追加</button><br>
-        <small>(もし{{Config.productName}} が既に設定されている場合)</small><br>
+        <small>({{Config.productName}}が既に設定されている場合)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -338,7 +338,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>システム統合 ...</h2>
+    <h2>システム統合中 ...</h2>
     <p class="master-description">システムに接続を試みています</p>
 </div>
 

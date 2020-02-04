@@ -77,6 +77,7 @@
         "emailSignature": "ลายเซ็นอีเมล",
         "emailSupportEmail": "สนับสนุนอีเมล",
         "enableEdgeRecording": "เปิดใช้การบันทึกเสียงสนทนาหรือไม่",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "ระยะเวลาบันทึกเหตุการณ์ (วัน)",
         "ldapAdminDn": "ผู้ดูแล LDAP DN",
         "ldapSearchBase": "ฐานการค้นหา LDAP",
@@ -85,6 +86,7 @@
         "localSystemId": "ระบบภายใน",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "ความแตกต่างสูงสุดระหว่างเวลาที่ซิงโครไนซ์กับอินเทอร์เน็ต (มิลลิวินาที)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "ความแตกต่างระหว่างเวลาซิงโครไนซ์กับเวลาท้องถิ่น (มิลลิวินาที)",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "ขนาดคิวการบันทึกสูงสุด (ไบต์)",
         "maxRecordQueueSizeElements": "ขนาดคิวการบันทึกสูงสุด (ไบต์)",
         "maxRemoteArchiveSynchronizationThreads": "การซิงโครไนซ์ที่เก็บข้อมูลระยะไกล",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "เปิดใช้งานการซิงโครไนส์เวลา",
         "primaryTimeServer": "Primary time synchronization server",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "เปิดใช้งานการแจ้งเตือนการปรับปรุง",
         "upnpPortMappingEnabled": "เปิดใช้การแมปพอร์ต UPnP",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "การตรวจสอบสุขภาพ",
+            "graphs": "Graphs",
             "storage": "พื้นที่จัดเก็บ",
             "log": "บันทึก"
         }

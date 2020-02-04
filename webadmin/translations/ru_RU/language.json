@@ -77,6 +77,7 @@
         "emailSignature": "Подпись к письму",
         "emailSupportEmail": "Электронная почта поддержки",
         "enableEdgeRecording": "Включить запись на внутренний носитель (edge)",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Размер журнала событий (дни)",
         "ldapAdminDn": "LDAP Администратор DN",
         "ldapSearchBase": "База поиска LDAP",
@@ -85,6 +86,7 @@
         "localSystemId": "Идентификатор локальной системы",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Максимальное различие между синхронизированным и интернет-временем (миллисекунды)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Максимальное различие между синхронизированным и местным временем (миллисекунды)",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "Максимальный размер очереди записи (байты)",
         "maxRecordQueueSizeElements": "Максимальный размер очереди записи (элементы)",
         "maxRemoteArchiveSynchronizationThreads": "Максимальное кол-во потоков синхронизации удаленного архива",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Синхронизация времени включена",
         "primaryTimeServer": "Primary time synchronization server",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Уведомления об обновлениях включены",
         "upnpPortMappingEnabled": "Сопоставление портов UPNP включено",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Мониторинг ресурсов",
+            "graphs": "Graphs",
             "storage": "Хранилища",
             "log": "Журнал"
         }

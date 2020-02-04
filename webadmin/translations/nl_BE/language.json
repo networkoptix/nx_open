@@ -77,6 +77,7 @@
         "emailSignature": "Email handtekening",
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Edge opname inschakelen",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Event log periode (dagen)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP-zoekbasis",
@@ -85,6 +86,7 @@
         "localSystemId": "Lokaal systeem ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max verschil tussen gesynchroniseerde en internettijd (milliseconden)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max verschil tussen gesynchroniseerde en lokale tijd (milliseconden)",
+        "maxP2pQueueSizeBytes": "Max P2P wachtrijgrootte (bytes)",
         "maxRecordQueueSizeBytes": "Max records wachtrijgrootte (bytes)",
         "maxRecordQueueSizeElements": "Max records wachtrijgrootte (elementen)",
         "maxRemoteArchiveSynchronizationThreads": "Max externe opname synchronisatie taken",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Tijdsynchronisatie ingeschakeld",
         "primaryTimeServer": "Primaire tijdsynchronisatieserver",
         "osTimeChangeCheckPeriodMs": "Controle van de tijd van het besturingssysteem",
-        "syncTimeExchangePeriod": "Tijdsychronisatie uitwisselingsperiode",
+        "syncTimeExchangePeriod": "Synchroniseer tijd synchronisatie interval voor netwerkverzoeken",
+        "syncTimeEpsilon": "Synchroniseer tijd epsilon. Nieuwe waarde wordt niet toegepast als tijd detla minder is dan epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max. aantal draagbare camera archief synchronisatie verbindingen",
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Server monitoring",
+            "graphs": "Graphs",
             "storage": "Opslagruimte",
             "log": "Log"
         }

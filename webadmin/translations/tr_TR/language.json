@@ -77,6 +77,7 @@
         "emailSignature": "E-posta imzası",
         "emailSupportEmail": "Destek maili",
         "enableEdgeRecording": "Çağrı Uç etkinleştirilsin",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Olay günlük periyodu (gün)",
         "ldapAdminDn": "LDAP yönetici DN",
         "ldapSearchBase": "LDAP veritabanı",
@@ -85,6 +86,7 @@
         "localSystemId": "Yerel Sistem Kimliği",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Eşzamanlı İnternet zamanı arasındaki maksimum fark (milisaniyeler)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Eşzamanlı yerel zaman arasındaki maksimum fark (milisaniyeler)",
+        "maxP2pQueueSizeBytes": "Maksimum kayıt kuyruğu boyutu (bayt)",
         "maxRecordQueueSizeBytes": "Maksimum kayıt kuyruğu boyutu (bayt)",
         "maxRecordQueueSizeElements": "Maksimum kayıt kuyruğu boyutu (öğeler)",
         "maxRemoteArchiveSynchronizationThreads": "Maksimum uzak arşiv senkronizasyon konuları",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Zaman senkronizasyonu etkin",
         "primaryTimeServer": "Birincil zaman senkronizasyon sunucusu",
         "osTimeChangeCheckPeriodMs": "İşletim sistemi zaman değişikliği kontrol süresi",
-        "syncTimeExchangePeriod": "Senkronizasyon eşitleme periyodu",
+        "syncTimeExchangePeriod": "Ağ istekleri için senkronizasyon zamanı senkronizasyon aralığı",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Maks. Giyilebilir kamera arşivi senkronizasyon konuları",
         "updateNotificationsEnabled": "Güncelleştirme bildirimleri etkin",
         "upnpPortMappingEnabled": "UPNP bağlantı noktası eşlemesi etkinleştirildi",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Performans İzleme",
+            "graphs": "Graphs",
             "storage": "Depolama",
             "log": "Günlük"
         }

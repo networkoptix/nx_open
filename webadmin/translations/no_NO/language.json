@@ -77,6 +77,7 @@
         "emailSignature": "E-post signatur",
         "emailSupportEmail": "Kundestøtte E-mail",
         "enableEdgeRecording": "Aktiver edge-opptak",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Hendelsesloggperiode (dager)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP-søkebase",
@@ -85,6 +86,7 @@
         "localSystemId": "Lokalt system-ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Maksimal forskjell mellom synkronisert og Internett-tid (millisekunder)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Maksimal forskjell mellom synkronisert og lokal tid (millisekunder)",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "Maksimal opptakskø størrelse (bytes)",
         "maxRecordQueueSizeElements": "Maksimal opptakskøstørrelse (elementer)",
         "maxRemoteArchiveSynchronizationThreads": "Maksimalt antall arkiver synkronisering tråder",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Tidssynkronisering aktivert",
         "primaryTimeServer": "Primary time synchronization server",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Oppdateringsvarsler aktivert",
         "upnpPortMappingEnabled": "UPNP port kartlegging aktivert",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Helseovervåking",
+            "graphs": "Graphs",
             "storage": "Lagring",
             "log": "Logg"
         }

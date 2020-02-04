@@ -77,6 +77,7 @@
         "emailSignature": "E-mail aláírás",
         "emailSupportEmail": "Ügyfélszolgálati e-mail",
         "enableEdgeRecording": "Edge rögzítés engedélyezése",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Eseménynapló időszak (nap)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP kereső bázis",
@@ -85,6 +86,7 @@
         "localSystemId": "Helyirendszer ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Maximális különbség a szinkronizált és az internetes idő között (milisec)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Maximális különbség a szinkronizált és avhelyi idő között (milisec)",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "Max. rekord sorméret (bájt)",
         "maxRecordQueueSizeElements": "Max. rekord sorméret (elem)",
         "maxRemoteArchiveSynchronizationThreads": "Rögzített videók távoli szinkronizálása max. szála",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Időszinkronizálás engedélyezve",
         "primaryTimeServer": "Elsődleges időszinkronizáló szerver",
         "osTimeChangeCheckPeriodMs": "OS időváltozási ellenőrzési időszak",
-        "syncTimeExchangePeriod": "Szinkronizációs időtartam",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max hordozható kamera archív szinkronszálak",
         "updateNotificationsEnabled": "Frissítések értesítései engedélyezve",
         "upnpPortMappingEnabled": "Az UPNP port hozzárendelés engedélyezve",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Állapotfigyelés",
+            "graphs": "Graphs",
             "storage": "Tároló",
             "log": "Napló"
         }

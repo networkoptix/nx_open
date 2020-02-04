@@ -77,6 +77,7 @@
         "emailSignature": "Підпис електронної пошти",
         "emailSupportEmail": "Email підтримки",
         "enableEdgeRecording": "Включити запис на внутрішній носій (edge)",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Розмір журналу подій (дні)",
         "ldapAdminDn": "LDAP адміністратор DN",
         "ldapSearchBase": "База пошуку LDAP",
@@ -85,6 +86,7 @@
         "localSystemId": "Ідентифікатор локальної системи",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Максимальна різниця між синхронізованим та Інтернет-часом (мілісекундами)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Максимальна різниця між синхронізованим та локальним часом (мілісекунди)",
+        "maxP2pQueueSizeBytes": "Макс. розмір черги P2P (байт)",
         "maxRecordQueueSizeBytes": "Макс розмір черги запису (байтів)",
         "maxRecordQueueSizeElements": "Макс розмір черги запису (елементи)",
         "maxRemoteArchiveSynchronizationThreads": "Максимальна кількість потоків синхронізації віддаленого архіву",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Синхронізація часу включена",
         "primaryTimeServer": "Основний сервер синхронізації часу",
         "osTimeChangeCheckPeriodMs": "Період перевірки часу зміни ОС",
-        "syncTimeExchangePeriod": "Період синхронізації",
+        "syncTimeExchangePeriod": "Інтервал синхронізації часу для мережевих запитів",
+        "syncTimeEpsilon": "Час синхронізації. Нове значення не застосовується при виявці часу менше аніж у epsilon",
         "maxWearableArchiveSynchronizationThreads": "Максимальна кількість потоків синхронізації для записів мобільних камер",
         "updateNotificationsEnabled": "Повідомлення про оновлення включені",
         "upnpPortMappingEnabled": "Зіставлення портів UPNP включено",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Моніторинг ресурсів",
+            "graphs": "Graphs",
             "storage": "Сховище",
             "log": "Журнал"
         }

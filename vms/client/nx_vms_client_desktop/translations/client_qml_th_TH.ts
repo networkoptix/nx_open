@@ -4,16 +4,22 @@
   <context>
     <name>AnalyticsSettings</name>
     <message>
-      <source>Enable</source>
-      <translation>เปิดใช้งาน</translation>
-    </message>
-    <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>การวิเคราะห์กล้องจะทำงานเฉพาะเมื่อมีการดูกล้อง เปิดใช้งานการบันทึกเพื่อให้ทำงานได้ตลอดเวลา</translation>
     </message>
+  </context>
+  <context>
+    <name>Box</name>
     <message>
-      <source>This is the built-in functionality</source>
-      <translation>นี่คือฟังก์ชั่นในตัว</translation>
+      <source>Click on video to start box.</source>
+      <translation type="unfinished">Click on video to start box.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ContextHintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation type="unfinished">Click to read more</translation>
     </message>
   </context>
   <context>
@@ -36,6 +42,80 @@
     <message>
       <source>Click to setup</source>
       <translation>คลิกเพื่อตั้งค่า</translation>
+    </message>
+  </context>
+  <context>
+    <name>Figure</name>
+    <message>
+      <source>No shape</source>
+      <translation type="unfinished">No shape</translation>
+    </message>
+    <message>
+      <source>click to add</source>
+      <translation type="unfinished">click to add</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>แก้ไข</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>ลบ</translation>
+    </message>
+    <message>
+      <source>Display on camera</source>
+      <translation type="unfinished">Display on camera</translation>
+    </message>
+    <message>
+      <source>Figure</source>
+      <translation type="unfinished">Figure</translation>
+    </message>
+  </context>
+  <context>
+    <name>FigureEditorDialog</name>
+    <message>
+      <source>Clear</source>
+      <translation>ล้าง</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>ตกลง</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>ยกเลิก</translation>
+    </message>
+  </context>
+  <context>
+    <name>InformationPanel</name>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation type="unfinished">Vendor</translation>
+    </message>
+  </context>
+  <context>
+    <name>Line</name>
+    <message>
+      <source>Click on video to start line.</source>
+      <translation type="unfinished">Click on video to start line.</translation>
+    </message>
+    <message>
+      <source>Click arrows to toggle the desired directions.</source>
+      <translation type="unfinished">Click arrows to toggle the desired directions.</translation>
+    </message>
+    <message>
+      <source>Line is not valid. Remove self-intersections to proceed.</source>
+      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation type="unfinished">
+        <numerusform>Maximum points count is reached (%n points).</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -77,6 +157,30 @@
     <message>
       <source>Server is offline</source>
       <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
+    </message>
+  </context>
+  <context>
+    <name>PolyFigure</name>
+    <message>
+      <source>Delete</source>
+      <translation>ลบ</translation>
+    </message>
+  </context>
+  <context>
+    <name>Polygon</name>
+    <message>
+      <source>Click on video to start polygon.</source>
+      <translation type="unfinished">Click on video to start polygon.</translation>
+    </message>
+    <message>
+      <source>Polygon is not valid. Remove self-intersections to proceed.</source>
+      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation type="unfinished">
+        <numerusform>Maximum points count is reached (%n points).</numerusform>
+      </translation>
     </message>
   </context>
   <context>

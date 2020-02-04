@@ -77,6 +77,7 @@
         "emailSignature": "Signature Courriel",
         "emailSupportEmail": "Support Courriel",
         "enableEdgeRecording": "Activer l'enregistrement Edge",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Période du journal d'événements (jours)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP Base de recherche",
@@ -85,6 +86,7 @@
         "localSystemId": "ID Système Local",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Différence max entre l'heure synchronisée et Internet (millisecondes)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Différence max entre l'heure synchronisée et locale (millisecondes)",
+        "maxP2pQueueSizeBytes": "Taille max de la file d'attente P2P (octets)",
         "maxRecordQueueSizeBytes": "Taille max file d'attente d'enregistrement (octets)",
         "maxRecordQueueSizeElements": "Taille max file d'attente d'enregistrement (éléments)",
         "maxRemoteArchiveSynchronizationThreads": "Threads max de synchronisation d'archives distantes",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Synchronisation de l'heure activée",
         "primaryTimeServer": "Serveur de synchronisation horaire principal",
         "osTimeChangeCheckPeriodMs": "Période de vérification du changement d'heure de l'OS",
-        "syncTimeExchangePeriod": "Période d'échange de temps de synchronisation",
+        "syncTimeExchangePeriod": "Intervalle de synchronisation de synchronisation de l'heure pour les requêtes réseau",
+        "syncTimeEpsilon": "Synchroniser le temps epsilon. La nouvelle valeur n'est pas appliquée si le temps est inférieur à epsilon",
         "maxWearableArchiveSynchronizationThreads": "Nombre max de threads de synchronisation d'archive de caméra portable",
         "updateNotificationsEnabled": "Notifications de mise à jour activées",
         "upnpPortMappingEnabled": "Mappage de port UPNP activé",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Moniteur de santé",
+            "graphs": "Graphs",
             "storage": "Stockage",
             "log": "Journal"
         }

@@ -986,6 +986,14 @@ to view more bookmarks</source>
       <source>Page...</source>
       <translation>Página...</translation>
     </message>
+    <message>
+      <source>Connect to this Server</source>
+      <translation>Conéctese a este servidor</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation>Alfiler</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1485,6 +1493,10 @@ to view more bookmarks</source>
     <message>
       <source>Built for %1-%2 with %3.</source>
       <translation>Construido para %1-%2 con %3.</translation>
+    </message>
+    <message>
+      <source>Regional support</source>
+      <translation>Apoyo regional</translation>
     </message>
   </context>
   <context>
@@ -2027,27 +2039,8 @@ to view more bookmarks</source>
       <translation>Comienzo</translation>
     </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>Seleccione al menos un dispositivo</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Seleccione al menos una cámara</translation>
-    </message>
-    <message>
       <source>Occurs</source>
       <translation>Ocurre</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Cámara de origen</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more cameras</source>
-      <translation>
-        <numerusform>Fuente y %n más cámaras</numerusform>
-        <numerusform>Fuente y %n más cámaras</numerusform>
-      </translation>
     </message>
     <message>
       <source>N/A</source>
@@ -2079,6 +2072,37 @@ to view more bookmarks</source>
         <numerusform>%n Servidores</numerusform>
         <numerusform>%n Servidores</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User</source>
+      <translation>Usuario</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Servidor de origen</translation>
+    </message>
+    <message>
+      <source>Source Camera</source>
+      <translation>Cámara fuente</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Fuente y %n más cámaras</numerusform>
+        <numerusform>Fuente y %n más cámaras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select at least one Device</source>
+      <translation>Seleccione al menos un dispositivo</translation>
+    </message>
+    <message>
+      <source>Select at least one Camera</source>
+      <translation>Seleccione al menos una Cámara</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Seleccionar servidor</translation>
     </message>
   </context>
   <context>
@@ -2202,6 +2226,13 @@ to view more bookmarks</source>
     <message>
       <source>Interval of Action</source>
       <translation>Intervalo de acción</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation>Servidores que admiten timbre</translation>
     </message>
   </context>
   <context>
@@ -3102,6 +3133,10 @@ a %1</translation>
         <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Description</source>
+      <translation>Descripción</translation>
+    </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
@@ -3245,6 +3280,13 @@ a %1</translation>
     <message>
       <source>Select cameras to setup failover priority</source>
       <translation>Seleccionar las cámaras para configurar la prioridad de conmutación por error</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation>Servidores que admiten el diagnóstico del ventilador</translation>
     </message>
   </context>
   <context>
@@ -3565,22 +3607,6 @@ a %1</translation>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
-      <source>Screens Allowed:</source>
-      <translation>Pantallas permitidas:</translation>
-    </message>
-    <message>
-      <source>Control Sessions Allowed:</source>
-      <translation>Sesiones de control permitidas:</translation>
-    </message>
-    <message>
-      <source>Archive Streams Allowed:</source>
-      <translation>Secuencias de archivo permitidos:</translation>
-    </message>
-    <message>
-      <source>Generic:</source>
-      <translation>Genérico:</translation>
-    </message>
-    <message>
       <source>License Type</source>
       <translation>Tipo de licencia</translation>
     </message>
@@ -3589,12 +3615,32 @@ a %1</translation>
       <translation>Clave de licencia</translation>
     </message>
     <message>
-      <source>Features:</source>
-      <translation>Características:</translation>
-    </message>
-    <message>
       <source>Locked to Hardware ID</source>
       <translation>Enlazado al ID de Hardware</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation type="unfinished">Generic</translation>
+    </message>
+    <message>
+      <source>Deactivations Left</source>
+      <translation type="unfinished">Deactivations Left</translation>
+    </message>
+    <message>
+      <source>Features</source>
+      <translation type="unfinished">Features</translation>
+    </message>
+    <message>
+      <source>Screens Allowed</source>
+      <translation type="unfinished">Screens Allowed</translation>
+    </message>
+    <message>
+      <source>Control Sessions Allowed</source>
+      <translation type="unfinished">Control Sessions Allowed</translation>
+    </message>
+    <message>
+      <source>Archive Streams Allowed</source>
+      <translation type="unfinished">Archive Streams Allowed</translation>
     </message>
   </context>
   <context>
@@ -3902,12 +3948,8 @@ a %1</translation>
       <translation>Fallo al abrir el archivo</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Envíe un correo electrónico con la clave de licencia y el ID de Hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Envíe la Clave de Licencia y el ID de Hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
+      <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
+      <translation>Para obtener un archivo de clave de activación, envíe la clave de licencia y la identificación de hardware proporcionadas a %1.</translation>
     </message>
   </context>
   <context>
@@ -4458,6 +4500,13 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation>Servidores que admiten monitoreo PoE</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
@@ -4712,16 +4761,8 @@ a %1</translation>
       <translation>Días de calendario</translation>
     </message>
     <message>
-      <source>less than an hour</source>
-      <translation>menos de una hora</translation>
-    </message>
-    <message>
       <source>%1 Mbps</source>
       <translation>%1 Mbps</translation>
-    </message>
-    <message>
-      <source>empty</source>
-      <translation>vacío</translation>
     </message>
     <message>
       <source>Device</source>
@@ -4742,10 +4783,6 @@ a %1</translation>
     <message>
       <source>Current Bitrate</source>
       <translation>Bitrate actual</translation>
-    </message>
-    <message>
-      <source>no data for forecast</source>
-      <translation>no hay datos para el pronóstico</translation>
     </message>
   </context>
   <context>
@@ -5196,6 +5233,10 @@ a %1</translation>
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>PoE</source>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5775,12 +5816,12 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>usb</translation>
     </message>
     <message>
-      <source>unknown</source>
-      <translation>desconocido</translation>
-    </message>
-    <message>
       <source>%1 TB</source>
       <translation>%1 TB</translation>
+    </message>
+    <message>
+      <source>smb</source>
+      <translation>smb</translation>
     </message>
   </context>
   <context>
@@ -6474,13 +6515,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
   </context>
   <context>
-    <name>QnWebPage</name>
-    <message>
-      <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation>DESCARGANDO&lt;br&gt;INICIADO</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6564,6 +6598,10 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Video Wall se elimina en el servidor y se cerrará.</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the selected server</source>
+      <translation>No se pudo conectar con el servidor seleccionado</translation>
     </message>
   </context>
   <context>
@@ -6773,20 +6811,12 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>Nueva matriz %1</translation>
     </message>
     <message>
-      <source>Video Wall license required</source>
-      <translation>Licencias para pared de vídeo requerida</translation>
-    </message>
-    <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
       <translation>Para activar esta función, active una Licencias para pared de vídeo.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
       <translation>Error al aplicar cambios</translation>
-    </message>
-    <message>
-      <source>To enable Video Wall, please activate a Video Wall license.</source>
-      <translation>Para habilitar Pared de vídeo, activa una Licencia para pared de vídeo.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
@@ -6841,6 +6871,10 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>Activar una licencia más para iniciar Pared de vídeo.</translation>
+    </message>
+    <message>
+      <source>Activate License...</source>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
@@ -7318,16 +7352,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
   </context>
   <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n usuarios</numerusform>
-        <numerusform>%n usuarios</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>TimelineCursorLayout</name>
     <message>
       <source>Live</source>
@@ -7478,6 +7502,13 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Unknown track</source>
       <translation>Pista desconocida</translation>
+    </message>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8360,6 +8391,17 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
+    <message>
+      <source>The proxy %1 requires a username and password.</source>
+      <translation>El proxy %1 requiere un nombre de usuario y contraseña.</translation>
+    </message>
+    <message>
+      <source>Select folder to upload</source>
+      <translation>Seleccionar carpeta para cargar</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
@@ -8447,6 +8489,10 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
       <translation>Número personalizado que se puede asignar a un diseño para una rápida identificación y acceso</translation>
+    </message>
+    <message>
+      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
+      <translation>Esta identificación ya esta siendo utilizada en el sistema. Use el botón Generar para encontrar una identificación libre.</translation>
     </message>
   </context>
   <context>
@@ -8860,6 +8906,10 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>Evento de diagnóstico de plugin desconocido</translation>
     </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Consumo</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8893,6 +8943,13 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Algunos usuarios no tienen acceso al diseño seleccionado. La acción no funcionará para ellos.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PasswordDialog</name>
+    <message>
+      <source>Sign In</source>
+      <translation>Registrarse</translation>
     </message>
   </context>
   <context>
@@ -8992,6 +9049,67 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>This OS version is no longer supported.</source>
       <translation>Esta versión del sistema operativo ya no es compatible.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
+    <message>
+      <source>%1 Mbps</source>
+      <translation>%1 Mbps</translation>
+    </message>
+    <message>
+      <source>Disconnected</source>
+      <translation>Desconectado</translation>
+    </message>
+    <message>
+      <source>Connected</source>
+      <translation>Conectado</translation>
+    </message>
+    <message>
+      <source>Powered</source>
+      <translation>Motorizado</translation>
+    </message>
+    <message>
+      <source>Unexpected</source>
+      <translation>Inesperado</translation>
+    </message>
+    <message>
+      <source>Empty</source>
+      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+      <translation>Vacío</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device %1 &gt;</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation>&lt; Dispositivo desconocido %1 &gt;</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Puerto</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Cámara</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Consumo</translation>
+    </message>
+    <message>
+      <source>Speed</source>
+      <translation>Velocidad</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Estatus</translation>
+    </message>
+    <message>
+      <source>Power</source>
+      <translation>Poder</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device &gt;</source>
+      <translation>&lt; Dispositivo desconocido &gt;</translation>
     </message>
   </context>
   <context>
@@ -9134,6 +9252,24 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
       <translation>Las marcas de agua se mostrarán a través de videos en vivo, archivados y exportados para usuarios no administradores. Usted y otros administradores no las verán.</translation>
+    </message>
+    <message>
+      <source>Only client-server video traffic can be encrypted</source>
+      <translation>Solo se puede cifrar el tráfico de video cliente-servidor</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n camaras</numerusform>
+        <numerusform>%n camaras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There are no compatible servers</source>
+      <translation>No hay servidores compatibles</translation>
     </message>
   </context>
   <context>
@@ -9484,13 +9620,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::WebWidget</name>
-    <message>
-      <source>Failed to load page</source>
-      <translation>Error al cargar la página</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -9727,10 +9856,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
-      <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation>Complete la información sobre usted y justifique la desactivación de la licencia</translation>
-    </message>
-    <message>
       <source>Next</source>
       <translation>Siguiente</translation>
     </message>
@@ -9769,6 +9894,20 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Other Reason</source>
       <translation>Otra Razón</translation>
+    </message>
+    <message>
+      <source>Please enter your contact information and the reason for deactivating your license</source>
+      <translation>Ingrese su información de contacto y el motivo para desactivar su licencia</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n Usuarios</numerusform>
+        <numerusform>%n Usuarios</numerusform>
+      </translation>
     </message>
   </context>
   <context>

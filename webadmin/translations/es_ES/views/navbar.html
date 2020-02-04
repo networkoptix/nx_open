@@ -12,8 +12,9 @@
                 <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Configuraciones</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}"><a ng-href="#/view/">Vista</a></li>
                 <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}"><a ng-href="#/client/">Cliente Ligero</a></li>
-                <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}"><a ng-href="#/info/">Información</a></li>
+                <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}"><a ng-href="#/info/">Monitoring</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}"><a ng-href="#/developers/">Para los desarrolladores</a></li>
+                <li ng-hide="settings.liteClient" ng-class="{active:isActive('/health')}"><a ng-href="#/health/">Información</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}"><a ng-href="#/help/">Ayuda</a></li>
             </ul>
 

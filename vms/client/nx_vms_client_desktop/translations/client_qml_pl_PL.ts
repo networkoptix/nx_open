@@ -4,16 +4,22 @@
   <context>
     <name>AnalyticsSettings</name>
     <message>
-      <source>Enable</source>
-      <translation>Włącz</translation>
-    </message>
-    <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Analityka w kamerze będzie działać tylko wtedy, gdy kamera jest na podglądzie. Należy włączyć nagrywanie, aby analityka działała cały czas.</translation>
     </message>
+  </context>
+  <context>
+    <name>Box</name>
     <message>
-      <source>This is the built-in functionality</source>
-      <translation>To jest wbudowana funkcja</translation>
+      <source>Click on video to start box.</source>
+      <translation>Kliknij wideo, aby rozpocząć prostokąt.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ContextHintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation type="unfinished">Click to read more</translation>
     </message>
   </context>
   <context>
@@ -36,6 +42,83 @@
     <message>
       <source>Click to setup</source>
       <translation>Kliknij, aby skonfigurować</translation>
+    </message>
+  </context>
+  <context>
+    <name>Figure</name>
+    <message>
+      <source>No shape</source>
+      <translation>Bez kształtu</translation>
+    </message>
+    <message>
+      <source>click to add</source>
+      <translation>kliknij, aby dodać</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Edytuj</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Usuń</translation>
+    </message>
+    <message>
+      <source>Display on camera</source>
+      <translation>Wyświetl na kamerze</translation>
+    </message>
+    <message>
+      <source>Figure</source>
+      <translation>Rysunek</translation>
+    </message>
+  </context>
+  <context>
+    <name>FigureEditorDialog</name>
+    <message>
+      <source>Clear</source>
+      <translation>Wyczyść</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Anuluj</translation>
+    </message>
+  </context>
+  <context>
+    <name>InformationPanel</name>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation type="unfinished">Vendor</translation>
+    </message>
+  </context>
+  <context>
+    <name>Line</name>
+    <message>
+      <source>Click on video to start line.</source>
+      <translation>Kliknij wideo, aby rozpocząć linię.</translation>
+    </message>
+    <message>
+      <source>Click arrows to toggle the desired directions.</source>
+      <translation>Kliknij strzałki, aby zmienić kierunek</translation>
+    </message>
+    <message>
+      <source>Line is not valid. Remove self-intersections to proceed.</source>
+      <translation>Linia jest nieprawidłowa. Usuń przecięcia, aby kontynuować.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punkt).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punkty).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -77,6 +160,33 @@
     <message>
       <source>Server is offline</source>
       <translation>Serwer jest odłączony</translation>
+    </message>
+  </context>
+  <context>
+    <name>PolyFigure</name>
+    <message>
+      <source>Delete</source>
+      <translation>Usuń</translation>
+    </message>
+  </context>
+  <context>
+    <name>Polygon</name>
+    <message>
+      <source>Click on video to start polygon.</source>
+      <translation>Kliknij wideo, aby rozpocząć wielokąt.</translation>
+    </message>
+    <message>
+      <source>Polygon is not valid. Remove self-intersections to proceed.</source>
+      <translation>Wielokąt jest nieprawidłowy. Usuń przecięcia, aby kontynuować.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
+      </translation>
     </message>
   </context>
   <context>

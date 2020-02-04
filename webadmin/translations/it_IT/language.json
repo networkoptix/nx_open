@@ -77,6 +77,7 @@
         "emailSignature": "Firma e-mail",
         "emailSupportEmail": "Email di supporto",
         "enableEdgeRecording": "Abilitazione della registrazione a bordo",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Periodo del registro eventi (giorni)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "Base di ricerca LDAP",
@@ -85,6 +86,7 @@
         "localSystemId": "ID del sistema locale",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Differenza massima tra tempo sincronizzato e Internet (millisecondi)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Differenza massima tra ora sincronizzata e locale (millisecondi)",
+        "maxP2pQueueSizeBytes": "Dimensione massima della coda P2P (byte)",
         "maxRecordQueueSizeBytes": "Dimensione massima della coda di registrazione (byte)",
         "maxRecordQueueSizeElements": "Dimensione massima della coda di registrazione (elementi)",
         "maxRemoteArchiveSynchronizationThreads": "Numero massimo di thread di sincronizzazione dell'archivio remoto",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Sincronizzazione dell'ora abilitata",
         "primaryTimeServer": "Server primario di sincronizzazione dell'ora",
         "osTimeChangeCheckPeriodMs": "Periodo di controllo della modifica dell'ora del sistema operativo",
-        "syncTimeExchangePeriod": "Sincronizza periodo di cambio dell'orario",
+        "syncTimeExchangePeriod": "Intervallo sincronizzazione orario per le richieste di rete",
+        "syncTimeEpsilon": "Tempo di sincronizzazione epsilon. Il nuovo valore non viene applicato se il tempo delta è inferiore a epsilon",
         "maxWearableArchiveSynchronizationThreads": "Thread di sincronizzazione massima dell'archivio della telecamera indossabili",
         "updateNotificationsEnabled": "Notifiche di aggiornamento abilitate",
         "upnpPortMappingEnabled": "Funzione UPNP abilitata",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Monitor prestazioni",
+            "graphs": "Graphs",
             "storage": "Archiviazione",
             "log": "Registro"
         }

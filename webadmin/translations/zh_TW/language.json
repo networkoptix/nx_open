@@ -77,6 +77,7 @@
         "emailSignature": "電子郵件簽章",
         "emailSupportEmail": "支援電子郵件",
         "enableEdgeRecording": "啟動斷線回補",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "事件日誌天數 (天)",
         "ldapAdminDn": "LDAP 管理者 DN",
         "ldapSearchBase": "LDAP 搜尋庫",
@@ -85,6 +86,7 @@
         "localSystemId": "本機系統 ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "與網際網路校時最大秒差 (毫秒)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "與本機伺服器校時最大秒差 (毫秒)",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "最大錄影序列大小 (位元組)",
         "maxRecordQueueSizeElements": "最大錄影序列大小 (元件)",
         "maxRemoteArchiveSynchronizationThreads": "最大遠程歸檔同步執行緒",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "時間同步啟用",
         "primaryTimeServer": "將主時間同步校時伺服器",
         "osTimeChangeCheckPeriodMs": "作業系統時間變更檢查期",
-        "syncTimeExchangePeriod": "交換同步時間週期",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "更新通知啟動",
         "upnpPortMappingEnabled": "啟用 UPNP 埠映射",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "資源檢視器",
+            "graphs": "Graphs",
             "storage": "儲存裝置",
             "log": "日誌"
         }

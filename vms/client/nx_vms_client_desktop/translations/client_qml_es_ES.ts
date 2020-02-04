@@ -4,16 +4,22 @@
   <context>
     <name>AnalyticsSettings</name>
     <message>
-      <source>Enable</source>
-      <translation>Habilitar</translation>
-    </message>
-    <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>La analítica de la cámara solo funcionará cuando se esté viendo la cámara. Habilita la grabación para que funcione todo el tiempo.</translation>
     </message>
+  </context>
+  <context>
+    <name>Box</name>
     <message>
-      <source>This is the built-in functionality</source>
-      <translation>Esta es la funcionalidad incorporada</translation>
+      <source>Click on video to start box.</source>
+      <translation>Haga clic en el video para iniciar la caja.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ContextHintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation type="unfinished">Click to read more</translation>
     </message>
   </context>
   <context>
@@ -36,6 +42,81 @@
     <message>
       <source>Click to setup</source>
       <translation>Haga clic para configurar</translation>
+    </message>
+  </context>
+  <context>
+    <name>Figure</name>
+    <message>
+      <source>No shape</source>
+      <translation>Sin forma</translation>
+    </message>
+    <message>
+      <source>click to add</source>
+      <translation>haga clic para agregar</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Corregir</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Borrar</translation>
+    </message>
+    <message>
+      <source>Display on camera</source>
+      <translation>Mostrar en cámara</translation>
+    </message>
+    <message>
+      <source>Figure</source>
+      <translation>Figura</translation>
+    </message>
+  </context>
+  <context>
+    <name>FigureEditorDialog</name>
+    <message>
+      <source>Clear</source>
+      <translation>Claro</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>Aceptar</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
+    </message>
+  </context>
+  <context>
+    <name>InformationPanel</name>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation type="unfinished">Vendor</translation>
+    </message>
+  </context>
+  <context>
+    <name>Line</name>
+    <message>
+      <source>Click on video to start line.</source>
+      <translation>Haga clic en el video para comenzar la línea.</translation>
+    </message>
+    <message>
+      <source>Click arrows to toggle the desired directions.</source>
+      <translation>Haga clic en las flechas para alternar las direcciones deseadas.</translation>
+    </message>
+    <message>
+      <source>Line is not valid. Remove self-intersections to proceed.</source>
+      <translation>La línea no es válida. Elimine las auto intersecciones para continuar.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -77,6 +158,31 @@
     <message>
       <source>Server is offline</source>
       <translation>El servidor esta desconectado</translation>
+    </message>
+  </context>
+  <context>
+    <name>PolyFigure</name>
+    <message>
+      <source>Delete</source>
+      <translation>Borrar</translation>
+    </message>
+  </context>
+  <context>
+    <name>Polygon</name>
+    <message>
+      <source>Click on video to start polygon.</source>
+      <translation>Haga clic en el video para iniciar el polígono.</translation>
+    </message>
+    <message>
+      <source>Polygon is not valid. Remove self-intersections to proceed.</source>
+      <translation>El polígono no es válido. Elimine las auto intersecciones para continuar.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
+      </translation>
     </message>
   </context>
   <context>

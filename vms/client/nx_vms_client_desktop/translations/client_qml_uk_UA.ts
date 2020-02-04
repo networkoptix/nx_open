@@ -4,16 +4,22 @@
   <context>
     <name>AnalyticsSettings</name>
     <message>
-      <source>Enable</source>
-      <translation>Включити</translation>
-    </message>
-    <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Аналітика камери працюватиме лише під час перегляду камери. Активуйте запис, щоб вона працювала весь час.</translation>
     </message>
+  </context>
+  <context>
+    <name>Box</name>
     <message>
-      <source>This is the built-in functionality</source>
-      <translation>Це вбудована функціональність</translation>
+      <source>Click on video to start box.</source>
+      <translation>Клацніть на відео для запуску.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ContextHintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation type="unfinished">Click to read more</translation>
     </message>
   </context>
   <context>
@@ -36,6 +42,83 @@
     <message>
       <source>Click to setup</source>
       <translation>Клiкнiть, щоб початы налаштування</translation>
+    </message>
+  </context>
+  <context>
+    <name>Figure</name>
+    <message>
+      <source>No shape</source>
+      <translation>Без форми</translation>
+    </message>
+    <message>
+      <source>click to add</source>
+      <translation>натисніть, щоб додати</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Редагувати</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Видалити</translation>
+    </message>
+    <message>
+      <source>Display on camera</source>
+      <translation>Показувати на камері</translation>
+    </message>
+    <message>
+      <source>Figure</source>
+      <translation>Малюнок</translation>
+    </message>
+  </context>
+  <context>
+    <name>FigureEditorDialog</name>
+    <message>
+      <source>Clear</source>
+      <translation>Очистити</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>ОК</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Скасувати</translation>
+    </message>
+  </context>
+  <context>
+    <name>InformationPanel</name>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation type="unfinished">Vendor</translation>
+    </message>
+  </context>
+  <context>
+    <name>Line</name>
+    <message>
+      <source>Click on video to start line.</source>
+      <translation>Натисніть на відео для початку.</translation>
+    </message>
+    <message>
+      <source>Click arrows to toggle the desired directions.</source>
+      <translation>Натисніть стрілки, щоб переключити бажані напрямки.</translation>
+    </message>
+    <message>
+      <source>Line is not valid. Remove self-intersections to proceed.</source>
+      <translation>Лінія не є припустимою. Видаліть самоперетини, щоб продовжити.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>Досягнута максимальна кількість точок (%n балів).</numerusform>
+        <numerusform>Досягнута максимальна кількість точок (%n балів).</numerusform>
+        <numerusform>Досягнута максимальна кількість точок (%n балів).</numerusform>
+        <numerusform>Досягнута максимальна кількість точок (%n балів).</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -77,6 +160,33 @@
     <message>
       <source>Server is offline</source>
       <translation>Сервер офлайн</translation>
+    </message>
+  </context>
+  <context>
+    <name>PolyFigure</name>
+    <message>
+      <source>Delete</source>
+      <translation>Видалити</translation>
+    </message>
+  </context>
+  <context>
+    <name>Polygon</name>
+    <message>
+      <source>Click on video to start polygon.</source>
+      <translation>Натисніть на відео, щоб почати багатокутник.</translation>
+    </message>
+    <message>
+      <source>Polygon is not valid. Remove self-intersections to proceed.</source>
+      <translation>Полігон неприпустимий. Видаліть самоперетини, щоб продовжити.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>Досягнута максимальна кількість точок (%n балів).</numerusform>
+        <numerusform>Досягнута максимальна кількість точок (%n балів).</numerusform>
+        <numerusform>Досягнута максимальна кількість точок (%n балів).</numerusform>
+        <numerusform>Досягнута максимальна кількість точок (%n балів).</numerusform>
+      </translation>
     </message>
   </context>
   <context>

@@ -6,7 +6,7 @@
         </div>
         <div class="col-md-8 col-md-pull-4">
             <uib-tabset>
-                <uib-tab heading="{{L.info.tabs.healthMonitoring}}" ng-if="user.hasAllResources">
+                <uib-tab heading="{{L.info.tabs.graphs}}" ng-if="user.hasAllResources">
                     <br>
                     <ng-include src="Config.viewsDir + 'components/health.html'"></ng-include>
                 </uib-tab>
