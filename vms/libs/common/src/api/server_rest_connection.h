@@ -26,6 +26,7 @@
 #include <nx/update/update_information.h>
 
 #include <nx/vms/api/analytics/settings_response.h>
+#include <nx/vms/api/analytics/device_analytics_settings_data.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/event_rule_data.h>
@@ -515,14 +516,14 @@ public:
     Handle getDeviceAnalyticsSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
+        Result<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle setDeviceAnalyticsSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
-        Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
+        Result<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle getPluginInformation(GetCallback callback, QThread* targetThread = nullptr);

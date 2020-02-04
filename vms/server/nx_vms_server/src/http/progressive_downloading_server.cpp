@@ -55,7 +55,11 @@ AVCodecID getPrefferedVideoCodec(const QByteArray& streamingFormat, const QStrin
     if (streamingFormat == "mpjpeg")
         return AV_CODEC_ID_MJPEG;
 
-    return findVideoEncoder(defaultCodec);
+    AVCodecID defaultCodecId = findVideoEncoder(defaultCodec);
+    if (streamingFormat == "mpegts" && defaultCodecId != AV_CODEC_ID_H264)
+        return AV_CODEC_ID_MPEG2VIDEO;
+
+    return defaultCodecId;
 }
 
 bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFormat)
@@ -64,8 +68,9 @@ bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFor
         return AV_CODEC_ID_VP8 == codec;
     if (streamingFormat == "mpjpeg")
         return AV_CODEC_ID_MJPEG == codec;
-
-    if (streamingFormat == "mpegts"|| streamingFormat == "mp4" || streamingFormat == "ismv")
+    if (streamingFormat == "mpegts")
+        return codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_MPEG2VIDEO;
+    if (streamingFormat == "mp4" || streamingFormat == "ismv")
         return codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265 || codec == AV_CODEC_ID_MPEG4;
 
     return false;

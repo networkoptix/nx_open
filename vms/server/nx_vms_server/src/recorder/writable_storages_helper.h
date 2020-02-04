@@ -40,7 +40,6 @@ private:
 
     std::vector<SpaceInfo> resultInfos(const std::vector<SpaceInfo>& candidates) const;
     static std::vector<SpaceInfo> online(const std::vector<SpaceInfo>& infos);
-    static StorageResourceList unique(const StorageResourceList& candidates);
     static std::vector<SpaceInfo> filterOutSpaceless(const std::vector<SpaceInfo>& infos);
     static std::vector<SpaceInfo> filterOutSmall(const std::vector<SpaceInfo>& infos);
     static std::vector<SpaceInfo> filterOutSmallSystem(const std::vector<SpaceInfo>& infos);

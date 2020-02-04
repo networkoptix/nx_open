@@ -80,12 +80,12 @@ protected:
 
     void whenPathsRequested()
     {
-        m_mediaPaths = media_paths::getMediaPaths(std::move(m_filterConfig));
+        m_mediaPartitions = media_paths::getMediaPartitions(m_filterConfig);
     }
 
     void thenNumberOfStoragesReturnedShouldBeEqualTo(int expected) const
     {
-        ASSERT_EQ(expected, m_mediaPaths.size());
+        ASSERT_EQ(expected, m_mediaPartitions.size());
     }
 
     void thenPathsShouldBeAmendedCorrectly() const
@@ -94,32 +94,29 @@ protected:
         assertSeparators();
         assertServerUuid();
         assertDataDirectory();
+        assertPartitionTypes();
     }
 
     void assertMediaFolders() const
     {
         const int foldersWithMediaSuffixCount = static_cast<int>(std::count_if(
-            m_mediaPaths.cbegin(),
-            m_mediaPaths.cend(),
-            [](const QString& path)
-            {
-                return path.contains(kMediaFolder);
-            }));
+            m_mediaPartitions.cbegin(), m_mediaPartitions.cend(),
+            [](const Partition& p) { return p.path.contains(kMediaFolder); }));
 
         if (m_isWindows)
         {
-            ASSERT_EQ(m_mediaPaths.size(), foldersWithMediaSuffixCount);
+            ASSERT_EQ(m_mediaPartitions.size(), foldersWithMediaSuffixCount);
             return;
         }
 
-        ASSERT_EQ(qMax(m_mediaPaths.size() - 1, 0), foldersWithMediaSuffixCount);
+        ASSERT_EQ(qMax(m_mediaPartitions.size() - 1, 0), foldersWithMediaSuffixCount);
     }
 
     void assertSeparators() const
     {
         const QString unexpectedSeparator = m_isWindows ? "/" : "\\";
-        for (const auto& mediaPath: m_mediaPaths)
-            ASSERT_FALSE(mediaPath.contains(unexpectedSeparator));
+        for (const auto& p: m_mediaPartitions)
+            ASSERT_FALSE(p.path.contains(unexpectedSeparator));
     }
 
     void assertServerUuid() const
@@ -127,8 +124,8 @@ protected:
         if (!m_isMultipleInstances)
             return;
 
-        for (const auto& path: m_mediaPaths)
-            ASSERT_TRUE(path.contains(kServerUuid.toString()));
+        for (const auto& p: m_mediaPartitions)
+            ASSERT_TRUE(p.path.contains(kServerUuid.toString()));
     }
 
     void assertDataDirectory() const
@@ -137,26 +134,26 @@ protected:
             return;
 
         auto pathIt = std::find_if(
-            m_mediaPaths.cbegin(),
-            m_mediaPaths.cend(),
-            [](const QString& path)
+            m_mediaPartitions.cbegin(),
+            m_mediaPartitions.cend(),
+            [](const Partition& p)
             {
-                return path.contains(kDataDirectory);
+                return p.path.contains(kDataDirectory);
             });
 
-        ASSERT_NE(m_mediaPaths.cend(), pathIt);
-        ASSERT_FALSE(pathIt->contains(kMediaFolder));
+        ASSERT_NE(m_mediaPartitions.cend(), pathIt);
+        ASSERT_FALSE(pathIt->path.contains(kMediaFolder));
     }
 
     void thenThereShouldBeNoThisPath(const QString& path) const
     {
         ASSERT_TRUE(
             std::none_of(
-                m_mediaPaths.cbegin(),
-                m_mediaPaths.cend(),
-                [&path](const QString& mediaPath)
+                m_mediaPartitions.cbegin(),
+                m_mediaPartitions.cend(),
+                [&path](const Partition& p)
                 {
-                    return mediaPath.contains(path);
+                    return p.path.contains(path);
                 }));
     }
 
@@ -171,7 +168,7 @@ private:
     static const QString kDataDirectory;
 
     FilterConfig m_filterConfig;
-    QList<QString> m_mediaPaths;
+    QList<Partition> m_mediaPartitions;
     bool m_isMultipleInstances = false;
     bool m_isWindows = false;
 
@@ -181,6 +178,22 @@ private:
         partition.path = path;
         partition.type = type;
         m_filterConfig.partitions.append(partition);
+    }
+
+    void assertPartitionTypes() const
+    {
+        for (const auto& p: m_mediaPartitions)
+        {
+            std::optional<nx::vms::server::PlatformMonitor::PartitionSpace> inputPartition;
+            for (const auto& inp: m_filterConfig.partitions)
+            {
+                if (p.path.contains(inp.path) && (!inputPartition || inp.path.size() > inputPartition->path.size()))
+                    inputPartition = inp;
+            }
+
+            ASSERT_TRUE(inputPartition);
+            ASSERT_EQ(p.type, inputPartition->type);
+        }
     }
 };
 

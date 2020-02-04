@@ -272,7 +272,6 @@
 #include <nx/vms/server/analytics/sdk_object_factory.h>
 #include <nx/utils/platform/current_process.h>
 #include <rest/handlers/change_camera_password_rest_handler.h>
-#include <nx/vms/server/fs/media_paths/media_paths.h>
 #include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/server/root_fs.h>
@@ -498,38 +497,17 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     return result;
 }
 
-QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, const QString& path)
+QnStorageResourcePtr MediaServerProcess::createStorage(
+    const QnUuid& serverId,
+    const nx::vms::server::fs::media_paths::Partition& partition)
 {
-    NX_VERBOSE(kLogTag, lm("Attempting to create storage %1").arg(path));
+    NX_VERBOSE(kLogTag, lm("Attempting to create storage %1").arg(partition.path));
     QnStorageResourcePtr storage(serverModule()->storagePluginFactory()->createStorage(commonModule(), "ufile"));
     storage->setName("Initial");
     storage->setParentId(serverId);
-    storage->setUrl(path);
+    storage->setUrl(partition.path);
     storage->fillID();
-
-    const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
-    const auto partitions = serverModule()->platform()->monitor()->totalPartitionSpaceInfo();
-
-    // Find the closest mount point. "/" matches everything on Linux.
-    auto storageType = nx::vms::server::PlatformMonitor::NetworkPartition;
-    QString closestMountPoint = "";
-    for (const auto& partition: partitions)
-    {
-        auto partitionPath = QnStorageResource::toNativeDirPath(partition.path);
-        if (!storagePath.startsWith(partitionPath))
-            continue;
-        if (!closestMountPoint.isEmpty())
-            if (closestMountPoint.length() > partitionPath.length())
-                continue;
-        closestMountPoint = partitionPath;
-        storageType = partition.type;
-    }
-    if (!closestMountPoint.isEmpty())
-    {
-        NX_VERBOSE(this, "Corresponding partition: %1 %2",
-            closestMountPoint, QnLexical::serialized(storageType));
-    }
-    storage->setStorageType(QnLexical::serialized(storageType));
+    storage->setStorageType(QnLexical::serialized(partition.type));
 
     auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
     if (!fileStorage || fileStorage->initOrUpdate() != Qn::StorageInit_Ok)
@@ -544,13 +522,13 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
         NX_DEBUG(
             kLogTag, "Storage with this path %1 total space is unknown or totalSpace < spaceLimit. "
             "Total space: %2, Space limit: %3",
-            path, fileStorage->getTotalSpace(), storage->getSpaceLimit());
+            partition.path, fileStorage->getTotalSpace(), storage->getSpaceLimit());
 
         return QnStorageResourcePtr();
     }
 
     storage->setUsedForWriting(storage->isWritable());
-    NX_DEBUG(kLogTag, lm("Storage %1 is operational: %2").args(path, storage->isUsedForWriting()));
+    NX_DEBUG(kLogTag, "Storage %1 is operational: %2", partition.path, storage->isUsedForWriting());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     NX_ASSERT(resType);
@@ -561,12 +539,14 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
     return storage;
 }
 
-QStringList MediaServerProcess::listRecordFolders(bool includeNonHdd) const
+QList<nx::vms::server::fs::media_paths::Partition> MediaServerProcess::listRecordFolders(
+    bool includeNonHdd) const
 {
     using namespace nx::vms::server::fs::media_paths;
 
-    auto mediaPathList = getMediaPaths(FilterConfig::createDefault(
+    auto mediaPathList = getMediaPartitions(FilterConfig::createDefault(
         serverModule()->platform(), includeNonHdd, &serverModule()->settings()));
+
     NX_VERBOSE(this, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }
@@ -574,31 +554,30 @@ QStringList MediaServerProcess::listRecordFolders(bool includeNonHdd) const
 QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerResourcePtr& mServer)
 {
     QnStorageResourceList storages;
-    QStringList availablePaths;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
 
-    availablePaths = listRecordFolders();
+    const auto partitions = listRecordFolders();
 
-    NX_DEBUG(kLogTag, lm("Available paths count: %1").arg(availablePaths.size()));
-    for(const QString& folderPath: availablePaths)
+    NX_DEBUG(kLogTag, lm("Available paths count: %1").arg(partitions.size()));
+    for(const auto& p: partitions)
     {
-        NX_DEBUG(kLogTag, lm("Available path: %1").arg(folderPath));
-        if (!mServer->getStorageByUrl(folderPath).isNull())
+        NX_DEBUG(kLogTag, lm("Available path: %1").arg(p.path));
+        if (!mServer->getStorageByUrl(p.path).isNull())
         {
             NX_DEBUG(kLogTag,
-                lm("Storage with this path %1 already exists. Won't be added.").arg(folderPath));
+                lm("Storage with this path %1 already exists. Won't be added.").arg(p.path));
             continue;
         }
         // Create new storage because of new partition found that missing in the database
-        QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
+        QnStorageResourcePtr storage = createStorage(mServer->getId(), p);
         if (!storage)
             continue;
 
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
         bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
-        NX_DEBUG(kLogTag, lm("Creating new storage: %1").arg(folderPath));
+        NX_DEBUG(kLogTag, lm("Creating new storage: %1").arg(p.path));
     }
     bigStorageThreshold /= QnStorageManager::kBigStorageTreshold;
 
@@ -2927,25 +2906,19 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:object reply Object with DeviceAgent settings model and values.
-     *         %param:object reply.model Settings model, as in DeviceAgent manifest.
-     *         %param:object reply.values Name-value map with setting values, using JSON types
-     *             according to each setting type.
+     *         %struct DeviceAnalyticsSettingsResponse
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
      * Applies passed settings values to the corresponding DeviceAgent (which is a device-engine
      * pair).
-     * %param:string engineId Unique id of an Analytics Engine.
-     * %param:string deviceId Id of a device.
-     * %param:object settings Name-value map with setting values, using JSON types according to
-     *     each setting type.
+     * %param:object JSON object containing request parameters
+     *      %struct DeviceAnalyticsSettingsRequest
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:object reply Object with DeviceAgent settings model and values that the
-     *         DeviceAgent returns after the values have been supplied.
-     *         %param:object reply.model Settings model, as in DeviceAgent manifest.
-     *         %param:object reply.values Name-value map with setting values, using JSON types
-     *             according to each setting type.
+     *         DeviceAgent returns after the values have been applied.
+     *         %struct DeviceAnalyticsSettingsResponse
      */
     reg("ec2/deviceAnalyticsSettings",
         new nx::vms::server::rest::DeviceAnalyticsSettingsHandler(serverModule()));
@@ -4641,28 +4614,47 @@ void MediaServerProcess::loadResourcesFromDatabase()
         moveHandlingCameras();
 }
 
-static QByteArray loadDataFromDb(ec2::AbstractResourceManagerPtr manager)
+static std::pair<QString, QByteArray> loadResourceParamsSettingsFromDb(
+    ec2::AbstractResourceManagerPtr manager)
 {
     nx::vms::api::ResourceParamWithRefDataList data;
     manager->getKvPairsSync(QnUuid(), &data);
+    std::pair<QString, QByteArray> result;
+    int found = 0;
     for (const auto& param: data)
     {
-        if (param.name == Qn::kResourceDataParamName)
-            return param.value.toUtf8();
+        if (param.name == "resourceFileUri")
+        {
+            result.first = param.value;
+            found |= 1;
+            if (found == 3)
+                return result;
+        }
+        else if (param.name == Qn::kResourceDataParamName)
+        {
+            result.second = param.value.toUtf8();
+            found |= 2;
+            if (found == 3)
+                return result;
+        }
     }
-    return QByteArray();
+    return result;
 }
 
 void MediaServerProcess::loadResourceParamsData()
 {
     using Data = nx::vms::utils::ResourceParamsData;
+    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
+    const auto [resourceFileUriFromDb, dataFromDb] = loadResourceParamsSettingsFromDb(manager);
     std::vector<Data> datas;
     QString local = QCoreApplication::applicationDirPath() + "/resource_data.json";
     if (QFile::exists(local))
         datas.push_back(Data::load(QFile(local)));
     if (serverModule()->settings().onlineResourceDataEnabled())
     {
-        datas.push_back(Data::load(commonModule()->globalSettings()->resourceFileUri()));
+        datas.push_back(Data::load(resourceFileUriFromDb.isEmpty()
+            ? commonModule()->globalSettings()->resourceFileUri()
+            : nx::utils::Url(resourceFileUriFromDb)));
         datas.push_back(Data::load(
             nx::utils::Url("http://beta.vmsproxy.com/beta-builds/daily/resource_data.json")));
     }
@@ -4671,7 +4663,7 @@ void MediaServerProcess::loadResourceParamsData()
     datas.push_back({"server DB", dataFromDB});
     datas.push_back(Data::load(QFile(":/resource_data.json")));
 
-    if (auto data = Data::getWithGreaterVersion(datas); data.value != dataFromDB)
+    if (auto data = Data::getWithGreaterVersion(datas); data.value != dataFromDb)
     {
         NX_INFO(this, "Update system wide resource_data.json from %1", data.location);
         manager->saveSync({{QnUuid(), Qn::kResourceDataParamName, std::move(data.value)}});
@@ -4876,10 +4868,6 @@ void MediaServerProcess::run()
 
     initializeUpnpPortMapper();
 
-    connect(
-        commonModule()->globalSettings(),
-        &QnGlobalSettings::resourceFileUriChanged,
-        [this] { loadResourceParamsData(); });
     loadResourceParamsData();
     loadResourcesFromDatabase();
 

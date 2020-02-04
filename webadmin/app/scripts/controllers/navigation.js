@@ -7,6 +7,9 @@ angular.module('webadminApp')
             isAdmin: true
         };
         $scope.noPanel = true;
+        $scope.nav = {
+            show : false
+        };
 
         nativeClient.init().then(function(result){
             $scope.settings.liteClient = result.lite;
@@ -40,6 +43,10 @@ angular.module('webadminApp')
             var currentPath = local_path.split('/')[1];
             return currentPath.split('?')[0] === path.split('/')[1].split('?')[0];
         };
+
+        $scope.toggleNav = function() {
+            $scope.showNav = !$scope.showNav;
+        }
 
         $scope.logout = function(){
             mediaserver.logout().then(function(){

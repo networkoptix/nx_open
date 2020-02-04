@@ -16,18 +16,18 @@ ResourceParamsData ResourceParamsData::load(const nx::utils::Url& url)
         NX_WARNING(NX_SCOPE_TAG, "Invalid url %1 for resource_data.json", result.location);
         return result;
     }
-    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
-    httpClient->setResponseReadTimeout(kResourceDataReadingTimeout);
-    httpClient->setMessageBodyReadTimeout(kResourceDataReadingTimeout);
-    if (httpClient->doGet(url)
-        && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
+    nx::network::http::HttpClient httpClient;
+    httpClient.setResponseReadTimeout(kResourceDataReadingTimeout);
+    httpClient.setMessageBodyReadTimeout(kResourceDataReadingTimeout);
+    if (httpClient.doGet(url)
+        && httpClient.response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
     {
-        const auto body = httpClient->fetchEntireMessageBody();
+        const auto body = httpClient.fetchEntireMessageBody();
         if (body)
             result.value = *body;
     }
     if (result.value.isEmpty())
-        NX_WARNING(NX_SCOPE_TAG, "Emmpty resource_data.json from %1", result.location);
+        NX_WARNING(NX_SCOPE_TAG, "Empty resource_data.json from %1", result.location);
     return result;
 }
 
@@ -42,7 +42,7 @@ ResourceParamsData ResourceParamsData::load(QFile&& file)
     }
     result.value = file.readAll();
     if (result.value.isEmpty())
-        NX_WARNING(NX_SCOPE_TAG, "Emmpty resource_data.json from %1", result.location);
+        NX_WARNING(NX_SCOPE_TAG, "Empty resource_data.json from %1", result.location);
     return result;
 }
 
@@ -56,21 +56,22 @@ ResourceParamsData ResourceParamsData::getWithGreaterVersion(
         if (data.value.isEmpty())
             continue;
         auto version = QnResourceDataPool::getVersion(data.value);
-        if (version <= resultVersion)
+        if (!result.value.isEmpty() && version <= resultVersion)
         {
             NX_DEBUG(NX_SCOPE_TAG,
                 "Skip resource_data.json version %1 from %2. Version %3 from %4 is greater.",
                 version, data.location, resultVersion, result.location);
             continue;
         }
-        if (!QnResourceDataPool::validateData(data.value))
+        if (!NX_ASSERT(QnResourceDataPool::validateData(data.value),
+            "Skip invalid resource_data.json from %1", data.location))
         {
-            NX_WARNING(NX_SCOPE_TAG, "Skip invalid resource_data.json from %1", data.location);
             continue;
         }
         resultVersion = std::move(version);
         result = data;
     }
+    NX_ASSERT(!result.value.isEmpty());
     return result;
 }
 

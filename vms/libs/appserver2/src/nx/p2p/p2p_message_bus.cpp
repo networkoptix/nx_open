@@ -21,6 +21,7 @@
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/qmetaobject_helper.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx {
 namespace p2p {
@@ -263,7 +264,7 @@ void MessageBus::createOutgoingConnections(
         int pos = m_lastOutgoingIndex % m_remoteUrls.size();
         ++m_lastOutgoingIndex;
 
-        const RemoteConnection& remoteConnection = m_remoteUrls[pos];
+        RemoteConnection& remoteConnection = m_remoteUrls[pos];
         if (!m_connections.contains(remoteConnection.peerId) &&
             !m_outgoingConnections.contains(remoteConnection.peerId))
         {
@@ -272,8 +273,18 @@ void MessageBus::createOutgoingConnections(
                 continue;
             }
 
-            if (remoteConnection.unauthorizedTimer.isValid() &&
-                !remoteConnection.unauthorizedTimer.hasExpired(m_intervals.unauthorizedConnectTimeout))
+            // Connection to this peer have been closed recently
+
+            nx::utils::remove_if(
+                remoteConnection.disconnectTimes,
+                [this](const auto& timer)
+                {
+                    return timer.hasExpired(m_intervals.remotePeerReconnectTimeout);
+                });
+
+            if (remoteConnection.disconnectTimes.size() >= 2
+                || (remoteConnection.disconnectTimes.size() >= 1 
+                && remoteConnection.lastConnectionState == ConnectionBase::State::Unauthorized))
             {
                 continue;
             }
@@ -543,23 +554,26 @@ void MessageBus::at_stateChanged(
                 emitPeerFoundLostSignals();
                 startReading(connection);
             }
+
             emit newDirectConnectionEstablished(connection.data());
             if (connection->remotePeer().peerType == PeerType::cloudServer)
                 sendInitialDataToCloud(connection);
 
             break;
         case Connection::State::Unauthorized:
+        case Connection::State::forbidden:
+        case Connection::State::Error:
             for (auto& removeUrlInfo: m_remoteUrls)
             {
                 if (removeUrlInfo.peerId == remoteId)
-                    removeUrlInfo.unauthorizedTimer.restart();
+                {
+                    removeUrlInfo.disconnectTimes.push_back(nx::utils::ElapsedTimer());
+                    removeUrlInfo.disconnectTimes.last().restart();
+                    removeUrlInfo.lastConnectionState = connection->state();
+                }
             }
-        case Connection::State::forbidden:
-        case Connection::State::Error:
-        {
             removeConnectionUnsafe(weakRef);
             break;
-        }
         default:
             break;
     }

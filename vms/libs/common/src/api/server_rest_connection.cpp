@@ -1035,7 +1035,7 @@ Handle ServerConnection::setEngineAnalyticsSettings(
 Handle ServerConnection::getDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
+    Result<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executeGet(
@@ -1051,7 +1051,8 @@ Handle ServerConnection::getDeviceAnalyticsSettings(
                 callback(
                     success,
                     requestId,
-                    result.deserialized<nx::vms::api::analytics::SettingsResponse>());
+                    result.deserialized<
+                        nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>());
             }),
         targetThread);
 }
@@ -1060,24 +1061,26 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
+    Result<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
+    nx::vms::api::analytics::DeviceAnalyticsSettingsRequest request;
+    request.settingsValues = settings;
+    request.analyticsEngineId = engine->getId();
+    request.deviceId = device->getId().toString();
+
     return executePost<QnJsonRestResult>(
         QString("/ec2/deviceAnalyticsSettings"),
-        QnRequestParamList{
-            {"deviceId", device->getId().toString()},
-            {"analyticsEngineId", engine->getId().toString()},
-        },
+        QnRequestParamList(),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        QJson::serialized(settings),
+        QJson::serialized(request),
         [callback = std::move(callback)](
             bool success, Handle requestId, const QnJsonRestResult& result)
         {
             callback(
                 success,
                 requestId,
-                result.deserialized<nx::vms::api::analytics::SettingsResponse>());
+                result.deserialized<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>());
         },
         targetThread);
 }

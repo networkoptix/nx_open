@@ -49,6 +49,8 @@ private:
     AVFormatContext* m_inputFormatContext;
 };
 
+AVCodecID findEncoderCodecId(const QString& codecName);
+
 inline const char* ffmpegErrorText(const int error)
 {
     static char error_buffer[255];

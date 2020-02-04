@@ -33,7 +33,6 @@ using StreamTypes = nx::vms::api::analytics::StreamTypes;
 using StreamIndex = nx::vms::api::StreamIndex;
 
 static const std::chrono::seconds kMinSkippedFramesReportingInterval(30);
-static const StreamIndex kDefaultPreferredStreamIndex = StreamIndex::primary;
 
 static bool isAliveStatus(Qn::ResourceStatus status)
 {
@@ -550,9 +549,17 @@ void DeviceAnalyticsContext::at_devicePropertyChanged(
         NX_DEBUG(
             this,
             lm("Credentials have been changed for the Device %1 (%2)")
-                .args(device->getName(), device->getId()));
+                .args(device->getUserDefinedName(), device->getId()));
 
         at_deviceUpdated(device);
+    }
+
+    if (propertyName == QnVirtualCameraResource::kAnalyzedStreamIndexes)
+    {
+        NX_DEBUG(this, "Analyzed stream indexes have been changed, Device: %1 (%2)",
+            device->getUserDefinedName(), device->getId());
+
+        updateAnalyzedStreamIndexes();
     }
 }
 
@@ -613,6 +620,16 @@ bool DeviceAnalyticsContext::isDeviceAlive() const
         && !flags.testFlag(Qn::desktop_camera);
 }
 
+void DeviceAnalyticsContext::updateAnalyzedStreamIndexes()
+{
+    const BindingMap bindings = analyticsBindingsSafe();
+
+    for (const auto& [engineId, binding]: bindings)
+        binding->recalculateStreamRequirements();
+
+    updateStreamProviderRequirements();
+}
+
 void DeviceAnalyticsContext::updateStreamProviderRequirements()
 {
     StreamProviderRequirementsMap providerRequirementsMap = getTotalProviderRequirements();
@@ -641,7 +658,7 @@ DeviceAnalyticsContext::StreamProviderRequirementsMap
 
         StreamIndex preferredStreamIndex = requirements->preferredStreamIndex;
         if (preferredStreamIndex == StreamIndex::undefined)
-            preferredStreamIndex = kDefaultPreferredStreamIndex;
+            preferredStreamIndex = QnVirtualCameraResource::kDefaultAnalyzedStreamIndex;
 
         providerRequirementsMap[preferredStreamIndex].requiredStreamTypes |=
             requirements->requiredStreamTypes;

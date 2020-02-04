@@ -505,18 +505,31 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
 void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
 {
     sendRuntimeData(connection, m_lastRuntimeInfo.keys());
-
+    qint64 totalSendBuffer = 0;
+    for (const auto& connection: m_connections.values())
     {
-        QnTransaction<vms::api::FullInfoData> tran(commonModule()->moduleGUID());
-        tran.command = ApiCommand::getFullInfo;
-        if (!readFullInfoData(connection.staticCast<Connection>()->userAccessData(),
-            connection->remotePeer(), &tran.params))
-        {
-            emit removeConnectionAsync(connection);
-            return;
-        }
-        sendTransactionImpl(connection, tran, TransportHeader());
+        if (connection->remotePeer().isClient())
+            totalSendBuffer += connection->sendBufferSize();
     }
+    if (totalSendBuffer > globalSettings()->maxP2pQueueSizeForAllClientsBytes())
+    {
+        NX_WARNING(this,
+            "Too many unsent data to clients. New client connection %1 is remporary rejected",
+            connection->remoteAddr());
+        emit removeConnectionAsync(connection);
+        return;
+    }
+
+    QnTransaction<vms::api::FullInfoData> tran(commonModule()->moduleGUID());
+    tran.command = ApiCommand::getFullInfo;
+    if (!readFullInfoData(connection.staticCast<Connection>()->userAccessData(),
+        connection->remotePeer(), &tran.params))
+    {
+        emit removeConnectionAsync(connection);
+        return;
+    }
+
+    sendTransactionImpl(connection, tran, TransportHeader());
 }
 
 bool ServerMessageBus::readFullInfoData(

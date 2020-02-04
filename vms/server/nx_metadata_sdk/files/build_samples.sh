@@ -16,26 +16,20 @@ else
     NO_TESTS=0
 fi
 
-# Use Ninja for Linux and Cygwin, if it is available on PATH.
-if which ninja >/dev/null
-then
-    GEN_OPTIONS=( -GNinja ) #< Generate for Ninja and gcc; Ninja uses all available CPU cores.
-    BUILD_OPTIONS=()
-else
-    GEN_OPTIONS=() #< Generate for GNU make and gcc.
-    BUILD_OPTIONS=( -- -j ) #< Use all available CPU cores.
-fi
-
 case "$(uname -s)" in #< Check if running in Windows from Cygwin/MinGW.
     CYGWIN*|MINGW*)
-        if [[ $(which cmake) == /usr/bin/* ]] # Cygwin's cmake is on PATH.
+        GEN_OPTIONS=( -Ax64 -Tv140,host=x64 ) #< Generate for Visual Studio 2015 compiler.
+        BASE_DIR=$(cygpath -w "$BASE_DIR") #< Windows-native cmake requires Windows path.
+        BUILD_OPTIONS=()
+        ;;
+    *) # Assume Linux; use Ninja if it is available on PATH.
+        if which ninja >/dev/null
         then
-            echo "WARNING: In Cygwin/MinGW, gcc instead of MSVC may work, but is not supported."
-            echo ""
-        else # Assuming Windows-native cmake is on PATH.
-            GEN_OPTIONS=( -Ax64 -Tv140,host=x64 ) #< Generate for Visual Studio 2015 compiler.
-            BASE_DIR=$(cygpath -w "$BASE_DIR") #< Windows-native cmake requires Windows path.
+            GEN_OPTIONS=( -GNinja ) #< Generate for Ninja and gcc; Ninja uses all CPU cores.
             BUILD_OPTIONS=()
+        else
+            GEN_OPTIONS=() #< Generate for GNU make and gcc.
+            BUILD_OPTIONS=( -- -j ) #< Use all available CPU cores.
         fi
         ;;
 esac
@@ -44,10 +38,9 @@ esac
     rm -rf "$BUILD_DIR/"
 )
 
-for SAMPLE_DIR in "$BASE_DIR/samples"/*
+for SOURCE_DIR in "$BASE_DIR/samples"/*
 do
-    SOURCE_DIR="$SAMPLE_DIR"
-    SAMPLE=$(basename "$SAMPLE_DIR")
+    SAMPLE=$(basename "$SOURCE_DIR")
     (set -x #< Log each command.
         mkdir -p "$BUILD_DIR/$SAMPLE"
         cd "$BUILD_DIR/$SAMPLE"
@@ -68,7 +61,6 @@ do
 done
 
 # Run unit tests if needed.
-echo ""
 if [[ $NO_TESTS == 1 ]]
 then
     echo "NOTE: Unit tests were not run."
@@ -79,7 +71,7 @@ else
 
         ctest --output-on-failure -C Debug
     )
-    echo ""
 fi
+echo ""
 
 echo "Samples built successfully, see the binaries in $BUILD_DIR"

@@ -279,6 +279,9 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
         return false;
     }
 
+    NX_OUTPUT << "Received compressed video frame, resolution: "
+        << videoFrame->width() << "x" << videoFrame->height();
+
     processVideoFrame(videoFrame, __func__);
     processFrameMotion(videoFrame->metadataList());
     return true;
@@ -291,6 +294,9 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
         NX_PRINT << "ERROR: Received uncompressed video frame, contrary to manifest.";
         return false;
     }
+
+    NX_OUTPUT << "Received uncompressed video frame, resolution: "
+        << videoFrame->width() << "x" << videoFrame->height();
 
     processVideoFrame(videoFrame, __func__);
     processFrameMotion(videoFrame->metadataList());

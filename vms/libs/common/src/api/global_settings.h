@@ -345,6 +345,8 @@ public:
     static bool isGlobalSetting(const nx::vms::api::ResourceParamWithRefData& param);
 
     int maxP2pQueueSizeBytes() const;
+    qint64 maxP2pQueueSizeForAllClientsBytes() const;
+
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
@@ -399,7 +401,6 @@ public:
     void setLicenseServerUrl(const QString& value);
 
     nx::utils::Url resourceFileUri() const;
-    void setResourceFileUri(const nx::utils::Url& value);
 
 signals:
     void initialized();
@@ -435,7 +436,6 @@ signals:
     void downloaderPeersChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
-    void resourceFileUriChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -535,6 +535,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_maxP2pQueueSizeBytes = nullptr;
+    QnResourcePropertyAdaptor<qint64>* m_maxP2pQueueSizeForAllClientsBytes = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets = nullptr;
 

@@ -26,7 +26,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_settings.h>
 
-
+#include <nx/vms/server/fs/media_paths/media_paths.h>
 #include <nx/vms/discovery/manager.h>
 #include <common/static_common_module.h>
 #include <managers/discovery_manager.h>
@@ -233,8 +233,11 @@ private:
 
     QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer);
     QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer);
-    QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path);
-    QStringList listRecordFolders(bool includeNonHdd = false) const;
+    QnStorageResourcePtr createStorage(
+        const QnUuid& serverId,
+        const nx::vms::server::fs::media_paths::Partition& partition);
+
+    QList<nx::vms::server::fs::media_paths::Partition> listRecordFolders(bool includeNonHdd = false) const;
     void connectSignals();
     void connectStorageSignals(QnStorageManager* storage);
     void setUpDataFromSettings();

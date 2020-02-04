@@ -6,6 +6,7 @@ import 'angular-sanitize';
 import 'angular-ui-bootstrap';
 import 'angular-clipboard';
 import 'tc-angular-chartjs';
+import 'utf8';
 
 import 'hint.css/hint.min.css';
 import 'rangeslider.js/dist/rangeslider.css';

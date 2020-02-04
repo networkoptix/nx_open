@@ -12,6 +12,7 @@ BusyIndicator
     contentItem: Row
     {
         spacing: 6;
+        visible: control.running
 
         Repeater
         {

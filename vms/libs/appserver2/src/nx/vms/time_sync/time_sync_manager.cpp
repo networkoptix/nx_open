@@ -210,12 +210,12 @@ bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::
     const auto timeDelta = value < syncTime ? syncTime - value : value - syncTime;
     if (timeDelta <= rtt + globalSettings()->syncTimeEpsilon())
         return false;
+    setSyncTimeInternal(value);
 
     NX_INFO(this,
         "Set sync time to the new value %1. Difference between new and old value is %2. rtt=%3",
         value, value - syncTime, rtt);
 
-    setSyncTimeInternal(value);
     emit timeChanged(value.count());
     return true;
 }

@@ -35,7 +35,8 @@ MetadataHandler::MetadataHandler(
     QnUuid engineId)
     :
     ServerModuleAware(serverModule),
-    m_resource(device), m_engineId(engineId),
+    m_resource(device),
+    m_engineId(engineId),
     m_metadataLogger("outgoing_metadata_", m_resource->getId(), m_engineId),
     m_objectCoordinatesTranslator(device)
 {

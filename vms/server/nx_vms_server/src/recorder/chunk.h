@@ -25,6 +25,7 @@ struct Chunk
     bool isInfinite() const { return durationMs == -1; }
 
     QString fileName() const;
+    bool isNull() const { return startTimeMs == -1; }
 
     int64_t startTimeMs = -1;
     int durationMs = 0;

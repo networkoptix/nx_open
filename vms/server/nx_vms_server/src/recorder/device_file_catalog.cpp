@@ -90,11 +90,11 @@ qint64 DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
     return result;
 }
 
-std::optional<nx::vms::server::Chunk> DeviceFileCatalog::chunkAt(int index) const
+nx::vms::server::Chunk DeviceFileCatalog::chunkAt(int index) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_chunks.size() <= (size_t) index)
-        return std::nullopt;
+        return nx::vms::server::Chunk();
 
     return m_chunks.at((size_t) index);
 }
@@ -156,7 +156,7 @@ std::deque<Chunk> DeviceFileCatalog::chunksBefore(int64_t timepointMs, int stora
 {
     std::deque<Chunk> result;
     NX_MUTEX_LOCKER lock(&m_mutex);
-    for (const auto& chunk : m_chunks)
+    for (const auto& chunk: m_chunks)
     {
         if (chunk.storageIndex != storageIndex)
             continue;

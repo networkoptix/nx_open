@@ -24,23 +24,6 @@
 #include <nx/utils/log/log.h>
 #include "../helpers/storage_space_helper.h"
 
-namespace {
-
-static QString determineStorageType(const QnMediaServerModule* serverModule, const QString& url)
-{
-    const auto partitions = serverModule->platform()->monitor()->totalPartitionSpaceInfo();
-    const auto partitionIt = std::find_if(
-        partitions.begin(), partitions.end(),
-        [&url](const auto& partition) { return url.startsWith(partition.path); });
-
-    const auto storageType =
-        (partitionIt != partitions.end()) ? partitionIt->type : PlatformMonitor::NetworkPartition;
-
-    return QnLexical::serialized(storageType);
-}
-
-} // namespace
-
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
 {}
@@ -168,7 +151,7 @@ nx::vms::server::StorageResourceList QnStorageSpaceRestHandler::storageListFrom(
 
             storage->setUrl(url);
             if (storage->getStorageType().isNull())
-                storage->setStorageType(determineStorageType(serverModule(), url));
+                storage->setStorageType(QnLexical::serialized(p.type));
 
             NX_VERBOSE(this, "Starting initOrUpdate for storage %1", storage->getUrl());
             if (storage->initOrUpdate() != Qn::StorageInit_Ok)

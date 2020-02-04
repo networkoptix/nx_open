@@ -315,6 +315,9 @@ QnMediaServerModule::QnMediaServerModule(
 
         ));
 
+    m_context->normalStorageManager->startAuxTimerTasks();
+    m_context->backupStorageManager->startAuxTimerTasks();
+
     if (QnAppInfo::isNx1())
     {
         m_settings->mutableSettings()->setBootedFromSdCard(

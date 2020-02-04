@@ -866,10 +866,10 @@ bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
             return result;
         };
 
-    const auto mediaPaths = getMediaPaths(pathConfig);
+    const auto partitions = getMediaPartitions(pathConfig);
     return std::any_of(
-        mediaPaths.cbegin(), mediaPaths.cend(),
-        [path = normalize(path)](const auto& p) { return normalize(p).startsWith(path); });
+        partitions.cbegin(), partitions.cend(),
+        [path = normalize(path)](const auto& p) { return normalize(p.path).startsWith(path); });
 }
 
 Qn::StorageInitResult QnFileStorageResource::testWrite() const

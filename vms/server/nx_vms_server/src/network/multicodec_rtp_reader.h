@@ -132,14 +132,8 @@ private:
     void buildClientRTCPReport(quint8 chNumber);
     QnAbstractMediaDataPtr getNextDataInternal();
     void processCameraTimeHelperEvent(nx::streaming::rtp::CameraTimeHelper::EventType event);
-
     void calcStreamUrl();
-
-    void updateOnvifTime(
-        int rtpBufferOffset,
-        int rtpPacketSize,
-        TrackInfo& track,
-        int rtpChannel);
+    void updateOnvifTime(const uint8_t* data, int size, TrackInfo& track);
 
     CameraDiagnostics::Result registerMulticastAddressesIfNeeded();
     CameraDiagnostics::Result registerAddressIfNeeded(

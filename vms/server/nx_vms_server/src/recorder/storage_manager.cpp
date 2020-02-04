@@ -59,6 +59,7 @@
 #include <nx/vms/server/metadata/analytics_helper.h>
 #include <nx/vms/server/fs/media_paths/media_paths.h>
 #include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
+#include <nx/analytics/utils.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -70,11 +71,7 @@ static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 
 const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024LL;
-#ifdef __arm__
-const qint64 kMinSystemStorageFreeSpace = 500 * 1000 * 1000LL;
-#else
-const qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
-#endif
+const qint64 kMinMetadataStorageFreeSpace = 1024 * 1024;
 
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
@@ -755,8 +752,6 @@ QnStorageManager::QnStorageManager(
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
     m_removeEmtyDirTimer.invalidate();
-
-    startAuxTimerTasks();
 
     connect(
         this, &QnStorageManager::newCatalogCreated,
@@ -1673,9 +1668,11 @@ QnRecordingStatsData QnStorageManager::getChunkStatisticsByCamera(qint64 bitrate
     auto catalogLow = m_devFileCatalog[QnServer::LowQualityCatalog].value(uniqueId);
 
     if (catalogHi && !catalogHi->isEmpty() && catalogLow && !catalogLow->isEmpty())
+    {
         return catalogHi->mergeRecordingStatisticsData(
             *catalogLow, bitrateAnalyzePeriodMs,
             [this](int storageIndex) { return storageRoot(storageIndex); });
+    }
 
     if (catalogHi && !catalogHi->isEmpty())
         return catalogHi->getStatistics(bitrateAnalyzePeriodMs);
@@ -1719,14 +1716,59 @@ void QnStorageManager::updateCameraHistory() const
 
 void QnStorageManager::checkSystemStorageSpace()
 {
-    for (const auto& storage: getAllStorages())
+    for (const auto& storage: getStorages())
     {
-        if (storage->getStatus() == Qn::Online
+        if (storage->isOnline()
             && storage->isSystem()
-            && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
+            && storage->getFreeSpace() < serverModule()->settings().minSystemStorageFreeSpace())
         {
             emit storageFailure(storage, nx::vms::api::EventReason::systemStorageFull);
         }
+    }
+}
+
+void QnStorageManager::checkMetadataStorageSpace()
+{
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+        serverModule()->commonModule()->moduleGUID());
+    if (!server)
+        return;
+
+    bool hasAnalyticsEngine = false;
+    auto cameras = resourcePool()->getAllCameras(server);
+    for (const auto& camera : cameras)
+    {
+        QSet<QnUuid> objectEngines;
+        for (const auto& objectType : camera->supportedObjectTypes())
+        {
+            if (!objectType.second.empty())
+                objectEngines.insert(objectType.first);
+        }
+        auto usedObjectEngines = camera->enabledAnalyticsEngines().intersect(objectEngines);
+        if (!usedObjectEngines.empty())
+        {
+            hasAnalyticsEngine = true;
+        }
+    }
+    if (!nx::analytics::hasActiveObjectEngines(
+        serverModule()->commonModule(),
+        serverModule()->commonModule()->moduleGUID()))
+    {
+        return; //< No active analytics engine.
+    }
+
+    for (const auto& storage : getAllStorages())
+    {
+        if (storage->getId() != server->metadataStorageId())
+            continue;
+
+        if (storage->getStatus() != Qn::Online)
+            emit storageFailure(storage, nx::vms::api::EventReason::metadataStorageOffline);
+        else if (storage->getFreeSpace() < kMinMetadataStorageFreeSpace)
+            emit storageFailure(storage, nx::vms::api::EventReason::metadataStorageFull);
+
+        if (m_analyticsEventsStorage && !m_analyticsEventsStorage->initialized())
+            emit storageFailure(storage, nx::vms::api::EventReason::metadataStorageOffline);
     }
 }
 
@@ -2300,7 +2342,23 @@ QSet<QnStorageResourcePtr> QnStorageManager::getClearableStorages() const
 StorageResourceList QnStorageManager::getAllWritableStorages(
     const StorageResourceList& additional) const
 {
-    return WritableStoragesHelper(this).list(m_storageRoots.values() + additional);
+    auto existing = getStorages();
+    const auto filterOutExisting =
+        [](const auto& existing, auto additional)
+        {
+            additional.erase(std::remove_if(
+                    additional.begin(), additional.end(),
+                    [&existing](const auto& a)
+                    {
+                        return std::any_of(
+                            existing.cbegin(), existing.cend(),
+                            [&a](const auto& e) { return e->getUrl() == a->getUrl(); });
+                    }),
+                additional.end());
+            return additional;
+        };
+
+    return WritableStoragesHelper(this).list(existing + filterOutExisting(existing, additional));
 }
 
 void QnStorageManager::testStoragesDone()
@@ -2375,6 +2433,11 @@ void QnStorageManager::checkWritableStoragesExist()
     }
 }
 
+std::chrono::milliseconds QnStorageManager::checkSystemFreeSpaceInterval() const
+{
+    return std::chrono::minutes(1);
+}
+
 void QnStorageManager::startAuxTimerTasks()
 {
     if (m_role == QnServer::StoragePool::Normal)
@@ -2384,6 +2447,12 @@ void QnStorageManager::startAuxTimerTasks()
             [this](nx::utils::TimerId) { checkWritableStoragesExist(); },
             kCheckStoragesAvailableInterval,
             kCheckStoragesAvailableInterval);
+
+        static const std::chrono::minutes kCheckMetadataStorageSpace(1);
+        m_auxTasksTimerManager.addNonStopTimer(
+            [this](nx::utils::TimerId) { checkMetadataStorageSpace(); },
+            kCheckMetadataStorageSpace,
+            kCheckMetadataStorageSpace);
     }
 
     static const std::chrono::minutes kCameraInfoUpdateInterval(5);
@@ -2391,11 +2460,10 @@ void QnStorageManager::startAuxTimerTasks()
         [this](nx::utils::TimerId) { m_camInfoWriter.writeAll(); },
         kCameraInfoUpdateInterval, kCameraInfoUpdateInterval);
 
-    static const std::chrono::minutes kCheckSystemStorageSpace(1);
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId) { checkSystemStorageSpace(); },
-        kCheckSystemStorageSpace,
-        kCheckSystemStorageSpace);
+        checkSystemFreeSpaceInterval(),
+        checkSystemFreeSpaceInterval());
 
     static const std::chrono::minutes kCheckStorageSpace(1);
     m_auxTasksTimerManager.addNonStopTimer(

@@ -16,6 +16,7 @@ BusyIndicator
     {
         id: repeater;
 
+        visible: control.running
         model: 3;
         delegate: NxCircle
         {

@@ -1,5 +1,4 @@
 #include "media_paths.h"
-#include "detail/media_paths_filter.h"
 
 namespace nx {
 namespace vms::server {
@@ -7,9 +6,9 @@ namespace fs {
 namespace media_paths {
 
 struct FilterConfig;
-QStringList getMediaPaths(FilterConfig filterConfig)
+QList<Partition> getMediaPartitions(const FilterConfig& filterConfig)
 {
-    return detail::Filter(std::move(filterConfig)).get();
+    return detail::Filter(filterConfig).get();
 }
 
 } // namespace media_paths

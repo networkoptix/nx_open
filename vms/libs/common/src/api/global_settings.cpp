@@ -58,7 +58,9 @@ const QString kProxyConnectTimeout("proxyConnectTimeoutSec");
 const int kProxyConnectTimeoutDefault = 5;
 
 const QString kMaxP2pQueueSizeBytesName("maxP2pQueueSizeBytes");
+const QString kMaxP2pQueueSizeForAllClientsBytesName("maxP2pAllClientsSizeBytes");
 const int kMaxP2pQueueSizeBytesDefault = 1024 * 1024 * 50;
+const qint64 kMaxP2pQueueSizeForAllClientsBytesDefault = 1024 * 1024 * 1024;
 const QString kMaxRecorderQueueSizeBytesName("maxRecordQueueSizeBytes");
 const int kMaxRecorderQueueSizeBytesDefault = 1024 * 1024 * 24;
 const QString kMaxRecorderQueueSizePacketsName("maxRecordQueueSizeElements");
@@ -92,7 +94,7 @@ const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(2
 const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(5);
 const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(1);
 const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
-const std::chrono::milliseconds kSyncTimeEpsilonDefault(100);
+const std::chrono::milliseconds kSyncTimeEpsilonDefault(200);
 
 const QString kEnableEdgeRecording(lit("enableEdgeRecording"));
 const QString kEnableWebSocketKey(lit("webSocketEnabled"));
@@ -608,6 +610,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxP2pQueueSizeBytesDefault,
         this);
 
+    m_maxP2pQueueSizeForAllClientsBytes = new QnLexicalResourcePropertyAdaptor<qint64>(
+        kMaxP2pQueueSizeForAllClientsBytesName,
+        kMaxP2pQueueSizeForAllClientsBytesDefault,
+        this);
+
     m_maxRecorderQueueSizeBytes = new QnLexicalResourcePropertyAdaptor<int>(
         kMaxRecorderQueueSizeBytesName,
         kMaxRecorderQueueSizeBytesDefault,
@@ -710,9 +717,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "licenseServer",
         "https://licensing.vmsproxy.com",
         this);
-
-    m_resourceFileUriAdaptor =
-        new QnLexicalResourcePropertyAdaptor<nx::utils::Url>("resourceFileUri", "", this);
 
     m_resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::utils::Url>(
         "resourceFileUri", "http://resources.vmsproxy.com/resource_data.json", this);
@@ -913,13 +917,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         &QnGlobalSettings::downloaderPeersChanged,
         Qt::QueuedConnection);
 
-    connect(
-        m_resourceFileUriAdaptor,
-        &QnAbstractResourcePropertyAdaptor::valueChanged,
-        this,
-        &QnGlobalSettings::resourceFileUriChanged,
-        Qt::QueuedConnection);
-
     AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -947,6 +944,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_arecontRtspEnabledAdaptor
         << m_sequentialFlirOnvifSearcherEnabledAdaptor
         << m_maxP2pQueueSizeBytes
+        << m_maxP2pQueueSizeForAllClientsBytes
         << m_maxRecorderQueueSizeBytes
         << m_maxRecorderQueueSizePackets
         << m_rtpFrameTimeoutMs
@@ -1661,6 +1659,11 @@ int QnGlobalSettings::maxP2pQueueSizeBytes() const
     return m_maxP2pQueueSizeBytes->value();
 }
 
+qint64 QnGlobalSettings::maxP2pQueueSizeForAllClientsBytes() const
+{
+    return m_maxP2pQueueSizeForAllClientsBytes->value();
+}
+
 int QnGlobalSettings::maxRecorderQueueSizeBytes() const
 {
     return m_maxRecorderQueueSizeBytes->value();
@@ -1819,11 +1822,6 @@ void QnGlobalSettings::setLicenseServerUrl(const QString& value)
 QString QnGlobalSettings::licenseServerUrl() const
 {
     return m_licenseServerUrlAdaptor->value();
-}
-
-void QnGlobalSettings::setResourceFileUri(const nx::utils::Url& value)
-{
-    m_resourceFileUriAdaptor->setValue(value);
 }
 
 nx::utils::Url QnGlobalSettings::resourceFileUri() const

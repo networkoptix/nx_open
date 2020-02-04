@@ -735,7 +735,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
         {
             QSqlQuery query(sqlDb);
             ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
-            const nx::vms::server::Chunk chunk = *referenceCatalogs[i]->chunkAt(j);
+            const nx::vms::server::Chunk chunk = referenceCatalogs[i]->chunkAt(j);
 
             query.addBindValue(referenceCatalogs[i]->cameraUniqueId()); // unique_id
             query.addBindValue(referenceCatalogs[i]->getCatalog()); // role
@@ -760,7 +760,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
         {
             sdb->addRecord(
                 referenceCatalogs[i]->cameraUniqueId(), referenceCatalogs[i]->getCatalog(),
-                *referenceCatalogs[i]->chunkAt(j));
+                referenceCatalogs[i]->chunkAt(j));
         }
     }
 

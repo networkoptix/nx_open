@@ -11,6 +11,12 @@
 namespace nx {
 namespace test {
 
+TEST(Chunk, DefaultConstructedIsNull)
+{
+    nx::vms::server::Chunk chunk;
+    ASSERT_TRUE(chunk.isNull());
+}
+
 TEST(DeviceFileCatalog, catalogRange)
 {
     QnMediaServerModule serverModule;
@@ -194,7 +200,7 @@ protected:
         ASSERT_EQ(chunks.size(), catalog->size());
         ASSERT_EQ(chunks, catalog->getChunks());
         for (size_t i = 0; i < catalog->size(); ++i)
-            ASSERT_EQ(chunks[i], catalog->chunkAt(i).value());
+            ASSERT_EQ(chunks[i], catalog->chunkAt(i));
     }
 
     static std::chrono::milliseconds accumDuration(const std::deque<Chunk>& chunks, int storageIndex)
@@ -236,7 +242,7 @@ TEST_F(DeviceFileCatalogTest, addChunk_chunkAt)
 
     catalog->addChunk(newChunk);
     ASSERT_EQ(11, catalog->size());
-    ASSERT_EQ(newChunk.startTimeMs, catalog->chunkAt(3).value().startTimeMs);
+    ASSERT_EQ(newChunk.startTimeMs, catalog->chunkAt(3).startTimeMs);
 
     const auto catalogChunks = catalog->getChunks().toDeque();
     ASSERT_EQ(11, catalogChunks.size());

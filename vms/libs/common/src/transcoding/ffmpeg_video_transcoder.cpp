@@ -15,6 +15,7 @@
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
 #include <nx/metrics/metrics_storage.h>
+#include <transcoding/transcoding_utils.h>
 
 namespace {
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
@@ -27,13 +28,13 @@ static const nx::utils::log::Tag kLogTag(lit("Transcoding"));
 
 AVCodecID findVideoEncoder(const QString& codecName)
 {
-    AVCodec* avCodec = avcodec_find_encoder_by_name(codecName.toLatin1().data());
-    if (!avCodec)
+    AVCodecID codecId = nx::transcoding::findEncoderCodecId(codecName);
+    if (codecId == AV_CODEC_ID_NONE)
     {
-        NX_WARNING(kLogTag) << "Configured codec:" << codecName << "not found, h263p will used";
+        NX_WARNING(kLogTag, "Configured codec: %1 not found, h263p will used", codecName);
         return AV_CODEC_ID_H263P;
     }
-    return avCodec->id;
+    return codecId;
 }
 
 namespace {

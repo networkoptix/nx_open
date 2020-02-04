@@ -95,7 +95,7 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
         {quint64(data->timestamp), data, isKeyFrame, int(mediaPacket->channelNumber)});
 
     m_cacheSizeInBytes += mediaPacket->dataSize();
-    clearCacheIfNeeded(&lk);
+    clearCacheIfNeeded();
 
     if(!isKeyFrame)
         return; // No sense to perform this operation more than once per GOP.
@@ -121,7 +121,7 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
         [this, timestamp = data->timestamp]() { m_onKeyFrame.notify(timestamp); });
 }
 
-void MediaStreamCache::clearCacheIfNeeded(QnMutexLockerBase* const /*lk*/)
+void MediaStreamCache::clearCacheIfNeeded()
 {
     const quint64 maxTimestamp = m_packetsByTimestamp.back().timestamp;
     if (maxTimestamp - m_packetsByTimestamp.front().timestamp <= quint64(m_cacheSizeUsec))

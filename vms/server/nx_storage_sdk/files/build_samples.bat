@@ -1,7 +1,6 @@
 :: Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 @echo off
-setlocal
 
 :: Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 set BASE_DIR_WITH_BACKSLASH=%~dp0
@@ -9,42 +8,40 @@ set BASE_DIR=%BASE_DIR_WITH_BACKSLASH:~0,-1%
 set BUILD_DIR=%BASE_DIR%-build
 
 echo on
-    if exist "%BUILD_DIR%/" rmdir /S /Q "%BUILD_DIR%/" || goto :end
+    rmdir /S /Q "%BUILD_DIR%/" 2>NUL
 @echo off
 
 for /d %%S in (%BASE_DIR%\samples\*) do (
-    call :build_sample %%S %* || goto :end
+    call :build_sample %%S %1 %2 %3 %4 %5 %6 %7 %8 || @goto :error
 )
 
 echo Samples built successfully, see the binaries in %BUILD_DIR%
-exit
-
-:end
-:: Export the exit status behind endlocal.
-endlocal && set RESULT=%ERRORLEVEL%
-exit /b %RESULT%
+exit /b
 
 :build_sample
-set SOURCE_DIR=%1\src
-set SAMPLE=%~n1
-set SAMPLE_BUILD_DIR=%BUILD_DIR%\%SAMPLE%
-echo on
-    mkdir "%SAMPLE_BUILD_DIR%" || goto :build_sample_fail
-    cd "%SAMPLE_BUILD_DIR%" || goto :build_sample_fail
-    
-    cmake "%SOURCE_DIR%" -Ax64 -Tv140,host=x64 %* || goto :build_sample_fail
-    cmake --build . || goto :build_sample_fail
-@echo off
-set ARTIFACT=%SAMPLE_BUILD_DIR%\Debug\%SAMPLE%.dll
-if not exist "%ARTIFACT%" (
-    echo ERROR: Failed to build plugin %SAMPLE%.
-    exit /b 64
-)
-echo:
-echo Plugin built:
-echo %ARTIFACT%
-echo:
-exit /b 0
+    set SOURCE_DIR=%1
+    set SAMPLE=%~n1
+    set SAMPLE_BUILD_DIR=%BUILD_DIR%\%SAMPLE%
+    echo on
+        mkdir "%SAMPLE_BUILD_DIR%" || @exit /b
+        cd "%SAMPLE_BUILD_DIR%" || @exit /b
+        
+        :: Not using %* to allow using `shift`.
+        cmake "%SOURCE_DIR%\src" -Ax64 -Tv140,host=x64 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
+        cmake --build . || @exit /b
+    @echo off
+    set ARTIFACT=%SAMPLE_BUILD_DIR%\Debug\%SAMPLE%.dll
+    if not exist "%ARTIFACT%" (
+        echo ERROR: Failed to build plugin %SAMPLE%.
+        exit /b 64
+    )
+    echo:
+    echo Plugin built:
+    echo %ARTIFACT%
+    echo:
+exit /b
 
-:build_sample_fail
-@echo off && exit /b %ERRORLEVEL%
+:error
+    @echo off
+    set RESULT=%ERRORLEVEL%
+exit /b %RESULT%

@@ -33,9 +33,13 @@ void filterOut(
 class PathAmender
 {
 public:
-    PathAmender(const QString& path, const FilterConfig& filterConfig):
+    PathAmender(QString& path, const FilterConfig& filterConfig):
         m_path(path),
         m_filterConfig(filterConfig)
+    {
+    }
+
+    void operator()()
     {
         if (m_filterConfig.isWindows)
         {
@@ -46,9 +50,8 @@ public:
         amendLinuxPath();
     }
 
-    QString take() { return std::move(m_path); }
 private:
-    QString m_path;
+    QString& m_path;
     const FilterConfig& m_filterConfig;
 
     void amendPath()
@@ -107,22 +110,34 @@ private:
 
 } // namespace
 
-Filter::Filter(FilterConfig filterConfig) :
+Filter::Filter(const FilterConfig& filterConfig):
     m_filterConfig(std::move(filterConfig))
 {}
 
-QStringList Filter::get() const
+QList<Partition> Filter::get() const
 {
-    QStringList result;
+    QList<Partition> result;
     NX_VERBOSE(this, "Candidates: %1", containerString(m_filterConfig.partitions));
-    for (const auto& partition : filteredPartitions())
-        result.push_back(amendPath(partition.path));
+    for (auto& partition: filteredPartitions())
+    {
+        amendPath(partition.path);
+        result.push_back(partition);
+    }
 
     if (m_filterConfig.isMultipleInstancesAllowed)
         appendServerGuidPostFix(&result);
 
-    std::sort(result.begin(), result.end());
-    result.erase(std::unique(result.begin(), result.end()), result.end());
+    std::sort(
+        result.begin(), result.end(),
+        [](const auto& p1, const auto& p2) { return p1.path < p2.path; });
+
+    result.erase(
+        std::unique(
+            result.begin(), result.end(), [](const auto& p1, const auto& p2)
+            {
+                return p1.path == p2.path;
+            }),
+        result.end());
 
     return result;
 }
@@ -139,15 +154,15 @@ QList<nx::vms::server::PlatformMonitor::PartitionSpace> Filter::filteredPartitio
     return partitions;
 }
 
-QString Filter::amendPath(const QString& path) const
+void Filter::amendPath(QString& path) const
 {
-    return PathAmender(path, m_filterConfig).take();
+    PathAmender(path, m_filterConfig)();
 }
 
-void Filter::appendServerGuidPostFix(QStringList* paths) const
+void Filter::appendServerGuidPostFix(QList<Partition>* partitions) const
 {
-    for (QString& path : *paths)
-        path = closeDirPath(path) + m_filterConfig.serverUuid.toString();
+    for (auto& p : *partitions)
+        p.path = closeDirPath(p.path) + m_filterConfig.serverUuid.toString();
 }
 
 } // namespace detail

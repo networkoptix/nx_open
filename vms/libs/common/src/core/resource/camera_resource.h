@@ -39,6 +39,10 @@ public:
     static const QString kUserEnabledAnalyticsEnginesProperty;
     static const QString kDeviceAgentsSettingsValuesProperty;
     static const QString kDeviceAgentManifestsProperty;
+    static const QString kAnalyzedStreamIndexes;
+
+    static const nx::vms::api::StreamIndex kDefaultAnalyzedStreamIndex =
+        nx::vms::api::StreamIndex::primary;
 
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
@@ -155,6 +159,10 @@ public:
     void setDeviceAgentManifest(
         const QnUuid& engineId,
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
+
+    nx::vms::api::StreamIndex analyzedStreamIndex(QnUuid engineId) const;
+
+    void setAnalyzedStreamIndex(QnUuid engineId, nx::vms::api::StreamIndex streamIndex);
 
     virtual bool hasDualStreamingInternal() const override;
 

@@ -10,6 +10,8 @@
 
 #include <utils/common/warnings.h>
 
+#include <nx/utils/log/assert.h>
+
 QnVideoRecorderSettings::QnVideoRecorderSettings(QObject* parent):
     base_type(parent)
 {
@@ -77,22 +79,30 @@ int QnVideoRecorderSettings::screen() const
     QRect geometry = settings.value(QLatin1String("screenResolution")).toRect();
 
     const auto screens = QGuiApplication::screens();
-    if (screens.at(oldScreen)->geometry() == geometry)
+    if (NX_ASSERT(oldScreen >= 0) && oldScreen < screens.size()
+        && screens.at(oldScreen)->geometry() == geometry)
+    {
         return oldScreen;
+    }
 
     for (int i = 0; i < screens.size(); i++)
     {
         if (screens.at(i)->geometry() == geometry)
             return i;
     }
+
     return screens.indexOf(QGuiApplication::primaryScreen());
 }
 
 void QnVideoRecorderSettings::setScreen(int screen)
 {
+    const auto screens = QGuiApplication::screens();
+    if (!NX_ASSERT(screen >= 0 && screen < screens.size()))
+        return;
+
     settings.setValue(QLatin1String("screen"), screen);
     settings.setValue(QLatin1String("screenResolution"),
-        QGuiApplication::screens().at(screen)->geometry());
+        screens.at(screen)->geometry());
 }
 
 float QnVideoRecorderSettings::qualityToNumeric(Qn::DecoderQuality quality)
@@ -119,6 +129,9 @@ int QnVideoRecorderSettings::screenToAdapter(int screen)
         return 0;
 
     const auto screens = QGuiApplication::screens();
+    if (!NX_ASSERT(screen >= 0 && screen < screens.size()))
+        return 0;
+
     QRect rect = screens.at(screen)->geometry();
     MONITORINFO monInfo;
     memset(&monInfo, 0, sizeof(monInfo));

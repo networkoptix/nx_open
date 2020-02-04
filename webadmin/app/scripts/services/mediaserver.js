@@ -1,3 +1,5 @@
+const utf8 = require( 'utf8' );
+
 'use strict';
 
 angular.module('webadminApp')
@@ -221,7 +223,7 @@ angular.module('webadminApp')
                 var digest = md5(login + ':' + realm + ':' + password);
                 var method = md5((method||'GET') + ':');
                 var authDigest = md5(digest + ':' + nonce + ':' + method);
-                var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
+                var auth = Base64.encode( utf8.encode(login) + ':' + nonce + ':' + authDigest);
 
                 return auth;
             },

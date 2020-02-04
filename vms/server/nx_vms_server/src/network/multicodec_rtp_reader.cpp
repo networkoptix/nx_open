@@ -206,6 +206,9 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         return result;
     }
 
+    if (m_pleaseStop)
+        return result;
+
     if (!m_gotSomeFrame)
     {
         NX_VERBOSE(this, "No frame has arrived since the stream was opened, device %1 (%2)",
@@ -398,15 +401,12 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         if (trackIndexIter != m_trackIndices.end())
         {
             auto& track = m_tracks[trackIndexIter->second];
-            int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - bytesRead;
-            const auto offset = rtpBufferOffset + kInterleavedRtpOverTcpPrefixLength;
-            const auto length = bytesRead - kInterleavedRtpOverTcpPrefixLength;
-            updateOnvifTime(offset, length, track, rtpChannelNum);
-            if (!track.parser->processData(
-                (quint8*)m_demuxedData[rtpChannelNum]->data(),
-                offset,
-                length,
-                m_gotData))
+            const int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - bytesRead;
+            const int offset = rtpBufferOffset + kInterleavedRtpOverTcpPrefixLength;
+            const int length = bytesRead - kInterleavedRtpOverTcpPrefixLength;
+            uint8_t* rtpPacketData = (uint8_t*)m_demuxedData[rtpChannelNum]->data();
+            updateOnvifTime(rtpPacketData + offset, length, track);
+            if (!track.parser->processData(rtpPacketData, offset, length, m_gotData))
             {
                 clearKeyData(track.logicalChannelNum);
                 m_demuxedData[rtpChannelNum]->clear();
@@ -487,10 +487,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                 m_demuxedData[rtpChannelNum]->finishWriting(bytesRead);
                 quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
 
-                updateOnvifTime(rtpBuffer - bufferBase, bytesRead, track, rtpChannelNum);
+                updateOnvifTime(rtpBuffer, bytesRead, track);
                 if (!track.parser->processData(
                         bufferBase,
-                        rtpBuffer-bufferBase,
+                        rtpBuffer - bufferBase,
                         bytesRead,
                         gotData))
                 {
@@ -971,14 +971,9 @@ QnRtspClient& QnMulticodecRtpReader::rtspClient()
     return m_RtpSession;
 }
 
-void QnMulticodecRtpReader::updateOnvifTime(
-    int rtpBufferOffset,
-    int rtpPacketSize,
-    TrackInfo& track,
-    int rtpChannel)
+void QnMulticodecRtpReader::updateOnvifTime(const uint8_t* data, int size, TrackInfo& track)
 {
-    uint8_t* data = (uint8_t*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset;
-    if (rtpPacketSize < nx::streaming::rtp::RtpHeader::kSize)
+    if (size < nx::streaming::rtp::RtpHeader::kSize)
     {
         NX_WARNING(this, "RTP packet size is less than RTP header size, resetting onvif time");
         track.onvifExtensionTimestamp.reset();
@@ -990,7 +985,7 @@ void QnMulticodecRtpReader::updateOnvifTime(
         return;
 
     const int bytesTillExtension = header->payloadOffset();
-    if (rtpPacketSize < bytesTillExtension)
+    if (size < bytesTillExtension)
     {
         NX_WARNING(this, "RTP packet size is less than expected, resetting onvif time");
         track.onvifExtensionTimestamp.reset();
@@ -998,9 +993,9 @@ void QnMulticodecRtpReader::updateOnvifTime(
     }
 
     data += bytesTillExtension;
-    rtpPacketSize -= bytesTillExtension;
+    size -= bytesTillExtension;
     nx::streaming::rtp::OnvifHeaderExtension onvifExtension;
-    if (onvifExtension.read(data, rtpPacketSize))
+    if (onvifExtension.read(data, size))
         track.onvifExtensionTimestamp = onvifExtension.ntp;
 }
 

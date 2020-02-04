@@ -35,7 +35,10 @@ LinkHoverProcessor::LinkHoverProcessor(QLabel* parent):
         QEvent::HoverLeave,
         QEvent::MouseButtonRelease };
 
-    installEventHandler(m_label, handledEvents, this,
+
+    // m_label will be destroyed before 'this'.
+    // If m_label is a signal reciever, event queue would be cleaned after it's destructions.
+    installEventHandler(m_label, handledEvents, m_label,
         [this](QObject* /*object*/, QEvent* event)
         {
             switch (event->type())

@@ -1131,7 +1131,7 @@ int QnRtspClient::readBinaryResponse(quint8* data, int maxDataSize)
 quint8* QnRtspClient::prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve)
 {
     if (channel >= 0 && demuxedData.size() <= (size_t)channel)
-        demuxedData.resize(channel+1);
+        demuxedData.resize(channel+1, nullptr);
     if (demuxedData[channel] == 0)
         demuxedData[channel] = new QnByteArray(16, 32);
     QnByteArray* dataVect = demuxedData[channel];
@@ -1160,7 +1160,6 @@ int QnRtspClient::readBinaryResponse(std::vector<QnByteArray*>& demuxedData, int
     int copyLen = qMin(dataLen, m_responseBufferLen);
     channelNumber = m_responseBuffer[1];
     quint8* data = prepareDemuxedData(demuxedData, channelNumber, dataLen);
-    //quint8* data = (quint8*) dataVect->data() + dataVect->size() - dataLen;
 
     memcpy(data, m_responseBuffer, copyLen);
     if (m_responseBufferLen > copyLen)

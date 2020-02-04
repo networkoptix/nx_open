@@ -49,6 +49,25 @@ In method <strong><code>analyticsLookupObjectTracks</code></strong>, parameter
 number of object track metadata items (each item is related to a video frame). The new parameter is
 just a flag showing whether to select all of them or not.
 </p>
+<p>
+In method <strong><code>deviceAnalyticsSettings (POST)</code></strong> parameters
+<strong><code>deviceId</code></strong> and <strong><code>analyticsEngineId</code></strong> have to
+be passed not as URL query parameters but as keys of a JSON request in the request body. Optional
+parameter <strong><code>analyzedStreamIndex</code></strong> have been added to the JSON request.
+Parameter <strong><code>settings</code></strong> of the JSON request has been renamed to
+<strong><code>settingsValues</code></strong>. Parameters <strong><code>values</code></strong> and
+<strong><code>model</code></strong> of the JSON response have been renamed to
+<strong><code>settingsValues</code></strong> and <strong><code>settingsModel</code></strong>
+respectively. Parameter <strong><code>analyzedStreamIndex</code></strong> has been added to the
+JSON response.
+</p>
+<p>
+In method <strong><code>deviceAnalyticsSettings (GET)</code></strong> parameters
+<strong><code>values</code></strong> and <strong><code>model</code></strong> of the JSON response
+have been renamed to <strong><code>settingsValues</code></strong> and
+<strong><code>settingsModel</code></strong> respectively. Parameter
+<strong><code>analyzedStreamIndex</code></strong> has been added to the JSON response.
+</p>
 <!--============================================================================================-->
 <hr/><h2>VMS <b>4.0</b> relative to <i>3.2</i></h2>
 <!--............................................................................................-->

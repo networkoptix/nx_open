@@ -206,8 +206,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         }
     }
 
-    // 'Digital Watchdog' (with space) is actually ISD cameras. Without space it's old DW cameras
-    if (name.isEmpty() || (vendor != kIsdFullVendorName && vendor != kDwFullVendorName))
+    if (name.isEmpty() || (vendor != kIsdFullVendorName))
         return QList<QnResourcePtr>();
 
     if (shouldStop())
