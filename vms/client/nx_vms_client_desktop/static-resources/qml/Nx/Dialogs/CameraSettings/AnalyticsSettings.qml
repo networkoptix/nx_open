@@ -24,6 +24,7 @@ Item
     property var currentEngineId
     property var currentEngineInfo
     property var currentSectionPath: []
+    property var currentSettingsModel
     property bool loading: false
 
     readonly property bool isDeviceDependent: currentEngineInfo !== undefined
@@ -49,7 +50,18 @@ Item
 
             if (engineId === currentEngineId)
             {
-                settingsView.setValues(store.deviceAgentSettingsValues(currentEngineId))
+                var actualModel = store.deviceAgentSettingsModel(currentEngineId)
+                var actualValues = store.deviceAgentSettingsValues(currentEngineId)
+
+                if (JSON.stringify(currentSettingsModel) == JSON.stringify(actualModel))
+                {
+                    settingsView.setValues(actualValues)
+                }
+                else
+                {
+                    currentSettingsModel = actualModel
+                    settingsView.loadModel(currentSettingsModel, actualValues)
+                }
             }
             else if (analyticsEngines.length > 0)
             {
@@ -77,15 +89,16 @@ Item
                 navigationMenu.currentItemId =
                     [engineId.toString()].concat(currentSectionPath).join("\n")
 
-                settingsView.loadModel(
-                    engineInfo.settingsModel,
-                    store.deviceAgentSettingsValues(engineInfo.id))
+                currentSettingsModel = store.deviceAgentSettingsModel(engineInfo.id)
+                var actualValues = store.deviceAgentSettingsValues(engineInfo.id)
+                settingsView.loadModel(currentSettingsModel, actualValues)
             }
             else
             {
                 currentEngineId = undefined
                 currentEngineInfo = undefined
                 currentSectionPath = []
+                currentSettingsModel = undefined
                 navigationMenu.currentItemId = undefined
                 settingsView.loadModel({}, {})
             }
@@ -143,6 +156,7 @@ Item
 
                 readonly property var engineId: modelData.id
                 readonly property var isSelected: currentEngineId === engineId
+                readonly property var settingsModel: isSelected ? currentSettingsModel : undefined
 
                 Column
                 {
@@ -158,6 +172,7 @@ Item
                         property var ctx_navigationMenu: navigationMenu
                         property var ctx_modelData: modelData
                         property var ctx_engineId: engineId
+                        property var ctx_settingsModel: settingsModel
                         property var ctx_sections: []
                         property int ctx_level: 0
                         property bool ctx_selected: container.isSelected
