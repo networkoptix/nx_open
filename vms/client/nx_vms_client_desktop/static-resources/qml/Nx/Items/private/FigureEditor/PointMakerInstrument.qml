@@ -94,7 +94,8 @@ Instrument
 
         if (count === 0)
         {
-            pointsModel.append(pointsModel.makePoint(d.snappedToFirstPoint(mouse.position)))
+            pointsModel.append(pointsModel.makePoint(mouse.position))
+            pointsModel.append(pointsModel.makePoint(mouse.position))
             return
         }
         d.processMove(mouse)
