@@ -37,9 +37,9 @@ LinkHoverProcessor::LinkHoverProcessor(QLabel* parent):
 
 
     installEventHandler(m_label, handledEvents, this,
-        [this](QObject* object, QEvent* event)
+        [this](QObject* /*object*/, QEvent* event)
         {
-            if (m_label && m_label == object)
+            if (!m_label)
                 return;
 
             switch (event->type())
