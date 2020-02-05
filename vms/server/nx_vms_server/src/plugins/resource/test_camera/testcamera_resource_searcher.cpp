@@ -120,7 +120,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 resource->setMAC(nx::utils::MacAddress(mac));
                 resource->setUrl(url.toString());
 
-                NX_VERBOSE(this, "Found test camera %1 (URL: %2)", resource, url);
+                NX_VERBOSE(this, "Discovered test camera %1 with URL %2", resource, url);
                 processedMac << mac;
                 resources.insert(mac, resource);
             }
@@ -144,7 +144,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(
 
     if (resourceType.isNull())
     {
-        NX_WARNING(this, lm("No resource type for id: %1").arg(resourceTypeId));
+        NX_WARNING(this, "No resource type for id: %1", resourceTypeId);
         return result;
     }
 
@@ -157,8 +157,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(
     result = QnVirtualCameraResourcePtr(new QnTestCameraResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
-    NX_DEBUG(this, "Create test camera resource [%1], type id: [%2]",
-        result, resourceTypeId);
+    NX_DEBUG(this, "Created test camera resource %1, typeId %2.", result, resourceTypeId);
     return result;
 
 }
