@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const server_address = process.env.server_address || 'https://10.1.5.115:7001';
+const server_address = process.env.server_address || 'https://10.1.5.210:7001';
 
 const common = require('./webpack.common.js');
 

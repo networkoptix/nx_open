@@ -151,7 +151,7 @@ public:
      * Return all storages which can be used for writing
      */
     nx::vms::server::StorageResourceList getAllWritableStorages(
-        const nx::vms::server::StorageResourceList& additional =
+        nx::vms::server::StorageResourceList additional =
         nx::vms::server::StorageResourceList()) const;
 
     nx::vms::server::StorageResourceList getStoragesInLexicalOrder() const;

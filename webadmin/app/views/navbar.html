@@ -43,7 +43,7 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Log Out</a></li>
+                <li ng-if="user" ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Log Out</a></li>
                 <li language-select uib-dropdown></li>
             </ul>
         </nav>
@@ -72,7 +72,7 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Log Out</a></li>
+                <li ng-if="user" ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Log Out</a></li>
                 <li language-select uib-dropdown></li>
             </ul>
         </nav>

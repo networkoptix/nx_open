@@ -108,7 +108,9 @@ angular.module('webadminApp')
                 }).catch(function(error){
                     $log.error(error);
                     $log.log('fall back to login dialog');
-                    callLogin();
+                    if ($location.path().indexOf(Config.apiTestTool) !== 0) {
+                        callLogin();
+                    }
                 });
             }
             if(error.status === 0) {
@@ -595,6 +597,9 @@ angular.module('webadminApp')
                     if(r.data.reply.flags.brokenSystem){ // No drives - redirect to settings and hide everything else
                         $location.path('/settings/system');
                         return null;
+                    }
+                    if($location.path().indexOf(Config.apiTestTool) === 0) {
+                        return undefined;
                     }
                     return self.getUser();
                 });

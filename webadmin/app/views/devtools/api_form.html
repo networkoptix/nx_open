@@ -242,7 +242,7 @@
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
-                    ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
+                    ng-if="userAuthenticated && (apiMethod.method=='GET' || apiMethod.method=='POST')"
                     class="btn btn-primary" ng-click="testMethod()">Test method</button>
             <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
                ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
