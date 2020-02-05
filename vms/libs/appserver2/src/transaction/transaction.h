@@ -1424,8 +1424,8 @@ APPLY(10402, removeAnalyticsEngine, nx::vms::api::IdData, \
                         AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                         RegularTransactionType()) /* regular transaction type */ \
 APPLY(10500, serverRuntimeEvent, nx::vms::api::ServerRuntimeEventData, \
-                        false, \
-                        true, \
+                        false, /*isPersistent*/ \
+                        false, /*isSystem*/ \
                         InvalidGetHashHelper(), \
                         [](const QnTransaction<nx::vms::api::ServerRuntimeEventData>& tran, \
                             const NotificationParams& notificationParams) \
