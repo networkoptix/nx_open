@@ -434,11 +434,17 @@ void CameraSettingsDialogStore::setAnalyticsStreamIndex(const QnUuid& engineId, 
     if (!NX_ASSERT(value == 0 || value == 1))
         value = std::clamp(value, 0, 1);
 
+    setAnalyticsStreamIndex(engineId, State::StreamIndex(value));
+}
+
+void CameraSettingsDialogStore::setAnalyticsStreamIndex(
+    const QnUuid& engineId, nx::vms::api::StreamIndex value, ModificationSource source)
+{
     d->executeAction(
         [&](State state)
         {
             return Reducer::setAnalyticsStreamIndex(
-                std::move(state), engineId, State::StreamIndex(value));
+                std::move(state), engineId, State::StreamIndex(value), source);
         });
 }
 

@@ -281,7 +281,10 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         bool loading = false;
         QnUuid currentEngineId;
 
-        QHash<QnUuid, UserEditable<StreamIndex>> streamByEngineId;
+        // This dictionary may contain engine ids that are no longer valid.
+        // Don't iterate through all 'streamByEngineId' kv-pairs, iterate through 'engines' instead
+        // and use 'engine.id' as a key.
+        QHash<QnUuid /*engineId*/, UserEditable<StreamIndex> /*streamIndex*/> streamByEngineId;
     };
     AnalyticsSettings analytics;
 

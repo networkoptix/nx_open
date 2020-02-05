@@ -714,8 +714,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
             false);
 
         state.analytics.enabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
-
-        // TODO: FIXME! #vkutin Implement state.analytics.streamByEngineId loading.
     }
 
     fetchFromCameras<bool>(state.recording.enabled, cameras,
@@ -1505,10 +1503,17 @@ State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
 }
 
 State CameraSettingsDialogStateReducer::setAnalyticsStreamIndex(
-    State state, const QnUuid& engineId, State::StreamIndex value)
+    State state, const QnUuid& engineId, State::StreamIndex value, ModificationSource source)
 {
-    state.analytics.streamByEngineId[engineId].setUser(value);
-    state.hasChanges = true;
+    if (source == ModificationSource::local)
+    {
+        state.analytics.streamByEngineId[engineId].setUser(value);
+        state.hasChanges = true;
+    }
+    else if (NX_ASSERT(source == ModificationSource::remote))
+    {
+        state.analytics.streamByEngineId[engineId].setBase(value);
+    }
     return state;
 }
 

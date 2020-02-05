@@ -77,7 +77,16 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::setCamera(
     camera = newCamera;
 
     if (camera)
+    {
         connect(camera, &QnResource::parentIdChanged, this, &Private::updateStore);
+
+        connect(camera, &QnResource::propertyChanged, this,
+            [this](const QnResourcePtr& resource, const QString& key)
+            {
+                if (resource == camera && key == QnVirtualCameraResource::kAnalyzedStreamIndexes)
+                    updateStore();
+            });
+    }
 
     updateStore();
 }
@@ -107,6 +116,12 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::updateStore()
         [](const auto& left, const auto& right) { return left.name < right.name; });
 
     store->setAnalyticsEngines(enginesList);
+
+    for (const auto& engine: enginesList)
+    {
+        store->setAnalyticsStreamIndex(engine.id, camera->analyzedStreamIndex(engine.id),
+            ModificationSource::remote);
+    }
 }
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
