@@ -11,6 +11,7 @@
         supportedLanguages: [
             'en_US', 'ru_RU'
         ],
+        apiTestTool: '/developers/api',
 
         defaultLogin: 'admin',
         defaultPassword: 'admin',

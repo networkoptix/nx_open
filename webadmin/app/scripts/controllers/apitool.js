@@ -9,11 +9,16 @@ angular.module('webadminApp')
         var activeApiMethod = $routeParams.apiMethod;
         $scope.Config = Config;
         $scope.session = $sessionStorage;
+        $scope.userAuthenticated = false;
 
         if($location.search().proprietary){
             Config.allowProprietary = $location.search().proprietary;
         }
         $scope.allowProprietary = Config.allowProprietary;
+
+        mediaserver.getCurrentUser().then(function() {
+            $scope.userAuthenticated = true;
+        });
 
         mediaserver.getApiMethods().then(function(data){
             $scope.apiGroups = data.data.groups;
