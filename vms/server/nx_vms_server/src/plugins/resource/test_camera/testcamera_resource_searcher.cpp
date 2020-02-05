@@ -120,7 +120,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 resource->setMAC(nx::utils::MacAddress(mac));
                 resource->setUrl(url.toString());
 
-                NX_VERBOSE(this, "Discovered test camera %1 with URL %2", resource, url);
+                NX_VERBOSE(this, "Discovered testcamera %1 with URL %2", resource, url);
                 processedMac << mac;
                 resources.insert(mac, resource);
             }
