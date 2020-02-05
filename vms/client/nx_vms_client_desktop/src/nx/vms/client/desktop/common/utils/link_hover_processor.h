@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 class QLabel;
 
@@ -26,7 +27,7 @@ private:
     bool updateOriginalText();
 
 private:
-    QLabel* const m_label = nullptr;
+    const QPointer<QLabel> m_label;
     QString m_originalText;
     QString m_alteredText;
     QString m_hoveredLink;
