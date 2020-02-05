@@ -1,7 +1,6 @@
 #include "workbench_context.h"
 
 #include <QtWidgets/QApplication>
-#include <QtWebKitWidgets/QWebView>
 
 #include <api/global_settings.h>
 #include <core/resource/user_resource.h>
@@ -37,7 +36,6 @@
 #include <ui/statistics/modules/durations_statistics_module.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 
-#include <ui/style/webview_style.h>
 #include <ui/widgets/main_window.h>
 #ifdef Q_OS_LINUX
 #include <ui/workaround/x11_launcher_workaround.h>
