@@ -37,6 +37,9 @@ int writeToQIODevice(void *opaque, uint8_t* buf, int size)
 AVCodecID findEncoderCodecId(const QString& codecName)
 {
     QString codecLower = codecName.toLower();
+    if (codecLower == "h263")
+        codecLower = "h263p"; //< force using h263p codec
+
     AVCodec* avCodec = avcodec_find_encoder_by_name(codecLower.toUtf8().constData());
     if (avCodec)
         return avCodec->id;
@@ -44,7 +47,7 @@ AVCodecID findEncoderCodecId(const QString& codecName)
     // Try to check codec substitutes if requested codecs not found.
     static std::map<std::string, std::vector<std::string>> codecSubstitutesMap
     {
-        { "h264", {"libopenh264"} },
+        { "h264", {"h264", "libopenh264"} },
     };
     auto substitutes = codecSubstitutesMap.find(codecLower.toUtf8().constData());
     if (substitutes == codecSubstitutesMap.end())

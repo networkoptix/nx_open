@@ -1568,8 +1568,6 @@ bool QnRtspConnectionProcessor::processRequest()
         sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
     }
     d->transcodeParams.codecId = d->params.videoCodec();
-    if (d->transcodeParams.codecId == AV_CODEC_ID_H263)
-        d->transcodeParams.codecId = AV_CODEC_ID_H263P; //< force using h263p codec
     d->transcodeParams.resolution = d->params.resolution();
     d->quality = d->params.quality();
     d->startTime = d->params.position();
