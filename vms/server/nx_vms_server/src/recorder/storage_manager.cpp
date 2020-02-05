@@ -2347,9 +2347,9 @@ StorageResourceList QnStorageManager::getAllWritableStorages(
     QSet<QString> urls;
     for (const auto& value: result)
         urls << value->getUrl();
-    nx::utils::remove_if(additional, 
+    nx::utils::remove_if(additional,
         [&urls](const auto& a) { return urls.contains(a->getUrl()); });
-    return WritableStoragesHelper(this).list(result);
+    return WritableStoragesHelper(this).list(result + additional);
 }
 
 void QnStorageManager::testStoragesDone()

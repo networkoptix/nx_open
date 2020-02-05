@@ -52,4 +52,13 @@ TEST_F(FtWritableStorageHelper, DuplicateStorageNotReturned)
     ASSERT_EQ(2, writableStorages.size());
 }
 
+TEST_F(FtWritableStorageHelper, AdditionalStoragesPresent)
+{
+    storageManager->storages = { createStorage("url1"), createStorage("url2") };
+    const auto writableStorages = storageManager->getAllWritableStorages(
+        /*additional*/{ createStorage("url3") });
+
+    ASSERT_EQ(3, writableStorages.size());
+}
+
 } // namespace nx::vms::server::test
