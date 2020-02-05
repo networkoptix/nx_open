@@ -20,6 +20,11 @@
 
 #include <nx/vms/server/event/server_runtime_event_manager.h>
 
+// TODO: #rvasilenko investigate why receiving a `remotePeerFound` signal doesn't guarantee that
+// non-persistent transaction will be received by another peer (just change the value of this macro
+// to 1).
+#define USE_REMOTE_PEER_FOUND_SIGNAL 0
+
 namespace nx::vms::server::event {
 
 static const QnUuid kDeviceId("{374b64c8-e8f2-4961-83b7-90180baa5c9b}");
@@ -112,7 +117,7 @@ private:
         nx::utils::ElapsedTimer timer;
         timer.restart();
 
-        #if 0
+        #if USE_REMOTE_PEER_FOUND_SIGNAL
             NX_MUTEX_LOCKER lock(&m_mutex);
             while (m_establishedConnectionCount < m_servers.size()
                 && timer.elapsed() < kSyncWaitTimeout)
@@ -152,9 +157,7 @@ private:
     {
         for (int i = 0; i < m_servers.size(); ++i)
         {
-            #if 0
-                // TODO: #rvasilenko investigate why receiving a `remotePeerFound` signal doesn't
-                // guarantee that non-persistent transaction will be received by another peer.
+            #if USE_REMOTE_PEER_FOUND_SIGNAL
                 QObject::connect(
                     m_servers[i]->commonModule()->ec2Connection().get(),
                     &ec2::AbstractECConnection::remotePeerFound,
