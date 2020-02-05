@@ -213,7 +213,7 @@ QnTestCameraResourcePtr QnTestCameraResourceSearcher::createDiscoveredTestCamera
         ? ""
         : (" with video layout " + nx::kit::utils::toString(videoLayoutString));
 
-    NX_INFO(this, "Discovered testcamera %1%2 with URL %3", resource, videoLayoutLogMessage, url);
+    NX_DEBUG(this, "Discovered testcamera %1%2 with URL %3", resource, videoLayoutLogMessage, url);
 
     return resource;
 }
