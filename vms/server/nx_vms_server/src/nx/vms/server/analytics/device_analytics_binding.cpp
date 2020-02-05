@@ -34,6 +34,7 @@
 #include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
+#include <nx/vms/server/event/server_runtime_event_manager.h>
 
 #include <nx/analytics/analytics_logging_ini.h>
 #include <nx/analytics/frame_info.h>
@@ -194,6 +195,9 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
             m_lastNeededMetadataTypes = std::move(neededMetadataTypes);
     }
 
+    if (m_started)
+        notifySettingsMaybeChanged();
+
     return m_started;
 }
 
@@ -250,6 +254,7 @@ void DeviceAnalyticsBinding::setSettingsInternal(const QJsonObject& settings)
     }
 
     m_deviceAgentContext.deviceAgent->setSettings(settings);
+    notifySettingsMaybeChanged();
 }
 
 void DeviceAnalyticsBinding::logIncomingFrame(Ptr<IDataPacket> frame)
@@ -362,6 +367,13 @@ bool DeviceAnalyticsBinding::isStreamConsumer() const
 bool DeviceAnalyticsBinding::isStreamConsumerUnsafe() const
 {
     return m_deviceAgentContext.deviceAgent && m_deviceAgentContext.deviceAgent->isConsumer();
+}
+
+void DeviceAnalyticsBinding::notifySettingsMaybeChanged() const
+{
+    serverModule()->serverRuntimeEventManager()->triggerDeviceAgentSettingsMaybeChangedEvent(
+        m_device->getId(),
+        m_engine->getId());
 }
 
 std::optional<EngineManifest> DeviceAnalyticsBinding::engineManifest() const

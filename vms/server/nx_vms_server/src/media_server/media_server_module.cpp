@@ -78,6 +78,7 @@
 #include <nx/vms/time_sync/server_time_sync_manager.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/event/extended_rule_processor.h>
+#include <nx/vms/server/event/server_runtime_event_manager.h>
 #include <nx/vms/server/system/nx1/info.h>
 #include <motion/motion_helper.h>
 #include <audit/mserver_audit_manager.h>
@@ -233,6 +234,9 @@ QnMediaServerModule::QnMediaServerModule(
         std::make_unique<nx::vms::server::nvr::hanwha::ServiceProvider>(this));
 
     m_nvrService = serviceFactory.createService();
+
+    m_serverRuntimeEventManager =
+        std::make_unique<nx::vms::server::event::ServerRuntimeEventManager>(this);
 
     initOutgoingSocketCounter();
 
@@ -767,6 +771,12 @@ nx::vms::server::network::MulticastAddressRegistry*
 nx::vms::server::nvr::IService* QnMediaServerModule::nvrService() const
 {
     return m_nvrService.get();
+}
+
+nx::vms::server::event::ServerRuntimeEventManager*
+    QnMediaServerModule::serverRuntimeEventManager() const
+{
+    return m_serverRuntimeEventManager.get();
 }
 
 QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const
