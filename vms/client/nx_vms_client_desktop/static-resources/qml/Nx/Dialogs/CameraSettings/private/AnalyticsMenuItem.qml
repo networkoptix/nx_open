@@ -50,7 +50,7 @@ Column
 
         readonly property var sectionsModel: level > 0
             ? ctx_modelData.sections
-            : ctx_settingsModel.sections
+            : ctx_settingsModel && ctx_settingsModel.sections
 
         readonly property bool collapsible: !!sectionsModel && sectionsModel.length > 0
 
