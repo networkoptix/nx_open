@@ -2506,8 +2506,8 @@ void MediaServerProcess::registerRestHandlers(
      *     or MAC address (not supported for certain cameras).
      * %param:string name Caption of the bookmark.
      * %param[opt]:string description Details of the bookmark.
-     * %param[opt]:integer timeout Time during which the recorded period should be preserved (in
-     *     milliseconds).
+     * %param[proprietary]:integer timeout Time during which the recorded period should be preserved
+     *     (in milliseconds).
      * %param:integer startTime Start time of the bookmark (in milliseconds since epoch).
      * %param:integer duration Length of the bookmark (in milliseconds).
      * %param[opt] tag Applied tag. Several tag parameters could be used to specify multiple tags.
@@ -2542,8 +2542,8 @@ void MediaServerProcess::registerRestHandlers(
      *     or MAC address (not supported for certain cameras).
      * %param:string name Caption of the bookmark.
      * %param[opt]:string  description Details of the bookmark.
-     * %param[opt]:integer timeout Time during which the recorded period should be preserved (in
-     *     milliseconds).
+     * %param[proprietary]:integer timeout Time during which the recorded period should be preserved
+     *     (in milliseconds).
      * %param:integer startTime Start time of the bookmark (in milliseconds since epoch).
      * %param:integer duration Length of the bookmark (in milliseconds).
      * %param[opt]:string tag Applied tag. Serveral tag parameters could be used to specify
