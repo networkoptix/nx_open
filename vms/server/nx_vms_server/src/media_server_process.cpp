@@ -2736,7 +2736,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler(serverModule()));
 
-    /**%apidoc POST /api/executeEventAction
+    /**%apidoc[proprietary] POST /api/executeEventAction
      * Execute event action.
      * %param:enum actionType Type of the action.
      *     %value UndefinedAction
