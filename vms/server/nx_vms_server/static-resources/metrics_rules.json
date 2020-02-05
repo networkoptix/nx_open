@@ -419,7 +419,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %streamIssues1h 0",
-                                "text": "had %streamIssues1h stream issues in the last hour"
+                                "text": "had %streamIssues1h Stream Issues in the last hour"
                             },
                             {
                                 "level": "error",
