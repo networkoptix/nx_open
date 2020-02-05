@@ -36,11 +36,12 @@ LinkHoverProcessor::LinkHoverProcessor(QLabel* parent):
         QEvent::MouseButtonRelease };
 
 
-    // m_label will be destroyed before 'this'.
-    // If m_label is a signal reciever, event queue would be cleaned after it's destructions.
-    installEventHandler(m_label, handledEvents, m_label,
-        [this](QObject* /*object*/, QEvent* event)
+    installEventHandler(m_label, handledEvents, this,
+        [this](QObject* object, QEvent* event)
         {
+            if (m_label && m_label == object)
+                return;
+
             switch (event->type())
             {
                 case QEvent::UpdateRequest:
