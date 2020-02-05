@@ -94,7 +94,18 @@ int elideDomNode(QDomNode &node
     return currentLength;
 };
 
-} //anonymous namespace
+} // namespace
+
+namespace nx::vms::common {
+namespace html {
+
+QString colored(const QString& text, const QColor& color)
+{
+    return QString("<font color=\"%1\">%2</font>").arg(color.name(), text);
+}
+
+} // namespace html
+} // namespace nx::vms::common
 
 
 QnHtmlTag::QnHtmlTag(const QLatin1String& tag, QString& result, LineBreaks lineBreaks) :

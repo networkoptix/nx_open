@@ -121,6 +121,11 @@ int QnLicense::deactivationsCount() const
     return m_deactivationsCount;
 }
 
+int QnLicense::deactivationsCountLeft() const
+{
+    return std::max(0, kMaximumDeactivationsCount - m_deactivationsCount);
+}
+
 QnLicense::QnLicense(const QByteArray& licenseBlock):
     m_rawLicense(licenseBlock)
 {

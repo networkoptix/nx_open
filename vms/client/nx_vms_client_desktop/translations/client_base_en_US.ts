@@ -3617,27 +3617,27 @@ to %1</source>
     </message>
     <message>
         <source>Generic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Deactivations Left</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Features</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Screens Allowed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Control Sessions Allowed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Archive Streams Allowed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Deactivations Remaining</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3905,10 +3905,6 @@ to %1</source>
         <source>This license is already activated and linked to Hardware ID %1 on %2</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Every license can be deactivated only a few times.</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>%1 are currently in use</source>
         <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
@@ -3923,6 +3919,13 @@ to %1</source>
         <translation>
             <numerusform>At least %1 is required</numerusform>
             <numerusform>At least %1 are required</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n deactivations remaining</source>
+        <translation>
+            <numerusform>%n deactivation remaining</numerusform>
+            <numerusform>%n deactivations remaining</numerusform>
         </translation>
     </message>
 </context>
@@ -6870,7 +6873,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Activate License...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7501,9 +7504,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
         <source>+%n values</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>+%n value</numerusform>
+            <numerusform>+%n values</numerusform>
         </translation>
     </message>
 </context>

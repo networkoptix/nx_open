@@ -1,8 +1,17 @@
 #pragma once
 
 #include <QtCore/QString>
+#include <QtGui/QColor>
 
 #include <nx/utils/url.h>
+
+namespace nx::vms::common {
+namespace html {
+
+QString colored(const QString& text, const QColor& color);
+
+} // namespace html
+} // namespace nx::vms::common
 
 /** RAII helper to consistently open/close html tags on the given string. */
 class QnHtmlTag

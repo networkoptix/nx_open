@@ -99,6 +99,9 @@ public:
     /** Actual deactivations count. */
     int deactivationsCount() const;
 
+    /** How much times this license can still be deactivated. */
+    int deactivationsCountLeft() const;
+
     virtual Qn::LicenseType type() const;
 
     bool isInfoMode() const;
