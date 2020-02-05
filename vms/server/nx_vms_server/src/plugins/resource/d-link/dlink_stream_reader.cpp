@@ -96,17 +96,17 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         if (role == Qn::CR_SecondaryLiveVideo)
             qWarning() << "No dualstreaming for DLink camera " << m_resource->getUrl() << ". Ignore second url request";
 
-        QUrl requestedUrl;
-        requestedUrl.setHost( m_dlinkRes->getHostAddress() );
-        requestedUrl.setPort( 80 );
-        requestedUrl.setScheme( QLatin1String("http") );
-        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+        nx::utils::Url requestedUrl;
+        requestedUrl.setHost(m_dlinkRes->getHostAddress());
+        requestedUrl.setPort(80);
+        requestedUrl.setScheme(QLatin1String("http"));
+        return CameraDiagnostics::NoMediaTrackResult(requestedUrl);
     }
 
-    QUrl requestedUrl;
-    requestedUrl.setHost( m_dlinkRes->getHostAddress() );
-    requestedUrl.setPort( 80 );
-    requestedUrl.setScheme( QLatin1String("http") );
+    nx::utils::Url requestedUrl;
+    requestedUrl.setHost(m_dlinkRes->getHostAddress());
+    requestedUrl.setPort(80);
+    requestedUrl.setScheme(QLatin1String("http"));
     requestedUrl.setPath( prifileStr );
 
     CLHttpStatus status;
@@ -120,12 +120,12 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
+        return CameraDiagnostics::NotAuthorisedResult(requestedUrl);
     }
 
     if (cam_info_file.isEmpty())
     {
-        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+        return CameraDiagnostics::NoMediaTrackResult(requestedUrl);
     }
 
     if (isCameraControlRequired) {
@@ -137,7 +137,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
     QnDlink_cam_info info = m_dlinkRes->getCamInfo();
     const int profileIndex = role == Qn::CR_SecondaryLiveVideo ? 1 : 0;
     if (profileIndex >= info.profiles.size() )
-        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+        return CameraDiagnostics::NoMediaTrackResult(requestedUrl);
     m_profile = info.profiles[profileIndex];
 
     if (m_profile.url.isEmpty())

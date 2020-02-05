@@ -121,7 +121,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
         NX_DEBUG(this, "Request %1 failed with %2", requestUrl, StatusCode::toString(statusCode));
 
     if (statusCode == nx::network::http::StatusCode::unauthorized)
-        return CameraDiagnostics::NotAuthorisedResult(requestUrl.toString());
+        return CameraDiagnostics::NotAuthorisedResult(requestUrl);
 
     auto messageBody = httpClient.fetchEntireMessageBody();
     QString rtspUrl;
@@ -130,12 +130,12 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
 
     QStringList urlLst = rtspUrl.split(QLatin1Char('\r'), QString::SkipEmptyParts);
     if(urlLst.size() < 1)
-        return CameraDiagnostics::NoMediaTrackResult(requestUrl.toString());
+        return CameraDiagnostics::NoMediaTrackResult(requestUrl);
 
     rtspUrl = urlLst.at(0);
 
     if (rtspUrl.isEmpty())
-        return CameraDiagnostics::NoMediaTrackResult(requestUrl.toString());
+        return CameraDiagnostics::NoMediaTrackResult(requestUrl);
 
     m_isdCam->updateSourceUrl(rtspUrl, getRole());
     NX_INFO(this, "Got stream URL %1 for camera %2 for role %3", rtspUrl, m_resource->getUrl(), getRole());

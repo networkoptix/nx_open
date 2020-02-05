@@ -779,7 +779,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if (!audioExist && !videoExist)
     {
         m_RtpSession.stop();
-        m_openStreamResult = CameraDiagnostics::NoMediaTrackResult(m_currentStreamUrl.toString());
+        m_openStreamResult = CameraDiagnostics::NoMediaTrackResult(m_currentStreamUrl);
         return m_openStreamResult;
     }
     m_rtpStarted = true;

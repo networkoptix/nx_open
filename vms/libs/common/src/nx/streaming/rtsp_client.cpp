@@ -428,7 +428,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     else if (urlScheme == nx::network::rtsp::kSecureUrlSchemeName)
         isSslRequired = true;
     else
-        return CameraDiagnostics::UnsupportedProtocolResult(m_url.toString(), m_url.scheme());
+        return CameraDiagnostics::UnsupportedProtocolResult(m_url, m_url.scheme());
 
     std::unique_ptr<nx::network::AbstractStreamSocket> previousSocketHolder;
     {
@@ -446,7 +446,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         targetAddress = nx::network::SocketAddress(m_url.host(), m_url.port(DEFAULT_RTP_PORT));
 
     if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), targetAddress.port);
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
 
     previousSocketHolder.reset(); //< Reset old socket after taking new one to guarantee new TCP port.
 
@@ -495,7 +495,7 @@ CameraDiagnostics::Result QnRtspClient::sendDescribe(int port)
         case nx::network::http::StatusCode::unauthorized:
         case nx::network::http::StatusCode::proxyAuthenticationRequired:
             stop();
-            return CameraDiagnostics::NotAuthorisedResult(m_url.toString());
+            return CameraDiagnostics::NotAuthorisedResult(m_url);
         default:
             stop();
             return CameraDiagnostics::RequestFailedResult(
@@ -505,7 +505,7 @@ CameraDiagnostics::Result QnRtspClient::sendDescribe(int port)
     if (!parseSDP(response))
     {
         stop();
-        return CameraDiagnostics::NoMediaTrackResult(m_url.toString());
+        return CameraDiagnostics::NoMediaTrackResult(m_url);
     }
 
     /*
@@ -1508,7 +1508,7 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
                 if( prevStatusCode == m_responseCode )
                 {
                     NX_DEBUG(this, "Already tried authentication and have been rejected");
-                    return CameraDiagnostics::NotAuthorisedResult(m_url.toString(QUrl::RemoveAuthority));
+                    return CameraDiagnostics::NotAuthorisedResult(m_url);
                 }
 
                 prevStatusCode = m_responseCode;
@@ -1526,7 +1526,7 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
         if (authResult != Qn::Auth_OK)
         {
             NX_DEBUG(this, "Authentification failed: %1", authResult);
-            return CameraDiagnostics::NotAuthorisedResult(m_url.toString(QUrl::RemoveAuthority));
+            return CameraDiagnostics::NotAuthorisedResult(m_url);
         }
     }
 

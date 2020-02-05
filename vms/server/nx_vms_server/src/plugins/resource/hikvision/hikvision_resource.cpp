@@ -205,7 +205,7 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
     if (!doGetRequest(url, getAuth(), &response, &statusCode))
     {
         if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
-            return CameraDiagnostics::NotAuthorisedResult(url.toString());
+            return CameraDiagnostics::NotAuthorisedResult(url);
 
         return CameraDiagnostics::RequestFailedResult(
             lit("Fetch channel capabilities"),
@@ -215,7 +215,7 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
     if (!parseChannelCapabilitiesResponse(response, outCapabilities))
     {
         return CameraDiagnostics::CameraResponseParseErrorResult(
-            url.toString(),
+            url,
             lit("Fetch camera capabilities"));
     }
 

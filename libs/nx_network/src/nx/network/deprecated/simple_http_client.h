@@ -71,7 +71,7 @@ public:
 
     void close();
 
-    QUrl lastRequestUrl() const;
+    nx::utils::Url lastRequestUrl() const;
 
     QHash<QByteArray, QByteArray> header() const
     {
@@ -134,7 +134,7 @@ private:
     QString m_localAddress;
     unsigned short m_localPort;
 
-    QUrl m_lastRequestUrl;
+    nx::utils::Url m_lastRequestUrl;
 };
 
 /*!

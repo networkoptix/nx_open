@@ -3,7 +3,6 @@
 #include <sstream>
 
 #include <QtCore/QCryptographicHash>
-#include <QtCore/QUrl>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
@@ -144,9 +143,9 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         if( !requestStr.startsWith('/') )
             request.append('/');
 
-        m_lastRequestUrl = QUrl(requestStr);
+        m_lastRequestUrl = nx::utils::Url(requestStr);
 
-        QByteArray encodedRequest = QUrl(QLatin1String(requestStr)).toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        QByteArray encodedRequest = nx::utils::Url(QLatin1String(requestStr)).toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
         request.append(encodedRequest);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
@@ -313,7 +312,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
     if( !requestStr.startsWith('/') )
         requestStr.insert(0, '/');
 
-    m_lastRequestUrl = QUrl(requestStr);
+    m_lastRequestUrl = nx::utils::Url(requestStr);
 
     if (!m_sock)
         return CL_TRANSPORT_ERROR;
@@ -337,7 +336,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
 
         request.append("GET ");
 
-        QByteArray encodedRequest = QUrl(QLatin1String(requestStr)).toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        QByteArray encodedRequest = nx::utils::Url(QLatin1String(requestStr)).toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
         request.append(encodedRequest);
 
         request.append(" HTTP/1.1\r\n");
@@ -570,7 +569,7 @@ QString CLSimpleHTTPClient::digestAccess(const QString& method, const QString& u
     return digestAccess(m_auth, mRealm, mNonce, method, url);
 }
 
-QUrl CLSimpleHTTPClient::lastRequestUrl() const
+nx::utils::Url CLSimpleHTTPClient::lastRequestUrl() const
 {
     return m_lastRequestUrl;
 }
