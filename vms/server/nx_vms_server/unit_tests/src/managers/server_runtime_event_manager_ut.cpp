@@ -86,7 +86,6 @@ private:
         for (int i = 0; i < serverCount; ++i)
         {
             auto server = std::make_unique<MediaServerLauncher>(/*tmpDir*/ "");
-            server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
             ASSERT_TRUE(server->start());
 
             QObject::connect(
