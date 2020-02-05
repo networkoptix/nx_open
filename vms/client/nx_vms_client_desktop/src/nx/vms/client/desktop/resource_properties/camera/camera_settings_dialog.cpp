@@ -183,6 +183,7 @@ struct CameraSettingsDialog::Private: public QObject
 
         store->loadCameras(cameras);
         deviceAgentSettingsAdaptor->setCamera(singleCamera);
+        analyticsEnginesWatcher->update();
 
         handleCamerasChanged();
     }

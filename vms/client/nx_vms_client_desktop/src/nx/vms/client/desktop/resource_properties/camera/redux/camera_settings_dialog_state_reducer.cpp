@@ -566,6 +566,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.motionAlert = {};
     state.analytics.enabledEngines = {};
     state.analytics.settingsValuesByEngineId = {};
+    state.analytics.streamByEngineId = {};
     state.enableMotionDetection = {};
 
     state.deviceType = firstCamera
@@ -1498,6 +1499,21 @@ State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
 
     state.analytics.enabledEngines.setUser(actualValue);
     state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setAnalyticsStreamIndex(
+    State state, const QnUuid& engineId, State::StreamIndex value, ModificationSource source)
+{
+    if (source == ModificationSource::local)
+    {
+        state.analytics.streamByEngineId[engineId].setUser(value);
+        state.hasChanges = true;
+    }
+    else if (NX_ASSERT(source == ModificationSource::remote))
+    {
+        state.analytics.streamByEngineId[engineId].setBase(value);
+    }
     return state;
 }
 

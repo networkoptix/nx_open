@@ -424,6 +424,30 @@ void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QVariantList& v
     setEnabledAnalyticsEngines(fromVariantList<QList<QnUuid>>(value).toSet());
 }
 
+int CameraSettingsDialogStore::analyticsStreamIndex(const QnUuid& engineId) const
+{
+    return int(d->state.analytics.streamByEngineId.value(engineId)());
+}
+
+void CameraSettingsDialogStore::setAnalyticsStreamIndex(const QnUuid& engineId, int value)
+{
+    if (!NX_ASSERT(value == 0 || value == 1))
+        value = std::clamp(value, 0, 1);
+
+    setAnalyticsStreamIndex(engineId, State::StreamIndex(value));
+}
+
+void CameraSettingsDialogStore::setAnalyticsStreamIndex(
+    const QnUuid& engineId, nx::vms::api::StreamIndex value, ModificationSource source)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setAnalyticsStreamIndex(
+                std::move(state), engineId, State::StreamIndex(value), source);
+        });
+}
+
 QJsonObject CameraSettingsDialogStore::deviceAgentSettingsModel(const QnUuid& engineId) const
 {
     return d->state.analytics.settingsModelByEngineId.value(engineId);

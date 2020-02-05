@@ -12,8 +12,12 @@ StackLayout
     property string name: ""
     property Item childrenItem: column
     property StackLayout sectionsItem: control
-    property alias contentEnabled: column.enabled
     property Item scrollBarParent: null
+    property Item extraHeaderItem: null
+
+    property bool contentEnabled: parent && parent.hasOwnProperty("contentEnabled")
+        ? parent.contentEnabled
+        : true
 
     Scrollable
     {
@@ -29,15 +33,43 @@ StackLayout
             enabled: size < 0.9999
         }
 
-        contentItem: AlignedColumn
+        contentItem: Column
         {
-            id: column
-
             width:
             {
                 return view.verticalScrollBar && view.verticalScrollBar.parent === view
                     ? Math.min(view.width, view.verticalScrollBar.x)
                     : view.width
+            }
+
+            Item
+            {
+                id: headerContainer
+
+                width: parent.width
+                height: extraHeaderItem ? extraHeaderItem.height : 0
+
+                Binding
+                {
+                    target: extraHeaderItem
+                    property: "width"
+                    value: headerContainer.width
+                }
+
+                Binding
+                {
+                    target: extraHeaderItem
+                    property: "parent"
+                    value: headerContainer
+                }
+            }
+
+            AlignedColumn
+            {
+                id: column
+
+                width: parent.width
+                enabled: control.contentEnabled
             }
         }
     }
@@ -48,4 +80,3 @@ StackLayout
             children[currentIndex].scrollBarParent = scrollBarParent
     }
 }
-

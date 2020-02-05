@@ -103,6 +103,9 @@ Item
                 settingsView.loadModel({}, {})
             }
 
+            if (currentEngineId)
+                streamComboBox.currentIndex = store.analyticsStreamIndex(currentEngineId)
+
             banner.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
         }
     }
@@ -202,49 +205,79 @@ Item
         }
     }
 
-    ColumnLayout
+    SettingsView
     {
+        id: settingsView
+
         x: navigationMenu.width + 16
         y: 16
         width: parent.width - x - 24
         height: parent.height - 16 - banner.height
-        spacing: 16
 
-        InformationPanel
+        enabled: !loading
+        contentEnabled: informationPanel.checked || isDeviceDependent
+        scrollBarParent: scrollBarsParent
+
+        onValuesEdited:
+            store.setDeviceAgentSettingsValues(currentEngineId, getValues())
+
+        headerItem: ColumnLayout
         {
-            id: informationPanel
+            spacing: 16
 
-            Layout.fillWidth: true
-
-            engineInfo: currentEngineInfo
-
-            visible: isDefaultSection
-            checkable: !isDeviceDependent
-
-            checked: currentEngineId !== undefined
-                && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
-
-            onClicked:
+            InformationPanel
             {
-                if (currentEngineId !== undefined)
-                    setEngineEnabled(currentEngineId, !checked)
+                id: informationPanel
+
+                checkable: !isDeviceDependent && !!currentEngineId
+                checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
+                engineInfo: currentEngineInfo
+                Layout.fillWidth: true
+
+                onClicked:
+                {
+                    if (currentEngineId)
+                        setEngineEnabled(currentEngineId, !checked)
+                }
             }
-        }
 
-        SettingsView
-        {
-            id: settingsView
+            Panel
+            {
+                id: commonSettings
 
-            enabled: !loading
+                title: "General Settings"
+                visible: commonContent.height > 0
+                Layout.fillWidth: true
+                enabled: settingsView.contentEnabled
 
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+                GridLayout
+                {
+                    id: commonContent
 
-            onValuesEdited:
-                store.setDeviceAgentSettingsValues(currentEngineId, getValues())
+                    columns: 2
+                    columnSpacing: 8
+                    flow: GridLayout.LeftToRight
 
-            contentEnabled: informationPanel.checked || isDeviceDependent
-            scrollBarParent: scrollBarsParent
+                    ContextHintLabel
+                    {
+                        text: qsTr("Camera stream")
+                        contextHintText: qsTr("Select video stream from the camera for analysis")
+                        color: ColorTheme.windowText
+                    }
+
+                    ComboBox
+                    {
+                        id: streamComboBox
+                        model: ["Primary", "Secondary"]
+
+                        onCurrentIndexChanged:
+                        {
+                            if (currentEngineId)
+                                store.setAnalyticsStreamIndex(currentEngineId, currentIndex)
+                        }
+                    }
+                }
+            }
         }
     }
 

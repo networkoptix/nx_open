@@ -36,6 +36,15 @@ struct ToolTipHelper
         setProperty("parent", QVariant::fromValue(parent));
     }
 
+    QQuickItem* invokerItem() const
+    {
+        return qobject_cast<QQuickItem*>(property("invoker").value<QObject*>());
+    }
+    void setInvokerItem(QQuickItem* invoker)
+    {
+        setProperty("invoker", QVariant::fromValue(invoker));
+    }
+
     bool isVisible() const
     {
         return property("visible").toBool();
@@ -99,7 +108,7 @@ public:
 public slots:
     void initEventFilter();
     void handleToolTipAboutToShow();
-    void handleToolTipParentChanged();
+    void handleToolTipInvokerChanged();
     void handleToolTipClosed();
 
 public:
@@ -110,9 +119,10 @@ public:
     QPoint hoverPos;
     bool visible = false;
     bool showOnHover = true;
+    bool stickToItem = false;
     int delayMs = 500;
     int shortDelayMs = 100;
-    bool hoverEnabledOrigignal = false;
+    bool hoverEnabledOriginal = false;
 };
 
 GlobalToolTipAttached::Private::Private(GlobalToolTipAttached* q, QObject* parent):
@@ -184,12 +194,12 @@ void GlobalToolTipAttached::Private::setShowOnHoverInternal(bool showOnHover)
     {
         if (const QVariant& hoverEnabled = item->property("hoverEnabled"); hoverEnabled.isValid())
         {
-            hoverEnabledOrigignal = hoverEnabled.toBool();
+            hoverEnabledOriginal = hoverEnabled.toBool();
             item->setProperty("hoverEnabled", true);
         }
         else
         {
-            hoverEnabledOrigignal = item->acceptHoverEvents();
+            hoverEnabledOriginal = item->acceptHoverEvents();
             item->setAcceptHoverEvents(true);
         }
 
@@ -200,9 +210,9 @@ void GlobalToolTipAttached::Private::setShowOnHoverInternal(bool showOnHover)
         item->removeEventFilter(this);
 
         if (const QVariant& hoverEnabled = item->property("hoverEnabled"); hoverEnabled.isValid())
-            item->setProperty("hoverEnabled", hoverEnabledOrigignal);
+            item->setProperty("hoverEnabled", hoverEnabledOriginal);
         else
-            item->setAcceptHoverEvents(hoverEnabledOrigignal);
+            item->setAcceptHoverEvents(hoverEnabledOriginal);
     }
 }
 
@@ -210,11 +220,11 @@ void GlobalToolTipAttached::Private::adjustPosition()
 {
     auto toolTip = instance();
 
-    if (!item || !toolTip || !item->window())
+    if (!item || !toolTip)
         return;
 
-    QQuickItem* root = item->window()->contentItem();
-    if (!root)
+    QQuickItem* parent = toolTip.parentItem();
+    if (!parent)
         return;
 
     const QSize rootSize = item->window()->size();
@@ -225,8 +235,8 @@ void GlobalToolTipAttached::Private::adjustPosition()
     const qreal w = toolTip.width();
     const qreal h = toolTip.height();
 
-    const QRectF itemRect = item->mapRectToItem(root, QRectF(QPointF(), item->size()));
-    const QPointF hoverPos = item->mapToItem(root, this->hoverPos);
+    const QRectF itemRect = item->mapRectToItem(parent, QRectF(QPointF(), item->size()));
+    const QPointF hoverPos = item->mapToItem(parent, this->hoverPos);
 
     qreal x = qBound(0.0, hoverPos.x(), rootSize.width() - w);
 
@@ -248,20 +258,21 @@ void GlobalToolTipAttached::Private::adjustPosition()
         y = qBound(0.0, hoverPos.y() + cursorPadding, rootSize.height() - h);
     }
 
-    const QPointF pos = item->mapFromItem(root, QPointF(x, y));
-    toolTip.setPosition(pos);
+    toolTip.setPosition(QPointF(x, y));
 }
 
 void GlobalToolTipAttached::Private::showImmediately()
 {
     auto toolTip = instance(true);
-    toolTip.setParentItem(item);
+    if (toolTip.invokerItem() != item)
+    {
+        toolTip.setInvokerItem(item);
+        connect(toolTip, SIGNAL(aboutToShow()), this, SLOT(handleToolTipAboutToShow()));
+        connect(toolTip, SIGNAL(invokerChanged()), this, SLOT(handleToolTipInvokerChanged()));
+        connect(toolTip, SIGNAL(closed()), this, SLOT(handleToolTipClosed()));
+    }
+
     update();
-
-    connect(toolTip, SIGNAL(aboutToShow()), this, SLOT(handleToolTipAboutToShow()));
-    connect(toolTip, SIGNAL(parentChanged()), this, SLOT(handleToolTipParentChanged()));
-    connect(toolTip, SIGNAL(closed()), this, SLOT(handleToolTipClosed()));
-
     toolTip.open();
 }
 
@@ -275,6 +286,18 @@ void GlobalToolTipAttached::Private::update()
 {
     if (auto toolTip = instance())
     {
+        if (stickToItem)
+        {
+            toolTip.setParentItem(toolTip.invokerItem());
+        }
+        else
+        {
+            const auto invoker = toolTip.invokerItem();
+            toolTip.setParentItem(invoker && invoker->window()
+                ? invoker->window()->contentItem()
+                : nullptr);
+        }
+
         toolTip.setText(text);
         adjustPosition();
     }
@@ -325,21 +348,21 @@ void GlobalToolTipAttached::Private::handleToolTipAboutToShow()
 {
     auto toolTip = instance();
 
-    if (toolTip.parentItem() != item)
+    if (toolTip.invokerItem() != item)
         return;
 
     if (!toolTip.isVisible())
         adjustPosition();
 }
 
-void GlobalToolTipAttached::Private::handleToolTipParentChanged()
+void GlobalToolTipAttached::Private::handleToolTipInvokerChanged()
 {
     auto toolTip = instance();
 
-    if (toolTip && toolTip.parentItem() != item)
+    if (toolTip && toolTip.invokerItem() != item)
     {
         disconnect(toolTip, SIGNAL(aboutToShow()), this, SLOT(handleToolTipAboutToShow()));
-        disconnect(toolTip, SIGNAL(parentChanged()), this, SLOT(handleToolTipParentChanged()));
+        disconnect(toolTip, SIGNAL(invokerChanged()), this, SLOT(handleToolTipInvokerChanged()));
         disconnect(toolTip, SIGNAL(closed()), this, SLOT(handleToolTipClosed()));
     }
 }
@@ -347,7 +370,10 @@ void GlobalToolTipAttached::Private::handleToolTipParentChanged()
 void GlobalToolTipAttached::Private::handleToolTipClosed()
 {
     if (auto toolTip = instance())
+    {
+        toolTip.setInvokerItem(nullptr);
         toolTip.setParentItem(nullptr);
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -367,12 +393,12 @@ QString GlobalToolTipAttached::text() const
     return d->text;
 }
 
-void GlobalToolTipAttached::setText(const QString& text)
+void GlobalToolTipAttached::setText(const QString& value)
 {
-    if (d->text == text)
+    if (d->text == value)
         return;
 
-    d->text = text;
+    d->text = value;
     emit textChanged();
 
     if (auto toolTip = d->instance(); toolTip && toolTip.isVisible())
@@ -384,12 +410,12 @@ bool GlobalToolTipAttached::isVisible() const
     return d->visible;
 }
 
-void GlobalToolTipAttached::setVisible(bool visible)
+void GlobalToolTipAttached::setVisible(bool value)
 {
-    if (d->visible == visible)
+    if (d->visible == value)
         return;
 
-    d->visible = visible;
+    d->visible = value;
     emit visibleChanged();
 }
 
@@ -398,14 +424,31 @@ bool GlobalToolTipAttached::showOnHover() const
     return d->showOnHover;
 }
 
-void GlobalToolTipAttached::setShowOnHover(bool showOnHover)
+void GlobalToolTipAttached::setShowOnHover(bool value)
 {
-    if (d->showOnHover == showOnHover)
+    if (d->showOnHover == value)
         return;
 
-    d->showOnHover = showOnHover;
-    d->setShowOnHoverInternal(showOnHover);
+    d->showOnHover = value;
+    d->setShowOnHoverInternal(value);
     emit showOnHoverChanged();
+}
+
+bool GlobalToolTipAttached::stickToItem() const
+{
+    return d->stickToItem;
+}
+
+void GlobalToolTipAttached::setStickToItem(bool value)
+{
+    if (d->stickToItem == value)
+        return;
+
+    d->stickToItem = value;
+    emit stickToItemChanged();
+
+    if (auto toolTip = d->instance(); toolTip && toolTip.isVisible())
+        d->update();
 }
 
 int GlobalToolTipAttached::delay() const
@@ -413,12 +456,12 @@ int GlobalToolTipAttached::delay() const
     return d->delayMs;
 }
 
-void GlobalToolTipAttached::setDelay(int delay)
+void GlobalToolTipAttached::setDelay(int value)
 {
-    if (d->delayMs == delay)
+    if (d->delayMs == value)
         return;
 
-    d->delayMs = delay;
+    d->delayMs = value;
     emit delayChanged();
 }
 
@@ -444,7 +487,7 @@ void GlobalToolTipAttached::show(const QString& text, int delay)
 
     if (!toolTip.isVisible())
         d->showDelayed(d->delayMs);
-    else if (d->item != toolTip.parentItem())
+    else if (d->item != toolTip.invokerItem())
         d->showDelayed(d->shortDelayMs, false);
     else if (text != toolTip.text())
         d->showImmediately();
@@ -464,7 +507,7 @@ void GlobalToolTipAttached::hide()
         return;
 
     // Items should only close ToolTip shown by itself.
-    if (toolTip.parentItem() != d->item)
+    if (toolTip.invokerItem() != d->item)
         return;
 
     toolTip.close();
