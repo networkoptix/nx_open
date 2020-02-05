@@ -280,7 +280,8 @@ bool QnServerStreamRecorder::cleanupQueue()
         }
     }
 
-    qWarning() << "HDD/SSD is slowing down recording for camera " << m_resource->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
+    NX_WARNING(this, "HDD/SSD is slowing down recording for camera %1. %2 frames have been dropped!",
+        m_resource->getUniqueId(), m_dataQueue.size());
     markNeedKeyData();
 
     {

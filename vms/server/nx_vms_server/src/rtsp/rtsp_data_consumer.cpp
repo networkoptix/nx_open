@@ -40,7 +40,7 @@ const auto checkConstantsEquality = []()
 }();
 
 static const int MAX_QUEUE_SIZE = 12;
-static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 2000ll * 1000ll; // 2 seconds
+static constexpr int64_t kMaxQueueDurationUsec = 2000000; // 2 seconds
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
 //static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
@@ -226,7 +226,6 @@ static const int MAX_DATA_QUEUE_SIZE = 120;
 
 void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch)
 {
-    NX_DEBUG(this, "Too long frame queue, cleanup");
     int currentIndex = lastIndex;
     if (m_videoChannels == 1)
     {
@@ -308,9 +307,9 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
     m_dataQueue.push(nonConstData);
 
     // quality control
-
+    auto queueDurationUsec = dataQueueDuration();
     if (m_dataQueue.size() > MAX_DATA_QUEUE_SIZE ||
-       (m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION))
+       (m_dataQueue.size() > m_dataQueue.maxSize() && queueDurationUsec > kMaxQueueDurationUsec))
     {
         auto unsafeQueue = m_dataQueue.lock();
         bool clearHiQ = !isLowMediaQuality(m_liveQuality); // remove LQ packets, keep HQ
@@ -326,6 +325,8 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
                     bool isHiQ = !(video->flags & QnAbstractMediaData::MediaFlags_LowQuality);
                     if (isHiQ == clearHiQ)
                     {
+                        NX_DEBUG(this, "Too long frame queue: %1, duration %2us, cleanup",
+                            unsafeQueue.size(), queueDurationUsec);
                         cleanupQueueToPos(unsafeQueue, i, ch);
                         break;
                     }
@@ -343,6 +344,8 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
                     const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(unsafeQueue.at(i).get() );
                     if (video && (video->flags & AV_PKT_FLAG_KEY) && video->channelNumber == ch)
                     {
+                        NX_DEBUG(this, "Too long frame queue: %1, duration %2us, cleanup any",
+                            unsafeQueue.size(), queueDurationUsec);
                         cleanupQueueToPos(unsafeQueue, i, ch);
                         break;
                     }
@@ -352,7 +355,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
     }
 
     // Queue too large. Clear data anyway causing video artifacts
-    while(m_dataQueue.size() > MAX_DATA_QUEUE_SIZE * (int) m_videoChannels)
+    while (m_dataQueue.size() > MAX_DATA_QUEUE_SIZE * (int) m_videoChannels)
     {
         QnAbstractDataPacketPtr tmp;
         m_dataQueue.pop(tmp);
