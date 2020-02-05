@@ -2912,8 +2912,8 @@ void MediaServerProcess::registerRestHandlers(
      * %apidoc POST /ec2/deviceAnalyticsSettings
      * Applies passed settings values to the corresponding DeviceAgent (which is a device-engine
      * pair).
-     * %param:object JSON object containing request parameters
-     *      %struct DeviceAnalyticsSettingsRequest
+     * %struct DeviceAnalyticsSettingsRequest
+     *
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.

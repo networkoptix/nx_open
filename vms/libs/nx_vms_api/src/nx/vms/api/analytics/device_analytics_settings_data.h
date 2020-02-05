@@ -53,7 +53,7 @@ struct NX_VMS_API DeviceAnalyticsSettingsResponse
     QJsonObject settingsValues;
 
     /**%apidoc
-     * Model of settings.
+     * Model of settings containing setting names, types and value restrictions.
      */
     QJsonObject settingsModel;
 };
