@@ -2720,7 +2720,7 @@ void MediaServerProcess::registerRestHandlers(
      * applied to the specified Object Track.
      * %param engineId Id of an Analytics Engine which offers the Action.
      * %param actionId Id of an Action to execute.
-     * %param trackId Id of an Object Track to which the Action is applied.
+     * %param objectTrackId Id of an Object Track to which the Action is applied.
      * %param deviceId Id of a Device from which the Action was triggered.
      * %param timestampUs Timestamp (microseconds) of the video frame from which the Action was
      *     triggered.
