@@ -279,7 +279,7 @@ public:
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
-    bool sendOptions();
+    CameraDiagnostics::Result sendOptions();
     CameraDiagnostics::Result sendDescribe(int port);
     bool sendKeepAlive();
 
@@ -379,5 +379,5 @@ private:
         Updates \a m_responseCode member.
         \return error description
     */
-    bool sendRequestAndReceiveResponse(nx::network::http::Request&& request, QByteArray& response);
+    CameraDiagnostics::Result sendRequestAndReceiveResponse(nx::network::http::Request&& request, QByteArray& response);
 };
