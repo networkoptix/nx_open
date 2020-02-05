@@ -42,7 +42,8 @@ FocusScope
         wrapMode: Text.WordWrap
         elide: Text.ElideRight
 
-        GlobalToolTip.text: description || (truncated ? text : null)
+        contextHintText: description
+        GlobalToolTip.text: truncated ? text : null
     }
 
     onContentItemChanged:
