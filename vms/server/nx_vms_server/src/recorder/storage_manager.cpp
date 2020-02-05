@@ -60,6 +60,7 @@
 #include <nx/vms/server/fs/media_paths/media_paths.h>
 #include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 #include <nx/analytics/utils.h>
+#include <nx/utils/std/algorithm.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -2340,25 +2341,15 @@ QSet<QnStorageResourcePtr> QnStorageManager::getClearableStorages() const
 }
 
 StorageResourceList QnStorageManager::getAllWritableStorages(
-    const StorageResourceList& additional) const
+    StorageResourceList additional) const
 {
-    auto existing = getStorages();
-    const auto filterOutExisting =
-        [](const auto& existing, auto additional)
-        {
-            additional.erase(std::remove_if(
-                    additional.begin(), additional.end(),
-                    [&existing](const auto& a)
-                    {
-                        return std::any_of(
-                            existing.cbegin(), existing.cend(),
-                            [&a](const auto& e) { return e->getUrl() == a->getUrl(); });
-                    }),
-                additional.end());
-            return additional;
-        };
-
-    return WritableStoragesHelper(this).list(existing + filterOutExisting(existing, additional));
+    auto result = getStorages();
+    QSet<QString> urls;
+    for (const auto& value: result)
+        urls << value->getUrl();
+    nx::utils::remove_if(additional, 
+        [&urls](const auto& a) { return urls.contains(a->getUrl()); });
+    return WritableStoragesHelper(this).list(result);
 }
 
 void QnStorageManager::testStoragesDone()
