@@ -5,7 +5,6 @@
 
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_data_packet.h>
-#include <utils/media/externaltimesource.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <utils/common/adaptive_sleep.h>
 #include <camera/video_camera.h>
@@ -25,7 +24,7 @@ static const QString RTP_METADATA_GENERIC_STR("ffmpeg-metadata");
 static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interval
 
 class QnRtspDataConsumer:
-    public QnAbstractDataConsumer, public QnlTimeSource
+    public QnAbstractDataConsumer
 {
 public:
     static const int MAX_STREAMING_SPEED = INT_MAX;
@@ -37,6 +36,7 @@ public:
     void resumeNetwork();
 
     void setLastSendTime(qint64 time);
+    qint64 lastSendTime() const;
     void setWaitCSeq(qint64 newTime, int sceq);
     virtual void putData(const QnAbstractDataPacketPtr& data);
     virtual bool canAcceptData() const;
@@ -48,12 +48,6 @@ public:
         bool iFramesOnly);
     QnMutex* dataQueueMutex();
     void setSingleShotMode(bool value);
-
-    virtual qint64 getDisplayedTime() const;
-    virtual qint64 getCurrentTime() const;
-    virtual qint64 getNextTime() const;
-    virtual qint64 getExternalTime() const;
-
     qint64 lastQueuedTime();
     void setSecondaryDataProvider(QnAbstractStreamDataProvider* value);
 
@@ -124,9 +118,6 @@ private:
     MediaQuality m_liveQuality;
     MediaQuality m_newLiveQuality;
 
-    static QHash<QHostAddress, qint64> m_lastSwitchTime;
-    static QSet<QnRtspDataConsumer*> m_allConsumers;
-    static QnMutex m_allConsumersMutex;
     int m_streamingSpeed;
     bool m_multiChannelVideo;
     QnAdaptiveSleep m_adaptiveSleep;

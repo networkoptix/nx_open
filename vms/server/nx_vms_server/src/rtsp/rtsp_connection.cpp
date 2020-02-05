@@ -909,7 +909,7 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
 {
     Q_D(QnRtspConnectionProcessor);
     if (d->dataProcessor)
-        return d->dataProcessor->getDisplayedTime();
+        return d->dataProcessor->lastSendTime();
     else
         return AV_NOPTS_VALUE;
 }

@@ -134,7 +134,11 @@ void QnRtspDataConsumer::resumeNetwork()
     m_pauseNetwork = false;
 }
 
-//qint64 lastSendTime() const { return m_lastSendTime; }
+qint64 QnRtspDataConsumer::lastSendTime() const
+{
+    return m_lastSendTime;
+}
+
 void QnRtspDataConsumer::setLastSendTime(qint64 time)
 {
     m_lastMediaTime = m_lastSendTime = time;
@@ -150,26 +154,6 @@ void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_waitSCeq = sceq;
     m_lastMediaTime = m_lastSendTime = newTime;
-}
-
-qint64 QnRtspDataConsumer::getCurrentTime() const
-{
-    return m_lastSendTime;
-}
-
-qint64 QnRtspDataConsumer::getNextTime() const
-{
-    return m_lastSendTime;
-}
-
-qint64 QnRtspDataConsumer::getDisplayedTime() const
-{
-    return m_lastSendTime;
-}
-
-qint64 QnRtspDataConsumer::getExternalTime() const
-{
-    return m_lastSendTime;
 }
 
 bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
