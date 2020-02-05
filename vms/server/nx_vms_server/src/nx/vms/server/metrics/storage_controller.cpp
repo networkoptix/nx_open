@@ -33,13 +33,7 @@ void StorageController::start()
         {
             if (const auto storage = resource.dynamicCast<StorageResource>().get())
             {
-                const auto addOrUpdate =
-                    [this, storage, resourcePool]()
-                    {
-                        if (resourcePool->getResourceById(storage->getParentId()))
-                            add(storage, moduleGUID());
-                    };
-
+                const auto addOrUpdate = [this, storage]() { add(storage, moduleGUID()); };
                 QObject::connect(storage, &QnResource::parentIdChanged, addOrUpdate);
                 addOrUpdate();
             }
