@@ -47,7 +47,7 @@ AVCodecID findEncoderCodecId(const QString& codecName)
     // Try to check codec substitutes if requested codecs not found.
     static std::map<std::string, std::vector<std::string>> codecSubstitutesMap
     {
-        { "h264", {"h264", "libopenh264"} },
+        { "h264", {"libopenh264"} },
     };
     auto substitutes = codecSubstitutesMap.find(codecLower.toUtf8().constData());
     if (substitutes == codecSubstitutesMap.end())
