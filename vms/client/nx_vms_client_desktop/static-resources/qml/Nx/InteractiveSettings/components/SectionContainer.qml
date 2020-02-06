@@ -35,6 +35,8 @@ StackLayout
 
         contentItem: Column
         {
+            spacing: 16
+
             width:
             {
                 return view.verticalScrollBar && view.verticalScrollBar.parent === view
@@ -67,6 +69,8 @@ StackLayout
             AlignedColumn
             {
                 id: column
+
+                spacing: 16
 
                 width: parent.width
                 enabled: control.contentEnabled

@@ -223,7 +223,8 @@ Item
 
         headerItem: ColumnLayout
         {
-            spacing: 16
+            id: header
+            spacing: 32
 
             InformationPanel
             {
@@ -249,6 +250,9 @@ Item
                 visible: commonContent.height > 0
                 Layout.fillWidth: true
                 enabled: settingsView.contentEnabled
+
+                topPadding: 36
+                bottomPadding: 16
 
                 GridLayout
                 {

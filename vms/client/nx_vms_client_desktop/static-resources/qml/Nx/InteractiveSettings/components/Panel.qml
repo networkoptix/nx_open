@@ -21,6 +21,9 @@ Panel
     contentHeight: contentItem ? contentItem.implicitHeight : 0
     clip: true
 
+    topPadding: 36
+    bottomPadding: 16
+
     contentItem: AlignedColumn
     {
         id: column
