@@ -789,11 +789,21 @@ nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid en
     const auto analyzedStreamIndexMap =
         QJson::deserialized(serializedProperty.toUtf8(), AnalyzedStreamIndexMap(), &success);
 
-    if (success && analyzedStreamIndexMap.contains(engineId))
+    if (!success)
+    {
+        NX_WARNING(this,
+            "%1 Unable to deserialize the analyzedStreamIndex map for the Device %2 (%3), "
+            "\"%4\" property content: %5",
+            __func__, getUserDefinedName(), getId(), kAnalyzedStreamIndexes, serializedProperty);
+
+        return kDefaultAnalyzedStreamIndex;
+    }
+
+    if (analyzedStreamIndexMap.contains(engineId))
         return analyzedStreamIndexMap[engineId];
 
     const QnResourcePool* const resourcePool = this->resourcePool();
-    if (!resourcePool)
+    if (!NX_ASSERT(resourcePool))
         return kDefaultAnalyzedStreamIndex;
 
     const auto engineResource = resourcePool->getResourceById(engineId)
@@ -814,8 +824,17 @@ void QnVirtualCameraResource::setAnalyzedStreamIndex(
 {
     const QString serializedProperty = getProperty(kAnalyzedStreamIndexes);
 
+    bool success = false;
     auto analyzedStreamIndexMap = QJson::deserialized(
         serializedProperty.toUtf8(), AnalyzedStreamIndexMap());
+
+    if (!success)
+    {
+        NX_WARNING(this,
+            "%1 Unable to deserialize the analyzedStreamIndex map for the Device %2 (%3), "
+            "\"%4\" property content: %5",
+            __func__, getUserDefinedName(), getId(), kAnalyzedStreamIndexes, serializedProperty);
+    }
 
     analyzedStreamIndexMap[engineId] = streamIndex;
 

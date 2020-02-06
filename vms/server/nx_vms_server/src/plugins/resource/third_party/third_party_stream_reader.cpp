@@ -168,11 +168,11 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
     int result = m_camManager.getEncoder( (int) encoderIndex, &intf );
     if( result != nxcip::NX_NO_ERROR )
     {
-        QUrl requestedUrl;
-        requestedUrl.setHost( m_thirdPartyRes->getHostAddress() );
-        requestedUrl.setPort( m_thirdPartyRes->httpPort() );
-        requestedUrl.setScheme( QLatin1String("http") );
-        return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+        nx::utils::Url requestedUrl;
+        requestedUrl.setHost(m_thirdPartyRes->getHostAddress());
+        requestedUrl.setPort(m_thirdPartyRes->httpPort());
+        requestedUrl.setScheme(QLatin1String("http"));
+        return CameraDiagnostics::NoMediaTrackResult(requestedUrl);
     }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
@@ -312,11 +312,11 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
         QString mediaUrlStr;
         if( cameraEncoder.getMediaUrl( &mediaUrlStr ) != nxcip::NX_NO_ERROR )
         {
-            QUrl requestedUrl;
-            requestedUrl.setHost( m_thirdPartyRes->getHostAddress() );
-            requestedUrl.setPort( m_thirdPartyRes->httpPort() );
-            requestedUrl.setScheme( QLatin1String("http") );
-            return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
+            nx::utils::Url requestedUrl;
+            requestedUrl.setHost(m_thirdPartyRes->getHostAddress());
+            requestedUrl.setPort(m_thirdPartyRes->httpPort());
+            requestedUrl.setScheme(QLatin1String("http"));
+            return CameraDiagnostics::NoMediaTrackResult(requestedUrl);
         }
 
         updateSourceUrl(mediaUrlStr);

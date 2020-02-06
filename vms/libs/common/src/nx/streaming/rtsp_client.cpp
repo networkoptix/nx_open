@@ -288,7 +288,6 @@ QnRtspClient::QnRtspClient(
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(10 * 1000),
-    m_responseCode(nx::network::http::StatusCode::ok),
     m_isAudioEnabled(true),
     m_tcpSock(std::move(tcpSock)),
     m_rtspAuthCtx(config.shouldGuessAuthDigest),
@@ -306,11 +305,6 @@ QnRtspClient::~QnRtspClient()
 {
     stop();
     delete [] m_responseBuffer;
-}
-
-nx::network::rtsp::StatusCodeValue QnRtspClient::getLastResponseCode() const
-{
-    return m_responseCode;
 }
 
 bool QnRtspClient::parseSDP(const QByteArray& response)
@@ -389,18 +383,6 @@ void QnRtspClient::parseRangeHeader(const QString& rangeStr)
     }
 }
 
-void QnRtspClient::updateResponseStatus(const QByteArray& response)
-{
-    int firstLineEnd = response.indexOf('\n');
-    if (firstLineEnd >= 0)
-    {
-        nx::network::http::StatusLine statusLine;
-        statusLine.parse( nx::network::http::ConstBufferRefType(response, 0, firstLineEnd) );
-        m_responseCode = statusLine.statusCode;
-        m_reasonPhrase = QLatin1String(statusLine.reasonPhrase);
-    }
-}
-
 CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 startTime)
 {
     m_actualTransport = m_transport;
@@ -411,7 +393,6 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         m_openedTime = startTime;
 
     m_SessionId.clear();
-    m_responseCode = nx::network::http::StatusCode::ok;
     m_url = url;
     m_responseBufferLen = 0;
     m_rtspAuthCtx.clear();
@@ -428,7 +409,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     else if (urlScheme == nx::network::rtsp::kSecureUrlSchemeName)
         isSslRequired = true;
     else
-        return CameraDiagnostics::UnsupportedProtocolResult(m_url.toString(), m_url.scheme());
+        return CameraDiagnostics::UnsupportedProtocolResult(m_url, m_url.scheme());
 
     std::unique_ptr<nx::network::AbstractStreamSocket> previousSocketHolder;
     {
@@ -446,7 +427,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         targetAddress = nx::network::SocketAddress(m_url.host(), m_url.port(DEFAULT_RTP_PORT));
 
     if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), targetAddress.port);
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
 
     previousSocketHolder.reset(); //< Reset old socket after taking new one to guarantee new TCP port.
 
@@ -460,53 +441,38 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         return CameraDiagnostics::NoErrorResult();
     }
 
-    if (!sendOptions())
+    auto result = sendOptions();
+    if (!result)
     {
         stop();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(
-            url.toString(), targetAddress.port);
+        return result;
     }
 
-    CameraDiagnostics::Result result = sendDescribe(targetAddress.port);
+    result = sendDescribe();
     if (result)
         NX_DEBUG(this, "Sucessfully opened RTSP stream %1", m_url);
 
     return result;
 }
 
-CameraDiagnostics::Result QnRtspClient::sendDescribe(int port)
+CameraDiagnostics::Result QnRtspClient::sendDescribe()
 {
     QByteArray response;
-    if (!sendRequestAndReceiveResponse(createDescribeRequest(), response))
+    auto result = sendRequestAndReceiveResponse(createDescribeRequest(), response);
+    if (!result)
     {
         stop();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(
-            m_url.toString(), port);
+        return result;
     }
 
     QString rangeStr = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
     if (!rangeStr.isEmpty())
         parseRangeHeader(rangeStr);
 
-    updateResponseStatus(response);
-    switch (m_responseCode)
-    {
-        case nx::network::http::StatusCode::ok:
-            break;
-        case nx::network::http::StatusCode::unauthorized:
-        case nx::network::http::StatusCode::proxyAuthenticationRequired:
-            stop();
-            return CameraDiagnostics::NotAuthorisedResult(m_url.toString());
-        default:
-            stop();
-            return CameraDiagnostics::RequestFailedResult(
-                lit("DESCRIBE %1").arg(m_url.toString()), m_reasonPhrase);
-    }
-
     if (!parseSDP(response))
     {
         stop();
-        return CameraDiagnostics::NoMediaTrackResult(m_url.toString());
+        return CameraDiagnostics::NoMediaTrackResult(m_url);
     }
 
     /*
@@ -626,7 +592,7 @@ bool QnRtspClient::sendRequestInternal(nx::network::http::Request&& request)
     return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
 }
 
-bool QnRtspClient::sendOptions()
+CameraDiagnostics::Result QnRtspClient::sendOptions()
 {
     nx::network::http::Request request;
     request.requestLine.method = kOptionsCommand;
@@ -634,12 +600,10 @@ bool QnRtspClient::sendOptions()
     request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     QByteArray response;
-    if (!sendRequestAndReceiveResponse(std::move(request), response))
-    {
+    auto result = sendRequestAndReceiveResponse(std::move(request), response);
+    if (!result)
         NX_ERROR(this, "OPTIONS request failed");
-        return false;
-    }
-    return true;
+    return result;
 }
 
 int QnRtspClient::getTrackCount(nx::streaming::Sdp::MediaType mediaType) const
@@ -1471,13 +1435,15 @@ int QnRtspClient::readSocketWithBuffering(quint8* buf, size_t bufSize, bool read
     return bytesRead;
 }
 
-bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& request, QByteArray& responseBuf )
+CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
+    nx::network::http::Request&& request, QByteArray& responseBuf)
 {
     nx::network::rtsp::StatusCodeValue prevStatusCode = nx::network::http::StatusCode::ok;
     addAuth( &request );
     addAdditionAttrs( &request );
 
     NX_VERBOSE(this, "Send: %1", request.requestLine.toString());
+    const int port = m_url.port(DEFAULT_RTP_PORT);
     for( int i = 0; i < 3; ++i )    //needed to avoid infinite loop in case of incorrect server behavour
     {
         QByteArray requestBuf;
@@ -1485,40 +1451,43 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& r
         if( m_tcpSock->send(requestBuf.constData(), requestBuf.size()) <= 0 )
         {
             NX_DEBUG(this, "Failed to send request: %2", SystemError::getLastOSErrorText());
-            return false;
+            return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_url.host(), port);
         }
 
         if( !readTextResponse(responseBuf) )
         {
             NX_DEBUG(this, "Failed to read response");
-            return false;
+            return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_url.host(), port);
         }
 
         nx::network::rtsp::RtspResponse response;
         if( !response.parse( responseBuf ) )
         {
             NX_DEBUG(this, "Failed to parse response");
-            return false;
+            return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_url.host(), port);
         }
 
-        m_responseCode = response.statusLine.statusCode;
-        switch (m_responseCode)
+        switch (response.statusLine.statusCode)
         {
+            case nx::network::http::StatusCode::ok:
+                return CameraDiagnostics::NoErrorResult();
+
             case nx::network::http::StatusCode::unauthorized:
             case nx::network::http::StatusCode::proxyAuthenticationRequired:
-                if( prevStatusCode == m_responseCode )
+                if (prevStatusCode == response.statusLine.statusCode)
                 {
                     NX_DEBUG(this, "Already tried authentication and have been rejected");
-                    return false;
+                    return CameraDiagnostics::NotAuthorisedResult(m_url);
                 }
 
-                prevStatusCode = m_responseCode;
+                prevStatusCode = response.statusLine.statusCode;
                 break;
 
             default:
                 m_serverInfo = nx::network::http::getHeaderValue(response.headers, nx::network::http::header::Server::NAME);
-                NX_VERBOSE(this, "Response: %1", response.statusLine.toString());
-                return true;
+                NX_DEBUG(this, "Response failed: %1", response.statusLine.toString());
+                return CameraDiagnostics::RequestFailedResult(
+                    m_url.toString(), response.statusLine.reasonPhrase);
         }
 
         addCommonHeaders(request.headers); //< Update sequence after unauthorized response.
@@ -1527,12 +1496,12 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& r
         if (authResult != Qn::Auth_OK)
         {
             NX_DEBUG(this, "Authentification failed: %1", authResult);
-            return false;
+            return CameraDiagnostics::NotAuthorisedResult(m_url);
         }
     }
 
     NX_VERBOSE(this, "Response after last retry: %1", prevStatusCode);
-    return false;
+    return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_url.host(), port);
 }
 
 QByteArray QnRtspClient::serverInfo() const

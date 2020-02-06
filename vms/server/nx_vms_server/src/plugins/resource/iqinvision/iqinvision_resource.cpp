@@ -38,7 +38,7 @@ CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()
     switch( status )
     {
         case CL_HTTP_AUTH_REQUIRED:
-            return CameraDiagnostics::NotAuthorisedResult( QString() );
+            return CameraDiagnostics::NotAuthorisedResult(nx::utils::Url());
         case CL_HTTP_SUCCESS:
         case CL_HTTP_REDIRECT:
             break;

@@ -5,6 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <common/common_globals.h>
+#include <nx/utils/url.h>
 
 //!Holds types related to performing camera availability diagnostics
 namespace CameraDiagnostics {
@@ -109,6 +110,8 @@ public:
     explicit operator bool() const;
     QString toString(QnResourcePool* resourcePool) const;
     Qn::MediaStreamEvent toMediaStreamEvent() const;
+protected:
+    QString urlToStr(const nx::utils::Url& value) const;
 };
 
 class NoErrorResult: public Result
@@ -158,10 +161,10 @@ class CannotOpenCameraMediaPortResult: public Result
 {
 public:
     CannotOpenCameraMediaPortResult(
-        const QString& mediaURL,
+        const nx::utils::Url& mediaURL,
         const int mediaPort)
         :
-        Result(ErrorCode::cannotOpenCameraMediaPort, mediaURL, QString::number(mediaPort))
+        Result(ErrorCode::cannotOpenCameraMediaPort, urlToStr(mediaURL), QString::number(mediaPort))
     {
     }
 };
@@ -170,10 +173,10 @@ class ConnectionClosedUnexpectedlyResult: public Result
 {
 public:
     ConnectionClosedUnexpectedlyResult(
-        const QString& mediaURL,
+        const QString& host,
         const int mediaPort)
         :
-        Result(ErrorCode::connectionClosedUnexpectedly, mediaURL, QString::number(mediaPort))
+        Result(ErrorCode::connectionClosedUnexpectedly, host, QString::number(mediaPort))
     {
     }
 };
@@ -209,10 +212,10 @@ class CameraResponseParseErrorResult: public Result
 {
 public:
     CameraResponseParseErrorResult(
-        const QString& requestedURL,
+        const nx::utils::Url& requestedURL,
         const QString &requestName)
         :
-        Result(ErrorCode::responseParseError, requestedURL, requestName)
+        Result(ErrorCode::responseParseError, urlToStr(requestedURL), requestName)
     {
     }
 };
@@ -221,9 +224,9 @@ class NoMediaTrackResult: public Result
 {
 public:
     NoMediaTrackResult(
-        const QString& requestedURL)
+        const nx::utils::Url& requestedURL)
         :
-        Result(ErrorCode::noMediaTrack, requestedURL)
+        Result(ErrorCode::noMediaTrack, urlToStr(requestedURL))
     {
     }
 };
@@ -232,9 +235,9 @@ class NotAuthorisedResult: public Result
 {
 public:
     NotAuthorisedResult(
-        const QString& requestedURL)
+        const nx::utils::Url& requestedURL)
         :
-        Result(ErrorCode::notAuthorised, requestedURL)
+        Result(ErrorCode::notAuthorised, urlToStr(requestedURL))
     {
     }
 };
@@ -243,10 +246,10 @@ class UnsupportedProtocolResult: public Result
 {
 public:
     UnsupportedProtocolResult(
-        const QString& mediaURL,
+        const nx::utils::Url& mediaUrl,
         const QString& protocolName)
         :
-        Result(ErrorCode::unsupportedProtocol, mediaURL, protocolName)
+        Result(ErrorCode::unsupportedProtocol, urlToStr(mediaUrl), protocolName)
     {
     }
 };

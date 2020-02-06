@@ -382,5 +382,9 @@ Qn::MediaStreamEvent Result::toMediaStreamEvent() const
     }
 }
 
+QString Result::urlToStr(const nx::utils::Url& value) const
+{
+    return value.toString(QUrl::RemoveUserInfo);
+}
 
 } // namespace CameraDiagnostics

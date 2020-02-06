@@ -91,6 +91,8 @@ private:
 
     bool isStreamConsumerUnsafe() const;
 
+    void notifySettingsMaybeChanged() const;
+
 private:
     struct DeviceAgentContext
     {

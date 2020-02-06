@@ -31,6 +31,7 @@
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
+#include <nx/vms/api/data/server_runtime_event_data.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_user_manager.h>
@@ -1107,6 +1108,9 @@ signals:
     void settingsChanged(nx::vms::api::ResourceParamDataList settings);
 
     void databaseDumped();
+
+    void serverRuntimeEventOccurred(
+        const nx::vms::api::ServerRuntimeEventData& serverRuntimeEventData);
 
 protected:
     virtual int dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler) = 0;

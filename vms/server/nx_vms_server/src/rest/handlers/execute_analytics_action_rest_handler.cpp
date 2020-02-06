@@ -235,7 +235,7 @@ QString QnExecuteAnalyticsActionRestHandler::checkInputParameters(
     else if (actionData.actionId.isEmpty())
         return makeErrorMessage("actionId");
     else if (actionData.objectTrackId.isNull())
-        return makeErrorMessage("trackId");
+        return makeErrorMessage("objectTrackId");
 
     return QString();
 }

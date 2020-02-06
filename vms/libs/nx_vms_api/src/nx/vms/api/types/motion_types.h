@@ -19,19 +19,8 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
 
 enum class StreamIndex
 {
-    /**%apidoc
-     * Stream is not defined.
-     */
     undefined = -1,
-
-    /**%apidoc
-     * Primary stream.
-     */
     primary = 0,
-
-    /**%apidoc
-     * Secondary stream.
-     */
     secondary = 1
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)

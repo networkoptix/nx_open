@@ -176,14 +176,14 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
         url.host(), url.port(), nx::network::deprecated::kDefaultConnectTimeout))
     {
         closeStream();
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), url.port());
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, url.port());
     }
 
     const QByteArray data = url.toString(QUrl::RemoveAuthority | QUrl::RemoveScheme).toUtf8();
     if (m_socket->send(data.data(), data.size() + 1) <= 0)
     {
        closeStream();
-       return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url.toString(), url.port());
+       return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url.host(), url.port());
     }
 
     return CameraDiagnostics::NoErrorResult();

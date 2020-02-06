@@ -236,8 +236,6 @@ public:
     QStringList getSdpByType(nx::streaming::Sdp::MediaType mediaType) const;
     int getTrackCount(nx::streaming::Sdp::MediaType mediaType) const;
 
-    nx::network::rtsp::StatusCodeValue getLastResponseCode() const;
-
     void setAudioEnabled(bool value);
     bool isAudioEnabled() const;
 
@@ -279,8 +277,8 @@ public:
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
-    bool sendOptions();
-    CameraDiagnostics::Result sendDescribe(int port);
+    CameraDiagnostics::Result sendOptions();
+    CameraDiagnostics::Result sendDescribe();
     bool sendKeepAlive();
 
     bool readTextResponse(QByteArray &response);
@@ -292,8 +290,6 @@ private:
     bool parseSDP(const QByteArray& response);
 
     void addAdditionAttrs( nx::network::http::Request* const request );
-    void updateResponseStatus(const QByteArray& response);
-
     bool processTextResponseInsideBinData();
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex);
@@ -318,7 +314,6 @@ private:
     qint64 m_endTime;
     float m_scale;
     std::chrono::milliseconds m_tcpTimeout;
-    nx::network::rtsp::StatusCodeValue m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
     std::chrono::milliseconds m_keepAliveTimeOut{0};
@@ -354,7 +349,6 @@ private:
     };
 
     std::vector<RtpChannel> m_rtpToTrack;
-    QString m_reasonPhrase;
     QString m_videoLayout;
 
     HttpAuthenticationClientContext m_rtspAuthCtx;
@@ -379,5 +373,5 @@ private:
         Updates \a m_responseCode member.
         \return error description
     */
-    bool sendRequestAndReceiveResponse(nx::network::http::Request&& request, QByteArray& response);
+    CameraDiagnostics::Result sendRequestAndReceiveResponse(nx::network::http::Request&& request, QByteArray& response);
 };

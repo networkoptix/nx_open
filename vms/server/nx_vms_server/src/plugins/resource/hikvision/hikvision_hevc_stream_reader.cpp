@@ -315,7 +315,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchRtspPortViaOldApi(
     if (!parseChannelPropertiesResponse(response, &channelProperties))
     {
         return CameraDiagnostics::CameraResponseParseErrorResult(
-            url.toString(),
+            url,
             "Fetch channel properties");
     }
 
@@ -332,7 +332,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchResponse(
     if (!doGetRequest(url, m_hikvisionResource->getAuth(), outBuffer, &statusCode))
     {
         if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
-            return CameraDiagnostics::NotAuthorisedResult(url.toString());
+            return CameraDiagnostics::NotAuthorisedResult(url);
 
         if (statusCode != nx::network::http::StatusCode::Value::ok)
         {
@@ -361,7 +361,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
     if (!result)
     {
         if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
-            return CameraDiagnostics::NotAuthorisedResult(channelProperties.httpUrl.toString());
+            return CameraDiagnostics::NotAuthorisedResult(channelProperties.httpUrl);
 
         return CameraDiagnostics::RequestFailedResult(
             "Fetch video channel configuration.",
@@ -383,7 +383,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
     if (!result)
     {
         return CameraDiagnostics::CameraResponseParseErrorResult(
-            channelProperties.httpUrl.toString(),
+            channelProperties.httpUrl,
             responseBuffer);
     }
     // Workaround camera bug. It wont change bitrate if codec just changed.
@@ -408,7 +408,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
     if (!result)
     {
         if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
-            return CameraDiagnostics::NotAuthorisedResult(channelProperties.httpUrl.toString());
+            return CameraDiagnostics::NotAuthorisedResult(channelProperties.httpUrl);
 
         return CameraDiagnostics::RequestFailedResult(
             "Update video channel configuration.",

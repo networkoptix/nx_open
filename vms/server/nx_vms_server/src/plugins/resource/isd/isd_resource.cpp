@@ -249,11 +249,11 @@ CameraDiagnostics::Result QnPlIsdResource::doISDApiRequest( const nx::utils::Url
     if( statusCode == nx::network::http::StatusCode::unauthorized )
     {
         setStatus(Qn::Unauthorized);
-        return CameraDiagnostics::NotAuthorisedResult( apiRequestUrl.toString() );
+        return CameraDiagnostics::NotAuthorisedResult(apiRequestUrl);
     }
     else if( statusCode != nx::network::http::StatusCode::ok )
     {
-        return CameraDiagnostics::CameraResponseParseErrorResult( apiRequestUrl.toString(), apiRequestUrl.path() );
+        return CameraDiagnostics::CameraResponseParseErrorResult(apiRequestUrl, apiRequestUrl.path() );
     }
 
     return CameraDiagnostics::NoErrorResult();

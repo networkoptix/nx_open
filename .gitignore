@@ -23,5 +23,5 @@ compile_commands.json
 
 # Build folders in the repository root.
 /build/
-/build-.*/
+/build-*/
 

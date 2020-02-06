@@ -559,7 +559,7 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
             setFirmware(firmware);
 
         if (status == CL_HTTP_AUTH_REQUIRED)
-            return CameraDiagnostics::NotAuthorisedResult(http.lastRequestUrl().toString());
+            return CameraDiagnostics::NotAuthorisedResult(http.lastRequestUrl());
     }
 
     if (commonModule()->isNeedToStop())
@@ -574,7 +574,7 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
 
         if (status == CL_HTTP_AUTH_REQUIRED)
-            return CameraDiagnostics::NotAuthorisedResult(http.lastRequestUrl().toString());
+            return CameraDiagnostics::NotAuthorisedResult(http.lastRequestUrl());
 
         if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::UnknownErrorResult();

@@ -170,7 +170,7 @@ CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool /*isCameraC
             m_camera->getAuth()));
     CLHttpStatus httpStatus = mHttpClient->doGET(m_request);
 
-    QUrl requestedUrl;
+    nx::utils::Url requestedUrl;
     requestedUrl.setHost(m_camera->getHostAddress());
     requestedUrl.setPort(m_camera->httpPort());
     requestedUrl.setScheme(QLatin1String("http"));
@@ -183,7 +183,7 @@ CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool /*isCameraC
         case CL_HTTP_SUCCESS:
             return CameraDiagnostics::NoErrorResult();
         case CL_HTTP_AUTH_REQUIRED:
-            return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
+            return CameraDiagnostics::NotAuthorisedResult(requestedUrl);
         default:
             return CameraDiagnostics::RequestFailedResult(m_request, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)httpStatus)));
     }

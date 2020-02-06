@@ -52,20 +52,20 @@ class IFrameSearchHelper;
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 namespace nx::vms::server::hls { class SessionPool; }
 namespace nx::vms::server { class CmdLineArguments; }
-namespace nx::vms::server::analytics 
-{
-    class SdkObjectFactory; 
+namespace nx::vms::server::analytics {
+    class SdkObjectFactory;
     class AbstractIFrameSearchHelper;
     class IFrameSearchHelper;
-}
-namespace nx::vms::server::network { class MulticastAddressRegistry;  }
+} // namespace nx::vms::server::analytics
 
+namespace nx::vms::server::network { class MulticastAddressRegistry;  }
 
 namespace nx::vms::server::event {
     class ExtendedRuleProcessor;
     class EventConnector;
     class EventMessageBus;
-}
+    class ServerRuntimeEventManager;
+} // namespace nx::vms::server::event
 
 namespace nx::analytics::db { class AbstractEventsStorage; }
 namespace nx::vms::server::time_sync { class TimeSyncManager; }
@@ -78,7 +78,7 @@ namespace nx::vms::server {
     class Settings;
     class ServerTimeSyncManager;
     class UpdateManager;
-}
+} // namespace nx::vms::server
 
 namespace nx::vms::server::nvr { class IService; }
 
@@ -170,6 +170,7 @@ public:
     nx::vms::server::hls::SessionPool* hlsSessionPool() const;
     nx::vms::server::network::MulticastAddressRegistry* multicastAddressRegistry() const;
     nx::vms::server::nvr::IService* nvrService() const;
+    nx::vms::server::event::ServerRuntimeEventManager* serverRuntimeEventManager() const;
 
     void initializeP2PDownloader();
 
@@ -240,6 +241,7 @@ private:
     std::unique_ptr<nx::vms::server::nvr::IService> m_nvrService;
     StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
     nx::vms::server::analytics::IFrameSearchHelper* m_analyticsIFrameSearchHelper = nullptr;
+    std::unique_ptr<nx::vms::server::event::ServerRuntimeEventManager> m_serverRuntimeEventManager;
 
     // When server stops, QnResourcePropertyDictionary is destroyed before QnResource objects
     // (at least some of them) because of unknown reasons. So QnResource can not make soap requests

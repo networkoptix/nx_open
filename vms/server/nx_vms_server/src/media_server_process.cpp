@@ -2510,7 +2510,8 @@ void MediaServerProcess::registerRestHandlers(
      *     (in milliseconds).
      * %param:integer startTime Start time of the bookmark (in milliseconds since epoch).
      * %param:integer duration Length of the bookmark (in milliseconds).
-     * %param[opt] tag Applied tag. Several tag parameters could be used to specify multiple tags.
+     * %param[opt]:string tag Applied tag. Several tag parameters could be used to specify multiple
+     *     tags.
      * %param[proprietary]:option local If present, the request should not be redirected to another
      *     server.
      * %param[proprietary]:option extraFormatting If present and the requested result format is
@@ -2546,7 +2547,7 @@ void MediaServerProcess::registerRestHandlers(
      *     (in milliseconds).
      * %param:integer startTime Start time of the bookmark (in milliseconds since epoch).
      * %param:integer duration Length of the bookmark (in milliseconds).
-     * %param[opt]:string tag Applied tag. Serveral tag parameters could be used to specify
+     * %param[opt]:string tag Applied tag. Several tag parameters could be used to specify
      *     multiple tags.
      * %param[proprietary]:option local If present, the request should not be redirected to another
      *     server.
@@ -2719,7 +2720,7 @@ void MediaServerProcess::registerRestHandlers(
      * applied to the specified Object Track.
      * %param engineId Id of an Analytics Engine which offers the Action.
      * %param actionId Id of an Action to execute.
-     * %param trackId Id of an Object Track to which the Action is applied.
+     * %param objectTrackId Id of an Object Track to which the Action is applied.
      * %param deviceId Id of a Device from which the Action was triggered.
      * %param timestampUs Timestamp (microseconds) of the video frame from which the Action was
      *     triggered.
@@ -2736,7 +2737,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler(serverModule()));
 
-    /**%apidoc POST /api/executeEventAction
+    /**%apidoc[proprietary] POST /api/executeEventAction
      * Execute event action.
      * %param:enum actionType Type of the action.
      *     %value UndefinedAction
@@ -2911,8 +2912,8 @@ void MediaServerProcess::registerRestHandlers(
      * %apidoc POST /ec2/deviceAnalyticsSettings
      * Applies passed settings values to the corresponding DeviceAgent (which is a device-engine
      * pair).
-     * %param:object JSON object containing request parameters
-     *      %struct DeviceAnalyticsSettingsRequest
+     * %struct DeviceAnalyticsSettingsRequest
+     *
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.

@@ -14,6 +14,7 @@
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
+#include <nx/vms/api/data/server_runtime_event_data.h>
 
 /**
  * This class describes all possible transactions and defines various access righs check for them.
@@ -1422,6 +1423,23 @@ APPLY(10402, removeAnalyticsEngine, nx::vms::api::IdData, \
                         InvalidFilterFunc(), /* Filter read func */ \
                         AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                         RegularTransactionType()) /* regular transaction type */ \
+APPLY(10500, serverRuntimeEvent, nx::vms::api::ServerRuntimeEventData, \
+                        false, /*isPersistent*/ \
+                        false, /*isSystem*/ \
+                        InvalidGetHashHelper(), \
+                        [](const QnTransaction<nx::vms::api::ServerRuntimeEventData>& tran, \
+                            const NotificationParams& notificationParams) \
+                        { \
+                            NX_ASSERT(tran.command == ApiCommand::serverRuntimeEvent); \
+                            emit notificationParams.ecConnection->serverRuntimeEventOccurred( \
+                                tran.params); \
+                        }, \
+                        AllowForAllAccess(), /* Save permission checker */ \
+                        AllowForAllAccess(), /* Read permission checker */ \
+                        InvalidFilterFunc(), /* Filter save func */ \
+                        InvalidFilterFunc(), /* Filter read func */ \
+                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                        RegularTransactionType()) /* regular transaction type */
 
 #define TRANSACTION_ENUM_APPLY(value, name, ...) name = value,
 

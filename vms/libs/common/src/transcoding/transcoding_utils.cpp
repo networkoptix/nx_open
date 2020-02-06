@@ -37,6 +37,9 @@ int writeToQIODevice(void *opaque, uint8_t* buf, int size)
 AVCodecID findEncoderCodecId(const QString& codecName)
 {
     QString codecLower = codecName.toLower();
+    if (codecLower == "h263")
+        codecLower = "h263p"; //< force using h263p codec
+
     AVCodec* avCodec = avcodec_find_encoder_by_name(codecLower.toUtf8().constData());
     if (avCodec)
         return avCodec->id;

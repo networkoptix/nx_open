@@ -213,7 +213,7 @@ QnTestCameraResourcePtr QnTestCameraResourceSearcher::createDiscoveredTestCamera
         ? ""
         : (" with video layout " + nx::kit::utils::toString(videoLayoutString));
 
-    NX_INFO(this, "Created testcamera %1%2 with URL %3", resource, videoLayoutLogMessage, url);
+    NX_DEBUG(this, "Discovered testcamera %1%2 with URL %3", resource, videoLayoutLogMessage, url);
 
     return resource;
 }
@@ -227,7 +227,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(
 
     if (resourceType.isNull())
     {
-        NX_WARNING(this, lm("No resource type for id: %1").arg(resourceTypeId));
+        NX_WARNING(this, "No resource type for id: %1", resourceTypeId);
         return result;
     }
 

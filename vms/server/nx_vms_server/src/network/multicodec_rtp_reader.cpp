@@ -779,7 +779,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if (!audioExist && !videoExist)
     {
         m_RtpSession.stop();
-        m_openStreamResult = CameraDiagnostics::NoMediaTrackResult(m_currentStreamUrl.toString());
+        m_openStreamResult = CameraDiagnostics::NoMediaTrackResult(m_currentStreamUrl);
         return m_openStreamResult;
     }
     m_rtpStarted = true;
@@ -834,11 +834,6 @@ void QnMulticodecRtpReader::createTrackParsers()
 
         m_tracks.push_back(trackParser);
     }
-}
-
-nx::network::rtsp::StatusCodeValue QnMulticodecRtpReader::getLastResponseCode() const
-{
-    return m_RtpSession.getLastResponseCode();
 }
 
 void QnMulticodecRtpReader::closeStream()

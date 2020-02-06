@@ -26,7 +26,7 @@ QRectF ObjectCoordinatesTranslator::translate(const QRectF& originalBoundingBox)
 {
     NX_VERBOSE(this,
         "Translating bounding box coordinates, rotation angle: %1 degrees, "
-        "original bounding box: %2, device %3 (%4)",
+        "original bounding box: %2, Device %3 (%4)",
         m_rotationAngleDegrees.load(), originalBoundingBox,
         m_device->getUserDefinedName(), m_device->getId());
 
@@ -61,7 +61,7 @@ QRectF ObjectCoordinatesTranslator::translate(const QRectF& originalBoundingBox)
         {
             NX_WARNING(this,
                 "Got invalid rotation angle: %1 degrees (allowed rotation angles are 0, 90, 180 "
-                "and 270 degrees), device %2 (%3)",
+                "and 270 degrees), Device %2 (%3)",
                 m_rotationAngleDegrees.load(), m_device->getUserDefinedName(), m_device->getId());
 
             return QRectF();
@@ -74,7 +74,7 @@ void ObjectCoordinatesTranslator::at_propertyChanged(
 {
     if (propertyName == QnMediaResource::rotationKey())
     {
-        NX_DEBUG(this, "Rotation has been changed, new rotataion is %1 degrees, device %2 (%3)",
+        NX_DEBUG(this, "Rotation has been changed, new rotataion is %1 degrees, Device %2 (%3)",
             getRotation(m_device), m_device->getUserDefinedName(), m_device->getId());
 
         m_rotationAngleDegrees.store(getRotation(m_device));

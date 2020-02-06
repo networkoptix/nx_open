@@ -48,6 +48,7 @@
 #include "data/webpage_data.h"
 #include "data/user_data_ex.h"
 #include "data/analytics_data.h"
+#include "data/server_runtime_event_data.h"
 
 #include "types/access_rights_types.h"
 #include "types/motion_types.h"
@@ -152,6 +153,7 @@ void Metatypes::initialize()
     qRegisterMetaType<VideowallControlMessageData>();
     qRegisterMetaType<WebPageData>();
     qRegisterMetaType<RtpTransportType>();
+    qRegisterMetaType<ServerRuntimeEventData>();
 };
 
 } // namespace nx::vms::api
