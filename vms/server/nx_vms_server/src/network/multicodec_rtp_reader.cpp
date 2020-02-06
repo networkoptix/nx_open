@@ -836,11 +836,6 @@ void QnMulticodecRtpReader::createTrackParsers()
     }
 }
 
-nx::network::rtsp::StatusCodeValue QnMulticodecRtpReader::getLastResponseCode() const
-{
-    return m_RtpSession.getLastResponseCode();
-}
-
 void QnMulticodecRtpReader::closeStream()
 {
     m_rtpStarted = false;
