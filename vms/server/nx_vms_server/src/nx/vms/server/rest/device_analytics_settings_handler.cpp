@@ -1,5 +1,7 @@
 #include "device_analytics_settings_handler.h"
 
+#include <variant>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <api/helpers/camera_id_helper.h>
@@ -21,29 +23,38 @@ using namespace nx::network;
 using DeviceAnalyticsSettingsRequest = nx::vms::api::analytics::DeviceAnalyticsSettingsRequest;
 using DeviceAnalyticsSettingsResponse = nx::vms::api::analytics::DeviceAnalyticsSettingsResponse;
 
-std::map<QString, QString> extractCommonRequestParametersFromBody(const QByteArray& body)
-{
-    std::map<QString, QString> result;
+using ParameterMap = std::map<QString, QString>;
 
+template<typename Data>
+using DataOrError = std::variant<Data, /*errorResponse*/ JsonRestResponse>;
+using CommonRequestParametersOrError = DataOrError<ParameterMap>;
+
+CommonRequestParametersOrError extractCommonRequestParametersFromBody(
+    const QByteArray& body)
+{
     bool success = false;
     if (const auto settingsRequest =
         QJson::deserialized(body, DeviceAnalyticsSettingsRequest(), &success);
         success)
     {
+        ParameterMap result;
+
         if (!settingsRequest.deviceId.isNull())
             result[kDeviceIdParameter] = settingsRequest.deviceId;
 
         if (!settingsRequest.analyticsEngineId.isNull())
             result[kAnalyticsEngineIdParameter] = settingsRequest.analyticsEngineId.toString();
+
+        return result;
     }
 
-    return result;
+    return makeResponse(QnRestResult::CantProcessRequest, "Unable to deserialize request body");
 }
 
-std::map<QString, QString> extractCommonRequestParameters(
-    const JsonRestRequest& request, const QByteArray& body = QByteArray())
+ParameterMap extractCommonRequestParametersFromUrlQuery(
+    const JsonRestRequest& request)
 {
-    std::map<QString, QString> result;
+    ParameterMap result;
 
     const QnRequestParams& requestQueryParameters = request.params;
     if (requestQueryParameters.contains(kDeviceIdParameter))
@@ -51,15 +62,6 @@ std::map<QString, QString> extractCommonRequestParameters(
 
     if (requestQueryParameters.contains(kAnalyticsEngineIdParameter))
         result[kAnalyticsEngineIdParameter] = requestQueryParameters[kAnalyticsEngineIdParameter];
-
-    if (body.isEmpty())
-        return result;
-
-    const std::map<QString, QString> parametersFromBody =
-        extractCommonRequestParametersFromBody(body);
-
-    for (const auto& [key, value]: parametersFromBody)
-        result[key] = value;
 
     return result;
 }
@@ -71,8 +73,8 @@ DeviceAnalyticsSettingsHandler::DeviceAnalyticsSettingsHandler(QnMediaServerModu
 
 JsonRestResponse DeviceAnalyticsSettingsHandler::executeGet(const JsonRestRequest& request)
 {
-    const std::map<QString, QString> commonRequestParameters =
-        extractCommonRequestParameters(request);
+    const ParameterMap commonRequestParameters =
+        extractCommonRequestParametersFromUrlQuery(request);
 
     const CommonRequestEntities commonRequestEntities =
         extractCommonRequestEntities(commonRequestParameters);
@@ -95,8 +97,16 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
     const JsonRestRequest& request,
     const QByteArray& body)
 {
-    const std::map<QString, QString> commonRequestParameters =
-        extractCommonRequestParameters(request, body);
+    const CommonRequestParametersOrError commonRequestParametersOrError =
+        extractCommonRequestParametersFromBody(body);
+
+    if (!NX_ASSERT(!commonRequestParametersOrError.valueless_by_exception()))
+        return makeResponse(QnRestResult::InternalServerError, "Internal server error");
+
+    if (std::holds_alternative<JsonRestResponse>(commonRequestParametersOrError))
+        return std::get<JsonRestResponse>(commonRequestParametersOrError);
+
+    const auto commonRequestParameters = std::get<ParameterMap>(commonRequestParametersOrError);
 
     const CommonRequestEntities commonRequestEntities =
         extractCommonRequestEntities(commonRequestParameters);
@@ -142,7 +152,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
 
 DeviceAnalyticsSettingsHandler::CommonRequestEntities
     DeviceAnalyticsSettingsHandler::extractCommonRequestEntities(
-        const std::map<QString, QString>& parameters) const
+        const ParameterMap& parameters) const
 {
     CommonRequestEntities result;
     const auto deviceIdIt = parameters.find(kDeviceIdParameter);
@@ -266,8 +276,14 @@ DeviceIdRetriever DeviceAnalyticsSettingsHandler::createCustomDeviceIdRetriever(
             if (deviceId.isEmpty())
                 return deviceId;
 
-            const std::map<QString, QString> commonParameters =
+            const CommonRequestParametersOrError commonParametersOrError =
                 extractCommonRequestParametersFromBody(request.messageBody);
+
+            if (!std::holds_alternative<ParameterMap>(commonParametersOrError))
+                return QString();
+
+            const auto commonParameters =
+                std::get<ParameterMap>(commonParametersOrError);
 
             if (const auto it = commonParameters.find(kDeviceIdParameter);
                 it != commonParameters.cend())
