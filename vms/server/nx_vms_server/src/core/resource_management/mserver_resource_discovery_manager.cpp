@@ -21,7 +21,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resource_searcher.h>
-#include <core/resource_management/data_only_camera_resource.h>
+#include <nx/vms/server/resource/data_only_camera.h>
 #include <plugins/resource/desktop_camera/desktop_camera_resource.h>
 #include <common/common_module.h>
 #include <media_server/settings.h>
@@ -111,7 +111,7 @@ QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid& re
         return res;
 
     // Found resource type, but could not find factory. Disabled discovery?
-    return QnResourcePtr(new DataOnlyCameraResource(resourceTypeId));
+    return QnResourcePtr(new nx::vms::server::resource::DataOnlyCamera(m_serverModule, resourceTypeId));
 }
 
 static void printInLogNetResources(const QnResourceList& resources)
