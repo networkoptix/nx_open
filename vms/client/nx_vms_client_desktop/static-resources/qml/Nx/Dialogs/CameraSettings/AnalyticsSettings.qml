@@ -260,18 +260,23 @@ Item
 
                     columns: 2
                     columnSpacing: 8
+                    width: commonSettings.width
                     flow: GridLayout.LeftToRight
 
                     ContextHintLabel
                     {
                         text: qsTr("Camera stream")
+                        horizontalAlignment: Text.AlignRight
                         contextHintText: qsTr("Select video stream from the camera for analysis")
+                        Layout.minimumWidth: commonSettings.width * 0.3
                         color: ColorTheme.windowText
                     }
 
                     ComboBox
                     {
                         id: streamComboBox
+                        Layout.fillWidth: true
+
                         model: ["Primary", "Secondary"]
 
                         onCurrentIndexChanged:
