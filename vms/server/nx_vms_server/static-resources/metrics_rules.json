@@ -203,7 +203,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %ramUsageP 0.8",
-                                "text": "Total RAM usage is %ramUsageP. VMS is using %serverRamUsageP."
+                                "text": "Total RAM Usage is %ramUsageP. VMS is using %serverRamUsageP."
                             }
                         ]
                     },
