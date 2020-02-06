@@ -558,11 +558,14 @@ namespace nxcip
             cameraParamsPersistentCapability    = 0x0800,     //!< camera parameters can be read/set even if camera is not accessible at the moment
             searchByMotionMaskCapability        = 0x1000,     //!< if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
             motionRegionCapability              = 0x2000,     //!< if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
-            needIFrameDetectionCapability       = 0x4000,      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
-            relativeTimestampCapability         = 0x8000,      //!< camera provides relative timestamps. It need to align them to the current time.
-            customMediaUrlCapability            = 0x10000,     //!< camera's media streams are editable and can be provided directly via setProperty API call.
-            cameraTimeCapability                = 0x20000,     //!< Camera sends absolute timestamps in media stream
-            fixedQualityCapability              = 0x40000,     //!< Camera does not allow to change stream quality/fps
+            needIFrameDetectionCapability       = 0x4000,     //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
+            relativeTimestampCapability         = 0x8000,     //!< camera provides relative timestamps. It need to align them to the current time.
+            customMediaUrlCapability            = 0x10000,    //!< camera's media streams are editable and can be provided directly via setProperty API call.
+            cameraTimeCapability                = 0x20000,    //!< Camera sends absolute timestamps in media stream
+            fixedQualityCapability              = 0x40000,    //!< Camera does not allow to change stream quality/fps
+            MulticastStreamCapability           = 0x80000,    //!< Camera supports multicast streaming.
+            ServerBoundCapability               = 0x100000,   //!< Camera is bound to a particular server.
+            dontAutoOpenCamera                  = 0x200000,   //!< Server should not open video from camera at its will.
         };
 
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)

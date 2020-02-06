@@ -471,6 +471,12 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
         dynamic_cast<QnSecurityCamResource*>(m_resource.data());
     bool canUseProvider = m_catalog == QnServer::HiQualityCatalog
         || !cameraResource || cameraResource->hasDualStreaming();
+    
+    if (auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
+    {
+        if (camera->getCameraCapabilities().testFlag(Qn::dontAutoOpenCamera))
+            return; //< Don't update thumbnails for such cameras.
+    }
 
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() && canUseProvider &&
        (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL) &&

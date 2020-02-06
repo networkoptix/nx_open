@@ -57,6 +57,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         FixedQualityCapability              = 0x40000, //< Camera does not allow to change stream quality/fps
         MulticastStreamCapability           = 0x80000, //< Camera supports multicast streaming.
         ServerBoundCapability               = 0x100000, //< Camera is bound to a particular server.
+        dontAutoOpenCamera                  = 0x200000, //< Server should not open video from camera at its will.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
