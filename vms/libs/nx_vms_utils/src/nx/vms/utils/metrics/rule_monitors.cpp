@@ -248,7 +248,7 @@ public:
         if (function() == "history")
         {
             return durationOperation(
-                1, 2, Border::move(),
+                1, 2, Border::keep(),
                 [](const auto& forEach)
                 {
                     QJsonArray items;
