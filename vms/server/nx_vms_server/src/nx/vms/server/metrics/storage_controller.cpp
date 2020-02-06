@@ -31,11 +31,15 @@ void StorageController::start()
         resourcePool, &QnResourcePool::resourceAdded,
         [this, resourcePool](const QnResourcePtr& resource)
         {
-            if (const auto storage = resource.dynamicCast<StorageResource>().get())
+            if (const auto s = resource.dynamicCast<StorageResource>().get())
             {
-                const auto addOrUpdate = [this, storage]() { add(storage, moduleGUID()); };
-                QObject::connect(storage, &QnResource::parentIdChanged, addOrUpdate);
-                addOrUpdate();
+                QObject::connect(s, &QnResource::parentIdChanged, [this, s]() { update(s); });
+                return update(s);
+            }
+            if (const auto s = resource.dynamicCast<QnMediaServerResource>().get())
+            {
+                for (const auto r: resourcePool->getResourcesByParentId(s->getId()))
+                    update(r.dynamicCast<StorageResource>().get());
             }
         });
 
@@ -43,9 +47,21 @@ void StorageController::start()
         resourcePool, &QnResourcePool::resourceRemoved,
         [this](const QnResourcePtr& resource)
         {
-            if (const auto storage = resource.dynamicCast<QnStorageResource>())
-                remove(storage->getId());
+            if (const auto s = resource.dynamicCast<QnStorageResource>())
+                remove(s->getId());
         });
+}
+
+void StorageController::update(StorageResource* storage)
+{
+    if (!storage)
+        return;
+
+    const auto resourcePool = serverModule()->commonModule()->resourcePool();
+    if (resourcePool->getResourceById(storage->getParentId()))
+        add(storage, storage->getId(), scopeOf(storage, moduleGUID()));
+    else
+        remove(storage->getId());
 }
 
 static auto transactionsPerSecond(const Resource& storage)

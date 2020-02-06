@@ -34,7 +34,7 @@ void SystemResourceController::start()
             }
 
             lastId = newId;
-            add(nullptr, newId.toSimpleString(), utils::metrics::Scope::system);
+            add(nullptr, newId, utils::metrics::Scope::system);
         });
 }
 

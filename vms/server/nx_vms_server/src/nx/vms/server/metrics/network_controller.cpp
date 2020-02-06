@@ -241,8 +241,8 @@ void NetworkController::addOrUpdateInterfaces(QList<QNetworkInterface> newIfaces
         {
             m_interfacesPool[name] = std::make_shared<NetworkInterfaceResource>(
                 serverModule(), std::move(iface));
-            add(m_interfacesPool[name], interfaceIdFromName(name),
-                utils::metrics::Scope::local);
+
+            add(m_interfacesPool[name], interfaceIdFromName(name), utils::metrics::Scope::local);
             continue;
         }
 

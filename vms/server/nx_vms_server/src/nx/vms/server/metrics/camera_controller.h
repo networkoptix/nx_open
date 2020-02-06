@@ -18,6 +18,7 @@ public:
     void start() override;
 
 private:
+    void update(resource::Camera* camera);
     static utils::metrics::ValueGroupProviders<Resource> makeProviders();
 };
 

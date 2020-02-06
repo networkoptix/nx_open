@@ -43,7 +43,7 @@ void ServerController::start()
         [this](const QnResourcePtr& resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
-                add(server.get(), moduleGUID());
+                add(server.get(), server->getId(), scopeOf(server, moduleGUID()));
         });
 
     QObject::connect(
