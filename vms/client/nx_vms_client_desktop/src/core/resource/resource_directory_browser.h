@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QPointer>
 #include <core/resource/client_resource_fwd.h>
 #include "local_resources_directory_model.h"
 
@@ -32,18 +33,23 @@ public:
     void setLocalResourcesDirectories(const QStringList& paths);
 
     static QnFileLayoutResourcePtr layoutFromFile(const QString& filename,
-        QnResourcePool* resourcePool);
-    static QnResourcePtr resourceFromFile(const QString& filename, QnResourcePool* resourcePool);
+        const QPointer<QnResourcePool>& resourcePool);
+
+    static QnResourcePtr resourceFromFile(const QString& filename,
+        const QPointer<QnResourcePool>& resourcePool);
+
     static QnResourcePtr createArchiveResource(const QString& filename,
-        QnResourcePool* resourcePool);
+        const QPointer<QnResourcePool>& resourcePool);
 
 private:
     void dropResourcesFromDirectory(const QString& path);
+    void stopInternal();
 
 private:
     LocalResourcesDirectoryModel* m_localResourceDirectoryModel;
     QThread* m_resourceProducerThread;
     LocalResourceProducer* m_resourceProducer;
+    std::once_flag m_stopOnceFlag;
 };
 
 } // namespace nx::vms::client::desktop

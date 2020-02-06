@@ -264,10 +264,10 @@ QnClientModule::~QnClientModule()
     if (auto longRunnablePool = QnLongRunnablePool::instance())
         longRunnablePool->stopAll();
 
-    m_clientCoreModule->commonModule()->resourcePool()->threadPool()->waitForDone();
-
     if (m_resourceDirectoryBrowser)
         m_resourceDirectoryBrowser->stop();
+
+    m_clientCoreModule->commonModule()->resourcePool()->threadPool()->waitForDone();
 
     m_networkProxyFactory = nullptr; // Object will be deleted by QNetworkProxyFactory
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);

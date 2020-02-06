@@ -63,6 +63,12 @@ LocalResourcesDirectoryModel::LocalResourcesDirectoryModel(QObject* parent):
         });
 }
 
+LocalResourcesDirectoryModel::~LocalResourcesDirectoryModel()
+{
+    m_deferredDirectoryChangeHandlerTimer.stop();
+    m_deferredFileChangeHandlerTimer.stop();
+}
+
 QStringList LocalResourcesDirectoryModel::getLocalResourcesDirectories() const
 {
     return m_localResourcesDirectories;

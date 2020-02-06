@@ -13,6 +13,7 @@ class LocalResourcesDirectoryModel : public QObject
 
 public:
     LocalResourcesDirectoryModel(QObject* parent = nullptr);
+    virtual ~LocalResourcesDirectoryModel() override;
 
     QStringList getLocalResourcesDirectories() const;
     void setLocalResourcesDirectories(const QStringList& paths);
