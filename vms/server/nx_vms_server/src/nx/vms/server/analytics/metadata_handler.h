@@ -44,7 +44,6 @@ public:
         QnUuid engineId);
 
     void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket);
-    void setEventTypeDescriptors(DescriptorMap descriptors);
     void setMetadataSink(QnAbstractDataReceptor* metadataSink);
     void removeMetadataSink(QnAbstractDataReceptor* metadataSink);
 
@@ -78,7 +77,7 @@ private:
 private:
     QnVirtualCameraResourcePtr m_resource;
     QnUuid m_engineId;
-    nx::analytics::EventTypeDescriptorMap m_eventTypeDescriptors;
+    mutable std::optional<nx::analytics::EventTypeDescriptorMap> m_eventTypeDescriptors;
     QMap<QString, nx::vms::api::EventState> m_eventStateMap;
     QnAbstractDataReceptor* m_metadataSink = nullptr;
     nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;
