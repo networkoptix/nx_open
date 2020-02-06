@@ -2969,8 +2969,7 @@ void MediaServerProcess::registerRestHandler(
     if (!cameraIdUrlParams.isEmpty())
         m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
 
-    if (std::unique_ptr<DeviceIdRetriever> deviceIdRetriever =
-        handler->createCustomDeviceIdRetriever())
+    if (DeviceIdRetriever deviceIdRetriever = handler->createCustomDeviceIdRetriever())
     {
         QString realPath = path;
         if (!realPath.startsWith('/'))

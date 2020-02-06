@@ -64,29 +64,6 @@ std::map<QString, QString> extractCommonRequestParameters(
     return result;
 }
 
-class DeviceIdRetriever: public ::DeviceIdRetriever
-{
-    virtual QString retrieveDeviceId(const nx::network::http::Request& request) const override
-    {
-        const QUrlQuery urlQuery(request.requestLine.url.query());
-        QString deviceId = urlQuery.queryItemValue(kDeviceIdParameter);
-
-        if (deviceId.isEmpty())
-            return deviceId;
-
-        const std::map<QString, QString> commonParameters = extractCommonRequestParametersFromBody(
-            request.messageBody);
-
-        if (const auto it = commonParameters.find(kDeviceIdParameter);
-            it != commonParameters.cend())
-        {
-            return it->second;
-        }
-
-        return QString();
-    }
-};
-
 DeviceAnalyticsSettingsHandler::DeviceAnalyticsSettingsHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
 {
@@ -278,10 +255,28 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     return result;
 }
 
-std::unique_ptr<::DeviceIdRetriever>
-    DeviceAnalyticsSettingsHandler::createCustomDeviceIdRetriever() const
+DeviceIdRetriever DeviceAnalyticsSettingsHandler::createCustomDeviceIdRetriever() const
 {
-    return std::make_unique<DeviceIdRetriever>();
+    return
+        [](const nx::network::http::Request& request)
+        {
+            const QUrlQuery urlQuery(request.requestLine.url.query());
+            QString deviceId = urlQuery.queryItemValue(kDeviceIdParameter);
+
+            if (deviceId.isEmpty())
+                return deviceId;
+
+            const std::map<QString, QString> commonParameters =
+                extractCommonRequestParametersFromBody(request.messageBody);
+
+            if (const auto it = commonParameters.find(kDeviceIdParameter);
+                it != commonParameters.cend())
+            {
+                return it->second;
+            }
+
+            return QString();
+        };
 }
 
 } // namespace nx::vms::server::rest
