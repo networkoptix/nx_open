@@ -12,11 +12,10 @@ FocusScope
     property Item contentItem: null
 
     property real spacing: 8
-    property alias labelY: label.y
 
     readonly property alias implicitLabelWidth: label.implicitWidth
     property alias labelWidth: label.width
-    property alias caption: label.text
+    property string caption
 
     implicitWidth: label.width + (contentItem ? contentItem.implicitWidth + spacing : 0)
 
@@ -34,6 +33,7 @@ FocusScope
         id: label
 
         y: isBaselineAligned ? Math.max(contentItem.baselineOffset - baselineOffset, 0) : 0
+        text: caption || " " //< Always non-empty to ensure fixed line height & baseline offset.
         horizontalAlignment: Text.AlignRight
         verticalAlignment: Text.AlignVCenter
         height: Math.max(implicitHeight, isBaselineAligned ? 0 : 28)

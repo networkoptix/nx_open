@@ -7,13 +7,21 @@ CheckBox
 {
     id: control
 
+    padding: 0
+    topPadding: 0
+    bottomPadding: 0
     leftPadding: 20
     rightPadding: 0
+
     font.pixelSize: 13
+    font.weight: Font.Normal
+
+    baselineOffset: text.baselineOffset
 
     indicator: Image
     {
-        y: topPadding + 1
+        y: topPadding
+        opacity: enabled ? 1.0 : 0.3
 
         source:
         {
@@ -24,17 +32,20 @@ CheckBox
                 source += "_hover"
             return source + ".png"
         }
-        opacity: enabled ? 1.0 : 0.3
     }
 
     contentItem: Text
     {
+        id: text
+
         leftPadding: 2
         rightPadding: 2
         verticalAlignment: Text.AlignVCenter
         elide: Qt.ElideRight
         font: control.font
         text: control.text
+        opacity: enabled ? 1.0 : 0.3
+
         color:
         {
             if (control.checked)
@@ -48,7 +59,6 @@ CheckBox
                 ? ColorTheme.lighter(ColorTheme.light, 2)
                 : ColorTheme.light
         }
-        opacity: enabled ? 1.0 : 0.3
     }
 
     FocusFrame
