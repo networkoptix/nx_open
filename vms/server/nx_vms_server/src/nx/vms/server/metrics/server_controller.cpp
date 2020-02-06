@@ -184,7 +184,13 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "logLevel",
-            [](const auto&) { return Value(toString(nx::utils::log::mainLogger()->maxLevel())); }
+            [](const auto&) 
+            { 
+                auto str = toString(nx::utils::log::mainLogger()->maxLevel());
+                if (!str.isEmpty())
+                    str[0] = str[0].toUpper();
+                return Value(str);
+            }
         )
     );
 }
