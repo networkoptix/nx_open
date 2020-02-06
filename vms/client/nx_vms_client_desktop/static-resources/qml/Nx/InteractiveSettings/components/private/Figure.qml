@@ -14,6 +14,8 @@ LabeledItem
     property var figureSettings
     property var figure
 
+    isGroup: true
+
     signal valueChanged()
 
     contentItem: Column

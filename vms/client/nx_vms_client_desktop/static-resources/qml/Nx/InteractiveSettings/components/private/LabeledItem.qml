@@ -2,7 +2,7 @@ import QtQuick 2.6
 
 import nx.vms.client.desktop 1.0
 
-FocusScope
+BottomPaddedItem
 {
     id: labeledItem
 
@@ -13,37 +13,42 @@ FocusScope
 
     property real spacing: 8
 
-    readonly property alias implicitLabelWidth: label.implicitWidth
     property alias labelWidth: label.width
     property string caption
-
-    implicitWidth: label.width + (contentItem ? contentItem.implicitWidth + spacing : 0)
-
-    implicitHeight: isBaselineAligned
-        ? Math.max(label.y + label.height, contentItem.y + contentItem.height)
-        : Math.max(Math.min(label.height, 28), contentItem ? contentItem.height : 0)
+    property bool isGroup: false
 
     width: parent.width
 
     readonly property bool isBaselineAligned: label.lineCount === 1
         && contentItem && contentItem.baselineOffset > 0
 
-    Label
+    paddedItem: FocusScope
     {
-        id: label
+        id: focusScope
 
-        y: isBaselineAligned ? Math.max(contentItem.baselineOffset - baselineOffset, 0) : 0
-        text: caption || " " //< Always non-empty to ensure fixed line height & baseline offset.
-        horizontalAlignment: Text.AlignRight
-        verticalAlignment: Text.AlignVCenter
-        height: Math.max(implicitHeight, isBaselineAligned ? 0 : 28)
-        topPadding: lineCount === 1 && !isBaselineAligned ? 1 : 0 //< Fine tuning.
-        maximumLineCount: 2
-        wrapMode: Text.WordWrap
-        elide: Text.ElideRight
+        implicitWidth: label.width + (contentItem ? contentItem.implicitWidth + spacing : 0)
 
-        contextHintText: description
-        GlobalToolTip.text: truncated ? text : null
+        implicitHeight: isBaselineAligned
+            ? Math.max(label.y + label.height, contentItem.y + contentItem.height)
+            : Math.max(Math.min(label.height, 28), contentItem ? contentItem.height : 0)
+
+        Label
+        {
+            id: label
+
+            y: isBaselineAligned ? Math.max(contentItem.baselineOffset - baselineOffset, 0) : 0
+            text: caption || " " //< Always non-empty to ensure fixed line height & baseline offset.
+            horizontalAlignment: Text.AlignRight
+            verticalAlignment: Text.AlignVCenter
+            height: Math.max(implicitHeight, isBaselineAligned ? 0 : 28)
+            topPadding: lineCount === 1 && !isBaselineAligned ? 1 : 0 //< Fine tuning.
+            maximumLineCount: 2
+            wrapMode: Text.WordWrap
+            elide: Text.ElideRight
+
+            contextHintText: description
+            GlobalToolTip.text: truncated ? text : null
+        }
     }
 
     onContentItemChanged:
@@ -51,7 +56,7 @@ FocusScope
         if (!contentItem)
             return
 
-        contentItem.parent = labeledItem
+        contentItem.parent = focusScope
         contentItem.focus = true
 
         contentItem.GlobalToolTip.text = Qt.binding(
