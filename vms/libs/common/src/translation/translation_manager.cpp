@@ -133,6 +133,19 @@ void QnTranslationManager::installTranslation(const QnTranslation &translation)
     }
 }
 
+QScopedPointer<QnTranslationManager::ThreadLocaleHolder>
+    QnTranslationManager::alterThreadLocale(const QString& locale)
+{
+    if (pushThreadTranslationLocale(locale))
+    {
+        auto result = new ThreadLocaleHolder;
+        result->manager = this;
+        return QScopedPointer(result);
+    }
+
+    return QScopedPointer<ThreadLocaleHolder>();
+}
+
 QString QnTranslationManager::localeCodeToTranslationPath(const QString& localeCode)
 {
     return kTranslationPathPrefix + localeCode + kTranslationPathExtension;
@@ -241,4 +254,74 @@ QnTranslation QnTranslationManager::loadTranslationInternal(
         filePaths.push_back(translationDir + L'/' + m_prefixes[i] + suffix);
 
     return QnTranslation(languageName, localeCode, filePaths);
+}
+
+bool QnTranslationManager::pushThreadTranslationLocale(const QString& locale)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    Qt::HANDLE id = QThread::currentThreadId();
+
+    if (!m_overlays.contains(locale))
+    {
+        // Load the required translation.
+        auto translation = loadTranslation(locale);
+        if (translation.isEmpty())
+            return false;
+
+        // Create translators.
+        m_overlays[locale] = QSharedPointer<nx::vms::translation::TranslationOverlay>(
+            new nx::vms::translation::TranslationOverlay(std::move(translation)));
+    }
+
+    auto& stack = m_localeStack[id];
+
+    if (!stack.empty())
+    {
+        // We have overlayed locale for the given thread already. Disable the existing translators.
+        const auto& curLocale = stack.top();
+        m_overlays[curLocale]->removeThreadContext(id);
+    }
+
+    // Enable translation overlay for the given thread.
+    m_overlays[locale]->addThreadContext(id);
+
+    // Store the new locale of the thread.
+    stack.push(locale);
+
+    // Done.
+    return true;
+}
+
+bool QnTranslationManager::popThreadTranslationLocale()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    Qt::HANDLE id = QThread::currentThreadId();
+
+    // Check that we have a translation overlay for the given thread.
+    auto it = m_localeStack.find(id);
+    if (it == m_localeStack.end())
+        return false;
+
+    auto& stack = *it;
+
+    // Uninstall the topmost locale.
+    const auto& curLocale = stack.pop();
+    m_overlays[curLocale]->removeThreadContext(id);
+
+    if (stack.empty())
+    {
+        // Clean up.
+        m_localeStack.erase(it);
+        for (auto& overlay: m_overlays)
+            overlay->uninstallIfUnused();
+    }
+    else
+    {
+        // Apply the next locale in stack.
+        const auto& locale = stack.top();
+        m_overlays[locale]->addThreadContext(id);
+    }
+
+    // Done.
+    return true;
 }

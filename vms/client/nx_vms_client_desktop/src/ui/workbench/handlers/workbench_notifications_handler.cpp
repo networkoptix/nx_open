@@ -16,6 +16,8 @@
 
 #include <common/common_module.h>
 
+#include <translation/translation_manager.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/user_resource.h>
@@ -205,6 +207,7 @@ void QnWorkbenchNotificationsHandler::clear()
 
 void QnWorkbenchNotificationsHandler::addNotification(const vms::event::AbstractActionPtr &action)
 {
+    auto locale = commonModule()->instance<QnTranslationManager>()->alterThreadLocale("de_DE");
     vms::event::EventParameters params = action->getRuntimeParams();
     vms::api::EventType eventType = params.eventType;
 
