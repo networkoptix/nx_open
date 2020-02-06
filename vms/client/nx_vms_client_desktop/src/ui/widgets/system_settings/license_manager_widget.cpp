@@ -126,6 +126,23 @@ DeactivationErrors filterDeactivationErrors(const DeactivationErrors& errors)
     return result;
 }
 
+QStringList licenseHtmlDescription(const QnLicensePtr& license)
+{
+    static const auto kLightTextColor = ColorTheme::instance()->color("light10");
+
+    QStringList result;
+
+    const QString licenseKey = html::monospace(
+        html::colored(QString::fromLatin1(license->key()), kLightTextColor));
+
+    const QString channelsCount = QnLicenseManagerWidget::tr(
+        "%n channels.", "", license->cameraCount());
+
+    result.push_back(licenseKey);
+    result.push_back(license->displayName() + ", " + channelsCount);
+    return result;
+}
+
 QString toPlainText(const QString& htmlText)
 {
     QTextDocument doc;
@@ -651,28 +668,11 @@ void QnLicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRem
     manager->removeLicense(license, this, removeLisencesHandler);
 }
 
-QString QnLicenseManagerWidget::getLicenseDescription(const QnLicensePtr& license) const
-{
-    if (!license)
-    {
-        NX_ASSERT(false, "Empty license");
-        return QString();
-    }
-
-    const auto key = QString::fromStdString(license->key().constData());
-    const auto channelsCountString = tr("%n channels.", "", license->cameraCount());
-
-    return lit("%1%2%3, %4").arg(key, kHtmlDelimiter, license->displayName(), channelsCountString);
-}
-
 bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
 {
     ui::dialogs::LicenseDeactivationReason dialog(m_deactivationReason, parentWidget());
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return false;
-
-    static const auto kLightTextColor = ColorTheme::instance()->color("light10");
-    static const auto kWarningTextColor = ColorTheme::instance()->color("red_l2");
 
     QStringList licenseDetails;
     for (const auto& license: licenses)
@@ -680,19 +680,14 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
         if (!NX_ASSERT(license))
             continue;
 
-        const QString licenseKey = htmlBold(
-            html::colored(QString::fromLatin1(license->key()), kLightTextColor));
-
-        const QString channelsCount = tr("%n channels.", "", license->cameraCount());
         QString deactivationsCount =
-            tr("%n deactivations remaining", "", license->deactivationsCountLeft());
+            tr("%n deactivations remaining.", "", license->deactivationsCountLeft());
 
         if (license->deactivationsCountLeft() < 2)
-            deactivationsCount = html::colored(deactivationsCount, kWarningTextColor);
+            deactivationsCount = setWarningStyleHtml(deactivationsCount);
 
-        QStringList licenseBlock;
-        licenseBlock.push_back(licenseKey);
-        licenseBlock.push_back(license->displayName() + ", " + channelsCount);
+        QStringList licenseBlock = licenseHtmlDescription(license);
+
         licenseBlock.push_back(deactivationsCount);
         licenseDetails.push_back(licenseBlock.join(kHtmlDelimiter));
     }
@@ -733,14 +728,20 @@ QString QnLicenseManagerWidget::getDeactivationErrorMessage(
 {
     using Deactivator = nx::vms::client::desktop::license::Deactivator;
 
-    static const auto kMessageDelimiter = lit("%1%1-%1%1").arg(kHtmlDelimiter);
+    static const auto kMessageDelimiter = QString("%1-%1").arg(kEmptyLine);
     QStringList result;
     for (auto it = errors.begin(); it != errors.end(); ++it)
     {
         const auto license = findLicense(it.key(), licenses);
-        const auto licenseDescription = getLicenseDescription(license);
+        if (!NX_ASSERT(license))
+            continue;
+
+        QStringList licenseBlock = licenseHtmlDescription(license);
         const auto error = setWarningStyleHtml(Deactivator::errorDescription(it.value()));
-        result += licenseDescription + kEmptyLine + error;
+        licenseBlock.push_back(QString()); //< Additional spacer.
+        licenseBlock.push_back(error);
+
+        result.push_back(licenseBlock.join(kHtmlDelimiter));
     }
 
     static const auto kContactCustomerSupportText = tr("Please contact Customer Support.");

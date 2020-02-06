@@ -3922,10 +3922,10 @@ to %1</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n deactivations remaining</source>
+        <source>%n deactivations remaining.</source>
         <translation>
-            <numerusform>%n deactivation remaining</numerusform>
-            <numerusform>%n deactivations remaining</numerusform>
+            <numerusform>%n deactivation remaining.</numerusform>
+            <numerusform>%n deactivations remaining.</numerusform>
         </translation>
     </message>
 </context>
@@ -9895,8 +9895,15 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Please enter your contact information and the reason for deactivating your license</source>
+        <source>Please complete the following for license deactivation</source>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Note that each license key may be deactivated a maximum of %n times.</source>
+        <translation>
+            <numerusform>Note that each license key may be deactivated a maximum of %n time.</numerusform>
+            <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+        </translation>
     </message>
 </context>
 <context>

@@ -104,6 +104,11 @@ QString colored(const QString& text, const QColor& color)
     return QString("<font color=\"%1\">%2</font>").arg(color.name(), text);
 }
 
+QString monospace(const QString& text)
+{
+    return QString("<font face=\"Roboto Mono\">%1</font>").arg(text);
+}
+
 } // namespace html
 } // namespace nx::vms::common
 

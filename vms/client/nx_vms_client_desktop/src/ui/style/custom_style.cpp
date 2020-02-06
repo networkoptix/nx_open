@@ -15,11 +15,13 @@
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
 #include <utils/math/color_transformations.h>
+#include <utils/common/html.h>
 
 #include <nx/utils/log/log_message.h>
 #include <nx/vms/client/desktop/common/utils/object_companion.h>
 #include <nx/vms/client/desktop/common/utils/page_size_adjuster.h>
 
+using namespace nx::vms::common;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -74,9 +76,9 @@ void setWarningStyleOn(QWidget* widget, bool on, qreal disabledOpacity)
         resetStyle(widget);
 }
 
-QString setWarningStyleHtml( const QString &source )
+QString setWarningStyleHtml(const QString& source)
 {
-    return lit("<font color=\"%1\">%2</font>").arg(qnGlobals->errorTextColor().name(), source);
+    return html::colored(source, qnGlobals->errorTextColor());
 }
 
 void setWarningFrame(QWidget* widget, int frameWidth, int roundingRadius)
