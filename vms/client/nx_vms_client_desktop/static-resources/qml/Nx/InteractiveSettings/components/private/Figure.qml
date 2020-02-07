@@ -20,7 +20,7 @@ LabeledItem
 
     contentItem: Column
     {
-        spacing: 12
+        spacing: 8
 
         baselineOffset: figureNameEdit.baselineOffset
 
