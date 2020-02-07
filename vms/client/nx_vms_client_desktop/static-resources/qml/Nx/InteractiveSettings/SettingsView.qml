@@ -48,7 +48,7 @@ Item
         _valuesChangedEnabled = true
     }
 
-    property bool _valuesChangedEnabled
+    property bool _valuesChangedEnabled: true
     function _emitValuesChanged()
     {
         if (_valuesChangedEnabled)

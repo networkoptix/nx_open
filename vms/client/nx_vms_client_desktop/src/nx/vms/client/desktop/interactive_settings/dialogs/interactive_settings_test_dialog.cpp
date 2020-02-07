@@ -8,6 +8,7 @@
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <nx/utils/log/assert.h>
+#include <nx/fusion/serialization/json.h>
 #include <client_core/client_core_module.h>
 #include <ui/style/custom_style.h>
 
@@ -73,7 +74,7 @@ void InteractiveSettingsTestDialog::refreshValues()
         QMetaObject::invokeMethod(rootObject, "getValues", Qt::DirectConnection,
             Q_RETURN_ARG(QVariant, result));
 
-        const QVariantMap values = result.toMap();
+        const auto& values = QJsonObject::fromVariantMap(result.toMap());
 
         ui->valuesTableWidget->setRowCount(values.size());
 
@@ -81,7 +82,8 @@ void InteractiveSettingsTestDialog::refreshValues()
         for (auto it = values.begin(); it != values.end(); ++it, ++i)
         {
             ui->valuesTableWidget->setItem(i, 0, new QTableWidgetItem(it.key()));
-            ui->valuesTableWidget->setItem(i, 1, new QTableWidgetItem(it.value().toString()));
+            ui->valuesTableWidget->setItem(i, 1, new QTableWidgetItem(
+                QString::fromUtf8(QJson::serialize(it.value()))));
         }
     }
 }
