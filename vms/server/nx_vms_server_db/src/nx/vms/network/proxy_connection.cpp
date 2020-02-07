@@ -482,7 +482,7 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
     if (!dstRoute.addr.isNull())
     {
         if (!dstRoute.gatewayId.isNull())
-        {\
+        {
             nx::network::http::StringType existAuthSession = nx::network::http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
             if (existAuthSession.isEmpty())
                 nx::network::http::insertOrReplaceHeader(&d->request.headers, nx::network::http::HttpHeader(Qn::AUTH_SESSION_HEADER_NAME, authSession().toByteArray()));
