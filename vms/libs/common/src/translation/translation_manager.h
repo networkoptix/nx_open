@@ -34,11 +34,12 @@ public:
 
     static void installTranslation(const QnTranslation& translation);
 
-    struct ThreadLocaleHolder
+    struct LocaleRollback
     {
-        ~ThreadLocaleHolder() { manager->popThreadTranslationLocale(); }
+        ~LocaleRollback() { manager->popThreadTranslationLocale(); }
         QnTranslationManager* manager;
     };
+    using ScopedLocaleRollback = QScopedPointer<LocaleRollback>;
     /**
      * Temporary changes the locale that is used in the current thread to translate tr() strings.
      * Returns a temporary object. When this object is destroyed, the original locale is restored.
@@ -46,7 +47,7 @@ public:
      * In the case of incorrect locale an empty pointer is returned and the current locale remains.
      * This method is reenterable, so it's possible to create a 'stack' of locales if necessary.
      */
-    QScopedPointer<ThreadLocaleHolder> alterThreadLocale(const QString& locale);
+    ScopedLocaleRollback alterThreadLocale(const QString& locale);
 
     static QString localeCodeToTranslationPath(const QString& localeCode);
     static QString translationPathToLocaleCode(const QString& translationPath);

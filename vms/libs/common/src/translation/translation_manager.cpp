@@ -133,17 +133,17 @@ void QnTranslationManager::installTranslation(const QnTranslation &translation)
     }
 }
 
-QScopedPointer<QnTranslationManager::ThreadLocaleHolder>
+QnTranslationManager::ScopedLocaleRollback
     QnTranslationManager::alterThreadLocale(const QString& locale)
 {
     if (pushThreadTranslationLocale(locale))
     {
-        auto result = new ThreadLocaleHolder;
+        auto result = new LocaleRollback;
         result->manager = this;
         return QScopedPointer(result);
     }
 
-    return QScopedPointer<ThreadLocaleHolder>();
+    return QScopedPointer<LocaleRollback>();
 }
 
 QString QnTranslationManager::localeCodeToTranslationPath(const QString& localeCode)
@@ -265,8 +265,11 @@ bool QnTranslationManager::pushThreadTranslationLocale(const QString& locale)
     {
         // Load the required translation.
         auto translation = loadTranslation(locale);
-        if (translation.isEmpty())
+        if (!NX_ASSERT(!translation.isEmpty(),
+            QString("Could not load translation locale '%1'").arg(locale)))
+        {
             return false;
+        }
 
         // Create translators.
         m_overlays[locale] = QSharedPointer<nx::vms::translation::TranslationOverlay>(
@@ -299,7 +302,7 @@ bool QnTranslationManager::popThreadTranslationLocale()
 
     // Check that we have a translation overlay for the given thread.
     auto it = m_localeStack.find(id);
-    if (it == m_localeStack.end())
+    if (!NX_ASSERT(it != m_localeStack.end(), "Unbalanced call of popThreadTranslationLocale"))
         return false;
 
     auto& stack = *it;
