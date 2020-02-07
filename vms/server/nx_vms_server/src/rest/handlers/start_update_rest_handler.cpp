@@ -20,12 +20,6 @@ int QnStartUpdateRestHandler::executePost(
     QByteArray& /*resultContentType*/,
     const QnRestConnectionProcessor* processor)
 {
-    if (!serverModule()->resourceAccessManager()->hasGlobalPermission(
-            processor->accessRights(), GlobalPermission::admin))
-    {
-        return nx::network::http::StatusCode::forbidden;
-    }
-
     serverModule()->updateManager()->startUpdate(body);
     return nx::network::http::StatusCode::ok;
 }

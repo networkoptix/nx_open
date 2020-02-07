@@ -21,12 +21,6 @@ int QnLogRestHandler::executeGet(
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
-    if (!processor->resourceAccessManager()->hasGlobalPermission(
-        processor->accessRights(), GlobalPermission::admin))
-    {
-        return nx::network::http::StatusCode::forbidden;
-    }
-
     qint64 linesToRead = 100;
     for (int i = 0; i < params.size(); ++i)
     {

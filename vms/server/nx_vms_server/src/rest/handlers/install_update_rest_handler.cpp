@@ -161,12 +161,6 @@ int QnInstallUpdateRestHandler::executePost(
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(), params);
 
-    if (!serverModule()->resourceAccessManager()->hasGlobalPermission(
-            processor->accessRights(), GlobalPermission::admin))
-    {
-        return nx::network::http::StatusCode::forbidden;
-    }
-
     m_onTriggeredCallback();
 
     if (request.isLocal)

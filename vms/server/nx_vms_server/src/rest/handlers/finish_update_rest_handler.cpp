@@ -63,12 +63,6 @@ int QnFinishUpdateRestHandler::executePost(
     QByteArray& resultContentType,
     const QnRestConnectionProcessor* processor)
 {
-    if (!serverModule()->resourceAccessManager()->hasGlobalPermission(
-            processor->accessRights(), GlobalPermission::admin))
-    {
-        return nx::network::http::StatusCode::forbidden;
-    }
-
     if (params.contains("ignorePendingPeers") || allPeersUpdatedSuccessfully())
     {
         serverModule()->updateManager()->finish();
