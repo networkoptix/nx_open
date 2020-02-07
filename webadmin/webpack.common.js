@@ -48,7 +48,7 @@ module.exports = {
             filename: 'api.xsl',
             inject: false
         }),
-        new ExtractTextPlugin({filename: 'styles/[name].css'}),
+        new ExtractTextPlugin('styles/[name].[chunkhash].css', { allChunks: true }),
         new CopyWebpackPlugin([
             {
                 from: '',
@@ -79,12 +79,12 @@ module.exports = {
         }),
         new webpack.optimize.CommonsChunkPlugin({
             name: "commons",
-            filename: "scripts/commons.js",
+            filename: "scripts/commons.[hash].js",
             minChunks: 2
         })
     ],
     output: {
-        filename: 'scripts/[name].js',
+        filename: 'scripts/[name].[hash].js',
         path: path.resolve(__dirname, 'dist'),
         publicPath: ''
     },
