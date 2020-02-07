@@ -339,6 +339,7 @@ void Manager::registerMetadataSink(
         return;
     }
 
+    QnMutexLocker lock(&m_contextMutex);
     m_metadataSinks[deviceResource->getId()] = metadataSink;
     auto analyticsContext = context(device);
     if (analyticsContext)
@@ -347,6 +348,7 @@ void Manager::registerMetadataSink(
 
 QWeakPointer<AbstractVideoDataReceptor> Manager::registerMediaSource(const QnUuid& deviceId)
 {
+    QnMutexLocker lock(&m_contextMutex);
     auto proxySource = QSharedPointer<ProxyVideoDataReceptor>::create();
     auto analyticsContext = context(deviceId);
 
@@ -418,6 +420,7 @@ QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(
 
 QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(const QnUuid& deviceId) const
 {
+    QnMutexLocker lock(&m_contextMutex);
     auto it = m_metadataSinks.find(deviceId);
     if (it == m_metadataSinks.cend())
         return QWeakPointer<QnAbstractDataReceptor>();
@@ -433,6 +436,7 @@ QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(
 
 QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId) const
 {
+    QnMutexLocker lock(&m_contextMutex);
     auto it = m_mediaSources.find(deviceId);
     if (it == m_mediaSources.cend())
         return QWeakPointer<ProxyVideoDataReceptor>();
