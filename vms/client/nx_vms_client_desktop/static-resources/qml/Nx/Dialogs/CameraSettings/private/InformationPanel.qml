@@ -68,6 +68,7 @@ Control
             id: description
             text: engineInfo ? engineInfo.description : ""
             color: ColorTheme.windowText
+            visible: !!text
             wrapMode: Text.Wrap
             topPadding: 8
             Layout.fillWidth: true
