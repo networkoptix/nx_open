@@ -22,6 +22,7 @@ ToolTip 1.0 ToolTip.qml
 TextArea 1.0 TextArea.qml
 TextButton 1.0 TextButton.qml
 LinearPaletteColorPicker 1.0 LinearPaletteColorPicker.qml
+RadioButton 1.0 RadioButton.qml
 
 ArrowIcon 1.0 ArrowIcon.qml
 SwitchIcon 1.0 SwitchIcon.qml
