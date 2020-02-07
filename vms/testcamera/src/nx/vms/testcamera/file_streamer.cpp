@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include <nx/utils/switch.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/network/abstract_socket.h>
 
@@ -18,22 +19,45 @@ using namespace std::chrono_literals;
 
 namespace {
 
-class Error: public std::exception
+/** Used to terminate streaming, either due to an error, or for any other reason. */
+class Exception: public std::exception
 {
 public:
-    Error(const QString& what): m_what(what.toStdString()) {}
+    enum class Kind { error, finishStreaming };
+
+    Exception(Kind kind, const QString& what): m_kind(kind), m_what(what.toStdString()) {}
     virtual const char* what() const noexcept override { return m_what.c_str(); }
+    Kind kind() const { return m_kind; }
 
 private:
+    const Kind m_kind;
     const std::string m_what;
 };
 
-class SocketError: public Error
+class SocketError: public Exception
 {
 public:
     SocketError(const QString& dataCaption, const QString& errorMessage, int bytesToSend):
-        Error(lm("Unable to send %1 (%2 bytes): %3").args(
+        Exception(Kind::error, lm("Unable to send %1 (%2 bytes): %3").args(
             dataCaption, bytesToSend, errorMessage))
+    {
+    }
+};
+
+/** The particular data value to be sent is not supported by testcamera. */
+class UnsupportedData: public Exception
+{
+public:
+    UnsupportedData(const QString& message):
+        Exception(Kind::error, "Unsupported data found in the video file: " + message) {}
+};
+
+/** Server has shut down the socket - this is not an error, but the streaming has to stop. */
+class SocketWasShutDown: public Exception
+{
+public:
+    SocketWasShutDown():
+        Exception(Kind::finishStreaming, "Connection was closed by the Server.")
     {
     }
 };
@@ -98,32 +122,54 @@ bool FileStreamer::streamFrame(const QnCompressedVideoData* frame, int frameInde
             m_ptsUnloopingContext->prevPts = pts;
         }
     }
-    catch (const Error& e)
+    catch (const Exception& e)
     {
-        NX_LOGGER_ERROR(m_logger, e.what());
+        const nx::utils::log::Level logLevel =
+            nx::utils::switch_(e.kind(),
+                Exception::Kind::error, [] { return nx::utils::log::Level::error; },
+                Exception::Kind::finishStreaming, [] { return nx::utils::log::Level::warning; }
+            );
+        NX_LOGGER_LOG(m_logger, logLevel, e.what());
         return false;
     }
     return true;
 }
 
-/** @throws SocketError */
+static std::pair<SystemError::ErrorCode, QString /*errorMessage*/> getLastOsError()
+{
+    const auto errorCode = SystemError::getLastOSErrorCode();
+    return {errorCode, lm("%1 (OS code %2).").args(SystemError::getLastOSErrorText(), errorCode)};
+}
+
+/** @throws Exception */
 void FileStreamer::send(
     const void* data, int size, const QString& dataCaptionForErrorMessage) const
 {
-    int bytesSent = 0;
+    int sendResult = 0;
     int bytesSentTotal = 0;
     while (bytesSentTotal < size)
     {
         const int bytesToSend = size - bytesSentTotal;
-        bytesSent = m_socket->send((const char*) data + bytesSentTotal, bytesToSend);
-        if (bytesSent <= 0)
+
+        sendResult = m_socket->send((const char*) data + bytesSentTotal, bytesToSend);
+
+        if (sendResult == 0)
+            throw SocketError(dataCaptionForErrorMessage, "Data was not accepted.", bytesToSend);
+
+        if (sendResult < 0)
         {
-            const QString errorMessage =
-                (bytesSent == 0) ? "Connection closed." : SystemError::getLastOSErrorText();
+            const auto [errorCode, errorMessage] = getLastOsError();
+            NX_LOGGER_DEBUG(m_logger, "Failed to send %1: send() returned %2: %3",
+                dataCaptionForErrorMessage, sendResult, errorMessage);
+
+            if (errorCode == SystemError::connectionAbort)
+                throw SocketWasShutDown();
             throw SocketError(dataCaptionForErrorMessage, errorMessage, bytesToSend);
         }
-        bytesSentTotal += bytesSent;
+
+        bytesSentTotal += sendResult;
     }
+
     NX_ASSERT(bytesSentTotal == size);
 }
 
@@ -245,11 +291,11 @@ microseconds FileStreamer::unloopAndShiftPtsIfNeeded(const microseconds pts) con
     return unloopedPts + *m_ptsUnloopingContext->requestedShift;
 }
 
-/** @throws SocketError */
+/** @throws Exception */
 void FileStreamer::sendMediaContextPacket(const QnCompressedVideoData* frame) const
 {
     if (frame->compressionType == AV_CODEC_ID_NONE || (frame->compressionType > 255))
-        throw Error(lm("Codec id %1 not supported by testcamera.").args(frame->compressionType));
+        throw UnsupportedData(lm("Codec id %1.").args(frame->compressionType));
 
     const QByteArray mediaContext = frame->context->serialize();
 
@@ -265,18 +311,18 @@ void FileStreamer::sendMediaContextPacket(const QnCompressedVideoData* frame) co
     send(buffer.constData(), buffer.size(), "media context packet");
 }
 
-/** @throws SocketError */
+/** @throws Exception */
 void FileStreamer::sendFramePacket(const QnCompressedVideoData* frame) const
 {
     if (frame->compressionType == AV_CODEC_ID_NONE || (frame->compressionType > 255))
-        throw Error(lm("Codec id %1 not supported.").args(frame->compressionType));
+        throw UnsupportedData(lm("Codec id %1.").args(frame->compressionType));
 
     if (frame->dataSize() == 0)
-        throw Error("Frame with zero size found - not supported.");
+        throw UnsupportedData("Frame with zero size.");
 
     if (frame->dataSize() > 8 * 1024 * 1024)
     {
-        throw Error(lm("Frame larger than 8 MB (actual: %1 bytes) found - not supported.")
+        throw UnsupportedData(lm("Frame larger than 8 MB - actually %1 bytes.")
             .args(frame->dataSize()));
     }
 
