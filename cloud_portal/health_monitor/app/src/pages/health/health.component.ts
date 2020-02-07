@@ -10,7 +10,7 @@ import { NxLanguageProviderService }             from '../../services/nx-languag
 import { NxUtilsService }                        from '../../services/utils.service';
 import { FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop';
 import { NxRibbonService }                       from '../../components/ribbon/ribbon.service';
-import { Subscription }                          from 'rxjs';
+import { Subscription, throwError } from 'rxjs';
 import { NxScrollMechanicsService }              from '../../services/scroll-mechanics.service';
 import { AutoUnsubscribe }                       from 'ngx-auto-unsubscribe';
 import { NxSystemAPI, NxSystemAPIService }       from '../../services/system-api.service';
@@ -36,7 +36,6 @@ export class NxHealthComponent implements OnInit, OnDestroy {
     server: NxSystemAPI;
 
     menu: any;
-    systemReady: boolean;
 
     reportSnapshot: any;
 
@@ -44,8 +43,8 @@ export class NxHealthComponent implements OnInit, OnDestroy {
     importedData: any = {};
     headerHeight: number;
 
-    hasServerError: boolean;
-    outdatedVersion: boolean;
+    hasServerError = false;
+    outdatedVersion = false;
 
     mediaLayoutClass: string;
 
@@ -72,8 +71,6 @@ export class NxHealthComponent implements OnInit, OnDestroy {
     ) {
         this.LANG = this.languageService.getTranslations();
         this.CONFIG = this.configService.getConfig();
-        this.hasServerError = false;
-        this.outdatedVersion = false;
     }
 
     ngOnInit(): void {
@@ -114,7 +111,8 @@ export class NxHealthComponent implements OnInit, OnDestroy {
             let infoPromise = Promise.resolve();
             this.accountService.get().then((account) => {
                 this.healthService.ready = false;
-                this.systemReady = false;
+                this.hasServerError = false;
+                this.outdatedVersion = false;
                 if (typeof account !== 'undefined') {
                     this.account = account;
                     this.system = this.systemService.createSystem(account.email, systemId);
@@ -129,6 +127,7 @@ export class NxHealthComponent implements OnInit, OnDestroy {
                                 vms_metrics: true
                             }
                         },
+                        isOnline: true,
                         mediaserver: undefined
                     };
                     this.system.mediaserver = this.serverApi.createConnection(
@@ -139,13 +138,17 @@ export class NxHealthComponent implements OnInit, OnDestroy {
                 }
                 this.healthService.system = this.system;
                 infoPromise.then(() => {
-                    this.systemReady = true;
-                    this.system.mediaserver.getAggregateHealthReport()
-                        .subscribe((result: any) => {
-                            this.setupReport(result);
-                        }, () => {
-                            this.healthService.ready = false;
-                        });
+                    if (this.system.isOnline) {
+                        this.outdatedVersion = !this.system.info.capabilities.vms_metrics;
+                    }
+                    if (!this.outdatedVersion) {
+                        this.system.mediaserver.getAggregateHealthReport()
+                            .subscribe((result: any) => {
+                                this.setupReport(result);
+                            }, () => {
+                                this.hasServerError = this.system.isOnline;
+                            });
+                    }
                 });
             });
         });
@@ -173,16 +176,9 @@ export class NxHealthComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {}
 
     setupReport(data) {
-        // Handle outdated version
-        if (!this.system.info.capabilities.vms_metrics) {
-            this.outdatedVersion = true;
-            return;
-        }
-
         // Handle server not responding for "ec2/metrics/manifest"
         if (!data.reply) {
-            this.hasServerError = true;
-            return;
+            return throwError('Error getting manifest');
         }
 
         this.healthService.ready = false;

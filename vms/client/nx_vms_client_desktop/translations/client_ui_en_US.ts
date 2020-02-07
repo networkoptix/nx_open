@@ -943,6 +943,14 @@
     </message>
 </context>
 <context>
+    <name>ConnectingToServerDialog</name>
+    <message>
+        <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
+        <source>Connecting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ConnectionNameDialog</name>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui"/>
@@ -1731,22 +1739,7 @@
     </message>
     <message>
         <location/>
-        <source>License Type:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>License Key:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Features</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Locked to Hardware ID:</source>
         <translation></translation>
     </message>
 </context>

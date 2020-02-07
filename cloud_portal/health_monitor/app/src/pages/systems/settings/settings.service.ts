@@ -16,6 +16,7 @@ export class NxSettingsService implements OnDestroy {
     systemSubject = new BehaviorSubject(undefined);
     selectedSectionSubject = new BehaviorSubject([]);
 
+    private _mergeTarget = '';
     share: boolean;
 
     constructor(private api: NxCloudApiService,
@@ -26,6 +27,14 @@ export class NxSettingsService implements OnDestroy {
                 private dialogs: NxDialogsService
     ) {
         this.config = this.configService.getConfig();
+    }
+
+    get mergeTarget() {
+        return this._mergeTarget;
+    }
+
+    set mergeTarget(target) {
+        this._mergeTarget = target;
     }
 
     get system() {

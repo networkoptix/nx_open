@@ -78,9 +78,20 @@ function getValues(rootItem)
         function(item)
         {
             if (item.getValue !== undefined)
-                result[item.name] = item.getValue()
+            {
+                try
+                {
+                    result[item.name] = item.getValue()
+                }
+                catch (error)
+                {
+                    console.warn("getValue() failed for item %1:".arg(item.name), error)
+                }
+            }
             else if (item.hasOwnProperty("value"))
+            {
                 result[item.name] = item.value
+            }
         })
 
     return result

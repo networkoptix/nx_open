@@ -987,6 +987,14 @@ om du vill visa fler bokmärken</translation>
       <source>Page...</source>
       <translation>Sida...</translation>
     </message>
+    <message>
+      <source>Connect to this Server</source>
+      <translation>Anslut till denna server</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation>Fäst</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1486,6 +1494,10 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Built for %1-%2 with %3.</source>
       <translation>Byggd för %1-%2 med %3.</translation>
+    </message>
+    <message>
+      <source>Regional support</source>
+      <translation>Regionalt stöd</translation>
     </message>
   </context>
   <context>
@@ -2028,27 +2040,8 @@ om du vill visa fler bokmärken</translation>
       <translation>Startar</translation>
     </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>Välj minst en enhet</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Välj minst en kamera</translation>
-    </message>
-    <message>
       <source>Occurs</source>
       <translation>Inträffar</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Källkamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more cameras</source>
-      <translation>
-        <numerusform>Källa och %n fler kameror</numerusform>
-        <numerusform>Källa och %n fler kameror</numerusform>
-      </translation>
     </message>
     <message>
       <source>N/A</source>
@@ -2080,6 +2073,37 @@ om du vill visa fler bokmärken</translation>
         <numerusform>%n Servrar</numerusform>
         <numerusform>%n Servrar</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User</source>
+      <translation>Användare</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Källserver</translation>
+    </message>
+    <message>
+      <source>Source Camera</source>
+      <translation>Källkamera</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Källa och %n fler kameror</numerusform>
+        <numerusform>Källa och %n fler kameror</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select at least one Device</source>
+      <translation>Välj minst en enhet</translation>
+    </message>
+    <message>
+      <source>Select at least one Camera</source>
+      <translation>Välj minst en kamera</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Välj server</translation>
     </message>
   </context>
   <context>
@@ -2203,6 +2227,13 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Interval of Action</source>
       <translation>Åtgärdsintervall</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation>Servrar som stöder summer</translation>
     </message>
   </context>
   <context>
@@ -3104,6 +3135,10 @@ till %1</translation>
         <numerusform>Händelselogg för %1 - %n händelser hittades</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Description</source>
+      <translation>Beskrivning</translation>
+    </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
@@ -3247,6 +3282,13 @@ till %1</translation>
     <message>
       <source>Select cameras to setup failover priority</source>
       <translation>Välj kameror för att konfigurera failover-prioritet</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation>Servrar som stöder fläktdiagnostik</translation>
     </message>
   </context>
   <context>
@@ -3567,22 +3609,6 @@ till %1</translation>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
-      <source>Screens Allowed:</source>
-      <translation>Skärmar tillåtna:</translation>
-    </message>
-    <message>
-      <source>Control Sessions Allowed:</source>
-      <translation>Tillåtna kontrollsessioner:</translation>
-    </message>
-    <message>
-      <source>Archive Streams Allowed:</source>
-      <translation>Tillåtna arkivströmmar:</translation>
-    </message>
-    <message>
-      <source>Generic:</source>
-      <translation>Allmänt:</translation>
-    </message>
-    <message>
       <source>License Type</source>
       <translation>Licenstyp</translation>
     </message>
@@ -3591,12 +3617,32 @@ till %1</translation>
       <translation>Licensnyckel</translation>
     </message>
     <message>
-      <source>Features:</source>
-      <translation>Egenskaper:</translation>
-    </message>
-    <message>
       <source>Locked to Hardware ID</source>
       <translation>Låst till maskinvaru-ID</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation type="unfinished">Generic</translation>
+    </message>
+    <message>
+      <source>Deactivations Left</source>
+      <translation type="unfinished">Deactivations Left</translation>
+    </message>
+    <message>
+      <source>Features</source>
+      <translation type="unfinished">Features</translation>
+    </message>
+    <message>
+      <source>Screens Allowed</source>
+      <translation type="unfinished">Screens Allowed</translation>
+    </message>
+    <message>
+      <source>Control Sessions Allowed</source>
+      <translation type="unfinished">Control Sessions Allowed</translation>
+    </message>
+    <message>
+      <source>Archive Streams Allowed</source>
+      <translation type="unfinished">Archive Streams Allowed</translation>
     </message>
   </context>
   <context>
@@ -3904,12 +3950,8 @@ till %1</translation>
       <translation>Det gick inte att öppna filen</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Skicka mail med licensnyckel och maskinvaru-ID som anges till %1 för att få en aktiveringsnyckel.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Skicka mail med licensnyckel och maskinvaru-ID som anges till %1 för att få en aktiveringsnyckel.</translation>
+      <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
+      <translation>För att få en aktiveringsnyckel skicka den medföljande licensnyckeln och maskinvaru-ID till %1.</translation>
     </message>
   </context>
   <context>
@@ -4460,6 +4502,13 @@ till %1</translation>
     </message>
   </context>
   <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation>Servrar som stöder PoE övervakning</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
@@ -4714,16 +4763,8 @@ till %1</translation>
       <translation>Kalenderdagar</translation>
     </message>
     <message>
-      <source>less than an hour</source>
-      <translation>mindre än en timme</translation>
-    </message>
-    <message>
       <source>%1 Mbps</source>
       <translation>%1 Mbps</translation>
-    </message>
-    <message>
-      <source>empty</source>
-      <translation>tom</translation>
     </message>
     <message>
       <source>Device</source>
@@ -4744,10 +4785,6 @@ till %1</translation>
     <message>
       <source>Current Bitrate</source>
       <translation>Nuvarande bithastighet</translation>
-    </message>
-    <message>
-      <source>no data for forecast</source>
-      <translation>ingen data för prognos</translation>
     </message>
   </context>
   <context>
@@ -5198,6 +5235,10 @@ till %1</translation>
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>PoE</source>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5778,12 +5819,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>usb</translation>
     </message>
     <message>
-      <source>unknown</source>
-      <translation>okänd</translation>
-    </message>
-    <message>
       <source>%1 TB</source>
       <translation>%1 TB</translation>
+    </message>
+    <message>
+      <source>smb</source>
+      <translation>smb</translation>
     </message>
   </context>
   <context>
@@ -6477,13 +6518,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
-    <name>QnWebPage</name>
-    <message>
-      <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation>DOWNLOADING&lt;br&gt;STARTED</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6567,6 +6601,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Videovägg togs bort på servern och stängs av.</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the selected server</source>
+      <translation>Det gick inte att ansluta till den valda servern</translation>
     </message>
   </context>
   <context>
@@ -6776,20 +6814,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Ny matris %1</translation>
     </message>
     <message>
-      <source>Video Wall license required</source>
-      <translation>Videovägglicens krävs</translation>
-    </message>
-    <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
       <translation>Aktivera denna funktion genom att aktivera en videoväggslicens.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
       <translation>Misslyckades med att spara ändringar</translation>
-    </message>
-    <message>
-      <source>To enable Video Wall, please activate a Video Wall license.</source>
-      <translation>Aktivera en videoväggslicens om du vill aktivera videovägg.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
@@ -6844,6 +6874,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>Aktivera ytterligare en licens för att starta Videovägg.</translation>
+    </message>
+    <message>
+      <source>Activate License...</source>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
@@ -7321,16 +7355,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n användare</numerusform>
-        <numerusform>%n användare</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>TimelineCursorLayout</name>
     <message>
       <source>Live</source>
@@ -7481,6 +7505,13 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Unknown track</source>
       <translation>Okänt spår</translation>
+    </message>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8363,6 +8394,17 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
+    <message>
+      <source>The proxy %1 requires a username and password.</source>
+      <translation>Proxy %1 kräver ett användarnamn och lösenord.</translation>
+    </message>
+    <message>
+      <source>Select folder to upload</source>
+      <translation>Välj mapp att ladda upp</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
@@ -8450,6 +8492,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
       <translation>Anpassade nummer som kan tilldelas till en kamera för snabb identifiering och tillgänglighet</translation>
+    </message>
+    <message>
+      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
+      <translation>Detta ID används redan i systemet. Använd Generera knappen för att hitta ett ledigt ID.</translation>
     </message>
   </context>
   <context>
@@ -8863,6 +8909,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>Okänd Plugin Diagnostic Event</translation>
     </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Förbrukning</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8896,6 +8946,13 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Vissa användare har inte tillgång till den valda layouten. Åtgärden fungerar inte för dem.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PasswordDialog</name>
+    <message>
+      <source>Sign In</source>
+      <translation>Logga in</translation>
     </message>
   </context>
   <context>
@@ -8995,6 +9052,67 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>This OS version is no longer supported.</source>
       <translation>Den här OS-versionen stöds inte längre.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
+    <message>
+      <source>%1 Mbps</source>
+      <translation>%1 Mbps</translation>
+    </message>
+    <message>
+      <source>Disconnected</source>
+      <translation>Frånkopplad</translation>
+    </message>
+    <message>
+      <source>Connected</source>
+      <translation>Ansluten</translation>
+    </message>
+    <message>
+      <source>Powered</source>
+      <translation>Strömsatt</translation>
+    </message>
+    <message>
+      <source>Unexpected</source>
+      <translation>Oväntat</translation>
+    </message>
+    <message>
+      <source>Empty</source>
+      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+      <translation>Tom</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device %1 &gt;</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation>&lt; Okänd enhet %1 &gt;</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Port</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Förbrukning</translation>
+    </message>
+    <message>
+      <source>Speed</source>
+      <translation>Hastighet</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Status</translation>
+    </message>
+    <message>
+      <source>Power</source>
+      <translation>Ström</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device &gt;</source>
+      <translation>&lt; Okänd enhet &gt;</translation>
     </message>
   </context>
   <context>
@@ -9137,6 +9255,24 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
       <translation>Vattenmärken kommer att visas över live, arkiv och exporterade videor för icke-administrativa användare. Du och andra administratörer ser inte dem.</translation>
+    </message>
+    <message>
+      <source>Only client-server video traffic can be encrypted</source>
+      <translation>Endast videotrafik för klient-server kan krypteras</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n kameror</numerusform>
+        <numerusform>%n kameror</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There are no compatible servers</source>
+      <translation>Det finns inga kompatibla servrar</translation>
     </message>
   </context>
   <context>
@@ -9487,13 +9623,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::WebWidget</name>
-    <message>
-      <source>Failed to load page</source>
-      <translation>Det gick inte att ladda sidan</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -9730,10 +9859,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
-      <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation>Vänligen fyll i information om dig själv och anledning till licensavaktivering</translation>
-    </message>
-    <message>
       <source>Next</source>
       <translation>Nästa</translation>
     </message>
@@ -9772,6 +9897,20 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Other Reason</source>
       <translation>Annan orsak</translation>
+    </message>
+    <message>
+      <source>Please enter your contact information and the reason for deactivating your license</source>
+      <translation>Ange din kontaktinformation och anledningen till att inaktivera din licens</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n Användare</numerusform>
+        <numerusform>%n Användare</numerusform>
+      </translation>
     </message>
   </context>
   <context>

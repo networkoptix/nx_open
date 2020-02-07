@@ -3,7 +3,7 @@
         <div class="col-12 p-0" *ngIf="layout != 'selectors'">
             <div class="d-block d-md-inline-flex flex-md-row w-100">
                 <div class="search-group" [ngClass]="{'mr-3' : layout == 'full'}">
-                    <span class="glyphicon glyphicon-search icon-search"></span>
+                    <span class="glyphicon web-icon-search icon-search"></span>
                     <input [ngModel]="localFilter.query"
                            (ngModelChange)="onSearchType($event)"
                            [ngClass]="{'non-empty': localFilter.query && localFilter.query != ''}"
@@ -15,7 +15,7 @@
                            [placeholder]="placeholder"/>
 
                     <button class="search-clear btn btn-clear" [hidden]="!localFilter.query" (click)="resetQuery()">
-                        <span class="glyphicon-close"></span>
+                        <span class="web-icon-close"></span>
                     </button>
                 </div>
                 <div class="float-left btn btn-big btn-tag-selected mt-3 mt-md-0 mr-1"
@@ -36,7 +36,7 @@
                         <span></span>
                         <span></span>
                     </div>
-                    <span translate>Advanced Search</span>
+                    <span class="btn-tag-label" translate>Advanced Search</span>
                 </div>
             </div>
         </div>

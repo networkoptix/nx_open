@@ -987,6 +987,14 @@ to view more bookmarks</source>
       <source>Page...</source>
       <translation>Страница...</translation>
     </message>
+    <message>
+      <source>Connect to this Server</source>
+      <translation type="unfinished">Connect to this Server</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation type="unfinished">Pin</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1503,6 +1511,10 @@ to view more bookmarks</source>
       <source>Built for %1-%2 with %3.</source>
       <translation>Built for %1-%2 with %3.</translation>
     </message>
+    <message>
+      <source>Regional support</source>
+      <translation type="unfinished">Regional support</translation>
+    </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>
@@ -1670,7 +1682,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Этот пользователь был удален из системы</numerusform>
         <numerusform>Эти пользователи были удалены из системы</numerusform>
         <numerusform>Эти пользователи были удалены из системы</numerusform>
@@ -1679,7 +1691,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Этот ресурс был удален из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
@@ -1940,7 +1952,7 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>У вас %n оповещение</numerusform>
         <numerusform>У вас %n оповещения</numerusform>
         <numerusform>У вас %n оповещений</numerusform>
@@ -2002,7 +2014,7 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 из %n устройств</numerusform>
         <numerusform>%1 из %n устройств</numerusform>
         <numerusform>%1 из %n устройств</numerusform>
@@ -2011,7 +2023,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 из %n камер</numerusform>
         <numerusform>%1 из %n камер</numerusform>
         <numerusform>%1 из %n камер</numerusform>
@@ -2028,7 +2040,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
@@ -2070,29 +2082,8 @@ to view more bookmarks</source>
       <translation>Начинается</translation>
     </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>Выберите хотя бы одно устройство</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Выберите хотя бы одну камеру</translation>
-    </message>
-    <message>
       <source>Occurs</source>
       <translation>Произошло</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Исходная камера</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more cameras</source>
-      <translation type="unfinished">
-        <numerusform>Исходная камера и ещё %n камера</numerusform>
-        <numerusform>Исходная камера и ещё %n камеры</numerusform>
-        <numerusform>Исходная камера и ещё %n камер</numerusform>
-        <numerusform>Исходная камера и ещё %n камер</numerusform>
-      </translation>
     </message>
     <message>
       <source>N/A</source>
@@ -2126,6 +2117,39 @@ to view more bookmarks</source>
         <numerusform>%n серверов</numerusform>
         <numerusform>%n Server</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User</source>
+      <translation>Пользователь</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation type="unfinished">Source Server</translation>
+    </message>
+    <message>
+      <source>Source Camera</source>
+      <translation type="unfinished">Source Camera</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select at least one Device</source>
+      <translation type="unfinished">Select at least one Device</translation>
+    </message>
+    <message>
+      <source>Select at least one Camera</source>
+      <translation type="unfinished">Select at least one Camera</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation type="unfinished">Select Server</translation>
     </message>
   </context>
   <context>
@@ -2252,6 +2276,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation type="unfinished">Servers that support buzzer</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
@@ -2270,7 +2301,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 не поддерживает двусторонний звук</numerusform>
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
@@ -2360,7 +2391,7 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 не имеет тревожных входов</numerusform>
         <numerusform>%1 не имеют тревожных входов</numerusform>
         <numerusform>%1 не имеют тревожных входов</numerusform>
@@ -2392,7 +2423,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Найдено %n устройство</numerusform>
         <numerusform>Найдено %n устройства</numerusform>
         <numerusform>Найдено %n устройств</numerusform>
@@ -2401,7 +2432,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Найдено %n камера</numerusform>
         <numerusform>Найдено %n камеры</numerusform>
         <numerusform>Найдено %n камер</numerusform>
@@ -2418,7 +2449,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Найдено %n модуль ввода-вывода</numerusform>
         <numerusform>Найдено %n модуля ввода-вывода</numerusform>
         <numerusform>Найдено %n модулей ввода-вывода</numerusform>
@@ -2501,7 +2532,7 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 не имеет тревожных выходов</numerusform>
         <numerusform>%1 не имеют тревожных выходов</numerusform>
         <numerusform>%1 не имеют тревожных выходов</numerusform>
@@ -3166,6 +3197,10 @@ to %1</source>
         <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Description</source>
+      <translation>Описание</translation>
+    </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
@@ -3319,6 +3354,13 @@ to %1</source>
     <message>
       <source>Select cameras to setup failover priority</source>
       <translation>Выберите камеры для настройки приоритета резервирования</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation type="unfinished">Servers that support fan diagnostic</translation>
     </message>
   </context>
   <context>
@@ -3641,22 +3683,6 @@ to %1</source>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
-      <source>Screens Allowed:</source>
-      <translation>Разрешённое число экранов:</translation>
-    </message>
-    <message>
-      <source>Control Sessions Allowed:</source>
-      <translation>Разрешённое число управляемых подключений:</translation>
-    </message>
-    <message>
-      <source>Archive Streams Allowed:</source>
-      <translation>Разрешённое число потоков записи:</translation>
-    </message>
-    <message>
-      <source>Generic:</source>
-      <translation>Общее:</translation>
-    </message>
-    <message>
       <source>License Type</source>
       <translation>Тип лицензии</translation>
     </message>
@@ -3665,12 +3691,32 @@ to %1</source>
       <translation>Ключ</translation>
     </message>
     <message>
-      <source>Features:</source>
-      <translation>Особенности:</translation>
-    </message>
-    <message>
       <source>Locked to Hardware ID</source>
       <translation>Привязано к аппаратному ID</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation type="unfinished">Generic</translation>
+    </message>
+    <message>
+      <source>Deactivations Left</source>
+      <translation type="unfinished">Deactivations Left</translation>
+    </message>
+    <message>
+      <source>Features</source>
+      <translation type="unfinished">Features</translation>
+    </message>
+    <message>
+      <source>Screens Allowed</source>
+      <translation type="unfinished">Screens Allowed</translation>
+    </message>
+    <message>
+      <source>Control Sessions Allowed</source>
+      <translation type="unfinished">Control Sessions Allowed</translation>
+    </message>
+    <message>
+      <source>Archive Streams Allowed</source>
+      <translation type="unfinished">Archive Streams Allowed</translation>
     </message>
   </context>
   <context>
@@ -3998,12 +4044,8 @@ to %1</source>
       <translation>Не удалось открыть файл</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Для получения лицензионного ключа необходимо отослать серийный номер и аппаратный ID на %1.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Пожалуйста, отправьте предоставленный лицензионный ключ и аппаратный ID на %1 чтобы получить файл с ключом активации.</translation>
+      <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
+      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
     </message>
   </context>
   <context>
@@ -4556,6 +4598,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation type="unfinished">Servers that support PoE monitoring</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
@@ -4822,16 +4871,8 @@ to %1</source>
       <translation>Дней</translation>
     </message>
     <message>
-      <source>less than an hour</source>
-      <translation>менее часа</translation>
-    </message>
-    <message>
       <source>%1 Mbps</source>
       <translation>%1 Мбит/с</translation>
-    </message>
-    <message>
-      <source>empty</source>
-      <translation>пусто</translation>
     </message>
     <message>
       <source>Device</source>
@@ -4852,10 +4893,6 @@ to %1</source>
     <message>
       <source>Current Bitrate</source>
       <translation>Текущий битрейт</translation>
-    </message>
-    <message>
-      <source>no data for forecast</source>
-      <translation>нет данных для прогноза</translation>
     </message>
   </context>
   <context>
@@ -5236,7 +5273,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
         <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
         <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
@@ -5249,7 +5286,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
         <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
         <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
@@ -5320,6 +5357,10 @@ to %1</source>
     <message>
       <source>Plugins</source>
       <translation>Плагины</translation>
+    </message>
+    <message>
+      <source>PoE</source>
+      <translation type="unfinished">PoE</translation>
     </message>
   </context>
   <context>
@@ -5902,12 +5943,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>usb</translation>
     </message>
     <message>
-      <source>unknown</source>
-      <translation>неизвестное</translation>
-    </message>
-    <message>
       <source>%1 TB</source>
       <translation>%1 Тб</translation>
+    </message>
+    <message>
+      <source>smb</source>
+      <translation type="unfinished">smb</translation>
     </message>
   </context>
   <context>
@@ -6605,13 +6646,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>QnWebPage</name>
-    <message>
-      <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation>ЗАГРУЗКА&lt;br&gt;НАЧИНАЕТСЯ</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6697,6 +6731,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Видеостена удалена на сервере и будет закрыта.</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the selected server</source>
+      <translation type="unfinished">Failed to connect to the selected server</translation>
     </message>
   </context>
   <context>
@@ -6912,20 +6950,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Новая матрица %1</translation>
     </message>
     <message>
-      <source>Video Wall license required</source>
-      <translation>Требуется лицензия на видеостену</translation>
-    </message>
-    <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
       <translation>Для включения этой функции, пожалуйста, активируйте лицензию на видеостену.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
       <translation>Не удалось применить изменения</translation>
-    </message>
-    <message>
-      <source>To enable Video Wall, please activate a Video Wall license.</source>
-      <translation>Для включения этой функции, пожалуйста, активируйте лицензию на видеостену.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
@@ -6984,6 +7014,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>Активируйте одну дополнительную лицензию, чтобы начать сеанс управления видеостеной.</translation>
+    </message>
+    <message>
+      <source>Activate License...</source>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
@@ -7343,7 +7377,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемент?</numerusform>
@@ -7517,18 +7551,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n user</numerusform>
-        <numerusform>%n пользователя</numerusform>
-        <numerusform>%n пользователей</numerusform>
-        <numerusform>%n user</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>TimelineCursorLayout</name>
     <message>
       <source>Live</source>
@@ -7679,6 +7701,15 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unknown track</source>
       <translation>Неизвестный трек</translation>
+    </message>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8207,7 +8238,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Не удалось добавить %n устройство</numerusform>
         <numerusform>Не удалось добавить %n устройства</numerusform>
         <numerusform>Не удалось добавить %n устройств</numerusform>
@@ -8595,6 +8626,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
+    <message>
+      <source>The proxy %1 requires a username and password.</source>
+      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+    </message>
+    <message>
+      <source>Select folder to upload</source>
+      <translation type="unfinished">Select folder to upload</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
@@ -8682,6 +8724,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
       <translation>Произвольный номер, который можно назначить для раскладки для быстрой идентификации и доступа к ней</translation>
+    </message>
+    <message>
+      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
+      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
     </message>
   </context>
   <context>
@@ -9099,6 +9145,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>Неизвестное событие диагностики плагинов</translation>
     </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9132,6 +9182,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>У некоторых пользователей нет доступа к выбранной раскладке. Действие не будет работать для них.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PasswordDialog</name>
+    <message>
+      <source>Sign In</source>
+      <translation type="unfinished">Sign In</translation>
     </message>
   </context>
   <context>
@@ -9231,6 +9288,67 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This OS version is no longer supported.</source>
       <translation>Эта версия ОС больше не поддерживается.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
+    <message>
+      <source>%1 Mbps</source>
+      <translation>%1 Мбит/с</translation>
+    </message>
+    <message>
+      <source>Disconnected</source>
+      <translation type="unfinished">Disconnected</translation>
+    </message>
+    <message>
+      <source>Connected</source>
+      <translation type="unfinished">Connected</translation>
+    </message>
+    <message>
+      <source>Powered</source>
+      <translation type="unfinished">Powered</translation>
+    </message>
+    <message>
+      <source>Unexpected</source>
+      <translation type="unfinished">Unexpected</translation>
+    </message>
+    <message>
+      <source>Empty</source>
+      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+      <translation type="unfinished">Empty</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device %1 &gt;</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation type="unfinished">&lt; Unknown device %1 &gt;</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Порт</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Камера</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
+    <message>
+      <source>Speed</source>
+      <translation>Скорость</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Статус</translation>
+    </message>
+    <message>
+      <source>Power</source>
+      <translation type="unfinished">Power</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device &gt;</source>
+      <translation type="unfinished">&lt; Unknown device &gt;</translation>
     </message>
   </context>
   <context>
@@ -9375,6 +9493,26 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
       <translation>Водяные знаки будут отображаться поверх живого, архивного и экспортированного видео только для пользователей без прав администратора. Вы и другие администраторы их не увидите.</translation>
+    </message>
+    <message>
+      <source>Only client-server video traffic can be encrypted</source>
+      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There are no compatible servers</source>
+      <translation type="unfinished">There are no compatible servers</translation>
     </message>
   </context>
   <context>
@@ -9733,13 +9871,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::WebWidget</name>
-    <message>
-      <source>Failed to load page</source>
-      <translation>Ошибка при загрузке страницы</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -9978,10 +10109,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
-      <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation>Пожалуйста, заполните информацию о себе и причину деактивации лицензии</translation>
-    </message>
-    <message>
       <source>Next</source>
       <translation>Далее</translation>
     </message>
@@ -10021,6 +10148,22 @@ If you intended to move analytics data to another storage location, please conta
       <source>Other Reason</source>
       <translation>Другая причина</translation>
     </message>
+    <message>
+      <source>Please enter your contact information and the reason for deactivating your license</source>
+      <translation type="unfinished">Please enter your contact information and the reason for deactivating your license</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n User</numerusform>
+        <numerusform>%n пользователя</numerusform>
+        <numerusform>%n пользователей</numerusform>
+        <numerusform>%n пользователь</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
@@ -10034,7 +10177,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Failed to move %n device</numerusform>
         <numerusform>Не удалось переместить %n устройства</numerusform>
         <numerusform>Не удалось переместить %n устройств</numerusform>
@@ -10043,7 +10186,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Failed to move %n camera</numerusform>
         <numerusform>Не удалось переместить %n камеры</numerusform>
         <numerusform>Не удалось переместить %n камер</numerusform>
@@ -10052,7 +10195,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Failed to move %n I/O Module</numerusform>
         <numerusform>Не удалось переместить %n модуля ввода-вывода</numerusform>
         <numerusform>Не удалось переместить %n модулей ввода-вывода</numerusform>
@@ -10065,7 +10208,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
@@ -10074,7 +10217,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
@@ -10083,7 +10226,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>

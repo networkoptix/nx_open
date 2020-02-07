@@ -77,6 +77,7 @@
         "emailSignature": "Assinatura de e-mail",
         "emailSupportEmail": "E-mail de suporte",
         "enableEdgeRecording": "Activar gravação \"edge\"",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Período do log de eventos (dias)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP search base",
@@ -85,6 +86,7 @@
         "localSystemId": "ID Sistema Local",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Diferença máxima entre o tempo sincronizado e o da Internet (milissegundos)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Diferença máxima entre o tempo sincronizado e o tempo local (milissegundos)",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
         "maxRecordQueueSizeElements": "Max record queue size (elements)",
         "maxRemoteArchiveSynchronizationThreads": "Max remote archive synchronization threads",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Sincronização de tempo activada",
         "primaryTimeServer": "Primary time synchronization server",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Notificações de actualização habilitadas",
         "upnpPortMappingEnabled": "Mapeamento de portas UPNP activado",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Health Monitoring",
+            "graphs": "Graphs",
             "storage": "Armazenamento",
             "log": "Registo"
         }

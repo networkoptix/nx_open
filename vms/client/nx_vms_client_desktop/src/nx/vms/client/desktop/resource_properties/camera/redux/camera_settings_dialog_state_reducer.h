@@ -44,7 +44,7 @@ public:
     static State setMotionRegionList(State state, const QList<QnMotionRegion>& value);
     static State setFisheyeSettings(State state, const QnMediaDewarpingParams& value);
     static State setIoPortDataList(State state, const QnIOPortDataList& value);
-    static State setIoModuleVisualStyle(State state, vms::api::IoModuleVisualStyle value);
+    static State setIoModuleVisualStyle(State state, nx::vms::api::IoModuleVisualStyle value);
     static State setCameraControlDisabled(State state, bool value);
     static State setDualStreamingDisabled(State state, bool value);
     static State setUseBitratePerGOP(State state, bool value);
@@ -53,8 +53,8 @@ public:
     static State setPreferredPtzPresetType(State state, nx::core::ptz::PresetType value);
     static State setForcedPtzPanTiltCapability(State state, bool value);
     static State setForcedPtzZoomCapability(State state, bool value);
-    static State setRtpTransportType(State state, vms::api::RtpTransportType value);
-    static State setForcedMotionStreamType(State state, vms::api::StreamIndex value);
+    static State setRtpTransportType(State state, nx::vms::api::RtpTransportType value);
+    static State setForcedMotionStreamType(State state, State::StreamIndex value);
     static State setCustomMediaPortUsed(State state, bool value);
     static State setCustomMediaPort(State state, int value);
     static State setTrustCameraTime(State state, bool value);
@@ -66,6 +66,8 @@ public:
     static std::pair<bool, State> setCurrentAnalyticsEngineId(State state, const QnUuid& engineId);
     static State setAnalyticsSettingsLoading(State state, bool value);
     static State setEnabledAnalyticsEngines(State state, const QSet<QnUuid>& value);
+    static State setAnalyticsStreamIndex(
+        State state, const QnUuid& engineId, State::StreamIndex value, ModificationSource source);
     static std::pair<bool, State> setDeviceAgentSettingsModel(
         State state, const QnUuid& engineId, const QJsonObject& value);
     static std::pair<bool, State> setDeviceAgentSettingsValues(

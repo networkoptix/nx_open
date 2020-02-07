@@ -41,8 +41,8 @@
             <span class="text">或</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">加入到現有的系統</button><br>
-        <small>(如果 {{Config.productName}} 已經被安裝)</small><br>
+        <button class="btn btn-default" ng-click="skip()">加入到現有系統</button><br>
+        <small>(如果 {{Config.productName}} 已安裝)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -475,7 +475,7 @@
             <div class="text-center"><b>使用 {{Config.productName}} 應用程式</b></div>
             <div class="col-xs-6 text-right">主機地址</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">通訊埠</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">登入帳號</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">登入</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">密碼</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>

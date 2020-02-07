@@ -81,4 +81,6 @@ ToolTip
             }
         }
     }
+
+    property Item invoker //< Used by GlobalToolTip.
 }

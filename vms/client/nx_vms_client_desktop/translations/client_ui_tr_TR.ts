@@ -33,11 +33,6 @@
       <source>System Servers</source>
       <translation>Sistem Sunucuları</translation>
     </message>
-    <message>
-      <location/>
-      <source>Customer Support</source>
-      <translation>Müşteri Hizmetleri</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -500,6 +495,11 @@
       <source>At</source>
       <translation>da/de</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use event source server</source>
+      <translation>Olay kaynağı sunucusunu kullan</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -527,6 +527,19 @@
       <location/>
       <source>Test</source>
       <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>BuzzerBusinessActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/buzzer_business_action_widget.ui"/>
+      <source>Fixed duration:</source>
+      <translation>Belirlenmiş Zaman:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>seconds</source>
+      <translation>saniye</translation>
     </message>
   </context>
   <context>
@@ -927,6 +940,14 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>Oturum açık kalsın</translation>
+    </message>
+  </context>
+  <context>
+    <name>ConnectingToServerDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
+      <source>Connecting...</source>
+      <translation type="unfinished">Connecting...</translation>
     </message>
   </context>
   <context>
@@ -1718,23 +1739,8 @@
     </message>
     <message>
       <location/>
-      <source>License Type:</source>
-      <translation>Lisans Türü:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>License Key:</source>
-      <translation>Lisans Anahtarı:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Features</source>
       <translation>Özellikler</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Locked to Hardware ID:</source>
-      <translation>Donanım Kimliği'ne kaydedildi:</translation>
     </message>
   </context>
   <context>
@@ -2066,6 +2072,24 @@
     </message>
   </context>
   <context>
+    <name>PasswordDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
+      <source>Sign in</source>
+      <translation>Giriş Yap</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
+      <translation>Parola</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Username</source>
+      <translation>Kullanıcı Adı</translation>
+    </message>
+  </context>
+  <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
@@ -2132,14 +2156,17 @@
     </message>
   </context>
   <context>
+    <name>PoeSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
+      <source>Attention! Power limit exceeded</source>
+      <translation>Dikkat! Güç sınırı aşıldı</translation>
+    </message>
+  </context>
+  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-      <source>Global Notification Settings...</source>
-      <translation>Genel Uyarı Sistemi...</translation>
-    </message>
-    <message>
-      <location/>
       <source>for</source>
       <translation>için</translation>
     </message>
@@ -2780,6 +2807,14 @@
       <location/>
       <source>Global Email Settings...</source>
       <translation>Genel e-posta ayarları...</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServerSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_dialogs/server_selection_dialog.ui"/>
+      <source>Select Servers</source>
+      <translation>Sunucuları seçin</translation>
     </message>
   </context>
   <context>

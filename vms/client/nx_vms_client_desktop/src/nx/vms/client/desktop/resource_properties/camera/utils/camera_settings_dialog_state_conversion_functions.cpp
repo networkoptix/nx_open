@@ -8,6 +8,7 @@
 
 #include <nx/client/core/motion/motion_grid.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
 
@@ -355,6 +356,12 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         }
 
         camera->setUserEnabledAnalyticsEngines(state.analytics.enabledEngines());
+
+        for (const auto& [id, index]: nx::utils::constKeyValueRange(state.analytics.streamByEngineId))
+        {
+            if (index.hasUser())
+                camera->setAnalyzedStreamIndex(id, index());
+        }
     }
 
     if (state.devicesDescription.isWearable == CombinedValue::All)

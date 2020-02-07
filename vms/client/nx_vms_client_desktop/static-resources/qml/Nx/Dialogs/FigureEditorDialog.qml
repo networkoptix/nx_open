@@ -60,6 +60,12 @@ Window
         id: cursorManager
     }
 
+    Shortcut
+    {
+        sequence: StandardKey.Cancel
+        onActivated: dialog.close()
+    }
+
     Item
     {
         id: content

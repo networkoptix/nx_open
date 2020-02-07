@@ -77,6 +77,7 @@
         "emailSignature": "Firma de correo electrónico",
         "emailSupportEmail": "Correo electrónico de soporte",
         "enableEdgeRecording": "Habilitar grabación de edge",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Período de registro de eventos (días)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "Base de búsqueda LDAP",
@@ -85,6 +86,7 @@
         "localSystemId": "ID del sistema local",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Diferencia máxima entre el tiempo sincronizado e Internet (milisegundos)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Diferencia máxima entre tiempo sincronizado y local (milisegundos)",
+        "maxP2pQueueSizeBytes": "Tamaño máximo de la cola P2P (bytes)",
         "maxRecordQueueSizeBytes": "Tamaño máximo de cola de grabación (bytes)",
         "maxRecordQueueSizeElements": "Tamaño máximo de cola de grabación (elementos)",
         "maxRemoteArchiveSynchronizationThreads": "Máximo hilos de sincronización remota de archivos",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Sincronización de tiempo habilitada",
         "primaryTimeServer": "Servidor primario de sincronización horaria",
         "osTimeChangeCheckPeriodMs": "Período de verificación de cambio de hora del SO",
-        "syncTimeExchangePeriod": "Período de intercambio de tiempo de sincronización",
+        "syncTimeExchangePeriod": "Intervalo de sincronización de tiempo para solicitudes de red",
+        "syncTimeEpsilon": "Tiempo de sincronización epsilon. El nuevo valor no se aplica si el tiempo detla menos que épsilon",
         "maxWearableArchiveSynchronizationThreads": "Máx hilos de sincronización de archivo de cámara portátil",
         "updateNotificationsEnabled": "Notificaciones de actualización habilitadas",
         "upnpPortMappingEnabled": "Mapeo de puerto UPNP habilitado",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Monitoreo de Salud",
+            "graphs": "Graphs",
             "storage": "Almacenamiento",
             "log": "Registro"
         }

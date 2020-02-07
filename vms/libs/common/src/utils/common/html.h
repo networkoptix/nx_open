@@ -1,8 +1,22 @@
 #pragma once
 
 #include <QtCore/QString>
+#include <QtGui/QColor>
 
 #include <nx/utils/url.h>
+
+/**
+ * Set of functions for generating Qt-compliant html-formatted text lines.
+ */
+namespace nx::vms::common {
+namespace html {
+
+QString colored(const QString& text, const QColor& color);
+
+QString monospace(const QString& text);
+
+} // namespace html
+} // namespace nx::vms::common
 
 /** RAII helper to consistently open/close html tags on the given string. */
 class QnHtmlTag

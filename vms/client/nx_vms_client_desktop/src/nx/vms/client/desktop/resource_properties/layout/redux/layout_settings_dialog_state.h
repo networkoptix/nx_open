@@ -166,6 +166,11 @@ struct LayoutSettingsDialogState: AbstractReduxState
     };
 
     Background background;
+
+    bool isDuplicateLogicalId() const
+    {
+        return otherLogicalIds.find(logicalId) != otherLogicalIds.cend();
+    }
 };
 
 #define LayoutSettingsDialogState_Range_Fields (min)(max)(value)

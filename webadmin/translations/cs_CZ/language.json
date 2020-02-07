@@ -77,6 +77,7 @@
         "emailSignature": "Podpis emailu",
         "emailSupportEmail": "Email podpory",
         "enableEdgeRecording": "Povolit edge záznam",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Doba záznamu události (dny)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "Vyhledávací základna LDAP",
@@ -85,6 +86,7 @@
         "localSystemId": "ID místního systému",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Maximální rozdíl mezi synchronizovaným a internetovým časem (milisekundy)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Maximální rozdíl mezi synchronizovaným a místním časem (milisekundy)",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "Maximální velikost fronty záznamů (bajty)",
         "maxRecordQueueSizeElements": "Maximální velikost fronty záznamů (elementy)",
         "maxRemoteArchiveSynchronizationThreads": "Maximální počet synchronizačních procesů vzdálené archivace",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Synchronizace času byla povolena",
         "primaryTimeServer": "Primary time synchronization server",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Aktualizace oznámení byla povolena",
         "upnpPortMappingEnabled": "Mapování portů UPNP bylo povoleno",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Monitorování stavu",
+            "graphs": "Graphs",
             "storage": "Úložiště",
             "log": "Deník"
         }

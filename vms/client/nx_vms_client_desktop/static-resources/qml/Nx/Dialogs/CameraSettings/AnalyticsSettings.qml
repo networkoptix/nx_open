@@ -24,6 +24,7 @@ Item
     property var currentEngineId
     property var currentEngineInfo
     property var currentSectionPath: []
+    property var currentSettingsModel
     property bool loading: false
 
     readonly property bool isDeviceDependent: currentEngineInfo !== undefined
@@ -49,7 +50,18 @@ Item
 
             if (engineId === currentEngineId)
             {
-                settingsView.setValues(store.deviceAgentSettingsValues(currentEngineId))
+                var actualModel = store.deviceAgentSettingsModel(currentEngineId)
+                var actualValues = store.deviceAgentSettingsValues(currentEngineId)
+
+                if (JSON.stringify(currentSettingsModel) == JSON.stringify(actualModel))
+                {
+                    settingsView.setValues(actualValues)
+                }
+                else
+                {
+                    currentSettingsModel = actualModel
+                    settingsView.loadModel(currentSettingsModel, actualValues)
+                }
             }
             else if (analyticsEngines.length > 0)
             {
@@ -77,18 +89,22 @@ Item
                 navigationMenu.currentItemId =
                     [engineId.toString()].concat(currentSectionPath).join("\n")
 
-                settingsView.loadModel(
-                    engineInfo.settingsModel,
-                    store.deviceAgentSettingsValues(engineInfo.id))
+                currentSettingsModel = store.deviceAgentSettingsModel(engineInfo.id)
+                var actualValues = store.deviceAgentSettingsValues(engineInfo.id)
+                settingsView.loadModel(currentSettingsModel, actualValues)
             }
             else
             {
                 currentEngineId = undefined
                 currentEngineInfo = undefined
                 currentSectionPath = []
+                currentSettingsModel = undefined
                 navigationMenu.currentItemId = undefined
                 settingsView.loadModel({}, {})
             }
+
+            if (currentEngineId)
+                streamComboBox.currentIndex = store.analyticsStreamIndex(currentEngineId)
 
             banner.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
         }
@@ -143,6 +159,7 @@ Item
 
                 readonly property var engineId: modelData.id
                 readonly property var isSelected: currentEngineId === engineId
+                readonly property var settingsModel: isSelected ? currentSettingsModel : undefined
 
                 Column
                 {
@@ -158,6 +175,7 @@ Item
                         property var ctx_navigationMenu: navigationMenu
                         property var ctx_modelData: modelData
                         property var ctx_engineId: engineId
+                        property var ctx_settingsModel: settingsModel
                         property var ctx_sections: []
                         property int ctx_level: 0
                         property bool ctx_selected: container.isSelected
@@ -187,47 +205,88 @@ Item
         }
     }
 
-    ColumnLayout
+    SettingsView
     {
+        id: settingsView
+
         x: navigationMenu.width + 16
         y: 16
         width: parent.width - x - 24
         height: parent.height - 16 - banner.height
-        spacing: 16
 
-        InformationPanel
+        enabled: !loading
+        contentEnabled: informationPanel.checked || isDeviceDependent
+        scrollBarParent: scrollBarsParent
+
+        onValuesEdited:
+            store.setDeviceAgentSettingsValues(currentEngineId, getValues())
+
+        headerItem: ColumnLayout
         {
-            id: informationPanel
+            id: header
+            spacing: 32
 
-            engineInfo: currentEngineInfo
-
-            visible: isDefaultSection
-            checkable: !isDeviceDependent
-
-            checked: currentEngineId !== undefined
-                && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
-
-            onClicked:
+            InformationPanel
             {
-                if (currentEngineId !== undefined)
-                    setEngineEnabled(currentEngineId, !checked)
+                id: informationPanel
+
+                checkable: !isDeviceDependent && !!currentEngineId
+                checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
+                engineInfo: currentEngineInfo
+                Layout.fillWidth: true
+
+                onClicked:
+                {
+                    if (currentEngineId)
+                        setEngineEnabled(currentEngineId, !checked)
+                }
             }
-        }
 
-        SettingsView
-        {
-            id: settingsView
+            Panel
+            {
+                id: commonSettings
 
-            enabled: !loading
+                title: "General Settings"
+                visible: commonContent.height > 0
+                Layout.fillWidth: true
+                enabled: settingsView.contentEnabled
 
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+                topPadding: 36
+                bottomPadding: 16
 
-            onValuesEdited:
-                store.setDeviceAgentSettingsValues(currentEngineId, getValues())
+                GridLayout
+                {
+                    id: commonContent
 
-            contentEnabled: informationPanel.checked || isDeviceDependent
-            scrollBarParent: scrollBarsParent
+                    columns: 2
+                    columnSpacing: 8
+                    width: commonSettings.width
+                    flow: GridLayout.LeftToRight
+
+                    ContextHintLabel
+                    {
+                        text: qsTr("Camera stream")
+                        horizontalAlignment: Text.AlignRight
+                        contextHintText: qsTr("Select video stream from the camera for analysis")
+                        Layout.minimumWidth: commonSettings.width * 0.3
+                        color: ColorTheme.windowText
+                    }
+
+                    ComboBox
+                    {
+                        id: streamComboBox
+                        Layout.fillWidth: true
+
+                        model: ["Primary", "Secondary"]
+
+                        onCurrentIndexChanged:
+                        {
+                            if (currentEngineId)
+                                store.setAnalyticsStreamIndex(currentEngineId, currentIndex)
+                        }
+                    }
+                }
+            }
         }
     }
 

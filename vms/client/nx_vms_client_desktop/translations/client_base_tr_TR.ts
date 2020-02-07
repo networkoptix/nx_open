@@ -986,6 +986,14 @@ to view more bookmarks</source>
       <source>Page...</source>
       <translation>Sayfa...</translation>
     </message>
+    <message>
+      <source>Connect to this Server</source>
+      <translation>Sunucuya bağlan</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation>Pin</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1485,6 +1493,10 @@ to view more bookmarks</source>
     <message>
       <source>Built for %1-%2 with %3.</source>
       <translation>%3 ile %1-%2 için Yap.</translation>
+    </message>
+    <message>
+      <source>Regional support</source>
+      <translation>Bölgesel destek</translation>
     </message>
   </context>
   <context>
@@ -2027,27 +2039,8 @@ to view more bookmarks</source>
       <translation>Başlat</translation>
     </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>En Az Bir Aygıt Seç</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>En Az Bir Kamera Seç</translation>
-    </message>
-    <message>
       <source>Occurs</source>
       <translation>Oluştur</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Kaynak Kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more cameras</source>
-      <translation>
-        <numerusform>Kaynak ve %n Kamera Daha</numerusform>
-        <numerusform>Kaynak ve %n Kamera Daha</numerusform>
-      </translation>
     </message>
     <message>
       <source>N/A</source>
@@ -2079,6 +2072,37 @@ to view more bookmarks</source>
         <numerusform>%n sunucu</numerusform>
         <numerusform>%n sunucular</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User</source>
+      <translation>Kullanıcı</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Kaynak Sunucu</translation>
+    </message>
+    <message>
+      <source>Source Camera</source>
+      <translation>Kaynak Kamera</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Kaynak ve %n Kamera Daha</numerusform>
+        <numerusform>Kaynak ve %n Kamera Daha</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select at least one Device</source>
+      <translation>En Az Bir Aygıt Seçin</translation>
+    </message>
+    <message>
+      <source>Select at least one Camera</source>
+      <translation>En Az Bir Kamera Seçin</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Sunucuları seçin</translation>
     </message>
   </context>
   <context>
@@ -2202,6 +2226,13 @@ to view more bookmarks</source>
     <message>
       <source>Interval of Action</source>
       <translation>Hareket Aralığı</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation>Sesli uyarıyı destekleyen sunucular</translation>
     </message>
   </context>
   <context>
@@ -3099,6 +3130,10 @@ to %1</source>
         <numerusform>%1 için olay günlüğü - %n olay bulundu</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Description</source>
+      <translation>Açıklama</translation>
+    </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
@@ -3242,6 +3277,13 @@ to %1</source>
     <message>
       <source>Select cameras to setup failover priority</source>
       <translation>Failover Önceliği Kurmak İçin Kamera Seç</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation>Fan tanılamayı destekleyen sunucular</translation>
     </message>
   </context>
   <context>
@@ -3562,22 +3604,6 @@ to %1</source>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
-      <source>Screens Allowed:</source>
-      <translation>İzinli Ekranlar:</translation>
-    </message>
-    <message>
-      <source>Control Sessions Allowed:</source>
-      <translation>İzin Verilen Kontrol Oturumları:</translation>
-    </message>
-    <message>
-      <source>Archive Streams Allowed:</source>
-      <translation>İzin Verilen Arşiv Akışları:</translation>
-    </message>
-    <message>
-      <source>Generic:</source>
-      <translation>Genel:</translation>
-    </message>
-    <message>
       <source>License Type</source>
       <translation>Lisans Tipi</translation>
     </message>
@@ -3586,12 +3612,32 @@ to %1</source>
       <translation>Lisans Anahtarı</translation>
     </message>
     <message>
-      <source>Features:</source>
-      <translation>Özellikler:</translation>
-    </message>
-    <message>
       <source>Locked to Hardware ID</source>
       <translation>Donanım Kimliği'ne kaydedildi</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation type="unfinished">Generic</translation>
+    </message>
+    <message>
+      <source>Deactivations Left</source>
+      <translation type="unfinished">Deactivations Left</translation>
+    </message>
+    <message>
+      <source>Features</source>
+      <translation type="unfinished">Features</translation>
+    </message>
+    <message>
+      <source>Screens Allowed</source>
+      <translation type="unfinished">Screens Allowed</translation>
+    </message>
+    <message>
+      <source>Control Sessions Allowed</source>
+      <translation type="unfinished">Control Sessions Allowed</translation>
+    </message>
+    <message>
+      <source>Archive Streams Allowed</source>
+      <translation type="unfinished">Archive Streams Allowed</translation>
     </message>
   </context>
   <context>
@@ -3899,12 +3945,8 @@ to %1</source>
       <translation>Dosya açılamadı</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Aktivasyon dosyasını almak için Lütfen %1 e ait lisans anahtarını ve donanım kimliğini e-posta olarak gönderin.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Aktivasyon dosyasını almak için Lütfen %1 e ait lisans anahtarını ve donanım kimliğini gönderin.</translation>
+      <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
+      <translation>Bir Etkinleştirme Anahtarı dosyası edinmek için lütfen verilen Lisans Anahtarını ve Donanım Kimliğini %1 e gönderin.</translation>
     </message>
   </context>
   <context>
@@ -4455,6 +4497,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation>PoE izlemeyi destekleyen sunucular</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
@@ -4709,16 +4758,8 @@ to %1</source>
       <translation>Takvim Günleri</translation>
     </message>
     <message>
-      <source>less than an hour</source>
-      <translation>bir saatten az</translation>
-    </message>
-    <message>
       <source>%1 Mbps</source>
       <translation>%1 Mbps</translation>
-    </message>
-    <message>
-      <source>empty</source>
-      <translation>boş</translation>
     </message>
     <message>
       <source>Device</source>
@@ -4739,10 +4780,6 @@ to %1</source>
     <message>
       <source>Current Bitrate</source>
       <translation>Mevcut Bitrate</translation>
-    </message>
-    <message>
-      <source>no data for forecast</source>
-      <translation>tahmin için veri yok</translation>
     </message>
   </context>
   <context>
@@ -5193,6 +5230,10 @@ to %1</source>
     <message>
       <source>Plugins</source>
       <translation>Eklentiler</translation>
+    </message>
+    <message>
+      <source>PoE</source>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5772,12 +5813,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>usb</translation>
     </message>
     <message>
-      <source>unknown</source>
-      <translation>bilinmeyen</translation>
-    </message>
-    <message>
       <source>%1 TB</source>
       <translation>%1 TB</translation>
+    </message>
+    <message>
+      <source>smb</source>
+      <translation>smb</translation>
     </message>
   </context>
   <context>
@@ -6471,13 +6512,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
-    <name>QnWebPage</name>
-    <message>
-      <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation>Indiriliyor&lt;br&gt;başladı</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6561,6 +6595,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Video wall bu sunucuda silinir ve kapatılır.</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the selected server</source>
+      <translation>İstenilen sunucuya bağlanılamadı</translation>
     </message>
   </context>
   <context>
@@ -6770,20 +6808,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>%1 Yeni Matris</translation>
     </message>
     <message>
-      <source>Video Wall license required</source>
-      <translation>Video Wall lisansı gerekli</translation>
-    </message>
-    <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
       <translation>Bu özelliği aktif etmek için lütfen Video Wall lisansını etkinleştirin.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
       <translation>Değişlikler uygulanamadı</translation>
-    </message>
-    <message>
-      <source>To enable Video Wall, please activate a Video Wall license.</source>
-      <translation>Video Wall'u etkinleştirmek için lütfen lisansınızı aktif edin.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
@@ -6838,6 +6868,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>Video wall başlatmak için 1 den fazla lisans etkinleştrimeniz gerekir.</translation>
+    </message>
+    <message>
+      <source>Activate License...</source>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
@@ -7315,16 +7349,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n kullanıcılar</numerusform>
-        <numerusform>%n kullanıcılar</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>TimelineCursorLayout</name>
     <message>
       <source>Live</source>
@@ -7475,6 +7499,13 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Unknown track</source>
       <translation>Bilinmeyen parça</translation>
+    </message>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8357,6 +8388,17 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
+    <message>
+      <source>The proxy %1 requires a username and password.</source>
+      <translation>%1 bir kullanıcı adı ve şifre gerektirir.</translation>
+    </message>
+    <message>
+      <source>Select folder to upload</source>
+      <translation>Yüklemek için dosyalar seçin</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
@@ -8444,6 +8486,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
       <translation>Özel numaralar hızlı bulma ve erişim kameralara atanabilir</translation>
+    </message>
+    <message>
+      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
+      <translation>Bu kimlik Sistemde zaten kullanılıyor. Ücretsiz bir kimlik bulmak için Oluştur düğmesini kullanın.</translation>
     </message>
   </context>
   <context>
@@ -8857,6 +8903,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>Bilinmeyen Eklenti Teşhis Olayı</translation>
     </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Tüketim</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8890,6 +8940,13 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Seçilen kullanıcıların hiçbiri seçilen yerleşime erişemez. Eylem çalışmayacak.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PasswordDialog</name>
+    <message>
+      <source>Sign In</source>
+      <translation>Giriş</translation>
     </message>
   </context>
   <context>
@@ -8989,6 +9046,67 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>This OS version is no longer supported.</source>
       <translation>Bu işletim sistemi artık desteklenmiyor.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
+    <message>
+      <source>%1 Mbps</source>
+      <translation>%1 Mbps</translation>
+    </message>
+    <message>
+      <source>Disconnected</source>
+      <translation>Bağlantı kesildi</translation>
+    </message>
+    <message>
+      <source>Connected</source>
+      <translation>Bağlandı</translation>
+    </message>
+    <message>
+      <source>Powered</source>
+      <translation>Güç</translation>
+    </message>
+    <message>
+      <source>Unexpected</source>
+      <translation>Beklenmedik</translation>
+    </message>
+    <message>
+      <source>Empty</source>
+      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+      <translation>Boş</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device %1 &gt;</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation>&lt; Bilinmeyen cihaz %1 &gt;</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Port</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Tüketim</translation>
+    </message>
+    <message>
+      <source>Speed</source>
+      <translation>Hız</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Durum</translation>
+    </message>
+    <message>
+      <source>Power</source>
+      <translation>Güç</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device &gt;</source>
+      <translation>&lt; Bilinmeyen cihaz &gt;</translation>
     </message>
   </context>
   <context>
@@ -9131,6 +9249,24 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
       <translation>Filigranlar, yalnızca yönetici olmayan kullanıcılar için canlı, arşivlenmiş ve dışa aktarılan videolar üzerinden gösterilir. Siz ve diğer yöneticiler onları görmeyeceksiniz.</translation>
+    </message>
+    <message>
+      <source>Only client-server video traffic can be encrypted</source>
+      <translation>Yalnızca istemci-sunucu video trafiği şifrelenebilir</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n kameralar</numerusform>
+        <numerusform>%n kameralar</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There are no compatible servers</source>
+      <translation>Uyumlu sunucu yok</translation>
     </message>
   </context>
   <context>
@@ -9481,13 +9617,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::WebWidget</name>
-    <message>
-      <source>Failed to load page</source>
-      <translation>Sayfa yüklemesi başarısız</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -9724,10 +9853,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
-      <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation>Lütfen kendinizle ilgili bilgileri doldurun ve lisans devre dışı bırakma nedenini doldurun</translation>
-    </message>
-    <message>
       <source>Next</source>
       <translation>İleri</translation>
     </message>
@@ -9766,6 +9891,20 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Other Reason</source>
       <translation>Diğer sebep</translation>
+    </message>
+    <message>
+      <source>Please enter your contact information and the reason for deactivating your license</source>
+      <translation>Lütfen iletişim bilgilerinizi ve lisansınızı devre dışı bırakma nedeninizi girin</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n kullanıcılar</numerusform>
+        <numerusform>%n kullanıcılar</numerusform>
+      </translation>
     </message>
   </context>
   <context>

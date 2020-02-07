@@ -61,5 +61,8 @@ export class NxSystemMergeStatusComponent implements OnInit, OnDestroy {
         this.currentlyMerging = true;
         this.isMaster = mergeInfo.role ? mergeInfo.role !== this.config.systemStatuses.slave : mergeInfo.masterSystemId === this.system.id;
         this.mergeTargetSystem = this.getMergeTarget(mergeInfo.anotherSystemId) || this.LANG.system.unknownName;
+        if (!this.isMaster) {
+            this.settingsService.mergeTarget = this.mergeTargetSystem.id;
+        }
     }
 }

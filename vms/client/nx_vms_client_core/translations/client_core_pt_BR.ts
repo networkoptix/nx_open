@@ -2,87 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pt-BR" sourcelanguage="en">
   <context>
-    <name>HumanReadable</name>
-    <message numerus="yes">
-      <source>Bytes</source>
-      <comment>Full suffix for displaying bytes</comment>
-      <translation>
-        <numerusform>Byte</numerusform>
-        <numerusform>Bytes</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>B</source>
-      <comment>Suffix for displaying bytes</comment>
-      <translation>B</translation>
-    </message>
-    <message numerus="yes">
-      <source>Kilobytes</source>
-      <comment>Full suffix for displaying kilobytes</comment>
-      <translation>
-        <numerusform>Kilobyte</numerusform>
-        <numerusform>Kilobytes</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>KB</source>
-      <comment>Suffix for displaying kilobytes</comment>
-      <translation>KB</translation>
-    </message>
-    <message numerus="yes">
-      <source>Megabytes</source>
-      <comment>Full suffix for displaying megabytes</comment>
-      <translation>
-        <numerusform>Megabyte</numerusform>
-        <numerusform>Megabytes</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>MB</source>
-      <comment>Suffix for displaying megabytes</comment>
-      <translation>MB</translation>
-    </message>
-    <message numerus="yes">
-      <source>Gigabytes</source>
-      <comment>Full suffix for displaying gigabytes</comment>
-      <translation>
-        <numerusform>Gigabyte</numerusform>
-        <numerusform>Gigabytes</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>GB</source>
-      <comment>Suffix for displaying gigabytes</comment>
-      <translation>Gb</translation>
-    </message>
-    <message numerus="yes">
-      <source>Terabytes</source>
-      <comment>Full suffix for displaying terabytes</comment>
-      <translation>
-        <numerusform>Terabyte</numerusform>
-        <numerusform>Terabytes</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>TB</source>
-      <comment>Suffix for displaying terabytes</comment>
-      <translation>Tb</translation>
-    </message>
-    <message numerus="yes">
-      <source>Petabytes</source>
-      <comment>Full suffix for displaying petabytes</comment>
-      <translation>
-        <numerusform>Petabyte</numerusform>
-        <numerusform>Petabyte</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>PB</source>
-      <comment>Suffix for displaying petabytes</comment>
-      <translation>PB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
@@ -171,6 +90,20 @@
     </message>
   </context>
   <context>
+    <name>QnLocalSystemDescription</name>
+    <message>
+      <source>New Server</source>
+      <translation>Novo servidor</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSystemDescription</name>
+    <message>
+      <source>Unnamed System</source>
+      <translation>Sistema sem nome</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSystemsModel</name>
     <message>
       <source>Owner: %1</source>
@@ -180,153 +113,6 @@
     <message>
       <source>Your System</source>
       <translation>O seu Sistema</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>sem</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>a</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>mseg</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>seg</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>min</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>hrs</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>dia</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>sems</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>meses</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>anos</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>milissegundo</numerusform>
-        <numerusform>milissegundo</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>segundos</numerusform>
-        <numerusform>segundos</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>minutos</numerusform>
-        <numerusform>minutos</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>hora</numerusform>
-        <numerusform>hora</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>dia</numerusform>
-        <numerusform>dia</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>semana</numerusform>
-        <numerusform>semana</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>mês</numerusform>
-        <numerusform>mês</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>ano</numerusform>
-        <numerusform>ano</numerusform>
-      </translation>
     </message>
   </context>
 </TS>

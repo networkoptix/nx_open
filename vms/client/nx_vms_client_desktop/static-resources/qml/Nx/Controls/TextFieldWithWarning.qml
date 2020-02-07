@@ -10,6 +10,8 @@ FocusScope
     implicitHeight: textField.implicitHeight
         + (warningMessage.visible ? warningMessage.height + warningSpacing : 0)
 
+    baselineOffset: textField.baselineOffset
+
     property alias textField: textField
 
     // Expose some frequently used properties to simplify the component usage. Other properties are

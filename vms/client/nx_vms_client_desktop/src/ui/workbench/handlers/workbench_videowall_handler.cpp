@@ -1139,7 +1139,7 @@ void QnWorkbenchVideoWallHandler::restoreMessages(const QnUuid& controllerUuid, 
     }
 }
 
-bool QnWorkbenchVideoWallHandler::canStartControlMode() const
+bool QnWorkbenchVideoWallHandler::canStartControlMode(const QnUuid& layoutId) const
 {
     if (!m_licensesHelper->isValid(Qn::LC_VideoWall))
     {
@@ -1157,22 +1157,20 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
         return false;
     }
 
-    auto layout = workbench()->currentLayout()->resource();
-    if (!layout)
-        return false;
+    // There is no layout for the target item, so nobody already controls it.
+    if (layoutId.isNull())
+        return true;
 
-    foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
+    // Check if another client instance already controls this layout.
+    const auto activePeers = runtimeInfoManager()->items()->getItems();
+    for (const QnPeerRuntimeInfo& info: activePeers)
     {
-        if (info.data.videoWallControlSession != layout->getId())
-            continue;
-
-        /* Ignore our control session. */
-        if (info.uuid == runtimeInfoManager()->localInfo().uuid)
-            continue;
-
-        showControlledByAnotherUserMessage();
-
-        return false;
+        if (info.data.videoWallControlSession == layoutId
+            && info.uuid != runtimeInfoManager()->localInfo().uuid)
+        {
+            showControlledByAnotherUserMessage();
+            return false;
+        }
     }
 
     return true;
@@ -1195,7 +1193,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     auto layoutResource = workbench()->currentLayout()->resource();
     NX_ASSERT(layoutResource || !active);
 
-    if (active && !canStartControlMode())
+    if (active && !canStartControlMode(layoutResource->getId()))
         return;
 
     if (m_controlMode.active == active)
@@ -1858,43 +1856,46 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
 {
-    if (!canStartControlMode())
+    const auto parameters = menu()->currentParameters(sender());
+    QnVideoWallItemIndex target;
+    for (const QnVideoWallItemIndex& index: parameters.videoWallItems())
+    {
+        if (index.isValid())
+        {
+            target = index;
+            break;
+        }
+    }
+
+    if (!NX_ASSERT(target.isValid(), "Action was triggered with incorrect parameters"))
         return;
 
-    const auto parameters = menu()->currentParameters(sender());
+    QnVideoWallItem item = target.item();
 
-    QnWorkbenchLayout *layout = NULL;
+    if (!canStartControlMode(item.layout))
+        return;
 
-    QnVideoWallItemIndexList indices = parameters.videoWallItems();
+    QnLayoutResourcePtr layoutResource = item.layout.isNull()
+        ? QnLayoutResourcePtr()
+        : resourcePool()->getResourceById<QnLayoutResource>(item.layout);
 
-    foreach(QnVideoWallItemIndex index, indices)
+    if (!layoutResource)
     {
-        if (!index.isValid())
-            continue;
-        QnVideoWallItem item = index.item();
-
-        QnLayoutResourcePtr layoutResource = item.layout.isNull()
-            ? QnLayoutResourcePtr()
-            : resourcePool()->getResourceById<QnLayoutResource>(item.layout);
-
-        if (!layoutResource)
-        {
-            layoutResource = constructLayout(QnResourceList());
-            layoutResource->setParentId(index.videowall()->getId());
-            layoutResource->setName(index.item().name);
-            resourcePool()->addResource(layoutResource);
-            resetLayout(QnVideoWallItemIndexList() << index, layoutResource);
-        }
-
-        layout = QnWorkbenchLayout::instance(layoutResource);
-        if (!layout)
-        {
-            layout = qnWorkbenchLayoutsFactory->create(layoutResource, workbench());
-            workbench()->addLayout(layout);
-        }
-        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
-        layout->notifyTitleChanged();
+        layoutResource = constructLayout(QnResourceList());
+        layoutResource->setParentId(target.videowall()->getId());
+        layoutResource->setName(target.item().name);
+        resourcePool()->addResource(layoutResource);
+        resetLayout(QnVideoWallItemIndexList() << target, layoutResource);
     }
+
+    auto layout = QnWorkbenchLayout::instance(layoutResource);
+    if (!layout)
+    {
+        layout = qnWorkbenchLayoutsFactory->create(layoutResource, workbench());
+        workbench()->addLayout(layout);
+    }
+    layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
+    layout->notifyTitleChanged();
 
     if (layout)
         workbench()->setCurrentLayout(layout);

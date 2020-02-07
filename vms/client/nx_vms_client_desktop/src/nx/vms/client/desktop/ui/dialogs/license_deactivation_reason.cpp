@@ -4,17 +4,24 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QPushButton>
 
-#include <nx/vms/client/desktop/common/widgets/input_field.h>
-#include <ui/workbench/workbench_context.h>
-
-#include <nx/vms/client/desktop/common/widgets/text_edit_field.h>
-#include <nx/vms/client/desktop/common/widgets/combo_box_field.h>
-
 #include <core/resource/user_resource.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
+#include <licensing/license.h>
+#include <utils/common/html.h>
 
-using namespace nx::vms::client::desktop;
+#include <nx/vms/client/desktop/common/widgets/input_field.h>
+#include <nx/vms/client/desktop/common/widgets/text_edit_field.h>
+#include <nx/vms/client/desktop/common/widgets/combo_box_field.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+
+#include <ui/workbench/workbench_context.h>
+
+using namespace nx::vms::common;
+
+namespace nx::vms::client::desktop {
+namespace ui {
+namespace dialogs {
 
 namespace {
 
@@ -55,10 +62,6 @@ TextValidateFunction reasonTextEditValidator(
 
 } // unnamed namespace
 
-namespace nx::vms::client::desktop {
-namespace ui {
-namespace dialogs {
-
 LicenseDeactivationReason::LicenseDeactivationReason(
     const license::RequestInfo& info,
     QWidget* parent)
@@ -66,8 +69,16 @@ LicenseDeactivationReason::LicenseDeactivationReason(
     base_type(parent),
     m_info(info)
 {
-    setIcon(QnMessageBoxIcon::Information);
-    setText(tr("Please enter your contact information and the reason for deactivating your license"));
+    static const auto kLightTextColor = ColorTheme::instance()->color("light10");
+
+    setText(tr("Please complete the following for license deactivation"));
+    setInformativeText(
+        html::colored(
+            tr("Note that each license key may be deactivated a maximum of %n times.", "",
+                QnLicense::kMaximumDeactivationsCount),
+            kLightTextColor));
+    setInformativeTextFormat(Qt::RichText);
+
     setStandardButtons(QDialogButtonBox::Cancel);
     setDefaultButton(QDialogButtonBox::NoButton);
 

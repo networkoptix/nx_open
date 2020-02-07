@@ -116,6 +116,16 @@ bool QnLicense::RegionalSupport::isValid() const
     return !company.isEmpty() && !address.isEmpty();
 }
 
+int QnLicense::deactivationsCount() const
+{
+    return m_deactivationsCount;
+}
+
+int QnLicense::deactivationsCountLeft() const
+{
+    return std::max(0, kMaximumDeactivationsCount - m_deactivationsCount);
+}
+
 QnLicense::QnLicense(const QByteArray& licenseBlock):
     m_rawLicense(licenseBlock)
 {
@@ -143,6 +153,9 @@ QnLicense::QnLicense(const api::DetailedLicenseData& value)
         params << QByteArray("COMPANY=").append(value.company);
         params << QByteArray("SUPPORT=").append(value.support);
     }
+
+    if (value.deactivations > 0)
+        params << QByteArray("DEACTIVATIONS=").append(QByteArray::number(value.deactivations));
 
     const auto licenseBlock = params.join('\n') + '\n';
     loadLicenseBlock(licenseBlock);
@@ -505,6 +518,8 @@ void QnLicense::parseLicenseBlock(
                 m_regionalSupport.company = QString::fromUtf8(avalue);
             else if (aname == "SUPPORT")
                 m_regionalSupport.address = QString::fromUtf8(avalue);
+            else if (aname == "DEACTIVATIONS")
+                m_deactivationsCount = avalue.toInt();
         }
 
         // v1 license activation is 4 strings + signature

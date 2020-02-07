@@ -4,16 +4,22 @@
   <context>
     <name>AnalyticsSettings</name>
     <message>
-      <source>Enable</source>
-      <translation>Etkinleştir</translation>
-    </message>
-    <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Kamera analitikleri sadece kamera görüntülenirken çalışır. Sürekli çalışması için kaydı etkinleştirin.</translation>
     </message>
+  </context>
+  <context>
+    <name>Box</name>
     <message>
-      <source>This is the built-in functionality</source>
-      <translation>Bu gömülü bir işlevdir</translation>
+      <source>Click on video to start box.</source>
+      <translation>Başlatmak için videoya tıklayın.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ContextHintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation type="unfinished">Click to read more</translation>
     </message>
   </context>
   <context>
@@ -36,6 +42,81 @@
     <message>
       <source>Click to setup</source>
       <translation>Parolayı değiştirmek için tıklayın</translation>
+    </message>
+  </context>
+  <context>
+    <name>Figure</name>
+    <message>
+      <source>No shape</source>
+      <translation>Şekil yok</translation>
+    </message>
+    <message>
+      <source>click to add</source>
+      <translation>eklemek için tıklayın</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Düzenle</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Sil</translation>
+    </message>
+    <message>
+      <source>Display on camera</source>
+      <translation>Kamerada göster</translation>
+    </message>
+    <message>
+      <source>Figure</source>
+      <translation>Şekil</translation>
+    </message>
+  </context>
+  <context>
+    <name>FigureEditorDialog</name>
+    <message>
+      <source>Clear</source>
+      <translation>Temizle</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>Tamam</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>İptal</translation>
+    </message>
+  </context>
+  <context>
+    <name>InformationPanel</name>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation type="unfinished">Vendor</translation>
+    </message>
+  </context>
+  <context>
+    <name>Line</name>
+    <message>
+      <source>Click on video to start line.</source>
+      <translation>Başlatmak için başlnagıç çizgisine tıklayın.</translation>
+    </message>
+    <message>
+      <source>Click arrows to toggle the desired directions.</source>
+      <translation>İstenen yönleri değiştirmek için okları tıklayın.</translation>
+    </message>
+    <message>
+      <source>Line is not valid. Remove self-intersections to proceed.</source>
+      <translation>Çizgi geçerli değil. Devam etmek için kaldırın.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>Maksümum nokta sayısına ulaşıldı (%n points).</numerusform>
+        <numerusform>Maksimum nokta sayısına ulaşıldı (%n points).</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -77,6 +158,31 @@
     <message>
       <source>Server is offline</source>
       <translation>Sunucu Çevrimdışı</translation>
+    </message>
+  </context>
+  <context>
+    <name>PolyFigure</name>
+    <message>
+      <source>Delete</source>
+      <translation>Sil</translation>
+    </message>
+  </context>
+  <context>
+    <name>Polygon</name>
+    <message>
+      <source>Click on video to start polygon.</source>
+      <translation>Başlatmak için videoya tıklayın.</translation>
+    </message>
+    <message>
+      <source>Polygon is not valid. Remove self-intersections to proceed.</source>
+      <translation>Çizgi geçerli değil. Devam etmek için kaldırın.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>Maksümum nokta sayısına ulaşıldı (%n points).</numerusform>
+        <numerusform>Maksimum nokta sayısına ulaşıldı (%n points).</numerusform>
+      </translation>
     </message>
   </context>
   <context>

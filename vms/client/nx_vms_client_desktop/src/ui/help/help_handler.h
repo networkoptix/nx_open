@@ -5,6 +5,8 @@
 
 #include "help_topics.h"
 
+// This class should not depend on any singletons.
+// If it must, it should be changed to our QnSingleton descendant.
 class QnHelpHandler: public QObject
 {
     Q_OBJECT

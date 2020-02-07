@@ -288,7 +288,7 @@ struct WorkbenchExportHandler::Private
             case FileExtension::exe86:
             {
                 const auto layout = ResourceDirectoryBrowser::layoutFromFile(
-                    completeFilename, resourcePool);
+                    completeFilename, QPointer(resourcePool));
                 if (layout)
                     resourcePool->addResource(layout);
                 return layout;

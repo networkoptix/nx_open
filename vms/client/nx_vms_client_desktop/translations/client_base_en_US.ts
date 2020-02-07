@@ -3604,22 +3604,6 @@ to %1</source>
 <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
-        <source>Screens Allowed:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Control Sessions Allowed:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Archive Streams Allowed:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Generic:</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>License Type</source>
         <translation></translation>
     </message>
@@ -3628,11 +3612,31 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Features:</source>
+        <source>Locked to Hardware ID</source>
         <translation></translation>
     </message>
     <message>
-        <source>Locked to Hardware ID</source>
+        <source>Generic</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Features</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Screens Allowed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Control Sessions Allowed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Archive Streams Allowed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Deactivations Remaining</source>
         <translation></translation>
     </message>
 </context>
@@ -3901,10 +3905,6 @@ to %1</source>
         <source>This license is already activated and linked to Hardware ID %1 on %2</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Every license can be deactivated only a few times.</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>%1 are currently in use</source>
         <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
@@ -3919,6 +3919,13 @@ to %1</source>
         <translation>
             <numerusform>At least %1 is required</numerusform>
             <numerusform>At least %1 are required</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n deactivations remaining.</source>
+        <translation>
+            <numerusform>%n deactivation remaining.</numerusform>
+            <numerusform>%n deactivations remaining.</numerusform>
         </translation>
     </message>
 </context>
@@ -6803,19 +6810,11 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Video Wall license required</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>To enable this feature, please activate a Video Wall license.</source>
         <translation></translation>
     </message>
     <message>
         <source>Failed to apply changes</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To enable Video Wall, please activate a Video Wall license.</source>
         <translation></translation>
     </message>
     <message numerus="yes">
@@ -6870,6 +6869,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Activate one more license to start Video Wall.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Activate License...</source>
         <translation></translation>
     </message>
 </context>
@@ -7498,6 +7501,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Unknown track</source>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>+%n values</source>
+        <translation>
+            <numerusform>+%n value</numerusform>
+            <numerusform>+%n values</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -9885,8 +9895,15 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Please enter your contact information and the reason for deactivating your license</source>
+        <source>Please complete the following for license deactivation</source>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Note that each license key may be deactivated a maximum of %n times.</source>
+        <translation>
+            <numerusform>Note that each license key may be deactivated a maximum of %n time.</numerusform>
+            <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+        </translation>
     </message>
 </context>
 <context>

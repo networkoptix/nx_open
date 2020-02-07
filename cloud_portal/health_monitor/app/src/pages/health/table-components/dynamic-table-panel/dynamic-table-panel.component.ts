@@ -1,16 +1,18 @@
 import {
+    AfterViewInit,
     Component, ElementRef, EventEmitter, Input, OnChanges,
     Output, SimpleChanges, ViewChild
 }                                   from '@angular/core';
 import { NxConfigService }          from '../../../../services/nx-config';
 import { NxHealthService }          from '../../health.service';
+import { NxScrollMechanicsService } from '../../../../services/scroll-mechanics.service';
 
 @Component({
     selector   : 'nx-dynamic-table-panel-component',
     templateUrl: './dynamic-table-panel.component.html',
     styleUrls  : ['./dynamic-table-panel.component.scss']
 })
-export class NxDynamicTablePanelComponent implements OnChanges {
+export class NxDynamicTablePanelComponent implements OnChanges, AfterViewInit {
 
     @Input() panelParams: any;
     @Input() activeEntity: any;
@@ -33,8 +35,13 @@ export class NxDynamicTablePanelComponent implements OnChanges {
 
     constructor(private configService: NxConfigService,
                 private healthService: NxHealthService,
+                private scrollMechanicsService: NxScrollMechanicsService,
     ) {
         this.CONFIG = this.configService.getConfig();
+    }
+
+    ngAfterViewInit() {
+        this.scrollMechanicsService.panelVisible(true);
     }
 
     ngOnChanges(changes: SimpleChanges) {

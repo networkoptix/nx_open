@@ -2,6 +2,114 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
   <context>
+    <name>ArchiveDuration</name>
+    <message>
+      <source>no data for forecast</source>
+      <translation>нет данных для прогноза</translation>
+    </message>
+    <message>
+      <source>empty</source>
+      <translation>пусто</translation>
+    </message>
+    <message>
+      <source>less than an hour</source>
+      <translation>менее часа</translation>
+    </message>
+  </context>
+  <context>
+    <name>HumanReadable</name>
+    <message numerus="yes">
+      <source>Bytes</source>
+      <comment>Full suffix for displaying bytes</comment>
+      <translation>
+        <numerusform>Байт</numerusform>
+        <numerusform>Байт</numerusform>
+        <numerusform>Байт</numerusform>
+        <numerusform>Байт</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>B</source>
+      <comment>Suffix for displaying bytes</comment>
+      <translation>Б</translation>
+    </message>
+    <message numerus="yes">
+      <source>Kilobytes</source>
+      <comment>Full suffix for displaying kilobytes</comment>
+      <translation>
+        <numerusform>Килобайта</numerusform>
+        <numerusform>Килобайта</numerusform>
+        <numerusform>Килобайта</numerusform>
+        <numerusform>Килобайта</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>KB</source>
+      <comment>Suffix for displaying kilobytes</comment>
+      <translation>Кб</translation>
+    </message>
+    <message numerus="yes">
+      <source>Megabytes</source>
+      <comment>Full suffix for displaying megabytes</comment>
+      <translation>
+        <numerusform>Мегабайта</numerusform>
+        <numerusform>Мегабайта</numerusform>
+        <numerusform>Мегабайта</numerusform>
+        <numerusform>Мегабайта</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>MB</source>
+      <comment>Suffix for displaying megabytes</comment>
+      <translation>Мб</translation>
+    </message>
+    <message numerus="yes">
+      <source>Gigabytes</source>
+      <comment>Full suffix for displaying gigabytes</comment>
+      <translation>
+        <numerusform>Гигабайта</numerusform>
+        <numerusform>Гигабайта</numerusform>
+        <numerusform>Гигабайта</numerusform>
+        <numerusform>Гигабайта</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>GB</source>
+      <comment>Suffix for displaying gigabytes</comment>
+      <translation>ГБ</translation>
+    </message>
+    <message numerus="yes">
+      <source>Terabytes</source>
+      <comment>Full suffix for displaying terabytes</comment>
+      <translation>
+        <numerusform>Терабайта</numerusform>
+        <numerusform>Терабайта</numerusform>
+        <numerusform>Терабайта</numerusform>
+        <numerusform>Терабайта</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>TB</source>
+      <comment>Suffix for displaying terabytes</comment>
+      <translation>ТБ</translation>
+    </message>
+    <message numerus="yes">
+      <source>Petabytes</source>
+      <comment>Full suffix for displaying petabytes</comment>
+      <translation>
+        <numerusform>Петабайт</numerusform>
+        <numerusform>Петабайт</numerusform>
+        <numerusform>Петабайт</numerusform>
+        <numerusform>Петабайт</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>PB</source>
+      <comment>Suffix for displaying petabytes</comment>
+      <translation>ПБ</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -819,13 +927,6 @@
     </message>
   </context>
   <context>
-    <name>QnLocalSystemDescription</name>
-    <message>
-      <source>New Server</source>
-      <translation>Новый сервер</translation>
-    </message>
-  </context>
-  <context>
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
@@ -997,10 +1098,166 @@
     </message>
   </context>
   <context>
-    <name>QnSystemDescription</name>
+    <name>QnTimeStrings</name>
     <message>
-      <source>Unnamed System</source>
-      <translation>Система без имени</translation>
+      <source>ms</source>
+      <comment>Suffix for displaying milliseconds</comment>
+      <translation>мс</translation>
+    </message>
+    <message>
+      <source>s</source>
+      <comment>Suffix for displaying seconds</comment>
+      <translation>с</translation>
+    </message>
+    <message>
+      <source>m</source>
+      <comment>Suffix for displaying minutes</comment>
+      <translation>м</translation>
+    </message>
+    <message>
+      <source>h</source>
+      <comment>Suffix for displaying hours</comment>
+      <translation>ч</translation>
+    </message>
+    <message>
+      <source>d</source>
+      <comment>Suffix for displaying days</comment>
+      <translation>д</translation>
+    </message>
+    <message>
+      <source>w</source>
+      <comment>Suffix for displaying weeks</comment>
+      <translation>н</translation>
+    </message>
+    <message>
+      <source>M</source>
+      <comment>Suffix for displaying months</comment>
+      <translation>М</translation>
+    </message>
+    <message>
+      <source>y</source>
+      <comment>Suffix for displaying years</comment>
+      <translation>г</translation>
+    </message>
+    <message>
+      <source>msec</source>
+      <comment>Long suffix for displaying milliseconds</comment>
+      <translation>мсек</translation>
+    </message>
+    <message>
+      <source>sec</source>
+      <comment>Long suffix for displaying seconds</comment>
+      <translation>сек</translation>
+    </message>
+    <message>
+      <source>min</source>
+      <comment>Long suffix for displaying minutes</comment>
+      <translation>мин</translation>
+    </message>
+    <message>
+      <source>hrs</source>
+      <comment>Long suffix for displaying hours</comment>
+      <translation>ч</translation>
+    </message>
+    <message>
+      <source>days</source>
+      <comment>Long suffix for displaying days</comment>
+      <translation>дней</translation>
+    </message>
+    <message>
+      <source>wks</source>
+      <comment>Long suffix for displaying weeks</comment>
+      <translation>нед</translation>
+    </message>
+    <message>
+      <source>mos</source>
+      <comment>Long suffix for displaying months</comment>
+      <translation>мес</translation>
+    </message>
+    <message>
+      <source>yrs</source>
+      <comment>Long suffix for displaying years</comment>
+      <translation>лет</translation>
+    </message>
+    <message numerus="yes">
+      <source>milliseconds</source>
+      <comment>Full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>миллисекунд</numerusform>
+        <numerusform>миллисекунд</numerusform>
+        <numerusform>миллисекунд</numerusform>
+        <numerusform>миллисекунд</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>seconds</source>
+      <comment>Full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>minutes</source>
+      <comment>Full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>минуты</numerusform>
+        <numerusform>минуты</numerusform>
+        <numerusform>минуты</numerusform>
+        <numerusform>минуты</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>hours</source>
+      <comment>Full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>часа</numerusform>
+        <numerusform>часа</numerusform>
+        <numerusform>часа</numerusform>
+        <numerusform>часа</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>days</source>
+      <comment>Full suffix for displaying days</comment>
+      <translation>
+        <numerusform>день</numerusform>
+        <numerusform>день</numerusform>
+        <numerusform>день</numerusform>
+        <numerusform>день</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>weeks</source>
+      <comment>Full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>недели</numerusform>
+        <numerusform>недели</numerusform>
+        <numerusform>недели</numerusform>
+        <numerusform>недели</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>months</source>
+      <comment>Full suffix for displaying months</comment>
+      <translation>
+        <numerusform>месяца</numerusform>
+        <numerusform>месяца</numerusform>
+        <numerusform>месяца</numerusform>
+        <numerusform>месяца</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>years</source>
+      <comment>Full suffix for displaying years</comment>
+      <translation>
+        <numerusform>года</numerusform>
+        <numerusform>года</numerusform>
+        <numerusform>года</numerusform>
+        <numerusform>года</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1191,7 +1448,7 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Движение на камере</numerusform>
         <numerusform>Движение на камерах</numerusform>
         <numerusform>Движение на камерах</numerusform>
@@ -1217,10 +1474,6 @@
     <message>
       <source>License Issue</source>
       <translation>Проблема с лицензией</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation>Резервное копирование архива завершено</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
@@ -1669,6 +1922,35 @@
     <message>
       <source>RAID error. %1.</source>
       <translation>Ошибка RAID. %1.</translation>
+    </message>
+    <message>
+      <source>Buzzer</source>
+      <translation type="unfinished">Buzzer</translation>
+    </message>
+    <message>
+      <source>Archive Backup Finished</source>
+      <translation type="unfinished">Archive Backup Finished</translation>
+    </message>
+    <message>
+      <source>PoE over Budget</source>
+      <translation type="unfinished">PoE over Budget</translation>
+    </message>
+    <message>
+      <source>Fan Error</source>
+      <translation type="unfinished">Fan Error</translation>
+    </message>
+    <message>
+      <source>PoE over budget at %1</source>
+      <translation type="unfinished">PoE over budget at %1</translation>
+    </message>
+    <message>
+      <source>Fan error at %1</source>
+      <translation type="unfinished">Fan error at %1</translation>
+    </message>
+    <message>
+      <source>Reason: Power limit exceeded (%1)</source>
+      <comment>%1 is consumption</comment>
+      <translation type="unfinished">Reason: Power limit exceeded (%1)</translation>
     </message>
   </context>
   <context>

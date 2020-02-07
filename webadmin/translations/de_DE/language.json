@@ -77,6 +77,7 @@
         "emailSignature": "Email-Signatur",
         "emailSupportEmail": "Email-Adresse Support",
         "enableEdgeRecording": "Edge-Aufzeichnung aktivieren",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Ereignisprotokollzeitraum (Tage)",
         "ldapAdminDn": "LDAP Admin-DN",
         "ldapSearchBase": "LDAP-Suchbasis",
@@ -85,6 +86,7 @@
         "localSystemId": "Lokale System-ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Maximaler Unterschied zwischen synchronisierter und Internetzeit (Millisekunden)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Maximaler Unterschied zwischen synchronisierter und lokaler Zeit (Millisekunden)",
+        "maxP2pQueueSizeBytes": "Maximale P2P-Warteschlangengröße (Byte)",
         "maxRecordQueueSizeBytes": "Maximale Größe der Warteschlange für Datensätze (Bytes)",
         "maxRecordQueueSizeElements": "Maximale Größe der Warteschlange für Datensätze (Elemente)",
         "maxRemoteArchiveSynchronizationThreads": "Max Remote-Archivsynchronisation-Threads",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Synchronisierung aktiviert",
         "primaryTimeServer": "Primärer Zeitsynchronisationsserver",
         "osTimeChangeCheckPeriodMs": "Prüfung der OS-Zeitänderung",
-        "syncTimeExchangePeriod": "Synchronisationszeitraum",
+        "syncTimeExchangePeriod": "Synchronisationsintervall für Netzwerkanfragen",
+        "syncTimeEpsilon": "Zeitsumme synchronisieren. Neuer Wert wird nicht angewendet, wenn die Delta-Zeit kleiner als die Summe ist",
         "maxWearableArchiveSynchronizationThreads": "Max. tragbare Kameraarchiv Syncthreads",
         "updateNotificationsEnabled": "Update-Benachrichtigungen aktiviert",
         "upnpPortMappingEnabled": "UPNP-Port-Mapping aktiviert",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Statusüberwachung",
+            "graphs": "Graphs",
             "storage": "Speicher",
             "log": "Log"
         }

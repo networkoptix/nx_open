@@ -5,8 +5,8 @@ $font-family-light : "robotolight", "Helvetica Neue", Helvetica, Arial, sans-ser
 $font-family-bold : "robotobold", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 @import '~sass-rem/rem';
-@import 'theme_palette';
-@import '/native-theme/theme_palette';
+@import '_theme_palette';
+@import '/native-theme/_theme_palette';
 @import 'custom/custom_palette';
 
 // Brand colors
@@ -234,9 +234,9 @@ $grid-wide-content-width: calc(84% - 1rem);
 $grid-super-wide-menu-width    : 12%;
 $grid-super-wide-content-width : calc(88% - 1rem);
 
-$grid-table-width: 70%;
-$grid-panel-width: calc(30% - 1rem);
-$grid-narrow-table-width: 60%;
-$grid-narrow-panel-width: calc(40% - 1rem);
-$grid-super-wide-table-width: 80%;
-$grid-super-wide-panel-width: calc(20% - 1rem);
+$grid-table-width: calc(100% - 350px - 1rem);
+$grid-panel-width: 350px;
+$grid-narrow-table-width: calc(100% - 350px - 1rem);
+$grid-narrow-panel-width: 350px;
+$grid-super-wide-table-width: calc(100% - 450px - 1rem);
+$grid-super-wide-panel-width: 450px;

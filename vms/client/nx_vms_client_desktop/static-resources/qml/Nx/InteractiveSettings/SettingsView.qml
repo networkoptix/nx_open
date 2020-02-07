@@ -14,6 +14,7 @@ Item
     property Item contentItem: null
     property bool contentEnabled: true
     property Item scrollBarParent: null
+    property Item headerItem: null
 
     property var resourceId
 
@@ -25,6 +26,7 @@ Item
         contentItem = Settings.createItems(settingsView, model)
         contentItem.contentEnabled = Qt.binding(function() { return contentEnabled })
         contentItem.scrollBarParent = Qt.binding(function() { return scrollBarParent })
+        contentItem.extraHeaderItem = Qt.binding(function() { return headerItem })
 
         if (initialValues)
             setValues(initialValues)
@@ -46,7 +48,7 @@ Item
         _valuesChangedEnabled = true
     }
 
-    property bool _valuesChangedEnabled
+    property bool _valuesChangedEnabled: true
     function _emitValuesChanged()
     {
         if (_valuesChangedEnabled)

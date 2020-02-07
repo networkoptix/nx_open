@@ -20,8 +20,9 @@ nx-dynamic-table {
   }
 
   .nx-table-wrapper {
-    max-width: 100%;
-    width: fit-content;
+    max-width : 100%;
+    width     : fit-content;
+    width     : -moz-fit-content;
 
     @include media-breakpoint-down(lg) {
       width: auto;
@@ -82,10 +83,6 @@ nx-dynamic-table {
 
     .nx-table {
       @media (min-width: 1280px) {
-        min-width: 700px !important;
-      }
-
-      @media (min-width: 1440px) {
         min-width: 800px !important;
       }
 
@@ -121,8 +118,8 @@ nx-dynamic-table {
             }
 
             .group-3 {
-              color        : $purple500;
-              border-color : $purple500;
+              color        : $green500;
+              border-color : $green500;
             }
 
             .group-4 {
@@ -136,8 +133,8 @@ nx-dynamic-table {
             }
 
             .group-6 {
-              color        : $green500;
-              border-color : $green500;
+              color        : $light10;
+              border-color : $light10;
             }
           }
         }

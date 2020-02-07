@@ -12,7 +12,7 @@ namespace nx::vms::client::desktop {
 
 class LayoutSettingsDialogStore;
 
-class LayoutLogicalIdsWatcher: public QObject
+class NX_VMS_CLIENT_DESKTOP_API LayoutLogicalIdsWatcher: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

@@ -33,11 +33,6 @@
       <source>System Servers</source>
       <translation>システムサーバー</translation>
     </message>
-    <message>
-      <location/>
-      <source>Customer Support</source>
-      <translation>カスタマーサポート</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -500,6 +495,11 @@
       <source>At</source>
       <translation>デバイス</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use event source server</source>
+      <translation type="unfinished">Use event source server</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -527,6 +527,19 @@
       <location/>
       <source>Test</source>
       <translation>テスト</translation>
+    </message>
+  </context>
+  <context>
+    <name>BuzzerBusinessActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/buzzer_business_action_widget.ui"/>
+      <source>Fixed duration:</source>
+      <translation>固定期間:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>seconds</source>
+      <translation>秒</translation>
     </message>
   </context>
   <context>
@@ -927,6 +940,14 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>ログインを維持</translation>
+    </message>
+  </context>
+  <context>
+    <name>ConnectingToServerDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
+      <source>Connecting...</source>
+      <translation type="unfinished">Connecting...</translation>
     </message>
   </context>
   <context>
@@ -1718,23 +1739,8 @@
     </message>
     <message>
       <location/>
-      <source>License Type:</source>
-      <translation>ライセンスタイプ:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>License Key:</source>
-      <translation>ライセンスキー:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Features</source>
       <translation>機能</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Locked to Hardware ID:</source>
-      <translation>ハードウェアIDのロック:</translation>
     </message>
   </context>
   <context>
@@ -2066,6 +2072,24 @@
     </message>
   </context>
   <context>
+    <name>PasswordDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
+      <source>Sign in</source>
+      <translation type="unfinished">Sign in</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
+      <translation>パスワード</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Username</source>
+      <translation>ユーザ名</translation>
+    </message>
+  </context>
+  <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
@@ -2132,14 +2156,17 @@
     </message>
   </context>
   <context>
+    <name>PoeSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
+      <source>Attention! Power limit exceeded</source>
+      <translation type="unfinished">Attention! Power limit exceeded</translation>
+    </message>
+  </context>
+  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-      <source>Global Notification Settings...</source>
-      <translation>グローバル通知設定...</translation>
-    </message>
-    <message>
-      <location/>
       <source>for</source>
       <translation>ユーザー</translation>
     </message>
@@ -2780,6 +2807,14 @@
       <location/>
       <source>Global Email Settings...</source>
       <translation>グローバルEmail設定(&amp;G)...</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServerSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_dialogs/server_selection_dialog.ui"/>
+      <source>Select Servers</source>
+      <translation>サーバー選択</translation>
     </message>
   </context>
   <context>

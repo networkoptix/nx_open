@@ -77,6 +77,7 @@
         "emailSignature": "Email signature",
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Enable edge recording",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP search base",
@@ -85,6 +86,7 @@
         "localSystemId": "Local System ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max difference between synchronized and Internet time (milliseconds)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max difference between synchronized and local time (milliseconds)",
+        "maxP2pQueueSizeBytes": "حجم قائمة انتظار P2P الأقصى (بايت)",
         "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
         "maxRecordQueueSizeElements": "Max record queue size (elements)",
         "maxRemoteArchiveSynchronizationThreads": "Max remote archive synchronization threads",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Time synchronization enabled",
         "primaryTimeServer": "Primary time synchronization server",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "syncTimeExchangePeriod": "مزامنة الفاصل الزمني لمزامنة الوقت لطلبات الشبكة",
+        "syncTimeEpsilon": "مزامنة الوقت إبسيلون. لا يتم تطبيق قيمة جديدة إذا كان الوقت أقل من إبسيلون",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Update notifications enabled",
         "upnpPortMappingEnabled": "UPNP port mapping enabled",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Health monitoring",
+            "graphs": "Graphs",
             "storage": "Storage",
             "log": "Log"
         }

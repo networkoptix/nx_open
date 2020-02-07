@@ -77,6 +77,7 @@
         "emailSignature": "Podpis e-mail",
         "emailSupportEmail": "E-mail do supportu",
         "enableEdgeRecording": "Włącz nagrywanie brzegowe",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Okres dziennika zdarzeń (dni)",
         "ldapAdminDn": "DN admina LDAP",
         "ldapSearchBase": "Podstawa wyszukiwania LDAP",
@@ -85,6 +86,7 @@
         "localSystemId": "ID lokalnego systemu",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max różnica między czasem zsynchronizowanym a internetowym (ms)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max różnica między czasem zsynchronizowanym a lokalnym (ms)",
+        "maxP2pQueueSizeBytes": "Maksymalny rozmiar kolejki P2P (bajty)",
         "maxRecordQueueSizeBytes": "Max rozmiar kolejki rekordów (bajty)",
         "maxRecordQueueSizeElements": "Max rozmiar kolejki rekordów (elementy)",
         "maxRemoteArchiveSynchronizationThreads": "Max liczba wątków synchronizacji zdalnej archiwizacji",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Synchronizacja czasu włączona",
         "primaryTimeServer": "Podstawowy serwer synchronizacji czasu",
         "osTimeChangeCheckPeriodMs": "Okres sprawdzania zmiany czasu systemu",
-        "syncTimeExchangePeriod": "Okres synchronizacji czasu",
+        "syncTimeExchangePeriod": "Interwał synchronizacji czasu dla żądań sieciowych",
+        "syncTimeEpsilon": "Wartość synchronizacji czasu epsilon. Nowa wartość nie jest stosowana jeśli czas delta jest mniejszy niż czas epsilon.",
         "maxWearableArchiveSynchronizationThreads": "Max liczba wątków synchronizacji nagrań kamery przenośnej",
         "updateNotificationsEnabled": "Powiadomienia o aktualizacji włączone",
         "upnpPortMappingEnabled": "Przekierowywanie portów UPNP włączone",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Monitorowanie stanu technicznego",
+            "graphs": "Graphs",
             "storage": "Archiwum",
             "log": "Dziennik"
         }

@@ -38,7 +38,7 @@ Instrument
 
             function shouldFinish()
             {
-                if (!count)
+                if (count === 0)
                     return false
 
                 const p1 = get(count - 1)
@@ -60,20 +60,35 @@ Instrument
             }
         }
 
-        function snappedToFirstPoint(point)
+        function snappedToFirstOrLastPoint(p)
         {
-            if (count <= minPoints)
-                return point
+            if (count === 0)
+                return p
 
             const fp = getPoint(0)
-            return F.snapped(point.x, point.y, fp.x, fp.y, snapDistance)
+            const lp = count > 1 ? getPoint(count - 2) : fp
+
+            if (F.distance(p.x, p.y, lp.x, lp.y) < F.distance(p.x, p.y, fp.x, fp.y))
+                return F.snapped(p.x, p.y, lp.x, lp.y, snapDistance)
+            else
+                return F.snapped(p.x, p.y, fp.x, fp.y, snapDistance)
+        }
+
+        function lastTwoPointsCollapsed()
+        {
+            if (count < 2)
+                return false
+
+            const p1 = getPoint(count - 1)
+            const p2 = getPoint(count - 2)
+            return p1.x === p2.x && p1.y === p2.y
         }
 
         function processMove(event)
         {
             event.accepted = true
             if (count > 0)
-                setPoint(count - 1, snappedToFirstPoint(event.position))
+                setPoint(count - 1, snappedToFirstOrLastPoint(event.position))
         }
 
         function normalizedIndex(index)
@@ -94,7 +109,8 @@ Instrument
 
         if (count === 0)
         {
-            pointsModel.append(pointsModel.makePoint(d.snappedToFirstPoint(mouse.position)))
+            pointsModel.append(pointsModel.makePoint(mouse.position))
+            pointsModel.append(pointsModel.makePoint(mouse.position))
             return
         }
         d.processMove(mouse)
@@ -114,13 +130,16 @@ Instrument
             return
         }
 
-        if (count == maxPoints)
+        if (d.lastTwoPointsCollapsed())
+            return
+
+        if (count === maxPoints)
         {
             finish()
             return
         }
 
-        pointsModel.append(pointsModel.makePoint(d.snappedToFirstPoint(mouse.position)))
+        pointsModel.append(pointsModel.makePoint(mouse))
     }
 
     function start()

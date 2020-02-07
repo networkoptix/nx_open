@@ -153,6 +153,8 @@ export class AppComponent {
         // @ts-ignore
         this.CONFIG.integrationStoreEnabled = window.SETTINGS.integrationStoreEnabled;
         // @ts-ignore
+        this.CONFIG.healthMonitoringEnabled = window.SETTINGS.healthMonitoringEnabled;
+        // @ts-ignore
         this.CONFIG.publicDownloads = window.SETTINGS.publicDownloads;
         // @ts-ignore
         this.CONFIG.publicReleases = window.SETTINGS.publicReleases;

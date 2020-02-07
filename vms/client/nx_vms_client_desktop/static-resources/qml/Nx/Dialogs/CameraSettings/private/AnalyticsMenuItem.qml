@@ -11,8 +11,9 @@ Column
     /**
      * Used context properties:
      *
-     * var ctx_modelData
+     * AnalyticsEngineInfo ctx_modelData
      * var ctx_engineId
+     * JsonObject ctx_settingsModel
      * var ctx_sections[]
      * int ctx_level
      * bool ctx_active
@@ -47,9 +48,9 @@ Column
             return ColorTheme.transparent(color, opacity)
         }
 
-        readonly property var sectionsModel: level
+        readonly property var sectionsModel: level > 0
             ? ctx_modelData.sections
-            : ctx_modelData.settingsModel.sections
+            : ctx_settingsModel && ctx_settingsModel.sections
 
         readonly property bool collapsible: !!sectionsModel && sectionsModel.length > 0
 

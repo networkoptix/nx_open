@@ -77,6 +77,7 @@
         "emailSignature": "Assinatura de e-mail",
         "emailSupportEmail": "E-mail de suporte",
         "enableEdgeRecording": "Ativar gravação de borda",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Período do log de eventos (dias)",
         "ldapAdminDn": "DN de administrador LDAP",
         "ldapSearchBase": "Base de pesquisa LDAP",
@@ -85,6 +86,7 @@
         "localSystemId": "ID do sistema local",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Diferença máxima entre o tempo sincronizado e o da Internet (milissegundos)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Diferença máxima entre tempo sincronizado e local (milissegundos)",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "Tamanho máximo da fila de registros (bytes)",
         "maxRecordQueueSizeElements": "Tamanho máximo da fila de registros (elementos)",
         "maxRemoteArchiveSynchronizationThreads": "Encadeamentos Máximos de Sincronização de Archive Remoto",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Sincronização de tempo activada",
         "primaryTimeServer": "Primary time synchronization server",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Notificações de actualização habilitadas",
         "upnpPortMappingEnabled": "Mapeamento de portas UPNP activado",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Health Monitoring",
+            "graphs": "Graphs",
             "storage": "Armazenamento",
             "log": "Registo"
         }

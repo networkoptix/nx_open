@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Спробуйте ще раз</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Повторіть спробу</button>
     </p>
 </div>
 
@@ -40,8 +40,8 @@
             <span class="text"> або </span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Додати до існуючої системи</button><br>
-        <small>(якщо {{Config.productName}} вже встановлено)</small><br>
+        <button class="btn btn-default" ng-click="skip()"> Додати до існуючої системи </button><br>
+        <small> (якщо {{Config.productName}} вже встановлено) </small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -362,7 +362,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Спробуйте ще раз</button>
+        <button class="btn btn-default" ng-click="retry()">Повторіть спробу</button>
     </p>
 </div>
 
@@ -453,7 +453,7 @@
         Опис помилки: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Спробуйте ще раз</button>
+        <button class="btn btn-default" ng-click="retry()">Повторіть спробу</button>
     </p>
 </div>
 

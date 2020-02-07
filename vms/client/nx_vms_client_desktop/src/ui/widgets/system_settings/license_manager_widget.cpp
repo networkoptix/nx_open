@@ -52,6 +52,8 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
+#include <utils/common/html.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/types/connection_types.h>
 
@@ -61,13 +63,13 @@
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
-using namespace nx;
+using namespace nx::vms::common;
 using namespace nx::vms::client::desktop;
 
 namespace {
 
-static const auto kHtmlDelimiter = lit("<br>");
-static const auto kEmptyLine = lit("%1%1").arg(kHtmlDelimiter);
+static const QString kHtmlDelimiter = "<br>";
+static const QString kEmptyLine = "<br><br>";
 
 QString licenseReplyLogString(
     QNetworkReply* reply,
@@ -121,6 +123,23 @@ DeactivationErrors filterDeactivationErrors(const DeactivationErrors& errors)
 
         result.insert(it.key(), it.value());
     }
+    return result;
+}
+
+QStringList licenseHtmlDescription(const QnLicensePtr& license)
+{
+    static const auto kLightTextColor = ColorTheme::instance()->color("light10");
+
+    QStringList result;
+
+    const QString licenseKey = html::monospace(
+        html::colored(QString::fromLatin1(license->key()), kLightTextColor));
+
+    const QString channelsCount = QnLicenseManagerWidget::tr(
+        "%n channels.", "", license->cameraCount());
+
+    result.push_back(licenseKey);
+    result.push_back(license->displayName() + ", " + channelsCount);
     return result;
 }
 
@@ -322,7 +341,7 @@ void QnLicenseManagerWidget::updateLicenses()
     bool connected = false;
     for (const QnPeerRuntimeInfo& info: runtimeInfoManager()->items()->getItems())
     {
-        if (info.data.peer.peerType != vms::api::PeerType::server)
+        if (info.data.peer.peerType != nx::vms::api::PeerType::server)
             continue;
         connected = true;
         break;
@@ -649,42 +668,35 @@ void QnLicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRem
     manager->removeLicense(license, this, removeLisencesHandler);
 }
 
-QString QnLicenseManagerWidget::getLicenseDescription(const QnLicensePtr& license) const
-{
-    if (!license)
-    {
-        NX_ASSERT(false, "Empty license");
-        return QString();
-    }
-
-    const auto key = QString::fromStdString(license->key().constData());
-    const auto channelsCountString = tr("%n channels.", "", license->cameraCount());
-
-    return lit("%1%2%3, %4").arg(key, kHtmlDelimiter, license->displayName(), channelsCountString);
-}
-
 bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
 {
-    QStringList extras;
-    for (const auto& license: licenses)
-        extras.push_back(getLicenseDescription(license));
-
-    static const auto kWarningText = tr("Every license can be deactivated only a few times.");
-    const auto warningColor = nx::vms::client::desktop::ColorTheme::instance()->color("red_l2").name();
-    const auto warningText = QString("<font color = \"%1\">%2</font>")
-        .arg(warningColor, kWarningText);
-    extras.push_back(warningText);
-
-    using namespace nx::vms::client::desktop::ui;
-    dialogs::LicenseDeactivationReason dialog(m_deactivationReason, parentWidget());
+    ui::dialogs::LicenseDeactivationReason dialog(m_deactivationReason, parentWidget());
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return false;
+
+    QStringList licenseDetails;
+    for (const auto& license: licenses)
+    {
+        if (!NX_ASSERT(license))
+            continue;
+
+        QString deactivationsCount =
+            tr("%n deactivations remaining.", "", license->deactivationsCountLeft());
+
+        if (license->deactivationsCountLeft() < 2)
+            deactivationsCount = setWarningStyleHtml(deactivationsCount);
+
+        QStringList licenseBlock = licenseHtmlDescription(license);
+
+        licenseBlock.push_back(deactivationsCount);
+        licenseDetails.push_back(licenseBlock.join(kHtmlDelimiter));
+    }
 
     QnMessageBox confirmationDialog(QnMessageBoxIcon::Question,
         tr("Deactivate licenses?", "", licenses.size()),
         QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
-    confirmationDialog.setInformativeText(extras.join(kEmptyLine), false);
+    confirmationDialog.setInformativeText(licenseDetails.join(kEmptyLine), false);
     confirmationDialog.setInformativeTextFormat(Qt::RichText);
     confirmationDialog.addButton(lit("Deactivate"),
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
@@ -716,14 +728,20 @@ QString QnLicenseManagerWidget::getDeactivationErrorMessage(
 {
     using Deactivator = nx::vms::client::desktop::license::Deactivator;
 
-    static const auto kMessageDelimiter = lit("%1%1-%1%1").arg(kHtmlDelimiter);
+    static const auto kMessageDelimiter = QString("%1-%1").arg(kEmptyLine);
     QStringList result;
     for (auto it = errors.begin(); it != errors.end(); ++it)
     {
         const auto license = findLicense(it.key(), licenses);
-        const auto licenseDescription = getLicenseDescription(license);
+        if (!NX_ASSERT(license))
+            continue;
+
+        QStringList licenseBlock = licenseHtmlDescription(license);
         const auto error = setWarningStyleHtml(Deactivator::errorDescription(it.value()));
-        result += licenseDescription + kEmptyLine + error;
+        licenseBlock.push_back(QString()); //< Additional spacer.
+        licenseBlock.push_back(error);
+
+        result.push_back(licenseBlock.join(kHtmlDelimiter));
     }
 
     static const auto kContactCustomerSupportText = tr("Please contact Customer Support.");

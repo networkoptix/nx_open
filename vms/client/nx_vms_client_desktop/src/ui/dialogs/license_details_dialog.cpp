@@ -10,70 +10,75 @@
 
 #include <ui/style/custom_style.h>
 
+#include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 
 using namespace nx::vms::client::desktop;
 
-QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /* = NULL*/):
+namespace {
+
+auto makeAddRowFunction(QFormLayout* layout, Aligner* aligner, QStringList* details)
+{
+    return
+        [=](const QString& name, const QString& value)
+        {
+            auto titleLabel = new QLabel(name + ":", layout->parentWidget());
+            layout->addRow(titleLabel, new QLabel(value, layout->parentWidget()));
+            aligner->addWidget(titleLabel);
+            details->push_back(name + ": " + value);
+        };
+}
+
+} // namespace
+
+QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr& license, QWidget* parent):
     base_type(parent),
     ui(new Ui::LicenseDetailsDialog())
 {
     ui->setupUi(this);
 
-    if (!license)
+    if (!NX_ASSERT(license))
         reject();
 
-    ui->licenseTypeLabel->setText(license->displayName());
-    ui->licenseKeyLabel->setText(QLatin1String(license->key()));
-    ui->licenseHwidLabel->setText(license->hardwareId());
+    auto aligner = new Aligner(this);
+    QStringList details;
 
-    auto addFeature = [this](const QString &text, int count) {
-        QLabel* valueLabel = new QLabel(this);
-        valueLabel->setText(QString::number(count));
-        ui->featuresLayout->addRow(text, valueLabel);
-    };
+    auto addGeneric = makeAddRowFunction(ui->genericDetailsLayout, aligner, &details);
+    auto addFeature = makeAddRowFunction(ui->featuresLayout, aligner, &details);
 
-    if (license->type() == Qn::LC_VideoWall) {
-        addFeature(tr("Screens Allowed:"), license->cameraCount() * 2);
-        addFeature(tr("Control Sessions Allowed:"), license->cameraCount());
-    } else {
-        addFeature(tr("Archive Streams Allowed:"), license->cameraCount());
+    details.push_back(tr("Generic") + ":");
+    addGeneric(tr("License Type"), license->displayName());
+    addGeneric(tr("License Key"), QString::fromLatin1(license->key()));
+    addGeneric(tr("Locked to Hardware ID"), license->hardwareId());
+    addGeneric(tr("Deactivations Remaining"),
+        QString::number(license->deactivationsCountLeft()));
+
+    details.push_back(QString()); //< Spacer.
+    details.push_back(tr("Features") + ":");
+    if (license->type() == Qn::LC_VideoWall)
+    {
+        addFeature(tr("Screens Allowed"), QString::number(license->cameraCount() * 2));
+        addFeature(tr("Control Sessions Allowed"), QString::number(license->cameraCount()));
+    }
+    else
+    {
+        addFeature(tr("Archive Streams Allowed"), QString::number(license->cameraCount()));
     }
 
     setWarningStyle(ui->errorLabel);
     ui->errorLabel->setText(QnLicenseValidator::errorMessage(QnLicenseErrorCode::FutureLicense));
     ui->errorLabel->setVisible(license->type() == Qn::LC_Invalid);
 
-    const auto licenseText = licenseDescription(license);
+    const auto licenseDescription = details.join('\n');
 
     auto copyButton = new ClipboardButton(ClipboardButton::StandardType::copyLong, this);
     connect(copyButton, &QPushButton::clicked, this,
-        [this, licenseText] { qApp->clipboard()->setText(licenseText); });
+        [licenseDescription] { qApp->clipboard()->setText(licenseDescription); });
 
     ui->buttonBox->addButton(copyButton, QDialogButtonBox::HelpRole);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setFocus();
 }
 
-QnLicenseDetailsDialog::~QnLicenseDetailsDialog() {
-}
-
-QString QnLicenseDetailsDialog::licenseDescription(const QnLicensePtr &license) const {
-    QStringList result;
-
-    auto addStringValue = [this, &result](const QString &text, const QString &value) { result << lit("%1: %2").arg(text).arg(value); };
-    auto addIntValue = [this, &result](const QString &text, int value) { result << lit("%1: %2").arg(text).arg(value); };
-
-    result << tr("Generic:");
-    addStringValue(tr("License Type"), license->displayName());
-    addStringValue(tr("License Key"), QString::fromUtf8(license->key()));
-    addStringValue(tr("Locked to Hardware ID"), license->hardwareId());
-    result << QString(); //spacer
-    result << tr("Features:");
-    if (license->type() == Qn::LC_VideoWall) {
-        addIntValue(tr("Screens Allowed:"), license->cameraCount() * 2);
-        addIntValue(tr("Control Sessions Allowed:"), license->cameraCount());
-    } else {
-        addIntValue(tr("Archive Streams Allowed:"), license->cameraCount());
-    }
-    return result.join(L'\n');
+QnLicenseDetailsDialog::~QnLicenseDetailsDialog()
+{
 }

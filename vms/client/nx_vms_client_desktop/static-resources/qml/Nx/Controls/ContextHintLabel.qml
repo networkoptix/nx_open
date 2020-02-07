@@ -8,12 +8,21 @@ Text
     property alias contextHelpTopic: contextHintButton.helpTopic
     property alias contextHintText: contextHintButton.toolTipText
 
-    rightPadding: contextHintButton.width + spacing
+    property bool centerIfMultiline: true //< Center hint button vertically if label is multiline.
+
+    readonly property bool hasContextHint: !!contextHintText
+
+    rightPadding: hasContextHint ? contextHintButton.width + spacing : 0
 
     ContextHintButton
     {
         id: contextHintButton
+
+        visible: hasContextHint
         x: parent.width - width
-        y: parent.baselineOffset - baselineOffset
+
+        y: centerIfMultiline && contextHintLabel.lineCount > 1
+            ? (contextHintLabel.height - height) / 2
+            : contextHintLabel.baselineOffset - baselineOffset
     }
 }

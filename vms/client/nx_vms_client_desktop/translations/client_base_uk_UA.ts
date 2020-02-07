@@ -986,6 +986,14 @@ to view more bookmarks</source>
       <source>Page...</source>
       <translation>Сторінка...</translation>
     </message>
+    <message>
+      <source>Connect to this Server</source>
+      <translation>Підключення до цього сервера</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation>Прикріпити</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1501,6 +1509,10 @@ to view more bookmarks</source>
     <message>
       <source>Built for %1-%2 with %3.</source>
       <translation>Побудовано для %1-%2 з %3.</translation>
+    </message>
+    <message>
+      <source>Regional support</source>
+      <translation>Регіональна підтримка</translation>
     </message>
   </context>
   <context>
@@ -2069,29 +2081,8 @@ to view more bookmarks</source>
       <translation>Починається</translation>
     </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>Виберіть принаймні один пристрій</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Виберіть хоча б одну камеру</translation>
-    </message>
-    <message>
       <source>Occurs</source>
       <translation>Трапилося</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Початкова камера</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more cameras</source>
-      <translation>
-        <numerusform>Початкова камера та ще %n камера</numerusform>
-        <numerusform>Початкова камера та ще %n камери</numerusform>
-        <numerusform>Початкова камера та ще %n камер</numerusform>
-        <numerusform>Початкова камера та ще %n камер</numerusform>
-      </translation>
     </message>
     <message>
       <source>N/A</source>
@@ -2125,6 +2116,39 @@ to view more bookmarks</source>
         <numerusform>%n Серверів</numerusform>
         <numerusform>%n Серверів</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User</source>
+      <translation>Користувач</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Вихідний сервер</translation>
+    </message>
+    <message>
+      <source>Source Camera</source>
+      <translation>Вихідна Камера</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Джерело й %n більше камер</numerusform>
+        <numerusform>Джерело й %n більше камер</numerusform>
+        <numerusform>Джерело й %n більше камер</numerusform>
+        <numerusform>Джерело й %n більше камер</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select at least one Device</source>
+      <translation>Виберіть принаймні один пристрій</translation>
+    </message>
+    <message>
+      <source>Select at least one Camera</source>
+      <translation>Виберіть хоча б одну камеру</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Виберіть сервер</translation>
     </message>
   </context>
   <context>
@@ -2248,6 +2272,13 @@ to view more bookmarks</source>
     <message>
       <source>Interval of Action</source>
       <translation>Інтервал спрацьовування Дії</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation>Сервери, які підтримують зумер</translation>
     </message>
   </context>
   <context>
@@ -3165,6 +3196,10 @@ to %1</source>
         <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Description</source>
+      <translation>Опис</translation>
+    </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
@@ -3318,6 +3353,13 @@ to %1</source>
     <message>
       <source>Select cameras to setup failover priority</source>
       <translation>Виберіть камери для налаштування Failover пріоритету</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation>Сервери, що підтримують діагностику вентиляторів</translation>
     </message>
   </context>
   <context>
@@ -3640,22 +3682,6 @@ to %1</source>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
-      <source>Screens Allowed:</source>
-      <translation>Дозволена кількість Екранів:</translation>
-    </message>
-    <message>
-      <source>Control Sessions Allowed:</source>
-      <translation>Дозволенi Підключення Керувань:</translation>
-    </message>
-    <message>
-      <source>Archive Streams Allowed:</source>
-      <translation>Дозволені Потоки Архіву:</translation>
-    </message>
-    <message>
-      <source>Generic:</source>
-      <translation>Загальні:</translation>
-    </message>
-    <message>
       <source>License Type</source>
       <translation>Тип Ліцензії</translation>
     </message>
@@ -3664,12 +3690,32 @@ to %1</source>
       <translation>Ліцензійний Ключ</translation>
     </message>
     <message>
-      <source>Features:</source>
-      <translation>Функції:</translation>
-    </message>
-    <message>
       <source>Locked to Hardware ID</source>
       <translation>Прив'язане до Апаратного ID</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation type="unfinished">Generic</translation>
+    </message>
+    <message>
+      <source>Deactivations Left</source>
+      <translation type="unfinished">Deactivations Left</translation>
+    </message>
+    <message>
+      <source>Features</source>
+      <translation type="unfinished">Features</translation>
+    </message>
+    <message>
+      <source>Screens Allowed</source>
+      <translation type="unfinished">Screens Allowed</translation>
+    </message>
+    <message>
+      <source>Control Sessions Allowed</source>
+      <translation type="unfinished">Control Sessions Allowed</translation>
+    </message>
+    <message>
+      <source>Archive Streams Allowed</source>
+      <translation type="unfinished">Archive Streams Allowed</translation>
     </message>
   </context>
   <context>
@@ -3997,12 +4043,8 @@ to %1</source>
       <translation>Не вдалося відкрити файл</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Для отримання ліцензійного ключа необхідно відіслати серійний номер і апаратний Hardware ID на %1.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Будь ласка, надішліть наданий Ліцензійний Ключ і апаратний Hardware ID на %1 щоб отримати файл з Ключем Активації.</translation>
+      <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
+      <translation>Щоб отримати файл з активацією, будь ласка, надішліть наданий ліцензійний ключ та ID апаратного ключа на %1.</translation>
     </message>
   </context>
   <context>
@@ -4555,6 +4597,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation>Сервери, які підтримують моніторинг PoE</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
@@ -4821,16 +4870,8 @@ to %1</source>
       <translation>Календарних Днів</translation>
     </message>
     <message>
-      <source>less than an hour</source>
-      <translation>менш ніж за годину</translation>
-    </message>
-    <message>
       <source>%1 Mbps</source>
       <translation>%1 Мбіт/с</translation>
-    </message>
-    <message>
-      <source>empty</source>
-      <translation>порожній</translation>
     </message>
     <message>
       <source>Device</source>
@@ -4851,10 +4892,6 @@ to %1</source>
     <message>
       <source>Current Bitrate</source>
       <translation>Поточний бітрейт</translation>
-    </message>
-    <message>
-      <source>no data for forecast</source>
-      <translation>немає даних для прогнозу</translation>
     </message>
   </context>
   <context>
@@ -5319,6 +5356,10 @@ to %1</source>
     <message>
       <source>Plugins</source>
       <translation>Плагіни</translation>
+    </message>
+    <message>
+      <source>PoE</source>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5901,12 +5942,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>usb</translation>
     </message>
     <message>
-      <source>unknown</source>
-      <translation>невідомо</translation>
-    </message>
-    <message>
       <source>%1 TB</source>
       <translation>%1 ТБ</translation>
+    </message>
+    <message>
+      <source>smb</source>
+      <translation>smb</translation>
     </message>
   </context>
   <context>
@@ -6604,13 +6645,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>QnWebPage</name>
-    <message>
-      <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation>ЗАВАНТАЖЕННЯ&lt;br&gt;ПОЧАТОК</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6696,6 +6730,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Відео Стіна видалена із сервера та буде закрита.</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the selected server</source>
+      <translation>Не вдалося підключитися до вибраного сервера</translation>
     </message>
   </context>
   <context>
@@ -6911,20 +6949,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Нова Матриця %1</translation>
     </message>
     <message>
-      <source>Video Wall license required</source>
-      <translation>Необхідна ліцензія на відео Стіну</translation>
-    </message>
-    <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
       <translation>Для включення цієї функції, будь ласка, активуйте ліцензію на відео Стіну.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
       <translation>Не вдалося зберегти зміни</translation>
-    </message>
-    <message>
-      <source>To enable Video Wall, please activate a Video Wall license.</source>
-      <translation>Для включення функції Відео Стіна, будь ласка, активуйте ліцензію на Відео Стіну.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
@@ -6983,6 +7013,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>Активуйте одну додаткову ліцензію, щоб почати сеанс керування Відео Стіною.</translation>
+    </message>
+    <message>
+      <source>Activate License...</source>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
@@ -7516,18 +7550,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n користувач</numerusform>
-        <numerusform>%n користувачі</numerusform>
-        <numerusform>%n користувачі</numerusform>
-        <numerusform>%n користувачі</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>TimelineCursorLayout</name>
     <message>
       <source>Live</source>
@@ -7678,6 +7700,15 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unknown track</source>
       <translation>Невідомий трек</translation>
+    </message>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8594,6 +8625,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
+    <message>
+      <source>The proxy %1 requires a username and password.</source>
+      <translation>Проксі %1 потребує ім'я користувача та пароль.</translation>
+    </message>
+    <message>
+      <source>Select folder to upload</source>
+      <translation>Виберіть папку для завантаження</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
@@ -8681,6 +8723,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
       <translation>Довільний номер, який можна призначити макету для швидкої ідентифікації та доступу до нього</translation>
+    </message>
+    <message>
+      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
+      <translation>Цей ID вже використовується в системі. Для пошуку безкоштовного ID скористайтеся кнопкою Генерування.</translation>
     </message>
   </context>
   <context>
@@ -9098,6 +9144,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>Невідома Подія Діагностики Плагіна</translation>
     </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Споживання</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9131,6 +9181,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Деякі користувачі не мають доступ до обраної розкладки. Дія для них не буде працювати.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PasswordDialog</name>
+    <message>
+      <source>Sign In</source>
+      <translation>Вхід</translation>
     </message>
   </context>
   <context>
@@ -9230,6 +9287,67 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This OS version is no longer supported.</source>
       <translation>Ця версія ОС більше не підтримується.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
+    <message>
+      <source>%1 Mbps</source>
+      <translation>%1 Мбіт/с</translation>
+    </message>
+    <message>
+      <source>Disconnected</source>
+      <translation>Від’єднано</translation>
+    </message>
+    <message>
+      <source>Connected</source>
+      <translation>Підключено</translation>
+    </message>
+    <message>
+      <source>Powered</source>
+      <translation>Підживлено</translation>
+    </message>
+    <message>
+      <source>Unexpected</source>
+      <translation>Несподіваний</translation>
+    </message>
+    <message>
+      <source>Empty</source>
+      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+      <translation>Порожній</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device %1 &gt;</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation>&lt; Невідомий пристрій %1 &gt;</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Порт</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Камера</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Споживання</translation>
+    </message>
+    <message>
+      <source>Speed</source>
+      <translation>Швидкість</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Статус</translation>
+    </message>
+    <message>
+      <source>Power</source>
+      <translation>Живлення</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device &gt;</source>
+      <translation>&lt; Невідомий пристрій &gt;</translation>
     </message>
   </context>
   <context>
@@ -9374,6 +9492,26 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
       <translation>Цифровi Водяні Знаки відображаються, архівуються та експортуються лише для неадміністраторів через он-лайн відео. Ви та інші адміністратори не побачите їх.</translation>
+    </message>
+    <message>
+      <source>Only client-server video traffic can be encrypted</source>
+      <translation>Лише відео трафік клієнт-серверу може бути зашифрованим</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n камера</numerusform>
+        <numerusform>%n камери</numerusform>
+        <numerusform>%n камери</numerusform>
+        <numerusform>%n камери</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There are no compatible servers</source>
+      <translation>Немає сумісних серверів</translation>
     </message>
   </context>
   <context>
@@ -9732,13 +9870,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::WebWidget</name>
-    <message>
-      <source>Failed to load page</source>
-      <translation>Помилка при завантаженні сторінки</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -9977,10 +10108,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
-      <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation>Будь ласка, заповніть інформацію про себе і причину деактивації ліцензії</translation>
-    </message>
-    <message>
       <source>Next</source>
       <translation>Далі</translation>
     </message>
@@ -10019,6 +10146,22 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Other Reason</source>
       <translation>Інша Причина</translation>
+    </message>
+    <message>
+      <source>Please enter your contact information and the reason for deactivating your license</source>
+      <translation>Будь ласка, введіть Вашу контактну інформацію і причину деактивації ліцензії</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n користувач</numerusform>
+        <numerusform>%n користувачів</numerusform>
+        <numerusform>%n користувачів</numerusform>
+        <numerusform>%n користувачів</numerusform>
+      </translation>
     </message>
   </context>
   <context>

@@ -77,6 +77,7 @@
         "emailSignature": "Chữ ký email",
         "emailSupportEmail": "Hỗ trợ Email",
         "enableEdgeRecording": "Cho phép ghi âm",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Chu kỳ đăng nhập sự kiện (ngày)",
         "ldapAdminDn": "LDAP quản trị DN",
         "ldapSearchBase": "Cơ sở tìm kiếm LDAP",
@@ -85,6 +86,7 @@
         "localSystemId": "ID hệ thống cục bộ",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Tối đa khác biệt giữa thời gian đồng bộ và Internet (mili giây)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Tối đa khác biệt giữa thời gian đồng bộ và Internet (mili giây)",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "Kích thước hàng đợi của bản ghi tối đa (byte)",
         "maxRecordQueueSizeElements": "Kích thước hàng đợi của bản ghi tối đa (byte)",
         "maxRemoteArchiveSynchronizationThreads": "Tệp đồng bộ hoá lưu trữ từ xa tối đa",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Đồng bộ hóa thời gian kích hoạt",
         "primaryTimeServer": "Máy chủ đồng bộ hóa thời gian chính",
         "osTimeChangeCheckPeriodMs": "Thời gian kiểm tra thay đổi thời gian của hệ điều hành",
-        "syncTimeExchangePeriod": "Đồng bộ hóa thời gian trao đổi",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Chủ đề đồng bộ hóa máy ảnh có thể đeo tối đa",
         "updateNotificationsEnabled": "Đã bật thông báo cập nhật",
         "upnpPortMappingEnabled": "Ánh xạ cổng UPNP được kích hoạt",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Theo dõi tài nguyên hệ thống",
+            "graphs": "Graphs",
             "storage": "Lưu trữ",
             "log": "Bản ghi"
         }

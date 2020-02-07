@@ -4,16 +4,22 @@
   <context>
     <name>AnalyticsSettings</name>
     <message>
-      <source>Enable</source>
-      <translation>Inschakelen</translation>
-    </message>
-    <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Camera-analyse werkt alleen als de camera wordt bekeken. Schakel opnemen in om het altijd te laten werken.</translation>
     </message>
+  </context>
+  <context>
+    <name>Box</name>
     <message>
-      <source>This is the built-in functionality</source>
-      <translation>Dit is de ingebouwde functionaliteit</translation>
+      <source>Click on video to start box.</source>
+      <translation>Klik op video om het vak te starten.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ContextHintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation type="unfinished">Click to read more</translation>
     </message>
   </context>
   <context>
@@ -36,6 +42,81 @@
     <message>
       <source>Click to setup</source>
       <translation>Klik om in te stellen</translation>
+    </message>
+  </context>
+  <context>
+    <name>Figure</name>
+    <message>
+      <source>No shape</source>
+      <translation>Geen vorm</translation>
+    </message>
+    <message>
+      <source>click to add</source>
+      <translation>klik om toe te voegen</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Aanpassen</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Display on camera</source>
+      <translation>Weergeven op camera</translation>
+    </message>
+    <message>
+      <source>Figure</source>
+      <translation>Figuur</translation>
+    </message>
+  </context>
+  <context>
+    <name>FigureEditorDialog</name>
+    <message>
+      <source>Clear</source>
+      <translation>Wissen</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>Oké</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuleren</translation>
+    </message>
+  </context>
+  <context>
+    <name>InformationPanel</name>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation type="unfinished">Vendor</translation>
+    </message>
+  </context>
+  <context>
+    <name>Line</name>
+    <message>
+      <source>Click on video to start line.</source>
+      <translation>Klik op video om de regel te starten.</translation>
+    </message>
+    <message>
+      <source>Click arrows to toggle the desired directions.</source>
+      <translation>Klik op pijlen om de gewenste richtingen te wisselen.</translation>
+    </message>
+    <message>
+      <source>Line is not valid. Remove self-intersections to proceed.</source>
+      <translation>Lijn is niet geldig. Verwijder kruisingen om door te gaan.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>Maximum aantal punten is bereikt (%n punten).</numerusform>
+        <numerusform>Maximum aantal punten is bereikt (%n punten).</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -77,6 +158,31 @@
     <message>
       <source>Server is offline</source>
       <translation>Server is offline</translation>
+    </message>
+  </context>
+  <context>
+    <name>PolyFigure</name>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+  </context>
+  <context>
+    <name>Polygon</name>
+    <message>
+      <source>Click on video to start polygon.</source>
+      <translation>Klik op video om het vak te starten.</translation>
+    </message>
+    <message>
+      <source>Polygon is not valid. Remove self-intersections to proceed.</source>
+      <translation>Polygon is niet geldig. Verwijder kruisingen om door te gaan.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Maximum points count is reached (%n points).</source>
+      <translation type="unfinished">
+        <numerusform>Maximum points count is reached (%n points).</numerusform>
+        <numerusform>Maximum points count is reached (%n points).</numerusform>
+      </translation>
     </message>
   </context>
   <context>

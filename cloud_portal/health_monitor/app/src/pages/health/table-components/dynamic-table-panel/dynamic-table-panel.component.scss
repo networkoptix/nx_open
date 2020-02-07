@@ -123,28 +123,29 @@
             width    : 100%;
         }
     }
-    
+
     .nx-panel-row {
         .nx-panel {
             display : flex;
             height  : fit-content;
-        
+
             .row-title {
                 height      : fit-content;
                 width       : fit-content;
+                width       : -moz-fit-content;
                 float       : left;
                 z-index     : 9;
                 max-width   : calc(100% - 1.5rem); // min with for line -> 16px + right padding (white space)
                 line-height : 16px;
                 margin      : 4px 0;
-            
+
                 span {
                     background-color : $light4;
                     padding-right    : 4px;
                     word-break       : keep-all;
                 }
             }
-        
+
             .row-line {
                 border-bottom : 1px dotted $light7;
                 width         : calc(100% - 1rem);

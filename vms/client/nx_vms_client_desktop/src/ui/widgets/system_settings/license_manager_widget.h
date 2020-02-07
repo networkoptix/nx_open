@@ -97,8 +97,6 @@ private:
 
     bool confirmDeactivation(const QnLicenseList& licenses);
 
-    QString getLicenseDescription(const QnLicensePtr& license) const;
-
     using DeactivationErrors = nx::vms::client::desktop::license::Deactivator::LicenseErrorHash;
     void showDeactivationErrorsDialog(
         const QnLicenseList& licenses,

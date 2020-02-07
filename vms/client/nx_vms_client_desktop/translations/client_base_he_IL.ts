@@ -986,6 +986,14 @@ to view more bookmarks</source>
       <source>Page...</source>
       <translation>עמוד...</translation>
     </message>
+    <message>
+      <source>Connect to this Server</source>
+      <translation type="unfinished">Connect to this Server</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation type="unfinished">Pin</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1501,6 +1509,10 @@ to view more bookmarks</source>
     <message>
       <source>Built for %1-%2 with %3.</source>
       <translation>נבנה ל%1-%2 עם %3.</translation>
+    </message>
+    <message>
+      <source>Regional support</source>
+      <translation>תמיכה אזורית</translation>
     </message>
   </context>
   <context>
@@ -2069,29 +2081,8 @@ to view more bookmarks</source>
       <translation>מתחיל</translation>
     </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>בחר לפחות התקן אחד</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>בחר לפחות מצלמה אחת</translation>
-    </message>
-    <message>
       <source>Occurs</source>
       <translation>מתרחש</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>מצלמת מקור</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more cameras</source>
-      <translation>
-        <numerusform>מקור ו %n מצלמות נוספות</numerusform>
-        <numerusform>מקורות ו %n מצלמות נוספות</numerusform>
-        <numerusform>מקורות ו %n מצלמות נוספות</numerusform>
-        <numerusform>מקורות ו %n מצלמות נוספות</numerusform>
-      </translation>
     </message>
     <message>
       <source>N/A</source>
@@ -2125,6 +2116,39 @@ to view more bookmarks</source>
         <numerusform>%n שרתים</numerusform>
         <numerusform>%n שרתים</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User</source>
+      <translation>משתמש</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>שרת המקור</translation>
+    </message>
+    <message>
+      <source>Source Camera</source>
+      <translation>מצלמת מקור</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>מקור ועוד %n מצלמות</numerusform>
+        <numerusform>מקור ועוד %n מצלמות</numerusform>
+        <numerusform>מקור ועוד %n מצלמות</numerusform>
+        <numerusform>מקור ועוד %n מצלמות</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select at least one Device</source>
+      <translation>בחר התקן אחד לפחות</translation>
+    </message>
+    <message>
+      <source>Select at least one Camera</source>
+      <translation>בחר מצלמה אחת לפחות</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>בחר שרת</translation>
     </message>
   </context>
   <context>
@@ -2248,6 +2272,13 @@ to view more bookmarks</source>
     <message>
       <source>Interval of Action</source>
       <translation>מרווח פעולה</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation type="unfinished">Servers that support buzzer</translation>
     </message>
   </context>
   <context>
@@ -3162,6 +3193,10 @@ to %1</source>
         <numerusform>יומן אירועים עבור %1 - %n אירועים נמצאו</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Description</source>
+      <translation>תיאור</translation>
+    </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
@@ -3315,6 +3350,13 @@ to %1</source>
     <message>
       <source>Select cameras to setup failover priority</source>
       <translation>בחר מצלמות להגדרת קדימות לגיבוי</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation type="unfinished">Servers that support fan diagnostic</translation>
     </message>
   </context>
   <context>
@@ -3637,22 +3679,6 @@ to %1</source>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
-      <source>Screens Allowed:</source>
-      <translation>מספר מסכים אפשרי:</translation>
-    </message>
-    <message>
-      <source>Control Sessions Allowed:</source>
-      <translation>מספר הפעלות שליטה מרחוק אפשריות:</translation>
-    </message>
-    <message>
-      <source>Archive Streams Allowed:</source>
-      <translation>מספר ארכיוני זרמים מותר:</translation>
-    </message>
-    <message>
-      <source>Generic:</source>
-      <translation>גנרי:</translation>
-    </message>
-    <message>
       <source>License Type</source>
       <translation>סוג רשיון</translation>
     </message>
@@ -3661,12 +3687,32 @@ to %1</source>
       <translation>מפתח רשיון:</translation>
     </message>
     <message>
-      <source>Features:</source>
-      <translation>תכונות:</translation>
-    </message>
-    <message>
       <source>Locked to Hardware ID</source>
       <translation>נעול למזהה-חומרה</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation type="unfinished">Generic</translation>
+    </message>
+    <message>
+      <source>Deactivations Left</source>
+      <translation type="unfinished">Deactivations Left</translation>
+    </message>
+    <message>
+      <source>Features</source>
+      <translation type="unfinished">Features</translation>
+    </message>
+    <message>
+      <source>Screens Allowed</source>
+      <translation type="unfinished">Screens Allowed</translation>
+    </message>
+    <message>
+      <source>Control Sessions Allowed</source>
+      <translation type="unfinished">Control Sessions Allowed</translation>
+    </message>
+    <message>
+      <source>Archive Streams Allowed</source>
+      <translation type="unfinished">Archive Streams Allowed</translation>
     </message>
   </context>
   <context>
@@ -3994,12 +4040,8 @@ to %1</source>
       <translation>פתיחת קובץ נכשלה</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>אנא שלח דוא"ל עם מפתח רישיון ומזהה חומרה שסופקו ל- %1 כדי לקבל קובץ הפעלה של מפתח.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>אנא שלח את מפתח הרישיון ואת מזהה החומרה שסופקו ל- %1 כדי לקבל קובץ הפעלה של מפתח.</translation>
+      <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
+      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
     </message>
   </context>
   <context>
@@ -4552,6 +4594,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation type="unfinished">Servers that support PoE monitoring</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
@@ -4818,16 +4867,8 @@ to %1</source>
       <translation>ימים קלנדריים</translation>
     </message>
     <message>
-      <source>less than an hour</source>
-      <translation>פחות משעה</translation>
-    </message>
-    <message>
       <source>%1 Mbps</source>
       <translation>%1 Mbps</translation>
-    </message>
-    <message>
-      <source>empty</source>
-      <translation>ריק</translation>
     </message>
     <message>
       <source>Device</source>
@@ -4848,10 +4889,6 @@ to %1</source>
     <message>
       <source>Current Bitrate</source>
       <translation>קצב תקשורת נוכחי</translation>
-    </message>
-    <message>
-      <source>no data for forecast</source>
-      <translation>אין נתונים לתחזית</translation>
     </message>
   </context>
   <context>
@@ -5316,6 +5353,10 @@ to %1</source>
     <message>
       <source>Plugins</source>
       <translation>תוספים</translation>
+    </message>
+    <message>
+      <source>PoE</source>
+      <translation type="unfinished">PoE</translation>
     </message>
   </context>
   <context>
@@ -5898,12 +5939,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>USB</translation>
     </message>
     <message>
-      <source>unknown</source>
-      <translation>לא ידוע</translation>
-    </message>
-    <message>
       <source>%1 TB</source>
       <translation>%1 TB</translation>
+    </message>
+    <message>
+      <source>smb</source>
+      <translation>smb</translation>
     </message>
   </context>
   <context>
@@ -6601,13 +6642,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>QnWebPage</name>
-    <message>
-      <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation>הורדה&lt;br&gt;התחילה</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -6693,6 +6727,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>קיר וידאו יוסר בשרת וייסגר.</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the selected server</source>
+      <translation type="unfinished">Failed to connect to the selected server</translation>
     </message>
   </context>
   <context>
@@ -6908,20 +6946,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>מטריצה חדשה %1</translation>
     </message>
     <message>
-      <source>Video Wall license required</source>
-      <translation>נדרש רישיון קיר וידאו</translation>
-    </message>
-    <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
       <translation>בכדי להפוך תכונה זו לזמינה, הפעל רישיון קיר וידאו.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
       <translation>החלת השינויים נכשלה</translation>
-    </message>
-    <message>
-      <source>To enable Video Wall, please activate a Video Wall license.</source>
-      <translation>כדי לאפשר את קיר הוידאו, הפעל רישיון קיר וידאו.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
@@ -6980,6 +7010,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>הפעל רישיון נוסף כדי להתחיל את השליטה בקיר הוידאו.</translation>
+    </message>
+    <message>
+      <source>Activate License...</source>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
@@ -7513,18 +7547,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>TimelineCursorLayout</name>
     <message>
       <source>Live</source>
@@ -7675,6 +7697,15 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unknown track</source>
       <translation>מסלול לא ידוע</translation>
+    </message>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8591,6 +8622,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
+    <message>
+      <source>The proxy %1 requires a username and password.</source>
+      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+    </message>
+    <message>
+      <source>Select folder to upload</source>
+      <translation type="unfinished">Select folder to upload</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
@@ -8678,6 +8720,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
       <translation>מספר מותאם אישית שניתן להקצות לפריסה לצורך גישה מהירה וזיהוי</translation>
+    </message>
+    <message>
+      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
+      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
     </message>
   </context>
   <context>
@@ -9095,6 +9141,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>תוסף אירוע אבחון לא ידוע</translation>
     </message>
+    <message>
+      <source>Consumption</source>
+      <translation>צריכה</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9128,6 +9178,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>לחלק מהמשתמשים אין גישה לפריסה שנבחרה. הפעולה לא תעבוד עבורם.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PasswordDialog</name>
+    <message>
+      <source>Sign In</source>
+      <translation type="unfinished">Sign In</translation>
     </message>
   </context>
   <context>
@@ -9227,6 +9284,67 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This OS version is no longer supported.</source>
       <translation>גירסת מערכת הפעלה זו אינה נתמכת עוד.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
+    <message>
+      <source>%1 Mbps</source>
+      <translation>%1 Mbps</translation>
+    </message>
+    <message>
+      <source>Disconnected</source>
+      <translation type="unfinished">Disconnected</translation>
+    </message>
+    <message>
+      <source>Connected</source>
+      <translation type="unfinished">Connected</translation>
+    </message>
+    <message>
+      <source>Powered</source>
+      <translation type="unfinished">Powered</translation>
+    </message>
+    <message>
+      <source>Unexpected</source>
+      <translation type="unfinished">Unexpected</translation>
+    </message>
+    <message>
+      <source>Empty</source>
+      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+      <translation type="unfinished">Empty</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device %1 &gt;</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation type="unfinished">&lt; Unknown device %1 &gt;</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>פורט</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>מצלמה</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
+    <message>
+      <source>Speed</source>
+      <translation>מהירות</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>מצב</translation>
+    </message>
+    <message>
+      <source>Power</source>
+      <translation type="unfinished">Power</translation>
+    </message>
+    <message>
+      <source>&lt; Unknown device &gt;</source>
+      <translation type="unfinished">&lt; Unknown device &gt;</translation>
     </message>
   </context>
   <context>
@@ -9371,6 +9489,26 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
       <translation>חתימות מים (Watermarks) יוצגו על שידורים ישירים, הקלטות וסרטונים מיוצאים עבור משתמשים שלא הוגדרו כמנהלים, אתה ומנהלי מערכת אחרים לא תראו חתימות מים אלה.</translation>
+    </message>
+    <message>
+      <source>Only client-server video traffic can be encrypted</source>
+      <translation>ניתן להצפין רק תנועת וידאו של שרת לקוח</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There are no compatible servers</source>
+      <translation type="unfinished">There are no compatible servers</translation>
     </message>
   </context>
   <context>
@@ -9729,13 +9867,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::WebWidget</name>
-    <message>
-      <source>Failed to load page</source>
-      <translation>טעינת הדף נכשלה</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -9974,10 +10105,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
-      <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation>נא למלא פרטים על עצמך ועל סיבת השבתת הרשיון</translation>
-    </message>
-    <message>
       <source>Next</source>
       <translation>הבא</translation>
     </message>
@@ -10016,6 +10143,22 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Other Reason</source>
       <translation>סיבה אחרת</translation>
+    </message>
+    <message>
+      <source>Please enter your contact information and the reason for deactivating your license</source>
+      <translation type="unfinished">Please enter your contact information and the reason for deactivating your license</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+      </translation>
     </message>
   </context>
   <context>

@@ -17,7 +17,6 @@ Control
     signal clicked()
 
     padding: 12
-    Layout.fillWidth: true
 
     background: Rectangle { color: ColorTheme.colors.dark8 }
 
@@ -26,10 +25,12 @@ Control
         id: column
         spacing: 0
 
+        clip: true
+
         RowLayout
         {
             id: caption
-            spacing: 0
+            spacing: 8
 
             Text
             {
@@ -67,8 +68,10 @@ Control
             id: description
             text: engineInfo ? engineInfo.description : ""
             color: ColorTheme.windowText
+            visible: !!text
             wrapMode: Text.Wrap
             topPadding: 8
+            Layout.fillWidth: true
         }
 
         Item

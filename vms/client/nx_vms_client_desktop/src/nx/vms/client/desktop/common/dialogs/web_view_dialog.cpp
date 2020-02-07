@@ -2,7 +2,6 @@
 
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
-#include <QtWebKitWidgets/QWebView>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QFrame>
@@ -43,7 +42,7 @@ WebViewDialog::WebViewDialog(const QUrl& url, QWidget* parent):
     mainLayout->addWidget(buttonBox);
 
     // Set some resonable size to avoid completely shrinked dialog.
-    setBaseSize(kBaseDialogSize);
+    resize(kBaseDialogSize);
 
     webWidget->load(url);
 }

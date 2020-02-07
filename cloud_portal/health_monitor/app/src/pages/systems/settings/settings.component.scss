@@ -35,6 +35,9 @@ nx-block {
     width: calc((100% - (#{$grid-gutter-width} + #{$scrollbar-height})) / 4);
     max-width:  calc((#{$fluid-container-max-width} - #{$grid-gutter-width}) / 4);
   }
+  nx-menu {
+    max-height: 100%;
+  }
 }
 
 //.fill-screen-height {

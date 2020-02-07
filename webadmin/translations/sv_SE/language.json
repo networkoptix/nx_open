@@ -77,6 +77,7 @@
         "emailSignature": "Epostsignatur",
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Aktivera edgeinspelning",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Händelseloggperiod (dagar)",
         "ldapAdminDn": "LDAP-administratör DN",
         "ldapSearchBase": "LDAP-sökbas",
@@ -85,6 +86,7 @@
         "localSystemId": "Lokalt system-ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max skillnad mellan synkroniserad och Internet-tid (millisekunder)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max skillnad mellan synkroniserad och lokal tid (millisekunder)",
+        "maxP2pQueueSizeBytes": "Max P2P-köstorlek (byte)",
         "maxRecordQueueSizeBytes": "Max köstorlek (byte)",
         "maxRecordQueueSizeElements": "Max köstorlek (element)",
         "maxRemoteArchiveSynchronizationThreads": "Max trådlösa arkivsynkroniseringstrådar",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "Tidssynkronisering aktiverad",
         "primaryTimeServer": "Primär tidssynkroniseringsserver",
         "osTimeChangeCheckPeriodMs": "Kontrolltid för OS-tidändring",
-        "syncTimeExchangePeriod": "Synkronisera tidsväxlingsperiod",
+        "syncTimeExchangePeriod": "Synkronisera tidssynkroniseringsintervall för nätverksförfrågningar",
+        "syncTimeEpsilon": "Synktid epsilon. Nytt värde tillämpas inte om tiden detla mindre än epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max synkroniseringstrådar för kroppsburen kameraarkiv",
         "updateNotificationsEnabled": "Uppdateringsnotifikationer aktiverade",
         "upnpPortMappingEnabled": "UPNP-portmappning aktiverad",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "Hälsoövervakning",
+            "graphs": "Graphs",
             "storage": "Lagring",
             "log": "Logg"
         }

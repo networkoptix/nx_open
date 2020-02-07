@@ -40,7 +40,7 @@
             <span class="text">of</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Toevoegen aan bestaand systeem</button><br>
+        <button class="btn btn-default" ng-click="skip()"> Toevoegen aan bestaand systeem </button><br>
         <small>(if {{Config.productName}} is reeds aangemaakt)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
@@ -379,7 +379,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
-    <h2>Het systeem is klaar voor gebruik</h2>
+    <h2>Systeem is klaar voor gebruik</h2>
     <p>Serveradres</p>
     <h4>{{serverAddress}}</h4>
     <p>Inloggen (voor beheerders)</p>
@@ -439,8 +439,8 @@
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
+        <button class="btn btn-default" ng-click="retry()">Probeer opnieuw</button>
+        <button class="btn btn-default" ng-click="skip()">Stel lokaal systeem in</button>
     </p>
 </div>
 

@@ -59,6 +59,7 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
     objectValues = Object.values;
 
     routeSubscription: SubscriptionLike;
+    queryParamSubscription: SubscriptionLike;
     breakpointSubscription: SubscriptionLike;
     tableReadySubscription: SubscriptionLike;
 
@@ -66,6 +67,7 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
 
     windowSizeSubscription: SubscriptionLike;
     tableWidthSubscription: SubscriptionLike;
+    panelSubscription: SubscriptionLike;
 
     fixedLayoutClass: string;
     layoutReady: boolean;
@@ -100,11 +102,24 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
                         this.elementSearch.nativeElement.style.width = width + 'px';
                     }
                 });
+
+        this.panelSubscription = this.scrollMechanicsService
+                                     .panelSubject
+                                     .subscribe(() => {
+                                         this.setLayout();
+                                     });
     }
 
     ngOnInit(): void {
         this.initialId = this.route.snapshot.queryParamMap.get('id');
         let searchParam = this.route.snapshot.queryParamMap.get('search');
+
+        this.queryParamSubscription = this.route.queryParamMap.subscribe(params => {
+            if (params.keys.length === 0 && this.route.snapshot.params.metric === this.metricId) {
+                this.selectedValues = {...this.healthService.values[this.metricId] || {}};
+                this.resetActiveEntity();
+            }
+        });
 
         this.routeSubscription = this.route
             .params
@@ -176,7 +191,7 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
 
     setActiveEntity(entity) {
         const queryParams: Params = {};
-        this.layoutReady = false;
+        this.layoutReady = this.activeEntity ? true : false;
 
         if (entity) {
             if (typeof entity === 'string') {
@@ -198,7 +213,8 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
             this.resetActiveEntity();
         }
 
-        this.setLayout();
+        // Layout will be set when panel is rendered
+        // this.setLayout();
     }
 
     resetActiveEntity(updateURI = true) {
@@ -219,23 +235,29 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
             } else {
 
                 const elementSearchHeight = this.elementSearch ? this.elementSearch.nativeElement.offsetHeight : 0;
-                this.containerDimensions = [elementSearchHeight + 16];
+                // Don't ask why this segment is duplicated ... it's important and it's working -- TT
+                if (!this.mobileDetailMode) {
+                    this.containerDimensions = [elementSearchHeight + 16];
+                }
 
                 if (this.tableContainer && this.healthService.tableReady) {
-
                     // measure table (not wrapper) width
                     const tableWidth = this.tableContainer.nativeElement.querySelectorAll('table')[0].offsetWidth;
-                    this.containerDimensions = [elementSearchHeight + 16, 0]; // trick table's onChanges will pick new dimensions
+
+                    if (!this.mobileDetailMode) {
+                        this.containerDimensions = [elementSearchHeight + 16, 0]; // trick table's onChanges will pick new dimensions
+                    }
                     // area available
                     const areaWidth = this.area.nativeElement.offsetWidth;
-                    // area available to the table (~80% + gutters
-                    const availAreaWidth = areaWidth * .78 + 46;
+                    // area available to the table (- gutter)
+                    const availAreaWidth = areaWidth - NxHealthService.PANEL_WIDTH - 16;
 
                     const isTableFit = (availAreaWidth > tableWidth) && !this.mobileDetailMode;
                     if (this.activeEntity && !this.mobileDetailMode) {
+                        this.elementSearch.nativeElement.style.width = 'auto';
                         this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--with-panel';
                     } else {
-                        this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--no-panel';
+                        this.fixedLayoutClass = 'fixedLayout--no-panel';
                     }
 
                     this.layoutReady = true;

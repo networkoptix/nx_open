@@ -1,5 +1,7 @@
 <div>
     <a class="btn-text" href="#" (click)="updateHealth.emit(true)"><svg-icon (click)="updateHealth.emit(true)"
               [src]="CONFIG.icons.dir + 'reload.svg'"
-              [svgStyle]="{'width.px': '20'}"></svg-icon>{{lastUpdate}}</a>
+              [svgStyle]="{'width.px': '20'}"></svg-icon>
+        <span>{{lastUpdate}}</span>
+    </a>
 </div>

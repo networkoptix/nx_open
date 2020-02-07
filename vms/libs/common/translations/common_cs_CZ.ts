@@ -2,6 +2,114 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="cs" sourcelanguage="en">
   <context>
+    <name>ArchiveDuration</name>
+    <message>
+      <source>no data for forecast</source>
+      <translation>žádné údaje pro prognózu</translation>
+    </message>
+    <message>
+      <source>empty</source>
+      <translation>prázdný</translation>
+    </message>
+    <message>
+      <source>less than an hour</source>
+      <translation>méně než hodina</translation>
+    </message>
+  </context>
+  <context>
+    <name>HumanReadable</name>
+    <message numerus="yes">
+      <source>Bytes</source>
+      <comment>Full suffix for displaying bytes</comment>
+      <translation>
+        <numerusform>Bajtů</numerusform>
+        <numerusform>Bajtů</numerusform>
+        <numerusform>Bajtů</numerusform>
+        <numerusform>Bajtů</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>B</source>
+      <comment>Suffix for displaying bytes</comment>
+      <translation>B</translation>
+    </message>
+    <message numerus="yes">
+      <source>Kilobytes</source>
+      <comment>Full suffix for displaying kilobytes</comment>
+      <translation>
+        <numerusform>Kilobajtů</numerusform>
+        <numerusform>Kilobajtů</numerusform>
+        <numerusform>Kilobajtů</numerusform>
+        <numerusform>Kilobajtů</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>KB</source>
+      <comment>Suffix for displaying kilobytes</comment>
+      <translation>KB</translation>
+    </message>
+    <message numerus="yes">
+      <source>Megabytes</source>
+      <comment>Full suffix for displaying megabytes</comment>
+      <translation>
+        <numerusform>Megabajtů</numerusform>
+        <numerusform>Megabajtů</numerusform>
+        <numerusform>Megabajtů</numerusform>
+        <numerusform>Megabajtů</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>MB</source>
+      <comment>Suffix for displaying megabytes</comment>
+      <translation>MB</translation>
+    </message>
+    <message numerus="yes">
+      <source>Gigabytes</source>
+      <comment>Full suffix for displaying gigabytes</comment>
+      <translation>
+        <numerusform>Gigabajtů</numerusform>
+        <numerusform>Gigabajtů</numerusform>
+        <numerusform>Gigabajtů</numerusform>
+        <numerusform>Gigabajtů</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>GB</source>
+      <comment>Suffix for displaying gigabytes</comment>
+      <translation>GB</translation>
+    </message>
+    <message numerus="yes">
+      <source>Terabytes</source>
+      <comment>Full suffix for displaying terabytes</comment>
+      <translation>
+        <numerusform>Terabajtů</numerusform>
+        <numerusform>Terabajtů</numerusform>
+        <numerusform>Terabajtů</numerusform>
+        <numerusform>Terabajtů</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>TB</source>
+      <comment>Suffix for displaying terabytes</comment>
+      <translation>TB</translation>
+    </message>
+    <message numerus="yes">
+      <source>Petabytes</source>
+      <comment>Full suffix for displaying petabytes</comment>
+      <translation>
+        <numerusform>Petabajtů</numerusform>
+        <numerusform>Petabajtů</numerusform>
+        <numerusform>Petabajtů</numerusform>
+        <numerusform>Petabajtů</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>PB</source>
+      <comment>Suffix for displaying petabytes</comment>
+      <translation>PB</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -819,13 +927,6 @@
     </message>
   </context>
   <context>
-    <name>QnLocalSystemDescription</name>
-    <message>
-      <source>New Server</source>
-      <translation>Nový server</translation>
-    </message>
-  </context>
-  <context>
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
@@ -877,7 +978,7 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Kamera</numerusform>
         <numerusform>%n Kamera</numerusform>
         <numerusform>%n Kamera</numerusform>
@@ -886,7 +987,7 @@
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kamera</numerusform>
         <numerusform>%n kamera</numerusform>
         <numerusform>%n kamera</numerusform>
@@ -997,10 +1098,166 @@
     </message>
   </context>
   <context>
-    <name>QnSystemDescription</name>
+    <name>QnTimeStrings</name>
     <message>
-      <source>Unnamed System</source>
-      <translation>Nepojmenovaný systém</translation>
+      <source>ms</source>
+      <comment>Suffix for displaying milliseconds</comment>
+      <translation>ms</translation>
+    </message>
+    <message>
+      <source>s</source>
+      <comment>Suffix for displaying seconds</comment>
+      <translation>s</translation>
+    </message>
+    <message>
+      <source>m</source>
+      <comment>Suffix for displaying minutes</comment>
+      <translation>m</translation>
+    </message>
+    <message>
+      <source>h</source>
+      <comment>Suffix for displaying hours</comment>
+      <translation>h</translation>
+    </message>
+    <message>
+      <source>d</source>
+      <comment>Suffix for displaying days</comment>
+      <translation>d</translation>
+    </message>
+    <message>
+      <source>w</source>
+      <comment>Suffix for displaying weeks</comment>
+      <translation>t</translation>
+    </message>
+    <message>
+      <source>M</source>
+      <comment>Suffix for displaying months</comment>
+      <translation>M</translation>
+    </message>
+    <message>
+      <source>y</source>
+      <comment>Suffix for displaying years</comment>
+      <translation>r</translation>
+    </message>
+    <message>
+      <source>msec</source>
+      <comment>Long suffix for displaying milliseconds</comment>
+      <translation>msek</translation>
+    </message>
+    <message>
+      <source>sec</source>
+      <comment>Long suffix for displaying seconds</comment>
+      <translation>sek</translation>
+    </message>
+    <message>
+      <source>min</source>
+      <comment>Long suffix for displaying minutes</comment>
+      <translation>min</translation>
+    </message>
+    <message>
+      <source>hrs</source>
+      <comment>Long suffix for displaying hours</comment>
+      <translation>hod</translation>
+    </message>
+    <message>
+      <source>days</source>
+      <comment>Long suffix for displaying days</comment>
+      <translation>dny</translation>
+    </message>
+    <message>
+      <source>wks</source>
+      <comment>Long suffix for displaying weeks</comment>
+      <translation>týdny</translation>
+    </message>
+    <message>
+      <source>mos</source>
+      <comment>Long suffix for displaying months</comment>
+      <translation>měsíce</translation>
+    </message>
+    <message>
+      <source>yrs</source>
+      <comment>Long suffix for displaying years</comment>
+      <translation>roky</translation>
+    </message>
+    <message numerus="yes">
+      <source>milliseconds</source>
+      <comment>Full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>milisekundy</numerusform>
+        <numerusform>milisekundy</numerusform>
+        <numerusform>milisekundy</numerusform>
+        <numerusform>milisekundy</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>seconds</source>
+      <comment>Full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>sekundy</numerusform>
+        <numerusform>sekundy</numerusform>
+        <numerusform>sekundy</numerusform>
+        <numerusform>sekundy</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>minutes</source>
+      <comment>Full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>minuty</numerusform>
+        <numerusform>minuty</numerusform>
+        <numerusform>minuty</numerusform>
+        <numerusform>minuty</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>hours</source>
+      <comment>Full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>hodin</numerusform>
+        <numerusform>hodin</numerusform>
+        <numerusform>hodin</numerusform>
+        <numerusform>hodin</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>days</source>
+      <comment>Full suffix for displaying days</comment>
+      <translation>
+        <numerusform>dny</numerusform>
+        <numerusform>dny</numerusform>
+        <numerusform>dny</numerusform>
+        <numerusform>dny</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>weeks</source>
+      <comment>Full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>týdny</numerusform>
+        <numerusform>týdny</numerusform>
+        <numerusform>týdny</numerusform>
+        <numerusform>týdny</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>months</source>
+      <comment>Full suffix for displaying months</comment>
+      <translation>
+        <numerusform>měsíce</numerusform>
+        <numerusform>měsíce</numerusform>
+        <numerusform>měsíce</numerusform>
+        <numerusform>měsíce</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>years</source>
+      <comment>Full suffix for displaying years</comment>
+      <translation>
+        <numerusform>roky</numerusform>
+        <numerusform>roky</numerusform>
+        <numerusform>roky</numerusform>
+        <numerusform>roky</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1217,10 +1474,6 @@
     <message>
       <source>License Issue</source>
       <translation>Problém s licencí</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation>Záloha archivu byla dokončena</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
@@ -1669,6 +1922,35 @@
     <message>
       <source>RAID error. %1.</source>
       <translation>Chyba RAID. %1.</translation>
+    </message>
+    <message>
+      <source>Buzzer</source>
+      <translation type="unfinished">Buzzer</translation>
+    </message>
+    <message>
+      <source>Archive Backup Finished</source>
+      <translation type="unfinished">Archive Backup Finished</translation>
+    </message>
+    <message>
+      <source>PoE over Budget</source>
+      <translation type="unfinished">PoE over Budget</translation>
+    </message>
+    <message>
+      <source>Fan Error</source>
+      <translation type="unfinished">Fan Error</translation>
+    </message>
+    <message>
+      <source>PoE over budget at %1</source>
+      <translation type="unfinished">PoE over budget at %1</translation>
+    </message>
+    <message>
+      <source>Fan error at %1</source>
+      <translation type="unfinished">Fan error at %1</translation>
+    </message>
+    <message>
+      <source>Reason: Power limit exceeded (%1)</source>
+      <comment>%1 is consumption</comment>
+      <translation type="unfinished">Reason: Power limit exceeded (%1)</translation>
     </message>
   </context>
   <context>

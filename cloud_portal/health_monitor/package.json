@@ -149,8 +149,10 @@
         "setupTestFrameworkScriptFile": "<rootDir>/src/setupJest.ts"
     },
     "scripts": {
-        "serve": "webpack-dev-server --config webpack.health_monitor-dev.js --open --hot --inline",
-        "build": "webpack --config webpack.health_monitor-prod.js --progress --profile --bail",
+        "check-files": "echo Current files; ls -l; echo; echo Current files in app; ls -l app; echo",
+        "lang": "npm run update-lang; npm run fill-lang; npm run compile-lang;",
+        "serve": "npm run lang; webpack-dev-server --config webpack.health_monitor-dev.js --open --hot --inline",
+        "build": "npm run check-files; npm run lang; npm run check-files; webpack --config webpack.health_monitor-prod.js --progress --profile --bail",
         "setSkin": "node setSkin.js --skin",
         "compile-lang": "python compile-lang.py",
         "fill-lang": "python fill-lang.py",

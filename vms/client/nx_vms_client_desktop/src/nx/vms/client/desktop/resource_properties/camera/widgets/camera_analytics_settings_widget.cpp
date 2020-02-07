@@ -8,7 +8,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static constexpr int kMinimumHeight = 400;
+static constexpr QSize kMinimumSize(800, 400);
 
 } // namespace
 
@@ -22,7 +22,7 @@ CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
     setClearColor(palette().window().color());
     setResizeMode(QQuickWidget::SizeRootObjectToView);
     setSource(QUrl("Nx/Dialogs/CameraSettings/AnalyticsSettings.qml"));
-    setMinimumHeight(kMinimumHeight);
+    setMinimumSize(kMinimumSize);
 
     if (!NX_ASSERT(rootObject()))
         return;

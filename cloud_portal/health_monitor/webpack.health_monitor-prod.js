@@ -5,22 +5,12 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const common = require('./webpack.health_monitor.js');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = merge(common, {
     plugins: [
         new CleanWebpackPlugin([ 'dist' ]),
         new UglifyJSPlugin({}),
         new webpack.HashedModuleIdsPlugin(),
-    
-        new CopyWebpackPlugin([
-            {
-                // Copy en_US lang file to have correct values
-                // before Boris update translations
-                from: '../app/language_compiled.json',
-                to: '../../translations/en_US/language_compiled.json'
-            }
-        ])
     ],
     output: {
         filename  : 'scripts/[name].[chunkhash].js',

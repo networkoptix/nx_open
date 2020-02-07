@@ -10,11 +10,11 @@ PolyFigure
     property string allowedDirections: (figureSettings && figureSettings.allowedDirections)
         ? figureSettings.allowedDirections : ""
 
-    canvas.opacity: (arrowA.hovered || arrowB.hovered) ? 0.5 : 1.0
+    canvas.opacity: (arrowLeft.hovered || arrowRight.hovered) ? 0.5 : 1.0
 
     LineArrow
     {
-        id: arrowA
+        id: arrowLeft
 
         visible: !pointMakerInstrument.enabled && allowedDirections !== "none"
         color: figure.color
@@ -27,18 +27,18 @@ PolyFigure
         {
             if (allowedDirections === "one")
             {
-                arrowB.checked = !checked
+                arrowRight.checked = !checked
             }
-            else if (allowedDirections !== "none" && !checked && !arrowB.checked)
+            else if (allowedDirections !== "none" && !checked && !arrowRight.checked)
             {
-                arrowB.checked = true
+                arrowRight.checked = true
             }
         }
     }
 
     LineArrow
     {
-        id: arrowB
+        id: arrowRight
 
         visible: !pointMakerInstrument.enabled && allowedDirections !== "none"
         color: figure.color
@@ -51,11 +51,11 @@ PolyFigure
         {
             if (allowedDirections === "one")
             {
-                arrowA.checked = !checked
+                arrowLeft.checked = !checked
             }
-            else if (allowedDirections !== "none" && !checked && !arrowA.checked)
+            else if (allowedDirections !== "none" && !checked && !arrowLeft.checked)
             {
-                arrowA.checked = true
+                arrowLeft.checked = true
             }
         }
     }
@@ -92,8 +92,8 @@ PolyFigure
     {
         pointMakerInstrument.start()
 
-        arrowA.checked = true
-        arrowB.checked = (allowedDirections !== "one")
+        arrowLeft.checked = true
+        arrowRight.checked = (allowedDirections !== "one")
     }
 
     function deserialize(json)
@@ -103,20 +103,20 @@ PolyFigure
         if (!hasFigure)
             return
 
-        if (json.direction === "a")
+        if (json.direction === "left")
         {
-            arrowA.checked = true
-            arrowB.checked = false
+            arrowLeft.checked = true
+            arrowRight.checked = false
         }
-        else if (json.direction === "b")
+        else if (json.direction === "right")
         {
-            arrowA.checked = false
-            arrowB.checked = true
+            arrowLeft.checked = false
+            arrowRight.checked = true
         }
         else
         {
-            arrowA.checked = true
-            arrowB.checked = true
+            arrowLeft.checked = true
+            arrowRight.checked = true
         }
     }
 
@@ -126,9 +126,9 @@ PolyFigure
         if (!json)
             return null
 
-        json.direction = (allowedDirections !== "none" && arrowA.checked !== arrowB.checked)
-            ? arrowA.checked ? "a" : "b"
-            : ""
+        json.direction = (allowedDirections !== "none" && arrowLeft.checked !== arrowRight.checked)
+            ? arrowLeft.checked ? "left" : "right"
+            : "absent"
 
         return json
     }

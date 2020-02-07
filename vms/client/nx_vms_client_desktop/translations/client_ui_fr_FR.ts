@@ -33,11 +33,6 @@
       <source>System Servers</source>
       <translation>Serveurs système</translation>
     </message>
-    <message>
-      <location/>
-      <source>Customer Support</source>
-      <translation>Soutien à la clientèle</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -500,6 +495,11 @@
       <source>At</source>
       <translation>À</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use event source server</source>
+      <translation type="unfinished">Use event source server</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -527,6 +527,19 @@
       <location/>
       <source>Test</source>
       <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>BuzzerBusinessActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/buzzer_business_action_widget.ui"/>
+      <source>Fixed duration:</source>
+      <translation>Durée fixe:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>seconds</source>
+      <translation>secondes</translation>
     </message>
   </context>
   <context>
@@ -927,6 +940,14 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>Rester connecté</translation>
+    </message>
+  </context>
+  <context>
+    <name>ConnectingToServerDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
+      <source>Connecting...</source>
+      <translation type="unfinished">Connecting...</translation>
     </message>
   </context>
   <context>
@@ -1718,23 +1739,8 @@
     </message>
     <message>
       <location/>
-      <source>License Type:</source>
-      <translation>Type de Licence:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>License Key:</source>
-      <translation>Clé de licence:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Features</source>
       <translation>Fonctionnalités</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Locked to Hardware ID:</source>
-      <translation>Verrouillé sur ID Matériel:</translation>
     </message>
   </context>
   <context>
@@ -2066,6 +2072,24 @@
     </message>
   </context>
   <context>
+    <name>PasswordDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
+      <source>Sign in</source>
+      <translation>Connecter</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
+      <translation>Mot de passe</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Username</source>
+      <translation>Nom d'usager</translation>
+    </message>
+  </context>
+  <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
@@ -2132,14 +2156,17 @@
     </message>
   </context>
   <context>
+    <name>PoeSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
+      <source>Attention! Power limit exceeded</source>
+      <translation>Attention! Limite de puissance dépassée</translation>
+    </message>
+  </context>
+  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-      <source>Global Notification Settings...</source>
-      <translation>Paramètres de notification globale...</translation>
-    </message>
-    <message>
-      <location/>
       <source>for</source>
       <translation>pour</translation>
     </message>
@@ -2780,6 +2807,14 @@
       <location/>
       <source>Global Email Settings...</source>
       <translation>&amp;Paramètres de courriel globaux...</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServerSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_dialogs/server_selection_dialog.ui"/>
+      <source>Select Servers</source>
+      <translation>Sélectionner Serveurs</translation>
     </message>
   </context>
   <context>

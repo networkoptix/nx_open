@@ -24,10 +24,47 @@ QString getFullDeviceName(const QString& shortName)
 
 QnAudioRecorderSettings::DeviceList fetchDevicesList()
 {
-    QnAudioRecorderSettings::DeviceList devices;
+    auto availableDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
 
-    QMap<QString, int> countByName;
-    for (const auto& info: QAudioDeviceInfo::availableDevices(QAudio::AudioInput))
+    #if defined(Q_OS_WIN)
+        // Under modern Windows systems there is an issue with duplicating entries returning by
+        // QAudioDeviceInfo::availableDevices(), one from WASAPI, one from winMM, see QTBUG-75781.
+        // Since they are actually the same devices provided by different interfaces, bad things
+        // may occur when both are selected as input source (immediate crash on use attempt).
+
+        // Device order will be kept.
+        QStringList nameOrder;
+        for (const auto& deviceInfo: availableDevices)
+            nameOrder.append(deviceInfo.deviceName());
+        nameOrder.removeDuplicates();
+
+        std::sort(availableDevices.begin(), availableDevices.end(),
+            [&nameOrder](const QAudioDeviceInfo& l, const QAudioDeviceInfo& r)
+            {
+                // First WASAPI one (1-2 channels usually), then winMM one (18 channels usually).
+                // Qt 5.14 provides QAudioDeviceInfo::realm() getter, it should be used instead.
+                if (l.deviceName() == r.deviceName())
+                    return l.supportedChannelCounts() < r.supportedChannelCounts();
+                return nameOrder.indexOf(l.deviceName()) < nameOrder.indexOf(r.deviceName());
+            });
+
+        const auto getDuplicatingWasapiDeviceItr =
+            [&availableDevices]()
+            {
+                return std::adjacent_find(availableDevices.begin(), availableDevices.end(),
+                    [](const QAudioDeviceInfo& l, const QAudioDeviceInfo& r)
+                    {
+                        return l.deviceName() == r.deviceName();
+                    });
+            };
+
+        while (getDuplicatingWasapiDeviceItr() != availableDevices.end())
+            availableDevices.erase(getDuplicatingWasapiDeviceItr());
+    #endif
+
+    QnAudioRecorderSettings::DeviceList devices;
+    QMap<QString, int> countByName; //< #vbreus Is it still makes sense, or just was workaround?
+    for (const auto& info: availableDevices)
     {
         const QString name = getFullDeviceName(info.deviceName());
         int& count = countByName[name];

@@ -77,6 +77,7 @@
         "emailSignature": "חתימת דוא\"ל",
         "emailSupportEmail": "דוא\"ל תמיכה",
         "enableEdgeRecording": "אפשר הקלטות edge",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "תקופת יומן האירועים (ימים)",
         "ldapAdminDn": "מנהל LDAP DN",
         "ldapSearchBase": "בסיס חיפוש LDAP",
@@ -85,6 +86,7 @@
         "localSystemId": "מזהה מערכת מקומי",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "הפרש מקסימלי בין זמן סינכרון לבין זמן אינטרנט (אלפיות השנייה)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "הפרש מקסימלי בין זמן סינכרון לבין זמן אינטרנט (אלפיות השנייה)",
+        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
         "maxRecordQueueSizeBytes": "גודל תור מרבי של רשומות (בתים)",
         "maxRecordQueueSizeElements": "גודל תור מרבי של רשומות (אלמנטים)",
         "maxRemoteArchiveSynchronizationThreads": "סינכרון מרבי של אשכולות סינכרון מרחוק",
@@ -113,7 +115,8 @@
         "timeSynchronizationEnabled": "סינכרון זמן מאופשר",
         "primaryTimeServer": "Primary time synchronization server",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "עדכון ההתראות מופעל",
         "upnpPortMappingEnabled": "מיפוי יציאת UPNP מאופשר",
@@ -129,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "healthMonitoring": "ניטור תקינות",
+            "graphs": "Graphs",
             "storage": "אחסון",
             "log": "יומן"
         }
