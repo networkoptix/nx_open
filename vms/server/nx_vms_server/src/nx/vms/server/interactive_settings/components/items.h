@@ -49,6 +49,14 @@ private:
     QString m_description;
 };
 
+class Separator: public Item
+{
+    Q_OBJECT
+
+public:
+    Separator(QObject* parent = nullptr);
+};
+
 class Group: public Item
 {
     Q_OBJECT
