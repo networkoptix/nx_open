@@ -105,8 +105,8 @@ bool Camera::performStreamingFile(
         {
             if (ini().stopStreamingOnErrors)
             {
-                NX_LOGGER_ERROR(logger,
-                    "Frame sending failed due to the above error; stop streaming.");
+                NX_LOGGER_INFO(logger,
+                    "Frame sending failed due to the above reason; stop streaming.");
                 return false;
             }
         }
