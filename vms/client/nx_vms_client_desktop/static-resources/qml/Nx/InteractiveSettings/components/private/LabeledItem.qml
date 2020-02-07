@@ -39,9 +39,6 @@ BottomPaddedItem
             y: isBaselineAligned ? Math.max(contentItem.baselineOffset - baselineOffset, 0) : 0
             text: caption || " " //< Always non-empty to ensure fixed line height & baseline offset.
             horizontalAlignment: Text.AlignRight
-            verticalAlignment: Text.AlignVCenter
-            height: Math.max(implicitHeight, isBaselineAligned ? 0 : 28)
-            topPadding: lineCount === 1 && !isBaselineAligned ? 1 : 0 //< Fine tuning.
             maximumLineCount: 2
             wrapMode: Text.WordWrap
             elide: Text.ElideRight
