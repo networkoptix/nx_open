@@ -404,7 +404,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadata
         [this](const EventList& events)
         {
             using namespace std::chrono;
-            auto eventMetadataPacket = new EventMetadataPacket();
+            auto eventMetadataPacket = makePtr<EventMetadataPacket>();
 
             for (const auto& hanwhaEvent: events)
             {
@@ -439,9 +439,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadata
             }
 
             if (NX_ASSERT(m_handler))
-                m_handler->handleMetadata(eventMetadataPacket);
-
-            eventMetadataPacket->releaseRef();
+                m_handler->handleMetadata(eventMetadataPacket.get());
         };
 
     if (!NX_ASSERT(m_engine))

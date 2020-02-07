@@ -74,7 +74,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
         [this](const EventList& events)
         {
             using namespace std::chrono;
-            auto packet = new EventMetadataPacket();
+            auto packet = makePtr<EventMetadataPacket>();
 
             for (const auto& dahuaEvent: events)
             {
@@ -98,7 +98,8 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
                 packet->addItem(eventMetadata.get());
             }
 
-            m_handler->handleMetadata(packet);
+            if (NX_ASSERT(m_handler))
+                m_handler->handleMetadata(packet.get());
         };
 
     NX_ASSERT(m_engine);
