@@ -413,6 +413,9 @@ std::string Engine::manifestString() const
                         "range": ["value1", "value2", "value3"]
                     },
                     {
+                        "type": "Separator"
+                    },
+                    {
                         "type": "CheckBox",
                         "caption": "Device Agent CheckBox",
                         "name": "testCheckBox",
