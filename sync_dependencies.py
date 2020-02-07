@@ -213,6 +213,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if have_mediaserver:
         if platform == "windows" or (platform == "linux" and arch == "x64"):
             sync("vms_benchmark-dev", path_variable="vms_benchmark_dev_dir")
+            sync("any/vms_benchmark-dev", path_variable="vms_benchmark_dev_all_platforms_dir")
 
         sync("sigar")
         sync("any/apidoctool-2.1", path_variable="APIDOCTOOL_PATH")

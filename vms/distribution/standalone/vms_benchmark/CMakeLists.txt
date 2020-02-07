@@ -4,7 +4,7 @@ set(zip_file ${distribution_output_dir}/${vms_benchmark_distribution_name}.zip)
 set(zip_log ${logs_dir}/vms_benchmark_zip.log)
 
 # Generated commands for add_custom_command() which copies the files - platform-dependent.
-set(copy_dependency_commands) 
+set(copy_dependencies_commands)
 
 if(targetDevice STREQUAL "windows-x64")
     set(executable_extension .exe)
@@ -86,13 +86,13 @@ if(targetDevice STREQUAL "windows-x64")
     
     # Make one "copy" command for each file to avoid reaching the command line length limit.
     foreach(dependency ${dependencies})
-        list(APPEND copy_dependency_commands
+        list(APPEND copy_dependencies_commands
             COMMAND ${CMAKE_COMMAND} -E copy ${dependency} vms_benchmark/testcamera/
         )
     endforeach()
 
-    list(APPEND copy_dependency_commands
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/vms/vms_benchmark/plink.exe vms_benchmark/
+    list(APPEND copy_dependencies_commands
+        COMMAND ${CMAKE_COMMAND} -E copy ${vms_benchmark_dev_dir}/files/plink.exe vms_benchmark/
     )
 else()
     set(benchmark_python_version 3.6)
@@ -130,10 +130,13 @@ else()
         ${CMAKE_BINARY_DIR}/bin/testcamera
     )
     
-    # Call via bash to resolve `*` used for .so symlinks.
     list(JOIN dependencies " " dependencies_args) #< Assuming dependencies do not contain spaces.
-    list(APPEND copy_dependency_commands
+    list(APPEND copy_dependencies_commands
+        # Call via bash to resolve `*` used for .so symlinks.
         COMMAND bash -c "cp -r ${dependencies_args} vms_benchmark/testcamera/"
+
+        # Needed because all executables have RPATH=../lib
+        COMMAND ln -s testcamera vms_benchmark/lib
     )
     
 endif()
@@ -146,15 +149,15 @@ add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E make_directory vms_benchmark/testcamera
     
     COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_BINARY_DIR}/vms/vms_benchmark/high.ts
-        ${CMAKE_BINARY_DIR}/vms/vms_benchmark/low.ts
+        ${vms_benchmark_dev_all_platforms_dir}/files/high.ts
+        ${vms_benchmark_dev_all_platforms_dir}/files/low.ts
         ${CMAKE_BINARY_DIR}/bin/vms_benchmark${executable_extension}
         ${CMAKE_BINARY_DIR}/build_info.txt
         ${CMAKE_CURRENT_SOURCE_DIR}/files/vms_benchmark.conf
         ${CMAKE_CURRENT_SOURCE_DIR}/files/readme.md
         vms_benchmark/
  
-    ${copy_dependency_commands}
+    ${copy_dependencies_commands}
  
     COMMAND ${CMAKE_COMMAND} -E echo "  Zipping VMS Benchmark - see ${zip_log}"
     COMMAND ${CMAKE_COMMAND} -E tar cvf ${zip_file} --format=zip vms_benchmark >${zip_log}
