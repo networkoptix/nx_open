@@ -13,7 +13,7 @@ CheckBox
 
         source:
         {
-            var source = "qrc:///skin/theme/checkbox"
+            var source = "qrc:///skin/theme/radiobutton"
             if (control.checked)
                 source += "_checked"
             if (control.hovered)
