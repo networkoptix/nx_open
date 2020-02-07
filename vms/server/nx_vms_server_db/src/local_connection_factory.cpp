@@ -1152,7 +1152,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * the result of the corresponding GET function.
      * </p>
      * %permissions Administrator.
-     * %param userId User unique id.
+     * %param userId User or user role unique id.
      * %param resourceIds List of accessible resources ids.
      * %// AbstractUserManager::setAccessRights
      */
