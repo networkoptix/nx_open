@@ -2,7 +2,7 @@ import QtQuick 2.6
 import QtQuick.Controls 2.4
 
 /*
- * This item has isGroup property and applies additional bottom padding 
+ * This item has isGroup property and applies additional bottom padding
  * to itself if either its or next item in a positioner isGroup is true
  */
 Item
@@ -25,13 +25,10 @@ Item
 
     readonly property bool needsBottomPadding:
     {
-        if (isGroup)
-            return true
-
         if (!Positioner || !parent || Positioner.isLastItem)
             return false
 
         var next = parent.children[Positioner.index + 1]
-        return next && next.isGroup || false
+        return next && (isGroup || next.isGroup) || false
     }
 }
