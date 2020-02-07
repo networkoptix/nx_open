@@ -15,7 +15,6 @@ BottomPaddedItem
 
     property alias labelWidth: label.width
     property string caption
-    property bool isGroup: false
 
     width: parent.width
 
