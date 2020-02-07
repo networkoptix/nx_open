@@ -390,6 +390,23 @@ std::string Engine::manifestString() const
                         "defaultValue": "a text"
                     },
                     {
+                        "type": "RadioButtonGroup",
+                        "name": "testRadioButtonGroup",
+                        "caption": "RadioButton Group",
+                        "defaultValue": "Catasigaloceras enodatum",
+                        "range": [
+                            "Kepplerites gowerianus",
+                            "Kepplerites galilaeii",
+                            "Sigaloceras calloviense",
+                            "Sigaloceras micans",
+                            "Catasigaloceras enodatum",
+                            "Kosmoceras medea",
+                            "Kosmoceras jason",
+                            "Kosmoceras obductum",
+                            "Kosmoceras posterior"
+                        ]
+                    },
+                    {
                         "type": "SpinBox",
                         "caption": "Device Agent SpinBox (plugin side)",
                         "name": "pluginSideTestSpinBox",

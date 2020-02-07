@@ -306,6 +306,11 @@ ComboBox::ComboBox(QObject* parent):
 {
 }
 
+RadioButtonGroup::RadioButtonGroup(QObject* parent):
+    EnumerationItem(QStringLiteral("RadioButtonGroup"), parent)
+{
+}
+
 SpinBox::SpinBox(QObject* parent):
     IntegerNumberItem(QStringLiteral("SpinBox"), parent)
 {
@@ -460,6 +465,7 @@ void Factory::registerTypes()
     registerType<CheckBox>("CheckBox");
     registerType<Button>("Button");
     registerType<Separator>("Separator");
+    registerType<RadioButtonGroup>("RadioButtonGroup");
 
     registerType<LineFigure>("LineFigure");
     registerType<BoxFigure>("BoxFigure");

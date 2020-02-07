@@ -341,6 +341,12 @@ public:
     ComboBox(QObject* parent = nullptr);
 };
 
+class RadioButtonGroup: public EnumerationItem
+{
+public:
+    RadioButtonGroup(QObject* parent = nullptr);
+};
+
 class SpinBox: public IntegerNumberItem
 {
 public:
