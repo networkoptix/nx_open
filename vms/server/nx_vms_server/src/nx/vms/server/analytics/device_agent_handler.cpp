@@ -28,9 +28,6 @@ DeviceAgentHandler::DeviceAgentHandler(
     connect(this, &DeviceAgentHandler::pluginDiagnosticEventTriggered,
         serverModule->eventConnector(), &event::EventConnector::at_pluginDiagnosticEvent,
         Qt::QueuedConnection);
-
-    m_metadataHandler.setEventTypeDescriptors(serverModule->commonModule()
-        ->analyticsEventTypeDescriptorManager()->supportedEventTypeDescriptors(m_device));
 }
 
 void DeviceAgentHandler::handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket)

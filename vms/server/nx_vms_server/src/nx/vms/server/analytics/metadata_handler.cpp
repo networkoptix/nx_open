@@ -9,6 +9,7 @@
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/events/events_fwd.h>
 
+#include <common/common_module.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/sdk_support/utils.h>
@@ -19,6 +20,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <nx/analytics/analytics_logging_ini.h>
+#include <nx/analytics/event_type_descriptor_manager.h>
 
 namespace nx {
 namespace vms::server {
@@ -50,8 +52,15 @@ MetadataHandler::MetadataHandler(
 std::optional<EventTypeDescriptor> MetadataHandler::eventTypeDescriptor(
     const QString& eventTypeId) const
 {
-    if (const auto it = m_eventTypeDescriptors.find(eventTypeId);
-        it != m_eventTypeDescriptors.cend())
+    if (!m_eventTypeDescriptors)
+    {
+        m_eventTypeDescriptors = serverModule()->commonModule()
+            ->analyticsEventTypeDescriptorManager()
+            ->supportedEventTypeDescriptors(m_resource);
+    }
+
+    if (const auto it = m_eventTypeDescriptors->find(eventTypeId);
+        it != m_eventTypeDescriptors->cend())
     {
         return it->second;
     }
@@ -250,11 +259,6 @@ void MetadataHandler::handleEventMetadata(
     }
 
     emit sdkEventTriggered(sdkEvent);
-}
-
-void MetadataHandler::setEventTypeDescriptors(DescriptorMap descriptors)
-{
-    m_eventTypeDescriptors = std::move(descriptors);
 }
 
 void MetadataHandler::setMetadataSink(QnAbstractDataReceptor* dataReceptor)

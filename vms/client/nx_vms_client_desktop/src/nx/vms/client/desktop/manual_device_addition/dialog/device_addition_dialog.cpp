@@ -12,6 +12,7 @@
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_changes_listener.h>
 #include <core/resource/camera_resource.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
@@ -72,7 +73,9 @@ DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
 
     initializeControls();
 
-    connect(m_pool, &QnResourcePool::urlChanged, this,
+    auto urlChangeListener = new QnResourceChangesListener(this);
+    urlChangeListener->connectToResources<QnVirtualCameraResource>(
+        &QnResource::urlChanged,
         [this](const QnResourcePtr& resource)
         {
             if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
