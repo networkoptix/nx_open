@@ -41,7 +41,7 @@ if [[ -e "$FRONT_END_HM/webpack.health_monitor.js" ]]
 then
     # Build Health Monitor
     echo "Building Health Monitor"
-    HEALTH_MONITOR="../health_monitor"
+    HEALTH_MONITOR="health_monitor"
     FRONT_END="$HEALTH_MONITOR/health_monitor"
 
     [ -d $HEALTH_MONITOR ] && rm -rf $HEALTH_MONITOR
