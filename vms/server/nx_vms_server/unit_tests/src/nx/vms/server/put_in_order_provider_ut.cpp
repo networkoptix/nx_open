@@ -19,7 +19,7 @@ TEST(SimpleReorderer, zeroInitialBufferDesc)
         reorderer.processNewData(data);
     }
 
-    // First packet unordered, after buffer have been automatically increased.
+    // First packet unordered, after the buffer has been automatically increased.
     auto& queue = reorderer.queue();
     ASSERT_EQ(1, queue.size());
     ASSERT_EQ(10, queue.front()->timestamp);
@@ -79,7 +79,7 @@ TEST(SimpleReorderer, nonZeroInitialBuffer)
 TEST(SimpleReorderer, bufferSize)
 {
     SimpleReorderer reorderer({10us});
-    // After buffer has been filled up, packet should be available without 'flush' call
+    // After the buffer has been filled up, a packet should be available without 'flush' call.
     for (int i = 1; i <= 15; ++i)
     {
         QnAbstractDataPacketPtr data(new QnWritableCompressedVideoData());
