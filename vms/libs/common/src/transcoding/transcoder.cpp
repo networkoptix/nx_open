@@ -150,19 +150,18 @@ QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
 
 bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
-    QSize streamResolution = nx::media::getFrameSize(video);
+    QSize streamResolution = findSavedResolution(video);
+    if (streamResolution.isEmpty())
+        streamResolution = nx::media::getFrameSize(video);
+
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
-        QSize srcResolution = findSavedResolution(video);
-        if (srcResolution.isEmpty())
-            srcResolution = streamResolution;
-
-        m_resolution.setHeight(qMin(srcResolution.height(), m_resolution.height())); // strict to source frame height
+        m_resolution.setHeight(qMin(streamResolution.height(), m_resolution.height())); // strict to source frame height
         // Round resolution height.
         m_resolution.setHeight(
             qPower2Round((unsigned) m_resolution.height(), kHeightRoundingFactor));
 
-        float ar = srcResolution.width() / (float)srcResolution.height();
+        float ar = streamResolution.width() / (float)streamResolution.height();
         m_resolution.setWidth(m_resolution.height() * ar);
         // Round resolution width.
         m_resolution.setWidth(qPower2Round((unsigned) m_resolution.width(), kWidthRoundingFactor));

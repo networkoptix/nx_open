@@ -22,7 +22,8 @@ CameraManager::CameraManager(const std::shared_ptr<Camera> camera):
         nxcip::BaseCameraManager::shareIpCapability |
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
-        nxcip::BaseCameraManager::cameraTimeCapability)
+        nxcip::BaseCameraManager::cameraTimeCapability |
+        nxcip::BaseCameraManager::dontAutoOpenCamera)
 {
     m_pluginRef->addRef();
     if (nx::vms::utils::installationInfo().hwPlatform !=

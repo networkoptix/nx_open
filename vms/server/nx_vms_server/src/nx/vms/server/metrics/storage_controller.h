@@ -18,6 +18,7 @@ public:
     void start() override;
 
 private:
+    void update(StorageResource* storage);
     static utils::metrics::ValueGroupProviders<Resource> makeProviders();
 };
 

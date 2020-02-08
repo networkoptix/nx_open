@@ -101,8 +101,10 @@ public:
     void setMaxNumberOfRedirects(int maxNumberOfRedirects);
 
     void setUserAgent(const QString& userAgent);
-    void setUserName(const QString& userAgent);
-    void setUserPassword(const QString& userAgent);
+    void setUserName(const QString& name);
+    void setUserPassword(const QString& password);
+    void setProxyUserName(const QString& name);
+    void setProxyUserPassword(const QString& password);
     void setAuthType(AuthType value);
     void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure);
 
@@ -143,6 +145,8 @@ private:
     std::optional<QString> m_userAgent;
     std::optional<QString> m_userName;
     std::optional<QString> m_userPassword;
+    std::optional<QString> m_proxyUserName;
+    std::optional<QString> m_proxyUserPassword;
     std::size_t m_maxInternalBufferSize;
     std::optional<SocketAddress> m_proxyEndpoint;
     bool m_isProxySecure = false;

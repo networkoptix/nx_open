@@ -258,6 +258,7 @@ QnClientModule::~QnClientModule()
 
     m_clientCoreModule->commonModule()->resourcePool()->threadPool()->waitForDone();
 
+
     QApplication::setOrganizationName(QString());
     QApplication::setApplicationName(QString());
     QApplication::setApplicationDisplayName(QString());

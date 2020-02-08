@@ -20,11 +20,12 @@ public:
     virtual api::metrics::ResourceManifest manifest() const override final;
 
 protected:
+    using ResourceController::add;
     ResourceType* add(ResourceType resource, QString id, Scope scope);
-    ResourceType* add(ResourceType resource, const QnUuid& localId);
+    ResourceType* add(ResourceType resource, const QnUuid& id, Scope scope);
 
     using ResourceController::remove;
-    bool remove(QnUuid id);
+    bool remove(const QnUuid& id);
 
 private:
     std::unique_ptr<ResourceProvider<Resource>> m_provider;
@@ -97,17 +98,13 @@ ResourceType* ResourceControllerImpl<ResourceType>::add(
 
 template<typename ResourceType>
 ResourceType* ResourceControllerImpl<ResourceType>::add(
-    ResourceType resource, const QnUuid& localId)
+    ResourceType resource, const QnUuid& id, Scope scope)
 {
-    return add(
-        std::move(resource), resource->getId().toSimpleString(),
-        (resource->getId() == localId || resource->getParentId() == localId)
-            ? utils::metrics::Scope::local
-            : utils::metrics::Scope::system);
+    return add(std::move(resource), id.toSimpleString(), scope);
 }
 
 template<typename ResourceType>
-bool ResourceControllerImpl<ResourceType>::remove(QnUuid id)
+bool ResourceControllerImpl<ResourceType>::remove(const QnUuid& id)
 {
     return remove(id.toSimpleString());
 }

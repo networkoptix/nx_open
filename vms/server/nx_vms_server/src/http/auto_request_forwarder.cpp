@@ -238,7 +238,7 @@ void QnAutoRequestForwarder::addCameraIdUrlParams(
 }
 
 void QnAutoRequestForwarder::addCustomDeviceIdRetriever(
-    QString path, std::unique_ptr<DeviceIdRetriever> deviceIdRetriever)
+    QString path, DeviceIdRetriever deviceIdRetriever)
 {
     NX_ASSERT(!path.isEmpty());
     NX_ASSERT(deviceIdRetriever);
@@ -358,7 +358,7 @@ bool QnAutoRequestForwarder::findCameraInUrlQuery(
     const QUrlQuery& urlQuery,
     QnResourcePtr* const outCamera)
 {
-    const QString path = request.requestLine.url.path();    
+    const QString path = request.requestLine.url.path();
 
     // Path may contain an arbitrary prefix before the checked part.
     QStringList paramNames;
@@ -393,7 +393,7 @@ bool QnAutoRequestForwarder::findCameraWithinDeviceIdRetriever(
     if (const auto it = m_deviceIdRetrieversByPath.find(path);
         it != m_deviceIdRetrieversByPath.cend())
     {
-        if (const QString deviceId = it->second->retrieveDeviceId(request); !deviceId.isEmpty())
+        if (const QString deviceId = it->second(request); !deviceId.isEmpty())
             *outCamera = nx::camera_id_helper::findCameraByFlexibleId(resourcePool(), deviceId);
     }
 

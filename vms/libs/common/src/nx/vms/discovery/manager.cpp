@@ -232,7 +232,8 @@ void Manager::initializeMulticastFinders(bool clientMode)
             nx::network::SocketAddress /*endpoint*/)
         {
             const auto endpoints = ec2::moduleInformationEndpoints(module);
-            m_moduleConnector->newEndpoints({endpoints.cbegin(), endpoints.cend()}, module.id);
+            if (module.id != commonModule()->moduleGUID())
+                m_moduleConnector->newEndpoints({endpoints.cbegin(), endpoints.cend()}, module.id);
         });
 
     if (!clientMode)

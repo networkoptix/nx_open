@@ -2084,7 +2084,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value 3 Transaction log
      * %return:text Tail of the server log file in text format
      */
-    reg("api/showLog", new QnLogRestHandler());
+    reg("api/showLog", new QnLogRestHandler(), kAdmin);
 
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
 
@@ -2573,14 +2573,14 @@ void MediaServerProcess::registerRestHandlers(
      * %param:object JSON with the update manifest. This JSON might be requested with the
      *     /ec2/updateInformation?version=versionId request.
      */
-    reg("ec2/startUpdate", new QnStartUpdateRestHandler(serverModule()));
+    reg("ec2/startUpdate", new QnStartUpdateRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /ec2/finishUpdate
      * Puts a system in the 'Update Finished' state.
      * %param[opt]:option ignorePendingPeers Force an update process completion regardless actual
      *     peers state.
      */
-    reg("ec2/finishUpdate", new QnFinishUpdateRestHandler(serverModule()));
+    reg("ec2/finishUpdate", new QnFinishUpdateRestHandler(serverModule()), kAdmin);
 
     /**%apidoc GET /ec2/updateStatus
      * Retrieves a current update processing system-wide state.
@@ -2594,13 +2594,13 @@ void MediaServerProcess::registerRestHandlers(
      * Initiates update package installation.
      */
     reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule(),
-        [this]() { m_installUpdateRequestReceived = true; }));
+        [this]() { m_installUpdateRequestReceived = true; }), kAdmin);
 
     /**%apidoc POST /ec2/cancelUpdate
      * Puts a system in the 'Idle' state update-wise. This means that the current update
      * manifest is cleared and all downloads are cancelled.
      */
-    reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
+    reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /ec2/retryUpdate
      * Retries the latest failed update action. E.g. if one of servers has failed update because
@@ -2804,7 +2804,8 @@ void MediaServerProcess::registerRestHandlers(
      *         structure:
      *         %struct NetworkPortWithPoweringMode
      */
-    reg("api/nvrNetworkBlock", new nx::vms::server::rest::NvrNetworkBlockHandler(serverModule()));
+    reg("api/nvrNetworkBlock",
+        new nx::vms::server::rest::NvrNetworkBlockHandler(serverModule()), kAdmin);
 
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
@@ -2929,7 +2930,7 @@ void MediaServerProcess::registerRestHandlers(
         new OptionsRequestHandler());
 
     reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
-        m_metricsController.get()));
+        m_metricsController.get()), kAdmin);
 
     /**%apidoc GET /ec2/metrics/manifest
      * %return:object Metrics parameter manifest. See metrics.md for details.
@@ -2969,8 +2970,7 @@ void MediaServerProcess::registerRestHandler(
     if (!cameraIdUrlParams.isEmpty())
         m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
 
-    if (std::unique_ptr<DeviceIdRetriever> deviceIdRetriever =
-        handler->createCustomDeviceIdRetriever())
+    if (DeviceIdRetriever deviceIdRetriever = handler->createCustomDeviceIdRetriever())
     {
         QString realPath = path;
         if (!realPath.startsWith('/'))

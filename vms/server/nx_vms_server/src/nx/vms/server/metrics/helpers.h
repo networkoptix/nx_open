@@ -7,6 +7,14 @@
 namespace nx::vms::server::metrics {
 
 template<typename ResourceType>
+utils::metrics::Scope scopeOf(const ResourceType& resource, const QnUuid& localServerId)
+{
+    return (resource->getId() == localServerId || resource->getParentId() == localServerId)
+        ? utils::metrics::Scope::local
+        : utils::metrics::Scope::system;
+}
+
+template<typename ResourceType>
 bool isServerOffline(const ResourceType& r)
 {
     const auto server = r->commonModule()->resourcePool()->getResourceById(r->getParentId());

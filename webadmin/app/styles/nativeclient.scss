@@ -46,7 +46,7 @@ body.inline-webadmin{
 .checkbox {
   margin-left : 22px;
   .text {
-    color       : #A5B7C0;
+    color : $light;
   }
 
   & input:hover ~ .checkmark {
@@ -63,11 +63,11 @@ body.inline-webadmin{
   & input:active ~ .checkmark {
     svg polygon.box,
     svg polyline.box {
-      stroke : #E1E7EA !important;
+      stroke : $buttonText !important;
     }
 
     & ~ .text {
-      color : #E1E7EA !important;
+      color : $buttonText !important;
     }
   }
 
@@ -75,11 +75,11 @@ body.inline-webadmin{
     svg polygon.box,
     svg polyline.tick,
     svg polyline.box {
-      stroke : #E1E7EA !important;
+      stroke : $buttonText !important;
     }
 
     & ~ .text {
-      color : #E1E7EA !important;
+      color : $buttonText !important;
     }
   }
 }
@@ -87,14 +87,14 @@ body.inline-webadmin{
 /* Create a custom checkbox */
 .checkmark {
   & svg polygon.box {
-    stroke            : #A5B7C0;
+    stroke            : $light;
   }
 
   & svg polyline.box {
-    stroke            : #A5B7C0;
+    stroke            : $light;
   }
 
   & svg polyline.tick {
-    stroke            : #A5B7C0;
+    stroke            : $light;
   }
 }

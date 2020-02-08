@@ -52,14 +52,13 @@ public:
      *
      * @param path Should have the format like "/api/ptz".
      */
-    void addCustomDeviceIdRetriever(
-        QString path, std::unique_ptr<DeviceIdRetriever> deviceIdRetriever);
+    void addCustomDeviceIdRetriever(QString path, DeviceIdRetriever deviceIdRetriever);
 
 private:
     QStringList m_ignoredPathWildcardMarks;
     QMultiHash<QString, QString> m_allowedPathPartByScheme;
     QHash<QString, QStringList> m_cameraIdUrlParamsByPath;
-    std::map<QString, std::unique_ptr<DeviceIdRetriever>> m_deviceIdRetrieversByPath;
+    std::map<QString, DeviceIdRetriever> m_deviceIdRetrieversByPath;
 
     bool isPathIgnored(const nx::network::http::Request* request);
 

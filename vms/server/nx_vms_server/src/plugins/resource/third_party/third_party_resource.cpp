@@ -39,6 +39,9 @@ static const std::map<Qn::CameraCapability, nxcip::BaseCameraManager::CameraCapa
     {Qn::ShareIpCapability, nxcip::BaseCameraManager::shareIpCapability},
     {Qn::CustomMediaUrlCapability, nxcip::BaseCameraManager::customMediaUrlCapability},
     {Qn::FixedQualityCapability, nxcip::BaseCameraManager::fixedQualityCapability},
+    {Qn::MulticastStreamCapability, nxcip::BaseCameraManager::MulticastStreamCapability},
+    {Qn::ServerBoundCapability, nxcip::BaseCameraManager::ServerBoundCapability},
+    {Qn::dontAutoOpenCamera, nxcip::BaseCameraManager::dontAutoOpenCamera},
 };
 
 static const std::map<Ptz::Capability, nxcip::CameraPtzManager::Capability>

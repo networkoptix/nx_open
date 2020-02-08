@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <QJsonArray>
+
 #include <nx/vms/utils/metrics/rule_monitors.h>
 #include <nx/vms/utils/metrics/value_monitors.h>
 
@@ -228,9 +230,11 @@ TEST_F(MetricsGenerators, ValueFloat)
     const auto sampleAvg = parseFormulaOrThrow("sampleAvg %b 1m", monitors).generator;
     const auto counterDelta = parseFormulaOrThrow("counterDelta %b 40s", monitors).generator;
     const auto counterToAvg = parseFormulaOrThrow("counterToAvg %b 20s", monitors).generator;
+    const auto history = parseFormulaOrThrow("history %b 1m", monitors).generator;
 
     resource.update("b", 0);
 
+    NX_DEBUG(this, history());
     EXPECT_EQ(sampleAvg(), api::metrics::Value());
     EXPECT_EQ(counterDelta(), api::metrics::Value(0));
     EXPECT_EQ(counterToAvg(), api::metrics::Value());
@@ -238,6 +242,7 @@ TEST_F(MetricsGenerators, ValueFloat)
     timeShift.applyAbsoluteShift(std::chrono::seconds(10));
     resource.update("b", 100);
 
+    NX_DEBUG(this, history());
     EXPECT_VALUE(sampleAvg(), 0);
     EXPECT_VALUE(counterDelta(), 100);
     EXPECT_VALUE(counterToAvg(), 10);
@@ -245,6 +250,7 @@ TEST_F(MetricsGenerators, ValueFloat)
     timeShift.applyAbsoluteShift(std::chrono::seconds(20));
     resource.update("b", 200);
 
+    NX_DEBUG(this, history());
     EXPECT_VALUE(sampleAvg(), 50);
     EXPECT_VALUE(counterDelta(), 200);
     EXPECT_VALUE(counterToAvg(), 10);
@@ -252,6 +258,7 @@ TEST_F(MetricsGenerators, ValueFloat)
     timeShift.applyAbsoluteShift(std::chrono::seconds(40));
     resource.update("b", 600);
 
+    NX_DEBUG(this, history());
     EXPECT_VALUE(sampleAvg(), 125);
     EXPECT_VALUE(counterDelta(), 600);
     EXPECT_VALUE(counterToAvg(), 20);
@@ -259,14 +266,23 @@ TEST_F(MetricsGenerators, ValueFloat)
     timeShift.applyAbsoluteShift(std::chrono::minutes(1));
     resource.update("b", 30);
 
+    NX_DEBUG(this, history());
     EXPECT_VALUE(sampleAvg(), 283.3);
     EXPECT_VALUE(counterDelta(), 30 - 200);
     EXPECT_VALUE(counterToAvg(), -28.5);
 
     timeShift.applyAbsoluteShift(std::chrono::minutes(1) + std::chrono::seconds(30));
 
+    NX_DEBUG(this, history());
     EXPECT_VALUE(sampleAvg(), 248.3);
     EXPECT_VALUE(counterDelta(), 30 - 600);
+    EXPECT_VALUE(counterToAvg(), 0);
+
+    timeShift.applyAbsoluteShift(std::chrono::minutes(2));
+
+    NX_DEBUG(this, history());
+    EXPECT_VALUE(sampleAvg(), 30);
+    EXPECT_VALUE(counterDelta(), 0);
     EXPECT_VALUE(counterToAvg(), 0);
 }
 

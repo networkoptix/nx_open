@@ -13,12 +13,9 @@ typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 class QnAbstractPtzController;
 class QnLiveStreamProvider;
 
-namespace nx::vms::server::resource { struct MulticastParameters; }
+namespace nx::vms::server::resource {
 
-namespace nx {
-namespace vms::server {
-namespace resource {
-
+struct MulticastParameters;
 class StreamCapabilityAdvancedParametersProvider;
 
 struct StreamCapabilityKey
@@ -292,6 +289,4 @@ private:
     std::shared_ptr<Metrics> m_metrics;
 };
 
-} // namespace resource
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::resource

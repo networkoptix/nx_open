@@ -18,12 +18,6 @@ int QnCancelUpdateRestHandler::executePost(
     QByteArray& /*resultContentType*/,
     const QnRestConnectionProcessor* processor)
 {
-    if (!serverModule()->resourceAccessManager()->hasGlobalPermission(
-            processor->accessRights(), GlobalPermission::admin))
-    {
-        return nx::network::http::StatusCode::forbidden;
-    }
-
     serverModule()->updateManager()->cancel();
     return nx::network::http::StatusCode::ok;
 }

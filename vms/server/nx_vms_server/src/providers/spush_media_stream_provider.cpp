@@ -104,9 +104,10 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     else
     {
         m_currentLiveParams = getLiveParams();
-        NX_VERBOSE(this, "Openning stream with params: %1", m_currentLiveParams);
+        NX_VERBOSE(this, "Opening stream with params: %1", m_currentLiveParams);
         m_openStreamResult = openStreamInternal(isControlRequired, m_currentLiveParams);
-        NX_VERBOSE(this, "Open stream result: [%1]", m_openStreamResult.toString(resourcePool()));
+        NX_VERBOSE(this, "Opening stream result: [%1]",
+            m_openStreamResult.toString(resourcePool()));
         m_needControlTimer.restart();
         m_openedWithStreamCtrl = isControlRequired;
     }

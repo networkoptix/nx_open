@@ -335,6 +335,18 @@ void ProxyConnectionProcessor::replaceCameraRefererHeader(const QnNetworkResourc
 bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRoute& dstRoute)
 {
     Q_D(ProxyConnectionProcessor);
+    // Check TTL
+    nx::network::http::StringType ttlString = nx::network::http::getHeaderValue(d->request.headers, Qn::PROXY_TTL_HEADER_NAME);
+    bool ok;
+    int ttl = ttlString.toInt(&ok);
+    if (!ok)
+        ttl = kMaxProxyTtl;
+    --ttl;
+    if (ttl <= 0)
+        return false;
+    nx::network::http::insertOrReplaceHeader(
+        &d->request.headers,
+        nx::network::http::HttpHeader(Qn::PROXY_TTL_HEADER_NAME, QByteArray::number(ttl)));
 
     if (isStandardProxyNeeded(commonModule(), d->request))
     {
@@ -471,17 +483,6 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
     {
         if (!dstRoute.gatewayId.isNull())
         {
-            nx::network::http::StringType ttlString = nx::network::http::getHeaderValue(d->request.headers, Qn::PROXY_TTL_HEADER_NAME);
-            bool ok;
-            int ttl = ttlString.toInt(&ok);
-            if (!ok)
-                ttl = kMaxProxyTtl;
-            --ttl;
-
-            if (ttl <= 0)
-                return false;
-
-            nx::network::http::insertOrReplaceHeader(&d->request.headers, nx::network::http::HttpHeader(Qn::PROXY_TTL_HEADER_NAME, QByteArray::number(ttl)));
             nx::network::http::StringType existAuthSession = nx::network::http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
             if (existAuthSession.isEmpty())
                 nx::network::http::insertOrReplaceHeader(&d->request.headers, nx::network::http::HttpHeader(Qn::AUTH_SESSION_HEADER_NAME, authSession().toByteArray()));

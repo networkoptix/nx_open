@@ -33,16 +33,17 @@ void CameraController::start()
     const auto resourcePool = serverModule()->commonModule()->resourcePool();
     QObject::connect(
         resourcePool, &QnResourcePool::resourceAdded,
-        [this](const QnResourcePtr& resource)
+        [this, resourcePool](const QnResourcePtr& resource)
         {
-            if (auto camera = resource.dynamicCast<resource::Camera>().get())
+            if (const auto c = resource.dynamicCast<resource::Camera>().get())
             {
-                if (camera->hasFlags(Qn::desktop_camera))
-                    return; //< Ignore desktop cameras.
-
-                const auto addOrUpdate = [this, camera]() { add(camera, moduleGUID()); };
-                QObject::connect(camera, &QnResource::parentIdChanged, addOrUpdate);
-                addOrUpdate();
+                QObject::connect(c, &QnResource::parentIdChanged, [this, c]() { update(c); });
+                return update(c);
+            }
+            if (const auto s = resource.dynamicCast<QnMediaServerResource>().get())
+            {
+                for (const auto r: resourcePool->getResourcesByParentId(s->getId()))
+                    update(r.dynamicCast<resource::Camera>().get());
             }
         });
 
@@ -50,9 +51,21 @@ void CameraController::start()
         resourcePool, &QnResourcePool::resourceRemoved,
         [this](const QnResourcePtr& resource)
         {
-            if (auto camera = resource.dynamicCast<resource::Camera>().get())
-                remove(camera->getId());
+            if (const auto c = resource.dynamicCast<resource::Camera>().get())
+                remove(c->getId());
         });
+}
+
+void CameraController::update(resource::Camera* camera)
+{
+    if (!camera || camera->hasFlags(Qn::desktop_camera))
+        return;
+
+    const auto resourcePool = serverModule()->commonModule()->resourcePool();
+    if (resourcePool->getResourceById(camera->getParentId()))
+        add(camera, camera->getId(), scopeOf(camera, moduleGUID()));
+    else
+        remove(camera->getId());
 }
 
 namespace {

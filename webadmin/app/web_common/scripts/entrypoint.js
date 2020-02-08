@@ -1,7 +1,9 @@
 //Vendor
-require('./vendor/cast.js');
-require('./vendor/cast-framework.js');
-require('./vendor/cast-sender.js');
+// CLOUD-4344 ********************************************
+// require('./vendor/cast.js');
+// require('./vendor/cast-framework.js');
+// require('./vendor/cast-sender.js');
+// CLOUD-4344 ********************************************
 require('./vendor/client-detection.js');
 require('./vendor/date.js');
 require('./vendor/Impetus.js');
@@ -38,7 +40,9 @@ require('./filters/highlight.js');
 require('./services/animateScope.js');
 require('./services/cameraRecords.js');
 require('./services/camerasProvider.js');
-require('./services/chromecast.js');
+// CLOUD-4344 ********************************************
+// require('./services/chromecast.js');
+// CLOUD-4344 ********************************************
 require('./services/nativeClient.js');
 require('./services/page.js');
 require('./services/poll.js');
