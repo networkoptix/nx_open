@@ -78,6 +78,7 @@
         "emailSupportEmail": "지원 이메일",
         "enableEdgeRecording": "오디오 녹음을 사용",
         "webSocketEnabled": "Enable WEB sockets",
+        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "이벤트 로그 기간(일)",
         "ldapAdminDn": "LDAP 관리자 DN",
         "ldapSearchBase": "LDAP 검색 기준",

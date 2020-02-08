@@ -78,6 +78,7 @@
         "emailSupportEmail": "支持电子邮件",
         "enableEdgeRecording": "启用预录制",
         "webSocketEnabled": "Enable WEB sockets",
+        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "事件日志周期（天）",
         "ldapAdminDn": "LDAP 管理员 DN",
         "ldapSearchBase": "LDAP 搜索库",
