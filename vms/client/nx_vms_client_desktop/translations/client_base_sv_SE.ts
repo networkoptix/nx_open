@@ -3622,27 +3622,27 @@ till %1</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
-    </message>
-    <message>
-      <source>Deactivations Left</source>
-      <translation type="unfinished">Deactivations Left</translation>
+      <translation>Allmänt</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Egenskaper</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Tillåtna skärmar</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Kontrollsessioner tillåtna</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Arkivströmmar tillåtna</translation>
+    </message>
+    <message>
+      <source>Deactivations Remaining</source>
+      <translation>Återstående deaktiveringar</translation>
     </message>
   </context>
   <context>
@@ -3910,10 +3910,6 @@ till %1</translation>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
       <translation>Licensen är redan aktiverad och kopplad till maskinvaru ID %1 på %2</translation>
     </message>
-    <message>
-      <source>Every license can be deactivated only a few times.</source>
-      <translation>Varje licens kan avaktiveras endast några få gånger.</translation>
-    </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
@@ -3928,6 +3924,13 @@ till %1</translation>
       <translation>
         <numerusform>Åtminstone %1 krävs</numerusform>
         <numerusform>Åtminstone %1 krävs</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n deactivations remaining.</source>
+      <translation>
+        <numerusform>%n återstående deaktiveringar.</numerusform>
+        <numerusform>%n återstående deaktiveringar.</numerusform>
       </translation>
     </message>
   </context>
@@ -6877,7 +6880,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivera licens...</translation>
     </message>
   </context>
   <context>
@@ -7508,9 +7511,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n värden</numerusform>
+        <numerusform>+%n värden</numerusform>
       </translation>
     </message>
   </context>
@@ -9899,8 +9902,15 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Annan orsak</translation>
     </message>
     <message>
-      <source>Please enter your contact information and the reason for deactivating your license</source>
-      <translation>Ange din kontaktinformation och anledningen till att inaktivera din licens</translation>
+      <source>Please complete the following for license deactivation</source>
+      <translation>Vänligen fyll i följande för licensavaktivering</translation>
+    </message>
+    <message numerus="yes">
+      <source>Note that each license key may be deactivated a maximum of %n times.</source>
+      <translation>
+        <numerusform>Observera att varje licensnyckel kan inaktiveras högst %n gånger.</numerusform>
+        <numerusform>Observera att varje licensnyckel kan inaktiveras högst %n gånger.</numerusform>
+      </translation>
     </message>
   </context>
   <context>

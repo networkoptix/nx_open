@@ -78,6 +78,7 @@
         "emailSupportEmail": "Email podpory",
         "enableEdgeRecording": "Povolit edge záznam",
         "webSocketEnabled": "Enable WEB sockets",
+        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "Doba záznamu události (dny)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "Vyhledávací základna LDAP",

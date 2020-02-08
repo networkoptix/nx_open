@@ -21,7 +21,7 @@ BaseTile
     property string compatibleVersion;
 
     isConnecting: ((control.systemId == context.connectingToSystem)
-        && context.connectingToSystem.length && !impl.isFactoryTile);
+        && context.connectingToSystem.length && !impl.isFactoryTile && isRunning);
 
     isAvailable:
     {
@@ -33,6 +33,8 @@ BaseTile
 
         return control.isConnectable;
     }
+
+    onIsRunningChanged: { if (isExpanded && !isRunning) toggle() }
 
     tileColor:
     {

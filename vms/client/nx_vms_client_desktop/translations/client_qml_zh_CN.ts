@@ -7,6 +7,14 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>摄像机分析功能将只在观看影像时有作用. 请启用录影来使其全时运作.</translation>
     </message>
+    <message>
+      <source>Camera stream</source>
+      <translation type="unfinished">Camera stream</translation>
+    </message>
+    <message>
+      <source>Select video stream from the camera for analysis</source>
+      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+    </message>
   </context>
   <context>
     <name>Box</name>

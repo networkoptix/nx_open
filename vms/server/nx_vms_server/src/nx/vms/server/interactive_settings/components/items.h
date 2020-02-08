@@ -49,6 +49,14 @@ private:
     QString m_description;
 };
 
+class Separator: public Item
+{
+    Q_OBJECT
+
+public:
+    Separator(QObject* parent = nullptr);
+};
+
 class Group: public Item
 {
     Q_OBJECT
@@ -331,6 +339,12 @@ class ComboBox: public EnumerationItem
 {
 public:
     ComboBox(QObject* parent = nullptr);
+};
+
+class RadioButtonGroup: public EnumerationItem
+{
+public:
+    RadioButtonGroup(QObject* parent = nullptr);
 };
 
 class SpinBox: public IntegerNumberItem

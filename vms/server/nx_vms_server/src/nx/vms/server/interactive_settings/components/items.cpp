@@ -26,6 +26,11 @@ QJsonObject Item::serialize() const
     return result;
 }
 
+Separator::Separator(QObject* parent):
+    Item(QStringLiteral("Separator"), parent)
+{
+}
+
 QQmlListProperty<Item> Group::items()
 {
     return QQmlListProperty<Item>(this, m_items);
@@ -301,6 +306,11 @@ ComboBox::ComboBox(QObject* parent):
 {
 }
 
+RadioButtonGroup::RadioButtonGroup(QObject* parent):
+    EnumerationItem(QStringLiteral("RadioButtonGroup"), parent)
+{
+}
+
 SpinBox::SpinBox(QObject* parent):
     IntegerNumberItem(QStringLiteral("SpinBox"), parent)
 {
@@ -454,6 +464,8 @@ void Factory::registerTypes()
     registerType<DoubleSpinBox>("DoubleSpinBox");
     registerType<CheckBox>("CheckBox");
     registerType<Button>("Button");
+    registerType<Separator>("Separator");
+    registerType<RadioButtonGroup>("RadioButtonGroup");
 
     registerType<LineFigure>("LineFigure");
     registerType<BoxFigure>("BoxFigure");

@@ -78,6 +78,7 @@
         "emailSupportEmail": "Электронная почта поддержки",
         "enableEdgeRecording": "Включить запись на внутренний носитель (edge)",
         "webSocketEnabled": "Enable WEB sockets",
+        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "Размер журнала событий (дни)",
         "ldapAdminDn": "LDAP Администратор DN",
         "ldapSearchBase": "База поиска LDAP",
