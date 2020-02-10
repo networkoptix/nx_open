@@ -120,7 +120,7 @@ public:
     virtual QnIOStateData portState(const QString& portId) const override
     {
         const std::optional<int> commandId = getCommandIdByInputPortId(portId);
-        const int timestamp = qnSyncTime->currentMSecsSinceEpoch();
+        const qint64 timestamp = qnSyncTime->currentMSecsSinceEpoch();
         if (!commandId)
         {
             NX_WARNING(this, "Unable to find a command to get port '%1' state", portId);
