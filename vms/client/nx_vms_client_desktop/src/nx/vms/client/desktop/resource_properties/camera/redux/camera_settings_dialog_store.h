@@ -105,6 +105,7 @@ public:
         const QnUuid& engineId, const QJsonObject& values);
     void resetDeviceAgentSettingsValues(
         const QnUuid& engineId, const QJsonObject& values);
+    Q_INVOKABLE bool dualStreamingEnabled() const;
     Q_INVOKABLE bool recordingEnabled() const;
 
     void setWearableMotionDetectionEnabled(bool value);

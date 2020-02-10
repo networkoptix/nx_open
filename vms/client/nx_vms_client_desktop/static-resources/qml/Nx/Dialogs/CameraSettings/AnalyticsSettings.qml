@@ -26,6 +26,7 @@ Item
     property var currentSectionPath: []
     property var currentSettingsModel
     property bool loading: false
+    property bool supportsDualStreaming: false
 
     readonly property bool isDeviceDependent: currentEngineInfo !== undefined
         && currentEngineInfo.isDeviceDependent
@@ -43,6 +44,7 @@ Item
             loading = store.analyticsSettingsLoading()
             analyticsEngines = store.analyticsEngines()
             enabledAnalyticsEngines = store.enabledAnalyticsEngines()
+            supportsDualStreaming = store.dualStreamingEnabled()
             if (settingsView.resourceId !== resourceId)
                 settingsView.resourceId = resourceId
             mediaResourceHelper.resourceId = store.resourceId().toString()
@@ -224,7 +226,7 @@ Item
         headerItem: ColumnLayout
         {
             id: header
-            spacing: 32
+            spacing: 16
 
             InformationPanel
             {
@@ -233,6 +235,7 @@ Item
                 checkable: !isDeviceDependent && !!currentEngineId
                 checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
                 engineInfo: currentEngineInfo
+                Layout.bottomMargin: 16
                 Layout.fillWidth: true
 
                 onClicked:
@@ -247,7 +250,7 @@ Item
                 id: commonSettings
 
                 title: "General Settings"
-                visible: commonContent.height > 0
+                visible: supportsDualStreaming
                 Layout.fillWidth: true
                 enabled: settingsView.contentEnabled
 

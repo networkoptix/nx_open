@@ -488,6 +488,11 @@ void CameraSettingsDialogStore::resetDeviceAgentSettingsValues(
         });
 }
 
+bool CameraSettingsDialogStore::dualStreamingEnabled() const
+{
+    return d->state.isDualStreamingEnabled();
+}
+
 bool CameraSettingsDialogStore::recordingEnabled() const
 {
     return d->state.recording.enabled();

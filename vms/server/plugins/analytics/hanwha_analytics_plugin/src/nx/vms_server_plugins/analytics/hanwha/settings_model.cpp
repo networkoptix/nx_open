@@ -92,7 +92,7 @@ const QString kDefaultSectionModelStuffing = R"json(
 const QString kShockDetectionModel = R"json(
             {
                 "type": "Section",
-                "name": "1 Shock detection",
+                "caption": "1 Shock detection",
                 "items":
                 [
                     {
@@ -124,7 +124,7 @@ const QString kShockDetectionModel = R"json(
 const QString kTamperingDetectionModel = R"json(
             {
                 "type": "Section",
-                "name": "3 Tampering detection",
+                "caption": "3 Tampering detection",
                 "items":
                 [
                     {
@@ -171,7 +171,7 @@ const QString kTamperingDetectionModel = R"json(
 const QString kDefocusDetectionModel = R"json(
             {
                 "type": "Section",
-                "name": "4 Defocus detection",
+                "caption": "4 Defocus detection",
                 "items":
                 [
                     {
@@ -266,7 +266,7 @@ const QString testModel = R"json(
         [
             {
                 "type": "Section",
-                "name": "1 Shock detection",
+                "caption": "1 Shock detection",
                 "items":
                 [
                     {
@@ -295,7 +295,7 @@ const QString testModel = R"json(
             },
             {
                 "type": "Section",
-                "name": "2.1 Motion detection. Include areas",
+                "caption": "2.1 Motion detection. Include areas",
                 "items":
                 [
                     {

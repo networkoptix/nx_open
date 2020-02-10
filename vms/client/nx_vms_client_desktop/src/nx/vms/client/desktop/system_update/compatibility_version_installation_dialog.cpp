@@ -110,14 +110,21 @@ void CompatibilityVersionInstallationDialog::processUpdateContents(
     if (nx::vms::client::desktop::verifyUpdateContents(
         verifiedContents, /*servers=*/{}, clientData, options))
     {
-        if (m_private->updateContents.preferOtherUpdate(verifiedContents))
+        if (m_private->updateContents.sourceType != nx::update::UpdateSourceType::internetSpecific
+            && m_private->updateContents.preferOtherUpdate(verifiedContents))
+        {
             m_private->updateContents = verifiedContents;
+        }
         else
-            NX_ERROR(this) << "processUpdateContents() rejected update information from" << contents.source;
+        {
+            NX_DEBUG(this, "processUpdateContents() rejected update information from %1",
+                contents.source);
+        }
     }
     else
     {
-        NX_ERROR(this) << "processUpdateContents() got invalid update contents from" << contents.source;
+        NX_ERROR(this, "processUpdateContents() got invalid update contents from %1",
+            contents.source);
     }
 }
 
