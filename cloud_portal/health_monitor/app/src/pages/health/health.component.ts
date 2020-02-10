@@ -10,7 +10,7 @@ import { NxLanguageProviderService }             from '../../services/nx-languag
 import { NxUtilsService }                        from '../../services/utils.service';
 import { FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop';
 import { NxRibbonService }                       from '../../components/ribbon/ribbon.service';
-import { Subscription, throwError } from 'rxjs';
+import { of, Subscription, throwError } from 'rxjs';
 import { NxScrollMechanicsService }              from '../../services/scroll-mechanics.service';
 import { AutoUnsubscribe }                       from 'ngx-auto-unsubscribe';
 import { NxSystemAPI, NxSystemAPIService }       from '../../services/system-api.service';
@@ -20,6 +20,7 @@ import { WINDOW }                                from '../../services/window-pro
 import { DOCUMENT }                              from '@angular/common';
 import { DeviceDetectorService }                 from 'ngx-device-detector';
 import { NxUriService }                          from '../../services/uri.service';
+import { flatMap } from 'rxjs/operators';
 
 @AutoUnsubscribe()
 @Component({
@@ -75,7 +76,12 @@ export class NxHealthComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.window.addEventListener('dragenter', event => {
-            if (event.dataTransfer.types[0] === 'Files') {
+            let types = event.dataTransfer.types;
+            // IE returns a DOMStringList instead of an array
+            if (types instanceof DOMStringList) {
+                types = Array.from(types);
+            }
+            if (types.includes('Files')) {
                 this.importShow = true;
             }
         });
@@ -96,8 +102,10 @@ export class NxHealthComponent implements OnInit, OnDestroy {
         };
 
         this.menuservice.selectedSectionSubject.subscribe(selection => {
-            this.menu.selectedSection = selection;
-            this.menu = {...this.menu}; // trigger onChange
+            if (this.menu.selectedSection !== selection) {
+                this.menu.selectedSection = selection;
+                this.menu                 = {...this.menu}; // trigger onChang
+            }
         });
 
         const currentRoute = this.router.url;
@@ -142,12 +150,12 @@ export class NxHealthComponent implements OnInit, OnDestroy {
                         this.outdatedVersion = !this.system.info.capabilities.vms_metrics;
                     }
                     if (!this.outdatedVersion) {
-                        this.system.mediaserver.getAggregateHealthReport()
-                            .subscribe((result: any) => {
-                                this.setupReport(result);
-                            }, () => {
-                                this.hasServerError = this.system.isOnline;
-                            });
+                        this.system.mediaserver.getAggregateHealthReport().pipe(
+                            flatMap((result: any) => this.setupReport(result))
+                        ).subscribe(() => {
+                        }, () => {
+                            this.hasServerError = this.system.isOnline;
+                        });
                     }
                 });
             });
@@ -173,7 +181,9 @@ export class NxHealthComponent implements OnInit, OnDestroy {
         this.headerHeight = document.getElementsByClassName('headerContainer')[0].scrollHeight;
     }
 
-    ngOnDestroy(): void {}
+    ngOnDestroy(): void {
+        this.ribbonService.hide();
+    }
 
     setupReport(data) {
         // Handle server not responding for "ec2/metrics/manifest"
@@ -221,6 +231,7 @@ export class NxHealthComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             this.healthService.ready = true;
         }, 200);
+        return of(true);
     }
 
     colorHeaderGroups(metric) {
@@ -333,7 +344,7 @@ export class NxHealthComponent implements OnInit, OnDestroy {
                                     icon: alarm ? alarm.level : '',
                                 };
 
-                                if (typeof formattedVal.text === 'string') { // Should numbers should be searchable?
+                                if (typeof formattedVal.text === 'string' && header.display) { // Should numbers should be searchable?
                                     this.healthService.values[metric][entity].searchTags += formattedVal.text.toLowerCase() + ' ';
                                 }
                             }
@@ -438,7 +449,7 @@ export class NxHealthComponent implements OnInit, OnDestroy {
     processManifestHeaders(displayFilter: string) {
         const headers = {};
         Object.values(this.healthService.manifest).forEach((metricValue) => {
-            const metric = JSON.parse(JSON.stringify(metricValue));
+            const metric: any = NxUtilsService.deepCopy(metricValue);
             headers[metric.id] = metric;
             headers[metric.id].values.forEach((headerGroup, index) => {
                 headers[metric.id].values[index].values = headerGroup.values.filter(header => {
@@ -452,7 +463,7 @@ export class NxHealthComponent implements OnInit, OnDestroy {
 
     createSnapshot(data) {
         const systems: any = Object.values(this.healthService.values.systems);
-        this.reportSnapshot = JSON.parse(JSON.stringify(data));
+        this.reportSnapshot = NxUtilsService.deepCopy(data);
         this.reportSnapshot.time = new Date().toJSON();
         this.reportSnapshot.system = systems[0].info.name;
     }

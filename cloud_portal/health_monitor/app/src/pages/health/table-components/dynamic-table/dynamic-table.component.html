@@ -11,12 +11,12 @@
          *ngIf="_elements.length" #dynamicTable
          [ngStyle]="{'margin-left': healthService.tableReady ? undefined : '-9999px'}">
 
-        <div *ngIf="tableHeader" class="table-header" [innerText]="tableHeader" #tableHeaderElement></div>
+        <div *ngIf="tableHeader" class="table-header" [innerText]="tableHeader" #tableTitle></div>
         <div class="table-wrapper" (scroll)="showTooltip($event)">
             <div *ngIf="showHorizontalTooltip"
                  class="horizontalTooltip d-none d-lg-block" translate>Use Shift + Wheel for horizontal scrolling.</div>
             <table class="table table-hover nx-table" >
-                <thead #thead>
+                <thead #tableHead>
                 <tr class="header-groups" *ngIf="showGroups">
                         <ng-container *ngFor="let headerGroup of headers.values; index as index; trackBy: trackItem">
                             <th *ngIf="headerGroup.values.length > 0"

@@ -7,8 +7,8 @@
     </nx-page-placeholder>
 
     <div *ngSwitchDefault>
-        <div class="gridAlertsCards">
-            <div class="d-flex flex-wrap p-0" *ngIf="!mobileDetailMode" #tiles>
+        <div class="gridAlertsCards" *ngIf="!healthLayoutService.mobileDetailMode" #tiles>
+            <div class="d-flex flex-wrap p-0">
                 <div *ngFor="let alert of alertCards; trackBy: trackItem" class="mb-3 mr-3 card-container">
                     <nx-system-alert-card-component [data]="alert"></nx-system-alert-card-component>
                 </div>
@@ -22,13 +22,13 @@
         <div class="gridMetricContent" #area
              [ngClass]="fixedLayoutClass">
 
-            <div class="gridMetricContentComponent" [hidden]="mobileDetailMode && activeTableEntity">
+            <div class="gridMetricContentComponent" [hidden]="healthLayoutService.mobileDetailMode && healthLayoutService.activeEntity">
                 <div class="gridMetricContentComponentWrapper" >
-                    <div *ngIf="canSeeTable()" #table
-                         [hidden]="mobileDetailMode"
-                         [ngClass]="{'data-wrapper' : !activeTableEntity}">
+                    <div *ngIf="canSeeTable()"
+                         [hidden]="healthLayoutService.mobileDetailMode"
+                         [ngClass]="{'data-wrapper' : !healthLayoutService.activeEntity}">
 
-                        <div class="" *ngIf="!mobileDetailMode" #search [ngStyle]="{'width': tableWrapper + 'px'}">
+                        <div class="" *ngIf="!healthLayoutService.mobileDetailMode" #search [ngStyle]="{'width': tableWrapper + 'px'}">
                             <nx-search
                                     name="filterModel"
                                     [ngModel]="filterModel"
@@ -39,25 +39,23 @@
                             </nx-search>
                         </div>
                         <nx-dynamic-table
-                                [dimensions]="containerDimensions"
                                 [tableHeader]="alertsCount + ' alerts'"
                                 [headers]="tableHeaders"
                                 [showGroups]="false"
                                 [elements]="alerts"
-                                (onRowClick)="setActiveEntity($event)"
-                                [activeEntity]="activeTableEntity">
+                                (onRowClick)="setActiveEntity($event)">
                         </nx-dynamic-table>
                     </div>
                 </div>
             </div>
 
             <div class="gridMetricContentPanelComponent"
-                 *ngIf="activePanelEntity && layoutReady"
-                 [ngStyle]="{'visibility': layoutReady ? undefined : 'hidden'}">
+                 *ngIf="healthLayoutService.activeEntity"
+                 [ngStyle]="{'visibility': healthService.tableReady && layoutReady ? undefined : 'hidden'}">
 
                 <div class="gridMetricContentPanelComponentWrapper pb-3">
                     <div class="mb-3 all-results-btn"
-                         [style.display]="!mobileDetailMode ? 'none' : 'block'">
+                         [style.display]="!healthLayoutService.mobileDetailMode ? 'none' : 'block'">
 
                         <button class="btn btn-default btn-back" (click)="resetActiveEntity()">
                             <span class="back-arrow"></span>
@@ -66,7 +64,6 @@
                     </div>
 
                     <nx-dynamic-table-panel-component
-                            [activeEntity]="activePanelEntity"
                             [panelParams]="activePanelParams"
                             (onCloseView)="resetActiveEntity()">
                     </nx-dynamic-table-panel-component>
