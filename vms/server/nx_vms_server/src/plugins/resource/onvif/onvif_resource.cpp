@@ -780,7 +780,8 @@ nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
         for (const auto& resolution: capabilities.resolutions)
         {
             key.resolution = resolution;
-            result.insert(key, nx::media::CameraStreamCapability());
+            const int fps = (capabilities.frameRateMax > 0) ? capabilities.frameRateMax : 0;
+            result.insert(key, nx::media::CameraStreamCapability(0, 0, fps));
         }
     }
 
@@ -4763,7 +4764,8 @@ void QnPlOnvifResource::afterConfigureStream(Qn::ConnectionRole /*role*/)
         m_streamConfCond.wait(&m_streamConfMutex);
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(Qn::ConnectionRole /*role*/)
+CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(
+    Qn::ConnectionRole /*role*/, const QnLiveStreamParams& /*params*/)
 {
     return CameraDiagnostics::NoErrorResult();
 }

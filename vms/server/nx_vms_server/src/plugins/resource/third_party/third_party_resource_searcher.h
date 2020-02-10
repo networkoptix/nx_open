@@ -50,7 +50,7 @@ public:
     static ThirdPartyResourceSearcher* instance();
 
     virtual std::vector<nx::vms::server::metrics::PluginMetrics> metrics() const override;
-
+    virtual bool canFindLocalResources() const override;
 protected:
     /** Implementation of QnUpnpResourceSearcherAsync::processPacket */
     virtual void processPacket(

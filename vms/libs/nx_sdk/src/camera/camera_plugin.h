@@ -66,6 +66,10 @@ namespace nxcip
     // {0D06134F-16D0-41c8-9752-A33E81FE9C74}
     static const nxpl::NX_GUID IID_CameraDiscoveryManager2 = { { 0x0d, 0x06, 0x13, 0x4f, 0x16, 0xd0, 0x41, 0xc8, 0x97, 0x52, 0xa3, 0x3e, 0x81, 0xfe, 0x9c, 0x74 } };
 
+    // {FEA0452D-8493-4FF3-83E9-72D5BF75A9DE}
+    static const nxpl::NX_GUID IID_CameraDiscoveryManager3 = { { 0xFE, 0xA0, 0x45, 0x2D, 0x84, 0x93, 0x4F, 0xF3, 0x83, 0xE9, 0x72, 0xD5, 0xBF, 0x75, 0xA9, 0xDE } };
+    
+
     //!Contains base camera information
     struct CameraInfo
     {
@@ -242,6 +246,19 @@ namespace nxcip
         virtual int findCameras2(CameraInfo2* cameras, const char* serverURL) = 0;
     };
 
+    class CameraDiscoveryManager3 : public CameraDiscoveryManager2
+    {
+    public:
+
+        enum Capability
+        {
+            noCapability = 0,
+            findLocalResources = 1 //< CameraDiscovery can find local resources without IP.
+        };
+
+        CameraDiscoveryManager3() = default;
+        virtual int getCapabilities() const = 0;
+    };
 
     //!Resolution of video stream picture
     struct Resolution

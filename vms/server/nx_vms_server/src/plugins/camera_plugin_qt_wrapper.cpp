@@ -7,6 +7,7 @@
 #include <nx/sdk/ptr.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/url.h>
 
 namespace nxcip_qt
 {
@@ -35,6 +36,24 @@ namespace nxcip_qt
         QnMutexLocker lk( &m_mutex );
         m_intf->getVendorName( m_texBuf );
         return QString::fromUtf8( m_texBuf );
+    }
+
+    QString CameraDiscoveryManager::urlToString(const nx::utils::Url& url)
+    {
+        QString result;
+        if (url.scheme().isEmpty() && !url.host().isEmpty())
+        {
+            // Url is a host.
+            result = url.toString(QUrl::RemoveScheme | QUrl::RemovePassword | QUrl::RemoveUserInfo
+                | QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment);
+            result.remove(QLatin1Char('/'));
+        }
+        else
+        {
+            // Url or local file path.
+            result = QUrl::fromPercentEncoding(url.toString().toLatin1());
+        }
+        return result;
     }
 
     //!See nxcip::CameraDiscoveryManager::findCameras
@@ -70,7 +89,7 @@ namespace nxcip_qt
     //!See nxcip::CameraDiscoveryManager::checkHostAddress
     int CameraDiscoveryManager::checkHostAddress(
         QVector<nxcip::CameraInfo2>* const cameras,
-        const QString& url,
+        const nx::utils::Url& url,
         const QString* login,
         const QString* password )
     {
@@ -78,13 +97,20 @@ namespace nxcip_qt
         QVector<nxcip::CameraInfo> cameraInfo1;
         cameraInfo1.resize(nxcip::CAMERA_INFO_ARRAY_SIZE);
 
-        const QByteArray urlUtf8 = url.toUtf8();
+        QByteArray urlUtf8 = urlToString(url).toUtf8();
         const QByteArray loginUtf8 = login ? login->toUtf8() : QByteArray();
         const QByteArray passwordUtf8 = password ? password->toUtf8() : QByteArray();
 
         auto discoveryManager2 = nx::sdk::queryInterfaceOfOldSdk<nxcip::CameraDiscoveryManager2>(
             m_intf, nxcip::IID_CameraDiscoveryManager2);
 
+        auto discoveryManager3 = nx::sdk::queryInterfaceOfOldSdk<nxcip::CameraDiscoveryManager3>(
+            m_intf, nxcip::IID_CameraDiscoveryManager3);
+
+        const int discoveryCaps = discoveryManager3 ? discoveryManager3->getCapabilities() : 0;
+        if (url.host().isEmpty() && !(discoveryCaps & nxcip::CameraDiscoveryManager3::findLocalResources))
+            return 0;
+        
         int result = 0;
         if (discoveryManager2.get())
         {

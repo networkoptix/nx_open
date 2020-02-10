@@ -136,7 +136,9 @@ void ILPVideoPacket::resizeBuffer( size_t bufSize )
         return;
     }
 
-    void* newBuffer = nx::kit::utils::mallocAligned( bufSize, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT );
+    void* newBuffer = nx::kit::utils::mallocAligned( 
+        bufSize + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE, 
+        nxcip::MEDIA_DATA_BUFFER_ALIGNMENT );
 
     if( m_bufSize > 0 )
     {

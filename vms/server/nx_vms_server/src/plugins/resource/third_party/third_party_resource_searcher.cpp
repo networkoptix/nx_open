@@ -154,29 +154,22 @@ QString ThirdPartyResourceSearcher::manufacturer() const
     return nx::vms::server::discovery::kThirdPartyManufacturerName;
 }
 
+bool ThirdPartyResourceSearcher::canFindLocalResources() const
+{
+    return true;
+}
+
 QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const nx::utils::Url& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
 {
     QVector<nxcip::CameraInfo2> cameraInfoTempArray;
 
     for(const auto& [pluginName, discoveryManager]: m_discoveryManagerByPluginName)
     {
-        QString addressStr = url.scheme();
-        if( url.scheme().isEmpty() )
-        {
-            //url is a host
-            addressStr = url.toString(QUrl::RemoveScheme | QUrl::RemovePassword | QUrl::RemoveUserInfo | QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment);
-            addressStr.remove( QLatin1Char('/') );
-        }
-        else
-        {
-            //url is an URL! or mswin path
-            addressStr = QUrl::fromPercentEncoding(url.toString().toLatin1());
-        }
         const QString& userName = auth.user();
         const QString& password = auth.password();
         int result = discoveryManager->checkHostAddress(
             &cameraInfoTempArray,
-            addressStr,
+            url,
             &userName,
             &password );
         if( result == nxcip::NX_NOT_AUTHORIZED )
@@ -184,7 +177,7 @@ QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const nx::utils:
             //trying one again with no login/password (so that plugin can use default ones)
             result = discoveryManager->checkHostAddress(
                 &cameraInfoTempArray,
-                addressStr,
+                url,
                 NULL,
                 NULL );
         }

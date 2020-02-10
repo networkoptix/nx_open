@@ -194,7 +194,9 @@ void QnManualCameraSearcher::onOnlineHostsScanDone(
 
     for (const auto& host: onlineHosts)
     {
-        const auto url = nx::network::url::Builder(baseUrl).setHost(host.toString()).toUrl();
+        auto url = nx::network::url::Builder(baseUrl);
+        if (!host.toString().isEmpty())
+            url.setHost(host.toString());
         m_taskManager.addTask(url, sequentialSearchers, /*isSequential*/ true);
 
         for (const auto& searcher: parallelSearchers)
