@@ -8,15 +8,25 @@ LabeledItem
 {
     id: control
 
+    property var range
     property var value: defaultValue
     property var defaultValue
-    property alias range: comboBox.model
+    property var itemCaptions
 
     onValueChanged: comboBox.currentIndex = range.indexOf(value)
 
     contentItem: ComboBox
     {
         id: comboBox
-        onActivated: control.value = currentText
+        onActivated: control.value = range[currentIndex]
+
+        model:
+        {
+            if (!Array.isArray(range))
+                return null
+
+            return range.map(
+                function (name) { return itemCaptions && itemCaptions[name] || name })
+        }
     }
 }

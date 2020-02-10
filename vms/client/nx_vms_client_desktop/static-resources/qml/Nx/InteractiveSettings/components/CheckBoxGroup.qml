@@ -12,6 +12,7 @@ LabeledItem
 
     property var value: defaultValue
     property var defaultValue
+    property var itemCaptions
     property alias range: buttons.model
 
     contentItem: MultiColumn
@@ -22,9 +23,10 @@ LabeledItem
 
         delegate: CheckBox
         {
-            text: modelData
+            readonly property var identifier: modelData
 
-            checked: Array.isArray(control.value) && control.value.indexOf(text) !== -1
+            text: (control.itemCaptions && control.itemCaptions[identifier]) || identifier
+            checked: Array.isArray(control.value) && control.value.indexOf(identifier) !== -1
 
             onClicked:
                 buttons.updateValue()
@@ -37,7 +39,7 @@ LabeledItem
             {
                 var item = itemAt(i)
                 if (item.checked)
-                    newValue.push(item.text)
+                    newValue.push(item.identifier)
             }
 
             control.value = newValue

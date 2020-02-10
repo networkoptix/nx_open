@@ -12,6 +12,7 @@ LabeledItem
 
     property var value: defaultValue
     property var defaultValue
+    property var itemCaptions
     property alias range: buttons.model
 
     contentItem: MultiColumn
@@ -22,12 +23,13 @@ LabeledItem
 
         delegate: RadioButton
         {
-            text: modelData
+            readonly property var identifier: modelData
 
-            checked: control.value == text
+            text: (control.itemCaptions && control.itemCaptions[identifier]) || identifier
+            checked: control.value == identifier
 
             onClicked:
-                control.value = text
+                control.value = identifier
         }
     }
 }

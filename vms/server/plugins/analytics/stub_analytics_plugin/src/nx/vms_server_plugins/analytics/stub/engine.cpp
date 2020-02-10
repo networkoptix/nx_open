@@ -394,18 +394,29 @@ std::string Engine::manifestString() const
                         "name": "testRadioButtonGroup",
                         "caption": "RadioButton Group",
                         "description": "Choose one option",
-                        "defaultValue": "Catasigaloceras enodatum",
+                        "defaultValue": "Cs_enodatum",
                         "range": [
-                            "Kepplerites gowerianus",
-                            "Kepplerites galilaeii",
-                            "Sigaloceras calloviense",
-                            "Sigaloceras micans",
-                            "Catasigaloceras enodatum",
-                            "Kosmoceras medea",
-                            "Kosmoceras jason",
-                            "Kosmoceras obductum",
-                            "Kosmoceras posterior"
-                        ]
+                            "K_gowerianus",
+                            "K_galilaeii",
+                            "S_calloviense",
+                            "S_micans",
+                            "Cs_enodatum",
+                            "K_medea",
+                            "K_jason",
+                            "K_obductum",
+                            "K_posterior"
+                        ],
+                        "itemCaptions": {
+                            "K_gowerianus": "Kepplerites gowerianus",
+                            "K_galilaeii": "Kepplerites galilaeii",
+                            "S_calloviense": "Sigaloceras calloviense",
+                            "S_micans": "Sigaloceras micans",
+                            "Cs_enodatum": "Catasigaloceras enodatum",
+                            "K_medea": "Kosmoceras medea",
+                            "K_jason": "Kosmoceras jason",
+                            "K_obductum": "Kosmoceras obductum",
+                            "K_posterior": "Kosmoceras posterior"
+                        }
                     },
                     {
                         "type": "CheckBoxGroup",
@@ -418,7 +429,13 @@ std::string Engine::manifestString() const
                             "Ammonoidea",
                             "Nautiloidea",
                             "Orthoceratoidea"
-                        ]
+                        ],
+                        "itemCaptions": {
+                            "Coleoidea": "Coleoidea (Bather, 1888)",
+                            "Ammonoidea": "Ammonoidea (Zittel, 1884)",
+                            "Nautiloidea": "Nautiloidea (Agassiz, 1847)",
+                            "Orthoceratoidea": "Orthoceratoidea (M'Coy 1844)"
+                        }
                     },
                     {
                         "type": "SpinBox",
@@ -441,7 +458,12 @@ std::string Engine::manifestString() const
                         "name": "testComboBox",
                         "caption": "Device Agent ComboBox",
                         "defaultValue": "value2",
-                        "range": ["value1", "value2", "value3"]
+                        "range": ["value1", "value2", "value3"],
+                        "itemCaptions": {
+                            "value1": "Device Agent Value #1",
+                            "value2": "Device Agent Value #2",
+                            "value3": "Device Agent Value #3"
+                        }
                     },
                     {
                         "type": "Separator"
