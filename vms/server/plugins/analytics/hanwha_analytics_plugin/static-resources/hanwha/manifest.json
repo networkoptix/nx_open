@@ -92,7 +92,7 @@
         [
             {
                 "type": "Section",
-                "name": "1 Shock detection",
+                "caption": "1 Shock detection",
                 "items":
                 [
                     {
@@ -121,7 +121,7 @@
             },
             {
                 "type": "Section",
-                "name": "2.1 Motion detection. Include areas",
+                "caption": "2.1 Motion detection. Include areas",
                 "items":
                 [
                     {
@@ -280,7 +280,7 @@
             },
             {
                 "type": "Section",
-                "name": "2.2 Motion detection. Exclude areas",
+                "caption": "2.2 Motion detection. Exclude areas",
                 "items":
                 [
                     {
@@ -322,7 +322,7 @@
             },
             {
                 "type": "Section",
-                "name": "3 Tampering detection",
+                "caption": "3 Tampering detection",
                 "items":
                 [
                     {
@@ -366,7 +366,7 @@
             },
             {
                 "type": "Section",
-                "name": "4 Defocus detection",
+                "caption": "4 Defocus detection",
                 "items":
                 [
                     {
@@ -403,7 +403,7 @@
             },
             {
                 "type": "Section",
-                "name": "5 Fog detection",
+                "caption": "5 Fog detection",
                 "items":
                 [
                     {
@@ -440,7 +440,7 @@
             },
             {
                 "type": "Section",
-                "name": "6 Face detection. General",
+                "caption": "6 Face detection. General",
                 "items":
                 [
                     {
@@ -461,7 +461,7 @@
             },
             {
                 "type": "Section",
-                "name": "7.1 Object detection [AI]. General",
+                "caption": "7.1 Object detection [AI]. General",
                 "items":
                 [
                     {
@@ -552,7 +552,7 @@
             },
             {
                 "type": "Section",
-                "name": "7.2 Object detection [AI]. Exclude areas",
+                "caption": "7.2 Object detection [AI]. Exclude areas",
                 "items":
                 [
                     {
@@ -587,7 +587,7 @@
             },
             {
                 "type": "Section",
-                "name": "8.1 IVA [AI]. Lines",
+                "caption": "8.1 IVA [AI]. Lines",
                 "items":
                 [
                     {
@@ -714,7 +714,7 @@
             },
             {
                 "type": "Section",
-                "name": "8.2 IVA [AI]. Include areas",
+                "caption": "8.2 IVA [AI]. Include areas",
                 "items":
                 [
                     {
@@ -1041,7 +1041,7 @@
             },
             {
                 "type": "Section",
-                "name": "8.3 IVA [AI]. Exclude areas",
+                "caption": "8.3 IVA [AI]. Exclude areas",
                 "items":
                 [
                     {
@@ -1076,7 +1076,7 @@
             },
             {
                 "type": "Section",
-                "name": "9 Audio detection",
+                "caption": "9 Audio detection",
                 "items":
                 [
                     {
@@ -1097,7 +1097,7 @@
             },
             {
                 "type": "Section",
-                "name": "10 Sound classification",
+                "caption": "10 Sound classification",
                 "items":
                 [
                     {
