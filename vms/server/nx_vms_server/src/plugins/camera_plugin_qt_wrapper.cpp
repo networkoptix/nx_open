@@ -82,13 +82,14 @@ namespace nxcip_qt
         QString urlStr;
         if (url.scheme().isEmpty() && !url.host().isEmpty())
         {
-            //url is a host.
-            urlStr = url.toString(QUrl::RemoveScheme | QUrl::RemovePassword | QUrl::RemoveUserInfo | QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment);
+            // Url is a host.
+            urlStr = url.toString(QUrl::RemoveScheme | QUrl::RemovePassword | QUrl::RemoveUserInfo 
+                | QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment);
             urlStr.remove(QLatin1Char('/'));
         }
         else
         {
-            //url is an URL! or mswin path
+            // Url or local file path.
             urlStr = QUrl::fromPercentEncoding(url.toString().toLatin1());
         }
 
@@ -102,7 +103,7 @@ namespace nxcip_qt
         auto discoveryManager3 = nx::sdk::queryInterfaceOfOldSdk<nxcip::CameraDiscoveryManager3>(
             m_intf, nxcip::IID_CameraDiscoveryManager3);
 
-        int discoveryCaps = discoveryManager3 ? discoveryManager3->getCapabilities() : 0;
+        const int discoveryCaps = discoveryManager3 ? discoveryManager3->getCapabilities() : 0;
         if (url.host().isEmpty() && !(discoveryCaps & nxcip::CameraDiscoveryManager3::findLocalResources))
             return 0;
         
