@@ -311,6 +311,25 @@ RadioButtonGroup::RadioButtonGroup(QObject* parent):
 {
 }
 
+CheckBoxGroup::CheckBoxGroup(QObject* parent):
+    EnumerationItem(QStringLiteral("CheckBoxGroup"), parent)
+{
+}
+
+void CheckBoxGroup::setValue(const QVariant& value)
+{
+    const auto validOptions = range();
+    QVariantList effectiveValue;
+
+    for (const auto& option: value.value<QVariantList>())
+    {
+        if (validOptions.contains(option))
+            effectiveValue.push_back(option);
+    }
+
+    ValueItem::setValue(effectiveValue);
+}
+
 SpinBox::SpinBox(QObject* parent):
     IntegerNumberItem(QStringLiteral("SpinBox"), parent)
 {
@@ -466,6 +485,7 @@ void Factory::registerTypes()
     registerType<Button>("Button");
     registerType<Separator>("Separator");
     registerType<RadioButtonGroup>("RadioButtonGroup");
+    registerType<CheckBoxGroup>("CheckBoxGroup");
 
     registerType<LineFigure>("LineFigure");
     registerType<BoxFigure>("BoxFigure");

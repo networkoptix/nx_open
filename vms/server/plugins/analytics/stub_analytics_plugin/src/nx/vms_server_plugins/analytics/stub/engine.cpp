@@ -393,6 +393,7 @@ std::string Engine::manifestString() const
                         "type": "RadioButtonGroup",
                         "name": "testRadioButtonGroup",
                         "caption": "RadioButton Group",
+                        "description": "Choose one option",
                         "defaultValue": "Catasigaloceras enodatum",
                         "range": [
                             "Kepplerites gowerianus",
@@ -404,6 +405,19 @@ std::string Engine::manifestString() const
                             "Kosmoceras jason",
                             "Kosmoceras obductum",
                             "Kosmoceras posterior"
+                        ]
+                    },
+                    {
+                        "type": "CheckBoxGroup",
+                        "name": "testCheckBoxGroup",
+                        "caption": "CheckBox Group",
+                        "description": "Choose one or several options",
+                        "defaultValue": ["Coleoidea", "Nautiloidea"],
+                        "range": [
+                            "Coleoidea",
+                            "Ammonoidea",
+                            "Nautiloidea",
+                            "Orthoceratoidea"
                         ]
                     },
                     {

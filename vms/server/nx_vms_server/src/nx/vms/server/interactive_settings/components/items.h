@@ -347,6 +347,14 @@ public:
     RadioButtonGroup(QObject* parent = nullptr);
 };
 
+class CheckBoxGroup: public EnumerationItem
+{
+public:
+    CheckBoxGroup(QObject* parent = nullptr);
+
+    virtual void setValue(const QVariant& value);
+};
+
 class SpinBox: public IntegerNumberItem
 {
 public:
