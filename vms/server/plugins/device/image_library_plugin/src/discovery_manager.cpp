@@ -26,6 +26,17 @@ void* DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
         addRef();
         return this;
     }
+    if (memcmp(&interfaceID, &nxcip::IID_CameraDiscoveryManager2, sizeof(nxcip::IID_CameraDiscoveryManager2)) == 0)
+    {
+        addRef();
+        return this;
+    }
+    if (memcmp(&interfaceID, &nxcip::IID_CameraDiscoveryManager3, sizeof(nxcip::IID_CameraDiscoveryManager3)) == 0)
+    {
+        addRef();
+        return this;
+    }
+
     if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
     {
         addRef();
@@ -52,6 +63,11 @@ void DiscoveryManager::getVendorName( char* buf ) const
 }
 
 int DiscoveryManager::findCameras( nxcip::CameraInfo* /*cameras*/, const char* /*localInterfaceIPAddr*/ )
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+int DiscoveryManager::findCameras2(nxcip::CameraInfo2* /*cameras*/, const char* /*serverURL*/)
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
@@ -114,6 +130,12 @@ int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* 
     return 1;
 }
 
+//!Implementation of nxcip::CameraDiscoveryManager2::checkHostAddress
+int DiscoveryManager::checkHostAddress2(nxcip::CameraInfo2* cameras, const char* address, const char* login, const char* password)
+{
+    return checkHostAddress(cameras, address, login, password);
+}
+
 int DiscoveryManager::fromMDNSData(
     const char* /*discoveredAddress*/,
     const unsigned char* /*mdnsResponsePacket*/,
@@ -142,4 +164,9 @@ int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )
 {
     *count = 0;
     return nxcip::NX_NO_ERROR;
+}
+
+int DiscoveryManager::getCapabilities() const
+{
+    return Capability::findLocalResources;
 }

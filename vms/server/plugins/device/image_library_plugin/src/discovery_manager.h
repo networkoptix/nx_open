@@ -9,7 +9,7 @@
 //!Represents defined (in settings) image directories as cameras with dts archive storage
 class DiscoveryManager
 :
-    public nxcip::CameraDiscoveryManager
+    public nxcip::CameraDiscoveryManager3
 {
 public:
     DiscoveryManager();
@@ -27,6 +27,11 @@ public:
     virtual int findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr ) override;
     //!Implementation of nxcip::CameraDiscoveryManager::checkHostAddress
     virtual int checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password ) override;
+    //!Implementation of nxcip::CameraDiscoveryManager2::checkHostAddress
+    virtual int checkHostAddress2(nxcip::CameraInfo2* cameras, const char* address, const char* login, const char* password) override;
+    //!Implementation of nxcip::CameraDiscoveryManager2::checkHostAddress
+    virtual int findCameras2(nxcip::CameraInfo2* cameras, const char* serverURL) override;
+
     //!Implementation of nxcip::CameraDiscoveryManager::fromMDNSData
     virtual int fromMDNSData(
         const char* discoveredAddress,
@@ -42,6 +47,9 @@ public:
         Does nothing
     */
     virtual int getReservedModelList( char** modelList, int* count ) override;
+
+    //!Implementation of nxcip::CameraDiscoveryManager3::getCapabilities
+    virtual int DiscoveryManager::getCapabilities() const override;
 
 private:
     nxpt::CommonRefManager m_refManager;

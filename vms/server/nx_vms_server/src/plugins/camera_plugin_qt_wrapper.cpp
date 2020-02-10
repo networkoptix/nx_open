@@ -7,6 +7,7 @@
 #include <nx/sdk/ptr.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/url.h>
 
 namespace nxcip_qt
 {
@@ -70,7 +71,7 @@ namespace nxcip_qt
     //!See nxcip::CameraDiscoveryManager::checkHostAddress
     int CameraDiscoveryManager::checkHostAddress(
         QVector<nxcip::CameraInfo2>* const cameras,
-        const QString& url,
+        const nx::utils::Url& url,
         const QString* login,
         const QString* password )
     {
@@ -78,13 +79,33 @@ namespace nxcip_qt
         QVector<nxcip::CameraInfo> cameraInfo1;
         cameraInfo1.resize(nxcip::CAMERA_INFO_ARRAY_SIZE);
 
-        const QByteArray urlUtf8 = url.toUtf8();
+        QString urlStr;
+        if (url.scheme().isEmpty() && !url.host().isEmpty())
+        {
+            //url is a host.
+            urlStr = url.toString(QUrl::RemoveScheme | QUrl::RemovePassword | QUrl::RemoveUserInfo | QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment);
+            urlStr.remove(QLatin1Char('/'));
+        }
+        else
+        {
+            //url is an URL! or mswin path
+            urlStr = QUrl::fromPercentEncoding(url.toString().toLatin1());
+        }
+
+        QByteArray urlUtf8 = urlStr.toUtf8();
         const QByteArray loginUtf8 = login ? login->toUtf8() : QByteArray();
         const QByteArray passwordUtf8 = password ? password->toUtf8() : QByteArray();
 
         auto discoveryManager2 = nx::sdk::queryInterfaceOfOldSdk<nxcip::CameraDiscoveryManager2>(
             m_intf, nxcip::IID_CameraDiscoveryManager2);
 
+        auto discoveryManager3 = nx::sdk::queryInterfaceOfOldSdk<nxcip::CameraDiscoveryManager3>(
+            m_intf, nxcip::IID_CameraDiscoveryManager3);
+
+        int discoveryCaps = discoveryManager3 ? discoveryManager3->getCapabilities() : 0;
+        if (url.host().isEmpty() && !(discoveryCaps & nxcip::CameraDiscoveryManager3::findLocalResources))
+            return 0;
+        
         int result = 0;
         if (discoveryManager2.get())
         {

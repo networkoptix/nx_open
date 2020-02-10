@@ -61,7 +61,7 @@ int QnManualCameraAdditionRestHandler::extractSearchStartParams(QnJsonRestResult
     if (!urlStr.isEmpty()) //< Single host search.
     {
         *outUrl = nx::utils::url::parseUrlFields(urlStr);
-        if (!outUrl->isValid() || outUrl->host().isEmpty())
+        if (!outUrl->isValid())
         {
             result->setError(QnRestResult::InvalidParameter,
                 lm("Invalid value '%1' for parameter '%2'").args(urlStr, kUrlParam));

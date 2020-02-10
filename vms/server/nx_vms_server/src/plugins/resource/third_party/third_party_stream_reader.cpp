@@ -64,33 +64,35 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
 :
     CLServerPushStreamReader(res),
     m_thirdPartyRes(res),
-    m_camManager(camManager),
-    m_sourceUrlMutex(QnMutex::Recursive)
+    m_camManager(camManager)
 {
     NX_ASSERT( m_thirdPartyRes );
 
     m_audioLayout.reset( new QnResourceCustomAudioLayout() );
 
     m_camManager.getCameraCapabilities( &m_cameraCapabilities );
-    Qn::directConnect(
-        res.data(), &QnResource::propertyChanged,
-        this,
-        [this](const QnResourcePtr& /*resource*/, const QString& propertyName)
-        {
-            if (propertyName == ResourcePropertyKey::kStreamUrls)
+    
+    if (m_cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
+    {
+        // Reopen stream in case of user change it.
+        Qn::directConnect(
+            res.data(), &QnResource::propertyChanged,
+            this,
+            [this](const QnResourcePtr& /*resource*/, const QString& propertyName)
             {
+                if (propertyName == ResourcePropertyKey::kStreamUrls)
                 {
-                    QnMutexLocker lock(&m_sourceUrlMutex);
-                    if (m_isServerSideUpdate)
+                    const auto newUrl = m_thirdPartyRes->sourceUrl(getRole());
+                    if (newUrl == lastOpenedUrl())
                         return;
-                }
 
-                NX_VERBOSE(this, "Reinitializing camera driver. 'hasDualStreaming' may be changed.");
-                m_resource->setStatus(Qn::Offline);
-                m_isMediaUrlValid.clear();
-                m_resource->initAsync(true);
-            }
-        });
+                    NX_VERBOSE(this, "Reinitializing camera driver. 'hasDualStreaming' may be changed.");
+                    m_resource->setStatus(Qn::Offline);
+                    m_isMediaUrlValid.clear();
+                    m_resource->initAsync(true);
+                }
+            });
+    }
     m_isMediaUrlValid.test_and_set();
 }
 
@@ -567,12 +569,22 @@ nx::utils::TimeHelper* ThirdPartyStreamReader::timeHelper(const QnAbstractMediaD
     return helperList->at(data->channelNumber).get();
 }
 
-void ThirdPartyStreamReader::updateSourceUrl(const QString& urlString)
+void ThirdPartyStreamReader::setLastOpenedUrl(const QString& value)
 {
     QnMutexLocker lock(&m_sourceUrlMutex);
-    m_isServerSideUpdate = true;
+    m_lastOpenedUrl = value;
+}
+
+QString ThirdPartyStreamReader::lastOpenedUrl() const
+{
+    QnMutexLocker lock(&m_sourceUrlMutex);
+    return m_lastOpenedUrl;
+}
+
+void ThirdPartyStreamReader::updateSourceUrl(const QString& urlString)
+{
+    setLastOpenedUrl(urlString);
     m_thirdPartyRes->updateSourceUrl(urlString, getRole());
-    m_isServerSideUpdate = false;
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
