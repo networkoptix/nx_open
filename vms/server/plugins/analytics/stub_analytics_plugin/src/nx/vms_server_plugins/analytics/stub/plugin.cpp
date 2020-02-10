@@ -36,7 +36,7 @@ std::string Plugin::manifestString() const
                     {
                         "type": "CheckBox",
                         "name": ")json" + kThrowPluginDiagnosticEventsFromEngineSetting + R"json(",
-                        "caption": "Throw plugin events from the Engine",
+                        "caption": "Produce Plugin Diagnostic Events from the Engine",
                         "defaultValue": false,
                         "value": false
                     }

@@ -185,12 +185,15 @@ void ConsumingDeviceAgent::pushPluginDiagnosticEvent(
     if (!m_handler)
     {
         NX_PRINT << __func__ << "(): "
-            << "INTERNAL ERROR: setHandler() was not called; ignoring plugin event";
+            << "INTERNAL ERROR: setHandler() was not called; ignoring Plugin Diagnostic Event.";
         return;
     }
 
     const auto event = makePtr<PluginDiagnosticEvent>(
         level, caption, description);
+
+    NX_OUTPUT << "Producing Plugin Diagnostic Event:\n" + event->toString();
+
     m_handler->handlePluginDiagnosticEvent(event.get());
 }
 

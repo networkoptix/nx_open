@@ -926,12 +926,12 @@ void DeviceAgent::updateEventGenerationParameters()
 {
     if (m_deviceAgentSettings.throwPluginDiagnosticEvents)
     {
-        NX_PRINT << __func__ << "(): Starting plugin event generation";
+        NX_PRINT << __func__ << "(): Starting Plugin Diagnostic Events generation.";
         m_needToThrowPluginDiagnosticEvents = true;
     }
     else
     {
-        NX_PRINT << __func__ << "(): Stopping plugin event generation";
+        NX_PRINT << __func__ << "(): Stopping Plugin Diagnostic Events generation.";
         m_needToThrowPluginDiagnosticEvents = false;
         m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }

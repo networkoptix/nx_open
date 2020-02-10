@@ -48,13 +48,16 @@ void Engine::pushPluginDiagnosticEvent(
     std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_handler)
     {
-        NX_PRINT << __func__ << "(): "
-            << "INTERNAL ERROR: setHandler() was not called; ignoring plugin event";
+        NX_PRINT << __func__ << "(): INTERNAL ERROR: "
+            << "setHandler() was not called; ignoring the Plugin Diagnostic Event.";
         return;
     }
 
     const auto event = makePtr<PluginDiagnosticEvent>(
         level, std::move(caption), std::move(description));
+
+    NX_OUTPUT << "Producing Plugin Diagnostic Event:\n" + event->toString();
+
     m_handler->handlePluginDiagnosticEvent(event.get());
 }
 

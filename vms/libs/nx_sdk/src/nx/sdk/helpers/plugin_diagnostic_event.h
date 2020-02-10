@@ -23,6 +23,9 @@ public:
     void setCaption(std::string caption);
     void setDescription(std::string description);
 
+    /** Intended for logging. Produces a multi-line text without the trailing newline. */
+    std::string toString() const;
+
 private:
     Level m_level = Level::info;
     std::string m_caption;

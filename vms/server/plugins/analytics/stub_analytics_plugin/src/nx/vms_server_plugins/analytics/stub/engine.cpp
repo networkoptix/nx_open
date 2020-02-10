@@ -359,7 +359,7 @@ std::string Engine::manifestString() const
                         "type": "CheckBox",
                         "name": ")json"
                         + kThrowPluginDiagnosticEventsFromDeviceAgentSetting + R"json(",
-                        "caption": "Throw plugin events from the DeviceAgent",
+                        "caption": "Produce Plugin Diagnostic Events from the DeviceAgent",
                         "defaultValue": false
                     },
                     {
@@ -575,12 +575,12 @@ Result<const IStringMap*> Engine::settingsReceived()
 
     if (m_needToThrowPluginDiagnosticEvents && !m_pluginDiagnosticEventThread)
     {
-        NX_PRINT << __func__ << "(): Starting plugin event generation";
+        NX_PRINT << __func__ << "(): Starting Plugin Diagnostic Event generation";
         m_needToThrowPluginDiagnosticEvents = true;
     }
     else if (!m_needToThrowPluginDiagnosticEvents && m_pluginDiagnosticEventThread)
     {
-        NX_PRINT << __func__ << "(): Stopping plugin event generation";
+        NX_PRINT << __func__ << "(): Stopping Plugin Diagnostic Event generation";
         m_needToThrowPluginDiagnosticEvents = false;
         m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }
