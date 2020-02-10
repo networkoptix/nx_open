@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const server_address = process.env.server_address || 'https://10.1.5.115:7001';
+const server_address = process.env.server_address || 'https://10.1.5.203:7001';
 
 const common = require('./webpack.common.js');
 
@@ -44,7 +44,7 @@ module.exports = merge(common, {
     plugins:[
         new webpack.HotModuleReplacementPlugin(),
         // new BundleAnalyzerPlugin({analyzerHost:'0.0.0.0', analyzerPort:9001})
-    
+
         // make some resources available while serve the project locally
         new CopyWebpackPlugin([
             // Local customizations *********************
