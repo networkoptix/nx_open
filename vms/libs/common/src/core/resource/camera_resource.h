@@ -28,8 +28,6 @@ class QnVirtualCameraResource : public QnSecurityCamResource
     Q_OBJECT
     Q_FLAGS(Qn::CameraCapabilities)
     Q_FLAGS(Ptz::Capabilities)
-    Q_PROPERTY(bool autoTimeZoneEnabled
-        READ getAutoTimeZoneEnabled WRITE setAutoTimeZoneEnabled)
     Q_PROPERTY(Qn::CameraCapabilities cameraCapabilities
         READ getCameraCapabilities WRITE setCameraCapabilities)
     Q_PROPERTY(Ptz::Capabilities ptzCapabilities
@@ -65,9 +63,6 @@ public:
 
     void issueOccured();
     void cleanCameraIssues();
-
-    bool getAutoTimeZoneEnabled() const;
-    void setAutoTimeZoneEnabled(bool value);
 
     nx::vms::api::RtpTransportType preferredRtpTransport() const;
     CameraMediaStreams mediaStreams() const;
@@ -206,7 +201,6 @@ private:
     DeviceAgentManifestMap fetchDeviceAgentManifests() const;
 
 private:
-    bool m_autoTimeZone = true;
     int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
     std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;

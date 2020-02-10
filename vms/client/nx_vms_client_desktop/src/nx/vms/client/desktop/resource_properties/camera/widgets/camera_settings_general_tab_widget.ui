@@ -209,7 +209,7 @@
      </item>
      <item>
       <widget class="QWidget" name="rightWidget" native="true">
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,1">
         <property name="spacing">
          <number>20</number>
         </property>
@@ -256,9 +256,6 @@
            </item>
           </layout>
          </widget>
-        </item>
-        <item>
-         <widget class="nx::vms::client::desktop::WearableCameraTimeZoneWidget" name="wearableTimeZoneWidget" native="true"/>
         </item>
         <item>
          <widget class="nx::vms::client::desktop::WearableCameraMotionWidget" name="wearableMotionWidget" native="true"/>
@@ -324,12 +321,6 @@
    <class>nx::vms::client::desktop::Panel</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/panel.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>nx::vms::client::desktop::WearableCameraTimeZoneWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_time_zone_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -27,7 +27,6 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     ui->cameraInfoWidget->setStore(store);
     ui->imageControlWidget->setStore(store);
     ui->wearableArchiveLengthWidget->setStore(store);
-    ui->wearableTimeZoneWidget->setStore(store);
     ui->wearableMotionWidget->setStore(store);
     ui->wearableUploadWidget->setStore(store);
 
@@ -73,7 +72,6 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
     const bool allWearableCameras = state.devicesDescription.isWearable == CombinedValue::All;
     ui->wearableArchiveLengthWidget->setVisible(allWearableCameras);
     ui->wearableMotionWidget->setVisible(allWearableCameras);
-    ui->wearableTimeZoneWidget->setVisible(allWearableCameras);
     ui->wearableUploadWidget->setVisible(state.isSingleWearableCamera());
 
     const bool licensePanelVisible = state.devicesDescription.isIoModule != CombinedValue::None
