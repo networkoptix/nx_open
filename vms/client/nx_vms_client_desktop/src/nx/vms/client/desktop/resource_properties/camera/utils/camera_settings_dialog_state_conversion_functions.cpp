@@ -356,6 +356,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         }
 
         camera->setUserEnabledAnalyticsEngines(state.analytics.enabledEngines());
+        camera->setAutoTimeZoneEnabled(state.autoTimeZoneEnabled);
 
         for (const auto& [id, index]: nx::utils::constKeyValueRange(state.analytics.streamByEngineId))
         {

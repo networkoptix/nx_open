@@ -258,6 +258,16 @@ void QnVirtualCameraResource::cleanCameraIssues() {
     }
 }
 
+bool QnVirtualCameraResource::getAutoTimeZoneEnabled() const
+{
+    return m_autoTimeZone;
+}
+
+void QnVirtualCameraResource::setAutoTimeZoneEnabled(bool value)
+{
+    m_autoTimeZone = value;
+}
+
 int QnVirtualCameraResource::issuesTimeoutMs() {
     return ISSUE_KEEP_TIMEOUT_MS;
 }
