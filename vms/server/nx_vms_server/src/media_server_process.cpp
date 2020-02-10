@@ -2946,7 +2946,8 @@ void MediaServerProcess::registerRestHandlers(
      * for details.
      */
     reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
-        m_metricsController.get(), serverModule(), m_ec2ConnectionFactory->serverConnector()));
+        m_metricsController.get(), serverModule(), m_ec2ConnectionFactory->serverConnector()),
+        kAdmin);
 }
 
 void MediaServerProcess::registerRestHandler(
