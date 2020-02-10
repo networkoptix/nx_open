@@ -32,7 +32,7 @@ Column
 
         height: 28
         itemId: [engineId.toString()].concat(ctx_sections).join("\n")
-        text: ctx_modelData.name
+        text: ctx_level > 0 ? ctx_modelData.caption : ctx_modelData.name
         active: ctx_active
         leftPadding: 16 + ctx_level * 8
         navigationMenu: ctx_navigationMenu

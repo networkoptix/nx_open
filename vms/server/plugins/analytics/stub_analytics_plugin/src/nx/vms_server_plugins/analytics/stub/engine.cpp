@@ -444,7 +444,7 @@ std::string Engine::manifestString() const
         "sections": [
             {
                 "type": "Section",
-                "name": "Example",
+                "caption": "Example",
                 "items": [
                     {
                         "type": "GroupBox",
@@ -494,7 +494,7 @@ std::string Engine::manifestString() const
                 "sections": [
                     {
                         "type": "Section",
-                        "name": "Nested section",
+                        "caption": "Nested section",
                         "items": [
                             {
                                 "type": "GroupBox",
@@ -537,7 +537,7 @@ std::string Engine::manifestString() const
             },
             {
                 "type": "Section",
-                "name": "ROI",
+                "caption": "ROI",
                 "items": [
                     {
                         "type": "PolygonFigure",
