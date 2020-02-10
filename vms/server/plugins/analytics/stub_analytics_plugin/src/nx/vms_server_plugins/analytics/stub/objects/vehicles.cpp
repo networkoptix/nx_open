@@ -61,6 +61,7 @@ static Attributes makeAttributes(
         makePtr<Attribute>(IAttribute::Type::string, "Brand", vehicle.first),
         makePtr<Attribute>(IAttribute::Type::string, "Model", vehicle.second),
         makePtr<Attribute>(IAttribute::Type::string, "Color", randomColor()),
+        makePtr<Attribute>(IAttribute::Type::string, "SomeValue.sys.hidden", "a hidden value"),
     };
     if (makeDistanceAttribute)
     {

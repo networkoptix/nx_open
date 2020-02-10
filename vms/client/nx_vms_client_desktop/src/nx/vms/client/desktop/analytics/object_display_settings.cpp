@@ -4,6 +4,7 @@
 
 #include <nx/utils/random.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/desktop/analytics/analytics_attributes.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <client/client_settings.h>
 
@@ -30,11 +31,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ObjectDisplaySettingsItem, AttributeVi
     (ObjectDisplaySettingsItem::AttributeVisibilityPolicy::always, "always")
     (ObjectDisplaySettingsItem::AttributeVisibilityPolicy::hover, "hover")
     (ObjectDisplaySettingsItem::AttributeVisibilityPolicy::never, "never"))
-
-bool systemAttribute(const QString& name)
-{
-    return name.startsWith(lit("nx.sys."));
-}
 
 } // namespace
 
@@ -91,8 +87,9 @@ std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::briefAttribu
 
     for (const auto& attribute: object.attributes)
     {
-        if (!systemAttribute(attribute.name) && settings.attributeVisibility.value(attribute.name)
-            == ObjectDisplaySettingsItem::AttributeVisibilityPolicy::always)
+        if (!isAnalyticsAttributeHidden(attribute.name)
+            && settings.attributeVisibility.value(attribute.name)
+                == ObjectDisplaySettingsItem::AttributeVisibilityPolicy::always)
         {
             result.push_back(attribute);
         }
@@ -110,8 +107,9 @@ std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::visibleAttri
 
     for (const auto& attribute: object.attributes)
     {
-        if (!systemAttribute(attribute.name) && settings.attributeVisibility.value(attribute.name)
-            != ObjectDisplaySettingsItem::AttributeVisibilityPolicy::never)
+        if (!isAnalyticsAttributeHidden(attribute.name)
+            && settings.attributeVisibility.value(attribute.name)
+                != ObjectDisplaySettingsItem::AttributeVisibilityPolicy::never)
         {
             result.push_back(attribute);
         }

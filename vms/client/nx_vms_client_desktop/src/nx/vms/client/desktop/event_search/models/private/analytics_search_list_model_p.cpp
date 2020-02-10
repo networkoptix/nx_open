@@ -30,6 +30,7 @@
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/client/desktop/analytics/analytics_attributes.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
@@ -750,7 +751,7 @@ QString AnalyticsSearchListModel::Private::attributes(
 
     for (auto begin = track.attributes.cbegin(); begin != track.attributes.cend(); )
     {
-        if (begin->name.isEmpty() || begin->name.startsWith("nx.sys."))
+        if (begin->name.isEmpty() || isAnalyticsAttributeHidden(begin->name))
         {
             ++begin;
             continue;
