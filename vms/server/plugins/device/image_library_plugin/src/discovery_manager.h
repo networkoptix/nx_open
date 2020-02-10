@@ -49,7 +49,7 @@ public:
     virtual int getReservedModelList( char** modelList, int* count ) override;
 
     //!Implementation of nxcip::CameraDiscoveryManager3::getCapabilities
-    virtual int DiscoveryManager::getCapabilities() const override;
+    virtual int getCapabilities() const override;
 
 private:
     nxpt::CommonRefManager m_refManager;
