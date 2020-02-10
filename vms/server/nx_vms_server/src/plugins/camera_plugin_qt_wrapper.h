@@ -88,6 +88,7 @@ namespace nxcip_qt
 
         const CameraDiscoveryManager& operator=(const CameraDiscoveryManager& right);
 
+        static QString urlToString(const nx::utils::Url& url);
     private:
         mutable QnMutex m_mutex;
         char* m_texBuf;

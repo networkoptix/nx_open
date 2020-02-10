@@ -38,6 +38,24 @@ namespace nxcip_qt
         return QString::fromUtf8( m_texBuf );
     }
 
+    QString CameraDiscoveryManager::urlToString(const nx::utils::Url& url)
+    {
+        QString result;
+        if (url.scheme().isEmpty() && !url.host().isEmpty())
+        {
+            // Url is a host.
+            result = url.toString(QUrl::RemoveScheme | QUrl::RemovePassword | QUrl::RemoveUserInfo
+                | QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment);
+            result.remove(QLatin1Char('/'));
+        }
+        else
+        {
+            // Url or local file path.
+            result = QUrl::fromPercentEncoding(url.toString().toLatin1());
+        }
+        return result;
+    }
+
     //!See nxcip::CameraDiscoveryManager::findCameras
     int CameraDiscoveryManager::findCameras(QVector<nxcip::CameraInfo2>* const cameras, const QString& localInterfaceIPAddr )
     {
@@ -79,21 +97,7 @@ namespace nxcip_qt
         QVector<nxcip::CameraInfo> cameraInfo1;
         cameraInfo1.resize(nxcip::CAMERA_INFO_ARRAY_SIZE);
 
-        QString urlStr;
-        if (url.scheme().isEmpty() && !url.host().isEmpty())
-        {
-            // Url is a host.
-            urlStr = url.toString(QUrl::RemoveScheme | QUrl::RemovePassword | QUrl::RemoveUserInfo 
-                | QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment);
-            urlStr.remove(QLatin1Char('/'));
-        }
-        else
-        {
-            // Url or local file path.
-            urlStr = QUrl::fromPercentEncoding(url.toString().toLatin1());
-        }
-
-        QByteArray urlUtf8 = urlStr.toUtf8();
+        QByteArray urlUtf8 = urlToString(url).toUtf8();
         const QByteArray loginUtf8 = login ? login->toUtf8() : QByteArray();
         const QByteArray passwordUtf8 = password ? password->toUtf8() : QByteArray();
 
