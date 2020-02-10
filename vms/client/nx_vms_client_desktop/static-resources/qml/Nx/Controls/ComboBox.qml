@@ -131,7 +131,7 @@ ComboBox
             anchors.fill: parent
             leftPadding: 8
             rightPadding: 8
-            text: modelData
+            text: (control.textRole ? modelData[textRole] : modelData) || ""
             elide: Text.ElideRight
             color: highlightedIndex == index ? ColorTheme.colors.brand_contrast : ColorTheme.text
             verticalAlignment: Text.AlignVCenter
