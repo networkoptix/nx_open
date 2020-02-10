@@ -83,6 +83,8 @@ void GenericTabbedDialog::setPageVisible(int key, bool visible)
     if (!m_tabWidget)
         return;
 
+    const auto previouslySelectedPage = currentPage();
+
     int indexToInsert = 0;
     for (auto& page: m_pages)
     {
@@ -113,6 +115,12 @@ void GenericTabbedDialog::setPageVisible(int key, bool visible)
             if (indexToRemove >= 0)
                 m_tabWidget->removeTab(indexToRemove);
         }
+
+        if (previouslySelectedPage != key)
+            setCurrentPage(previouslySelectedPage);
+        else if (m_tabWidget->count() > 0)
+            m_tabWidget->setCurrentIndex(0);
+
         return;
     }
 

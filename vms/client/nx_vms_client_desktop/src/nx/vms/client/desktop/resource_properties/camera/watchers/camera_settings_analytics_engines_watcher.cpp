@@ -96,18 +96,16 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_connectionOpened()
     NX_ASSERT(!m_online);
     m_online = true;
 
+    engines.clear();
+
     for (const auto& engine: commonModule()->resourcePool()->getResources<AnalyticsEngineResource>())
         at_resourceAdded(engine);
 }
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_connectionClosed()
 {
-    NX_ASSERT(m_online && engines.empty());
+    NX_ASSERT(m_online);
     m_online = false;
-    engines.clear();
-
-    if (!NX_ASSERT(!camera))
-        setCamera({});
 }
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::setCamera(
