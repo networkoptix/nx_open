@@ -353,7 +353,7 @@ public:
     virtual void beforeConfigureStream(Qn::ConnectionRole role);
     virtual void afterConfigureStream(Qn::ConnectionRole role);
     virtual CameraDiagnostics::Result customStreamConfiguration(
-        Qn::ConnectionRole role);
+        Qn::ConnectionRole role, const QnLiveStreamParams& params);
 
     double getClosestAvailableFps(double desiredFps);
 

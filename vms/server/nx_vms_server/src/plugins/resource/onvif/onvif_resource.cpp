@@ -4764,7 +4764,8 @@ void QnPlOnvifResource::afterConfigureStream(Qn::ConnectionRole /*role*/)
         m_streamConfCond.wait(&m_streamConfMutex);
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(Qn::ConnectionRole /*role*/)
+CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(
+    Qn::ConnectionRole /*role*/, const QnLiveStreamParams& /*params*/)
 {
     return CameraDiagnostics::NoErrorResult();
 }

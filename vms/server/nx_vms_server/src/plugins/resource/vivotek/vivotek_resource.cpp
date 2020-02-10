@@ -87,10 +87,10 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(
 }
 
 CameraDiagnostics::Result VivotekResource::customStreamConfiguration(
-    Qn::ConnectionRole role)
+    Qn::ConnectionRole role, const QnLiveStreamParams& params)
 {
     bool success = true;
-    if (streamSupportsHevc(role))
+    if (streamSupportsHevc(role) && params.codec.toLower() == kHevcCodecString)
         success = setHevcForStream(role);
 
     if (!success)
