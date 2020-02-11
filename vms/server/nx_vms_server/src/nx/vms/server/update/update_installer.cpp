@@ -58,6 +58,9 @@ UpdateInstaller::~UpdateInstaller()
 
 void UpdateInstaller::prepareAsync(const QString& path)
 {
+    if (!serverModule()->rootFileSystem()->changeOwner(workDir()))
+        NX_WARNING(this, "Unable to chown %1", workDir());
+
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         if (m_state == State::inProgress)

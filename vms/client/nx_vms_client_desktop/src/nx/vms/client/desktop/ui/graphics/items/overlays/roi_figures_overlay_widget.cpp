@@ -118,9 +118,9 @@ RoiFiguresOverlayWidget::Line parseLine(const QJsonObject& object)
     parseItem(line, object);
 
     const auto& direction = figure.value(QStringLiteral("direction")).toString();
-    if (direction == QStringLiteral("a"))
+    if (direction == QStringLiteral("left"))
         line.direction = Line::Direction::a;
-    else if (direction == QStringLiteral("b"))
+    else if (direction == QStringLiteral("right"))
         line.direction = Line::Direction::b;
 
     return line;
