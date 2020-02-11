@@ -364,10 +364,11 @@ BaseFigure::BaseFigure(const QString& figureType, QObject* parent):
     QJsonObject result = currentFigureValue;
     for (auto it = newFigureValue.begin(); it != newFigureValue.end(); ++it)
     {
-        if (it->isNull() || it->isUndefined())
+        const QString propertyKey = it.key();
+
+        if ((it->isNull() || it->isUndefined()) && !kNullableFields.contains(propertyKey))
             continue;
 
-        const QString propertyKey = it.key();
         if (it->isObject())
         {
             result[propertyKey] =
