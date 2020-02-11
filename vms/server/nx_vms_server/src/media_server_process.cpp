@@ -4546,6 +4546,9 @@ void MediaServerProcess::startObjects()
     m_serverStartedTimer->setSingleShot(true);
     m_serverStartedTimer->start(serverModule()->settings().serverStartedEventTimeoutMs());
     m_checkAnalyticsTimer->start(kCheckAnalyticsUsedTimeout);
+
+    if (nx::vms::server::nvr::IService* const nvrService = serverModule()->nvrService())
+        nvrService->start();
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const
@@ -4851,9 +4854,6 @@ void MediaServerProcess::run()
 
     if (needToStop())
         return;
-
-    if (nx::vms::server::nvr::IService* const nvrService = serverModule->nvrService())
-        nvrService->start();
 
     serverModule->resourcePool()->threadPool()->setMaxThreadCount(
         serverModule->settings().resourceInitThreadsCount());
