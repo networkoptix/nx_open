@@ -202,7 +202,7 @@ void setBitrate(
             if (isVideoInfo(mediaType) && targetHeader)
             {
                 VIDEOINFO * info = reinterpret_cast<VIDEOINFO*>(mediaType->pbFormat);
-                if (info->bmiHeader.biCompression == targetHeader->biCompression)
+                if (info && info->bmiHeader.biCompression == targetHeader->biCompression)
                 {
                     info->dwBitRate = bitrate;
                     pConfig->SetFormat(mediaType);
