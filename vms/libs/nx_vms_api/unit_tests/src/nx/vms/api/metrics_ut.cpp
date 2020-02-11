@@ -485,6 +485,7 @@ TEST(Metrics, Formatting)
 
     EXPECT_FORMAT("", 100.0, "100");
     EXPECT_FORMAT("pixels", 100.0, "100 pixels");
+    EXPECT_FORMAT("%", 0.15, "15%");
 
     EXPECT_FORMAT("KB", 100.0, "0.1 KB");
     EXPECT_FORMAT("KB", 5000.0, "4.88 KB");

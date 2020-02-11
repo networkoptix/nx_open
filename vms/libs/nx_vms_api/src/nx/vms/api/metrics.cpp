@@ -79,10 +79,12 @@ static Value durationString(const Value& value, bool hoursOnly)
 }
 
 template<typename Convert>
-std::function<Value(const Value&)> numericFormatter(const QString& units, Convert convert)
+std::function<Value(const Value&)> numericFormatter(
+    const QString& units, Convert convert, bool addSpace = true)
 {
     return
-        [units, convert = std::move(convert)](const Value& value)
+        [suffix = units.isEmpty() ? QString() : (addSpace ? (" " + units) : units),
+            convert = std::move(convert)](const Value& value)
         {
             if (!value.isDouble())
                 return value;
@@ -105,7 +107,7 @@ std::function<Value(const Value&)> numericFormatter(const QString& units, Conver
                 if (string.endsWith('.')) string.chop(1);
             }
 
-            return Value(units.isEmpty() ? string : (string + " " + units));
+            return Value(string + suffix);
         };
 }
 
@@ -118,7 +120,7 @@ std::function<Value(const Value&)> makeFormatter(const QString& targetFormat)
         return numericFormatter("", [](double v) { return v; }); // Rounded number without units.
 
     if (targetFormat == "%")
-        return numericFormatter(targetFormat, [](double v) { return v * 100; });
+        return numericFormatter(targetFormat, [](double v) { return v * 100; }, /*addSpace*/ false);
 
     if (targetFormat == "duration")
         return [](const Value& v) { return durationString(v, /*hoursOnly*/ false); };
