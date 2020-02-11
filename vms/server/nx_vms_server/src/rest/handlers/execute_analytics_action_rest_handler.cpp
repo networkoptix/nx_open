@@ -5,12 +5,14 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <media_server/media_server_module.h>
+#include <nx/kit/utils.h>
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/uuid.h>
+#include <nx/utils/switch.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/conversion_utils.h>
@@ -177,11 +179,11 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return StatusCode::ok;
     }
 
-    AnalyticsActionResult actionResult;
-    auto extendedActionData = makeExtendedAnalyticsActionData(
-        *actionData,
-        engineResource,
-        *actionTypeDescriptor);
+    std::optional<ExtendedAnalyticsActionData> extendedActionData =
+        makeExtendedAnalyticsActionData(
+            *actionData,
+            engineResource,
+            *actionTypeDescriptor);
 
     if (!extendedActionData)
     {
@@ -193,15 +195,46 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return StatusCode::ok;
     }
 
-    const QString errorMessage = executeAction(*extendedActionData, &actionResult);
-    if (!errorMessage.isEmpty())
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest,
-            lm("Engine %1 failed to execute Action: %2").args(engineResource, errorMessage));
-    }
+    return doExecuteAction(result, engineResource, *extendedActionData);
+}
 
-    result.setReply(actionResult);
-    return StatusCode::ok;
+int QnExecuteAnalyticsActionRestHandler::doExecuteAction(
+    QnJsonRestResult& result,
+    nx::vms::server::resource::AnalyticsEngineResourcePtr engineResource,
+    const ExtendedAnalyticsActionData& extendedActionData)
+{
+    using namespace nx::network::http;
+
+    QString errorMessage;
+    AnalyticsActionResult actionResult;
+    return nx::utils::switch_(
+        executeAction(extendedActionData, &actionResult, &errorMessage),
+
+        ExecuteActionStatus::internalError,
+        [&]()
+        {
+            result.setError(QnJsonRestResult::InternalServerError,
+                lm("INTERNAL ERROR: Unable to execute Action %1 on Engine %2: %3").args(
+                    extendedActionData.action.actionId, engineResource, errorMessage));
+            return StatusCode::internalServerError;
+        },
+
+        ExecuteActionStatus::pluginError,
+        [&]()
+        {
+            result.setError(QnJsonRestResult::CantProcessRequest,
+                lm("Engine %1 failed to execute Action %2: %3").args(
+                    engineResource, extendedActionData.action.actionId, errorMessage));
+            return StatusCode::ok;
+        },
+
+        ExecuteActionStatus::noError,
+        [&]()
+        {
+            result.setReply(actionResult);
+            return StatusCode::ok;
+        }
+    );
 }
 
 std::optional<AnalyticsAction> QnExecuteAnalyticsActionRestHandler::deserializeActionData(
@@ -255,7 +288,7 @@ resource::AnalyticsEngineResourcePtr QnExecuteAnalyticsActionRestHandler::engine
 std::optional<nx::vms::api::analytics::ActionTypeDescriptor>
     QnExecuteAnalyticsActionRestHandler::actionDescriptor(const AnalyticsAction& actionData) const
 {
-    nx::analytics::ActionTypeDescriptorManager actionTypeDescriptorManager(
+    const nx::analytics::ActionTypeDescriptorManager actionTypeDescriptorManager(
         serverModule()->commonModule());
 
     const auto descriptor = actionTypeDescriptorManager.descriptor(actionData.actionId);
@@ -368,29 +401,37 @@ std::optional<ExtendedAnalyticsActionData>
     return extendedAnalyticsActionData;
 }
 
-/** @return Empty string on success, or a short error message on error.*/
-QString QnExecuteAnalyticsActionRestHandler::executeAction(
-    const ExtendedAnalyticsActionData& actionData,
-    AnalyticsActionResult* outActionResult)
+QnExecuteAnalyticsActionRestHandler::ExecuteActionStatus
+    QnExecuteAnalyticsActionRestHandler::executeAction(
+        const ExtendedAnalyticsActionData& actionData,
+        AnalyticsActionResult* outActionResult,
+        QString* outErrorMessage)
 {
-    static const QString kNoEngineToExecuteActionMessage(
-        "No Engine Resource to has been provided for executing the Action.");
-    if (!NX_ASSERT(actionData.engine, kNoEngineToExecuteActionMessage))
-        return kNoEngineToExecuteActionMessage;
+    if (!NX_ASSERT(outErrorMessage))
+        return ExecuteActionStatus::internalError;
+
+    *outErrorMessage = "No Engine Resource has been provided for executing the Action.";
+    if (!NX_ASSERT(actionData.engine, *outErrorMessage))
+        return ExecuteActionStatus::internalError;
 
     const auto action = makePtr<Action>(actionData);
-    static const QString kNoSdkEngineToExecuteActionMessage(
-        "No SDK Engine object has been provided for executing the Action.");
+    *outErrorMessage = "No SDK Engine object has been provided for executing the Action.";
     const wrappers::EnginePtr sdkEngine = actionData.engine->sdkEngine();
-    if (!NX_ASSERT(sdkEngine, kNoSdkEngineToExecuteActionMessage))
-        return kNoSdkEngineToExecuteActionMessage;
+    if (!NX_ASSERT(sdkEngine, *outErrorMessage))
+        return ExecuteActionStatus::internalError;
 
     const wrappers::Engine::ExecuteActionResult executeActionResult =
         sdkEngine->executeAction(action);
 
     if (executeActionResult.errorMessage.isEmpty()) //< Successfully executed the Action.
+    {
+        *outErrorMessage = "";
         *outActionResult = executeActionResult.actionResult;
-    return executeActionResult.errorMessage;
+        return ExecuteActionStatus::noError;
+    }
+
+    *outErrorMessage = executeActionResult.errorMessage;
+    return ExecuteActionStatus::pluginError;
 }
 
 std::optional<ObjectTrackEx>

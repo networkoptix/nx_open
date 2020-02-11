@@ -56,9 +56,17 @@ private:
         const nx::vms::server::resource::AnalyticsEngineResourcePtr engineResource,
         const nx::vms::api::analytics::ActionTypeDescriptor& actionTypeDescriptor);
 
-    QString executeAction(
+    enum class ExecuteActionStatus { noError, internalError, pluginError };
+
+    /** @return Http status code. */
+    int doExecuteAction(QnJsonRestResult& result,
+        nx::vms::server::resource::AnalyticsEngineResourcePtr engineResource,
+        const ExtendedAnalyticsActionData& extendedActionData);
+
+    ExecuteActionStatus executeAction(
         const ExtendedAnalyticsActionData& actionData,
-        AnalyticsActionResult* outActionResult);
+        AnalyticsActionResult* outActionResult,
+        QString* outErrorMessage);
 
     std::optional<nx::analytics::db::ObjectTrackEx> fetchObjectTrack(
         const QnUuid& objectTrackId,
