@@ -172,7 +172,7 @@ nx::vms::api::EventLevel fromPluginDiagnosticEventLevel(IPluginDiagnosticEvent::
         case IPluginDiagnosticEvent::Level::error:
             return EventLevel::ErrorEventLevel;
         default:
-            NX_ASSERT(false, "Wrong plugin event level");
+            NX_ASSERT(false, "Wrong Plugin Diagnostic Event level: %1", (int) level);
             return EventLevel::UndefinedEventLevel;
     }
 }
