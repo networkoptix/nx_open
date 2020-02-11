@@ -11,10 +11,10 @@
                     aria-expanded="false"
                     ng-click="nav.show = !nav.show">
 
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
+                <span class="sr-only">切換</span>
+                <span class="icon-bar"> </span>
+                <span class="icon-bar"> </span>
+                <span class="icon-bar"> </span>
             </button>
         </div>
         <nav ng-if="!noPanel && nav.show" class="visible-xs collapse navbar-collapse" id="navbar-collapse" role="navigation">
@@ -30,7 +30,7 @@
                        ng-click="nav.show = !nav.show" ng-href="#/client/">Lite Client</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
-                       ng-click="nav.show = !nav.show" ng-href="#/info/">Monitoring</a></li>
+                       ng-click="nav.show = !nav.show" ng-href="#/info/">監測中</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-click="nav.show = !nav.show" ng-href="#/developers/">開發人員使用</a></li>
@@ -56,14 +56,14 @@
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/view/">瀏覽</a></li>
                 <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/client/">Lite
-                        Client</a></li>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/client/">Lite                        
+                        客戶端</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/info/">Monitoring</a>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/info/">監測中</a>
                 </li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/developers/">For
-                        Developers</a></li>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/developers/">對於
+                        開發人員</a></li>
                 <li ng-if="user.isOwner || user.isAdmin" ng-class="{active:isActive('/health')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-href="#/health/">資訊</a></li>

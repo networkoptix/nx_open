@@ -498,7 +498,7 @@
     <message>
       <location/>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>使用事件來源伺服器</translation>
     </message>
   </context>
   <context>
@@ -947,7 +947,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>連線中...</translation>
     </message>
   </context>
   <context>
@@ -2076,7 +2076,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
       <source>Sign in</source>
-      <translation type="unfinished">Sign in</translation>
+      <translation>登錄</translation>
     </message>
     <message>
       <location/>
@@ -2160,7 +2160,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
       <source>Attention! Power limit exceeded</source>
-      <translation type="unfinished">Attention! Power limit exceeded</translation>
+      <translation>請注意！超出供電上限</translation>
     </message>
   </context>
   <context>
