@@ -103,6 +103,14 @@ LabeledItem
                         }
 
                         Component.onCompleted: updateThumbnail()
+
+                        Rectangle
+                        {
+                            id: dimmer
+
+                            anchors.fill: parent
+                            color: ColorTheme.transparent("black", 0.5)
+                        }
                     }
 
                     FigurePreview
