@@ -12,6 +12,7 @@
 #include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/core/common/utils/path_util.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 #include <core/resource/camera_resource.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -90,7 +91,8 @@ void parseItem(RoiFiguresOverlayWidget::Item& item, const QJsonObject& object)
         return;
 
     item.visible = object.value(QStringLiteral("showOnCamera")).toBool(true);
-    item.color = figure.value(QStringLiteral("color")).toString();
+    item.color = figure.value(QStringLiteral("color")).toString(
+        ColorTheme::instance()->color("roi1").name());
 
     item.points.clear();
     for (const auto p: figure.value(QStringLiteral("points")).toArray())

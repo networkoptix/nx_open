@@ -166,16 +166,8 @@ Window
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                colors: [
-                    "#e040fb",
-                    "#536dfe",
-                    "#64ffda",
-                    "#ffff00",
-                    "#ffab40",
-                    "#b2ff59",
-                    "#7c4dff",
-                    "#ff4081"
-                ]
+                colors: ColorTheme.groupKeys("roi").map(
+                    function(key) { return ColorTheme.colors[key] })
 
                 onColorChanged: editor.color = color
             }
@@ -252,7 +244,7 @@ Window
     {
         editor.deserialize(json)
         if (!editor.hasFigure)
-            editor.color = palette.colors[0]
+            editor.color = ColorTheme.colors.roi1
         palette.color = editor.color
     }
 }

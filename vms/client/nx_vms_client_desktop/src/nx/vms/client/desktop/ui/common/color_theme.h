@@ -38,6 +38,7 @@ public:
 
     QList<QColor> groupColors(const char* groupName) const;
     QList<QColor> groupColors(const QString& groupName) const;
+    Q_INVOKABLE QStringList groupKeys(const QString& groupName) const;
 
     static Q_INVOKABLE QColor transparent(const QColor& color, qreal alpha);
     Q_INVOKABLE QColor darker(const QColor& color, int offset) const;

@@ -96,6 +96,15 @@
         "detectedObject9":  "#9c6b50",
         "detectedObject10": "#cbcbcb",
 
+        "roi1": "#e040fb",
+        "roi2": "#536dfe",
+        "roi3": "#64ffda",
+        "roi4": "#ffff00",
+        "roi5": "#ffab40",
+        "roi6": "#b2ff59",
+        "roi7": "#7c4dff",
+        "roi8": "#ff4081",
+
         "timeline_main":    "#3a911e",
         "timeline_bg":      "#223925",
 
