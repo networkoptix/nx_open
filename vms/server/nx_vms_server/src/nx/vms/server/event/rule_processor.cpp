@@ -144,7 +144,11 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
         case vms::api::ActionType::exitFullscreenAction:
         case vms::api::ActionType::openLayoutAction:
             return QnMediaServerResourcePtr(); //< Don't transfer to other server, execute here.
-
+        case vms::api::ActionType::buzzerAction:
+        {
+            NX_ASSERT(res);
+            return res.dynamicCast<QnMediaServerResource>();
+        }
         default:
             return res
                 ? resourcePool()->getResourceById<QnMediaServerResource>(res->getParentId())
@@ -235,7 +239,11 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 
     prepareAdditionActionParams(action);
 
-    auto resources = resourcePool()->getResourcesByIds<QnNetworkResource>(action->getResources());
+    QnNetworkResourceList cameraResources =
+        resourcePool()->getResourcesByIds<QnNetworkResource>(action->getResources());
+
+    QnMediaServerResourceList serverResources =
+        resourcePool()->getResourcesByIds<QnMediaServerResource>(action->getResources());
 
     switch (action->actionType())
     {
@@ -245,12 +253,11 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
         {
             if (action->getParams().useSource)
             {
-                resources << resourcePool()->getResourcesByIds<QnNetworkResource>(
+                cameraResources << resourcePool()->getResourcesByIds<QnNetworkResource>(
                     action->getSourceResources(resourcePool()));
             }
             break;
         }
-
         case vms::api::ActionType::sayTextAction:
         case vms::api::ActionType::playSoundAction:
         case vms::api::ActionType::playSoundOnceAction:
@@ -273,23 +280,45 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
             }
             break;
         }
+        case vms::api::ActionType::buzzerAction:
+        {
+            if (action->getParams().useSource)
+            {
+                serverResources = resourcePool()->getResourcesByIds<QnMediaServerResource>(
+                    QList{action->getRuntimeParams().sourceServerId});
+            }
+        }
 
         default:
             break;
     }
 
-    if (resources.isEmpty())
+    if (cameraResources.isEmpty() && vms::event::requiresCameraResource(action->actionType()))
+        return; //< Camera doesn't exist anymore.
+
+    if (serverResources.isEmpty() && vms::event::requiresServerResource(action->actionType()))
+        return; //< Server doesn't exist anymore.
+
+    if (cameraResources.isEmpty() && serverResources.isEmpty())
     {
-        if (vms::event::requiresCameraResource(action->actionType()))
-            return; //< Camera doesn't exist anymore.
-        else
-            doExecuteAction(action, QnResourcePtr());
+        doExecuteAction(action, QnResourcePtr());
+        return;
     }
-    else
-    {
-        for (const auto& res: resources)
-            doExecuteAction(action, res);
-    }
+
+    std::vector<QnResourcePtr> resources;
+
+    resources.insert(
+        resources.end(),
+        std::make_move_iterator(cameraResources.begin()),
+        std::make_move_iterator(cameraResources.end()));
+
+    resources.insert(
+        resources.end(),
+        std::make_move_iterator(serverResources.begin()),
+        std::make_move_iterator(serverResources.end()));
+
+    for (const auto& resource: resources)
+        doExecuteAction(action, resource);
 }
 
 bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& action)

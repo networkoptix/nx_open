@@ -398,7 +398,7 @@ void QnOnvifStreamReader::fixDahuaStreamUrl(
     constexpr auto kChannel("channel");
     constexpr auto kSubtype("subtype");
 
-    // Fixable url should somewhat look like this:
+    // Fixable url should look somewhat like this:
     // rtsp://217.171.200.130:5542/cam/realmonitor?channel=2&subtype=1&unicast=true&proto=Onvif
     // Let's check it.
 
@@ -416,13 +416,16 @@ void QnOnvifStreamReader::fixDahuaStreamUrl(
     if (!isNumber)
         return; //< Unknown url format => url should not be fixed.
 
-    // Fix channel.
-    query.removeQueryItem(kChannel);
-    query.addQueryItem(kChannel, QString::number(neededChannelNumber));
-
-    // Fix subtype (primary/secondary).
-    query.removeQueryItem(kSubtype);
-    query.addQueryItem(kSubtype, QString::number(neededSubtypeNumber));
+    // Fix channel and subtype.
+    QList<QPair<QString, QString>> queryParams = query.queryItems();
+    for (auto& param: queryParams)
+    {
+        if (param.first == kChannel)
+            param.second = QString::number(neededChannelNumber);
+        else if (param.first == kSubtype)
+            param.second = QString::number(neededSubtypeNumber);
+    }
+    query.setQueryItems(queryParams);
 
     url.setQuery(query.toString());
     *urlString = url.toString();

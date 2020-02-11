@@ -9,7 +9,7 @@
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
 
-static constexpr int kTimeoutMs = 5 * 1000;
+static constexpr int kTimeoutMs = 10 * 1000;
 
 QnTestCameraStreamReader::QnTestCameraStreamReader(
     const QnTestCameraResourcePtr& res)
