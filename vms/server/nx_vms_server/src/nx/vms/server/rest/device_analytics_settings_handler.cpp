@@ -273,7 +273,7 @@ DeviceIdRetriever DeviceAnalyticsSettingsHandler::createCustomDeviceIdRetriever(
             const QUrlQuery urlQuery(request.requestLine.url.query());
             QString deviceId = urlQuery.queryItemValue(kDeviceIdParameter);
 
-            if (deviceId.isEmpty())
+            if (!deviceId.isEmpty())
                 return deviceId;
 
             const CommonRequestParametersOrError commonParametersOrError =
