@@ -144,6 +144,8 @@ static const int kEmailSendDelay = 0;
 static const QChar kOldEmailDelimiter(L';');
 static const QChar kNewEmailDelimiter(L' ');
 
+static const size_t kPushThumbnailHeight = 64;
+
 } // namespace
 
 using nx::vms::api::EventType;
@@ -914,7 +916,6 @@ struct PushPayload
     QString image;
 };
 #define PushPayload_Fields (url)(image)
-QN_FUSION_DECLARE_FUNCTIONS(PushPayload, (json));
 
 struct PushNotification
 {
@@ -929,6 +930,7 @@ struct PushNotification
         static const auto enumString =
             [](const auto& value)
             {
+                // Translate "someEnumSerializedValue" into "Some Enum Serialized Value".
                 QString text = QnLexical::serialized(value);
                 text[0] = text[0].toUpper();
                 text.replace(QRegularExpression("(.)([A-Z][a-z]+)"), "\\1 \\2");
@@ -945,22 +947,21 @@ struct PushNotification
         if (!event.description.isEmpty())
             body += event.description + "\n";
 
-        payload.url = lm("%1://%2/client/%3/view/?timestamp=%4").args(
+        payload.url = nx::utils::log::makeMessage("%1://%2/client/%3/view/?timestamp=%4",
             nx::vms::utils::AppInfo::nativeUriProtocol(), settings->cloudHost(),
             settings->cloudSystemId(), event.eventTimestampUsec / 1000);
         if (!event.eventResourceId.isNull())
         {
             payload.url += "&resources=" + event.eventResourceId.toSimpleString();
-            payload.image = lm("https://%1.%2/ec2/cameraThumbnail?cameraId=%3&time=%4&height=64").args(
+            payload.image = nx::utils::log::makeMessage(
+                "https://%1/ec2/cameraThumbnail?cameraId=%2&time=%3&height=%4&authKey=%5",
                 settings->cloudSystemId(),
-                "relay.vmsproxy.hdw.mx", //< TODO: Set actual proxy host.
-                event.eventResourceId.toSimpleString(),
-                event.eventTimestampUsec / 1000); //< TODO: Add temporary auth key.
+                event.eventResourceId.toSimpleString(), event.eventTimestampUsec / 1000,
+                kPushThumbnailHeight, "IMPLEMENT_AUTH_KEY");
         }
     }
 };
 #define PushNotification_Fields (title)(body)(payload)
-QN_FUSION_DECLARE_FUNCTIONS(PushNotification, (json));
 
 struct PushNotificationMessage
 {
@@ -993,8 +994,8 @@ bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActio
 
     message.notification = PushNotification(action->getRuntimeParams(), settings);
 
-    nx::utils::Url url("https://CLOUD-HOST/api/notifications/push_notification");
-    url.setHost(settings->cloudHost());
+    nx::utils::Url url(nx::utils::log::makeMessage(
+        "https://%1/api/notifications/push_notification", settings->cloudHost()));
 
     nx::network::http::HttpClient client;
     client.setUserName(settings->cloudSystemId());
