@@ -106,6 +106,7 @@ public:
     CameraDiagnostics::Result lastError() const;
 
     virtual std::chrono::microseconds currentTime() const override;
+    void setAccurateSeek(bool value) { m_accurateSeek = value; }
 
 protected:
     virtual bool init();
@@ -141,6 +142,7 @@ private:
     bool isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const;
 private slots:
 private:
+    bool m_accurateSeek = true;
     unsigned m_selectedAudioChannel;
     bool m_eof;
     FrameTypeExtractor* m_frameTypeExtractor;

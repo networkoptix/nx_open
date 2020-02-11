@@ -430,7 +430,9 @@ void ProgressiveDownloadingServer::run()
     QnServer::ChunksCatalog qualityToUse;
     auto streamInfo = findCompatibleStream(
         physicalResource->mediaStreams().streams, streamingFormat, requestedResolutionStr);
-    if (streamInfo)
+
+    bool accurateSeek = decodedUrlQuery.hasQueryItem("accurate_seek");
+    if (streamInfo && !accurateSeek)
     {
         qualityToUse = streamInfo->getEncoderIndex() == nx::vms::api::StreamIndex::primary
             ? QnServer::HiQualityCatalog
@@ -554,6 +556,7 @@ void ProgressiveDownloadingServer::run()
             d->serverModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
         d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
         d->archiveDP->jumpTo(timeUSec, timeUSec);
+        d->archiveDP->setAccurateSeek(accurateSeek);
 
         if (auto mediaEvent = d->archiveDP->lastError().toMediaStreamEvent())
         {

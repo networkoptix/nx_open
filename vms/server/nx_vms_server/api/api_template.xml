@@ -162,6 +162,11 @@
                             <description>Send only audio stream.</description>
                             <optional>true</optional>
                         </param>
+                        <param>
+                            <name>accurate_seek</name>
+                            <description>Seek accurate in archive to specified timestamp(pos), if it disabled then will seek to the nearest left(on timeline) keyframe. This causes the stream to be transcoded. Disabled by default</description>
+                            <optional>true</optional>
+                        </param>
                     </params>
                     <result>
                         <caption>Video stream in the requested format</caption>
