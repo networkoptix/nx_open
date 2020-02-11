@@ -19,6 +19,10 @@ export class NxUtilsService {
         this.CONFIG = this.config.getConfig();
     }
 
+    static deepCopy(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    }
+
     // Sort array of objects
     static byParam(fn, order) {
         return (a, b) => {

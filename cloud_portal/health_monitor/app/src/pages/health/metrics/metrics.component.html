@@ -1,4 +1,4 @@
-<div [ngSwitch]="metricValuesLen" class="h-100">
+<div [ngSwitch]="healthLayoutService.metricsValuesCount" class="h-100">
 
     <nx-page-placeholder
             *ngSwitchCase="0"
@@ -11,22 +11,22 @@
          [ngClass]="fixedLayoutClass"
          *ngSwitchDefault>
 
-        <div class="gridMetricContentComponent" #areaTable
+        <div class="gridMetricContentComponent"
              *ngIf="selectedData && selectedValues"
-             [hidden]="mobileDetailMode && activeEntity">
+             [hidden]="healthLayoutService.mobileDetailMode && healthLayoutService.activeEntity">
 
             <div class="gridMetricContentComponentWrapper">
-                <div *ngIf="metricValuesLen === 1" class="col-12 col-xl-7 col-xxxl-5 p-0">
+                <div *ngIf="healthLayoutService.metricsValuesCount === 1" class="col-12 col-xl-7 col-xxxl-5 p-0">
                     <nx-single-entity
                             [params]="selectedPanelData"
                             [entity]="objectValues(selectedValues)[0]">
                     </nx-single-entity>
                 </div>
-                <div *ngIf="metricValuesLen > 1" class="p-0" #tableContainer
-                     [ngClass]="{'data-wrapper' : !activeEntity}">
+                <div *ngIf="healthLayoutService.metricsValuesCount > 1" class="p-0"
+                     [ngClass]="{'data-wrapper' : !healthLayoutService.activeEntity}">
 
                     <div class="mb-3 p-0" #search
-                         *ngIf="metricValuesLen > 1">
+                         *ngIf="healthLayoutService.metricsValuesCount > 1">
 
                         <nx-search
                                 name="filterModel"
@@ -38,11 +38,9 @@
                         </nx-search>
                     </div>
                     <nx-dynamic-table
-                            [dimensions]="containerDimensions"
                             [headers]="selectedData"
                             [elements]="selectedValues"
-                            (onRowClick)="setActiveEntity($event)"
-                            [activeEntity]="activeEntity">
+                            (onRowClick)="setActiveEntity($event)">
                     </nx-dynamic-table>
                 </div>
 
@@ -51,12 +49,12 @@
         </div>
 
         <div class="gridMetricContentPanelComponent"
-             *ngIf="activeEntity"
-             [ngStyle]="{'visibility': layoutReady ? undefined : 'hidden'}">
+             *ngIf="healthLayoutService.activeEntity"
+             [ngStyle]="{'visibility': healthService.tableReady && layoutReady ? undefined : 'hidden'}">
 
-            <div class="gridMetricContentPanelComponentWrapper pb-3" #metricPanel>
+            <div class="gridMetricContentPanelComponentWrapper pb-3">
                 <div class="mb-3 all-results-btn"
-                     [style.display]="!mobileDetailMode ? 'none' : 'block'">
+                     [style.display]="!healthLayoutService.mobileDetailMode ? 'none' : 'block'">
 
                     <hr class="pb-3 m-0">
                     <button class="btn btn-default btn-back" (click)="resetActiveEntity()">
@@ -66,7 +64,6 @@
                 </div>
 
                 <nx-dynamic-table-panel-component
-                        [activeEntity]="activeEntity"
                         [panelParams]="selectedPanelData"
                         (onCloseView)="resetActiveEntity()">
                 </nx-dynamic-table-panel-component>

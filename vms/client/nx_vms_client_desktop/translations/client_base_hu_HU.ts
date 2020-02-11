@@ -3623,6 +3623,10 @@ to %1</source>
       <translation type="unfinished">Generic</translation>
     </message>
     <message>
+      <source>Deactivations Left</source>
+      <translation type="unfinished">Deactivations Left</translation>
+    </message>
+    <message>
       <source>Features</source>
       <translation type="unfinished">Features</translation>
     </message>
@@ -3637,10 +3641,6 @@ to %1</source>
     <message>
       <source>Archive Streams Allowed</source>
       <translation type="unfinished">Archive Streams Allowed</translation>
-    </message>
-    <message>
-      <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
     </message>
   </context>
   <context>
@@ -3908,6 +3908,10 @@ to %1</source>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
       <translation>Ez a licenc már aktiválva van %1 Hardver ID-hoz (%2)</translation>
     </message>
+    <message>
+      <source>Every license can be deactivated only a few times.</source>
+      <translation>Minden licencet csak néhányszor lehet deaktiválni.</translation>
+    </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
@@ -3922,13 +3926,6 @@ to %1</source>
       <translation>
         <numerusform>Legalább %1 szükséges</numerusform>
         <numerusform>Legalább %1 szükséges</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
       </translation>
     </message>
   </context>
@@ -9900,15 +9897,8 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Egyéb ok</translation>
     </message>
     <message>
-      <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
-    </message>
-    <message numerus="yes">
-      <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-      </translation>
+      <source>Please enter your contact information and the reason for deactivating your license</source>
+      <translation type="unfinished">Please enter your contact information and the reason for deactivating your license</translation>
     </message>
   </context>
   <context>

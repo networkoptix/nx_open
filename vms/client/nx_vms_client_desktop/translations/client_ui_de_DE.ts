@@ -947,7 +947,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation>Verbinden...</translation>
+      <translation type="unfinished">Connecting...</translation>
     </message>
   </context>
   <context>

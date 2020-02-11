@@ -1,5 +1,5 @@
 <div class="panel col-12"
-     *ngIf="activeEntity" #nxPanelView>
+     *ngIf="healthLayoutService.activeEntity" #nxPanelView>
     <nx-block type='gray' header-class="sticky1rem">
         <header>
             <div class="panel-title">
@@ -10,7 +10,7 @@
             </span>
         </header>
         <ng-container *ngIf="panelParams.id === 'cameras' && !healthService.importedData">
-            <nx-image-section [cameraInfo]="activeEntity"></nx-image-section>
+            <nx-image-section [cameraInfo]="healthLayoutService.activeEntity"></nx-image-section>
         </ng-container>
         <nx-section>
             <ng-container *ngFor="let paramGroup of panelParams.values">
@@ -24,14 +24,14 @@
                             <div class="row-line"></div>
                         </div>
                         <div class="col-5 pl-0 d-flex align-items-end"
-                             *ngIf="activeEntity[paramGroup.id] && activeEntity[paramGroup.id][param.id]; else noValue"
-                             [title]="activeEntity[paramGroup.id][param.id].tooltip">
+                             *ngIf="healthLayoutService.activeEntity[paramGroup.id] && healthLayoutService.activeEntity[paramGroup.id][param.id]; else noValue"
+                             [title]="healthLayoutService.activeEntity[paramGroup.id][param.id].tooltip">
                             <span class="row-value"
-                                  [ngClass]="activeEntity[paramGroup.id][param.id].class"
-                                  [innerText]="[undefined, ''].indexOf(activeEntity[paramGroup.id][param.id].text) === -1
-                                  ? activeEntity[paramGroup.id][param.id].text : '−'"></span>
-                            <svg-icon *ngIf="activeEntity[paramGroup.id][param.id].icon"
-                                      [src]="CONFIG.icons.dir + activeEntity[paramGroup.id][param.id].icon + '.svg'"
+                                  [ngClass]="healthLayoutService.activeEntity[paramGroup.id][param.id].class"
+                                  [innerText]="[undefined, ''].indexOf(healthLayoutService.activeEntity[paramGroup.id][param.id].text) === -1
+                                  ? healthLayoutService.activeEntity[paramGroup.id][param.id].text : '−'"></span>
+                            <svg-icon *ngIf="healthLayoutService.activeEntity[paramGroup.id][param.id].icon"
+                                      [src]="CONFIG.icons.dir + healthLayoutService.activeEntity[paramGroup.id][param.id].icon + '.svg'"
                                       [svgStyle]="{'width.px': '20', 'margin-top': '-4px', 'pointer-events': 'none'}"
                                       style="height: 16px"
                                       class="pl-1 mt-1 mb-1"></svg-icon>

@@ -148,16 +148,16 @@ LabeledItem
                     Text
                     {
                         text: qsTr("No shape")
-                        color: ColorTheme.colors.dark11
-                        font.pixelSize: 11
+                        color: ColorTheme.colors.dark13
+                        font.pixelSize: 13
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 
                     Text
                     {
                         text: qsTr("click to add")
-                        color: ColorTheme.colors.dark11
-                        font.pixelSize: 9
+                        color: ColorTheme.colors.dark13
+                        font.pixelSize: 11
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }

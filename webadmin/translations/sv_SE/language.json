@@ -77,8 +77,7 @@
         "emailSignature": "Epostsignatur",
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Aktivera edgeinspelning",
-        "webSocketEnabled": "Aktivera WEB anslutningar",
-        "maxP2pAllClientsSizeBytes": "Maximal buffertstorlek för att skicka p2p-data till alla klienter",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Händelseloggperiod (dagar)",
         "ldapAdminDn": "LDAP-administratör DN",
         "ldapSearchBase": "LDAP-sökbas",
@@ -133,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "graphs": "Grafer",
+            "graphs": "Graphs",
             "storage": "Lagring",
             "log": "Logg"
         }

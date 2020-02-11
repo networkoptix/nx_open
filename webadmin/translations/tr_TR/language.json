@@ -78,7 +78,6 @@
         "emailSupportEmail": "Destek maili",
         "enableEdgeRecording": "Çağrı Uç etkinleştirilsin",
         "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "Olay günlük periyodu (gün)",
         "ldapAdminDn": "LDAP yönetici DN",
         "ldapSearchBase": "LDAP veritabanı",

@@ -989,7 +989,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>连接到此服务器</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -1489,7 +1489,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional support</source>
-      <translation type="unfinished">Regional support</translation>
+      <translation>区域支持</translation>
     </message>
   </context>
   <context>
@@ -2058,29 +2058,29 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>源服务器</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>源摄像机</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>来源与 %n 个以上的摄像机</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>请选择至少一台设备</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>请选择至少一台摄像机</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>选择服务器</translation>
     </message>
   </context>
   <context>
@@ -2210,7 +2210,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>支持蜂鸣器的服务器</translation>
     </message>
   </context>
   <context>
@@ -3248,7 +3248,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>支持诊断风扇的服务器</translation>
     </message>
   </context>
   <context>
@@ -3581,7 +3581,7 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>通用</translation>
     </message>
     <message>
       <source>Features</source>
@@ -8791,7 +8791,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>消耗量</translation>
     </message>
   </context>
   <context>
@@ -8832,7 +8832,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>登入</translation>
     </message>
   </context>
   <context>
@@ -8942,19 +8942,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>断开连接</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>连接</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>已启用</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>未预料到的</translation>
     </message>
     <message>
       <source>Empty</source>
@@ -8988,11 +8988,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>電源</translation>
     </message>
     <message>
       <source>&lt; Unknown device &gt;</source>
-      <translation type="unfinished">&lt; Unknown device &gt;</translation>
+      <translation>&lt; 未知设备 &gt;</translation>
     </message>
   </context>
   <context>
@@ -9137,7 +9137,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>仅能在客户端-服务器的视频传输中加密。</translation>
     </message>
   </context>
   <context>
@@ -9150,7 +9150,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>没有兼容的服务器</translation>
     </message>
   </context>
   <context>
@@ -9773,12 +9773,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>请完成以下操作以重置授权</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>请注意，每个授权码最多可以重置 %n 次。</numerusform>
       </translation>
     </message>
   </context>

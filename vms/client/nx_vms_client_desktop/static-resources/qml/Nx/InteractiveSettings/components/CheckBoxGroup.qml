@@ -21,15 +21,28 @@ LabeledItem
 
         baselineOffset: (count > 0) ? itemAt(0).baselineOffset : 0
 
-        delegate: RadioButton
+        delegate: CheckBox
         {
             readonly property var identifier: modelData
 
             text: (control.itemCaptions && control.itemCaptions[identifier]) || identifier
-            checked: control.value == identifier
+            checked: Array.isArray(control.value) && control.value.indexOf(identifier) !== -1
 
             onClicked:
-                control.value = identifier
+                buttons.updateValue()
+        }
+
+        function updateValue()
+        {
+            var newValue = []
+            for (var i = 0; i != count; ++i)
+            {
+                var item = itemAt(i)
+                if (item.checked)
+                    newValue.push(item.identifier)
+            }
+
+            control.value = newValue
         }
     }
 }

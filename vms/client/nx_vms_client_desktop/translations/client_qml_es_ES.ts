@@ -7,14 +7,6 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>La analítica de la cámara solo funcionará cuando se esté viendo la cámara. Habilita la grabación para que funcione todo el tiempo.</translation>
     </message>
-    <message>
-      <source>Camera stream</source>
-      <translation>Flujo de cámara</translation>
-    </message>
-    <message>
-      <source>Select video stream from the camera for analysis</source>
-      <translation>Seleccionar flujo de vídeo de la cámara para análisis</translation>
-    </message>
   </context>
   <context>
     <name>Box</name>
@@ -27,7 +19,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation>Haga clic para leer más</translation>
+      <translation type="unfinished">Click to read more</translation>
     </message>
   </context>
   <context>
@@ -98,11 +90,11 @@
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
-      <translation>Versión</translation>
+      <translation type="unfinished">Version</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Fabricante</translation>
+      <translation type="unfinished">Vendor</translation>
     </message>
   </context>
   <context>

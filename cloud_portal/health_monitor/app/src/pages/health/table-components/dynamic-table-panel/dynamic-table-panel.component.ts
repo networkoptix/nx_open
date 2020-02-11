@@ -1,57 +1,50 @@
 import {
     AfterViewInit,
-    Component, ElementRef, EventEmitter, Input, OnChanges,
-    Output, SimpleChanges, ViewChild
+    Component, ElementRef, EventEmitter, Input,
+    Output, ViewChild
 }                                   from '@angular/core';
 import { NxConfigService }          from '../../../../services/nx-config';
 import { NxHealthService }          from '../../health.service';
 import { NxScrollMechanicsService } from '../../../../services/scroll-mechanics.service';
+import { NxHealthLayoutService } from '../../health-layout.service';
 
 @Component({
     selector   : 'nx-dynamic-table-panel-component',
     templateUrl: './dynamic-table-panel.component.html',
     styleUrls  : ['./dynamic-table-panel.component.scss']
 })
-export class NxDynamicTablePanelComponent implements OnChanges, AfterViewInit {
+export class NxDynamicTablePanelComponent implements AfterViewInit {
 
     @Input() panelParams: any;
-    @Input() activeEntity: any;
     @Output() public onCloseView: EventEmitter<any> = new EventEmitter<any>();
-    // @Output() public onFeedbackClick: EventEmitter<any> = new EventEmitter<any>();
 
     CONFIG: any = {};
     name: string;
 
     windowSize: any = {};
-    windowScroll: any;
     clientHeight: number;
     offsetHeight: number;
     scrollHeight: number;
-    viewScrollFixedTop: boolean;
-    viewScrollFixedBottom: boolean;
-    elementWidth: any;
 
     @ViewChild('nxPanelView', { static: false }) nxPanelView: ElementRef;
 
     constructor(private configService: NxConfigService,
                 private healthService: NxHealthService,
                 private scrollMechanicsService: NxScrollMechanicsService,
+                private healthLayoutService: NxHealthLayoutService
     ) {
         this.CONFIG = this.configService.getConfig();
+        this.healthLayoutService.activeEntitySubject.subscribe((activeEntity: any) => {
+            this.name = activeEntity ? this.healthService.findEntityName(activeEntity) : '';
+        });
     }
 
     ngAfterViewInit() {
         this.scrollMechanicsService.panelVisible(true);
     }
 
-    ngOnChanges(changes: SimpleChanges) {
-        if (changes.activeEntity && changes.activeEntity.currentValue) {
-            this.name = this.healthService.findEntityName(changes.activeEntity.currentValue);
-        }
-    }
-
     closeView() {
-        this.activeEntity = undefined;
-        this.onCloseView.emit(this.activeEntity);
+        this.healthLayoutService.activeEntity = undefined;
+        this.onCloseView.emit(undefined);
     }
 }

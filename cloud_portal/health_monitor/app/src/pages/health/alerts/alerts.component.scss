@@ -61,6 +61,12 @@ nx-system-alerts-component {
         .gridMetricContent {
             display : flex;
 
+            .gridMetricContentPanelComponent {
+                width       : 30%;
+                min-width   : 350px;
+                margin-left : 1rem;
+            }
+
             &.fixedLayout {
                 &--with-panel {
                     .gridMetricContentComponent {
@@ -74,6 +80,7 @@ nx-system-alerts-component {
 
                     .gridMetricContentPanelComponent {
                         width : 30%;
+                        margin-left : 0;
 
                         @include media-breakpoint-down(lg) {
                             width : 100%;

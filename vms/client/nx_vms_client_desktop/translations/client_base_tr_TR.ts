@@ -3617,27 +3617,27 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Genel</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Özellikler</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>İzinli Ekranlar</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>İzin Verilen Oturumlar</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>İzin Verilen Arşiv Akışları</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Kalan Devre Dışılar</translation>
     </message>
   </context>
   <context>
@@ -3923,9 +3923,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>%n deaktivasyon kaldı.</numerusform>
+        <numerusform>%n deaktivasyon kaldı.</numerusform>
       </translation>
     </message>
   </context>
@@ -6874,7 +6874,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Lisansı Etkinleştir...</translation>
     </message>
   </context>
   <context>
@@ -7505,9 +7505,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n değer</numerusform>
+        <numerusform>+%n değer</numerusform>
       </translation>
     </message>
   </context>
@@ -9897,13 +9897,13 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Lisansın devre dışı bırakılması için lütfen aşağıdakileri tamamlayın</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Her lisans anahtarının en fazla %n kez devre dışı bırakılabileceğini unutmayın.</numerusform>
+        <numerusform>Her lisans anahtarının en fazla %n kez devre dışı bırakılabileceğini unutmayın.</numerusform>
       </translation>
     </message>
   </context>
