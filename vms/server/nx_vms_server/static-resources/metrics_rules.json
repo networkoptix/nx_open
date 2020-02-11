@@ -159,13 +159,13 @@
                         "alarms": [
                             {
                                 "level": "warning",
-                                "condition": "equal %logLevel debug",
-                                "text": "current logging level is %logLevel. Recommended logging level is info."
+                                "condition": "equal %logLevel Debug",
+                                "text": "current logging level is %logLevel. Recommended logging level is Info."
                             },
                             {
                                 "level": "warning",
-                                "condition": "equal %logLevel verbose",
-                                "text": "current logging level is %logLevel. Recommended logging level is info."
+                                "condition": "equal %logLevel Verbose",
+                                "text": "current logging level is %logLevel. Recommended logging level is Info."
                             }
                         ]
                     },
