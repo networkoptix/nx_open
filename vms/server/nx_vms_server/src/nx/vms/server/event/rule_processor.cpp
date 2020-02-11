@@ -300,24 +300,12 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
         return; //< Server doesn't exist anymore.
 
     if (cameraResources.isEmpty() && serverResources.isEmpty())
-    {
         doExecuteAction(action, QnResourcePtr());
-        return;
-    }
 
-    std::vector<QnResourcePtr> resources;
+    for (const auto& resource: cameraResources)
+        doExecuteAction(action, resource);
 
-    resources.insert(
-        resources.end(),
-        std::make_move_iterator(cameraResources.begin()),
-        std::make_move_iterator(cameraResources.end()));
-
-    resources.insert(
-        resources.end(),
-        std::make_move_iterator(serverResources.begin()),
-        std::make_move_iterator(serverResources.end()));
-
-    for (const auto& resource: resources)
+    for (const auto& resource: serverResources)
         doExecuteAction(action, resource);
 }
 

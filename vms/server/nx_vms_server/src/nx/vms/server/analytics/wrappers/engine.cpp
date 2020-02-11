@@ -189,7 +189,7 @@ Engine::ExecuteActionResult Engine::executeAction(Ptr<const IAction> action)
     const QString engineRef = engineResourcePtr
         ? lm("Engine %1 (%2)").args(engineResourcePtr->getName(), engineResourcePtr->getId())
         : "unknown Engine";
-    NX_INFO(this,
+    NX_DEBUG(this,
         "Executed Analytics Action %1 of %2 on Device %3: actionUrl %4, messageToUser %5.",
         action->actionId(),
         engineRef,

@@ -784,6 +784,8 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
 nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid engineId) const
 {
     const QString serializedProperty = getProperty(kAnalyzedStreamIndexes);
+    if (serializedProperty.isEmpty())
+        return kDefaultAnalyzedStreamIndex;
 
     bool success = false;
     const auto analyzedStreamIndexMap =
@@ -795,7 +797,6 @@ nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid en
             "%1 Unable to deserialize the analyzedStreamIndex map for the Device %2 (%3), "
             "\"%4\" property content: %5",
             __func__, getUserDefinedName(), getId(), kAnalyzedStreamIndexes, serializedProperty);
-
         return kDefaultAnalyzedStreamIndex;
     }
 
@@ -828,7 +829,7 @@ void QnVirtualCameraResource::setAnalyzedStreamIndex(
     auto analyzedStreamIndexMap = QJson::deserialized(
         serializedProperty.toUtf8(), AnalyzedStreamIndexMap());
 
-    if (!success)
+    if (!success && !serializedProperty.isEmpty())
     {
         NX_WARNING(this,
             "%1 Unable to deserialize the analyzedStreamIndex map for the Device %2 (%3), "

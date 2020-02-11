@@ -34,7 +34,6 @@ struct AnalyticsAction
 };
 #define AnalyticsAction_Fields (engineId)(actionId)(objectTrackId)(deviceId)(timestampUs)(params)
 
-// TODO: #dmishin: Rename to AvailableAnalyticsActionsOfEngine.
 struct AvailableAnalyticsActionsOfEngine
 {
     QnUuid engineId;

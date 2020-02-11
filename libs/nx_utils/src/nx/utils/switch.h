@@ -46,7 +46,7 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  * ```
  *  nx::utils::switch_(data.command(),
  *      "help", [] { printHelp(); },
- *      "save", [&] { save(data.argument()); },
+ *      "save", [&] { save(data.argument()); }
  *  );
  * ```
  * Equivalent of:

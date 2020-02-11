@@ -62,7 +62,8 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsByObject(
     {
         auto startTime = duration_cast<milliseconds>(microseconds(track.firstAppearanceTimeUs));
         auto endTime = duration_cast<milliseconds>(microseconds(track.lastAppearanceTimeUs));
-        result += QnTimePeriod(startTime.count(), endTime.count() - startTime.count());
+        if (endTime > startTime)
+            result += QnTimePeriod(startTime.count(), endTime.count() - startTime.count());
     }
 
     return QnTimePeriodList::aggregateTimePeriodsUnconstrained(
