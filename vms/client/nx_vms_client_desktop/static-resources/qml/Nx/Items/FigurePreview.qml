@@ -31,7 +31,7 @@ Item
         }
 
         if (!figure.color)
-            figure.color = ColorTheme.colors.roi1
+            figure.color = ColorTheme.colors.roi1.toString()
 
         if (figureType === "line")
             loader.source = "private/FigurePreview/Line.qml"
