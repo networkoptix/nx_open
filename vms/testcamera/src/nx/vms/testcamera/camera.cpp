@@ -19,7 +19,7 @@ using namespace std::literals::chrono_literals;
 
 namespace nx::vms::testcamera {
 
-static constexpr unsigned int kSendTimeoutMs = 1000;
+static constexpr unsigned int kSendTimeoutMs = 10000;
 
 static nx::utils::MacAddress makeMacAddress(int cameraNumber, const QString& macAddressPrefix)
 {
