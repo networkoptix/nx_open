@@ -78,7 +78,6 @@
         "emailSupportEmail": "Hỗ trợ Email",
         "enableEdgeRecording": "Cho phép ghi âm",
         "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "Chu kỳ đăng nhập sự kiện (ngày)",
         "ldapAdminDn": "LDAP quản trị DN",
         "ldapSearchBase": "Cơ sở tìm kiếm LDAP",

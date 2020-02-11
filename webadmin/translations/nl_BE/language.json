@@ -77,8 +77,7 @@
         "emailSignature": "Email handtekening",
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Edge opname inschakelen",
-        "webSocketEnabled": "WEB sockets inschakelen",
-        "maxP2pAllClientsSizeBytes": "Maximale buffergrootte om p2p-gegevens naar alle clients te verzenden",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Event log periode (dagen)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP-zoekbasis",
@@ -133,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "graphs": "Grafiek",
+            "graphs": "Graphs",
             "storage": "Opslagruimte",
             "log": "Log"
         }

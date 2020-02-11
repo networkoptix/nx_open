@@ -78,7 +78,6 @@
         "emailSupportEmail": "สนับสนุนอีเมล",
         "enableEdgeRecording": "เปิดใช้การบันทึกเสียงสนทนาหรือไม่",
         "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "ระยะเวลาบันทึกเหตุการณ์ (วัน)",
         "ldapAdminDn": "ผู้ดูแล LDAP DN",
         "ldapSearchBase": "ฐานการค้นหา LDAP",

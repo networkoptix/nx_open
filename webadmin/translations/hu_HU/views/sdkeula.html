@@ -1,21 +1,9 @@
 <div class="container">
     <ng-include src="'license.html'"></ng-include>
     <form role="form">
-        <div class="form-group">
-            <label class="checkbox">
-                <input type="checkbox"
-                       ng-model="agree">
-                <span class="checkmark">
-                            <svg viewbox="0 0 20 16">
-                                <polygon class="box" points="2.5,2.5 2.5,13.5 13.5,13.6 13.5,2.5"></polygon>
-                                <polyline class="box" points="12.5,2.5 2.5,2.5 2.5,13.5 13.5,13.6 13.5,8.5"></polyline>
-                                <polyline class="tick" points="5,7.5 8,10.5 15.5,3"></polyline>
-                                <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
-                            </svg>
-                        </span>
-                <span class="text">Yes, I accept the agreement</span>
-            </label>
-        </div>
+        <div class="checkbox">
+        <label><input type="checkbox" ng-model="agree">Igen, elfogadom a megállapodást</label>
+            </div>
         <button class="btn btn-default" ng-click="next()" ng-disabled="!agree">Következő</button>
     </form>
 </div>

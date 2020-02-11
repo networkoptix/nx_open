@@ -77,8 +77,7 @@
         "emailSignature": "Email-Signatur",
         "emailSupportEmail": "Email-Adresse Support",
         "enableEdgeRecording": "Edge-Aufzeichnung aktivieren",
-        "webSocketEnabled": "Aktivieren Sie WEB-Sockets",
-        "maxP2pAllClientsSizeBytes": "Maximale Puffergröße zum Senden von P2P-Daten an alle Clients",
+        "webSocketEnabled": "Enable WEB sockets",
         "eventLogPeriodDays": "Ereignisprotokollzeitraum (Tage)",
         "ldapAdminDn": "LDAP Admin-DN",
         "ldapSearchBase": "LDAP-Suchbasis",
@@ -133,7 +132,7 @@
     },
     "info": {
         "tabs": {
-            "graphs": "Graphen",
+            "graphs": "Graphs",
             "storage": "Speicher",
             "log": "Log"
         }

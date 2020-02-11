@@ -78,7 +78,6 @@
         "emailSupportEmail": "支援電子郵件",
         "enableEdgeRecording": "啟動斷線回補",
         "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "事件日誌天數 (天)",
         "ldapAdminDn": "LDAP 管理者 DN",
         "ldapSearchBase": "LDAP 搜尋庫",

@@ -3617,27 +3617,27 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation>Allgemein</translation>
+      <translation type="unfinished">Generic</translation>
+    </message>
+    <message>
+      <source>Deactivations Left</source>
+      <translation type="unfinished">Deactivations Left</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation>Features</translation>
+      <translation type="unfinished">Features</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation>Bildschirme erlaubt</translation>
+      <translation type="unfinished">Screens Allowed</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation>Kontrollsitzungen erlaubt</translation>
+      <translation type="unfinished">Control Sessions Allowed</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation>Archivstreams erlaubt</translation>
-    </message>
-    <message>
-      <source>Deactivations Remaining</source>
-      <translation>Verbleibende Deaktivierungen</translation>
+      <translation type="unfinished">Archive Streams Allowed</translation>
     </message>
   </context>
   <context>
@@ -3905,6 +3905,10 @@ to %1</source>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
       <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 auf %2 verbunden</translation>
     </message>
+    <message>
+      <source>Every license can be deactivated only a few times.</source>
+      <translation>Jede Lizenz kann nur ein paar Mal deaktiviert werden.</translation>
+    </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
@@ -3919,13 +3923,6 @@ to %1</source>
       <translation>
         <numerusform>Mindestens %1 ist erforderlich</numerusform>
         <numerusform>Mindestens %1 sind erforderlich</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n deactivations remaining.</source>
-      <translation>
-        <numerusform>%n Deaktivierung verbleibend.</numerusform>
-        <numerusform>%n Deaktivierungen verbleibend.</numerusform>
       </translation>
     </message>
   </context>
@@ -6875,7 +6872,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>Aktiviere Lizenz...</translation>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
@@ -7506,9 +7503,9 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation>
-        <numerusform>+%n Wert</numerusform>
-        <numerusform>+%n Werte</numerusform>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
       </translation>
     </message>
   </context>
@@ -9897,15 +9894,8 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Anderer Grund</translation>
     </message>
     <message>
-      <source>Please complete the following for license deactivation</source>
-      <translation>Bitte führen Sie die folgenden Schritte aus, um die Lizenz zu deaktivieren</translation>
-    </message>
-    <message numerus="yes">
-      <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation>
-        <numerusform>Beachten Sie, dass jeder Lizenzschlüssel maximal %n mal deaktiviert werden kann.</numerusform>
-        <numerusform>Beachten Sie, dass jeder Lizenzschlüssel maximal %n mal deaktiviert werden kann.</numerusform>
-      </translation>
+      <source>Please enter your contact information and the reason for deactivating your license</source>
+      <translation>Bitte geben Sie Ihre Kontaktdaten und den Grund für die Deaktivierung Ihrer Lizenz ein</translation>
     </message>
   </context>
   <context>

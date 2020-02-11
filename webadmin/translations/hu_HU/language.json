@@ -78,7 +78,6 @@
         "emailSupportEmail": "Ügyfélszolgálati e-mail",
         "enableEdgeRecording": "Edge rögzítés engedélyezése",
         "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "Eseménynapló időszak (nap)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP kereső bázis",

@@ -78,7 +78,6 @@
         "emailSupportEmail": "E-mail de suporte",
         "enableEdgeRecording": "Ativar gravação de borda",
         "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "Período do log de eventos (dias)",
         "ldapAdminDn": "DN de administrador LDAP",
         "ldapSearchBase": "Base de pesquisa LDAP",

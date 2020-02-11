@@ -7,14 +7,6 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Kameraanalys fungerar bara när kameran visas. Aktivera inspelning så att den fungerar hela tiden.</translation>
     </message>
-    <message>
-      <source>Camera stream</source>
-      <translation>Kameraström</translation>
-    </message>
-    <message>
-      <source>Select video stream from the camera for analysis</source>
-      <translation>Välj videoström från kameran för analys</translation>
-    </message>
   </context>
   <context>
     <name>Box</name>
@@ -27,7 +19,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation>Klicka för att läsa mer</translation>
+      <translation type="unfinished">Click to read more</translation>
     </message>
   </context>
   <context>
@@ -98,11 +90,11 @@
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
-      <translation>Version</translation>
+      <translation type="unfinished">Version</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Leverantör</translation>
+      <translation type="unfinished">Vendor</translation>
     </message>
   </context>
   <context>
