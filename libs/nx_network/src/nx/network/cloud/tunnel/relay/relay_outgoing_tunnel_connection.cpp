@@ -80,6 +80,7 @@ void OutgoingTunnelConnection::establishNewConnection(
                 relayClient = nx::cloud::relay::api::ClientFactory::instance().create(m_relayUrl);
 
             relayClient->bindToAioThread(getAioThread());
+            relayClient->setTimeout(timeout);
             relayClient->openConnectionToTheTargetHost(
                 m_relaySessionId,
                 std::bind(&OutgoingTunnelConnection::onConnectionOpened, this,
