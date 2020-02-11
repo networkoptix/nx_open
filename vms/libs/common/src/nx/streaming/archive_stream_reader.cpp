@@ -795,7 +795,7 @@ begin_label:
                 }
             }
 
-            if (m_nextData && m_accurateSeek)
+            if (m_nextData)
             {
                 if (m_nextData->flags & QnAbstractMediaData::MediaFlags_LIVE)
                     setSkipFramesToTime(0, true);

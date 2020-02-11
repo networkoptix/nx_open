@@ -555,8 +555,7 @@ void ProgressiveDownloadingServer::run()
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (
             d->serverModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
         d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
-        d->archiveDP->jumpTo(timeUSec, timeUSec);
-        d->archiveDP->setAccurateSeek(accurateSeek);
+        d->archiveDP->jumpTo(timeUSec, accurateSeek ? timeUSec : 0);
 
         if (auto mediaEvent = d->archiveDP->lastError().toMediaStreamEvent())
         {
