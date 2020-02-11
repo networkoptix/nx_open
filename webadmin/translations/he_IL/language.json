@@ -78,7 +78,6 @@
         "emailSupportEmail": "דוא\"ל תמיכה",
         "enableEdgeRecording": "אפשר הקלטות edge",
         "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "תקופת יומן האירועים (ימים)",
         "ldapAdminDn": "מנהל LDAP DN",
         "ldapSearchBase": "בסיס חיפוש LDAP",
