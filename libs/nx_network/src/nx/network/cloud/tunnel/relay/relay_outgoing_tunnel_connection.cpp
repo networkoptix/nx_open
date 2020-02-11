@@ -3,7 +3,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "api/relay_api_client_factory.h"
+#include "api/detail/relay_api_client_factory.h"
 #include "../../protocol_type.h"
 
 namespace nx {
