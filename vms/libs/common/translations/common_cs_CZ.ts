@@ -877,7 +877,7 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Kamera</numerusform>
         <numerusform>%n Kamera</numerusform>
         <numerusform>%n Kamera</numerusform>
@@ -886,7 +886,7 @@
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kamera</numerusform>
         <numerusform>%n kamera</numerusform>
         <numerusform>%n kamera</numerusform>

@@ -18,17 +18,20 @@
                title="{{server.ipFull}}"
                ng-click="toggleServerCollapsed(server)"
                class="server-link collapse-group"
-               ng-class="{offline:server.status!='Online'}"><div class="pull-right"><span><icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-up" title-true="згорнути" ></icon>
-                        <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="розгорнути" ></icon>
+               ng-class="{offline:server.status!='Online'}">
+                <div class="pull-right">
+                    <span>
+                        <icon for="!server.collapsed && cameras[server.id].length> 0 "on-true =" chevron-up "title-true ="згорнути"> </icon>
+                        <icon for="server.collapsed && cameras[server.id].length> 0 "on-true =" chevron-down "title-true ="розгорнути"> </icon>
                     </span>
                 </div>
                 <div class="hide-excess-text">
                     <span ng-if="server.active"
-                          class="glyphicon glyphicon-server-active"></span>
+                          class="glyphicon glyphicon-server-active"> </span>
                     <span ng-if="server.status == 'Online' && !server.active"
-                          class="glyphicon glyphicon-server-online"></span>
+                          class="glyphicon glyphicon-server-online"> </span>
                     <span ng-if="server.status != 'Online' && !server.active"
-                          class="glyphicon glyphicon-server-offline"></span>
+                          class="glyphicon glyphicon-server-offline"> </span>
                     <span class="server-name">&nbsp; {{server.name}}</span>
                     <small ng-if="toggleInfo">
                         &nbsp;{{server.ip}}

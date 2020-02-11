@@ -1191,7 +1191,7 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Движение на камере</numerusform>
         <numerusform>Движение на камерах</numerusform>
         <numerusform>Движение на камерах</numerusform>

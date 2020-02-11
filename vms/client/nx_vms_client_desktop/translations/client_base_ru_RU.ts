@@ -1670,7 +1670,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Этот пользователь был удален из системы</numerusform>
         <numerusform>Эти пользователи были удалены из системы</numerusform>
         <numerusform>Эти пользователи были удалены из системы</numerusform>
@@ -1679,7 +1679,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Этот ресурс был удален из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
@@ -1940,7 +1940,7 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>У вас %n оповещение</numerusform>
         <numerusform>У вас %n оповещения</numerusform>
         <numerusform>У вас %n оповещений</numerusform>
@@ -2002,7 +2002,7 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 из %n устройств</numerusform>
         <numerusform>%1 из %n устройств</numerusform>
         <numerusform>%1 из %n устройств</numerusform>
@@ -2011,7 +2011,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 из %n камер</numerusform>
         <numerusform>%1 из %n камер</numerusform>
         <numerusform>%1 из %n камер</numerusform>
@@ -2028,7 +2028,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
@@ -2087,7 +2087,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Исходная камера и ещё %n камера</numerusform>
         <numerusform>Исходная камера и ещё %n камеры</numerusform>
         <numerusform>Исходная камера и ещё %n камер</numerusform>
@@ -2270,7 +2270,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 не поддерживает двусторонний звук</numerusform>
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
@@ -2360,7 +2360,7 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 не имеет тревожных входов</numerusform>
         <numerusform>%1 не имеют тревожных входов</numerusform>
         <numerusform>%1 не имеют тревожных входов</numerusform>
@@ -2392,7 +2392,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Найдено %n устройство</numerusform>
         <numerusform>Найдено %n устройства</numerusform>
         <numerusform>Найдено %n устройств</numerusform>
@@ -2401,7 +2401,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Найдено %n камера</numerusform>
         <numerusform>Найдено %n камеры</numerusform>
         <numerusform>Найдено %n камер</numerusform>
@@ -2418,7 +2418,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Найдено %n модуль ввода-вывода</numerusform>
         <numerusform>Найдено %n модуля ввода-вывода</numerusform>
         <numerusform>Найдено %n модулей ввода-вывода</numerusform>
@@ -2501,7 +2501,7 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 не имеет тревожных выходов</numerusform>
         <numerusform>%1 не имеют тревожных выходов</numerusform>
         <numerusform>%1 не имеют тревожных выходов</numerusform>
@@ -5236,7 +5236,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
         <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
         <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
@@ -5249,7 +5249,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
         <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
         <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
@@ -7343,7 +7343,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемент?</numerusform>
@@ -7520,7 +7520,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n user</numerusform>
         <numerusform>%n пользователя</numerusform>
         <numerusform>%n пользователей</numerusform>
@@ -8207,7 +8207,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Не удалось добавить %n устройство</numerusform>
         <numerusform>Не удалось добавить %n устройства</numerusform>
         <numerusform>Не удалось добавить %n устройств</numerusform>
@@ -10034,7 +10034,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Failed to move %n device</numerusform>
         <numerusform>Не удалось переместить %n устройства</numerusform>
         <numerusform>Не удалось переместить %n устройств</numerusform>
@@ -10043,7 +10043,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Failed to move %n camera</numerusform>
         <numerusform>Не удалось переместить %n камеры</numerusform>
         <numerusform>Не удалось переместить %n камер</numerusform>
@@ -10052,7 +10052,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Failed to move %n I/O Module</numerusform>
         <numerusform>Не удалось переместить %n модуля ввода-вывода</numerusform>
         <numerusform>Не удалось переместить %n модулей ввода-вывода</numerusform>
@@ -10065,7 +10065,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
@@ -10074,7 +10074,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
@@ -10083,7 +10083,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
