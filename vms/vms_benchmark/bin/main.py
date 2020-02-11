@@ -1058,7 +1058,7 @@ def main(conf_file, ini_file, log_file):
         filename=log_file,
         filemode='w',
         level=logging.DEBUG,
-        format='%(asctime)s %(message)s',
+        format='%(asctime)s.%(msecs)03d %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     report(f"VMS Benchmark (version: {vms_version()}) started; logging to {log_file_ref}.")
