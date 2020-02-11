@@ -993,7 +993,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>鎖定</translation>
     </message>
   </context>
   <context>
@@ -3593,19 +3593,19 @@ to %1</source>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>允許投放畫面數</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>允許控制連線數</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>允許錄影總數</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>允許重置次數</translation>
     </message>
   </context>
   <context>
@@ -5744,11 +5744,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>光碟</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>swap磁區</translation>
     </message>
     <message>
       <source>network</source>

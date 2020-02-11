@@ -7,6 +7,14 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Camera-analyse werkt alleen als de camera wordt bekeken. Schakel opnemen in om het altijd te laten werken.</translation>
     </message>
+    <message>
+      <source>Camera stream</source>
+      <translation>Camera stream</translation>
+    </message>
+    <message>
+      <source>Select video stream from the camera for analysis</source>
+      <translation>Selecteer videostream van de camera voor analyse</translation>
+    </message>
   </context>
   <context>
     <name>Box</name>
@@ -19,7 +27,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>Klik om meer te lezen</translation>
     </message>
   </context>
   <context>
@@ -90,11 +98,11 @@
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versie</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Fabrikant</translation>
     </message>
   </context>
   <context>

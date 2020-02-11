@@ -183,12 +183,20 @@
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" ng-model="apiMethod.addCredentials"> 認証
-                </label>
-                <p class="help-block">Urlにログインとパスワードを追加する</p>
-            </div>
+            <label class="checkbox">
+                <input type="checkbox"
+                       ng-model="apiMethod.addCredentials">
+                <span class="checkmark">
+                            <svg viewbox="0 0 20 16">
+                                <polygon class="box" points="2.5,2.5 2.5,13.5 13.5,13.6 13.5,2.5"></polygon>
+                                <polyline class="box" points="12.5,2.5 2.5,2.5 2.5,13.5 13.5,13.6 13.5,8.5"></polyline>
+                                <polyline class="tick" points="5,7.5 8,10.5 15.5,3"></polyline>
+                                <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
+                            </svg>
+                        </span>
+                <span class="text">Use credentials</span>
+            </label>
+            <p class="help-block">Urlにログインとパスワードを追加する</p>
         </div>
     </div>
 
@@ -234,10 +242,10 @@
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
-                    ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
-                    class="btn btn-primary" ng-click="testMethod()">テスト</button>
+                    ng-if="userAuthenticated && (apiMethod.method=='GET' || apiMethod.method=='POST')"
+                    class="btn btn-primary" ng-click="testMethod()">Test method</button>
             <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
-               ng-href="{{getDebugUrl()}}" target="_blank">新規タブで開く</a>
+               ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
         </div>
     </div>
 
