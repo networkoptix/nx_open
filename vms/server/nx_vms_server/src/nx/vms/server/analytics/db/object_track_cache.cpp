@@ -217,6 +217,8 @@ void ObjectTrackCache::updateObject(
 
     if (trackContext.track.objectTypeId.isEmpty())
         trackContext.track.objectTypeId = objectMetadata.typeId;
+    trackContext.track.lastAppearanceTimeUs = 
+        std::max(trackContext.track.lastAppearanceTimeUs, packet.timestampUs);
 
     auto assignBestShotFromPacket =
         [](auto& track, const auto& packet, const auto& boundingBox)
@@ -253,8 +255,6 @@ void ObjectTrackCache::updateObject(
             trackContext.roughBestShot = false; //< Do not auto reassign any more.
         }
     }
-
-    trackContext.track.lastAppearanceTimeUs = packet.timestampUs;
 
     addNewAttributes(objectMetadata.attributes, &trackContext);
 
