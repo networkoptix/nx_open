@@ -5701,11 +5701,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>光碟</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>swap磁區</translation>
     </message>
     <message>
       <source>network</source>

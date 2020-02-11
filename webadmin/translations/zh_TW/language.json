@@ -114,7 +114,7 @@
         "primaryTimeServer": "將主時間同步校時伺服器",
         "osTimeChangeCheckPeriodMs": "作業系統時間變更檢查期",
         "syncTimeExchangePeriod": "交換同步時間週期",
-        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
+        "maxWearableArchiveSynchronizationThreads": "穿戴式攝影機錄影資料同時最大單次上傳量",
         "updateNotificationsEnabled": "更新通知啟動",
         "upnpPortMappingEnabled": "啟用 UPNP 埠映射",
         "useTextEmailFormat": "發送純文字電子郵件",
