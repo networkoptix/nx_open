@@ -43,8 +43,7 @@ public:
 
     QnMulticodecRtpReader(
         const QnResourcePtr& resource,
-        const nx::streaming::rtp::TimeOffsetPtr& timeOffset,
-        std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
+        const nx::streaming::rtp::TimeOffsetPtr& timeOffset);
     virtual ~QnMulticodecRtpReader();
 
     /** Implementation of QnAbstractMediaStreamProvider::getNextData. */

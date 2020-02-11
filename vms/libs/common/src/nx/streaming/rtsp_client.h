@@ -152,10 +152,29 @@ public:
         QPair<int, int> interleaved{ -1, -1 };
         std::shared_ptr<QnRtspIoDevice> ioDevice;
     };
-    QnRtspClient(const Config& config,
-        std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
+    QnRtspClient(const Config& config);
 
     ~QnRtspClient();
+
+
+    /**
+     * Shutdown TCP socket and terminate current IO operation. Can be called from the other thread.
+     * Thread safe. Can be called from another thread.
+     */
+    void shutdown();
+
+    /**
+     * @return true if RTSP connection is opened
+     * Thread safe. Can be called from another thread.
+     */
+    bool isOpened() const;
+
+    /**
+     * Set TCP time on RTSP connection.
+     * Thread safe. Can be called from another thread.
+     */
+    void setTCPTimeout(std::chrono::milliseconds timeout);
+
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
     CameraDiagnostics::Result open(const nx::utils::Url& url, qint64 startTime = AV_NOPTS_VALUE);
@@ -170,12 +189,6 @@ public:
 
     // returns true if there is no error delivering STOP
     bool stop();
-
-    /** Shutdown TCP socket and terminate current IO operation. Can be called from the other thread */
-    void shutdown();
-
-    // returns true if session is opened
-    bool isOpened() const;
 
     // session timeout in ms
     unsigned int sessionTimeoutMs();
@@ -217,7 +230,6 @@ public:
     void setAdditionAttribute(const QByteArray& name, const QByteArray& value);
     void removeAdditionAttribute(const QByteArray& name);
 
-    void setTCPTimeout(std::chrono::milliseconds timeout);
     std::chrono::milliseconds getTCPTimeout() const;
 
     void parseRangeHeader(const QString& rangeStr);

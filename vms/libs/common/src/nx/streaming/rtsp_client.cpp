@@ -220,7 +220,8 @@ void QnRtspIoDevice::updateSockets()
     {
         m_mediaSocket.reset();
         m_rtcpSocket.reset();
-        m_owner->m_tcpSock->setRecvBufferSize(kSocketBufferSize);
+        if (m_owner->m_tcpSock)
+            m_owner->m_tcpSock->setRecvBufferSize(kSocketBufferSize);
         return;
     }
 
@@ -276,8 +277,7 @@ static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
 // QnRtspClient
 
 QnRtspClient::QnRtspClient(
-    const Config& config,
-    std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock)
+    const Config& config)
     :
     m_config(config),
     m_csec(2),
@@ -289,16 +289,12 @@ QnRtspClient::QnRtspClient(
     m_scale(1.0),
     m_tcpTimeout(10 * 1000),
     m_isAudioEnabled(true),
-    m_tcpSock(std::move(tcpSock)),
     m_rtspAuthCtx(config.shouldGuessAuthDigest),
     m_userAgent(nx::network::http::userAgentString()),
     m_defaultAuthScheme(nx::network::http::header::AuthScheme::basic)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
-
-    if( !m_tcpSock )
-        m_tcpSock = nx::network::SocketFactory::createStreamSocket();
 }
 
 QnRtspClient::~QnRtspClient()
@@ -411,10 +407,8 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     else
         return CameraDiagnostics::UnsupportedProtocolResult(m_url, m_url.scheme());
 
-    std::unique_ptr<nx::network::AbstractStreamSocket> previousSocketHolder;
     {
         QnMutexLocker lock(&m_socketMutex);
-        previousSocketHolder = std::move(m_tcpSock);
         m_tcpSock = nx::network::SocketFactory::createStreamSocket(isSslRequired);
     }
 
@@ -428,8 +422,6 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
 
     if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
-
-    previousSocketHolder.reset(); //< Reset old socket after taking new one to guarantee new TCP port.
 
     m_tcpSock->setNoDelay(true);
     m_tcpSock->setRecvTimeout(m_tcpTimeout);
@@ -512,20 +504,21 @@ bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
 bool QnRtspClient::stop()
 {
     QnMutexLocker lock(&m_socketMutex);
-    m_tcpSock->close();
+    m_tcpSock.reset();
     return true;
 }
 
 void QnRtspClient::shutdown()
 {
     QnMutexLocker lock(&m_socketMutex);
-    m_tcpSock->shutdown();
+    if (m_tcpSock)
+        m_tcpSock->shutdown();
 }
 
 bool QnRtspClient::isOpened() const
 {
     QnMutexLocker lock(&m_socketMutex);
-    return m_tcpSock->isConnected();
+    return m_tcpSock && m_tcpSock->isConnected();
 }
 
 unsigned int QnRtspClient::sessionTimeoutMs()
@@ -585,6 +578,9 @@ nx::network::http::Request QnRtspClient::createDescribeRequest()
 
 bool QnRtspClient::sendRequestInternal(nx::network::http::Request&& request)
 {
+    if (!m_tcpSock)
+        return false;
+
     addAuth(&request);
     addAdditionAttrs(&request);
     QByteArray requestBuf;
@@ -637,6 +633,10 @@ void QnRtspClient::registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex)
 
 bool QnRtspClient::sendSetup()
 {
+    if (!m_tcpSock)
+        return false;
+    const QString localAddress = m_tcpSock->getLocalAddress().address.toString();
+
     using namespace nx::streaming;
 	
     if (m_sdpTracks.empty())
@@ -699,7 +699,7 @@ bool QnRtspClient::sendSetup()
             if (m_actualTransport == nx::vms::api::RtpTransportType::multicast)
             {
                 track.ioDevice->bindToMulticastAddress(track.sdpMedia.connectionAddress,
-                    m_tcpSock->getLocalAddress().address.toString());
+                    localAddress);
             }
 
             if (m_actualTransport != nx::vms::api::RtpTransportType::tcp)
@@ -816,7 +816,7 @@ bool QnRtspClient::sendSetup()
                             ports.mediaPort, ports.rtcpPort);
 
                         track.ioDevice->bindToMulticastAddress(track.sdpMedia.connectionAddress,
-                            m_tcpSock->getLocalAddress().address.toString());
+                            localAddress);
                     }
                 }
             }
@@ -1013,12 +1013,15 @@ bool QnRtspClient::sendKeepAlive()
 
 void QnRtspClient::sendBynaryResponse(const quint8* buffer, int size)
 {
-    m_tcpSock->send(buffer, size);
+    if (m_tcpSock)
+        m_tcpSock->send(buffer, size);
 }
 
 bool QnRtspClient::processTextResponseInsideBinData()
 {
     // have text response or part of text response.
+    if (!m_tcpSock)
+        return false;
     int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
     if (bytesRead <= 0)
         return false;
@@ -1057,6 +1060,8 @@ bool QnRtspClient::processTextResponseInsideBinData()
 
 int QnRtspClient::readBinaryResponse(quint8* data, int maxDataSize)
 {
+    if (!m_tcpSock)
+        return 0;
     while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
@@ -1106,6 +1111,8 @@ quint8* QnRtspClient::prepareDemuxedData(std::vector<QnByteArray*>& demuxedData,
 
 int QnRtspClient::readBinaryResponse(std::vector<QnByteArray*>& demuxedData, int& channelNumber)
 {
+    if (!m_tcpSock)
+        return 0;
     while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
@@ -1168,6 +1175,8 @@ bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)
 // demux text data only
 bool QnRtspClient::readTextResponse(QByteArray& response)
 {
+    if (!m_tcpSock)
+        return false;
     int ignoreDataSize = 0;
     bool needMoreData = m_responseBufferLen == 0;
     for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock->isConnected(); ++i)
@@ -1341,6 +1350,7 @@ void QnRtspClient::removeAdditionAttribute(const QByteArray& name)
 void QnRtspClient::setTCPTimeout(std::chrono::milliseconds timeout)
 {
     m_tcpTimeout = timeout;
+    QnMutexLocker lock(&m_socketMutex);
     if (m_tcpSock)
     {
         m_tcpSock->setRecvTimeout(m_tcpTimeout);
@@ -1444,6 +1454,10 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
 
     NX_VERBOSE(this, "Send: %1", request.requestLine.toString());
     const int port = m_url.port(DEFAULT_RTP_PORT);
+
+    if (!m_tcpSock)
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_url.host(), port);
+
     for( int i = 0; i < 3; ++i )    //needed to avoid infinite loop in case of incorrect server behavour
     {
         QByteArray requestBuf;
@@ -1516,6 +1530,7 @@ const std::vector<QnRtspClient::SDPTrackInfo>& QnRtspClient::getTrackInfo() cons
 
 nx::network::AbstractStreamSocket* QnRtspClient::tcpSock()
 {
+    QnMutexLocker lock(&m_socketMutex);
     return m_tcpSock.get();
 }
 

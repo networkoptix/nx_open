@@ -92,11 +92,10 @@ nx::vms::api::RtpTransportType QnMulticodecRtpReader::s_defaultTransportToUse =
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(
     const QnResourcePtr& res,
-    const nx::streaming::rtp::TimeOffsetPtr& timeOffset,
-    std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock)
+    const nx::streaming::rtp::TimeOffsetPtr& timeOffset)
 :
     QnResourceConsumer(res),
-    m_RtpSession(QnRtspClient::Config(), std::move(tcpSock)),
+    m_RtpSession(QnRtspClient::Config()),
     m_timeHelper(res->getUniqueId().toStdString(), timeOffset),
     m_pleaseStop(false),
     m_gotSomeFrame(false),
