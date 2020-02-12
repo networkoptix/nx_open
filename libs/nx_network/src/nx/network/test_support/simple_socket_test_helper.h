@@ -223,44 +223,6 @@ std::unique_ptr<SyncSocketServer<Socket>> syncSocketServer(Socket socket, Args .
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-void socketTransferSync(
-    const ServerSocketMaker& serverMaker,
-    const ClientSocketMaker& clientMaker,
-    boost::optional<SocketAddress> endpointToConnectTo = boost::none,
-    const QByteArray& testMessage = kTestMessage)
-{
-    const auto syncServer = syncSocketServer(serverMaker());
-    auto serverAddress = syncServer->start();
-    if (!endpointToConnectTo)
-        endpointToConnectTo = std::move(serverAddress);
-
-    nx::utils::thread clientThread(
-        [endpointToConnectTo, &testMessage, &clientMaker]()
-        {
-            const auto clientCount = 1/*testClientCount()*/;
-            for (size_t i = 0; i != clientCount; ++i)
-            {
-                auto client = clientMaker();
-                ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout))
-                    << i << ": " << SystemError::getLastOSErrorText().toStdString();
-
-                ASSERT_EQ(
-                    testMessage.size(),
-                    client->send(testMessage.constData(), testMessage.size())) << SystemError::getLastOSErrorText().toStdString();
-
-                const auto incomingMessage = readNBytes(
-                    client.get(), testMessage.size());
-
-                ASSERT_TRUE(!incomingMessage.isEmpty()) << i << ": " << SystemError::getLastOSErrorText().toStdString();
-                ASSERT_EQ(testMessage, incomingMessage);
-                client.reset();
-            }
-        });
-
-    clientThread.join();
-}
-
-template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketTransferSyncFlags(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
@@ -1042,8 +1004,6 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::serverSocketPleaseStopCancelsPostedCall(mkServer); } \
 
 #define NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
-    Type(Name, TransferSync) \
-        { nx::network::test::socketTransferSync(mkServer, mkClient, endpointToConnectTo); } \
     Type(Name, TransferSyncFlags) \
         { nx::network::test::socketTransferSyncFlags(mkServer, mkClient, endpointToConnectTo); } \
     Type(Name, TransferSyncAsyncSwitch) \
