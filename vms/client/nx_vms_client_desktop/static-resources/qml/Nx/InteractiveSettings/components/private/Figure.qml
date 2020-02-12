@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.6
 import QtGraphicalEffects 1.0
 
 import Nx 1.0
@@ -40,6 +40,10 @@ LabeledItem
 
             Item
             {
+                id: figureBlock
+
+                activeFocusOnTab: true
+
                 readonly property size implicitSize:
                 {
                     const rotated = Geometry.isRotated90(videoPositioner.videoRotation)
@@ -187,9 +191,28 @@ LabeledItem
                 MouseArea
                 {
                     id: mouseArea
+
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: openEditDialog()
+                }
+
+                Rectangle
+                {
+                    id: focusMarker
+
+                    anchors.fill: parent
+                    radius: background.radius
+                    visible: figureBlock.activeFocus
+                    color: "transparent"
+                    border.color: ColorTheme.transparent(ColorTheme.highlight, 0.5)
+                    border.width: 1
+                }
+
+                Keys.onPressed:
+                {
+                    if (event.key == Qt.Key_Space)
+                        openEditDialog()
                 }
             }
 
