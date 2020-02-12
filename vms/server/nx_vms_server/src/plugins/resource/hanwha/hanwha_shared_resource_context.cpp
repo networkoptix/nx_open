@@ -22,6 +22,7 @@ static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::seconds kCacheDataTimeout(30);
 static const QString kObsoleteInterfaceParameter = lit("Network1");
 static const std::chrono::milliseconds kPositionAggregationTimeout(1000);
+static const std::chrono::seconds kAlarmInputInitializationTimeout(30);
 
 static nx::utils::Url cleanUrl(nx::utils::Url url)
 {
@@ -400,6 +401,45 @@ void HanwhaSharedResourceContext::setTimeShift(std::chrono::milliseconds value)
 void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings)
 {
     m_chunkLoaderSettings = settings;
+}
+
+void HanwhaSharedResourceContext::initializeAlarmInputs()
+{
+    {
+        NX_MUTEX_LOCKER lock(&m_dataMutex);
+        if (m_alarmInputInitializationTimer.isValid()
+            && !m_alarmInputInitializationTimer.hasExpired(kAlarmInputInitializationTimeout))
+        {
+            return;
+        }
+
+        m_alarmInputInitializationTimer.restart();
+    }
+
+    nx::utils::ScopeGuard timerGuard = nx::utils::makeScopeGuard(
+        [this]()
+        {
+            NX_MUTEX_LOCKER lock(&m_dataMutex);
+            m_alarmInputInitializationTimer.invalidate();
+        });
+
+    HanwhaRequestHelper helper(shared_from_this());
+    const HanwhaResponse viewResponse = helper.view("eventsources/alarminput");
+
+    if (!viewResponse.isSuccessful())
+        return;
+
+    std::map<QString, QString> alarmInputParameters = viewResponse.response();
+    for (auto& [parameterName, parameterValue]: alarmInputParameters)
+    {
+        if (parameterName.endsWith("Enabled"))
+            parameterValue = kHanwhaTrue;
+    }
+
+    const HanwhaResponse setResponse = helper.set("eventsources/alarminput", alarmInputParameters);
+
+    if (setResponse.isSuccessful())
+        timerGuard.disarm();
 }
 
 HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()

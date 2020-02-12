@@ -1368,10 +1368,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
             ioPorts.push_back(inputPortData);
         }
 
-        HanwhaRequestHelper helper(sharedContext());
-        helper.set(
-            "eventsources/alarminput",
-            {{lm("AlarmInput.%1.Enable").args(getChannel() + 1), kHanwhaTrue}});
+        sharedContext()->initializeAlarmInputs();
     }
 
     if (maxAlarmOutputs.is_initialized() && *maxAlarmOutputs > 0)

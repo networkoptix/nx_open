@@ -162,6 +162,8 @@ public:
 
     void setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings);
 
+    void initializeAlarmInputs();
+
     // NOTE: function objects return HanwhaResult<T>.
     HanwhaCachedData<HanwhaInformation> information;
     HanwhaCachedData<HanwhaResponse> eventStatuses;
@@ -193,6 +195,7 @@ private:
     QAuthenticator m_resourceAuthenticator;
     nx::utils::Url m_lastSuccessfulUrl;
     nx::utils::ElapsedTimer m_lastSuccessfulUrlTimer;
+    nx::utils::ElapsedTimer m_alarmInputInitializationTimer;
 
     mutable QnMutex m_sessionMutex;
 
