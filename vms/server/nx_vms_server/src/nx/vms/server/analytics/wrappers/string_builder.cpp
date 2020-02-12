@@ -19,8 +19,6 @@ static QString toHumanReadableString(ViolationType violation)
 {
     switch (violation)
     {
-        case ViolationType::internalViolation:
-            return "internal violation";
         case ViolationType::nullManifest:
             return "Manifest is null";
         case ViolationType::nullManifestString:

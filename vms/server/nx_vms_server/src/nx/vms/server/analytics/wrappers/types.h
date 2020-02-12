@@ -61,7 +61,6 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SdkMethod);
 enum class ViolationType
 {
     undefined,
-    internalViolation,
     nullManifest,
     nullManifestString,
     emptyManifestString,

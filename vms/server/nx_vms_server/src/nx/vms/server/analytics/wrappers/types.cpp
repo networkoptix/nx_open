@@ -29,9 +29,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::analytics::wrappers, 
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::analytics::wrappers, ViolationType,
     (nx::vms::server::analytics::wrappers::ViolationType::undefined, "undefined")
-    (
-        nx::vms::server::analytics::wrappers::ViolationType::internalViolation,
-        "internalViolation")
     (nx::vms::server::analytics::wrappers::ViolationType::nullManifest, "nullManifest")
     (
         nx::vms::server::analytics::wrappers::ViolationType::nullManifestString,

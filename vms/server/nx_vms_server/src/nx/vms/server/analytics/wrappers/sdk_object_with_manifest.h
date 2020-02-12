@@ -68,6 +68,14 @@ public:
                         SdkMethod::manifest, sdkObjectDescription(), error);
                 }
                 handleError(SdkMethod::manifest, error, /*returnValue*/ nullptr);
+            },
+            [this, outStringBuilder](const QString& errorMessage) //< InternalErrorHandler
+            {
+                const QString caption = "Internal Error in Server while obtaining manifest of "
+                    + sdkObjectDescription().descriptionString();
+                const QString description =
+                    errorMessage + " Additional details may be available in the Server log.";
+                throwPluginEvent(caption, description);
             });
 
         return manifestProcessor.manifest(m_mainSdkObject);
