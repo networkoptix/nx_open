@@ -735,11 +735,13 @@ TEST_F(CloudServerSocket, serverChecksConnectionState)
     }
 
     // After some time server is supposed to detect an error and restore listening state.
-    std::this_thread::sleep_for(kKeepAliveOptions.maxDelay() * 2);
+    for (;;)
     {
         const auto peer = peerPool->findAndLockPeerDataByHostName(server->fullName());
-        ASSERT_TRUE((bool) peer);
-        ASSERT_TRUE(peer->value().isListening);
+        if (peer && peer->value().isListening)
+            break;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 

@@ -42,7 +42,10 @@ protected:
     api::Client& relayClient()
     {
         if (!m_relayClient)
+        {
             m_relayClient = api::ClientFactory::instance().create(relay().basicUrl());
+            m_relayClient->setTimeout(nx::network::kNoTimeout);
+        }
         return *m_relayClient;
     }
 
@@ -262,6 +265,7 @@ protected:
             nx::network::url::Builder(relay().basicUrl())
                 .setPath(api::kRelayStatisticsMetricsPath).toUrl(),
             nx::network::http::AuthInfo());
+        m_httpClient->setRequestTimeout(nx::network::kNoTimeout);
         m_httpClient->execute(
             std::bind(&HttpApiStatistics::saveStatisticsRequestResult, this, _1, _2, _3));
     }
