@@ -14,7 +14,11 @@ Control
     property bool checkable: true
     property bool checked: false
 
-    signal clicked()
+    property alias streamSelectorVisible: streamSelection.visible
+    property alias streamSelectorEnabled: streamSelection.enabled
+    property alias currentStreamIndex: streamComboBox.currentIndex
+
+    signal enableSwitchClicked()
 
     padding: 12
 
@@ -23,65 +27,69 @@ Control
     contentItem: ColumnLayout
     {
         id: column
-        spacing: 0
+        spacing: 16
 
         clip: true
 
-        RowLayout
+        Column
         {
-            id: caption
             spacing: 8
+            Layout.fillWidth: true
+
+            RowLayout
+            {
+                id: caption
+
+                width: parent.width
+                spacing: 8
+
+                Text
+                {
+                    id: name
+
+                    text: engineInfo ? engineInfo.name : ""
+                    color: ColorTheme.text
+                    font.pixelSize: 15
+                    font.weight: Font.Medium
+                    elide: Text.ElideRight
+                    Layout.fillWidth: true
+                }
+
+                SwitchIcon
+                {
+                    id: enableSwitch
+
+                    visible: informationPanel.checkable
+                    hovered: mouseArea.containsMouse && !mouseArea.containsPress
+                    checkState: informationPanel.checked ? Qt.Checked : Qt.Unchecked
+
+                    MouseArea
+                    {
+                        id: mouseArea
+
+                        anchors.fill: parent
+                        acceptedButtons: Qt.LeftButton
+                        hoverEnabled: true
+
+                        onClicked:
+                            informationPanel.enableSwitchClicked()
+                    }
+                }
+            }
 
             Text
             {
-                id: name
+                id: description
 
-                text: engineInfo ? engineInfo.name : ""
-                color: ColorTheme.text
-                font.pixelSize: 15
-                font.weight: Font.Medium
-                elide: Text.ElideRight
-                Layout.fillWidth: true
-            }
-
-            SwitchIcon
-            {
-                id: enableSwitch
-
-                visible: informationPanel.checkable
-                hovered: mouseArea.containsMouse && !mouseArea.containsPress
-                checkState: informationPanel.checked ? Qt.Checked : Qt.Unchecked
-
-                MouseArea
-                {
-                    id: mouseArea
-                    anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton
-                    hoverEnabled: true
-                    onClicked: informationPanel.clicked()
-                }
+                text: engineInfo ? engineInfo.description : ""
+                color: ColorTheme.windowText
+                width: parent.width
+                visible: !!text
+                wrapMode: Text.Wrap
             }
         }
 
-        Text
-        {
-            id: description
-            text: engineInfo ? engineInfo.description : ""
-            color: ColorTheme.windowText
-            visible: !!text
-            wrapMode: Text.Wrap
-            topPadding: 8
-            Layout.fillWidth: true
-        }
-
-        Item
-        {
-            id: spacing
-            implicitHeight: 16
-            visible: informationTable.height > 0
-        }
-
-        GridLayout
+        Grid
         {
             id: informationTable
 
@@ -89,6 +97,7 @@ Control
             columnSpacing: 8
             rowSpacing: 8
             flow: GridLayout.LeftToRight
+            Layout.fillWidth: true
 
             Text
             {
@@ -118,6 +127,49 @@ Control
                 text: engineInfo ? engineInfo.vendor : ""
                 color: ColorTheme.light
                 visible: !!text
+            }
+        }
+
+        Column
+        {
+            id: streamSelection
+
+            spacing: 16
+            Layout.fillWidth: true
+
+            Rectangle
+            {
+                id: separator
+                width: parent.width
+                height: 1
+                color: ColorTheme.colors.dark13
+            }
+
+            Row
+            {
+                width: parent.width
+                spacing: 8
+
+                ContextHintLabel
+                {
+                    id: streamLabel
+
+                    text: qsTr("Camera stream")
+                    horizontalAlignment: Text.AlignRight
+                    contextHintText: qsTr("Select video stream from the camera for analysis")
+                    color: ColorTheme.windowText
+                    width: parent.width * 0.3
+                    y: streamComboBox.baselineOffset - baselineOffset
+                }
+
+                ComboBox
+                {
+                    id: streamComboBox
+
+                    x: streamLabel.width
+                    width: parent.width - x
+                    model: ["Primary", "Secondary"]
+                }
             }
         }
     }
