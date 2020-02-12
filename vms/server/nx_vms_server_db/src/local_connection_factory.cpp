@@ -548,9 +548,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc POST /ec2/saveCameraUserAttributes
      * Save additional camera attributes for a single camera.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * Parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". Example of such object can be seen in an item of the list returned by
+     * /ec2/getCameraUserAttributesList function.
      * </p>
      * %permissions Administrator, or a custom user with "Edit camera settings" permission.
      * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
