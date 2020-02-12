@@ -125,6 +125,8 @@ public:
     StunAsyncClientAcceptanceTest()
     {
         AbstractAsyncClient::Settings clientSettings;
+        clientSettings.sendTimeout = kNoTimeout;
+        clientSettings.recvTimeout = kNoTimeout;
         clientSettings.reconnectPolicy.initialDelay = std::chrono::milliseconds(1);
         m_client = std::make_unique<typename AsyncClientTestTypes::ClientType>(clientSettings);
     }

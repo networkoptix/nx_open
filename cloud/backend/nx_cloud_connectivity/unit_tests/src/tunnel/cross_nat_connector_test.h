@@ -18,6 +18,7 @@ class TunnelConnector:
     public ::testing::Test
 {
 public:
+    TunnelConnector();
     ~TunnelConnector();
 
     void setConnectorFactoryFunc(
@@ -60,6 +61,7 @@ protected:
 private:
     std::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
     nx::hpm::MediatorFunctionalTest m_mediator;
+    network::stun::AbstractAsyncClient::Settings m_mediatorConnectorSettingsBak;
 };
 
 } //namespace test

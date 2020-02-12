@@ -14,6 +14,16 @@ using nx::hpm::MediaServerEmulator;
 
 constexpr const std::chrono::seconds kDefaultTestTimeout = std::chrono::seconds(15);
 
+TunnelConnector::TunnelConnector()
+{
+    network::stun::AbstractAsyncClient::Settings settings;
+    settings.recvTimeout = kNoTimeout;
+    settings.sendTimeout = kNoTimeout;
+
+    m_mediatorConnectorSettingsBak =
+        nx::hpm::api::MediatorConnector::setStunClientSettings(settings);
+}
+
 TunnelConnector::~TunnelConnector()
 {
     if (m_oldFactoryFunc)
@@ -21,6 +31,9 @@ TunnelConnector::~TunnelConnector()
         CrossNatConnectorFactory::instance().setCustomFunc(
             std::move(*m_oldFactoryFunc));
     }
+
+    nx::hpm::api::MediatorConnector::setStunClientSettings(
+        m_mediatorConnectorSettingsBak);
 }
 
 void TunnelConnector::setConnectorFactoryFunc(
