@@ -11,6 +11,7 @@
 #include <nx/streaming/nx_streaming_ini.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/time_helper.h>
+#include <common/common_module.h>
 
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
 static const qint64 kMinAudioFrameDurationUsec = 1000;
@@ -104,8 +105,16 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     m_numberOfChannels.reset();
     setNeedKeyData();
+    auto commonModule = m_resource->commonModule();
     for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
+    {
+        if (commonModule)
+        {
+            m_stat[i].setWindowSize(commonModule->mediaStatisticsWindowSize());
+            m_stat[i].setMaxDurationInFrames(commonModule->mediaStatisticsMaxDurationInFrames());
+        }
         m_stat[i].reset();
+    }
     m_numberOfErrors = 0;
 }
 

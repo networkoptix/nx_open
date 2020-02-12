@@ -165,6 +165,15 @@ public:
         "instead of HTTPS when opening connections to this Server. "
         "It allows to save CPU for slow ARM devices."
     };
+
+    Option<int> mediaStatisticsWindowSize{ this, "mediaStatisticsWindowSize", 2,
+        "Time period in seconds for media stream statistics."
+    };
+    Option<int> mediaStatisticsMaxDurationInFrames{ this, "mediaStatisticsMaxDurationInFrames", 0,
+        "Maximum queue size in media frames for media stream statistics."
+        "Value 0 means unlimited."
+    };
+
     Option<bool> createFullCrashDump{this, "createFullCrashDump", false,
         "Configures the size of crash dumps:\n"
         "Windows: If true, crash dump with contain full process memory included is created in case"

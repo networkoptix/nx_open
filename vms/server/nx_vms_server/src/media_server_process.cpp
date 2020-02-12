@@ -3803,6 +3803,11 @@ bool MediaServerProcess::setUpMediaServerResource(
     commonModule()->setModuleInformation(selfInformation);
     commonModule()->bindModuleInformation(m_mediaServer);
 
+    commonModule()->setMediaStatisticsWindowSize(
+        std::chrono::seconds(serverModule->settings().mediaStatisticsWindowSize()));
+    commonModule()->setMediaStatisticsMaxDurationInFrames(
+        serverModule->settings().mediaStatisticsMaxDurationInFrames());
+
     return foundOwnServerInDb;
 }
 

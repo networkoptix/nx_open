@@ -3,14 +3,24 @@
 #include <mutex>
 #include <deque>
 #include <chrono>
+#include <limits>
 
 namespace nx {
 namespace sdk {
 
+/**
+ * This class calculates media stream bitrate, average frame rate and GOP size.
+ */
+
 class MediaStreamStatistics
 {
 public:
-    MediaStreamStatistics();
+    MediaStreamStatistics(
+        std::chrono::microseconds windowSize = std::chrono::seconds(2),
+        int maxDurationInFrames = 0);
+
+    void setWindowSize(std::chrono::microseconds windowSize);
+    void setMaxDurationInFrames(int maxDurationInFrames);
 
     void reset();
     void onData(std::chrono::microseconds timestamp, size_t dataSize, bool isKeyFrame);
@@ -20,6 +30,9 @@ public:
     bool hasMediaData() const;
 
 private:
+    std::chrono::microseconds m_windowSize {};
+    int m_maxDurationInFrames = 0;
+
     struct Data
     {
         Data() = default;

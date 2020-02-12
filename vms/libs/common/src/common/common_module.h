@@ -328,6 +328,11 @@ public:
 
     QnResourceDataPool* resourceDataPool() const;
 
+    void setMediaStatisticsWindowSize(std::chrono::microseconds value);
+    std::chrono::microseconds mediaStatisticsWindowSize() const;
+
+    void setMediaStatisticsMaxDurationInFrames(int value);
+    int mediaStatisticsMaxDurationInFrames() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -401,4 +406,7 @@ private:
     bool m_standaloneMode = false;
     std::atomic<bool> m_needToStop{false};
     nx::utils::SoftwareVersion m_engineVersion;
+
+    std::chrono::microseconds m_mediaStatisticsWindowSize = std::chrono::seconds(2);
+    int m_mediaStatisticsMaxDurationInFrames = 0;
 };

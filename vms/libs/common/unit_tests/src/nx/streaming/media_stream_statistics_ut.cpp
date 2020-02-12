@@ -5,9 +5,11 @@
 
 namespace nx::streaming::test {
 
-TEST(MediaStreamStatistics, main)
+void check(int maxFrames, int overlappedBitrate, int overlappedFps)
 {
     QnMediaStreamStatistics statistics;
+    statistics.setWindowSize(std::chrono::seconds(2));
+    statistics.setMaxDurationInFrames(maxFrames);
 
     QnWritableCompressedVideoDataPtr video(new QnWritableCompressedVideoData());
     const auto currentTimeMs = 0;
@@ -62,8 +64,14 @@ TEST(MediaStreamStatistics, main)
         statistics.onData(video);
         video->timestamp += 50000; //< 20 fps, 1Mb/sec
     }
-    ASSERT_EQ(10000000, statistics.bitrateBitsPerSecond());
-    ASSERT_FLOAT_EQ(25, statistics.getFrameRate());
+    ASSERT_EQ(overlappedBitrate, statistics.bitrateBitsPerSecond());
+    ASSERT_FLOAT_EQ(overlappedFps, statistics.getFrameRate());
+}
+
+TEST(MediaStreamStatistics, main)
+{
+    check(/*maxFrames */ 1000, /*overlappedBitrate*/ 10000000, /*overlappedFps*/ 25);
+    check(/*maxFrames */ 10, /*overlappedBitrate*/ 8000000, /*overlappedFps*/ 20);
 }
 
 } // namespace nx::streaming::test
