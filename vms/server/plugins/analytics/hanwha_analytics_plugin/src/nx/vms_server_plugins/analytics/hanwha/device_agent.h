@@ -72,6 +72,7 @@ private:
 
     void loadSupportedEventTypes(); // page 9 Application Programmers Guide
 
+    std::unique_ptr<nx::network::http::HttpClient> createSettingsHttpClient() const;
 public:
     void addSettingModel(nx::vms::api::analytics::DeviceAgentManifest* destinastionManifest);
 
@@ -95,7 +96,6 @@ private:
 
     Settings m_settings;
     FrameSize m_frameSize;
-    nx::network::http::HttpClient m_settingsHttpClient;
     bool m_serverHasSentInitialSettings = false;
 };
 
