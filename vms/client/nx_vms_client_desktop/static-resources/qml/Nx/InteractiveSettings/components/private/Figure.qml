@@ -216,26 +216,15 @@ LabeledItem
                 }
             }
 
-            Column
+            TextButton
             {
-                spacing: 8
+                icon.source: "qrc:/skin/text_buttons/trash.png"
+                visible: preview.hasFigure
 
-                Button
+                onClicked:
                 {
-                    text: qsTr("Edit")
-                    onClicked: openEditDialog()
-                }
-
-                Button
-                {
-                    text: qsTr("Delete")
-                    onClicked:
-                    {
-                        figure = null
-                        figureNameEdit.text = ""
-                    }
-                    visible: preview.hasFigure
-                    backgroundColor: ColorTheme.colors.red_core
+                    figure = null
+                    figureNameEdit.text = ""
                 }
             }
         }
