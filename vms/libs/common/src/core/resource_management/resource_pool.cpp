@@ -59,8 +59,7 @@ QnResourcePool::QnResourcePool(QObject* parent):
 QnResourcePool::~QnResourcePool()
 {
     QnMutexLocker locker(&m_resourcesMtx);
-    m_adminResource.clear();
-    m_resources.clear();
+    clear();
 }
 
  QThreadPool* QnResourcePool::threadPool() const
@@ -450,8 +449,29 @@ QnUserResourcePtr QnResourcePool::getAdministrator() const
 
 void QnResourcePool::clear()
 {
-    QnMutexLocker lk(&m_resourcesMtx);
-    m_resources.clear();
+    QnResourceList tempList;
+    {
+        QnMutexLocker lk(&m_resourcesMtx);
+
+        for (const auto& resource: m_resources)
+            tempList << resource;
+        for (const auto& resource: m_tmpResources)
+            tempList << resource;
+        for (const auto& resource: m_incompatibleServers)
+            tempList << resource;
+
+        m_tmpResources.clear();
+        m_resources.clear();
+        m_incompatibleServers.clear();
+        m_adminResource.clear();
+
+        d->ioModules.clear();
+        d->mediaServers.clear();
+        d->resourcesByUniqueId.clear();
+    }
+
+    for (const auto& resource: tempList)
+        resource->disconnect(this);
 }
 
 bool QnResourcePool::containsIoModules() const
