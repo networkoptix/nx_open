@@ -410,6 +410,8 @@ void HanwhaSharedResourceContext::initializeAlarmInputs()
         if (m_alarmInputInitializationTimer.isValid()
             && !m_alarmInputInitializationTimer.hasExpired(kAlarmInputInitializationTimeout))
         {
+            NX_DEBUG(this,
+                "Alram inputs have been initialized recently, ignoring initialization request");
             return;
         }
 
@@ -427,19 +429,30 @@ void HanwhaSharedResourceContext::initializeAlarmInputs()
     const HanwhaResponse viewResponse = helper.view("eventsources/alarminput");
 
     if (!viewResponse.isSuccessful())
+    {
+        NX_DEBUG(this, "Unable to fetch current alarm input port states, request URL: %1, "
+            "error code: %2, error string: %3",
+            viewResponse.requestUrl(), viewResponse.errorCode(), viewResponse.errorString());
         return;
+    }
 
     std::map<QString, QString> alarmInputParameters = viewResponse.response();
     for (auto& [parameterName, parameterValue]: alarmInputParameters)
     {
         if (parameterName.endsWith("Enabled"))
+        {
+            NX_DEBUG(this, "Settings parameter %1 to true", parameterName);
             parameterValue = kHanwhaTrue;
+        }
     }
 
     const HanwhaResponse setResponse = helper.set("eventsources/alarminput", alarmInputParameters);
-
     if (setResponse.isSuccessful())
         timerGuard.disarm();
+
+    NX_DEBUG(this,
+        "Unable to enable alarm inputs, requestUrl: %1, error code: %2, error string: %3",
+        setResponse.requestUrl(), setResponse.errorCode(), setResponse.errorString());
 }
 
 HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
