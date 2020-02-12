@@ -30,10 +30,8 @@ static QString toHumanReadableString(ViolationType violation)
         case ViolationType::invalidJson:
             return "Manifest deserialization error - manifest is not a valid JSON";
         case ViolationType::invalidJsonStructure:
-        {
             return "Manifest deserialization error - unable to deserialize provided JSON to the "
                 "Manifest structure";
-        }
         case ViolationType::manifestLogicalError:
             return "Manifest contains logical errors";
         case ViolationType::nullEngine:

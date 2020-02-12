@@ -24,14 +24,16 @@ namespace nx::vms::server::analytics::wrappers {
 class SettingsProcessor
 {
 public:
+    using SdkErrorHandler = std::function<void(const sdk_support::Error&)>;
+
     SettingsProcessor(
         DebugSettings debugSettings,
         SdkObjectDescription sdkObjectDescription,
-        ProcessorErrorHandler errorHandler)
+        SdkErrorHandler sdkErrorHandler)
         :
         m_debugSettings(std::move(debugSettings)),
         m_sdkObjectDescription(std::move(sdkObjectDescription)),
-        m_errorHandler(std::move(errorHandler))
+        m_errorHandler(std::move(sdkErrorHandler))
     {
     }
 
@@ -124,7 +126,7 @@ private:
 private:
     DebugSettings m_debugSettings;
     SdkObjectDescription m_sdkObjectDescription;
-    ProcessorErrorHandler m_errorHandler;
+    SdkErrorHandler m_errorHandler;
 };
 
 } // namespace nx::vms::server::analytics::wrappers

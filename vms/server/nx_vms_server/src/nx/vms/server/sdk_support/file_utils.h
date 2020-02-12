@@ -21,19 +21,23 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FilenameGenerationOption)
 Q_DECLARE_FLAGS(FilenameGenerationOptions, FilenameGenerationOption)
 Q_DECLARE_OPERATORS_FOR_FLAGS(FilenameGenerationOptions)
 
+/** Intended for experimenting and debugging. */
 std::optional<QString> loadStringFromFile(
     const nx::utils::log::Tag& logTag,
     const QString& absoluteFilePath);
 
+/** Intended for experimenting and debugging. */
 bool dumpStringToFile(
     const nx::utils::log::Tag& logTag,
     const QString& absoluteFilePath,
     const QString& stringToDump);
 
+/** Intended for experimenting and debugging. */
 QString debugFileAbsolutePath(
     const QString& debugDirectoryPath,
     const QString filenameWithoutPath);
 
+/** Intended for experimenting and debugging. */
 QString baseNameOfFileToDumpOrLoadData(
     const resource::AnalyticsPluginResourcePtr& plugin,
     const resource::AnalyticsEngineResourcePtr& engine,

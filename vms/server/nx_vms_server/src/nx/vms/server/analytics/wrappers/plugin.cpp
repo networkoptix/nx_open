@@ -70,7 +70,7 @@ wrappers::EnginePtr Plugin::createEngine(const resource::AnalyticsEngineResource
         libName());
 }
 
-DebugSettings Plugin::makeManifestProcessorSettings() const
+DebugSettings Plugin::makeManifestProcessorDebugSettings() const
 {
     DebugSettings settings;
     settings.outputPath = pluginsIni().analyticsManifestOutputPath;

@@ -14,7 +14,6 @@
 
 #include <nx/vms/server/analytics/wrappers/fwd.h>
 #include <nx/vms/server/analytics/wrappers/device_agent.h>
-#include <nx/vms/server/analytics/wrappers/manifest_processor.h>
 #include <nx/vms/server/analytics/wrappers/settings_processor.h>
 
 namespace nx::vms::server::analytics::wrappers {
@@ -35,7 +34,7 @@ Engine::Engine(
 {
 }
 
-DebugSettings Engine::makeManifestProcessorSettings() const
+DebugSettings Engine::makeManifestProcessorDebugSettings() const
 {
     const auto engineResource = this->engineResource();
     if (!engineResource)

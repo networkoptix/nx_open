@@ -73,7 +73,7 @@ QString SdkObjectDescription::descriptionString() const
         }
         case SdkObjectType::deviceAgent:
         {
-            return lm("DeviceAgent: %1, Engine %2, %3")
+            return lm("DeviceAgent for %1, Engine %2, %3")
                 .args(m_device->getUserDefinedName(), m_engine->getId(), m_plugin->getName());
         }
         default:

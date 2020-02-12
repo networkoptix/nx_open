@@ -84,8 +84,6 @@ struct Violation
     QString details;
 };
 
-using ProcessorErrorHandler = std::function<void(const sdk_support::Error&)>;
-
 } // namespace nx::vms::server::analytics::wrappers
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

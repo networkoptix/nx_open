@@ -7,17 +7,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log_level.h>
-#include <nx/utils/log/log_main.h>
 #include <nx/fusion/model_functions.h>
 
-#include <nx/sdk/analytics/i_engine.h>
-
 #include <nx/vms/server/sdk_support/utils.h>
-#include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/sdk_support/result_holder.h>
-#include <nx/vms/server/event/event_connector.h>
-#include <nx/vms/server/interactive_settings/json_engine.h>
-#include <nx/vms/server/analytics/wrappers/manifest_processor.h>
 #include <nx/vms/server/analytics/wrappers/settings_processor.h>
 
 namespace nx::vms::server::analytics::wrappers {
@@ -44,7 +37,7 @@ DeviceAgent::DeviceAgent(
 {
 }
 
-DebugSettings DeviceAgent::makeManifestProcessorSettings() const
+DebugSettings DeviceAgent::makeManifestProcessorDebugSettings() const
 {
     DebugSettings settings;
     settings.outputPath = pluginsIni().analyticsManifestOutputPath;

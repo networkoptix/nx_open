@@ -58,6 +58,8 @@ struct ManifestError
     QString additionalInfo;
 };
 
+NX_VMS_API QString toHumanReadableString(ManifestError manifestError);
+
 struct ListManifestErrorTypes
 {
     ManifestErrorType emptyId;

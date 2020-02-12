@@ -30,7 +30,7 @@ public:
     wrappers::EnginePtr createEngine(const resource::AnalyticsEngineResourcePtr engineResource);
 
 protected:
-    virtual DebugSettings makeManifestProcessorSettings() const override;
+    virtual DebugSettings makeManifestProcessorDebugSettings() const override;
 
     virtual SdkObjectDescription sdkObjectDescription() const override;
 
