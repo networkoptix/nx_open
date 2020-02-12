@@ -593,6 +593,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             // todo: #gdm add server/client timezone conversion
             result = tr("Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1").
                 arg(datetime::toString(dt));
+            break;
         }
         case EventReason::backupDone:
         {

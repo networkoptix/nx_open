@@ -300,7 +300,7 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
                 default:
                     break;
             }
-
+            return QVariant();
         case Qn::UuidRole:
             return qVariantFromValue(m_id);
         case Qn::ModifiedRole:

@@ -405,6 +405,8 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
                         return vms::api::EventReason::backupFailedNoBackupStorageError;
                     case CopyError::FromStorageError:
                         return vms::api::EventReason::backupFailedSourceStorageError;
+                    case CopyError::SourceFileError:
+                        return vms::api::EventReason::backupFailedSourceFileError;
                     case CopyError::TargetFileError:
                         return vms::api::EventReason::backupFailedTargetFileError;
                     case CopyError::ChunkError:
