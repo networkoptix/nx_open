@@ -225,10 +225,8 @@ void RoiFiguresOverlayWidget::Private::strokePolyline(
         QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_1_5>();
 
     functions->glEnable(GL_LINE_SMOOTH);
-    functions->glEnable(GL_POINT_SMOOTH);
     functions->glEnable(GL_BLEND);
     functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    functions->glDepthMask(false);
     functions->glLineWidth((GLfloat) lineWidth);
     functions->glPointSize((GLfloat) (lineWidth - 0.5 * widget->devicePixelRatioF()));
     functions->glColor3d(color.redF(), color.greenF(), color.blueF());
@@ -242,12 +240,16 @@ void RoiFiguresOverlayWidget::Private::strokePolyline(
 
     functions->glEnd();
 
-    functions->glBegin(GL_POINTS);
+    if (lineWidth >= 2.0)
+    {
+        functions->glEnable(GL_POINT_SMOOTH);
+        functions->glBegin(GL_POINTS);
         for (const auto& point: points)
             functions->glVertex2d(point.x(), point.y());
-    functions->glEnd();
+        functions->glEnd();
+        functions->glDisable(GL_POINT_SMOOTH);
+    }
 
-    functions->glDepthMask(true);
     functions->glDisable(GL_BLEND);
     functions->glDisable(GL_LINE_SMOOTH);
 
