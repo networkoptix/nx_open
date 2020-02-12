@@ -445,7 +445,8 @@ public:
     };
 
     Option<qint64> minSystemStorageFreeSpace{
-        this, "minSystemStorageFreeSpace", kMinSystemStorageFreeSpace, ""};
+        this, "minSystemStorageFreeSpace", kMinSystemStorageFreeSpace, 
+        "Minimal system storage free space in bytes. If it less, server will generate warning event."};
 
     Option<bool> noOutgoingConnectionsMetric{ this, "noOutgoingConnectionsMetric", false,
         "Disable metric 'outgoingConnections'. Used for test purpose only."
