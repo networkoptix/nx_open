@@ -71,8 +71,8 @@ public:
             },
             [this, outStringBuilder](const QString& errorMessage) //< InternalErrorHandler
             {
-                const QString caption = "Internal Error in Server while obtaining manifest of "
-                    + sdkObjectDescription().descriptionString();
+                const QString caption = "Internal Error in Server while obtaining manifest of ["
+                    + sdkObjectDescription().descriptionString() + "]";
                 const QString description =
                     errorMessage + " Additional details may be available in the Server log.";
                 throwPluginEvent(caption, description);
