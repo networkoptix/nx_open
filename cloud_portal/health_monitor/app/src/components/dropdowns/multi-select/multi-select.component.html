@@ -4,6 +4,7 @@
 
     <button class="btn btn-dropdown-toggle dropdown-toggle"
             (click)="show = !show"
+            id="{{id}}"
             type="button" data-toggle="dropdown">
 
         <span [innerHtml]="textSelected" class="ellipsis d-contents d-md-block"></span>
@@ -14,7 +15,7 @@
     </button>
     <div class="dropdown-menu" [nxArrowNav]="show"
          [style.display]="show ? 'inline-block' : 'none'"
-         aria-labelledby="multiSelect">
+         [attr.aria-labelledby]="id">
 
         <ul class="dropdown-menu--header" *ngIf="canSearch">
             <li class="dropdown-item-container">

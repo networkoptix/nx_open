@@ -159,46 +159,47 @@ header {
                 font-family : $font-family-medium;
                 text-decoration: none;
                 cursor      : pointer !important;
-                
+
                 @media (max-width : $collapse-second-width) {
                     height : 32px;
                 }
-                
+
                 &:hover {
                     background-color : $light5;
                     color            : $dark9 !important;
                 }
-                
+
                 &:active {
                     background-color : $light6 !important;
                     //color            : $light1 !important;
                 }
-                
+
                 &.selected {
                     background-color : $light16 !important;
                     color            : $light1 !important;
-                    
+
                     &:hover {
                         color : $light1 !important;
                     }
                 }
-                
+
                 &:focus {
                     background-color : $light4;
                 }
-    
+
                 & > span:first-child {
                     @include ellipsis;
                     padding      : 0 rem(10px);
                 }
             }
-            
+
             nx-checkbox {
-                position : absolute;
-                left     : 10px;
-                top      : 3px;
-                height   : 20px;
-                
+                position    : absolute;
+                left        : 10px;
+                height      : 20px;
+                display     : flex;
+                align-items : center;
+
                 & + label {
                     position     : absolute;
                     padding-left : 30px !important;

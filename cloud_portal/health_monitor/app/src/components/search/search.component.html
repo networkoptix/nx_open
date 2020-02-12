@@ -56,7 +56,8 @@
                      [ngClass]="{'mb-2' : layout == 'selectors', 'mb-3' : layout != 'selectors', 'col-lg-12': layoutMod}">
 
                     <label style="text-transform: capitalize" *ngIf="select.label != ''">{{ select.label }}</label>
-                    <nx-select [name]="select.label"
+                    <nx-select [id]="select.id"
+                               [name]="select.label"
                                [items]="select.items"
                                [(ngModel)]="select.selected"
                                (ngModelChange)="onModelChange($event)"
@@ -67,7 +68,8 @@
                 <div class="drop mb-3" *ngFor="let multiselect of localFilter.multiselects"
                      [ngClass]="{'mb-2' : layout == 'selectors', 'mb-3' : layout != 'selectors'}">
                     <label style="text-transform: capitalize">{{ multiselect.label }}</label>
-                    <nx-multi-select [name]="multiselect.label"
+                    <nx-multi-select [id]="multiselect.id"
+                                     [name]="multiselect.label"
                                      [items]="multiselect.items"
                                      [(ngModel)]="multiselect.selected"
                                      (ngModelChange)="onModelChange($event)"

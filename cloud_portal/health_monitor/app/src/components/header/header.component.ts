@@ -74,10 +74,6 @@ export class NxHeaderComponent implements OnInit, OnDestroy {
         this.LANG = this.languageService.getTranslations();
     }
 
-    private isActive(val) {
-        return this.window.location.pathname.indexOf(val) >= 0;
-    }
-
     private systemIdUpdate(id) {
         this.systemId = id;
         this.localStorage.set('systemId', this.systemId);
@@ -221,9 +217,27 @@ export class NxHeaderComponent implements OnInit, OnDestroy {
             this.systemCounter = this.systems.length;
 
             this.updateActiveSystem();
+            this.updateActive();
         });
+    }
 
+    private isActive(val) {
+        return this.window.location.pathname.indexOf(val) >= 0;
+    }
 
+    onClick(event) {
+        if (this.systemId && this.isActive(event.target.id) && !this.isActive('view') && !this.isActive('health')) {
+            event.stopPropagation();
+            return false;
+        } else {
+            if (event.target.id === 'systems') {
+                return true;
+            }
+        }
+        if (this.isActive(event.target.id)) {
+            event.stopPropagation();
+            return false;
+        }
     }
 
     login () {

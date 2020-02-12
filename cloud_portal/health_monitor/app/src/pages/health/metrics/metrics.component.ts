@@ -56,12 +56,15 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
 
     objectValues = Object.values;
 
+    selectedSubscription: SubscriptionLike;
     routeSubscription: SubscriptionLike;
     queryParamSubscription: SubscriptionLike;
     breakpointSubscription: SubscriptionLike;
     windowSizeSubscription: SubscriptionLike;
-    panelSubscription: SubscriptionLike;
     locationSubscription: SubscriptionLike;
+    layoutReadySubscription: SubscriptionLike;
+    fixedLayoutClassSubscription: SubscriptionLike;
+    activeEntitySubscription: SubscriptionLike;
 
     @ViewChild('search', { static: false }) searchElement: ElementRef;
     @ViewChild('area', { static: false }) area: ElementRef;
@@ -83,12 +86,6 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
         this.filterModel = {
             query: ''
         };
-
-        this.panelSubscription = this.scrollMechanicsService
-                                     .panelSubject
-                                     .subscribe(() => {
-                                         this.setLayout();
-                                     });
     }
 
     ngOnInit(): void {
@@ -108,7 +105,7 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
             });
         });
 
-        this.menuService
+        this.selectedSubscription = this.menuService
             .selectedSectionSubject
             .pipe(throttleTime(1000))
             .subscribe(selection => {
@@ -140,8 +137,6 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
                     searchParam = undefined;
                     this.search();
                 }
-
-                this.setLayout();
             });
 
         this.windowSizeSubscription = this.scrollMechanicsService.windowSizeSubject.subscribe(({ width }) => {
@@ -159,17 +154,22 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
         this.healthLayoutService.searchTableArea = this.area;
         this.healthLayoutService.searchElement = this.searchElement;
 
-        this.healthLayoutService.fixedLayoutClassSubject.pipe(delay(0)).subscribe((className: string) => {
+        this.fixedLayoutClassSubscription = this.healthLayoutService.fixedLayoutClassSubject.pipe(delay(0)).subscribe((className: string) => {
             this.fixedLayoutClass = className;
         });
 
-        this.healthLayoutService.layoutReadySubject.pipe(delay(0)).subscribe((value: boolean) => {
+        this.layoutReadySubscription = this.healthLayoutService.layoutReadySubject.pipe(delay(0)).subscribe((value: boolean) => {
             this.layoutReady = value;
         });
-        this.setLayout();
+
+        this.activeEntitySubscription = this.healthLayoutService.activeEntitySubject.pipe(delay(0)).subscribe(() => {
+            this.setLayout();
+        });
     }
 
-    ngOnDestroy() {}
+    ngOnDestroy() {
+        this.healthLayoutService.resetActiveEntity();
+    }
 
     handleInitialId() {
         if (this.initialId) {
@@ -219,9 +219,6 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
         } else {
             this.resetActiveEntity();
         }
-
-        // Layout will be set when panel is rendered
-        // this.setLayout();
     }
 
     resetActiveEntity(updateURI = true) {
@@ -229,14 +226,11 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
             const queryParams: Params = {};
             queryParams.id            = undefined;
             this.uri.updateURI(undefined, queryParams);
-            this.setLayout();
         }
         this.healthLayoutService.resetActiveEntity();
     }
 
     private setLayout() {
-        if (this.healthLayoutService.tableElement) {
-            this.healthLayoutService.setMetricsLayout();
-        }
+        this.healthLayoutService.setMetricsLayout();
     }
 }
