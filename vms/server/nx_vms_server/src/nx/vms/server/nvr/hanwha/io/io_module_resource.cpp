@@ -14,7 +14,6 @@ static IIoManager* getIoManager(QnMediaServerModule* serverModule)
         return nullptr;
 
     nvr::IIoManager* ioManager = nvrService->ioManager();
-    NX_ASSERT(ioManager);
     return ioManager;
 }
 
@@ -94,11 +93,8 @@ bool IoModuleResource::setIoPortDescriptions(QnIOPortDataList portDescriptors, b
 void IoModuleResource::startInputPortStatesMonitoring()
 {
     nvr::IIoManager* const ioManager = getIoManager(serverModule());
-    if (!ioManager)
-    {
-        NX_WARNING(this, "Unable to access IO manager while trying to register handler");
-        return;
-    }
+    if (!NX_ASSERT(ioManager, "Unable to access IO manager while trying to register handler"))
+        return;    
 
     m_handlerId = ioManager->registerStateChangeHandler(
         [this](const QnIOStateDataList& state) { handleStateChange(state); });
@@ -113,11 +109,8 @@ void IoModuleResource::stopInputPortStatesMonitoring()
     }
 
     nvr::IIoManager* const ioManager = getIoManager(serverModule());
-    if (!ioManager)
-    {
-        NX_DEBUG(this, "Unable to access IO manager while trying to unregister IO handler");
+    if (!NX_ASSERT(ioManager, "Unable to access IO manager while trying to unregister IO handler"))
         return;
-    }
 
     ioManager->unregisterStateChangeHandler(m_handlerId);
 }

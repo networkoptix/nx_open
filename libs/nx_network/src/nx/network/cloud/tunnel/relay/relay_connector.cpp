@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "api/relay_api_client_factory.h"
+#include "api/detail/relay_api_client_factory.h"
 #include "relay_outgoing_tunnel_connection.h"
 
 namespace nx {
@@ -55,6 +55,9 @@ void Connector::connect(
     dispatch(
         [this, timeout]()
         {
+            if (timeout > std::chrono::milliseconds::zero())
+                m_relayClient->setTimeout(timeout);
+
             m_relayClient->startSession(
                 m_connectSessionId,
                 m_targetHostAddress.host.toStdString(),

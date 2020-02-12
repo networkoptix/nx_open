@@ -14,6 +14,7 @@ void SyncReader::cancel()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_readComplete = true;
+    m_cancelled = true;
     m_condition.notify_one();
 }
 
@@ -26,6 +27,8 @@ int SyncReader::read(uint8_t* buffer, int size)
     {
         m_bufferOffset = 0;
         std::unique_lock<std::mutex> lock(m_mutex);
+        if (m_cancelled)
+            return 0;
         m_readComplete = false;
         SystemError::ErrorCode error = SystemError::connectionAbort;
         std::size_t bytesRead;

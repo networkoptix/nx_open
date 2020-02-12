@@ -20,6 +20,7 @@ private:
     std::mutex m_mutex;
     std::condition_variable m_condition;
     bool m_readComplete = true;
+    bool m_cancelled = false;
 
     int m_bufferSize = 0;
     int m_bufferOffset = 0;

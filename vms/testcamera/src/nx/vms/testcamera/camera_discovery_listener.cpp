@@ -4,12 +4,16 @@
 #include <chrono>
 
 #include <nx/kit/utils.h>
+#include <nx/utils/url.h>
 #include <nx/network/nettools.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_factory.h>
 #include <nx/vms/testcamera/test_camera_ini.h>
 
 #include "logger.h"
+
+using nx::network::SocketAddress;
+using nx::network::HostAddress;
 
 namespace nx::vms::testcamera {
 
@@ -43,7 +47,7 @@ bool CameraDiscoveryListener::initialize()
                 ipRange.firstIp = iface.subNetworkAddress().toIPv4Address();
                 ipRange.lastIp = iface.broadcastAddress().toIPv4Address();
                 m_allowedIpRanges.push_back(ipRange);
-                NX_LOGGER_INFO(m_logger, "Listening to discovery messages from IP range (%1, %2).",
+                NX_LOGGER_INFO(m_logger, "Will accept discovery messages from IP range (%1, %2).",
                     iface.subNetworkAddress(), iface.broadcastAddress());
             }
         }
@@ -51,8 +55,7 @@ bool CameraDiscoveryListener::initialize()
 
     if (m_allowedIpRanges.size() == 0 && m_localInterfacesToListen.size() > 0)
     {
-        NX_LOGGER_ERROR(m_logger,
-            "Unable to listen to discovery messages on requested IP addresses.");
+        NX_LOGGER_ERROR(m_logger, "Unable to obtain IP ranges to accept discovery messages.");
         return false;
     }
 
@@ -60,7 +63,7 @@ bool CameraDiscoveryListener::initialize()
 }
 
 bool CameraDiscoveryListener::serverAddressIsAllowed(
-    const nx::network::SocketAddress& serverAddress)
+    const SocketAddress& serverAddress)
 {
     if (m_allowedIpRanges.empty()) //< All Server IPs are allowed.
         return true;
@@ -81,17 +84,20 @@ bool CameraDiscoveryListener::serverAddressIsAllowed(
         });
 }
 
-/** @return Empty string on error, having logged the error message. */
+/** @return Empty string on socket being closed, or on error, having logged the error message. */
 QByteArray CameraDiscoveryListener::receiveDiscoveryMessage(
     QByteArray* buffer,
-    nx::network::SocketAddress* outServerAddress,
+    SocketAddress* outServerAddress,
     nx::network::AbstractDatagramSocket* discoverySocket) const
 {
     const int bytesRead = discoverySocket->recvFrom(
         buffer->data(), buffer->size(), outServerAddress);
 
     if (bytesRead == 0)
+    {
+        NX_LOGGER_WARNING(m_logger, "Discovery socket connection closed by the Server.");
         return QByteArray();
+    }
 
     if (bytesRead < 0)
     {
@@ -110,7 +116,7 @@ QByteArray CameraDiscoveryListener::receiveDiscoveryMessage(
 
 void CameraDiscoveryListener::sendDiscoveryResponseMessage(
     nx::network::AbstractDatagramSocket* discoverySocket,
-    const nx::network::SocketAddress& serverAddress) const
+    const SocketAddress& serverAddress) const
 {
     const QByteArray response = m_obtainDiscoveryResponseMessageFunc();
 
@@ -132,25 +138,79 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
             serverAddress, nx::kit::utils::toString(response));
     }
 }
+/** @return False on error, having logged the error message. */
+bool CameraDiscoveryListener::obtainDiscoverySocketAddress(
+    SocketAddress* outSocketAddress) const
+{
+    if (!NX_ASSERT(outSocketAddress))
+        return false;
+
+    const int port = ini().discoveryPort;
+    if (port <= 0 || port >= 65536)
+    {
+        NX_LOGGER_ERROR(m_logger, "Invalid discoveryPort in .ini: %1.", port);
+        return false;
+    }
+
+    if (m_localInterfacesToListen.size() != 1)
+    {
+        // Will bind the discovery socket to all local interfaces.
+        *outSocketAddress = SocketAddress(HostAddress::anyHost, port);
+        NX_LOGGER_INFO(m_logger, "Listening to discovery messages from any host, port %1.", port);
+        return true;
+    }
+
+    // Will bind the discovery socket to this only interface.
+
+    const QString hostAddressStr = m_localInterfacesToListen.at(0);
+
+    // Validate host address string before creating HostAddress, because its constructor asserts
+    // the string to be valid.
+    nx::utils::Url url;
+    url.setHost(hostAddressStr);
+    if (!url.isValid())
+    {
+        NX_LOGGER_ERROR(m_logger, "Invalid local interface for discovery: %1.",
+            nx::kit::utils::toString(hostAddressStr)); //< Enquote and escape.
+        return false;
+    }
+
+    *outSocketAddress = SocketAddress(HostAddress(hostAddressStr), port);
+    NX_LOGGER_INFO(m_logger, "Listening to discovery messages from %1.", *outSocketAddress);
+
+    return true;
+}
 
 /*virtual*/ void CameraDiscoveryListener::run()
 {
+    const auto error = //< Intended to be called like: return error("...");
+        [this](const QString& message) { NX_LOGGER_ERROR(m_logger, message); };
+
     auto discoverySocket = nx::network::SocketFactory::createDatagramSocket();
+    if (!discoverySocket)
+        return error("Unable to create discovery socket.");
 
-    discoverySocket->bind(nx::network::SocketAddress(
-        nx::network::HostAddress::anyHost, ini().discoveryPort));
+    SocketAddress socketAddress;
+    if (!obtainDiscoverySocketAddress(&socketAddress))
+        return;
+    if (!discoverySocket->bind(socketAddress))
+        return error(lm("Unable to bind discovery socket to %1").args(socketAddress));
 
-    discoverySocket->setRecvTimeout(ini().discoveryMessageTimeoutMs);
+    const int socketTimeout = ini().discoveryMessageTimeoutMs;
+    if (!discoverySocket->setRecvTimeout(socketTimeout))
+        return error(lm("Unable to set discovery socket timeout of %1 ms.").args(socketTimeout));
+
     QByteArray buffer(1024 * 8, '\0');
-    nx::network::SocketAddress serverAddress;
+    SocketAddress serverAddress;
 
-    const QByteArray expectedDiscoveryMessage =
-        ini().discoveryMessage + QByteArray("\n");
+    const QByteArray expectedDiscoveryMessage = ini().discoveryMessage + QByteArray("\n");
 
     while (!m_needStop)
     {
         const QByteArray discoveryMessage = receiveDiscoveryMessage(
             &buffer, &serverAddress, discoverySocket.get());
+        if (discoveryMessage.isEmpty())
+            continue;
 
         const bool isServerAllowed = serverAddressIsAllowed(serverAddress);
 

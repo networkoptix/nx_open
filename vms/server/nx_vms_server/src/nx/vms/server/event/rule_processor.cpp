@@ -233,19 +233,22 @@ void RuleProcessor::doExecuteAction(const vms::event::AbstractActionPtr& action,
 
 void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 {
+    using namespace nx::vms::event;
+
     if (!NX_ASSERT(action, "No action to execute"))
         return; //< Something is wrong.
     NX_VERBOSE(this, "Executing action [%1]", action->getRuleId());
 
     prepareAdditionActionParams(action);
 
-    QnNetworkResourceList cameraResources =
-        resourcePool()->getResourcesByIds<QnNetworkResource>(action->getResources());
+    QnResourceList resources = resourcePool()->getResourcesByIds(action->getResources());
+    if (requiresCameraResource(action->actionType()))
+        resources = resources.filtered<QnNetworkResource>();
+    else if (requiresServerResource(action->actionType()))
+        resources = resources.filtered<QnMediaServerResource>();
 
-    QnMediaServerResourceList serverResources =
-        resourcePool()->getResourcesByIds<QnMediaServerResource>(action->getResources());
-
-    switch (action->actionType())
+    const auto actionType = action->actionType();
+    switch (actionType)
     {
         case vms::api::ActionType::showTextOverlayAction:
         case vms::api::ActionType::showOnAlarmLayoutAction:
@@ -253,8 +256,8 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
         {
             if (action->getParams().useSource)
             {
-                cameraResources << resourcePool()->getResourcesByIds<QnNetworkResource>(
-                    action->getSourceResources(resourcePool()));
+                resources << QnResourceList(resourcePool()->getResourcesByIds<QnNetworkResource>(
+                    action->getSourceResources(resourcePool())));
             }
             break;
         }
@@ -284,8 +287,8 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
         {
             if (action->getParams().useSource)
             {
-                serverResources = resourcePool()->getResourcesByIds<QnMediaServerResource>(
-                    QList{action->getRuntimeParams().sourceServerId});
+                resources << QnResourceList(resourcePool()->getResourcesByIds<QnMediaServerResource>(
+                    QList{action->getRuntimeParams().sourceServerId}));
             }
         }
 
@@ -293,20 +296,14 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
             break;
     }
 
-    if (cameraResources.isEmpty() && vms::event::requiresCameraResource(action->actionType()))
-        return; //< Camera doesn't exist anymore.
-
-    if (serverResources.isEmpty() && vms::event::requiresServerResource(action->actionType()))
-        return; //< Server doesn't exist anymore.
-
-    if (cameraResources.isEmpty() && serverResources.isEmpty())
-        doExecuteAction(action, QnResourcePtr());
-
-    for (const auto& resource: cameraResources)
-        doExecuteAction(action, resource);
-
-    for (const auto& resource: serverResources)
-        doExecuteAction(action, resource);
+    if (resources.isEmpty())
+    {
+        if (requiresCameraResource(actionType) || requiresServerResource(actionType))
+            return; //< Camera or server doesn't exist any more.
+        doExecuteAction(action, QnResourcePtr()); //< Resource is not need for this action.
+    }
+    for (const auto& res: resources)
+        doExecuteAction(action, res);
 }
 
 bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& action)

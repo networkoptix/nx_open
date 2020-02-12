@@ -485,10 +485,6 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_uniqueId = deviceInfo->id();
     m_sharedId = deviceInfo->sharedId();
     m_channelNumber = deviceInfo->channelNumber();
-
-    m_settingsHttpClient.setUserName(m_auth.user());
-    m_settingsHttpClient.setUserPassword(m_auth.password());
-    m_settingsHttpClient.addAdditionalHeader("Accept", "application/json");
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)
@@ -499,6 +495,15 @@ void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)
 void DeviceAgent::setMonitor(MetadataMonitor* monitor)
 {
     m_monitor = monitor;
+}
+
+std::unique_ptr<nx::network::http::HttpClient> DeviceAgent::createSettingsHttpClient() const
+{
+    auto result = std::make_unique<nx::network::http::HttpClient>();
+    result->setUserName(m_auth.user());
+    result->setUserPassword(m_auth.password());
+    result->addAdditionalHeader("Accept", "application/json");
+    return result;
 }
 
 /**
@@ -513,11 +518,13 @@ std::string DeviceAgent::sendWritingRequestToDeviceSync(const std::string& query
     command.setPath(kEventPath);
     command.setQuery(QString::fromStdString(query));
 
-    const bool isSent = m_settingsHttpClient.doGet(command);
+    auto settingsHttpClient = createSettingsHttpClient();
+
+    const bool isSent = settingsHttpClient->doGet(command);
     if (!isSent)
         return "Failed to send command to camera";
 
-    auto* response = m_settingsHttpClient.response();
+    auto* response = settingsHttpClient->response();
     if (response->statusLine.statusCode != 200)
         return response->statusLine.toString().toStdString();
 
@@ -531,7 +538,7 @@ std::string DeviceAgent::sendWritingRequestToDeviceSync(const std::string& query
         }
     }
     */
-    auto messageBodyOptional = m_settingsHttpClient.fetchEntireMessageBody();
+    auto messageBodyOptional = settingsHttpClient->fetchEntireMessageBody();
     if (messageBodyOptional.has_value())
     {
         std::string body = messageBodyOptional->toStdString();
@@ -565,15 +572,17 @@ std::string DeviceAgent::sendReadingRequestToDeviceSync(
     command.setPath(QString::fromStdString(kPathPattern).arg(domain));
     command.setQuery(QString::fromStdString(kQueryPattern).arg(submenu).arg(action).arg(m_channelNumber));
 
-    const bool isSent = m_settingsHttpClient.doGet(command);
+    auto settingsHttpClient = createSettingsHttpClient();
+
+    const bool isSent = settingsHttpClient->doGet(command);
     if (!isSent)
         return result;
 
-    auto* response = m_settingsHttpClient.response();
+    auto* response = settingsHttpClient->response();
     const bool isApproved = (response->statusLine.statusCode == 200);
     const std::string sl = response->statusLine.toString().toStdString();
 
-    auto messageBodyOptional = m_settingsHttpClient.fetchEntireMessageBody();
+    auto messageBodyOptional = settingsHttpClient->fetchEntireMessageBody();
     if (messageBodyOptional.has_value())
         result = messageBodyOptional->toStdString();
     else

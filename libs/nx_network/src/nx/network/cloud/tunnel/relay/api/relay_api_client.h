@@ -55,6 +55,8 @@ public:
     virtual nx::utils::Url url() const = 0;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const = 0;
+
+    virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) = 0;
 };
 
 } // namespace nx::cloud::relay::api

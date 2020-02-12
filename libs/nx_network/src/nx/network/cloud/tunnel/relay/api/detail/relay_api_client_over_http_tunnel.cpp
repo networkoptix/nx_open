@@ -6,14 +6,10 @@
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/url/url_builder.h>
 
-#include "detail/relay_tunnel_validator.h"
-#include "relay_api_http_paths.h"
+#include "relay_tunnel_validator.h"
+#include "../relay_api_http_paths.h"
 
 namespace nx::cloud::relay::api {
-
-// TODO: Make this timeout configurable.
-// And configure it properly when connecting!
-static constexpr auto kTimeout = std::chrono::seconds(11);
 
 ClientOverHttpTunnel::ClientOverHttpTunnel(
     const nx::utils::Url& baseUrl,
@@ -93,7 +89,8 @@ void ClientOverHttpTunnel::openTunnel(
     if (tunnelValidatorFactoryFunc)
         client->setTunnelValidatorFactory(std::move(tunnelValidatorFactoryFunc));
     client->setCustomHeaders({{kNxProtocolHeader, kRelayProtocol}});
-    client->setTimeout(kTimeout);
+    if (timeout())
+        client->setTimeout(*timeout());
     auto clientPtr = client.get();
     m_tunnelingClients.push_back(std::move(client));
 

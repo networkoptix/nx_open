@@ -9,11 +9,12 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/math/math.h>
 
-namespace nx::network
-{
-    class AbstractDatagramSocket;
-    class SocketAddress;
-}
+namespace nx::network {
+
+class AbstractDatagramSocket;
+class SocketAddress;
+
+} // namespace nx::network
 
 namespace nx::vms::testcamera {
 
@@ -53,6 +54,8 @@ private:
     void sendDiscoveryResponseMessage(
         nx::network::AbstractDatagramSocket* discoverySocket,
         const nx::network::SocketAddress& serverAddress) const;
+
+    bool obtainDiscoverySocketAddress(nx::network::SocketAddress* outSocketAddress) const;
 
 protected:
     virtual void run() override;

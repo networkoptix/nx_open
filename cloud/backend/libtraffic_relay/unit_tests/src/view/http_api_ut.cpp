@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_factory.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/url/url_builder.h>
@@ -42,7 +42,10 @@ protected:
     api::Client& relayClient()
     {
         if (!m_relayClient)
+        {
             m_relayClient = api::ClientFactory::instance().create(relay().basicUrl());
+            m_relayClient->setTimeout(nx::network::kNoTimeout);
+        }
         return *m_relayClient;
     }
 
@@ -262,6 +265,7 @@ protected:
             nx::network::url::Builder(relay().basicUrl())
                 .setPath(api::kRelayStatisticsMetricsPath).toUrl(),
             nx::network::http::AuthInfo());
+        m_httpClient->setRequestTimeout(nx::network::kNoTimeout);
         m_httpClient->execute(
             std::bind(&HttpApiStatistics::saveStatisticsRequestResult, this, _1, _2, _3));
     }

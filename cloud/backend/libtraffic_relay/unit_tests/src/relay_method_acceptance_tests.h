@@ -98,6 +98,7 @@ protected:
     {
         using namespace std::placeholders;
 
+        m_clientSideApiClient->setTimeout(nx::network::kNoTimeout);
         m_clientSideApiClient->startSession(
             "sessionId",
             m_serverPeerName,

@@ -580,3 +580,23 @@ QnResourceDataPool* QnCommonModule::resourceDataPool() const
 {
     return m_resourceDataPool;
 }
+
+void QnCommonModule::setMediaStatisticsWindowSize(std::chrono::microseconds value)
+{
+    m_mediaStatisticsWindowSize = value;
+}
+
+std::chrono::microseconds QnCommonModule::mediaStatisticsWindowSize() const
+{
+    return m_mediaStatisticsWindowSize;
+}
+
+void QnCommonModule::setMediaStatisticsMaxDurationInFrames(int value)
+{
+    m_mediaStatisticsMaxDurationInFrames = value;
+}
+
+int QnCommonModule::mediaStatisticsMaxDurationInFrames() const
+{
+    return m_mediaStatisticsMaxDurationInFrames;
+}

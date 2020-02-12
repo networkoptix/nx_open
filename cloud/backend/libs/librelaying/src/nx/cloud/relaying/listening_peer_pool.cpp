@@ -44,6 +44,9 @@ void ListeningPeerPool::addConnection(
     const std::string& originalPeerName,
     std::unique_ptr<network::AbstractStreamSocket> connection)
 {
+    NX_VERBOSE(this, "New connection from %1 (%2)",
+        originalPeerName, connection->getForeignAddress());
+
     auto peerName = convertHostnameToInternalFormat(originalPeerName);
 
     QnMutexLocker lock(&m_mutex);

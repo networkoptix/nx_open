@@ -2,16 +2,29 @@
 
 #include <algorithm>
 
-static const std::chrono::microseconds kWindowSize = std::chrono::seconds(2);
-
 namespace nx {
 namespace sdk {
 
 using namespace std::chrono;
 
-MediaStreamStatistics::MediaStreamStatistics()
+MediaStreamStatistics::MediaStreamStatistics(
+    std::chrono::microseconds windowSize,
+    int maxDurationInFrames)
+    :
+    m_windowSize(windowSize),
+    m_maxDurationInFrames(maxDurationInFrames)
 {
     reset();
+}
+
+void MediaStreamStatistics::setWindowSize(std::chrono::microseconds windowSize)
+{
+    m_windowSize = windowSize;
+}
+
+void MediaStreamStatistics::setMaxDurationInFrames(int maxDurationInFrames)
+{
+    m_maxDurationInFrames = maxDurationInFrames;
 }
 
 void MediaStreamStatistics::reset()
@@ -44,9 +57,12 @@ void MediaStreamStatistics::onData(
     m_totalSizeBytes += dataSize;
 
     // Remove old and future data in case of media stream time has been changed.
-    removeRange(toIterator(timestamp + kWindowSize), m_data.end());
+    removeRange(toIterator(timestamp + m_windowSize), m_data.end());
     if (!m_data.empty())
-        removeRange(m_data.begin(), toIterator(m_data.back().timestamp - kWindowSize));
+        removeRange(m_data.begin(), toIterator(m_data.back().timestamp - m_windowSize));
+    const int extraFrames = m_data.size() - m_maxDurationInFrames;
+    if (extraFrames > 0 && m_maxDurationInFrames > 0)
+        removeRange(m_data.begin(), m_data.begin() + extraFrames);
     m_lastDataTimer = steady_clock::now();
 }
 
@@ -54,7 +70,7 @@ int64_t MediaStreamStatistics::bitrateBitsPerSecond() const
 {
     std::lock_guard<std::mutex> locker(m_mutex);
     const auto elapsed = steady_clock::now() - m_lastDataTimer;
-    if (m_data.empty() || elapsed > kWindowSize)
+    if (m_data.empty() || elapsed > m_windowSize)
         return 0;
 
     const auto interval = intervalUnsafe().count();
@@ -73,7 +89,7 @@ float MediaStreamStatistics::getFrameRate() const
 {
     std::lock_guard<std::mutex> locker(m_mutex);
     const auto elapsed = steady_clock::now() - m_lastDataTimer;
-    if (m_data.empty() || elapsed > kWindowSize)
+    if (m_data.empty() || elapsed > m_windowSize)
         return 0;
     const auto interval = intervalUnsafe().count();
     if (interval > 0)

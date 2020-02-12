@@ -44,18 +44,11 @@ bool FfmpegAudioDemuxer::open(
     FfmpegIoContextPtr ioContext, const std::optional<StreamConfig>& config)
 {
     close();
-
     m_ioContext = std::move(ioContext);
-    if (m_formatContext)
-    {
-        m_formatContext->pb = nullptr;
-        avformat_close_input(&m_formatContext);
-    }
-
     m_formatContext = avformat_alloc_context();
     m_formatContext->pb = m_ioContext->getAvioContext();
 
-    int status;
+    int status = 0;
     if (config)
     {
         NX_DEBUG(this, "Open ffmpeg demuxer with params: %1 %2 %3",
@@ -71,10 +64,17 @@ bool FfmpegAudioDemuxer::open(
         NX_DEBUG(this, "Open ffmpeg demuxer");
         status = avformat_open_input(&m_formatContext, "", 0, 0);
     }
-
     if (status < 0)
     {
         NX_ERROR(this, "Failed to open audio stream, error: %1",
+            QnFfmpegHelper::getErrorStr(status));
+        return false;
+    }
+
+    status = avformat_find_stream_info(m_formatContext, nullptr);
+    if (status < 0)
+    {
+        NX_ERROR(this, "Failed to find stream info, error: %1",
             QnFfmpegHelper::getErrorStr(status));
         return false;
     }
