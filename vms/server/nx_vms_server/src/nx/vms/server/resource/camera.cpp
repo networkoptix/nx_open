@@ -421,8 +421,12 @@ CameraDiagnostics::Result Camera::initInternal()
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    NX_VERBOSE(this, "Initialising camera driver");
+    NX_VERBOSE(this, "Before initialising camera driver");
+    nx::utils::ElapsedTimer t;
+    t.restart();
     const auto driverResult = initializeCameraDriver();
+    NX_DEBUG(this, 
+        "Initialising camera driver done. Camera %1. It took %2", getPhysicalId(), t.elapsed());
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;
 
