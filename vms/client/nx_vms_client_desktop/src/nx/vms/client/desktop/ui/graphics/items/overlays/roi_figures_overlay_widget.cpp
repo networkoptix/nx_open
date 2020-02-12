@@ -121,9 +121,9 @@ RoiFiguresOverlayWidget::Line parseLine(const QJsonObject& object)
 
     const auto& direction = figure.value(QStringLiteral("direction")).toString();
     if (direction == QStringLiteral("left"))
-        line.direction = Line::Direction::a;
+        line.direction = Line::Direction::left;
     else if (direction == QStringLiteral("right"))
-        line.direction = Line::Direction::b;
+        line.direction = Line::Direction::right;
 
     return line;
 }
@@ -276,7 +276,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(
     core::PathUtil pathUtil;
     pathUtil.setPoints(points);
 
-    if (line.direction == Line::Direction::a || line.direction == Line::Direction::none)
+    if (line.direction == Line::Direction::left)
     {
         drawDirectionMark(
             painter,
@@ -285,7 +285,8 @@ void RoiFiguresOverlayWidget::Private::drawLine(
             line.color,
             widget);
     }
-    if (line.direction == Line::Direction::b || line.direction == Line::Direction::none)
+
+    if (line.direction == Line::Direction::right)
     {
         drawDirectionMark(
             painter,
