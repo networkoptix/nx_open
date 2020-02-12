@@ -158,7 +158,7 @@ Control
                     horizontalAlignment: Text.AlignRight
                     contextHintText: qsTr("Select video stream from the camera for analysis")
                     color: ColorTheme.windowText
-                    width: parent.width * 0.3
+                    width: informationPanel.width * 0.3 - informationPanel.leftPadding
                     y: streamComboBox.baselineOffset - baselineOffset
                 }
 
