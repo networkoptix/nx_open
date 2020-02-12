@@ -103,14 +103,6 @@ NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE_EX(
     [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
     nx::network::SocketAddress(m_server->fullName()));
 
-TEST_F(UdpHolePunching, TransferSyncSsl)
-{
-    network::test::socketTransferSync(
-        [&]() { return std::make_unique<ssl::StreamServerSocket>(cloudServerSocket(), ssl::EncryptionUse::always); },
-        []() { return std::make_unique<ssl::ClientStreamSocket>(std::make_unique<CloudStreamSocket>(AF_INET)); },
-        nx::network::SocketAddress(m_server->fullName()));
-}
-
 TEST_F(UdpHolePunching, loadTest)
 {
     const std::chrono::seconds testDuration(7 * utils::TestOptions::timeoutMultiplier());

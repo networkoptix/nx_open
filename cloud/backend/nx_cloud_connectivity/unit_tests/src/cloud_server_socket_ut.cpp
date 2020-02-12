@@ -258,13 +258,6 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
     [this](){ return makeServerTester(); },
     [this](){ return makeClientTester(); });
 
-TEST_F(CloudServerSocketTcpTest, TransferSyncSsl)
-{
-    network::test::socketTransferSync(
-        [&]() { return std::make_unique<ssl::StreamServerSocket>(makeServerTester(), ssl::EncryptionUse::always); },
-        [&]() { return std::make_unique<ssl::ClientStreamSocket>(makeClientTester()); });
-}
-
 TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
 {
     network::test::AddressBinder addressBinder;
