@@ -266,9 +266,12 @@ bool QnTranslationManager::setCurrentThreadTranslationLocale(const QString& loca
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     Qt::HANDLE id = QThread::currentThreadId();
+    const auto& curLocale = m_threadLocales.value(id);
 
-    if (const auto& curLocale = m_threadLocales.value(id);
-        !curLocale.isEmpty())
+    if (locale == curLocale)
+        return true;
+
+    if (!curLocale.isEmpty())
     {
         // We have overlayed locale for the given thread already. Disable the existing translators.
         m_overlays[curLocale]->removeThreadContext(id);
