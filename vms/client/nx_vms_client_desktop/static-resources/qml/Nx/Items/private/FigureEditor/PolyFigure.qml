@@ -11,10 +11,15 @@ Figure
 {
     id: figure
 
-    property alias minPoints: pointMakerInstrument.minPoints
-    property alias maxPoints: pointMakerInstrument.maxPoints
+    readonly property alias geometricMinPoints: pointMakerInstrument.minPoints
+    readonly property int minPoints:
+        (figureSettings && figureSettings.minPoints) || geometricMinPoints
+    readonly property int maxPoints:
+        (figureSettings && figureSettings.maxPoints && figureSettings.maxPoints >= minPoints)
+            ? figureSettings.maxPoints
+            : polygon ? -1 : 2
     property real snapDistance: 8
-    readonly property bool hasFigure: pointsCount >= (polygon ? 3 : 2)
+    readonly property bool hasFigure: pointsCount >= geometricMinPoints
         || (pointMakerInstrument.enabled && pointsCount > 0)
     acceptable: !pathUtil.hasSelfIntersections && pointsCount >= minPoints
         && (!pointMakerInstrument.enabled || pointsCount === 0)
@@ -44,12 +49,6 @@ Figure
         closed: polygon
 
         item: mouseArea
-
-        minPoints: (figureSettings && figureSettings.minPoints) || (polygon ? 3 : 2)
-        maxPoints:
-            (figureSettings && figureSettings.maxPoints && figureSettings.maxPoints >= minPoints)
-                ? figureSettings.maxPoints
-                : polygon ? -1 : 2
 
         onEnabledChanged: canvas.requestPaint()
     }
@@ -267,7 +266,7 @@ Figure
                 if (pointMenu.pointIndex < 0)
                     return
 
-                if (pointMakerInstrument.count > 3)
+                if (pointMakerInstrument.count > geometricMinPoints)
                     pointMakerInstrument.removePoint(pointMenu.pointIndex)
                 else
                     startCreation()

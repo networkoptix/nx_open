@@ -15,7 +15,7 @@ Instrument
     readonly property real endY: count > 0 ? getPoint(count - 1).y : 0
 
     property real snapDistance: 12
-    property int minPoints: 2
+    property int minPoints: closed ? 3 : 2
     property int maxPoints: 0
     property bool closed: false
 
