@@ -452,9 +452,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc:arrayParams POST /ec2/saveCameraUserAttributesList
      * Save additional camera attributes for a number of cameras.
      * <p>
-     * Parameters should be passed as a JSON array of objects in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * Parameters should be passed as a JSON array of objects in POST message body with content
+     * type "application/json". Example of such array can be seen in the result of the
+     * corresponding GET function, and each object of such array has the same structure as the
+     * object supplied to /ec2/saveCameraUserAttributes.
      * </p>
      * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
      * %param cameraName Camera name.
@@ -546,11 +547,15 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<CameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
 
     /**%apidoc POST /ec2/saveCameraUserAttributes
-     * Save additional camera attributes for a single camera.
+     * Save additional camera attributes for a single camera. If it is needed to change only a
+     * subset of attributes on a given camera, /ec2/getCameraUserAttributesList should be called,
+     * the JSON object corresponding to the given camera extracted from the returned array,
+     * patched, and supplied to this function.
      * <p>
      * Parameters should be passed as a JSON object in POST message body with content type
-     * "application/json". Example of such object can be seen in an item of the list returned by
-     * /ec2/getCameraUserAttributesList function.
+     * "application/json". Example of such object can be seen in an item of the array returned by
+     * /ec2/getCameraUserAttributesList, and such object has the same structure as an item of the
+     * array supplied to /ec2/saveCameraUserAttributesList.
      * </p>
      * %permissions Administrator, or a custom user with "Edit camera settings" permission.
      * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
@@ -646,10 +651,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * Read additional camera attributes.
      * %param[default] format
      * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
-     *     field via /ec2/getCamerasEx) or MAC address (not
-     *     supported for certain cameras). If omitted, return data for all cameras.
+     *     field via /ec2/getCamerasEx) or MAC address (not supported for certain cameras). If
+     *     omitted, return data for all cameras.
      * %return List of objects with additional camera attributes for all cameras, in the requested
-     *     format.
+     *     format. If JSON was requested, each object in this array has the same structure as an
+     *     object supplied to /ec2/saveCameraUserAttributes and as an item of the array supplied to
+     *     /ec2/saveCameraUserAttributesList.
      *     %param cameraId Camera unique id.
      *     %param cameraName Camera name.
      *     %param userDefinedGroupName Name of the user-defined camera group.
