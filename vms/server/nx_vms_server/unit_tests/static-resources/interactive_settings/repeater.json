@@ -1,0 +1,40 @@
+{
+    "type": "Settings",
+
+    "_values": {
+        "user0.name": "User0",
+        "user0.note1": "note#1",
+        "user0.note2": "note#2",
+        "user1.name": "User1",
+        "user1.note1": "note#1",
+        "user1.note2": "note#2"
+    },
+
+    "items": [
+        {
+            "type": "Repeater",
+            "count": 2,
+            "startIndex": 0,
+            "template": {
+                "type": "GroupBox",
+                "caption": "Users",
+                "items": [
+                    {
+                        "type": "TextField",
+                        "name": "user#.name",
+                        "defaultValue": "User#1"
+                    },
+                    {
+                        "type": "Repeater",
+                        "count": 2,
+                        "template": {
+                            "type": "TextField",
+                            "name": "user#1.note#2",
+                            "defaultValue": "note#####2"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

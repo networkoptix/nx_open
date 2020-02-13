@@ -20,7 +20,131 @@ namespace {
 
 using namespace components;
 
-std::variant<AbstractEngine::Error, Item*> createItem(Item* parent, const QJsonObject& object)
+QString processItemTemplateString(QString str, const int index, const int depth)
+{
+    QString result;
+
+    enum class State
+    {
+        idle,
+        sharpRead,
+        readingNumber,
+    };
+
+    State state = State::idle;
+    QString number;
+
+    const auto indexStr = QString::number(index);
+
+    // Append non-specific character at the end to finish processing states.
+    str.append(L'$');
+
+    for (int i = 0; i < str.length(); ++i)
+    {
+        const auto ch = str[i];
+
+        switch (state)
+        {
+            case State::idle:
+                if (ch == L'#')
+                    state = State::sharpRead;
+                else
+                    result += ch;
+                break;
+
+            case State::sharpRead:
+                if (ch == L'#')
+                {
+                    result += ch;
+                    state = State::idle;
+                }
+                else if (ch.isDigit())
+                {
+                    number += ch;
+                    state = State::readingNumber;
+                }
+                else if (depth == 1)
+                {
+                    result += indexStr;
+                    result += ch;
+                    state = State::idle;
+                }
+                else
+                {
+                    result += L'#';
+                    result += ch;
+                    state = State::idle;
+                }
+
+                break;
+
+            case State::readingNumber:
+                if (ch.isDigit())
+                {
+                    number += ch;
+                }
+                else
+                {
+                    const int num = number.toInt();
+                    if (num == depth)
+                        result += indexStr;
+                    else
+                        result += L'#' + number;
+
+                    number.clear();
+
+                    // Need to reprocess the character.
+                    state = State::idle;
+                    --i;
+                }
+                break;
+        }
+    }
+
+    result.chop(1);
+
+    return result;
+}
+
+QJsonValue processItemTemplate(const QJsonValue& value, const int index, const int depth)
+{
+    switch (value.type())
+    {
+        case QJsonValue::String:
+        {
+            return processItemTemplateString(value.toString(), index, depth);
+        }
+
+        case QJsonValue::Object:
+        {
+            QJsonObject result;
+
+            const QJsonObject object = value.toObject();
+            for (auto it = object.begin(); it != object.end(); ++it)
+                result[it.key()] = processItemTemplate(it.value(), index, depth);
+
+            return result;
+        }
+
+        case QJsonValue::Array:
+        {
+            QJsonArray array;
+
+            for (const auto item: value.toArray())
+                array.append(processItemTemplate(item, index, depth));
+
+            return array;
+        }
+
+        default:
+            break;
+    }
+
+    return value;
+}
+
+std::variant<AbstractEngine::Error, Item*> createItem(
+    Item* parent, const QJsonObject& object, int repeaterDepth)
 {
     const auto type = object["type"].toString();
     if (type.isEmpty())
@@ -64,7 +188,7 @@ std::variant<AbstractEngine::Error, Item*> createItem(Item* parent, const QJsonO
         for (const QJsonValue itemValue: object["items"].toArray())
         {
             const QJsonObject itemObject = itemValue.toObject();
-            const auto result = createItem(item.get(), itemObject);
+            const auto result = createItem(item.get(), itemObject, repeaterDepth);
 
             if (const auto childItem = std::get_if<Item*>(&result))
                 itemsProperty.append(&itemsProperty, *childItem);
@@ -79,7 +203,7 @@ std::variant<AbstractEngine::Error, Item*> createItem(Item* parent, const QJsonO
 
         for (const QJsonValue sectionValue: object["sections"].toArray())
         {
-            const auto result = createItem(item.get(), sectionValue.toObject());
+            const auto result = createItem(item.get(), sectionValue.toObject(), repeaterDepth);
             const auto childItem = std::get_if<Item*>(&result);
             if (!childItem)
                 return result;
@@ -92,6 +216,26 @@ std::variant<AbstractEngine::Error, Item*> createItem(Item* parent, const QJsonO
             }
 
             sectionsProperty.append(&sectionsProperty, childSection);
+        }
+    }
+
+    if (const auto repeater = qobject_cast<Repeater*>(item.get()))
+    {
+        const auto& itemTemplate = QJsonObject::fromVariantMap(repeater->itemTemplate().toMap());
+        const int count = repeater->count();
+        const int startIndex = repeater->startIndex();
+        auto itemsProperty = repeater->items();
+
+        for (int i = 0; i < count; ++i)
+        {
+            const QJsonObject& model =
+                processItemTemplate(itemTemplate, i + startIndex, repeaterDepth).toObject();
+            const auto result = createItem(repeater, model, repeaterDepth + 1);
+
+            if (const auto childItem = std::get_if<Item*>(&result))
+                itemsProperty.append(&itemsProperty, *childItem);
+            else
+                return result;
         }
     }
 
@@ -110,7 +254,7 @@ AbstractEngine::Error JsonEngine::loadModelFromJsonObject(const QJsonObject& jso
     auto object = json;
     object["type"] = "Settings";
 
-    const auto result = createItem(nullptr, object);
+    const auto result = createItem(nullptr, object, 1);
     if (const auto item = std::get_if<Item*>(&result))
         return setSettingsItem(static_cast<Settings*>(*item));
 
