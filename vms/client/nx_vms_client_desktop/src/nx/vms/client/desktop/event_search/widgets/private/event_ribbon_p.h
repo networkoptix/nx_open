@@ -236,6 +236,7 @@ private:
     QHash<ResourceThumbnailProvider*, PreviewLoadData> m_loadingByProvider;
     QHash<QnMediaServerResourcePtr, ServerLoadData> m_loadingByServer;
     ResourceThumbnailProvider* m_providerLoadingFromCache = nullptr;
+    QTimer* m_layoutTimer = nullptr;
 };
 
 } // namespace nx::vms::client::desktop
