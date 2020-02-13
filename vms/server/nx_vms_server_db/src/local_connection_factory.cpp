@@ -1698,7 +1698,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractMiscManager::changeSystemId
     regUpdate<SystemIdData>(p, ApiCommand::changeSystemId);
 
-    // AbstractECConnection
+    /**%apidoc POST /ec2/restoreDatabase
+     * Restore the System database (shared among all Servers) from the specified backup.
+     * %param:string data Binary database dump, encoded in Base64.
+     * %// AbstractECConnection
+     */
     regUpdate<DatabaseDumpData>(p, ApiCommand::restoreDatabase);
 
     /**%apidoc GET /ec2/getFullInfo
@@ -1715,7 +1719,21 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<std::nullptr_t, LicenseDataList>(p, ApiCommand::getLicenses);
 
+    /**%apidoc GET /ec2/dumpDatabase
+     * Back up the System database (shared among all Servers).
+     * %param[default] format
+     * %return Object in the requested format, containing the binary database dump.
+     *     %param:string data Binary database dump, encoded in Base64.
+     */
     regGet<std::nullptr_t, DatabaseDumpData>(p, ApiCommand::dumpDatabase);
+
+    /**%apidoc[proprietary] GET /ec2/dumpDatabaseToFile
+     * Back up the System database (shared among all Servers) to the specified file.
+     * %param[default] format
+     * %param:string path Path to a file to be created on the current Server's filesystem.
+     * %return Object in the requested format, describing the created file.
+     *     %param size File size in bytes.
+     */
     regGet<StoredFilePath, DatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 
     // AbstractECConnectionFactory
