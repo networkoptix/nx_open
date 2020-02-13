@@ -96,4 +96,33 @@ TEST(SimpleReorderer, bufferSize)
     }
 }
 
+TEST(SimpleReorderer, bufferOverflow)
+{
+    SimpleReorderer reorderer({ /*minDuration*/ 10us, /* maxDuration*/ 10us });
+
+    auto addData = 
+        [&](qint64 timestamp)
+        {
+            QnAbstractDataPacketPtr data(new QnWritableCompressedVideoData());
+            data->timestamp = timestamp;
+            reorderer.processNewData(data);
+        };
+
+    for (int i = 1; i <= 10; ++i)
+        addData(i + 10);
+
+    auto& queue = reorderer.queue();
+
+    addData(1);
+    addData(22);
+
+    ASSERT_EQ(3, queue.size());
+    ASSERT_EQ(1, queue[0]->timestamp);
+    ASSERT_EQ(11, queue[1]->timestamp);
+    ASSERT_EQ(12, queue[2]->timestamp);
+
+    reorderer.flush();
+    ASSERT_EQ(12, queue.size());
+}
+
 } // namespace nx:vms::server::test
