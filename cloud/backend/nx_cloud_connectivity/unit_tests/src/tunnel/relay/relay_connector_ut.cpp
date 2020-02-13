@@ -96,7 +96,7 @@ protected:
 
         m_connector->connect(
             hpm::api::ConnectResponse(),
-            std::chrono::milliseconds::zero(),
+            nx::network::kNoTimeout,
             std::bind(&RelayConnector::onConnectFinished, this, _1, _2, _3));
     }
 

@@ -105,6 +105,12 @@ std::unique_ptr<AbstractStreamSocket> ReverseConnection::takeSocket()
     return nullptr;
 }
 
+void ReverseConnection::setTimeout(
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    m_relayClient->setTimeout(timeout);
+}
+
 void ReverseConnection::stopWhileInAioThread()
 {
     m_relayClient.reset();

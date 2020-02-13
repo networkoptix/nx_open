@@ -37,6 +37,7 @@ public:
 
     nx::cloud::relay::api::BeginListeningResponse beginListeningResponse() const;
     std::unique_ptr<AbstractStreamSocket> takeSocket();
+    void setTimeout(std::optional<std::chrono::milliseconds> timeout);
 
 protected:
     virtual void stopWhileInAioThread() override;

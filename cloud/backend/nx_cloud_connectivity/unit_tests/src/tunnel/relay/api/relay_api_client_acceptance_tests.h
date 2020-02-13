@@ -65,6 +65,7 @@ protected:
         initializeHttpServerIfNeeded();
         m_client = std::make_unique<typename ClientTypeSet::Client>(
             m_baseUrl, nullptr);
+        m_client->setTimeout(nx::network::kNoTimeout);
 
         nx::utils::promise<void> done;
         m_client->startSession(
