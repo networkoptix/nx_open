@@ -537,21 +537,25 @@ void DeviceSearcher::processPacket(DiscoveredDeviceInfo info)
 
 void DeviceSearcher::onDeviceDescriptionXmlRequestDone(nx::network::http::AsyncHttpClientPtr httpClient)
 {
-    DiscoveredDeviceInfo* ctx = nullptr;
+    DiscoveredDeviceInfo ctx;
+    bool processRequired = false;
     {
         QnMutexLocker lk(&m_mutex);
         HttpClientsDict::iterator it = m_httpClients.find(httpClient);
         if (it == m_httpClients.end())
             return;
-        ctx = &it->second;
+        processRequired = httpClient->response()
+            && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok;
+        if (processRequired)
+            ctx = it->second;
     }
 
-    if (httpClient->response() && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
+    if (processRequired)
     {
         // TODO: #ak check content type. Must be text/xml; charset="utf-8"
         //reading message body
         const nx::network::http::BufferType& msgBody = httpClient->fetchMessageBodyBuffer();
-        processDeviceXml(*ctx, msgBody);
+        processDeviceXml(ctx, msgBody);
     }
 
     QnMutexLocker lk(&m_mutex);
