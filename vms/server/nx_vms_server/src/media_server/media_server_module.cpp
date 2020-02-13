@@ -371,8 +371,8 @@ QnMediaServerModule::QnMediaServerModule(
         commonModule()->timerManager()));
     m_multicastAddressRegistry = store(new nx::vms::server::network::MulticastAddressRegistry());
 
-    auto translationManager = new QnTranslationManager();
-    store(translationManager);
+    // Initialize TranslationManager.
+    auto translationManager = instance<QnTranslationManager>();
 
     // Right now QTranslators are created with qApp as a parent,
     // so we need to call installTranslation() in the main thread.

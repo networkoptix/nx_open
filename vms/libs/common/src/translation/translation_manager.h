@@ -4,6 +4,7 @@
 #include "translation_overlay.h"
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 #include <QtCore/QHash>
 #include <QtCore/QStack>
 #include <QtCore/QString>
@@ -34,20 +35,21 @@ public:
 
     static void installTranslation(const QnTranslation& translation);
 
-    struct LocaleRollback
-    {
-        ~LocaleRollback() { manager->popThreadTranslationLocale(); }
-        QnTranslationManager* manager;
-    };
-    using ScopedLocaleRollback = QScopedPointer<LocaleRollback>;
     /**
      * Temporary changes the locale that is used in the current thread to translate tr() strings.
-     * Returns a temporary object. When this object is destroyed, the original locale is restored.
+     * When this object is destroyed, the original locale is restored.
      *
-     * In the case of incorrect locale an empty pointer is returned and the current locale remains.
-     * This method is reenterable, so it's possible to create a 'stack' of locales if necessary.
+     * In the case of incorrect locale the current locale remains.
      */
-    ScopedLocaleRollback alterThreadLocale(const QString& locale);
+    class LocaleRollback
+    {
+    public:
+        LocaleRollback(QnTranslationManager* manager, const QString& locale);
+        ~LocaleRollback();
+    private:
+        QString m_prevLocale;
+        QPointer<QnTranslationManager> m_manager;
+    };
 
     static QString localeCodeToTranslationPath(const QString& localeCode);
     static QString translationPathToLocaleCode(const QString& translationPath);
@@ -60,8 +62,9 @@ protected:
         const QString& translationName) const;
 
 private:
-    bool pushThreadTranslationLocale(const QString& locale);
-    bool popThreadTranslationLocale();
+    bool setCurrentThreadTranslationLocale(const QString& locale);
+    QString getCurrentThreadTranslationLocale() const;
+    void uninstallUnusedOverlays();
 
 private:
     QList<QString> m_searchPaths;
@@ -69,8 +72,8 @@ private:
     QList<QnTranslation> m_translations;
     bool m_translationsValid;
 
-    nx::utils::Mutex m_mutex;
-    QHash<Qt::HANDLE, QStack<QString>> m_localeStack;
+    mutable nx::utils::Mutex m_mutex;
+    QHash<Qt::HANDLE, QString> m_threadLocales;
     QHash<QString, QSharedPointer<nx::vms::translation::TranslationOverlay>> m_overlays;
 
 };
