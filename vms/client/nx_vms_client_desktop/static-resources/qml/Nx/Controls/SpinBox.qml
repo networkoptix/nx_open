@@ -1,5 +1,6 @@
 import QtQuick 2.10
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.4
+
 import Nx 1.0
 
 import "private"
@@ -8,20 +9,29 @@ SpinBox
 {
     id: control
 
-    implicitWidth: 200
-    implicitHeight: 28
-    leftPadding: 8
-    rightPadding: 18
+    implicitWidth: Math.max(contentWidth + leftPadding + rightPadding, 64)
+    implicitHeight: Math.max(contentHeight, 28) + topPadding + bottomPadding
+
+    leftPadding: control.mirrored ? 18 : 8
+    rightPadding: control.mirrored ? 8 : 18
+    topPadding: padding
+    bottomPadding: padding
+    padding: 0
 
     font.pixelSize: 14
 
     background: TextFieldBackground { control: parent }
 
+    locale: Qt.locale("C")
+
+    property real contentHeight: textInput.implicitHeight
+
+    property real contentWidth: 4 + Math.max(
+        fontMetrics.advanceWidth(textFromValue(from, locale)),
+        fontMetrics.advanceWidth(textFromValue(to, locale)))
+
     onValueChanged:
-    {
-        if (control.valueFromText(textInput.text, Qt.locale()) !== value)
-            textInput.text = control.textFromValue(value, Qt.locale())
-    }
+        textInput.updateValue()
 
     contentItem: TextInput
     {
@@ -32,10 +42,23 @@ SpinBox
         selectByMouse: true
         selectedTextColor: ColorTheme.brightText
         selectionColor: ColorTheme.highlight
-
+        verticalAlignment: Text.AlignVCenter
+        inputMethodHints: control.inputMethodHints
         validator: control.validator
+        readOnly: !control.editable
+        clip: true
 
-        onTextEdited: control.value = control.valueFromText(text, Qt.locale())
+        onTextEdited:
+        {
+            control.value = control.valueFromText(text, control.locale)
+            updateValue()
+        }
+
+        function updateValue()
+        {
+            if (control.valueFromText(text, control.locale) !== control.value)
+                text = textFromValue(control.value, control.locale)
+        }
     }
 
     up.indicator: Rectangle
@@ -86,5 +109,22 @@ SpinBox
         }
     }
 
-    Component.onCompleted: textInput.text = control.displayText
+    FontMetrics
+    {
+        id: fontMetrics
+        font: textInput.font
+    }
+
+    valueFromText: (function(text, locale)
+    {
+        return Number.fromLocaleString(locale, text)
+    })
+
+    textFromValue: (function(value, locale)
+    {
+        return Number(value).toLocaleString(locale, 'f', 0)
+    })
+
+    Component.onCompleted:
+        textInput.text = control.displayText
 }

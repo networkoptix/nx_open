@@ -1,3 +1,5 @@
+import QtQuick 2.6
+
 import Nx.Controls 1.0
 
 import "private"
@@ -11,10 +13,18 @@ LabeledItem
     property alias maxValue: spinBox.to
     property alias value: spinBox.value
 
-    contentItem: SpinBox
+    contentItem: Item
     {
-        id: spinBox
-        editable: true
-        value: defaultValue
+        implicitWidth: spinBox.implicitWidth
+        implicitHeight: spinBox.implicitHeight
+        baselineOffset: spinBox.baselineOffset
+
+        SpinBox
+        {
+            id: spinBox
+
+            editable: true
+            value: defaultValue
+        }
     }
 }
