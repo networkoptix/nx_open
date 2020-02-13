@@ -93,8 +93,6 @@ class Repeater: public Group
     using base_type = Group;
 
 public:
-    using Group::Group;
-
     Repeater(QObject* parent = nullptr);
 
     QVariant itemTemplate() const;
