@@ -761,7 +761,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             if stream_stats[stream_type].frame_drops > ini['maxAllowedFrameDrops']:
                                 issues.append(exceptions.VmsBenchmarkIssue(
                                     f'{stream_stats[stream_type].frame_drops} frame-dropping '
-                                    'situation(s) '
+                                    'situation(s) detected '
                                     f'in {stream_type} streams.'))
 
                             worst_lag_us = stream_stats[stream_type].worst_lag_us()
