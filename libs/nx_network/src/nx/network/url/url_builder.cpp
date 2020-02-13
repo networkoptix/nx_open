@@ -1,5 +1,7 @@
 #include "url_builder.h"
 
+#include <QtCore/QUrlQuery>
+
 namespace nx::network::url {
 
 Builder::Builder(const nx::utils::Url& url):
@@ -148,6 +150,14 @@ Builder& Builder::setQuery(const QUrlQuery& query)
 {
     m_url.setQuery(query);
     return *this;
+}
+
+Builder& Builder::addQueryItem(const QString& name, const QString& value)
+{
+    // TODO: Optimize by QUrlQuery field in Builder.
+    QUrlQuery query(m_url.query());
+    query.addQueryItem(name, value);
+    return setQuery(query);
 }
 
 Builder& Builder::setFragment(const QString& fragment, QUrl::ParsingMode mode)

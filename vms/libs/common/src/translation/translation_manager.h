@@ -1,8 +1,15 @@
 #pragma once
 
-#include <QtCore/QObject>
-
 #include "translation.h"
+#include "translation_overlay.h"
+
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
+#include <QtCore/QHash>
+#include <QtCore/QStack>
+#include <QtCore/QString>
+
+#include <nx/utils/thread/mutex.h>
 
 class QnTranslationManager: public QObject
 {
@@ -28,6 +35,22 @@ public:
 
     static void installTranslation(const QnTranslation& translation);
 
+    /**
+     * Temporary changes the locale that is used in the current thread to translate tr() strings.
+     * When this object is destroyed, the original locale is restored.
+     *
+     * In the case of incorrect locale the current locale remains.
+     */
+    class LocaleRollback
+    {
+    public:
+        LocaleRollback(QnTranslationManager* manager, const QString& locale);
+        ~LocaleRollback();
+    private:
+        QString m_prevLocale;
+        QPointer<QnTranslationManager> m_manager;
+    };
+
     static QString localeCodeToTranslationPath(const QString& localeCode);
     static QString translationPathToLocaleCode(const QString& translationPath);
     static QString localeCode31to30(const QString& localeCode);
@@ -39,8 +62,18 @@ protected:
         const QString& translationName) const;
 
 private:
+    bool setCurrentThreadTranslationLocale(const QString& locale);
+    QString getCurrentThreadTranslationLocale() const;
+    void uninstallUnusedOverlays();
+
+private:
     QList<QString> m_searchPaths;
     QList<QString> m_prefixes;
     QList<QnTranslation> m_translations;
     bool m_translationsValid;
+
+    mutable nx::utils::Mutex m_mutex;
+    QHash<Qt::HANDLE, QString> m_threadLocales;
+    QHash<QString, QSharedPointer<nx::vms::translation::TranslationOverlay>> m_overlays;
+
 };

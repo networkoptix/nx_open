@@ -12,6 +12,7 @@
 #include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/core/common/utils/path_util.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 #include <core/resource/camera_resource.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -90,7 +91,8 @@ void parseItem(RoiFiguresOverlayWidget::Item& item, const QJsonObject& object)
         return;
 
     item.visible = object.value(QStringLiteral("showOnCamera")).toBool(true);
-    item.color = figure.value(QStringLiteral("color")).toString();
+    item.color = figure.value(QStringLiteral("color")).toString(
+        ColorTheme::instance()->color("roi1").name());
 
     item.points.clear();
     for (const auto p: figure.value(QStringLiteral("points")).toArray())
@@ -119,9 +121,9 @@ RoiFiguresOverlayWidget::Line parseLine(const QJsonObject& object)
 
     const auto& direction = figure.value(QStringLiteral("direction")).toString();
     if (direction == QStringLiteral("left"))
-        line.direction = Line::Direction::a;
+        line.direction = Line::Direction::left;
     else if (direction == QStringLiteral("right"))
-        line.direction = Line::Direction::b;
+        line.direction = Line::Direction::right;
 
     return line;
 }
@@ -223,10 +225,8 @@ void RoiFiguresOverlayWidget::Private::strokePolyline(
         QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_1_5>();
 
     functions->glEnable(GL_LINE_SMOOTH);
-    functions->glEnable(GL_POINT_SMOOTH);
     functions->glEnable(GL_BLEND);
     functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    functions->glDepthMask(false);
     functions->glLineWidth((GLfloat) lineWidth);
     functions->glPointSize((GLfloat) (lineWidth - 0.5 * widget->devicePixelRatioF()));
     functions->glColor3d(color.redF(), color.greenF(), color.blueF());
@@ -240,12 +240,16 @@ void RoiFiguresOverlayWidget::Private::strokePolyline(
 
     functions->glEnd();
 
-    functions->glBegin(GL_POINTS);
+    if (lineWidth >= 2.0)
+    {
+        functions->glEnable(GL_POINT_SMOOTH);
+        functions->glBegin(GL_POINTS);
         for (const auto& point: points)
             functions->glVertex2d(point.x(), point.y());
-    functions->glEnd();
+        functions->glEnd();
+        functions->glDisable(GL_POINT_SMOOTH);
+    }
 
-    functions->glDepthMask(true);
     functions->glDisable(GL_BLEND);
     functions->glDisable(GL_LINE_SMOOTH);
 
@@ -272,7 +276,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(
     core::PathUtil pathUtil;
     pathUtil.setPoints(points);
 
-    if (line.direction == Line::Direction::a || line.direction == Line::Direction::none)
+    if (line.direction == Line::Direction::left)
     {
         drawDirectionMark(
             painter,
@@ -281,7 +285,8 @@ void RoiFiguresOverlayWidget::Private::drawLine(
             line.color,
             widget);
     }
-    if (line.direction == Line::Direction::b || line.direction == Line::Direction::none)
+
+    if (line.direction == Line::Direction::right)
     {
         drawDirectionMark(
             painter,

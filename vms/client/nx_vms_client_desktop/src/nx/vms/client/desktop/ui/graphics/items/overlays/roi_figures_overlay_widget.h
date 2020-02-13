@@ -24,7 +24,7 @@ public:
 
     struct Line: Item
     {
-        enum class Direction { none, a, b };
+        enum class Direction { none, left, right };
         Direction direction = Direction::none;
     };
 

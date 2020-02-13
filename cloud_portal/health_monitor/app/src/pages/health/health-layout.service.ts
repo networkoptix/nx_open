@@ -181,7 +181,7 @@ export class NxHealthLayoutService {
             if (this.activeEntity && !this.mobileDetailMode) {
                 this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--with-panel';
             } else {
-                this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--no-panel';
+                this.fixedLayoutClass = 'fixedLayout--no-panel';
             }
 
             if (this.mobileDetailMode && this.activeEntity) {
@@ -208,13 +208,15 @@ export class NxHealthLayoutService {
                     this.dimensions = [elementSearchHeight + 16, 0]; // trick table's onChanges will pick new dimensions
                 }
                 // area available
-                const areaWidth = this.searchTableArea.nativeElement.offsetWidth;
+                const areaWidth = this.searchTableArea ? this.searchTableArea.nativeElement.offsetWidth : 0;
                 // area available to the table (- gutter)
                 const availAreaWidth = areaWidth - NxHealthService.PANEL_WIDTH - 16;
 
                 const isTableFit = (availAreaWidth > this.tableWidth) && !this.mobileDetailMode;
                 if (this.activeEntity && !this.mobileDetailMode) {
-                    this.searchElement.nativeElement.style.width = 'auto';
+                    if (this.searchElement) {
+                        this.searchElement.nativeElement.style.width = 'auto';
+                    }
                     this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--with-panel';
                 } else {
                     this.fixedLayoutClass = 'fixedLayout--no-panel';
@@ -238,13 +240,10 @@ export class NxHealthLayoutService {
     }
 
     setTableDimensions() {
-        if (!this.tableHeaderElement) {
-            return;
-        }
         const windowSize = this.scrollMechanicsService.windowSizeSubject.getValue();
 
         const ELEMENTS_HEIGHT = this.dimensions.reduce((prev, curr) => prev + curr, 0);
-        const THEAD_HEIGHT = this.tableHeaderElement.nativeElement.offsetHeight;
+        const THEAD_HEIGHT = this.tableHeaderElement ? this.tableHeaderElement.nativeElement.offsetHeight : 0;
         const PADDING = 16;
         const PAGINATION_HEIGHT = 64;
 
@@ -259,7 +258,7 @@ export class NxHealthLayoutService {
             pageSize = 5;
         }
         this.pageSize = pageSize;
-        if (this.tableElement.nativeElement.offsetWidth !== 0) {
+        if (this.tableElement && this.tableElement.nativeElement.offsetWidth !== 0) {
             this.tableWidth = this.tableElement.nativeElement.offsetWidth;
         }
         this.healthService.tableReady = true;

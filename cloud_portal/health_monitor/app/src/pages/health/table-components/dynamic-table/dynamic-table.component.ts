@@ -208,7 +208,6 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
 
     ngOnChanges(changes: SimpleChanges) {
         let resetURI;
-        let setDimensions;
 
         if (changes.headers) {
             this.selectedHeader = undefined;
@@ -221,18 +220,7 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
 
         if (changes.elements) {
             this._elements = Object.values(changes.elements.currentValue);
-
-            if (this.dataTable) {
-                const tableWrapper      = this.dataTable.nativeElement.querySelectorAll('.table-wrapper')[0];
-                tableWrapper.scrollLeft = 0;
-            }
-
             this.setPage(1);
-            setDimensions = true;
-        }
-
-        if (setDimensions) {
-            // TODO: Try to remove timeout in CLOUD-423
             if (this.dataTable) {
                 this.setTableDimensions();
             }

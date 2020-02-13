@@ -110,15 +110,6 @@ namespace {
 
 const auto kLastRunningTime = lit("lastRunningTime");
 
-void installTranslations()
-{
-    static const QString kDefaultPath(":/translations/common_en_US.qm");
-
-    QnTranslationManager translationManager;
-    QnTranslation defaultTranslation = translationManager.loadTranslation(kDefaultPath);
-    QnTranslationManager::installTranslation(defaultTranslation);
-}
-
 } // namespace
 
 class ServerDataProviderFactory:
@@ -384,8 +375,18 @@ QnMediaServerModule::QnMediaServerModule(
         commonModule()->timerManager()));
     m_multicastAddressRegistry = store(new nx::vms::server::network::MulticastAddressRegistry());
 
-    // Translations must be installed from the main application thread.
-    executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
+    // Initialize TranslationManager.
+    auto translationManager = instance<QnTranslationManager>();
+
+    // Right now QTranslators are created with qApp as a parent,
+    // so we need to call installTranslation() in the main thread.
+    auto installProc = [translationManager]()
+    {
+        auto locale = QnAppInfo::defaultLanguage();
+        auto defaultTranslation = translationManager->loadTranslation(locale);
+        QnTranslationManager::installTranslation(defaultTranslation);
+    };
+    executeDelayed(installProc, kDefaultDelay, qApp->thread());
 }
 
 void QnMediaServerModule::initializeP2PDownloader()

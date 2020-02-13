@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { NxConfigService } from '../../../services/nx-config';
+import { NxConfigService }                                    from '../../../services/nx-config';
+import { NxMenuService }                                      from '../menu.service';
 
 /* Usage
 */
@@ -18,7 +19,9 @@ export class NxLevel1ItemComponent implements OnInit, OnChanges {
 
     CONFIG: any;
 
-    constructor(private configService: NxConfigService) {
+    constructor(private configService: NxConfigService,
+                private menuService: NxMenuService,
+    ) {
         this.CONFIG = this.configService.getConfig();
     }
 
@@ -32,5 +35,9 @@ export class NxLevel1ItemComponent implements OnInit, OnChanges {
             this.itemPath = changes.base.currentValue;
             this.itemPath += (this.item.path !== '') ? '/' + this.item.path : '';
         }
+    }
+
+    menuClick(sectionId) {
+        this.menuService.setSection(sectionId);
     }
 }

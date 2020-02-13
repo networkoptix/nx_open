@@ -58,7 +58,7 @@ Item
         y: pathUtil.midAnchorPoint.y
         rotation: F.toDegrees(pathUtil.midAnchorPointNormalAngle)
         color: "white"
-        visible: !direction || direction === "a"
+        visible: !direction || direction === "left"
     }
 
     LineArrow
@@ -67,7 +67,7 @@ Item
         y: pathUtil.midAnchorPoint.y
         rotation: F.toDegrees(pathUtil.midAnchorPointNormalAngle) + 180
         color: "white"
-        visible: !direction || direction === "b"
+        visible: !direction || direction === "right"
     }
 
     onFigureJsonChanged:

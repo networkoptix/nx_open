@@ -78,6 +78,7 @@
         "emailSupportEmail": "Email підтримки",
         "enableEdgeRecording": "Включити запис на внутрішній носій (edge)",
         "webSocketEnabled": "Enable WEB sockets",
+        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
         "eventLogPeriodDays": "Розмір журналу подій (дні)",
         "ldapAdminDn": "LDAP адміністратор DN",
         "ldapSearchBase": "База пошуку LDAP",

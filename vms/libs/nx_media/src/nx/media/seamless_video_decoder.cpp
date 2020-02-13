@@ -102,6 +102,7 @@ void SeamlessVideoDecoderPrivate::updateSar(const QnConstCompressedVideoDataPtr&
             if (!nx::media_utils::h264::extractSps(frame, sps))
                 return;
             sar = sps.getSar();
+            break;
         }
         default:
             NX_WARNING(this, "SAR parser is not implemented for codec %1", frame->compressionType);

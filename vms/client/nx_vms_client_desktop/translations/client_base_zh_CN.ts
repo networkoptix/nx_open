@@ -3601,7 +3601,7 @@ to %1</source>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>允许重置次数</translation>
     </message>
   </context>
   <context>

@@ -39,14 +39,14 @@
     &:hover {
         background-color : $hover;
     }
-    
+
     &:active {
         background-color : $active;
     }
 }
 
 #selected-tag {
-    color         : $light1;
+    color         : $light1 !important;
     padding-left  : 12px;
     padding-right : 0;
 }

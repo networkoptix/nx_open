@@ -11,7 +11,8 @@ const noop = () => {
 
 /* Usage
  <nx-multi-select
-     name="permissions"
+     [id]="select.id"
+     [name]="permissions"
      canSelectAll?
      canSearch?
      description="Roles"
@@ -36,6 +37,7 @@ const noop = () => {
 })
 
 export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnChanges {
+    @Input() id: any;
     @Input('items') itemsOrig: any;
     @Input() canSelectAll: any;
     @Input() canSearch: any;
@@ -63,6 +65,7 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     // TODO: Bind ngModel to the component and eliminate EventEmitter
 
     ngOnInit(): void {
+        this.id = this.id || 'multiSelect';
         this.canSelectAll = (this.canSelectAll !== undefined);
         this.canSearch = (this.canSearch !== undefined);
     }

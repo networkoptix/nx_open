@@ -397,6 +397,7 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
             int flags = value.toInt(&ok);
             NX_ASSERT(ok);
             setFlags(static_cast<Qn::ItemFlags>(flags));
+            break;
         }
         case Qn::ItemRotationRole:
         {

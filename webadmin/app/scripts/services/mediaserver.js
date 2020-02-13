@@ -599,7 +599,9 @@ angular.module('webadminApp')
                         return null;
                     }
                     if($location.path().indexOf(Config.apiTestTool) === 0) {
-                        return undefined;
+                        return self.getUser().catch(function () {
+                            return undefined;
+                        });
                     }
                     return self.getUser();
                 });

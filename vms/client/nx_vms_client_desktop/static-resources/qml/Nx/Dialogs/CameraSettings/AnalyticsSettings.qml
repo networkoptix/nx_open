@@ -106,7 +106,7 @@ Item
             }
 
             if (currentEngineId)
-                streamComboBox.currentIndex = store.analyticsStreamIndex(currentEngineId)
+                header.currentStreamIndex = store.analyticsStreamIndex(currentEngineId)
 
             banner.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
         }
@@ -217,78 +217,34 @@ Item
         height: parent.height - 16 - banner.height
 
         enabled: !loading
-        contentEnabled: informationPanel.checked || isDeviceDependent
+        contentEnabled: header.checked || isDeviceDependent
         scrollBarParent: scrollBarsParent
 
         onValuesEdited:
             store.setDeviceAgentSettingsValues(currentEngineId, getValues())
 
-        headerItem: ColumnLayout
+        headerItem: InformationPanel
         {
             id: header
-            spacing: 16
 
-            InformationPanel
+            checkable: !isDeviceDependent && !!currentEngineId
+            checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
+            engineInfo: currentEngineInfo
+            streamSelectorVisible: supportsDualStreaming
+            streamSelectorEnabled: settingsView.contentEnabled
+            Layout.bottomMargin: 16
+            Layout.fillWidth: true
+
+            onEnableSwitchClicked:
             {
-                id: informationPanel
-
-                checkable: !isDeviceDependent && !!currentEngineId
-                checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
-                engineInfo: currentEngineInfo
-                Layout.bottomMargin: 16
-                Layout.fillWidth: true
-
-                onClicked:
-                {
-                    if (currentEngineId)
-                        setEngineEnabled(currentEngineId, !checked)
-                }
+                if (currentEngineId)
+                    setEngineEnabled(currentEngineId, !checked)
             }
 
-            Panel
+            onCurrentStreamIndexChanged:
             {
-                id: commonSettings
-
-                title: "General Settings"
-                visible: supportsDualStreaming
-                Layout.fillWidth: true
-                enabled: settingsView.contentEnabled
-
-                topPadding: 36
-                bottomPadding: 16
-
-                GridLayout
-                {
-                    id: commonContent
-
-                    columns: 2
-                    columnSpacing: 8
-                    width: commonSettings.width
-                    flow: GridLayout.LeftToRight
-
-                    ContextHintLabel
-                    {
-                        text: qsTr("Camera stream")
-                        horizontalAlignment: Text.AlignRight
-                        contextHintText: qsTr("Select video stream from the camera for analysis")
-                        Layout.minimumWidth: commonSettings.width * 0.3
-                        color: ColorTheme.windowText
-                    }
-
-                    ComboBox
-                    {
-                        id: streamComboBox
-                        Layout.fillWidth: true
-
-                        model: ["Primary", "Secondary"]
-
-                        onCurrentIndexChanged:
-                        {
-                            if (currentEngineId)
-                                store.setAnalyticsStreamIndex(currentEngineId, currentIndex)
-                        }
-                    }
-                }
+                if (currentEngineId)
+                    store.setAnalyticsStreamIndex(currentEngineId, currentStreamIndex)
             }
         }
     }

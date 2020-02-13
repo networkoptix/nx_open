@@ -21,11 +21,16 @@ PolyFigure
         {
             if (pointMakerInstrument.count === 0)
                 return qsTr("Click on video to start polygon.")
+            if (minPoints > geometricMinPoints && pointMakerInstrument.count < minPoints + 1)
+                return qsTr("This polygon requires at least %n points.", "", minPoints)
         }
         else
         {
             if (pathUtil.hasSelfIntersections)
                 return qsTr("Polygon is not valid. Remove self-intersections to proceed.")
+
+            if (pointMakerInstrument.count < minPoints)
+                return qsTr("This polygon requires at least %n points.", "", minPoints)
 
             if (pointMakerInstrument.count === maxPoints && hoverInstrument.edgeHovered)
                 return qsTr("Maximum points count is reached (%n points).", "", maxPoints)
@@ -35,8 +40,11 @@ PolyFigure
     }
     hintStyle:
     {
-        if (!pointMakerInstrument.enabled && pathUtil.hasSelfIntersections)
+        if (!pointMakerInstrument.enabled
+             && (pathUtil.hasSelfIntersections || pointMakerInstrument.count < minPoints))
+        {
             return Banner.Style.Error
+        }
         return Banner.Style.Info
     }
 

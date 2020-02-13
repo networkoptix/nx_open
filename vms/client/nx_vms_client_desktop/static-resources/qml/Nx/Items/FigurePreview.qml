@@ -1,5 +1,7 @@
 import QtQuick 2.0
 
+import Nx 1.0
+
 Item
 {
     id: preview
@@ -27,6 +29,9 @@ Item
             loader.source = ""
             return
         }
+
+        if (!figure.color)
+            figure.color = ColorTheme.colors.roi1.toString()
 
         if (figureType === "line")
             loader.source = "private/FigurePreview/Line.qml"

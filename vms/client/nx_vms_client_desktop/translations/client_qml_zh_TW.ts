@@ -13,14 +13,14 @@
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>從攝影機中選擇影片串流進行分析</translation>
     </message>
   </context>
   <context>
     <name>Box</name>
     <message>
       <source>Click on video to start box.</source>
-      <translation type="unfinished">Click on video to start box.</translation>
+      <translation>點擊畫面以啟用圈選區域</translation>
     </message>
   </context>
   <context>
@@ -76,7 +76,7 @@
     </message>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>圖形</translation>
     </message>
   </context>
   <context>
@@ -109,20 +109,20 @@
     <name>Line</name>
     <message>
       <source>Click on video to start line.</source>
-      <translation type="unfinished">Click on video to start line.</translation>
+      <translation>點擊畫面以啟用畫線功能</translation>
     </message>
     <message>
       <source>Click arrows to toggle the desired directions.</source>
-      <translation type="unfinished">Click arrows to toggle the desired directions.</translation>
+      <translation>點擊箭頭以切換方向。</translation>
     </message>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>設定區域有誤，請移除線條交錯部分。</translation>
     </message>
     <message numerus="yes">
       <source>Maximum points count is reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>Maximum points count is reached (%n points).</numerusform>
+      <translation>
+        <numerusform>頂點數已達最大值 (已有 %n 個頂點)</numerusform>
       </translation>
     </message>
   </context>
@@ -178,16 +178,16 @@
     <name>Polygon</name>
     <message>
       <source>Click on video to start polygon.</source>
-      <translation type="unfinished">Click on video to start polygon.</translation>
+      <translation>點擊畫面以啟用圈選區域</translation>
     </message>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>設定區域有誤，請移除線條交錯部分。</translation>
     </message>
     <message numerus="yes">
       <source>Maximum points count is reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>Maximum points count is reached (%n points).</numerusform>
+      <translation>
+        <numerusform>頂點數已達最大值 (已有 %n 個頂點)</numerusform>
       </translation>
     </message>
   </context>

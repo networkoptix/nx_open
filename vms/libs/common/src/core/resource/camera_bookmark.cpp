@@ -412,6 +412,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
         {
             const auto bookmarksList = sortEachList(commonModule, source, sortOrder);
             result = mergeSortedBookmarks(bookmarksList, pred, intermediateLimit);
+            break;
         }
         default:
         {

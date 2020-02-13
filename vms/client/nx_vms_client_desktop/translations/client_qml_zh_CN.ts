@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>从摄像机中选择视频流进行分析</translation>
     </message>
   </context>
   <context>
@@ -60,7 +60,7 @@
     </message>
     <message>
       <source>click to add</source>
-      <translation type="unfinished">click to add</translation>
+      <translation>点选新增</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Click arrows to toggle the desired directions.</source>
-      <translation type="unfinished">Click arrows to toggle the desired directions.</translation>
+      <translation>点击箭头切换方向。</translation>
     </message>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>

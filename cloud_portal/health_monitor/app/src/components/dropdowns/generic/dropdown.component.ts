@@ -8,7 +8,8 @@ const noop = () => {
 };
 
 /* Usage
-<nx-select name="permissions"
+<nx-select [id]="select.id"
+           [name]="permissions"
            [items]="accessRoles"
            label="optionLabel"          <- which property should be shown
            [(ngModel)]="user.role.name"
@@ -34,6 +35,7 @@ const noop = () => {
 
 export class NxGenericDropdown implements OnInit, ControlValueAccessor {
     // items should have at least name ex [{name: 'a', id: 1}, {name: 'b', id:3}]
+    @Input() id: any;
     @Input() items: any;
     @Input() selected: any;
     @Output() onSelected = new EventEmitter<string>();
@@ -57,6 +59,7 @@ export class NxGenericDropdown implements OnInit, ControlValueAccessor {
     // TODO: Bind ngModel to the component and eliminate EventEmitter
 
     ngOnInit(): void {
+        this.id = this.id || 'genericSelect';
     }
 
     trackItem(index, item) {

@@ -40,6 +40,7 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
     breakpointSubscription: SubscriptionLike;
     layoutReadySubscription: SubscriptionLike;
     locationSubscription: SubscriptionLike;
+    selectedSubscription: SubscriptionLike;
 
     layoutReady: boolean;
     fixedLayoutClass: string;
@@ -135,19 +136,21 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
 
         this.locationSubscription = this.location.subscribe((event: PopStateEvent) => {
             // force view component update without URI update
-            const params = {...this.route.snapshot.queryParams};
+            setTimeout(() => {
+                const params = {...this.route.snapshot.queryParams};
 
-            if (params.id) {
-                const alarm = this.healthService.alertsValues.find((alert) => {
-                    return (alert.metric === params.metric && alert.entity === params.id);
-                });
-                this.setActiveEntity(alarm, false);
-            } else {
-                this.resetActiveEntity(false);
-            }
+                if (params.id) {
+                    const alarm = this.healthService.alertsValues.find((alert) => {
+                        return (alert.metric === params.metric && alert.entity === params.id);
+                    });
+                    this.setActiveEntity(alarm, false);
+                } else {
+                    this.resetActiveEntity(false);
+                }
+            });
         });
 
-        this.menuService
+        this.selectedSubscription = this.menuService
             .selectedSectionSubject
             .pipe(throttleTime(1000))
             .subscribe(selection => {
@@ -177,7 +180,9 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
             this.layoutReady = value;
         });
 
-        this.setLayout();
+        this.healthLayoutService.activeEntitySubject.pipe(delay(0)).subscribe(() => {
+            this.setLayout();
+        });
     }
 
     trackItem(index, item) {
@@ -392,12 +397,8 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
                 this.desktopDetailMode = true;
             }
 
-            this.setLayout();
-
         } else {
-            if (this.healthLayoutService.activeEntity) {
-                this.resetActiveEntity();
-            }
+            this.resetActiveEntity();
         }
     }
 
@@ -408,7 +409,6 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
             queryParams.id            = undefined;
             queryParams.metric        = undefined;
             this.uriService.updateURI(undefined, queryParams);
-            this.setLayout();
         }
         this.healthLayoutService.resetActiveEntity();
     }
@@ -418,8 +418,6 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     private setLayout() {
-        if (this.area) {
-            this.healthLayoutService.setAlertLayout();
-        }
+        this.healthLayoutService.setAlertLayout();
     }
 }

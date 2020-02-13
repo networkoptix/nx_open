@@ -35,7 +35,7 @@ StackLayout
 
         contentItem: Column
         {
-            spacing: 16
+            spacing: 32
 
             width:
             {

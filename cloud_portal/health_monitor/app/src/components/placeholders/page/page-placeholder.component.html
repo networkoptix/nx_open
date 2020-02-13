@@ -8,7 +8,7 @@
         <div *ngIf="condition">
             <div *ngIf="iconClass" class="placeholder-icon" [ngClass]="iconClass"></div>
             <div *ngIf="!iconClass" class="placeholder-icon">
-                <svg-icon src="static/icons/{{iconName}}.svg"></svg-icon>
+                <svg-icon [src]="CONFIG.icons.dir + iconName + '.svg'"></svg-icon>
             </div>
             <h2 *ngIf="placeholderTitle" class="placeholder-title"
                  [innerHTML]="placeholderTitle"></h2>

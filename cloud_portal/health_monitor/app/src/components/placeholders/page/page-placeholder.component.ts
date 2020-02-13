@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { NxLanguageProviderService }                   from '../../../services/nx-language-provider';
+import { NxConfigService } from '../../../services/nx-config';
 
 /* Usage
 <nx-page-placeholder
@@ -27,13 +28,15 @@ export class NxPagePlaceholderComponent implements OnInit {
     @Input() preloader: boolean;
     @Input() condition: boolean;
 
+    CONFIG: any;
     LANG: any;
 
     iconName: string;
 
-    constructor(
-            private languageService: NxLanguageProviderService,
+    constructor(private configService: NxConfigService,
+                private languageService: NxLanguageProviderService,
     ) {
+        this.CONFIG = this.configService.getConfig();
         this.LANG = this.languageService.getTranslations();
     }
 

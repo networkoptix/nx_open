@@ -39,6 +39,12 @@ public:
     using QmlEngine::settingsItem;
 };
 
+class TestJsonEngine: public JsonEngine
+{
+public:
+    using JsonEngine::settingsItem;
+};
+
 } // namespace
 
 TEST(InteractiveSettings, simpleInstantiation)
@@ -83,7 +89,7 @@ TEST(InteractiveSettings, simpleJsonSerialization)
 {
     const auto testFileName = kLocalTestDataPath + "simple_serialization.json";
 
-    JsonEngine engine;
+    TestJsonEngine engine;
     const auto result = engine.loadModelFromFile(testFileName);
     ASSERT_EQ(result.code, QmlEngine::ErrorCode::ok);
 
@@ -153,6 +159,20 @@ TEST(InteractiveSettings, rangeCheck)
     const auto actualValues = engine.values();
     const auto expectedValues = QJsonObject::fromVariantMap(
         engine.settingsItem()->property(kValuesProperty).toMap());
+
+    ASSERT_EQ(actualValues, expectedValues);
+}
+
+TEST(InteractiveSettings, repeater)
+{
+    const auto testFileName = kLocalTestDataPath + "repeater.json";
+
+    TestJsonEngine engine;
+    const auto result = engine.loadModelFromFile(testFileName);
+    ASSERT_EQ(result.code, QmlEngine::ErrorCode::ok);
+
+    const auto actualValues = engine.values();
+    const auto expectedValues = loadJsonFromFile(testFileName)["_values"].toObject();
 
     ASSERT_EQ(actualValues, expectedValues);
 }

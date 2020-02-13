@@ -83,6 +83,9 @@
 #include <nx_vms_server_ini.h>
 #include <nx/network/http/http_client.h>
 #include <nx/vms/utils/app_info.h>
+#include <nx/network/url/url_builder.h>
+
+#include <translation/translation_manager.h>
 
 namespace {
 
@@ -334,6 +337,8 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
             case ActionType::buzzerAction:
                 result = executeBuzzerAction(action);
                 break;
+            case ActionType::pushNotificationAction:
+                result = sendPushNotification(action);
             default:
                 break;
         }
@@ -914,6 +919,31 @@ struct PushPayload
 {
     QString url;
     QString image;
+
+    PushPayload() = default;
+    PushPayload(const vms::event::EventParameters& event, const QnGlobalSettings* settings)
+    {
+        auto click = nx::network::url::Builder()
+            .setScheme(nx::vms::utils::AppInfo::nativeUriProtocol())
+            .setHost(settings->cloudHost())
+            .setPath("client", settings->cloudSystemId(), "view")
+            .addQueryItem("timestamp", event.eventTimestampUsec / 1000);
+        if (!event.eventResourceId.isNull())
+        {
+            click.addQueryItem("resources", event.eventResourceId.toSimpleString());
+            image = nx::network::url::Builder()
+                .setScheme(nx::network::http::kSecureUrlSchemeName)
+                .setHost(settings->cloudSystemId())
+                .setPath("ec2", "cameraThumbnail")
+                .addQueryItem("cameraId", event.eventResourceId.toSimpleString())
+                .addQueryItem("time", event.eventTimestampUsec / 1000)
+                .addQueryItem("height", kPushThumbnailHeight)
+                .addQueryItem("authKey", "NOT_IMPLEMENTED") //< TODO.
+                .toString();
+        }
+
+        url = click.toString();
+    }
 };
 #define PushPayload_Fields (url)(image)
 
@@ -925,7 +955,8 @@ struct PushNotification
     // TODO: options?
 
     PushNotification() = default;
-    PushNotification(const vms::event::EventParameters& event, const QnGlobalSettings* settings)
+    PushNotification(const vms::event::EventParameters& event, const QnGlobalSettings* settings):
+        payload(event, settings)
     {
         static const auto enumString =
             [](const auto& value)
@@ -946,19 +977,6 @@ struct PushNotification
             body += "Reason: " + enumString(event.reasonCode) + "\n";
         if (!event.description.isEmpty())
             body += event.description + "\n";
-
-        payload.url = nx::utils::log::makeMessage("%1://%2/client/%3/view/?timestamp=%4",
-            nx::vms::utils::AppInfo::nativeUriProtocol(), settings->cloudHost(),
-            settings->cloudSystemId(), event.eventTimestampUsec / 1000);
-        if (!event.eventResourceId.isNull())
-        {
-            payload.url += "&resources=" + event.eventResourceId.toSimpleString();
-            payload.image = nx::utils::log::makeMessage(
-                "https://%1/ec2/cameraThumbnail?cameraId=%2&time=%3&height=%4&authKey=%5",
-                settings->cloudSystemId(),
-                event.eventResourceId.toSimpleString(), event.eventTimestampUsec / 1000,
-                kPushThumbnailHeight, "IMPLEMENT_AUTH_KEY");
-        }
     }
 };
 #define PushNotification_Fields (title)(body)(payload)
@@ -976,6 +994,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActionPtr& action)
 {
+    //TODO: read target locale from settings, than uncomment the follow.
+
+    //const QString locale = "de_DE";
+    //QnTranslationManager::LocaleRollback rollback(
+    //    serverModule()->commonModule()->instance<QnTranslationManager>(), locale);
+
     PushNotificationMessage message;
     const auto settings = serverModule()->commonModule()->globalSettings();
     message.systemId = settings->cloudSystemId();
@@ -994,8 +1018,10 @@ bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActio
 
     message.notification = PushNotification(action->getRuntimeParams(), settings);
 
-    nx::utils::Url url(nx::utils::log::makeMessage(
-        "https://%1/api/notifications/push_notification", settings->cloudHost()));
+    const auto url = nx::network::url::Builder()
+        .setScheme(nx::network::http::kSecureUrlSchemeName)
+        .setHost(settings->cloudHost())
+        .setPath("api", "notifications", "push_notification");
 
     nx::network::http::HttpClient client;
     client.setUserName(settings->cloudSystemId());
@@ -1447,36 +1473,32 @@ void ExtendedRuleProcessor::updateRecipientsList(
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
 }
 
-
 std::set<QString> ExtendedRuleProcessor::cloudUsers(std::vector<QnUuid> filter) const
 {
-    std::set<QString> users;
-    const auto add =
-        [&users](const auto& user)
-        {
-            if (user && user->isEnabled() && user->isCloud())
-                users.insert(user->getName());
-        };
-
+    QnUserResourceList userList;
     if (filter.empty())
     {
-        for (const auto& user: serverModule()->resourcePool()->getResources<QnUserResource>())
-            add(user);
-        return users;
+        userList = serverModule()->resourcePool()->getResources<QnUserResource>();
     }
-
-    QList<QnUuid> userRoles;
-    QnUserResourceList userList;
-    userRolesManager()->usersAndRoles(filter, userList, userRoles);
-    for (const auto& user: userList)
-        add(user);
-    for (const auto& role: userRoles)
+    else
     {
-        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(role))
-            add(subject.user());
+        QList<QnUuid> userRoles;
+        userRolesManager()->usersAndRoles(filter, userList, userRoles);
+        for (const auto& role: userRoles)
+        {
+            for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(role))
+                userList.push_back(subject.user());
+        }
     }
 
-    return users;
+    std::set<QString> names;
+    for (const auto& user: userList)
+    {
+        if (user->isEnabled() && user->isCloud())
+            names.insert(user->getName());
+    }
+
+    return names;
 }
 
 } // namespace event

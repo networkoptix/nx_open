@@ -1214,8 +1214,8 @@
       <comment>Full suffix for displaying hours</comment>
       <translation>
         <numerusform>година</numerusform>
-        <numerusform>годин</numerusform>
         <numerusform>години</numerusform>
+        <numerusform>годин</numerusform>
         <numerusform>години</numerusform>
       </translation>
     </message>

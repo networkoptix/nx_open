@@ -3,17 +3,18 @@ import {
     forwardRef, ViewEncapsulation, OnDestroy
 }                                                  from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
-import { ActivatedRoute, Router }                           from '@angular/router';
-import { Location }                                         from '@angular/common';
-import { Subject }                                          from 'rxjs/Subject';
-import { isArray }                                          from 'rxjs/internal-compatibility';
-import { NxConfigService }                                  from '../../services/nx-config';
-import { NxUriService }                                     from '../../services/uri.service';
-import { NxLanguageProviderService }                        from '../../services/nx-language-provider';
+import { ActivatedRoute, Router }         from '@angular/router';
+import { Location }                       from '@angular/common';
+import { Subject }                        from 'rxjs/Subject';
+import { isArray }                        from 'rxjs/internal-compatibility';
+import { NxConfigService }                from '../../services/nx-config';
+import { NxUriService }                   from '../../services/uri.service';
+import { NxLanguageProviderService }      from '../../services/nx-language-provider';
 import { Subscription, SubscriptionLike } from 'rxjs';
-import { NxScrollMechanicsService }                         from '../../services/scroll-mechanics.service';
-import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { debounceTime } from 'rxjs/operators';
+import { NxScrollMechanicsService }       from '../../services/scroll-mechanics.service';
+import { AutoUnsubscribe }                from 'ngx-auto-unsubscribe';
+import { debounceTime }                   from 'rxjs/operators';
+import { NxUtilsService }                 from '../../services/utils.service';
 /* Usage
  <nx-search
      name="NAME"
@@ -219,7 +220,10 @@ export class NxSearchComponent implements OnInit, OnDestroy, ControlValueAccesso
              (value.selects && value.selects.length) ||
              (value.multiselects && value.multiselects.length))) {
 
-            this.localFilter = value;
+            if (JSON.stringify(this.localFilter) === JSON.stringify(value)) {
+                return;
+            }
+            this.localFilter = NxUtilsService.deepCopy(value);
             this.advSearch = (this.localFilter.selects && this.localFilter.selects.length) ||
                     (this.localFilter.multiselects && this.localFilter.multiselects.length) ||
                     (this.localFilter.tags && this.localFilter.tags.length);

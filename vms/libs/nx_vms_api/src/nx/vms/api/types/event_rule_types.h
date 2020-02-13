@@ -260,6 +260,9 @@ enum ActionType
      * - durationMs (optional)
      */
     buzzerAction = 20,
+
+    /** Send push notification using cloud. */
+    pushNotificationAction = 21,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 

@@ -21,7 +21,13 @@ struct ColorTheme::Private
 {
     QVariantMap colors;
 
-    QHash<QString, QList<QColor>> groups;
+    struct Group
+    {
+        QList<QColor> colors; //< Sorted by lightness.
+        QStringList keys; //< Sorted alphabetically.
+    };
+
+    QHash<QString, Group> groups;
 
     QMap<QString, QString> colorSubstitutions; //< Default #XXXXXX to updated #YYYYYY.
 
@@ -100,6 +106,23 @@ QSet<QString> ColorTheme::Private::updateColors(const QJsonObject& newColors)
 
     QSet<QString> updatedColors;
 
+    QCollator collator;
+    collator.setNumericMode(true);
+    collator.setCaseSensitivity(Qt::CaseInsensitive);
+
+    const auto insertAlphabetically =
+        [&collator](QStringList& list, const QString& key)
+        {
+            auto iter = std::lower_bound(list.begin(), list.end(), key,
+                [&collator](const QString& left, const QString& right)
+                {
+                    return collator.compare(left, right) < 0;
+                });
+
+            if (iter == list.end() || *iter != key)
+                list.insert(iter, key);
+        };
+
     for (auto it = newColors.begin(); it != newColors.end(); ++it)
     {
         if (it->type() != QJsonValue::String)
@@ -119,16 +142,18 @@ QSet<QString> ColorTheme::Private::updateColors(const QJsonObject& newColors)
         if (auto groupNameMatch = groupNameRe.match(colorName); groupNameMatch.hasMatch())
         {
             const QString groupName = groupNameMatch.captured(0);
-            QList<QColor>& group = groups[groupName];
+            auto& group = groups[groupName];
             if (oldColor.isValid())
-                group.removeOne(oldColor);
-            groups[groupName].append(color);
+                group.colors.removeOne(oldColor);
+
+            group.colors.append(color);
+            insertAlphabetically(group.keys, colorName);
         }
     }
 
     for (auto it = groups.begin(); it != groups.end(); ++it)
     {
-        auto& colors = it.value();
+        auto& colors = it.value().colors;
 
         std::sort(colors.begin(), colors.end(),
             [](const QColor& c1, const QColor& c2)
@@ -197,12 +222,17 @@ QColor ColorTheme::color(const QString& name, qreal alpha) const
 
 QList<QColor> ColorTheme::groupColors(const char* groupName) const
 {
-    return d->groups[QLatin1String(groupName)];
+    return groupColors(QLatin1String(groupName));
 }
 
 QList<QColor> ColorTheme::groupColors(const QString& groupName) const
 {
-    return d->groups[groupName];
+    return d->groups[groupName].colors;
+}
+
+QStringList ColorTheme::groupKeys(const QString& groupName) const
+{
+    return d->groups[groupName].keys;
 }
 
 QColor ColorTheme::transparent(const QColor& color, qreal alpha)
@@ -231,7 +261,7 @@ QColor ColorTheme::lighter(const QColor& color, int offset) const
         return hsl.toRgb();
     }
 
-    const auto& colors = d->groups.value(info.group);
+    const auto& colors = d->groups.value(info.group).colors;
     auto result = colors[qBound(0, info.index + offset, colors.size() - 1)];
     result.setAlpha(color.alpha());
     return result;
