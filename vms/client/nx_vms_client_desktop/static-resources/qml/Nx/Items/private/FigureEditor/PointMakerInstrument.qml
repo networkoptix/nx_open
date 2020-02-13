@@ -88,7 +88,12 @@ Instrument
         {
             event.accepted = true
             if (count > 0)
-                setPoint(count - 1, snappedToFirstOrLastPoint(event.position))
+            {
+                setPoint(count - 1,
+                    count > minPoints
+                         ? snappedToFirstOrLastPoint(event.position)
+                         : event.position)
+            }
         }
 
         function normalizedIndex(index)
