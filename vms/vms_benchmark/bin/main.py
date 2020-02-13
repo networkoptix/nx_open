@@ -215,7 +215,10 @@ def _check_storages(api, ini, camera_count):
         * ini['archiveBitratePerCameraMbps'] * 1000 * 1000 // 8
     )
     for storage in _get_storages(api, ini):
-        if storage.free_space >= storage.reserved_space + space_for_recordings_bytes:
+        if (
+            storage.is_used_for_writing and
+                storage.free_space >= storage.reserved_space + space_for_recordings_bytes
+        ):
             break
     else:
         raise exceptions.BoxStateError(
