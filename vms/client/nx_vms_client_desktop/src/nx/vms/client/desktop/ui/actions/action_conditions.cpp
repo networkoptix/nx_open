@@ -1724,11 +1724,8 @@ ActionVisibility ReachableServerCondition::check(
     if (server->getId() == context->commonModule()->remoteGUID())
         return InvisibleAction;
 
-    if (!server->isOnline()
-        || !context->commonModule()->moduleDiscoveryManager()->getEndpoint(server->getId()))
-    {
+    if (!context->commonModule()->moduleDiscoveryManager()->getEndpoint(server->getId()))
         return DisabledAction;
-    }
 
     return EnabledAction;
 }

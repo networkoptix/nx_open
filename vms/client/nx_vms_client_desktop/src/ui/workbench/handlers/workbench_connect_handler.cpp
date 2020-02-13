@@ -1102,7 +1102,7 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
 
     const auto discoveryManager = commonModule()->moduleDiscoveryManager();
     const auto endpoint = discoveryManager->getEndpoint(serverId);
-    if (!endpoint || !server->isOnline())
+    if (!endpoint)
     {
         reportServerSelectionFailure();
         return;
