@@ -136,6 +136,7 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
 
         case vms::api::ActionType::diagnosticsAction:
         case vms::api::ActionType::showPopupAction:
+        case vms::api::ActionType::pushNotificationAction:
         case vms::api::ActionType::showTextOverlayAction:
         case vms::api::ActionType::showOnAlarmLayoutAction:
         case vms::api::ActionType::execHttpRequestAction:

@@ -84,6 +84,8 @@
 #include <nx/network/http/http_client.h>
 #include <nx/vms/utils/app_info.h>
 
+#include <translation/translation_manager.h>
+
 namespace {
 
 static const QString tpProductLogo(lit("logo"));
@@ -334,6 +336,8 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
             case ActionType::buzzerAction:
                 result = executeBuzzerAction(action);
                 break;
+            case ActionType::pushNotificationAction:
+                result = sendPushNotification(action);
             default:
                 break;
         }
@@ -976,6 +980,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActionPtr& action)
 {
+    //TODO: read target locale from settings, than uncomment the follow.
+
+    //const QString locale = "de_DE";
+    //QnTranslationManager::LocaleRollback rollback(
+    //    serverModule()->commonModule()->instance<QnTranslationManager>(), locale);
+
     PushNotificationMessage message;
     const auto settings = serverModule()->commonModule()->globalSettings();
     message.systemId = settings->cloudSystemId();
