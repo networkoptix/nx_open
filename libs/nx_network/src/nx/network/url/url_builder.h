@@ -39,8 +39,29 @@ public:
     Builder& appendPath(const char* path, QUrl::ParsingMode mode = QUrl::DecodedMode);
     Builder& appendPath(const QByteArray& path, QUrl::ParsingMode mode = QUrl::DecodedMode);
 
+    template<typename T, typename... Ts>
+    Builder& appendPath(T first, Ts... tail)
+    {
+        appendPath(std::forward<T>(first));
+        if constexpr (sizeof...(Ts) > 0) appendPath(std::forward<Ts>(tail)...);
+        return *this;
+    }
+
+    template<typename T, typename... Ts>
+    Builder& setPath(T first, Ts... tail)
+    {
+        return setPath(std::forward<T>(first)).appendPath(std::forward<Ts>(tail)...);
+    }
+
     Builder& setQuery(const QString& query, QUrl::ParsingMode mode = QUrl::DecodedMode);
     Builder& setQuery(const QUrlQuery& query);
+    Builder& addQueryItem(const QString& name, const QString& value);
+
+    template<typename T>
+    Builder& addQueryItem(const QString& name, const T& value)
+    {
+        return addQueryItem(name, ::toString(value));
+    }
 
     Builder& setFragment(const QString& fragment, QUrl::ParsingMode mode = QUrl::DecodedMode);
 
