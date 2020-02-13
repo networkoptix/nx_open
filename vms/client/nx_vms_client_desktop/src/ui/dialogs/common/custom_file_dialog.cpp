@@ -28,7 +28,7 @@ public:
     static QnCustomFileDialog::FileFilter createVideoFilter()
     {
         static const QStringList kVideoFormats{"avi", "mkv", "mp4", "mov", "ts", "m2ts", "mpeg",
-            "mpg", "flv", "wmv", "3gp"};
+            "mpegts", "mpg", "flv", "wmv", "3gp"};
         return {tr("Video"), kVideoFormats};
     }
 
