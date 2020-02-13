@@ -301,6 +301,8 @@ void BasicTestFixture::startRelay(int index)
     const auto dataDirString = lm("%1/relay_%2").args(testDataDir(), index).toStdString();
     newRelay->addArg("-dataDir", dataDirString.c_str());
 
+    newRelay->addArg("--listeningPeer/takeIdleConnectionTimeout=1h");
+
     for (const auto& argument : m_relayStartupArguments)
     {
         newRelay->removeArgByName(argument.name.c_str());
