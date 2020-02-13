@@ -167,43 +167,6 @@ void DeviceSearcher::unregisterHandler(SearchHandler* handler, const QString& de
     }
 }
 
-void DeviceSearcher::saveDiscoveredDevicesSnapshot()
-{
-    QnMutexLocker lk(&m_mutex);
-    m_discoveredDevicesToProcess.swap(m_discoveredDevices);
-    m_discoveredDevices.clear();
-}
-
-void DeviceSearcher::processDiscoveredDevices(SearchHandler* handlerToUse)
-{
-    for (std::map<HostAddress, DiscoveredDeviceInfo>::iterator
-        it = m_discoveredDevicesToProcess.begin();
-        it != m_discoveredDevicesToProcess.end();
-        )
-    {
-        if (handlerToUse)
-        {
-            const auto url = it->second.descriptionUrl;
-            if (handlerToUse->processPacket(
-                it->second.localInterfaceAddress,
-                SocketAddress(url.host(), url.port()),
-                it->second.devInfo,
-                it->second.xmlDevInfo))
-            {
-                m_discoveredDevicesToProcess.erase(it++);
-                continue;
-            }
-        }
-        else
-        {
-            NX_ASSERT(false);
-            // TODO: #ak this needs to be implemented if camera discovery ever becomes truly asynchronous
-        }
-
-        ++it;
-    }
-}
-
 int DeviceSearcher::cacheTimeout() const
 {
     return m_settings->cacheTimeout();

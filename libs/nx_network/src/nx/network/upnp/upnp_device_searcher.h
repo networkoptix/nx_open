@@ -46,9 +46,6 @@ public:
  * Searches devices asynchronously
  * NOTE: sends discover packets from all local network interfaces
  * NOTE: Handlers are iterated in order they were registered
- * NOTE: Class methods are thread-safe with the only exception:
- *     saveDiscoveredDevicesSnapshot() and processDiscoveredDevices() calls
- *     MUST be serialized by calling entity.
  * NOTE: this class is single-tone
  */
 class NX_NETWORK_API DeviceSearcher:
@@ -88,19 +85,6 @@ public:
      */
     void unregisterHandler(SearchHandler* handler, const QString& deviceType = QString());
 
-    /**
-     * Makes internal copy of discovered but not processed devices. processDiscoveredDevices uses
-     * this copy.
-     */
-    void saveDiscoveredDevicesSnapshot();
-    /**
-     * Passes discovered devices info snapshot to registered handlers.
-     * If some handlers processes packet (UPNPSearchHandler::processPacket returns true),
-     *     then packet is removed and not passed to other handlers.
-     * @param handlerToUse If NULL, all handlers are used, otherwise packets are passed to
-     *     handlerToUse only.
-     */
-    void processDiscoveredDevices(SearchHandler* handlerToUse = NULL);
     int cacheTimeout() const;
     nx::utils::TimerManager* timerManager() const { return m_timerManager; }
 private:
