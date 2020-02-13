@@ -61,6 +61,9 @@ static constexpr milliseconds kPreviewCheckInterval = 100ms;
 
 static constexpr milliseconds kPreviewLoadTimeout = 1min;
 
+static constexpr int kFpsLimit = 60;
+static constexpr milliseconds kTimeBetweenLayoutRequests = 1000ms / kFpsLimit;
+
 /*
  * Tiles can have optional timed auto-close mode.
  * When such tile is first created, expiration timer is set to kInvisibleAutoCloseDelay.
@@ -148,6 +151,16 @@ EventRibbon::Private::Private(EventRibbon* q):
     m_previewLoad->setInterval(kPreviewCheckInterval);
     m_previewLoad->setFlags(nx::utils::PendingOperation::FireImmediately);
     m_previewLoad->setCallback(loadNextPreviewDelayed);
+
+    // Limit the number of layout update requests to 60 per second.
+    m_layoutTimer = new QTimer(this);
+    m_layoutTimer->setSingleShot(true);
+    m_layoutTimer->setInterval(kTimeBetweenLayoutRequests);
+    connect(m_layoutTimer, &QTimer::timeout, this,
+        [this]
+        {
+            qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
+        });
 }
 
 EventRibbon::Private::~Private()
@@ -1380,8 +1393,8 @@ void EventRibbon::Private::doUpdateView()
     updateHover();
     updateHighlightedTiles();
 
-    if (!m_animations.empty())
-        qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
+    if (!m_animations.empty() && !m_layoutTimer->isActive())
+        m_layoutTimer->start();
 }
 
 void EventRibbon::Private::fadeIn(EventTile* widget)
@@ -1442,7 +1455,6 @@ QWidget* EventRibbon::Private::createFadeCurtain(EventTile* widget, QVariantAnim
         {
             const auto currentColor = toTransparent(color, animator->currentValue().toReal());
             painter->fillRect(curtain->rect(), currentColor);
-            curtain->update();
             return true;
         }));
 

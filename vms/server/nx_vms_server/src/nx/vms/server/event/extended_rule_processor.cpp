@@ -926,7 +926,7 @@ struct PushPayload
         auto click = nx::network::url::Builder()
             .setScheme(nx::vms::utils::AppInfo::nativeUriProtocol())
             .setHost(settings->cloudHost())
-            .setPath("client", settings->cloudSystemId(), "view")
+            .setPathParts("client", settings->cloudSystemId(), "view")
             .addQueryItem("timestamp", event.eventTimestampUsec / 1000);
         if (!event.eventResourceId.isNull())
         {
@@ -934,7 +934,7 @@ struct PushPayload
             image = nx::network::url::Builder()
                 .setScheme(nx::network::http::kSecureUrlSchemeName)
                 .setHost(settings->cloudSystemId())
-                .setPath("ec2", "cameraThumbnail")
+                .setPath("ec2/cameraThumbnail")
                 .addQueryItem("cameraId", event.eventResourceId.toSimpleString())
                 .addQueryItem("time", event.eventTimestampUsec / 1000)
                 .addQueryItem("height", kPushThumbnailHeight)
@@ -1021,7 +1021,7 @@ bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActio
     const auto url = nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
         .setHost(settings->cloudHost())
-        .setPath("api", "notifications", "push_notification");
+        .setPath("api/notifications/push_notification");
 
     nx::network::http::HttpClient client;
     client.setUserName(settings->cloudSystemId());

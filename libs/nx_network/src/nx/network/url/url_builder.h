@@ -40,7 +40,7 @@ public:
     Builder& appendPath(const QByteArray& path, QUrl::ParsingMode mode = QUrl::DecodedMode);
 
     template<typename T, typename... Ts>
-    Builder& appendPath(T first, Ts... tail)
+    Builder& appendPathParts(T first, Ts... tail)
     {
         appendPath(std::forward<T>(first));
         if constexpr (sizeof...(Ts) > 0) appendPath(std::forward<Ts>(tail)...);
@@ -48,9 +48,9 @@ public:
     }
 
     template<typename T, typename... Ts>
-    Builder& setPath(T first, Ts... tail)
+    Builder& setPathParts(T first, Ts... tail)
     {
-        return setPath(std::forward<T>(first)).appendPath(std::forward<Ts>(tail)...);
+        return setPath(std::forward<T>(first)).appendPathParts(std::forward<Ts>(tail)...);
     }
 
     Builder& setQuery(const QString& query, QUrl::ParsingMode mode = QUrl::DecodedMode);

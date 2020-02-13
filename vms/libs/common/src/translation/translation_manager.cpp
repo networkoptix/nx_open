@@ -3,7 +3,8 @@
 #include <QtCore/QDir>
 #include <QtCore/QTranslator>
 #include <QtCore/QCoreApplication>
-
+#include <QtCore/QThread>
+ 
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
