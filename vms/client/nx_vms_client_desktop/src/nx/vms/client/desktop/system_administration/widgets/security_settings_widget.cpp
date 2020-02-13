@@ -25,11 +25,14 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
 
     setHelpTopic(ui->auditTrailCheckBox, Qn::AuditTrail_Help);
     setHelpTopic(ui->auditTrailHint, Qn::AuditTrail_Help);
+
     ui->auditTrailHint->setHint(tr("Tracks and logs all user actions."));
 
+    setHelpTopic(ui->limitSessionLengthHint, Qn::LaunchingAndClosing_Help);
     ui->limitSessionLengthHint->setHint(
         tr("Users will be automatically logged out if their session exceeds the specified duration."));
 
+    setHelpTopic(ui->videoTrafficEncryptionHint, Qn::SecureConnection_Help);
     ui->videoTrafficEncryptionHint->setHint(tr("Only client-server video traffic can be encrypted"));
 
     connect(ui->watermarkSettingsButton, &QPushButton::pressed, this,
