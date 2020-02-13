@@ -1,5 +1,7 @@
 #include "translation_overlay_item.h"
 
+#include <QtCore/QThread>
+
 namespace nx::vms::translation {
 
 TranslationOverlayItem::TranslationOverlayItem(QObject* parent):
