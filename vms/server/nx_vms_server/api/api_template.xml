@@ -157,6 +157,11 @@
                             <description>Turn on realtime optimization. It will drop some frames if not enough CPU for realtime transcoding.</description>
                             <optional>true</optional>
                         </param>
+                        <param>
+                            <name>accurate_seek</name>
+                            <description>Seek for the exact time in the archive by the specified timestamp(pos), if it disabled then will seek to the nearest left(on timeline) keyframe. This causes the stream to be transcoded. Disabled by default.</description>
+                            <optional>true</optional>
+                        </param>
                     </params>
                     <result>
                         <caption>Video stream in the requested format</caption>
