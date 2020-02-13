@@ -2335,7 +2335,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/mergeSystems", new QnMergeSystemsRestHandler(serverModule()), kAdmin);
 
     /**%apidoc GET /api/backupDatabase
-     * Back up server database.
+     * Back up the Server database.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/backupDatabase", new QnBackupDbRestHandler(serverModule()));

@@ -1656,8 +1656,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * to database.
      * %param[default] format
      * %param[unused] path
-     *     %// NOTE: ApiStoredFilePath.path is serialized as "folder".
-     * %param[opt] folder Folder name in a virtual FS
+     *     %// NOTE: StoredFilePath.path is serialized as "folder".
+     * %param[opt]:string folder Folder name in a virtual FS
      * %return List of objects in the requested format.
      *    %// TODO: Describe params.
      * %// AbstractStoredFileManager::listDirectory
@@ -1668,8 +1668,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * Read file data from a virtual FS
      * %param[default] format
      * %param[unused] path
-     *     %// NOTE: ApiStoredFilePath.path is serialized as "folder".
-     * %param[opt] folder File name
+     *     %// NOTE: StoredFilePath.path is serialized as "folder".
+     * %param[opt]:string folder File name
      * %return Object in the requested format.
      * %// AbstractStoredFileManager::getStoredFile
      */
