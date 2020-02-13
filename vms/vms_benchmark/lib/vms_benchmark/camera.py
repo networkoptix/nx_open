@@ -24,6 +24,7 @@ class Camera:
                 "dayOfWeek": day_of_week,
                 "fps": highStreamFps,
                 "recordingType": "RT_Always",
+                "streamQuality": "QualityNormal",
             }
             for day_of_week in range(1, 8)
         ]

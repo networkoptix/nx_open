@@ -22,6 +22,7 @@ static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::seconds kCacheDataTimeout(30);
 static const QString kObsoleteInterfaceParameter = lit("Network1");
 static const std::chrono::milliseconds kPositionAggregationTimeout(1000);
+static const std::chrono::seconds kAlarmInputInitializationTimeout(30);
 
 static nx::utils::Url cleanUrl(nx::utils::Url url)
 {
@@ -403,6 +404,58 @@ void HanwhaSharedResourceContext::setTimeShift(std::chrono::milliseconds value)
 void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings)
 {
     m_chunkLoaderSettings = settings;
+}
+
+void HanwhaSharedResourceContext::initializeAlarmInputs()
+{
+    {
+        NX_MUTEX_LOCKER lock(&m_dataMutex);
+        if (m_alarmInputInitializationTimer.isValid()
+            && !m_alarmInputInitializationTimer.hasExpired(kAlarmInputInitializationTimeout))
+        {
+            NX_DEBUG(this,
+                "Alram inputs have been initialized recently, ignoring initialization request");
+            return;
+        }
+
+        m_alarmInputInitializationTimer.restart();
+    }
+
+    nx::utils::ScopeGuard timerGuard = nx::utils::makeScopeGuard(
+        [this]()
+        {
+            NX_MUTEX_LOCKER lock(&m_dataMutex);
+            m_alarmInputInitializationTimer.invalidate();
+        });
+
+    HanwhaRequestHelper helper(shared_from_this());
+    const HanwhaResponse viewResponse = helper.view("eventsources/alarminput");
+
+    if (!viewResponse.isSuccessful())
+    {
+        NX_DEBUG(this, "Unable to fetch current alarm input port states, request URL: %1, "
+            "error code: %2, error string: %3",
+            viewResponse.requestUrl(), viewResponse.errorCode(), viewResponse.errorString());
+        return;
+    }
+
+    std::map<QString, QString> alarmInputParameters = viewResponse.response();
+    for (auto& [parameterName, parameterValue]: alarmInputParameters)
+    {
+        if (parameterName.endsWith("Enabled"))
+        {
+            NX_DEBUG(this, "Settings parameter %1 to true", parameterName);
+            parameterValue = kHanwhaTrue;
+        }
+    }
+
+    const HanwhaResponse setResponse = helper.set("eventsources/alarminput", alarmInputParameters);
+    if (setResponse.isSuccessful())
+        timerGuard.disarm();
+
+    NX_DEBUG(this,
+        "Unable to enable alarm inputs, requestUrl: %1, error code: %2, error string: %3",
+        setResponse.requestUrl(), setResponse.errorCode(), setResponse.errorString());
 }
 
 HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
