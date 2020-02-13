@@ -1447,36 +1447,32 @@ void ExtendedRuleProcessor::updateRecipientsList(
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
 }
 
-
 std::set<QString> ExtendedRuleProcessor::cloudUsers(std::vector<QnUuid> filter) const
 {
-    std::set<QString> users;
-    const auto add =
-        [&users](const auto& user)
-        {
-            if (user && user->isEnabled() && user->isCloud())
-                users.insert(user->getName());
-        };
-
+    QnUserResourceList userList;
     if (filter.empty())
     {
-        for (const auto& user: serverModule()->resourcePool()->getResources<QnUserResource>())
-            add(user);
-        return users;
+        userList = serverModule()->resourcePool()->getResources<QnUserResource>();
     }
-
-    QList<QnUuid> userRoles;
-    QnUserResourceList userList;
-    userRolesManager()->usersAndRoles(filter, userList, userRoles);
-    for (const auto& user: userList)
-        add(user);
-    for (const auto& role: userRoles)
+    else
     {
-        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(role))
-            add(subject.user());
+        QList<QnUuid> userRoles;
+        userRolesManager()->usersAndRoles(filter, userList, userRoles);
+        for (const auto& role: userRoles)
+        {
+            for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(role))
+                userList.push_back(subject.user());
+        }
     }
 
-    return users;
+    std::set<QString> names;
+    for (const auto& user: userList)
+    {
+        if (user->isEnabled() && user->isCloud())
+            names.insert(user->getName());
+    }
+
+    return names;
 }
 
 } // namespace event
