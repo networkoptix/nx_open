@@ -28,6 +28,7 @@ QString processItemTemplateString(QString str, const int index, const int depth)
     {
         idle,
         sharpRead,
+        braceRead,
         readingNumber,
     };
 
@@ -63,6 +64,10 @@ QString processItemTemplateString(QString str, const int index, const int depth)
                     number += ch;
                     state = State::readingNumber;
                 }
+                else if (ch == L'{')
+                {
+                    state = State::braceRead;
+                }
                 else if (depth == 1)
                 {
                     result += indexStr;
@@ -76,6 +81,35 @@ QString processItemTemplateString(QString str, const int index, const int depth)
                     state = State::idle;
                 }
 
+                break;
+
+            case State::braceRead:
+                if (ch.isDigit())
+                {
+                    number += ch;
+                }
+                else if (ch == L'}')
+                {
+                    const int num = number.toInt();
+                    if (num == depth)
+                        result += indexStr;
+                    else
+                        result += "#{" + number + "}";
+
+                    number.clear();
+
+                    state = State::idle;
+                }
+                else
+                {
+                    result += "#{";
+                    result += number;
+                    number.clear();
+
+                    // Need to reprocess the character.
+                    state = State::idle;
+                    --i;
+                }
                 break;
 
             case State::readingNumber:

@@ -3,9 +3,11 @@
 
     "_values": {
         "user0.name": "User0",
+        "user0.id": "#1000#{a}0#{1}0#{1",
         "user0.note1": "note#1",
         "user0.note2": "note#2",
         "user1.name": "User1",
+        "user1.id": "#1010#{a}0#{1}0#{1",
         "user1.note1": "note#1",
         "user1.note2": "note#2"
     },
@@ -23,6 +25,11 @@
                         "type": "TextField",
                         "name": "user#.name",
                         "defaultValue": "User#1"
+                    },
+                    {
+                        "type": "TextField",
+                        "name": "user#.id",
+                        "defaultValue": "#10#{1}0#{a}0##{1}0#{1"
                     },
                     {
                         "type": "Repeater",
