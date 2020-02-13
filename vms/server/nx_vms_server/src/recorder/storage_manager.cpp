@@ -1773,11 +1773,99 @@ void QnStorageManager::checkMetadataStorageSpace()
     }
 }
 
+struct CleanupInfo
+{
+    int64_t total = 0;
+    std::vector<std::pair<QnStorageResourcePtr, /*toDelete*/int64_t>> perStorage;
+
+    CleanupInfo(const QSet<QnStorageResourcePtr>& storages)
+    {
+        for (const auto& s: storages)
+        {
+            const int64_t toDelete = std::max<int64_t>(0LL, s->getSpaceLimit() - s->getFreeSpace());
+            perStorage.push_back(std::make_pair(s, toDelete));
+            total += toDelete;
+        }
+    }
+
+    bool needToCleanup(const QnStorageResourcePtr& s) const
+    {
+        if (total == 0)
+            return false;
+
+        return std::any_of(
+            perStorage.cbegin(), perStorage.cend(),
+            [&s](const auto& ps) { return ps.first == s && ps.second > 0; });
+    }
+
+    bool needToCleanup() const
+    {
+        return total > 0;
+    }
+};
+
+void QnStorageManager::logBeforeCleanup(const CleanupInfo& cleanupInfo) const
+{
+    NX_DEBUG(
+        this, "[Cleanup, measure]: %1 storages are ready for a cleanup, Role: '%2'",
+        cleanupInfo.perStorage.size(),
+        m_role == QnServer::StoragePool::Normal ? "main" : "backup");
+
+    for (const auto& ps: cleanupInfo.perStorage)
+    {
+        const auto& storage = ps.first;
+        const bool isAbleToRemove =
+            storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile;
+
+        if (storage->getSpaceLimit() == 0 || !isAbleToRemove)
+        {
+            NX_DEBUG(
+                this, "[Cleanup, measure]: storage: '%1' spaceLimit: %2, RemoveFileCap: %3. Skipping.",
+                nx::utils::url::hidePassword(storage->getUrl()),
+                storage->getSpaceLimit(),
+                isAbleToRemove);
+
+            continue;
+        }
+
+        NX_DEBUG(
+            this, "[Cleanup, measure]: storage: '%1', spaceLimit: %2, freeSpace: %3, toDelete: %4",
+            nx::utils::url::hidePassword(storage->getUrl()),
+            storage->getSpaceLimit(),
+            storage->getFreeSpace(),
+            ps.second);
+    }
+
+    NX_DEBUG(
+        this, "[Cleanup, measure]: Total bytes to cleanup: %1 (%2 Mb) (%3 Gb)",
+        cleanupInfo.total,
+        cleanupInfo.total / (1024 * 1024),
+        cleanupInfo.total / (1024 * 1024 * 1024));
+}
+
+void QnStorageManager::logAfterCleanup(
+    const CleanupInfo& cleanupInfo,
+    const std::chrono::steady_clock::time_point startPoint) const
+{
+    using namespace std::chrono;
+    qint64 elapsedSec = std::max<int64_t>(
+        duration_cast<seconds>(steady_clock::now() - startPoint).count(), 1LL);
+
+    NX_DEBUG(
+        this,
+        "[Cleanup, measure]: Cleanup routine for role '%1' has finished. "
+        "Elapsed %2s (%4hrs). Cleanup speed: %5Mb/s",
+        m_role == QnServer::StoragePool::Normal ? "main " : "backup",
+        elapsedSec,
+        elapsedSec / (60 * 60),
+        cleanupInfo.total / (1024 * 1024 * elapsedSec));
+}
+
 void QnStorageManager::clearSpace(bool forced)
 {
     QnMutexLocker lk(&m_clearSpaceMutex);
 
-    // if Backup on Schedule (or on demand) synchronization routine is
+    // If Backup on Schedule (or on demand) synchronization routine is
     // running at the moment, dont run clearSpace() if it's been triggered by
     // the timer.
     bool backupOnAndTimerTriggered = m_role == QnServer::StoragePool::Backup && !forced &&
@@ -1786,97 +1874,53 @@ void QnStorageManager::clearSpace(bool forced)
     if (backupOnAndTimerTriggered)
         return;
 
-    // 1. delete old data if cameras have max duration limit
+    // Delete old data if cameras have max duration limit.
     clearMaxDaysData();
 
-    // 2. free storage space
+    // Free storage space.
     bool allStoragesReady = true;
     QSet<QnStorageResourcePtr> storages = getClearableStorages();
+    for (const auto& storage: getUsedWritableStorages())
+    {
+        if (!storages.contains(storage))
+        {
+            NX_DEBUG(
+                this, "[Cleanup]: Storage %1 is being fast scanned. Skipping",
+                nx::utils::url::hidePassword(storage->getUrl()));
 
-    for (const auto& storage: getUsedWritableStorages()) {
-        if (!storages.contains(storage)) {
-            NX_VERBOSE(this, "[Cleanup]: Storage %1 is being fast scanned. Skipping", nx::utils::url::hidePassword(storage->getUrl()));
             allStoragesReady = false;
         }
     }
 
-    if (allStoragesReady && m_role == QnServer::StoragePool::Normal) {
+    if (allStoragesReady && m_role == QnServer::StoragePool::Normal)
         updateCameraHistory();
-    }
 
-    qint64 toDeleteTotal = 0;
-    std::chrono::time_point<std::chrono::steady_clock> cleanupStartTime = std::chrono::steady_clock::now();
+    const auto cleanupInfo = CleanupInfo(storages);
+    if (cleanupInfo.needToCleanup())
+        logBeforeCleanup(cleanupInfo);
 
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose))
-    {
-        NX_VERBOSE(this, lit("[Cleanup, measure]: %1 storages are ready for a cleanup").arg(storages.size()));
-        NX_VERBOSE(this, lit("[Cleanup, measure]: Starting cleanup routine for %1 storage manager")
-                .arg((m_role == QnServer::StoragePool::Normal ? lit("main") : lit("backup"))));
-
-        for (const auto& storage: storages)
-        {
-            if (storage->getSpaceLimit() == 0 ||
-                (storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile)
-                    != QnAbstractStorageResource::cap::RemoveFile)
-            {
-                NX_VERBOSE(this, "[Cleanup, measure]: storage: %1 spaceLimit: %2, RemoveFileCap: %3, skipping",
-                        nx::utils::url::hidePassword(storage->getUrl()), storage->getSpaceLimit(),
-                        (storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile) == QnAbstractStorageResource::cap::RemoveFile);
-                continue;
-            }
-
-            qint64 toDeleteForStorage = storage->getSpaceLimit() - storage->getFreeSpace();
-            NX_VERBOSE(this, "[Cleanup, measure]: storage: %1, spaceLimit: %2, freeSpace: %3, toDelete: %4",
-                    nx::utils::url::hidePassword(storage->getUrl()),
-                    storage->getSpaceLimit(),
-                    storage->getFreeSpace(),
-                    toDeleteForStorage);
-
-            if (toDeleteForStorage > 0)
-                toDeleteTotal += toDeleteForStorage;
-        }
-
-        NX_VERBOSE(this, lit("[Cleanup, measure]: Total bytes to cleanup: %1 (%2 Mb) (%3 Gb)")
-                .arg(toDeleteTotal)
-                .arg(toDeleteTotal / (1024 * 1024))
-                .arg(toDeleteTotal / (1024 * 1024 * 1024)));
-    }
+    const auto cleanupStartTime = std::chrono::steady_clock::now();
 
     QnStorageResourceList delAgainList;
-    for(const QnStorageResourcePtr& storage: storages) {
+    for(const QnStorageResourcePtr& storage: storages)
+    {
+        if (!cleanupInfo.needToCleanup(storage))
+            continue;
+
         if (!clearOldestSpace(storage, true, storage->getSpaceLimit()))
             delAgainList << storage;
     }
+
     for(const QnStorageResourcePtr& storage: delAgainList)
         clearOldestSpace(storage, false, storage->getSpaceLimit());
 
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose) && toDeleteTotal > 0)
-    {
-        QString clearSpaceLogMessage;
-        QTextStream clearSpaceLogStream(&clearSpaceLogMessage);
-        auto cleanupEndTime = std::chrono::steady_clock::now();
-        qint64 elapsedMs =
-            std::chrono::duration_cast<std::chrono::milliseconds>
-                (cleanupEndTime - cleanupStartTime).count();
-        qint64 elapsedSecs = qMax((elapsedMs / 1000), 1ll);
-
-        clearSpaceLogStream << "[Cleanup, measure]: Cleanup routine for "
-                            << (m_role == QnServer::StoragePool::Normal ? "main " : "backup")
-                            << " storage manager has finished" << endl;
-        clearSpaceLogStream << "[Cleanup, measure]: time elapsed: " << elapsedMs << " ms "
-                            << "(" << elapsedSecs << " secs) "
-                            << "(" << (elapsedSecs / (60 * 60)) << " hrs)" << endl;
-        clearSpaceLogStream << "[Cleanup, measure]: cleanup speed was "
-                            << (toDeleteTotal / (1024 * 1024 * elapsedSecs)) << " Mb/s"
-        << endl;
-        NX_VERBOSE(this, clearSpaceLogMessage);
-    }
+    if (cleanupInfo.needToCleanup())
+        logAfterCleanup(cleanupInfo, cleanupStartTime);
 
     if (m_role != QnServer::StoragePool::Normal)
         return;
 
-    // 5. Cleanup motion
-
+    // Cleanup motion.
     bool readyToDeleteMotion = (m_scanData.lock()->state == Qn::RebuildState_None); // do not delete motion while rebuilding in progress (just in case, unnecessary)
     for (const QnStorageResourcePtr& storage: getAllStorages())
     {
@@ -1901,10 +1945,10 @@ void QnStorageManager::clearSpace(bool forced)
         m_clearMotionTimer.restart();
     }
 
-    // 6. Cleanup bookmarks and analytics by cameras
-    if (m_clearBookmarksTimer.elapsed() > BOOKMARK_CLEANUP_INTERVAL) {
+    // Cleanup bookmarks and analytics by cameras.
+    if (m_clearBookmarksTimer.elapsed() > BOOKMARK_CLEANUP_INTERVAL)
+    {
         m_clearBookmarksTimer.restart();
-
         const auto oldestDataTimestampByCamera = calculateOldestDataTimestampByCamera();
         if (!oldestDataTimestampByCamera.isEmpty())
         {
@@ -1914,7 +1958,7 @@ void QnStorageManager::clearSpace(bool forced)
                 clearAnalyticsEvents(oldestDataTimestampByCamera);
         }
 
-        // 7. Cleanup more analytics if there is no disk space
+        // Cleanup more analytics if there is no disk space.
         forciblyClearAnalyticsEvents();
     }
 }

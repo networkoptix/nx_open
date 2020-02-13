@@ -4,6 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <nx/kit/utils.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/ptr.h>
 
@@ -13,51 +14,50 @@
 #include <nx/vms/server/analytics/wrappers/types.h>
 #include <plugins/vms_server_plugins_ini.h>
 
-#include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
-#include <nx/vms/event/events/events_fwd.h>
 
 #include <nx/fusion/serialization/json.h>
 
-
 namespace nx::vms::server::analytics::wrappers {
-
-using ManifestProcessorViolationHandler = std::function<void(Violation)>;
 
 template<typename Manifest>
 class ManifestProcessor
 {
 public:
+    using ViolationHandler = std::function<void(Violation)>;
+    using SdkErrorHandler = std::function<void(const sdk_support::Error&)>;
+    using InternalErrorHandler = std::function<void(const QString& /*errorMessage*/)>;
+
     ManifestProcessor(
         DebugSettings debugSettings,
         SdkObjectDescription sdkObjectDescription,
-        ManifestProcessorViolationHandler violationHandler,
-        ProcessorErrorHandler errorHandler)
+        ViolationHandler violationHandler,
+        SdkErrorHandler errorHandler,
+        InternalErrorHandler internalErrorHandler)
         :
         m_debugSettings(std::move(debugSettings)),
         m_sdkObjectDescription(std::move(sdkObjectDescription)),
         m_violationHandler(std::move(violationHandler)),
-        m_errorHandler(std::move(errorHandler))
+        m_sdkErrorHandler(std::move(errorHandler)),
+        m_internalErrorHandler(std::move(internalErrorHandler))
     {
     }
 
     template<typename SdkObject>
     std::optional<Manifest> manifest(const SdkObject& sdkObject) const
     {
-        if (!NX_ASSERT(sdkObject))
+        if (!NX_ASSERT(sdkObject, kNullSdkObjectErrorMessage))
         {
-            m_violationHandler({
-                ViolationType::internalViolation,
-                "SDK object is unavailable while retrieving manifest"});
+            m_internalErrorHandler(kNullSdkObjectErrorMessage);
             return std::nullopt;
         }
 
-        sdk::Ptr<const sdk::IString> manifest = loadManifestStringFromFile();
-        if (!manifest)
-            manifest = loadManifestStringFromSdkObject(sdkObject);
+        sdk::Ptr<const sdk::IString> manifestString = loadManifestStringFromFile();
+        if (!manifestString)
+            manifestString = loadManifestStringFromSdkObject(sdkObject);
 
-        dumpManifestStringToFile(manifest);
-        return processManifest(manifest);
+        dumpManifestStringToFile(manifestString);
+        return processManifest(manifestString);
     }
 
 private:
@@ -83,18 +83,16 @@ private:
     template<typename SdkObject>
     sdk::Ptr<const sdk::IString> loadManifestStringFromSdkObject(const SdkObject& sdkObject) const
     {
-        if (!NX_ASSERT(sdkObject))
+        if (!NX_ASSERT(sdkObject, kNullSdkObjectErrorMessage))
         {
-            m_violationHandler({
-                ViolationType::internalViolation,
-                "SDK object is unavailable while retrieving manifest"});
+            m_internalErrorHandler(kNullSdkObjectErrorMessage);
             return nullptr;
         }
 
         const sdk_support::ResultHolder<const sdk::IString*> result = sdkObject->manifest();
         if (!result.isOk())
         {
-            m_errorHandler(sdk_support::Error::fromResultHolder(result));
+            m_sdkErrorHandler(sdk_support::Error::fromResultHolder(result));
             return nullptr;
         }
 
@@ -108,7 +106,7 @@ private:
 
         const QString stringToDump = (manifestString && manifestString->str())
             ? QString(manifestString->str())
-            : QString();
+            : "";
 
         const auto baseFilename = m_sdkObjectDescription.baseInputOutputFilename();
         const auto absoluteFilename = sdk_support::debugFileAbsolutePath(
@@ -122,9 +120,8 @@ private:
 
         if (!dumpIsSuccessful)
         {
-            m_violationHandler({
-                ViolationType::internalViolation,
-                "Unable to dump manifest to file"});
+            m_internalErrorHandler(lm("Unable to dump manifest to file %2.").args(
+                nx::kit::utils::toString(absoluteFilename)));
         }
     }
 
@@ -133,23 +130,20 @@ private:
     {
         if (!manifestString)
         {
-            m_violationHandler(
-                {ViolationType::nullManifest, /*violationDetails*/ QString()});
+            m_violationHandler({ViolationType::nullManifest, /*violationDetails*/ ""});
             return std::nullopt;
         }
 
         const char* const manifestCString = manifestString->str();
         if (!manifestCString)
         {
-            m_violationHandler(
-                {ViolationType::nullManifestString, /*violationDetails*/ QString()});
+            m_violationHandler({ViolationType::nullManifestString, /*violationDetails*/ ""});
             return std::nullopt;
         }
 
         if (*manifestCString == '\0')
         {
-            m_violationHandler(
-                {ViolationType::emptyManifestString, /*violationDetails*/ QString()});
+            m_violationHandler({ViolationType::emptyManifestString, /*violationDetails*/ ""});
             return std::nullopt;
         }
 
@@ -171,16 +165,14 @@ private:
         QJsonValue jsonValue;
         if (!QJsonDetail::deserialize_json(manifestString.toUtf8(), &jsonValue))
         {
-            m_violationHandler(
-                {ViolationType::invalidJson, /*violationDetails*/ QString()});
+            m_violationHandler({ViolationType::invalidJson, /*violationDetails*/ ""});
             return std::nullopt;
         }
 
         QnJsonContext ctx;
         if (!QJson::deserialize(&ctx, jsonValue, &result))
         {
-            m_violationHandler(
-                {ViolationType::invalidJsonStructure, /*violationDetails*/ QString()});
+            m_violationHandler({ViolationType::invalidJsonStructure, /*violationDetails*/ ""});
             return std::nullopt;
         }
 
@@ -236,10 +228,14 @@ private:
     }
 
 private:
+    static constexpr const char* kNullSdkObjectErrorMessage =
+        "SDK object to retrieve manifest from is null.";
+
     const DebugSettings m_debugSettings;
     const SdkObjectDescription m_sdkObjectDescription;
-    ManifestProcessorViolationHandler m_violationHandler;
-    ProcessorErrorHandler m_errorHandler;
+    ViolationHandler m_violationHandler;
+    SdkErrorHandler m_sdkErrorHandler;
+    InternalErrorHandler m_internalErrorHandler;
 };
 
 } // namespace nx::vms::server::analytics::wrappers

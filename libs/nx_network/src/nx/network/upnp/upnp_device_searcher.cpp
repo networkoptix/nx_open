@@ -167,43 +167,6 @@ void DeviceSearcher::unregisterHandler(SearchHandler* handler, const QString& de
     }
 }
 
-void DeviceSearcher::saveDiscoveredDevicesSnapshot()
-{
-    QnMutexLocker lk(&m_mutex);
-    m_discoveredDevicesToProcess.swap(m_discoveredDevices);
-    m_discoveredDevices.clear();
-}
-
-void DeviceSearcher::processDiscoveredDevices(SearchHandler* handlerToUse)
-{
-    for (std::map<HostAddress, DiscoveredDeviceInfo>::iterator
-        it = m_discoveredDevicesToProcess.begin();
-        it != m_discoveredDevicesToProcess.end();
-        )
-    {
-        if (handlerToUse)
-        {
-            const auto url = it->second.descriptionUrl;
-            if (handlerToUse->processPacket(
-                it->second.localInterfaceAddress,
-                SocketAddress(url.host(), url.port()),
-                it->second.devInfo,
-                it->second.xmlDevInfo))
-            {
-                m_discoveredDevicesToProcess.erase(it++);
-                continue;
-            }
-        }
-        else
-        {
-            NX_ASSERT(false);
-            // TODO: #ak this needs to be implemented if camera discovery ever becomes truly asynchronous
-        }
-
-        ++it;
-    }
-}
-
 int DeviceSearcher::cacheTimeout() const
 {
     return m_settings->cacheTimeout();
@@ -574,21 +537,25 @@ void DeviceSearcher::processPacket(DiscoveredDeviceInfo info)
 
 void DeviceSearcher::onDeviceDescriptionXmlRequestDone(nx::network::http::AsyncHttpClientPtr httpClient)
 {
-    DiscoveredDeviceInfo* ctx = nullptr;
+    DiscoveredDeviceInfo ctx;
+    bool processRequired = false;
     {
         QnMutexLocker lk(&m_mutex);
         HttpClientsDict::iterator it = m_httpClients.find(httpClient);
         if (it == m_httpClients.end())
             return;
-        ctx = &it->second;
+        processRequired = httpClient->response()
+            && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok;
+        if (processRequired)
+            ctx = it->second;
     }
 
-    if (httpClient->response() && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
+    if (processRequired)
     {
         // TODO: #ak check content type. Must be text/xml; charset="utf-8"
         //reading message body
         const nx::network::http::BufferType& msgBody = httpClient->fetchMessageBodyBuffer();
-        processDeviceXml(*ctx, msgBody);
+        processDeviceXml(ctx, msgBody);
     }
 
     QnMutexLocker lk(&m_mutex);

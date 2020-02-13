@@ -61,7 +61,6 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SdkMethod);
 enum class ViolationType
 {
     undefined,
-    internalViolation,
     nullManifest,
     nullManifestString,
     emptyManifestString,
@@ -83,8 +82,6 @@ struct Violation
     ViolationType type = ViolationType::undefined;
     QString details;
 };
-
-using ProcessorErrorHandler = std::function<void(const sdk_support::Error&)>;
 
 } // namespace nx::vms::server::analytics::wrappers
 

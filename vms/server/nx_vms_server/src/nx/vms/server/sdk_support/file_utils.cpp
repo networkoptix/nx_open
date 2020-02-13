@@ -75,13 +75,13 @@ std::optional<QString> loadStringFromFile(
 {
     if (!NX_ASSERT(!absoluteFilePath.isEmpty()))
     {
-        NX_DEBUG(logTag, "Unable to load string from file: filename is empty");
+        NX_WARNING(logTag, "Unable to load string from file: filename is empty");
         return std::nullopt;
     }
 
     if (!QFileInfo::exists(absoluteFilePath))
     {
-        NX_DEBUG(logTag,
+        NX_WARNING(logTag,
             "Unable to load string from file: file %1 doesn't exist", absoluteFilePath);
         return std::nullopt;
     }
@@ -89,7 +89,7 @@ std::optional<QString> loadStringFromFile(
     QFile f(absoluteFilePath);
     if (!f.open(QFile::ReadOnly))
     {
-        NX_DEBUG(logTag, "Unable to load string file: unable to open %1", absoluteFilePath);
+        NX_WARNING(logTag, "Unable to load string file: unable to open %1", absoluteFilePath);
         return std::nullopt;
     }
 
@@ -103,14 +103,14 @@ bool dumpStringToFile(
 {
     if (!NX_ASSERT(!absoluteFilePath.isEmpty()))
     {
-        NX_DEBUG(logTag, "Unable to dump string to file: filename is empty");
+        NX_WARNING(logTag, "Unable to dump string to file: filename is empty");
         return false;
     }
 
     QFileInfo fileInfo(absoluteFilePath);
     if (!fileInfo.absoluteDir().exists())
     {
-        NX_DEBUG(logTag,
+        NX_WARNING(logTag,
             "Unable to dump string to file: parent directory of %1 doesn't exist",
             absoluteFilePath);
         return false;
@@ -119,14 +119,14 @@ bool dumpStringToFile(
     QFile f(absoluteFilePath);
     if (!f.open(QFile::WriteOnly))
     {
-        NX_DEBUG(logTag, "Unable to dump string to file: unable to open %1", absoluteFilePath);
+        NX_WARNING(logTag, "Unable to dump string to file: unable to open %1", absoluteFilePath);
         return false;
     }
 
 
     if (f.write(stringToDump.toUtf8()) < 0)
     {
-        NX_DEBUG(logTag,
+        NX_WARNING(logTag,
             "Unable to dump string to file: error occurred while writing to %1", absoluteFilePath);
         return false;
     }
@@ -135,7 +135,7 @@ bool dumpStringToFile(
     {
         if (f.write("\n") < 0)
         {
-            NX_DEBUG(logTag,
+            NX_WARNING(logTag,
                 "Unable to dump string to file %1: unable to write trailing end-of-line symbol",
                 absoluteFilePath);
             return false;

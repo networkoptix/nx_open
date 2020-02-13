@@ -152,4 +152,12 @@ QString toHumanReadableString(ManifestErrorType errorType)
     }
 }
 
+QString toHumanReadableString(ManifestError manifestError)
+{
+    return "Manifest error: " + toHumanReadableString(manifestError.errorType)
+        + (manifestError.additionalInfo.isEmpty()
+            ? ""
+            : (". Details: " + manifestError.additionalInfo));
+}
+
 } // namespace nx::vms::api::analytics

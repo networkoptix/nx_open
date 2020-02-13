@@ -1153,17 +1153,6 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
             m_delay.breakSleep();
         }
     }
-    else if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
-    {
-        if (m_lastQueuedVideoTime != AV_NOPTS_VALUE)
-        {
-            NX_VERBOSE(this, "Metadata lag behing last video packet: %1ms",
-                (m_lastQueuedVideoTime - metadata->timestamp) / 1000);
-        }
-
-        processMetadata(metadata);
-        return;
-    }
 
     QnAbstractDataConsumer::putData(data);
     if (video && m_dataQueue.size() < 2)
@@ -1305,6 +1294,9 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!media)
         return true;
+
+    if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
+        processMetadata(metadata);
 
     QnCompressedVideoDataPtr vd = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
 

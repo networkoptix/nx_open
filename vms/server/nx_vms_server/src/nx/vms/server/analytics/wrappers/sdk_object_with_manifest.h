@@ -49,29 +49,33 @@ public:
             return std::nullopt;
 
         ManifestProcessor<ManifestType> manifestProcessor(
-            makeManifestProcessorSettings(),
+            makeManifestProcessorDebugSettings(),
             sdkObjectDescription(),
-            [this, outStringBuilder](Violation violation)
+            [this, outStringBuilder](Violation violation) //< ViolationHandler
             {
                 if (outStringBuilder)
                 {
-                    *outStringBuilder =
-                        std::make_unique<StringBuilder>(
-                            SdkMethod::manifest, sdkObjectDescription(), violation);
+                    *outStringBuilder = std::make_unique<StringBuilder>(
+                        SdkMethod::manifest, sdkObjectDescription(), violation);
                 }
-
                 handleViolation(SdkMethod::manifest, violation, /*returnValue*/ nullptr);
             },
-            [this, outStringBuilder](sdk_support::Error error)
+            [this, outStringBuilder](sdk_support::Error error) //< SdkErrorHandler
             {
                 if (outStringBuilder)
                 {
-                    *outStringBuilder =
-                        std::make_unique<StringBuilder>(
-                            SdkMethod::manifest, sdkObjectDescription(), error);
+                    *outStringBuilder = std::make_unique<StringBuilder>(
+                        SdkMethod::manifest, sdkObjectDescription(), error);
                 }
-
                 handleError(SdkMethod::manifest, error, /*returnValue*/ nullptr);
+            },
+            [this, outStringBuilder](const QString& errorMessage) //< InternalErrorHandler
+            {
+                const QString caption = "Internal Error in Server while obtaining manifest of ["
+                    + sdkObjectDescription().descriptionString() + "]";
+                const QString description =
+                    errorMessage + " Additional details may be available in the Server log.";
+                throwPluginEvent(caption, description);
             });
 
         return manifestProcessor.manifest(m_mainSdkObject);
@@ -84,81 +88,33 @@ public:
     QString libName() const { return m_libName; }
 
 protected:
-    virtual DebugSettings makeManifestProcessorSettings() const = 0;
+    virtual DebugSettings makeManifestProcessorDebugSettings() const = 0;
 
     virtual SdkObjectDescription sdkObjectDescription() const = 0;
 
 protected:
-    template<typename GenericError, typename ReturnType>
-    ReturnType handleGenericError(
-        SdkMethod sdkMethod,
-        const GenericError& error,
-        ReturnType returnValue,
-        bool shouldTriggerAssert = false) const
-    {
-        const StringBuilder stringBuilder(sdkMethod, sdkObjectDescription(), error);
-
-        if (shouldTriggerAssert)
-            NX_ASSERT(false, stringBuilder.buildLogString());
-        else
-            NX_DEBUG(this, stringBuilder.buildLogString());
-
-        throwPluginEvent(
-            stringBuilder.buildPluginDiagnosticEventCaption(),
-            stringBuilder.buildPluginDiagnosticEventDescription());
-
-        return returnValue;
-    }
-
     template<typename ReturnType>
     ReturnType handleError(
         SdkMethod sdkMethod,
         const sdk_support::Error& error,
-        ReturnType returnValue,
-        bool shouldTriggerAssert = false) const
+        ReturnType returnValue) const
     {
         if (!NX_ASSERT(!error.isOk()))
             return returnValue;
 
-        return handleGenericError(sdkMethod, error, returnValue, shouldTriggerAssert);
+        return handleGenericError(sdkMethod, error, returnValue, /*mustFailAssertion*/ false);
     }
 
     template<typename ReturnType>
     ReturnType handleViolation(
         SdkMethod sdkMethod,
         const Violation& violation,
-        ReturnType returnValue,
-        bool shouldTriggerAssert = false) const
+        ReturnType returnValue) const
     {
-        return handleGenericError(sdkMethod, violation, returnValue, shouldTriggerAssert);
-    }
-
-    void throwPluginEvent(
-        const QString& caption,
-        const QString& description) const
-    {
-        using namespace nx::vms::event;
-        const auto sdkObjectDescription = this->sdkObjectDescription();
-
-        const auto engineResource = sdkObjectDescription.engine();
-        const QnUuid engineId = engineResource ? engineResource->getId() : QnUuid();
-
-        PluginDiagnosticEventPtr pluginDiagnosticEvent(
-            new PluginDiagnosticEvent(
-                qnSyncTime->currentUSecsSinceEpoch(),
-                engineId,
-                caption,
-                description,
-                nx::vms::api::EventLevel::ErrorEventLevel,
-                sdkObjectDescription.device()));
-
-        // TODO: better introduce a helper class and use a real connection instead of
-        // `invokeMethod`.
-        QMetaObject::invokeMethod(
-            serverModule()->eventConnector(),
-            "at_pluginDiagnosticEvent",
-            Qt::QueuedConnection,
-            Q_ARG(nx::vms::event::PluginDiagnosticEventPtr, pluginDiagnosticEvent));
+        const bool mustFailAssertion =
+            violation.type == ViolationType::methodExecutionTookTooLong
+            && pluginsIni().shouldMethodTimeoutViolationTriggerAnAssertion;
+        return handleGenericError(sdkMethod, violation, returnValue, mustFailAssertion);
     }
 
     sdk_support::TimedGuard makeTimedGuard(
@@ -172,9 +128,57 @@ protected:
                 handleViolation(
                     sdkMethod,
                     {ViolationType::methodExecutionTookTooLong, std::move(additionalInfo)},
-                    /*returnValue*/ nullptr,
-                    pluginsIni().shouldMethodTimeoutViolationTriggerAnAssertion);
+                    /*returnValue*/ nullptr);
             });
+    }
+
+private:
+    void throwPluginEvent(
+        const QString& caption,
+        const QString& description) const
+    {
+        using namespace nx::vms::event;
+        const auto sdkObjectDescription = this->sdkObjectDescription();
+
+        const auto engineResource = sdkObjectDescription.engine();
+        const QnUuid engineId = engineResource ? engineResource->getId() : QnUuid();
+
+        const PluginDiagnosticEventPtr pluginDiagnosticEvent(new PluginDiagnosticEvent(
+            qnSyncTime->currentUSecsSinceEpoch(),
+            engineId,
+            caption,
+            description,
+            nx::vms::api::EventLevel::ErrorEventLevel,
+            sdkObjectDescription.device()));
+
+        // TODO: better introduce a helper class and use a real connection instead of
+        // `invokeMethod`.
+        QMetaObject::invokeMethod(
+            serverModule()->eventConnector(),
+            "at_pluginDiagnosticEvent",
+            Qt::QueuedConnection,
+            Q_ARG(nx::vms::event::PluginDiagnosticEventPtr, pluginDiagnosticEvent));
+    }
+
+    template<typename GenericError, typename ReturnType>
+    ReturnType handleGenericError(
+        SdkMethod sdkMethod,
+        const GenericError& error,
+        ReturnType returnValue,
+        bool mustFailAssertion = false) const
+    {
+        const StringBuilder stringBuilder(sdkMethod, sdkObjectDescription(), error);
+
+        if (mustFailAssertion)
+            NX_ASSERT(false, stringBuilder.buildLogString());
+        else
+            NX_DEBUG(this, stringBuilder.buildLogString());
+
+        throwPluginEvent(
+            stringBuilder.buildPluginDiagnosticEventCaption(),
+            stringBuilder.buildPluginDiagnosticEventDescription());
+
+        return returnValue;
     }
 
 private:

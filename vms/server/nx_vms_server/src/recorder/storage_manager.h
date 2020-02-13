@@ -58,6 +58,7 @@ class ArchiveIndexer;
 class AuxiliaryTask;
 class QnUuid;
 class QnScheduleSync;
+struct CleanupInfo;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
 namespace nx::vms::server { class WritableStoragesHelper; }
@@ -313,6 +314,11 @@ private:
 
     void emptyCatalogsForNotExistingFolders(const QnStorageResourcePtr& storage);
     void checkSystemStorageSpace();
+    void logBeforeCleanup(const CleanupInfo& cleanupInfo) const;
+    void logAfterCleanup(
+        const CleanupInfo& cleanupInfo,
+        const std::chrono::steady_clock::time_point startPoint) const;
+
 private:
     nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;

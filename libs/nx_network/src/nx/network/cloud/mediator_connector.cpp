@@ -146,10 +146,11 @@ void MediatorConnector::unsubscribeFromSystemCredentialsSet(nx::utils::Subscript
     m_credentialsSetEvent.removeSubscription(id);
 }
 
-void MediatorConnector::setStunClientSettings(
-    network::stun::AbstractAsyncClient::Settings stunClientSettings)
+network::stun::AbstractAsyncClient::Settings
+    MediatorConnector::setStunClientSettings(
+        network::stun::AbstractAsyncClient::Settings stunClientSettings)
 {
-    s_stunClientSettings = std::move(stunClientSettings);
+    return std::exchange(s_stunClientSettings, std::move(stunClientSettings));
 }
 
 void MediatorConnector::stopWhileInAioThread()

@@ -103,14 +103,16 @@ public:
 
     void unsubscribeFromSystemCredentialsSet(nx::utils::SubscriptionId id);
 
-    static void setStunClientSettings(
+    /**
+     * @return The previous settings.
+     */
+    static network::stun::AbstractAsyncClient::Settings setStunClientSettings(
         network::stun::AbstractAsyncClient::Settings stunClientSettings);
 
 private:
     mutable QnMutex m_mutex;
     std::optional<SystemCredentials> m_credentials;
     nx::utils::Subscription<std::optional<SystemCredentials>> m_credentialsSetEvent;
-
 
     std::unique_ptr<MediatorEndpointProvider> m_mediatorEndpointProvider;
     std::shared_ptr<MediatorStunClient> m_stunClient;

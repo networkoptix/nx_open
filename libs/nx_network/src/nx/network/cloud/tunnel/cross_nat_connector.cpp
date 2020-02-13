@@ -48,7 +48,7 @@ CrossNatConnector::CrossNatConnector(
     :
     m_cloudConnectController(cloudConnectController),
     m_targetPeerAddress(targetPeerAddress),
-    m_connectSessionId(QnUuid::createUuid().toByteArray().toStdString()),
+    m_connectSessionId(QnUuid::createUuid().toSimpleByteArray().toStdString()),
     m_mediatorAddress(std::move(mediatorAddress)),
     m_originatingHostAddressReplacement(
         m_cloudConnectController->settings().originatingHostAddressReplacement()),

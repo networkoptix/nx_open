@@ -19,8 +19,6 @@ static QString toHumanReadableString(ViolationType violation)
 {
     switch (violation)
     {
-        case ViolationType::internalViolation:
-            return "internal violation";
         case ViolationType::nullManifest:
             return "Manifest is null";
         case ViolationType::nullManifestString:
@@ -30,10 +28,8 @@ static QString toHumanReadableString(ViolationType violation)
         case ViolationType::invalidJson:
             return "Manifest deserialization error - manifest is not a valid JSON";
         case ViolationType::invalidJsonStructure:
-        {
             return "Manifest deserialization error - unable to deserialize provided JSON to the "
                 "Manifest structure";
-        }
         case ViolationType::manifestLogicalError:
             return "Manifest contains logical errors";
         case ViolationType::nullEngine:
@@ -125,7 +121,7 @@ QString StringBuilder::buildPluginDiagnosticEventDescription() const
 
 QString StringBuilder::buildViolationFullString() const
 {
-    return lm("Method %1::%2 of [%3] violated its contract: %4%5").args(
+    return lm("Technical details: Method %1::%2 of [%3] violated its contract: %4%5").args(
         toHumanReadableString(m_sdkObjectDescription.sdkObjectType()),
         toHumanReadableString(m_sdkMethod),
         m_sdkObjectDescription.descriptionString(),
@@ -137,7 +133,7 @@ QString StringBuilder::buildViolationFullString() const
 
 QString StringBuilder::buildViolationShortString() const
 {
-    return lm("Contract violation: [%1]").args(m_sdkObjectDescription.descriptionString());
+    return "Issue with the plugin detected";
 }
 
 QString StringBuilder::buildErrorFullString() const
@@ -151,7 +147,7 @@ QString StringBuilder::buildErrorFullString() const
 
 QString StringBuilder::buildErrorShortString() const
 {
-    return lm("Error: [%1]").args(m_sdkObjectDescription.descriptionString());
+    return lm("Error in [%1]").args(m_sdkObjectDescription.descriptionString());
 }
 
 } // namespace nx::vms::server::analytics::wrappers

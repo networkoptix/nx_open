@@ -164,14 +164,18 @@ protected:
                 .setScheme(nx::network::http::kUrlSchemeName)
                 .setEndpoint(m_mediator->moduleInstance()->impl()->httpEndpoints().front())
                 .setPath(api::kMediatorApiPrefix));
+
             const auto response = mediatorClient.getListeningPeers();
-            ASSERT_EQ(api::ResultCode::ok, std::get<0>(response));
-            const auto listeningPeers = std::get<1>(response);
-            if (listeningPeers.systems.find(QString::fromUtf8(m_cloudSystemCredentials.systemId)) !=
-                listeningPeers.systems.end())
+            if (std::get<0>(response) == api::ResultCode::ok)
             {
-                break;
+                const auto listeningPeers = std::get<1>(response);
+                if (listeningPeers.systems.find(QString::fromUtf8(m_cloudSystemCredentials.systemId)) !=
+                    listeningPeers.systems.end())
+                {
+                    break;
+                }
             }
+
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }

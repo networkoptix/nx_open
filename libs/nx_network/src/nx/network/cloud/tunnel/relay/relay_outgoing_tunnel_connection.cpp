@@ -1,7 +1,7 @@
 #include "relay_outgoing_tunnel_connection.h"
 
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/std/cpp14.h>
+#include <nx/utils/log/log.h>
 
 #include "api/detail/relay_api_client_factory.h"
 #include "../../protocol_type.h"
@@ -22,6 +22,8 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_usageCounter(std::make_shared<int>(0))
 {
     bindToAioThread(getAioThread());
+
+    NX_VERBOSE(this, "Created new relay tunnel. Url %1, session %2", relayUrl, relaySessionId);
 }
 
 void OutgoingTunnelConnection::stopWhileInAioThread()
@@ -61,6 +63,8 @@ void OutgoingTunnelConnection::establishNewConnection(
         [this, timeout, socketAttributes = std::move(socketAttributes),
             handler = std::move(handler)]() mutable
         {
+            NX_VERBOSE(this, "Opening new connection with timeout %1", timeout);
+
             stopInactivityTimer();
 
             m_activeRequests.push_back(std::make_unique<RequestContext>());
@@ -139,6 +143,8 @@ void OutgoingTunnelConnection::onConnectionOpened(
     std::unique_ptr<AbstractStreamSocket> connection,
     std::list<std::unique_ptr<RequestContext>>::iterator requestIter)
 {
+    NX_VERBOSE(this, "Open connection completed with result %1", resultCode);
+
     auto requestContext = std::move(*requestIter);
     m_activeRequests.erase(requestIter);
 
@@ -182,6 +188,8 @@ void OutgoingTunnelConnection::reportTunnelClosure(SystemError::ErrorCode reason
 {
     if (!m_tunnelClosedHandler)
         return;
+
+    NX_VERBOSE(this, "Reporting tunnel closure. %1", SystemError::toString(reason));
 
     decltype(m_tunnelClosedHandler) tunnelClosedHandler;
     tunnelClosedHandler.swap(m_tunnelClosedHandler);
