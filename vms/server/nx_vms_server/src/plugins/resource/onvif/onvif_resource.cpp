@@ -4715,7 +4715,24 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
     _onvifDevice__SetRelayOutputState request;
     request.RelayOutputToken = relayOutputInfo.token;
 
-    const auto onvifActive = m_isRelayOutputInversed ? !active : active;
+    auto onvifActive = m_isRelayOutputInversed ? !active : active;
+
+    /*
+     Some cameras have a bug.
+     If "output relay idle state" == "open" (i.e. activeByDefault == false),
+     then "SetRelayOutputState" argument "LogicalState" is accepted as inversed value
+     (active as inactive and vice versa).
+
+     If "output relay idle state" == "close", then "SetRelayOutputState" works perfect.
+
+    */
+
+    bool useInvertedActiveStateForOpenIdleState =
+        resourceData().value<bool>(ResourceDataKey::kUseInvertedActiveStateForOpenIdleState);
+
+    if (useInvertedActiveStateForOpenIdleState && relayOutputInfo.activeByDefault == false)
+        onvifActive = !onvifActive;
+
     request.LogicalState = onvifActive ? onvifXsd__RelayLogicalState::active : onvifXsd__RelayLogicalState::inactive;
 
     _onvifDevice__SetRelayOutputStateResponse response;
