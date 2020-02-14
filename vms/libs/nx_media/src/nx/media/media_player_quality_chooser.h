@@ -58,7 +58,7 @@ struct Result: public boost::equality_comparable1<Result>
  * @param liveMode Used to find a server to query transcoding capability.
  * @param positionMs Used when not liveMode, to find a server to query transcoding capability.
  * @param currentDecoders List of decoders currently used by the player.
- * @return Either one of kQualityLow or kQialityHigh tokens, or a custom resolution which can
+ * @return Either one of kQualityLow or kQualityHigh tokens, or a custom resolution which can
  *     have width set to <=0 to indicate "auto" width. ATTENTION: This method does not inspect
  *     camera aspect ratio, thus, the returned custom size width should be treated as specified
  *     in logical pixels.
