@@ -152,7 +152,7 @@ struct CSNode
     int locationOnHeap = -1;
 };
 
-class CSndUList
+class UDT_API CSndUList
 {
 public:
     CSndUList(
