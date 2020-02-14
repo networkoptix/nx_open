@@ -174,6 +174,14 @@ private:
 
     struct PlaybackRange
     {
+        PlaybackRange() {};
+
+        PlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec):
+            startTimeUsec(startTimeUsec),
+            endTimeUsec(endTimeUsec)
+        {
+        }
+
         int64_t startTimeUsec = AV_NOPTS_VALUE;
         int64_t endTimeUsec = AV_NOPTS_VALUE;
 
@@ -189,12 +197,13 @@ private:
         }
     };
 
-    std::atomic<PlaybackRange> m_playbackRange;
+    PlaybackRange m_playbackRange;
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
     CameraDiagnostics::Result m_openStreamResult;
     std::optional<std::chrono::steady_clock::time_point> m_packetLossReportTime;
 
+    mutable QnMutex m_mutex;
     static nx::utils::Mutex s_defaultTransportMutex;
     static nx::vms::api::RtpTransportType s_defaultTransportToUse;
     std::set<nx::vms::server::network::MulticastAddressRegistry::RegisteredAddressHolderPtr>

@@ -167,7 +167,12 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    const PlaybackRange playbackRange = m_playbackRange.exchange(PlaybackRange());
+    PlaybackRange playbackRange;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        std::swap(playbackRange, m_playbackRange);
+    }
+
     if (playbackRange.isValid())
     {
         m_RtpSession.sendPlay(
@@ -658,7 +663,12 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_gotKeyDataInfo.clear();
     m_gotData = false;
 
-    const PlaybackRange playbackRange = m_playbackRange.exchange(PlaybackRange());
+    PlaybackRange playbackRange;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        std::swap(playbackRange, m_playbackRange);
+    }
+
     m_openStreamResult = m_RtpSession.open(m_currentStreamUrl, playbackRange.startTimeUsec);
     if(m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return m_openStreamResult;
@@ -916,7 +926,8 @@ void QnMulticodecRtpReader::calcStreamUrl()
 
 void QnMulticodecRtpReader::setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec)
 {
-    m_playbackRange.exchange({startTimeUsec, endTimeUsec});
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_playbackRange = PlaybackRange(startTimeUsec, endTimeUsec);
 }
 
 void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat& format)
