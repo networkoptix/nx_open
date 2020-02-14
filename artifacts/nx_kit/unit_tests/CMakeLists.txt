@@ -65,6 +65,10 @@ add_executable(nx_kit_ut
     src/main.cpp
 )
 
+if(WIN32)
+    set_target_properties(nx_kit_ut PROPERTIES WIN32_EXECUTABLE OFF)
+endif()
+
 target_link_libraries(nx_kit_ut
     nx_kit
     disabled_ini_config_ut
