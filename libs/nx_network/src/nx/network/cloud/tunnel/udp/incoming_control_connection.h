@@ -53,11 +53,11 @@ public:
 private:
     virtual void stopWhileInAioThread() override;
 
-    void monitorKeepAlive();
+    void monitorKeepAlive(std::chrono::steady_clock::time_point currentTime);
     void readConnectionRequest();
     void continueReadRequest();
     void processRequest();
-    void handleError(SystemError::ErrorCode code);
+    void reportError(SystemError::ErrorCode code);
 
     template<typename In, typename Out>
     bool tryProcess(stun::Message* response);
@@ -70,7 +70,7 @@ private:
     std::unique_ptr<UdtStreamSocket> m_socket;
     const std::chrono::milliseconds m_maxKeepAliveInterval;
 
-    std::chrono::steady_clock::time_point m_lastKeepAlive;
+    std::chrono::steady_clock::time_point m_lastKeepAliveTime;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_errorHandler;
     utils::MoveOnlyFunc<void()> m_selectedHandler;
 

@@ -19,13 +19,34 @@ namespace test {
 static const size_t kTestConnections = 10;
 static const auto kConnectionId = QnUuid().createUuid().toSimpleString();
 static const std::chrono::milliseconds kSocketTimeout(3000);
-static const std::chrono::milliseconds kMaxKeepAliveInterval(3000);
+static const auto kDefaultKeepAliveInterval = std::chrono::milliseconds(3000);
 
 class UdpIncomingTunnelConnectionTest:
     public ::testing::Test
 {
 protected:
     void SetUp() override
+    {
+        m_connectionParameters.udpTunnelKeepAliveInterval = kDefaultKeepAliveInterval;
+        m_connectionParameters.udpTunnelKeepAliveRetries = 1;
+    }
+
+    void TearDown() override
+    {
+        if (const auto connection = takeConnection())
+            connection->pleaseStopSync();
+
+        m_freeSocket->pleaseStopSync();
+        for (auto& socket : m_connectedSockets)
+            socket->pleaseStopSync();
+    }
+
+    void setControlConnectionKeepAliveTimeout(std::chrono::milliseconds timeout)
+    {
+        m_connectionParameters.udpTunnelKeepAliveInterval = timeout;
+    }
+
+    void givenStartedIncomingConnection()
     {
         utils::TestSyncQueue<SystemError::ErrorCode> results;
 
@@ -43,36 +64,25 @@ protected:
         ASSERT_EQ(results.pop(), SystemError::noError);
         ASSERT_EQ(results.pop(), SystemError::noError);
 
-        nx::hpm::api::ConnectionParameters connectionParameters;
-        connectionParameters.udpTunnelKeepAliveInterval = kMaxKeepAliveInterval;
-        connectionParameters.udpTunnelKeepAliveRetries = 1;
-
         utils::promise<void> startedPromise;
         tmpSocket->dispatch(
             [&]()
             {
-                auto cc = std::make_unique<IncomingControlConnection>(
-                    kConnectionId.toUtf8(), std::move(tmpSocket), connectionParameters);
+                auto controlConnection = std::make_unique<IncomingControlConnection>(
+                    kConnectionId.toUtf8(), std::move(tmpSocket), m_connectionParameters);
                 tmpSocketGuard.disarm();
 
-                cc->start(nullptr /* do not wait for select in test */);
-                m_connection = std::make_unique<udp::IncomingTunnelConnection>(std::move(cc));
+                auto controlConnectionPtr = controlConnection.get();
+                m_connection = std::make_unique<udp::IncomingTunnelConnection>(
+                    std::move(controlConnection));
+
+                controlConnectionPtr->start(nullptr);
 
                 acceptForever();
                 startedPromise.set_value();
             });
 
         startedPromise.get_future().wait();
-    }
-
-    void TearDown() override
-    {
-        if (const auto connection = takeConnection())
-            connection->pleaseStopSync();
-
-        m_freeSocket->pleaseStopSync();
-        for (auto& socket : m_connectSockets)
-            socket->pleaseStopSync();
     }
 
     std::unique_ptr<UdtStreamSocket> makeSocket(bool randevous = false)
@@ -125,7 +135,7 @@ protected:
             });
 
         QnMutexLocker lock(&m_mutex);
-        m_connectSockets.push_back(std::move(socket));
+        m_connectedSockets.push_back(std::move(socket));
     }
 
     std::unique_ptr<udp::IncomingTunnelConnection> takeConnection()
@@ -137,38 +147,43 @@ protected:
     }
 
     QnMutex m_mutex;
+    nx::hpm::api::ConnectionParameters m_connectionParameters;
     nx::network::SocketAddress m_connectionAddress;
     std::unique_ptr<udp::IncomingTunnelConnection> m_connection;
     std::unique_ptr<UdtStreamSocket> m_freeSocket;
     utils::TestSyncQueue<SystemError::ErrorCode> m_acceptResults;
     utils::TestSyncQueue<SystemError::ErrorCode> m_connectResults;
     std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedSockets;
-    std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_connectSockets;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_connectedSockets;
 };
 
 TEST_F(UdpIncomingTunnelConnectionTest, Timeout)
 {
+    setControlConnectionKeepAliveTimeout(std::chrono::milliseconds(1));
+
+    givenStartedIncomingConnection();
+
     ASSERT_EQ(m_acceptResults.pop(), SystemError::timedOut);
 }
 
 TEST_F(UdpIncomingTunnelConnectionTest, Connections)
 {
+    setControlConnectionKeepAliveTimeout(std::chrono::hours(1));
+
+    givenStartedIncomingConnection();
+
     runConnectingSockets(kTestConnections);
     for (size_t i = 0; i < kTestConnections; ++i)
     {
         ASSERT_EQ(m_connectResults.pop(), SystemError::noError) << "i = " << i;
         ASSERT_EQ(m_acceptResults.pop(), SystemError::noError) << "i = " << i;
     }
-
-    EXPECT_TRUE(m_connectResults.isEmpty());
-    EXPECT_TRUE(m_acceptResults.isEmpty());
-
-    // then connection closes by timeout
-    ASSERT_EQ(m_acceptResults.pop(), SystemError::timedOut);
 }
 
 TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
 {
+    givenStartedIncomingConnection();
+
     // we can connect right after start
     runConnectingSockets();
     ASSERT_EQ(m_connectResults.pop(), SystemError::noError);
@@ -261,11 +276,14 @@ TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
 
 TEST_F(UdpIncomingTunnelConnectionTest, PleaseStop)
 {
+    givenStartedIncomingConnection();
     // Tests if TearDown() works fine right after SetUp()
 }
 
 TEST_F(UdpIncomingTunnelConnectionTest, PleaseStopOnRun)
 {
+    givenStartedIncomingConnection();
+
     std::vector<nx::utils::thread> threads;
     for (size_t i = 0; i < kTestConnections; ++i)
     {
