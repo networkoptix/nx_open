@@ -122,6 +122,8 @@ public:
     MediatorStunClientWithEndpointProvider()
     {
         network::stun::AbstractAsyncClient::Settings settings;
+        settings.recvTimeout = nx::network::kNoTimeout;
+        settings.sendTimeout = nx::network::kNoTimeout;
         settings.reconnectPolicy.initialDelay = std::chrono::milliseconds(100);
 
         m_client = std::make_unique<api::MediatorStunClient>(
