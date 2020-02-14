@@ -296,12 +296,6 @@ void ExtendedRuleProcessor::prepareAdditionActionParams(const vms::event::Abstra
 bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& action)
 {
     bool result = base_type::executeActionInternal(action);
-
-    // This is a temporary testing solution, until push notifications get their own action type.
-    // TODO: Add server selection for push action type in RuleProcessor::getDestinationServer.
-    if (action->actionType() == ActionType::showPopupAction && ini().pushNotifyOnPopup)
-        sendPushNotification(action);
-
     if (!result)
     {
         switch (action->actionType())
@@ -337,8 +331,13 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
             case ActionType::buzzerAction:
                 result = executeBuzzerAction(action);
                 break;
+            case ActionType::showPopupAction:
+                if (ini().pushNotifyOnPopup)
+                    sendPushNotification(action);
+                break;
             case ActionType::pushNotificationAction:
                 result = sendPushNotification(action);
+                break;
             default:
                 break;
         }
@@ -919,31 +918,6 @@ struct PushPayload
 {
     QString url;
     QString image;
-
-    PushPayload() = default;
-    PushPayload(const vms::event::EventParameters& event, const QnGlobalSettings* settings)
-    {
-        auto click = nx::network::url::Builder()
-            .setScheme(nx::vms::utils::AppInfo::nativeUriProtocol())
-            .setHost(settings->cloudHost())
-            .setPathParts("client", settings->cloudSystemId(), "view")
-            .addQueryItem("timestamp", event.eventTimestampUsec / 1000);
-        if (!event.eventResourceId.isNull())
-        {
-            click.addQueryItem("resources", event.eventResourceId.toSimpleString());
-            image = nx::network::url::Builder()
-                .setScheme(nx::network::http::kSecureUrlSchemeName)
-                .setHost(settings->cloudSystemId())
-                .setPath("ec2/cameraThumbnail")
-                .addQueryItem("cameraId", event.eventResourceId.toSimpleString())
-                .addQueryItem("time", event.eventTimestampUsec / 1000)
-                .addQueryItem("height", kPushThumbnailHeight)
-                .addQueryItem("authKey", "NOT_IMPLEMENTED") //< TODO.
-                .toString();
-        }
-
-        url = click.toString();
-    }
 };
 #define PushPayload_Fields (url)(image)
 
@@ -953,31 +927,6 @@ struct PushNotification
     QString body;
     PushPayload payload;
     // TODO: options?
-
-    PushNotification() = default;
-    PushNotification(const vms::event::EventParameters& event, const QnGlobalSettings* settings):
-        payload(event, settings)
-    {
-        static const auto enumString =
-            [](const auto& value)
-            {
-                // Translate "someEnumSerializedValue" into "Some Enum Serialized Value".
-                QString text = QnLexical::serialized(value);
-                text[0] = text[0].toUpper();
-                text.replace(QRegularExpression("(.)([A-Z][a-z]+)"), "\\1 \\2");
-                text.replace(QRegularExpression("([a-z0-9])([A-Z])"), "\\1 \\2");
-                return text;
-            };
-
-        // TODO: Work out normal messages for all cases.
-        title = event.caption.isEmpty() ? enumString(event.eventType) : event.caption;
-        if (const auto resource = settings->resourcePool()->getResourceById(event.eventResourceId))
-            body += resource->getName() + "\n";
-        if (event.reasonCode != vms::event::EventReason::none)
-            body += "Reason: " + enumString(event.reasonCode) + "\n";
-        if (!event.description.isEmpty())
-            body += event.description + "\n";
-    }
 };
 #define PushNotification_Fields (title)(body)(payload)
 
@@ -994,12 +943,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActionPtr& action)
 {
-    //TODO: read target locale from settings, than uncomment the follow.
-
-    //const QString locale = "de_DE";
-    //QnTranslationManager::LocaleRollback rollback(
-    //    serverModule()->commonModule()->instance<QnTranslationManager>(), locale);
-
     PushNotificationMessage message;
     const auto settings = serverModule()->commonModule()->globalSettings();
     message.systemId = settings->cloudSystemId();
@@ -1016,7 +959,9 @@ bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActio
         return true;
     }
 
-    message.notification = PushNotification(action->getRuntimeParams(), settings);
+    message.notification = makePushNotification(action);
+    NX_VERBOSE(this, "Push Notification: %1\n%2",
+        message.notification.title, message.notification.body);
 
     const auto url = nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
@@ -1471,6 +1416,72 @@ void ExtendedRuleProcessor::updateRecipientsList(
 
     recipients.removeDuplicates();
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
+}
+
+PushPayload ExtendedRuleProcessor::makePushPayload(
+    const vms::event::EventParameters& event, bool isCamera) const
+{
+    const auto settings = serverModule()->commonModule()->globalSettings();
+    nx::network::url::Builder url = nx::network::url::Builder()
+        .setScheme(nx::vms::utils::AppInfo::nativeUriProtocol())
+        .setHost(settings->cloudHost())
+        .setPathParts("client", settings->cloudSystemId(), "view")
+        .addQueryItem("timestamp", event.eventTimestampUsec / 1000);
+
+    nx::network::url::Builder image;
+    if (isCamera)
+    {
+        url.addQueryItem("resources", event.eventResourceId.toSimpleString());
+        image = nx::network::url::Builder()
+            .setScheme(nx::network::http::kSecureUrlSchemeName)
+            .setHost(settings->cloudSystemId())
+            .setPath("ec2/cameraThumbnail")
+            .addQueryItem("cameraId", event.eventResourceId.toSimpleString())
+            .addQueryItem("time", event.eventTimestampUsec / 1000)
+            .addQueryItem("height", kPushThumbnailHeight);
+    }
+
+    return {url.toString(), image.toString()};
+}
+
+PushNotification ExtendedRuleProcessor::makePushNotification(
+    const vms::event::AbstractActionPtr& action) const
+{
+    const auto params = action->getParams();
+    const auto event = action->getRuntimeParams();
+    const auto common = serverModule()->commonModule();
+    const auto resource = resourcePool()->getResourceById(event.eventResourceId);
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+
+    // TODO: Investigate why sometimes QnTranslationManager is not created in time so translations
+    // do not work, see vms/server/nx_vms_server/src/media_server/media_server_module.cpp:382.
+    std::optional<QnTranslationManager::LocaleRollback> localeGuard;
+    if (const auto tm = common->findInstance<QnTranslationManager>())
+    {
+        // TODO: Get the language for each user as soon as users have it in VMS server DB.
+        const auto language = common->globalSettings()->pushNotificationsLanguage();
+        localeGuard = QnTranslationManager::LocaleRollback(tm, language);
+    }
+
+    const auto join =
+        [](QStringList items)
+        {
+            items.removeAll("");
+            return items.join("\n");
+        };
+
+    vms::event::StringsHelper strings(common);
+    return {
+        // TODO: Add UTF-8 icon by nx::vms::client::desktop::eventSubtype.
+        // TODO: May return HTML, make sure it works in client.
+        strings.notificationCaption(event, camera),
+        join({
+            resource ? resource->getName() : QString(),
+            params.text,
+            strings.notificationDescription(event),
+        }),
+        makePushPayload(event, camera),
+    };
 }
 
 std::set<QString> ExtendedRuleProcessor::cloudUsers(std::vector<QnUuid> filter) const
