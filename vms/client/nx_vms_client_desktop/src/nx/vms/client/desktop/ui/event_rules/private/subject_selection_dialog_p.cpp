@@ -79,7 +79,7 @@ QVariant RoleListModel::data(const QModelIndex& index, int role) const
     if (!index.isValid() || index.model() != this)
         return QVariant();
 
-    if (!m_userValidator)
+    if (!m_roleValidator && !m_userValidator)
         return qVariantFromValue(QValidator::Acceptable);
 
     const auto roleId = index.data(Qn::UuidRole).value<QnUuid>();

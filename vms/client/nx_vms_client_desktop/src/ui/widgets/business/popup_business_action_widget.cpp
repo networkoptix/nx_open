@@ -21,7 +21,7 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    setHelpTopic(this, Qn::EventsActions_ShowNotification_Help);
+    setHelpTopic(this, Qn::EventsActions_ShowDesktopNotification_Help);
 
     ui->hintLabel->setHint(tr("Notification will be shown until one of the users who see it "
         "creates bookmark with event description"));

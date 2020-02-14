@@ -57,6 +57,7 @@ ActionSubtype actionSubtype(nx::vms::api::ActionType actionType)
         case ActionType::sendMailAction:
         case ActionType::diagnosticsAction:
         case ActionType::showPopupAction:
+        case ActionType::pushNotificationAction:
         case ActionType::playSoundAction:
         case ActionType::playSoundOnceAction:
         case ActionType::sayTextAction:

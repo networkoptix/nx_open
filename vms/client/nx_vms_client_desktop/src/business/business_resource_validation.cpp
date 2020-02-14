@@ -838,6 +838,47 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
     m_layout = layout;
 }
 
+//-------------------------------------------------------------------------------------------------
+// QnCloudUsersValidationPolicy
+
+QnCloudUsersValidationPolicy::QnCloudUsersValidationPolicy(QnCommonModule* common)
+{
+}
+
+QValidator::State QnCloudUsersValidationPolicy::roleValidity(const QnUuid& roleId) const
+{
+    const auto& users = commonModule()->resourceAccessSubjectsCache()->usersInRole(roleId);
+    bool hasCloud = false;
+    bool hasNonCloud = false;
+
+    for (const auto& subject: users)
+    {
+        if (!subject.isUser())
+            continue;
+        const auto& user = subject.user();
+
+        if (!user->isEnabled())
+            continue;
+
+        hasCloud |= user->isCloud();
+        hasNonCloud |= !user->isCloud();
+    }
+
+    return hasNonCloud ? QValidator::Intermediate : QValidator::Acceptable;
+}
+
+bool QnCloudUsersValidationPolicy::userValidity(const QnUserResourcePtr& user) const
+{
+    return user->isCloud();
+}
+
+QString QnCloudUsersValidationPolicy::calculateAlert(
+    bool allUsers,
+    const QSet<QnUuid>& subjects) const
+{
+    return {};
+}
+
 bool QnBuzzerPolicy::isServerValid(const QnMediaServerResourcePtr& server)
 {
     if (!server)

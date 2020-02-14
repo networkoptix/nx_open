@@ -302,6 +302,21 @@ private:
     QnLayoutResourcePtr m_layout;
 };
 
+class QnCloudUsersValidationPolicy: public QnSubjectValidationPolicy
+{
+    using base_type = QnSubjectValidationPolicy;
+
+public:
+    QnCloudUsersValidationPolicy(QnCommonModule* common);
+
+    virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
+    virtual bool userValidity(const QnUserResourcePtr& user) const override;
+    virtual QString calculateAlert(bool allUsers, const QSet<QnUuid>& subjects) const override;
+
+private:
+
+};
+
 class QnBuzzerPolicy
 {
     Q_DECLARE_TR_FUNCTIONS(QnBuzzerPolicy)

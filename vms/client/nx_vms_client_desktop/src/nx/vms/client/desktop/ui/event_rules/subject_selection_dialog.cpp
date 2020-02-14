@@ -214,6 +214,34 @@ void SubjectSelectionDialog::showAllUsersChanged(bool value)
     layout()->activate();
 }
 
+void SubjectSelectionDialog::setOptions(const CustomizableOptions& options)
+{
+    auto filter = options.userFilter;
+    auto f =
+        [this, filter](int row, const QModelIndex& index) -> bool
+        {
+            auto user = m_users->sourceModel()->index(row, UserListModel::NameColumn, index)
+                .data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+
+            return user ? filter(*user) : false;
+        };
+
+    m_users->setCustomUsersOnly(false);
+    m_users->setCustomFilterAcceptsRow(f);
+
+    ui->showAllUsers->setVisible(options.showAllUsersSwitcher);
+    ui->usersGroupBox->setVisible(true);
+    ui->usersGroupBox->setTitle(options.userListHeader);
+
+    m_userListDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
+
+    // Reduce layout flicker.
+    ui->usersGroupBox->updateGeometry();
+    ui->mainWidget->updateGeometry();
+    updateGeometry();
+    layout()->activate();
+}
+
 void SubjectSelectionDialog::setUserValidator(UserValidator userValidator)
 {
     m_users->setUserValidator(userValidator);

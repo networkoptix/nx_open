@@ -5,6 +5,7 @@
 #include <ui/widgets/business/recording_business_action_widget.h>
 #include <ui/widgets/business/sendmail_business_action_widget.h>
 #include <ui/widgets/business/popup_business_action_widget.h>
+#include <ui/widgets/business/push_notification_business_action_widget.h>
 #include <ui/widgets/business/play_sound_business_action_widget.h>
 #include <ui/widgets/business/say_text_business_action_widget.h>
 #include <ui/widgets/business/bookmark_business_action_widget.h>
@@ -33,6 +34,8 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
             return new QnSendmailBusinessActionWidget(parent);
         case vms::api::ActionType::showPopupAction:
             return new QnPopupBusinessActionWidget(parent);
+        case vms::api::ActionType::pushNotificationAction:
+            return new vms::client::desktop::PushNotificationBusinessActionWidget(parent);
         case vms::api::ActionType::playSoundAction:
         case vms::api::ActionType::playSoundOnceAction:
             return new QnPlaySoundBusinessActionWidget(parent);
@@ -49,7 +52,7 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
         case vms::api::ActionType::execHttpRequestAction:
             return new QnExecHttpRequestActionWidget(parent);
         case vms::api::ActionType::openLayoutAction:
-            return new nx::vms::client::desktop::OpenLayoutActionWidget(parent);
+            return new vms::client::desktop::OpenLayoutActionWidget(parent);
         case vms::api::ActionType::fullscreenCameraAction:
             return new QnFullscreenCameraActionWidget(parent);
         case vms::api::ActionType::exitFullscreenAction:

@@ -58,7 +58,8 @@ QString StringsHelper::actionName(ActionType value) const
         case ActionType::panicRecordingAction:    return tr("Panic recording");
         case ActionType::sendMailAction:          return tr("Send email");
         case ActionType::diagnosticsAction:       return tr("Write to log");
-        case ActionType::showPopupAction:         return tr("Show notification");
+        case ActionType::showPopupAction:         return tr("Show desktop notification");
+        case ActionType::pushNotificationAction:  return tr("Send mobile notification");
         case ActionType::playSoundAction:         return tr("Repeat sound");
         case ActionType::playSoundOnceAction:     return tr("Play sound");
         case ActionType::sayTextAction:           return tr("Speak");

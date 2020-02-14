@@ -358,6 +358,7 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
                 }
             }
             else if (actionType == ActionType::showPopupAction
+                  || actionType == ActionType::pushNotificationAction
                   || actionType == ActionType::showOnAlarmLayoutAction)
             {
                 QnUserResourceList users;
@@ -449,6 +450,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                     return action.actionParams.emailAddress;
 
                 case ActionType::showPopupAction:
+                case ActionType::pushNotificationAction:
                 case ActionType::showOnAlarmLayoutAction:
                     return action.actionParams.allUsers
                         ? tr("All users")

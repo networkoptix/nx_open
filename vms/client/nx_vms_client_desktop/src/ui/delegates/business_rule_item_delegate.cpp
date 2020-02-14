@@ -378,6 +378,13 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
         }
         editorButton = usersButton;
     }
+    else if (actionType == ActionType::pushNotificationAction)
+    {
+        auto usersButton = new QnSelectUsersDialogButton(parent);
+        usersButton->setSubjectValidationPolicy(new QnCloudUsersValidationPolicy(commonModule()));
+        // TODO: #spanasenko Set user filter.
+        editorButton = usersButton;
+    }
     else if (actionType == ActionType::playSoundAction ||
         actionType == ActionType::playSoundOnceAction ||
         actionType == ActionType::sayTextAction)

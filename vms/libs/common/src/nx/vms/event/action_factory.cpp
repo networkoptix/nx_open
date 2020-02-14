@@ -85,6 +85,7 @@ AbstractActionPtr ActionFactory::createAction(
         case ActionType::undefinedAction:
         case ActionType::diagnosticsAction:
         case ActionType::showPopupAction:
+        case ActionType::pushNotificationAction:
         case ActionType::playSoundOnceAction:
         case ActionType::playSoundAction:
         case ActionType::sayTextAction:
