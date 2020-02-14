@@ -14,6 +14,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
+#include <utils/common/synctime.h>
 #include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
@@ -130,8 +131,10 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     {
         m_rtpReader.setOnSocketReadTimeoutCallback(
             kNvrSocketReadTimeout,
-            [this](){ return createEmptyPacket(); });
-        m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
+            [this]() { return createEmptyPacket(); });
+
+        // Media frame timeout.
+        m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max());
     }
 
     if (!m_rateControlEnabled)
@@ -246,9 +249,10 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
     const auto role = getRole();
     if (role == Qn::CR_Archive)
     {
-        const auto mediaType = m_hanwhaResource->isNvr()
-            ? kHanwhaSearchMediaType
-            : kHanwhaBackupMediaType;
+        const auto mediaType =
+            m_hanwhaResource->isNvr() && m_sessionType != HanwhaSessionType::fileExport
+                ? kHanwhaSearchMediaType
+                : kHanwhaBackupMediaType;
 
         if (m_hanwhaResource->isNvr())
         {
@@ -305,9 +309,6 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
             .arg(*m_overlappedId));
 
         *outUrl = url.toString();
-        NX_VERBOSE(this) << *outUrl << "Time Range:"
-            << QDateTime::fromMSecsSinceEpoch(m_startTimeUsec / 1000)
-            << QDateTime::fromMSecsSinceEpoch(m_endTimeUsec / 1000);
     }
 
     if (ini().forcedRtspPort > 0)
@@ -316,6 +317,8 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
         realUrl.setPort(ini().forcedRtspPort);
         *outUrl = realUrl.toString();
     }
+
+    NX_DEBUG(this, "Stream URI: %1", *outUrl);
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -348,19 +351,19 @@ void HanwhaStreamReader::setPositionUsec(qint64 value)
     }
 
     NX_ASSERT(value != AV_NOPTS_VALUE && value != DATETIME_NOW);
-    NX_DEBUG(this, lm("Set position %1 for device %2").args(mksecToDateTime(value), m_resource->getUniqueId()));
-    m_rtpReader.setPositionUsec(value);
+    NX_DEBUG(this, "Set position %1 for device %2",
+        mksecToDateTime(value), m_resource->getUniqueId());
+
+    m_rtpReader.setPlaybackRange(
+        value,
+        m_sessionType == HanwhaSessionType::fileExport
+            ? qnSyncTime->currentUSecsSinceEpoch()
+            : AV_NOPTS_VALUE);
 }
 
 void HanwhaStreamReader::setRateControlEnabled(bool enabled)
 {
     m_rateControlEnabled = enabled;
-}
-
-void HanwhaStreamReader::setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec)
-{
-    m_startTimeUsec = startTimeUsec;
-    m_endTimeUsec = endTimeUsec;
 }
 
 void HanwhaStreamReader::setOverlappedId(nx::core::resource::OverlappedId overlappedId)

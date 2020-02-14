@@ -170,17 +170,33 @@ SessionContextPtr HanwhaSharedResourceContext::session(
 
     const bool isLive = sessionType == HanwhaSessionType::live;
 
+    NX_DEBUG(this, "Obtaining a session of type %1, cientId: %2, "
+        "current amount of non-live sessions: %3, current amount of live sessions: %4",
+        (int) sessionType, clientId, totalAmountOfSessions(false), totalAmountOfSessions(true));
+
     auto& sessionsByClientId = m_sessions[sessionType];
     const int maxConsumers = isLive ? kDefaultNvrMaxLiveSessions : m_maxArchiveSessions.load();
     const bool sessionLimitExceeded = !sessionsByClientId.contains(clientId)
         && totalAmountOfSessions(isLive) >= maxConsumers;
 
     if (sessionLimitExceeded)
+    {
+        NX_DEBUG(this, "Session limit for type %1 has been exceeded, exiting. cientId: %2, "
+            "current amount of non-live sessions: %3, current amount of live sessions: %4",
+            (int)sessionType, clientId, totalAmountOfSessions(false), totalAmountOfSessions(true));
         return SessionContextPtr();
+    }
 
     auto strongSessionCtx = sessionsByClientId.value(clientId).toStrongRef();
     if (strongSessionCtx)
+    {
+        NX_DEBUG(this, "Returning an already existing session of type %1, cientId: %2, "
+            "current amount of non-live sessions: %3, current amount of live sessions: %4, "
+            "sessionKey: %5",
+            (int)sessionType, clientId, totalAmountOfSessions(false), totalAmountOfSessions(true),
+            strongSessionCtx->sessionId);
         return strongSessionCtx;
+    }
 
     HanwhaRequestHelper helper(shared_from_this());
     const auto response = helper.view(lit("media/sessionkey"));
@@ -193,6 +209,12 @@ SessionContextPtr HanwhaSharedResourceContext::session(
 
     strongSessionCtx = SessionContextPtr::create(*sessionKey, clientId);
     sessionsByClientId[clientId] = strongSessionCtx.toWeakRef();
+
+    NX_DEBUG(this, "Created a new session of type %1, cientId: %2, "
+        "current amount of non-live sessions: %3, current amount of live sessions: %4, "
+        "sessionKey: %5",
+        (int)sessionType, clientId, totalAmountOfSessions(false), totalAmountOfSessions(true),
+        strongSessionCtx->sessionId);
 
     return strongSessionCtx;
 }

@@ -76,7 +76,7 @@ public:
 
     nx::utils::Url getCurrentStreamUrl() const;
 
-    void setPositionUsec(qint64 value);
+    void setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec = AV_NOPTS_VALUE);
 
     void setDateTimeFormat(const QnRtspClient::DateTimeFormat& format);
 
@@ -171,7 +171,25 @@ private:
 
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
-    std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
+
+    struct PlaybackRange
+    {
+        int64_t startTimeUsec = AV_NOPTS_VALUE;
+        int64_t endTimeUsec = AV_NOPTS_VALUE;
+
+        bool isValid() const
+        {
+            if (startTimeUsec == AV_NOPTS_VALUE)
+                return false;
+
+            if (endTimeUsec == AV_NOPTS_VALUE)
+                return true;
+
+            return endTimeUsec > startTimeUsec;
+        }
+    };
+
+    std::atomic<PlaybackRange> m_playbackRange;
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
     CameraDiagnostics::Result m_openStreamResult;
