@@ -1,28 +1,11 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('HealthReportCtrl', ['$scope', '$location', 'camerasProvider', 'systemAPI', '$q', '$poll',
-    function ($scope, $location, camerasProvider, systemAPI, $q) {
+    .controller('HealthReportCtrl', ['$scope', 'mediaserver',
+    function ($scope, mediaserver) {
         $scope.Config = Config;
-
-        function requestHealthManifest(){
-            return systemAPI.getHealthManifest().then(function (data) {
-                return data.data.reply;
-            });
-        }
-
-        function requestHealthValues(){
-            return systemAPI.getHealthValues().then(function (data) {
-                return data.data.reply;
-            });
-        }
-
-        function retriveData() {
-            return $q.all([requestHealthManifest(), requestHealthValues()]).then(function (result) {
-                $scope.manifest = result[0];
-                $scope.values = result[1];
-            });
-        }
-
-        retriveData();
+        $scope.ready = false;
+        mediaserver.getModuleInformation().then(function (r) {
+            $scope.ready = true;
+        });
     }]);
