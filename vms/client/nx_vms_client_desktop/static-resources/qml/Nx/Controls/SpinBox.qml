@@ -24,7 +24,7 @@ SpinBox
 
     background: TextFieldBackground { control: parent }
 
-    locale: NxGlobals.numericInputLocale("C")
+    locale: NxGlobals.numericInputLocale()
 
     validator: IntValidator
     {
