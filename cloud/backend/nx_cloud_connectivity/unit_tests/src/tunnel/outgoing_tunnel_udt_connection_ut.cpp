@@ -70,7 +70,7 @@ protected:
     struct ConnectContext
     {
         nx::utils::promise<ConnectResult> connectedPromise;
-        std::chrono::milliseconds timeout;
+        std::chrono::milliseconds timeout = std::chrono::milliseconds::zero();
         std::chrono::steady_clock::time_point startTime;
         std::chrono::steady_clock::time_point endTime;
     };

@@ -16,14 +16,21 @@ public:
     virtual ~QnStoragePluginFactory();
 
     bool existsFactoryForProtocol(const QString &protocol);
-    void registerStoragePlugin(const QString &protocol, const StorageFactory &factory, bool isDefaultProtocol = false);
+    void registerStoragePlugin(
+        const QString &protocol,
+        const StorageFactory &factory,
+        bool isDefaultProtocol = false);
+
     QnStorageResource *createStorage(
         QnCommonModule* commonModule,
         const QString &url,
         bool useDefaultForUnknownPrefix = true);
 
+    static void setDefault(StorageFactory factory);
+
 private:
     QHash<QString, StorageFactory> m_factoryByProtocol;
     StorageFactory m_defaultFactory;
+    static StorageFactory s_factory;
     QnMutex m_mutex; // TODO: #vasilenko this mutex is not used, is it intentional?
 };

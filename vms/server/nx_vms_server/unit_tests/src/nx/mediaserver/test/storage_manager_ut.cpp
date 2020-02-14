@@ -1,9 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <QtCore/QThread>
+
 #include <recorder/device_file_catalog.h>
 #include <nx/core/access/access_types.h>
+#include <nx/utils/test_support/utils.h>
 #include <server/server_globals.h>
 #include <common/common_module.h>
+#include <core/resource/storage_plugin_factory.h>
 
 #include "media_server_module_fixture.h"
 #include <media_server/media_server_module.h>
@@ -59,7 +63,7 @@ TEST_F(StorageManager, deleteRecordsToTime)
     ASSERT_EQ(AV_NOPTS_VALUE, catalog->minTime());
 }
 
-class FtStorageManager: public ::testing::Test
+class FtSystemStorageSpace: public ::testing::Test
 {
 protected:
     qint64 minSystemFreeSpace = -1;
@@ -147,14 +151,14 @@ private:
     }
 };
 
-TEST_F(FtStorageManager, checkSystemStorageSpace_SettingSetCorrectly)
+TEST_F(FtSystemStorageSpace, SettingSetCorrectly)
 {
     minSystemFreeSpace = 10;
     startServer();
     assertSettingSetCorrectly();
 }
 
-TEST_F(FtStorageManager, checkSystemStorageSpace_EmitIfNoSpace)
+TEST_F(FtSystemStorageSpace, EmitIfNoSpace)
 {
     minSystemFreeSpace = 10;
     startServer();
@@ -162,12 +166,321 @@ TEST_F(FtStorageManager, checkSystemStorageSpace_EmitIfNoSpace)
     assertSignalReceived();
 }
 
-TEST_F(FtStorageManager, checkSystemStorageSpace_NoEmitIfEnoughSpace)
+TEST_F(FtSystemStorageSpace, NoEmitIfEnoughSpace)
 {
     minSystemFreeSpace = 10;
     startServer();
     createStorageManager(/* systemStorageFreeSpace */ 15);
     assertNoSignalReceived();
+}
+
+using namespace std::chrono;
+
+class FtClearSpace: public ::testing::Test
+{
+protected:
+    std::chrono::milliseconds initDelay = 1s;
+    int storageCount = 0;
+
+    virtual void SetUp() override
+    {
+        m_thread.start();
+        m_thread.moveToThread(&m_thread);
+        std::promise<void> p;
+        auto f = p.get_future();
+        QTimer::singleShot(
+            0ms, &m_thread,
+            [this, p = std::move(p)]() mutable
+            {
+                const MediaServerLauncher::DisabledFeatures disabledFeatures = {
+                    MediaServerLauncher::DisabledFeature::noPlugins,
+                    MediaServerLauncher::DisabledFeature::noMonitorStatistics,
+                    MediaServerLauncher::DisabledFeature::noResourceDiscovery };
+                m_server.reset(new MediaServerLauncher(/*tmpDir*/ "", /*port*/ 0, disabledFeatures));
+                p.set_value();
+            });
+        f.wait();
+    }
+
+    virtual void TearDown() override
+    {
+        m_thread.quit();
+        m_thread.wait();
+    }
+
+    void mockPluginCreateStorage()
+    {
+        QnStoragePluginFactory::setDefault(
+            [this](QnCommonModule*, const QString&)
+            {
+                auto result = new test_support::StorageStub(
+                    m_server->serverModule(),
+                    /*url*/ "",
+                    /*totalSpace*/ 100'000'000'000LL,
+                    /*freeSpace*/ 100'000'000'000LL,
+                    /*spaceLimit*/ 0,
+                    /*isSystem*/ false,
+                    /*isOnline*/ true,
+                    /*isUsedForWriting*/ false);
+                result->initDelay = initDelay;
+                return result;
+            });
+    }
+
+    void mockMediaFilterConfig()
+    {
+        using namespace nx::vms::server::fs::media_paths;
+        FilterConfig config;
+        for (int i = 0; i < storageCount; ++i)
+        {
+            auto p = PlatformMonitor::PartitionSpace();
+            p.path = QString("/some/path_%1").arg(i);
+            p.type = PlatformMonitor::LocalDiskPartition;
+            config.partitions.push_back(p);
+        }
+        FilterConfig::setDefault(config);
+    }
+
+    void assertStoragesInitalizationAndClearSpaceCallTime()
+    {
+        while (true)
+        {
+            std::this_thread::sleep_for(50ms);
+            if (m_clearSpaceCalled)
+                return;
+        }
+    }
+
+    void startServer()
+    {
+        std::promise<void> p;
+        auto f = p.get_future();
+        QTimer::singleShot(
+            0ms, &m_thread,
+            [this, p = std::move(p)]() mutable
+            {
+                ASSERT_TRUE(m_server->start());
+                auto manager = m_server->serverModule()->normalStorageManager();
+                QObject::connect(
+                    manager,
+                    &QnStorageManager::clearSpaceCalled,
+                    [this, manager]()
+                    {
+                        saveStorages(manager->getStorages());
+                        assertStoragesInitialized();
+                        m_clearSpaceCalled = true;
+                        m_afterClearSpaceFunc();
+                    });
+                p.set_value();
+            });
+        f.wait();
+    }
+
+    void stopServer()
+    {
+        m_server->stop();
+    }
+
+    void mockEmptyFilterConfig()
+    {
+        using namespace nx::vms::server::fs::media_paths;
+        FilterConfig::setDefault(FilterConfig());
+    }
+
+    void prepareDataToClear()
+    {
+        ASSERT_GE(storageCount, 2);
+        ASSERT_GE(m_storages.size(), 2);
+        /**
+            * We will make freeSpace < spaceLimit for the first storage.
+            * Also we will place 1 chunk on the 1st storage and 100 on the second. The 1st
+            * chunk will be newer than the other 100 so to clear the first one - the 100 chunks
+            * from the other storage should be deleted first.
+            */
+
+        const auto chunkSize = 10LL;
+        const auto secondStorageChunks = createChunks(
+            /*count*/ m_secondStorageChunks,
+            /*timestamp*/ 1,
+            /*size*/ chunkSize,
+            m_storages[1]);
+
+        const auto firstStorageChunks = createChunks(
+            /*count*/ m_firstStorageChunks,
+            /*timestamp*/ secondStorageChunks.back().startTimeMs + 1,
+            /*size*/ 10,
+            m_storages[0]);
+
+        addToCatalog(m_cameraName, firstStorageChunks);
+        addToCatalog(m_cameraName, secondStorageChunks);
+        m_storages[0]->freeSpace = m_storages[0]->getSpaceLimit() - chunkSize + 1;
+    }
+
+    void disconnectOnClearSignal()
+    {
+        QObject::disconnect(
+            m_server->serverModule()->normalStorageManager(),
+            &QnStorageManager::clearSpaceCalled,
+            nullptr,
+            nullptr);
+    }
+
+    void setAfterClearCallback(std::function<void()> f)
+    {
+        m_afterClearSpaceFunc = f;
+    }
+
+    void assertDataCleared()
+    {
+        while (true)
+        {
+            std::this_thread::sleep_for(50ms);
+            const bool storagesCleared =
+                m_storages[0]->removeCallCount + m_storages[1]->removeCallCount
+                >= m_firstStorageChunks + m_secondStorageChunks;
+
+            const auto catalog = m_server->serverModule()->normalStorageManager()->getFileCatalog(
+                m_cameraName, QnServer::HiQualityCatalog);
+            const bool catalogCleared = catalog->getChunks().empty();
+
+            if (catalogCleared && storagesCleared)
+                break;
+        }
+    }
+
+private:
+    std::unique_ptr<MediaServerLauncher> m_server;
+    QThread m_thread;
+    std::atomic<bool> m_clearSpaceCalled = false;
+    QList<QSharedPointer<test_support::StorageStub>> m_storages;
+    std::function<void()> m_afterClearSpaceFunc = [](){};
+    const int m_firstStorageChunks = 1;
+    const int m_secondStorageChunks = 100;
+    const QString m_cameraName = "cam1";
+
+    std::deque<Chunk> createChunks(
+        int count,
+        int64_t startTimeMs,
+        int64_t chunkSize,
+        const QSharedPointer<test_support::StorageStub>& storage)
+    {
+        std::deque<Chunk> result;
+        const int storageIndex =
+            m_server->serverModule()->storageDbPool()->getStorageIndex(storage);
+
+        for (int i = 0; i < count; ++i)
+        {
+            Chunk chunk;
+            chunk.startTimeMs = startTimeMs + i;
+            chunk.setFileSize(chunkSize);
+            chunk.storageIndex = storageIndex;
+            result.push_back(chunk);
+        }
+
+        return result;
+    }
+
+    void addToCatalog(const QString& cameraId, const std::deque<Chunk>& chunks)
+    {
+        auto catalog = m_server->serverModule()->normalStorageManager()->getFileCatalog(
+            cameraId, QnServer::HiQualityCatalog);
+        catalog->addChunks(chunks);
+    }
+
+    void assertStoragesInitialized()
+    {
+        ASSERT_EQ(storageCount, m_storages.size())
+            << "No storages have been created by the time when "
+            << "QnStorageManager::clearSpace has been called";
+
+        const bool allInitialized = std::all_of(
+            m_storages.cbegin(), m_storages.cend(),
+            [](const auto& s)
+            {
+                NX_GTEST_ASSERT_TRUE((bool) s);
+                NX_GTEST_ASSERT_GT(s->getSpaceLimit(), 0);
+                return s->initFinished.load();
+            });
+
+        ASSERT_TRUE(allInitialized)
+            << "Not all storages have been initialized when "
+            << "clearSpace has been called";
+    }
+
+    void saveStorages(const StorageResourceList& storages)
+    {
+        using namespace nx::vms::server;
+        using namespace nx::vms::server::test::test_support;
+        std::transform(
+            storages.cbegin(), storages.cend(), std::back_inserter(m_storages),
+            [](const StorageResourcePtr& s) { return s.dynamicCast<StorageStub>(); });
+    }
+};
+
+TEST_F(FtClearSpace, ClearSpaceWontCalledUntilAllStoragesAddedToStorageManager)
+{
+    initDelay = 10s;
+    storageCount = 1;
+    mockPluginCreateStorage();
+    mockMediaFilterConfig();
+    startServer();
+    assertStoragesInitalizationAndClearSpaceCallTime();
+}
+
+TEST_F(FtClearSpace, NewStoragesCorrectlyDiscovered)
+{
+    storageCount = 5;
+    mockPluginCreateStorage();
+    mockMediaFilterConfig();
+    startServer();
+    assertStoragesInitalizationAndClearSpaceCallTime();
+}
+
+TEST_F(FtClearSpace, StoragesLoadedFromDb)
+{
+    storageCount = 5;
+    mockPluginCreateStorage();
+    mockMediaFilterConfig();
+    startServer();
+    assertStoragesInitalizationAndClearSpaceCallTime();
+
+    stopServer();
+    mockEmptyFilterConfig(); //< No new storages should be discovered after this.
+    startServer();
+    assertStoragesInitalizationAndClearSpaceCallTime();
+}
+
+TEST_F(FtClearSpace, DISABLED_WontStart_NoRemoveCapability)
+{
+    // #TODO #akulikov.
+}
+
+TEST_F(FtClearSpace, CorrectDataCleared)
+{
+    storageCount = 2;
+    setAfterClearCallback(
+        [this]()
+        {
+            prepareDataToClear();
+            disconnectOnClearSignal();
+        });
+
+    mockPluginCreateStorage();
+    mockMediaFilterConfig();
+    startServer();
+    assertStoragesInitalizationAndClearSpaceCallTime();
+    assertDataCleared();
+    // #TODO #akulikov. Check relevant log messages have been written.
+}
+
+TEST_F(FtClearSpace, DISABLED_MotionCleaned)
+{
+    // #TODO #server.
+}
+
+TEST_F(FtClearSpace, DISABLED_AnalyticsCleaned_DISABLED)
+{
+    // #TODO #server.
 }
 
 } // namespace test

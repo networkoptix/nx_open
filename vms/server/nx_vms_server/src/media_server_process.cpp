@@ -730,11 +730,30 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             initializeAnalyticsEvents();
 
         NX_DEBUG(this, "[Storages init] Analytics storage DB initialized");
-
+        waitWhileStoragesAddedToStorageManagers(/*expected storage count*/modifiedStorages.size());
         serverModule()->normalStorageManager()->initDone();
         serverModule()->backupStorageManager()->initDone();
         m_storageInitializationDone = true;
     });
+}
+
+void MediaServerProcess::waitWhileStoragesAddedToStorageManagers(int expected)
+{
+    const auto n = serverModule()->normalStorageManager();
+    const auto b = serverModule()->backupStorageManager();
+    while (n->getStorages().size() + b->getStorages().size() < expected)
+    {
+        NX_VERBOSE(this, "Waiting for storage managers to populate");
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
+
+void MediaServerProcess::startDeletor()
+{
+    QString dataLocation = serverModule()->settings().dataDir();
+    QDir stateDirectory;
+    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
+    serverModule()->fileDeletor()->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 }
 
 QString getComputerName()
@@ -4941,12 +4960,7 @@ void MediaServerProcess::at_appStarted()
         return;
 
     m_crashReporter->scanAndReportByTimer(serverModule()->runTimeSettings());
-
-    QString dataLocation = serverModule()->settings().dataDir();
-    QDir stateDirectory;
-    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-    serverModule()->fileDeletor()->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
-
+    startDeletor();
     updateSpecificFeatures();
 };
 

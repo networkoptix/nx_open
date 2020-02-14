@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <nx/utils/uuid.h>
 #include <platform/platform_abstraction.h>
 
@@ -26,6 +28,11 @@ struct FilterConfig
         QnPlatformAbstraction* platform,
         bool includeNonHdd,
         const nx::vms::server::Settings* settings);
+
+    static void setDefault(const FilterConfig& config);
+
+private:
+    static std::optional<FilterConfig> s_default;
 };
 
 } // namespace media_paths

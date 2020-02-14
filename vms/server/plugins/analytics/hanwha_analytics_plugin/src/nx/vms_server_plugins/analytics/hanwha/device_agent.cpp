@@ -309,8 +309,11 @@ void DeviceAgent::doSetSettings(
     copySettingsFromServerToCamera(errorMap, sourceMap,
         m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
 
+#if 0
+    // Fog detection is currently unavailable.
     copySettingsFromServerToCamera(errorMap, sourceMap,
         m_settings.fogDetection, sender, m_frameSize, m_channelNumber);
+#endif
 
     copySettingsFromServerToCamera(errorMap, sourceMap,
         m_settings.objectDetectionGeneral, sender, m_frameSize, m_channelNumber);
@@ -318,25 +321,29 @@ void DeviceAgent::doSetSettings(
     copySettingsFromServerToCamera(errorMap, sourceMap,
         m_settings.objectDetectionBestShot, sender, m_frameSize, m_channelNumber);
 
-    for (int i = 0; i < 8; ++i)
     {
-        copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.objectDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+        auto unusedErrorMap = makePtr<nx::sdk::StringMap>();
+        // Here we use temporary error map, because setting empty exclude area leads to false
+        // error report.
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+        {
+            copySettingsFromServerToCamera(unusedErrorMap, sourceMap,
+                m_settings.objectDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+        }
     }
-
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
             m_settings.ivaLine[i], sender, m_frameSize, m_channelNumber, i);
     }
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
             m_settings.ivaIncludeArea[i], sender, m_frameSize, m_channelNumber, i);
     }
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < Settings::kMultiplicity; ++i)
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
             m_settings.ivaExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
@@ -373,7 +380,10 @@ void DeviceAgent::getPluginSideSettings(
 
     m_settings.defocusDetection.writeToServer(response);
 
+#if 0
+// Fog detection is currently unavailable.
     m_settings.fogDetection.writeToServer(response);
+#endif
 
     m_settings.objectDetectionGeneral.writeToServer(response);
 
@@ -423,7 +433,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadata
 
                 eventMetadata->setTypeId(hanwhaEvent.typeId.toStdString());
                 eventMetadata->setCaption(hanwhaEvent.caption.toStdString());
-                eventMetadata->setDescription(hanwhaEvent.caption.toStdString());
+                eventMetadata->setDescription(hanwhaEvent.description.toStdString());
                 eventMetadata->setIsActive(hanwhaEvent.isActive);
                 eventMetadata->setConfidence(1.0);
                 eventMetadata->addAttribute(makePtr<Attribute>(
@@ -653,8 +663,11 @@ void DeviceAgent::readCameraSettings()
     sunapiReply = loadEventSettings("defocusdetection");
     readFromDeviceReply(sunapiReply, &m_settings.defocusDetection, m_frameSize, m_channelNumber);
 
+#if 0
+    // Fog detection is currently unavailable.
     sunapiReply = loadEventSettings("fogdetection");
     readFromDeviceReply(sunapiReply, &m_settings.fogDetection, m_frameSize, m_channelNumber);
+#endif
 
     //sunapiReply = loadEventSettings("facedetection");
     //readFromDeviceReply(sunapiReply, &m_settings.faceDetectionGeneral, m_frameSize, m_channelNumber);

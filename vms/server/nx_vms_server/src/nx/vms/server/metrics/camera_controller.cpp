@@ -232,7 +232,7 @@ auto makeStorageProviders()
             "minArchiveLengthS",
             [](const auto& r)
             {
-                if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed())
+                if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed() && !r->isDtsBased())
                     return Value(std::chrono::hours(days * 24));
                 return Value();
             }

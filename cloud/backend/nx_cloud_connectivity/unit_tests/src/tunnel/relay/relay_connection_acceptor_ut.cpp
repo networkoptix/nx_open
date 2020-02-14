@@ -311,6 +311,7 @@ private:
         base_type::SetUp();
 
         m_connection = std::make_unique<detail::ReverseConnection>(relayServerUrl());
+        m_connection->setTimeout(nx::network::kNoTimeout);
     }
 
     virtual void TearDown() override
