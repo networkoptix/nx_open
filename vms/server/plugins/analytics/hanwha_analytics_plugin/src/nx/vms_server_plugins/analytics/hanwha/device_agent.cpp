@@ -310,7 +310,7 @@ void DeviceAgent::doSetSettings(
         m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
 
 #if 0
-// Fog detection is currently unavailable.
+    // Fog detection is currently unavailable.
     copySettingsFromServerToCamera(errorMap, sourceMap,
         m_settings.fogDetection, sender, m_frameSize, m_channelNumber);
 #endif
@@ -321,14 +321,16 @@ void DeviceAgent::doSetSettings(
     copySettingsFromServerToCamera(errorMap, sourceMap,
         m_settings.objectDetectionBestShot, sender, m_frameSize, m_channelNumber);
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
     {
+        auto unusedErrorMap = makePtr<nx::sdk::StringMap>();
         // Here we use temporary error map, because setting empty exclude area leads to false
         // error report.
-        copySettingsFromServerToCamera(makePtr<nx::sdk::StringMap>(), sourceMap,
-            m_settings.objectDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+        {
+            copySettingsFromServerToCamera(unusedErrorMap, sourceMap,
+                m_settings.objectDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+        }
     }
-
     for (int i = 0; i < Settings::kMultiplicity; ++i)
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
