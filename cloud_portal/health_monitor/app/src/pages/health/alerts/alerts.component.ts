@@ -64,7 +64,7 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
 
     @ViewChild('tiles', { static: false }) tilesElement: ElementRef;
     @ViewChild('search', { static: false }) searchElement: ElementRef;
-    @ViewChild('area', { static: false }) area: ElementRef;
+    @ViewChild('area', { static: false }) areaElement: ElementRef;
     // @ViewChild('tableContainer', { static: false }) tableContainer: ElementRef;
 
     constructor(private route: ActivatedRoute,
@@ -170,7 +170,7 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
         this.healthLayoutService.dimensions = [];
         this.healthLayoutService.tilesElement = this.tilesElement;
         this.healthLayoutService.searchElement = this.searchElement;
-        this.healthLayoutService.searchTableArea = this.area;
+        this.healthLayoutService.searchTableArea = this.areaElement;
 
         this.healthLayoutService.fixedLayoutClassSubject.pipe(delay(0)).subscribe((className) => {
             this.fixedLayoutClass = className;

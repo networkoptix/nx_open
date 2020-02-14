@@ -19,14 +19,17 @@ export class NxHealthLayoutService {
     pageSizeSubject = new BehaviorSubject(undefined);
     tableWidthSubject = new BehaviorSubject(0);
 
+    // Common between alerts and metrics
     searchTableAreaSubject = new BehaviorSubject(undefined);
     searchElementSubject = new BehaviorSubject(undefined);
+
+    // Alerts only
+    tilesElementSubject = new BehaviorSubject(undefined);
+
+    // Dynamic table elements
     tableElementSubject = new BehaviorSubject(undefined);
     tableHeaderElementSubject = new BehaviorSubject(undefined);
     tableTitleElementSubject = new BehaviorSubject(undefined);
-    tilesElementSubject = new BehaviorSubject(undefined);
-
-    private static ROW_HEIGHT = 26;
 
     get activeEntity() {
         return this.activeEntitySubject.getValue();
@@ -168,74 +171,21 @@ export class NxHealthLayoutService {
     setAlertLayout() {
         const searchElementHeight = this.searchElement ? this.searchElement.nativeElement.offsetHeight : 0;
         const elementTilesHeight = this.tilesElement ? this.tilesElement.nativeElement.offsetHeight : 0;
-        this.dimensions = [elementTilesHeight, searchElementHeight, 17 /*separator = 1px + padding*/];
-
-        if (this.tableElement && this.healthService.tableReady) {
-            this.tableWidth = this.tableElement.nativeElement.querySelectorAll('table')[0].offsetWidth;
-            // area available
-            const areaWidth = this.searchTableArea.nativeElement.offsetWidth;
-            // area available to the table (- gutter)
-            const availAreaWidth = areaWidth - NxHealthService.PANEL_WIDTH - 16;
-
-            const isTableFit = (availAreaWidth > this.tableWidth) && !this.mobileDetailMode;
-            if (this.activeEntity && !this.mobileDetailMode) {
-                this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--with-panel';
-            } else {
-                this.fixedLayoutClass = 'fixedLayout--no-panel';
-            }
-
-            if (this.mobileDetailMode && this.activeEntity) {
-                this.fixedLayoutClass = 'fixedLayout--no-panel';
-            }
-            this.layoutReady = true;
+        if (!this.mobileDetailMode) {
+            this.dimensions = [elementTilesHeight, searchElementHeight, 17 /*separator = 1px + padding*/];
         }
+        this.setLayout();
     }
 
     setMetricsLayout() {
-        if (!this.searchTableArea) {
-            return;
-        }
         if (this.metricsValuesCount === 1) {
             this.fixedLayoutClass = 'fixedLayout--no-panel';
         } else {
             const elementSearchHeight = this.searchElement ? this.searchElement.nativeElement.offsetHeight : 0;
-            // Don't ask why this segment is duplicated ... it's important and it's working -- TT
-            if (this.tableElement && this.healthService.tableReady) {
-                // measure table (not wrapper) width
-                this.tableWidth = this.tableElement.nativeElement.querySelectorAll('table')[0].offsetWidth;
-
-                if (!this.mobileDetailMode) {
-                    this.dimensions = [elementSearchHeight + 16, 0]; // trick table's onChanges will pick new dimensions
-                }
-                // area available
-                const areaWidth = this.searchTableArea ? this.searchTableArea.nativeElement.offsetWidth : 0;
-                // area available to the table (- gutter)
-                const availAreaWidth = areaWidth - NxHealthService.PANEL_WIDTH - 16;
-
-                const isTableFit = (availAreaWidth > this.tableWidth) && !this.mobileDetailMode;
-                if (this.activeEntity && !this.mobileDetailMode) {
-                    if (this.searchElement) {
-                        this.searchElement.nativeElement.style.width = 'auto';
-                    }
-                    this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--with-panel';
-                } else {
-                    this.fixedLayoutClass = 'fixedLayout--no-panel';
-                }
-                this.layoutReady = true;
-            } else if (!this.mobileDetailMode) {
+            if (!this.mobileDetailMode) {
                 this.dimensions = [elementSearchHeight + 16];
             }
-
-            if (this.mobileDetailMode && this.activeEntity) {
-                this.fixedLayoutClass = 'fixedLayout--no-panel';
-                this.layoutReady = true;
-            }
-        }
-    }
-
-    setSearchWidth(width) {
-        if (this.searchElement) {
-            this.searchElement.nativeElement.style.width = `${width}px`;
+            this.setLayout();
         }
     }
 
@@ -246,6 +196,7 @@ export class NxHealthLayoutService {
         const THEAD_HEIGHT = this.tableHeaderElement ? this.tableHeaderElement.nativeElement.offsetHeight : 0;
         const PADDING = 16;
         const PAGINATION_HEIGHT = 64;
+        const ROW_HEIGHT = 26 ;
 
         let availSpace = windowSize.height - 4 * PADDING - ELEMENTS_HEIGHT - THEAD_HEIGHT - 48 - PAGINATION_HEIGHT;
 
@@ -253,7 +204,7 @@ export class NxHealthLayoutService {
             availSpace -= this.tableTitleElement.nativeElement.offsetHeight;
         }
 
-        let pageSize = Math.ceil(availSpace / NxHealthLayoutService.ROW_HEIGHT);
+        let pageSize = Math.ceil(availSpace / ROW_HEIGHT);
         if (pageSize < 5) {
             pageSize = 5;
         }
@@ -262,5 +213,36 @@ export class NxHealthLayoutService {
             this.tableWidth = this.tableElement.nativeElement.offsetWidth;
         }
         this.healthService.tableReady = true;
+    }
+
+    private setLayout() {
+        if (!this.tableElement || !this.healthService.tableReady) {
+            return;
+        }
+        // measure table (not wrapper) width
+        const table = this.tableElement.nativeElement.querySelectorAll('table')[0];
+        this.tableWidth = table ? table.offsetWidth : 0;
+
+        if (this.activeEntity && !this.mobileDetailMode) {
+            // area available
+            const areaWidth = this.searchTableArea ? this.searchTableArea.nativeElement.offsetWidth : 0;
+            // area available to the table (- gutter)
+            const availAreaWidth = areaWidth - NxHealthService.PANEL_WIDTH - 16;
+            const isTableFit = (availAreaWidth > this.tableWidth);
+            this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--with-panel';
+
+            if (this.searchElement) {
+                this.searchElement.nativeElement.style.width = 'auto';
+            }
+        } else {
+            this.fixedLayoutClass = 'fixedLayout--no-panel';
+        }
+        this.layoutReady = true;
+    }
+
+    private setSearchWidth(width) {
+        if (this.searchElement) {
+            this.searchElement.nativeElement.style.width = `${width}px`;
+        }
     }
 }

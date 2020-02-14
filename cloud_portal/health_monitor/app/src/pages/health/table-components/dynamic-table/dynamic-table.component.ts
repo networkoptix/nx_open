@@ -84,11 +84,8 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
 
     @ViewChild('tableHead', { static: false }) tableHeadElement: ElementRef;
     @ViewChild('tableTitle', { static: false }) tableTitleElement: ElementRef;
-    @ViewChild('nxTable', { static: false }) dataTable: ElementRef;
+    @ViewChild('nxTable', { static: false }) tableElement: ElementRef;
     @ViewChild('tooltip', { static: false }) tableTooltip: ElementRef;
-
-    // CSS does not use CONFIG so this is here to avoid confusion if changing the value
-    private static ROW_HEIGHT = 26;
 
     constructor(private configService: NxConfigService,
                 private uri: NxUriService,
@@ -111,8 +108,8 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
 
         this.resizeSubscription = this.scrollMechanicsService.windowSizeSubject.subscribe(() => {
             this.mobileDetailMode = this.healthLayoutService.activeEntity && this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.lg);
-            if (this.dataTable) {
-                this.healthLayoutService.tableWidth = this.dataTable.nativeElement.offsetWidth;
+            if (this.tableElement) {
+                this.healthLayoutService.tableWidth = this.tableElement.nativeElement.offsetWidth;
             }
 
             this.setPagerSize();
@@ -162,7 +159,7 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
     initLayoutService() {
         this.healthLayoutService.tableHeaderElement = this.tableHeadElement;
         this.healthLayoutService.tableTitleElement = this.tableTitleElement;
-        this.healthLayoutService.tableElement = this.dataTable;
+        this.healthLayoutService.tableElement = this.tableElement;
 
         this.pageSubscription = this.healthLayoutService.pageSizeSubject.pipe(delay(0)).subscribe(pageSize => {
             this.pageSize = pageSize;
@@ -187,12 +184,6 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.lg)) {
             this.mobileDetailMode = !!this.selectedEntity;
         }
-        // TODO: Try to remove timeout in CLOUD-4233
-        setTimeout(() => {
-            if (this.dataTable && !this.mobileDetailMode) {
-                this.scrollMechanicsService.setElementTableWidth(this.dataTable.nativeElement.offsetWidth);
-            }
-        });
 
         if (!activeEntity && !this.healthService.tableReady) {
             this.setPage(undefined, this.startIndex || 0);
@@ -221,7 +212,7 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         if (changes.elements) {
             this._elements = Object.values(changes.elements.currentValue);
             this.setPage(1);
-            if (this.dataTable) {
+            if (this.tableElement) {
                 this.setTableDimensions();
             }
         }
@@ -357,13 +348,28 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
                     return (elm) => {
                         return elm[groupId] && elm[groupId][paramId] && ALARM_ORDER[elm[groupId][paramId].icon] || '';
                     };
-                case 'totalSpaceB':
+                case 'resolution':
                     return (elm) => {
-                        return elm[groupId] && elm[groupId][paramId] && parseFloat(elm[groupId][paramId].text) || '';
+                        if (elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].value) {
+                            const res = elm[groupId][paramId].value.toLowerCase().split('x');
+
+                            if (res.length === 2) {
+                                return res[0] * res[1];
+                            } else {
+                                return 0; // invalid format
+                            }
+                        } else {
+                            return 0; // no data
+                        }
                     };
                 default:
                     return (elm) => {
-                        return elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].text || '';
+                        const format = elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].formatClass || undefined;
+
+                        if (['longText', 'long-text', 'shortText', 'short-text', 'text', 'no-max-width'].includes(format)) {
+                            return elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].text || '';
+                        }
+                        return elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].value || 0;
                     };
             }
         }

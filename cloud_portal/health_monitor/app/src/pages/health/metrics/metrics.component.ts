@@ -67,7 +67,7 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
     activeEntitySubscription: SubscriptionLike;
 
     @ViewChild('search', { static: false }) searchElement: ElementRef;
-    @ViewChild('area', { static: false }) area: ElementRef;
+    @ViewChild('area', { static: false }) areaElement: ElementRef;
 
     constructor(private accountService: NxAccountService,
                 private configService: NxConfigService,
@@ -98,7 +98,7 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
                 const params = {...this.route.snapshot.queryParams};
 
                 if (params.id) {
-                    this.setActiveEntity(params.id, false);
+                    this.setActiveEntity(params.id);
                 } else {
                     this.resetActiveEntity(false);
                 }
@@ -151,7 +151,7 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit() {
         this.healthLayoutService.dimensions = [];
-        this.healthLayoutService.searchTableArea = this.area;
+        this.healthLayoutService.searchTableArea = this.areaElement;
         this.healthLayoutService.searchElement = this.searchElement;
 
         this.fixedLayoutClassSubscription = this.healthLayoutService.fixedLayoutClassSubject.pipe(delay(0)).subscribe((className: string) => {
@@ -194,16 +194,15 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
         }
     }
 
-    setActiveEntity(entity, updateURI = true) {
+    setActiveEntity(entity) {
         const queryParams: Params = {};
         this.layoutReady = this.healthLayoutService.activeEntity ? true : false;
 
         if (entity) {
+            // Happens when we get the entity from the url.
             if (typeof entity === 'string') {
-                setTimeout(() => {
-                    this.healthLayoutService.activeEntity = this.selectedValues[entity];
-                });
-                if (entity) {
+                this.healthLayoutService.activeEntity = this.selectedValues[entity];
+                if (!this.healthLayoutService.activeEntity) {
                     queryParams.id = undefined;
                     this.uri.updateURI(undefined, queryParams);
                 }
