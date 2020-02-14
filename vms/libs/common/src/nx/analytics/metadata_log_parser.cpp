@@ -46,6 +46,7 @@ bool MetadataLogParser::parseFloat(
 
 static const std::string kMetadataTimestampMsLabel = "metadataTimestampMs";
 static const std::string kObjectsLabel = "objects:";
+static const std::string kBestShotLabel = "bestShot:";
 
 /**
  * Reads the text in form `metadataTimestampMs #, ...; objects: #:`, where `#` is the respective
@@ -125,6 +126,10 @@ bool MetadataLogParser::parsePacketLine(
         lineStream >> label;
         if (label == kObjectsLabel)
             break;
+
+        if (label == kBestShotLabel)
+            return false; //< Ignore best shot packets.
+
         if (label.empty() || !lineStream)
             return warning(lm("Missing label \"%1\"").args(kObjectsLabel));
     }

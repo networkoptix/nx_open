@@ -53,9 +53,12 @@ QString toString(const ObjectMetadata& objectMetadata)
         + ", y " + QString::number(objectMetadata.boundingBox.y())
         + ", width " + QString::number(objectMetadata.boundingBox.width())
         + ", height " + QString::number(objectMetadata.boundingBox.height())
-        + ", trackId " + objectMetadata.trackId.toString()
-        + ", typeId " + objectMetadata.typeId
-        + ", attributes {";
+        + ", trackId " + objectMetadata.trackId.toString();
+
+    if (objectMetadata.bestShot)
+        return s;
+
+    s += ", typeId " + objectMetadata.typeId + ", attributes {";
 
     const QRegularExpression kExpectedCharsOnlyRegex("\\A[A-Za-z_0-9.]+\\z");
 
@@ -80,7 +83,6 @@ QString toString(const ObjectMetadata& objectMetadata)
     }
 
     s += "}";
-    s += QString(", isBestShot ") + (objectMetadata.bestShot ? "true" : "false");
     return s;
 }
 
