@@ -150,7 +150,8 @@ QN_HELP_TOPIC(CameraSettings_Expert_LogicalId_Help,             "assigning_logic
 QN_HELP_TOPIC(EventsActions_Help,                               "configuring_events_and_actions.htm")
 QN_HELP_TOPIC(EventsActions_Schedule_Help,                      "setting_up_schedule_for_tracki.htm")
 
-QN_HELP_TOPIC(EventsActions_ShowNotification_Help,              "notifications.htm")
+QN_HELP_TOPIC(EventsActions_ShowDesktopNotification_Help,       "notifications.htm")
+QN_HELP_TOPIC(EventsActions_SendMobileNotification_Help,        "notifications.htm")
 QN_HELP_TOPIC(EventsActions_SendMail_Help,                      "mail_notifications.htm")
 QN_HELP_TOPIC(EventsActions_StartRecording_Help,                "start_recording_on_camera.htm")
 QN_HELP_TOPIC(EventsActions_StartPanicRecording_Help,           "start_panic_recording.htm")

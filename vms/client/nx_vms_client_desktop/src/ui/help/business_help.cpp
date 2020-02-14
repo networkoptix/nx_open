@@ -60,7 +60,9 @@ int actionHelpId(ActionType type)
         case ActionType::sendMailAction:
             return Qn::EventsActions_SendMail_Help;
         case ActionType::showPopupAction:
-            return Qn::EventsActions_ShowNotification_Help;
+            return Qn::EventsActions_ShowDesktopNotification_Help;
+        case ActionType::pushNotificationAction:
+            return Qn::EventsActions_SendMobileNotification_Help;
         case ActionType::playSoundOnceAction:
             return Qn::EventsActions_PlaySound_Help;
         case ActionType::playSoundAction:

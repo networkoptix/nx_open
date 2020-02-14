@@ -6,6 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/widgets/business/abstract_business_params_widget.h>
+#include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/utils/uuid.h>
 
 class QPushButton;
@@ -15,6 +16,8 @@ class QnBusinessStringsHelper;
 }}} // namespace nx::vms::event
 
 class QnSubjectValidationPolicy;
+
+using CustomizableOptions = nx::vms::client::desktop::ui::SubjectSelectionDialog::CustomizableOptions;
 
 class QnSubjectTargetActionWidget: public QnAbstractBusinessParamsWidget
 {
@@ -33,6 +36,8 @@ protected:
 
     void setValidationPolicy(QnSubjectValidationPolicy* policy); //< Takes ownership.
 
+    void setDialogOptions(const CustomizableOptions& options);
+
     void updateSubjectsButton();
 
 private:
@@ -46,4 +51,5 @@ private:
     QPushButton* m_subjectsButton = nullptr;
     QScopedPointer<nx::vms::event::StringsHelper> m_helper;
     QScopedPointer<QnSubjectValidationPolicy> m_validationPolicy;
+    std::optional<CustomizableOptions> m_options;
 };

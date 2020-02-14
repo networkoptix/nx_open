@@ -34,10 +34,21 @@ class SubjectSelectionDialog: public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
+    struct CustomizableOptions
+    {
+        QString userListHeader;
+        std::function<bool(const QnUserResource&)> userFilter;
+        bool showAllUsersSwitcher = false;
+        QColor alertColor;
+    };
+
+public:
     explicit SubjectSelectionDialog(QWidget* parent = nullptr, Qt::WindowFlags windowFlags = 0);
     virtual ~SubjectSelectionDialog() override;
 
     void showAlert(const QString& text);
+
+    void setOptions(const CustomizableOptions& options);
 
     // Sets user validator. If it's not set, any user is considered valid.
     void setUserValidator(UserValidator userValidator);

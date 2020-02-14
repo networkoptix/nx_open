@@ -326,6 +326,7 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
         {
             auto ids = (
                 m_actionType != ActionType::showPopupAction
+                && m_actionType != ActionType::pushNotificationAction
                 && m_actionType != ActionType::openLayoutAction)
                     ? filterActionResources(this, m_actionResources, m_actionType)
                     : filterSubjectIds(m_actionParams.additionalResources);
@@ -386,6 +387,7 @@ bool QnBusinessRuleViewModel::setData(Column column, const QVariant& value, int 
             {
                 case ActionType::openLayoutAction:
                 case ActionType::showPopupAction:
+                case ActionType::pushNotificationAction:
                 {
                     auto params = m_actionParams;
                     params.additionalResources = decltype(params.additionalResources)(
@@ -610,6 +612,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
 
         case vms::event::ActionType::openLayoutAction:
         case vms::event::ActionType::showPopupAction:
+        case vms::event::ActionType::pushNotificationAction:
         {
             if (m_actionParams.allUsers)
                 return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -1196,6 +1199,16 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
 
                     return validationState != QValidator::Invalid;
                 }
+                case ActionType::pushNotificationAction:
+                {
+                    static const QnCloudUsersValidationPolicy cloudUsersPolicy(commonModule());
+                    const auto subjects = filterSubjectIds(m_actionParams.additionalResources);
+                    const auto validationState = cloudUsersPolicy.validity(
+                        m_actionParams.allUsers,
+                        subjects);
+
+                    return validationState != QValidator::Invalid;
+                }
 
                 case ActionType::sayTextAction:
                     return !m_actionParams.sayText.isEmpty()
@@ -1325,6 +1338,7 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
         }
         case ActionType::openLayoutAction:
         case ActionType::showPopupAction:
+        case ActionType::pushNotificationAction:
         {
             if (m_actionParams.allUsers)
                 return nx::vms::event::StringsHelper::allUsersText();

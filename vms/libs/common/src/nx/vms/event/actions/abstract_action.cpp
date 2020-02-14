@@ -18,6 +18,7 @@ bool requiresCameraResource(ActionType actionType)
         case ActionType::sendMailAction:
         case ActionType::diagnosticsAction:
         case ActionType::showPopupAction:
+        case ActionType::pushNotificationAction:
         case ActionType::openLayoutAction:
         case ActionType::exitFullscreenAction:
         case ActionType::buzzerAction:
@@ -52,6 +53,7 @@ bool requiresUserResource(ActionType actionType)
         case ActionType::cameraRecordingAction:
         case ActionType::diagnosticsAction:
         case ActionType::showPopupAction:
+        case ActionType::pushNotificationAction:
         case ActionType::playSoundOnceAction:
         case ActionType::playSoundAction:
         case ActionType::sayTextAction:
@@ -99,6 +101,7 @@ bool requiresAdditionalUserResource(ActionType actionType)
 
         case ActionType::bookmarkAction:
         case ActionType::showPopupAction:
+        case ActionType::pushNotificationAction:
         case ActionType::playSoundOnceAction:
         case ActionType::sayTextAction:
         case ActionType::showOnAlarmLayoutAction:
@@ -129,6 +132,7 @@ bool hasToggleState(ActionType actionType)
         case ActionType::sendMailAction:
         case ActionType::diagnosticsAction:
         case ActionType::showPopupAction:
+        case ActionType::pushNotificationAction:
         case ActionType::playSoundOnceAction:
         case ActionType::sayTextAction:
         case ActionType::executePtzPresetAction:
@@ -230,6 +234,7 @@ QList<ActionType> userAvailableActions()
         ActionType::sendMailAction,
         ActionType::diagnosticsAction,
         ActionType::showPopupAction,
+        ActionType::pushNotificationAction,
         ActionType::playSoundAction,
         ActionType::playSoundOnceAction,
         ActionType::sayTextAction,

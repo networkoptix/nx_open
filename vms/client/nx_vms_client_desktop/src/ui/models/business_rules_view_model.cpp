@@ -133,6 +133,7 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
                     || vms::event::requiresUserResource(actionType)
                     || actionType == vms::api::ActionType::openLayoutAction
                     || actionType == vms::api::ActionType::showPopupAction
+                    || actionType == vms::api::ActionType::pushNotificationAction
                     || actionType == vms::api::ActionType::playSoundAction
                     || actionType == vms::api::ActionType::playSoundOnceAction
                     || actionType == vms::api::ActionType::sayTextAction)

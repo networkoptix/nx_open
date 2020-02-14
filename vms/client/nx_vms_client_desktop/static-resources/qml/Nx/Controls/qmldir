@@ -9,6 +9,7 @@ ContextHintLabel 1.0 ContextHintLabel.qml
 TextField 1.0 TextField.qml
 TextFieldWithWarning 1.0 TextFieldWithWarning.qml
 SpinBox 1.0 SpinBox.qml
+DoubleSpinBox 1.0 DoubleSpinBox.qml
 ComboBox 1.0 ComboBox.qml
 CheckBox 1.0 CheckBox.qml
 GroupBox 1.0 GroupBox.qml

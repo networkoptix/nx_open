@@ -11,7 +11,6 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 
-#include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -52,6 +51,9 @@ void QnSubjectTargetActionWidget::selectSubjects()
 
     dialog.setUserValidator(
         [this](const QnUserResourcePtr& user) { return userValidity(user); });
+
+    if (m_options)
+        dialog.setOptions(m_options.value());
 
     QSet<QnUuid> selected;
     for (auto id: params.additionalResources)
@@ -174,6 +176,11 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
 void QnSubjectTargetActionWidget::setValidationPolicy(QnSubjectValidationPolicy* policy)
 {
     m_validationPolicy.reset(policy);
+}
+
+void QnSubjectTargetActionWidget::setDialogOptions(const CustomizableOptions& options)
+{
+    m_options.emplace(options);
 }
 
 QValidator::State QnSubjectTargetActionWidget::roleValidity(const QnUuid& roleId) const

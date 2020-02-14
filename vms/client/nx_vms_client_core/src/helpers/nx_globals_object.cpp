@@ -109,4 +109,11 @@ QnUuid NxGlobalsObject::uuid(const QString& uuid) const
     return QnUuid::fromStringSafe(uuid);
 }
 
+QLocale NxGlobalsObject::numericInputLocale(const QString& basedOn) const
+{
+    auto locale = basedOn.isEmpty() ? QLocale() : QLocale(basedOn);
+    locale.setNumberOptions(QLocale::RejectGroupSeparator | QLocale::OmitGroupSeparator);
+    return locale;
+}
+
 } // namespace nx::vms::client::core

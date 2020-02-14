@@ -25,6 +25,7 @@
 #include <nx/vms/client/core/common/utils/encoded_credentials.h>
 #include <nx/vms/client/core/common/utils/properties_sync.h>
 #include <nx/vms/client/core/common/utils/path_util.h>
+#include <nx/vms/client/core/common/utils/validators.h>
 #include <nx/vms/client/core/camera/thumbnail/live_thumbnail_provider.h>
 #include <nx/vms/client/core/common/helpers/texture_size_helper.h>
 #include <nx/client/core/media/media_player.h>
@@ -113,6 +114,8 @@ void initializeMetaTypes()
     PropertiesSync::registerQmlTypes();
     PathUtil::registerQmlType();
     TextureSizeHelper::registerQmlType();
+    IntValidator::registerQmlType();
+    DoubleValidator::registerQmlType();
 
     /* NxMediaPlayer should not be used.
     It is here only to allow assignments of MediaPlayer to properties of this type. */
