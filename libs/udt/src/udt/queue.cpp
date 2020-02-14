@@ -333,6 +333,9 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
 
 int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
 {
+    // When this method destroyes CUDT, it must do it with no mutex lock.
+    std::shared_ptr<CUDT> u;
+
     std::lock_guard<std::mutex> listguard(m_ListLock);
 
     if (-1 == m_iLastEntry)
@@ -344,7 +347,7 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
     if (ts < m_nodeHeap[0]->timestamp)
         return -1;
 
-    std::shared_ptr<CUDT> u = m_nodeHeap[0]->socket.lock();
+    u = m_nodeHeap[0]->socket.lock();
     remove_(m_nodeHeap[0]);
 
     if (!u || !u->connected() || u->broken())
@@ -1052,12 +1055,14 @@ void CRcvQueue::addNewEntry(const std::weak_ptr<CUDT>& u)
 
 std::shared_ptr<CUDT> CRcvQueue::takeNewEntry()
 {
+    std::shared_ptr<CUDT> u;
+
     std::lock_guard<std::mutex> lock(m_IDLock);
 
     if (m_vNewEntry.empty())
         return nullptr;
 
-    std::shared_ptr<CUDT> u = m_vNewEntry.front().lock();
+    u = m_vNewEntry.front().lock();
     m_vNewEntry.erase(m_vNewEntry.begin());
 
     return u;
