@@ -849,6 +849,11 @@ QString StringsHelper::needToSelectUserText()
     return tr("Select at least one user");
 }
 
+QString StringsHelper::poeConsumption()
+{
+    return tr("Consumption");
+}
+
 QString StringsHelper::poeConsumptionString(double current, double limit)
 {
     return qFuzzyIsNull(current) || current < 0
@@ -868,6 +873,70 @@ QString StringsHelper::poeConsumptionStringFromParams(const EventParameters& par
         return QString();
 
     return poeOverallConsumptionString(values.currentConsumptionWatts, values.upperLimitWatts);
+}
+
+QString StringsHelper::notificationCaption(
+    const EventParameters& parameters,
+    const QnVirtualCameraResourcePtr& camera) const
+{
+    switch (parameters.eventType)
+    {
+        case EventType::softwareTriggerEvent:
+            return lit("%1 <b>%2</b>").arg(
+                eventName(parameters.eventType),
+                getSoftwareTriggerName(parameters));
+
+        case EventType::userDefinedEvent:
+            return parameters.caption.isEmpty()
+                ? tr("Generic Event")
+                : parameters.caption;
+
+        case EventType::pluginDiagnosticEvent:
+            return parameters.caption.isEmpty()
+                ? tr("Unknown Plugin Diagnostic Event")
+                : parameters.caption;
+
+        case EventType::analyticsSdkEvent:
+            return parameters.caption.isEmpty()
+                ? getAnalyticsSdkEventName(parameters)
+                : parameters.caption;
+
+        case EventType::cameraDisconnectEvent:
+            return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
+                QnCameraDeviceStringSet(
+                    tr("Device was disconnected"),
+                    tr("Camera was disconnected"),
+                    tr("I/O Module was disconnected")), camera);
+        default:
+            return eventName(parameters.eventType);
+    }
+}
+
+QString StringsHelper::notificationDescription(const EventParameters& parameters) const
+{
+    switch (parameters.eventType)
+    {
+        case EventType::userDefinedEvent:
+        case EventType::pluginDiagnosticEvent:
+        case EventType::analyticsSdkEvent:
+            return parameters.description;
+
+        case EventType::poeOverBudgetEvent:
+        {
+            // Note: this code is used to generate mobile push notifications only.
+            // It desktop client it is overridden by the one with rich text formatting.
+            const auto consumptionString = poeConsumptionStringFromParams(parameters);
+            if (consumptionString.isEmpty())
+                return QString();
+
+            return QString("%1 %2")
+                .arg(poeConsumption())
+                .arg(consumptionString);
+        }
+
+        default:
+            return QString();
+    }
 }
 
 } // namespace event

@@ -439,72 +439,32 @@ QString NotificationListModel::Private::caption(const nx::vms::event::EventParam
     const QnVirtualCameraResourcePtr& camera) const
 {
     // TODO: #vkutin Include event end condition, if applicable. Include aggregation.
-
-    switch (parameters.eventType)
-    {
-        case EventType::softwareTriggerEvent:
-            return lit("%1 <b>%2</b>").arg(
-                m_helper->eventName(parameters.eventType),
-                m_helper->getSoftwareTriggerName(parameters));
-
-        case EventType::userDefinedEvent:
-            return parameters.caption.isEmpty()
-                ? tr("Generic Event")
-                : parameters.caption;
-
-        case EventType::pluginDiagnosticEvent:
-            return parameters.caption.isEmpty()
-                ? tr("Unknown Plugin Diagnostic Event")
-                : parameters.caption;
-
-        case EventType::analyticsSdkEvent:
-            return parameters.caption.isEmpty()
-                ? m_helper->getAnalyticsSdkEventName(parameters)
-                : parameters.caption;
-
-        case EventType::cameraDisconnectEvent:
-            return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
-                QnCameraDeviceStringSet(
-                    tr("Device was disconnected"),
-                    tr("Camera was disconnected"),
-                    tr("I/O Module was disconnected")), camera);
-        default:
-            return m_helper->eventName(parameters.eventType);
-    }
+    return m_helper->notificationCaption(parameters, camera);
 }
 
 QString NotificationListModel::Private::getPoeOverBudgetDescription(
     const nx::vms::event::EventParameters& parameters) const
 {
+    static const auto kDescriptionTemplate =
+        QString("<font color = '%1'><b>%2</b></font> %3")
+        .arg(QPalette().color(QPalette::WindowText).name())
+        .arg(m_helper->poeConsumption());
+
     const auto consumptionString = event::StringsHelper::poeConsumptionStringFromParams(parameters);
     if (consumptionString.isEmpty())
         return QString();
 
-    static const auto kBoldTemplate = QString("<b>%1</b>");
-    static const auto kDescriptionTemplate =
-        QString("<font color = '%1'>%2</font> %3")
-        .arg(QPalette().color(QPalette::WindowText).name())
-        .arg(tr("Consumption"));
-
-    return kDescriptionTemplate.arg(kBoldTemplate.arg(consumptionString));
+    return kDescriptionTemplate.arg(consumptionString);
 }
 
 QString NotificationListModel::Private::description(
     const nx::vms::event::EventParameters& parameters) const
 {
-    switch (parameters.eventType)
-    {
-        case EventType::userDefinedEvent:
-        case EventType::pluginDiagnosticEvent:
-        case EventType::analyticsSdkEvent:
-            return parameters.description;
+    if (parameters.eventType == EventType::poeOverBudgetEvent)
+        return getPoeOverBudgetDescription(parameters);
 
-        case EventType::poeOverBudgetEvent:
-            return getPoeOverBudgetDescription(parameters);
+    return m_helper->notificationDescription(parameters);
 
-        default:
-            return QString();
-    }
 }
 
 QPixmap NotificationListModel::Private::pixmapForAction(
