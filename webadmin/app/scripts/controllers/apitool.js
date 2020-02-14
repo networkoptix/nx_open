@@ -165,7 +165,14 @@ angular.module('webadminApp')
                     newParams[key] = params[key].getTime();
                     continue;
                 }
-                newParams[key] = params[key];
+                var formType = $scope.activeFunction.params.find(function(element) {
+                    return element.name === key;
+                });
+                var data = params[key];
+                if (formType.type === "object") {
+                    data = JSON.parse(data);
+                }
+                newParams[key] = data;
             }
             return newParams;
         }
