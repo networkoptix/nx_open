@@ -3,6 +3,8 @@ import QtQuick.Controls 2.4
 
 import Nx 1.0
 
+import nx.vms.client.core 1.0
+
 import "private"
 
 SpinBox
@@ -22,7 +24,14 @@ SpinBox
 
     background: TextFieldBackground { control: parent }
 
-    locale: Qt.locale("C")
+    locale: NxGlobals.numericInputLocale("C")
+
+    validator: IntValidator
+    {
+        top: control.to
+        bottom: control.from
+        locale: control.locale
+    }
 
     property real contentHeight: textInput.implicitHeight
 
@@ -31,7 +40,7 @@ SpinBox
         fontMetrics.advanceWidth(textFromValue(to, locale)))
 
     onValueChanged:
-        textInput.updateValue()
+        textInput.updateText()
 
     contentItem: TextInput
     {
@@ -50,14 +59,32 @@ SpinBox
 
         onTextEdited:
         {
-            control.value = control.valueFromText(text, control.locale)
-            updateValue()
+            try
+            {
+                var newValue = control.valueFromText(text, control.locale)
+                control.value = newValue
+
+                if (newValue != control.value)
+                    updateText()
+            }
+            catch (error)
+            {
+            }
         }
 
-        function updateValue()
+        onEditingFinished:
+            text = textFromValue(control.value, control.locale)
+
+        function updateText()
         {
-            if (control.valueFromText(text, control.locale) !== control.value)
-                text = textFromValue(control.value, control.locale)
+            try
+            {
+                if (control.valueFromText(text, control.locale) !== control.value)
+                    text = textFromValue(control.value, control.locale)
+            }
+            catch (error)
+            {
+            }
         }
     }
 
@@ -65,7 +92,7 @@ SpinBox
     {
         implicitWidth: 18
         implicitHeight: parent.height / 2
-        x: parent.width - width
+        x: control.mirrored ? 0 : parent.width - width
 
         color:
         {
@@ -89,7 +116,7 @@ SpinBox
     {
         implicitWidth: 18
         implicitHeight: parent.height / 2
-        x: parent.width - width
+        x: control.mirrored ? 0 : parent.width - width
         y: parent.height / 2
 
         color:

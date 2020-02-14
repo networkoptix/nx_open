@@ -26,6 +26,8 @@ public:
     Q_INVOKABLE void ensureFlickableChildVisible(QQuickItem* item);
 
     Q_INVOKABLE QnUuid uuid(const QString& uuid) const;
+
+    Q_INVOKABLE QLocale numericInputLocale(const QString& basedOn = "") const;
 };
 
 } // namespace nx::vms::client::core
