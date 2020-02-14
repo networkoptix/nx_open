@@ -2,17 +2,6 @@
 
 #include <QtMultimedia/QAbstractVideoBuffer>
 
-#include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLTexture>
-#include <QtGui/QOpenGLFunctions>
-#include <QtGui/QOpenGLShaderProgram>
-#include <QtGui/QOpenGLFramebufferObject>
-#include <QtGui/QOffscreenSurface>
-
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
-#include <drm/drm_fourcc.h>
-
 #include <nx/utils/log/log.h>
 
 #include "mfx_buffering.h"

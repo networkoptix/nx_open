@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtCore/QtGlobal>
-#include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
 
 #include <nx/streaming/video_data_packet.h>
@@ -18,6 +16,7 @@ public:
     {
         bool useVideoMemory = true;
     };
+
 public:
     QuickSyncVideoDecoder(
         const RenderContextSynchronizerPtr& /*synchronizer*/, const QSize& /*resolution*/);
