@@ -52,7 +52,6 @@ public:
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_engineNameChanged(const QnResourcePtr& resource);
-    void at_enginePropertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_engineManifestChanged(const AnalyticsEngineResourcePtr& engine);
     void at_connectionOpened();
     void at_connectionClosed();
@@ -186,8 +185,6 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
 
         connect(engine, &QnResource::nameChanged,
             this, &Private::at_engineNameChanged);
-        connect(engine, &QnResource::propertyChanged,
-            this, &Private::at_enginePropertyChanged);
         connect(engine, &AnalyticsEngineResource::manifestChanged,
             this, &Private::at_engineManifestChanged);
 
@@ -215,20 +212,6 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_engineNameChanged(
 
     it->name = resource->getName();
     updateStore();
-}
-
-void CameraSettingsAnalyticsEnginesWatcher::Private::at_enginePropertyChanged(
-    const QnResourcePtr& resource, const QString& key)
-{
-    if (!store)
-        return;
-
-    const auto engine = resource.staticCast<AnalyticsEngineResource>();
-
-    if (key == AnalyticsEngineResource::kSettingsValuesProperty)
-    {
-        store->setDeviceAgentSettingsValues(engine->getId(), engine->settingsValues());
-    }
 }
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_engineManifestChanged(

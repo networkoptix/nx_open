@@ -442,7 +442,7 @@ void QnClientModule::initSingletons()
 
     commonModule->store(new QnPlatformAbstraction());
 
-    commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>();
+    auto messageProcessor = commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>();
     commonModule->store(new QnClientResourceFactory());
 
     commonModule->store(new QnCameraBookmarksManager());
@@ -486,7 +486,24 @@ void QnClientModule::initSingletons()
     commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
 
-    commonModule->store(new AnalyticsSettingsManager());
+    auto analyticsSettingsManager = commonModule->store(new AnalyticsSettingsManager());
+
+    // TODO: #GDM Move out connection and server interface to the AnalyticsSettingsManagerHolder class.
+    connect(messageProcessor,
+        &QnClientMessageProcessor::serverRuntimeEventOccurred,
+        this,
+        [this, analyticsSettingsManager](const nx::vms::api::ServerRuntimeEventData& eventData)
+        {
+            if (eventData.eventType == nx::vms::api::ServerRuntimeEventType::deviceAgentSettingsMaybeChanged)
+            {
+                const auto payload =
+                    QJson::deserialized<nx::vms::api::DeviceAgentSettingsMaybeChangedData>(
+                        eventData.eventData);
+
+                analyticsSettingsManager->refreshSettings({payload.deviceId, payload.engineId});
+            }
+        });
+
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
 

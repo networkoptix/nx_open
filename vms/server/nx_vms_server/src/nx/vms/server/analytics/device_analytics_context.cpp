@@ -11,6 +11,7 @@
 
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <nx/vms/server/analytics/device_analytics_binding.h>
 #include <nx/vms/server/analytics/data_converter.h>
@@ -40,8 +41,8 @@ static bool isAliveStatus(Qn::ResourceStatus status)
 }
 
 static std::optional<QJsonObject> mergeWithDbAndDefaultSettings(
-    const QnVirtualCameraResourcePtr& device,
-    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
+    const resource::CameraPtr& device,
+    const resource::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settingsFromUser)
 {
     const auto engineManifest = engine->manifest();
@@ -64,7 +65,7 @@ static std::optional<QJsonObject> mergeWithDbAndDefaultSettings(
 
 DeviceAnalyticsContext::DeviceAnalyticsContext(
     QnMediaServerModule* serverModule,
-    const QnVirtualCameraResourcePtr& device)
+    const resource::CameraPtr& device)
     :
     base_type(serverModule),
     m_device(device),

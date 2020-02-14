@@ -3,7 +3,6 @@
 #include <variant>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
 #include <api/helpers/camera_id_helper.h>
 #include <media_server/media_server_module.h>
 
@@ -13,6 +12,7 @@
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <nx/vms/api/analytics/settings_response.h>
 #include <nx/vms/api/analytics/device_analytics_settings_data.h>
@@ -247,8 +247,11 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     response.analyzedStreamIndex =
         commonRequestEntities.device->analyzedStreamIndex(engineId);
 
-    const std::optional<QJsonObject> settingsModel =
-        commonRequestEntities.device->deviceAgentSettingsModel(engineId);
+    auto camera = commonRequestEntities.device.objectCast<resource::Camera>();
+    NX_ASSERT(camera);
+    const std::optional<QJsonObject> settingsModel = camera
+        ? camera->deviceAgentSettingsModel(engineId)
+        : std::nullopt;
 
     if (!settingsModel)
     {

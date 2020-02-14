@@ -41,7 +41,7 @@ class DeviceAnalyticsContext:
 public:
     DeviceAnalyticsContext(
         QnMediaServerModule* severModule,
-        const QnVirtualCameraResourcePtr& device);
+        const resource::CameraPtr& device);
 
     virtual ~DeviceAnalyticsContext();
 
@@ -110,7 +110,7 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-    QnVirtualCameraResourcePtr m_device;
+    resource::CameraPtr m_device;
     BindingMap m_bindings;
     QWeakPointer<QnAbstractDataReceptor> m_metadataSink;
 

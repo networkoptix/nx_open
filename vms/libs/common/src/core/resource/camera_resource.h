@@ -37,6 +37,7 @@ class QnVirtualCameraResource : public QnSecurityCamResource
 public:
     static const QString kCompatibleAnalyticsEnginesProperty;
     static const QString kUserEnabledAnalyticsEnginesProperty;
+    // This property kept here only because of statistics filtering.
     static const QString kDeviceAgentsSettingsValuesProperty;
     static const QString kDeviceAgentManifestsProperty;
     static const QString kAnalyzedStreamIndexes;
@@ -144,14 +145,6 @@ public:
      *     Device, enabled by the user and active (running on the current Server) Engines are used.
      */
     std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
-
-    std::optional<QJsonObject> deviceAgentSettingsModel(QnUuid engineId) const;
-
-    QHash<QnUuid, QJsonObject> deviceAgentSettingsValues() const;
-    void setDeviceAgentSettingsValues(const QHash<QnUuid, QJsonObject>& settingsValues);
-
-    QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
-    void setDeviceAgentSettingsValues(const QnUuid& engineId, const QJsonObject& settingsValues);
 
     std::optional<nx::vms::api::analytics::DeviceAgentManifest> deviceAgentManifest(
         const QnUuid& engineId) const;

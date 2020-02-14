@@ -4,7 +4,9 @@
 #include <camera/video_camera.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <providers/live_stream_provider.h>
 #include <utils/media/av_codec_helper.h>
 
@@ -442,7 +444,7 @@ CameraDiagnostics::Result Camera::initInternal()
     nx::utils::ElapsedTimer t;
     t.restart();
     const auto driverResult = initializeCameraDriver();
-    NX_DEBUG(this, 
+    NX_DEBUG(this,
         "Initialising camera driver done. Camera %1. It took %2", getPhysicalId(), t.elapsed());
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;
@@ -858,6 +860,47 @@ bool Camera::fixMulticastParametersIfNeeded(
     }
 
     return somethingIsFixed;
+}
+
+std::optional<QJsonObject> Camera::deviceAgentSettingsModel(const QnUuid& engineId) const
+{
+    const auto manifest = deviceAgentManifest(engineId);
+    if (manifest && manifest->deviceAgentSettingsModel.isObject())
+        return manifest->deviceAgentSettingsModel.toObject();
+
+    const auto engine = base_type::resourcePool()
+        ->getResourceById<nx::vms::common::AnalyticsEngineResource>(engineId);
+
+    if (!engine)
+        return std::nullopt;
+
+    return engine->manifest().deviceAgentSettingsModel;
+}
+
+QHash<QnUuid, QJsonObject> Camera::deviceAgentSettingsValues() const
+{
+    return QJson::deserialized<QHash<QnUuid, QJsonObject>>(
+        getProperty(kDeviceAgentsSettingsValuesProperty).toUtf8());
+}
+
+void Camera::setDeviceAgentSettingsValues(
+    const QHash<QnUuid, QJsonObject>& settingsValues)
+{
+    setProperty(kDeviceAgentsSettingsValuesProperty,
+        QString::fromUtf8(QJson::serialized(settingsValues)));
+    saveProperties();
+}
+
+QJsonObject Camera::deviceAgentSettingsValues(const QnUuid& engineId) const
+{
+    return deviceAgentSettingsValues()[engineId];
+}
+
+void Camera::setDeviceAgentSettingsValues(const QnUuid& engineId, const QJsonObject& settingsValues)
+{
+    auto settingsValuesByEngineId = deviceAgentSettingsValues();
+    settingsValuesByEngineId[engineId] = settingsValues;
+    setDeviceAgentSettingsValues(settingsValuesByEngineId);
 }
 
 std::optional<QnLiveStreamParams> Camera::targetParams(StreamIndex streamIndex)
