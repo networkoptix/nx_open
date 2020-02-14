@@ -121,7 +121,8 @@ EventRibbon::Private::Private(EventRibbon* q):
     m_scrollBar(new QScrollBar(Qt::Vertical, q)),
     m_viewport(new QWidget(q)),
     m_autoCloseTimer(new QTimer()),
-    m_previewLoad(new nx::utils::PendingOperation())
+    m_previewLoad(new nx::utils::PendingOperation()),
+    m_layoutUpdate(new nx::utils::PendingOperation())
 {
     NX_ASSERT(Importance() == Importance::NoNotification);
 
@@ -153,10 +154,9 @@ EventRibbon::Private::Private(EventRibbon* q):
     m_previewLoad->setCallback(loadNextPreviewDelayed);
 
     // Limit the number of layout update requests to 60 per second.
-    m_layoutTimer = new QTimer(this);
-    m_layoutTimer->setSingleShot(true);
-    m_layoutTimer->setInterval(kTimeBetweenLayoutRequests);
-    connect(m_layoutTimer, &QTimer::timeout, this, &Private::updateView);
+    m_layoutUpdate->setInterval(kTimeBetweenLayoutRequests);
+    m_layoutUpdate->setFlags(nx::utils::PendingOperation::NoFlags);
+    m_layoutUpdate->setCallback([this]() { Private::updateView(); });
 }
 
 EventRibbon::Private::~Private()
@@ -1389,8 +1389,8 @@ void EventRibbon::Private::doUpdateView()
     updateHover();
     updateHighlightedTiles();
 
-    if (!m_animations.empty() && !m_layoutTimer->isActive())
-        m_layoutTimer->start();
+    if (!m_animations.empty())
+        m_layoutUpdate->requestOperation();
 }
 
 void EventRibbon::Private::fadeIn(EventTile* widget)
@@ -1454,6 +1454,7 @@ QWidget* EventRibbon::Private::createFadeCurtain(EventTile* widget, QVariantAnim
             return true;
         }));
 
+    connect(animator, &QVariantAnimation::valueChanged, curtain, qOverload<>(&QWidget::update));
     connect(animator, &QObject::destroyed, curtain, &QObject::deleteLater);
     installEventHandler(curtain, QEvent::Hide, animator, &QAbstractAnimation::stop);
 
