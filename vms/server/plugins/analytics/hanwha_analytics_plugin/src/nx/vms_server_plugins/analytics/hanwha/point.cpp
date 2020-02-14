@@ -85,6 +85,15 @@ std::optional<std::vector<PluginPoint>> ServerStringToPluginPoints(
     std::vector<PluginPoint> result;
 
     if (strcmp(source, "null") == 0)
+        return std::nullopt; //< Inadmissible value.
+
+    std::string err;
+    nx::kit::Json json = nx::kit::Json::parse(source, err);
+    if (!json.is_object())
+        return std::nullopt;
+
+    const nx::kit::Json& jsonFigure = json["figure"];
+    if (jsonFigure.is_null())
     {
         if (label)
             *label = std::string();
@@ -92,13 +101,7 @@ std::optional<std::vector<PluginPoint>> ServerStringToPluginPoints(
             *direction = Direction();
         return result; //< Empty figure.
     }
-
-    std::string err;
-    nx::kit::Json json = nx::kit::Json::parse(source, err);
-    if (!json.is_object())
-        return std::nullopt;
-
-    if (const nx::kit::Json& jsonFigure = json["figure"]; !jsonFigure.is_object())
+    else if (!jsonFigure.is_object())
     {
         return std::nullopt;
     }
