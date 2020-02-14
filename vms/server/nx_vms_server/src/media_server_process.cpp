@@ -744,7 +744,7 @@ void MediaServerProcess::waitWhileStoragesAddedToStorageManagers(int expected)
     while (n->getStorages().size() + b->getStorages().size() < expected)
     {
         NX_VERBOSE(this, "Waiting for storage managers to populate");
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
