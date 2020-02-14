@@ -185,7 +185,7 @@ private:
             if (endTimeUsec == AV_NOPTS_VALUE)
                 return true;
 
-            return endTimeUsec > startTimeUsec;
+            return endTimeUsec >= startTimeUsec;
         }
     };
 

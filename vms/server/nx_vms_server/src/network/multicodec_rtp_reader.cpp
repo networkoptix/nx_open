@@ -167,7 +167,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    const PlaybackRange playbackRange = m_playbackRange.exchange({AV_NOPTS_VALUE, AV_NOPTS_VALUE});
+    const PlaybackRange playbackRange = m_playbackRange.exchange(PlaybackRange());
     if (playbackRange.isValid())
     {
         m_RtpSession.sendPlay(
@@ -658,7 +658,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_gotKeyDataInfo.clear();
     m_gotData = false;
 
-    const PlaybackRange playbackRange = m_playbackRange.exchange({AV_NOPTS_VALUE, AV_NOPTS_VALUE});
+    const PlaybackRange playbackRange = m_playbackRange.exchange(PlaybackRange());
     m_openStreamResult = m_RtpSession.open(m_currentStreamUrl, playbackRange.startTimeUsec);
     if(m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return m_openStreamResult;
