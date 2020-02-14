@@ -100,7 +100,10 @@ TEST_F( ConnectTest, BindConnect )
         ASSERT_TRUE( testHttpServer.bindAndListen() );
     }
 
-    stun::AsyncClient msClient;
+    stun::AbstractAsyncClient::Settings clientSettings;
+    clientSettings.recvTimeout = nx::network::kNoTimeout;
+    clientSettings.sendTimeout = nx::network::kNoTimeout;
+    stun::AsyncClient msClient(clientSettings);
     auto msClientGuard = nx::utils::makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
     msClient.connect(
