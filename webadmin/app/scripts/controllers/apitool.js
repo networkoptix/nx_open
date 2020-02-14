@@ -170,7 +170,11 @@ angular.module('webadminApp')
                 });
                 var data = params[key];
                 if (formType.type === "object") {
-                    data = JSON.parse(data);
+                    try {
+                        data = JSON.parse(data);
+                    } catch(error) {
+                        data = "Not a valid json";
+                    }
                 }
                 newParams[key] = data;
             }

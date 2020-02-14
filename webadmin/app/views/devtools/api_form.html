@@ -167,10 +167,11 @@
 
 
                 <div ng-switch-when="info">
-                    <textarea id="{{param.name}}"
+                    <textarea id="{{param.name}}" class="form-control"
                               name="{{param.name}}"
                               ng-required="!param.optional"
                               ng-model="apiMethod.params[param.name]"
+                              rows="5"
                     ></textarea>
                 </div>
 
