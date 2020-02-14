@@ -156,11 +156,7 @@ EventRibbon::Private::Private(EventRibbon* q):
     m_layoutTimer = new QTimer(this);
     m_layoutTimer->setSingleShot(true);
     m_layoutTimer->setInterval(kTimeBetweenLayoutRequests);
-    connect(m_layoutTimer, &QTimer::timeout, this,
-        [this]
-        {
-            qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
-        });
+    connect(m_layoutTimer, &QTimer::timeout, this, &Private::updateView);
 }
 
 EventRibbon::Private::~Private()
