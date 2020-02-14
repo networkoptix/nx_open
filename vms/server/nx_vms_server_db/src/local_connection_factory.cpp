@@ -497,13 +497,14 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value 6 Saturday
      *         %value 7 Sunday
      *     %param scheduleTasks[].streamQuality Quality of the recording.
-     *         %value QualityLowest
-     *         %value QualityLow
-     *         %value QualityNormal
-     *         %value QualityHigh
-     *         %value QualityHighest
-     *         %value QualityPreSet
-     *         %value QualityNotDefined
+     *         %value undefined
+     *         %value lowest
+     *         %value low
+     *         %value normal
+     *         %value high
+     *         %value highest
+     *         %value preset
+     *         %//value[proptietary] rapidReview
      *     %param scheduleTasks[].fps Frames per second (integer).
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
@@ -594,13 +595,14 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value 6 Saturday
      *         %value 7 Sunday
      *     %param scheduleTasks[].streamQuality Quality of the recording.
-     *         %value QualityLowest
-     *         %value QualityLow
-     *         %value QualityNormal
-     *         %value QualityHigh
-     *         %value QualityHighest
-     *         %value QualityPreSet
-     *         %value QualityNotDefined
+     *         %value undefined
+     *         %value lowest
+     *         %value low
+     *         %value normal
+     *         %value high
+     *         %value highest
+     *         %value preset
+     *         %//value[proptietary] rapidReview
      *     %param scheduleTasks[].fps Frames per second (integer).
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
@@ -691,13 +693,14 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value 6 Saturday
      *             %value 7 Sunday
      *         %param scheduleTasks[].streamQuality Quality of the recording.
-     *             %value QualityLowest
-     *             %value QualityLow
-     *             %value QualityNormal
-     *             %value QualityHigh
-     *             %value QualityHighest
-     *             %value QualityPreSet
-     *             %value QualityNotDefined
+     *             %value undefined
+     *             %value lowest
+     *             %value low
+     *             %value normal
+     *             %value high
+     *             %value highest
+     *             %value preset
+     *             %//value[proptietary] rapidReview
      *         %param scheduleTasks[].fps Frames per second (integer).
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
@@ -831,13 +834,14 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value 6 Saturday
      *             %value 7 Sunday
      *         %param scheduleTasks[].streamQuality Quality of the recording.
-     *             %value QualityLowest
-     *             %value QualityLow
-     *             %value QualityNormal
-     *             %value QualityHigh
-     *             %value QualityHighest
-     *             %value QualityPreSet
-     *             %value QualityNotDefined
+     *             %value undefined
+     *             %value lowest
+     *             %value low
+     *             %value normal
+     *             %value high
+     *             %value highest
+     *             %value preset
+     *             %//value[proptietary] rapidReview
      *         %param scheduleTasks[].fps Frames per second (integer).
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
