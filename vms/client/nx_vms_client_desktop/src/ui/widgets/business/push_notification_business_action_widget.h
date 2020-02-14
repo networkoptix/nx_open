@@ -27,6 +27,7 @@ private:
 
 private:
     QScopedPointer<Ui::PushNotificationBusinessActionWidget> ui;
+    QString m_lastCustomText;
 };
 
 } // namespace nx::vms::client::desktop

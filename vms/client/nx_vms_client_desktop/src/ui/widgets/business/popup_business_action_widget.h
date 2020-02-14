@@ -26,4 +26,5 @@ private:
 
 private:
     QScopedPointer<Ui::PopupBusinessActionWidget> ui;
+    QString m_lastCustomText;
 };

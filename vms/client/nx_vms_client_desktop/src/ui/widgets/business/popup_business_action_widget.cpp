@@ -29,6 +29,24 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
     connect(ui->forceAcknoledgementCheckBox, &QCheckBox::toggled,
         this, &QnPopupBusinessActionWidget::parametersChanged);
 
+    connect(ui->customTextCheckBox, &QCheckBox::clicked, this,
+        [this]()
+        {
+            const bool useCustomText = ui->customTextCheckBox->isChecked();
+
+            if (!useCustomText)
+                m_lastCustomText = ui->customTextEdit->toPlainText();
+
+            ui->customTextEdit->setPlainText(useCustomText ? m_lastCustomText : QString());
+
+            parametersChanged();
+        });
+    connect(ui->customTextEdit, &QPlainTextEdit::textChanged,
+        this, &QnPopupBusinessActionWidget::parametersChanged);
+
+    ui->customTextEdit->setEnabled(ui->customTextCheckBox->isChecked());
+    connect(ui->customTextCheckBox, &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
+
     setSubjectsButton(ui->selectUsersButton);
 }
 
@@ -52,7 +70,16 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
     }
 
     if (fields.testFlag(Field::actionParams))
-        ui->forceAcknoledgementCheckBox->setChecked(model()->actionParams().needConfirmation);
+    {
+        const auto params = model()->actionParams();
+
+        ui->forceAcknoledgementCheckBox->setChecked(params.needConfirmation);
+
+        const bool useCustomText = !params.text.isEmpty();
+        m_lastCustomText = params.text;
+        ui->customTextCheckBox->setChecked(useCustomText);
+        ui->customTextEdit->setPlainText(useCustomText ? params.text : QString());
+    }
 
     updateValidationPolicy();
     base_type::at_model_dataChanged(fields);
@@ -62,7 +89,9 @@ void QnPopupBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* after
 {
     setTabOrder(before, ui->selectUsersButton);
     setTabOrder(ui->selectUsersButton, ui->forceAcknoledgementCheckBox);
-    setTabOrder(ui->forceAcknoledgementCheckBox, after);
+    setTabOrder(ui->forceAcknoledgementCheckBox, ui->customTextCheckBox);
+    setTabOrder(ui->customTextCheckBox, ui->customTextEdit);
+    setTabOrder(ui->customTextEdit, after);
 }
 
 void QnPopupBusinessActionWidget::parametersChanged()
@@ -73,6 +102,7 @@ void QnPopupBusinessActionWidget::parametersChanged()
     QScopedValueRollback<bool> guard(m_updating, true);
     auto params = model()->actionParams();
     params.needConfirmation = ui->forceAcknoledgementCheckBox->isChecked();
+    params.text = ui->customTextCheckBox->isChecked() ? ui->customTextEdit->toPlainText() : QString();
     model()->setActionParams(params);
     updateValidationPolicy();
     updateSubjectsButton();
