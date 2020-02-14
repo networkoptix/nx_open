@@ -15,7 +15,8 @@ ConnectionUpgradeTunnelClient::ConnectionUpgradeTunnelClient(
 {
 }
 
-void ConnectionUpgradeTunnelClient::setTimeout(std::chrono::milliseconds timeout)
+void ConnectionUpgradeTunnelClient::setTimeout(
+    std::optional<std::chrono::milliseconds> timeout)
 {
     m_timeout = timeout;
 }

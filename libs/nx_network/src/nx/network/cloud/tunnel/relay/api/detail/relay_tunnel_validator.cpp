@@ -33,7 +33,7 @@ void TunnelValidator::bindToAioThread(network::aio::AbstractAioThread* aioThread
         m_connection->bindToAioThread(aioThread);
 }
 
-void TunnelValidator::setTimeout(std::chrono::milliseconds timeout)
+void TunnelValidator::setTimeout(std::optional<std::chrono::milliseconds> timeout)
 {
     m_timeout = timeout;
 }

@@ -31,7 +31,7 @@ void Client::bindToAioThread(aio::AbstractAioThread* aioThread)
         m_validator->bindToAioThread(aioThread);
 }
 
-void Client::setTimeout(std::chrono::milliseconds timeout)
+void Client::setTimeout(std::optional<std::chrono::milliseconds> timeout)
 {
     m_timeout = timeout;
     m_actualClient->setTimeout(timeout);

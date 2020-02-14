@@ -35,7 +35,8 @@ void ExperimentalTunnelClient::bindToAioThread(
     m_timer.bindToAioThread(aioThread);
 }
 
-void ExperimentalTunnelClient::setTimeout(std::chrono::milliseconds timeout)
+void ExperimentalTunnelClient::setTimeout(
+    std::optional<std::chrono::milliseconds> timeout)
 {
     m_timeout = timeout;
 }

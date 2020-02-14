@@ -20,7 +20,8 @@ void ClientConnectionValidator::bindToAioThread(
     m_messagePipeline.bindToAioThread(aioThread);
 }
 
-void ClientConnectionValidator::setTimeout(std::chrono::milliseconds timeout)
+void ClientConnectionValidator::setTimeout(
+    std::optional<std::chrono::milliseconds> timeout)
 {
     m_timeout = timeout;
 }

@@ -20,7 +20,7 @@ public:
         const nx::utils::Url& baseTunnelUrl,
         ClientFeedbackFunction clientFeedbackFunction);
 
-    virtual void setTimeout(std::chrono::milliseconds timeout) override;
+    virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) override;
 
     virtual void openTunnel(
         OpenTunnelCompletionHandler completionHandler) override;
