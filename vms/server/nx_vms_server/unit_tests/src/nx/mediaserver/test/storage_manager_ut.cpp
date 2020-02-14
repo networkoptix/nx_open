@@ -206,6 +206,8 @@ protected:
     {
         m_thread.quit();
         m_thread.wait();
+        nx::vms::server::fs::media_paths::FilterConfig::setDefault(std::nullopt);
+        QnStoragePluginFactory::setDefault(nullptr);
     }
 
     void mockPluginCreateStorage()
@@ -279,6 +281,8 @@ protected:
     void stopServer()
     {
         m_server->stop();
+        m_clearSpaceCalled = false;
+        m_storages.clear();
     }
 
     void mockEmptyFilterConfig()

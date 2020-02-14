@@ -44,7 +44,7 @@ FilterConfig FilterConfig::createDefault(
     return result;
 }
 
-void FilterConfig::setDefault(const FilterConfig& config)
+void FilterConfig::setDefault(const std::optional<FilterConfig>& config)
 {
     s_default = config;
 }
