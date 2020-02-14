@@ -217,7 +217,7 @@ class AppendPathToUrl:
 {
 };
 
-TEST_P(AppendPathToUrl, appendedPathIsValid)
+TEST_P(AppendPathToUrl, appended)
 {
     const UrlPathParts parts = GetParam();
     Builder builder = Builder(kSampleUrl)
@@ -227,20 +227,45 @@ TEST_P(AppendPathToUrl, appendedPathIsValid)
         builder.appendPath(part);
 
     const auto url = builder.toUrl();
-    ASSERT_TRUE(urlIsValid(url));
+    EXPECT_TRUE(urlIsValid(url));
+    EXPECT_EQ(url.path().toStdString(), parts.expectedPath);
 }
 
-TEST_P(AppendPathToUrl, appendedPathIsExpected)
+TEST_P(AppendPathToUrl, appendedParts)
 {
     const UrlPathParts parts = GetParam();
     Builder builder = Builder(kSampleUrl)
         .setPath(parts.path);
 
-    for (const auto& part: parts.parts)
-        builder.appendPath(part);
+    switch (parts.parts.size())
+    {
+        case 0: break;
+        case 1: builder.appendPathParts(parts.parts[0]); break;
+        case 2: builder.appendPathParts(parts.parts[0], parts.parts[1]); break;
+        default: FAIL() << "Unsupported number of arguments"; break;
+    };
 
     const auto url = builder.toUrl();
-    ASSERT_EQ(url.path().toStdString(), parts.expectedPath);
+    EXPECT_TRUE(urlIsValid(url));
+    EXPECT_EQ(url.path().toStdString(), parts.expectedPath);
+}
+
+TEST_P(AppendPathToUrl, setParts)
+{
+    const UrlPathParts parts = GetParam();
+    Builder builder = Builder(kSampleUrl);
+
+    switch (parts.parts.size())
+    {
+        case 0: builder.setPath(parts.path); break;
+        case 1: builder.setPathParts(parts.path, parts.parts[0]); break;
+        case 2: builder.setPathParts(parts.path, parts.parts[0], parts.parts[1]); break;
+        default: FAIL() << "Unsupported number of arguments"; break;
+    };
+
+    const auto url = builder.toUrl();
+    EXPECT_TRUE(urlIsValid(url));
+    EXPECT_EQ(url.path().toStdString(), parts.expectedPath);
 }
 
 static std::vector<UrlPathParts> kPathParts
@@ -269,7 +294,34 @@ INSTANTIATE_TEST_CASE_P(UrlBuilderAppendPath,
 	AppendPathToUrl,
 	::testing::ValuesIn(kPathParts));
 
+class UrlBuilderQuery: public UrlBuilderTest
+{
+protected:
+    static void expectQuery(const Builder& builder, const QString& expectedQuery)
+    {
+        const auto url = builder.toUrl();
+        EXPECT_TRUE(urlIsValid(url));
+        EXPECT_EQ(url.query(), expectedQuery);
+
+        const auto querySuffix = expectedQuery.isEmpty() ? QString() : ("?" + expectedQuery);
+        EXPECT_EQ(url.toString(), kSampleUrl.toString() + querySuffix);
+    }
+};
+
+TEST_F(UrlBuilderQuery, addItem)
+{
+    Builder builder = Builder(kSampleUrl);
+    expectQuery(builder, "");
+
+    builder.addQueryItem("string", "stringValue");
+    expectQuery(builder, "string=stringValue");
+
+    builder.addQueryItem("number", 42);
+    expectQuery(builder, "string=stringValue&number=42");
+
+    builder.addQueryItem("status", http::StatusCode::notFound);
+    expectQuery(builder, "string=stringValue&number=42&status=404");
+}
+
 } // namespace test
 } // namespace nx::network::url
-
-
