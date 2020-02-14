@@ -9,11 +9,16 @@ namespace vms::server {
 namespace fs {
 namespace media_paths {
 
+std::optional<FilterConfig> FilterConfig::s_default;
+
 FilterConfig FilterConfig::createDefault(
     QnPlatformAbstraction* platform,
     bool includeNonHdd,
     const nx::vms::server::Settings* settings)
 {
+    if (s_default)
+        return *s_default;
+
     FilterConfig result;
 
     result.isMultipleInstancesAllowed =
@@ -37,6 +42,11 @@ FilterConfig FilterConfig::createDefault(
 #endif
 
     return result;
+}
+
+void FilterConfig::setDefault(const FilterConfig& config)
+{
+    s_default = config;
 }
 
 } // namespace media_paths

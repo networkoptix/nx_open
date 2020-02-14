@@ -1863,6 +1863,13 @@ void QnStorageManager::logAfterCleanup(
 
 void QnStorageManager::clearSpace(bool forced)
 {
+    if (!m_firstStoragesTestDone)
+    {
+        NX_DEBUG(this, "[Cleanup] Not all storages have been checked. Skipping this time.");
+        return;
+    }
+
+    emit clearSpaceCalled(this);
     QnMutexLocker lk(&m_clearSpaceMutex);
 
     // If Backup on Schedule (or on demand) synchronization routine is

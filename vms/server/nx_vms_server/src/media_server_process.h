@@ -263,6 +263,8 @@ private:
     void onBackupDbTimer();
     std::chrono::milliseconds calculateDbBackupTimeout() const;
     void updateSpecificFeatures() const;
+    void waitWhileStoragesAddedToStorageManagers(int expected);
+    void startDeletor();
 
 private:
     int m_argc = 0;

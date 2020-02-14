@@ -2,6 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
+QnStoragePluginFactory::StorageFactory QnStoragePluginFactory::s_factory = nullptr;
+
 QnStoragePluginFactory::QnStoragePluginFactory(QObject* parent):
     QObject(parent),
     m_defaultFactory()
@@ -30,11 +32,19 @@ bool QnStoragePluginFactory::existsFactoryForProtocol(const QString &protocol)
     return m_factoryByProtocol.find(protocol) == m_factoryByProtocol.end() ? false : true;
 }
 
+void QnStoragePluginFactory::setDefault(StorageFactory factory)
+{
+    s_factory = factory;
+}
+
 QnStorageResource *QnStoragePluginFactory::createStorage(
     QnCommonModule* commonModule,
     const QString &url,
     bool useDefaultForUnknownPrefix)
 {
+    if (s_factory)
+        return s_factory(commonModule, url);
+
     int index = url.indexOf(lit("://"));
     if (index == -1)
         return m_defaultFactory ? m_defaultFactory(commonModule, url) : nullptr;

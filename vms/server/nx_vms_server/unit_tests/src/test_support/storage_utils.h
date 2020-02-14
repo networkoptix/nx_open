@@ -7,6 +7,7 @@
 #include <nx/vms/server/resource/storage_resource.h>
 #include <server/server_globals.h>
 #include <recorder/storage_manager.h>
+#include <plugins/storage/file_storage/file_storage_resource.h>
 
 class MediaServerLauncher;
 class QnMediaServerModule;
@@ -20,7 +21,7 @@ namespace nx::vms::server::test::test_support {
 QnStorageResourcePtr addStorage(
     MediaServerLauncher* server, const QString& path, QnServer::StoragePool storageRole);
 
-class StorageStub: public StorageResource
+class StorageStub: public QnFileStorageResource
 {
 public:
     QString url;
@@ -28,17 +29,23 @@ public:
     int64_t freeSpace = -1;
     bool isSystemFlag = false;
     bool isOnlineFlag = false;
+    std::chrono::milliseconds initDelay{0};
+    std::atomic<bool> initFinished = false;
 
     StorageStub(
         QnMediaServerModule* serverModule, const QString& url, int64_t totalSpace,
         int64_t freeSpace, int64_t spaceLimit, bool isSystem, bool isOnline, bool isUsedForWriting)
         :
-        StorageResource(serverModule), url(url), totalSpace(totalSpace),
+        QnFileStorageResource(serverModule), url(url), totalSpace(totalSpace),
         freeSpace(freeSpace), isSystemFlag(isSystem), isOnlineFlag(isOnline)
     {
         setSpaceLimit(spaceLimit);
         setUsedForWriting(isUsedForWriting);
         setIdUnsafe(QnUuid::createUuid());
+    }
+
+    ~StorageStub()
+    {
     }
 
     virtual QIODevice* openInternal(const QString&, QIODevice::OpenMode ) override { return nullptr; }
@@ -52,7 +59,13 @@ public:
     virtual qint64 getFreeSpace() override { return freeSpace; }
     virtual qint64 getTotalSpace() const override { return totalSpace; }
     virtual int getCapabilities() const override { return ListFile | RemoveFile | ReadFile | WriteFile | DBReady; }
-    virtual Qn::StorageInitResult initOrUpdate() override { return Qn::StorageInit_Ok; }
+    virtual Qn::StorageInitResult initOrUpdate() override
+    {
+        std::this_thread::sleep_for(initDelay);
+        initFinished = true;
+        return Qn::StorageInit_Ok;
+    }
+
     virtual void setUrl(const QString& url) override { this->url = url; }
     virtual QString getUrl() const override { return url; }
     virtual bool isSystem() const override { return isSystemFlag; }
