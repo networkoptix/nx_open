@@ -192,7 +192,7 @@ protected:
             0ms, &m_thread,
             [this, p = std::move(p)]() mutable
             {
-                const auto disabledFeatures = {
+                const MediaServerLauncher::DisabledFeatures disabledFeatures = {
                     MediaServerLauncher::DisabledFeature::noPlugins,
                     MediaServerLauncher::DisabledFeature::noMonitorStatistics,
                     MediaServerLauncher::DisabledFeature::noResourceDiscovery };
@@ -211,7 +211,7 @@ protected:
     void mockPluginCreateStorage()
     {
         QnStoragePluginFactory::setDefault(
-            [this](QnCommonModule*, const QString& url)
+            [this](QnCommonModule*, const QString&)
             {
                 auto result = new test_support::StorageStub(
                     m_server->serverModule(),
@@ -409,9 +409,11 @@ private:
 
     void saveStorages(const StorageResourceList& storages)
     {
+        using namespace nx::vms::server;
+        using namespace nx::vms::server::test::test_support;
         std::transform(
             storages.cbegin(), storages.cend(), std::back_inserter(m_storages),
-            [](const auto& s) { return s.dynamicCast<test_support::StorageStub>(); });
+            [](const StorageResourcePtr& s) { return s.dynamicCast<StorageStub>(); });
     }
 };
 
