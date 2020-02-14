@@ -203,16 +203,12 @@ void OutgoingTunnelConnection::onConnectCompleted(
     UdtStreamSocket* connectionPtr,
     SystemError::ErrorCode errorCode)
 {
-    NX_VERBOSE(this, lm("cross-nat %1. result: %2")
-        .arg(m_connectionId).arg(SystemError::toString(errorCode)));
-
     //called from connectionPtr completion handler
-
     //ensuring connectionPtr can be safely freed in any thread
-    connectionPtr->post(
-        std::bind(
-            &OutgoingTunnelConnection::reportConnectResult, this,
-            connectionPtr, errorCode));
+
+    post(std::bind(
+        &OutgoingTunnelConnection::reportConnectResult, this,
+        connectionPtr, errorCode));
 }
 
 void OutgoingTunnelConnection::reportConnectResult(

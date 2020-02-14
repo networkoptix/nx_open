@@ -112,15 +112,17 @@ private:
     void proceedWithConnection(
         UdtStreamSocket* connectionPtr,
         std::chrono::milliseconds timeout);
+
     void onConnectCompleted(
         UdtStreamSocket* connectionPtr,
         SystemError::ErrorCode errorCode);
+
     void reportConnectResult(
         UdtStreamSocket* connectionPtr,
         SystemError::ErrorCode errorCode);
 
     void onConnectionClosed(SystemError::ErrorCode closeReason);
-    
+
     void onStunMessageReceived(nx::network::stun::Message message);
 };
 
