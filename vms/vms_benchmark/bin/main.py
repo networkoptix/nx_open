@@ -317,6 +317,7 @@ class Storage:
             self.url = raw['url']
             self.free_space = int(raw['freeSpace'])
             self.reserved_space = int(raw['reservedSpace'])
+            self.is_used_for_writing = raw['isUsedForWriting']
             flags_joined = raw['storageStatus']
             if flags_joined == '' or flags_joined == 'none':
                 flags = []

@@ -88,7 +88,7 @@ class BoxConnection:
         self.eth_speed = eth_speed.strip() if eth_speed else None
 
     def sh(self, command, timeout_s=None,
-           su=False, exc=False, stdout=sys.stdout, stderr=None, stdin=None):
+           su=False, exc=False, stdout=sys.stdout, stderr=None, stdin=None, verbose=False):
         command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
 
         logging.info(
@@ -99,9 +99,14 @@ class BoxConnection:
 
         actual_timeout_s = timeout_s or ini_ssh_command_timeout_s
 
+        run_args = [*self.ssh_args]
+        if verbose:
+            run_args.append('-v')
+        run_args.append(command_wrapped)
+
         try:
             run = subprocess.run(
-                [*self.ssh_args, command_wrapped],
+                run_args,
                 timeout=actual_timeout_s,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
