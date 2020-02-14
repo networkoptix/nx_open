@@ -16,7 +16,7 @@ void MultiMessageClient::bindToAioThread(aio::AbstractAioThread* aioThread)
     // TODO
 }
 
-void MultiMessageClient::setTimeout(std::chrono::milliseconds /*timeout*/)
+void MultiMessageClient::setTimeout(std::optional<std::chrono::milliseconds> /*timeout*/)
 {
     // TODO
 }

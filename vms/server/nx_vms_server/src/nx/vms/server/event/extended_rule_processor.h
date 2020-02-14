@@ -14,10 +14,12 @@ namespace nx {
 namespace vms::server {
 namespace event {
 
+struct PushPayload;
+struct PushNotification;
+
 /*
 * ExtendedRuleProcessor can execute business actions
 */
-
 class ExtendedRuleProcessor: public RuleProcessor
 {
     Q_OBJECT
@@ -103,6 +105,9 @@ private:
         const vms::event::AbstractActionPtr& action,
         const QList<vms::event::InfoDetail>& aggregationDetailList,
         Qn::ResourceInfoLevel detailLevel) const;
+
+    PushPayload makePushPayload(const vms::event::EventParameters& event, bool isCamera) const;
+    PushNotification makePushNotification(const vms::event::AbstractActionPtr& action) const;
 
     std::set<QString> cloudUsers(std::vector<QnUuid> filter) const;
 };

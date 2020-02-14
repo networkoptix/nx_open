@@ -66,7 +66,7 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    virtual void setTimeout(std::chrono::milliseconds timeout) = 0;
+    virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) = 0;
 
     virtual void openTunnel(
         OpenTunnelCompletionHandler completionHandler) = 0;

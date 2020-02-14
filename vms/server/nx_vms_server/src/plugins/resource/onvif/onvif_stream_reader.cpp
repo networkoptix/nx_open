@@ -178,7 +178,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     m_onvifRes->beforeConfigureStream(getRole());
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(
         getRole() == Qn::CR_LiveVideo, streamUrl, isCameraControlRequired, params);
-    m_onvifRes->customStreamConfiguration(getRole(), params);
+    if (isCameraControlRequired)
+        m_onvifRes->customStreamConfiguration(getRole(), params);
     m_onvifRes->afterConfigureStream(getRole());
 
     if (result)

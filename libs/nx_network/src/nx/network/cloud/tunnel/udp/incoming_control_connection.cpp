@@ -22,7 +22,7 @@ IncomingControlConnection::IncomingControlConnection(
     m_maxKeepAliveInterval(
         connectionParameters.udpTunnelKeepAliveInterval *
         connectionParameters.udpTunnelKeepAliveRetries),
-    m_lastKeepAlive(std::chrono::steady_clock::now())
+    m_lastKeepAliveTime(std::chrono::steady_clock::now())
 {
     m_buffer.reserve(kBufferSize);
     m_parser.setMessage(&m_message);
@@ -48,13 +48,13 @@ void IncomingControlConnection::start(
 {
     NX_ASSERT(m_socket->isInSelfAioThread());
     m_selectedHandler = std::move(selectedHandler);
-    monitorKeepAlive();
+    monitorKeepAlive(std::chrono::steady_clock::now());
     readConnectionRequest();
 }
 
 void IncomingControlConnection::resetLastKeepAlive()
 {
-    m_lastKeepAlive = std::chrono::steady_clock::now();
+    m_lastKeepAliveTime = std::chrono::steady_clock::now();
     NX_VERBOSE(this, lm("Update last keep alive"));
 }
 
@@ -68,16 +68,27 @@ AbstractStreamSocket* IncomingControlConnection::socket()
     return m_socket.get();
 }
 
-void IncomingControlConnection::monitorKeepAlive()
+void IncomingControlConnection::monitorKeepAlive(
+    std::chrono::steady_clock::time_point currentTime)
 {
     using namespace std::chrono;
-    const auto timePassed = steady_clock::now() - m_lastKeepAlive;
-    const auto next = duration_cast<milliseconds>(m_maxKeepAliveInterval - timePassed);
-    if (next.count() <= 0)
-        return handleError(SystemError::timedOut);
 
-    NX_VERBOSE(this, lm("Set keep alive timer for %1 ms").arg(next.count()));
-    m_socket->registerTimer(next, [this](){ monitorKeepAlive(); });
+    const auto delay = std::max(
+        floor<milliseconds>(m_lastKeepAliveTime + m_maxKeepAliveInterval - currentTime),
+        milliseconds(1));
+
+    NX_VERBOSE(this, "Set keep alive timer for %1", delay);
+
+    m_socket->registerTimer(
+        delay,
+        [this]()
+        {
+            const auto currentTime = steady_clock::now();
+            if (m_lastKeepAliveTime + m_maxKeepAliveInterval < currentTime)
+                return reportError(SystemError::timedOut);
+
+            monitorKeepAlive(currentTime);
+        });
 }
 
 void IncomingControlConnection::readConnectionRequest()
@@ -95,10 +106,10 @@ void IncomingControlConnection::continueReadRequest()
         {
             NX_ASSERT(code != SystemError::timedOut);
             if (code != SystemError::noError)
-                return handleError(code);
+                return reportError(code);
 
             if (bytesRead == 0)
-                return handleError(SystemError::connectionReset);
+                return reportError(SystemError::connectionReset);
 
             resetLastKeepAlive();
             size_t processed = 0;
@@ -112,12 +123,12 @@ void IncomingControlConnection::continueReadRequest()
                     return processRequest();
 
                 case nx::network::server::ParserState::failed:
-                    return handleError(SystemError::invalidData);
+                    return reportError(SystemError::invalidData);
 
                 case nx::network::server::ParserState::readingBody:
                     // Stun message cannot have body.
                     NX_ASSERT(false);
-                    return handleError(SystemError::invalidData);
+                    return reportError(SystemError::invalidData);
             };
         });
 }
@@ -159,18 +170,17 @@ void IncomingControlConnection::processRequest()
         [this]( SystemError::ErrorCode code, size_t)
         {
             if (code != SystemError::noError)
-                return handleError(code);
+                return reportError(code);
 
             resetLastKeepAlive();
             readConnectionRequest();
         });
 }
 
-void IncomingControlConnection::handleError(SystemError::ErrorCode code)
+void IncomingControlConnection::reportError(SystemError::ErrorCode code)
 {
-    const auto handler = std::move(m_errorHandler);
-    if (handler)
-        handler(code);
+    if (m_errorHandler)
+        nx::utils::swapAndCall(m_errorHandler, code);
 }
 
 hpm::api::UdpHolePunchingSynResponse IncomingControlConnection::process(

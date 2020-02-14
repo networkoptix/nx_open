@@ -741,6 +741,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         {},
         this);
 
+    m_pushNotificationsLanguageAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        "pushNotificationsLanguage",
+        QnAppInfo::defaultLanguage(),
+        this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -971,6 +976,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_metadataStorageChangePolicyAdaptor
         << m_maxRtpRetryCount
         << m_specificFeaturesAdaptor
+        << m_pushNotificationsLanguageAdaptor
     ;
 
     return result;
@@ -1827,6 +1833,11 @@ QString QnGlobalSettings::licenseServerUrl() const
 nx::utils::Url QnGlobalSettings::resourceFileUri() const
 {
     return m_resourceFileUriAdaptor->value();
+}
+
+QString QnGlobalSettings::pushNotificationsLanguage() const
+{
+    return m_pushNotificationsLanguageAdaptor->value();
 }
 
 void QnGlobalSettings::setLowQualityScreenVideoCodec(const QString& value)

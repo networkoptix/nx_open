@@ -366,7 +366,7 @@ public:
     {
     }
 
-    virtual void setTimeout(std::chrono::milliseconds timeout) override
+    virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) override
     {
         m_timeout = timeout;
     }

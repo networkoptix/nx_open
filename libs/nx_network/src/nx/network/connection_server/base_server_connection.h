@@ -213,6 +213,12 @@ public:
     void setInactivityTimeout(std::optional<std::chrono::milliseconds> value)
     {
         NX_ASSERT(m_streamSocket->pollable()->isInSelfAioThread());
+
+        // NOTE: Here, std::nullopt means "no timeout". But, on the API level,
+        // "std::nullopt" means "default timeout" and kNoTimeout is used for "no timeout".
+        if (value && value == kNoTimeout)
+            value = std::nullopt;
+
         m_inactivityTimeout = value;
 
         if (value)

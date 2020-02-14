@@ -15,7 +15,7 @@ GetPostTunnelClient::GetPostTunnelClient(
 {
 }
 
-void GetPostTunnelClient::setTimeout(std::chrono::milliseconds timeout)
+void GetPostTunnelClient::setTimeout(std::optional<std::chrono::milliseconds> timeout)
 {
     m_timeout = timeout;
 }

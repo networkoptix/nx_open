@@ -76,7 +76,7 @@ enum class PacketFlag
     Control = 1,
 };
 
-class CPacket
+class UDT_API CPacket
 {
     friend class UdpChannel;
     friend class CSndQueue;

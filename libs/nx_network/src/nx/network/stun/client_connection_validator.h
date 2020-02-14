@@ -21,7 +21,7 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    virtual void setTimeout(std::chrono::milliseconds timeout) override;
+    virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) override;
     virtual void validate(http::tunneling::ValidateTunnelCompletionHandler handler) override;
     virtual std::unique_ptr<AbstractStreamSocket> takeConnection() override;
 

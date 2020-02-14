@@ -29,7 +29,7 @@ struct FilterConfig
         bool includeNonHdd,
         const nx::vms::server::Settings* settings);
 
-    static void setDefault(const FilterConfig& config);
+    static void setDefault(const std::optional<FilterConfig>& config);
 
 private:
     static std::optional<FilterConfig> s_default;

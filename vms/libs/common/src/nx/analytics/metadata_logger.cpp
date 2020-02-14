@@ -58,25 +58,57 @@ QString makeLogFileName(
 }
 
 static QString makeObjectsLogLinesIfNeeded(
-    const std::vector<ObjectMetadata>& objectMetadataList)
+    const std::vector<ObjectMetadata>& objectMetadataList,
+    const QString& objectLogLinePrefix = QString(),
+    const QString& wholeLineBlockPrefix = ":\n")
 {
     if (!loggingIni().logObjectMetadataDetails || objectMetadataList.empty())
         return "";
 
     static const QString kIndent = "    ";
 
-    QString result = ":\n"; //< The previous line ends with the object count.
-
+    QString result = wholeLineBlockPrefix;
     for (int i = 0; i < (int) objectMetadataList.size(); ++i)
     {
         const auto& object = objectMetadataList.at(i);
         result.append(kIndent);
+        result.append(objectLogLinePrefix + " ");
 
         result.append(toString(object));
 
         if (i < (int) objectMetadataList.size() - 1) //< Not the last object metadata.
             result.append("\n");
     }
+
+    return result;
+}
+
+static QString makeBestShotDescriptionLines(const std::vector<ObjectMetadata>& objectMetadataList)
+{
+    std::vector<ObjectMetadata> bestShotMetadataList;
+    std::vector<ObjectMetadata> nonBestShotObjectMetadataList;
+
+    for (const auto& objectMetadata: objectMetadataList)
+    {
+        auto& packetList = objectMetadata.bestShot
+            ? bestShotMetadataList
+            : nonBestShotObjectMetadataList;
+
+        packetList.push_back(objectMetadata);
+    }
+
+    NX_ASSERT(!bestShotMetadataList.empty());
+
+    QString result = makeObjectsLogLinesIfNeeded(
+        bestShotMetadataList,
+        (bestShotMetadataList.size() == 1
+            ? ""
+            : "WARNING! Multiple best shot items in the object packet:"));
+
+    result += makeObjectsLogLinesIfNeeded(
+        nonBestShotObjectMetadataList,
+        "WARNING! Best shot packet contains non-best-shot metadata:",
+        /*whole line block prefix*/ "");
 
     return result;
 }
@@ -243,8 +275,10 @@ QString MetadataLogger::buildObjectMetadataLogString(
         + "diffFromPrevMs " + toMsString(diffFromPrev) + ", "
         + "diffFromCurrentTimeMs " + toMsString(currentPacketTimestamp - vmsSystemTime)
         + additionalInfoStr
-        + "; objects: " + QString::number(metadataPacket.objectMetadataList.size())
-        + makeObjectsLogLinesIfNeeded(metadataPacket.objectMetadataList);
+        + (metadataPacket.containsBestShotMetadata()
+            ? "; bestShot" + makeBestShotDescriptionLines(metadataPacket.objectMetadataList)
+            : "; objects: " + QString::number(metadataPacket.objectMetadataList.size())
+                + makeObjectsLogLinesIfNeeded(metadataPacket.objectMetadataList));
 }
 
 void MetadataLogger::logLine(QString lineStr)

@@ -1085,16 +1085,15 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
 
 void MediaServerProcess::stopSync()
 {
-    qWarning() << "Stopping server";
-
     {
-        QnMutexLocker lock( &m_stopMutex );
+        QnMutexLocker lock(&m_stopMutex);
         if (m_stopping)
             return;
 
         m_stopping = true;
     }
 
+    qWarning() << "Stopping server";
     pleaseStop();
     quit();
 

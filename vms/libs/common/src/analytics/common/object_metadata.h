@@ -67,7 +67,16 @@ struct ObjectMetadataPacket
     qint64 timestampUs = 0;
     qint64 durationUs = 0;
     std::vector<ObjectMetadata> objectMetadataList;
+
+    bool containsBestShotMetadata() const
+    {
+        return std::any_of(
+            objectMetadataList.cbegin(),
+            objectMetadataList.cend(),
+            [](const ObjectMetadata& objectMetadata) { return objectMetadata.bestShot; });
+    }
 };
+
 #define ObjectMetadataPacket_Fields (deviceId)(timestampUs)(durationUs)(objectMetadataList)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadataPacket, (json)(ubjson));
 

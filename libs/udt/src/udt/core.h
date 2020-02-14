@@ -98,7 +98,7 @@ enum class ConnectState
     done,
 };
 
-class CUDT:
+class UDT_API CUDT:
     public std::enable_shared_from_this<CUDT>
 {
 public: //API

@@ -118,6 +118,7 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
     switch(action->actionType())
     {
         case vms::api::ActionType::sendMailAction:
+        case vms::api::ActionType::pushNotificationAction:
         {
             // Look for server with public IP address.
             const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
@@ -136,7 +137,6 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
 
         case vms::api::ActionType::diagnosticsAction:
         case vms::api::ActionType::showPopupAction:
-        case vms::api::ActionType::pushNotificationAction:
         case vms::api::ActionType::showTextOverlayAction:
         case vms::api::ActionType::showOnAlarmLayoutAction:
         case vms::api::ActionType::execHttpRequestAction:

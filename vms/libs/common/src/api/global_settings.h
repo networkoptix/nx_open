@@ -401,6 +401,7 @@ public:
     void setLicenseServerUrl(const QString& value);
 
     nx::utils::Url resourceFileUri() const;
+    QString pushNotificationsLanguage() const;
 
 signals:
     void initialized();
@@ -569,6 +570,7 @@ private:
     QnResourcePropertyAdaptor<std::map<QString, int>>* m_specificFeaturesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_pushNotificationsLanguageAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 
