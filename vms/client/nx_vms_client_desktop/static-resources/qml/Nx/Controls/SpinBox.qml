@@ -59,17 +59,11 @@ SpinBox
 
         onTextEdited:
         {
-            try
-            {
-                var newValue = control.valueFromText(text, control.locale)
-                control.value = newValue
+            var newValue = control.valueFromText(text, control.locale)
+            control.value = newValue
 
-                if (newValue != control.value)
-                    updateText()
-            }
-            catch (error)
-            {
-            }
+            if (newValue != control.value)
+                updateText()
         }
 
         onEditingFinished:
@@ -77,14 +71,8 @@ SpinBox
 
         function updateText()
         {
-            try
-            {
-                if (control.valueFromText(text, control.locale) !== control.value)
-                    text = textFromValue(control.value, control.locale)
-            }
-            catch (error)
-            {
-            }
+            if (control.valueFromText(text, control.locale) !== control.value)
+                text = textFromValue(control.value, control.locale)
         }
     }
 

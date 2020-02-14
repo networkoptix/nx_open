@@ -109,9 +109,9 @@ QnUuid NxGlobalsObject::uuid(const QString& uuid) const
     return QnUuid::fromStringSafe(uuid);
 }
 
-QLocale NxGlobalsObject::numericInputLocale(const QString& name) const
+QLocale NxGlobalsObject::numericInputLocale(const QString& basedOn) const
 {
-    QLocale locale(name);
+    QLocale locale(basedOn);
     auto numberOptions = locale.numberOptions();
     numberOptions.setFlag(QLocale::RejectGroupSeparator, true);
     numberOptions.setFlag(QLocale::RejectLeadingZeroInExponent, false);
