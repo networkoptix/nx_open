@@ -179,38 +179,6 @@ using namespace std::chrono;
 class FtClearSpace: public ::testing::Test
 {
 protected:
-};
-
-TEST_F(FtClearSpace, WontStart_SpaceLimitZero)
-{
-    // #TODO #akulikov.
-    // Also check no relevant log messages have been written.
-}
-
-TEST_F(FtClearSpace, WontStart_NoRemoveCapability)
-{
-    // #TODO #akulikov.
-}
-
-TEST_F(FtClearSpace, CorrectDataCleaned)
-{
-    // #TODO #akulikov.
-    // Also check relevant log messages have been written.
-}
-
-TEST_F(FtClearSpace, MotionCleaned)
-{
-    // #TODO #server.
-}
-
-TEST_F(FtClearSpace, AnalyticsCleaned)
-{
-    // #TODO #server.
-}
-
-class FtStorageInit: public ::testing::Test
-{
-protected:
     std::chrono::milliseconds initDelay = 1s;
     int storageCount = 0;
 
@@ -248,9 +216,9 @@ protected:
                 auto result = new test_support::StorageStub(
                     m_server->serverModule(),
                     /*url*/ "",
-                    /*totalSpace*/ 100'000'000'000,
-                    /*freeSpace*/ 100'000'000'000,
-                    /*spaceLimit*/ 10'000'000'000,
+                    /*totalSpace*/ 100'000'000'000LL,
+                    /*freeSpace*/ 100'000'000'000LL,
+                    /*spaceLimit*/ 0,
                     /*isSystem*/ false,
                     /*isOnline*/ true,
                     /*isUsedForWriting*/ false);
@@ -298,23 +266,10 @@ protected:
                     &QnStorageManager::clearSpaceCalled,
                     [this, manager]()
                     {
-                        const auto allStorages = manager->getStorages();
-                        ASSERT_EQ(storageCount, allStorages.size())
-                            << "No storages have been created by the time when "
-                            << "QnStorageManager::clearSpace has been called";
-                        const bool allInitialized = std::all_of(
-                            allStorages.cbegin(),
-                            allStorages.cend(),
-                            [](const auto& s)
-                            {
-                                const auto storageStub = s.dynamicCast<test_support::StorageStub>();
-                                NX_GTEST_ASSERT_TRUE((bool) storageStub);
-                                return storageStub->initFinished.load();
-                            });
-                        ASSERT_TRUE(allInitialized)
-                            << "Not all storages have been initialized when "
-                            << "clearSpace has been called";
+                        saveStorages(manager->getStorages());
+                        assertStoragesInitialized();
                         m_clearSpaceCalled = true;
+                        m_afterClearSpaceFunc();
                     });
                 p.set_value();
             });
@@ -332,13 +287,135 @@ protected:
         FilterConfig::setDefault(FilterConfig());
     }
 
+    void prepareDataToClear()
+    {
+        ASSERT_GE(storageCount, 2);
+        ASSERT_GE(m_storages.size(), 2);
+        /**
+            * We will make freeSpace < spaceLimit for the first storage.
+            * Also we will place 1 chunk on the 1st storage and 100 on the second. The 1st
+            * chunk will be newer than the other 100 so to clear the first one - the 100 chunks
+            * from the other storage should be deleted first.
+            */
+
+        const auto chunkSize = 10LL;
+        const auto secondStorageChunks = createChunks(
+            /*count*/ m_secondStorageChunks,
+            /*timestamp*/ 1,
+            /*size*/ chunkSize,
+            m_storages[1]);
+
+        const auto firstStorageChunks = createChunks(
+            /*count*/ m_firstStorageChunks,
+            /*timestamp*/ secondStorageChunks.back().startTimeMs + 1,
+            /*size*/ 10,
+            m_storages[0]);
+
+        addToCatalog(m_cameraName, firstStorageChunks);
+        addToCatalog(m_cameraName, secondStorageChunks);
+        m_storages[0]->freeSpace = m_storages[0]->getSpaceLimit() - chunkSize + 1;
+    }
+
+    void disconnectOnClearSignal()
+    {
+        QObject::disconnect(
+            m_server->serverModule()->normalStorageManager(),
+            &QnStorageManager::clearSpaceCalled,
+            nullptr,
+            nullptr);
+    }
+
+    void setAfterClearCallback(std::function<void()> f)
+    {
+        m_afterClearSpaceFunc = f;
+    }
+
+    void assertDataCleared()
+    {
+        while (true)
+        {
+            std::this_thread::sleep_for(50ms);
+            const bool storagesCleared =
+                m_storages[0]->removeCallCount + m_storages[1]->removeCallCount
+                >= m_firstStorageChunks + m_secondStorageChunks;
+
+            const auto catalog = m_server->serverModule()->normalStorageManager()->getFileCatalog(
+                m_cameraName, QnServer::HiQualityCatalog);
+            const bool catalogCleared = catalog->getChunks().empty();
+
+            if (catalogCleared && storagesCleared)
+                break;
+        }
+    }
+
 private:
     std::unique_ptr<MediaServerLauncher> m_server;
     QThread m_thread;
     std::atomic<bool> m_clearSpaceCalled = false;
+    QList<QSharedPointer<test_support::StorageStub>> m_storages;
+    std::function<void()> m_afterClearSpaceFunc = [](){};
+    const int m_firstStorageChunks = 1;
+    const int m_secondStorageChunks = 100;
+    const QString m_cameraName = "cam1";
+
+    std::deque<Chunk> createChunks(
+        int count,
+        int64_t startTimeMs,
+        int64_t chunkSize,
+        const QSharedPointer<test_support::StorageStub>& storage)
+    {
+        std::deque<Chunk> result;
+        const int storageIndex =
+            m_server->serverModule()->storageDbPool()->getStorageIndex(storage);
+
+        for (int i = 0; i < count; ++i)
+        {
+            Chunk chunk;
+            chunk.startTimeMs = startTimeMs + i;
+            chunk.setFileSize(chunkSize);
+            chunk.storageIndex = storageIndex;
+            result.push_back(chunk);
+        }
+
+        return result;
+    }
+
+    void addToCatalog(const QString& cameraId, const std::deque<Chunk>& chunks)
+    {
+        auto catalog = m_server->serverModule()->normalStorageManager()->getFileCatalog(
+            cameraId, QnServer::HiQualityCatalog);
+        catalog->addChunks(chunks);
+    }
+
+    void assertStoragesInitialized()
+    {
+        ASSERT_EQ(storageCount, m_storages.size())
+            << "No storages have been created by the time when "
+            << "QnStorageManager::clearSpace has been called";
+
+        const bool allInitialized = std::all_of(
+            m_storages.cbegin(), m_storages.cend(),
+            [](const auto& s)
+            {
+                NX_GTEST_ASSERT_TRUE((bool) s);
+                NX_GTEST_ASSERT_GT(s->getSpaceLimit(), 0);
+                return s->initFinished.load();
+            });
+
+        ASSERT_TRUE(allInitialized)
+            << "Not all storages have been initialized when "
+            << "clearSpace has been called";
+    }
+
+    void saveStorages(const StorageResourceList& storages)
+    {
+        std::transform(
+            storages.cbegin(), storages.cend(), std::back_inserter(m_storages),
+            [](const auto& s) { return s.dynamicCast<test_support::StorageStub>(); });
+    }
 };
 
-TEST_F(FtStorageInit, ClearSpaceWontCalledUntilAllStoragesAddedToStorageManager)
+TEST_F(FtClearSpace, ClearSpaceWontCalledUntilAllStoragesAddedToStorageManager)
 {
     initDelay = 10s;
     storageCount = 1;
@@ -348,7 +425,7 @@ TEST_F(FtStorageInit, ClearSpaceWontCalledUntilAllStoragesAddedToStorageManager)
     assertStoragesInitalizationAndClearSpaceCallTime();
 }
 
-TEST_F(FtStorageInit, NewStoragesCorrectlyDiscovered)
+TEST_F(FtClearSpace, NewStoragesCorrectlyDiscovered)
 {
     storageCount = 5;
     mockPluginCreateStorage();
@@ -357,7 +434,7 @@ TEST_F(FtStorageInit, NewStoragesCorrectlyDiscovered)
     assertStoragesInitalizationAndClearSpaceCallTime();
 }
 
-TEST_F(FtStorageInit, StoragesLoadedFromDb)
+TEST_F(FtClearSpace, StoragesLoadedFromDb)
 {
     storageCount = 5;
     mockPluginCreateStorage();
@@ -369,6 +446,39 @@ TEST_F(FtStorageInit, StoragesLoadedFromDb)
     mockEmptyFilterConfig(); //< No new storages should be discovered after this.
     startServer();
     assertStoragesInitalizationAndClearSpaceCallTime();
+}
+
+TEST_F(FtClearSpace, DISABLED_WontStart_NoRemoveCapability)
+{
+    // #TODO #akulikov.
+}
+
+TEST_F(FtClearSpace, CorrectDataCleared)
+{
+    storageCount = 2;
+    setAfterClearCallback(
+        [this]()
+        {
+            prepareDataToClear();
+            disconnectOnClearSignal();
+        });
+
+    mockPluginCreateStorage();
+    mockMediaFilterConfig();
+    startServer();
+    assertStoragesInitalizationAndClearSpaceCallTime();
+    assertDataCleared();
+    // #TODO #akulikov. Check relevant log messages have been written.
+}
+
+TEST_F(FtClearSpace, DISABLED_MotionCleaned)
+{
+    // #TODO #server.
+}
+
+TEST_F(FtClearSpace, DISABLED_AnalyticsCleaned_DISABLED)
+{
+    // #TODO #server.
 }
 
 } // namespace test

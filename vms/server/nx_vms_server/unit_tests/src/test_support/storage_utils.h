@@ -31,6 +31,7 @@ public:
     bool isOnlineFlag = false;
     std::chrono::milliseconds initDelay{0};
     std::atomic<bool> initFinished = false;
+    std::atomic<int> removeCallCount = 0;
 
     StorageStub(
         QnMediaServerModule* serverModule, const QString& url, int64_t totalSpace,
@@ -51,7 +52,12 @@ public:
     virtual QIODevice* openInternal(const QString&, QIODevice::OpenMode ) override { return nullptr; }
     virtual FileInfoList getFileList(const QString&) override { return FileInfoList(); }
     virtual qint64 getFileSize(const QString&) const override { return -1LL; }
-    virtual bool removeFile(const QString&) override { return true; }
+    virtual bool removeFile(const QString&) override
+    {
+        removeCallCount++;
+        return true;
+    }
+
     virtual bool removeDir(const QString&) override { return true; }
     virtual bool renameFile(const QString& , const QString& ) override { return true; }
     virtual bool isFileExists(const QString& ) override { return true; }
