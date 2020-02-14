@@ -156,12 +156,15 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
-        m_resolution.setHeight(qMin(streamResolution.height(), m_resolution.height())); // strict to source frame height
+        if (streamResolution.isValid())
+            m_resolution.setHeight(qMin(streamResolution.height(), m_resolution.height())); // strict to source frame height
         // Round resolution height.
         m_resolution.setHeight(
             qPower2Round((unsigned) m_resolution.height(), kHeightRoundingFactor));
 
-        float ar = streamResolution.width() / (float)streamResolution.height();
+        float ar = 1.0;
+        if (streamResolution.isValid())
+            ar = streamResolution.width() / (float)streamResolution.height();
         m_resolution.setWidth(m_resolution.height() * ar);
         // Round resolution width.
         m_resolution.setWidth(qPower2Round((unsigned) m_resolution.width(), kWidthRoundingFactor));
