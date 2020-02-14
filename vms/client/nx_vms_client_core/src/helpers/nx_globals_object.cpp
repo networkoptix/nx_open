@@ -111,12 +111,8 @@ QnUuid NxGlobalsObject::uuid(const QString& uuid) const
 
 QLocale NxGlobalsObject::numericInputLocale(const QString& basedOn) const
 {
-    QLocale locale(basedOn);
-    auto numberOptions = locale.numberOptions();
-    numberOptions.setFlag(QLocale::RejectGroupSeparator, true);
-    numberOptions.setFlag(QLocale::RejectLeadingZeroInExponent, false);
-    numberOptions.setFlag(QLocale::RejectTrailingZeroesAfterDot, false);
-    locale.setNumberOptions(numberOptions);
+    auto locale = basedOn.isEmpty() ? QLocale() : QLocale(basedOn);
+    locale.setNumberOptions(QLocale::RejectGroupSeparator | QLocale::OmitGroupSeparator);
     return locale;
 }
 
