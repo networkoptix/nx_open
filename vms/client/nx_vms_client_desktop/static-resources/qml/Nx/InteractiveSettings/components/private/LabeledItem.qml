@@ -56,7 +56,12 @@ BottomPaddedItem
         contentItem.focus = true
 
         contentItem.GlobalToolTip.text = Qt.binding(
-            function() { return description })
+            function()
+            {
+                return labeledItem.hasOwnProperty("defaultTooltip")
+                    ? "Default value: " + labeledItem.defaultTooltip
+                    : ""
+            })
 
         contentItem.width = Qt.binding(
             function() { return labeledItem.width - contentItem.x })
