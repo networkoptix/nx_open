@@ -34,6 +34,7 @@ void ConnectionUpgradeTunnelClient::openTunnel(
     m_httpClient->setAdditionalHeaders(customHeaders());
     if (m_timeout)
     {
+        m_httpClient->setSendTimeout(*m_timeout);
         m_httpClient->setMessageBodyReadTimeout(*m_timeout);
         m_httpClient->setResponseReadTimeout(*m_timeout);
     }
