@@ -264,7 +264,7 @@ private:
     std::chrono::milliseconds calculateDbBackupTimeout() const;
     void updateSpecificFeatures() const;
     void startDeletor();
-    nx::vms::api::StorageDataList MediaServerProcess::loadStorages() const;
+    nx::vms::api::StorageDataList loadStorages() const;
     nx::vms::server::StorageResourceList processExistingStorages();
     nx::vms::server::StorageResourceList fromDataToStorageList(
         const nx::vms::api::StorageDataList& dataList) const;

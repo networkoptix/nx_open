@@ -704,7 +704,7 @@ StorageResourceList MediaServerProcess::fromDataToStorageList(
     StorageResourceList result;
     std::transform(
         qnStorages.cbegin(), qnStorages.cend(), std::back_inserter(result),
-        [](const auto& s)
+        [](const QnStorageResourcePtr& s)
         {
             const auto result = s.dynamicCast<StorageResource>();
             NX_ASSERT(result);
