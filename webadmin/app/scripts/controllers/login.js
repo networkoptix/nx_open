@@ -4,6 +4,10 @@ angular.module('webadminApp')
     .controller('LoginCtrl', ['$scope', 'mediaserver', '$sessionStorage', 'dialogs', 'nativeClient',
     function ($scope, mediaserver, $sessionStorage, dialogs, nativeClient) {
 
+        // A hack that allows the user to change the url and remove the login dialog.
+        $scope.$on('$locationChangeSuccess', function() {
+            window.location.reload();
+        });
 
         // Login digest: http://en.wikipedia.org/wiki/Digest_access_authentication
         // Task: https://hdw.mx/redmine/issues/4812

@@ -221,10 +221,12 @@ TEST_F(AioAsyncChannelBridge, forwards_all_received_data_after_channel_closure)
 {
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
+
     pauseRightDestination();
-    waitForSomeDataToBeReadFromLeftSource();
+
     closeLeftSource();
     resumeRightDestination();
+
     assertAllDataFromLeftHasBeenTransferredToTheRight();
 }
 
