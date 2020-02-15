@@ -61,9 +61,11 @@ protected:
 
         m_clientSideApiClient = std::make_unique<ClientSideApiClient>(
             relay().basicUrl(), nullptr);
+        m_clientSideApiClient->setTimeout(nx::network::kNoTimeout);
 
         m_serverSideApiClient = std::make_unique<ServerSideApiClient>(
             relay().basicUrl(), nullptr);
+        m_serverSideApiClient->setTimeout(nx::network::kNoTimeout);
     }
 
     //---------------------------------------------------------------------------------------------
