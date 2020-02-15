@@ -55,9 +55,11 @@ export class NxSettingsService implements OnDestroy {
 
     addUser() {
         // Call share dialog, run process inside
+        this.system.pauseUpdate = true;
         return this.dialogs
                    .addUser(this.accountService, this.system)
                    .then((userId) => {
+                       this.system.pauseUpdate = false;
                        if (userId) {
                            userId = this.system.mediaserver.cleanId(userId);
                            this.menuService.setDetailsSection(userId);

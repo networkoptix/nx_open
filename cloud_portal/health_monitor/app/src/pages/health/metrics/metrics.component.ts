@@ -186,7 +186,7 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
     }
 
     search() {
-        this.selectedValues = this.healthService.itemsSearch(this.healthService.values[this.metricId], this.filterModel) || {};
+        this.selectedValues = this.healthService.itemsSearch(this.healthService.values[this.metricId], this.filterModel);
 
         this.handleInitialId();
         if (this.healthLayoutService.activeEntity && !this.selectedValues[this.healthLayoutService.activeEntity.id]) {

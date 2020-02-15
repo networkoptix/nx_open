@@ -64,7 +64,7 @@
             </header>
             <div class="placeholder" *ngIf="system && !system.isAvailable; else systemSettings">
                 <svg-icon
-                    [svgStyle]="{ 'width.px': '64', 'pointer-events': 'none' }"
+                    [svgStyle]="{ 'width.px': '64'}"
                     [src]="CONFIG.icons.dir + 'system_settings_placeholder.svg'"></svg-icon>
                 <span translate>Can't load system settings</span>
             </div>

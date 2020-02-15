@@ -155,7 +155,7 @@ export class NxHealthComponent implements OnInit, OnDestroy {
                             flatMap((result: any) => this.setupReport(result))
                         ).subscribe(() => {}, () => {
                             if (!this.system.id) {
-                                this.window.location.reload();
+                                !this.window.parent ? this.window.location.reload() : this.window.parent.location.reload();
                             }
                             this.hasServerError = this.system.isOnline;
                         });
@@ -522,7 +522,7 @@ export class NxHealthComponent implements OnInit, OnDestroy {
             flatMap((result: any) => this.setupReport(result))
         ).subscribe(() => {}, () => {
             if (!this.system.id) {
-                this.window.location.reload();
+                !this.window.parent ? this.window.location.reload() : this.window.parent.location.reload();
             }
             this.hasServerError = this.system.isOnline;
         });
