@@ -756,12 +756,12 @@ public:
     StorageManagerWatcher(QnMediaServerModule* serverModule):
         m_serverModule(serverModule)
     {
-        QObject::connect(
+        m_normalManagerConnection = QObject::connect(
             serverModule->normalStorageManager(),
             &QnStorageManager::storageAdded,
             [this](const QnStorageResourcePtr& storage) { onAdded(storage); });
 
-        QObject::connect(
+        m_backupManagerConnection = QObject::connect(
             serverModule->backupStorageManager(),
             &QnStorageManager::storageAdded,
             [this](const QnStorageResourcePtr& storage) { onAdded(storage); });
@@ -778,17 +778,23 @@ public:
             NX_MUTEX_LOCKER lock(&m_mutex);
             if (expectedUrls == toUrlSet(m_storages))
             {
-                NX_DEBUG(this, "[Storages init] All storages have been added to storage manager");
+                NX_DEBUG(
+                    typeid(MediaServerProcess),
+                    "[Storages init] All storages have been added to storage manager");
                 break;
             }
 
             if (steady_clock::now() - startTime > 1min)
             {
-                NX_ERROR(this, "[Storages init] Failed to add all storages to storage manager");
+                NX_ERROR(
+                    typeid(MediaServerProcess),
+                    "[Storages init] Failed to add all storages to storage manager");
                 break;
             }
         }
 
+        QObject::disconnect(m_normalManagerConnection);
+        QObject::disconnect(m_backupManagerConnection);
         m_serverModule->normalStorageManager()->initDone();
         m_serverModule->backupStorageManager()->initDone();
     }
@@ -797,6 +803,8 @@ private:
     QnMediaServerModule* m_serverModule = nullptr;
     mutable QnMutex m_mutex;
     StorageResourceList m_storages;
+    QMetaObject::Connection m_normalManagerConnection;
+    QMetaObject::Connection m_backupManagerConnection;
 
     void onAdded(const QnStorageResourcePtr& storage)
     {
