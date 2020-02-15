@@ -471,9 +471,9 @@ static int freeGB(QString drive)
 }
 #endif
 
-QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
+static StorageResourceList getSmallStorages(const StorageResourceList& storages)
 {
-    QnStorageResourceList result;
+    StorageResourceList result;
     for (const auto& storage: storages)
     {
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
@@ -497,12 +497,18 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     return result;
 }
 
-QnStorageResourcePtr MediaServerProcess::createStorage(
+StorageResourcePtr MediaServerProcess::createStorage(
     const QnUuid& serverId,
     const nx::vms::server::fs::media_paths::Partition& partition)
 {
     NX_VERBOSE(kLogTag, lm("Attempting to create storage %1").arg(partition.path));
-    QnStorageResourcePtr storage(serverModule()->storagePluginFactory()->createStorage(commonModule(), "ufile"));
+    auto storage = QnStorageResourcePtr(serverModule()->storagePluginFactory()->createStorage(
+        commonModule(),
+        "ufile")).dynamicCast<StorageResource>();
+
+    if (!NX_ASSERT(storage))
+        return StorageResourcePtr();
+
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(partition.path);
@@ -513,7 +519,7 @@ QnStorageResourcePtr MediaServerProcess::createStorage(
     if (!fileStorage || fileStorage->initOrUpdate() != Qn::StorageInit_Ok)
     {
         NX_WARNING(this, "Failed to initialize new storage '%1', path");
-        return QnStorageResourcePtr();
+        return StorageResourcePtr();
     }
 
     calculateSpaceLimitOrLoadFromConfig(commonModule(), fileStorage);
@@ -524,7 +530,7 @@ QnStorageResourcePtr MediaServerProcess::createStorage(
             "Total space: %2, Space limit: %3",
             partition.path, fileStorage->getTotalSpace(), storage->getSpaceLimit());
 
-        return QnStorageResourcePtr();
+        return StorageResourcePtr();
     }
 
     storage->setUsedForWriting(storage->isWritable());
@@ -551,10 +557,9 @@ QList<nx::vms::server::fs::media_paths::Partition> MediaServerProcess::listRecor
     return mediaPathList;
 }
 
-QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerResourcePtr& mServer)
+StorageResourceList MediaServerProcess::createStorages()
 {
-    QnStorageResourceList storages;
-    //bool isBigStorageExist = false;
+    StorageResourceList storages;
     qint64 bigStorageThreshold = 0;
 
     const auto partitions = listRecordFolders();
@@ -563,14 +568,14 @@ QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerReso
     for(const auto& p: partitions)
     {
         NX_DEBUG(kLogTag, lm("Available path: %1").arg(p.path));
-        if (!mServer->getStorageByUrl(p.path).isNull())
+        if (!m_mediaServer->getStorageByUrl(p.path).isNull())
         {
             NX_DEBUG(kLogTag,
                 lm("Storage with this path %1 already exists. Won't be added.").arg(p.path));
             continue;
         }
         // Create new storage because of new partition found that missing in the database
-        QnStorageResourcePtr storage = createStorage(mServer->getId(), p);
+        StorageResourcePtr storage = createStorage(m_mediaServer->getId(), p);
         if (!storage)
             continue;
 
@@ -600,17 +605,14 @@ QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerReso
     return storages;
 }
 
-QnStorageResourceList MediaServerProcess::updateStorages(QnMediaServerResourcePtr mServer)
+StorageResourceList MediaServerProcess::updateStorages(const StorageResourceList& storages)
 {
     const auto partitions = serverModule()->platform()->monitor()->totalPartitionSpaceInfo();
 
-    QMap<QnUuid, QnStorageResourcePtr> result;
+    QMap<QnUuid, StorageResourcePtr> result;
     // I've switched all patches to native separator to fix network patches like \\computer\share
-    for(const QnStorageResourcePtr& abstractStorage: mServer->getStorages())
+    for(const auto& storage: storages)
     {
-        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
-        if (!storage)
-            continue;
         bool modified = false;
         if (!storage->getUrl().contains("://")) {
             QString updatedURL = QDir::toNativeSeparators(storage->getUrl());
@@ -659,93 +661,194 @@ QnStorageResourceList MediaServerProcess::updateStorages(QnMediaServerResourcePt
     return result.values();
 }
 
+ec2::AbstractMediaServerManagerPtr MediaServerProcess::serverManager() const
+{
+    return serverModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess);
+}
+
+nx::vms::api::StorageDataList MediaServerProcess::loadStorages() const
+{
+    nx::vms::api::StorageDataList result;
+    ec2::ErrorCode rez;
+    while ((rez = serverManager()->getStoragesSync(QnUuid(), &result)) != ec2::ErrorCode::ok)
+    {
+        NX_DEBUG(this, lm("[Storages init] Can't get storage list. Reason: %1").arg(rez));
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        if (m_needStop)
+            return nx::vms::api::StorageDataList();
+    }
+
+    return result;
+}
+
+void MediaServerProcess::removeStorages(const StorageResourceList& storages)
+{
+    if (storages.empty())
+        return;
+
+    nx::vms::api::IdDataList idList;
+    for (const auto& s: storages)
+        idList.push_back(s->getId());
+
+    if (serverManager()->removeStoragesSync(idList) != ec2::ErrorCode::ok)
+        NX_WARNING(this, "[Storages init] Failed to remove storages");
+}
+
+StorageResourceList MediaServerProcess::fromDataToStorageList(
+    const nx::vms::api::StorageDataList& dataList) const
+{
+    auto messageProcessor = serverModule()->commonModule()->messageProcessor();
+    for (const auto& entry: dataList)
+        messageProcessor->updateResource(entry, ec2::NotificationSource::Local);
+    const auto qnStorages = m_mediaServer->getStorages();
+    StorageResourceList result;
+    std::transform(
+        qnStorages.cbegin(), qnStorages.cend(), std::back_inserter(result),
+        [](const auto& s)
+        {
+            const auto result = s.dynamicCast<StorageResource>();
+            NX_ASSERT(result);
+            return result;
+        });
+    return result;
+}
+
+static void intializeAndLog(const StorageResourceList& storages)
+{
+    for (const auto& s: storages)
+    {
+        const auto initResult = s->initOrUpdate();
+        NX_DEBUG(
+            typeid(MediaServerProcess),
+            "[Storages init] Existing storage: '%1', initialization result: %2, space limit: %3",
+            nx::utils::url::hidePassword(s->getUrl()),
+            initResult,
+            s->getSpaceLimit());
+    }
+}
+
+static StorageResourceList subtractLists(
+    const StorageResourceList& from,
+    const StorageResourceList& what)
+{
+    StorageResourceList result;
+    std::copy_if(
+        from.cbegin(), from.cend(), std::back_inserter(result),
+        [&what](const auto& s) { return !what.contains(s); });
+
+    return result;
+}
+
+StorageResourceList MediaServerProcess::processExistingStorages()
+{
+    const auto existing = fromDataToStorageList(loadStorages());
+    const auto modified = updateStorages(existing);
+    intializeAndLog(existing);
+    const auto tooSmall = getSmallStorages(existing);
+    removeStorages(tooSmall);
+    saveStorages(subtractLists(modified, tooSmall));
+    return subtractLists(existing, tooSmall);
+}
+
+class StorageManagerWatcher
+{
+public:
+    StorageManagerWatcher(QnMediaServerModule* serverModule):
+        m_serverModule(serverModule)
+    {
+        QObject::connect(
+            serverModule->normalStorageManager(),
+            &QnStorageManager::storageAdded,
+            [this](const QnStorageResourcePtr& storage) { onAdded(storage); });
+
+        QObject::connect(
+            serverModule->backupStorageManager(),
+            &QnStorageManager::storageAdded,
+            [this](const QnStorageResourcePtr& storage) { onAdded(storage); });
+    }
+
+    void waitForPopulate(const StorageResourceList& expected) const
+    {
+        using namespace std::chrono;
+        const auto expectedUrls = toUrlSet(expected);
+        const auto startTime = steady_clock::now();
+        while (true)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            if (expectedUrls == toUrlSet(m_storages))
+            {
+                NX_DEBUG(this, "[Storages init] All storages have been added to storage manager");
+                break;
+            }
+
+            if (steady_clock::now() - startTime > 1min)
+            {
+                NX_ERROR(this, "[Storages init] Failed to add all storages to storage manager");
+                break;
+            }
+        }
+
+        m_serverModule->normalStorageManager()->initDone();
+        m_serverModule->backupStorageManager()->initDone();
+    }
+
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
+    mutable QnMutex m_mutex;
+    StorageResourceList m_storages;
+
+    void onAdded(const QnStorageResourcePtr& storage)
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        const auto storageResource = storage.dynamicCast<StorageResource>();
+        NX_ASSERT(storageResource);
+        if (!m_storages.contains(storageResource))
+            m_storages.append(storageResource);
+    }
+
+    static QSet<QString> toUrlSet(const StorageResourceList& storages)
+    {
+        QSet<QString> result;
+        for (const auto& s: storages)
+            result.insert(s->getUrl());
+        return result;
+    }
+};
+
+void MediaServerProcess::initializeMetaDataStorage()
+{
+    connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
+        &MediaServerProcess::at_serverPropertyChanged);
+
+    if (!m_mediaServer->metadataStorageId().isNull() || QFile::exists(getMetadataDatabaseName()))
+        initializeAnalyticsEvents();
+
+    NX_DEBUG(this, "[Storages init] Analytics storage DB initialized");
+}
+
 void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProcessor)
 {
     m_initStoragesAsyncPromise.reset(new nx::utils::promise<void>());
-    QtConcurrent::run([messageProcessor, this]
-    {
-        NX_VERBOSE(this, "[Storages init] Init storages begin");
-        const auto setPromiseGuardFunc = nx::utils::makeScopeGuard(
-            [&]()
-            {
-                NX_VERBOSE(this, "[Storages init] Init storages end");
-                m_initStoragesAsyncPromise->set_value();
-            });
-
-        //read server's storages
-        ec2::AbstractECConnectionPtr ec2Connection = messageProcessor->commonModule()->ec2Connection();
-        ec2::ErrorCode rez;
-        nx::vms::api::StorageDataList storages;
-
-        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(
-            QnUuid(), &storages)) != ec2::ErrorCode::ok)
+    QtConcurrent::run(
+        [messageProcessor, this]()
         {
-            NX_DEBUG(this, lm("[Storages init] Can't get storage list. Reason: %1").arg(rez));
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
+            NX_VERBOSE(this, "[Storages init] Init storages begin");
+            const auto setPromiseGuardFunc = nx::utils::makeScopeGuard(
+                [&]()
+                {
+                    NX_VERBOSE(this, "[Storages init] Init storages end");
+                    m_initStoragesAsyncPromise->set_value();
+                });
 
-        for(const auto& storage: storages)
-        {
-            NX_DEBUG(
-                this, "[Storages init] Existing storage: '%1', spaceLimit = %2",
-                nx::utils::url::hidePassword(storage.url), storage.spaceLimit);
-
-            messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
-        }
-
-        for (const auto& s: m_mediaServer->getStorages())
-        {
-            const auto result = s->initOrUpdate();
-            if (result == Qn::StorageInit_Ok)
-                NX_DEBUG(this, "[Storages init] Existing storage '%1' is successfully initialized", nx::utils::url::hidePassword(s->getUrl()));
-            else
-                NX_WARNING(this, "[Storages init] Failed to initialize existing storage '%1'",  nx::utils::url::hidePassword(s->getUrl()));
-        }
-
-        QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
-        if (!smallStorages.isEmpty())
-        {
-            nx::vms::api::IdDataList idList;
-            for (const auto& value: smallStorages)
-                idList.push_back(value->getId());
-            if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
-                qWarning() << "[Storages init] Failed to remove deprecated storage on startup. Postpone removing to the next start...";
-            commonModule()->resourcePool()->removeResources(smallStorages);
-        }
-
-        QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
-        modifiedStorages.append(updateStorages(m_mediaServer));
-
-        saveStorages(ec2Connection, modifiedStorages);
-        for(const QnStorageResourcePtr &storage: modifiedStorages)
-            messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
-
-        NX_DEBUG(this, "[Storages init] Updated storages saved and update resource signal sent");
-        connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
-            &MediaServerProcess::at_serverPropertyChanged);
-
-        if (!m_mediaServer->metadataStorageId().isNull() || QFile::exists(getMetadataDatabaseName()))
-            initializeAnalyticsEvents();
-
-        NX_DEBUG(this, "[Storages init] Analytics storage DB initialized");
-        waitWhileStoragesAddedToStorageManagers(/*expected storage count*/modifiedStorages.size());
-        serverModule()->normalStorageManager()->initDone();
-        serverModule()->backupStorageManager()->initDone();
-        m_storageInitializationDone = true;
-    });
-}
-
-void MediaServerProcess::waitWhileStoragesAddedToStorageManagers(int expected)
-{
-    const auto n = serverModule()->normalStorageManager();
-    const auto b = serverModule()->backupStorageManager();
-    while (n->getStorages().size() + b->getStorages().size() < expected)
-    {
-        NX_VERBOSE(this, "Waiting for storage managers to populate");
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
+            const auto storageManagerWatcher = StorageManagerWatcher(serverModule());
+            const auto existing = processExistingStorages();
+            const auto newStorages = createStorages();
+            saveStorages(newStorages);
+            storageManagerWatcher.waitForPopulate(newStorages + existing);
+            initializeMetaDataStorage();
+            m_storageInitializationDone = true;
+        });
 }
 
 void MediaServerProcess::startDeletor()
@@ -859,15 +962,13 @@ void MediaServerProcess::saveMediaServerUserAttributes(
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
 }
 
-void MediaServerProcess::saveStorages(
-    ec2::AbstractECConnectionPtr ec2Connection,
-    const QnStorageResourceList& storages)
+void MediaServerProcess::saveStorages(const StorageResourceList& storages)
 {
     nx::vms::api::StorageDataList apiStorages;
     ec2::fromResourceListToApi(storages, apiStorages);
 
     ec2::ErrorCode rez;
-    while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages))
+    while ((rez = serverManager()->saveStoragesSync(apiStorages))
         != ec2::ErrorCode::ok && !needToStop())
     {
         NX_WARNING(this) << "Call to change server's storages failed. Reason: " << rez;

@@ -53,6 +53,7 @@
 #include <nx/vms/server/discovery/discovery_monitor.h>
 #include <system_log/system_event_log_reader.h>
 #include <nx/vms/utils/metrics/system_controller.h>
+#include <nx/vms/server/resource/storage_resource.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -195,8 +196,7 @@ private:
     void initPublicIpDiscovery();
     void startPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
-    void saveStorages(
-        ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
+    void saveStorages(const nx::vms::server::StorageResourceList& storages);
     void dumpSystemUsageStats();
     bool isStopping() const;
     void resetSystemState(nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager);
@@ -231,9 +231,9 @@ private:
     void loadPlugins();
     void initResourceTypes();
 
-    QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer);
-    QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer);
-    QnStorageResourcePtr createStorage(
+    StorageResourceList updateStorages(const nx::vms::server::StorageResourceList& storages);
+    nx::vms::server::StorageResourceList createStorages();
+    StorageResourcePtr createStorage(
         const QnUuid& serverId,
         const nx::vms::server::fs::media_paths::Partition& partition);
 
@@ -263,8 +263,14 @@ private:
     void onBackupDbTimer();
     std::chrono::milliseconds calculateDbBackupTimeout() const;
     void updateSpecificFeatures() const;
-    void waitWhileStoragesAddedToStorageManagers(int expected);
     void startDeletor();
+    nx::vms::api::StorageDataList MediaServerProcess::loadStorages() const;
+    nx::vms::server::StorageResourceList processExistingStorages();
+    nx::vms::server::StorageResourceList fromDataToStorageList(
+        const nx::vms::api::StorageDataList& dataList) const;
+    void removeStorages(const nx::vms::server::StorageResourceList& storages);
+    ec2::AbstractMediaServerManagerPtr serverManager() const;
+    void initializeMetaDataStorage();
 
 private:
     int m_argc = 0;
