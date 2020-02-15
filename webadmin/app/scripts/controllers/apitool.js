@@ -16,6 +16,13 @@ angular.module('webadminApp')
         }
         $scope.allowProprietary = Config.allowProprietary;
 
+        // Hack for triggering login for unauthorized users when they go to another tab.
+        $scope.$on('$locationChangeSuccess', function(data) {
+            if (!$scope.userAuthenticated) {
+                window.location.reload();
+            }
+        });
+
         mediaserver.getCurrentUser().then(function() {
             $scope.userAuthenticated = true;
         });
