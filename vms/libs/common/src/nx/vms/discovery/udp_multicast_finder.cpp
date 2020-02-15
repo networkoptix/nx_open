@@ -157,7 +157,9 @@ std::unique_ptr<network::UDPSocket> UdpMulticastFinder::makeSocket(const nx::net
     socket->bindToAioThread(getAioThread());
 
     if (socket->setNonBlockingMode(true)
-        && socket->setReuseAddrFlag(true) && socket->bind(endpoint))
+        && socket->setReuseAddrFlag(true)
+        && socket->setReusePortFlag(true)
+        && socket->bind(endpoint))
     {
         NX_DEBUG(this, lm("New socket %1").arg(socket->getLocalAddress()));
         return socket;
@@ -180,7 +182,6 @@ void UdpMulticastFinder::joinMulticastGroup(const nx::network::HostAddress& ip)
         return; //< Ok.
     }
 
-    m_receiver.reset();
     NX_DEBUG(this, "Could not join socket %1 to multicast group: %2",
         ip, SystemError::getLastOSErrorText());
 }
