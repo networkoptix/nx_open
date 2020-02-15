@@ -1358,6 +1358,8 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr& abstractStorage)
     connect(
         storage.data(), &QnStorageResource::isBackupChanged,
         this, &QnStorageManager::at_storageRoleChanged);
+
+    emit storageAdded(abstractStorage);
 }
 
 bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) const

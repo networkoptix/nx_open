@@ -276,7 +276,7 @@ angular.module('webadminApp')
 
             $header.click(function() {
                 //350ms delay is to give the navbar enough time to collapse
-                $timeout(updateHeights,350);
+                $timeout(updateHeights, 350);
             });
 
             $window.resize(updateHeights);
@@ -287,7 +287,9 @@ angular.module('webadminApp')
             });
         }
 
-        if($('.cameras-panel').length){
-            initResizing();
-        }
+        $timeout(function() {
+            if($('.cameras-panel').length){
+                initResizing();
+            }
+        });
     }]);

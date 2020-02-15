@@ -213,6 +213,7 @@ signals:
     void backupFinished(qint64 backedUpToMs, nx::vms::api::EventReason);
     void newCatalogCreated(const QString& cameraUniqueId, QnServer::ChunksCatalog quality);
     void clearSpaceCalled(QnStorageManager* manager);
+    void storageAdded(const QnStorageResourcePtr& storage);
 
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
