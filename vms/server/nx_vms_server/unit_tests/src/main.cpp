@@ -53,15 +53,18 @@ int main(int argc, char** argv)
         auto parser = fillConfig(arguments);
     #endif
 
-    std::unique_ptr<QnStaticCommonModule> staticCommonModule;
     int result = nx::network::test::runTest(
         argc, argv,
-        [&staticCommonModule](const nx::utils::ArgumentParser& /*args*/)
+        [](const nx::utils::ArgumentParser& /*args*/)
         {
-            staticCommonModule = std::make_unique<QnStaticCommonModule>(
-                nx::vms::api::PeerType::server);
-
-            return nx::utils::test::DeinitFunctions();
+            nx::utils::test::DeinitFunctions deinitFunctions;
+            auto sgGuard = std::make_unique<QnStaticCommonModule>(nx::vms::api::PeerType::server);
+            deinitFunctions.push_back(
+                [sgGuard = std::move(sgGuard)]() mutable
+                {
+                    sgGuard.reset();
+                });
+            return deinitFunctions;
         });
     if (parser->isSet("help"))
         parser->showHelp();
