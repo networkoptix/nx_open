@@ -67,6 +67,7 @@ void ExperimentalTunnelClient::initiateDownChannel()
     m_downChannelHttpClient->setAdditionalHeaders(customHeaders());
     if (m_timeout)
     {
+        m_downChannelHttpClient->setSendTimeout(*m_timeout);
         m_downChannelHttpClient->setResponseReadTimeout(*m_timeout);
         m_downChannelHttpClient->setMessageBodyReadTimeout(*m_timeout);
     }
@@ -95,6 +96,7 @@ void ExperimentalTunnelClient::initiateUpChannel()
     m_upChannelHttpClient = std::make_unique<AsyncClient>();
     if (m_timeout)
     {
+        m_upChannelHttpClient->setSendTimeout(*m_timeout);
         m_upChannelHttpClient->setResponseReadTimeout(*m_timeout);
         m_upChannelHttpClient->setMessageBodyReadTimeout(*m_timeout);
     }
@@ -125,9 +127,6 @@ void ExperimentalTunnelClient::initiateChannel(
     const std::string& requestPath,
     std::function<void()> requestHandler)
 {
-    httpClient->setResponseReadTimeout(kNoTimeout);
-    httpClient->setMessageBodyReadTimeout(kNoTimeout);
-
     const auto tunnelUrl = url::Builder(m_baseTunnelUrl).appendPath(
         http::rest::substituteParameters(
             requestPath,
