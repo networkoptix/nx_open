@@ -213,11 +213,11 @@ protected:
     void mockPluginCreateStorage()
     {
         QnStoragePluginFactory::setDefault(
-            [this](QnCommonModule*, const QString&)
+            [this](QnCommonModule*, const QString& url)
             {
                 auto result = new test_support::StorageStub(
                     m_server->serverModule(),
-                    /*url*/ "",
+                    url,
                     /*totalSpace*/ 100'000'000'000LL,
                     /*freeSpace*/ 100'000'000'000LL,
                     /*spaceLimit*/ 0,
