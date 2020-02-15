@@ -175,13 +175,24 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         return QnAbstractMediaDataPtr(0);
     }
 
-    const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
-    if (position != AV_NOPTS_VALUE)
+    PlaybackRange playbackRange;
     {
-        NX_VERBOSE(this, "Getting next data, seeking to position %1 us, device %2 (%3)",
-            position, m_resource->getName(), m_resource->getId());
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        std::swap(playbackRange, m_playbackRange);
+    }
 
-        m_RtpSession.sendPlay(position, AV_NOPTS_VALUE /*endTime */, m_RtpSession.getScale());
+    if (playbackRange.isValid())
+    {
+        NX_VERBOSE(this, "Getting next data, seeking to position %1-%2 us, device %3 (%4)",
+            playbackRange.startTimeUsec,
+            playbackRange.endTimeUsec,
+            m_resource->getName(), m_resource->getId());
+	
+        m_RtpSession.sendPlay(
+            playbackRange.startTimeUsec,
+            playbackRange.endTimeUsec,
+            m_RtpSession.getScale());
+
         createTrackParsers();
     }
 
@@ -685,8 +696,13 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_gotKeyDataInfo.clear();
     m_gotData = false;
 
-    const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
-    m_openStreamResult = m_RtpSession.open(m_currentStreamUrl, position);
+    PlaybackRange playbackRange;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        std::swap(playbackRange, m_playbackRange);
+    }
+
+    m_openStreamResult = m_RtpSession.open(m_currentStreamUrl, playbackRange.startTimeUsec);
     if(m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return m_openStreamResult;
 
@@ -720,7 +736,10 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if (const auto result = registerMulticastAddressesIfNeeded(); !result)
         return result;
 
-    if (!m_RtpSession.sendPlay(position, AV_NOPTS_VALUE, m_RtpSession.getScale()))
+    if (!m_RtpSession.sendPlay(
+        playbackRange.startTimeUsec,
+        playbackRange.endTimeUsec,
+        m_RtpSession.getScale()))
     {
         NX_WARNING(this, "Can't open RTSP stream [%1], PLAY request has been failed",
             m_currentStreamUrl);
@@ -943,9 +962,10 @@ void QnMulticodecRtpReader::calcStreamUrl()
     }
 }
 
-void QnMulticodecRtpReader::setPositionUsec(qint64 value)
+void QnMulticodecRtpReader::setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec)
 {
-    m_positionUsec = value;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_playbackRange = PlaybackRange(startTimeUsec, endTimeUsec);
 }
 
 void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat& format)

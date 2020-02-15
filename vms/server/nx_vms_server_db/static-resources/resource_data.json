@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.1.204",
+    "version": "4.1.1.208",
     "data": [
         {
             "keys": [
@@ -251,7 +251,7 @@
             "noVideoSupport": true
         },
         {
-            "keys": ["FLIR|FC*"],
+            "keys": [ "FLIR|FC*" ],
             "ioSettings": [
                 {
                     "id": "$DI:0",
@@ -266,6 +266,12 @@
                     "supportedPortTypes": "Output"
                 }
             ]
+        },
+        {
+            "keys": [
+                "Hikvision|DS-2TD2636*"
+            ],
+            "useInvertedActiveStateForOpenIdleState": true
         },
         {
             "keys": [

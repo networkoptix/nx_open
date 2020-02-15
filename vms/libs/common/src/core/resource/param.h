@@ -189,6 +189,8 @@ namespace ResourceDataKey
 
     static const QString kDoUpdatePortInSubscriptionAddress("doUpdatePortInSubscriptionAddress");
 
+    static const QString kUseInvertedActiveStateForOpenIdleState("useInvertedActiveStateForOpenIdleState");
+
     // Rename?
     static const QString kNeedToReloadAllAdvancedParametersAfterApply("needToReloadAllAdvancedParametersAfterApply");
 

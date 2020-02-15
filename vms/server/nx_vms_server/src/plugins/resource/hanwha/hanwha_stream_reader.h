@@ -24,7 +24,6 @@ public:
     void setSessionType(HanwhaSessionType value);
     void setClientId(const QnUuid& id);
     void setRateControlEnabled(bool enabled);
-    void setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec);
     void setOverlappedId(nx::core::resource::OverlappedId overlappedId);
 
     SessionContextPtr sessionContext();
@@ -55,8 +54,6 @@ private:
     HanwhaSessionType m_sessionType = HanwhaSessionType::live;
     QnUuid m_clientId;
     SessionContextPtr m_sessionContext;
-    int64_t m_startTimeUsec = 0;
-    int64_t m_endTimeUsec = 0;
     qint64 m_lastTimestampUsec = AV_NOPTS_VALUE;
     nx::utils::ElapsedTimer m_timeSinceLastFrame;
     boost::optional<nx::core::resource::OverlappedId> m_overlappedId;

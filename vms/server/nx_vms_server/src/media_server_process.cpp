@@ -2098,13 +2098,14 @@ void MediaServerProcess::registerRestHandlers(
      *                 %value AdminOnly
      *             %param:integer reply[].actionParams.fps Frames per second for recording.
      *             %param:enum reply[].actionParams.streamQuality Stream quality for recording.
-     *                 %value QualityLowest
-     *                 %value QualityLow
-     *                 %value QualityNormal
-     *                 %value QualityHigh
-     *                 %value QualityHighest
-     *                 %value QualityPreSet
-     *                 %value QualityNotDefined
+     *                 %value undefined
+     *                 %value lowest
+     *                 %value low
+     *                 %value normal
+     *                 %value high
+     *                 %value highest
+     *                 %value preset
+     *                 %//value[proptietary] rapidReview
      *             %param:integer reply[].actionParams.recordingDuration Duration of the recording,
      *                 in seconds.
      *             %param:integer reply[].actionParams.recordAfter For Bookmark, extension to the
