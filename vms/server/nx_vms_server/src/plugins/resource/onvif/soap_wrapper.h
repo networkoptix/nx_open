@@ -684,7 +684,7 @@ private:
     nx::vms::common::Credentials getForcedCredentials(
         QnCommonModule* commonModule,
         const QString& manufacturer, const QString& model);
-    void calcTimeDrift();
+    int calcTimeDrift();
 
 };
 // ------------------------------------------------------------------------------------------------

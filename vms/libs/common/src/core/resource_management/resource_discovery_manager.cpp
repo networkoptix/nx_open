@@ -247,7 +247,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
     QElapsedTimer discoveryTime;
     discoveryTime.restart();
-
+    int delayForNextSearch = 0;
     switch( m_state )
     {
         case InitialSearch:
@@ -269,10 +269,12 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
             }
 
             ++m_runNumber;
+            delayForNextSearch = qMax(GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS, 
+                int(MIN_DISCOVERY_SEARCH_MS - discoveryTime.elapsed()));
             break;
     }
 
-    m_timer->start( qMax(GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS, int(MIN_DISCOVERY_SEARCH_MS - discoveryTime.elapsed()) ));
+    m_timer->start(delayForNextSearch);
 }
 
 void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList& resources)
