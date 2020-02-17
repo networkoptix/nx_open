@@ -3,7 +3,7 @@ import Nx.Controls 1.0
 
 import "private"
 
-BottomPaddedItem
+Group
 {
     id: control
 
@@ -11,25 +11,34 @@ BottomPaddedItem
     property alias caption: groupBox.title
     property string description: ""
 
-    property alias childrenItem: groupBox.contentItem
+    childrenItem: groupBox.contentItem
 
-    isGroup: true
     width: parent.width
+    implicitWidth: content.implicitWidth
+    implicitHeight: content.implicitHeight
 
-    paddedItem: GroupBox
+    contentItem: BottomPaddedItem
     {
-        id: groupBox
+        id: content
 
-        contentItem: AlignedColumn
+        isGroup: true
+        width: parent.width
+
+        paddedItem: GroupBox
         {
-            id: column
+            id: groupBox
 
-            Binding
+            contentItem: AlignedColumn
             {
-                target: column
-                property: "labelWidthHint"
-                value: control.parent.labelWidth - control.x - column.x
-                when: control.parent && control.parent.hasOwnProperty("labelWidth")
+                id: column
+
+                Binding
+                {
+                    target: column
+                    property: "labelWidthHint"
+                    value: control.parent.labelWidth - control.x - column.x
+                    when: control.parent && control.parent.hasOwnProperty("labelWidth")
+                }
             }
         }
     }

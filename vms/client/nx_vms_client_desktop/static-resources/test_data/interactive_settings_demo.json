@@ -78,19 +78,150 @@
             ]
         },
         {
-            "type": "PolygonFigure",
-            "name": "polygon",
-            "caption": "Polygon"
+            "type": "GroupBox",
+            "caption": "Polygons",
+            "items": [
+                {
+                    "type": "Repeater",
+                    "items": [
+                        {
+                            "type": "GroupBox",
+                            "caption": "Polygon 1",
+                            "items": [
+                                {
+                                    "type": "PolygonFigure",
+                                    "name": "polygon1.figure"
+                                },
+                                {
+                                    "type": "TextField",
+                                    "name": "polygon1.comment",
+                                    "defaultValue": "A comment"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "GroupBox",
+                            "caption": "Polygon 2",
+                            "items": [
+                                {
+                                    "type": "PolygonFigure",
+                                    "name": "polygon2.figure"
+                                },
+                                {
+                                    "type": "TextField",
+                                    "name": "polygon2.comment",
+                                    "defaultValue": "A comment"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         },
         {
-            "type": "BoxFigure",
-            "name": "box",
-            "caption": "Box"
+            "type": "GroupBox",
+            "caption": "Boxes",
+            "items": [
+                {
+                    "type": "Repeater",
+                    "items": [
+                        {
+                            "type": "GroupBox",
+                            "caption": "Box 1",
+                            "filledCheckPolicy": "allItems",
+                            "items": [
+                                {
+                                    "type": "BoxFigure",
+                                    "name": "box1.figure"
+                                },
+                                {
+                                    "type": "TextField",
+                                    "name": "box1.comment",
+                                    "defaultValue": "A comment"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "GroupBox",
+                            "caption": "Box 2",
+                            "filledCheckPolicy": "allItems",
+                            "items": [
+                                {
+                                    "type": "BoxFigure",
+                                    "name": "box2.figure"
+                                },
+                                {
+                                    "type": "TextField",
+                                    "name": "box2.comment",
+                                    "defaultValue": "A comment"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         },
         {
-            "type": "LineFigure",
-            "name": "line",
-            "caption": "Line"
+            "type": "GroupBox",
+            "caption": "Lines",
+            "items": [
+                {
+                    "type": "Repeater",
+                    "items": [
+                        {
+                            "type": "GroupBox",
+                            "caption": "Line 1",
+                            "filledCheckItems": ["line1.figure"],
+                            "items": [
+                                {
+                                    "type": "LineFigure",
+                                    "name": "line1.figure",
+                                    "defaultValue": "A comment"
+                                },
+                                {
+                                    "type": "TextField",
+                                    "name": "line1.comment",
+                                    "defaultValue": "A comment"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "GroupBox",
+                            "caption": "Line 2",
+                            "filledCheckItems": ["line2.figure"],
+                            "items": [
+                                {
+                                    "type": "LineFigure",
+                                    "name": "line2.figure",
+                                    "defaultValue": "A comment"
+                                },
+                                {
+                                    "type": "TextField",
+                                    "name": "line2.comment",
+                                    "defaultValue": "A comment"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "GroupBox",
+            "caption": "Notes",
+            "items": [
+                {
+                    "type": "Repeater",
+                    "addButtonCaption": "Add Note",
+                    "items": [
+                        { "type": "TextField", "name": "note1", "caption": "Note 1" },
+                        { "type": "TextField", "name": "note2", "caption": "Note 2" },
+                        { "type": "TextField", "name": "note3", "caption": "Note 3" },
+                        { "type": "TextField", "name": "note4", "caption": "Note 4" },
+                        { "type": "TextField", "name": "note5", "caption": "Note 5" }
+                    ]
+                }
+            ]
         }
     ]
 }

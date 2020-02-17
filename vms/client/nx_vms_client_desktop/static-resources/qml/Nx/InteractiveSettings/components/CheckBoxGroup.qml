@@ -17,6 +17,8 @@ LabeledItem
     property var itemCaptions
     property alias range: buttons.model
 
+    readonly property bool filled: value && value !== []
+
     contentItem: MultiColumn
     {
         id: buttons
@@ -43,7 +45,7 @@ LabeledItem
         function updateValue()
         {
             var newValue = []
-            for (var i = 0; i != count; ++i)
+            for (var i = 0; i !== count; ++i)
             {
                 var item = itemAt(i)
                 if (item.checked)

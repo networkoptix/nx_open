@@ -13,6 +13,8 @@ LabeledItem
 
     signal valueChanged()
 
+    readonly property bool filled: textField.text !== ""
+
     contentItem: TextFieldWithWarning
     {
         readonly property var validationRegex:

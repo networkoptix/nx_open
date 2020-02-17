@@ -5,79 +5,87 @@ import Nx 1.0
 
 import "private"
 
-Panel
+Group
 {
     id: control
 
     property string name: ""
-    property alias caption: control.title
+    property alias caption: panel.title
     property string description: ""
     property bool collapsible: false
     property bool collapsed: false
 
-    property alias childrenItem: control.contentItem
+    childrenItem: panel.contentItem
 
     width: parent.width
-    contentHeight: contentItem ? contentItem.implicitHeight : 0
-    clip: true
 
-    topPadding: 36
-    bottomPadding: 16
-
-    contentItem: AlignedColumn
+    contentItem: Panel
     {
-        id: column
+        id: panel
 
-        height: control.contentHeight
+        width: parent.width
+        contentWidth: width
+        contentHeight: column.implicitHeight
+        clip: true
 
-        Binding
+        topPadding: 36
+        bottomPadding: 16
+
+        contentItem: AlignedColumn
         {
-            target: column
-            property: "labelWidthHint"
-            value: control.parent.labelWidth - control.x - x
-            when: control.parent && control.parent.hasOwnProperty("labelWidth")
-        }
-    }
+            id: column
 
-    states: State
-    {
-        name: "collapsed"
-        when: control.collapsed
-        PropertyChanges { target: control; contentHeight: 0 }
-    }
+            height: panel.contentHeight
 
-    transitions: Transition
-    {
-        NumberAnimation
-        {
-            properties: "contentHeight"
-            easing.type: Easing.InOutQuad
-            duration: 200
-        }
-    }
-
-    MouseArea
-    {
-        id: expandCollapseButton
-
-        visible: control.collapsible
-        parent: control.label
-        anchors.right: parent.right
-        width: 20
-        height: parent.height
-        acceptedButtons: Qt.LeftButton
-        hoverEnabled: true
-
-        ArrowIcon
-        {
-            anchors.centerIn: parent
-            rotation: control.collapsed ? 0 : 180
-            color: expandCollapseButton.containsMouse && !expandCollapseButton.pressed
-                ? ColorTheme.colors.light1
-                : ColorTheme.colors.light4
+            Binding
+            {
+                target: column
+                property: "labelWidthHint"
+                value: control.parent.labelWidth - control.x - x
+                when: control.parent && control.parent.hasOwnProperty("labelWidth")
+            }
         }
 
-        onClicked:
-            control.collapsed = !control.collapsed
+        states: State
+        {
+            name: "collapsed"
+            when: control.collapsed
+            PropertyChanges { target: control; contentHeight: 0 }
+        }
+
+        transitions: Transition
+        {
+            NumberAnimation
+            {
+                properties: "contentHeight"
+                easing.type: Easing.InOutQuad
+                duration: 200
+            }
+        }
+
+        MouseArea
+        {
+            id: expandCollapseButton
+
+            visible: control.collapsible
+            parent: panel.label
+            anchors.right: parent.right
+            width: 20
+            height: parent.height
+            acceptedButtons: Qt.LeftButton
+            hoverEnabled: true
+
+            ArrowIcon
+            {
+                anchors.centerIn: parent
+                rotation: control.collapsed ? 0 : 180
+                color: expandCollapseButton.containsMouse && !expandCollapseButton.pressed
+                    ? ColorTheme.colors.light1
+                    : ColorTheme.colors.light4
+            }
+
+            onClicked:
+                control.collapsed = !control.collapsed
+        }
     }
 }

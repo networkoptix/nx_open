@@ -14,6 +14,9 @@ LabeledItem
     property alias maxValue: spinBox.to
     property alias value: spinBox.value
 
+    readonly property bool filled: spinBox.value !== 0
+
+    contentItem: SpinBox
     contentItem: Item
     {
         implicitWidth: spinBox.implicitWidth

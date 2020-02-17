@@ -1,4 +1,4 @@
-function _createItemsRecursively(parent, model, depth)
+function _createItemsRecursively(parent, visualParent, model, depth)
 {
     var type = model.type
     if (type === "GroupBox" && depth === 1)
@@ -12,23 +12,35 @@ function _createItemsRecursively(parent, model, depth)
         return null
     }
 
-    var item = component.createObject(parent, model)
+    var item = component.createObject(visualParent, model)
 
     if (item)
     {
         if (item.valueChanged)
             item.valueChanged.connect(settingsView.triggerValuesEdited)
 
+        if (item.filledChanged && parent.processFilledChanged)
+        {
+            item.filledChanged.connect(function() { parent.processFilledChanged(item) })
+            parent.processFilledChanged(item)
+        }
+
         if (item.childrenItem && model.items)
         {
             model.items.forEach(
-                function(model) { _createItemsRecursively(item.childrenItem, model, depth + 1) })
+                function(model)
+                {
+                    _createItemsRecursively(item, item.childrenItem, model, depth + 1)
+                })
         }
 
         if (item.sectionsItem && model.sections)
         {
             model.sections.forEach(
-                function(model) { _createItemsRecursively(item.sectionsItem, model, depth) })
+                function(model)
+                {
+                    _createItemsRecursively(item, item.sectionsItem, model, depth)
+                })
         }
     }
     else
@@ -46,7 +58,7 @@ function createItems(parent, model, sections)
     var modelCopy = JSON.parse(JSON.stringify(model))
     modelCopy.type = "Settings"
 
-    var item = _createItemsRecursively(parent.childrenItem, modelCopy, 0)
+    var item = _createItemsRecursively(parent, parent.childrenItem, modelCopy, 0)
     item.parent = parent
     item.anchors.fill = parent
 
