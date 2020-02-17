@@ -228,7 +228,7 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
         if (sendResult == 0)
         {
             NX_DEBUG(this, "Socket was closed by the other peer (send() -> 0).");
-            break;
+            return false;
         }
 
         if (sendResult < 0)
