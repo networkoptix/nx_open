@@ -223,29 +223,63 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
     Q_D(QnTCPConnectionProcessor);
     while (!needToStop() && size > 0 && d->socket->isConnected())
     {
-        int sended = 0;
-        sended = d->socket->send(data, size);
+        const int sendResult = d->socket->send(data, size);
 
-        if (sended < 0 && SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
+        if (sendResult == 0)
         {
-            unsigned int sendTimeout = 0;
-            if (!d->socket->getSendTimeout(&sendTimeout))
-                return false;
-            const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(sendTimeout);
-            nx::network::aio::UnifiedPollSet pollSet;
-            if (!pollSet.add(d->socket->pollable(), nx::network::aio::etWrite))
-                return false;
-            if (pollSet.poll(kPollTimeout) < 1)
-                return false;
-            continue; //< socket in async mode
+            NX_DEBUG(this, "Socket was closed by the other peer (send() -> 0).");
+            break;
         }
 
-        if( sended <= 0 )
+        if (sendResult < 0)
+        {
+            const auto errorCode = SystemError::getLastOSErrorCode();
+
+            if (errorCode == SystemError::wouldBlock)
+            {
+                unsigned int sendTimeout = 0;
+                if (!d->socket->getSendTimeout(&sendTimeout))
+                {
+                    NX_WARNING(this, "Unable to get socket timeout.");
+                    return false;
+                }
+                const std::chrono::milliseconds kPollTimeout =
+                    std::chrono::milliseconds(sendTimeout);
+                nx::network::aio::UnifiedPollSet pollSet;
+                if (!pollSet.add(d->socket->pollable(), nx::network::aio::etWrite))
+                {
+                    NX_WARNING(this, "Unable to start polling the socket.");
+                    return false;
+                }
+                if (pollSet.poll(kPollTimeout) < 1)
+                {
+                    NX_WARNING(this, "Unable to poll the socket.");
+                    return false;
+                }
+                continue; //< socket in async mode
+            }
+
+            if (!d->socket->isConnected()) //< Non-recoverable socket error.
+            {
+                NX_DEBUG(this, "Unable to send data to socket: %1",
+                    SystemError::toString(errorCode));
+                return false;
+            }
+
             break;
-        data += sended;
-        size -= sended;
+        }
+
+        data += sendResult;
+        size -= sendResult;
     }
-    return d->socket->isConnected();
+
+    if (!d->socket->isConnected())
+    {
+        NX_DEBUG(this, "Socket was disconnected.");
+        return false;
+    }
+
+    return true;
 }
 
 
