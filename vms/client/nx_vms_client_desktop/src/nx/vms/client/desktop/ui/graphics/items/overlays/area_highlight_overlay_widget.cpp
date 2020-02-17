@@ -11,6 +11,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/client/core/utils/geometry.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 #include "area_rect_item.h"
@@ -21,6 +22,11 @@ using nx::vms::client::core::Geometry;
 namespace nx::vms::client::desktop {
 
 namespace {
+
+using namespace std::chrono;
+
+static constexpr int kFpsLimit = 60;
+static constexpr milliseconds kTimeBetweenUpdateRequests = 1000ms / kFpsLimit;
 
 static QRectF calculateLabelGeometry(
     QRectF boundingRect,
@@ -176,11 +182,17 @@ public:
     bool highlightAreasOnHover = true;
     QPointer<QGraphicsRotation> rotation;
     int angle = 0;
+    std::unique_ptr<nx::utils::PendingOperation> updateOperation;
 };
 
 AreaHighlightOverlayWidget::Private::Private(AreaHighlightOverlayWidget* q):
-    q(q)
+    q(q),
+    updateOperation(new nx::utils::PendingOperation())
 {
+    // Limit the number of update requests to 60 per second.
+    updateOperation->setInterval(kTimeBetweenUpdateRequests);
+    updateOperation->setFlags(nx::utils::PendingOperation::NoFlags);
+    updateOperation->setCallback([q]() { q->update(); });
 }
 
 void AreaHighlightOverlayWidget::Private::setHighlightedArea(const QnUuid& areaId)
@@ -195,7 +207,7 @@ void AreaHighlightOverlayWidget::Private::setHighlightedArea(const QnUuid& areaI
     updateArea(oldHighlightedAreaId);
     updateArea(areaId);
 
-    q->update();
+    updateOperation->requestOperation();
 }
 
 void AreaHighlightOverlayWidget::Private::updateArea(
@@ -349,7 +361,7 @@ void AreaHighlightOverlayWidget::addOrUpdateArea(
     d->updateArea(area);
     NX_VERBOSE(this, "Area was added or updated, total %1", d->areaById.size());
 
-    update();
+    d->updateOperation->requestOperation();
 }
 
 void AreaHighlightOverlayWidget::removeArea(const QnUuid& areaId)
@@ -357,7 +369,7 @@ void AreaHighlightOverlayWidget::removeArea(const QnUuid& areaId)
     if (d->areaById.remove(areaId) > 0)
     {
         NX_VERBOSE(this, "Area was removed, total %1 left", d->areaById.size());
-        update();
+        d->updateOperation->requestOperation();
     }
 }
 
