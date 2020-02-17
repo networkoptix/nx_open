@@ -1,13 +1,12 @@
 #include "analytics_settings_manager.h"
 
-#include <nx/utils/guarded_callback.h>
-#include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <client_core/connection_context_aware.h>
-#include <api/server_rest_connection.h>
+
+#include <nx/vms/api/analytics/device_analytics_settings_data.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 namespace nx::vms::client::desktop {
 
@@ -58,59 +57,6 @@ AnalyticsSettingsListener::AnalyticsSettingsListener(
 
 //--------------------------------------------------------------------------------------------------
 
-class AnalyticsSettingsServerRestApiInterface: public AnalyticsSettingsServerInterface
-{
-public:
-    AnalyticsSettingsServerRestApiInterface(QObject* owner):
-        m_owner(owner)
-    {}
-
-    virtual rest::Handle getSettings(
-        const QnVirtualCameraResourcePtr& device,
-        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        AnalyticsSettingsCallback callback) override
-    {
-        const auto server = NX_ASSERT(device)
-            ? device->getParentServer()
-            : QnMediaServerResourcePtr();
-
-        if (!NX_ASSERT(server) || !NX_ASSERT(engine) || !NX_ASSERT(m_owner))
-            return {};
-
-        return server->restConnection()->getDeviceAnalyticsSettings(
-            device,
-            engine,
-            nx::utils::guarded(m_owner, callback),
-            m_owner->thread());
-    }
-
-    virtual rest::Handle applySettings(
-        const QnVirtualCameraResourcePtr& device,
-        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        const QJsonObject& settings,
-        AnalyticsSettingsCallback callback) override
-    {
-        const auto server = NX_ASSERT(device)
-            ? device->getParentServer()
-            : QnMediaServerResourcePtr();
-
-        if (!NX_ASSERT(server) || !NX_ASSERT(engine) || !NX_ASSERT(m_owner))
-            return {};
-
-        return server->restConnection()->setDeviceAnalyticsSettings(
-            device,
-            engine,
-            settings,
-            nx::utils::guarded(m_owner, callback),
-            m_owner->thread());
-    }
-
-private:
-    QPointer<QObject> m_owner;
-};
-
-//--------------------------------------------------------------------------------------------------
-
 class AnalyticsSettingsManager::Private: public QObject, public QnConnectionContextAware
 {
 public:
@@ -154,8 +100,6 @@ public:
 
 AnalyticsSettingsManager::Private::Private()
 {
-    serverInterface = std::make_shared<AnalyticsSettingsServerRestApiInterface>(this);
-
     using nx::vms::common::AnalyticsEngineResource;
     auto engineManifestChangesListener = new QnResourceChangesListener(
         QnResourceChangesListener::Policy::silentRemove,
@@ -180,6 +124,9 @@ void AnalyticsSettingsManager::Private::refreshSettings(const DeviceAgentId& age
 {
     auto [device, engine] = toResources(agentId, resourcePool());
     if (!device || !engine)
+        return;
+
+    if (!NX_ASSERT(serverInterface))
         return;
 
     NX_DEBUG(this, "Refreshing settings for %1 - %2", device->getName(), engine->getName());
@@ -271,7 +218,7 @@ AnalyticsSettingsManager::~AnalyticsSettingsManager()
 {
 }
 
-void AnalyticsSettingsManager::setCustomServerInterface(
+void AnalyticsSettingsManager::setServerInterface(
     AnalyticsSettingsServerInterfacePtr serverInterface)
 {
     d->serverInterface = serverInterface;
@@ -316,6 +263,9 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
 {
     if (isApplyingChanges())
         return Error::busy;
+
+    if (!NX_ASSERT(d->serverInterface))
+        return Error::noError;
 
     for (auto it = valuesByAgentId.begin(); it != valuesByAgentId.end(); ++it)
     {

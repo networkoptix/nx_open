@@ -128,11 +128,6 @@ Qt::ConnectionType QnClientMessageProcessor::handlerConnectionType() const
 void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
 {
     base_type::connectToConnection(connection);
-
-    connect(connection.get(),
-        &ec2::AbstractECConnection::serverRuntimeEventOccurred,
-        this,
-        &QnClientMessageProcessor::serverRuntimeEventOccurred);
 }
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)

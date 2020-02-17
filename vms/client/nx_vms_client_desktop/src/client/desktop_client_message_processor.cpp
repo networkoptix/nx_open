@@ -39,6 +39,11 @@ void QnDesktopClientMessageProcessor::connectToConnection(const ec2::AbstractECC
         &ec2::AbstractDiscoveryNotificationManager::gotInitialDiscoveredServers,
         this,
         &QnDesktopClientMessageProcessor::at_gotInitialDiscoveredServers);
+
+    connect(connection.get(),
+        &ec2::AbstractECConnection::serverRuntimeEventOccurred,
+        this,
+        &QnDesktopClientMessageProcessor::serverRuntimeEventOccurred);
 }
 
 void QnDesktopClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)

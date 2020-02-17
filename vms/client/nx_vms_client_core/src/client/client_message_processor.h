@@ -7,8 +7,6 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
-namespace nx::vms::api { struct ServerRuntimeEventData; }
-
 class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT
@@ -23,9 +21,6 @@ public:
 
     void setHoldConnection(bool holdConnection);
     bool isConnectionHeld() const;
-
-signals:
-    void serverRuntimeEventOccurred(const nx::vms::api::ServerRuntimeEventData& eventData);
 
 protected:
     virtual Qt::ConnectionType handlerConnectionType() const override;

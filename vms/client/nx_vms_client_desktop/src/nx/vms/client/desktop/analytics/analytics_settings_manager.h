@@ -10,6 +10,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::api::analytics { struct DeviceAnalyticsSettingsResponse; }
 
@@ -93,10 +94,10 @@ public:
     virtual ~AnalyticsSettingsManager() override;
 
     /**
-     * Custom server interface can be passed to emulate behavior in unit tests. Ownership will be
-     * shared. If not passed, default server rest interface will be created and used.
+     * Server interface should be passed to send actual requests to the media server. Ownership will
+     * be shared.
      */
-    void setCustomServerInterface(AnalyticsSettingsServerInterfacePtr serverInterface);
+    void setServerInterface(AnalyticsSettingsServerInterfacePtr serverInterface);
 
     void refreshSettings(const DeviceAgentId& agentId);
 
@@ -117,7 +118,7 @@ signals:
 
 private:
     class Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 
     friend class AnalyticsSettingsListener;
 };

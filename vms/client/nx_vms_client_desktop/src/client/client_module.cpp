@@ -111,6 +111,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_manager_factory.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -217,8 +218,14 @@ QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
 
 } // namespace
 
+struct QnClientModule::Private
+{
+    std::unique_ptr<AnalyticsSettingsManager> analyticsSettingsManager;
+};
+
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
     QObject(parent),
+    d(new Private()),
     m_startupParameters(startupParams)
 {
 #if defined(Q_OS_WIN)
@@ -486,23 +493,8 @@ void QnClientModule::initSingletons()
     commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
 
-    auto analyticsSettingsManager = commonModule->store(new AnalyticsSettingsManager());
-
-    // TODO: #GDM Move out connection and server interface to the AnalyticsSettingsManagerHolder class.
-    connect(messageProcessor,
-        &QnClientMessageProcessor::serverRuntimeEventOccurred,
-        this,
-        [this, analyticsSettingsManager](const nx::vms::api::ServerRuntimeEventData& eventData)
-        {
-            if (eventData.eventType == nx::vms::api::ServerRuntimeEventType::deviceAgentSettingsMaybeChanged)
-            {
-                const auto payload =
-                    QJson::deserialized<nx::vms::api::DeviceAgentSettingsMaybeChangedData>(
-                        eventData.eventData);
-
-                analyticsSettingsManager->refreshSettings({payload.deviceId, payload.engineId});
-            }
-        });
+    d->analyticsSettingsManager = AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
+        messageProcessor);
 
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
@@ -817,6 +809,11 @@ nx::vms::client::desktop::ResourceDirectoryBrowser*
     QnClientModule::resourceDirectoryBrowser() const
 {
     return m_resourceDirectoryBrowser.data();
+}
+
+AnalyticsSettingsManager* QnClientModule::analyticsSettingsManager() const
+{
+    return d->analyticsSettingsManager.get();
 }
 
 void QnClientModule::initLocalInfo()

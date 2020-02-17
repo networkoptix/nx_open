@@ -43,7 +43,7 @@ protected:
         m_manager.reset(new AnalyticsSettingsManager());
         m_serverInterfaceMock = std::make_shared<AnalyticsSettingsMockApiInterface>();
 
-        m_manager->setCustomServerInterface(m_serverInterfaceMock);
+        m_manager->setServerInterface(m_serverInterfaceMock);
     }
 
     // virtual void TearDown() will be called after each test is run.
