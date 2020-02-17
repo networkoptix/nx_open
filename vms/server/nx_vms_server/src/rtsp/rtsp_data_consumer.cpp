@@ -733,7 +733,8 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
             *lenPtr = htons(m_sendBuffer.size() - kRtpTcpHeaderSize - dataStartIndex);
             if (m_sendBuffer.size() >= kTcpSendBlockSize)
             {
-                m_owner->sendBuffer(m_sendBuffer);
+                [[maybe_unused]] const bool sendResult =
+                    m_owner->sendBuffer(m_sendBuffer); //< Error is already logged.
                 m_sendBuffer.clear();
             }
         }
@@ -741,7 +742,9 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
         {
             NX_ASSERT(m_sendBuffer.size() < 16384);
             nx::network::AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
-            mediaSocket->send(m_sendBuffer.data(), m_sendBuffer.size());
+            const int sendResult = mediaSocket->send(m_sendBuffer.data(), m_sendBuffer.size());
+            if (sendResult != m_sendBuffer.size())
+                NX_DEBUG(this, "Unable to send data to the socket: send() -> %1.", sendResult);
             m_sendBuffer.clear();
 
             // get rtcp report to check keepalive timeout

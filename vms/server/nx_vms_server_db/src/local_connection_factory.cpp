@@ -1704,7 +1704,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 
     /**%apidoc POST /ec2/restoreDatabase
      * Restore the System database (shared among all Servers) from the specified backup.
-     * %param:string data Binary database dump, encoded in Base64.
      * %// AbstractECConnection
      */
     regUpdate<DatabaseDumpData>(p, ApiCommand::restoreDatabase);
@@ -1727,7 +1726,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * Back up the System database (shared among all Servers).
      * %param[default] format
      * %return Object in the requested format, containing the binary database dump.
-     *     %param:string data Binary database dump, encoded in Base64.
      */
     regGet<std::nullptr_t, DatabaseDumpData>(p, ApiCommand::dumpDatabase);
 
@@ -1736,7 +1734,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[default] format
      * %param:string path Path to a file to be created on the current Server's filesystem.
      * %return Object in the requested format, describing the created file.
-     *     %param size File size in bytes.
      */
     regGet<StoredFilePath, DatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 

@@ -201,7 +201,7 @@ private:
         for (decltype (manifestErrors.size()) i = 0; i < manifestErrors.size(); ++i)
         {
             const auto& error = manifestErrors[i];
-            result += lm("error: %1").args(toHumanReadableString(error.errorType));
+            result += lm("error: %1").args(error.errorType);
             if (!error.additionalInfo.isEmpty())
                 result += lm(", details: %1").args(error.additionalInfo);
 

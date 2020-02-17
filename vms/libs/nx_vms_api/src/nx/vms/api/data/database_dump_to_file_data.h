@@ -10,6 +10,7 @@ namespace api {
 
 struct NX_VMS_API DatabaseDumpToFileData: Data
 {
+    /**%apidoc Binary database dump file size, in bytes. */
     qint64 size = 0;
 };
 #define DatabaseDumpToFileData_Fields (size)

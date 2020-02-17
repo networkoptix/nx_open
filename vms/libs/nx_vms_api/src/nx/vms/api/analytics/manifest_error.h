@@ -42,7 +42,7 @@ enum class ManifestErrorType
 Q_DECLARE_FLAGS(ManifestErrorTypes, ManifestErrorType)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ManifestErrorTypes)
 
-NX_VMS_API QString toHumanReadableString(ManifestErrorType errorType);
+NX_VMS_API QString toString(ManifestErrorType errorType);
 
 struct ManifestError
 {
@@ -58,7 +58,7 @@ struct ManifestError
     QString additionalInfo;
 };
 
-NX_VMS_API QString toHumanReadableString(ManifestError manifestError);
+NX_VMS_API QString toString(ManifestError manifestError);
 
 struct ListManifestErrorTypes
 {

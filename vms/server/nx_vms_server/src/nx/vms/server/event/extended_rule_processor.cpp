@@ -1453,15 +1453,11 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
     const auto resource = resourcePool()->getResourceById(event.eventResourceId);
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
-    // TODO: Investigate why sometimes QnTranslationManager is not created in time so translations
-    // do not work, see vms/server/nx_vms_server/src/media_server/media_server_module.cpp:382.
-    std::optional<QnTranslationManager::LocaleRollback> localeGuard;
-    if (const auto tm = common->findInstance<QnTranslationManager>())
-    {
-        // TODO: Get the language for each user as soon as users have it in VMS server DB.
-        const auto language = common->globalSettings()->pushNotificationsLanguage();
-        localeGuard = QnTranslationManager::LocaleRollback(tm, language);
-    }
+    // TODO: Get the language for each user as soon as users have it in VMS server DB.
+    const auto language = common->globalSettings()->pushNotificationsLanguage();
+    NX_VERBOSE(this, "Translate push notification to %1", language);
+    QnTranslationManager::LocaleRollback localeGuard(
+        serverModule()->findInstance<QnTranslationManager>(), language);
 
     const auto join =
         [](QStringList items)
