@@ -373,15 +373,23 @@ void QnVideoStreamDisplay::updateRenderList()
     QnMutexLocker lock( &m_renderListMtx );
     if (m_renderListModified)
     {
-        foreach(QnAbstractRenderer* renderer, m_newList)
+        for (auto& renderer: m_newList)
+        {
             renderer->inUse();
 
-        foreach(QnAbstractRenderer* renderer, m_renderList)
+            if (m_timeBlocked)
+                renderer->blockTimeValue(m_channelNumber, m_blockedTimeValue);
+            else
+                renderer->unblockTimeValue(m_channelNumber);
+        }
+
+        for (auto& renderer: m_renderList)
             renderer->notInUse();
 
         m_renderList = m_newList;
         if (m_bufferedFrameDisplayer)
             m_bufferedFrameDisplayer->setRenderList(m_renderList);
+
         m_renderListModified = false;
     }
 };
@@ -953,8 +961,11 @@ qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const
 
 void QnVideoStreamDisplay::blockTimeValue(qint64 time)
 {
-    foreach(QnAbstractRenderer* render, m_renderList)
-        render->blockTimeValue(m_channelNumber, microseconds(time));
+    m_blockedTimeValue = microseconds(time);
+    m_timeBlocked = true;
+
+    for (auto renderer: m_renderList)
+        renderer->blockTimeValue(m_channelNumber, m_blockedTimeValue);
 }
 
 void QnVideoStreamDisplay::setPausedSafe(bool value)
@@ -969,18 +980,14 @@ void QnVideoStreamDisplay::setPausedSafe(bool value)
 
 void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
 {
-    QnMutexLocker lock( &m_renderListMtx );
-    foreach(QnAbstractRenderer* render, m_renderList)
-        render->blockTimeValue(m_channelNumber, microseconds(time));
+    QnMutexLocker lock(&m_renderListMtx);
+    blockTimeValue(time);
 }
 
 bool QnVideoStreamDisplay::isTimeBlocked() const
 {
     QnMutexLocker lock(&m_renderListMtx);
-    if (m_renderList.empty())
-        return false;
-    QnAbstractRenderer* renderer = *m_renderList.begin();
-    return renderer->isTimeBlocked(m_channelNumber);
+    return m_timeBlocked;
 }
 
 void QnVideoStreamDisplay::unblockTimeValue()
@@ -991,8 +998,11 @@ void QnVideoStreamDisplay::unblockTimeValue()
         m_bufferedFrameDisplayer->overrideTimestampOfNextFrameToRender(m_lastDisplayedTime);
     m_timeChangeEnabled = true;
     */
-    foreach(QnAbstractRenderer* render, m_renderList)
-        render->unblockTimeValue(m_channelNumber);
+
+    m_timeBlocked = false;
+
+    for (auto renderer: m_renderList)
+        renderer->unblockTimeValue(m_channelNumber);
 }
 
 void QnVideoStreamDisplay::afterJump()
