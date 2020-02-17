@@ -98,6 +98,7 @@ private:
     float getDefaultFps() const;
 
     bool doesStreamSuitMotionAnalysisRequirements();
+    void strictFpsToLimit(float* fps) const;
 
     bool doesFrameSuitMotionAnalysisRequirements(
         const QnCompressedVideoDataPtr& compressedFrame) const;

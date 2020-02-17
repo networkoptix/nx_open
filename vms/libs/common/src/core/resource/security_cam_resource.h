@@ -63,7 +63,7 @@ public:
     virtual Qn::MotionType getMotionType() const;
     void setMotionType(Qn::MotionType value);
 
-    virtual int getMaxFps() const;
+    virtual int getMaxFps(StreamIndex streamIndex = StreamIndex::primary) const;
 
     virtual void setMaxFps(int fps);
 

@@ -8,7 +8,7 @@ QnTestCameraResource::QnTestCameraResource(QnMediaServerModule* serverModule):
 {
 }
 
-int QnTestCameraResource::getMaxFps() const
+int QnTestCameraResource::getMaxFps(StreamIndex /*streamIndex*/) const
 {
     return 30;
 }

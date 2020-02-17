@@ -13,7 +13,7 @@ public:
 
     QnTestCameraResource(QnMediaServerModule* serverModule);
 
-    virtual int getMaxFps() const override;
+    virtual int getMaxFps(StreamIndex streamIndex = StreamIndex::primary) const override;
     virtual QString getDriverName() const override;
 
     virtual QString getHostAddress() const override;
