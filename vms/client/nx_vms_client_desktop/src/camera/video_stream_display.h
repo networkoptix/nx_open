@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <set>
 
 extern "C"
@@ -157,6 +158,8 @@ private:
     mutable QnMutex m_renderListMtx;
     bool m_isPaused;
     QnAspectRatio m_overridenAspectRatio;
+    std::chrono::microseconds m_blockedTimeValue{};
+    bool m_timeBlocked = false;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
