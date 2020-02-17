@@ -106,8 +106,13 @@ export class NxUtilsService {
         a.download = filename;
 
         this.document.body.appendChild(a);
-        a.click();
-        this.document.body.removeChild(a);
+
+        // Safari in HM standalone does not work without timeout after appendChild, reason unclear
+        // TODO: Investigate why download doesn't work without timeout
+        setTimeout(() => {
+            a.click();
+            this.document.body.removeChild(a);
+        });
 
         // revokeObjectURL breaks download on MSEdge and Firefox
         // URL.revokeObjectURL(objectUrl);
