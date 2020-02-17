@@ -6,6 +6,7 @@
 
 namespace nx::media {
 
+template<typename T>
 class CachingMetadataConsumer: public AbstractMetadataConsumer
 {
     using base_type = AbstractMetadataConsumer;
@@ -17,7 +18,7 @@ public:
     size_t cacheSize() const;
     void setCacheSize(size_t cacheSize);
 
-    QnAbstractCompressedMetadataPtr metadata(
+    T metadata(
         std::chrono::microseconds timestamp, int channel) const;
 
     enum class PickingPolicy
@@ -25,7 +26,7 @@ public:
         TakeFirst,
         TakeLast,
     };
-    QList<QnAbstractCompressedMetadataPtr> metadataRange(
+    QList<T> metadataRange(
         std::chrono::microseconds startTimestamp,
         std::chrono::microseconds endTimestamp,
         int channel,
