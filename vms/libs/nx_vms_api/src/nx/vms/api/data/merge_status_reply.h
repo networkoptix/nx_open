@@ -8,7 +8,10 @@ namespace nx::vms::api {
 
 struct NX_VMS_API MergeStatusReply
 {
+    /**%apidoc Id of the last merge operation. */
     QnUuid mergeId;
+
+    /**%apidoc Whether the last merge operation is in progress. */
     bool mergeInProgress = false;
 };
 #define MergeStatusReply_Fields (mergeId)(mergeInProgress)
