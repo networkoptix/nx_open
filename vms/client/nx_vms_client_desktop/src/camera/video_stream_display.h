@@ -184,5 +184,5 @@ private:
 
     void calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec);
 
-    bool downscaleFrame(const CLVideoDecoderOutputPtr& src, const CLVideoDecoderOutputPtr& dst, QnFrameScaler::DownscaleFactor scaleFactor, AVPixelFormat pixFmt);
+    bool downscaleFrame(const CLVideoDecoderOutputPtr& src, CLVideoDecoderOutputPtr& dst, QnFrameScaler::DownscaleFactor scaleFactor, AVPixelFormat pixFmt);
 };

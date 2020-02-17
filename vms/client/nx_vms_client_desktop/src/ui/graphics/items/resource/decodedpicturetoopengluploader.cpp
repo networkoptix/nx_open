@@ -891,24 +891,18 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
     emptyPictureBuf->m_skippingForbidden = false;
     emptyPictureBuf->m_displayedRect = displayedRect;
 
-    if( decodedPicture->picData )
-    {
-        NX_ASSERT(false, "Not supported");
-    }
-    else    //data is stored in system memory (in AVPacket)
-    {
-        //have go through upload thread, since opengl uploading does not scale good on Intel HD Graphics and
-            //it does not matter on PCIe graphics card due to high video memory bandwidth
 
-        m_framesWaitingUploadInGUIThread.push_back( new AVPacketUploader( emptyPictureBuf, decodedPicture, this ) );
+    //have go through upload thread, since opengl uploading does not scale good on Intel HD Graphics and
+        //it does not matter on PCIe graphics card due to high video memory bandwidth
 
-        //savePicToFile( decodedPicture.data(), decodedPicture->pkt_dts );
+    m_framesWaitingUploadInGUIThread.push_back( new AVPacketUploader( emptyPictureBuf, decodedPicture, this ) );
 
-        //if( avPacketUploader->success() )
-        //    m_picturesWaitingRendering.push_back( emptyPictureBuf );
-        //else
-        //    m_emptyBuffers.push_back( emptyPictureBuf );        //considering picture buffer invalid
-    }
+    //savePicToFile( decodedPicture.data(), decodedPicture->pkt_dts );
+
+    //if( avPacketUploader->success() )
+    //    m_picturesWaitingRendering.push_back( emptyPictureBuf );
+    //else
+    //    m_emptyBuffers.push_back( emptyPictureBuf );        //considering picture buffer invalid
 }
 
 bool DecodedPictureToOpenGLUploader::isUsingFrame( const QSharedPointer<CLVideoDecoderOutput>& image ) const

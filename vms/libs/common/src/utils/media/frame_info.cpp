@@ -34,31 +34,6 @@ extern "C" {
 #endif
 };
 
-/////////////////////////////////////////////////////
-//  class QnOpenGLPictureData
-/////////////////////////////////////////////////////
-QnOpenGLPictureData::QnOpenGLPictureData(
-    SynchronizationContext* const syncCtx,
-//GLXContext _glContext,
-    unsigned int _glTexture )
-:
-    QnAbstractPictureDataRef( syncCtx ),
-//m_glContext( _glContext ),
-    m_glTexture( _glTexture )
-{
-}
-
-//!Returns context of texture
-//GLXContext QnOpenGLPictureData::glContext() const
-//{
-//    return m_glContext;
-//}
-
-//!Returns OGL texture name
-unsigned int QnOpenGLPictureData::glTexture() const
-{
-    return m_glTexture;
-}
 
 /////////////////////////////////////////////////////
 //  class CLVideoDecoderOutput

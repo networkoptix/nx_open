@@ -306,16 +306,6 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     m_spsFound = false;
 }
 
-void QnFfmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
-{
-    //About empty implementation see comment to QnAbstractVideoDecoder::setOutPictureSize
-}
-
-unsigned int QnFfmpegVideoDecoder::getDecoderCaps() const
-{
-    return QnAbstractVideoDecoder::multiThreadedMode;
-}
-
 void QnFfmpegVideoDecoder::setSpeed( float /*newValue*/ )
 {
     // ffmpeg-based decoder has nothing to do here
@@ -669,14 +659,9 @@ AVPixelFormat QnFfmpegVideoDecoder::GetPixelFormat() const
     return CLVideoDecoderOutput::fixDeprecatedPixelFormat(m_context->pix_fmt);
 }
 
-QnAbstractPictureDataRef::PicStorageType QnFfmpegVideoDecoder::targetMemoryType() const
+MemoryType QnFfmpegVideoDecoder::targetMemoryType() const
 {
-    return QnAbstractPictureDataRef::pstSysMemPic;
-}
-
-QSize QnFfmpegVideoDecoder::getOriginalPictureSize() const
-{
-    return QSize( getWidth(), getHeight() );
+    return MemoryType::SystemMemory;
 }
 
 void QnFfmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode val)

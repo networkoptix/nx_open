@@ -36,6 +36,8 @@ public:
         const DecoderConfig& config,
         nx::metrics::Storage* metrics,
         const QnConstCompressedVideoDataPtr& data);
+    QnFfmpegVideoDecoder(const QnFfmpegVideoDecoder&) = delete;
+    QnFfmpegVideoDecoder& operator=(const QnFfmpegVideoDecoder&) = delete;
     ~QnFfmpegVideoDecoder();
     bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
@@ -51,11 +53,9 @@ public:
     AVCodecContext* getContext() const;
 
     virtual AVPixelFormat GetPixelFormat() const override;
-    QnAbstractPictureDataRef::PicStorageType targetMemoryType() const;
-    int getWidth() const  { return m_context->width;  }
-    int getHeight() const { return m_context->height; }
-    //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
-    virtual QSize getOriginalPictureSize() const override;
+    MemoryType targetMemoryType() const;
+    virtual int getWidth() const override { return m_context->width;  }
+    virtual int getHeight() const override { return m_context->height; }
     double getSampleAspectRatio() const;
     virtual AVPixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
@@ -63,12 +63,6 @@ public:
     void determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data);
     void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy);
     virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
-    virtual void setOutPictureSize( const QSize& outSize ) override;
-    //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
-    /*!
-        Supports \a multiThreadedMode
-    */
-    virtual unsigned int getDecoderCaps() const override;
     virtual void setSpeed( float newValue ) override;
 
     int getLastDecodeResult() const { return m_lastDecodeResult; }
@@ -105,7 +99,7 @@ private:
 
     //int m_width;
     //int m_height;
-
+    bool m_tryHardwareAcceleration = false;
     static bool m_first_instance;
     AVCodecID m_codecId;
     bool m_showmotion;
