@@ -24,7 +24,6 @@ protected:
     virtual bool activate(QObject *watched, QEvent *event) = 0;
 };
 
-
 template<class Base>
 class QnSingleEventProcessor: public QnEventProcessor<Base> {
 public:
@@ -46,7 +45,6 @@ protected:
 private:
     QEvent::Type m_type;
 };
-
 
 template<class Base>
 class QnMultiEventProcessor: public QnEventProcessor<Base> {
@@ -92,7 +90,6 @@ protected:
     }
 };
 
-
 class QnAbstractEventSignalizer: public QObject {
     Q_OBJECT;
 public:
@@ -101,7 +98,6 @@ public:
 signals:
     void activated(QObject *object, QEvent *event);
 };
-
 
 template<class Base>
 class QnEventSignalizer: public Base {
@@ -116,11 +112,9 @@ protected:
     }
 };
 
-
 typedef QnEventSignalizer<QnSingleEventProcessor<QnAbstractEventSignalizer> > QnSingleEventSignalizer;
 typedef QnEventSignalizer<QnMultiEventProcessor<QnAbstractEventSignalizer> >  QnMultiEventSignalizer;
 typedef QnEventSignalizer<QnEveryEventProcessor<QnAbstractEventSignalizer> >  QnEveryEventSignalizer;
-
 
 namespace Qn {
     enum EventProcessingPolicy {
@@ -337,7 +331,7 @@ template<
     class Watched,
     /* Bool typecast availability check: */
     class = decltype(static_cast<bool>(std::declval<Watched>())),
-    /* Dereferenceability and installEventFilter method existance check: */
+    /* Dereferenceability and installEventFilter method existence check: */
     class = decltype(std::declval<Watched>()->installEventFilter(nullptr))>
 bool installEventFilter(const Watched& watched, QObject* filter)
 {
@@ -401,4 +395,3 @@ QnAbstractEventSignalizer* installEventHandler(
 
     return scopedSignalizer.take(); //< pass scoped ownership to the caller
 }
-

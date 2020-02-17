@@ -405,7 +405,7 @@ protected:
 
     /**
      * Filter out resolutions, that are greater then video source resolution.
-     * @note: As this function is virtual, descendents may change any resource capabilities.
+     * @note: As this function is virtual, descendants may change any resource capabilities.
      */
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 

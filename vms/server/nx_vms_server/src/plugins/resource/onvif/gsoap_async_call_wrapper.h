@@ -40,7 +40,7 @@ public:
 //!Async wrapper for gsoap call
 /*!
     \note Class methods are not thread-safe. All calls MUST be serialized by caller
-    \note Request interleaving is not supported. Issueing new request with previous still running causes undefined behavior
+    \note Request interleaving is not supported. Issuing new request with previous still running causes undefined behavior
 */
 template<typename SyncWrapper, typename Request, typename Response>
 class GSoapAsyncCallWrapper
@@ -132,7 +132,7 @@ public:
             receives GSoap result code or \a SOAP_INTERRUPTED
         \return \a true if async call has been started successfully
         \note Request interleaving is not supported
-            Issueing new request with previous still running causes undefined behavior
+            Issuing new request with previous still running causes undefined behavior
     */
     template<class RequestType, class ResultHandler>
     void callAsync(RequestType&& request, ResultHandler&& resultHandler)

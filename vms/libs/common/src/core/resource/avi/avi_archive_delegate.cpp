@@ -595,7 +595,7 @@ bool QnAviArchiveDelegate::findStreams()
                 m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
         }
         else {
-            // TODO: #vasilenko avoid using deprecated methods
+            // TODO: #rvasilenko avoid using deprecated methods
             m_streamsFound = avformat_find_stream_info(m_formatContext, nullptr) >= 0;
         }
 

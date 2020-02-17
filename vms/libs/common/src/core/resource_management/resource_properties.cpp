@@ -78,7 +78,7 @@ int QnResourcePropertyDictionary::saveParamsAsync(const QnUuid& resourceId)
     nx::vms::api::ResourceParamWithRefDataList data;
     {
         QnMutexLocker lock( &m_mutex );
-        //TODO #vasilenko is it correct to mark property as saved before it has been actually saved to ec?
+        //TODO #rvasilenko is it correct to mark property as saved before it has been actually saved to ec?
         fromModifiedDataToSavedData(resourceId, data);
     }
     return saveData(std::move(data));
@@ -89,7 +89,7 @@ int QnResourcePropertyDictionary::saveParamsAsync(const QList<QnUuid>& idList)
     nx::vms::api::ResourceParamWithRefDataList data;
     {
         QnMutexLocker lock( &m_mutex );
-        //TODO #vasilenko is it correct to mark property as saved before it has been actually saved to ec?
+        //TODO #rvasilenko is it correct to mark property as saved before it has been actually saved to ec?
         for(const QnUuid& resourceId: idList)
             fromModifiedDataToSavedData(resourceId, data);
     }

@@ -32,5 +32,5 @@ private:
     QHash<QString, StorageFactory> m_factoryByProtocol;
     StorageFactory m_defaultFactory;
     static StorageFactory s_factory;
-    QnMutex m_mutex; // TODO: #vasilenko this mutex is not used, is it intentional?
+    QnMutex m_mutex; // TODO: #rvasilenko this mutex is not used, is it intentional?
 };

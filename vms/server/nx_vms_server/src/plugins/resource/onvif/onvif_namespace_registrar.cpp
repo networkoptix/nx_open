@@ -73,7 +73,7 @@ const Namespace* requestNamespaces(RequestTypeId typeId)
     return itr->second.data();
 }
 
-} // namespaec onvif
+} // namespace onvif
 } // namespace plugins
 } // namespace vms::server
 } // namespace nx

@@ -2358,7 +2358,7 @@ void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resour
     for(const DeviceFileCatalogPtr& catalogLow: m_devFileCatalog[QnServer::LowQualityCatalog])
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 
-    // TODO: #vasilenko should we delete bookmarks here too?
+    // TODO: #rvasilenko should we delete bookmarks here too?
 }
 
 bool QnStorageManager::isWritableStoragesAvailable() const

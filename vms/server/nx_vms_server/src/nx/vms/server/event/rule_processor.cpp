@@ -701,12 +701,12 @@ vms::event::AbstractActionList RuleProcessor::matchActions(
 
 void RuleProcessor::at_actionDelivered(const vms::event::AbstractActionPtr& /*action*/)
 {
-    // TODO: #vasilenko implement me.
+    // TODO: #rvasilenko implement me.
 }
 
 void RuleProcessor::at_actionDeliveryFailed(const vms::event::AbstractActionPtr& /*action*/)
 {
-    // TODO: #vasilenko implement me.
+    // TODO: #rvasilenko implement me.
 }
 
 void RuleProcessor::at_broadcastActionFinished(int handle, ec2::ErrorCode errorCode)

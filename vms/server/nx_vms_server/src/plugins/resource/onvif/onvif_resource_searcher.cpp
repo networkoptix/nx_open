@@ -35,7 +35,7 @@ const static std::array<int, 4> kOnvifDeviceAltPorts =
     8081, //FLIR default port
     8032, // DW default port
     50080, // NEW DW cam default port
-    9988 // Dahui default port
+    9988 // Dahua default port
 };
 static const int kDefaultOnvifPort = 80;
 static const std::chrono::milliseconds kManualDiscoveryConnectTimeout(5000);
