@@ -8,9 +8,13 @@ LabeledItem
 {
     id: control
 
+    // TODO: #dfisenko: rename to "defaultTooltip" for enabling tooltips
+    property bool defaultTooltip_: defaultValue
     property alias caption: checkBox.text
     property alias value: checkBox.checked
     property bool defaultValue: false
+
+    readonly property bool filled: checkBox.checked
 
     contentItem: checkBox
 

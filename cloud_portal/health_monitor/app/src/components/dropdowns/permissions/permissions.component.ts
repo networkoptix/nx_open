@@ -1,5 +1,5 @@
 import {
-    Component, OnInit, Inject, ViewEncapsulation,
+    Component, OnInit, ViewEncapsulation,
     Input, Output, EventEmitter, SimpleChanges
 }                                    from '@angular/core';
 import { NxLanguageProviderService } from '../../../services/nx-language-provider';
@@ -38,6 +38,14 @@ export class NxPermissionsDropdown implements OnInit {
     // TODO: Bind ngModel to the component and eliminate EventEmitter
 
     ngOnInit(): void {
+        this.processAccessRoles();
+        const role = this.accessRoles.filter(x => x.name === this.selected.name)[ 0 ];
+        this.selection = '';
+
+        if (role) {
+            this.selection = role.optionLabel || this.message;
+            this.changePermission(role);
+        }
     }
 
     processAccessRoles() {
@@ -68,7 +76,7 @@ export class NxPermissionsDropdown implements OnInit {
     // }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes.roles && changes.roles.currentValue) {
+        if (changes.roles && changes.roles.currentValue && !this.system.pauseUpdate) {
             this.processAccessRoles();
             const role = this.accessRoles.filter(x => x.name === this.selected.name)[ 0 ];
             this.selection = '';
@@ -79,7 +87,7 @@ export class NxPermissionsDropdown implements OnInit {
             }
         }
 
-        if (changes.selected && changes.selected.currentValue) {
+        if (changes.selected && changes.selected.currentValue && !this.system.pauseUpdate) {
             this.selection = this.accessRoles.find(x => x.name === changes.selected.currentValue.name).optionLabel;
         }
     }

@@ -9,6 +9,8 @@ LabeledItem
     property alias value: textField.text
     property string defaultValue: ""
 
+    readonly property bool filled: textField.text !== ""
+
     contentItem: TextArea
     {
         id: textField

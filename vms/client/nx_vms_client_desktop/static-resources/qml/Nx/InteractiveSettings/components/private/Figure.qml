@@ -21,6 +21,8 @@ LabeledItem
 
     signal valueChanged()
 
+    readonly property bool filled: !!figure
+
     contentItem: Column
     {
         spacing: 8

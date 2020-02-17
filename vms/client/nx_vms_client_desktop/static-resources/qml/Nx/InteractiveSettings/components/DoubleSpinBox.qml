@@ -8,6 +8,7 @@ LabeledItem
 {
     id: control
 
+    property real defaultTooltip: defaultValue
     property real defaultValue: 0
     property alias minValue: spinBox.dFrom
     property alias maxValue: spinBox.dTo

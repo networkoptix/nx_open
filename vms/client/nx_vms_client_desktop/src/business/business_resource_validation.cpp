@@ -876,7 +876,55 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
     bool allUsers,
     const QSet<QnUuid>& subjects) const
 {
-    return {};
+    QnUserResourceList users;
+    if (allUsers)
+    {
+        users = resourcePool()->getResources<QnUserResource>();
+    }
+    else
+    {
+        QnUuidList roles;
+        commonModule()->userRolesManager()->usersAndRoles(subjects, users, roles);
+        for (const auto& roleId: roles)
+        {
+            const auto& inRole = commonModule()->resourceAccessSubjectsCache()->usersInRole(roleId);
+            for (const auto& subject: inRole)
+            {
+                if (!subject.isUser())
+                    continue;
+
+                if (std::find_if(users.begin(), users.end(),
+                    [subject](const QnUserResourcePtr& existing)
+                    {
+                        return subject.user()->getId() == existing->getId();
+                    }) == users.end())
+                {
+                    users << subject.user();
+                }
+            }
+        }
+    }
+
+    int nonCloudCount = 0, totalCount = 0;
+    for (const auto& user: users)
+    {
+        if (user->isEnabled())
+        {
+            if (!user->isCloud())
+                ++nonCloudCount;
+            ++totalCount;
+        }
+    }
+
+    if (totalCount == 0)
+        return nx::vms::event::StringsHelper::needToSelectUserText();
+
+    if (nonCloudCount != 0)
+        return tr("%1 of %2 selected users are not Cloud users and will not get mobile notifications.")
+            .arg(nonCloudCount)
+            .arg(totalCount);
+
+    return QString();
 }
 
 bool QnBuzzerPolicy::isServerValid(const QnMediaServerResourcePtr& server)

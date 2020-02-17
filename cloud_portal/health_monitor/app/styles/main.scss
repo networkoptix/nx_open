@@ -116,6 +116,10 @@ html.webclient-page{
     }
 }
 
+svg {
+    pointer-events: none;
+}
+
 .block-container {
   max-width: $fluid-container-max-width;
   width: 100%;

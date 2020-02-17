@@ -24,8 +24,8 @@ nx-dynamic-table {
     width     : fit-content;
     width     : -moz-fit-content;
 
-    @include media-breakpoint-down(lg) {
-      width: auto;
+    @media (max-width : 1280px) {
+      width: 100%;
     }
 
     ::-webkit-scrollbar {

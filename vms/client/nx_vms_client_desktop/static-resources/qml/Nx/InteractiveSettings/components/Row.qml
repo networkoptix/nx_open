@@ -1,8 +1,18 @@
 import QtQuick 2.0
 
-Row
+import "private"
+
+Group
 {
     property string name: ""
-    property Item childrenItem: this
-    spacing: 8
+    childrenItem: row
+
+    implicitWidth: row.implicitWidth
+    implicitHeight: row.implicitHeight
+
+    contentItem: Row
+    {
+        id: row
+        spacing: 8
+    }
 }

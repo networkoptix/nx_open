@@ -156,14 +156,18 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         }
         this.healthService.tableReady = true;
     }
+
     initLayoutService() {
         this.healthLayoutService.tableHeaderElement = this.tableHeadElement;
         this.healthLayoutService.tableTitleElement = this.tableTitleElement;
         this.healthLayoutService.tableElement = this.tableElement;
 
-        this.pageSubscription = this.healthLayoutService.pageSizeSubject.pipe(delay(0)).subscribe(pageSize => {
-            this.pageSize = pageSize;
-            this.setPage(1);
+        this.pageSubscription = this.healthLayoutService
+            .pageSizeSubject
+            .pipe(delay(0))
+            .subscribe(pageSize => {
+                this.pageSize = pageSize;
+                this.setPage(1);
         });
 
         this.healthLayoutService.activeEntitySubject.subscribe((activeEntity: any) => {
@@ -364,11 +368,16 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
                     };
                 default:
                     return (elm) => {
+                        if (!(elm[groupId] && elm[groupId][paramId])) {
+                            return Number.NEGATIVE_INFINITY; // metric does not exist - visual representation is "-"
+                        }
+
                         const format = elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].formatClass || undefined;
 
                         if (['longText', 'long-text', 'shortText', 'short-text', 'text', 'no-max-width'].includes(format)) {
                             return elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].text || '';
                         }
+
                         return elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].value || 0;
                     };
             }

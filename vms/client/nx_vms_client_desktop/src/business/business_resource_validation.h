@@ -304,6 +304,7 @@ private:
 
 class QnCloudUsersValidationPolicy: public QnSubjectValidationPolicy
 {
+    Q_DECLARE_TR_FUNCTIONS(QnCloudUsersValidationPolicy)
     using base_type = QnSubjectValidationPolicy;
 
 public:

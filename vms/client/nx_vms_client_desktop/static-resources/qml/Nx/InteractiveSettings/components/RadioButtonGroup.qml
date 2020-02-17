@@ -15,6 +15,8 @@ LabeledItem
     property var itemCaptions
     property alias range: buttons.model
 
+    readonly property bool filled: value
+
     contentItem: MultiColumn
     {
         id: buttons
@@ -26,7 +28,7 @@ LabeledItem
             readonly property var identifier: modelData
 
             text: (control.itemCaptions && control.itemCaptions[identifier]) || identifier
-            checked: control.value == identifier
+            checked: control.value === identifier
 
             onClicked:
                 control.value = identifier

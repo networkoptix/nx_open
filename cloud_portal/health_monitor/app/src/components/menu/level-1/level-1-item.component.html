@@ -10,7 +10,7 @@
     </div>
     <div class="menu-level-1-icon" *ngIf="item.svg">
         <svg-icon [src]="CONFIG.icons.dir + item.svg +'.svg'"
-                  [svgStyle]="{'width.px': '24', 'height.px': '24' }"></svg-icon>
+                  [svgStyle]="{'width.px': '24', 'height.px': '24'}"></svg-icon>
     </div>
     {{item.label}}
     <div *ngIf="item.alerts" class="menu-level-1-alerts">

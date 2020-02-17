@@ -10,10 +10,14 @@ LabeledItem
 
     isGroup: buttons.count > 1
 
+    // TODO: #dfisenko: rename to "defaultTooltip" for enabling tooltips
+    property var defaultTooltip_: ""
     property var value: defaultValue
     property var defaultValue
     property var itemCaptions
     property alias range: buttons.model
+
+    readonly property bool filled: value && value !== []
 
     contentItem: MultiColumn
     {
@@ -30,12 +34,18 @@ LabeledItem
 
             onClicked:
                 buttons.updateValue()
+
+            onHoveredChanged:
+            {
+                if (hovered)
+                    control.defaultTooltip_ = defaultValue.indexOf(identifier) !== -1
+            }
         }
 
         function updateValue()
         {
             var newValue = []
-            for (var i = 0; i != count; ++i)
+            for (var i = 0; i !== count; ++i)
             {
                 var item = itemAt(i)
                 if (item.checked)

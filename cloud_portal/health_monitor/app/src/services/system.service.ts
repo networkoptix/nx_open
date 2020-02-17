@@ -324,6 +324,8 @@ export class NxSystem extends System implements OnDestroy {
     usersPromise: any;
     systemPoll: any;
 
+    pauseUpdate = false;
+
     connectionSubject = new BehaviorSubject<boolean>(false);
     infoSubject = new BehaviorSubject<NxSystem>(undefined);
 

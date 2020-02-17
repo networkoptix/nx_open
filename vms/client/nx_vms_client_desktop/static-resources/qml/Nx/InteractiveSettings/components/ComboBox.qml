@@ -8,6 +8,7 @@ LabeledItem
 {
     id: control
 
+    property var defaultTooltip: itemCaptions[defaultValue]
     property var range
     property var value: defaultValue
     property var defaultValue

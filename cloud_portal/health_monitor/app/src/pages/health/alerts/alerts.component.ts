@@ -44,7 +44,7 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
 
     layoutReady: boolean;
     fixedLayoutClass: string;
-    desktopDetailMode: boolean;
+    smallDesktopMode: boolean;
     breakpoint: string;
 
     manifest: any;
@@ -129,7 +129,7 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
                 this.healthLayoutService.mobileDetailMode = false;
             }
 
-            this.desktopDetailMode = this.healthLayoutService.activeEntity && this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.xl);
+            this.smallDesktopMode = this.scrollMechanicsService.mediaQueryMin(NxScrollMechanicsService.MEDIA.lg) && this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.xl);
 
             this.setLayout();
         });
@@ -393,17 +393,12 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
                 this.healthLayoutService.mobileDetailMode = true;
             }
 
-            if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.xl)) {
-                this.desktopDetailMode = true;
-            }
-
         } else {
             this.resetActiveEntity();
         }
     }
 
     resetActiveEntity(updateURI = true) {
-        this.desktopDetailMode = false;
         if (updateURI) {
             const queryParams: Params = {};
             queryParams.id            = undefined;
