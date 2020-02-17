@@ -2105,7 +2105,7 @@ void MediaServerProcess::registerRestHandlers(
      *                 %value high
      *                 %value highest
      *                 %value preset
-     *                 %//value[proptietary] rapidReview
+     *                 %//value[proprietary] rapidReview
      *             %param:integer reply[].actionParams.recordingDuration Duration of the recording,
      *                 in seconds.
      *             %param:integer reply[].actionParams.recordAfter For Bookmark, extension to the
