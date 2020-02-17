@@ -16,7 +16,6 @@ LabeledItem
 
     readonly property bool filled: spinBox.value !== 0
 
-    contentItem: SpinBox
     contentItem: Item
     {
         implicitWidth: spinBox.implicitWidth
