@@ -224,8 +224,12 @@ void AreaHighlightOverlayWidget::Private::updateArea(
     const auto& tooltipGeometry = calculateLabelGeometry(
         q->rect(), naturalTooltipSize, area.tooltipItem->textMargins(), rect);
     area.tooltipItem->setPos(tooltipGeometry.topLeft());
-    area.tooltipItem->setScale(
-        std::min(1.0, Geometry::scaleFactor(naturalTooltipSize, tooltipGeometry.size())));
+    const auto scaleFactor =
+        std::min(1.0, Geometry::scaleFactor(naturalTooltipSize, tooltipGeometry.size()));
+    // Qt does not check that scale factor is different from the previous one.
+    // Rescaling is slow on macOS.
+    if (area.tooltipItem->scale() != scaleFactor)
+        area.tooltipItem->setScale(scaleFactor);
     area.tooltipItem->setTargetObjectGeometry(rect);
     area.tooltipItem->setBackgroundColor(
         (Geometry::eroded(rect, 0.5).contains(tooltipGeometry.center()) || !highlighted)
