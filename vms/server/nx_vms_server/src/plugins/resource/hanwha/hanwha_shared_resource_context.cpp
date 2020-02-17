@@ -461,6 +461,15 @@ void HanwhaSharedResourceContext::initializeAlarmInputs()
     std::map<QString, QString> alarmInputParameters = viewResponse.response();
     for (auto& [parameterName, parameterValue]: alarmInputParameters)
     {
+        // Device response looks like:
+        // ```
+        // AlarmOutput.1.Enabled=True
+        // AlarmOutput.1.State=NormallyOpen
+        // AlarmOutput.2.Enabled=False
+        // AlarmOutput.2.State=NormallyClose
+        // ...
+        // ```
+        // We enable all the outputs but keep their state intact.
         if (parameterName.endsWith("Enabled"))
         {
             NX_DEBUG(this, "Settings parameter %1 to true", parameterName);
