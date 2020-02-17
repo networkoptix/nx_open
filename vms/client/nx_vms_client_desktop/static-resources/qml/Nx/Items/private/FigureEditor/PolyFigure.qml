@@ -45,6 +45,9 @@ Figure
     {
         id: pointMakerInstrument
 
+        minPoints: figure.minPoints
+        maxPoints: figure.maxPoints
+
         enabled: false
         closed: polygon
 
