@@ -120,11 +120,11 @@ public:
     virtual QnIOStateData portState(const QString& portId) const override
     {
         const std::optional<int> commandId = getCommandIdByInputPortId(portId);
-        const qint64 timestamp = qnSyncTime->currentMSecsSinceEpoch();
+        const qint64 timestampUs = qnSyncTime->currentUSecsSinceEpoch();
         if (!commandId)
         {
             NX_WARNING(this, "Unable to find a command to get port '%1' state", portId);
-            return QnIOStateData(portId, /*portState*/ false, timestamp);
+            return QnIOStateData(portId, /*portState*/ false, timestampUs);
         }
 
         const int command = prepareCommand<int>(*commandId);
@@ -134,10 +134,10 @@ public:
         if (result != 0)
         {
             NX_WARNING(this, "Unable to get state of the port '%2'", portId);
-            return QnIOStateData(portId, /*portState*/ false, timestamp);
+            return QnIOStateData(portId, /*portState*/ false, timestampUs);
         }
 
-        return {portId, (bool) commandData, timestamp};
+        return {portId, (bool) commandData, timestampUs};
     }
 private:
     int m_ioDeviceDescriptor = -1;

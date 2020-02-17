@@ -44,14 +44,14 @@ void IoStateFetcher::run()
         std::set<QnIOStateData> portStateData;
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
-            const int64_t currentTimestampMs = qnSyncTime->currentMSecsSinceEpoch();
+            const int64_t currentTimestampUs = qnSyncTime->currentUSecsSinceEpoch();
 
             for (const auto& [portId, portState]: m_outputPortStates)
             {
                 QnIOStateData outputPortStateData;
                 outputPortStateData.id = portId;
                 outputPortStateData.isActive = (portState == IoPortState::active);
-                outputPortStateData.timestamp = currentTimestampMs;
+                outputPortStateData.timestamp = currentTimestampUs;
                 portStateData.insert(outputPortStateData);
             }
         }
