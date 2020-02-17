@@ -17,6 +17,8 @@ PolyFigure
         id: arrowLeft
 
         visible: !pointMakerInstrument.enabled && allowedDirections !== "none"
+            && pathUtil.length > 0
+
         color: figure.color
 
         x: pathUtil.midAnchorPoint.x
@@ -41,6 +43,8 @@ PolyFigure
         id: arrowRight
 
         visible: !pointMakerInstrument.enabled && allowedDirections !== "none"
+            && pathUtil.length > 0
+
         color: figure.color
 
         x: pathUtil.midAnchorPoint.x
