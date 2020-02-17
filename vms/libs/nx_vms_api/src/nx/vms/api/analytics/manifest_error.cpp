@@ -89,7 +89,7 @@ QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::ManifestErrorTypes, (numeric
 
 namespace nx::vms::api::analytics {
 
-QString toHumanReadableString(ManifestErrorType errorType)
+QString toString(ManifestErrorType errorType)
 {
     switch (errorType)
     {
@@ -152,9 +152,9 @@ QString toHumanReadableString(ManifestErrorType errorType)
     }
 }
 
-QString toHumanReadableString(ManifestError manifestError)
+QString toString(ManifestError manifestError)
 {
-    return "Manifest error: " + toHumanReadableString(manifestError.errorType)
+    return "Manifest error: " + toString(manifestError.errorType)
         + (manifestError.additionalInfo.isEmpty()
             ? ""
             : (". Details: " + manifestError.additionalInfo));

@@ -5,17 +5,17 @@
 
 namespace nx::vms::server::analytics::wrappers {
 
-static QString toHumanReadableString(SdkObjectType sdkObjectType)
+static QString toString(SdkObjectType sdkObjectType)
 {
     return QnLexical::serialized(sdkObjectType);
 }
 
-static QString toHumanReadableString(SdkMethod sdkMethod)
+static QString toString(SdkMethod sdkMethod)
 {
     return QnLexical::serialized(sdkMethod) + "()";
 }
 
-static QString toHumanReadableString(ViolationType violation)
+static QString toString(ViolationType violation)
 {
     switch (violation)
     {
@@ -42,7 +42,7 @@ static QString toHumanReadableString(ViolationType violation)
             return "Method execution took too long";
         default:
             NX_ASSERT(false);
-            return QString("unknown violation");
+            return "Unknown violation";
     }
 }
 
@@ -87,20 +87,18 @@ QString StringBuilder::buildPluginInfoString() const
 QString StringBuilder::buildViolationPluginInfoString() const
 {
     return lm("Method %1::%2 violated its contract: %3%4").args(
-        toHumanReadableString(m_sdkObjectDescription.sdkObjectType()),
-        toHumanReadableString(m_sdkMethod),
-        toHumanReadableString(m_violation.type),
+        m_sdkObjectDescription.sdkObjectType(),
+        m_sdkMethod,
+        m_violation.type,
         m_violation.details.isEmpty()
-            ? QString()
-            : lm(", details: %1").args(m_violation.details).toQString());
+            ? ""
+            : lm(", details: %1").args(m_violation.details));
 }
 
 QString StringBuilder::buildErrorPluginInfoString() const
 {
     return lm("Method %1::%2 returned an error: %3").args(
-        toHumanReadableString(m_sdkObjectDescription.sdkObjectType()),
-        toHumanReadableString(m_sdkMethod),
-        m_error);
+        m_sdkObjectDescription.sdkObjectType(), m_sdkMethod, m_error);
 }
 
 QString StringBuilder::buildPluginDiagnosticEventCaption() const
@@ -122,13 +120,13 @@ QString StringBuilder::buildPluginDiagnosticEventDescription() const
 QString StringBuilder::buildViolationFullString() const
 {
     return lm("Technical details: Method %1::%2 of [%3] violated its contract: %4%5").args(
-        toHumanReadableString(m_sdkObjectDescription.sdkObjectType()),
-        toHumanReadableString(m_sdkMethod),
+        m_sdkObjectDescription.sdkObjectType(),
+        m_sdkMethod,
         m_sdkObjectDescription.descriptionString(),
-        toHumanReadableString(m_violation.type),
+        m_violation.type,
         m_violation.details.isEmpty()
-            ? QString()
-            : lm(", details: %1").args(m_violation.details).toQString());
+            ? ""
+            : lm(", details: %1").args(m_violation.details));
 }
 
 QString StringBuilder::buildViolationShortString() const
@@ -139,8 +137,8 @@ QString StringBuilder::buildViolationShortString() const
 QString StringBuilder::buildErrorFullString() const
 {
     return lm("Method %1::%2 of [%3] returned an error: %4").args(
-        toHumanReadableString(m_sdkObjectDescription.sdkObjectType()),
-        toHumanReadableString(m_sdkMethod),
+        m_sdkObjectDescription.sdkObjectType(),
+        m_sdkMethod,
         m_sdkObjectDescription.descriptionString(),
         m_error);
 }
