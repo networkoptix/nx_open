@@ -504,14 +504,14 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value high
      *         %value highest
      *         %value preset
-     *         %//value[proptietary] rapidReview
+     *         %//value[proprietary] rapidReview
      *     %param scheduleTasks[].fps Frames per second (integer).
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
      *     %value true
      * %param disableDualStreaming
-     *     %value false turn of dual streaming.
-     *     %value true enable dual streaming if it supported by camera.
+     *     %value false Turn of dual streaming.
+     *     %value true Enable dual streaming if it supported by camera.
      * %param controlEnabled Whether server manages the camera (changes resolution, FPS, create
      *     profiles, etc).
      *     %value false
@@ -602,7 +602,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value high
      *         %value highest
      *         %value preset
-     *         %//value[proptietary] rapidReview
+     *         %//value[proprietary] rapidReview
      *     %param scheduleTasks[].fps Frames per second (integer).
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
@@ -700,7 +700,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value high
      *             %value highest
      *             %value preset
-     *             %//value[proptietary] rapidReview
+     *             %//value[proprietary] rapidReview
      *         %param scheduleTasks[].fps Frames per second (integer).
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
@@ -841,7 +841,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value high
      *             %value highest
      *             %value preset
-     *             %//value[proptietary] rapidReview
+     *             %//value[proprietary] rapidReview
      *         %param scheduleTasks[].fps Frames per second (integer).
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
