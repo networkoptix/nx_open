@@ -1017,7 +1017,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(
     if (!currentAEConfig)
         return CameraDiagnostics::RequestFailedResult("selectAudioEncoderConfig", QString());
 
-    // TODO: #vasilenko UTF unuse std::string
+    // TODO: #rvasilenko UTF unuse std::string
     outInfo->audioEncoderConfigurationToken = currentAEConfig->token;
 
     if (!isCameraControlRequired)

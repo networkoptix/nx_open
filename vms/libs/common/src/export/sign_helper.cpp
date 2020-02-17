@@ -708,7 +708,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
             goto error_label;
         }
 
-        // TODO: #vasilenko avoid using deprecated methods
+        // TODO: #rvasilenko avoid using deprecated methods
         //out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
 
         m_outPacket->data = videoBuf;

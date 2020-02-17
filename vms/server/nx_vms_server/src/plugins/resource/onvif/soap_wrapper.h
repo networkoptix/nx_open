@@ -639,7 +639,7 @@ namespace Media2
 class DeviceSoapWrapper : public SoapWrapper<DeviceBindingProxy>
 {
 public:
-    // TODO: #vasilenko UTF unuse std::string
+    // TODO: #rvasilenko UTF unuse std::string
     DeviceSoapWrapper(
         const SoapTimeouts& timeouts,
         const std::string& endpoint,
@@ -684,7 +684,7 @@ private:
     nx::vms::common::Credentials getForcedCredentials(
         QnCommonModule* commonModule,
         const QString& manufacturer, const QString& model);
-    void calcTimeDrift();
+    int calcTimeDrift();
 
 };
 // ------------------------------------------------------------------------------------------------

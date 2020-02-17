@@ -139,13 +139,13 @@ bool OnvifResourceInformationFetcher::ignoreCamera(
 
     if (resourceData.value<bool>(ResourceDataKey::kIgnoreONVIF))
         return true;
-    
+
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
         const char* rxVendor(IGNORE_VENDORS[i][0]);
         const char* rxName(IGNORE_VENDORS[i][1]);
 
-        if (wildcardMatch(rxVendor, manufacturer, MatchMode::caseInsensitive) 
+        if (wildcardMatch(rxVendor, manufacturer, MatchMode::caseInsensitive)
             && wildcardMatch(rxName, name, MatchMode::caseInsensitive))
         {
             return true;
@@ -220,7 +220,7 @@ void OnvifResourceInformationFetcher::findResources(
     QString model = info.name;
     QString firmware;
     QHostAddress sender(QUrl(endpoint).host());
-    // TODO: #vasilenko UTF unuse std::string
+    // TODO: #rvasilenko UTF unuse std::string
     DeviceSoapWrapper soapWrapper(
         SoapTimeouts(serverModule()->settings().onvifTimeouts()),
         endpoint.toStdString(), QString(), QString(), 0);
@@ -434,7 +434,7 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
 
 QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& response) const
 {
-    // TODO: #vasilenko UTF unuse std::string
+    // TODO: #rvasilenko UTF unuse std::string
     return response.HardwareId.empty()
         ? QString()
         : QString::fromStdString(response.HardwareId) + QLatin1String("::") +

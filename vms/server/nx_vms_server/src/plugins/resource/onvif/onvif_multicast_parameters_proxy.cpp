@@ -86,6 +86,8 @@ void updateConfigurationWithMulticastParameters(
     MulticastParameters& multicastParameters)
 {
     const auto multicastConfiguration = inOutEncoderConfiguration->Multicast;
+    if (!multicastConfiguration)
+        return;
 
     if (multicastParameters.address)
     {

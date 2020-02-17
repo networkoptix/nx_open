@@ -165,7 +165,7 @@ DeviceSoapWrapper::~DeviceSoapWrapper()
 {
 }
 
-void DeviceSoapWrapper::calcTimeDrift()
+int DeviceSoapWrapper::calcTimeDrift()
 {
     _onvifDevice__GetSystemDateAndTime request;
     _onvifDevice__GetSystemDateAndTimeResponse response;
@@ -190,6 +190,7 @@ void DeviceSoapWrapper::calcTimeDrift()
             m_timeDrift = datetime.toMSecsSinceEpoch() / 1000 - QDateTime::currentMSecsSinceEpoch() / 1000;
         }
     }
+    return soapRes;
 }
 
 QAuthenticator DeviceSoapWrapper::getDefaultPassword(
@@ -290,7 +291,9 @@ bool DeviceSoapWrapper::fetchLoginPassword(
             arg(found));
     };
 
-    calcTimeDrift();
+    if (calcTimeDrift() != SOAP_OK)
+        return false;
+    
     for (const auto& credentials : possibleCredentials)
     {
         if (commonModule->isNeedToStop())

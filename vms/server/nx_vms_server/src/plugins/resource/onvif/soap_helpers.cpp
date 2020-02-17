@@ -99,5 +99,5 @@ int soapWsseAddUsernameTokenDigest(
 
 } // namespace onvif
 } // namespace plugins
-} // namespaec mediaserver_core
+} // namespace mediaserver_core
 } // namespace nx

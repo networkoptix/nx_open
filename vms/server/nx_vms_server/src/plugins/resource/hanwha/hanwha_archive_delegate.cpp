@@ -269,9 +269,6 @@ void HanwhaArchiveDelegate::setRange(
     m_endTimeUsec = (endTimeUsec != AV_NOPTS_VALUE)
         ? endTimeUsec - timeShiftUsec() : AV_NOPTS_VALUE;
 
-    if (m_streamReader)
-        m_streamReader->setPlaybackRange(m_startTimeUsec, m_endTimeUsec);
-
     seek(startTimeUsec, true /*findIFrame*/);
 }
 

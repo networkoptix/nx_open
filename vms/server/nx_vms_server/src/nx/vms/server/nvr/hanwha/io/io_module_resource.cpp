@@ -94,7 +94,7 @@ void IoModuleResource::startInputPortStatesMonitoring()
 {
     nvr::IIoManager* const ioManager = getIoManager(serverModule());
     if (!NX_ASSERT(ioManager, "Unable to access IO manager while trying to register handler"))
-        return;    
+        return;
 
     m_handlerId = ioManager->registerStateChangeHandler(
         [this](const QnIOStateDataList& state) { handleStateChange(state); });
@@ -148,8 +148,9 @@ void IoModuleResource::handleStateChange(const QnIOStateDataList& state)
         {
             case Qn::IOPortType::PT_Input:
             {
-                NX_DEBUG(this, "Emitting inputPortStateChanged signal for port %1, state %2",
-                    portState.id, portState.isActive);
+                NX_DEBUG(this,
+                    "Emitting inputPortStateChanged signal for port %1, state %2, timestamp %3 us",
+                    portState.id, portState.isActive, portState.timestamp);
 
                 emit inputPortStateChanged(
                     toSharedPointer(this),
@@ -161,8 +162,9 @@ void IoModuleResource::handleStateChange(const QnIOStateDataList& state)
             }
             case Qn::IOPortType::PT_Output:
             {
-                NX_DEBUG(this, "Emitting outputPortStateChanged signal for port %1, state %2",
-                    portState.id, portState.isActive);
+                NX_DEBUG(this,
+                    "Emitting outputPortStateChanged signal for port %1, state %2, timestamp %3 us",
+                    portState.id, portState.isActive, portState.timestamp);
 
                 emit outputPortStateChanged(
                     toSharedPointer(this),

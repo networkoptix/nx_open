@@ -163,7 +163,13 @@ QString XmlRequestHelper::Result::attributeOrEmpty(const QString& name) const
 
 std::optional<XmlRequestHelper::Result> XmlRequestHelper::get(const QString& path)
 {
-    const auto url = nx::network::url::Builder(m_url).setPath(lit("/") + path);
+    const auto url = nx::network::url::Builder(m_url).setPath(lit("/") + path).toUrl();
+    if (url.host().isEmpty())
+    {
+        NX_VERBOSE(this, "Failed to send GET request. Invalid url %1", url);
+        return std::nullopt;
+    }
+
     if (!m_client->doGet(url) || !isResponseOK(m_client.get()))
     {
         NX_VERBOSE(this, "Failed to send GET request");
@@ -175,7 +181,13 @@ std::optional<XmlRequestHelper::Result> XmlRequestHelper::get(const QString& pat
 
 bool XmlRequestHelper::put(const QString& path, const QString& data)
 {
-    const auto url = nx::network::url::Builder(m_url).setPath(lit("/") + path);
+    const auto url = nx::network::url::Builder(m_url).setPath(lit("/") + path).toUrl();
+    if (url.host().isEmpty())
+    {
+        NX_VERBOSE(this, "Failed to send PUT request. Invalid url %1", url);
+        return false;
+    }
+
     if (!m_client->doPut(url, "application/xml", data.toUtf8()) || !isResponseOK(m_client.get()))
     {
         NX_VERBOSE(this, "Failed to send PUT request");

@@ -19,9 +19,9 @@
 
 #include <nx/fusion/model_functions.h>
 
-//static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
-static const int SOAP_DISCOVERY_TIMEOUT = -500; // "+" in seconds, "-" in mseconds
-static const int SOAP_HELLO_CHECK_TIMEOUT = -1; // "+" in seconds, "-" in mseconds
+//static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in milliseconds
+static const int SOAP_DISCOVERY_TIMEOUT = -500; // "+" in seconds, "-" in milliseconds
+static const int SOAP_HELLO_CHECK_TIMEOUT = -1; // "+" in seconds, "-" in milliseconds
 static const int CHECK_HELLO_RETRY_COUNT = 50;
 
 //extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
@@ -238,7 +238,7 @@ void OnvifResourceSearcherWsdd::pleaseStop()
             QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
 
         if (!bindSucceeded) {
-            qWarning() << "OnvifResourceSearcherWsdd::updateInterfacesListenSockets: faild to bind. Address: " << key;
+            qWarning() << "OnvifResourceSearcherWsdd::updateInterfacesListenSockets: failed to bind. Address: " << key;
             continue;
         }
 

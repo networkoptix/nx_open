@@ -50,7 +50,7 @@ bool QnPlAreconVisionResource::isPanoramic() const
 bool QnPlAreconVisionResource::isDualSensor() const
 {
     const QString model = getModel();
-    return model.contains(lit("3130")) || model.contains(lit("3135")); // TODO: #Elric #vasilenko move to json?
+    return model.contains(lit("3130")) || model.contains(lit("3135")); // TODO: #Elric #rvasilenko move to json?
 }
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)

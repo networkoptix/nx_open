@@ -106,7 +106,7 @@ struct StrictResolution
 };
 
 // strict maximum resolution for this models
-// TODO: #Elric #VASILENKO move out to JSON
+// TODO: #Elric #rvasilenko move out to JSON
 StrictResolution strictResolutionList[] =
 {
     { "Brickcom-30xN", QSize(1920, 1080) }
@@ -141,7 +141,7 @@ const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
-const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
+const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //kHz
 const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 60; //60s
 static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 30;
 
@@ -1641,7 +1641,7 @@ int QnPlOnvifResource::innerQualityToOnvif(
         * ((int)quality - (int)Qn::StreamQuality::lowest)
         / ((int)Qn::StreamQuality::highest - (int)Qn::StreamQuality::lowest);
 
-    NX_DEBUG(this, "innerQualityToOnvif: in quality = %1, out qualty = %2, minOnvifQuality = %3, maxOnvifQuality = %4",
+    NX_DEBUG(this, "innerQualityToOnvif: in quality = %1, out quality = %2, minOnvifQuality = %3, maxOnvifQuality = %4",
         (int) quality, onvifQuality, minQuality, maxQuality);
 
     return onvifQuality;
@@ -4581,7 +4581,7 @@ bool QnPlOnvifResource::setRelayOutputInfo(const RelayOutputInfo& relayOutputInf
         auth.password(),
         m_timeDrift);
 
-    NX_DEBUG(this, lit("Swiching camera %1 relay output %2 to monostable mode").
+    NX_DEBUG(this, lit("Switching camera %1 relay output %2 to monostable mode").
         arg(QString::fromLatin1(soapWrapper.endpoint())).arg(QString::fromStdString(relayOutputInfo.token)));
 
     //switching to monostable mode
@@ -4693,7 +4693,7 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
         relayOutputInfo.activeByDefault = false;
         if (!setRelayOutputInfo(relayOutputInfo))
         {
-            NX_DEBUG(this, "Cannot set camera %1 output %2 to state %3 with timeout %4 msec. "
+            NX_DEBUG(this, "Cannot set camera %1 output %2 to state %3 with timeout %4 milliseconds. "
                 "Cannot set mode to %5",
                 "", relayOutputInfo.token, QString(active ? "active" : "inactive"),
                 autoResetTimeoutMS, QString(relayOutputInfo.isBistable ? "bistable" : "monostable"));
@@ -4717,7 +4717,24 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
     _onvifDevice__SetRelayOutputState request;
     request.RelayOutputToken = relayOutputInfo.token;
 
-    const auto onvifActive = m_isRelayOutputInversed ? !active : active;
+    auto onvifActive = m_isRelayOutputInversed ? !active : active;
+
+    /*
+     Some cameras have a bug.
+     If "output relay idle state" == "open" (i.e. activeByDefault == false),
+     then "SetRelayOutputState" argument "LogicalState" is accepted as inversed value
+     (active as inactive and vice versa).
+
+     If "output relay idle state" == "close", then "SetRelayOutputState" works perfect.
+
+    */
+
+    bool useInvertedActiveStateForOpenIdleState =
+        resourceData().value<bool>(ResourceDataKey::kUseInvertedActiveStateForOpenIdleState);
+
+    if (useInvertedActiveStateForOpenIdleState && relayOutputInfo.activeByDefault == false)
+        onvifActive = !onvifActive;
+
     request.LogicalState = onvifActive ? onvifXsd__RelayLogicalState::active : onvifXsd__RelayLogicalState::inactive;
 
     _onvifDevice__SetRelayOutputStateResponse response;

@@ -197,7 +197,8 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
         nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(objectTrackBestShotPacket->trackId());
     bestShot.bestShot = true;
     const auto box = objectTrackBestShotPacket->boundingBox();
-    bestShot.boundingBox = QRectF(box.x, box.y, box.width, box.height);
+    bestShot.boundingBox = m_objectCoordinatesTranslator.translate(
+        QRectF(box.x, box.y, box.width, box.height));
 
     bestShotPacket.objectMetadataList.push_back(std::move(bestShot));
 
