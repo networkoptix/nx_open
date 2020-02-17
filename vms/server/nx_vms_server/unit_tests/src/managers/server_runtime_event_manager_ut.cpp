@@ -58,7 +58,7 @@ protected:
 
     void makeSureEventHasBeenDeliveredToServer(int serverIndex)
     {
-        static const std::chrono::seconds kMaxServerRuntimeEventTransactionAwaitTime(5);
+        static const std::chrono::seconds kMaxServerRuntimeEventTransactionAwaitTime(30);
         bool isEventDataCorrect = false;
         nx::utils::ElapsedTimer timer;
         timer.restart();
@@ -144,7 +144,7 @@ private:
                     });
 
                 if (!isConnectionEstablished)
-                    std::this_thread::sleep_for(5ms);
+                    std::this_thread::sleep_for(10ms);
 
             } while (!isConnectionEstablished && timer.elapsed() < kSyncWaitTimeout);
         #endif
