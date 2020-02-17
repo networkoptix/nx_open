@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.208",
+    "version": "1.0.1.210",
     "data": [
         {
             "keys": [
@@ -3376,7 +3376,8 @@
             "pelco|imd2007-1es",
             "avigilon|9c-h4a-3mh-180",
             "panomera s7 76/22 c|panomera s7",
-            "vivotek|ms9321-ehv"
+            "vivotek|ms9321-ehv",
+            "Arecont Vision|*"
             ],
             "canShareLicenseGroup": true
         },
