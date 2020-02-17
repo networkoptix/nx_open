@@ -1093,7 +1093,7 @@ def main(conf_file, ini_file, log_file):
 
     # On Windows plink tool is used and this tool doesn't support the fallback to default for the
     # SSH login.
-    if platform.system() == "Linux" and not conf["boxLogin"]:
+    if platform.system() == 'Windows' and not conf["boxLogin"]:
         class InvalidBoxLoginConfigOptionValue(exceptions.VmsBenchmarkError):
             pass
 
