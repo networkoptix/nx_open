@@ -26,7 +26,8 @@ QnAudioRecorderSettings::DeviceList fetchDevicesList()
 {
     auto availableDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
 
-    #if defined(Q_OS_WIN)
+    if (nx::utils::AppInfo::isWindows())
+    {
         // Under modern Windows systems there is an issue with duplicating entries returning by
         // QAudioDeviceInfo::availableDevices(), one from WASAPI, one from winMM, see QTBUG-75781.
         // Since they are actually the same devices provided by different interfaces, bad things
@@ -60,7 +61,7 @@ QnAudioRecorderSettings::DeviceList fetchDevicesList()
 
         while (getDuplicatingWasapiDeviceItr() != availableDevices.end())
             availableDevices.erase(getDuplicatingWasapiDeviceItr());
-    #endif
+    }
 
     QnAudioRecorderSettings::DeviceList devices;
     QMap<QString, int> countByName; //< #vbreus Is it still makes sense, or just was workaround?
