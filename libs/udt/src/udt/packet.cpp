@@ -174,7 +174,10 @@ int CPacket::getLength() const
 
 void CPacket::setLength(int len)
 {
-    m_PacketVector[1].setSize(len);
+    // NOTE: Forbidding negative values.
+    // 1. The underlying buffer size is unsigned.
+    // 2. Error reporting must be done directly with error codes, not with buffer size.
+    m_PacketVector[1].setSize(std::max(len, 0));
 }
 
 void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int size)
