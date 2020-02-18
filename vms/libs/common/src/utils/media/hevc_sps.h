@@ -133,8 +133,8 @@ public:
     DecodedUev spsSeqParameterSetId = 0;
     DecodedUev chromaFormatIdc = 0;
     bool separateColourPlaneFlag = false;
-    DecodedUev picWidthInLumaSamples = 0;
-    DecodedUev picHeightInLumaSamples = 0;
+    DecodedUev width = 0;
+    DecodedUev height = 0;
     bool conformanceWindowFlag = false;
     DecodedUev confWinLeftOffset = 0;
     DecodedUev confWinRightOffset = 0;

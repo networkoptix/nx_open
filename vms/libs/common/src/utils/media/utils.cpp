@@ -20,7 +20,7 @@ QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
         {
             nx::media_utils::hevc::Sps sps;
             if (sps.decodeFromVideoFrame(frame))
-                return QSize(sps.picWidthInLumaSamples, sps.picHeightInLumaSamples);
+                return QSize(sps.width, sps.height);
             return QSize();
         }
         case AV_CODEC_ID_H264:

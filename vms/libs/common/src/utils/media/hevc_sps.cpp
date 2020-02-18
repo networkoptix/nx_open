@@ -84,8 +84,22 @@ bool Sps::decode(const uint8_t* payload, int payloadLength)
         if (chromaFormatIdc == 3)
             separateColourPlaneFlag = reader.getBit();
 
-        picWidthInLumaSamples = NALUnit::extractUEGolombCode(reader);
-        picHeightInLumaSamples = NALUnit::extractUEGolombCode(reader);
+        width = NALUnit::extractUEGolombCode(reader);
+        height = NALUnit::extractUEGolombCode(reader);
+
+        const bool conformance_window_flag = reader.getBit();
+        if (conformance_window_flag)
+        {
+            const int SubHeightC = chromaFormatIdc == 1 ? 2 : 1; //< 2 for yuv420, otherwise 1.
+
+            int conf_win_left_offset = NALUnit::extractUEGolombCode(reader);
+            int conf_win_right_offset = NALUnit::extractUEGolombCode(reader);
+            int conf_win_top_offset = NALUnit::extractUEGolombCode(reader);
+            int conf_win_bottom_offset = NALUnit::extractUEGolombCode(reader);
+
+            width -= SubHeightC * (conf_win_left_offset + conf_win_right_offset);
+            height -= SubHeightC * (conf_win_top_offset + conf_win_bottom_offset);
+        }
 
         // Stop decoding since we do not need further fields.
         // TODO: #dmishin implement full decoding.
