@@ -91,17 +91,17 @@ bool Sps::decode(const uint8_t* payload, int payloadLength)
         if (conformance_window_flag)
         {
             // 2 for yuv420 or yuv422.
-            const int SubWidthC = chromaFormatIdc == 1 || chromaFormatIdc == 2 ? 2 : 1;
+            const int subWidthC = chromaFormatIdc == 1 || chromaFormatIdc == 2 ? 2 : 1;
             // 2 for yuv420, otherwise 1.
-            const int SubHeightC = chromaFormatIdc == 1 ? 2 : 1;
+            const int subHeightC = chromaFormatIdc == 1 ? 2 : 1;
 
             const int confWinLeftOffset = NALUnit::extractUEGolombCode(reader);
             const int confWinRightOffset = NALUnit::extractUEGolombCode(reader);
             const int confWinTopOffset = NALUnit::extractUEGolombCode(reader);
             const int confWinBottomOffset = NALUnit::extractUEGolombCode(reader);
 
-            width -= SubWidthC * (confWinLeftOffset + confWinRightOffset);
-            height -= SubHeightC * (confWinTopOffset + confWinBottomOffset);
+            width -= subWidthC * (confWinLeftOffset + confWinRightOffset);
+            height -= subHeightC * (confWinTopOffset + confWinBottomOffset);
         }
 
         // Stop decoding since we do not need further fields.
