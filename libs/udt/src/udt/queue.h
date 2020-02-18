@@ -67,9 +67,6 @@ class ServerSideConnectionAcceptor;
 
 class CUnitQueue
 {
-    friend class CRcvQueue;
-    friend class CRcvBuffer;
-
 public:
     CUnitQueue();
     ~CUnitQueue();
@@ -85,7 +82,7 @@ public:
     // Returned value:
     //    0: success, -1: failure.
 
-    int init(int size, int mss, int version);
+    int init(int size, int mss);
 
     // Functionality:
     //    Increase (double) the unit queue size.
@@ -114,6 +111,9 @@ public:
 
     CUnit* getNextAvailUnit();
 
+    int decCount() { return --m_iCount; }
+    int incCount() { return ++m_iCount; }
+
 private:
     struct CQEntry
     {
@@ -134,7 +134,6 @@ private:
     int m_iCount = 0;        // total number of valid packets in the queue
 
     int m_iMSS = 0;            // unit buffer size
-    int m_iIPversion = 0;        // IP version
 
 private:
     CUnitQueue(const CUnitQueue&);
@@ -453,6 +452,7 @@ private:
     UdpChannel* m_channel = nullptr;
     // shared timer with the snd queue
     CTimer* m_timer = nullptr;
+    const int m_iIPversion;
 
     // packet payload size
     int m_iPayloadSize = 0;

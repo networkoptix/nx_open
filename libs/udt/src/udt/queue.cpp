@@ -146,6 +146,7 @@ static SendedPacketVerifier packetVerifier;
 
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
+//-------------------------------------------------------------------------------------------------
 
 CUnitQueue::CUnitQueue() = default;
 
@@ -167,7 +168,7 @@ CUnitQueue::~CUnitQueue()
     }
 }
 
-int CUnitQueue::init(int size, int mss, int version)
+int CUnitQueue::init(int size, int mss)
 {
     CQEntry* tempq = nullptr;
     CUnit* tempu = nullptr;
@@ -193,7 +194,6 @@ int CUnitQueue::init(int size, int mss, int version)
 
     m_iSize = size;
     m_iMSS = mss;
-    m_iIPversion = version;
 
     return 0;
 }
@@ -219,7 +219,7 @@ int CUnitQueue::increase()
             p = p->next;
     }
     m_iCount = real_count;
-    if (double(m_iCount) / m_iSize < 0.9)
+    if (double(real_count) / m_iSize < 0.9)
         return -1;
 
     CQEntry* tempq = nullptr;
@@ -269,9 +269,13 @@ CUnit* CUnitQueue::getNextAvailUnit()
 
     do
     {
-        for (CUnit* sentinel = m_pCurrQueue->m_pUnit + m_pCurrQueue->m_iSize - 1; m_pAvailUnit != sentinel; ++m_pAvailUnit)
+        for (CUnit* sentinel = m_pCurrQueue->m_pUnit + m_pCurrQueue->m_iSize - 1;
+            m_pAvailUnit != sentinel;
+            ++m_pAvailUnit)
+        {
             if (m_pAvailUnit->m_iFlag == 0)
                 return m_pAvailUnit;
+        }
 
         if (m_pCurrQueue->m_pUnit->m_iFlag == 0)
         {
@@ -288,6 +292,7 @@ CUnit* CUnitQueue::getNextAvailUnit()
     return nullptr;
 }
 
+//-------------------------------------------------------------------------------------------------
 
 CSndUList::CSndUList(
     CTimer* timer,
@@ -783,13 +788,14 @@ CRcvQueue::CRcvQueue(
     m_pRcvUList(std::make_unique<CRcvUList>()),
     m_channel(c),
     m_timer(t),
+    m_iIPversion(ipVersion),
     m_iPayloadSize(payload),
     m_bClosing(false),
     m_pRendezvousQueue(std::make_unique<CRendezvousQueue>())
 {
     m_iPayloadSize = payload;
 
-    m_UnitQueue.init(size, payload, ipVersion);
+    m_UnitQueue.init(size, payload);
 }
 
 CRcvQueue::~CRcvQueue()
@@ -828,7 +834,7 @@ void CRcvQueue::stop()
 
 void CRcvQueue::worker()
 {
-    detail::SocketAddress addr(m_UnitQueue.m_iIPversion);
+    detail::SocketAddress addr(m_iIPversion);
 
     while (!m_bClosing)
     {
@@ -992,7 +998,7 @@ int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
     }
 
     // copy packet content
-    memcpy(packet.m_nHeader, newpkt->m_nHeader, CPacket::m_iPktHdrSize);
+    memcpy(packet.header(), newpkt->header(), kPacketHeaderSize);
     memcpy(packet.m_pcData, newpkt->m_pcData, newpkt->getLength());
     packet.setLength(newpkt->getLength());
 

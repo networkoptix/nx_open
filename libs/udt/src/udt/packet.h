@@ -45,6 +45,7 @@ Yunhong Gu, last updated 01/02/2011
 #include <atomic>
 #include <cassert>
 #include <iostream>
+#include <tuple>
 
 #include "udt.h"
 
@@ -85,10 +86,8 @@ public:
         return N;
     }
 
-    iovec* bufs()
-    {
-        return (iovec*) m_bufs.data();
-    }
+    iovec* bufs() { return (iovec*)m_bufs.data(); }
+    const iovec* bufs() const { return (iovec*) m_bufs.data(); }
 
     const IoBuf& operator[](int i) const
     {
@@ -143,15 +142,16 @@ enum class PacketFlag
     Control = 1,
 };
 
+// The 128-bit header field.
+using PacketHeader = uint32_t[4];
+
+static constexpr auto kPacketHeaderSize = sizeof(PacketHeader);
+
 class UDT_API CPacket
 {
-    friend class UdpChannel;
-    friend class CSndQueue;
-    friend class CRcvQueue;
-
 private:
-    uint32_t m_nHeader[4];               // The 128-bit header field
-    BufArray<2> m_PacketVector;             // The 2-demension vector of UDT packet [header, data]
+    PacketHeader m_nHeader;
+    BufArray<2> m_PacketVector;          // The 2-dimension vector of UDT packet [header, data]
 
 public:
     int32_t& m_iSeqNo;                   // alias: sequence number
@@ -159,8 +159,6 @@ public:
     int32_t& m_iTimeStamp;               // alias: timestamp
     int32_t& m_iID;            // alias: socket ID
     char*& m_pcData;                     // alias: data/control information
-
-    static constexpr int m_iPktHdrSize = 16;    // packet header size
 
 public:
     CPacket();
@@ -267,6 +265,16 @@ public:
     //    Pointer to the new packet.
 
     CPacket* clone() const;
+
+    const uint32_t* header() const { return m_nHeader; }
+    uint32_t* header() { return m_nHeader; }
+
+    std::tuple<const iovec*, std::size_t> ioBufs() const;
+    std::tuple<iovec*, std::size_t> ioBufs();
+
+    // TODO: #ak These are debug functions. Drop them!
+    void lockPacketVector() { m_PacketVector.lock(); }
+    void unlockPacketVector() { m_PacketVector.unlock(); }
 
 protected:
 

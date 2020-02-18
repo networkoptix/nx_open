@@ -158,7 +158,7 @@ CPacket::CPacket():
     memset(m_nHeader, 0, sizeof(m_nHeader));
 
     m_PacketVector[0].data() = (char *)m_nHeader;
-    m_PacketVector[0].setSize(CPacket::m_iPktHdrSize);
+    m_PacketVector[0].setSize(kPacketHeaderSize);
     m_PacketVector[1].data() = NULL;
     m_PacketVector[1].setSize(0);
 }
@@ -336,13 +336,25 @@ int32_t CPacket::getMsgSeq() const
 CPacket* CPacket::clone() const
 {
     CPacket* pkt = new CPacket;
-    memcpy(pkt->m_nHeader, m_nHeader, m_iPktHdrSize);
+    memcpy(pkt->m_nHeader, m_nHeader, kPacketHeaderSize);
     pkt->m_pcData = new char[m_PacketVector[1].size()];
     memcpy(pkt->m_pcData, m_pcData, m_PacketVector[1].size());
     pkt->m_PacketVector[1].setSize(m_PacketVector[1].size());
 
     return pkt;
 }
+
+std::tuple<const iovec*, std::size_t> CPacket::ioBufs() const
+{
+    return std::make_tuple(m_PacketVector.bufs(), m_PacketVector.size());
+}
+
+std::tuple<iovec*, std::size_t> CPacket::ioBufs()
+{
+    return std::make_tuple(m_PacketVector.bufs(), m_PacketVector.size());
+}
+
+//-------------------------------------------------------------------------------------------------
 
 CHandShake::CHandShake()
 {
