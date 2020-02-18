@@ -62,8 +62,8 @@ using iovec = WSABUF;
 #else
 struct IoBuf: protected iovec
 {
-    char*& data() { return iov_base; };
-    const char* data() const { return iov_base; };
+    char*& data() { return (char*&) iov_base; };
+    const char* data() const { return (const char*&) iov_base; };
 
     void setSize(std::size_t val) { iov_len = val; }
     std::size_t size() const { return iov_len; };
