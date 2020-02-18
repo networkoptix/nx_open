@@ -50,8 +50,12 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr& license, QWid
     addGeneric(tr("License Type"), license->displayName());
     addGeneric(tr("License Key"), QString::fromLatin1(license->key()));
     addGeneric(tr("Locked to Hardware ID"), license->hardwareId());
-    addGeneric(tr("Deactivations Remaining"),
-        QString::number(license->deactivationsCountLeft()));
+
+    if (license->type() != Qn::LC_Trial)
+    {
+        addGeneric(tr("Deactivations Remaining"),
+            QString::number(license->deactivationsCountLeft()));
+    }
 
     details.push_back(QString()); //< Spacer.
     details.push_back(tr("Features") + ":");
