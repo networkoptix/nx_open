@@ -87,8 +87,8 @@ bool Sps::decode(const uint8_t* payload, int payloadLength)
         width = NALUnit::extractUEGolombCode(reader);
         height = NALUnit::extractUEGolombCode(reader);
 
-        const bool conformance_window_flag = reader.getBit();
-        if (conformance_window_flag)
+        const bool conformanceWindowFlag = reader.getBit();
+        if (conformanceWindowFlag)
         {
             // 2 for yuv420 or yuv422.
             const int subWidthC = chromaFormatIdc == 1 || chromaFormatIdc == 2 ? 2 : 1;
