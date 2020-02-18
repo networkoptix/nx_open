@@ -245,8 +245,8 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
     msghdr mh;
     mh.msg_name = localAddr.get();
     mh.msg_namelen = localAddr.size();
-    mh.msg_iov = (iovec*)packet.m_PacketVector;
-    mh.msg_iovlen = 2;
+    mh.msg_iov = packet.m_PacketVector.bufs();
+    mh.msg_iovlen = packet.m_PacketVector.size();
     mh.msg_control = NULL;
     mh.msg_controllen = 0;
     mh.msg_flags = 0;
@@ -256,7 +256,7 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
     DWORD size = CPacket::m_iPktHdrSize + packet.getLength();
     int res = ::WSASendTo(
         m_iSocket,
-        (LPWSABUF)packet.m_PacketVector, 2, &size, 0,
+        (LPWSABUF) packet.m_PacketVector.bufs(), packet.m_PacketVector.size(), &size, 0,
         addr.get(), addr.size(),
         NULL, NULL);
     res = (0 == res) ? size : -1;
@@ -295,8 +295,8 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) c
     msghdr mh;
     mh.msg_name = addr.get();
     mh.msg_namelen = addr.size();
-    mh.msg_iov = packet.m_PacketVector;
-    mh.msg_iovlen = 2;
+    mh.msg_iov = packet.m_PacketVector.bufs();
+    mh.msg_iovlen = packet.m_PacketVector.size();
     mh.msg_control = NULL;
     mh.msg_controllen = 0;
     mh.msg_flags = 0;
@@ -316,13 +316,17 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) c
     DWORD size = CPacket::m_iPktHdrSize + packet.getLength();
     DWORD flag = 0;
 
+    packet.m_PacketVector.lock();
+
     int res = ::WSARecvFrom(
         m_iSocket,
-        (LPWSABUF)packet.m_PacketVector, 2, &size, &flag,
+        (LPWSABUF) packet.m_PacketVector.bufs(), packet.m_PacketVector.size(), &size, &flag,
         addr.get(), &addr.length(),
         NULL, NULL);
     res = (0 == res) ? size : -1;
 #endif
+
+    packet.m_PacketVector.unlock();
 
     if (res <= 0)
     {

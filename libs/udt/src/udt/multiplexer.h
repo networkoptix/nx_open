@@ -10,7 +10,7 @@ class CTimer;
 /**
  * Manages reading/writing an UDP socket. A single UDP socket can be used by multiple UDT sockets.
  */
-class Multiplexer
+class UDT_API Multiplexer
 {
 public:
     Multiplexer(
