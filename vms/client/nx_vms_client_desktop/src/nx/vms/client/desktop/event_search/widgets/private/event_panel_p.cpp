@@ -76,7 +76,7 @@ EventPanel::Private::Private(EventPanel* q):
     m_tabs->setProperty(style::Properties::kTabBarIndent, kTabBarShift);
     setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
 
-    for (auto [tab, synchronizer]: nx::utils::keyValueRange(m_synchronizers))
+    for (auto [tab, synchronizer]: nx::utils::constKeyValueRange(m_synchronizers))
     {
         connect(synchronizer, &AbstractSearchSynchronizer::activeChanged, this,
             [this, tab = tab](bool isActive)
@@ -92,7 +92,7 @@ EventPanel::Private::Private(EventPanel* q):
             m_previousTab = m_lastTab;
             m_lastTab = m_tabs->currentWidget();
 
-            for (auto [tab, synchronizer]: nx::utils::keyValueRange(m_synchronizers))
+            for (auto [tab, synchronizer]: nx::utils::constKeyValueRange(m_synchronizers))
                 synchronizer->setActive(m_tabs->currentWidget() == tab);
 
             NX_VERBOSE(this->q, "Tab changed; previous: %1, current: %2", m_previousTab, m_lastTab);

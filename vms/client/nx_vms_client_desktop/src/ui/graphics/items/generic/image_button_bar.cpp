@@ -226,7 +226,7 @@ void QnImageButtonBar::submitCheckedButtons(int mask)
 
     QScopedValueRollback<bool> guard(m_submitting, true);
 
-    for (auto [buttonMask, button]: nx::utils::keyValueRange(m_buttonByMask))
+    for (auto [buttonMask, button]: nx::utils::constKeyValueRange(m_buttonByMask))
     {
         if ((buttonMask & mask) == 0)
             continue;
@@ -246,7 +246,7 @@ void QnImageButtonBar::submitEnabledButtons(int mask)
 
     QScopedValueRollback<bool> guard(m_submitting, true);
 
-    for (auto [buttonMask, button]: nx::utils::keyValueRange(m_buttonByMask))
+    for (auto [buttonMask, button]: nx::utils::constKeyValueRange(m_buttonByMask))
     {
         if ((buttonMask & mask) == 0)
             continue;

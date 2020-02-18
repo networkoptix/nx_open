@@ -285,7 +285,7 @@ void TileInteractionHandler::openSource(
     Parameters parameters(resourceList);
     const auto arguments = setupDropActionParameters(resourceList, index.data(Qn::TimestampRole));
 
-    for (const auto& param: nx::utils::keyValueRange(arguments))
+    for (const auto& param: nx::utils::constKeyValueRange(arguments))
         parameters.setArgument(param.first, param.second);
 
     const auto action = inNewTab ? OpenInNewTabAction : DropResourcesAction;
