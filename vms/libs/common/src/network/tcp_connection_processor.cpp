@@ -258,6 +258,10 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
                 }
                 continue; //< socket in async mode
             }
+            else if (SystemError::getLastOSErrorCode() == SystemError::interrupted)
+            {
+                continue; //< Retrying interrupted call.
+            }
 
             NX_DEBUG(this, "Unable to send data to socket: %1(%2)", errorCode, SystemError::toString(errorCode));
             return false;
