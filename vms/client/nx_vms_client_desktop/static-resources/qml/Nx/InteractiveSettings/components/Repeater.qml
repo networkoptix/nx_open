@@ -65,7 +65,7 @@ Item
             if (Utils.isItemFilled(column.children[i]))
                 return i
         }
-        return -1
+        return 0
     }
 
     function updateVisibility()
