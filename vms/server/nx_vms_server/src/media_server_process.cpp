@@ -518,7 +518,7 @@ StorageResourcePtr MediaServerProcess::createStorage(
     auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
     if (!fileStorage || fileStorage->initOrUpdate() != Qn::StorageInit_Ok)
     {
-        NX_WARNING(this, "Failed to initialize new storage '%1', path");
+        NX_WARNING(this, "Failed to initialize new storage %1", partition.path);
         return StorageResourcePtr();
     }
 
