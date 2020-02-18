@@ -235,7 +235,7 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
         {
             const auto errorCode = SystemError::getLastOSErrorCode();
 
-            if (errorCode == SystemError::wouldBlock)
+            if (errorCode == SystemError::wouldBlock || errorCode == SystemError::again)
             {
                 unsigned int sendTimeout = 0;
                 if (!d->socket->getSendTimeout(&sendTimeout))
@@ -259,14 +259,8 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
                 continue; //< socket in async mode
             }
 
-            if (!d->socket->isConnected()) //< Non-recoverable socket error.
-            {
-                NX_DEBUG(this, "Unable to send data to socket: %1",
-                    SystemError::toString(errorCode));
-                return false;
-            }
-
-            break;
+            NX_DEBUG(this, "Unable to send data to socket: %1(%2)", errorCode, SystemError::toString(errorCode));
+            return false;
         }
 
         data += sendResult;
