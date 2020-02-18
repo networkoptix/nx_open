@@ -370,10 +370,10 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
 
 void QnVideoStreamDisplay::updateRenderList()
 {
-    QnMutexLocker lock( &m_renderListMtx );
+    QnMutexLocker lock(&m_renderListMtx);
     if (m_renderListModified)
     {
-        for (auto& renderer: m_newList)
+        foreach (QnAbstractRenderer* renderer, m_newList)
         {
             renderer->inUse();
 
@@ -383,7 +383,7 @@ void QnVideoStreamDisplay::updateRenderList()
                 renderer->unblockTimeValue(m_channelNumber);
         }
 
-        for (auto& renderer: m_renderList)
+        foreach (QnAbstractRenderer* renderer, m_renderList)
             renderer->notInUse();
 
         m_renderList = m_newList;
@@ -961,7 +961,7 @@ void QnVideoStreamDisplay::blockTimeValue(qint64 time)
     m_blockedTimeValue = microseconds(time);
     m_timeBlocked = true;
 
-    for (auto renderer: m_renderList)
+    foreach (QnAbstractRenderer* renderer, m_renderList)
         renderer->blockTimeValue(m_channelNumber, m_blockedTimeValue);
 }
 
@@ -998,7 +998,7 @@ void QnVideoStreamDisplay::unblockTimeValue()
 
     m_timeBlocked = false;
 
-    for (auto renderer: m_renderList)
+    foreach (QnAbstractRenderer* renderer, m_renderList)
         renderer->unblockTimeValue(m_channelNumber);
 }
 
