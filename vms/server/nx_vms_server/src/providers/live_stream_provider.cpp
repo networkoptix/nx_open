@@ -195,6 +195,12 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
     m_prevCameraControlDisabled = value;
 }
 
+void QnLiveStreamProvider::strictFpsToLimit(float* fps) const
+{
+    const float maxFps = m_cameraRes->getMaxFps(toStreamIndex(getRole()));
+    *fps = qBound((float) QnLiveStreamParams::kMinSecondStreamFps, *fps, maxFps);
+}
+
 QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStreamParams& value)
 {
     QnLiveStreamParams params = value;
@@ -210,8 +216,7 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
         if (params.fps == QnLiveStreamParams::kFpsNotInitialized)
             params.fps = getDefaultFps();
     }
-    params.fps = qBound(
-        (float) 1.0, params.fps, (float)m_cameraRes->getMaxFps());
+    strictFpsToLimit(&params.fps);
 
     if (params.resolution.isEmpty())
         params.resolution = advancedLiveStreamParams.resolution;
@@ -277,7 +282,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
 
 float QnLiveStreamProvider::getDefaultFps() const
 {
-    float maxFps = m_cameraRes->getMaxFps();
+    const float maxFps = m_cameraRes->getMaxFps(toStreamIndex(getRole()));
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         int reservedSecondStreamFps = m_cameraRes->reservedSecondStreamFps();
@@ -290,25 +295,26 @@ float QnLiveStreamProvider::getDefaultFps() const
 
     QnLiveStreamParams params;
     const Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
-    int newSecondaryStreamFps = m_cameraRes->defaultSecondaryFps(params.quality);
+    float newSecondaryStreamFps = m_cameraRes->defaultSecondaryFps(params.quality);
 
     if (sharingMethod == Qn::PixelsFpsSharing)
     {
-        if (m_cameraRes->getMaxFps() - m_primaryFps < 2)
+        if (maxFps - m_primaryFps < 2)
             newSecondaryStreamFps /= 2;
     }
     else if (sharingMethod == Qn::BasicFpsSharing)
     {
         newSecondaryStreamFps = qMin(
             newSecondaryStreamFps,
-            m_cameraRes->getMaxFps() - m_primaryFps);
+            maxFps - m_primaryFps);
     }
     else
     {
         // noSharing
     }
-    return qBound(
-        QnLiveStreamParams::kMinSecondStreamFps, newSecondaryStreamFps, m_cameraRes->getMaxFps());
+
+    strictFpsToLimit(&newSecondaryStreamFps);
+    return newSecondaryStreamFps;
 }
 
 bool QnLiveStreamProvider::doesStreamSuitMotionAnalysisRequirements()
@@ -323,7 +329,7 @@ bool QnLiveStreamProvider::doesStreamSuitMotionAnalysisRequirements()
 bool QnLiveStreamProvider::isMaxFps() const
 {
     QnMutexLocker lock(&m_liveMutex);
-    return m_liveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
+    return m_liveParams.fps >= m_cameraRes->getMaxFps(toStreamIndex(getRole())) - 0.1;
 }
 
 bool QnLiveStreamProvider::needHardwareMotion()

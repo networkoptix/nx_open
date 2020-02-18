@@ -28,7 +28,7 @@ struct NX_VMS_API DeviceAnalyticsSettingsRequest
     nx::vms::api::StreamIndex analyzedStreamIndex = nx::vms::api::StreamIndex::undefined;
 
     /**%apidoc
-     * Name-value map with setting values, using JSON types according to each setting type.
+     * Name-value map with setting values, using JSON types corresponding to each setting type.
      */
     QJsonObject settingsValues;
 };
@@ -48,7 +48,7 @@ struct NX_VMS_API DeviceAnalyticsSettingsResponse
     StreamIndex analyzedStreamIndex = StreamIndex::undefined;
 
     /**%apidoc
-     * Name-value map with setting values, using JSON types according to each setting type.
+     * Name-value map with setting values, using JSON types corresponding to each setting type.
      */
     QJsonObject settingsValues;
 

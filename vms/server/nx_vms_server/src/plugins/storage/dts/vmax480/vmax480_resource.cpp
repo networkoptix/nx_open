@@ -35,7 +35,7 @@ QnPlVmax480Resource::~QnPlVmax480Resource()
     }
 }
 
-int QnPlVmax480Resource::getMaxFps() const
+int QnPlVmax480Resource::getMaxFps(StreamIndex /*streamIndex*/) const
 {
     return 30;
 }

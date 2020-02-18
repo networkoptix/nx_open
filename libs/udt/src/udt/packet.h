@@ -41,16 +41,83 @@ Yunhong Gu, last updated 01/02/2011
 #ifndef __UDT_PACKET_H__
 #define __UDT_PACKET_H__
 
+#include <array>
+#include <atomic>
+#include <cassert>
+#include <iostream>
 
 #include "udt.h"
 
 #ifdef _WIN32
-struct iovec
+struct IoBuf: protected WSABUF
 {
-    int iov_len;
-    char* iov_base;
+    char*& data() { return buf; };
+    const char* data() const { return buf; };
+
+    void setSize(std::size_t val) { len = val; }
+    std::size_t size() const { return len; };
+};
+
+using iovec = WSABUF;
+#else
+struct IoBuf: protected iovec
+{
+    char*& data() { return (char*&) iov_base; };
+    const char* data() const { return (const char*&) iov_base; };
+
+    void setSize(std::size_t val) { iov_len = val; }
+    std::size_t size() const { return iov_len; };
 };
 #endif
+
+template<std::size_t N>
+class BufArray
+{
+public:
+    std::size_t size() const
+    {
+        for (std::size_t i = 0; i < N; ++i)
+        {
+            if (int(m_bufs[i].size()) < 0)
+                return i;
+        }
+
+        return N;
+    }
+
+    iovec* bufs()
+    {
+        return (iovec*) m_bufs.data();
+    }
+
+    const IoBuf& operator[](int i) const
+    {
+        assert(!m_locked);
+        return m_bufs[i];
+    }
+
+    IoBuf& operator[](int i)
+    {
+        assert(!m_locked);
+        return m_bufs[i];
+    }
+
+    void lock()
+    {
+        m_locked = true;
+    }
+
+    void unlock()
+    {
+        m_locked = false;
+    }
+
+private:
+    std::array<IoBuf, N> m_bufs;
+    std::atomic<bool> m_locked = false;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 class UdpChannel;
 
@@ -81,6 +148,10 @@ class UDT_API CPacket
     friend class UdpChannel;
     friend class CSndQueue;
     friend class CRcvQueue;
+
+private:
+    uint32_t m_nHeader[4];               // The 128-bit header field
+    BufArray<2> m_PacketVector;             // The 2-demension vector of UDT packet [header, data]
 
 public:
     int32_t& m_iSeqNo;                   // alias: sequence number
@@ -124,15 +195,6 @@ public:
     //    None.
 
     void pack(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
-
-    // Functionality:
-    //    Read the packet vector.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    Pointer to the packet vector.
-
-    iovec* getPacketVector();
 
     // Functionality:
     //    Read the packet flag.
@@ -207,8 +269,6 @@ public:
     CPacket* clone() const;
 
 protected:
-    uint32_t m_nHeader[4];               // The 128-bit header field
-    iovec m_PacketVector[2];             // The 2-demension vector of UDT packet [header, data]
 
     int32_t __pad = 0;
 

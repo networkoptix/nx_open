@@ -1,7 +1,5 @@
 #include "notification_levels.h"
 
-#include <nx/vms/event/actions/abstract_action.h>
-
 #include <utils/common/warnings.h>
 
 #include <ui/style/globals.h>
@@ -11,87 +9,14 @@ using namespace nx;
 using nx::vms::api::EventType;
 using nx::vms::api::ActionType;
 
-QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::AbstractActionPtr& action)
+QnNotificationLevel::Value QnNotificationLevel::valueOf(const nx::vms::event::AbstractActionPtr& action)
 {
-    if (action->actionType() == ActionType::playSoundAction)
-        return Value::CommonNotification;
+    return static_cast<QnNotificationLevel::Value>(nx::vms::event::levelOf(action));
+};
 
-    if (action->actionType() == ActionType::showOnAlarmLayoutAction)
-        return Value::CriticalNotification;
-
-    return valueOf(action->getRuntimeParams());
-}
-
-QnNotificationLevel::Value QnNotificationLevel::valueOf(
-    const nx::vms::event::EventParameters& params)
+QnNotificationLevel::Value QnNotificationLevel::valueOf(const nx::vms::event::EventParameters& params)
 {
-    EventType eventType = params.eventType;
-
-    if (eventType >= EventType::userDefinedEvent)
-        return Value::CommonNotification;
-
-    switch (eventType)
-    {
-        // Gray notifications.
-        case EventType::cameraMotionEvent:
-        case EventType::cameraInputEvent:
-        case EventType::serverStartEvent:
-        case EventType::softwareTriggerEvent:
-        case EventType::analyticsSdkEvent:
-            return Value::CommonNotification;
-
-        // Yellow notifications.
-        case EventType::networkIssueEvent:
-        case EventType::cameraIpConflictEvent:
-        case EventType::serverConflictEvent:
-            return Value::ImportantNotification;
-
-        // Red notifications.
-        case EventType::cameraDisconnectEvent:
-        case EventType::storageFailureEvent:
-        case EventType::serverFailureEvent:
-        case EventType::licenseIssueEvent:
-        case EventType::fanErrorEvent:
-        case EventType::poeOverBudgetEvent:
-            return Value::CriticalNotification;
-
-        case EventType::backupFinishedEvent:
-        {
-            vms::api::EventReason reason = static_cast<vms::api::EventReason>(params.reasonCode);
-            const bool failure =
-                reason == vms::api::EventReason::backupFailedChunkError ||
-                reason == vms::api::EventReason::backupFailedNoBackupStorageError ||
-                reason == vms::api::EventReason::backupFailedSourceFileError ||
-                reason == vms::api::EventReason::backupFailedSourceStorageError ||
-                reason == vms::api::EventReason::backupFailedTargetFileError;
-
-            if (failure)
-                return Value::CriticalNotification;
-
-            const bool success = reason == vms::api::EventReason::backupDone;
-            return success ? Value::SuccessNotification : Value::CommonNotification;
-        }
-
-        case EventType::pluginDiagnosticEvent:
-        {
-            using namespace nx::vms::api;
-            switch (params.metadata.level)
-            {
-                case EventLevel::ErrorEventLevel:
-                    return Value::CriticalNotification;
-
-                case EventLevel::WarningEventLevel:
-                    return Value::ImportantNotification;
-
-                default:
-                    return Value::CommonNotification;
-            }
-        }
-
-        default:
-            NX_ASSERT(false, "All enum values must be handled");
-            return Value::NoNotification;
-    }
+    return static_cast<QnNotificationLevel::Value>(nx::vms::event::levelOf(params));
 }
 
 QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageType messageType)

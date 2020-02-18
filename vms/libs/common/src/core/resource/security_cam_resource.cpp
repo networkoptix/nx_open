@@ -276,10 +276,10 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, Qn::Notif
     }
 }
 
-int QnSecurityCamResource::getMaxFps() const
+int QnSecurityCamResource::getMaxFps(StreamIndex streamIndex) const
 {
     const auto capabilities = cameraMediaCapability();
-    int result = capabilities.streamCapabilities.value(StreamIndex::primary).maxFps;
+    int result = capabilities.streamCapabilities.value(streamIndex).maxFps;
     if (result > 0)
         return result;
 

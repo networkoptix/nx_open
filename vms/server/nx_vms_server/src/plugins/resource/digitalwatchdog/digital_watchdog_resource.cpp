@@ -89,7 +89,7 @@ bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
         return false;
     }
 
-    return true; // ignore other error (for cameras with non standart HTTP port)
+    return true; // ignore other error (for cameras with non standard HTTP port)
 }
 
 CameraDiagnostics::Result QnDigitalWatchdogResource::initializeCameraDriver()

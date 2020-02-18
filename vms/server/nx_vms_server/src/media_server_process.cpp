@@ -518,7 +518,7 @@ StorageResourcePtr MediaServerProcess::createStorage(
     auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
     if (!fileStorage || fileStorage->initOrUpdate() != Qn::StorageInit_Ok)
     {
-        NX_WARNING(this, "Failed to initialize new storage '%1', path");
+        NX_WARNING(this, "Failed to initialize new storage %1", partition.path);
         return StorageResourcePtr();
     }
 
@@ -1627,8 +1627,7 @@ void MediaServerProcess::registerRestHandlers(
      * If merge is not in progress it means all data that belongs to servers on the moment when merge was requested
      * are synchronized. This functions is a system wide and can be called from any server in the system to check merge status.
      * %return:object JSON object with an error code, error string, and the reply on success.
-     *     %param:string unique id of the last merge operation.
-     *     %param:boolean true if last merge operation is in progress.
+     *     %struct MergeStatusReply
      */
     reg(nx::vms::server::rest::GetMergeStatusHandler::kUrlPath,
         new nx::vms::server::rest::GetMergeStatusHandler(serverModule()));
@@ -1951,12 +1950,15 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
 
     /**%apidoc GET /api/ping
-     * Ping the server.
+     * Ping the Server.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:object reply Object with data.
-     *         %param:string reply.moduleGuid Module unique id.
+     *         %param:uuid reply.moduleGuid Id of the Server Module.
+     *         %param:uuid reply.localSystemId Id of the System.
+     *         %param[proprietary]:integer sysIdTime
+     *         %param[proprietary] tranLogTime
      */
     reg("api/ping", new QnPingRestHandler());
 
@@ -2033,7 +2035,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value start Start backup just now.
      *     %value stop Stop backup.
      *     %value <any_other_value_or_no_parameter> Report the backup process status.
-     * %return:object Bakcup process progress status or an error code.
+     * %return:object Backup process progress status or an error code.
      */
     reg("api/backupControl", new QnBackupControlRestHandler(serverModule()));
 
@@ -2540,8 +2542,8 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
      * %param[opt]:arrayJson filter This parameter is used for Motion and Analytics Search
-     *     ("periodsType" must be set to 1 or 2). Search motion or analytics event on a video according
-     *     to specified attributes values.
+     *     ("periodsType" must be set to 1 or 2). Search motion or analytics event on a video
+     *     according to the specified attributes values.
      *     <br/>Motion Search Format: string with a JSON list of <i>sensors</i>,
      *     each <i>sensor</i> is a JSON list of <i>rectangles</i>, each <i>rectangle</i> is:
      *     <br/>
@@ -2797,7 +2799,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
-     * %param:string deviceId device id (can be obtained from "id" field via
+     * %param[opt]:string deviceId device id (can be obtained from "id" field via
      *     /ec2/getCamerasEx), or MAC address (not supported for
      *     certain cameras), or "Logical Id".
      * %param[opt]:string objectTypeId Analytics Object Type id.
@@ -3002,19 +3004,19 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/analyticsEngineSettings
      * Return values of settings of the specified Engine.
-     * %param:string analyticsEngineId Id of analytics engine.
+     * %param:string analyticsEngineId Id of an Analytics Engine.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:object reply Object with Engine settings model and values.
      *         %param:object reply.model Settings model, as in Engine manifest.
      *         %param:object reply.values Name-value map with setting values, using JSON types
-     *             according to each setting type.
+     *             corresponding to each setting type.
      *
      * %apidoc POST /ec2/analyticsEngineSettings
      * Applies passed settings values to correspondent Analytics Engine.
-     * %param:string engineId Unique id of Analytics Engine.
-     * %param:object settings Name-value map with setting values, using JSON types according to
+     * %param:string engineId Id of an Analytics Engine.
+     * %param:object settings Name-value map with setting values, using JSON types corresponding to
      *     each setting type.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
@@ -3023,14 +3025,14 @@ void MediaServerProcess::registerRestHandlers(
      *         after the values have been supplied.
      *         %param:object reply.model Settings model, as in Engine manifest.
      *         %param:object reply.values Name-value map with setting values, using JSON types
-     *             according to each setting type.
+     *             corresponding to each setting type.
      */
     reg("ec2/analyticsEngineSettings",
         new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
      * Return settings values of the specified DeviceAgent (which is a device-engine pair).
-     * %param:string analyticsEngineId Unique id of an Analytics Engine.
+     * %param:string analyticsEngineId Id of an Analytics Engine.
      * %param:string deviceId Id of a device.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.

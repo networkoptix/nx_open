@@ -811,15 +811,18 @@ void socketAcceptCancelAsync(
         auto server = serverMaker();
         ASSERT_TRUE(server->setNonBlockingMode(true))
             << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count()))
-            << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress))
             << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(server->listen(5))
             << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(server->setRecvTimeout(kNoTimeout.count()))
+            << SystemError::getLastOSErrorText().toStdString();
 
         server->acceptAsync(
-            [&](SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>) { NX_CRITICAL(false); });
+            [&](SystemError::ErrorCode errorCode, std::unique_ptr<AbstractStreamSocket>)
+            {
+                NX_CRITICAL(false, lm("%1").args(SystemError::toString(errorCode)));
+            });
 
         if (i)
             std::this_thread::sleep_for(std::chrono::milliseconds(10 * i));

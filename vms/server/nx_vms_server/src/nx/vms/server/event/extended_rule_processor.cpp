@@ -84,6 +84,8 @@
 #include <nx/network/http/http_client.h>
 #include <nx/vms/utils/app_info.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/switch.h>
+#include <nx/vms/event/level.h>
 
 #include <translation/translation_manager.h>
 
@@ -1460,18 +1462,25 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
         serverModule()->findInstance<QnTranslationManager>(), language);
 
     const auto join =
-        [](QStringList items)
+        [](const QString& delimiter, QStringList items)
         {
             items.removeAll("");
-            return items.join("\n");
+            return items.join(delimiter);
         };
 
     vms::event::StringsHelper strings(common);
     return {
-        // TODO: Add UTF-8 icon by nx::vms::client::desktop::eventSubtype.
-        // TODO: May return HTML, make sure it works in client.
-        strings.notificationCaption(event, camera),
-        join({
+        join(" ", {
+            nx::utils::switch_(vms::event::levelOf(action),
+                vms::event::Level::critical, [] { return "\u203C"; }, //< UTF for !!
+                vms::event::Level::important, [] { return "\u26A0"; }, //< UFT for (!)
+                vms::event::Level::success, [] { return "\u2705"; }, //< UTF for [v]
+                nx::utils::default_, [] { return ""; }
+            ),
+            // TODO: May return HTML. Make sure it works on android and iOS.
+            strings.notificationCaption(event, camera),
+        }),
+        join("\n", {
             resource ? resource->getName() : QString(),
             params.text,
             strings.notificationDescription(event),

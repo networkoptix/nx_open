@@ -324,8 +324,8 @@ bool HevcParser::handleSingleNalUnitPacket(
     {
         hevc::Sps sps;
         sps.decode(payload, payloadLength);
-        m_context.width = sps.picWidthInLumaSamples;
-        m_context.height = sps.picHeightInLumaSamples;
+        m_context.width = sps.width;
+        m_context.height = sps.height;
     }
 
     m_chunks.emplace_back(payload - m_rtpBufferBase, payloadLength, true);
@@ -557,8 +557,8 @@ bool HevcParser::extractPictureDimensionsFromSps(const uint8_t* buffer, int buff
     if (!sps.decode(buffer, bufferLength))
         return false;
 
-    m_context.width = sps.picWidthInLumaSamples;
-    m_context.height = sps.picHeightInLumaSamples;
+    m_context.width = sps.width;
+    m_context.height = sps.height;
 
     return true;
 }

@@ -355,7 +355,7 @@ private:
         // Profile number available via NVR CGI or standalone camera CGI.
         int directNumber = kHanwhaInvalidProfile;
 
-        // Profile numbera available via bypass. Not relevant for standalone cameras
+        // Profile number available via bypass. Not relevant for standalone cameras
         int bypassNumber = kHanwhaInvalidProfile;
     };
 
