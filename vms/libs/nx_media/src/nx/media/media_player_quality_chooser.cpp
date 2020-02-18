@@ -297,6 +297,20 @@ Result chooseVideoQuality(const int videoQuality, const Input& input)
     Streams streams;
     findCameraStreams(input.camera, &streams);
 
+    // If high requested, high stream exists but has an unknown resolution, return high.
+    if (videoQuality == Player::HighVideoQuality
+        && streams.highCodec != AV_CODEC_ID_NONE && !streams.highResolution.isValid())
+    {
+        return {Player::HighVideoQuality, QSize(-1, -1)};
+    }
+
+    // If low requested, low stream exists but has an unknown resolution, return low.
+    if (videoQuality == Player::LowVideoQuality
+        && streams.lowCodec != AV_CODEC_ID_NONE && !streams.lowResolution.isValid())
+    {
+        return {Player::LowVideoQuality, QSize(-1, -1)};
+    }
+
     Result result = choosePreferredQuality(streams, videoQuality, input);
 
     if (result.quality == Player::LowVideoQuality)

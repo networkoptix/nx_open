@@ -526,15 +526,17 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     // High quality requested.
     T.noTrans().low(320, 240).high(1920, 1080).max(1920, 1080).req(high) >> high;
     T.noTrans().low(320, 240).high(1920, 1080).max(1920, 1080).req(1080) >> high;
-    T.noTrans().low(320, 240).high(1920, 1080).max(640, 480)  .req(high) >> low;
+    T.noTrans().low(320, 240).high(1920, 1080).max( 640,  480).req(high) >> low;
     T.noTrans()              .high(2560, 1440).max(1920, 1080).req(high) >> unknown;
     T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(1080) >> high;
-    T          .low(320, 240).high(1280, 720) .max(640, 480)  .req(high) >> low;
+    T          .low(320, 240).high(1280,  720).max( 640,  480).req(high) >> low;
     T          .low(320, 240).high(2560, 1440).max(1920, 1080).req(high) >> QSize(1920, 1080);
+    T          .low( -1,  -1).high(  -1,   -1).max(1920, 1080).req(high) >> high;
 
     // Low quality requested.
     T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(low)  >> low;
     T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(240)  >> low;
+    T          .low( -1,  -1).high(  -1,   -1).max(1920, 1080).req(low)  >> low;
 
     // Invalid video quality.
     T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(-113) >> unknown;
