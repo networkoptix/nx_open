@@ -12,6 +12,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/impl_ptr.h>
 
+#include "analytics_settings_types.h"
+
 namespace nx::vms::api::analytics { struct DeviceAnalyticsSettingsResponse; }
 
 namespace nx::vms::client::desktop {
@@ -23,6 +25,8 @@ using AnalyticsSettingsCallback =
 class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsServerInterface
 {
 public:
+    virtual ~AnalyticsSettingsServerInterface();
+
     virtual rest::Handle getSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
@@ -35,19 +39,6 @@ public:
 };
 using AnalyticsSettingsServerInterfacePtr = std::shared_ptr<AnalyticsSettingsServerInterface>;
 
-struct DeviceAgentId
-{
-    QnUuid device;
-    QnUuid engine;
-
-    inline bool operator==(const DeviceAgentId& other) const
-    {
-        return device == other.device && engine == other.engine;
-    }
-};
-
-uint qHash(const DeviceAgentId& key);
-
 class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsListener: public QObject
 {
     Q_OBJECT
@@ -55,12 +46,10 @@ class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsListener: public QObject
 public:
     const DeviceAgentId agentId;
 
-    QJsonObject model() const;
-    QJsonObject values() const;
+    DeviceAgentData data() const;
 
 signals:
-    void modelChanged(const QJsonObject& model);
-    void valuesChanged(const QJsonObject& values);
+    void dataChanged(const DeviceAgentData& data);
 
 protected:
     AnalyticsSettingsListener(const DeviceAgentId& agentId, AnalyticsSettingsManager* manager);
@@ -105,18 +94,12 @@ public:
 
     AnalyticsSettingsListenerPtr getListener(const DeviceAgentId& agentId);
 
-    QJsonObject values(const DeviceAgentId& agentId) const;
-    QJsonObject model(const DeviceAgentId& agentId) const;
+    DeviceAgentData data(const DeviceAgentId& agentId) const;
 
     /**
      * Send changed actual values to the server.
      */
     Error applyChanges(const QHash<DeviceAgentId, QJsonObject>& valuesByAgentId);
-
-    bool isApplyingChanges() const;
-
-signals:
-    void appliedChanges();
 
 private:
     class Private;

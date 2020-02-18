@@ -11,22 +11,19 @@
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::common;
+using namespace nx::vms::api::analytics;
 
-uint qHash(const DeviceAgentId& key)
+//--------------------------------------------------------------------------------------------------
+
+AnalyticsSettingsServerInterface::~AnalyticsSettingsServerInterface()
 {
-    return qHash(key.device) + qHash(key.engine);
 }
 
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
-QJsonObject AnalyticsSettingsListener::model() const
+DeviceAgentData AnalyticsSettingsListener::data() const
 {
-    return m_manager->model(agentId);
-}
-
-QJsonObject AnalyticsSettingsListener::values() const
-{
-    return m_manager->values(agentId);
+    return m_manager->data(agentId);
 }
 
 AnalyticsSettingsListener::AnalyticsSettingsListener(
@@ -50,7 +47,12 @@ public:
 
     bool hasSubscription(const DeviceAgentId& id) const;
 
-    void setSettings(const DeviceAgentId& id, const QJsonObject& model, const QJsonObject& values);
+    void updateStatus(const DeviceAgentId& id, DeviceAgentData::Status status);
+
+    void loadResponseData(
+        const DeviceAgentId& id,
+        bool success,
+        const DeviceAnalyticsSettingsResponse& response);
 
     auto toResources(const DeviceAgentId& agentId)
     {
@@ -75,11 +77,8 @@ public:
     };
 
 public:
-    struct SettingsData
+    struct SettingsData: DeviceAgentData
     {
-        QJsonObject model;
-        QJsonObject values;
-
         std::weak_ptr<AnalyticsSettingsListener> listener;
     };
     struct Subscription
@@ -149,21 +148,21 @@ void AnalyticsSettingsManager::Private::refreshSettings(const DeviceAgentId& age
         [this, agentId](
             bool success,
             rest::Handle requestId,
-            const nx::vms::api::analytics::DeviceAnalyticsSettingsResponse& result)
+            const DeviceAnalyticsSettingsResponse& result)
         {
             NX_VERBOSE(this, "Received reply %1 (success: %2)", requestId, success);
             if (!pendingRefreshRequests.removeOne(requestId))
                 return;
 
-            if (!success)
-                return;
-
-            setSettings(agentId, result.settingsModel, result.settingsValues);
+            loadResponseData(agentId, success, result);
         });
 
     NX_VERBOSE(this, "Request handle %1", handle);
     if (handle > 0)
+    {
         pendingRefreshRequests.append(handle);
+        updateStatus(agentId, DeviceAgentData::Status::loading);
+    }
 }
 
 void AnalyticsSettingsManager::Private::handleListenerDeleted(const DeviceAgentId& id)
@@ -187,32 +186,54 @@ bool AnalyticsSettingsManager::Private::hasSubscription(const DeviceAgentId& id)
     return it->settingsByEngineId.contains(id.engine);
 }
 
-void AnalyticsSettingsManager::Private::setSettings(
-    const DeviceAgentId& id, const QJsonObject& model, const QJsonObject& values)
+void AnalyticsSettingsManager::Private::updateStatus(
+    const DeviceAgentId& id,
+    DeviceAgentData::Status status)
+{
+    if (!hasSubscription(id))
+        return;
+
+    auto& data = dataByAgentIdRef(id);
+    if (data.status == status)
+        return;
+
+    data.status = status;
+    if (auto listener = data.listener.lock())
+        emit listener->dataChanged(data);
+}
+
+void AnalyticsSettingsManager::Private::loadResponseData(
+    const DeviceAgentId& id,
+    bool success,
+    const DeviceAnalyticsSettingsResponse& response)
 {
     auto& data = dataByAgentIdRef(id);
 
-    const bool modelChanged = (data.model != model);
+    const bool modelChanged = (data.model != response.settingsModel);
     if (modelChanged)
-        data.model = model;
+        data.model = response.settingsModel;
 
-    const bool valuesChanged = (data.values != values);
+    const bool valuesChanged = (data.values != response.settingsValues);
     if (valuesChanged)
-        data.values = values;
+        data.values = response.settingsValues;
 
-    NX_VERBOSE(this, "Store settings for %1, model changed: %2, values changed: %3",
-        toString(id), modelChanged, valuesChanged);
+    const auto status = success
+        ? DeviceAgentData::Status::ok
+        : DeviceAgentData::Status::failure;
+    const bool statusChanged = (data.status != status);
+    data.status = status;
+
+    NX_VERBOSE(this, "Store settings for %1, model changed: %2, values changed: %3, status %4",
+        toString(id), modelChanged, valuesChanged, (int)status);
     if (modelChanged)
-        NX_VERBOSE(this, "Updated model:\n%1", model);
+        NX_VERBOSE(this, "Updated model:\n%1", data.model);
     if (valuesChanged)
-        NX_VERBOSE(this, "Updated values:\n%1", values);
+        NX_VERBOSE(this, "Updated values:\n%1", data.values);
 
-    if (auto listener = data.listener.lock())
+    if (modelChanged || valuesChanged || statusChanged)
     {
-        if (modelChanged)
-            emit listener->modelChanged(model);
-        if (valuesChanged)
-            emit listener->valuesChanged(values);
+        if (auto listener = data.listener.lock())
+            emit listener->dataChanged(data);
     }
 }
 
@@ -265,20 +286,15 @@ AnalyticsSettingsListenerPtr AnalyticsSettingsManager::getListener(const DeviceA
     return listener;
 }
 
-QJsonObject AnalyticsSettingsManager::values(const DeviceAgentId& agentId) const
+DeviceAgentData AnalyticsSettingsManager::data(const DeviceAgentId& agentId) const
 {
-    return d->dataByAgentId(agentId).values;
-}
-
-QJsonObject AnalyticsSettingsManager::model(const DeviceAgentId& agentId) const
-{
-    return d->dataByAgentId(agentId).model;
+    return d->dataByAgentId(agentId);
 }
 
 AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
     const QHash<DeviceAgentId, QJsonObject>& valuesByAgentId)
 {
-    if (isApplyingChanges())
+    if (!d->pendingApplyRequests.isEmpty())
         return Error::busy;
 
     if (!NX_ASSERT(d->serverInterface))
@@ -300,31 +316,23 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
             [this, agentId](
                 bool success,
                 rest::Handle requestId,
-                const nx::vms::api::analytics::DeviceAnalyticsSettingsResponse& result)
+                const DeviceAnalyticsSettingsResponse& result)
             {
                 if (!d->pendingApplyRequests.removeOne(requestId))
                     return;
 
-                if (success)
-                {
-                    if (d->hasSubscription(agentId))
-                        d->setSettings(agentId, result.settingsModel, result.settingsValues);
-                }
-
-                if (!isApplyingChanges())
-                    emit appliedChanges();
+                if (d->hasSubscription(agentId))
+                    d->loadResponseData(agentId, success, result);
             });
 
         if (handle > 0)
+        {
             d->pendingApplyRequests.append(handle);
+            d->updateStatus(agentId, DeviceAgentData::Status::applying);
+        }
     }
 
     return Error::noError;
-}
-
-bool AnalyticsSettingsManager::isApplyingChanges() const
-{
-    return !d->pendingApplyRequests.isEmpty();
 }
 
 } // namespace nx::vms::client::desktop

@@ -23,6 +23,7 @@ struct WearableState;
 struct ScheduleCellParams;
 struct CameraSettingsDialogState;
 struct AnalyticsEngineInfo;
+struct DeviceAgentData;
 
 class CameraSettingsDialogStore: public QObject
 {
@@ -98,13 +99,12 @@ public:
     Q_INVOKABLE void setAnalyticsStreamIndex(const QnUuid& engineId, int value);
     void setAnalyticsStreamIndex(const QnUuid& engineId, nx::vms::api::StreamIndex value,
         ModificationSource source = ModificationSource::local);
+
     Q_INVOKABLE QJsonObject deviceAgentSettingsModel(const QnUuid& engineId) const;
-    void setDeviceAgentSettingsModel(const QnUuid& engineId, const QJsonObject& value);
     Q_INVOKABLE QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
-    Q_INVOKABLE void setDeviceAgentSettingsValues(
-        const QnUuid& engineId, const QJsonObject& values);
-    void resetDeviceAgentSettingsValues(
-        const QnUuid& engineId, const QJsonObject& values);
+    Q_INVOKABLE void setDeviceAgentSettingsValues(const QnUuid& engineId, const QJsonObject& values);
+    void resetDeviceAgentData(const QnUuid& engineId, const DeviceAgentData& data);
+
     Q_INVOKABLE bool dualStreamingEnabled() const;
     Q_INVOKABLE bool recordingEnabled() const;
 

@@ -64,16 +64,17 @@ public:
     static State setAnalyticsEngines(
         State state, const QList<AnalyticsEngineInfo>& value);
     static std::pair<bool, State> setCurrentAnalyticsEngineId(State state, const QnUuid& engineId);
-    static State setAnalyticsSettingsLoading(State state, bool value);
+
     static State setEnabledAnalyticsEngines(State state, const QSet<QnUuid>& value);
     static State setAnalyticsStreamIndex(
         State state, const QnUuid& engineId, State::StreamIndex value, ModificationSource source);
-    static std::pair<bool, State> setDeviceAgentSettingsModel(
-        State state, const QnUuid& engineId, const QJsonObject& value);
+
     static std::pair<bool, State> setDeviceAgentSettingsValues(
         State state, const QnUuid& engineId, const QJsonObject& values);
-    static std::pair<bool, State> resetDeviceAgentSettingsValues(
-        State state, const QnUuid& engineId, const QJsonObject& values);
+
+    static std::pair<bool, State> resetDeviceAgentData(
+        State state, const QnUuid& engineId, const DeviceAgentData& values);
+
     static State setWearableMotionDetectionEnabled(State state, bool value);
     static State setWearableMotionSensitivity(State state, int value);
     static State setCredentials(

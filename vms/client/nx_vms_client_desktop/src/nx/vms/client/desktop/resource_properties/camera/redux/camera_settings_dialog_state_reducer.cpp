@@ -565,7 +565,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recordingAlert = {};
     state.motionAlert = {};
     state.analytics.enabledEngines = {};
-    state.analytics.settingsValuesByEngineId = {};
+    state.analytics.settingsByEngineId = {};
     state.analytics.streamByEngineId = {};
     state.enableMotionDetection = {};
 
@@ -1475,15 +1475,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngi
         return {false, std::move(state)};
 
     state.analytics.currentEngineId = value;
-    state.analytics.loading = true;
 
     return {true, std::move(state)};
-}
-
-State CameraSettingsDialogStateReducer::setAnalyticsSettingsLoading(State state, bool value)
-{
-    state.analytics.loading = value;
-    return state;
 }
 
 State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
@@ -1517,13 +1510,6 @@ State CameraSettingsDialogStateReducer::setAnalyticsStreamIndex(
     return state;
 }
 
-std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsModel(
-    State state, const QnUuid& engineId, const QJsonObject& value)
-{
-    state.analytics.settingsModelByEngineId[engineId] = value;
-    return {true, std::move(state)};
-}
-
 std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsValues(
     State state, const QnUuid& engineId, const QJsonObject& values)
 {
@@ -1535,7 +1521,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
         return {false, std::move(state)};
     }
 
-    auto& storedValues = state.analytics.settingsValuesByEngineId[engineId];
+    auto& storedValues = state.analytics.settingsByEngineId[engineId].values;
     if (storedValues.get() == values)
         return {false, std::move(state)};
 
@@ -1545,11 +1531,14 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
     return {true, std::move(state)};
 }
 
-std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentSettingsValues(
-    State state, const QnUuid& engineId, const QJsonObject& values)
+std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
+    State state, const QnUuid& engineId, const DeviceAgentData& data)
 {
-    state.analytics.settingsValuesByEngineId[engineId].setBase(values);
-    state.analytics.settingsValuesByEngineId[engineId].resetUser();
+    auto& settings = state.analytics.settingsByEngineId[engineId];
+    settings.model = data.model;
+    settings.values.setBase(data.values);
+    settings.values.resetUser();
+    settings.loading = data.status != DeviceAgentData::Status::ok;
     return std::make_pair(true, std::move(state));
 }
 

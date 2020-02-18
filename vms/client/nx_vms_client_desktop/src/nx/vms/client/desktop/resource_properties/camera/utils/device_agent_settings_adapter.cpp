@@ -23,53 +23,9 @@ public:
     CameraSettingsDialogStore* store = nullptr;
     QnVirtualCameraResourcePtr camera;
     AnalyticsSettingsManager* settingsManager = nullptr;
-    QnUuid currentEngineId;
+    //QnUuid currentEngineId;
     std::unique_ptr<AnalyticsSettingsMultiListener> settingsListener;
-
-public:
-    void refreshSettings(const QnUuid& engineId);
-    void updateLoadingState();
 };
-
-void DeviceAgentSettingsAdapter::Private::refreshSettings(const QnUuid& engineId)
-{
-    if (!settingsListener)
-        return;
-
-    NX_VERBOSE(this, "Refreshing settings");
-    updateLoadingState();
-
-    const QJsonObject& model = settingsListener->model(engineId);
-    if (model.isEmpty())
-        return;
-
-    store->setDeviceAgentSettingsModel(engineId, model);
-    const auto actualValues = settingsListener->values(engineId);
-    NX_VERBOSE(this, "Reset actual values to store:\n%1", actualValues);
-    store->resetDeviceAgentSettingsValues(engineId, actualValues);
-}
-
-void DeviceAgentSettingsAdapter::Private::updateLoadingState()
-{
-    bool loading = false;
-
-    if (settingsManager->isApplyingChanges())
-    {
-        NX_VERBOSE(this, "Keep loading state while applying changes");
-        loading = true;
-    }
-    else if (!currentEngineId.isNull() && settingsListener->model(currentEngineId).isEmpty())
-    {
-        NX_VERBOSE(this, "Set loading state as values are still not loaded");
-        loading = true;
-    }
-    else
-    {
-        NX_VERBOSE(this, "Reset loading state");
-    }
-
-    store->setAnalyticsSettingsLoading(loading);
-}
 
 DeviceAgentSettingsAdapter::DeviceAgentSettingsAdapter(
     CameraSettingsDialogStore* store,
@@ -84,22 +40,19 @@ DeviceAgentSettingsAdapter::DeviceAgentSettingsAdapter(
     if (!NX_ASSERT(d->settingsManager))
         return;
 
-    d->currentEngineId = d->store->currentAnalyticsEngineId();
+    //d->currentEngineId = d->store->currentAnalyticsEngineId();
 
-    connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
-        [this]()
-        {
-            const auto id = d->store->currentAnalyticsEngineId();
-            if (d->currentEngineId == id)
-                return;
+    //connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
+    //    [this]()
+    //    {
+    //        const auto id = d->store->currentAnalyticsEngineId();
+    //        if (d->currentEngineId == id)
+    //            return;
 
-            d->currentEngineId = id;
-            NX_VERBOSE(this, "Current engine changed to %1, refreshing settings", id);
-            executeDelayedParented([this, id]() { d->refreshSettings(id); }, this);
-        });
-
-    connect(d->settingsManager, &AnalyticsSettingsManager::appliedChanges, this,
-        [this]() { d->updateLoadingState(); });
+    //        d->currentEngineId = id;
+    //        NX_VERBOSE(this, "Current engine changed to %1, refreshing settings", id);
+    //        executeDelayedParented([this, id]() { d->refreshSettings(id); }, this);
+    //    });
 }
 
 DeviceAgentSettingsAdapter::~DeviceAgentSettingsAdapter()
@@ -118,43 +71,28 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 camera,
                 AnalyticsSettingsMultiListener::ListenPolicy::allEngines);
 
-            if (!d->currentEngineId.isNull())
-                d->refreshSettings(d->currentEngineId);
-
-            connect(d->settingsListener.get(), &AnalyticsSettingsMultiListener::modelChanged,
+            connect(d->settingsListener.get(), &AnalyticsSettingsMultiListener::dataChanged,
                 this,
-                [this](const QnUuid& engineId, const QJsonObject& model)
+                [this](const QnUuid& engineId, const DeviceAgentData& data)
                 {
-                    if (!d->store->deviceAgentSettingsModel(engineId).isEmpty())
-                    {
-                        d->store->setDeviceAgentSettingsModel(engineId, model);
-                        const auto actualValues = d->settingsListener->values(engineId);
-                        NX_VERBOSE(this, "Model changed, reloading actual values to store:\n%1",
-                            actualValues);
-                        d->store->resetDeviceAgentSettingsValues(engineId, actualValues);
-                        d->updateLoadingState();
-                    }
+                    d->store->resetDeviceAgentData(engineId, data);
                 });
 
-            connect(d->settingsListener.get(), &AnalyticsSettingsMultiListener::valuesChanged,
-                this,
-                [this](const QnUuid& engineId)
-                {
-                    NX_VERBOSE(this, "Settings values changed, load them to store");
-                    d->refreshSettings(engineId);
-                });
+            for (const auto& engineId: d->settingsListener->engineIds())
+                d->store->resetDeviceAgentData(engineId, d->settingsListener->data(engineId));
         }
         else
         {
             d->settingsListener.reset();
         }
     }
-    else if (camera && !d->currentEngineId.isNull())
-    {
+
+    //else if (camera && !d->currentEngineId.isNull())
+    //{
         // Refresh settings even if camera is not changed. This happens when the dialog is re-opened
         // or instantly after we have applied the changes.
-        d->refreshSettings(d->currentEngineId);
-    }
+    //    d->refreshSettings(d->currentEngineId);
+    //}
 
 }
 
@@ -168,20 +106,19 @@ void DeviceAgentSettingsAdapter::applySettings()
 
     const QnUuid& cameraId = d->camera->getId();
 
-    const auto& valuesByEngineId = d->store->state().analytics.settingsValuesByEngineId;
+    const auto& settingsByEngineId = d->store->state().analytics.settingsByEngineId;
     QHash<DeviceAgentId, QJsonObject> valuesToSet;
 
-    for (auto it = valuesByEngineId.begin(); it != valuesByEngineId.end(); ++it)
+    for (auto it = settingsByEngineId.begin(); it != settingsByEngineId.end(); ++it)
     {
-        if (it.value().hasUser())
+        if (it->values.hasUser())
         {
-            valuesToSet.insert(DeviceAgentId{cameraId, it.key()}, it.value().get());
-            NX_VERBOSE(this, "Applying changes:\n%1", it.value().get());
+            valuesToSet.insert(DeviceAgentId{cameraId, it.key()}, it->values.get());
+            NX_VERBOSE(this, "Applying changes:\n%1", it->values.get());
         }
     }
 
     d->settingsManager->applyChanges(valuesToSet);
-    d->updateLoadingState();
 }
 
 } // namespace nx::vms::client::desktop

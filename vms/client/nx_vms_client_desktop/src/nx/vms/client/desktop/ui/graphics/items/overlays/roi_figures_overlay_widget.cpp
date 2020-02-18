@@ -184,7 +184,7 @@ public:
 
     qreal realLineWidth(QWidget* widget) const;
 
-    void updateFigureKeys(const QnUuid& engineId, const QJsonObject& model);
+    void updateFigureKeys(const QnUuid& engineId, const DeviceAgentData& data);
     void updateFigures();
 };
 
@@ -374,12 +374,12 @@ qreal RoiFiguresOverlayWidget::Private::realLineWidth(QWidget* widget) const
 }
 
 void RoiFiguresOverlayWidget::Private::updateFigureKeys(
-    const QnUuid& engineId, const QJsonObject& model)
+    const QnUuid& engineId, const DeviceAgentData& data)
 {
     if (!settingsListener)
         return;
 
-    figureKeysByEngineId.insert(engineId, findFigureKeys(model));
+    figureKeysByEngineId.insert(engineId, findFigureKeys(data.model));
 
     updateFigures();
 }
@@ -398,7 +398,7 @@ void RoiFiguresOverlayWidget::Private::updateFigures()
         if (keys.isEmpty())
             continue;
 
-        const QJsonObject& values = settingsListener->values(engineId);
+        const QJsonObject& values = settingsListener->data(engineId).values;
 
         for (auto it = keys.begin(); it != keys.end(); ++it)
         {
@@ -446,16 +446,14 @@ RoiFiguresOverlayWidget::RoiFiguresOverlayWidget(
             AnalyticsSettingsMultiListener::ListenPolicy::enabledEngines,
             this);
 
-        connect(d->settingsListener, &AnalyticsSettingsMultiListener::modelChanged, d.data(),
+        connect(d->settingsListener, &AnalyticsSettingsMultiListener::dataChanged, d.get(),
             &Private::updateFigureKeys);
-        connect(d->settingsListener, &AnalyticsSettingsMultiListener::valuesChanged, d.data(),
-            &Private::updateFigures);
 
         auto initializeKeys =
             [this]()
             {
                 for (const QnUuid& engineId: d->settingsListener->engineIds())
-                    d->updateFigureKeys(engineId, d->settingsListener->model(engineId));
+                    d->updateFigureKeys(engineId, d->settingsListener->data(engineId));
             };
         connect(
             d->settingsListener, &AnalyticsSettingsMultiListener::enginesChanged,
