@@ -28,7 +28,7 @@
                          [hidden]="healthLayoutService.mobileDetailMode"
                          [ngClass]="{'data-wrapper' : !healthLayoutService.activeEntity}">
 
-                        <div class="" *ngIf="!healthLayoutService.mobileDetailMode" #search [ngStyle]="{'width': tableWrapper + 'px'}">
+                        <div class="" *ngIf="!healthLayoutService.mobileDetailMode" #search >
                             <nx-search
                                     name="filterModel"
                                     [ngModel]="filterModel"

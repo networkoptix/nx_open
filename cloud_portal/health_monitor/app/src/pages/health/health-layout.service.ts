@@ -219,16 +219,15 @@ export class NxHealthLayoutService {
         if (!this.tableElement || !this.healthService.tableReady) {
             return;
         }
+
         // measure table (not wrapper) width
         const table = this.tableElement.nativeElement.querySelectorAll('table')[0];
         this.tableWidth = table ? table.offsetWidth : 0;
 
         if (this.activeEntity && !this.mobileDetailMode) {
-            // area available
             const areaWidth = this.searchTableArea ? this.searchTableArea.nativeElement.offsetWidth : 0;
-            // area available to the table (- gutter)
-            const availAreaWidth = areaWidth - NxHealthService.PANEL_WIDTH - 16;
-            const isTableFit = (availAreaWidth > this.tableWidth);
+            const widthPanel = this.healthService.getPanelWidth();
+            const isTableFit = (areaWidth > this.tableWidth + widthPanel + 16); // +gutter
             this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--with-panel';
 
             if (this.searchElement) {

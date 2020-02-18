@@ -130,7 +130,7 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
                     this.selectedHeader = undefined;
                 }
 
-                this.setPage(undefined, this.startIndex);
+                this.selectPage(undefined, this.startIndex);
             });
         });
     }
@@ -167,7 +167,12 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
             .pipe(delay(0))
             .subscribe(pageSize => {
                 this.pageSize = pageSize;
-                this.setPage(1);
+                const params = {...this.route.snapshot.queryParams};
+                if (params.index) {
+                    this.setPage(undefined, parseInt(params.index, 10));
+                } else {
+                    this.setPage(1);
+                }
         });
 
         this.healthLayoutService.activeEntitySubject.subscribe((activeEntity: any) => {
@@ -192,6 +197,8 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         if (!activeEntity && !this.healthService.tableReady) {
             this.setPage(undefined, this.startIndex || 0);
         }
+
+        this.setPagerSize();
     }
 
     trackItem(index, item) {
@@ -215,10 +222,19 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
 
         if (changes.elements) {
             this._elements = Object.values(changes.elements.currentValue);
-            this.setPage(1);
-            if (this.tableElement) {
-                this.setTableDimensions();
-            }
+
+            setTimeout(() => {
+                const params = {...this.route.snapshot.queryParams};
+                if (changes.elements.firstChange && params.index) {
+                    this.setPage(undefined, parseInt(params.index, 10));
+                } else {
+                    this.setPage(1);
+                }
+
+                if (this.tableElement) {
+                    this.setTableDimensions();
+                }
+            });
         }
 
         if (resetURI) {
@@ -295,21 +311,8 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         }
     }
 
-    setPage(page: number, startIndex?) {
-        // TODO: possible optimization - we may not need snapshot params here
-        if (this.mobileDetailMode || startIndex === 0 && this.params.index === undefined) {
-            return;
-        }
-
-        this.params = { ...this.route.snapshot.queryParams };
+    selectPage(page: number, startIndex?) {
         if (page) {
-            const numPages = Math.ceil(this._elements.length / this.pageSize);
-            // outsmarting pagination component which fire (pageChange) if currentPage > numPages
-            // which causes panel to be disposed on window resize if table resize and we're on last page -- TT
-            // for more details -> ask me no later than 3 hours after I commit the code
-            if (this.currentPage !== page && this.currentPage <= numPages) {
-                this.setClickedRow(undefined);
-            }
             this.currentPage = page;
             this.startIndex = (page - 1) * this.pageSize;
         } else {
@@ -319,11 +322,27 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         // preserve window offset
         this.uri.pageOffset = window.pageYOffset;
         setTimeout(() => this.setPagedItems(this.startIndex));
-        const index = (this.startIndex === 0) ? undefined : this.startIndex;
+
+    }
+
+    setPage(page: number, startIndex?, fromComponent = false) {
+        // TODO: possible optimization - we may not need snapshot params here
+        if (this.mobileDetailMode || startIndex === 0 && this.params.index === undefined) {
+            return;
+        }
+
+        this.selectPage(page, startIndex);
+
+        this.params = {...this.route.snapshot.queryParams};
+        const index     = (this.startIndex === 0) ? undefined : this.startIndex;
         const pageParam = this.params && parseInt(this.params.index, 10) || undefined;
 
         if (pageParam !== index) {
             const queryParams: Params = {};
+            if (fromComponent) {
+                queryParams.id = undefined;
+                this.healthLayoutService.activeEntity = undefined;
+            }
             queryParams.index = (this.currentPage === 1) ? undefined : this.startIndex;
 
             this.uri.updateURI(this.uri.getURL(), queryParams);
@@ -365,6 +384,14 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
                         } else {
                             return 0; // no data
                         }
+                    };
+                case 'displayAddress':
+                    return (elm) => {
+                        if (!(elm[groupId] && elm[groupId][paramId])) {
+                            return Number.NEGATIVE_INFINITY; // metric does not exist - visual representation is "-"
+                        }
+                        const value = elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].value;
+                        return parseInt(value.replace(/\./g, '')) || 0;
                     };
                 default:
                     return (elm) => {

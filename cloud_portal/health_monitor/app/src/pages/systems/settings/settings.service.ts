@@ -59,7 +59,6 @@ export class NxSettingsService implements OnDestroy {
         return this.dialogs
                    .addUser(this.accountService, this.system)
                    .then((userId) => {
-                       this.system.pauseUpdate = false;
                        if (userId) {
                            userId = this.system.mediaserver.cleanId(userId);
                            this.menuService.setDetailsSection(userId);
@@ -69,7 +68,8 @@ export class NxSettingsService implements OnDestroy {
                        // dialog was dismissed ... this handler is required if dialog is dismissible
                        // if we don't handle it will raise a JS error
                        // ERROR Error: Uncaught (in promise): [object Number]
-                   });
+                   })
+                   .finally(() => this.system.pauseUpdate = false);
     }
 
     ngOnDestroy() {
