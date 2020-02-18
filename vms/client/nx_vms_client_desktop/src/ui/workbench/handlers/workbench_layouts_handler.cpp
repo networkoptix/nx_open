@@ -176,6 +176,33 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             }
         });
 
+    connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
+        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
+        {
+            if (!subject.isUser())
+                return;
+
+            const auto currentUser = context()->user();
+            if (!currentUser)
+                return;
+
+            if (currentUser->getId() != subject.id())
+                return;
+
+            const auto resourceFlags = resource->flags();
+            if (!resourceFlags.testFlag(Qn::layout) || !resourceFlags.testFlag(Qn::remote))
+                return;
+
+            if (resourceFlags.testFlag(Qn::removed))
+                return;
+
+            if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
+                && workbench()->layouts().empty())
+            {
+                action(action::OpenNewTabAction)->trigger();
+            }
+        });
+
     connect(commonModule()->messageProcessor(), &QnCommonMessageProcessor::businessActionReceived,
         this, &LayoutsHandler::at_openLayoutAction_triggered);
 }
