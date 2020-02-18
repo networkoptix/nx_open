@@ -4571,7 +4571,7 @@ bool QnPlOnvifResource::fetchRelayOutputInfo(const std::string& outputID, RelayO
     return false; //there is no output with id outputID
 }
 
-bool QnPlOnvifResource::setRelayOutputInfo(const RelayOutputInfo& relayOutputInfo)
+bool QnPlOnvifResource::soapSetRelayOutputInfo(RelayOutputInfo relayOutputInfo)
 {
     QAuthenticator auth = getAuth();
     DeviceSoapWrapper soapWrapper(
@@ -4581,29 +4581,52 @@ bool QnPlOnvifResource::setRelayOutputInfo(const RelayOutputInfo& relayOutputInf
         auth.password(),
         m_timeDrift);
 
-    NX_DEBUG(this, lit("Switching camera %1 relay output %2 to monostable mode").
-        arg(QString::fromLatin1(soapWrapper.endpoint())).arg(QString::fromStdString(relayOutputInfo.token)));
+    NX_DEBUG(this,
+        "Switching camera %1 relay output %2: mode = %3, delay = %4 ms, activeByDefault = %5",
+        soapWrapper.endpoint(),
+        QString::fromStdString(relayOutputInfo.token),
+        relayOutputInfo.isBistable ? "bistable" : "monostable",
+        relayOutputInfo.delayTimeMs,
+        relayOutputInfo.activeByDefault ? "true" : "false");
 
-    //switching to monostable mode
     _onvifDevice__SetRelayOutputSettings setOutputSettingsRequest;
     setOutputSettingsRequest.RelayOutputToken = relayOutputInfo.token;
     onvifXsd__RelayOutputSettings relayOutputSettings;
-    relayOutputSettings.Mode = relayOutputInfo.isBistable ? onvifXsd__RelayMode::Bistable : onvifXsd__RelayMode::Monostable;
+    relayOutputSettings.Mode = relayOutputInfo.isBistable
+        ? onvifXsd__RelayMode::Bistable
+        : onvifXsd__RelayMode::Monostable;
 
     relayOutputSettings.DelayTime = relayOutputInfo.delayTimeMs;
 
-    relayOutputSettings.IdleState = relayOutputInfo.activeByDefault ? onvifXsd__RelayIdleState::closed : onvifXsd__RelayIdleState::open;
+    relayOutputSettings.IdleState = relayOutputInfo.activeByDefault
+        ? onvifXsd__RelayIdleState::closed
+        : onvifXsd__RelayIdleState::open;
+
     setOutputSettingsRequest.Properties = &relayOutputSettings;
     _onvifDevice__SetRelayOutputSettingsResponse setOutputSettingsResponse;
-    const int soapCallResult = soapWrapper.setRelayOutputSettings(setOutputSettingsRequest, setOutputSettingsResponse);
-    if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
-    {
-        NX_DEBUG(this, "Failed to switch camera %1 relay output %2 to monostable mode. %3",
-            soapWrapper.endpoint(), relayOutputInfo.token, soapCallResult);
-        return false;
-    }
+    const int soapCallResult = soapWrapper.setRelayOutputSettings(
+        setOutputSettingsRequest, setOutputSettingsResponse);
 
-    return true;
+    const bool isSuccess = (soapCallResult == SOAP_OK || soapCallResult == SOAP_MUSTUNDERSTAND);
+
+    static QString kResultMessage[2] =
+    {
+        "Failed to switch camera %1 relay output %2 "
+        "to mode = %3, delay = %4 ms, activeByDefault = %5. ErrorCode = %6"
+        ,
+        "Succeeded to switch camera %1 relay output %2 "
+        "to mode = %3, delay = %4 ms, activeByDefault = %5. ErrorCode = %6"
+    };
+
+    NX_DEBUG(this, kResultMessage[(int) isSuccess],
+        soapWrapper.endpoint(),
+        relayOutputInfo.token,
+        relayOutputInfo.isBistable ? "bistable" : "monostable",
+        relayOutputInfo.delayTimeMs,
+        relayOutputInfo.activeByDefault ? "true" : "false",
+        soapCallResult);
+
+    return isSuccess;
 }
 
 int QnPlOnvifResource::getMaxChannelsFromDriver() const
@@ -4645,6 +4668,56 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
     return m_videoLayout;
 }
 
+bool QnPlOnvifResource::soapSetRelayOutputState(RelayOutputInfo relayOutputInfo, bool active)
+{
+    QAuthenticator auth = getAuth();
+
+    DeviceSoapWrapper soapWrapper(
+        onvifTimeouts(),
+        getDeviceOnvifUrl().toStdString(),
+        auth.user(),
+        auth.password(),
+        m_timeDrift);
+
+    _onvifDevice__SetRelayOutputState request;
+    request.RelayOutputToken = relayOutputInfo.token;
+
+    auto onvifActive = m_isRelayOutputInversed ? !active : active;
+
+    /*
+     Some cameras have a bug.
+     If "output relay idle state" == "open" (i.e. activeByDefault == false),
+     then "SetRelayOutputState" argument "LogicalState" is accepted as inversed value
+     (active as inactive and vice versa).
+
+     If "output relay idle state" == "close", then "SetRelayOutputState" works perfect.
+
+    */
+
+    const bool useInvertedActiveStateForOpenIdleState =
+        resourceData().value<bool>(ResourceDataKey::kUseInvertedActiveStateForOpenIdleState);
+
+    if (useInvertedActiveStateForOpenIdleState && relayOutputInfo.activeByDefault == false)
+        onvifActive = !onvifActive;
+
+    request.LogicalState = onvifActive ? onvifXsd__RelayLogicalState::active : onvifXsd__RelayLogicalState::inactive;
+
+    _onvifDevice__SetRelayOutputStateResponse response;
+    const int soapCallResult = soapWrapper.setRelayOutputState(request, response);
+
+    const bool isSuccess = (soapCallResult == SOAP_OK || soapCallResult == SOAP_MUSTUNDERSTAND);
+
+    static QString kResultMessage[2] =
+    {
+        "Failed to switch camera %1 relay output %2 to state = %3. ErrorCode = %4",
+        "Succeeded to switch camera %1 relay output %2 to state = %3. ErrorCode = %4"
+    };
+
+    NX_DEBUG(this, kResultMessage[(int)isSuccess],
+        soapWrapper.endpoint(), relayOutputInfo.token, onvifActive, soapCallResult);
+    return isSuccess;
+}
+
 void QnPlOnvifResource::setOutputPortStateNonSafe(
     quint64 timerID,
     const QString& outputID,
@@ -4670,81 +4743,27 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
     const bool isBistableModeRequired = autoResetTimeoutMS == 0;
 #endif
 
-#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
-    std::string requiredDelayTime;
-    if (autoResetTimeoutMS > 0)
-    {
-        std::ostringstream ss;
-        ss<<"PT"<<(autoResetTimeoutMS < 1000 ? 1 : autoResetTimeoutMS/1000)<<"S";
-        requiredDelayTime = ss.str();
-    }
-#endif
     if ((relayOutputInfo.isBistable != isBistableModeRequired) ||
 #ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
-        (!isBistableModeRequired && relayOutputInfo.delayTimeMs != requiredDelayTime) ||
+        (!isBistableModeRequired && relayOutputInfo.delayTimeMs != autoResetTimeoutMS) ||
 #endif
         relayOutputInfo.activeByDefault)
     {
         //switching output to required mode
         relayOutputInfo.isBistable = isBistableModeRequired;
-#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
-        relayOutputInfo.delayTimeMs = requiredDelayTime;
-#endif
+        #ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+                relayOutputInfo.delayTimeMs = autoResetTimeoutMS;
+        #endif
         relayOutputInfo.activeByDefault = false;
-        if (!setRelayOutputInfo(relayOutputInfo))
+        if (!soapSetRelayOutputInfo(relayOutputInfo))
         {
-            NX_DEBUG(this, "Cannot set camera %1 output %2 to state %3 with timeout %4 milliseconds. "
-                "Cannot set mode to %5",
-                "", relayOutputInfo.token, QString(active ? "active" : "inactive"),
-                autoResetTimeoutMS, QString(relayOutputInfo.isBistable ? "bistable" : "monostable"));
-            return /*false*/;
+            NX_DEBUG(this, "Cannot change relay output %1 state. Failed to set relay output info", outputID);
+            return;
         }
-
-        NX_DEBUG(this, "Camera %1 output %2 has been switched to %3 mode", "", outputID,
-            QString(relayOutputInfo.isBistable ? "bistable" : "monostable"));
     }
 
-    //modifying output
-    QAuthenticator auth = getAuth();
-
-    DeviceSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        getDeviceOnvifUrl().toStdString(),
-        auth.user(),
-        auth.password(),
-        m_timeDrift);
-
-    _onvifDevice__SetRelayOutputState request;
-    request.RelayOutputToken = relayOutputInfo.token;
-
-    auto onvifActive = m_isRelayOutputInversed ? !active : active;
-
-    /*
-     Some cameras have a bug.
-     If "output relay idle state" == "open" (i.e. activeByDefault == false),
-     then "SetRelayOutputState" argument "LogicalState" is accepted as inversed value
-     (active as inactive and vice versa).
-
-     If "output relay idle state" == "close", then "SetRelayOutputState" works perfect.
-
-    */
-
-    bool useInvertedActiveStateForOpenIdleState =
-        resourceData().value<bool>(ResourceDataKey::kUseInvertedActiveStateForOpenIdleState);
-
-    if (useInvertedActiveStateForOpenIdleState && relayOutputInfo.activeByDefault == false)
-        onvifActive = !onvifActive;
-
-    request.LogicalState = onvifActive ? onvifXsd__RelayLogicalState::active : onvifXsd__RelayLogicalState::inactive;
-
-    _onvifDevice__SetRelayOutputStateResponse response;
-    const int soapCallResult = soapWrapper.setRelayOutputState(request, response);
-    if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
-    {
-        NX_DEBUG(this, "Failed to set relay %1 output state to %2. endpoint %3",
-            relayOutputInfo.token, onvifActive, soapWrapper.endpoint());
-        return /*false*/;
-    }
+    if (!this->soapSetRelayOutputState(relayOutputInfo, active))
+        return;
 
 #ifdef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
     if ((autoResetTimeoutMS > 0) && active)
@@ -4759,9 +4778,6 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
     }
 #endif
 
-    NX_DEBUG(this, "Successfully set relay %1 output state to %2. endpoint %3",
-        relayOutputInfo.token, onvifActive, soapWrapper.endpoint());
-    return /*true*/;
 }
 
 void QnPlOnvifResource::beforeConfigureStream(Qn::ConnectionRole /*role*/)

@@ -672,8 +672,9 @@ private:
     bool fetchRelayOutputInfo(const std::string& outputID, RelayOutputInfo* const relayOutputInfo);
     bool fetchRelayInputInfo(const _onvifDevice__GetCapabilitiesResponse& capabilitiesResponse);
     bool fetchPtzInfo();
-    bool setRelayOutputInfo(const RelayOutputInfo& relayOutputInfo);
+    bool soapSetRelayOutputInfo(RelayOutputInfo relayOutputInfo);
     void checkPrimaryResolution(QSize& primaryResolution);
+    bool soapSetRelayOutputState(RelayOutputInfo relayOutputInfo, bool active);
     void setOutputPortStateNonSafe(
         quint64 timerID,
         const QString& outputID,

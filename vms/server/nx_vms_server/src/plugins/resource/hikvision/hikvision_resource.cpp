@@ -156,7 +156,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
     if (m_hevcSupported)
     {
         fetchChannelCount();
-        // Video properties has been read succesfully, time to read audio properties.
+        // Video properties has been read successfully, time to read audio properties.
         fetchAndSetAudioSource();
         fetchAndSetAudioResourceOptions();
 
