@@ -153,14 +153,14 @@ CPacket::CPacket():
     m_iMsgNo((int32_t&)(m_nHeader[1])),
     m_iTimeStamp((int32_t&)(m_nHeader[2])),
     m_iID((int32_t&)(m_nHeader[3])),
-    m_pcData((char*&)(m_PacketVector[1].iov_base))
+    m_pcData(m_PacketVector[1].data())
 {
     memset(m_nHeader, 0, sizeof(m_nHeader));
 
-    m_PacketVector[0].iov_base = (char *)m_nHeader;
-    m_PacketVector[0].iov_len = CPacket::m_iPktHdrSize;
-    m_PacketVector[1].iov_base = NULL;
-    m_PacketVector[1].iov_len = 0;
+    m_PacketVector[0].data() = (char *)m_nHeader;
+    m_PacketVector[0].setSize(CPacket::m_iPktHdrSize);
+    m_PacketVector[1].data() = NULL;
+    m_PacketVector[1].setSize(0);
 }
 
 CPacket::~CPacket()
@@ -169,12 +169,12 @@ CPacket::~CPacket()
 
 int CPacket::getLength() const
 {
-    return m_PacketVector[1].iov_len;
+    return m_PacketVector[1].size();
 }
 
 void CPacket::setLength(int len)
 {
-    m_PacketVector[1].iov_len = len;
+    m_PacketVector[1].setSize(len);
 }
 
 void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int size)
@@ -192,8 +192,8 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
 
             // data ACK seq. no.
             // optional: RTT (microsends), RTT variance (microseconds) advertised flow window size (packets), and estimated link capacity (packets per second)
-            m_PacketVector[1].iov_base = (char *)rparam;
-            m_PacketVector[1].iov_len = size;
+            m_PacketVector[1].data() = (char *)rparam;
+            m_PacketVector[1].setSize(size);
 
             break;
 
@@ -203,46 +203,46 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
 
             // control info field should be none
             // but "writev" does not allow this
-            m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
-            m_PacketVector[1].iov_len = 4; //0;
+            m_PacketVector[1].data() = (char *)&__pad; //NULL;
+            m_PacketVector[1].setSize(4); //0;
 
             break;
 
         case ControlPacketType::LossReport: //0011 - Loss Report (NAK)
                                      // loss list
-            m_PacketVector[1].iov_base = (char *)rparam;
-            m_PacketVector[1].iov_len = size;
+            m_PacketVector[1].data() = (char *)rparam;
+            m_PacketVector[1].setSize(size);
 
             break;
 
         case ControlPacketType::DelayWarning: //0100 - Congestion Warning
                                        // control info field should be none
                                        // but "writev" does not allow this
-            m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
-            m_PacketVector[1].iov_len = 4; //0;
+            m_PacketVector[1].data() = (char *)&__pad; //NULL;
+            m_PacketVector[1].setSize(4); //0;
 
             break;
 
         case ControlPacketType::KeepAlive: //0001 - Keep-alive
                                     // control info field should be none
                                     // but "writev" does not allow this
-            m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
-            m_PacketVector[1].iov_len = 4; //0;
+            m_PacketVector[1].data() = (char *)&__pad; //NULL;
+            m_PacketVector[1].setSize(4); //0;
 
             break;
 
         case ControlPacketType::Handshake: //0000 - Handshake
                                     // control info filed is handshake info
-            m_PacketVector[1].iov_base = (char *)rparam;
-            m_PacketVector[1].iov_len = size; //sizeof(CHandShake);
+            m_PacketVector[1].data() = (char *)rparam;
+            m_PacketVector[1].setSize(size); //sizeof(CHandShake);
 
             break;
 
         case ControlPacketType::Shutdown: //0101 - Shutdown
                                    // control info field should be none
                                    // but "writev" does not allow this
-            m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
-            m_PacketVector[1].iov_len = 4; //0;
+            m_PacketVector[1].data() = (char *)&__pad; //NULL;
+            m_PacketVector[1].setSize(4); //0;
 
             break;
 
@@ -251,8 +251,8 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
             m_nHeader[1] = *(int32_t *)lparam;
 
             //first seq no, last seq no
-            m_PacketVector[1].iov_base = (char *)rparam;
-            m_PacketVector[1].iov_len = size;
+            m_PacketVector[1].data() = (char *)rparam;
+            m_PacketVector[1].setSize(size);
 
             break;
 
@@ -262,8 +262,8 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
 
             // control info field should be none
             // but "writev" does not allow this
-            m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
-            m_PacketVector[1].iov_len = 4; //0;
+            m_PacketVector[1].data() = (char *)&__pad; //NULL;
+            m_PacketVector[1].setSize(4); //0;
 
             break;
 
@@ -275,13 +275,13 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
 
             if (NULL != rparam)
             {
-                m_PacketVector[1].iov_base = (char *)rparam;
-                m_PacketVector[1].iov_len = size;
+                m_PacketVector[1].data() = (char *)rparam;
+                m_PacketVector[1].setSize(size);
             }
             else
             {
-                m_PacketVector[1].iov_base = (char *)&__pad;
-                m_PacketVector[1].iov_len = 4;
+                m_PacketVector[1].data() = (char *)&__pad;
+                m_PacketVector[1].setSize(4);
             }
 
             break;
@@ -289,11 +289,6 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
         default:
             break;
     }
-}
-
-iovec* CPacket::getPacketVector()
-{
-    return m_PacketVector;
 }
 
 PacketFlag CPacket::getFlag() const
@@ -342,9 +337,9 @@ CPacket* CPacket::clone() const
 {
     CPacket* pkt = new CPacket;
     memcpy(pkt->m_nHeader, m_nHeader, m_iPktHdrSize);
-    pkt->m_pcData = new char[m_PacketVector[1].iov_len];
-    memcpy(pkt->m_pcData, m_pcData, m_PacketVector[1].iov_len);
-    pkt->m_PacketVector[1].iov_len = m_PacketVector[1].iov_len;
+    pkt->m_pcData = new char[m_PacketVector[1].size()];
+    memcpy(pkt->m_pcData, m_pcData, m_PacketVector[1].size());
+    pkt->m_PacketVector[1].setSize(m_PacketVector[1].size());
 
     return pkt;
 }
