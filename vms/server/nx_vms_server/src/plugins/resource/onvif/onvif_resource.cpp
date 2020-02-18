@@ -4606,16 +4606,13 @@ bool QnPlOnvifResource::soapSetRelayOutputInfo(RelayOutputInfo relayOutputInfo)
 
     const bool isSuccess = (soapCallResult == SOAP_OK || soapCallResult == SOAP_MUSTUNDERSTAND);
 
-    static QString kResultMessage[2] =
-    {
-        "Failed to switch camera %1 relay output %2 "
-        "to mode = %3, delay = %4 ms, activeByDefault = %5. ErrorCode = %6"
-        ,
-        "Succeeded to switch camera %1 relay output %2 "
-        "to mode = %3, delay = %4 ms, activeByDefault = %5. ErrorCode = %6"
-    };
+    static const QString kResultVerb[2] = { "Failed", "Succeeded" };
+    static const QString kResultMessage =
+        "%1 to switch camera %2 relay output %3 "
+        "to mode = %4, delay = %5 ms, activeByDefault = %6. ErrorCode = %7";
 
-    NX_DEBUG(this, kResultMessage[(int) isSuccess],
+    NX_DEBUG(this, kResultMessage,
+        kResultVerb[(int)isSuccess],
         soapWrapper.endpoint(),
         relayOutputInfo.token,
         relayOutputInfo.isBistable ? "bistable" : "monostable",
@@ -4694,24 +4691,27 @@ bool QnPlOnvifResource::soapSetRelayOutputState(RelayOutputInfo relayOutputInfo,
     const bool useInvertedActiveStateForOpenIdleState =
         resourceData().value<bool>(ResourceDataKey::kUseInvertedActiveStateForOpenIdleState);
 
-    if (useInvertedActiveStateForOpenIdleState && relayOutputInfo.activeByDefault == false)
+    if (useInvertedActiveStateForOpenIdleState && !relayOutputInfo.activeByDefault)
         onvifActive = !onvifActive;
 
-    request.LogicalState = onvifActive ? onvifXsd__RelayLogicalState::active : onvifXsd__RelayLogicalState::inactive;
+    request.LogicalState =
+        onvifActive ? onvifXsd__RelayLogicalState::active : onvifXsd__RelayLogicalState::inactive;
 
     _onvifDevice__SetRelayOutputStateResponse response;
     const int soapCallResult = soapWrapper.setRelayOutputState(request, response);
 
     const bool isSuccess = (soapCallResult == SOAP_OK || soapCallResult == SOAP_MUSTUNDERSTAND);
 
-    static QString kResultMessage[2] =
-    {
-        "Failed to switch camera %1 relay output %2 to state = %3. ErrorCode = %4",
-        "Succeeded to switch camera %1 relay output %2 to state = %3. ErrorCode = %4"
-    };
+    static const QString kResultVerb[2] = { "Failed", "Succeeded" };
+    static const QString kResultMessage =
+        "%1 to switch camera %2 relay output %3 to state = %4. ErrorCode = %5";
 
-    NX_DEBUG(this, kResultMessage[(int)isSuccess],
-        soapWrapper.endpoint(), relayOutputInfo.token, onvifActive, soapCallResult);
+    NX_DEBUG(this, kResultMessage,
+        kResultVerb[(int)isSuccess],
+        soapWrapper.endpoint(),
+        relayOutputInfo.token,
+        onvifActive,
+        soapCallResult);
     return isSuccess;
 }
 
