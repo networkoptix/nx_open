@@ -458,13 +458,17 @@ void PlayerSetQualityTest::test(const TestCase& testCase)
     m_camera->setStreams(testCase.highStreamResolution, testCase.lowStreamResolution);
     m_camera->setChannelCount(testCase.channelCount);
 
+    const std::vector<AbstractVideoDecoder*> currentDecoders{};
+    media_player_quality_chooser::Input input;
+    input.transcodingCodec = MockVideoDecoder::s_transcodingCodec;
+    input.liveMode = true;
+    input.positionMs = -1;
+    input.camera = m_camera;
+    input.allowOverlay = true;
+    input.currentDecoders = &currentDecoders;
+
     const auto& result = media_player_quality_chooser::chooseVideoQuality(
-        MockVideoDecoder::s_transcodingCodec,
-        testCase.videoQuality,
-        true,
-        -1,
-        m_camera,
-        true);
+        testCase.videoQuality, input);
 
     if (result != testCase.expectedQuality)
     {
