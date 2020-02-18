@@ -102,7 +102,9 @@ QString processItemTemplateString(QString str, const int index, const int depth)
                 }
                 else
                 {
-                    result += "#{";
+                    result += (depth == 1)
+                        ? indexStr + "{"
+                        : "#{";
                     result += number;
                     number.clear();
 
