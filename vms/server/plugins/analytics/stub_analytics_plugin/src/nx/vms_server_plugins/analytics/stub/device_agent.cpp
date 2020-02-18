@@ -179,7 +179,8 @@ std::string DeviceAgent::manifestString() const
         ")json" + kObjectInTheAreaEventType + R"json("
     ],
     "supportedObjectTypeIds": [
-        ")json" + kCarObjectType + R"json("
+        ")json" + kCarObjectType + R"json(",
+        "id": ")json" + kStoneObjectType + R"json("
     ],
     "eventTypes": [
         {
@@ -213,10 +214,6 @@ std::string DeviceAgent::manifestString() const
         {
             "id": ")json" + kBlinkingObjectType + R"json(",
             "name": "Blinking Object"
-        },
-        {
-            "id": ")json" + kStoneObjectType + R"json(",
-            "name": "Stone"
         }
     ])json"
         + (ini().overrideSettingsModelInDeviceAgent ? kOverriddenDeviceAgentSettingsModel : "")
