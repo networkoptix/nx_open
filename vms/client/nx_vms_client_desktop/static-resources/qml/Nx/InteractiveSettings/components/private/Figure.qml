@@ -122,7 +122,9 @@ LabeledItem
                             if (settingsView.resourceId.isNull())
                                 return
 
-                            thumbnailProvider.refresh(settingsView.resourceId)
+                            thumbnailProvider.refresh(
+                                settingsView.resourceId,
+                                settingsView.currentEngineId)
                         }
 
                         Component.onCompleted: updateThumbnail()

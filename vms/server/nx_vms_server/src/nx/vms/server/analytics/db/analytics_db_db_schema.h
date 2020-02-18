@@ -345,4 +345,9 @@ R"sql(
     UPDATE track set track_detail = null;
 )sql";
 
+static constexpr char kAddTrackStreamIndex[] =
+R"sql(
+    ALTER TABLE track ADD COLUMN stream_index INTEGER DEFAULT 0;
+)sql";
+
 } // namespace nx::analytics::db

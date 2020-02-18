@@ -10,6 +10,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/streaming/media_data_packet_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/types/motion_types.h>
 
 namespace nx {
 namespace common {
@@ -67,6 +68,7 @@ struct ObjectMetadataPacket
     qint64 timestampUs = 0;
     qint64 durationUs = 0;
     std::vector<ObjectMetadata> objectMetadataList;
+    nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
 
     bool containsBestShotMetadata() const
     {
@@ -77,7 +79,12 @@ struct ObjectMetadataPacket
     }
 };
 
-#define ObjectMetadataPacket_Fields (deviceId)(timestampUs)(durationUs)(objectMetadataList)
+#define ObjectMetadataPacket_Fields (deviceId) \
+    (timestampUs) \
+    (durationUs) \
+    (objectMetadataList) \
+    (streamIndex)
+
 QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadataPacket, (json)(ubjson));
 
 bool operator==(const ObjectMetadataPacket& left, const ObjectMetadataPacket& right);

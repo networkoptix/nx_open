@@ -38,6 +38,7 @@
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::client::desktop {
 
@@ -47,6 +48,9 @@ namespace {
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
+
+using StreamIndex = nx::vms::api::StreamIndex;
+using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
 
 static constexpr milliseconds kMetadataTimerInterval = 1000ms;
 static constexpr milliseconds kDataChangedInterval = 500ms;
@@ -117,7 +121,7 @@ int AnalyticsSearchListModel::Private::count() const
 QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int role,
     bool& handled) const
 {
-    const auto& track = m_data[index.row()];
+    const nx::analytics::db::ObjectTrack& track = m_data[index.row()];
     handled = true;
 
     static const auto kDefaultLocale = QString();
@@ -162,9 +166,18 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return QVariant::fromValue(previewParams(track).timestamp);
 
         case Qn::PreviewStreamSelectionRole:
-            return QVariant::fromValue(
-                nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics);
+        {
+            const bool isBestShotCorrect = track.bestShot.initialized()
+                && (track.bestShot.streamIndex == StreamIndex::primary
+                    || track.bestShot.streamIndex == StreamIndex::secondary);
 
+            if (!NX_ASSERT(isBestShotCorrect))
+                return QVariant::fromValue(StreamSelectionMode::forcedPrimary);
+
+            return QVariant::fromValue(track.bestShot.streamIndex == StreamIndex::primary
+                ? StreamSelectionMode::forcedPrimary
+                : StreamSelectionMode::forcedSecondary);
+        }
         case Qn::DurationRole:
             return QVariant::fromValue(objectDuration(track));
 
@@ -593,6 +606,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 newTrack.attributes = item.attributes;
                 newTrack.bestShot.rect = item.boundingBox;
                 newTrack.bestShot.timestampUs = objectMetadata->timestampUs;
+                newTrack.bestShot.streamIndex = objectMetadata->streamIndex;
                 newTrack.firstAppearanceTimeUs = objectMetadata->timestampUs;
                 newTrack.lastAppearanceTimeUs = objectMetadata->timestampUs;
 

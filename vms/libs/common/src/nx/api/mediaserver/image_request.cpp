@@ -50,6 +50,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::api::CameraImageRequest, StreamSel
     (nx::api::CameraImageRequest::StreamSelectionMode::auto_, "auto")
     (nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary, "forcedPrimary")
     (nx::api::CameraImageRequest::StreamSelectionMode::forcedSecondary, "forcedSecondary")
-    (nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics, "sameAsAnalytics")
     (nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion, "sameAsMotion")
 )

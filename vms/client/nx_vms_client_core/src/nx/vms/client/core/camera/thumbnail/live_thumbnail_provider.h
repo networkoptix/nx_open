@@ -27,8 +27,8 @@ public:
 
     virtual QPixmap pixmap(const QString& thumbnailId) const override;
 
-    Q_INVOKABLE void refresh(const QnUuid& cameraId);
-    Q_INVOKABLE void refresh(const QString& cameraId);
+    Q_INVOKABLE void refresh(const QnUuid& cameraId, const QnUuid& engineId);
+    Q_INVOKABLE void refresh(const QString& cameraId, const QString& engineId);
 
     int thumbnailsHeight() const { return m_thumbnailHeight; }
     void setThumbnailsHeight(int height);

@@ -100,10 +100,13 @@ bool operator<(std::chrono::microseconds first, const ObjectMetadataPacket& seco
 
 QString toString(const ObjectMetadataPacket& packet)
 {
-    QString s = lit("PTS ") + QString::number(packet.timestampUs)
-        + lit(", durationUs ") + QString::number(packet.durationUs)
-        + lit(", deviceId ") + packet.deviceId.toString()
-        + lit(", objects: ") + QString::number(packet.objectMetadataList.size()) + lit("\n");
+    QString s = lm("PTS: %1, durationUs: %2, deviceId: %3, streamIndex: %4, objects: %5\n")
+        .args(
+            packet.timestampUs,
+            packet.durationUs,
+            packet.deviceId,
+            packet.objectMetadataList.size(),
+            packet.streamIndex);
 
     for (const auto& object: packet.objectMetadataList)
         s += "    " + toString(object) + "\n";
@@ -146,7 +149,8 @@ bool operator==(const ObjectMetadataPacket& left, const ObjectMetadataPacket& ri
     return left.deviceId == right.deviceId
         && left.timestampUs == right.timestampUs
         && left.durationUs == right.durationUs
-        && left.objectMetadataList == right.objectMetadataList;
+        && left.objectMetadataList == right.objectMetadataList
+        && left.streamIndex == right.streamIndex;
 }
 
 bool operator<(const ObjectMetadataPacket& first, std::chrono::microseconds second)

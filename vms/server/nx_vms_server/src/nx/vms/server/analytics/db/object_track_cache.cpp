@@ -217,7 +217,7 @@ void ObjectTrackCache::updateObject(
 
     if (trackContext.track.objectTypeId.isEmpty())
         trackContext.track.objectTypeId = objectMetadata.typeId;
-    trackContext.track.lastAppearanceTimeUs = 
+    trackContext.track.lastAppearanceTimeUs =
         std::max(trackContext.track.lastAppearanceTimeUs, packet.timestampUs);
 
     auto assignBestShotFromPacket =
@@ -225,6 +225,7 @@ void ObjectTrackCache::updateObject(
         {
             track.bestShot.timestampUs = packet.timestampUs;
             track.bestShot.rect = boundingBox;
+            track.bestShot.streamIndex = packet.streamIndex;
         };
 
     if (objectMetadata.bestShot)
@@ -241,14 +242,13 @@ void ObjectTrackCache::updateObject(
         trackContext.roughBestShot = true; //< Auto assign the first frame.
     }
 
-    // Update best shot to the first I-frame of the track in case of it not defined by driver.
+    // Update best shot to the first I-frame of the track in case it is not defined by a Plugin.
     if (trackContext.roughBestShot && m_iframeHelper)
     {
         using namespace nx::vms::api;
         // TODO: Get stream index from the packet.
-        auto streamIndex = ini().analyzeSecondaryStream ? StreamIndex::secondary : StreamIndex::primary;
         const auto timeUs = m_iframeHelper->findAfter(
-            trackContext.track.deviceId, streamIndex, trackContext.track.bestShot.timestampUs);
+            trackContext.track.deviceId, packet.streamIndex, trackContext.track.bestShot.timestampUs);
         if (timeUs >= trackContext.track.bestShot.timestampUs && timeUs <= packet.timestampUs)
         {
             assignBestShotFromPacket(trackContext.track, packet, objectMetadata.boundingBox);
