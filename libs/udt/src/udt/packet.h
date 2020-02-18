@@ -153,10 +153,6 @@ private:
     PacketHeader m_nHeader;
     BufArray<2> m_PacketVector;          // The 2-dimension vector of UDT packet [header, data]
 
-private:
-    uint32_t m_nHeader[4];               // The 128-bit header field
-    BufArray<2> m_PacketVector;             // The 2-demension vector of UDT packet [header, data]
-
 public:
     int32_t& m_iSeqNo;                   // alias: sequence number
     int32_t& m_iMsgNo;                   // alias: message number
