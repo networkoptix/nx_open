@@ -90,15 +90,18 @@ bool Sps::decode(const uint8_t* payload, int payloadLength)
         const bool conformance_window_flag = reader.getBit();
         if (conformance_window_flag)
         {
-            const int SubHeightC = chromaFormatIdc == 1 ? 2 : 1; //< 2 for yuv420, otherwise 1.
+            // 2 for yuv420 or yuv422.
+            const int SubWidthC = chromaFormatIdc == 1 || chromaFormatIdc == 2 ? 2 : 1;
+            // 2 for yuv420, otherwise 1.
+            const int SubHeightC = chromaFormatIdc == 1 ? 2 : 1;
 
-            int conf_win_left_offset = NALUnit::extractUEGolombCode(reader);
-            int conf_win_right_offset = NALUnit::extractUEGolombCode(reader);
-            int conf_win_top_offset = NALUnit::extractUEGolombCode(reader);
-            int conf_win_bottom_offset = NALUnit::extractUEGolombCode(reader);
+            const int confWinLeftOffset = NALUnit::extractUEGolombCode(reader);
+            const int confWinRightOffset = NALUnit::extractUEGolombCode(reader);
+            const int confWinTopOffset = NALUnit::extractUEGolombCode(reader);
+            const int confWinBottomOffset = NALUnit::extractUEGolombCode(reader);
 
-            width -= SubHeightC * (conf_win_left_offset + conf_win_right_offset);
-            height -= SubHeightC * (conf_win_top_offset + conf_win_bottom_offset);
+            width -= SubWidthC * (confWinLeftOffset + confWinRightOffset);
+            height -= SubHeightC * (confWinTopOffset + confWinBottomOffset);
         }
 
         // Stop decoding since we do not need further fields.
