@@ -27,6 +27,8 @@ extern "C" {
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <client/client_module.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
+#include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
+
 
 using namespace std::chrono;
 
@@ -485,37 +487,38 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         return Status_Displayed; // true to prevent 100% cpu usage on unknown codec
     }
 
+    if (reverseMode != m_prevReverseMode || m_needResetDecoder)
+    {
+        clearReverseQueue();
+        QnMutexLocker lock( &m_mtx );
+        m_decoderData.decoder.reset();
+        m_prevReverseMode = reverseMode;
+        m_needResetDecoder = false;
+        //data->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice;
+    }
+
+
     auto dec = m_decoderData.decoder.get();
     if (!dec || m_decoderData.compressionType != data->compressionType)
     {
         DecoderConfig config;
         config.mtDecodePolicy = toEncoderPolicy(/*mtDecoding*/ enableFrameQueue);
 
-        dec = new QnFfmpegVideoDecoder(
-            config, 
-            /*metrics*/ nullptr,
-            data);
+        if (!m_reverseMode && QuickSyncVideoDecoder::isSupported())
+            dec = new QuickSyncVideoDecoder();
+        else
+            dec = new QnFfmpegVideoDecoder(config, /*metrics*/ nullptr, data);
         if (dec == nullptr)
         {
             NX_VERBOSE(this, lit("Can't find create decoder for compression type %1").arg(data->compressionType));
             return Status_Displayed;
         }
 
-        dec->setSpeed(m_speed);
         dec->setLightCpuMode(m_decodeMode);
         m_decoderData.decoder.reset(dec);
         m_decoderData.compressionType = data->compressionType;
     }
 
-    if (reverseMode != m_prevReverseMode || m_needResetDecoder)
-    {
-        clearReverseQueue();
-        QnMutexLocker lock( &m_mtx );
-        dec->resetDecoder(data);
-        m_prevReverseMode = reverseMode;
-        m_needResetDecoder = false;
-        //data->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice;
-    }
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
     if (dec->getWidth() > 0)
@@ -711,7 +714,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
 bool QnVideoStreamDisplay::downscaleFrame(const CLVideoDecoderOutputPtr& src, CLVideoDecoderOutputPtr& dst, QnFrameScaler::DownscaleFactor scaleFactor, AVPixelFormat pixFmt)
 {
-    if (m_decoderData.decoder->targetMemoryType() != MemoryType::VideoMemory)
+    if (m_decoderData.decoder->targetMemoryType() == MemoryType::VideoMemory)
     {
         dst = src;
         return true;
@@ -786,12 +789,12 @@ bool QnVideoStreamDisplay::processDecodedFrame(
     bool enableFrameQueue,
     bool /*reverseMode*/)
 {
-    if (!outFrame->data[0])
+    if (!outFrame->data[0] && outFrame->memoryType() != MemoryType::VideoMemory)
         return false;
 
     qnClientModule->videoCache()->add(m_resource->toResource()->getId(), outFrame);
 
-    if (enableFrameQueue)
+    if (enableFrameQueue /*&& outFrame->memoryType() != MemoryType::VideoMemory*/)
     {
         NX_ASSERT(!outFrame->isExternalData());
 
@@ -923,10 +926,6 @@ void QnVideoStreamDisplay::setSpeed(float value)
         QnMutexLocker lock(&m_mtx);
         m_enableFrameQueue = true;
     }
-
-    QnMutexLocker lock( &m_mtx );
-    if (m_decoderData.decoder)
-        m_decoderData.decoder->setSpeed( value );
 }
 
 void QnVideoStreamDisplay::overrideTimestampOfNextFrameToRender(qint64 value)

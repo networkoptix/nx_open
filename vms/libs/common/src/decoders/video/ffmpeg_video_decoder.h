@@ -63,7 +63,6 @@ public:
     void determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data);
     void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy);
     virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
-    virtual void setSpeed( float newValue ) override;
 
     int getLastDecodeResult() const { return m_lastDecodeResult; }
 private:
@@ -125,7 +124,6 @@ private:
     bool m_useMtDecoding;
     bool m_needRecreate;
     nx::metrics::Storage* m_metrics = nullptr;
-    int m_lastDecodeResult = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

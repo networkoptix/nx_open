@@ -38,7 +38,11 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLShaderProgram>
 
+#include <nx/utils/log/log.h>
+
 #include <QtX11Extras/QX11Info>
+
+#include <va/va_glx.h>
 
 #include <nx/media/quick_sync/va_surface_info.h>
 

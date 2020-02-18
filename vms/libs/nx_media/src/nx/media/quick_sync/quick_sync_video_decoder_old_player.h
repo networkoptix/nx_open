@@ -1,7 +1,7 @@
 #pragma once
 
-#include "decoders/video/abstract_video_decoder.h"
-#include "nx/streaming/video_data_packet.h"
+#include <decoders/video/abstract_video_decoder.h>
+#include <nx/streaming/video_data_packet.h>
 
 namespace nx::media {
     class QuickSyncVideoDecoderImpl;
@@ -10,8 +10,7 @@ namespace nx::media {
 class QuickSyncVideoDecoder: public QnAbstractVideoDecoder
 {
 public:
-    QuickSyncVideoDecoder();
-    virtual bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame) override;
+    virtual bool decode(const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutputPtr* const outFrame) override;
 
     virtual const AVFrame* lastFrame() const override;
     virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
@@ -22,11 +21,13 @@ public:
     virtual MemoryType targetMemoryType() const override;
     virtual double getSampleAspectRatio() const override;
 
-    virtual void setSpeed(float newValue) override;
     virtual void setLightCpuMode(DecodeMode val) override;
     virtual void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy) override;
 
+    static bool isSupported();
+
 private:
-    std::unique_ptr<nx::media::QuickSyncVideoDecoderImpl> m_impl;
-    QSize m_resulution;
+    std::shared_ptr<nx::media::QuickSyncVideoDecoderImpl> m_impl;
+    QSize m_resolution;
+    AVCodecID m_codecId = AV_CODEC_ID_NONE;
 };

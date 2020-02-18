@@ -109,6 +109,8 @@ public:
         ImageCorrectionResult m_imgCorrection;
         QRectF m_displayedRect;
         QnGlRendererTexturePack* m_texturePack;
+        void* m_vaglx_surface = nullptr;
+        void* m_display = nullptr;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
@@ -209,28 +211,16 @@ public:
 
     //!Loads picture with dat stored in \a planes to opengl \a dest
     /*!
-        \param glContext This context MUST be current in the current thread
-        \param planes Array size must be >= 3. Although, only necessary planes are used (3 for YV12, 2 for NV12)
-        \param lineSizes Array size must be >= 3
-        \param isVideoMemory Should be set to true when data in \a planes is in USWC memory to optimize data reading. false otherwise. Currently unused
-
         \note Method is re-enterable
         \return false, if failed to make \a glContext current. Otherwise, true
     */
     bool uploadDataToGl(
-        UploadedPicture* const dest,
-        AVPixelFormat format,
-        unsigned int width,
-        unsigned int height,
-        uint8_t* planes[],
-        int lineSizes[],
-        bool isVideoMemory );
+        UploadedPicture* const dest, const QSharedPointer<CLVideoDecoderOutput>& frame);
 private:
     friend class QnGlRendererTexture;
     friend class DecodedPicturesDeleter;
 
     QSharedPointer<DecodedPictureToOpenGLUploaderPrivate> d;
-    int m_format;
     uchar* m_yuv2rgbBuffer;
     int m_yuv2rgbBufferLen;
     qreal m_painterOpacity;

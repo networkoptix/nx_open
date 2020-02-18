@@ -24,8 +24,6 @@ private:
     bool initSession();
     bool allocFrames();
 
-    VADisplay initDisplay();
-
 private:
     struct OutputSurface
     {

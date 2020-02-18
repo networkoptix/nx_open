@@ -75,8 +75,6 @@ public:
         \param data First encoded frame of new stream. It is recommended that this frame be IDR and contain sequence header
     */
     virtual void resetDecoder( const QnConstCompressedVideoDataPtr& data ) = 0;
-    //!Notifies decoder about source stream speed change
-    virtual void setSpeed( float newValue ) = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

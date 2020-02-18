@@ -79,6 +79,31 @@ static bool convertImageFormat(
     return false;
 }
 
+void CLVideoDecoderOutput::attachToVideoMemory(
+    const std::shared_ptr<QVideoFrame>& frame, std::weak_ptr<void> decoder)
+{
+    m_memoryType = MemoryType::VideoMemory;
+    flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
+    pkt_dts = frame->startTime();
+    width = frame->size().width();
+    height = frame->size().height();
+    m_frame = frame;
+    m_decoder = std::move(decoder);
+}
+
+std::weak_ptr<void> CLVideoDecoderOutput::decoder()
+{
+    return m_decoder;
+}
+
+QVariant CLVideoDecoderOutput::handle()
+{
+    if (!m_frame)
+        return QVariant();
+
+    return m_frame->handle();
+}
+
 void CLVideoDecoderOutput::setUseExternalData(bool value)
 {
     if (value != m_useExternalData)

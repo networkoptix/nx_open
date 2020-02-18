@@ -37,7 +37,6 @@ int main()
     pthread_attr_getstacksize(&attr, &stacksize);
     printf("Thread stack size = %d bytes \n", stacksize);
 
-    NX_DEBUG(NX_SCOPE_TAG, "QQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
     nx::media::QuickSyncVideoDecoder decode(nullptr, QSize());
     auto frame = loadFrameFromFile("frame.h264");
     if (!frame)

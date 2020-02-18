@@ -29,6 +29,9 @@ extern "C"
 #include <nx/streaming/config.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 
+#include <va/va_glx.h>
+#include <nx/media/quick_sync/va_surface_info.h>
+
 namespace
 {
     const int ROUND_COEFF = 8;
@@ -544,6 +547,8 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
 
 DecodedPictureToOpenGLUploader::UploadedPicture::~UploadedPicture()
 {
+    if (m_vaglx_surface)
+        vaDestroySurfaceGLX(m_display, m_vaglx_surface);
     delete m_texturePack;
     m_texturePack = NULL;
 }
@@ -619,23 +624,18 @@ public:
     {
         m_isRunning = true;
 
-        m_success =
-            m_uploader->uploadDataToGl(
-                m_dest,
-                (AVPixelFormat)m_src->format,
-                m_src->width,
-                m_src->height,
-                m_src->data,
-                m_src->linesize,
-                false );
+        m_success = m_uploader->uploadDataToGl(m_dest, m_src);
         m_done = true;
         if( m_success )
             m_uploader->pictureDataUploadSucceeded(m_dest);
         else
             m_uploader->pictureDataUploadFailed(m_dest );
 
-        nx::vms::api::ImageCorrectionData imCor = m_uploader->getImageCorrection();
-        m_dest->processImage(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0], imCor);
+        if (m_src->memoryType() != MemoryType::VideoMemory)
+        {
+            nx::vms::api::ImageCorrectionData imCor = m_uploader->getImageCorrection();
+            m_dest->processImage(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0], imCor);
+        }
 
         m_isRunning = false;
     }
@@ -718,7 +718,6 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     unsigned int /*asyncDepth*/ )
 :
     d(new DecodedPictureToOpenGLUploaderPrivate(glWidget)),
-    m_format( AV_PIX_FMT_NONE ),
     m_yuv2rgbBuffer( NULL ),
     m_yuv2rgbBufferLen( 0 ),
     m_painterOpacity( 1.0 ),
@@ -788,9 +787,8 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
     NX_VERBOSE(this,
         lm("Uploading decoded picture to gl textures. dts %1").arg(decodedPicture->pkt_dts));
 
-    m_hardwareDecoderUsed = decodedPicture->flags & QnAbstractMediaData::MediaFlags_HWDecodingUsed;
+    //m_hardwareDecoderUsed = decodedPicture->flags & QnAbstractMediaData::MediaFlags_HWDecodingUsed;
 
-    m_format = decodedPicture->format;
     UploadedPicture* emptyPictureBuf = NULL;
 
     QnMutexLocker lk( &m_mutex );
@@ -821,7 +819,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
             {
                 emptyPictureBuf = m_emptyBuffers.front();
                 m_emptyBuffers.pop_front();
-                NX_VERBOSE(this, "Found empty buffer");
+                NX_DEBUG(this, "Found empty buffer");
             }
             else if((!m_renderedPictures.empty()))  //reserving one uploaded picture (preferring picture
                                                     //which has not been shown yet) so that renderer always
@@ -830,7 +828,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 //selecting oldest rendered picture
                 emptyPictureBuf = m_renderedPictures.front();
                 m_renderedPictures.pop_front();
-                NX_VERBOSE(this,
+                NX_DEBUG(this,
                     lm("Taking (2) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)")
                         .arg(emptyPictureBuf->pts())
                         .arg(decodedPicture->pkt_dts)
@@ -858,7 +856,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 {
                     if( (*it)->isRunning() || (*it)->picture()->m_skippingForbidden )
                         continue;
-                    NX_VERBOSE(this,
+                    NX_DEBUG(this,
                         lm("Ignoring decoded frame with timestamp %1 (%2). Playback does not catch up with decoding.")
                             .arg((*it)->picture()->m_pts)
                             .arg(QDateTime::fromMSecsSinceEpoch((*it)->picture()->m_pts / 1000)
@@ -1051,6 +1049,7 @@ void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
 {
     //NOTE m_mutex MUST be locked!
 
+    NX_DEBUG(this, "cancelUploadingInGUIThread");
     while( !m_framesWaitingUploadInGUIThread.empty() )
     {
         for( std::deque<AVPacketUploader*>::iterator
@@ -1222,12 +1221,7 @@ static QString toString( AVPixelFormat format )
 
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
-    const AVPixelFormat format,
-    const unsigned int width,
-    const unsigned int height,
-    uint8_t* planes[],
-    int lineSizes[],
-    bool /*isVideoMemory*/ )
+    const QSharedPointer<CLVideoDecoderOutput>& frame)
 {
     if (!m_initializedContext) // TODO: #vkutin #ynikitenkov Why here?
     {
@@ -1235,7 +1229,58 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         m_initializedSurface = m_initializedContext->surface();
     }
 
-    //NX_INFO(this, lm("uploadDataToGl. %1").arg((size_t) this));
+    if (frame->memoryType() == MemoryType::VideoMemory)
+    {
+        //NX_DEBUG(this, "draw start");
+        auto surfaceInfo = frame->handle().value<VaSurfaceInfo>();
+        auto decoder = frame->decoder().lock();
+        if (!decoder)
+            return false;
+
+
+        emptyPictureBuf->texturePack()->setPictureFormat((AVPixelFormat)frame->format);
+        emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
+        QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
+        VAStatus status;
+        if (texture->ensureInitialized(frame->width, frame->height, frame->width, 1, GL_RGBA, 1, -1)
+            || emptyPictureBuf->m_display != surfaceInfo.display)
+        {
+            //NX_DEBUG(this, "draw init");
+            emptyPictureBuf->m_display = surfaceInfo.display;
+            if (emptyPictureBuf->m_vaglx_surface)
+                vaDestroySurfaceGLX(emptyPictureBuf->m_display, emptyPictureBuf->m_vaglx_surface);
+
+            status = vaCreateSurfaceGLX(emptyPictureBuf->m_display, GL_TEXTURE_2D, texture->id(), &emptyPictureBuf->m_vaglx_surface);
+            if (status != VA_STATUS_SUCCESS)
+            {
+                NX_DEBUG(this, "vaCreateSurfaceGLX failed: %1", status);
+                return false;
+            }
+        }
+        status = vaCopySurfaceGLX(emptyPictureBuf->m_display, emptyPictureBuf->m_vaglx_surface, surfaceInfo.id, 0);
+        if (status != VA_STATUS_SUCCESS)
+        {
+            NX_DEBUG(this, "vaCopySurfaceGLX failed: %1", status);
+            return false;
+        }
+
+        status = vaSyncSurface(emptyPictureBuf->m_display, surfaceInfo.id);
+        if (status != VA_STATUS_SUCCESS)
+        {
+            NX_DEBUG(this, "vaSyncSurface failed: %1", status);
+            return false;
+        }
+
+        d->glBindTexture(GL_TEXTURE_2D, texture->id());
+        //NX_DEBUG(this, "draw end");
+        return true;
+    }
+
+    const AVPixelFormat format = (AVPixelFormat)frame->format;
+    const unsigned int width = frame->width;
+    const unsigned int height = frame->height;
+    uint8_t** planes = frame->data;
+    int* lineSizes = frame->linesize;
 
     //waiting for all operations with textures (submitted by renderer) are finished
 
@@ -1465,13 +1510,6 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
         // TODO: #ak free memory immediately for still images
     }
-
-    if (m_hardwareDecoderUsed)
-    {
-        d->glFlush();
-        d->glFinish();
-    }
-
     return true;
 }
 

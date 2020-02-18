@@ -3,13 +3,15 @@
 #include <deque>
 #include <thread>
 
-#include <va/va_glx.h>
+#include <QtMultimedia/QVideoFrame>
 
 #include "allocators/sysmem_allocator.h"
 #include "allocators/vaapi_allocator.h"
 #include "mfx_sys_qt_video_buffer.h"
 #include "mfx_drm_qt_video_buffer.h"
 #include "mfx_status_string.h"
+#include "va_display.h"
+
 
 #define MSDK_ALIGN16(value) (((value + 15) >> 4) << 4) // round up to a multiple of 16
 
@@ -21,34 +23,16 @@ constexpr int kSyncWaitMsec = 5000;
 
 QuickSyncVideoDecoderImpl::QuickSyncVideoDecoderImpl()
 {
+    memset(&m_response, 0, sizeof(m_response));
 }
 
 QuickSyncVideoDecoderImpl::~QuickSyncVideoDecoderImpl()
 {
     NX_DEBUG(this, "Close quick sync video decoder");
-    if (m_display)
-        vaTerminate(m_display);
+    if (m_allocator)
+        m_allocator->FreeFrames(&m_response);
 
     m_mfxSession.Close();
-}
-
-VADisplay QuickSyncVideoDecoderImpl::initDisplay()
-{
-    VADisplay display = vaGetDisplayGLX(XOpenDisplay(":0.0"));
-    if (!display)
-    {
-        NX_ERROR(this, "Cannot create VADisplay");
-        return nullptr;
-    }
-
-    int major, minor;
-    VAStatus status = vaInitialize(display, &major, &minor);
-    if (status != VA_STATUS_SUCCESS)
-    {
-        NX_ERROR(this, "Cannot initialize VA-API: %1", status);
-        return nullptr;
-    }
-    return display;
 }
 
 bool QuickSyncVideoDecoderImpl::initSession()
@@ -62,7 +46,7 @@ bool QuickSyncVideoDecoderImpl::initSession()
         return false;
     }
     NX_DEBUG(this, "MFX version %1.%2", version.Major, version.Minor);
-    m_display = initDisplay();
+    m_display = VaDisplay::getDisplay();
     if (!m_display)
     {
         NX_ERROR(this, "Failed to get VA display");
@@ -272,7 +256,7 @@ bool QuickSyncVideoDecoderImpl::syncOutputSurface(nx::QVideoFramePtr* result)
     if (m_config.useVideoMemory)
     {
         vaapiMemId* surfaceData = (vaapiMemId*)surface.surface->frame.Data.MemId;
-        VaSurfaceInfo surfaceDataHandle{*(surfaceData->m_surface), m_display, surfaceData->m_image};
+        VaSurfaceInfo surfaceDataHandle{*(surfaceData->m_surface), m_display};
         buffer = new MfxDrmQtVideoBuffer(surface.surface, surfaceDataHandle);
     }
     else
@@ -288,10 +272,9 @@ bool QuickSyncVideoDecoderImpl::syncOutputSurface(nx::QVideoFramePtr* result)
 int QuickSyncVideoDecoderImpl::decode(
     const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result)
 {
-
     mfxBitstream bitstream;
     memset(&bitstream, 0, sizeof(bitstream));
-    if (frame)
+    if (frame) // TODO make flush
     {
         m_bitstreamData.insert(
             m_bitstreamData.end(), frame->data(), frame->data() + frame->dataSize());

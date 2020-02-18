@@ -1,5 +1,4 @@
-#ifndef frame_info_1730
-#define frame_info_1730
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -8,6 +7,7 @@
 
 #include <QtCore/QAtomicInt>
 #include <QtGui/QImage>
+#include <QtMultimedia/QVideoFrame>
 
 extern "C" {
 
@@ -44,6 +44,11 @@ public:
     CLVideoDecoderOutput(int targetWidth, int targetHeight, int targetFormat);
     CLVideoDecoderOutput(QImage image);
     ~CLVideoDecoderOutput();
+
+    MemoryType memoryType() const { return m_memoryType; }
+    void attachToVideoMemory(const std::shared_ptr<QVideoFrame>& frame, std::weak_ptr<void> decoder);
+    QVariant handle();
+    std::weak_ptr<void> decoder();
 
     QImage toImage() const;
 
@@ -95,6 +100,12 @@ public:
 
     /** Number of the video channel in video layout. */
     int channel = 0;
+    MemoryType m_memoryType = MemoryType::SystemMemory;
+
+    // Contain video surface in case of video memory usage
+    std::shared_ptr<QVideoFrame> m_frame;
+    // Contain reference to video decoder to ensure that it still alive
+    std::weak_ptr<void> m_decoder;
 
     FrameMetadata metadata; // addition data associated with video frame
 
@@ -123,6 +134,3 @@ public:
 
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif //frame_info_1730
-

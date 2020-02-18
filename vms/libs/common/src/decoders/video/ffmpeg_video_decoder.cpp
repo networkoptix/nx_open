@@ -306,11 +306,6 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     m_spsFound = false;
 }
 
-void QnFfmpegVideoDecoder::setSpeed( float /*newValue*/ )
-{
-    // ffmpeg-based decoder has nothing to do here
-}
-
 void QnFfmpegVideoDecoder::reallocateDeinterlacedFrame()
 {
     int roundWidth = qPower2Ceil((unsigned) m_context->width, 32);

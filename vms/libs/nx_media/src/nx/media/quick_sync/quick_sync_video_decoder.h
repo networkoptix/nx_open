@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtMultimedia/QVideoFrame>
-
 #include <nx/streaming/video_data_packet.h>
 #include <nx/media/abstract_video_decoder.h>
 
