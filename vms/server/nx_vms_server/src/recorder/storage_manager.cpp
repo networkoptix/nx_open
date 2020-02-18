@@ -1777,16 +1777,28 @@ void QnStorageManager::checkMetadataStorageSpace()
 
 struct CleanupInfo
 {
+    struct PerStorageInfo
+    {
+        int64_t toDelete = 0;
+        bool hasRemoveFileCapability = false;
+        bool nonZeroSpaceLimit = false;
+    };
+
     int64_t total = 0;
-    std::vector<std::pair<QnStorageResourcePtr, /*toDelete*/int64_t>> perStorage;
+    std::vector<std::pair<QnStorageResourcePtr, PerStorageInfo>> perStorage;
 
     CleanupInfo(const QSet<QnStorageResourcePtr>& storages)
     {
         for (const auto& s: storages)
         {
-            const int64_t toDelete = std::max<int64_t>(0LL, s->getSpaceLimit() - s->getFreeSpace());
-            perStorage.push_back(std::make_pair(s, toDelete));
-            total += toDelete;
+            PerStorageInfo p;
+            p.toDelete = std::max<int64_t>(0LL, s->getSpaceLimit() - s->getFreeSpace());
+            p.hasRemoveFileCapability =
+                s->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile;
+            p.nonZeroSpaceLimit = s->getSpaceLimit() > 0;
+            perStorage.push_back(std::make_pair(s, p));
+            if (p.hasRemoveFileCapability)
+                total += p.toDelete;
         }
     }
 
@@ -1797,13 +1809,16 @@ struct CleanupInfo
 
         return std::any_of(
             perStorage.cbegin(), perStorage.cend(),
-            [&s](const auto& ps) { return ps.first == s && ps.second > 0; });
+            [&s](const auto& ps)
+            {
+                return ps.first == s
+                    && ps.second.hasRemoveFileCapability
+                    && ps.second.nonZeroSpaceLimit
+                    && ps.second.toDelete > 0;
+            });
     }
 
-    bool needToCleanup() const
-    {
-        return total > 0;
-    }
+    bool needToCleanup() const { return total > 0; }
 };
 
 void QnStorageManager::logBeforeCleanup(const CleanupInfo& cleanupInfo) const
@@ -1816,16 +1831,13 @@ void QnStorageManager::logBeforeCleanup(const CleanupInfo& cleanupInfo) const
     for (const auto& ps: cleanupInfo.perStorage)
     {
         const auto& storage = ps.first;
-        const bool isAbleToRemove =
-            storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile;
-
-        if (storage->getSpaceLimit() == 0 || !isAbleToRemove)
+        if (!cleanupInfo.needToCleanup(storage))
         {
             NX_DEBUG(
                 this, "[Cleanup, measure]: storage: '%1' spaceLimit: %2, RemoveFileCap: %3. Skipping.",
                 nx::utils::url::hidePassword(storage->getUrl()),
                 storage->getSpaceLimit(),
-                isAbleToRemove);
+                ps.second.hasRemoveFileCapability);
 
             continue;
         }
@@ -1835,7 +1847,7 @@ void QnStorageManager::logBeforeCleanup(const CleanupInfo& cleanupInfo) const
             nx::utils::url::hidePassword(storage->getUrl()),
             storage->getSpaceLimit(),
             storage->getFreeSpace(),
-            ps.second);
+            ps.second.toDelete);
     }
 
     NX_DEBUG(
@@ -1938,7 +1950,6 @@ void QnStorageManager::clearSpace(bool forced)
             readyToDeleteMotion = false; // offline storage may contain archive. do not delete motion so far
             break;
         }
-
     }
 
     if (readyToDeleteMotion)

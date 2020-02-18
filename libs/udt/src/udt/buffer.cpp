@@ -336,7 +336,7 @@ CRcvBuffer::~CRcvBuffer()
         if (NULL != m_pUnit[i])
         {
             m_pUnit[i]->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            m_pUnitQueue->decCount();
         }
     }
 
@@ -355,7 +355,7 @@ bool CRcvBuffer::addData(CUnit* unit, int offset)
     m_pUnit[pos] = unit;
 
     unit->m_iFlag = 1;
-    ++m_pUnitQueue->m_iCount;
+    m_pUnitQueue->incCount();
 
     return true;
 }
@@ -380,7 +380,7 @@ int CRcvBuffer::readBuffer(char* data, int len)
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
             tmp->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            m_pUnitQueue->decCount();
 
             if (++p == m_iSize)
                 p = 0;
@@ -418,7 +418,7 @@ int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
             tmp->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            m_pUnitQueue->decCount();
 
             if (++p == m_iSize)
                 p = 0;
@@ -493,7 +493,7 @@ int CRcvBuffer::readMsg(char* data, int len)
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
             tmp->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            m_pUnitQueue->decCount();
         }
         else
             m_pUnit[p]->m_iFlag = 2;
@@ -558,7 +558,7 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
         CUnit* tmp = m_pUnit[m_iStartPos];
         m_pUnit[m_iStartPos] = NULL;
         tmp->m_iFlag = 0;
-        --m_pUnitQueue->m_iCount;
+        m_pUnitQueue->decCount();
 
         if (++m_iStartPos == m_iSize)
             m_iStartPos = 0;

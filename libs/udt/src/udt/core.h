@@ -41,6 +41,7 @@ Yunhong Gu, last updated 02/28/2012
 #ifndef __UDT_CORE_H__
 #define __UDT_CORE_H__
 
+#include <memory>
 #include <mutex>
 
 #include "udt.h"
@@ -175,7 +176,7 @@ public: // internal API
     void setBroken(bool val);
     bool broken() const;
 
-    CSNode* sNode() { return m_pSNode; }
+    CSNode* sNode() { return m_pSNode.get(); }
 
     int payloadSize() const { return m_iPayloadSize; }
 
@@ -209,8 +210,8 @@ public: // internal API
 
     void setMultiplexer(const std::shared_ptr<Multiplexer>& multiplexer);
 
-    CSndBuffer* sndBuffer() { return m_pSndBuffer; }
-    CRcvBuffer* rcvBuffer() { return m_pRcvBuffer; }
+    CSndBuffer* sndBuffer() { return m_pSndBuffer.get(); }
+    CRcvBuffer* rcvBuffer() { return m_pRcvBuffer.get(); }
 
     bool synRecving() const { return m_bSynRecving; }
     bool synSending() const { return m_bSynSending; }
@@ -454,9 +455,9 @@ private: // Status
     int64_t m_llLastReqTime = 0;            // last time when a connection request is sent
 
 private: // Sending related data
-    CSndBuffer* m_pSndBuffer = nullptr;                    // Sender buffer
-    CSndLossList* m_pSndLossList = nullptr;                // Sender loss list
-    CPktTimeWindow* m_pSndTimeWindow = nullptr;            // Packet sending time window
+    std::unique_ptr<CSndBuffer> m_pSndBuffer;
+    std::unique_ptr<CSndLossList> m_pSndLossList;
+    std::unique_ptr<CPktTimeWindow> m_pSndTimeWindow;
 
     volatile uint64_t m_ullInterval = 0;             // Inter-packet time, in CPU clock cycles
     uint64_t m_ullTimeDiff = 0;                      // aggregate difference in inter-packet time
@@ -476,10 +477,10 @@ private: // Sending related data
     void CCUpdate();
 
 private: // Receiving related data
-    CRcvBuffer* m_pRcvBuffer = nullptr;                    // Receiver buffer
-    CRcvLossList* m_pRcvLossList = nullptr;                // Receiver loss list
-    CACKWindow* m_pACKWindow = nullptr;                    // ACK history window
-    CPktTimeWindow* m_pRcvTimeWindow = nullptr;            // Packet arrival time window
+    std::unique_ptr<CRcvBuffer> m_pRcvBuffer;
+    std::unique_ptr<CRcvLossList> m_pRcvLossList;
+    std::unique_ptr<CACKWindow> m_pACKWindow;                    // ACK history window
+    std::unique_ptr<CPktTimeWindow> m_pRcvTimeWindow;
 
     int32_t m_iRcvLastAck = 0;                       // Last sent ACK
     uint64_t m_ullLastAckTime = 0;                   // Timestamp of last ACK
@@ -556,7 +557,7 @@ private: // for UDP multiplexer
     std::shared_ptr<Multiplexer> m_multiplexer;
     detail::SocketAddress m_pPeerAddr;    // peer address
     uint32_t m_piSelfIP[4];             // local UDP IP address
-    CSNode* m_pSNode = nullptr;         // node information for UDT list used in snd queue
+    std::unique_ptr<CSNode> m_pSNode;         // node information for UDT list used in snd queue
     std::shared_ptr<ServerSideConnectionAcceptor> m_synPacketHandler;
 
 private: // for epoll

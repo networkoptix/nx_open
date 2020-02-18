@@ -135,16 +135,16 @@ CUDT::~CUDT()
         m_multiplexer->sendQueue().sndUList().remove(this);
 
     // destroy the data structures
-    delete m_pSndBuffer;
-    delete m_pRcvBuffer;
-    delete m_pSndLossList;
-    delete m_pRcvLossList;
-    delete m_pACKWindow;
-    delete m_pSndTimeWindow;
-    delete m_pRcvTimeWindow;
+    m_pSndBuffer.reset();
+    m_pRcvBuffer.reset();
+    m_pSndLossList.reset();
+    m_pRcvLossList.reset();
+    m_pACKWindow.reset();
+    m_pSndTimeWindow.reset();
+    m_pRcvTimeWindow.reset();
     delete m_pCCFactory;
     delete m_pCC;
-    delete m_pSNode;
+    m_pSNode.reset();
 }
 
 CSndQueue& CUDT::sndQueue()
@@ -478,7 +478,7 @@ void CUDT::open()
 
     // Initial sequence number, loss, acknowledgement, etc.
     m_iPktSize = m_iMSS - 28;
-    m_iPayloadSize = m_iPktSize - CPacket::m_iPktHdrSize;
+    m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
 
     m_iEXPCount = 1;
     m_iBandwidth = 1;
@@ -494,7 +494,7 @@ void CUDT::open()
 
     // structures for queue
     if (!m_pSNode)
-        m_pSNode = new CSNode();
+        m_pSNode = std::make_unique<CSNode>();
     m_pSNode->socket = shared_from_this();
     m_pSNode->timestamp = 1;
     m_pSNode->locationOnHeap = -1;
@@ -757,7 +757,7 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
     m_iMSS = m_ConnRes.m_iMSS;
     m_iFlowWindowSize = m_ConnRes.m_iFlightFlagSize;
     m_iPktSize = m_iMSS - 28;
-    m_iPayloadSize = m_iPktSize - CPacket::m_iPktHdrSize;
+    m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
     m_iPeerISN = m_ConnRes.m_iISN;
     m_iRcvLastAck = m_ConnRes.m_iISN;
     m_iRcvLastAckAck = m_ConnRes.m_iISN;
@@ -766,14 +766,14 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
     memcpy(m_piSelfIP, m_ConnRes.m_piPeerIP, 16);
 
     // Prepare all data structures
-    m_pSndBuffer = new CSndBuffer(32, m_iPayloadSize);
-    m_pRcvBuffer = new CRcvBuffer(rcvQueue().unitQueue(), m_iRcvBufSize);
+    m_pSndBuffer = std::make_unique<CSndBuffer>(32, m_iPayloadSize);
+    m_pRcvBuffer = std::make_unique<CRcvBuffer>(rcvQueue().unitQueue(), m_iRcvBufSize);
     // after introducing lite ACK, the sndlosslist may not be cleared in time, so it requires twice space.
-    m_pSndLossList = new CSndLossList(m_iFlowWindowSize * 2);
-    m_pRcvLossList = new CRcvLossList(m_iFlightFlagSize);
-    m_pACKWindow = new CACKWindow(1024);
-    m_pRcvTimeWindow = new CPktTimeWindow(16, 64);
-    m_pSndTimeWindow = new CPktTimeWindow();
+    m_pSndLossList = std::make_unique<CSndLossList>(m_iFlowWindowSize * 2);
+    m_pRcvLossList = std::make_unique<CRcvLossList>(m_iFlightFlagSize);
+    m_pACKWindow = std::make_unique<CACKWindow>(1024);
+    m_pRcvTimeWindow = std::make_unique<CPktTimeWindow>(16, 64);
+    m_pSndTimeWindow = std::make_unique<CPktTimeWindow>();
 
     CInfoBlock ib;
     ib.m_iIPversion = m_iIPversion;
@@ -855,15 +855,15 @@ Result<> CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
     peer.copy(hs->m_piPeerIP);
 
     m_iPktSize = m_iMSS - 28;
-    m_iPayloadSize = m_iPktSize - CPacket::m_iPktHdrSize;
+    m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
 
-    m_pSndBuffer = new CSndBuffer(32, m_iPayloadSize);
-    m_pRcvBuffer = new CRcvBuffer(rcvQueue().unitQueue(), m_iRcvBufSize);
-    m_pSndLossList = new CSndLossList(m_iFlowWindowSize * 2);
-    m_pRcvLossList = new CRcvLossList(m_iFlightFlagSize);
-    m_pACKWindow = new CACKWindow(1024);
-    m_pRcvTimeWindow = new CPktTimeWindow(16, 64);
-    m_pSndTimeWindow = new CPktTimeWindow();
+    m_pSndBuffer = std::make_unique<CSndBuffer>(32, m_iPayloadSize);
+    m_pRcvBuffer = std::make_unique<CRcvBuffer>(rcvQueue().unitQueue(), m_iRcvBufSize);
+    m_pSndLossList = std::make_unique<CSndLossList>(m_iFlowWindowSize * 2);
+    m_pRcvLossList = std::make_unique<CRcvLossList>(m_iFlightFlagSize);
+    m_pACKWindow = std::make_unique<CACKWindow>(1024);
+    m_pRcvTimeWindow = std::make_unique<CPktTimeWindow>(16, 64);
+    m_pSndTimeWindow = std::make_unique<CPktTimeWindow>();
 
     CInfoBlock ib;
     ib.m_iIPversion = peer.family();
