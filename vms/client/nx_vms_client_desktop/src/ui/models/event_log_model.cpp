@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include <QtGui/QTextDocument>
 #include <QtGui/QPalette>
 
 // TODO: #vkutin Think of a proper location and namespace
@@ -51,6 +52,20 @@ using namespace nx;
 using eventIterator = vms::event::ActionDataList::iterator;
 using nx::vms::api::EventType;
 using nx::vms::api::ActionType;
+
+namespace {
+
+QString ensurePlain(const QString& source)
+{
+    if (!mightBeHtml(source))
+        return source;
+
+    QTextDocument doc;
+    doc.setHtml(source);
+    return doc.toPlainText();
+}
+
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 // QnEventLogModel::DataIndex
@@ -477,7 +492,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                 {
                     const auto text = action.actionParams.text.trimmed();
                     if (!text.isEmpty())
-                        return text;
+                        return ensurePlain(text);
                 }
                 default:
                     break;
@@ -496,7 +511,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             }
             else
             {
-                result = m_stringsHelper->eventDetails(action.eventParams).join(L'\n');
+                result = ensurePlain(m_stringsHelper->eventDetails(action.eventParams).join(L'\n'));
             }
 
             if (!vms::event::hasToggleState(eventType, action.eventParams, commonModule()))
