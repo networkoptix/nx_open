@@ -301,14 +301,14 @@ Result chooseVideoQuality(const int videoQuality, const Input& input)
     if (videoQuality == Player::HighVideoQuality
         && streams.highCodec != AV_CODEC_ID_NONE && !streams.highResolution.isValid())
     {
-        return {Player::HighVideoQuality, QSize(-1, -1)};
+        return {Player::HighVideoQuality, QSize()};
     }
 
     // If low requested, low stream exists but has an unknown resolution, return low.
     if (videoQuality == Player::LowVideoQuality
         && streams.lowCodec != AV_CODEC_ID_NONE && !streams.lowResolution.isValid())
     {
-        return {Player::LowVideoQuality, QSize(-1, -1)};
+        return {Player::LowVideoQuality, QSize()};
     }
 
     Result result = choosePreferredQuality(streams, videoQuality, input);

@@ -38,20 +38,20 @@ Player::TranscodingSupportStatus transcodingSupportStatus(
 
 struct Input
 {
-    AVCodecID transcodingCodec;
+    AVCodecID transcodingCodec = AV_CODEC_ID_NONE;
 
     /** Used to find a server to query transcoding capability. */
-    bool liveMode;
+    bool liveMode = false;
 
     /** Used when not liveMode, to find a server to query transcoding capability. */
-    qint64 positionMs;
+    qint64 positionMs = -1;
 
     QnVirtualCameraResourcePtr camera;
 
-    bool allowOverlay;
+    bool allowOverlay = false;
 
     /** List of decoders currently used by the player. */
-    const std::vector<AbstractVideoDecoder*>* currentDecoders;
+    const std::vector<AbstractVideoDecoder*>* currentDecoders = nullptr;
 };
 
 struct Result: public boost::equality_comparable1<Result>
