@@ -57,6 +57,22 @@ const State& CameraSettingsDialogStore::state() const
     return d->state;
 }
 
+void CameraSettingsDialogStore::loadCameras(
+    const QnVirtualCameraResourceList& cameras,
+    DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
+    CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::loadCameras(
+                std::move(state),
+                cameras,
+                deviceAgentSettingsAdapter,
+                analyticsEnginesWatcher);
+        });
+}
+
 void CameraSettingsDialogStore::setReadOnly(bool value)
 {
     d->executeAction([&](State state) { return Reducer::setReadOnly(std::move(state), value); });
@@ -81,11 +97,6 @@ void CameraSettingsDialogStore::setSingleWearableState(const WearableState& valu
 {
     d->executeAction(
         [&](State state) { return Reducer::setSingleWearableState(std::move(state), value); });
-}
-
-void CameraSettingsDialogStore::loadCameras(const QnVirtualCameraResourceList& cameras)
-{
-    d->executeAction([&](State state) { return Reducer::loadCameras(std::move(state), cameras); });
 }
 
 void CameraSettingsDialogStore::setSingleCameraUserName(const QString& text)

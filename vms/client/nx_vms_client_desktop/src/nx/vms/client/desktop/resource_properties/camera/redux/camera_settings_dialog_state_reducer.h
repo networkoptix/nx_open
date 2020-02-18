@@ -6,19 +6,25 @@
 
 namespace nx::vms::client::desktop {
 
+class DeviceAgentSettingsAdapter;
+class CameraSettingsAnalyticsEnginesWatcher;
+
 class NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogStateReducer
 {
 public:
     using State = CameraSettingsDialogState;
     using ScheduleTasks = State::RecordingSettings::ScheduleTasks;
 
+    static State loadCameras(
+        State state,
+        const QnVirtualCameraResourceList& cameras,
+        DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter = nullptr,
+        CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher = nullptr);
+
     static State setReadOnly(State state, bool value);
     static State setSettingsOptimizationEnabled(State state, bool value);
     static State setGlobalPermissions(State state, GlobalPermissions value);
     static State setSingleWearableState(State state, const WearableState& value);
-
-    static State loadCameras(State state, const QnVirtualCameraResourceList& cameras);
-
     static State setSingleCameraUserName(State state, const QString& text);
     static State setScheduleBrush(State state, const ScheduleCellParams& brush);
     static State setScheduleBrushRecordingType(State state, Qn::RecordingType value);

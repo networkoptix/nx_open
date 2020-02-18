@@ -23,7 +23,6 @@ public:
     CameraSettingsDialogStore* store = nullptr;
     QnVirtualCameraResourcePtr camera;
     AnalyticsSettingsManager* settingsManager = nullptr;
-    //QnUuid currentEngineId;
     std::unique_ptr<AnalyticsSettingsMultiListener> settingsListener;
 };
 
@@ -37,22 +36,7 @@ DeviceAgentSettingsAdapter::DeviceAgentSettingsAdapter(
     d->store = store;
 
     d->settingsManager = qnClientModule->analyticsSettingsManager();
-    if (!NX_ASSERT(d->settingsManager))
-        return;
-
-    //d->currentEngineId = d->store->currentAnalyticsEngineId();
-
-    //connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
-    //    [this]()
-    //    {
-    //        const auto id = d->store->currentAnalyticsEngineId();
-    //        if (d->currentEngineId == id)
-    //            return;
-
-    //        d->currentEngineId = id;
-    //        NX_VERBOSE(this, "Current engine changed to %1, refreshing settings", id);
-    //        executeDelayedParented([this, id]() { d->refreshSettings(id); }, this);
-    //    });
+    NX_ASSERT(d->settingsManager);
 }
 
 DeviceAgentSettingsAdapter::~DeviceAgentSettingsAdapter()
@@ -77,23 +61,12 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 {
                     d->store->resetDeviceAgentData(engineId, data);
                 });
-
-            for (const auto& engineId: d->settingsListener->engineIds())
-                d->store->resetDeviceAgentData(engineId, d->settingsListener->data(engineId));
         }
         else
         {
             d->settingsListener.reset();
         }
     }
-
-    //else if (camera && !d->currentEngineId.isNull())
-    //{
-        // Refresh settings even if camera is not changed. This happens when the dialog is re-opened
-        // or instantly after we have applied the changes.
-    //    d->refreshSettings(d->currentEngineId);
-    //}
-
 }
 
 void DeviceAgentSettingsAdapter::applySettings()
@@ -119,6 +92,17 @@ void DeviceAgentSettingsAdapter::applySettings()
     }
 
     d->settingsManager->applyChanges(valuesToSet);
+}
+
+std::unordered_map<QnUuid, DeviceAgentData> DeviceAgentSettingsAdapter::dataByEngineId() const
+{
+    std::unordered_map<QnUuid, DeviceAgentData> result;
+    if (!d->settingsListener)
+        return result;
+
+    for (const auto& engineId: d->settingsListener->engineIds())
+        result.emplace(engineId, d->settingsListener->data(engineId));
+    return result;
 }
 
 } // namespace nx::vms::client::desktop

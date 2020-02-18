@@ -18,6 +18,9 @@
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
 
+#include "../utils/device_agent_settings_adapter.h"
+#include "../watchers/camera_settings_analytics_engines_watcher.h"
+
 namespace nx::vms::client::desktop {
 
 using State = CameraSettingsDialogState;
@@ -542,7 +545,9 @@ State CameraSettingsDialogStateReducer::setSingleWearableState(
 
 State CameraSettingsDialogStateReducer::loadCameras(
     State state,
-    const Cameras& cameras)
+    const Cameras& cameras,
+    DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
+    CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher)
 {
     const auto firstCamera = cameras.empty()
         ? Camera()
@@ -713,7 +718,25 @@ State CameraSettingsDialogStateReducer::loadCameras(
             nullptr,
             false);
 
+        if (analyticsEnginesWatcher)
+            state = setAnalyticsEngines(std::move(state), analyticsEnginesWatcher->engineInfoList());
+
+        state.analytics.streamByEngineId = {};
+        for (const auto& engine: state.analytics.engines)
+        {
+            state.analytics.streamByEngineId[engine.id].setBase(
+                firstCamera->analyzedStreamIndex(engine.id));
+        }
+
+        state.analytics.settingsByEngineId = {};
+        if (deviceAgentSettingsAdapter)
+        {
+            for (auto [engineId, deviceAgentData]: deviceAgentSettingsAdapter->dataByEngineId())
+                state = resetDeviceAgentData(std::move(state), engineId, deviceAgentData).second;
+        }
+
         state.analytics.enabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
+        state.analytics.enabledEngines.resetUser();
     }
 
     fetchFromCameras<bool>(state.recording.enabled, cameras,
