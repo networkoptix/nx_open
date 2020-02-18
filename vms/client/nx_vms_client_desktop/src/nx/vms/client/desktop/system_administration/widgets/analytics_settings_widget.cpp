@@ -3,20 +3,23 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtQuick/QQuickItem>
 #include <QtQml/QQmlProperty>
-#include <QtCore/QUrlQuery>
 #include <QtCore/QMetaObject>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QUrlQuery>
+
+#include <api/server_rest_connection.h>
+#include <client_core/connection_context_aware.h>
+#include <client_core/client_core_module.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <utils/common/connective.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
-#include <common/common_module.h>
-#include <client_core/connection_context_aware.h>
-#include <client_core/client_core_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <api/server_rest_connection.h>
 
 using namespace nx::vms::common;
 
@@ -46,7 +49,9 @@ bool isEngineVisible(const AnalyticsEnginesWatcher::AnalyticsEngineInfo& info)
 
 } // namespace
 
-class AnalyticsSettingsWidget::Private: public QObject, public QnConnectionContextAware
+class AnalyticsSettingsWidget::Private:
+    public Connective<QObject>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QVariant analyticsEngines READ analyticsEngines NOTIFY analyticsEnginesChanged)
@@ -110,8 +115,8 @@ private:
     void updateEngine(const QnUuid& engineId);
 
 public:
-    QQuickWidget* view = nullptr;
-    AnalyticsEnginesWatcher* enginesWatcher = nullptr;
+    const QScopedPointer<QQuickWidget> view;
+    const QScopedPointer<AnalyticsEnginesWatcher> enginesWatcher;
     QVariantList engines;
     bool hasChanges = false;
     bool settingsLoading = false;
@@ -342,7 +347,7 @@ AnalyticsSettingsWidget::AnalyticsSettingsWidget(QWidget* parent):
     base_type(parent),
     d(new Private(this))
 {
-    anchorWidgetToParent(d->view);
+    anchorWidgetToParent(d->view.get());
 
     connect(d.get(), &Private::analyticsEnginesChanged, this,
         &AnalyticsSettingsWidget::visibilityUpdateRequested);

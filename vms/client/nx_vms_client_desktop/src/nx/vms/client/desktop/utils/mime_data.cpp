@@ -66,7 +66,7 @@ QByteArray serializeToInternal(const QList<QnUuid>& ids, const QHash<int, QVaria
         stream << id.toString();
 
     stream << static_cast<quint32>(arguments.size());
-    for (const auto& [key, value]: nx::utils::keyValueRange(arguments))
+    for (const auto& [key, value]: nx::utils::constKeyValueRange(arguments))
         stream << key << value;
 
     return result;

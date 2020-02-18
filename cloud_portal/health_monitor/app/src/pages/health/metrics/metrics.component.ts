@@ -15,8 +15,8 @@ import { NxLanguageProviderService } from '../../../services/nx-language-provide
 import { SubscriptionLike }          from 'rxjs';
 import { AutoUnsubscribe }           from 'ngx-auto-unsubscribe';
 import { NxScrollMechanicsService }  from '../../../services/scroll-mechanics.service';
-import { delay, throttleTime } from 'rxjs/operators';
-import { NxHealthLayoutService } from '../health-layout.service';
+import { delay, throttleTime }       from 'rxjs/operators';
+import { NxHealthLayoutService }     from '../health-layout.service';
 
 interface Params {
     [key: string]: any;
@@ -118,7 +118,7 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
         });
 
         this.routeSubscription = this.route
-            .params
+            .params.pipe(delay(0))
             .subscribe((params: any) => {
                 this.metricId = params.metric;
                 this.metricName = this.healthService.manifest[this.metricId].name;
@@ -194,9 +194,10 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
         }
     }
 
-    setActiveEntity(entity) {
+    setActiveEntity(entity, forceURIUpdate = true) {
+
         const queryParams: Params = {};
-        this.layoutReady = this.healthLayoutService.activeEntity ? true : false;
+        this.layoutReady = !!this.healthLayoutService.activeEntity;
 
         if (entity) {
             // Happens when we get the entity from the url.
@@ -204,8 +205,12 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
                 this.healthLayoutService.activeEntity = this.selectedValues[entity];
                 if (!this.healthLayoutService.activeEntity) {
                     queryParams.id = undefined;
-                    this.uri.updateURI(undefined, queryParams);
+                } else if (forceURIUpdate) {
+                    queryParams.id = entity;
                 }
+
+                this.uri.updateURI(undefined, queryParams);
+
             } else {
                 this.healthLayoutService.activeEntity = entity;
                 queryParams.id = entity.id;
@@ -221,6 +226,9 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
     }
 
     resetActiveEntity(updateURI = true) {
+        if (!this.healthLayoutService.activeEntity) {
+            return;
+        }
         if (updateURI) {
             const queryParams: Params = {};
             queryParams.id            = undefined;

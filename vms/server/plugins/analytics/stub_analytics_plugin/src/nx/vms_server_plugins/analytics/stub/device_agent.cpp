@@ -179,7 +179,8 @@ std::string DeviceAgent::manifestString() const
         ")json" + kObjectInTheAreaEventType + R"json("
     ],
     "supportedObjectTypeIds": [
-        ")json" + kCarObjectType + R"json("
+        ")json" + kCarObjectType + R"json(",
+        ")json" + kStoneObjectType + R"json("
     ],
     "eventTypes": [
         {

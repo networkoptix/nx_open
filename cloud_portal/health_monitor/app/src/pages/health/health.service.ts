@@ -1,6 +1,7 @@
 import { Injectable }                      from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { NxConfigService }                 from '../../services/nx-config';
+import { NxScrollMechanicsService }        from '../../services/scroll-mechanics.service';
 
 @Injectable({
     providedIn: 'root'
@@ -34,7 +35,10 @@ export class NxHealthService {
 
     CONFIG: any;
 
-    constructor(private configService: NxConfigService) {
+    constructor(
+        private configService: NxConfigService,
+        private scrollMechanicsService: NxScrollMechanicsService,
+    ) {
         this.CONFIG = this.configService.getConfig();
         this.importedData = false;
     }
@@ -77,6 +81,15 @@ export class NxHealthService {
 
     set tableReady(tableReady) {
         this.tableReadySubject.next(tableReady);
+    }
+
+    getPanelWidth() {
+        // values are set from CSS values in $grid-panel-width and $grid-super-wide-panel-width
+        if (this.scrollMechanicsService.mediaQueryMin(NxScrollMechanicsService.MEDIA.xxxxl)) {
+            return 450;
+        }
+
+        return 350;
     }
 
     pad(n) {

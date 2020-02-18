@@ -239,7 +239,8 @@ public:
                 close();
             });
 
-        for (auto [name, handler]: nx::utils::constKeyValueRange(debugActions()))
+        const auto& actions = debugActions();
+        for (auto [name, handler]: nx::utils::constKeyValueRange(actions))
             addButton(name, handler);
     }
 

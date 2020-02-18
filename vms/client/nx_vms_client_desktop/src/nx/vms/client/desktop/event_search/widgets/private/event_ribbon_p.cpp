@@ -649,7 +649,7 @@ void EventRibbon::Private::closeExpiredTiles()
     QList<QPersistentModelIndex> expired;
     const int oldDeadlineCount = m_deadlines.size();
 
-    for (const auto& [index, deadline]: nx::utils::keyValueRange(m_deadlines))
+    for (const auto& [index, deadline]: nx::utils::constKeyValueRange(m_deadlines))
     {
         if (index != m_hoveredIndex && deadline.hasExpired() && index.isValid())
             expired.push_back(index);
@@ -660,7 +660,7 @@ void EventRibbon::Private::closeExpiredTiles()
 
     const auto unreadCountGuard = makeUnreadCountGuard();
 
-    for (const auto index: expired)
+    for (const auto& index: std::as_const(expired))
         m_model->removeRows(index.row(), 1);
 
     NX_VERBOSE(q, "Expired %1 tiles", expired.size());
@@ -1258,7 +1258,8 @@ void EventRibbon::Private::doUpdateView()
 
     if (!q->isVisible())
     {
-        for (auto animator: m_animations.keys())
+        const auto animators = m_animations.keys();
+        for (auto animator: animators)
             delete animator;
 
         // After insertion inside visible range it is in temporarily incorrect state:

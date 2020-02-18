@@ -87,6 +87,7 @@
                         {
                             "type": "GroupBox",
                             "caption": "Polygon 1",
+                            "filledCheckItems": ["polygon1.figure"],
                             "items": [
                                 {
                                     "type": "PolygonFigure",
@@ -102,6 +103,7 @@
                         {
                             "type": "GroupBox",
                             "caption": "Polygon 2",
+                            "filledCheckItems": ["polygon2.figure"],
                             "items": [
                                 {
                                     "type": "PolygonFigure",
@@ -128,7 +130,7 @@
                         {
                             "type": "GroupBox",
                             "caption": "Box 1",
-                            "filledCheckPolicy": "allItems",
+                            "filledCheckItems": ["box1.figure"],
                             "items": [
                                 {
                                     "type": "BoxFigure",
@@ -144,7 +146,7 @@
                         {
                             "type": "GroupBox",
                             "caption": "Box 2",
-                            "filledCheckPolicy": "allItems",
+                            "filledCheckItems": ["box2.figure"],
                             "items": [
                                 {
                                     "type": "BoxFigure",

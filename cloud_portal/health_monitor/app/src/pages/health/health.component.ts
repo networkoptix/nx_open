@@ -115,6 +115,8 @@ export class NxHealthComponent implements OnInit, OnDestroy {
         }
 
         this.route.params.subscribe((params: any) => {
+            this.ribbonService.hide();
+            this.importedData = {};
             const systemId = params.systemId;
             // Promise holder so that if hm is in standalone mode its skips a systems getInfo call.
             let infoPromise = Promise.resolve();
