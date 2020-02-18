@@ -506,7 +506,7 @@ std::string Engine::manifestString() const
                     }
                 ]
             }
-        ],
+        ],)json" + R"json(
         "sections": [
             {
                 "type": "Section",
