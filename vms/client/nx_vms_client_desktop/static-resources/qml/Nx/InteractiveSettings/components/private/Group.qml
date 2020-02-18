@@ -4,7 +4,6 @@ import "utils.js" as Utils
 
 Item
 {
-    property string filledCheckPolicy: "anyOfItems"
     property var filledCheckItems: undefined
 
     property Item contentItem: null
@@ -13,7 +12,7 @@ Item
     implicitWidth: contentItem ? contentItem.implicitWidth : 0
     implicitHeight: contentItem ? contentItem.implicitHeight : 0
 
-    property bool filled: false
+    property bool filled: true
 
     onContentItemChanged:
     {
@@ -53,45 +52,25 @@ Item
         return result
     }
 
-    function isAnyOfItemsFilled()
+    function updateFilled()
     {
         const itemsToCheck = getItemsToCheck()
+
+        if (itemsToCheck.length === 0)
+        {
+            filled = true
+            return
+        }
 
         for (var i = 0; i < itemsToCheck.length; ++i)
         {
             if (Utils.isItemFilled(itemsToCheck[i]))
-                return true
+            {
+                filled = true
+                return
+            }
         }
 
-        return false
-    }
-
-    function areAllItemsFilled()
-    {
-        const itemsToCheck = getItemsToCheck()
-
-        for (var i = 0; i < itemsToCheck.length; ++i)
-        {
-            if (!Utils.isItemFilled(itemsToCheck[i]))
-                return false
-        }
-
-        return true
-    }
-
-    function updateFilled()
-    {
-        if (!contentItem)
-        {
-            filled = false
-            return
-        }
-
-        if (filledCheckPolicy === "anyOfItems")
-            filled = isAnyOfItemsFilled()
-        else if (filledCheckPolicy === "allItems")
-            filled = areAllItemsFilled()
-        else
-            filled = false
+        filled = false
     }
 }
