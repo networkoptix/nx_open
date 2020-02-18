@@ -56,9 +56,6 @@
 #include <core/resource_management/resource_properties.h>
 #include <utils/media/av_codec_helper.h>
 
-//!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
-#define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
-
 namespace
 {
 
@@ -4729,32 +4726,20 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
         m_triggerOutputTasks.erase(timerID);
     }
 
-    //retrieving output info to check mode
     RelayOutputInfo relayOutputInfo;
     if (!fetchRelayOutputInfo(outputID.toStdString(), &relayOutputInfo))
     {
         NX_DEBUG(this, "Cannot change relay output %1 state. Failed to get relay output info", outputID);
-        return /*false*/;
+        return;
     }
 
-#ifdef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
-    const bool isBistableModeRequired = true;
-#else
-    const bool isBistableModeRequired = autoResetTimeoutMS == 0;
-#endif
-
-    if ((relayOutputInfo.isBistable != isBistableModeRequired) ||
-#ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
-        (!isBistableModeRequired && relayOutputInfo.delayTimeMs != autoResetTimeoutMS) ||
-#endif
-        relayOutputInfo.activeByDefault)
+    // #ak: assume that camera can only work in bistable mode (true for some (or all?) DW cameras)
+    if (!relayOutputInfo.isBistable || relayOutputInfo.activeByDefault)
     {
-        //switching output to required mode
-        relayOutputInfo.isBistable = isBistableModeRequired;
-        #ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
-                relayOutputInfo.delayTimeMs = autoResetTimeoutMS;
-        #endif
+        // Switching output to required mode.
+        relayOutputInfo.isBistable = true;
         relayOutputInfo.activeByDefault = false;
+        relayOutputInfo.delayTimeMs = 0;
         if (!soapSetRelayOutputInfo(relayOutputInfo))
         {
             NX_DEBUG(this, "Cannot change relay output %1 state. Failed to set relay output info", outputID);
@@ -4765,19 +4750,16 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
     if (!this->soapSetRelayOutputState(relayOutputInfo, active))
         return;
 
-#ifdef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
     if ((autoResetTimeoutMS > 0) && active)
     {
         QnMutexLocker lk(&m_ioPortMutex);
-        //adding task to reset port state
+        // Adding task to reset port state.
         using namespace std::placeholders;
         const quint64 timerID = commonModule()->timerManager()->addTimer(
             std::bind(&QnPlOnvifResource::setOutputPortStateNonSafe, this, _1, outputID, !active, 0),
             std::chrono::milliseconds(autoResetTimeoutMS));
         m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, !active, 0);
     }
-#endif
-
 }
 
 void QnPlOnvifResource::beforeConfigureStream(Qn::ConnectionRole /*role*/)
