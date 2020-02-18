@@ -33,16 +33,30 @@ auto rangeAdapter(const PairType& pair)
 }
 
 template<typename KeyValueContainer>
-auto keyValueRange(KeyValueContainer&& container)
+auto keyValueRange(KeyValueContainer& container)
 {
     return rangeAdapter(container.keyValueBegin(), container.keyValueEnd());
 }
 
+// Avoid constructing from temporaries.
 template<typename KeyValueContainer>
-auto constKeyValueRange(KeyValueContainer&& container)
+auto keyValueRange(KeyValueContainer&& container) = delete;
+
+template<typename KeyValueContainer>
+auto constKeyValueRange(const KeyValueContainer& container)
 {
     return rangeAdapter(container.constKeyValueBegin(), container.constKeyValueEnd());
 }
+
+template<typename KeyValueContainer>
+auto constKeyValueRange(KeyValueContainer& container)
+{
+    return rangeAdapter(container.constKeyValueBegin(), container.constKeyValueEnd());
+}
+
+// Avoid constructing from temporaries.
+template<typename KeyValueContainer>
+auto constKeyValueRange(KeyValueContainer&& container) = delete;
 
 template<typename Range>
 auto reverseRange(const Range& range)
