@@ -1,5 +1,7 @@
 #include "analytics_settings_multi_listener.h"
 
+#include <client/client_module.h>
+
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -37,7 +39,7 @@ AnalyticsSettingsMultiListener::Private::Private(
     ListenPolicy listenPolicy)
     :
     q(q),
-    settingsManager(commonModule()->instance<AnalyticsSettingsManager>()),
+    settingsManager(qnClientModule->analyticsSettingsManager()),
     listenPolicy(listenPolicy)
 {
 }

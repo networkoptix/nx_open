@@ -3,6 +3,7 @@
 #include <memory>
 
 class QnDesktopClientMessageProcessor;
+class QnResourcePool;
 
 namespace nx::vms::client::desktop {
 
@@ -16,6 +17,7 @@ class AnalyticsSettingsManagerFactory
 {
 public:
     static std::unique_ptr<AnalyticsSettingsManager> createAnalyticsSettingsManager(
+        QnResourcePool* resourcePool,
         QnDesktopClientMessageProcessor* messageProcessor);
 };
 

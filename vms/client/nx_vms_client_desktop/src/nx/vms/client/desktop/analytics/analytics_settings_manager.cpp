@@ -10,29 +10,12 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace nx::vms::common;
+
 uint qHash(const DeviceAgentId& key)
 {
     return qHash(key.device) + qHash(key.engine);
 }
-
-auto toResources(const DeviceAgentId& agentId, QnResourcePool* resourcePool)
-{
-    return std::make_pair(
-        resourcePool->getResourceById<QnVirtualCameraResource>(agentId.device),
-        resourcePool->getResourceById<nx::vms::common::AnalyticsEngineResource>(agentId.engine)
-    );
-}
-
-QString toString(const DeviceAgentId& agentId, QnResourcePool* resourcePool)
-{
-    const auto device = resourcePool->getResourceById<QnVirtualCameraResource>(agentId.device);
-    const auto engine = resourcePool->getResourceById<nx::vms::common::AnalyticsEngineResource>(
-        agentId.engine);
-
-    return QString("%1 - %2").arg(
-        device ? device->getName() : "Deleted device",
-        engine ? engine->getName() : "Deleted engine");
-};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -57,10 +40,10 @@ AnalyticsSettingsListener::AnalyticsSettingsListener(
 
 //--------------------------------------------------------------------------------------------------
 
-class AnalyticsSettingsManager::Private: public QObject, public QnConnectionContextAware
+class AnalyticsSettingsManager::Private: public QObject
 {
 public:
-    Private();
+    void listenResourcePool(QnResourcePool* resourcePool);
 
     void refreshSettings(const DeviceAgentId& agentId);
     void handleListenerDeleted(const DeviceAgentId& id);
@@ -68,6 +51,28 @@ public:
     bool hasSubscription(const DeviceAgentId& id) const;
 
     void setSettings(const DeviceAgentId& id, const QJsonObject& model, const QJsonObject& values);
+
+    auto toResources(const DeviceAgentId& agentId)
+    {
+        if (!NX_ASSERT(m_resourcePool))
+            return std::make_pair(QnVirtualCameraResourcePtr(), AnalyticsEngineResourcePtr());
+
+        return std::make_pair(
+            m_resourcePool->getResourceById<QnVirtualCameraResource>(agentId.device),
+            m_resourcePool->getResourceById<AnalyticsEngineResource>(agentId.engine)
+        );
+    }
+
+    QString toString(const DeviceAgentId& agentId)
+    {
+        if (!NX_ASSERT(m_resourcePool))
+            return QString();
+
+        auto [device, engine] = toResources(agentId);
+        return QString("%1 - %2").arg(
+            device ? device->getName() : "Deleted device",
+            engine ? engine->getName() : "Deleted engine");
+    };
 
 public:
     struct SettingsData
@@ -96,18 +101,25 @@ public:
     AnalyticsSettingsServerInterfacePtr serverInterface;
     QList<rest::Handle> pendingRefreshRequests;
     QList<rest::Handle> pendingApplyRequests;
+
+private:
+    QPointer<QnResourcePool> m_resourcePool;
 };
 
-AnalyticsSettingsManager::Private::Private()
+void AnalyticsSettingsManager::Private::listenResourcePool(QnResourcePool* resourcePool)
 {
-    using nx::vms::common::AnalyticsEngineResource;
+    m_resourcePool = resourcePool;
+    if (!NX_ASSERT(resourcePool))
+        return;
+
     auto engineManifestChangesListener = new QnResourceChangesListener(
         QnResourceChangesListener::Policy::silentRemove,
         this);
 
     engineManifestChangesListener->connectToResources<AnalyticsEngineResource>(
+        resourcePool,
         &AnalyticsEngineResource::manifestChanged,
-        [this](const nx::vms::common::AnalyticsEngineResourcePtr& engine)
+        [this](const AnalyticsEngineResourcePtr& engine)
         {
             NX_DEBUG(this, "Engine manifest changed for %1", engine->getName());
 
@@ -122,7 +134,7 @@ AnalyticsSettingsManager::Private::Private()
 
 void AnalyticsSettingsManager::Private::refreshSettings(const DeviceAgentId& agentId)
 {
-    auto [device, engine] = toResources(agentId, resourcePool());
+    auto [device, engine] = toResources(agentId);
     if (!device || !engine)
         return;
 
@@ -156,7 +168,7 @@ void AnalyticsSettingsManager::Private::refreshSettings(const DeviceAgentId& age
 
 void AnalyticsSettingsManager::Private::handleListenerDeleted(const DeviceAgentId& id)
 {
-    NX_VERBOSE(this, "Listener destroyed: %1", toString(id, resourcePool()));
+    NX_VERBOSE(this, "Listener destroyed: %1", toString(id));
     auto subscriptionIt = subscriptionByDeviceId.find(id.device);
     if (subscriptionIt != subscriptionByDeviceId.end())
     {
@@ -189,7 +201,7 @@ void AnalyticsSettingsManager::Private::setSettings(
         data.values = values;
 
     NX_VERBOSE(this, "Store settings for %1, model changed: %2, values changed: %3",
-        toString(id, resourcePool()), modelChanged, valuesChanged);
+        toString(id), modelChanged, valuesChanged);
     if (modelChanged)
         NX_VERBOSE(this, "Updated model:\n%1", model);
     if (valuesChanged)
@@ -218,6 +230,11 @@ AnalyticsSettingsManager::~AnalyticsSettingsManager()
 {
 }
 
+void AnalyticsSettingsManager::setResourcePool(QnResourcePool* resourcePool)
+{
+    d->listenResourcePool(resourcePool);
+}
+
 void AnalyticsSettingsManager::setServerInterface(
     AnalyticsSettingsServerInterfacePtr serverInterface)
 {
@@ -226,19 +243,19 @@ void AnalyticsSettingsManager::setServerInterface(
 
 void AnalyticsSettingsManager::refreshSettings(const DeviceAgentId& agentId)
 {
-    NX_VERBOSE(this, "Force refresh called for %1", toString(agentId, d->resourcePool()));
+    NX_VERBOSE(this, "Force refresh called for %1", d->toString(agentId));
     if (d->hasSubscription(agentId))
         d->refreshSettings(agentId);
 }
 
 AnalyticsSettingsListenerPtr AnalyticsSettingsManager::getListener(const DeviceAgentId& agentId)
 {
-    NX_VERBOSE(this, "Listener requested for %1", toString(agentId, d->resourcePool()));
+    NX_VERBOSE(this, "Listener requested for %1", d->toString(agentId));
     auto& data = d->dataByAgentIdRef(agentId);
     if (const auto& listener = data.listener.lock())
         return listener;
 
-    NX_DEBUG(this, "New listener created for %1", toString(agentId, d->resourcePool()));
+    NX_DEBUG(this, "New listener created for %1", d->toString(agentId));
     AnalyticsSettingsListenerPtr listener(new AnalyticsSettingsListener(agentId, this));
     data.listener = listener;
     connect(listener.get(), &QObject::destroyed, d.data(),
@@ -270,7 +287,7 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
     for (auto it = valuesByAgentId.begin(); it != valuesByAgentId.end(); ++it)
     {
         const auto agentId = it.key();
-        auto [device, engine] = toResources(agentId, d->resourcePool());
+        auto [device, engine] = d->toResources(agentId);
         if (!device || !engine)
             continue;
 

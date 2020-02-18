@@ -71,9 +71,11 @@ private:
 
 std::unique_ptr<AnalyticsSettingsManager>
 AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
+    QnResourcePool* resourcePool,
     QnDesktopClientMessageProcessor* messageProcessor)
 {
     auto manager = std::make_unique<AnalyticsSettingsManager>();
+    manager->setResourcePool(resourcePool);
 
     auto serverInterface = std::make_shared<AnalyticsSettingsServerRestApiInterface>(manager.get());
     manager->setServerInterface(serverInterface);

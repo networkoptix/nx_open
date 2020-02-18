@@ -494,6 +494,7 @@ void QnClientModule::initSingletons()
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
 
     d->analyticsSettingsManager = AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
+        commonModule->resourcePool(),
         messageProcessor);
 
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());

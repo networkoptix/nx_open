@@ -33,10 +33,12 @@ SystemInternetAccessWatcher::SystemInternetAccessWatcher(QObject* parent):
 
     auto serverChangesListener = new QnResourceChangesListener(this);
     serverChangesListener->connectToResources<QnMediaServerResource>(
+        resourcePool(),
         &QnMediaServerResource::serverFlagsChanged,
         this, &SystemInternetAccessWatcher::updateState);
 
     serverChangesListener->connectToResources<QnMediaServerResource>(
+        resourcePool(),
         &QnMediaServerResource::statusChanged,
         this, &SystemInternetAccessWatcher::updateState);
 

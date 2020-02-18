@@ -2,6 +2,8 @@
 
 #include <common/static_common_module.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
 #include <nx/core/access/access_types.h>
 
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
@@ -40,17 +42,17 @@ protected:
     virtual void SetUp()
     {
         m_environment.reset(new Environment());
-        m_manager.reset(new AnalyticsSettingsManager());
         m_serverInterfaceMock = std::make_shared<AnalyticsSettingsMockApiInterface>();
-
+        m_manager.reset(new AnalyticsSettingsManager());
+        m_manager->setResourcePool(resourcePool());
         m_manager->setServerInterface(m_serverInterfaceMock);
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
-        m_serverInterfaceMock.reset();
         m_manager.reset();
+        m_serverInterfaceMock.reset();
         m_environment.reset();
     }
 
@@ -76,6 +78,14 @@ protected:
     QScopedPointer<AnalyticsSettingsManager> m_manager;
     AnalyticsSettingsMockApiInterfacePtr m_serverInterfaceMock;
 };
+
+static const QString kEmptyReply = R"json(
+    {
+        "analyzedStreamIndex": "primary",
+        "settingsModel": {},
+        "settingsValues": {}
+    }
+)json";
 
 TEST_F(AnalyticsSettingsManagerTest, init)
 {

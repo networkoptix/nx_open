@@ -1,5 +1,7 @@
 #include "device_agent_settings_adapter.h"
 
+#include <client/client_module.h>
+
 #include <nx/utils/log/assert.h>
 #include <utils/common/delayed.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
@@ -78,7 +80,7 @@ DeviceAgentSettingsAdapter::DeviceAgentSettingsAdapter(
 {
     d->store = store;
 
-    d->settingsManager = d->commonModule()->findInstance<AnalyticsSettingsManager>();
+    d->settingsManager = qnClientModule->analyticsSettingsManager();
     if (!NX_ASSERT(d->settingsManager))
         return;
 

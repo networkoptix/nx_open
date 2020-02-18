@@ -93,6 +93,8 @@ public:
     AnalyticsSettingsManager(QObject* parent = nullptr);
     virtual ~AnalyticsSettingsManager() override;
 
+    void setResourcePool(QnResourcePool* resourcePool);
+
     /**
      * Server interface should be passed to send actual requests to the media server. Ownership will
      * be shared.

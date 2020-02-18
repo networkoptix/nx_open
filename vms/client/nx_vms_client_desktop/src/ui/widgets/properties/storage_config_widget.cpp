@@ -407,7 +407,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     QnResourceChangesListener* cameraBackupTypeListener = new QnResourceChangesListener(this);
     cameraBackupTypeListener->connectToResources<QnVirtualCameraResource>(
-        &QnVirtualCameraResource::backupQualitiesChanged, this, &QnStorageConfigWidget::updateBackupInfo);
+        resourcePool(),
+        &QnVirtualCameraResource::backupQualitiesChanged,
+        this,
+        &QnStorageConfigWidget::updateBackupInfo);
 
     /* By [Left] disable storage, by [Right] enable storage: */
     installEventHandler(ui->storageView, QEvent::KeyPress, this,
