@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.211",
+    "version": "4.1.1.211",
     "data": [
         {
             "keys": [
@@ -2137,7 +2137,7 @@
             "keys": [
                 "Samsung Techwin|SNP-6200RH", "Samsung Techwin|SNP-6200RH|3.00_140302"
             ],
-            "_comment": "This one cannot be calliberated since it pass to -20 which we haven't implemented.",
+            "_comment": "This one cannot be calibrated since it pass to -20 which we haven't implemented.",
             "_ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2349,7 +2349,7 @@
                 "DW|*"
             ],
             "onvifVendorSubtype": "Digital Watchdog",
-            "_comment": "Used to set typeId of 'Digital Watchdog' for all manufectures that are resolved to 'DW'."
+            "_comment": "Used to set typeId of 'Digital Watchdog' for all manufactures that are resolved to 'DW'."
         },
         {
             "keys": [
