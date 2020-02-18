@@ -2799,7 +2799,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
-     * %param:string deviceId device id (can be obtained from "id" field via
+     * %param[opt]:string deviceId device id (can be obtained from "id" field via
      *     /ec2/getCamerasEx), or MAC address (not supported for
      *     certain cameras), or "Logical Id".
      * %param[opt]:string objectTypeId Analytics Object Type id.
