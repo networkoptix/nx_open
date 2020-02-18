@@ -213,6 +213,10 @@ std::string DeviceAgent::manifestString() const
         {
             "id": ")json" + kBlinkingObjectType + R"json(",
             "name": "Blinking Object"
+        },
+        {
+            "id": ")json" + kStoneObjectType + R"json(",
+            "name": "Stone"
         }
     ])json"
         + (ini().overrideSettingsModelInDeviceAgent ? kOverriddenDeviceAgentSettingsModel : "")
