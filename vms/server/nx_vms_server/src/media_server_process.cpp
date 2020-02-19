@@ -885,7 +885,7 @@ void MediaServerProcess::dumpSystemUsageStats()
     }
 
     QnMutexLocker lk(&m_mutex);
-    if(m_dumpSystemResourceUsageTaskId == 0)  //monitoring cancelled
+    if(m_dumpSystemResourceUsageTaskId == 0)  //monitoring canceled
         return;
     m_dumpSystemResourceUsageTaskId = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&MediaServerProcess::dumpSystemUsageStats, this),
@@ -4441,7 +4441,7 @@ void MediaServerProcess::writeMutableSettingsData()
     serverModule()->mutableSettings()->appserverPassword.set("");
 #ifdef _DEBUG
     NX_ASSERT(serverModule()->settings().appserverPassword().isEmpty(),
-        "appserverPassword is not emptyu in registry. Restart the server as Administrator");
+        "appserverPassword is not empty in registry. Restart the server as Administrator");
 #endif
 
     // show our cloud host value in registry in case of installer will check it
