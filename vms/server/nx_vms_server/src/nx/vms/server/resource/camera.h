@@ -199,6 +199,33 @@ public:
         nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
         nx::vms::api::StreamIndex streamIndex);
 
+    /**
+     * Device agent settings model, stored in the camera property (in the device agent manifest).
+     */
+    std::optional<QJsonObject> deviceAgentSettingsModel(const QnUuid& engineId) const;
+
+    /**
+     * Device agent settings values, stored in the camera property.
+     */
+    QHash<QnUuid, QJsonObject> deviceAgentSettingsValues() const;
+
+    /**
+     * Save applied device agent settings values to the database via the camera property.
+     */
+    void setDeviceAgentSettingsValues(const QHash<QnUuid, QJsonObject>& settingsValues);
+
+    /**
+     * Device agent settings values, stored in the camera property. Helper function for the single
+     * engine.
+     */
+    QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
+
+    /**
+     * Save applied device agent settings values to the database via the camera property. Helper
+     * function for the single engine.
+     */
+    void setDeviceAgentSettingsValues(const QnUuid& engineId, const QJsonObject& settingsValues);
+
     struct Metrics
     {
         std::atomic<qint64> streamIssues{0};

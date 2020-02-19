@@ -1,5 +1,7 @@
 #include "analytics_settings_multi_listener.h"
 
+#include <client/client_module.h>
+
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -37,7 +39,7 @@ AnalyticsSettingsMultiListener::Private::Private(
     ListenPolicy listenPolicy)
     :
     q(q),
-    settingsManager(commonModule()->instance<AnalyticsSettingsManager>()),
+    settingsManager(qnClientModule->analyticsSettingsManager()),
     listenPolicy(listenPolicy)
 {
 }
@@ -112,15 +114,10 @@ void AnalyticsSettingsMultiListener::Private::addListener(const QnUuid& engineId
     auto listener = settingsManager->getListener(DeviceAgentId{camera->getId(), engineId});
     listeners.insert(engineId, listener);
 
-    connect(listener.get(), &AnalyticsSettingsListener::valuesChanged, this,
-        [this, engineId](const QJsonObject& values)
+    connect(listener.get(), &AnalyticsSettingsListener::dataChanged, this,
+        [this, engineId](const DeviceAgentData& data)
         {
-            emit q->valuesChanged(engineId, values);
-        });
-    connect(listener.get(), &AnalyticsSettingsListener::modelChanged, this,
-        [this, engineId](const QJsonObject& model)
-        {
-            emit q->modelChanged(engineId, model);
+            emit q->dataChanged(engineId, data);
         });
 }
 
@@ -150,17 +147,10 @@ AnalyticsSettingsMultiListener::~AnalyticsSettingsMultiListener()
 {
 }
 
-QJsonObject AnalyticsSettingsMultiListener::values(const QnUuid& engineId) const
+DeviceAgentData AnalyticsSettingsMultiListener::data(const QnUuid& engineId) const
 {
     if (const auto& listener = d->listeners.value(engineId))
-        return listener->values();
-    return {};
-}
-
-QJsonObject AnalyticsSettingsMultiListener::model(const QnUuid& engineId) const
-{
-    if (const auto& listener = d->listeners.value(engineId))
-        return listener->model();
+        return listener->data();
     return {};
 }
 

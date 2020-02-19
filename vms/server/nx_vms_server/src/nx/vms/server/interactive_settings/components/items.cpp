@@ -482,7 +482,7 @@ LineFigure::LineFigure(QObject* parent):
 }
 
 PolygonFigure::PolygonFigure(QObject* parent):
-    BaseFigure(QStringLiteral("BoxFigure"), parent)
+    BaseFigure(QStringLiteral("PolygonFigure"), parent)
 {
 }
 
@@ -496,7 +496,7 @@ void PolygonFigure::setMaxPoints(int maxPoints)
 }
 
 BoxFigure::BoxFigure(QObject* parent):
-    BaseFigure(QStringLiteral("PolygonFigure"), parent)
+    BaseFigure(QStringLiteral("BoxFigure"), parent)
 {
 }
 

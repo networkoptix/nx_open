@@ -5,38 +5,51 @@
 #include <QtCore/QObject>
 #include <QtCore/QJsonObject>
 
+#include <api/server_rest_connection_fwd.h>
+
+#include <core/resource/resource_fwd.h>
+
 #include <nx/utils/uuid.h>
+#include <nx/utils/impl_ptr.h>
+
+#include "analytics_settings_types.h"
+
+namespace nx::vms::api::analytics { struct DeviceAnalyticsSettingsResponse; }
 
 namespace nx::vms::client::desktop {
 
 class AnalyticsSettingsManager;
+using AnalyticsSettingsCallback =
+    rest::Callback<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>;
 
-struct DeviceAgentId
+class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsServerInterface
 {
-    QnUuid device;
-    QnUuid engine;
+public:
+    virtual ~AnalyticsSettingsServerInterface();
 
-    inline bool operator==(const DeviceAgentId& other) const
-    {
-        return device == other.device && engine == other.engine;
-    }
+    virtual rest::Handle getSettings(
+        const QnVirtualCameraResourcePtr& device,
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        AnalyticsSettingsCallback callback) = 0;
+    virtual rest::Handle applySettings(
+        const QnVirtualCameraResourcePtr& device,
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        const QJsonObject& settings,
+        AnalyticsSettingsCallback callback) = 0;
 };
+using AnalyticsSettingsServerInterfacePtr = std::shared_ptr<AnalyticsSettingsServerInterface>;
 
-uint qHash(const DeviceAgentId& key);
-
-class AnalyticsSettingsListener: public QObject
+class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsListener: public QObject
 {
     Q_OBJECT
 
 public:
     const DeviceAgentId agentId;
 
-    QJsonObject model() const;
-    QJsonObject values() const;
+    DeviceAgentData data() const;
 
 signals:
-    void modelChanged(const QJsonObject& model);
-    void valuesChanged(const QJsonObject& values);
+    void dataChanged(const DeviceAgentData& data);
 
 protected:
     AnalyticsSettingsListener(const DeviceAgentId& agentId, AnalyticsSettingsManager* manager);
@@ -53,9 +66,9 @@ using AnalyticsSettingsListenerPtr = std::shared_ptr<AnalyticsSettingsListener>;
  * Centralized storage class, which ensures all subscribers ('listeners') are always have an access
  * to an actual version of the analytics settings. When some class changes settings, manager sends
  * these changes to the server and notifies other listeners about it. When changes are received from
- * the server (using resource properties mechanism), actual values are re-requested if needed.
+ * the server (using special transaction), actual values are re-requested.
  */
-class AnalyticsSettingsManager: public QObject
+class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsManager: public QObject
 {
     Q_OBJECT
 
@@ -69,24 +82,28 @@ public:
     AnalyticsSettingsManager(QObject* parent = nullptr);
     virtual ~AnalyticsSettingsManager() override;
 
+    void setResourcePool(QnResourcePool* resourcePool);
+
+    /**
+     * Server interface should be passed to send actual requests to the media server. Ownership will
+     * be shared.
+     */
+    void setServerInterface(AnalyticsSettingsServerInterfacePtr serverInterface);
+
+    void refreshSettings(const DeviceAgentId& agentId);
+
     AnalyticsSettingsListenerPtr getListener(const DeviceAgentId& agentId);
 
-    QJsonObject values(const DeviceAgentId& agentId) const;
-    QJsonObject model(const DeviceAgentId& agentId) const;
+    DeviceAgentData data(const DeviceAgentId& agentId) const;
 
     /**
      * Send changed actual values to the server.
      */
     Error applyChanges(const QHash<DeviceAgentId, QJsonObject>& valuesByAgentId);
 
-    bool isApplyingChanges() const;
-
-signals:
-    void appliedChanges();
-
 private:
     class Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 
     friend class AnalyticsSettingsListener;
 };

@@ -75,6 +75,7 @@ DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
 
     auto urlChangeListener = new QnResourceChangesListener(this);
     urlChangeListener->connectToResources<QnVirtualCameraResource>(
+        resourcePool(),
         &QnResource::urlChanged,
         [this](const QnResourcePtr& resource)
         {

@@ -3,7 +3,6 @@
 #include <variant>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
 #include <api/helpers/camera_id_helper.h>
 #include <media_server/media_server_module.h>
 
@@ -13,6 +12,7 @@
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <nx/vms/api/analytics/settings_response.h>
 #include <nx/vms/api/analytics/device_analytics_settings_data.h>
@@ -241,25 +241,24 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     const QnUuid deviceId = commonRequestEntities.device->getId();
     const QnUuid engineId = commonRequestEntities.engine->getId();
 
-    response.settingsValues = analyticsManager->getSettings(
+    const std::optional<analytics::Settings>& settings = analyticsManager->getSettings(
         deviceId.toString(), engineId.toString());
 
     response.analyzedStreamIndex =
         commonRequestEntities.device->analyzedStreamIndex(engineId);
 
-    const std::optional<QJsonObject> settingsModel =
-        commonRequestEntities.device->deviceAgentSettingsModel(engineId);
-
-    if (!settingsModel)
+    if (settings)
+    {
+        response.settingsModel = settings->model;
+        response.settingsValues = settings->values;
+    }
+    else
     {
         const auto message =
-            lm("Unable to find DeviceAgent settings model for the Engine with id %1")
-            .args(engineId);
-
+            lm("Unable to load DeviceAgent settings for the Engine with id %1").args(engineId);
         return makeResponse(QnRestResult::Error::CantProcessRequest, message);
     }
 
-    response.settingsModel = *settingsModel;
     result.json.setReply(response);
 
     return result;

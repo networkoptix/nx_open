@@ -6,6 +6,8 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+#include "../data/analytics_engine_info.h"
+
 namespace nx::vms::client::desktop {
 
 class CameraSettingsDialogStore;
@@ -21,7 +23,8 @@ public:
 
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
-    void update();
+
+    QList<AnalyticsEngineInfo> engineInfoList() const;
 
 private:
     class Private;
