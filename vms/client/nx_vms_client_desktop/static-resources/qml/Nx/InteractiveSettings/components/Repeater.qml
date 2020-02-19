@@ -6,7 +6,7 @@ import "private/utils.js" as Utils
 
 Item
 {
-    property alias addButtonCaption: addButton.text
+    property string addButtonCaption: ""
 
     readonly property Item childrenItem: column
 
@@ -43,7 +43,7 @@ Item
 
         anchors.bottom: parent.bottom
         x: column.labelWidth + 8
-        text: qsTr("Add")
+        text: addButtonCaption || qsTr("Add")
 
         visible: visibleItemsCount < column.children.length
 
