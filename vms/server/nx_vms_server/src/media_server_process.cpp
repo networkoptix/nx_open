@@ -2542,7 +2542,7 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
      * %param[opt]:arrayJson filter This parameter is used for Motion and Analytics Search
-     *     ("periodsType" must be set to 1 or 2). Search motion or analytics event on a video
+     *     (if "periodsType" is set to 1 or 2). Search motion or analytics event on a video
      *     according to the specified attribute values.
      *     <br/>Motion Search Format: string with a JSON list of <i>sensors</i>,
      *     each <i>sensor</i> is a JSON list of <i>rectangles</i>, each <i>rectangle</i> is:
@@ -2578,7 +2578,7 @@ void MediaServerProcess::registerRestHandlers(
      *     amount of microseconds per screen pixel.
      * %param[opt]:integer periodsType Chunk type.
      *     %value 0 All records.
-     *     %value 1 Only chunks with motion (parameter "filter" is required).
+     *     %value 1 Only chunks with motion (parameter "filter" might be applied).
      *     %value 2 Only chunks with analytics event (parameter "filter" might be applied).
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
