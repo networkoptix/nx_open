@@ -358,7 +358,15 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     connect(action(action::FullscreenAction), &QAction::toggled, this,
         &MainWindow::setFullScreen);
     connect(action(action::MinimizeAction), &QAction::triggered, this,
-        &QWidget::showMinimized);
+        [this]()
+        {
+            showMinimized();
+            // Widget updates are completely disabled while application in minimized state to
+            // avoid unnecessary heavy computations which are result of Qt quirks combined with
+            // player and rendering architecture.
+            setUpdatesEnabled(!isMinimized());
+        });
+
     connect(action(action::FullscreenMaximizeHotkeyAction), &QAction::triggered,
         action(action::EffectiveMaximizeAction), &QAction::trigger);
 
@@ -763,10 +771,12 @@ void MainWindow::closeEvent(QCloseEvent* event)
     menu()->trigger(action::ExitAction);
 }
 
-void MainWindow::changeEvent(QEvent *event)
+void MainWindow::changeEvent(QEvent* event)
 {
     if (event->type() == QEvent::WindowStateChange)
     {
+        setUpdatesEnabled(!isMinimized());
+
 #if defined(Q_OS_WIN) // An additional hack for our custom WM_NCCALCSIZE working correctly.
         const auto wscEvent = static_cast<QWindowStateChangeEvent*>(event);
         if (wscEvent->oldState().testFlag(Qt::WindowMinimized) && m_inFullscreen)
