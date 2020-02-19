@@ -70,7 +70,8 @@ public:
 
     UDTSTATUS m_Status = INIT;                       // current socket state
 
-    uint64_t m_TimeStamp = 0;                     // time when the socket is closed
+    // time when the socket is closed.
+    std::chrono::microseconds m_TimeStamp = std::chrono::microseconds::zero();
 
     int m_iIPversion = 0;                         // IP version
     detail::SocketAddress m_pSelfAddr;                    // pointer to the local address of the socket

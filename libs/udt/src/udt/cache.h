@@ -260,7 +260,7 @@ public:
     uint32_t m_piIP[4];        // IP address, machine read only, not human readable format
     int m_iIPversion = 0;        // IP version
     uint64_t m_ullTimeStamp = 0;    // last update time
-    int m_iRTT = 0;            // RTT
+    std::chrono::microseconds m_iRTT = std::chrono::microseconds::zero();            // RTT
     int m_iBandwidth = 0;        // estimated bandwidth
     int m_iLossRate = 0;        // average loss rate
     int m_iReorderDistance = 0;    // packet reordering distance
