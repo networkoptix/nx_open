@@ -26,6 +26,7 @@ static constexpr char kStaticData[] = "SimpleTest";
 static constexpr char kTestFileHttpPath[] = "/test.txt";
 static constexpr char kTestFilePath[] = ":/content/networkoptix.txt";
 static constexpr char kTestFileMimeType[] = "text/plain";
+static constexpr char kSilentHandlerPath[] = "/HttpClientServerTest/test";
 
 class HttpClientServerTest:
     public ::testing::Test
@@ -55,6 +56,13 @@ protected:
             .setPath(kTestFileHttpPath).toUrl();
     }
 
+    nx::utils::Url silentHandlerUrl() const
+    {
+        return url::Builder().setScheme(kUrlSchemeName)
+            .setEndpoint(m_testHttpServer->serverAddress())
+            .setPath(kSilentHandlerPath).toUrl();
+    }
+
     const QByteArray& fileBody() const
     {
         return m_fileBody;
@@ -81,6 +89,15 @@ private:
             kTestFilePath,
             kTestFileMimeType));
 
+        ASSERT_TRUE(testHttpServer()->registerRequestProcessorFunc(
+            kSilentHandlerPath,
+            [this](RequestContext requestContext, RequestProcessedHandler handler)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                requestContext.connection->closeConnection(SystemError::connectionReset);
+                handler(StatusCode::internalServerError);
+            }));
+
         ASSERT_TRUE(testHttpServer()->bindAndListen());
     }
 };
@@ -94,6 +111,21 @@ TEST_F(HttpClientServerTest, SimpleTest)
     ASSERT_TRUE(client.response());
     ASSERT_EQ(StatusCode::ok, client.response()->statusLine.statusCode);
     ASSERT_EQ(client.fetchMessageBodyBuffer(), kStaticData);
+}
+
+TEST_F(HttpClientServerTest, http_client_can_be_reused_after_failed_request)
+{
+    nx::network::http::HttpClient client;
+
+    // Failing request by response timeout.
+    client.setResponseReadTimeout(std::chrono::milliseconds(1));
+    ASSERT_FALSE(client.doGet(silentHandlerUrl()));
+
+    // Reusing client.
+    client.setResponseReadTimeout(kNoTimeout);
+    ASSERT_TRUE(client.doGet(staticDataUrl()));
+
+    // process does not crash.
 }
 
 TEST_F(HttpClientServerTest, FileDownload)

@@ -333,8 +333,10 @@ void HttpClient::instantiateHttpClient()
         std::bind(&HttpClient::onResponseReceived, this));
     m_asyncHttpClient->setOnSomeMessageBodyAvailable(
         std::bind(&HttpClient::onSomeMessageBodyAvailable, this));
+
+    // NOTE: Doing post before invoking onDone to let m_asyncHttpClient complete its processing.
     m_asyncHttpClient->setOnDone(
-        std::bind(&HttpClient::onDone, this));
+        [this]() { m_asyncHttpClient->post([this]() { onDone(); }); });
 }
 
 template<typename AsyncClientFunc>
@@ -357,34 +359,35 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         //setting up attributes
         for (const auto& keyValue : m_additionalHeaders)
             m_asyncHttpClient->addAdditionalHeader(keyValue.first, keyValue.second);
-        if (m_subsequentReconnectTries)
-            m_asyncHttpClient->setSubsequentReconnectTries(*m_subsequentReconnectTries);
-        if (m_reconnectTries)
-            m_asyncHttpClient->setTotalReconnectTries(*m_reconnectTries);
-        if (m_sendTimeout)
-            m_asyncHttpClient->setSendTimeout(*m_sendTimeout);
-        if (m_responseReadTimeout)
-            m_asyncHttpClient->setResponseReadTimeout(*m_responseReadTimeout);
-        if (m_messageBodyReadTimeout)
-            m_asyncHttpClient->setMessageBodyReadTimeout(*m_messageBodyReadTimeout);
-        if (m_maxNumberOfRedirects)
-            m_asyncHttpClient->setMaxNumberOfRedirects(*m_maxNumberOfRedirects);
-        if (m_userAgent)
-            m_asyncHttpClient->setUserAgent(*m_userAgent);
-        if (m_userName)
-            m_asyncHttpClient->setUserName(*m_userName);
-        if (m_userPassword)
-            m_asyncHttpClient->setUserPassword(*m_userPassword);
-        if (m_authType)
-            m_asyncHttpClient->setAuthType(*m_authType);
-        if (m_proxyEndpoint)
-            m_asyncHttpClient->setProxyVia(*m_proxyEndpoint, m_isProxySecure);
-
-        m_asyncHttpClient->setDisablePrecalculatedAuthorization(m_precalculatedAuthorizationDisabled);
-        m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);
 
         lk.relock();
     }
+
+    if (m_subsequentReconnectTries)
+        m_asyncHttpClient->setSubsequentReconnectTries(*m_subsequentReconnectTries);
+    if (m_reconnectTries)
+        m_asyncHttpClient->setTotalReconnectTries(*m_reconnectTries);
+    if (m_sendTimeout)
+        m_asyncHttpClient->setSendTimeout(*m_sendTimeout);
+    if (m_responseReadTimeout)
+        m_asyncHttpClient->setResponseReadTimeout(*m_responseReadTimeout);
+    if (m_messageBodyReadTimeout)
+        m_asyncHttpClient->setMessageBodyReadTimeout(*m_messageBodyReadTimeout);
+    if (m_maxNumberOfRedirects)
+        m_asyncHttpClient->setMaxNumberOfRedirects(*m_maxNumberOfRedirects);
+    if (m_userAgent)
+        m_asyncHttpClient->setUserAgent(*m_userAgent);
+    if (m_userName)
+        m_asyncHttpClient->setUserName(*m_userName);
+    if (m_userPassword)
+        m_asyncHttpClient->setUserPassword(*m_userPassword);
+    if (m_authType)
+        m_asyncHttpClient->setAuthType(*m_authType);
+    if (m_proxyEndpoint)
+        m_asyncHttpClient->setProxyVia(*m_proxyEndpoint, m_isProxySecure);
+
+    m_asyncHttpClient->setDisablePrecalculatedAuthorization(m_precalculatedAuthorizationDisabled);
+    m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);
 
     m_lastResponse = std::nullopt;
 
@@ -397,9 +400,9 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         (m_asyncHttpClient->state() <= AsyncClient::State::sResponseReceived) &&
         !m_lastResponse)
     {
-        // m_lastResponse is set in responseReceived hander. But, AsyncHttpClient first sets state 
+        // m_lastResponse is set in responseReceived hander. But, AsyncHttpClient first sets state
         // to AsyncClient::State::sResponseReceived, then emits responseReceived event.
-        // So, there is a period of time when the state is already 
+        // So, there is a period of time when the state is already
         // AsyncClient::State::sResponseReceived but m_lastResponse is still not set.
         m_cond.wait(lk.mutex());
     }
