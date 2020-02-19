@@ -429,10 +429,11 @@ void Manager::setSettings(
     if (!NX_ASSERT(analyticsContext, lm("Device %1").arg(deviceId)))
         return;
 
-    analyticsContext->setSettings(engineId, deviceAgentSettings);
+    analyticsContext->setSettingsValues(engineId, deviceAgentSettings);
 }
 
-QJsonObject Manager::getSettings(const QString& deviceId, const QString& engineId) const
+std::optional<Settings> Manager::getSettings(
+    const QString& deviceId, const QString& engineId) const
 {
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
     {

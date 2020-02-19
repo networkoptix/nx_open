@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include <QtCore/QJsonObject>
+
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_globals.h>
@@ -12,6 +14,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/analytics/settings.h>
 #include <nx/vms/server/analytics/stream_data_receptor.h>
 #include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/sdk/analytics/i_device_agent.h>
@@ -43,15 +46,15 @@ public:
         QnMediaServerModule* severModule,
         const resource::CameraPtr& device);
 
-    virtual ~DeviceAnalyticsContext();
+    virtual ~DeviceAnalyticsContext() override;
 
     void setEnabledAnalyticsEngines(
         const resource::AnalyticsEngineResourceList& engines);
     void removeEngine(const resource::AnalyticsEngineResourcePtr& engine);
 
     void setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink);
-    void setSettings(const QString& engineId, const QJsonObject& settings);
-    QJsonObject getSettings(const QString& engineId) const;
+    void setSettingsValues(const QString& engineId, const QJsonObject& settings);
+    std::optional<Settings> getSettings(const QString& engineId) const;
 
     // @return map Engine id -> has alive DeviceAgent
     std::map<QnUuid, bool> bindingStatuses() const;

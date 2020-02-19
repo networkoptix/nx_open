@@ -161,7 +161,7 @@ void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor
         binding->setMetadataSink(m_metadataSink);
 }
 
-void DeviceAnalyticsContext::setSettings(const QString& engineId, const QJsonObject& settings)
+void DeviceAnalyticsContext::setSettingsValues(const QString& engineId, const QJsonObject& settings)
 {
     QnUuid analyticsEngineId(engineId);
     const QJsonObject effectiveSettings = prepareSettings(analyticsEngineId, settings);
@@ -264,7 +264,7 @@ std::optional<QJsonObject> DeviceAnalyticsContext::loadSettingsFromSpecificFile(
     return sdk_support::toQJsonObject(*settingsString);
 }
 
-QJsonObject DeviceAnalyticsContext::getSettings(const QString& engineId) const
+std::optional<Settings> DeviceAnalyticsContext::getSettings(const QString& engineId) const
 {
     const QnUuid analyticsEngineId(engineId);
     const auto engine = serverModule()
@@ -305,12 +305,12 @@ QJsonObject DeviceAnalyticsContext::getSettings(const QString& engineId) const
         NX_DEBUG(this, "No DeviceAnalyticsBinding for the Device %1 and the Engine %2",
             m_device, engineId);
 
-        return jsonEngine.values();
+        return Settings{jsonEngine.serializeModel(), jsonEngine.values()};
     }
 
     const QJsonObject pluginSideSettings = binding->getSettings();
     jsonEngine.applyValues(pluginSideSettings);
-    return jsonEngine.values();
+    return Settings{jsonEngine.serializeModel(), jsonEngine.values()};
 }
 
 std::map<QnUuid, bool> DeviceAnalyticsContext::bindingStatuses() const

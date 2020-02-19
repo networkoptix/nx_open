@@ -241,28 +241,24 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     const QnUuid deviceId = commonRequestEntities.device->getId();
     const QnUuid engineId = commonRequestEntities.engine->getId();
 
-    response.settingsValues = analyticsManager->getSettings(
+    const std::optional<analytics::Settings>& settings = analyticsManager->getSettings(
         deviceId.toString(), engineId.toString());
 
     response.analyzedStreamIndex =
         commonRequestEntities.device->analyzedStreamIndex(engineId);
 
-    auto camera = commonRequestEntities.device.objectCast<resource::Camera>();
-    NX_ASSERT(camera);
-    const std::optional<QJsonObject> settingsModel = camera
-        ? camera->deviceAgentSettingsModel(engineId)
-        : std::nullopt;
-
-    if (!settingsModel)
+    if (settings)
+    {
+        response.settingsModel = settings->model;
+        response.settingsValues = settings->values;
+    }
+    else
     {
         const auto message =
-            lm("Unable to find DeviceAgent settings model for the Engine with id %1")
-            .args(engineId);
-
+            lm("Unable to load DeviceAgent settings for the Engine with id %1").args(engineId);
         return makeResponse(QnRestResult::Error::CantProcessRequest, message);
     }
 
-    response.settingsModel = *settingsModel;
     result.json.setReply(response);
 
     return result;
