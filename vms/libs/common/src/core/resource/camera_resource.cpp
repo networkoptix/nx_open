@@ -28,6 +28,8 @@
 #include <nx/utils/app_info.h>
 #include <nx/fusion/model_functions.h>
 
+#include <nx/kit/utils.h>
+
 namespace {
 
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
@@ -754,7 +756,8 @@ nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid en
         NX_WARNING(this,
             "%1 Unable to deserialize the analyzedStreamIndex map for the Device %2 (%3), "
             "\"%4\" property content: %5",
-            __func__, getUserDefinedName(), getId(), kAnalyzedStreamIndexes, serializedProperty);
+            __func__, getUserDefinedName(), getId(), kAnalyzedStreamIndexes,
+            nx::kit::utils::toString(serializedProperty));
         return kDefaultAnalyzedStreamIndex;
     }
 
