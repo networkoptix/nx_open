@@ -139,6 +139,11 @@ bool HttpClient::eof() const
     return (m_done && m_msgBodyBuffer.isEmpty()) || m_error;
 }
 
+bool HttpClient::hasRequestSucceeded() const
+{
+    return m_asyncHttpClient->hasRequestSucceeded();
+}
+
 BufferType HttpClient::fetchMessageBodyBuffer()
 {
     QnMutexLocker lk(&m_mutex);

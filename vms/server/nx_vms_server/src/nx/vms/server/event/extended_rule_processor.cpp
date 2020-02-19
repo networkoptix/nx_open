@@ -919,9 +919,9 @@ void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
 struct PushPayload
 {
     QString url;
-    QString image;
+    QString imageUrl;
 };
-#define PushPayload_Fields (url)(image)
+#define PushPayload_Fields (url)(imageUrl)
 
 struct PushNotification
 {
@@ -932,38 +932,38 @@ struct PushNotification
 };
 #define PushNotification_Fields (title)(body)(payload)
 
-struct PushNotificationMessage
+struct PushRequest
 {
     QString systemId;
     std::set<QString> targets;
     PushNotification notification;
 };
-#define PushNotificationMessage_Fields (systemId)(targets)(notification)
+#define PushRequest_Fields (systemId)(targets)(notification)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (PushPayload)(PushNotification)(PushNotificationMessage), (json), _Fields);
+    (PushPayload)(PushNotification)(PushRequest), (json), _Fields);
 
 bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActionPtr& action)
 {
-    PushNotificationMessage message;
+    PushRequest request;
     const auto settings = serverModule()->commonModule()->globalSettings();
-    message.systemId = settings->cloudSystemId();
-    if (message.systemId.isEmpty())
+    request.systemId = settings->cloudSystemId();
+    if (request.systemId.isEmpty())
     {
         NX_DEBUG(this, "Not sending push notification, system is not connected to cloud");
         return true;
     }
 
-    message.targets = cloudUsers(action->getParams().additionalResources);
-    if (message.targets.empty())
+    request.targets = cloudUsers(action->getParams().additionalResources);
+    if (request.targets.empty())
     {
         NX_DEBUG(this, "Not sending push notification, no targets found");
         return true;
     }
 
-    message.notification = makePushNotification(action);
+    request.notification = makePushNotification(action);
     NX_VERBOSE(this, "Push Notification: %1\n%2",
-        message.notification.title, message.notification.body);
+        request.notification.title, request.notification.body);
 
     const auto url = nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
@@ -975,11 +975,16 @@ bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActio
     client.setUserPassword(settings->cloudAuthKey());
     client.setAuthType(nx::network::http::AuthType::authBasic);
 
-    const auto serialized = QJson::serialized(message);
-    const auto result = client.doPost(url, "application/json", serialized);
-    NX_DEBUG(this, "Send push notification to %1: %2 -- %3", url, serialized, client.response()
-        ? client.response()->toString()
-        : SystemError::toString(client.lastSysErrorCode()));
+    const auto serialized = QJson::serialized(request);
+    const auto result = client.doPost(url, "application/json", serialized)
+        && client.hasRequestSucceeded();
+
+    NX_UTILS_LOG(
+        result ? nx::utils::log::Level::debug : nx::utils::log::Level::warning,
+        this,
+        "Send push notification to %1: %2 -- %3", url, serialized, client.response()
+            ? client.response()->toString()
+            : SystemError::toString(client.lastSysErrorCode()));
 
     return result;
 }
@@ -1430,11 +1435,11 @@ PushPayload ExtendedRuleProcessor::makePushPayload(
         .setPathParts("client", settings->cloudSystemId(), "view")
         .addQueryItem("timestamp", event.eventTimestampUsec / 1000);
 
-    nx::network::url::Builder image;
+    nx::network::url::Builder imageUrl;
     if (isCamera)
     {
         url.addQueryItem("resources", event.eventResourceId.toSimpleString());
-        image = nx::network::url::Builder()
+        imageUrl = nx::network::url::Builder()
             .setScheme(nx::network::http::kSecureUrlSchemeName)
             .setHost(settings->cloudSystemId())
             .setPath("ec2/cameraThumbnail")
@@ -1443,7 +1448,7 @@ PushPayload ExtendedRuleProcessor::makePushPayload(
             .addQueryItem("height", kPushThumbnailHeight);
     }
 
-    return {url.toString(), image.toString()};
+    return {url.toString(), imageUrl.toString()};
 }
 
 PushNotification ExtendedRuleProcessor::makePushNotification(
