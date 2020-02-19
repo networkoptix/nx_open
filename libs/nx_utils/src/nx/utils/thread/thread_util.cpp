@@ -29,7 +29,7 @@ uintptr_t currentThreadSystemId()
     uint64_t tid = 0;
     pthread_threadid_np(NULL, &tid);
     return tid;
-#elif defined(Q_OS_ANDROID)
+#else
     #error "Not implemented"
     return 0;
 #endif
