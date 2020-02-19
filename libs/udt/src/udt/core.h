@@ -425,9 +425,9 @@ private: // Options
     int m_iIPversion = AF_INET;                            // IP version
     bool m_bRendezvous = false;                          // Rendezvous connection mode
     // sending timeout in milliseconds.
-    std::chrono::milliseconds m_iSndTimeOut = std::chrono::milliseconds(-1);
+    std::chrono::milliseconds m_sendTimeout = std::chrono::milliseconds(-1);
     // receiving timeout in milliseconds.
-    std::chrono::milliseconds m_iRcvTimeOut = std::chrono::milliseconds(-1);
+    std::chrono::milliseconds m_recvTimeout = std::chrono::milliseconds(-1);
     bool m_bReuseAddr = true;                // reuse an exiting port or not, for UDP multiplexer
     int64_t m_llMaxBW = -1;                // maximum data transfer rate (threshold)
 

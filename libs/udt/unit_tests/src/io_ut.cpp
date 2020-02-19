@@ -131,10 +131,7 @@ public:
             m_rawUdpReceiverThread.join();
 
         if (m_connectThread.joinable())
-        {
-            UDT::shutdown(clientSocket(), UDT_SHUT_RDWR);
             m_connectThread.join();
-        }
     }
 
 protected:
@@ -143,6 +140,13 @@ protected:
         base_type::SetUp();
 
         givenClientSocket();
+    }
+
+    virtual void TearDown() override
+    {
+        UDT::shutdown(clientSocket(), UDT_SHUT_RDWR);
+
+        base_type::TearDown();
     }
 
     void startRawUdpReceiver()
@@ -222,13 +226,13 @@ TEST_F(Connect, timeout)
     thenConnectFailedWithTimeout();
 }
 
-TEST_F(Connect, DISABLED_no_timeout)
+TEST_F(Connect, no_timeout_by_default)
 {
     startRawUdpReceiver();
 
-    setSendTimeout(std::chrono::hours(1));
     whenConnectFromADifferentThread();
 
+    // NOTE: The default timeout was 3 seconds.
     std::this_thread::sleep_for(std::chrono::seconds(5));
 
     thenConnectIsStillRunning();
