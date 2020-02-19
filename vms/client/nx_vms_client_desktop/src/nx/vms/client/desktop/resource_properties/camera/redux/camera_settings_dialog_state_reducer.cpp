@@ -18,6 +18,9 @@
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
 
+#include "../utils/device_agent_settings_adapter.h"
+#include "../watchers/camera_settings_analytics_engines_watcher.h"
+
 namespace nx::vms::client::desktop {
 
 using State = CameraSettingsDialogState;
@@ -542,7 +545,9 @@ State CameraSettingsDialogStateReducer::setSingleWearableState(
 
 State CameraSettingsDialogStateReducer::loadCameras(
     State state,
-    const Cameras& cameras)
+    const Cameras& cameras,
+    DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
+    CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher)
 {
     const auto firstCamera = cameras.empty()
         ? Camera()
@@ -565,7 +570,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recordingAlert = {};
     state.motionAlert = {};
     state.analytics.enabledEngines = {};
-    state.analytics.settingsValuesByEngineId = {};
+    state.analytics.settingsByEngineId = {};
     state.analytics.streamByEngineId = {};
     state.enableMotionDetection = {};
 
@@ -713,7 +718,25 @@ State CameraSettingsDialogStateReducer::loadCameras(
             nullptr,
             false);
 
+        if (analyticsEnginesWatcher)
+            state = setAnalyticsEngines(std::move(state), analyticsEnginesWatcher->engineInfoList());
+
+        state.analytics.streamByEngineId = {};
+        for (const auto& engine: state.analytics.engines)
+        {
+            state.analytics.streamByEngineId[engine.id].setBase(
+                firstCamera->analyzedStreamIndex(engine.id));
+        }
+
+        state.analytics.settingsByEngineId = {};
+        if (deviceAgentSettingsAdapter)
+        {
+            for (auto [engineId, deviceAgentData]: deviceAgentSettingsAdapter->dataByEngineId())
+                state = resetDeviceAgentData(std::move(state), engineId, deviceAgentData).second;
+        }
+
         state.analytics.enabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
+        state.analytics.enabledEngines.resetUser();
     }
 
     fetchFromCameras<bool>(state.recording.enabled, cameras,
@@ -1475,15 +1498,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngi
         return {false, std::move(state)};
 
     state.analytics.currentEngineId = value;
-    state.analytics.loading = true;
 
     return {true, std::move(state)};
-}
-
-State CameraSettingsDialogStateReducer::setAnalyticsSettingsLoading(State state, bool value)
-{
-    state.analytics.loading = value;
-    return state;
 }
 
 State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
@@ -1517,13 +1533,6 @@ State CameraSettingsDialogStateReducer::setAnalyticsStreamIndex(
     return state;
 }
 
-std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsModel(
-    State state, const QnUuid& engineId, const QJsonObject& value)
-{
-    state.analytics.settingsModelByEngineId[engineId] = value;
-    return {true, std::move(state)};
-}
-
 std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsValues(
     State state, const QnUuid& engineId, const QJsonObject& values)
 {
@@ -1535,7 +1544,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
         return {false, std::move(state)};
     }
 
-    auto& storedValues = state.analytics.settingsValuesByEngineId[engineId];
+    auto& storedValues = state.analytics.settingsByEngineId[engineId].values;
     if (storedValues.get() == values)
         return {false, std::move(state)};
 
@@ -1545,11 +1554,14 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
     return {true, std::move(state)};
 }
 
-std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentSettingsValues(
-    State state, const QnUuid& engineId, const QJsonObject& values)
+std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
+    State state, const QnUuid& engineId, const DeviceAgentData& data)
 {
-    state.analytics.settingsValuesByEngineId[engineId].setBase(values);
-    state.analytics.settingsValuesByEngineId[engineId].resetUser();
+    auto& settings = state.analytics.settingsByEngineId[engineId];
+    settings.model = data.model;
+    settings.values.setBase(data.values);
+    settings.values.resetUser();
+    settings.loading = data.status != DeviceAgentData::Status::ok;
     return std::make_pair(true, std::move(state));
 }
 

@@ -23,6 +23,9 @@ struct WearableState;
 struct ScheduleCellParams;
 struct CameraSettingsDialogState;
 struct AnalyticsEngineInfo;
+struct DeviceAgentData;
+class DeviceAgentSettingsAdapter;
+class CameraSettingsAnalyticsEnginesWatcher;
 
 class CameraSettingsDialogStore: public QObject
 {
@@ -36,11 +39,15 @@ public:
     const CameraSettingsDialogState& state() const;
 
     // Actions.
+    void loadCameras(
+        const QnVirtualCameraResourceList& cameras,
+        DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
+        CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher);
+
     void setReadOnly(bool value);
     void setSettingsOptimizationEnabled(bool value);
     void setGlobalPermissions(GlobalPermissions value);
     void setSingleWearableState(const WearableState& value);
-    void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);
     void setScheduleBrush(const ScheduleCellParams& brush);
     void setScheduleBrushRecordingType(Qn::RecordingType value);
@@ -96,22 +103,25 @@ public:
     Q_INVOKABLE void setEnabledAnalyticsEngines(const QVariantList& value);
     Q_INVOKABLE int analyticsStreamIndex(const QnUuid& engineId) const;
     Q_INVOKABLE void setAnalyticsStreamIndex(const QnUuid& engineId, int value);
-    void setAnalyticsStreamIndex(const QnUuid& engineId, nx::vms::api::StreamIndex value,
+    void setAnalyticsStreamIndex(const QnUuid& engineId,
+        nx::vms::api::StreamIndex value,
         ModificationSource source = ModificationSource::local);
+
     Q_INVOKABLE QJsonObject deviceAgentSettingsModel(const QnUuid& engineId) const;
-    void setDeviceAgentSettingsModel(const QnUuid& engineId, const QJsonObject& value);
     Q_INVOKABLE QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
     Q_INVOKABLE void setDeviceAgentSettingsValues(
         const QnUuid& engineId, const QJsonObject& values);
-    void resetDeviceAgentSettingsValues(
-        const QnUuid& engineId, const QJsonObject& values);
+    void resetDeviceAgentData(const QnUuid& engineId, const DeviceAgentData& data);
+
     Q_INVOKABLE bool dualStreamingEnabled() const;
     Q_INVOKABLE bool recordingEnabled() const;
 
     void setWearableMotionDetectionEnabled(bool value);
     void setWearableMotionSensitivity(int value);
-    void setCredentials(const std::optional<QString>& login, const std::optional<QString>& password);
-    void setStreamUrls(const QString& primary, const QString& secondary,
+    void setCredentials(
+        const std::optional<QString>& login, const std::optional<QString>& password);
+    void setStreamUrls(const QString& primary,
+        const QString& secondary,
         ModificationSource source = ModificationSource::local);
 
 signals:

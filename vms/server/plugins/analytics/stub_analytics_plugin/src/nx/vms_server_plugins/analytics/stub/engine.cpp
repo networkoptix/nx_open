@@ -136,57 +136,70 @@ void Engine::initCapabilities()
 
 std::string Engine::manifestString() const
 {
-    return /*suppress newline*/1 + R"json(
+    return /*suppress newline*/ 1 + R"json(
 {
     "eventTypes": [
         {
-            "id": ")json" + kLineCrossingEventType + R"json(",
+            "id": ")json"
+        + kLineCrossingEventType + R"json(",
             "name": "Line crossing"
         },
         {
-            "id": ")json" + kObjectInTheAreaEventType + R"json(",
+            "id": ")json"
+        + kObjectInTheAreaEventType + R"json(",
             "name": "Object in the area",
             "flags": "stateDependent|regionDependent"
         },
         {
-            "id": ")json" + kSuspiciousNoiseEventType + R"json(",
+            "id": ")json"
+        + kSuspiciousNoiseEventType + R"json(",
             "name": "Suspicious noise",
-            "groupId": ")json" + kSoundRelatedEventGroup + R"json("
+            "groupId": ")json"
+        + kSoundRelatedEventGroup + R"json("
         }
     ],
     "objectTypes": [
         {
-            "id": ")json" + kCarObjectType + R"json(",
+            "id": ")json"
+        + kCarObjectType + R"json(",
             "name": "Car"
         },
         {
-            "id": ")json" + kHumanFaceObjectType + R"json(",
+            "id": ")json"
+        + kHumanFaceObjectType + R"json(",
             "name": "Human face"
         },
         {
-            "id": ")json" + kMotionVisualizationObjectType + R"json(",
+            "id": ")json"
+        + kMotionVisualizationObjectType + R"json(",
             "name": "Motion visualization object"
         },
         {
-            "id": ")json" + kStoneObjectType + R"json(",
+            "id": ")json"
+        + kStoneObjectType + R"json(",
             "name": "Stone"
         }
     ],
     "groups": [
         {
-            "id": ")json" + kSoundRelatedEventGroup + R"json(",
+            "id": ")json"
+        + kSoundRelatedEventGroup + R"json(",
             "name": "Sound related events"
         }
     ],
-    "capabilities": ")json" + m_capabilities + R"json(",
-    "streamTypeFilter": ")json" + m_streamTypeFilter + R"json(",
-    "preferredStream": ")json" + ini().preferredStream + R"json(",
+    "capabilities": ")json"
+        + m_capabilities + R"json(",
+    "streamTypeFilter": ")json"
+        + m_streamTypeFilter + R"json(",
+    "preferredStream": ")json"
+        + ini().preferredStream + R"json(",
     "objectActions": [
         {
             "id": "nx.stub.addToList",
             "name": "Add to list",
             "supportedObjectTypeIds": [
-                ")json" + kCarObjectType + R"json("
+                ")json"
+        + kCarObjectType + R"json("
             ],
             "requirements": {
                 "capabilities": "needBestShotVideoFrame|needBestShotObjectMetadata|needFullTrack",
@@ -244,7 +257,8 @@ std::string Engine::manifestString() const
             "id": "nx.stub.addPerson",
             "name": "Add person (URL-based)",
             "supportedObjectTypeIds": [
-                ")json" + kCarObjectType + R"json("
+                ")json"
+        + kCarObjectType + R"json("
             ]
         }
     ],
@@ -261,43 +275,50 @@ std::string Engine::manifestString() const
                         "items": [
                             {
                                 "type": "CheckBox",
-                                "name": ")json" + kGenerateCarsSetting + R"json(",
+                                "name": ")json"
+        + kGenerateCarsSetting + R"json(",
                                 "caption": "Generate cars",
                                 "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
-                                "name": ")json" + kGenerateTrucksSetting + R"json(",
+                                "name": ")json"
+        + kGenerateTrucksSetting + R"json(",
                                 "caption": "Generate trucks",
                                 "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
-                                "name": ")json" + kGeneratePedestriansSetting + R"json(",
+                                "name": ")json"
+        + kGeneratePedestriansSetting + R"json(",
                                 "caption": "Generate pedestrians",
                                 "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
-                                "name": ")json" + kGenerateHumanFacesSetting + R"json(",
+                                "name": ")json"
+        + kGenerateHumanFacesSetting + R"json(",
                                 "caption": "Generate human faces",
                                 "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
-                                "name": ")json" + kGenerateBicyclesSetting + R"json(",
+                                "name": ")json"
+        + kGenerateBicyclesSetting + R"json(",
                                 "caption": "Generate bicycles",
                                 "defaultValue": true
                             },
                             {
                                 "type": "CheckBox",
-                                "name": ")json" + kGenerateStonesSetting + R"json(",
+                                "name": ")json"
+        + kGenerateStonesSetting + R"json(",
                                 "caption": "Generate stones",
                                 "defaultValue": false
                             },
                             {
                                 "type": "SpinBox",
-                                "name": ")json" + kBlinkingObjectPeriodMsSetting + R"json(",
+                                "name": ")json"
+        + kBlinkingObjectPeriodMsSetting + R"json(",
                                 "caption": "Generate 1-frame BlinkingObject every N ms (if not 0)",
                                 "defaultValue": 0,
                                 "minValue": 0,
@@ -305,13 +326,15 @@ std::string Engine::manifestString() const
                             },
                             {
                                 "type": "CheckBox",
-                                "name": ")json" + kBlinkingObjectInDedicatedPacketSetting + R"json(",
+                                "name": ")json"
+        + kBlinkingObjectInDedicatedPacketSetting + R"json(",
                                 "caption": "Put BlinkingObject into a dedicated MetadataPacket",
                                 "defaultValue": false
                             },
                             {
                                 "type": "SpinBox",
-                                "name": ")json" + kNumberOfObjectsToGenerateSetting + R"json(",
+                                "name": ")json"
+        + kNumberOfObjectsToGenerateSetting + R"json(",
                                 "caption": "Number of objects to generate",
                                 "defaultValue": 1,
                                 "minValue": 1,
@@ -319,7 +342,8 @@ std::string Engine::manifestString() const
                             },
                             {
                                 "type": "SpinBox",
-                                "name": ")json" + kGenerateObjectsEveryNFramesSetting + R"json(",
+                                "name": ")json"
+        + kGenerateObjectsEveryNFramesSetting + R"json(",
                                 "caption": "Generate objects every N frames",
                                 "defaultValue": 1,
                                 "minValue": 1,
@@ -327,13 +351,15 @@ std::string Engine::manifestString() const
                             },
                             {
                                 "type": "CheckBox",
-                                "name": ")json" + kGeneratePreviewPacketSetting + R"json(",
+                                "name": ")json"
+        + kGeneratePreviewPacketSetting + R"json(",
                                 "caption": "Generate preview packet",
                                 "defaultValue": true
                             },
                             {
                                 "type": "SpinBox",
-                                "name": ")json" + kGeneratePreviewAfterNFramesSetting + R"json(",
+                                "name": ")json"
+        + kGeneratePreviewAfterNFramesSetting + R"json(",
                                 "caption": "Generate preview after N frames",
                                 "defaultValue": 30,
                                 "minValue": 1,
@@ -341,7 +367,8 @@ std::string Engine::manifestString() const
                             },
                             {
                                 "type": "SpinBox",
-                                "name": ")json" + kOverallMetadataDelayMsSetting + R"json(",
+                                "name": ")json"
+        + kOverallMetadataDelayMsSetting + R"json(",
                                 "caption": "Overall metadata delay, ms",
                                 "defaultValue": 0,
                                 "minValue": 0,
@@ -351,26 +378,29 @@ std::string Engine::manifestString() const
                     },
                     {
                         "type": "CheckBox",
-                        "name": ")json" + kGenerateEventsSetting + R"json(",
+                        "name": ")json"
+        + kGenerateEventsSetting + R"json(",
                         "caption": "Generate events",
                         "defaultValue": true
                     },
                     {
                         "type": "CheckBox",
                         "name": ")json"
-                        + kThrowPluginDiagnosticEventsFromDeviceAgentSetting + R"json(",
+        + kThrowPluginDiagnosticEventsFromDeviceAgentSetting + R"json(",
                         "caption": "Produce Plugin Diagnostic Events from the DeviceAgent",
                         "defaultValue": false
                     },
                     {
                         "type": "CheckBox",
-                        "name": ")json" + kLeakFramesSetting + R"json(",
+                        "name": ")json"
+        + kLeakFramesSetting + R"json(",
                         "caption": "Force a memory leak when processing a video frame",
                         "defaultValue": false
                     },
                     {
                         "type": "SpinBox",
-                        "name": ")json" + kAdditionalFrameProcessingDelayMsSetting + R"json(",
+                        "name": ")json"
+        + kAdditionalFrameProcessingDelayMsSetting + R"json(",
                         "caption": "Additional frame processing delay, ms",
                         "defaultValue": 0,
                         "minValue": 0,
@@ -476,7 +506,7 @@ std::string Engine::manifestString() const
                     }
                 ]
             }
-        ],
+        ],)json" + R"json(
         "sections": [
             {
                 "type": "Section",
@@ -576,25 +606,147 @@ std::string Engine::manifestString() const
                 "caption": "ROI",
                 "items": [
                     {
-                        "type": "PolygonFigure",
-                        "name": "testPolygon",
-                        "caption": "Polygon (points are plugin side)"
+                        "type": "GroupBox",
+                        "caption": "Polygons",
+                        "items": [
+                            {
+                                "type": "Repeater",
+                                "count": 5,
+                                "template": {
+                                    "type": "GroupBox",
+                                    "caption": "Polygon #",
+                                    "filledCheckItems": ["polygon#.figure"],
+                                    "items": [
+                                        {
+                                            "type": "PolygonFigure",
+                                            "name": "polygon#.figure",
+                                            "minPoints": 4,
+                                            "maxPoints": 8
+                                        },
+                                        {
+                                            "type": "SpinBox",
+                                            "name": "polygon#.threshold",
+                                            "caption": "Level of detection",
+                                            "defaultValue": 50,
+                                            "minValue": 1,
+                                            "maxValue": 100
+                                        },
+                                        {
+                                            "type": "SpinBox",
+                                            "name": "polygon#.sensitivity",
+                                            "caption": "Sensitivity",
+                                            "defaultValue": 80,
+                                            "minValue": 1,
+                                            "maxValue": 100
+                                        },
+                                        {
+                                            "type": "SpinBox",
+                                            "name": "polygon#.minimumDuration",
+                                            "caption": "Minimum duration (s)",
+                                            "defaultValue": 0,
+                                            "minValue": 0,
+                                            "maxValue": 5
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
                     },
                     {
-                        "type": "BoxFigure",
-                        "name": "testBox",
-                        "caption": "Box"
+                        "type": "GroupBox",
+                        "caption": "Boxes",
+                        "items": [
+                            {
+                                "type": "Repeater",
+                                "count": 5,
+                                "template": {
+                                    "type": "GroupBox",
+                                    "caption": "Box #",
+                                    "filledCheckItems": ["box#.figure"],
+                                    "items": [
+                                        {
+                                            "type": "BoxFigure",
+                                            "name": "box#.figure"
+                                        },
+                                        {
+                                            "type": "SpinBox",
+                                            "name": "box#.threshold",
+                                            "caption": "Level of detection",
+                                            "defaultValue": 50,
+                                            "minValue": 1,
+                                            "maxValue": 100
+                                        },
+                                        {
+                                            "type": "SpinBox",
+                                            "name": "box#.sensitivity",
+                                            "caption": "Sensitivity",
+                                            "defaultValue": 80,
+                                            "minValue": 1,
+                                            "maxValue": 100
+                                        },
+                                        {
+                                            "type": "SpinBox",
+                                            "name": "box#.minimumDuration",
+                                            "caption": "Minimum duration (s)",
+                                            "defaultValue": 0,
+                                            "minValue": 0,
+                                            "maxValue": 5
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
                     },
                     {
-                        "type": "LineFigure",
-                        "name": "testLine",
-                        "caption": "Line"
+                        "type": "GroupBox",
+                        "caption": "Lines",
+                        "items": [
+                            {
+                                "type": "Repeater",
+                                "count": 5,
+                                "template": {
+                                    "type": "GroupBox",
+                                    "caption": "Line #",
+                                    "filledCheckItems": ["line#.figure"],
+                                    "items": [
+                                        {
+                                            "type": "LineFigure",
+                                            "name": "line#.figure"
+                                        },
+                                        {
+                                            "type": "CheckBox",
+                                            "name": "line#.person",
+                                            "caption": "Person",
+                                            "defaultValue": false
+                                        },
+                                        {
+                                            "type": "CheckBox",
+                                            "name": "line#.vehicle",
+                                            "caption": "Vehicle",
+                                            "defaultValue": false
+                                        },
+                                        {
+                                            "type": "CheckBox",
+                                            "name": "line#.crossing",
+                                            "caption": "Crossing",
+                                            "defaultValue": false
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
                     },
                     {
-                        "type": "LineFigure",
-                        "name": "testPolyLine",
+                        "type": "GroupBox",
                         "caption": "Polyline",
-                        "maxPoints": 8
+                        "items": [
+                            {
+                                "type": "LineFigure",
+                                "name": "testPolyLine",
+                                "caption": "Polyline",
+                                "maxPoints": 8
+                            }
+                        ]
                     }
                 ]
             }

@@ -7,9 +7,10 @@
 #include <utils/common/connective.h>
 
 // TODO: #ynikitenkov add versions with add/remove/specified resource slot handlers
-class QnResourceChangesListener: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
+class QnResourceChangesListener: public Connective<QObject>
 {
-    typedef Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
+
 public:
     enum class Policy
     {
@@ -21,16 +22,15 @@ public:
     };
     Q_DECLARE_FLAGS(Policies, Policy);
 
-    QnResourceChangesListener(QObject *parent = nullptr):
-        base_type(parent),
-        QnCommonModuleAware(parent)
+    QnResourceChangesListener(QObject* parent = nullptr):
+        base_type(parent)
     {
     }
 
-    QnResourceChangesListener(Policies policies, QObject *parent = nullptr):
-        QnResourceChangesListener(parent)
+    QnResourceChangesListener(Policies policies, QObject* parent = nullptr):
+        base_type(parent),
+        m_policies(policies)
     {
-        m_policies = policies;
     }
 
     template<
@@ -39,11 +39,12 @@ public:
         class TargetClass,
         class TargetSlotClass>
     void connectToResources(
+        QnResourcePool* resourcePool,
         const ResourceSignalClass& signal,
         TargetClass* receiver,
         const TargetSlotClass& slot)
     {
-        connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+        connect(resourcePool, &QnResourcePool::resourceAdded, this,
             [signal, receiver, slot](const QnResourcePtr &resource)
             {
                 if (const auto& target = resource.dynamicCast<ResourceClass>())
@@ -53,7 +54,7 @@ public:
                 }
             });
 
-        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        connect(resourcePool, &QnResourcePool::resourceRemoved, this,
             [this, signal, receiver, slot](const QnResourcePtr &resource)
             {
                 if (const auto& target = resource.dynamicCast<ResourceClass>())
@@ -64,7 +65,8 @@ public:
                 }
             });
 
-        for (const auto& target: resourcePool()->getResources<ResourceClass>())
+        const auto resources = resourcePool->getResources<ResourceClass>();
+        for (const auto& target: resources)
         {
             connect(target, signal, receiver, slot);
             if (m_policies.testFlag(Policy::notifyForExisting))
@@ -74,10 +76,11 @@ public:
 
     template<class ResourceClass, class ResourceSignalClass>
     void connectToResources(
+        QnResourcePool* resourcePool,
         const ResourceSignalClass& signal,
         std::function<void(const QnSharedResourcePointer<ResourceClass>& resource)> slot)
     {
-        connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+        connect(resourcePool, &QnResourcePool::resourceAdded, this,
             [this, signal, slot](const QnResourcePtr& resource)
             {
                 if (const auto& target = resource.dynamicCast<ResourceClass>())
@@ -87,7 +90,7 @@ public:
                 }
             });
 
-        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        connect(resourcePool, &QnResourcePool::resourceRemoved, this,
             [this, signal, slot](const QnResourcePtr& resource)
             {
                 if (const auto& target = resource.dynamicCast<ResourceClass>())
@@ -98,7 +101,8 @@ public:
                 }
             });
 
-        for (const auto& target: resourcePool()->getResources<ResourceClass>())
+        const auto resources = resourcePool->getResources<ResourceClass>();
+        for (const auto& target: resources)
         {
             connect(target, signal, this, [target, slot]() { slot(target); });
             if (m_policies.testFlag(Policy::notifyForExisting))

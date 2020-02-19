@@ -12,7 +12,6 @@
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
-#include "../data/analytics_engine_info.h"
 
 using namespace nx::vms::common;
 
@@ -47,12 +46,13 @@ class CameraSettingsAnalyticsEnginesWatcher::Private:
 public:
     Private(QnCommonModule* commonModule, CameraSettingsDialogStore* store);
 
+    QList<AnalyticsEngineInfo> engineInfoList() const;
+
     void setCamera(const QnVirtualCameraResourcePtr& camera);
     void updateStore();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_engineNameChanged(const QnResourcePtr& resource);
-    void at_enginePropertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_engineManifestChanged(const AnalyticsEngineResourcePtr& engine);
     void at_connectionOpened();
     void at_connectionClosed();
@@ -91,6 +91,30 @@ CameraSettingsAnalyticsEnginesWatcher::Private::Private(
         at_connectionOpened();
 }
 
+QList<AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::Private::engineInfoList() const
+{
+    if (!camera)
+        return {};
+
+    auto enginesList = engines.values();
+    const auto compatibleEngines = camera->compatibleAnalyticsEngines();
+
+    const auto isIncompatibleEngine =
+        [compatibleEngines](const AnalyticsEngineInfo& engineInfo)
+        {
+            return !compatibleEngines.contains(engineInfo.id);
+        };
+
+    enginesList.erase(
+        std::remove_if(enginesList.begin(), enginesList.end(), isIncompatibleEngine),
+        enginesList.end());
+
+    std::sort(enginesList.begin(), enginesList.end(),
+        [](const auto& left, const auto& right) { return left.name < right.name; });
+
+    return enginesList;
+}
+
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_connectionOpened()
 {
     NX_ASSERT(!m_online);
@@ -122,7 +146,6 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::setCamera(
     if (camera)
     {
         connect(camera, &QnResource::parentIdChanged, this, &Private::updateStore);
-
         connect(camera, &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& key)
             {
@@ -130,43 +153,21 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::setCamera(
                     updateStore();
             });
     }
-
-    updateStore();
 }
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::updateStore()
 {
-    if (!store)
-        return;
-
-    if (!camera)
+    if (store)
     {
-        store->setAnalyticsEngines({});
-        return;
-    }
+        const auto enginesList = engineInfoList();
+        store->setAnalyticsEngines(enginesList);
 
-    auto enginesList = engines.values();
-    const auto compatibleEngines = camera->compatibleAnalyticsEngines();
-
-    const auto isIncompatibleEngine =
-        [compatibleEngines](const AnalyticsEngineInfo& engineInfo)
+        for (const auto& engine: enginesList)
         {
-            return !compatibleEngines.contains(engineInfo.id);
-        };
+            store->setAnalyticsStreamIndex(engine.id, camera->analyzedStreamIndex(engine.id),
+                ModificationSource::remote);
+        }
 
-    enginesList.erase(
-        std::remove_if(enginesList.begin(), enginesList.end(), isIncompatibleEngine),
-        enginesList.end());
-
-    std::sort(enginesList.begin(), enginesList.end(),
-        [](const auto& left, const auto& right) { return left.name < right.name; });
-
-    store->setAnalyticsEngines(enginesList);
-
-    for (const auto& engine: enginesList)
-    {
-        store->setAnalyticsStreamIndex(engine.id, camera->analyzedStreamIndex(engine.id),
-            ModificationSource::remote);
     }
 }
 
@@ -186,8 +187,6 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
 
         connect(engine, &QnResource::nameChanged,
             this, &Private::at_engineNameChanged);
-        connect(engine, &QnResource::propertyChanged,
-            this, &Private::at_enginePropertyChanged);
         connect(engine, &AnalyticsEngineResource::manifestChanged,
             this, &Private::at_engineManifestChanged);
 
@@ -215,20 +214,6 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_engineNameChanged(
 
     it->name = resource->getName();
     updateStore();
-}
-
-void CameraSettingsAnalyticsEnginesWatcher::Private::at_enginePropertyChanged(
-    const QnResourcePtr& resource, const QString& key)
-{
-    if (!store)
-        return;
-
-    const auto engine = resource.staticCast<AnalyticsEngineResource>();
-
-    if (key == AnalyticsEngineResource::kSettingsValuesProperty)
-    {
-        store->setDeviceAgentSettingsValues(engine->getId(), engine->settingsValues());
-    }
 }
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_engineManifestChanged(
@@ -265,9 +250,9 @@ void CameraSettingsAnalyticsEnginesWatcher::setCamera(const QnVirtualCameraResou
     d->setCamera(camera);
 }
 
-void CameraSettingsAnalyticsEnginesWatcher::update()
+QList<AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::engineInfoList() const
 {
-    d->updateStore();
+    return d->engineInfoList();
 }
 
 } // namespace nx::vms::client::desktop

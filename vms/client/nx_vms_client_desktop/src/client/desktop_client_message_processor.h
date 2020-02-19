@@ -4,6 +4,8 @@
 
 #include <nx/vms/api/data_fwd.h>
 
+namespace nx::vms::api { struct ServerRuntimeEventData; }
+
 class QnIncompatibleServerWatcher;
 
 class QnDesktopClientMessageProcessor: public QnClientMessageProcessor
@@ -15,6 +17,9 @@ public:
     virtual ~QnDesktopClientMessageProcessor() override;
 
     QnIncompatibleServerWatcher *incompatibleServerWatcher() const;
+
+signals:
+    void serverRuntimeEventOccurred(const nx::vms::api::ServerRuntimeEventData& eventData);
 
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;

@@ -5,6 +5,7 @@ Settings
     readonly property var _serializedModel:
     {
         "type": "Settings",
+        "filledCheckItems": [],
         "items": [
             {
                 "type": "TextField",
@@ -26,6 +27,7 @@ Settings
             {
                 "type": "GroupBox",
                 "caption": "Group",
+                "filledCheckItems": [],
                 "items": [
                     {
                         "type": "SpinBox",
@@ -49,6 +51,7 @@ Settings
                     },
                     {
                         "type": "Row",
+                        "filledCheckItems": [],
                         "items": [
                             {
                                 "type": "Button",

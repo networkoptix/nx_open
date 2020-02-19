@@ -652,21 +652,6 @@ std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedObjectType
     return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), enabledAnalyticsEngines());
 }
 
-std::optional<QJsonObject> QnVirtualCameraResource::deviceAgentSettingsModel(QnUuid engineId) const
-{
-    const auto manifest = deviceAgentManifest(engineId);
-    if (manifest && manifest->deviceAgentSettingsModel.isObject())
-        return manifest->deviceAgentSettingsModel.toObject();
-
-    const auto engine =
-        resourcePool()->getResourceById<nx::vms::common::AnalyticsEngineResource>(engineId);
-
-    if (!engine)
-        return std::nullopt;
-
-    return engine->manifest().deviceAgentSettingsModel;
-}
-
 QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines() const
 {
     return QJson::deserialized<QSet<QnUuid>>(
@@ -729,33 +714,6 @@ QnVirtualCameraResource::DeviceAgentManifestMap
 {
     return QJson::deserialized<DeviceAgentManifestMap>(
         getProperty(kDeviceAgentManifestsProperty).toUtf8());
-}
-
-QHash<QnUuid, QJsonObject> QnVirtualCameraResource::deviceAgentSettingsValues() const
-{
-    return QJson::deserialized<QHash<QnUuid, QJsonObject>>(
-        getProperty(kDeviceAgentsSettingsValuesProperty).toUtf8());
-}
-
-void QnVirtualCameraResource::setDeviceAgentSettingsValues(
-    const QHash<QnUuid, QJsonObject>& settingsValues)
-{
-    setProperty(kDeviceAgentsSettingsValuesProperty,
-        QString::fromUtf8(QJson::serialized(settingsValues)));
-    saveProperties();
-}
-
-QJsonObject QnVirtualCameraResource::deviceAgentSettingsValues(const QnUuid& engineId) const
-{
-    return deviceAgentSettingsValues()[engineId];
-}
-
-void QnVirtualCameraResource::setDeviceAgentSettingsValues(
-    const QnUuid& engineId, const QJsonObject& settingsValues)
-{
-    auto settingsValuesByEngineId = deviceAgentSettingsValues();
-    settingsValuesByEngineId[engineId] = settingsValues;
-    setDeviceAgentSettingsValues(settingsValuesByEngineId);
 }
 
 std::optional<nx::vms::api::analytics::DeviceAgentManifest>

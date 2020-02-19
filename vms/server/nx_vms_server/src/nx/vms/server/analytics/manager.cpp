@@ -9,7 +9,6 @@
 #include <plugins/plugin_manager.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 
@@ -19,6 +18,7 @@
 #include <nx/vms/server/analytics/proxy_stream_data_receptor.h>
 
 #include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/vms/server/sdk_support/utils.h>
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
@@ -263,21 +263,25 @@ void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
 
 void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device)
 {
-    updateCompatibilityWithEngines(device);
+    auto camera = device.objectCast<resource::Camera>();
+    if (!NX_ASSERT(camera))
+        return;
+
+    updateCompatibilityWithEngines(camera);
     connect(
-        device, &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged,
+        camera, &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged,
         this, &Manager::at_deviceUserEnabledAnalyticsEnginesChanged);
 
-    auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), device);
+    auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), camera);
     context->setEnabledAnalyticsEngines(
-        device->enabledAnalyticsEngineResources().filtered<resource::AnalyticsEngineResource>());
-    context->setMetadataSink(metadataSinkUnsafe(device->getId()));
+        camera->enabledAnalyticsEngineResources().filtered<resource::AnalyticsEngineResource>());
+    context->setMetadataSink(metadataSinkUnsafe(camera->getId()));
 
-    if (auto source = mediaSourceUnsafe(device->getId()).toStrongRef())
+    if (auto source = mediaSourceUnsafe(camera->getId()).toStrongRef())
         source->setProxiedReceptor(context);
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_deviceAnalyticsContexts.emplace(device->getId(), context);
+    m_deviceAnalyticsContexts.emplace(camera->getId(), context);
 }
 
 void Manager::handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& device)
@@ -425,10 +429,11 @@ void Manager::setSettings(
     if (!NX_ASSERT(analyticsContext, lm("Device %1").arg(deviceId)))
         return;
 
-    analyticsContext->setSettings(engineId, deviceAgentSettings);
+    analyticsContext->setSettingsValues(engineId, deviceAgentSettings);
 }
 
-QJsonObject Manager::getSettings(const QString& deviceId, const QString& engineId) const
+std::optional<Settings> Manager::getSettings(
+    const QString& deviceId, const QString& engineId) const
 {
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
     {
