@@ -227,7 +227,7 @@ TEST_F(LiveStreamParametersWithoutAdvancedParams, secondaryFps)
     params.fps = m_camera->getMaxFps();
     m_videoCamera->getPrimaryReader()->setPrimaryStreamParams(params);
     auto secondaryParams = m_videoCamera->getSecondaryReader()->getLiveParams();
-    EXPECT_EQ(7, secondaryParams.fps);
+    EXPECT_EQ(7, (int) secondaryParams.fps);
 
     m_camera->setStreamFpsSharingMethod(Qn::BasicFpsSharing);
     params.fps = 1;
@@ -235,7 +235,7 @@ TEST_F(LiveStreamParametersWithoutAdvancedParams, secondaryFps)
     params.fps = m_camera->getMaxFps();
     m_videoCamera->getPrimaryReader()->setPrimaryStreamParams(params);
     secondaryParams = m_videoCamera->getSecondaryReader()->getLiveParams();
-    EXPECT_EQ(2, secondaryParams.fps);
+    EXPECT_EQ(2, (int) secondaryParams.fps);
 
     m_camera->setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
     params.fps = 1;
@@ -243,7 +243,7 @@ TEST_F(LiveStreamParametersWithoutAdvancedParams, secondaryFps)
     params.fps = m_camera->getMaxFps();
     m_videoCamera->getPrimaryReader()->setPrimaryStreamParams(params);
     secondaryParams = m_videoCamera->getSecondaryReader()->getLiveParams();
-    EXPECT_EQ(3, secondaryParams.fps);
+    EXPECT_EQ(3, (int) secondaryParams.fps);
 }
 
 } // namespace test
