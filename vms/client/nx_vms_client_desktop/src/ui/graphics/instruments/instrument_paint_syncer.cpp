@@ -30,8 +30,7 @@ bool InstrumentPaintSyncer::eventFilter(QObject* watched, QEvent* event)
 
 void InstrumentPaintSyncer::tick(int /*deltaTime*/)
 {
-    if (currentWatched() && m_currentWidget && m_currentWidget->window()
-        && !m_currentWidget->window()->isMinimized())
+    if (currentWatched() && m_currentWidget)
     {
        m_currentWidget->update();
     }
