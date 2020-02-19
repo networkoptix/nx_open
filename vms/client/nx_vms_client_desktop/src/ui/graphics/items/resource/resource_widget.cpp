@@ -518,7 +518,8 @@ void QnResourceWidget::updateDetailsText()
 
     const QString text = calculateDetailsText();
     m_hudOverlay->details()->setHtml(text);
-    m_hudOverlay->details()->setVisible(!text.isEmpty());
+    setOverlayWidgetVisible(
+        m_hudOverlay->details(), /*visible*/ !text.isEmpty(), /*animate*/ false);
 }
 
 QString QnResourceWidget::calculatePositionText() const
@@ -533,7 +534,8 @@ void QnResourceWidget::updatePositionText()
 
     const QString text = calculatePositionText();
     m_hudOverlay->position()->setHtml(text);
-    m_hudOverlay->position()->setVisible(!text.isEmpty());
+    setOverlayWidgetVisible(
+        m_hudOverlay->position(), /*visible*/ !text.isEmpty(), /*animate*/ false);
 }
 
 QnStatusOverlayController *QnResourceWidget::statusOverlayController() const
