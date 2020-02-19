@@ -42,7 +42,7 @@ private:
 
     void processDiscoveryResponseMessage(
         const QByteArray& discoveryResponseMessage,
-        const QString& testcameraAddress,
+        const nx::network::SocketAddress& testcameraDiscoverySocketAddress,
         QnResourceList* resources,
         std::set<nx::utils::MacAddress>* processedMacAddresses) const;
 
@@ -53,7 +53,7 @@ private:
         const nx::utils::MacAddress& macAddress,
         const QString& videoLayoutString,
         int mediaPort,
-        const QString& testcameraAddress) const;
+        const nx::network::SocketAddress& testcameraDiscoverySocketAddress) const;
 
     bool readDiscoveryResponse(
         nx::network::AbstractDatagramSocket* socket,
