@@ -2543,7 +2543,7 @@ void MediaServerProcess::registerRestHandlers(
      *     - the format is auto-detected).
      * %param[opt]:arrayJson filter This parameter is used for Motion and Analytics Search
      *     ("periodsType" must be set to 1 or 2). Search motion or analytics event on a video
-     *     according to the specified attributes values.
+     *     according to the specified attribute values.
      *     <br/>Motion Search Format: string with a JSON list of <i>sensors</i>,
      *     each <i>sensor</i> is a JSON list of <i>rectangles</i>, each <i>rectangle</i> is:
      *     <br/>
@@ -2557,18 +2557,18 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>[[{"x":0,"y":0,"width":43,"height":31}]]</code>
      *     <br/>Example of two rectangles for a single-sensor camera:
      *     <code>[[{"x":0,"y":0,"width":5,"height":7},{"x":12,"y":10,"width":8,"height":6}]]</code>
-     *     <br/>Analytics Search Format: string with a JSON object that might take the following attributes
-     *     as an input:
+     *     <br/>Analytics Search Format: string with a JSON object that might take the following
+     *     attributes as an input:
      *     <br/>
      *     <ul>
-     *     <li>"boundingBox" key represents a <i>rectangle</i>. Value is a dictionary with same format
-     *     as for Motion Search rectangle;</li>
-     *     <li>"freeText" key for full-text search over analytics data attributes. Value is expected to be a
-     *     string with search input;
+     *     <li>"boundingBox" key represents a <i>rectangle</i>. The value is a dictionary with the
+     *     same format as for Motion Search rectangle;</li>
+     *     <li>"freeText" key for full-text search over analytics data attributes. The value is
+     *     expected to be a string with the search input;
      *     </li>
      *     </ul>
-     *     <br/>Example of JSON object:
-     *     <code>{"boundingBox":{"height":0,"width":0.1,"x":0.,"y":1.},"freeText":"Test"}</code>
+     *     <br/>Example of the JSON object:
+     *     <code>{"boundingBox":{"height":0,"width":0.1,"x":0.0,"y":1.0},"freeText":"Test"}</code>
      * %param[proprietary]:enum format Data format. Default value is "json".
      *     %value ubjson Universal Binary JSON data format.
      *     %value json JSON data format.
@@ -2579,7 +2579,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:integer periodsType Chunk type.
      *     %value 0 All records.
      *     %value 1 Only chunks with motion (parameter "filter" is required).
-     *     %value 2 Only chunks with analytics event(parameter "filter" might be applied).
+     *     %value 2 Only chunks with analytics event (parameter "filter" might be applied).
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
      * %param[opt]:integer limit Maximum number of chunks to return.
