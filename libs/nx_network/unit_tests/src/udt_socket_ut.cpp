@@ -67,15 +67,57 @@ public:
             });
     }
 
+protected:
+    void startSilentUdpServer()
+    {
+        m_udpSocket = std::make_unique<UDPSocket>(AF_INET);
+        ASSERT_TRUE(m_udpSocket->bind(SocketAddress::anyPrivateAddress));
+
+        m_serverEndpoint = m_udpSocket->getLocalAddress();
+    }
+
+    void whenConnectWithTimeout(std::chrono::milliseconds timeout)
+    {
+        initializeClientSocketIfNeeded();
+
+        m_lastConnectResult = m_clientSocket->connect(m_serverEndpoint, timeout)
+            ? SystemError::noError
+            : SystemError::getLastOSErrorCode();
+    }
+
+    void thenConnectFailedWithError(SystemError::ErrorCode expected)
+    {
+        ASSERT_EQ(expected, *m_lastConnectResult);
+    }
+
 private:
     boost::optional<SocketFactory::CreateStreamSocketFuncType> m_createStreamSocketFunc;
     boost::optional<SocketFactory::CreateStreamServerSocketFuncType> m_createStreamServerSocketFunc;
+    std::unique_ptr<UDPSocket> m_udpSocket;
+    std::unique_ptr<UdtStreamSocket> m_clientSocket;
+    SocketAddress m_serverEndpoint;
+    std::optional<SystemError::ErrorCode> m_lastConnectResult;
+
+    void initializeClientSocketIfNeeded()
+    {
+        m_clientSocket = std::make_unique<UdtStreamSocket>(AF_INET);
+    }
 };
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST_F, SocketUdt,
     [](){ return std::make_unique<UdtStreamServerSocket>(AF_INET); },
     [](){ return std::make_unique<UdtStreamSocket>(AF_INET); })
+
+//-------------------------------------------------------------------------------------------------
+
+TEST_F(SocketUdt, connect_timeout)
+{
+    startSilentUdpServer();
+
+    whenConnectWithTimeout(std::chrono::milliseconds(1));
+    thenConnectFailedWithError(SystemError::timedOut);
+}
 
 //-------------------------------------------------------------------------------------------------
 

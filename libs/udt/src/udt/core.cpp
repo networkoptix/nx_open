@@ -118,8 +118,8 @@ CUDT::CUDT(const CUDT& ancestor):
     m_iSockType = ancestor.m_iSockType;
     m_iIPversion = ancestor.m_iIPversion;
     m_bRendezvous = ancestor.m_bRendezvous;
-    m_iSndTimeOut = ancestor.m_iSndTimeOut;
-    m_iRcvTimeOut = ancestor.m_iRcvTimeOut;
+    m_sendTimeout = ancestor.m_sendTimeout;
+    m_recvTimeout = ancestor.m_recvTimeout;
     m_bReuseAddr = true;    // this must be true, because all accepted sockets shared the same port with the listener
     m_llMaxBW = ancestor.m_llMaxBW;
 
@@ -288,11 +288,11 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
             break;
 
         case UDT_SNDTIMEO:
-            m_iSndTimeOut = std::chrono::milliseconds(*(int*)optval);
+            m_sendTimeout = std::chrono::milliseconds(*(int*)optval);
             break;
 
         case UDT_RCVTIMEO:
-            m_iRcvTimeOut = std::chrono::milliseconds(*(int*)optval);
+            m_recvTimeout = std::chrono::milliseconds(*(int*)optval);
             break;
 
         case UDT_REUSEADDR:
@@ -380,12 +380,12 @@ Result<> CUDT::getOpt(UDTOpt optName, void* optval, int& optlen)
             break;
 
         case UDT_SNDTIMEO:
-            *(int*)optval = m_iSndTimeOut.count();
+            *(int*)optval = m_sendTimeout.count();
             optlen = sizeof(int);
             break;
 
         case UDT_RCVTIMEO:
-            *(int*)optval = m_iRcvTimeOut.count();
+            *(int*)optval = m_recvTimeout.count();
             optlen = sizeof(int);
             break;
 
@@ -558,8 +558,6 @@ Result<> CUDT::listen()
     return success();
 }
 
-static constexpr auto kDefaultConnectTimeout = std::chrono::seconds(3);
-
 Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
 {
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
@@ -582,12 +580,14 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
     // register this socket in the rendezvous queue
     // RendezevousQueue is used to temporarily store incoming handshake, non-rendezvous connections also require this function
     std::optional<std::chrono::microseconds> deadline;
+    if (m_sendTimeout > std::chrono::milliseconds::zero())
+        deadline = CTimer::getTime() + m_sendTimeout;
+    // else no timeout.
 
-    deadline = kDefaultConnectTimeout;
-    if (m_bRendezvous)
-        *deadline *= 10;
-    *deadline += CTimer::getTime();
-    rcvQueue().registerConnector(m_SocketId, shared_from_this(), serv_addr, *deadline);
+    rcvQueue().registerConnector(
+        m_SocketId, shared_from_this(),
+        serv_addr,
+        deadline ? *deadline : std::chrono::microseconds::max());
 
     // This is my current configurations
     m_ConnReq.m_iVersion = m_iVersion;
@@ -640,7 +640,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
     Error error(OsErrorCode::ok);
     Result<> internalConnectResult;
 
-    while (!isClosing())
+    while (!isClosing() && !broken())
     {
         // avoid sending too many requests, at most 1 request per 250ms
         if (CTimer::getTime() - m_llLastReqTime > kSyncRepeatMinPeriod)
@@ -653,8 +653,16 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
             m_llLastReqTime = CTimer::getTime();
         }
 
+        std::chrono::microseconds recvTimeout = CRcvQueue::kDefaultRecvTimeout;
+        if (deadline)
+        {
+            recvTimeout = std::min(
+                std::max(*deadline - CTimer::getTime(), std::chrono::microseconds::zero()),
+                recvTimeout);
+        }
+
         response.setLength(m_iPayloadSize);
-        if (rcvQueue().recvfrom(m_SocketId, response) > 0)
+        if (rcvQueue().recvfrom(m_SocketId, response, recvTimeout) > 0)
         {
             auto result = connect(response);
             if (!result.ok())
@@ -1038,7 +1046,7 @@ Result<int> CUDT::send(const char* data, int len)
         {
             // wait here during a blocking sending
             std::unique_lock<std::mutex> lock(m_SendBlockLock);
-            if (m_iSndTimeOut < std::chrono::milliseconds::zero())
+            if (m_sendTimeout < std::chrono::milliseconds::zero())
             {
                 while (!m_bBroken && m_bConnected && !isClosing() &&
                     (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth)
@@ -1048,7 +1056,7 @@ Result<int> CUDT::send(const char* data, int len)
             }
             else
             {
-                const auto exptime = CTimer::getTime() + m_iSndTimeOut;
+                const auto exptime = CTimer::getTime() + m_sendTimeout;
                 for (auto currentTime = CTimer::getTime();
                     !m_bBroken && m_bConnected && !isClosing() &&
                         (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) &&
@@ -1079,7 +1087,7 @@ Result<int> CUDT::send(const char* data, int len)
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
-        if (m_iSndTimeOut >= std::chrono::milliseconds::zero())
+        if (m_sendTimeout >= std::chrono::milliseconds::zero())
             return Error(OsErrorCode::timedOut);
 
         return success(0);
@@ -1132,14 +1140,14 @@ Result<int> CUDT::recv(char* data, int len)
         else
         {
             std::unique_lock<std::mutex> lock(m_RecvDataLock);
-            if (m_iRcvTimeOut < std::chrono::milliseconds::zero())
+            if (m_recvTimeout < std::chrono::milliseconds::zero())
             {
                 while (!m_bBroken && m_bConnected && !isClosing() && (0 == m_pRcvBuffer->getRcvDataSize()))
                     m_RecvDataCond.wait(lock);
             }
             else
             {
-                const auto exptime = CTimer::getTime() + m_iRcvTimeOut;
+                const auto exptime = CTimer::getTime() + m_recvTimeout;
                 for (auto currentTime = CTimer::getTime();
                     !m_bBroken && m_bConnected && !isClosing() &&
                         (0 == m_pRcvBuffer->getRcvDataSize()) && currentTime < exptime;
@@ -1164,7 +1172,7 @@ Result<int> CUDT::recv(char* data, int len)
         s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_IN, false);
     }
 
-    if ((res <= 0) && (m_iRcvTimeOut >= std::chrono::milliseconds::zero()))
+    if ((res <= 0) && (m_recvTimeout >= std::chrono::milliseconds::zero()))
         return Error(OsErrorCode::timedOut);
 
     return success(res);
@@ -1204,7 +1212,7 @@ Result<int> CUDT::sendmsg(const char* data, int len, std::chrono::milliseconds t
         {
             // wait here during a blocking sending
             std::unique_lock<std::mutex> lock(m_SendBlockLock);
-            if (m_iSndTimeOut < std::chrono::milliseconds::zero())
+            if (m_sendTimeout < std::chrono::milliseconds::zero())
             {
                 while (!m_bBroken && m_bConnected && !isClosing() &&
                     ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len))
@@ -1214,7 +1222,7 @@ Result<int> CUDT::sendmsg(const char* data, int len, std::chrono::milliseconds t
             }
             else
             {
-                const auto exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
+                const auto exptime = CTimer::getTime() + m_sendTimeout * 1000ULL;
                 for (auto currentTime = CTimer::getTime();
                     !m_bBroken && m_bConnected && !isClosing() &&
                         ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len) &&
@@ -1236,7 +1244,7 @@ Result<int> CUDT::sendmsg(const char* data, int len, std::chrono::milliseconds t
 
     if ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len)
     {
-        if (m_iSndTimeOut >= std::chrono::milliseconds::zero())
+        if (m_sendTimeout >= std::chrono::milliseconds::zero())
             return Error(OsErrorCode::timedOut);
 
         return success(0);
@@ -1305,7 +1313,7 @@ Result<int> CUDT::recvmsg(char* data, int len)
     do
     {
         std::unique_lock<std::mutex> lock(m_RecvDataLock);
-        if (m_iRcvTimeOut < std::chrono::milliseconds::zero())
+        if (m_recvTimeout < std::chrono::milliseconds::zero())
         {
             while (!m_bBroken && m_bConnected && !isClosing() &&
                 (0 == (res = m_pRcvBuffer->readMsg(data, len))))
@@ -1315,7 +1323,7 @@ Result<int> CUDT::recvmsg(char* data, int len)
         }
         else
         {
-            if (m_RecvDataCond.wait_for(lock, std::chrono::milliseconds(m_iRcvTimeOut)) ==
+            if (m_RecvDataCond.wait_for(lock, std::chrono::milliseconds(m_recvTimeout)) ==
                 std::cv_status::timeout)
             {
                 timeout = true;
@@ -1337,7 +1345,7 @@ Result<int> CUDT::recvmsg(char* data, int len)
         s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_IN, false);
     }
 
-    if ((res <= 0) && (m_iRcvTimeOut >= std::chrono::milliseconds::zero()))
+    if ((res <= 0) && (m_recvTimeout >= std::chrono::milliseconds::zero()))
         return Error(OsErrorCode::timedOut);
 
     return success(res);

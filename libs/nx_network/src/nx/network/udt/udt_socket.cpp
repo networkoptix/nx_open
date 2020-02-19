@@ -738,19 +738,14 @@ void UdtStreamSocket::cancelIoInAioThread(aio::EventType eventType)
 
 bool UdtStreamSocket::connectToIp(
     const SocketAddress& remoteAddress,
-    std::chrono::milliseconds /*timeout*/)
+    std::chrono::milliseconds timeout)
 {
-    // TODO: #ak use timeoutMs.
-
     NX_ASSERT(m_state == detail::SocketState::open);
 
     const SystemSocketAddress addr(remoteAddress, m_ipVersion);
     if (!addr.get())
         return false;
 
-    // The official documentation doesn't advice using select but here we just need
-    // to wait on a single socket fd, select is way more faster than epoll on linux
-    // since epoll needs to create the internal structure inside of kernel.
     bool nbk_sock = false;
     if (!getNonBlockingMode(&nbk_sock))
         return false;
@@ -759,7 +754,18 @@ bool UdtStreamSocket::connectToIp(
         if (!setNonBlockingMode(nbk_sock))
             return false;
     }
+
+    // Saving current send timeout and setting connect timeout.
+    unsigned int sendTimeoutBak = 0;
+    if (!getSendTimeout(&sendTimeoutBak) || !setSendTimeout(timeout.count()))
+        return false;
+
     int ret = UDT::connect(m_impl->udtHandle, addr.get(), addr.length());
+
+    // Restoring send timeout.
+    if (!setSendTimeout(sendTimeoutBak))
+        return false;
+
     // The UDT connect will always return zero even if such operation is async which is
     // different with the existed Posix/Win32 socket design. So if we meet an non-zero
     // value, the only explanation is an error happened which cannot be solved.
@@ -769,6 +775,7 @@ bool UdtStreamSocket::connectToIp(
         detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
+
     m_state = detail::SocketState::connected;
     m_isInternetConnection = !getForeignAddress().address.isLocalNetwork();
     return true;
