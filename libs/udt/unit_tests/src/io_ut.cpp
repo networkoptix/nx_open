@@ -165,7 +165,7 @@ protected:
         ASSERT_EQ(0, bind(m_udpServer, localAddress.get(), localAddress.size()));
         ASSERT_EQ(0, getsockname(
             m_udpServer,
-            m_rawUdpReceiverAddress.get(), (int*)&m_rawUdpReceiverAddress.length()));
+            m_rawUdpReceiverAddress.get(), &m_rawUdpReceiverAddress.length()));
 
         m_rawUdpReceiverThread =
             std::thread([this]() { rawUdpReceiverFunc(); });
