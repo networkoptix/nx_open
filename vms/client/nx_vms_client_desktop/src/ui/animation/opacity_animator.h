@@ -7,4 +7,5 @@ class QGraphicsObject;
 
 bool hasOpacityAnimator(QGraphicsObject* item);
 VariantAnimator* takeOpacityAnimator(QGraphicsObject* item);
-VariantAnimator* opacityAnimator(QGraphicsObject* item, qreal speed = 1.0);
+VariantAnimator* opacityAnimator(
+    QGraphicsObject* item, qreal speed = 1.0, bool controlVisibility = false);
