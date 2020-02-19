@@ -431,6 +431,7 @@ BaseFigure::BaseFigure(const QString& figureType, QObject* parent):
     {
         const QString propertyKey = it.key();
 
+        const static QStringList kNullableFields = { "figure", "points" };
         if ((it->isNull() || it->isUndefined()) && !kNullableFields.contains(propertyKey))
             continue;
 
