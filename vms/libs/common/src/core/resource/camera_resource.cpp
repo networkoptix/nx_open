@@ -785,7 +785,7 @@ void QnVirtualCameraResource::setAnalyzedStreamIndex(
 
     bool success = false;
     auto analyzedStreamIndexMap = QJson::deserialized(
-        serializedProperty.toUtf8(), AnalyzedStreamIndexMap());
+        serializedProperty.toUtf8(), AnalyzedStreamIndexMap(), &success);
 
     if (!success && !serializedProperty.isEmpty())
     {
