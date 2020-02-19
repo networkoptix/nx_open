@@ -82,7 +82,7 @@ void CUDTSocket::removeEPoll(const int eid)
 CUDTUnited::CUDTUnited()
 {
     // Socket ID MUST start from a random value
-    srand((unsigned int)CTimer::getTime());
+    srand(CTimer::getTime().count());
     m_SocketId = 1 + (int)((1 << 30) * (double(rand()) / RAND_MAX));
 
     m_cache = std::make_unique<CCache<CInfoBlock>>();
@@ -675,13 +675,13 @@ Result<> CUDTUnited::getsockname(const UDTSOCKET u, sockaddr* name, int* namelen
 
 Result<int> CUDTUnited::select(ud_set* readfds, ud_set* writefds, ud_set* exceptfds, const timeval* timeout)
 {
-    uint64_t entertime = CTimer::getTime();
+    const auto entertime = CTimer::getTime();
 
-    uint64_t to;
+    std::chrono::microseconds to;
     if (nullptr == timeout)
-        to = 0xFFFFFFFFFFFFFFFFULL;
+        to = std::chrono::microseconds::max();
     else
-        to = timeout->tv_sec * 1000000 + timeout->tv_usec;
+        to = std::chrono::microseconds(timeout->tv_sec * 1000000 + timeout->tv_usec);
 
     // initialize results
     int count = 0;
@@ -805,13 +805,13 @@ Result<int> CUDTUnited::selectEx(
     vector<UDTSOCKET>* exceptfds,
     int64_t msTimeOut)
 {
-    uint64_t entertime = CTimer::getTime();
+    const auto entertime = CTimer::getTime();
 
-    uint64_t to;
+    std::chrono::microseconds to;
     if (msTimeOut >= 0)
-        to = msTimeOut * 1000;
+        to = std::chrono::milliseconds(msTimeOut);
     else
-        to = 0xFFFFFFFFFFFFFFFFULL;
+        to = std::chrono::microseconds::max();
 
     // initialize results
     int count = 0;
@@ -959,6 +959,8 @@ std::shared_ptr<CUDTSocket> CUDTUnited::locate(
     return nullptr;
 }
 
+static constexpr std::chrono::microseconds kSomeUnclearTimeout = std::chrono::seconds(3);
+
 void CUDTUnited::checkBrokenSockets()
 {
     std::unique_lock<std::mutex> cg(m_ControlLock);
@@ -975,7 +977,7 @@ void CUDTUnited::checkBrokenSockets()
             if (i->second->m_Status == LISTENING)
             {
                 // for a listening socket, it should wait an extra 3 seconds in case a client is connecting
-                if (CTimer::getTime() - i->second->m_TimeStamp < 3000000)
+                if (CTimer::getTime() - i->second->m_TimeStamp < kSomeUnclearTimeout)
                     continue;
             }
             else if ((i->second->m_pUDT->rcvBuffer() != nullptr)
@@ -1016,21 +1018,23 @@ void CUDTUnited::checkBrokenSockets()
 
     for (auto j = m_ClosedSockets.begin(); j != m_ClosedSockets.end(); ++j)
     {
-        if (j->second->m_pUDT->lingerExpiration() > 0)
+        if (j->second->m_pUDT->lingerExpiration() > std::chrono::microseconds::zero())
         {
             // asynchronous close:
             if ((nullptr == j->second->m_pUDT->sndBuffer())
                 || (0 == j->second->m_pUDT->sndBuffer()->getCurrBufSize())
                 || (j->second->m_pUDT->lingerExpiration() <= CTimer::getTime()))
             {
-                j->second->m_pUDT->setLingerExpiration(0);
+                j->second->m_pUDT->setLingerExpiration(std::chrono::microseconds::zero());
                 j->second->m_pUDT->setIsClosing(true);
                 j->second->m_TimeStamp = CTimer::getTime();
             }
         }
 
+        static constexpr auto kDestroyTimeout = std::chrono::seconds(1);
+
         // timeout 1 second to destroy a socket AND it has been removed from RcvUList
-        if (CTimer::getTime() - j->second->m_TimeStamp > 1000000)
+        if (CTimer::getTime() - j->second->m_TimeStamp > kDestroyTimeout)
             tbr.push_back(j->first);
     }
 
@@ -1283,7 +1287,7 @@ void CUDTUnited::garbageCollect()
         m_Sockets.clear();
 
         for (auto j = m_ClosedSockets.begin(); j != m_ClosedSockets.end(); ++j)
-            j->second->m_TimeStamp = 0;
+            j->second->m_TimeStamp = std::chrono::microseconds::zero();
     }
 
     for (;;)

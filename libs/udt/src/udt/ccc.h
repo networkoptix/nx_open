@@ -146,7 +146,7 @@ protected:
     // Returned value:
     //    None.
 
-    void setACKTimer(int msINT);
+    void setACKTimer(std::chrono::microseconds msINT);
 
     // Functionality:
     //    Set packet-based acknowldging and the number of packets to send an ACK.
@@ -159,12 +159,10 @@ protected:
 
     // Functionality:
     //    Set RTO value.
-    // Parameters:
-    //    0) [in] msRTO: RTO in macroseconds.
     // Returned value:
     //    None.
 
-    void setRTO(int usRTO);
+    void setRTO(std::chrono::microseconds usRTO);
 
     // Functionality:
     //    Send a user defined control packet.
@@ -200,10 +198,10 @@ private:
     void setBandwidth(int bw);
     void setSndCurrSeqNo(int32_t seqno);
     void setRcvRate(int rcvrate);
-    void setRTT(int rtt);
+    void setRTT(std::chrono::microseconds rtt);
 
 protected:
-    const int32_t& m_iSYNInterval;    // UDT constant parameter, SYN
+    const std::chrono::microseconds m_iSYNInterval;    // UDT constant parameter, SYN
 
     double m_dPktSndPeriod;              // Packet sending period, in microseconds
     double m_dCWndSize;                  // Congestion window size, in packets
@@ -214,7 +212,7 @@ protected:
     int m_iMSS;                // Maximum Packet Size, including all packet headers
     int32_t m_iSndCurrSeqNo;        // current maximum seq no sent out
     int m_iRcvRate;            // packet arrive rate at receiver side, packets per second
-    int m_iRTT;                // current estimated RTT, microsecond
+    std::chrono::microseconds m_iRTT;                // current estimated RTT, microsecond
 
     char* m_pcParam;            // user defined parameter
     int m_iPSize;            // size of m_pcParam
@@ -222,11 +220,11 @@ protected:
 private:
     UDTSOCKET m_UDT;                     // The UDT entity that this congestion control algorithm is bound to
 
-    int m_iACKPeriod;                    // Periodical timer to send an ACK, in milliseconds
+    std::chrono::microseconds m_iACKPeriod = std::chrono::microseconds::zero();                    // Periodical timer to send an ACK
     int m_iACKInterval;                  // How many packets to send one ACK, in packets
 
     bool m_bUserDefinedRTO;              // if the RTO value is defined by users
-    int m_iRTO;                          // RTO value, microseconds
+    std::chrono::microseconds m_iRTO;                          // RTO value, microseconds
 
     CPerfMon m_PerfInfo;                 // protocol statistics information
 };
@@ -262,8 +260,8 @@ public:
     virtual void onTimeout();
 
 private:
-    int m_iRCInterval;            // UDT Rate control interval
-    uint64_t m_LastRCTime;        // last rate increase time
+    std::chrono::microseconds m_iRCInterval = std::chrono::microseconds::zero();            // UDT Rate control interval
+    std::chrono::microseconds m_LastRCTime = std::chrono::microseconds::zero();        // last rate increase time
     bool m_bSlowStart;            // if in slow start phase
     int32_t m_iLastAck;            // last ACKed seq no
     bool m_bLoss;            // if loss happened since last rate increase

@@ -55,6 +55,8 @@ Yunhong Gu, last updated 01/12/2011
 #include "common.h"
 #include "packet.h"
 
+static constexpr auto kSyncRepeatMinPeriod = std::chrono::milliseconds(250);
+
 class CUDT;
 
 struct CUnit
@@ -145,7 +147,7 @@ private:
 struct CSNode
 {
     std::weak_ptr<CUDT> socket;
-    uint64_t timestamp = 0;
+    std::chrono::microseconds timestamp = std::chrono::microseconds::zero();
 
     // -1 means not on the heap.
     int locationOnHeap = -1;
@@ -198,12 +200,12 @@ public:
     // Returned value:
     //    Scheduled processing time of the first UDT socket in the list.
 
-    uint64_t getNextProcTime();
+    std::chrono::microseconds getNextProcTime();
 
     int lastEntry() const { return m_iLastEntry; }
 
 private:
-    void insert_(int64_t ts, std::shared_ptr<CUDT> u);
+    void insert_(std::chrono::microseconds ts, std::shared_ptr<CUDT> u);
     void remove_(CSNode* n);
 
 private:
@@ -232,7 +234,7 @@ struct CRNode
 {
     UDTSOCKET socketId = -1;
     std::weak_ptr<CUDT> socket;
-    uint64_t timestamp = 0;
+    std::chrono::microseconds timestamp = std::chrono::microseconds::zero();
 
     CRNode* prev = nullptr;
     CRNode* next = nullptr;
@@ -307,7 +309,7 @@ public:
         const UDTSOCKET& id,
         std::weak_ptr<CUDT> u,
         const detail::SocketAddress& addr,
-        uint64_t ttl);
+        std::chrono::microseconds ttl);
 
     void remove(const UDTSOCKET& id);
 
@@ -325,7 +327,7 @@ private:
         // UDT sonnection peer address
         detail::SocketAddress peerAddr;
         // the time that this request expires
-        uint64_t ttl = 0;
+        std::chrono::microseconds ttl = std::chrono::microseconds::zero();
 
         CRL();
     };
@@ -419,7 +421,7 @@ public:
         const UDTSOCKET& id,
         std::shared_ptr<CUDT> u,
         const detail::SocketAddress& addr,
-        uint64_t ttl);
+        std::chrono::microseconds ttl);
 
     void removeConnector(const UDTSOCKET& id);
 

@@ -48,14 +48,13 @@ using namespace std;
 CACKWindow::CACKWindow(int size):
     m_piACKSeqNo(NULL),
     m_piACK(NULL),
-    m_pTimeStamp(NULL),
     m_iSize(size),
     m_iHead(0),
     m_iTail(0)
 {
     m_piACKSeqNo = new int32_t[m_iSize];
     m_piACK = new int32_t[m_iSize];
-    m_pTimeStamp = new uint64_t[m_iSize];
+    m_pTimestamp.resize(m_iSize);
 
     m_piACKSeqNo[0] = -1;
 }
@@ -64,14 +63,13 @@ CACKWindow::~CACKWindow()
 {
     delete[] m_piACKSeqNo;
     delete[] m_piACK;
-    delete[] m_pTimeStamp;
 }
 
 void CACKWindow::store(int32_t seq, int32_t ack)
 {
     m_piACKSeqNo[m_iHead] = seq;
     m_piACK[m_iHead] = ack;
-    m_pTimeStamp[m_iHead] = CTimer::getTime();
+    m_pTimestamp[m_iHead] = CTimer::getTime();
 
     m_iHead = (m_iHead + 1) % m_iSize;
 
@@ -95,7 +93,7 @@ int CACKWindow::acknowledge(int32_t seq, int32_t& ack)
                 ack = m_piACK[i];
 
                 // calculate RTT
-                int rtt = int(CTimer::getTime() - m_pTimeStamp[i]);
+                int rtt = (int) (CTimer::getTime() - m_pTimestamp[i]).count();
 
                 if (i + 1 == m_iHead)
                 {
@@ -124,7 +122,7 @@ int CACKWindow::acknowledge(int32_t seq, int32_t& ack)
             ack = m_piACK[j];
 
             // calculate RTT
-            int rtt = int(CTimer::getTime() - m_pTimeStamp[j]);
+            int rtt = (int) (CTimer::getTime() - m_pTimestamp[j]).count();
 
             if (j == m_iHead)
             {
@@ -152,10 +150,7 @@ CPktTimeWindow::CPktTimeWindow(int asize, int psize):
     m_piProbeWindow(NULL),
     m_iProbeWindowPtr(0),
     m_iLastSentTime(0),
-    m_iMinPktSndInt(1000000),
-    m_LastArrTime(),
-    m_CurrArrTime(),
-    m_ProbeTime()
+    m_iMinPktSndInt(1000000)
 {
     m_piPktWindow = new int[m_iAWSize];
     m_piPktReplica = new int[m_iAWSize];
@@ -257,7 +252,7 @@ void CPktTimeWindow::onPktArrival()
     m_CurrArrTime = CTimer::getTime();
 
     // record the packet interval between the current and the last one
-    *(m_piPktWindow + m_iPktWindowPtr) = int(m_CurrArrTime - m_LastArrTime);
+    *(m_piPktWindow + m_iPktWindowPtr) = (int) (m_CurrArrTime - m_LastArrTime).count();
 
     // the window is logically circular
     ++m_iPktWindowPtr;
@@ -278,7 +273,7 @@ void CPktTimeWindow::probe2Arrival()
     m_CurrArrTime = CTimer::getTime();
 
     // record the probing packets interval
-    *(m_piProbeWindow + m_iProbeWindowPtr) = int(m_CurrArrTime - m_ProbeTime);
+    *(m_piProbeWindow + m_iProbeWindowPtr) = (int) (m_CurrArrTime - m_ProbeTime).count();
     // the window is logically circular
     ++m_iProbeWindowPtr;
     if (m_iProbeWindowPtr == m_iPWSize)

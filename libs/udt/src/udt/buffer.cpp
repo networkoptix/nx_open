@@ -104,7 +104,7 @@ CSndBuffer::~CSndBuffer()
     }
 }
 
-void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
+void CSndBuffer::addBuffer(const char* data, int len, std::chrono::milliseconds ttl, bool order)
 {
     int size = len / m_iMSS;
     if ((len % m_iMSS) != 0)
@@ -114,7 +114,7 @@ void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
     while (size + m_iCount >= m_iSize)
         increase();
 
-    uint64_t time = CTimer::getTime();
+    const auto time = CTimer::getTime();
     int32_t inorder = order;
     inorder <<= 29;
 
@@ -184,7 +184,7 @@ int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
             s->m_iMsgNo |= 0x40000000;
 
         s->m_iLength = pktlen;
-        s->m_iTTL = -1;
+        s->m_iTTL = std::chrono::milliseconds(-1);
         s = s->m_pNext;
 
         total += pktlen;
@@ -227,7 +227,8 @@ int CSndBuffer::readData(char** data, const int offset, int32_t& msgno, int& msg
     for (int i = 0; i < offset; ++i)
         p = p->m_pNext;
 
-    if ((p->m_iTTL >= 0) && ((CTimer::getTime() - p->m_OriginTime) / 1000 >(uint64_t)p->m_iTTL))
+    if ((p->m_iTTL >= std::chrono::milliseconds::zero()) &&
+        ((CTimer::getTime() - p->m_OriginTime) > p->m_iTTL))
     {
         msgno = p->m_iMsgNo & 0x1FFFFFFF;
 
