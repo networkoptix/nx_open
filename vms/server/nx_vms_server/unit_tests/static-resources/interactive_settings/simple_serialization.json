@@ -1,5 +1,6 @@
 {
     "type": "Settings",
+    "filledCheckItems": [],
     "items": [
         {
             "type": "TextField",
@@ -21,6 +22,7 @@
         {
             "type": "GroupBox",
             "caption": "Group",
+            "filledCheckItems": [],
             "items": [
                 {
                     "type": "SpinBox",
@@ -44,6 +46,7 @@
                 },
                 {
                     "type": "Row",
+                    "filledCheckItems": [],
                     "items": [
                         {
                             "type": "Button",
