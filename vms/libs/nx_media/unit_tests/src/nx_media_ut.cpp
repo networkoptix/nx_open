@@ -188,19 +188,22 @@ public:
         return m_videoLayout;
     }
 
-    /** Either resolution can be empty - the corresponding stream will not be created. */
-    void setStreams(QSize highResolution, QSize lowResolution)
+    /**
+     * Either resolution can be missing - the corresponding stream will not be created.
+     */
+    void setStreams(
+        const std::optional<QSize>& highResolution, const std::optional<QSize>& lowResolution)
     {
         setProperty(ResourcePropertyKey::kMediaStreams, QString());
 
         // For mock camera, use a codec that will never match any reasonable transcoding codec.
         static const int kCodec = /*102400*/ AV_CODEC_ID_PROBE;
 
-        const QString highStr = highResolution.isEmpty()
+        const QString highStr = !highResolution
             ? ""
             : lit("{\"encoderIndex\":0, \"resolution\":\"%1x%2\", \"codec\":%3}")
                 .arg(highResolution.width()).arg(highResolution.height()).arg(kCodec);
-        const QString lowStr = lowResolution.isEmpty()
+        const QString lowStr = !lowResolution
             ? ""
             : lit("{\"encoderIndex\":1, \"resolution\":\"%1x%2\", \"codec\":%3}")
                 .arg(lowResolution.width()).arg(lowResolution.height()).arg(kCodec);
@@ -210,8 +213,8 @@ public:
         setProperty(ResourcePropertyKey::kMediaStreams, json);
 
         const int expectedStreamsCount =
-            int(!lowResolution.isEmpty()) + int(!highResolution.isEmpty());
-        if ((size_t)expectedStreamsCount != mediaStreams().streams.size())
+            (int) lowResolution.has_value() + (int) highResolution.has_value();
+        if ((size_t) expectedStreamsCount != mediaStreams().streams.size())
         {
             NX_INFO(this, lit(
                 "INTERNAL ERROR: Failed adding camera streams: expected %1, actual %2")
@@ -303,8 +306,8 @@ public:
     bool serverSupportsTranscoding = true;
     QSize maxTranscodingResolution;
     QSize maxDecoderResolution;
-    QSize highStreamResolution;
-    QSize lowStreamResolution;
+    std::optional<QSize> highStreamResolution;
+    std::optional<QSize> lowStreamResolution;
     int videoQuality = Player::UnknownVideoQuality;
     media_player_quality_chooser::Result expectedQuality;
 
@@ -394,10 +397,16 @@ public:
                 break;
             case Player::LowVideoQuality:
             case Player::LowIframesOnlyVideoQuality:
-                expectedQuality = Result(quality, lowStreamResolution);
+                expectedQuality = Result(quality,
+                    (lowStreamResolution && lowStreamResolution->isValid())
+                        ? *lowStreamResolution
+                        : QSize());
                 break;
             case Player::HighVideoQuality:
-                expectedQuality = Result(quality, highStreamResolution);
+                expectedQuality = Result(quality,
+                    (highStreamResolution && highStreamResolution->isValid())
+                        ? *highStreamResolution
+                        : QSize());
                 break;
             default:
                 NX_ASSERT(false, "To set custom quality use explicit Result.");

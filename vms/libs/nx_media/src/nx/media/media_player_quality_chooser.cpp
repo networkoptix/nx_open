@@ -31,9 +31,9 @@ static const int kHeightRoundingFactor = 4;
 struct Streams
 {
     QSize highResolution;
-    AVCodecID highCodec;
+    AVCodecID highCodec = AV_CODEC_ID_NONE;
     QSize lowResolution;
-    AVCodecID lowCodec;
+    AVCodecID lowCodec = AV_CODEC_ID_NONE;
 };
 
 /**
@@ -301,20 +301,23 @@ Result chooseVideoQuality(const int videoQuality, const Input& input)
     if (videoQuality == Player::HighVideoQuality
         && streams.highCodec != AV_CODEC_ID_NONE && !streams.highResolution.isValid())
     {
-        return {Player::HighVideoQuality, QSize()};
+        NX_DEBUG(kLogTag, "High stream requested but high stream resolution is unknown.");
+        result = {Player::HighVideoQuality, QSize()};
     }
-
     // If low requested, low stream exists but has an unknown resolution, return low.
-    if (videoQuality == Player::LowVideoQuality
+    else if (videoQuality == Player::LowVideoQuality
         && streams.lowCodec != AV_CODEC_ID_NONE && !streams.lowResolution.isValid())
     {
-        return {Player::LowVideoQuality, QSize()};
+        NX_DEBUG(kLogTag, "Low stream requested but low stream resolution is unknown.");
+        result = {Player::LowVideoQuality, QSize()};
     }
+    else
+    {
+        result = choosePreferredQuality(streams, videoQuality, input);
 
-    Result result = choosePreferredQuality(streams, videoQuality, input);
-
-    if (result.quality == Player::LowVideoQuality)
-        result = chooseFallbackQuality(streams, input);
+        if (result.quality == Player::LowVideoQuality)
+            result = chooseFallbackQuality(streams, input);
+    }
 
     NX_DEBUG(kLogTag, lm("Requested %1 => Set %2").args(
         qualityString(videoQuality), qualityString(result)));
