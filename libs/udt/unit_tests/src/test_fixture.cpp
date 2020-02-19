@@ -23,6 +23,11 @@ void BasicFixture::setIpVersion(int ipVersion)
     m_ipVersion = ipVersion;
 }
 
+int BasicFixture::ipVersion() const
+{
+    return m_ipVersion;
+}
+
 void BasicFixture::givenListeningServerSocket()
 {
     m_serverSocket = UDT::socket(m_ipVersion, SOCK_STREAM, 0);
@@ -90,9 +95,14 @@ void BasicFixture::closeServerSocket()
     m_serverSocket = -1;
 }
 
-void BasicFixture::givenConnectingClientSocket()
+void BasicFixture::givenClientSocket()
 {
     m_clientSocket = UDT::socket(m_ipVersion, SOCK_STREAM, 0);
+}
+
+void BasicFixture::givenConnectingClientSocket()
+{
+    givenClientSocket();
 
     enableNonBlockingMode(m_clientSocket);
 
@@ -101,7 +111,7 @@ void BasicFixture::givenConnectingClientSocket()
 
 void BasicFixture::givenConnectedClientSocket()
 {
-    m_clientSocket = UDT::socket(m_ipVersion, SOCK_STREAM, 0);
+    givenClientSocket();
 
     connectToServer();
 }
