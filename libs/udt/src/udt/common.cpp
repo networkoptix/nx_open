@@ -172,7 +172,7 @@ void CTimer::rdtsc(uint64_t &x)
 {
     if (m_bUseMicroSecond)
     {
-        x = getTime();
+        x = getTime().count();
         return;
     }
 
@@ -197,12 +197,12 @@ void CTimer::rdtsc(uint64_t &x)
     BOOL ret = QueryPerformanceCounter((LARGE_INTEGER *)&x);
     //SetThreadAffinityMask(hCurThread, dwOldMask);
     if (!ret)
-        x = getTime() * s_ullCPUFrequency;
+        x = getTime().count() * s_ullCPUFrequency;
 #elif defined(__APPLE__)
     x = mach_absolute_time();
 #else
     // use system call to read time clock for other archs
-    x = getTime();
+    x = getTime().count();
 #endif
 }
 
@@ -246,22 +246,18 @@ uint64_t CTimer::getCPUFrequency()
     return s_ullCPUFrequency;
 }
 
-void CTimer::sleep(uint64_t interval)
+void CTimer::sleep(std::chrono::microseconds interval)
 {
-    uint64_t t;
-    rdtsc(t);
-
     // sleep next "interval" time
-    sleepto(t + interval);
+    sleepto(getTime() + interval);
 }
 
-void CTimer::sleepto(uint64_t nexttime)
+void CTimer::sleepto(std::chrono::microseconds nexttime)
 {
     // Use class member such that the method can be interrupted by others
     m_ullSchedTime = nexttime;
 
-    uint64_t t;
-    rdtsc(t);
+    auto t = CTimer::getTime();
 
     while (t < m_ullSchedTime)
     {
@@ -283,14 +279,14 @@ void CTimer::sleepto(uint64_t nexttime)
 #endif
 #endif
 
-        rdtsc(t);
+        t = getTime();
     }
 }
 
 void CTimer::interrupt()
 {
     // schedule the sleepto time to the current CCs, so that it will stop
-    rdtsc(m_ullSchedTime);
+    m_ullSchedTime = getTime();
     tick();
 }
 
@@ -303,7 +299,7 @@ void CTimer::tick()
 #endif
 }
 
-uint64_t CTimer::getTime()
+std::chrono::microseconds CTimer::getTime()
 {
     //For Cygwin and other systems without microsecond level resolution, uncomment the following three lines
     //uint64_t x;
@@ -325,7 +321,7 @@ uint64_t CTimer::getTime()
     clock_gettime(CLOCK_MONOTONIC, &t);
 #endif
 
-    return (uint64_t)t.tv_sec * (uint64_t)1000000 + (uint64_t)(t.tv_nsec / 1000);
+    return std::chrono::microseconds((uint64_t)t.tv_sec * (uint64_t)1000000 + (uint64_t)(t.tv_nsec / 1000));
 #else
     LARGE_INTEGER ccf;
     HANDLE hCurThread = ::GetCurrentThread();
@@ -339,13 +335,13 @@ uint64_t CTimer::getTime()
         {
             //if (m_winVersion.dwMajorVersion < 6)
             //    SetThreadAffinityMask(hCurThread, dwOldMask);
-            return (cc.QuadPart * 1000000ULL / ccf.QuadPart);
+            return std::chrono::microseconds((cc.QuadPart * 1000000ULL / ccf.QuadPart));
         }
     }
 
     //if (m_winVersion.dwMajorVersion < 6)
     //    SetThreadAffinityMask(hCurThread, dwOldMask);
-    return GetTickCount() * 1000ULL;
+    return std::chrono::microseconds(GetTickCount() * 1000ULL);
 #endif
 }
 

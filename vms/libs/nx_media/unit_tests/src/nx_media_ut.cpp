@@ -458,13 +458,17 @@ void PlayerSetQualityTest::test(const TestCase& testCase)
     m_camera->setStreams(testCase.highStreamResolution, testCase.lowStreamResolution);
     m_camera->setChannelCount(testCase.channelCount);
 
+    const std::vector<AbstractVideoDecoder*> currentDecoders{};
+    media_player_quality_chooser::Input input;
+    input.transcodingCodec = MockVideoDecoder::s_transcodingCodec;
+    input.liveMode = true;
+    input.positionMs = -1;
+    input.camera = m_camera;
+    input.allowOverlay = true;
+    input.currentDecoders = &currentDecoders;
+
     const auto& result = media_player_quality_chooser::chooseVideoQuality(
-        MockVideoDecoder::s_transcodingCodec,
-        testCase.videoQuality,
-        true,
-        -1,
-        m_camera,
-        true);
+        testCase.videoQuality, input);
 
     if (result != testCase.expectedQuality)
     {
@@ -522,15 +526,17 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     // High quality requested.
     T.noTrans().low(320, 240).high(1920, 1080).max(1920, 1080).req(high) >> high;
     T.noTrans().low(320, 240).high(1920, 1080).max(1920, 1080).req(1080) >> high;
-    T.noTrans().low(320, 240).high(1920, 1080).max(640, 480)  .req(high) >> low;
+    T.noTrans().low(320, 240).high(1920, 1080).max( 640,  480).req(high) >> low;
     T.noTrans()              .high(2560, 1440).max(1920, 1080).req(high) >> unknown;
     T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(1080) >> high;
-    T          .low(320, 240).high(1280, 720) .max(640, 480)  .req(high) >> low;
+    T          .low(320, 240).high(1280,  720).max( 640,  480).req(high) >> low;
     T          .low(320, 240).high(2560, 1440).max(1920, 1080).req(high) >> QSize(1920, 1080);
+    T          .low( -1,  -1).high(  -1,   -1).max(1920, 1080).req(high) >> high;
 
     // Low quality requested.
     T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(low)  >> low;
     T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(240)  >> low;
+    T          .low( -1,  -1).high(  -1,   -1).max(1920, 1080).req(low)  >> low;
 
     // Invalid video quality.
     T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(-113) >> unknown;

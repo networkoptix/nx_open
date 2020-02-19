@@ -9,6 +9,8 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/math/math.h>
 
+#include "network_settings.h"
+
 namespace nx::network {
 
 class AbstractDatagramSocket;
@@ -30,7 +32,7 @@ public:
     CameraDiscoveryListener(
         const Logger* logger,
         std::function<QByteArray()> obtainDiscoveryResponseMessageFunc,
-        QStringList localInterfacesToListen);
+        NetworkSettings networkSettings);
 
     virtual ~CameraDiscoveryListener();
 
@@ -55,7 +57,7 @@ private:
         nx::network::AbstractDatagramSocket* discoverySocket,
         const nx::network::SocketAddress& serverAddress) const;
 
-    bool obtainDiscoverySocketAddress(nx::network::SocketAddress* outSocketAddress) const;
+    std::optional<nx::network::SocketAddress> obtainDiscoverySocketAddress() const;
 
 protected:
     virtual void run() override;
@@ -63,7 +65,7 @@ protected:
 private:
     const Logger* const m_logger;
     const std::function<QByteArray()> m_obtainDiscoveryResponseMessageFunc;
-    const QStringList m_localInterfacesToListen;
+    const NetworkSettings m_networkSettings;
     std::vector<IpRangeV4> m_allowedIpRanges;
 };
 

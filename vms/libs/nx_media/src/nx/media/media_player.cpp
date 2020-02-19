@@ -81,7 +81,7 @@ static qint64 usecToMsec(qint64 posUsec)
     return posUsec == DATETIME_NOW ? kLivePosition : posUsec / 1000ll;
 }
 
-using QualityInfo = nx::media::media_player_quality_chooser::Result;
+using QualityInfo = media_player_quality_chooser::Result;
 using QualityInfoList = QList<QualityInfo>;
 QList<int> sortOutEqualQualities(QualityInfoList qualities)
 {
@@ -711,14 +711,15 @@ void PlayerPrivate::applyVideoQuality()
         ? dataConsumer->currentVideoDecoders()
         : std::vector<AbstractVideoDecoder*>();
 
-    const auto& result = media_player_quality_chooser::chooseVideoQuality(
-        archiveReader->getTranscodingCodec(),
-        videoQuality,
-        liveMode,
-        positionMs,
-        camera,
-        allowOverlay,
-        currentVideoDecoders);
+    media_player_quality_chooser::Input input;
+    input.transcodingCodec = archiveReader->getTranscodingCodec();
+    input.liveMode = liveMode;
+    input.positionMs = positionMs;
+    input.camera = camera;
+    input.allowOverlay = allowOverlay;
+    input.currentDecoders = &currentVideoDecoders;
+
+    const auto& result = media_player_quality_chooser::chooseVideoQuality(videoQuality, input);
 
     switch (result.quality)
     {
@@ -1243,24 +1244,20 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
     if (!camera)
         return result; //< Setting videoQuality for files is not supported.
 
-    auto getQuality =
-        [&camera,
+    const auto currentDecoders = d->dataConsumer
+        ? d->dataConsumer->currentVideoDecoders()
+        : std::vector<AbstractVideoDecoder*>();
+    const auto getQuality =
+        [input = media_player_quality_chooser::Input{
             transcodingCoded,
-            liveMode = d->liveMode,
-            positionMs = d->positionMs,
-            currentVideoDecoders = d->dataConsumer
-                ? d->dataConsumer->currentVideoDecoders()
-                : std::vector<AbstractVideoDecoder*>()](
-                    int quality)
+            d->liveMode,
+            d->positionMs,
+            camera,
+            /*allowOverlay*/ true,
+            &currentDecoders
+        }](int quality)
         {
-            return media_player_quality_chooser::chooseVideoQuality(
-                transcodingCoded,
-                quality,
-                liveMode,
-                positionMs,
-                camera,
-                true,
-                currentVideoDecoders);
+            return media_player_quality_chooser::chooseVideoQuality(quality, input);
         };
 
     const auto& highQuality = getQuality(HighVideoQuality);

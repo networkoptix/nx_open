@@ -41,6 +41,7 @@ Yunhong Gu, last updated 08/01/2009
 #ifndef __UDT_COMMON_H__
 #define __UDT_COMMON_H__
 
+#include <chrono>
 
 #ifndef _WIN32
 #include <sys/time.h>
@@ -98,7 +99,7 @@ public:
     // Returned value:
     //    None.
 
-    void sleep(uint64_t interval);
+    void sleep(std::chrono::microseconds interval);
 
     // Functionality:
     //    Seelp until CC "nexttime".
@@ -107,7 +108,7 @@ public:
     // Returned value:
     //    None.
 
-    void sleepto(uint64_t nexttime);
+    void sleepto(std::chrono::microseconds nexttime);
 
     // Functionality:
     //    Stop the sleep() or sleepto() methods.
@@ -154,7 +155,7 @@ public:
     // Returned value:
     //    current time in microseconds.
 
-    static uint64_t getTime();
+    static std::chrono::microseconds getTime();
 
     // Functionality:
     //    trigger an event such as new connection, close, new data, etc. for "select" call.
@@ -187,7 +188,7 @@ private:
     uint64_t getTimeInMicroSec();
 
 private:
-    uint64_t m_ullSchedTime;             // next schedulled time
+    std::chrono::microseconds m_ullSchedTime;             // next schedulled time
 
                                          //#ifdef _WIN32
                                          //   OSVERSIONINFO m_winVersion;

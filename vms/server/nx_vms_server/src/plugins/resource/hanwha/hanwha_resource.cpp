@@ -4079,7 +4079,7 @@ QnLiveStreamParams HanwhaResource::liveStreamParams(Qn::ConnectionRole role) con
     result.codec = toHanwhaString(streamCodec(role));
     result.resolution = streamResolution(role);
     result.fps = streamFrameRate(role, QnLiveStreamParams::kFpsNotInitialized);
-    result.bitrateKbps = streamBitrate(role, QnLiveStreamParams());
+    result.bitrateKbps = streamBitrate(role, result);
     return result;
 }
 

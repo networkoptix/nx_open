@@ -188,11 +188,6 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
         return success();
 
     nx::utils::Url url = nx::utils::url::parseUrlFields(m_resource->getUrl());
-    if (!url.query().isEmpty())
-    {
-        closeStream();
-        return error(CameraInvalidParams(lm("Non-empty query: %1").args(url)));
-    }
     url.setQuery(lm("primary=%1&fps=%2").args(
         getRole() == Qn::CR_LiveVideo ? "1" : "0", params.fps));
 

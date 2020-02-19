@@ -17,7 +17,8 @@ namespace aio {
 
 namespace detail { class AioTaskQueue; }
 
-class NX_NETWORK_API AbstractAioThread
+class NX_NETWORK_API AbstractAioThread:
+    public nx::utils::Thread
 {
 public:
     virtual ~AbstractAioThread() = default;
@@ -40,8 +41,7 @@ public:
  *   - Maximum timeout to wait for desired event.
  */
 class NX_NETWORK_API AIOThread:
-    public AbstractAioThread,
-    public nx::utils::Thread
+    public AbstractAioThread
 {
 public:
     /**

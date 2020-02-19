@@ -67,7 +67,9 @@ public:
     // Returned value:
     //    None.
 
-    void addBuffer(const char* data, int len, int ttl = -1, bool order = false);
+    void addBuffer(
+        const char* data, int len,
+        std::chrono::milliseconds ttl = std::chrono::milliseconds(-1), bool order = false);
 
     // Functionality:
     //    Read a block of data from file and insert it into the sending list.
@@ -131,8 +133,8 @@ private:
         int m_iLength;                    // length of the block
 
         int32_t m_iMsgNo;                 // message number
-        uint64_t m_OriginTime;            // original request time
-        int m_iTTL;                       // time to live (milliseconds)
+        std::chrono::microseconds m_OriginTime;            // original request time
+        std::chrono::milliseconds m_iTTL;                       // time to live (milliseconds)
 
         Block* m_pNext;                   // next block
     } *m_pBlock, *m_pFirstBlock, *m_pCurrBlock, *m_pLastBlock;
@@ -165,8 +167,6 @@ private:
 
 class CRcvBuffer
 {
-    friend class CUDT;
-
 public:
     CRcvBuffer(CUnitQueue* queue, int bufsize = 65536);
     ~CRcvBuffer();

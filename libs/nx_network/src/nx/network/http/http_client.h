@@ -66,6 +66,7 @@ public:
     SystemError::ErrorCode lastSysErrorCode() const;
     bool isValid() const;
     bool eof() const;
+    bool hasRequestSucceeded() const;
 
     /**
      * Retrieve the currently accumulated message body, removing it from the internal buffer.

@@ -104,7 +104,7 @@ CSndBuffer::~CSndBuffer()
     }
 }
 
-void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
+void CSndBuffer::addBuffer(const char* data, int len, std::chrono::milliseconds ttl, bool order)
 {
     int size = len / m_iMSS;
     if ((len % m_iMSS) != 0)
@@ -114,7 +114,7 @@ void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
     while (size + m_iCount >= m_iSize)
         increase();
 
-    uint64_t time = CTimer::getTime();
+    const auto time = CTimer::getTime();
     int32_t inorder = order;
     inorder <<= 29;
 
@@ -184,7 +184,7 @@ int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
             s->m_iMsgNo |= 0x40000000;
 
         s->m_iLength = pktlen;
-        s->m_iTTL = -1;
+        s->m_iTTL = std::chrono::milliseconds(-1);
         s = s->m_pNext;
 
         total += pktlen;
@@ -227,7 +227,8 @@ int CSndBuffer::readData(char** data, const int offset, int32_t& msgno, int& msg
     for (int i = 0; i < offset; ++i)
         p = p->m_pNext;
 
-    if ((p->m_iTTL >= 0) && ((CTimer::getTime() - p->m_OriginTime) / 1000 >(uint64_t)p->m_iTTL))
+    if ((p->m_iTTL >= std::chrono::milliseconds::zero()) &&
+        ((CTimer::getTime() - p->m_OriginTime) > p->m_iTTL))
     {
         msgno = p->m_iMsgNo & 0x1FFFFFFF;
 
@@ -336,7 +337,7 @@ CRcvBuffer::~CRcvBuffer()
         if (NULL != m_pUnit[i])
         {
             m_pUnit[i]->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            m_pUnitQueue->decCount();
         }
     }
 
@@ -355,7 +356,7 @@ bool CRcvBuffer::addData(CUnit* unit, int offset)
     m_pUnit[pos] = unit;
 
     unit->m_iFlag = 1;
-    ++m_pUnitQueue->m_iCount;
+    m_pUnitQueue->incCount();
 
     return true;
 }
@@ -380,7 +381,7 @@ int CRcvBuffer::readBuffer(char* data, int len)
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
             tmp->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            m_pUnitQueue->decCount();
 
             if (++p == m_iSize)
                 p = 0;
@@ -418,7 +419,7 @@ int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
             tmp->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            m_pUnitQueue->decCount();
 
             if (++p == m_iSize)
                 p = 0;
@@ -493,7 +494,7 @@ int CRcvBuffer::readMsg(char* data, int len)
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
             tmp->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            m_pUnitQueue->decCount();
         }
         else
             m_pUnit[p]->m_iFlag = 2;
@@ -558,7 +559,7 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
         CUnit* tmp = m_pUnit[m_iStartPos];
         m_pUnit[m_iStartPos] = NULL;
         tmp->m_iFlag = 0;
-        --m_pUnitQueue->m_iCount;
+        m_pUnitQueue->decCount();
 
         if (++m_iStartPos == m_iSize)
             m_iStartPos = 0;

@@ -146,6 +146,7 @@ static SendedPacketVerifier packetVerifier;
 
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
+//-------------------------------------------------------------------------------------------------
 
 CUnitQueue::CUnitQueue() = default;
 
@@ -167,7 +168,7 @@ CUnitQueue::~CUnitQueue()
     }
 }
 
-int CUnitQueue::init(int size, int mss, int version)
+int CUnitQueue::init(int size, int mss)
 {
     CQEntry* tempq = nullptr;
     CUnit* tempu = nullptr;
@@ -193,7 +194,6 @@ int CUnitQueue::init(int size, int mss, int version)
 
     m_iSize = size;
     m_iMSS = mss;
-    m_iIPversion = version;
 
     return 0;
 }
@@ -219,7 +219,7 @@ int CUnitQueue::increase()
             p = p->next;
     }
     m_iCount = real_count;
-    if (double(m_iCount) / m_iSize < 0.9)
+    if (double(real_count) / m_iSize < 0.9)
         return -1;
 
     CQEntry* tempq = nullptr;
@@ -269,9 +269,13 @@ CUnit* CUnitQueue::getNextAvailUnit()
 
     do
     {
-        for (CUnit* sentinel = m_pCurrQueue->m_pUnit + m_pCurrQueue->m_iSize - 1; m_pAvailUnit != sentinel; ++m_pAvailUnit)
+        for (CUnit* sentinel = m_pCurrQueue->m_pUnit + m_pCurrQueue->m_iSize - 1;
+            m_pAvailUnit != sentinel;
+            ++m_pAvailUnit)
+        {
             if (m_pAvailUnit->m_iFlag == 0)
                 return m_pAvailUnit;
+        }
 
         if (m_pCurrQueue->m_pUnit->m_iFlag == 0)
         {
@@ -288,6 +292,7 @@ CUnit* CUnitQueue::getNextAvailUnit()
     return nullptr;
 }
 
+//-------------------------------------------------------------------------------------------------
 
 CSndUList::CSndUList(
     CTimer* timer,
@@ -320,7 +325,7 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
 
         if (n->locationOnHeap == 0)
         {
-            n->timestamp = 1;
+            n->timestamp = std::chrono::microseconds(1);
             m_timer->interrupt();
             return;
         }
@@ -328,7 +333,7 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
         remove_(n);
     }
 
-    insert_(1, u);
+    insert_(std::chrono::microseconds(1), u);
 }
 
 int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
@@ -342,8 +347,7 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
         return -1;
 
     // no pop until the next schedulled time
-    uint64_t ts;
-    CTimer::rdtsc(ts);
+    auto ts = CTimer::getTime();
     if (ts < m_nodeHeap[0]->timestamp)
         return -1;
 
@@ -360,7 +364,7 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
     addr = u->peerAddr();
 
     // insert a new entry, ts is the next processing time
-    if (ts > 0)
+    if (ts > std::chrono::microseconds::zero())
         insert_(ts, u);
 
     return 1;
@@ -373,17 +377,17 @@ void CSndUList::remove(CUDT* u)
     remove_(u->sNode());
 }
 
-uint64_t CSndUList::getNextProcTime()
+std::chrono::microseconds CSndUList::getNextProcTime()
 {
     std::lock_guard<std::mutex> listguard(m_ListLock);
 
     if (-1 == m_iLastEntry)
-        return 0;
+        return std::chrono::microseconds::zero();
 
     return m_nodeHeap[0]->timestamp;
 }
 
-void CSndUList::insert_(int64_t ts, std::shared_ptr<CUDT> u)
+void CSndUList::insert_(std::chrono::microseconds ts, std::shared_ptr<CUDT> u)
 {
     CSNode* n = u->sNode();
 
@@ -499,13 +503,12 @@ void CSndQueue::worker()
 {
     while (!m_bClosing)
     {
-        uint64_t ts = m_pSndUList->getNextProcTime();
+        const auto ts = m_pSndUList->getNextProcTime();
 
-        if (ts > 0)
+        if (ts > std::chrono::microseconds::zero())
         {
             // wait until next processing time of the first socket on the list
-            uint64_t currtime;
-            CTimer::rdtsc(currtime);
+            const auto currtime = CTimer::getTime();
             if (currtime < ts)
                 m_timer->sleepto(ts);
 
@@ -561,11 +564,11 @@ void CRcvUList::insert(std::shared_ptr<CUDT> u)
     auto n = new CRNode();
     n->socketId = u->socketId();
     n->socket = u;
-    n->timestamp = 1;
+    n->timestamp = std::chrono::microseconds(1);
 
     m_socketIdToNode[n->socketId] = n;
 
-    CTimer::rdtsc(n->timestamp);
+    n->timestamp = CTimer::getTime();
 
     if (!m_nodeListHead)
     {
@@ -617,7 +620,7 @@ void CRcvUList::update(UDTSOCKET socketId)
 
     auto n = it->second;
 
-    CTimer::rdtsc(n->timestamp);
+    n->timestamp = CTimer::getTime();
 
     // if n is the last node, do not need to change
     if (nullptr == n->next)
@@ -681,7 +684,7 @@ void CRendezvousQueue::insert(
     const UDTSOCKET& id,
     std::weak_ptr<CUDT> u,
     const detail::SocketAddress& addr,
-    uint64_t ttl)
+    std::chrono::microseconds ttl)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -741,7 +744,7 @@ void CRendezvousQueue::updateConnStatus()
             continue;
 
         // avoid sending too many requests, at most 1 request per 250ms
-        if (CTimer::getTime() - udtSocket->lastReqTime() > 250000)
+        if (CTimer::getTime() - udtSocket->lastReqTime() > kSyncRepeatMinPeriod)
         {
             if (CTimer::getTime() >= i->ttl)
             {
@@ -783,13 +786,14 @@ CRcvQueue::CRcvQueue(
     m_pRcvUList(std::make_unique<CRcvUList>()),
     m_channel(c),
     m_timer(t),
+    m_iIPversion(ipVersion),
     m_iPayloadSize(payload),
     m_bClosing(false),
     m_pRendezvousQueue(std::make_unique<CRendezvousQueue>())
 {
     m_iPayloadSize = payload;
 
-    m_UnitQueue.init(size, payload, ipVersion);
+    m_UnitQueue.init(size, payload);
 }
 
 CRcvQueue::~CRcvQueue()
@@ -828,7 +832,7 @@ void CRcvQueue::stop()
 
 void CRcvQueue::worker()
 {
-    detail::SocketAddress addr(m_UnitQueue.m_iIPversion);
+    detail::SocketAddress addr(m_iIPversion);
 
     while (!m_bClosing)
     {
@@ -877,13 +881,15 @@ void CRcvQueue::worker()
     }
 }
 
+// TODO: #ak Name properly.
+static constexpr auto kSomeThreshold = std::chrono::milliseconds(100);
+
 void CRcvQueue::timerCheck()
 {
-    uint64_t currtime;
-    CTimer::rdtsc(currtime);
+    const auto currtime = CTimer::getTime();
 
     CRNode* ul = m_pRcvUList->m_nodeListHead;
-    uint64_t ctime = currtime - 100000 * CTimer::getCPUFrequency();
+    const auto ctime = currtime - kSomeThreshold;
     while ((nullptr != ul) && (ul->timestamp < ctime))
     {
         std::shared_ptr<CUDT> u = ul->socket.lock();
@@ -992,7 +998,7 @@ int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
     }
 
     // copy packet content
-    memcpy(packet.m_nHeader, newpkt->m_nHeader, CPacket::m_iPktHdrSize);
+    memcpy(packet.header(), newpkt->header(), kPacketHeaderSize);
     memcpy(packet.m_pcData, newpkt->m_pcData, newpkt->getLength());
     packet.setLength(newpkt->getLength());
 
@@ -1023,7 +1029,7 @@ void CRcvQueue::registerConnector(
     const UDTSOCKET& id,
     std::shared_ptr<CUDT> u,
     const detail::SocketAddress& addr,
-    uint64_t ttl)
+    std::chrono::microseconds ttl)
 {
     m_pRendezvousQueue->insert(id, u, addr, ttl);
 }

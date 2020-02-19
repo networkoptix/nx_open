@@ -12,6 +12,9 @@
 
 namespace nx::vms::testcamera {
 
+static const QString kDiscoveryPortCliKey = "--discovery-port";
+static const QString kMediaPortCliKey = "--media-port";
+
 struct CliOptions
 {
     struct CameraSet
@@ -40,6 +43,8 @@ struct CliOptions
     OptionalUs shiftPtsPrimaryPeriod;
     OptionalUs shiftPtsSecondaryPeriod;
     QStringList localInterfaces;
+    std::optional<int> discoveryPort;
+    std::optional<int> mediaPort;
     std::vector<CameraSet> cameraSets;
 };
 

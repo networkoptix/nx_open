@@ -157,6 +157,10 @@ QnSharedResourcePointer<QnAbstractVideoCamera> QnLiveStreamProvider::getOwner() 
 void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
+
+    if (role != Qn::ConnectionRole::CR_LiveVideo && role != Qn::ConnectionRole::CR_SecondaryLiveVideo)
+        return;
+
     updateSoftwareMotion();
 
     if (NX_ASSERT(serverModule()))

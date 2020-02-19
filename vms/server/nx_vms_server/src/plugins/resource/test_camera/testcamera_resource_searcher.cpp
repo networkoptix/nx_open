@@ -15,6 +15,7 @@
 using namespace std::chrono_literals;
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
+static const QString kDiscoveryPortParameterName = "discoveryPort";
 
 using nx::vms::testcamera::ini;
 
@@ -97,7 +98,7 @@ bool QnTestCameraResourceSearcher::readDiscoveryResponse(
 
     processDiscoveryResponseMessage(
         discoveryResponseMessage,
-        testcameraHost,
+        remoteEndpoint,
         resources,
         processedMacAddresses);
 
@@ -134,7 +135,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources()
 
 void QnTestCameraResourceSearcher::processDiscoveryResponseMessage(
     const QByteArray& discoveryResponseMessage,
-    const QString& testcameraHost,
+    const nx::network::SocketAddress& testcameraDiscoverySocketAddress,
     QnResourceList* resources,
     std::set<nx::utils::MacAddress>* processedMacAddresses) const
 {
@@ -145,12 +146,14 @@ void QnTestCameraResourceSearcher::processDiscoveryResponseMessage(
     {
         NX_DEBUG(this,
             "Ignoring received testcamera discovery response %1 from testcamera %2: %3",
-            nx::kit::utils::toString(discoveryResponseMessage), testcameraHost, errorMessage);
+            nx::kit::utils::toString(discoveryResponseMessage),
+            testcameraDiscoverySocketAddress,
+            errorMessage);
         return;
     }
 
     NX_DEBUG(this, "Received discovery response from testcamera %1 hosting %2 Cameras: %3",
-        testcameraHost,
+        testcameraDiscoverySocketAddress,
         discoveryResponse.cameraDiscoveryResponses().size(),
         nx::kit::utils::toString(discoveryResponseMessage));
 
@@ -167,7 +170,7 @@ void QnTestCameraResourceSearcher::processDiscoveryResponseMessage(
             cameraDiscoveryResponse->macAddress(),
             cameraDiscoveryResponse->videoLayoutSerialized(),
             discoveryResponse.mediaPort(),
-            testcameraHost))
+            testcameraDiscoverySocketAddress))
         {
             processedMacAddresses->insert(cameraDiscoveryResponse->macAddress());
             resources->push_back(resource);
@@ -179,7 +182,7 @@ QnTestCameraResourcePtr QnTestCameraResourceSearcher::createDiscoveredTestCamera
     const nx::utils::MacAddress& macAddress,
     const QString& videoLayoutString,
     int mediaPort,
-    const QString& testcameraHost) const
+    const nx::network::SocketAddress& testcameraDiscoverySocketAddress) const
 {
     const QnTestCameraResourcePtr resource(new QnTestCameraResource(serverModule()));
 
@@ -193,11 +196,17 @@ QnTestCameraResourcePtr QnTestCameraResourceSearcher::createDiscoveredTestCamera
         return {};
     }
 
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem(
+        kDiscoveryPortParameterName,
+        QString::number(testcameraDiscoverySocketAddress.port));
+
     const nx::utils::Url url = nx::network::url::Builder()
         .setScheme("tcp")
-        .setHost(testcameraHost)
+        .setHost(testcameraDiscoverySocketAddress.address.toString())
         .setPort(mediaPort)
-        .setPath(macAddress.toString());
+        .setPath(macAddress.toString())
+        .setQuery(urlQuery);
 
     resource->setTypeId(resourceTypeId);
     resource->setName(model);
@@ -255,8 +264,15 @@ QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils
     NX_VERBOSE(this, "%1(%2, authenticator, isSearchAction: %3)",
         __func__, nx::kit::utils::toString(url.toStdString()), isSearchAction ? "true" : "false");
 
+    int discoveryPort = QUrlQuery(url.query())
+        .queryItemValue(kDiscoveryPortParameterName).toInt();
+
+    if (discoveryPort == 0)
+        discoveryPort = url.port(ini().discoveryPort);
+
     const auto socket = nx::network::SocketFactory::createDatagramSocket();
-    sendDiscoveryMessage(socket.get(), url.host(), url.port(/*defaultPort*/ ini().discoveryPort));
+
+    sendDiscoveryMessage(socket.get(),url.host(), discoveryPort);
 
     socket->setRecvTimeout(1s);
 

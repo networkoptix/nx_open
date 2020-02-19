@@ -41,6 +41,7 @@ Yunhong Gu, last updated 02/28/2012
 #ifndef __UDT_CORE_H__
 #define __UDT_CORE_H__
 
+#include <memory>
 #include <mutex>
 
 #include "udt.h"
@@ -67,7 +68,7 @@ class ServerSideConnectionAcceptor
 {
 public:
     ServerSideConnectionAcceptor(
-        uint64_t startTime,
+        std::chrono::microseconds startTime,
         UDTSockType sockType,
         UDTSOCKET socketId,
         CSndQueue* sndQueue,
@@ -83,7 +84,7 @@ public:
 
 private:
     bool m_closing = false;
-    uint64_t m_StartTime = 0;
+    std::chrono::microseconds m_StartTime = std::chrono::microseconds::zero();
     UDTSockType m_iSockType;
     UDTSOCKET m_SocketId;
     CSndQueue* m_sendQueue = nullptr;
@@ -175,12 +176,12 @@ public: // internal API
     void setBroken(bool val);
     bool broken() const;
 
-    CSNode* sNode() { return m_pSNode; }
+    CSNode* sNode() { return m_pSNode.get(); }
 
     int payloadSize() const { return m_iPayloadSize; }
 
-    int64_t lastReqTime() const { return m_llLastReqTime; }
-    void setLastReqTime(int64_t value) { m_llLastReqTime = value; }
+    std::chrono::microseconds lastReqTime() const { return m_llLastReqTime; }
+    void setLastReqTime(std::chrono::microseconds value) { m_llLastReqTime = value; }
 
     void addEPoll(const int eid, int eventsToReport);
     void removeEPoll(const int eid);
@@ -209,8 +210,8 @@ public: // internal API
 
     void setMultiplexer(const std::shared_ptr<Multiplexer>& multiplexer);
 
-    CSndBuffer* sndBuffer() { return m_pSndBuffer; }
-    CRcvBuffer* rcvBuffer() { return m_pRcvBuffer; }
+    CSndBuffer* sndBuffer() { return m_pSndBuffer.get(); }
+    CRcvBuffer* rcvBuffer() { return m_pRcvBuffer.get(); }
 
     bool synRecving() const { return m_bSynRecving; }
     bool synSending() const { return m_bSynSending; }
@@ -227,8 +228,8 @@ public: // internal API
     int udpSndBufSize() const { return m_iUDPSndBufSize; }
     int udpRcvBufSize() const { return m_iUDPRcvBufSize; }
 
-    uint64_t lingerExpiration() const { return m_ullLingerExpiration; }
-    void setLingerExpiration(uint64_t value) { m_ullLingerExpiration = value; }
+    std::chrono::microseconds lingerExpiration() const { return m_ullLingerExpiration; }
+    void setLingerExpiration(std::chrono::microseconds value) { m_ullLingerExpiration = value; }
 
     bool reuseAddr() const { return m_bReuseAddr; }
 
@@ -305,7 +306,7 @@ public: // internal API
     // Returned value:
     //    Actual size of data sent.
 
-    Result<int> sendmsg(const char* data, int len, int ttl, bool inorder);
+    Result<int> sendmsg(const char* data, int len, std::chrono::milliseconds ttl, bool inorder);
 
     // Functionality:
     //    Receive a message to buffer "data".
@@ -370,13 +371,16 @@ public: // internal API
     // Generation and processing of packets
     void sendCtrl(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
     void processCtrl(CPacket& ctrlpkt);
-    int packData(CPacket& packet, uint64_t& ts);
+    int packData(CPacket& packet, std::chrono::microseconds& ts);
     Result<> processData(CUnit* unit);
 
     void checkTimers(bool forceAck);
 
-    static constexpr int m_iSYNInterval = 10000;             // Periodical Rate Control Interval, 10000 microsecond
+    // Periodical Rate Control Interval, 10000 microsecond.
+    static constexpr auto m_iSYNInterval = std::chrono::microseconds(10000);
+
     static constexpr int m_iSelfClockInterval = 64;       // ACK interval for self-clocking
+
     static CUDTUnited* s_UDTUnited;               // UDT global management base
 
 public:
@@ -420,8 +424,10 @@ private: // Options
     int m_iUDPRcvBufSize = kDefaultRecvBufferSize * kDefaultMtuSize;                        // UDP receiving buffer size
     int m_iIPversion = AF_INET;                            // IP version
     bool m_bRendezvous = false;                          // Rendezvous connection mode
-    int m_iSndTimeOut = -1;                           // sending timeout in milliseconds
-    int m_iRcvTimeOut = -1;                           // receiving timeout in milliseconds
+    // sending timeout in milliseconds.
+    std::chrono::milliseconds m_iSndTimeOut = std::chrono::milliseconds(-1);
+    // receiving timeout in milliseconds.
+    std::chrono::milliseconds m_iRcvTimeOut = std::chrono::milliseconds(-1);
     bool m_bReuseAddr = true;                // reuse an exiting port or not, for UDP multiplexer
     int64_t m_llMaxBW = -1;                // maximum data transfer rate (threshold)
 
@@ -443,23 +449,25 @@ private: // Status
 
     int m_iEXPCount = 1;                // Expiration counter
     int m_iBandwidth = 1;               // Estimated bandwidth, number of packets per second
-    int m_iRTT = 10 * m_iSYNInterval;   // RTT, in microseconds
-    int m_iRTTVar = (10 * m_iSYNInterval) >> 1;                      // RTT variance
+    std::chrono::microseconds m_iRTT = 10 * m_iSYNInterval;   // RTT, in microseconds
+    std::chrono::microseconds m_iRTTVar = (10 * m_iSYNInterval) / 2;    // RTT variance
     int m_iDeliveryRate = 16;                // Packet arrival rate at the receiver side
 
-    uint64_t m_ullLingerExpiration = 0;     // Linger expiration time (for GC to close a socket with data in sending buffer)
+    // Linger expiration time (for GC to close a socket with data in sending buffer)
+    std::chrono::microseconds m_ullLingerExpiration = std::chrono::microseconds::zero();
 
     CHandShake m_ConnReq;               // connection request
     CHandShake m_ConnRes;               // connection response
-    int64_t m_llLastReqTime = 0;            // last time when a connection request is sent
+    // last time when a connection request is sent.
+    std::chrono::microseconds m_llLastReqTime = std::chrono::microseconds::zero();
 
 private: // Sending related data
-    CSndBuffer* m_pSndBuffer = nullptr;                    // Sender buffer
-    CSndLossList* m_pSndLossList = nullptr;                // Sender loss list
-    CPktTimeWindow* m_pSndTimeWindow = nullptr;            // Packet sending time window
+    std::unique_ptr<CSndBuffer> m_pSndBuffer;
+    std::unique_ptr<CSndLossList> m_pSndLossList;
+    std::unique_ptr<CPktTimeWindow> m_pSndTimeWindow;
 
-    volatile uint64_t m_ullInterval = 0;             // Inter-packet time, in CPU clock cycles
-    uint64_t m_ullTimeDiff = 0;                      // aggregate difference in inter-packet time
+    std::chrono::microseconds m_ullInterval = std::chrono::microseconds::zero();             // Inter-packet time.
+    std::chrono::microseconds m_ullTimeDiff = std::chrono::microseconds::zero();                      // aggregate difference in inter-packet time
 
     volatile int m_iFlowWindowSize = 0;              // Flow control window size
     volatile double m_dCongestionWindow = 0.0;         // congestion window size
@@ -469,20 +477,21 @@ private: // Sending related data
     volatile int32_t m_iSndCurrSeqNo = 0;            // The largest sequence number that has been sent
     int32_t m_iLastDecSeq = 0;                       // Sequence number sent last decrease occurs
     int32_t m_iSndLastAck2 = 0;                      // Last ACK2 sent back
-    uint64_t m_ullSndLastAck2Time = 0;               // The time when last ACK2 was sent back
+    // The time when last ACK2 was sent back.
+    std::chrono::microseconds m_ullSndLastAck2Time = std::chrono::microseconds::zero();
 
     int32_t m_iISN = 0;                              // Initial Sequence Number
 
     void CCUpdate();
 
 private: // Receiving related data
-    CRcvBuffer* m_pRcvBuffer = nullptr;                    // Receiver buffer
-    CRcvLossList* m_pRcvLossList = nullptr;                // Receiver loss list
-    CACKWindow* m_pACKWindow = nullptr;                    // ACK history window
-    CPktTimeWindow* m_pRcvTimeWindow = nullptr;            // Packet arrival time window
+    std::unique_ptr<CRcvBuffer> m_pRcvBuffer;
+    std::unique_ptr<CRcvLossList> m_pRcvLossList;
+    std::unique_ptr<CACKWindow> m_pACKWindow;                    // ACK history window
+    std::unique_ptr<CPktTimeWindow> m_pRcvTimeWindow;
 
     int32_t m_iRcvLastAck = 0;                       // Last sent ACK
-    uint64_t m_ullLastAckTime = 0;                   // Timestamp of last ACK
+    std::chrono::microseconds m_ullLastAckTime = std::chrono::microseconds::zero();                   // Timestamp of last ACK
     int32_t m_iRcvLastAckAck = 0;                    // Last sent ACK that has been acknowledged
     int32_t m_iAckSeqNo = 0;                         // Last ACK sequence number
     int32_t m_iRcvCurrSeqNo = 0;                     // Largest received sequence number
@@ -508,7 +517,8 @@ private: // synchronization: mutexes and conditions
     void releaseSynch();
 
 private: // Trace
-    uint64_t m_StartTime = 0;                       // timestamp when the UDT entity is started
+    // timestamp when the UDT entity is started.
+    std::chrono::microseconds m_StartTime = std::chrono::microseconds::zero();
     int64_t m_llSentTotal = 0;                      // total number of sent data packets, including retransmissions
     int64_t m_llRecvTotal = 0;                      // total number of received packets
     int m_iSndLossTotal = 0;                        // total number of lost packets (sender side)
@@ -518,9 +528,10 @@ private: // Trace
     int m_iRecvACKTotal = 0;                        // total number of received ACK packets
     int m_iSentNAKTotal = 0;                        // total number of sent NAK packets
     int m_iRecvNAKTotal = 0;                        // total number of received NAK packets
-    int64_t m_llSndDurationTotal = 0;               // total real time for sending
+    std::chrono::microseconds m_llSndDurationTotal = std::chrono::microseconds::zero();               // total real time for sending
 
-    uint64_t m_LastSampleTime = 0;                  // last performance sample time
+    // last performance sample time.
+    std::chrono::microseconds m_LastSampleTime = std::chrono::microseconds::zero();
     int64_t m_llTraceSent = 0;                      // number of pakctes sent in the last trace interval
     int64_t m_llTraceRecv = 0;                      // number of pakctes received in the last trace interval
     int m_iTraceSndLoss = 0;                        // number of lost packets in the last trace interval (sender side)
@@ -530,33 +541,36 @@ private: // Trace
     int m_iRecvACK = 0;                             // number of ACKs received in the last trace interval
     int m_iSentNAK = 0;                             // number of NAKs sent in the last trace interval
     int m_iRecvNAK = 0;                             // number of NAKs received in the last trace interval
-    int64_t m_llSndDuration = 0;            // real time for sending
-    int64_t m_llSndDurationCounter = 0;        // timers to record the sending duration
+    std::chrono::microseconds m_llSndDuration = std::chrono::microseconds::zero();            // real time for sending
+    // timers to record the sending duration.
+    std::chrono::microseconds m_llSndDurationCounter = std::chrono::microseconds::zero();
 
 private: // Timers
     uint64_t m_ullCPUFrequency = 1;                  // CPU clock frequency, used for Timer, ticks per microsecond
 
-    uint64_t m_ullNextACKTime = 0;            // Next ACK time, in CPU clock cycles, same below
-    uint64_t m_ullNextNAKTime = 0;            // Next NAK time
+    std::chrono::microseconds m_ullNextACKTime = std::chrono::microseconds::zero();            // Next ACK time, in CPU clock cycles, same below
+    std::chrono::microseconds m_ullNextNAKTime = std::chrono::microseconds::zero();            // Next NAK time
 
-    volatile uint64_t m_ullSYNInt = 0;        // SYN interval
-    volatile uint64_t m_ullACKInt = 0;        // ACK interval
-    volatile uint64_t m_ullNAKInt = 0;        // NAK interval
-    volatile uint64_t m_ullLastRspTime = 0;        // time stamp of last response from the peer
+    std::chrono::microseconds m_ullSYNInt = std::chrono::microseconds::zero();        // SYN interval
+    std::chrono::microseconds m_ullACKInt = std::chrono::microseconds::zero();        // ACK interval
+    std::chrono::microseconds m_ullNAKInt = std::chrono::microseconds::zero();        // NAK interval
 
-    uint64_t m_ullMinNakInt = 0;            // NAK timeout lower bound; too small value can cause unnecessary retransmission
-    uint64_t m_ullMinExpInt = 0;            // timeout lower bound threshold: too small timeout can cause problem
+    // time stamp of last response from the peer.
+    std::chrono::microseconds m_ullLastRspTime = std::chrono::microseconds::zero();
+
+    std::chrono::microseconds m_ullMinNakInt = std::chrono::microseconds::zero();            // NAK timeout lower bound; too small value can cause unnecessary retransmission
+    std::chrono::microseconds m_ullMinExpInt = std::chrono::microseconds::zero();            // timeout lower bound threshold: too small timeout can cause problem
 
     int m_iPktCount = 0;                // packet counter for ACK
     int m_iLightACKCount = 0;            // light ACK counter
 
-    uint64_t m_ullTargetTime = 0;            // scheduled time of next packet sending
+    std::chrono::microseconds m_ullTargetTime = std::chrono::microseconds::zero();            // scheduled time of next packet sending
 
 private: // for UDP multiplexer
     std::shared_ptr<Multiplexer> m_multiplexer;
     detail::SocketAddress m_pPeerAddr;    // peer address
     uint32_t m_piSelfIP[4];             // local UDP IP address
-    CSNode* m_pSNode = nullptr;         // node information for UDT list used in snd queue
+    std::unique_ptr<CSNode> m_pSNode;         // node information for UDT list used in snd queue
     std::shared_ptr<ServerSideConnectionAcceptor> m_synPacketHandler;
 
 private: // for epoll

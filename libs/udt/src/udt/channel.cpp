@@ -232,12 +232,14 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
     // convert packet header into network order
     //for (int j = 0; j < 4; ++ j)
     //   packet.m_nHeader[j] = htonl(packet.m_nHeader[j]);
-    uint32_t* p = packet.m_nHeader;
+    uint32_t* p = packet.header();
     for (int j = 0; j < 4; ++j)
     {
         *p = htonl(*p);
         ++p;
     }
+
+    auto [bufs, bufsCount] = packet.ioBufs();
 
 #ifndef _WIN32
     detail::SocketAddress localAddr(addr);
@@ -245,18 +247,18 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
     msghdr mh;
     mh.msg_name = localAddr.get();
     mh.msg_namelen = localAddr.size();
-    mh.msg_iov = packet.m_PacketVector.bufs();
-    mh.msg_iovlen = packet.m_PacketVector.size();
+    mh.msg_iov = bufs;
+    mh.msg_iovlen = bufsCount;
     mh.msg_control = NULL;
     mh.msg_controllen = 0;
     mh.msg_flags = 0;
 
     int res = ::sendmsg(m_iSocket, &mh, 0);
 #else
-    DWORD size = CPacket::m_iPktHdrSize + packet.getLength();
+    DWORD size = kPacketHeaderSize + packet.getLength();
     int res = ::WSASendTo(
         m_iSocket,
-        (LPWSABUF) packet.m_PacketVector.bufs(), packet.m_PacketVector.size(), &size, 0,
+        (LPWSABUF) bufs, bufsCount, &size, 0,
         addr.get(), addr.size(),
         NULL, NULL);
     res = (0 == res) ? size : -1;
@@ -265,7 +267,7 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
     // convert back into local host order
     //for (int k = 0; k < 4; ++ k)
     //   packet.m_nHeader[k] = ntohl(packet.m_nHeader[k]);
-    p = packet.m_nHeader;
+    p = packet.header();
     for (int k = 0; k < 4; ++k)
     {
         *p = ntohl(*p);
@@ -291,12 +293,14 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) c
     // Reserving size for any address.
     addr = detail::SocketAddress(AF_INET6);
 
+    auto [bufs, bufsCount] = packet.ioBufs();
+
 #ifndef _WIN32
     msghdr mh;
     mh.msg_name = addr.get();
     mh.msg_namelen = addr.size();
-    mh.msg_iov = packet.m_PacketVector.bufs();
-    mh.msg_iovlen = packet.m_PacketVector.size();
+    mh.msg_iov = bufs;
+    mh.msg_iovlen = bufsCount;
     mh.msg_control = NULL;
     mh.msg_controllen = 0;
     mh.msg_flags = 0;
@@ -313,20 +317,20 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) c
 
     int res = ::recvmsg(m_iSocket, &mh, 0);
 #else
-    DWORD size = CPacket::m_iPktHdrSize + packet.getLength();
+    DWORD size = kPacketHeaderSize + packet.getLength();
     DWORD flag = 0;
 
-    packet.m_PacketVector.lock();
+    packet.lockPacketVector();
 
     int res = ::WSARecvFrom(
         m_iSocket,
-        (LPWSABUF) packet.m_PacketVector.bufs(), packet.m_PacketVector.size(), &size, &flag,
+        (LPWSABUF) bufs, bufsCount, &size, &flag,
         addr.get(), &addr.length(),
         NULL, NULL);
     res = (0 == res) ? size : -1;
 #endif
 
-    packet.m_PacketVector.unlock();
+    packet.unlockPacketVector();
 
     if (res <= 0)
     {
@@ -334,12 +338,12 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) c
         return OsError();
     }
 
-    packet.setLength(res - CPacket::m_iPktHdrSize);
+    packet.setLength(res - kPacketHeaderSize);
 
     // convert back into local host order
     //for (int i = 0; i < 4; ++ i)
     //   packet.m_nHeader[i] = ntohl(packet.m_nHeader[i]);
-    uint32_t* p = packet.m_nHeader;
+    uint32_t* p = packet.header();
     for (int i = 0; i < 4; ++i)
     {
         *p = ntohl(*p);

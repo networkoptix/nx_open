@@ -36,6 +36,24 @@ Player::TranscodingSupportStatus transcodingSupportStatus(
     bool liveMode,
     TranscodingRequestType requestType = TranscodingRequestType::detailed);
 
+struct Input
+{
+    AVCodecID transcodingCodec = AV_CODEC_ID_NONE;
+
+    /** Used to find a server to query transcoding capability. */
+    bool liveMode = false;
+
+    /** Used when not liveMode, to find a server to query transcoding capability. */
+    qint64 positionMs = -1;
+
+    QnVirtualCameraResourcePtr camera;
+
+    bool allowOverlay = false;
+
+    /** List of decoders currently used by the player. */
+    const std::vector<AbstractVideoDecoder*>* currentDecoders = nullptr;
+};
+
 struct Result: public boost::equality_comparable1<Result>
 {
     Player::VideoQuality quality = Player::UnknownVideoQuality;
@@ -55,23 +73,12 @@ struct Result: public boost::equality_comparable1<Result>
 /**
  * @param videoQuality Video quality desired by the user. Same as Player::videoQuality: either
  *     one of enum Player::VideoQuality values, or approximate vertical resolution.
- * @param liveMode Used to find a server to query transcoding capability.
- * @param positionMs Used when not liveMode, to find a server to query transcoding capability.
- * @param currentDecoders List of decoders currently used by the player.
  * @return Either one of kQualityLow or kQualityHigh tokens, or a custom resolution which can
  *     have width set to <=0 to indicate "auto" width. ATTENTION: This method does not inspect
  *     camera aspect ratio, thus, the returned custom size width should be treated as specified
  *     in logical pixels.
  */
-Result chooseVideoQuality(
-    AVCodecID transcodingCodec,
-    int videoQuality,
-    bool liveMode,
-    qint64 positionMs,
-    const QnVirtualCameraResourcePtr& camera,
-    bool allowOverlay,
-    const std::vector<AbstractVideoDecoder*>& currentDecoders =
-        std::vector<AbstractVideoDecoder*>());
+Result chooseVideoQuality(int videoQuality, const Input& input);
 
 } // namespace media_player_quality_chooser
 

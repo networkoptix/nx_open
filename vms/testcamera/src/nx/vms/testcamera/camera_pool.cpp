@@ -18,7 +18,7 @@ namespace nx::vms::testcamera {
 
 CameraPool::CameraPool(
     const FileCache* const fileCache,
-    QStringList localInterfacesToListen,
+    NetworkSettings networkSettings,
     QnCommonModule* commonModule,
     bool noSecondaryStream,
     std::optional<int> fpsPrimary,
@@ -26,13 +26,11 @@ CameraPool::CameraPool(
     :
     QnTcpListener(
         commonModule,
-        localInterfacesToListen.isEmpty()
-            ? QHostAddress::Any
-            : QHostAddress(localInterfacesToListen[0]),
-        ini().mediaPort
+        QHostAddress::Any,
+        networkSettings.mediaPort
     ),
     m_fileCache(fileCache),
-    m_localInterfacesToListen(std::move(localInterfacesToListen)),
+    m_networkSettings(std::move(networkSettings)),
     m_logger(new Logger("CameraPool")),
     m_frameLogger(new FrameLogger()),
     m_noSecondaryStream(noSecondaryStream),
@@ -208,7 +206,7 @@ QByteArray CameraPool::obtainDiscoveryResponseMessage() const
 {
     QMutexLocker lock(&m_mutex);
 
-    DiscoveryResponse discoveryResponse(ini().mediaPort);
+    DiscoveryResponse discoveryResponse(m_networkSettings.mediaPort);
     for (const auto& [macAddress, camera]: m_cameraByMacAddress)
     {
         if (camera->isEnabled())
@@ -227,7 +225,7 @@ bool CameraPool::startDiscovery()
     m_discoveryListener = std::make_unique<CameraDiscoveryListener>(
         m_logger.get(),
         [this]() { return obtainDiscoveryResponseMessage(); },
-        m_localInterfacesToListen);
+        m_networkSettings);
 
     if (!m_discoveryListener->initialize())
         return false;

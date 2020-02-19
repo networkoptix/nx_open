@@ -8,7 +8,7 @@ struct Ini: public nx::kit::IniConfig
 {
     Ini(): IniConfig("test_camera.ini") { reload(); }
 
-    NX_INI_INT(4984, discoveryPort, "Port on which test camera expects discovery packets used\n"
+    NX_INI_INT(4984, discoveryPort, "Port on which testcamera expects discovery packets. Used\n"
         "for Server's auto camera discovery feature.");
 
     NX_INI_INT(4985, mediaPort, "Port on which testcamera serves the media stream.");

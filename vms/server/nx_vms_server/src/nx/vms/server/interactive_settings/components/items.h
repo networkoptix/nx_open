@@ -451,9 +451,6 @@ public:
 class BaseFigure: public ValueItem
 {
     Q_OBJECT
-protected:
-    static inline const QStringList kNullableFields = {"figure", "points"};
-
 public:
     BaseFigure(const QString& figureType, QObject* parent = nullptr);
     virtual void setValue(const QVariant& value) override;
