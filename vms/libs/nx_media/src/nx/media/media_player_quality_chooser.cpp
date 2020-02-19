@@ -2,6 +2,7 @@
 
 #include <QtCore/QSize>
 
+#include <utils/media/av_codec_helper.h>
 #include <common/common_module.h>
 
 #include <nx/fusion/model_functions.h>
@@ -28,32 +29,75 @@ static const QSize kDefaultAspect(16, 9);
 static const int kWidthRoundingFactor = 16;
 static const int kHeightRoundingFactor = 4;
 
+static QString avCodecIdToString(AVCodecID avCodecId)
+{
+    // NOTE: For AV_CODEC_ID_NONE, QnAvCodecHelper::codecIdToString() returns an empty string, and
+    // for unregistered values it returns null string.
+
+    if (avCodecId == AV_CODEC_ID_NONE)
+        return "NONE";
+
+    const QString s = QnAvCodecHelper::codecIdToString(avCodecId);
+
+    if (s.isEmpty())
+        return QString::number((int) avCodecId);
+
+    return s;
+}
+
 struct Streams
 {
     QSize highResolution;
     AVCodecID highCodec = AV_CODEC_ID_NONE;
     QSize lowResolution;
     AVCodecID lowCodec = AV_CODEC_ID_NONE;
+
+    QString toString() const
+    {
+        return QString("Streams{")
+            + "highResolution " + ::toString(highResolution)
+            + ", highCodec " + avCodecIdToString(highCodec)
+            + ", lowResolution " + ::toString(lowResolution)
+            + ", lowCodec " + avCodecIdToString(lowCodec)
+            + "}";
+    }
 };
 
 /**
- * If a particular stream is missing, its parameters are not assigned a value.
+ * Obtain Low and High stream codec and resolution.
+ *
+ * If a particular stream is missing, its parameters are assigned default values.
  */
-void findCameraStreams(const QnVirtualCameraResourcePtr& camera, Streams* streams)
+static Streams findCameraStreams(const QnVirtualCameraResourcePtr& camera)
 {
+    Streams streams;
+
+    if (camera->mediaStreams().streams.empty())
+    {
+        NX_DEBUG(kLogTag, "No streams found on camera.");
+        return streams;
+    }
+
     for (const auto& stream: camera->mediaStreams().streams)
     {
         if (stream.getEncoderIndex() == nx::vms::api::StreamIndex::primary) //< High
         {
-            streams->highCodec = (AVCodecID) stream.codec;
-            streams->highResolution = stream.getResolution();
+            streams.highCodec = (AVCodecID) stream.codec;
+            streams.highResolution = stream.getResolution();
         }
         else if (stream.getEncoderIndex() == nx::vms::api::StreamIndex::secondary) //< Low
         {
-            streams->lowCodec = (AVCodecID) stream.codec;
-            streams->lowResolution = stream.getResolution();
+            streams.lowCodec = (AVCodecID) stream.codec;
+            streams.lowResolution = stream.getResolution();
+        }
+        else
+        {
+            NX_DEBUG(kLogTag, "Unrecognized stream index %1", stream.getEncoderIndex());
         }
     }
+
+    NX_DEBUG(kLogTag, streams.toString());
+    return streams;
 }
 
 static QSize limitResolution(const QSize& desiredResolution, const QSize& limit)
@@ -276,26 +320,13 @@ static Result chooseFallbackQuality(const Streams& streams, const Input& input)
     return {};
 }
 
-static QString qualityString(const Result& quality)
-{
-    return quality.toString();
-}
-
-static QString qualityString(int quality)
-{
-    if (quality >= Player::CustomVideoQuality)
-        return qualityString({Player::CustomVideoQuality, QSize(-1, quality)});
-
-    return qualityString({static_cast<Player::VideoQuality>(quality), QSize()});
-}
-
 } // namespace
 
 Result chooseVideoQuality(const int videoQuality, const Input& input)
 {
-    // Obtain Low and High stream codec and resolution.
-    Streams streams;
-    findCameraStreams(input.camera, &streams);
+    const Streams streams = findCameraStreams(input.camera);
+
+    Result result;
 
     // If high requested, high stream exists but has an unknown resolution, return high.
     if (videoQuality == Player::HighVideoQuality
@@ -320,8 +351,7 @@ Result chooseVideoQuality(const int videoQuality, const Input& input)
     }
 
     NX_DEBUG(kLogTag, lm("Requested %1 => Set %2").args(
-        qualityString(videoQuality), qualityString(result)));
-
+        videoQualityToString(videoQuality), result));
     return result;
 }
 
@@ -374,15 +404,12 @@ bool Result::operator==(const Result& other) const
 
 QString Result::toString() const
 {
-    QString result = QnLexical::serialized(quality);
+    if (quality > Player::CustomVideoQuality)
+        return lm("VideoQuality{%1}").arg((int) quality);
 
-    if (frameSize.height() >= 0)
-    {
-        if (frameSize.width() >= 0)
-            result += QStringLiteral(" [%1 x %2]").arg(frameSize.width()).arg(frameSize.height());
-        else
-            result += QStringLiteral(" [h: %1]").arg(frameSize.height());
-    }
+    QString result = QnLexical::serialized(quality);
+    if (frameSize != QSize())
+        result += lm("[%1 x %2]").args(frameSize.width(), frameSize.height());
 
     return result;
 }

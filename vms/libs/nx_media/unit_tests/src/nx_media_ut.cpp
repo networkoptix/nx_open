@@ -39,10 +39,22 @@ static QString qSizeToString(const QSize& size)
     if (size.height() >= 0)
     {
         if (size.width() >= 0)
-            return lit("%1 x %2").arg(size.width()).arg(size.height());
-        return lit("%1").arg(size.height());
+            return lm("%1 x %2").args(size.width(), size.height());
+        return lm("%1").arg(size.height());
     }
-    return lit("<invalid>");
+
+    if (size == QSize())
+        return "<invalid>";
+
+    return lm("<invalid[%1 x %2]>").args(size.width(), size.height());
+}
+
+static QString qSizeToString(const std::optional<QSize>& size)
+{
+    if (size)
+        return qSizeToString(size);
+
+    return "<missing>";
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -201,14 +213,14 @@ public:
 
         const QString highStr = !highResolution
             ? ""
-            : lit("{\"encoderIndex\":0, \"resolution\":\"%1x%2\", \"codec\":%3}")
-                .arg(highResolution.width()).arg(highResolution.height()).arg(kCodec);
+            : lm("{\"encoderIndex\":0, \"resolution\":\"%1x%2\", \"codec\":%3}").args(
+                highResolution->width(), highResolution->height(), kCodec);
         const QString lowStr = !lowResolution
             ? ""
-            : lit("{\"encoderIndex\":1, \"resolution\":\"%1x%2\", \"codec\":%3}")
-                .arg(lowResolution.width()).arg(lowResolution.height()).arg(kCodec);
-        const QString separator = (lowStr.isEmpty() || highStr.isEmpty()) ? lit("") : lit(", ");
-        const QString json = lit("{\"streams\":[") + lowStr + separator + highStr + lit("]}");
+            : lm("{\"encoderIndex\":1, \"resolution\":\"%1x%2\", \"codec\":%3}").args(
+                lowResolution->width(), lowResolution->height(), kCodec);
+        const QString separator = (lowStr.isEmpty() || highStr.isEmpty()) ? "" : ", ";
+        const QString json = "{\"streams\":[" + lowStr + separator + highStr + "]}";
 
         setProperty(ResourcePropertyKey::kMediaStreams, json);
 
@@ -433,8 +445,7 @@ public:
             + lit("\nMax decoder resolution: %1").arg(qSizeToString(maxDecoderResolution))
             + lit("\nHigh resolution: %1").arg(qSizeToString(highStreamResolution))
             + lit("\nLow resolution: %1").arg(qSizeToString(lowStreamResolution))
-            + lit("\nRequested quality: %1")
-                .arg(QnLexical::serialized(static_cast<Player::VideoQuality>(videoQuality)))
+            + lit("\nRequested quality: %1").arg(videoQualityToString(videoQuality))
             + lit("\nExpected quality: %1").arg(expectedQuality.toString());
     }
 };

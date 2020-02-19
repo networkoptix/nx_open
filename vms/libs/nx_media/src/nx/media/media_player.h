@@ -291,6 +291,8 @@ private:
 
 QN_FUSION_DECLARE_FUNCTIONS(Player::VideoQuality, (lexical))
 
+QString videoQualityToString(int videoQuality);
+
 } // namespace media
 } // namespace nx
 
