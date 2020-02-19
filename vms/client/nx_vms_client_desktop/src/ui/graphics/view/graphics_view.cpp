@@ -14,6 +14,7 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, QWidget* parent):
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setTransformationAnchor(QGraphicsView::NoAnchor);
+    setViewportUpdateMode(QGraphicsView::NoViewportUpdate);
 }
 
 QnGraphicsView::~QnGraphicsView()
