@@ -36,7 +36,7 @@ LabeledItem
 
         Row
         {
-            spacing: 8
+            spacing: 4
 
             FigureView
             {
