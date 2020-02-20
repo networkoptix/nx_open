@@ -533,16 +533,15 @@ void QnUserSettingsDialog::applyChanges()
     QnResourcesChangesManager::UserCallbackFunction callbackFunction =
         [actionManager, mode, customUserResources](bool success, const QnUserResourcePtr& user)
         {
-            if (!actionManager)
-                return;
-
-            if (mode != QnUserSettingsModel::NewUser)
+            if (!success || !actionManager)
                 return;
 
             // Cannot capture the resource directly because real resource pointer may differ if
             // the transaction is received before the request callback.
-            NX_ASSERT(user);
-            if (success && user && isCustomUser(user))
+            if (!NX_ASSERT(user))
+                return;
+
+            if (isCustomUser(user))
             {
                 const auto resourcePool = user->resourcePool();
                 const auto layouts = layoutsToShare(resourcePool, **customUserResources);
@@ -554,7 +553,7 @@ void QnUserSettingsDialog::applyChanges()
                 qnResourcesChangesManager->saveAccessibleResources(user, **customUserResources);
             }
 
-            if (success && user)
+            if (mode == QnUserSettingsModel::NewUser)
                 actionManager->trigger(action::SelectNewItemAction, user);
         };
 
