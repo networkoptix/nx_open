@@ -120,7 +120,7 @@ private:
     struct CQEntry
     {
         CUnit* m_pUnit = nullptr;        // unit queue
-        char* m_pBuffer = nullptr;        // data buffer
+        Buffer m_pBuffer;
         int m_iSize = 0;        // size of each queue
 
         CQEntry* next = nullptr;

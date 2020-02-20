@@ -130,6 +130,7 @@ Result<> UdpChannel::open(const std::optional<detail::SocketAddress>& addr)
 Result<> UdpChannel::open(UDPSOCKET udpsock)
 {
     m_iSocket = udpsock;
+
     return setUDPSockOpt();
 }
 
@@ -218,7 +219,7 @@ detail::SocketAddress UdpChannel::getPeerAddr() const
     return socketAddress;
 }
 
-Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packet) const
+Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packet)
 {
     assert(m_iSocket != INVALID_SOCKET);
 
@@ -226,7 +227,10 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
     if (packet.getFlag() == PacketFlag::Control)
     {
         for (int i = 0, n = packet.getLength() / 4; i < n; ++i)
-            *((uint32_t *)packet.m_pcData + i) = htonl(*((uint32_t *)packet.m_pcData + i));
+        {
+            *((uint32_t *)packet.payload().data() + i) =
+                htonl(*((uint32_t *)packet.payload().data() + i));
+        }
     }
 
     // convert packet header into network order
@@ -255,6 +259,8 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
 
     int res = ::sendmsg(m_iSocket, &mh, 0);
 #else
+    m_inSend = true;
+
     DWORD size = kPacketHeaderSize + packet.getLength();
     int res = ::WSASendTo(
         m_iSocket,
@@ -262,6 +268,8 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
         addr.get(), addr.size(),
         NULL, NULL);
     res = (0 == res) ? size : -1;
+
+    m_inSend = false;
 #endif
 
     // convert back into local host order
@@ -277,7 +285,10 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
     if (packet.getFlag() == PacketFlag::Control)
     {
         for (int l = 0, n = packet.getLength() / 4; l < n; ++l)
-            *((uint32_t *)packet.m_pcData + l) = ntohl(*((uint32_t *)packet.m_pcData + l));
+        {
+            *((uint32_t *)packet.payload().data() + l) =
+                ntohl(*((uint32_t *)packet.payload().data() + l));
+        }
     }
 
     if (res < 0)
@@ -286,7 +297,7 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
     return success(res);
 }
 
-Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) const
+Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet)
 {
     assert(m_iSocket != INVALID_SOCKET);
 
@@ -320,15 +331,39 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) c
     DWORD size = kPacketHeaderSize + packet.getLength();
     DWORD flag = 0;
 
+#define WRITE_TO_TMP_BUF
+
+#ifdef WRITE_TO_TMP_BUF
+    std::string buf;
+    buf.resize(kPacketHeaderSize + packet.getLength());
+    WSABUF tmpBuf;
+    tmpBuf.buf = buf.data();
+    tmpBuf.len = buf.size();
+#endif
+
+    if (!m_recvThreadId)
+        m_recvThreadId = std::this_thread::get_id();
+    else if (std::this_thread::get_id() != m_recvThreadId)
+        abort();
+
     packet.lockPacketVector();
+
+    m_inRecv = true;
 
     int res = ::WSARecvFrom(
         m_iSocket,
-        (LPWSABUF) bufs, bufsCount, &size, &flag,
+#ifdef WRITE_TO_TMP_BUF
+        (LPWSABUF) &tmpBuf, 1,
+#else
+        (LPWSABUF) bufs, bufsCount,
+#endif,
+        &size, &flag,
         addr.get(), &addr.length(),
         NULL, NULL);
     res = (0 == res) ? size : -1;
 #endif
+
+    m_inRecv = false;
 
     packet.unlockPacketVector();
 
@@ -337,6 +372,14 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) c
         packet.setLength(-1);
         return OsError();
     }
+
+#ifdef WRITE_TO_TMP_BUF
+    assert(res > kPacketHeaderSize);
+    assert(kPacketHeaderSize + packet.getLength() == buf.size());
+
+    memcpy(bufs[0].buf, buf.data(), kPacketHeaderSize);
+    memcpy(bufs[1].buf, buf.data() + kPacketHeaderSize, res - kPacketHeaderSize);
+#endif
 
     packet.setLength(res - kPacketHeaderSize);
 
@@ -353,7 +396,10 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) c
     if (packet.getFlag() == PacketFlag::Control)
     {
         for (int j = 0, n = packet.getLength() / 4; j < n; ++j)
-            *((uint32_t *)packet.m_pcData + j) = ntohl(*((uint32_t *)packet.m_pcData + j));
+        {
+            *((uint32_t *)packet.payload().data() + j) =
+                ntohl(*((uint32_t *)packet.payload().data() + j));
+        }
     }
 
     return success(packet.getLength());

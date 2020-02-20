@@ -38,9 +38,10 @@ written by
 Yunhong Gu, last updated 03/12/2011
 *****************************************************************************/
 
+#include "buffer.h"
+
 #include <cstring>
 #include <cmath>
-#include "buffer.h"
 
 using namespace std;
 
@@ -56,7 +57,7 @@ CSndBuffer::CSndBuffer(int size, int mss):
     m_iCount(0)
 {
     // initial physical buffer of "size"
-    m_pBuffer = new Buffer;
+    m_pBuffer = new BufferNode;
     m_pBuffer->m_pcData = new char[m_iSize * m_iMSS];
     m_pBuffer->m_iSize = m_iSize;
     m_pBuffer->m_pNext = NULL;
@@ -97,7 +98,7 @@ CSndBuffer::~CSndBuffer()
 
     while (m_pBuffer != NULL)
     {
-        Buffer* temp = m_pBuffer;
+        BufferNode* temp = m_pBuffer;
         m_pBuffer = m_pBuffer->m_pNext;
         delete[] temp->m_pcData;
         delete temp;
@@ -203,22 +204,25 @@ int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
     return total;
 }
 
-int CSndBuffer::readData(char** data, int32_t& msgno)
+std::optional<Buffer> CSndBuffer::readData(int32_t& msgno)
 {
     // No data to read
     if (m_pCurrBlock == m_pLastBlock)
         return 0;
 
-    *data = m_pCurrBlock->m_pcData;
-    int readlen = m_pCurrBlock->m_iLength;
+    std::optional<Buffer> data;
+    // TODO: #ak Avoid copying here by switching Block::m_pcData to Buffer.
+    if (m_pCurrBlock->m_iLength >= 0)
+        data = Buffer(m_pCurrBlock->m_pcData, m_pCurrBlock->m_iLength);
+
     msgno = m_pCurrBlock->m_iMsgNo;
 
     m_pCurrBlock = m_pCurrBlock->m_pNext;
 
-    return readlen;
+    return data;
 }
 
-int CSndBuffer::readData(char** data, const int offset, int32_t& msgno, int& msglen)
+std::optional<Buffer> CSndBuffer::readData(const int offset, int32_t& msgno, int& msglen)
 {
     std::lock_guard<std::mutex> lock(m_BufLock);
 
@@ -245,14 +249,14 @@ int CSndBuffer::readData(char** data, const int offset, int32_t& msgno, int& msg
             msglen++;
         }
 
-        return -1;
+        return std::nullopt;
     }
 
-    *data = p->m_pcData;
-    int readlen = p->m_iLength;
+    // TODO: #ak Avoid copying here by switching Block::m_pcData to Buffer.
+    auto data = Buffer(p->m_pcData, p->m_iLength);
     msgno = p->m_iMsgNo;
 
-    return readlen;
+    return data;
 }
 
 void CSndBuffer::ackData(int offset)
@@ -277,13 +281,13 @@ void CSndBuffer::increase()
     int unitsize = m_pBuffer->m_iSize;
 
     // new physical buffer
-    Buffer* nbuf = new Buffer;
+    BufferNode* nbuf = new BufferNode;
     nbuf->m_pcData = new char[unitsize * m_iMSS];
     nbuf->m_iSize = unitsize;
     nbuf->m_pNext = NULL;
 
     // insert the buffer at the end of the buffer list
-    Buffer* p = m_pBuffer;
+    BufferNode* p = m_pBuffer;
     while (NULL != p->m_pNext)
         p = p->m_pNext;
     p->m_pNext = nbuf;
@@ -373,7 +377,7 @@ int CRcvBuffer::readBuffer(char* data, int len)
         if (unitsize > rs)
             unitsize = rs;
 
-        memcpy(data, m_pUnit[p]->m_Packet.m_pcData + m_iNotch, unitsize);
+        memcpy(data, m_pUnit[p]->m_Packet.payload().data() + m_iNotch, unitsize);
         data += unitsize;
 
         if ((rs > unitsize) || (rs == m_pUnit[p]->m_Packet.getLength() - m_iNotch))
@@ -410,7 +414,7 @@ int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
         if (unitsize > rs)
             unitsize = rs;
 
-        ofs.write(m_pUnit[p]->m_Packet.m_pcData + m_iNotch, unitsize);
+        ofs.write(m_pUnit[p]->m_Packet.payload().data() + m_iNotch, unitsize);
         if (ofs.fail())
             break;
 
@@ -484,7 +488,7 @@ int CRcvBuffer::readMsg(char* data, int len)
 
         if (unitsize > 0)
         {
-            memcpy(data, m_pUnit[p]->m_Packet.m_pcData, unitsize);
+            memcpy(data, m_pUnit[p]->m_Packet.payload().data(), unitsize);
             data += unitsize;
             rs -= unitsize;
         }

@@ -612,13 +612,12 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
 
     // Inform the server my configurations.
     CPacket request;
-    char* reqdata = new char[m_iPayloadSize];
-    request.pack(ControlPacketType::Handshake, NULL, reqdata, m_iPayloadSize);
+    request.pack1(ControlPacketType::Handshake, NULL, m_iPayloadSize);
     // ID = 0, connection request
     request.m_iID = 0;
 
     int hs_size = m_iPayloadSize;
-    m_ConnReq.serialize(reqdata, hs_size);
+    m_ConnReq.serialize(request.payload().data(), hs_size);
     request.setLength(hs_size);
     sndQueue().sendto(serv_addr, request);
     m_llLastReqTime = CTimer::getTime();
@@ -627,15 +626,11 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
 
     // asynchronous connect, return immediately
     if (!m_bSynRecving)
-    {
-        delete[] reqdata;
         return success();
-    }
 
     // Wait for the negotiated configurations from the peer side.
     CPacket response;
-    char* resdata = new char[m_iPayloadSize];
-    response.pack(ControlPacketType::Handshake, NULL, resdata, m_iPayloadSize);
+    response.pack1(ControlPacketType::Handshake, NULL, m_iPayloadSize);
 
     Error error(OsErrorCode::ok);
     Result<> internalConnectResult;
@@ -645,7 +640,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
         // avoid sending too many requests, at most 1 request per 250ms
         if (CTimer::getTime() - m_llLastReqTime > kSyncRepeatMinPeriod)
         {
-            m_ConnReq.serialize(reqdata, hs_size);
+            m_ConnReq.serialize(request.payload().data(), hs_size);
             request.setLength(hs_size);
             if (m_bRendezvous)
                 request.m_iID = m_ConnRes.m_iID;
@@ -686,9 +681,6 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
         }
     }
 
-    delete[] reqdata;
-    delete[] resdata;
-
     if (error.osError() == OsErrorCode::ok)
     {
         if (isClosing())                                                 // if the socket is closed before connection...
@@ -728,7 +720,7 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
         if ((PacketFlag::Control != response.getFlag()) || (ControlPacketType::Handshake != response.getType()))
             return Error(OsErrorCode::connectionRefused, UDT::ProtocolError::handshakeFailure);
 
-        m_ConnRes.deserialize(response.m_pcData, response.getLength());
+        m_ConnRes.deserialize(response.payload().data(), response.getLength());
 
         if (m_bRendezvous)
         {
@@ -910,12 +902,10 @@ Result<> CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
     //send the response to the peer, see listen() for more discussions about this
     CPacket response;
     int size = CHandShake::m_iContentSize;
-    char* buffer = new char[size];
-    hs->serialize(buffer, size);
-    response.pack(ControlPacketType::Handshake, NULL, buffer, size);
+    response.pack1(ControlPacketType::Handshake, NULL, size);
+    hs->serialize(response.payload().data(), size);
     response.m_iID = m_PeerID;
     sndQueue().sendto(peer, response);
-    delete[] buffer;
 
     return success();
 }
@@ -1630,7 +1620,8 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             // to save time on buffer processing and bandwidth/AS measurement, a lite ACK only feeds back an ACK number
             if (4 == size)
             {
-                ctrlpkt.pack(pkttype, NULL, &ack, size);
+                ctrlpkt.pack1(pkttype, NULL, size);
+                memcpy(ctrlpkt.payload().data(), &ack, size);
                 ctrlpkt.m_iID = m_PeerID;
                 sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
@@ -1686,13 +1677,15 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 {
                     data[4] = m_pRcvTimeWindow->getPktRcvSpeed();
                     data[5] = m_pRcvTimeWindow->getBandwidth();
-                    ctrlpkt.pack(pkttype, &m_iAckSeqNo, data, 24);
+                    ctrlpkt.pack1(pkttype, &m_iAckSeqNo, 24);
+                    memcpy(ctrlpkt.payload().data(), data, 24);
 
                     m_ullLastAckTime = CTimer::getTime();
                 }
                 else
                 {
-                    ctrlpkt.pack(pkttype, &m_iAckSeqNo, data, 16);
+                    ctrlpkt.pack1(pkttype, &m_iAckSeqNo, 16);
+                    memcpy(ctrlpkt.payload().data(), data, 16);
                 }
 
                 ctrlpkt.m_iID = m_PeerID;
@@ -1708,7 +1701,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         }
 
         case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgement of Acknowledgement
-            ctrlpkt.pack(pkttype, lparam);
+            ctrlpkt.pack1(pkttype, lparam);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
@@ -1721,12 +1714,14 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 if (1 == size)
                 {
                     // only 1 loss packet
-                    ctrlpkt.pack(pkttype, NULL, (int32_t *)rparam + 1, 4);
+                    ctrlpkt.pack1(pkttype, NULL, 4);
+                    ctrlpkt.payload().assign((const char*)((int32_t*)rparam + 1), 4);
                 }
                 else
                 {
                     // more than 1 loss packets
-                    ctrlpkt.pack(pkttype, NULL, rparam, 8);
+                    ctrlpkt.pack1(pkttype, NULL, 8);
+                    ctrlpkt.payload().assign((const char*) rparam, 8);
                 }
 
                 ctrlpkt.m_iID = m_PeerID;
@@ -1746,7 +1741,8 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
 
                 if (0 < losslen)
                 {
-                    ctrlpkt.pack(pkttype, NULL, data, losslen * 4);
+                    ctrlpkt.pack1(pkttype, NULL, losslen * 4);
+                    ctrlpkt.payload().assign((const char*) data, losslen * 4);
                     ctrlpkt.m_iID = m_PeerID;
                     sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
@@ -1772,7 +1768,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         }
 
         case ControlPacketType::DelayWarning: //100 - Congestion Warning
-            ctrlpkt.pack(pkttype);
+            ctrlpkt.pack1(pkttype);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
@@ -1781,35 +1777,37 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             break;
 
         case ControlPacketType::KeepAlive: //001 - Keep-alive
-            ctrlpkt.pack(pkttype);
+            ctrlpkt.pack1(pkttype);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
         case ControlPacketType::Handshake: //000 - Handshake
-            ctrlpkt.pack(pkttype, NULL, rparam, sizeof(CHandShake));
+            ctrlpkt.pack1(pkttype, NULL, sizeof(CHandShake));
+            ctrlpkt.payload().assign((const char*) rparam, sizeof(CHandShake));
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
         case ControlPacketType::Shutdown: //101 - Shutdown
-            ctrlpkt.pack(pkttype);
+            ctrlpkt.pack1(pkttype);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
         case ControlPacketType::MsgDropRequest: //111 - Msg drop request
-            ctrlpkt.pack(pkttype, lparam, rparam, 8);
+            ctrlpkt.pack1(pkttype, lparam, 8);
+            ctrlpkt.payload().assign((const char*) rparam, 8);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
         case ControlPacketType::RemotePeerFailure: //1000 - acknowledge the peer side a special error
-            ctrlpkt.pack(pkttype, lparam);
+            ctrlpkt.pack1(pkttype, lparam);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
@@ -1840,7 +1838,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             // process a lite ACK
             if (4 == ctrlpkt.getLength())
             {
-                ack = *(int32_t *)ctrlpkt.m_pcData;
+                ack = *(int32_t *)ctrlpkt.payload().data();
                 if (CSeqNo::seqcmp(ack, m_iSndLastAck) >= 0)
                 {
                     m_iFlowWindowSize -= CSeqNo::seqoff(m_iSndLastAck, ack);
@@ -1864,7 +1862,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             }
 
             // Got data ACK
-            ack = *(int32_t *)ctrlpkt.m_pcData;
+            ack = *(int32_t *)ctrlpkt.payload().data();
 
             // check the validation of the ack
             if (CSeqNo::seqcmp(ack, CSeqNo::incseq(m_iSndCurrSeqNo)) > 0)
@@ -1878,7 +1876,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             if (CSeqNo::seqcmp(ack, m_iSndLastAck) >= 0)
             {
                 // Update Flow Window Size, must update before and together with m_iSndLastAck
-                m_iFlowWindowSize = *((int32_t *)ctrlpkt.m_pcData + 3);
+                m_iFlowWindowSize = *((int32_t *)ctrlpkt.payload().data() + 3);
                 m_iSndLastAck = ack;
             }
 
@@ -1921,7 +1919,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             // Update RTT
             //m_iRTT = *((int32_t *)ctrlpkt.m_pcData + 1);
             //m_iRTTVar = *((int32_t *)ctrlpkt.m_pcData + 2);
-            int rtt = *((int32_t *)ctrlpkt.m_pcData + 1);
+            int rtt = *((int32_t *)ctrlpkt.payload().data() + 1);
             m_iRTTVar = std::chrono::microseconds((m_iRTTVar.count() * 3 + abs(rtt - m_iRTT.count())) >> 2);
             m_iRTT = std::chrono::microseconds((m_iRTT.count() * 7 + rtt) >> 3);
 
@@ -1930,11 +1928,11 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             if (ctrlpkt.getLength() > 16)
             {
                 // Update Estimated Bandwidth and packet delivery rate
-                if (*((int32_t *)ctrlpkt.m_pcData + 4) > 0)
-                    m_iDeliveryRate = (m_iDeliveryRate * 7 + *((int32_t *)ctrlpkt.m_pcData + 4)) >> 3;
+                if (*((int32_t *)ctrlpkt.payload().data() + 4) > 0)
+                    m_iDeliveryRate = (m_iDeliveryRate * 7 + *((int32_t *)ctrlpkt.payload().data() + 4)) >> 3;
 
-                if (*((int32_t *)ctrlpkt.m_pcData + 5) > 0)
-                    m_iBandwidth = (m_iBandwidth * 7 + *((int32_t *)ctrlpkt.m_pcData + 5)) >> 3;
+                if (*((int32_t *)ctrlpkt.payload().data() + 5) > 0)
+                    m_iBandwidth = (m_iBandwidth * 7 + *((int32_t *)ctrlpkt.payload().data() + 5)) >> 3;
 
                 m_pCC->setRcvRate(m_iDeliveryRate);
                 m_pCC->setBandwidth(m_iBandwidth);
@@ -1977,7 +1975,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
         case ControlPacketType::LossReport: //011 - Loss Report
         {
-            int32_t* losslist = (int32_t *)(ctrlpkt.m_pcData);
+            int32_t* losslist = (int32_t *)(ctrlpkt.payload().data());
 
             m_pCC->onLoss(losslist, ctrlpkt.getLength() / 4);
             CCUpdate();
@@ -2056,7 +2054,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
         case ControlPacketType::Handshake:
         {
             CHandShake req;
-            req.deserialize(ctrlpkt.m_pcData, ctrlpkt.getLength());
+            req.deserialize(ctrlpkt.payload().data(), ctrlpkt.getLength());
             if ((req.m_iReqType > 0) || (m_bRendezvous && (req.m_iReqType != -2)))
             {
                 // The peer side has not received the handshake message, so it keeps querying
@@ -2096,13 +2094,13 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
         case ControlPacketType::MsgDropRequest:
             m_pRcvBuffer->dropMsg(ctrlpkt.getMsgSeq());
-            m_pRcvLossList->remove(*(int32_t*)ctrlpkt.m_pcData, *(int32_t*)(ctrlpkt.m_pcData + 4));
+            m_pRcvLossList->remove(*(int32_t*)ctrlpkt.payload().data(), *(int32_t*)(ctrlpkt.payload().data() + 4));
 
             // move forward with current recv seq no.
-            if ((CSeqNo::seqcmp(*(int32_t*)ctrlpkt.m_pcData, CSeqNo::incseq(m_iRcvCurrSeqNo)) <= 0)
-                && (CSeqNo::seqcmp(*(int32_t*)(ctrlpkt.m_pcData + 4), m_iRcvCurrSeqNo) > 0))
+            if ((CSeqNo::seqcmp(*(int32_t*)ctrlpkt.payload().data(), CSeqNo::incseq(m_iRcvCurrSeqNo)) <= 0)
+                && (CSeqNo::seqcmp(*(int32_t*)(ctrlpkt.payload().data() + 4), m_iRcvCurrSeqNo) > 0))
             {
-                m_iRcvCurrSeqNo = *(int32_t*)(ctrlpkt.m_pcData + 4);
+                m_iRcvCurrSeqNo = *(int32_t*)(ctrlpkt.payload().data() + 4);
             }
 
             break;
@@ -2131,7 +2129,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
 int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
 {
-    int payload = 0;
+    std::optional<Buffer> payload;
     bool probe = false;
 
     const auto entertime = CTimer::getTime();
@@ -2151,9 +2149,9 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
 
         int msglen;
 
-        payload = m_pSndBuffer->readData(&(packet.m_pcData), offset, packet.m_iMsgNo, msglen);
+        payload = m_pSndBuffer->readData(offset, packet.m_iMsgNo, msglen);
 
-        if (-1 == payload)
+        if (!payload)
         {
             int32_t seqpair[2];
             seqpair[0] = packet.m_iSeqNo;
@@ -2169,8 +2167,10 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
 
             return 0;
         }
-        else if (0 == payload)
+        else if (payload->empty())
+        {
             return 0;
+        }
 
         ++m_iTraceRetrans;
         ++m_iRetransTotal;
@@ -2183,7 +2183,8 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
         int cwnd = (m_iFlowWindowSize < (int)m_dCongestionWindow) ? m_iFlowWindowSize : (int)m_dCongestionWindow;
         if (cwnd >= CSeqNo::seqlen(m_iSndLastAck, CSeqNo::incseq(m_iSndCurrSeqNo)))
         {
-            if (0 != (payload = m_pSndBuffer->readData(&(packet.m_pcData), packet.m_iMsgNo)))
+            payload = m_pSndBuffer->readData(packet.m_iMsgNo);
+            if (payload && !payload->empty())
             {
                 m_iSndCurrSeqNo = CSeqNo::incseq(m_iSndCurrSeqNo);
                 m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
@@ -2213,7 +2214,10 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
 
     packet.m_iTimeStamp = (int) (CTimer::getTime() - m_StartTime).count();
     packet.m_iID = m_PeerID;
-    packet.setLength(payload);
+
+    assert(payload);
+    const auto payloadSize = payload->size();
+    packet.setPayload(std::move(*payload));
 
     m_pCC->onPktSent(&packet);
     //m_pSndTimeWindow->onPktSent(packet.m_iTimeStamp);
@@ -2247,7 +2251,7 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
 
     m_ullTargetTime = ts;
 
-    return payload;
+    return payloadSize;
 }
 
 Result<> CUDT::processData(CUnit* unit)
@@ -2736,7 +2740,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
         return 1004;
 
     CHandShake hs;
-    hs.deserialize(packet.m_pcData, packet.getLength());
+    hs.deserialize(packet.payload().data(), packet.getLength());
 
     // SYN cookie
     char clienthost[NI_MAXHOST];
@@ -2758,7 +2762,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
         hs.m_iCookie = *(int*)cookie;
         packet.m_iID = hs.m_iID;
         int size = packet.getLength();
-        hs.serialize(packet.m_pcData, size);
+        hs.serialize(packet.payload().data(), size);
         m_sendQueue->sendto(addr, packet);
         return 0;
     }
@@ -2785,7 +2789,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
             // mismatch, reject the request
             hs.m_iReqType = 1002;
             int size = CHandShake::m_iContentSize;
-            hs.serialize(packet.m_pcData, size);
+            hs.serialize(packet.payload().data(), size);
             packet.m_iID = id;
             m_sendQueue->sendto(addr, packet);
         }
@@ -2800,7 +2804,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
             if (!result.ok() || result.get() != 1)
             {
                 int size = CHandShake::m_iContentSize;
-                hs.serialize(packet.m_pcData, size);
+                hs.serialize(packet.payload().data(), size);
                 packet.m_iID = id;
                 m_sendQueue->sendto(addr, packet);
             }
