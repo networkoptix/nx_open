@@ -62,7 +62,6 @@ protected:
 private:
     QByteArray obtainDiscoveryResponseMessage() const;
 
-
     void reportAddingCameras(
         bool cameraForEachFile,
         const CameraOptions& cameraOptions,

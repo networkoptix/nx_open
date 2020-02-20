@@ -1,6 +1,6 @@
 #pragma once
 
-#include<QtCore/QStringList>
+#include <QtCore/QStringList>
 
 struct NetworkOptions
 {

@@ -186,6 +186,7 @@ bool CameraPool::startDiscovery()
         QCoreApplication::instance(), &QCoreApplication::quit);
 
     m_discoveryListener->start();
+
     start(); //< QnTcpListener
 
     return true;

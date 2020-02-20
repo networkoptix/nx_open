@@ -160,7 +160,7 @@ std::optional<SocketAddress> CameraDiscoveryListener::obtainDiscoverySocketAddre
     if (!discoverySocket)
         return error("Unable to create discovery socket.");
 
-    std::optional<SocketAddress> socketAddress = obtainDiscoverySocketAddress();
+    const std::optional<SocketAddress> socketAddress = obtainDiscoverySocketAddress();
     if (!socketAddress)
         return;
 
