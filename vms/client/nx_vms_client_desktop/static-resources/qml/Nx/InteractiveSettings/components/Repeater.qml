@@ -39,6 +39,7 @@ Item
         text: addButtonCaption || qsTr("Add")
 
         visible: visibleItemsCount < column.children.length
+        iconUrl: "qrc:///skin/buttons/plus.png"
 
         onClicked:
         {
