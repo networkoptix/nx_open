@@ -1,7 +1,9 @@
 #include "animation_timer.h"
+
 #include <cassert>
 #include <QtCore/QAbstractAnimation>
 #include <utils/common/warnings.h>
+#include <nx/utils/log/assert.h>
 
 // -------------------------------------------------------------------------- //
 // AnimationTimerListener
