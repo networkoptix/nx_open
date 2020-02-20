@@ -41,12 +41,12 @@ Yunhong Gu, last updated 05/05/2009
 #ifndef __UDT_BUFFER_H__
 #define __UDT_BUFFER_H__
 
-#include <mutex>
-
-#include "udt.h"
-#include "list.h"
-#include "queue.h"
 #include <fstream>
+#include <mutex>
+#include <optional>
+
+#include "common.h"
+#include "queue.h"
 
 
 static const int kDefaultMtuSize = 1400;
@@ -84,24 +84,18 @@ public:
     // Functionality:
     //    Find data position to pack a DATA packet from the furthest reading point.
     // Parameters:
-    //    0) [out] data: the pointer to the data position.
-    //    1) [out] msgno: message number of the packet.
-    // Returned value:
-    //    Actual length of data read.
+    //    0) [out] msgno: message number of the packet.
 
-    int readData(char** data, int32_t& msgno);
+    std::optional<Buffer> readData(int32_t& msgno);
 
     // Functionality:
     //    Find data position to pack a DATA packet for a retransmission.
     // Parameters:
-    //    0) [out] data: the pointer to the data position.
-    //    1) [in] offset: offset from the last ACK point.
-    //    2) [out] msgno: message number of the packet.
-    //    3) [out] msglen: length of the message
-    // Returned value:
-    //    Actual length of data read.
+    //    0) [in] offset: offset from the last ACK point.
+    //    1) [out] msgno: message number of the packet.
+    //    2) [out] msglen: length of the message
 
-    int readData(char** data, const int offset, int32_t& msgno, int& msglen);
+    std::optional<Buffer> readData(const int offset, int32_t& msgno, int& msglen);
 
     // Functionality:
     //    Update the ACK point and may release/unmap/return the user data according to the flag.
@@ -144,11 +138,11 @@ private:
     // m_pCurrBlock:    The current block
     // m_pLastBlock:     The last block (if first == last, buffer is empty)
 
-    struct Buffer
+    struct BufferNode
     {
         char* m_pcData;            // buffer
         int m_iSize;            // size
-        Buffer* m_pNext;            // next buffer
+        BufferNode* m_pNext;            // next buffer
     } *m_pBuffer;            // physical buffer
 
     int32_t m_iNextMsgNo;                // next message number

@@ -42,6 +42,7 @@ Yunhong Gu, last updated 01/27/2011
 #define __UDT_CHANNEL_H__
 
 #include <optional>
+#include <thread>
 
 #include "udt.h"
 #include "packet.h"
@@ -121,7 +122,7 @@ public:
     // Returned value:
     //    Actual size of data sent.
 
-    Result<int> sendto(const detail::SocketAddress& addr, CPacket& packet) const;
+    Result<int> sendto(const detail::SocketAddress& addr, CPacket& packet);
 
     // Functionality:
     //    Receive a packet from the channel and record the source address.
@@ -131,7 +132,7 @@ public:
     // Returned value:
     //    Actual size of data received.
 
-    Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet) const;
+    Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet);
 
     Result<> shutdown();
 
@@ -142,9 +143,12 @@ private:
     int m_iIPversion;                    // IP version
 
     UDPSOCKET m_iSocket;                 // socket descriptor
+    std::optional<std::thread::id> m_recvThreadId;
 
     int m_iSndBufSize;                   // UDP sending buffer size
     int m_iRcvBufSize;                   // UDP receiving buffer size
+    std::atomic<bool> m_inRecv = false;
+    std::atomic<bool> m_inSend = false;
 
                                          // Functionality:
                                          //    Disconnect and close the UDP entity.

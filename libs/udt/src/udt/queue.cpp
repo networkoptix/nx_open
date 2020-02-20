@@ -157,7 +157,6 @@ CUnitQueue::~CUnitQueue()
     while (p != nullptr)
     {
         delete[] p->m_pUnit;
-        delete[] p->m_pBuffer;
 
         CQEntry* q = p;
         if (p == m_pLastQueue)
@@ -172,19 +171,18 @@ int CUnitQueue::init(int size, int mss)
 {
     CQEntry* tempq = nullptr;
     CUnit* tempu = nullptr;
-    char* tempb = nullptr;
 
     tempq = new CQEntry;
     tempu = new CUnit[size];
-    tempb = new char[size * mss];
+    auto tempb = Buffer(size * mss);
 
     for (int i = 0; i < size; ++i)
     {
         tempu[i].m_iFlag = 0;
-        tempu[i].m_Packet.m_pcData = tempb + i * mss;
+        tempu[i].m_Packet.setPayload(tempb.substr(i * mss));
     }
     tempq->m_pUnit = tempu;
-    tempq->m_pBuffer = tempb;
+    tempq->m_pBuffer = std::move(tempb);
     tempq->m_iSize = size;
 
     m_pQEntry = m_pCurrQueue = m_pLastQueue = tempq;
@@ -224,22 +222,21 @@ int CUnitQueue::increase()
 
     CQEntry* tempq = nullptr;
     CUnit* tempu = nullptr;
-    char* tempb = nullptr;
 
     // all queues have the same size
     int size = m_pQEntry->m_iSize;
 
     tempq = new CQEntry;
     tempu = new CUnit[size];
-    tempb = new char[size * m_iMSS];
+    Buffer tempb(size * m_iMSS);
 
     for (int i = 0; i < size; ++i)
     {
         tempu[i].m_iFlag = 0;
-        tempu[i].m_Packet.m_pcData = tempb + i * m_iMSS;
+        tempu[i].m_Packet.setPayload(tempb.substr(i * m_iMSS));
     }
     tempq->m_pUnit = tempu;
-    tempq->m_pBuffer = tempb;
+    tempq->m_pBuffer = std::move(tempb);
     tempq->m_iSize = size;
 
     m_pLastQueue->next = tempq;
@@ -759,16 +756,14 @@ void CRendezvousQueue::updateConnStatus()
             }
 
             CPacket request;
-            char* reqdata = new char[udtSocket->payloadSize()];
-            request.pack(ControlPacketType::Handshake, nullptr, reqdata, udtSocket->payloadSize());
+            request.pack1(ControlPacketType::Handshake, nullptr, udtSocket->payloadSize());
             // ID = 0, connection request
             request.m_iID = !udtSocket->rendezvous() ? 0 : udtSocket->connRes().m_iID;
             int hs_size = udtSocket->payloadSize();
-            udtSocket->connReq().serialize(reqdata, hs_size);
+            udtSocket->connReq().serialize(request.payload().data(), hs_size);
             request.setLength(hs_size);
             udtSocket->sndQueue().sendto(i->peerAddr, request);
             udtSocket->setLastReqTime(CTimer::getTime());
-            delete[] reqdata;
         }
     }
 }
@@ -809,7 +804,6 @@ CRcvQueue::~CRcvQueue()
         while (!i->second.empty())
         {
             CPacket* pkt = i->second.front();
-            delete[] pkt->m_pcData;
             delete pkt;
             i->second.pop();
         }
@@ -857,10 +851,9 @@ void CRcvQueue::worker()
         {
             // no space, skip this packet
             CPacket temp;
-            temp.m_pcData = new char[m_iPayloadSize];
+            temp.setPayload(Buffer(m_iPayloadSize));
             temp.setLength(m_iPayloadSize);
             m_channel->recvfrom(addr, temp);
-            delete[] temp.m_pcData;
             timerCheck();
             continue;
         }
@@ -1002,10 +995,9 @@ int CRcvQueue::recvfrom(
 
     // copy packet content
     memcpy(packet.header(), newpkt->header(), kPacketHeaderSize);
-    memcpy(packet.m_pcData, newpkt->m_pcData, newpkt->getLength());
+    packet.setPayload(newpkt->payload());
     packet.setLength(newpkt->getLength());
 
-    delete[] newpkt->m_pcData;
     delete newpkt;
 
     // remove this message from queue,
@@ -1048,7 +1040,6 @@ void CRcvQueue::removeConnector(const UDTSOCKET& id)
     {
         while (!i->second.empty())
         {
-            delete[] i->second.front()->m_pcData;
             delete i->second.front();
             i->second.pop();
         }

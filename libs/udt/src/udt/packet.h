@@ -45,8 +45,10 @@ Yunhong Gu, last updated 01/02/2011
 #include <atomic>
 #include <cassert>
 #include <iostream>
+#include <memory>
 #include <tuple>
 
+#include "common.h"
 #include "udt.h"
 
 #ifdef _WIN32
@@ -91,13 +93,17 @@ public:
 
     const IoBuf& operator[](int i) const
     {
-        assert(!m_locked);
+        if (m_locked)
+            abort();
+
         return m_bufs[i];
     }
 
     IoBuf& operator[](int i)
     {
-        assert(!m_locked);
+        if (m_locked)
+            abort();
+
         return m_bufs[i];
     }
 
@@ -151,14 +157,17 @@ class UDT_API CPacket
 {
 private:
     PacketHeader m_nHeader;
-    BufArray<2> m_PacketVector;          // The 2-dimension vector of UDT packet [header, data]
 
 public:
     int32_t& m_iSeqNo;                   // alias: sequence number
     int32_t& m_iMsgNo;                   // alias: message number
     int32_t& m_iTimeStamp;               // alias: timestamp
-    int32_t& m_iID;            // alias: socket ID
-    char*& m_pcData;                     // alias: data/control information
+    int32_t& m_iID;                      // alias: socket ID
+
+    const Buffer& payload() const { return m_payload; }
+    Buffer& payload() { return m_payload; }
+
+    void setPayload(Buffer buffer) { m_payload = std::move(buffer); }
 
 public:
     CPacket();
@@ -187,12 +196,13 @@ public:
     // Parameters:
     //    0) [in] pkttype: packet type filed.
     //    1) [in] lparam: pointer to the first data structure, explained by the packet type.
-    //    2) [in] rparam: pointer to the second data structure, explained by the packet type.
-    //    3) [in] size: size of rparam, in number of bytes;
+    //    2) [in] size: size of payload, in number of bytes;
+    // NOTE: This function allocates the payload buffer, but it has to be filled
+    // by the caller after this function returns.
     // Returned value:
     //    None.
 
-    void pack(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
+    void pack1(ControlPacketType pkttype, void* lparam = NULL, int payloadSize = 0);
 
     // Functionality:
     //    Read the packet flag.
@@ -276,12 +286,17 @@ public:
     void lockPacketVector() { m_PacketVector.lock(); }
     void unlockPacketVector() { m_PacketVector.unlock(); }
 
-protected:
-
+private:
     int32_t __pad = 0;
+    // TODO: #ak Remove mutable.
+    mutable Buffer m_payload;
+    // TODO: #ak Remove mutable.
+    mutable BufArray<2> m_PacketVector;          // The 2-dimension vector of UDT packet [header, data]
 
-protected:
-    CPacket& operator=(const CPacket&);
+    // TODO: #ak Remove const.
+    void preparePacketVector() const;
+
+    CPacket& operator=(const CPacket&) = delete;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
