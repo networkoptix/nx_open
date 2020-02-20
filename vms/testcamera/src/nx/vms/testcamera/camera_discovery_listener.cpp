@@ -138,6 +138,7 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
             serverAddress, nx::kit::utils::toString(response));
     }
 }
+
 /** @return Nullopt on error, having logged the error message. */
 std::optional<SocketAddress> CameraDiscoveryListener::obtainDiscoverySocketAddress() const
 {
