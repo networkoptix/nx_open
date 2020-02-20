@@ -1461,11 +1461,13 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
     const auto resource = resourcePool()->getResourceById(event.eventResourceId);
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
-    // TODO: Get the language for each user as soon as users have it in VMS server DB.
-    const auto language = common->globalSettings()->pushNotificationsLanguage();
-    NX_VERBOSE(this, "Translate push notification to %1", language);
-    QnTranslationManager::LocaleRollback localeGuard(
-        serverModule()->findInstance<QnTranslationManager>(), language);
+    // FIXME: VMS-17538.
+    #if !defined(_WIN32)
+        const auto language = common->globalSettings()->pushNotificationsLanguage();
+        NX_VERBOSE(this, "Translate push notification to %1", language);
+        QnTranslationManager::LocaleRollback localeGuard(
+            serverModule()->findInstance<QnTranslationManager>(), language);
+    #endif
 
     const auto join =
         [](const QString& delimiter, QStringList items)
@@ -1478,10 +1480,14 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
     return {
         join(" ", {
             nx::utils::switch_(vms::event::levelOf(action),
-                vms::event::Level::critical, [] { return "\u203C"; }, //< UTF for !!
-                vms::event::Level::important, [] { return "\u26A0"; }, //< UFT for (!)
-                vms::event::Level::success, [] { return "\u2705"; }, //< UTF for [v]
-                nx::utils::default_, [] { return ini().pushNotifyCommonUtfIcon ? "\u2615" : ""; }
+                vms::event::Level::critical,
+                [] { return QString(QChar(0x203C)); }, //< UTF for "!!".
+                vms::event::Level::important,
+                [] { return QString(QChar(0x26A0)); }, //< UTF for "(!)".
+                vms::event::Level::success,
+                [] { return QString(QChar(0x2705)); }, //< UTF for "[v]".
+                nx::utils::default_,
+                [] { return ini().pushNotifyCommonUtfIcon ? QString(QChar(0x2615)) : QString(); }
             ),
             // TODO: May return HTML. Make sure it works on android and iOS.
             strings.notificationCaption(event, camera, /*includeHtml*/ false),
