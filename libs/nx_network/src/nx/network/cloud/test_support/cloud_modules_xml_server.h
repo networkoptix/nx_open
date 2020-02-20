@@ -21,7 +21,7 @@ class NX_NETWORK_API CloudModulesXmlServer
 public:
     static constexpr char kRequestPath[] = "/cloud_modules.xml";
 
-    class Modules
+    class NX_NETWORK_API Modules
     {
         public:
             void setCdbUrl(const nx::utils::Url& url);
