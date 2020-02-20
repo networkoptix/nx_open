@@ -349,7 +349,8 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
         {"E", "6.03"},
         {"B", "6.03"},
         {"I", "6.03"},
-        {"AB2L", ""} //< Any firmware version.
+        {"AB2L", ""}, //< Any firmware version.
+        {"AB3L", ""}, //< Any firmware version.
     };
 
     QByteArray version;
