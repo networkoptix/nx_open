@@ -534,14 +534,14 @@ private:
 
 TEST_F(NxMediaPlayerTest, SetQuality)
 {
-    PlayerSetQualityTest qualityTest;
+    PlayerSetQualityTest playerSetQualityTest;
 
     static const auto high = Player::HighVideoQuality;
     static const auto low = Player::LowVideoQuality;
     static const auto lowIframes = Player::LowIframesOnlyVideoQuality;
     static const auto unknown = Player::UnknownVideoQuality;
 
-    #define T TestCase().setLineNumber(__LINE__).setExecutor(&qualityTest)
+    #define T TestCase().setLineNumber(__LINE__).setExecutor(&playerSetQualityTest)
 
     // High quality requested.
     T.noTrans().low(320, 240).high(1920, 1080).max(1920, 1080).req(high) >> high;
