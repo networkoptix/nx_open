@@ -16,7 +16,7 @@ namespace nx::network::cloud::test {
  *      <set resName="speedtest_module" resValue="http://speedtest.vmsproxy.com"/>
  *  </sequence>
  */
-class CloudModulesXmlServer
+class NX_NETWORK_API CloudModulesXmlServer
 {
 public:
     static constexpr char kRequestPath[] = "/cloud_modules.xml";
