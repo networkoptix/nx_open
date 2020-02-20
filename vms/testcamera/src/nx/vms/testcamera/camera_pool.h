@@ -33,7 +33,7 @@ public:
      */
     CameraPool(
         const FileCache* fileCache,
-        NetworkOptions networkSettings,
+        NetworkOptions networkOptions,
         QnCommonModule* commonModule,
         bool noSecondaryStream,
         std::optional<int> fpsPrimary,
@@ -77,7 +77,7 @@ private:
 
 private:
     const FileCache* const m_fileCache;
-    const NetworkOptions m_networkSettings;
+    const NetworkOptions m_networkOptions;
     const std::unique_ptr<Logger> m_logger;
     const std::unique_ptr<FrameLogger> m_frameLogger;
     std::map<nx::utils::MacAddress, std::unique_ptr<Camera>> m_cameraByMacAddress;

@@ -20,11 +20,11 @@ namespace nx::vms::testcamera {
 CameraDiscoveryListener::CameraDiscoveryListener(
     const Logger* logger,
     std::function<QByteArray()> obtainDiscoveryResponseMessageFunc,
-    NetworkOptions networkSettings)
+    NetworkOptions networkOptions)
     :
     m_logger(logger),
     m_obtainDiscoveryResponseMessageFunc(std::move(obtainDiscoveryResponseMessageFunc)),
-    m_networkSettings(std::move(networkSettings))
+    m_networkOptions(std::move(networkOptions))
 {
 }
 
@@ -35,7 +35,7 @@ CameraDiscoveryListener::~CameraDiscoveryListener()
 
 bool CameraDiscoveryListener::initialize()
 {
-    for (const auto& addr: m_networkSettings.localInterfacesToListen)
+    for (const auto& addr: m_networkOptions.localInterfacesToListen)
     {
         for (const auto& iface: nx::network::getAllIPv4Interfaces(
             nx::network::InterfaceListPolicy::keepAllAddressesPerInterface,
@@ -53,7 +53,7 @@ bool CameraDiscoveryListener::initialize()
         }
     }
 
-    if (m_allowedIpRanges.size() == 0 && m_networkSettings.localInterfacesToListen.size() > 0)
+    if (m_allowedIpRanges.size() == 0 && m_networkOptions.localInterfacesToListen.size() > 0)
     {
         NX_LOGGER_ERROR(m_logger, "Unable to obtain IP ranges to accept discovery messages.");
         return false;
@@ -141,14 +141,14 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
 /** @return Nullopt on error, having logged the error message. */
 std::optional<SocketAddress> CameraDiscoveryListener::obtainDiscoverySocketAddress() const
 {
-    if (m_networkSettings.discoveryPort <= 0 || m_networkSettings.discoveryPort >= 65536)
+    if (m_networkOptions.discoveryPort <= 0 || m_networkOptions.discoveryPort >= 65536)
     {
         NX_LOGGER_ERROR(m_logger, "Invalid discoveryPort in .ini: %1.",
-            m_networkSettings.discoveryPort);
+            m_networkOptions.discoveryPort);
         return std::nullopt;
     }
 
-    return SocketAddress(HostAddress::anyHost, m_networkSettings.discoveryPort);
+    return SocketAddress(HostAddress::anyHost, m_networkOptions.discoveryPort);
 }
 
 /*virtual*/ void CameraDiscoveryListener::run()

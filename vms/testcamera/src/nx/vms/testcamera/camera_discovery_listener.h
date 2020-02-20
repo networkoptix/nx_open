@@ -31,7 +31,7 @@ public:
     CameraDiscoveryListener(
         const Logger* logger,
         std::function<QByteArray()> obtainDiscoveryResponseMessageFunc,
-        NetworkOptions networkSettings);
+        NetworkOptions networkOptions);
 
     virtual ~CameraDiscoveryListener();
 
@@ -64,7 +64,7 @@ protected:
 private:
     const Logger* const m_logger;
     const std::function<QByteArray()> m_obtainDiscoveryResponseMessageFunc;
-    const NetworkOptions m_networkSettings;
+    const NetworkOptions m_networkOptions;
     std::vector<IpRangeV4> m_allowedIpRanges;
 };
 
