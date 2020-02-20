@@ -149,7 +149,7 @@ static const int kEmailSendDelay = 0;
 static const QChar kOldEmailDelimiter(L';');
 static const QChar kNewEmailDelimiter(L' ');
 
-static const size_t kPushThumbnailHeight = 64;
+static const size_t kPushThumbnailHeight = 480;
 
 } // namespace
 
@@ -1448,7 +1448,8 @@ PushPayload ExtendedRuleProcessor::makePushPayload(
             .addQueryItem("height", kPushThumbnailHeight);
     }
 
-    return {url.toString(), imageUrl.toString()};
+    const QString imageUrlOverride(ini().pushNotifyImageUrl);
+    return {url.toString(), imageUrlOverride.isEmpty() ? imageUrl.toString() : imageUrlOverride};
 }
 
 PushNotification ExtendedRuleProcessor::makePushNotification(
@@ -1480,10 +1481,10 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
                 vms::event::Level::critical, [] { return "\u203C"; }, //< UTF for !!
                 vms::event::Level::important, [] { return "\u26A0"; }, //< UFT for (!)
                 vms::event::Level::success, [] { return "\u2705"; }, //< UTF for [v]
-                nx::utils::default_, [] { return ""; }
+                nx::utils::default_, [] { return ini().pushNotifyCommonUtfIcon ? "\u2615" : ""; }
             ),
             // TODO: May return HTML. Make sure it works on android and iOS.
-            strings.notificationCaption(event, camera),
+            strings.notificationCaption(event, camera, /*includeHtml*/ false),
         }),
         join("\n", {
             resource ? resource->getName() : QString(),

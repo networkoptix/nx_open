@@ -63,6 +63,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_INT(100, stopTimeoutS, "Timeout to wait on server stop before crash.");
 
     NX_INI_FLAG(0, pushNotifyOnPopup, "Sends push notifications on popup actions.");
+    NX_INI_FLAG(0, pushNotifyCommonUtfIcon, "Enables UTF icon for common level messages.");
+    NX_INI_STRING(0, pushNotifyImageUrl, "Overrides imageUrl for all push notifications.");
 };
 
 inline Ini& ini()

@@ -877,14 +877,14 @@ QString StringsHelper::poeConsumptionStringFromParams(const EventParameters& par
 
 QString StringsHelper::notificationCaption(
     const EventParameters& parameters,
-    const QnVirtualCameraResourcePtr& camera) const
+    const QnVirtualCameraResourcePtr& camera,
+    bool includeHtml) const
 {
     switch (parameters.eventType)
     {
         case EventType::softwareTriggerEvent:
-            return lit("%1 <b>%2</b>").arg(
-                eventName(parameters.eventType),
-                getSoftwareTriggerName(parameters));
+            return (includeHtml ? lit("%1 <b>%2</b>") : lit("%1 %2"))
+                .arg(eventName(parameters.eventType), getSoftwareTriggerName(parameters));
 
         case EventType::userDefinedEvent:
             return parameters.caption.isEmpty()
