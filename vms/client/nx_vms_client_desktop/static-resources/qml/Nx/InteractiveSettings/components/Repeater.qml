@@ -19,8 +19,7 @@ Item
 
     function processFilledChanged()
     {
-        if (!addButton.wasClicked)
-            visibleItemsCount = lastFilledItemIndex() + 1
+        visibleItemsCount = Math.max(visibleItemsCount, lastFilledItemIndex() + 1)
     }
 
     AlignedColumn
@@ -28,18 +27,12 @@ Item
         id: column
         width: parent.width
 
-        onChildrenChanged:
-        {
-            visibleItemsCount = lastFilledItemIndex() + 1
-            updateVisibility()
-        }
+        onChildrenChanged: initialVisibilityUpdateTimer.restart()
     }
 
     Button
     {
         id: addButton
-
-        property bool wasClicked: false
 
         anchors.bottom: parent.bottom
         x: column.labelWidth + 8
@@ -49,10 +42,21 @@ Item
 
         onClicked:
         {
-            wasClicked = true
-
             if (visibleItemsCount < column.children.length)
                 ++visibleItemsCount
+        }
+    }
+
+    Timer
+    {
+        // Queued update of visible items count.
+        id: initialVisibilityUpdateTimer
+        interval: 0
+        running: false
+        onTriggered:
+        {
+            visibleItemsCount = lastFilledItemIndex() + 1
+            updateVisibility()
         }
     }
 
