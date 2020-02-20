@@ -42,6 +42,7 @@ struct CliOptions
     QStringList localInterfaces;
     std::optional<int> discoveryPort;
     std::optional<int> mediaPort;
+    bool reuseDiscoveryPort = false;
     std::vector<CameraSet> cameraSets;
 };
 

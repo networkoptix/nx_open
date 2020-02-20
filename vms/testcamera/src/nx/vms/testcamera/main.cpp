@@ -63,6 +63,8 @@ NetworkOptions makeNetworkOptions(const CliOptions& options)
     else
         result.mediaPort = ini().mediaPort;
 
+    result.reuseDiscoveryPort = options.reuseDiscoveryPort;
+
     return result;
 }
 

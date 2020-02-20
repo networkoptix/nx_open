@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <QtCore/QCoreApplication>
+
 #include <nx/kit/utils.h>
 #include <nx/network/nettools.h>
 #include <nx/vms/testcamera/test_camera_ini.h>
@@ -18,7 +20,7 @@ namespace nx::vms::testcamera {
 
 CameraPool::CameraPool(
     const FileCache* const fileCache,
-    NetworkOptions networkSettings,
+    NetworkOptions networkOptions,
     QnCommonModule* commonModule,
     bool noSecondaryStream,
     std::optional<int> fpsPrimary,
@@ -27,10 +29,10 @@ CameraPool::CameraPool(
     QnTcpListener(
         commonModule,
         QHostAddress::Any,
-        networkSettings.mediaPort
+        networkOptions.mediaPort
     ),
     m_fileCache(fileCache),
-    m_networkSettings(std::move(networkSettings)),
+    m_networkOptions(std::move(networkOptions)),
     m_logger(new Logger("CameraPool")),
     m_frameLogger(new FrameLogger()),
     m_noSecondaryStream(noSecondaryStream),
@@ -41,6 +43,7 @@ CameraPool::CameraPool(
 
 CameraPool::~CameraPool()
 {
+    stop();
 }
 
 void CameraPool::reportAddingCameras(
@@ -206,7 +209,7 @@ QByteArray CameraPool::obtainDiscoveryResponseMessage() const
 {
     QMutexLocker lock(&m_mutex);
 
-    DiscoveryResponse discoveryResponse(m_networkSettings.mediaPort);
+    DiscoveryResponse discoveryResponse(m_networkOptions.mediaPort);
     for (const auto& [macAddress, camera]: m_cameraByMacAddress)
     {
         if (camera->isEnabled())
@@ -225,12 +228,19 @@ bool CameraPool::startDiscovery()
     m_discoveryListener = std::make_unique<CameraDiscoveryListener>(
         m_logger.get(),
         [this]() { return obtainDiscoveryResponseMessage(); },
-        m_networkSettings);
+        m_networkOptions);
 
     if (!m_discoveryListener->initialize())
         return false;
 
+    // If any thread finishes (e.g. due to an error), testcamera must exit.
+    connect(m_discoveryListener.get(), &CameraDiscoveryListener::finished,
+        QCoreApplication::instance(), &QCoreApplication::quit);
+    connect(this, &CameraPool::finished,
+        QCoreApplication::instance(), &QCoreApplication::quit);
+
     m_discoveryListener->start();
+
     start(); //< QnTcpListener
 
     return true;
