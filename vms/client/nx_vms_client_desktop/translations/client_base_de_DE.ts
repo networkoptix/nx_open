@@ -2646,7 +2646,7 @@ to %1</source>
     <name>QnCloudUsersValidationPolicy</name>
     <message>
       <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
-      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+      <translation>%1 von %2 ausgewählten Benutzern sind keine Cloudnutzer und erhalten keine mobilen Benachrichtigungen.</translation>
     </message>
   </context>
   <context>
@@ -9111,7 +9111,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
       <source>Cloud users</source>
-      <translation type="unfinished">Cloud users</translation>
+      <translation>Cloudnutzer</translation>
     </message>
   </context>
   <context>

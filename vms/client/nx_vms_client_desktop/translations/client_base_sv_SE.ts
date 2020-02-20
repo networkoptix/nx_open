@@ -2651,7 +2651,7 @@ till %1</translation>
     <name>QnCloudUsersValidationPolicy</name>
     <message>
       <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
-      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+      <translation>%1 av %2 utvalda användare är inte molnanvändare och kommer inte att få mobilaviseringar.</translation>
     </message>
   </context>
   <context>
@@ -9116,7 +9116,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
       <source>Cloud users</source>
-      <translation type="unfinished">Cloud users</translation>
+      <translation>Molnanvändare</translation>
     </message>
   </context>
   <context>

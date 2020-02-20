@@ -116,9 +116,9 @@
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Denna rad kräver minst %n punkter.</numerusform>
+        <numerusform>Denna rad kräver minst %n punkter.</numerusform>
       </translation>
     </message>
   </context>
@@ -189,9 +189,9 @@
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Denna polygon kräver minst %n punkter.</numerusform>
+        <numerusform>Denna polygon kräver minst %n punkter.</numerusform>
       </translation>
     </message>
   </context>
@@ -199,7 +199,7 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Lägg till</translation>
     </message>
   </context>
   <context>

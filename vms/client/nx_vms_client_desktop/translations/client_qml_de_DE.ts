@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Klicken, um hinzuzufügen</translation>
     </message>
   </context>
   <context>
@@ -86,11 +86,11 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Kamerastream</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Videostream von der Kamera zur Analyse auswählen</translation>
     </message>
   </context>
   <context>
@@ -116,9 +116,9 @@
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Diese Linie benötigt mindestens %n Punkt.</numerusform>
+        <numerusform>Diese Linie benötigt mindestens %n Punkte.</numerusform>
       </translation>
     </message>
   </context>
@@ -189,9 +189,9 @@
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Dieses Polygon benötigt mindestens %n Punkt.</numerusform>
+        <numerusform>Dieses Polygon benötigt mindestens %n Punkte.</numerusform>
       </translation>
     </message>
   </context>
@@ -199,7 +199,7 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Hinzufügen</translation>
     </message>
   </context>
   <context>
