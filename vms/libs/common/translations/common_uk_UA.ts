@@ -23,7 +23,7 @@
       <comment>Full suffix for displaying bytes</comment>
       <translation>
         <numerusform>Байт</numerusform>
-        <numerusform>Байтів</numerusform>
+        <numerusform>Байти</numerusform>
         <numerusform>Байтів</numerusform>
         <numerusform>Байтів</numerusform>
       </translation>
@@ -38,9 +38,9 @@
       <comment>Full suffix for displaying kilobytes</comment>
       <translation>
         <numerusform>Кілобайт</numerusform>
+        <numerusform>Кілобайт</numerusform>
         <numerusform>Кілобайти</numerusform>
-        <numerusform>Кілобайтів</numerusform>
-        <numerusform>Кілобайтів</numerusform>
+        <numerusform>Кілобайти</numerusform>
       </translation>
     </message>
     <message>
@@ -53,7 +53,7 @@
       <comment>Full suffix for displaying megabytes</comment>
       <translation>
         <numerusform>Мегабайт</numerusform>
-        <numerusform>Мегабайтів</numerusform>
+        <numerusform>Мегабайти</numerusform>
         <numerusform>Мегабайтів</numerusform>
         <numerusform>Мегабайтів</numerusform>
       </translation>
@@ -70,7 +70,7 @@
         <numerusform>Гігабайт</numerusform>
         <numerusform>Гігабайти</numerusform>
         <numerusform>Гігабайтів</numerusform>
-        <numerusform>Гігабайтів</numerusform>
+        <numerusform>Гігабайти</numerusform>
       </translation>
     </message>
     <message>
@@ -82,10 +82,10 @@
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
       <translation>
-        <numerusform>Теребайт</numerusform>
+        <numerusform>Терабайт</numerusform>
         <numerusform>Терабайти</numerusform>
         <numerusform>Терабайтів</numerusform>
-        <numerusform>Терабайтів</numerusform>
+        <numerusform>Терабайти</numerusform>
       </translation>
     </message>
     <message>
@@ -98,9 +98,9 @@
       <comment>Full suffix for displaying petabytes</comment>
       <translation>
         <numerusform>Петабайт</numerusform>
-        <numerusform>Петабайти</numerusform>
-        <numerusform>Петабайтів</numerusform>
-        <numerusform>Петабайтів</numerusform>
+        <numerusform>Петбайти</numerusform>
+        <numerusform>Петбайтів</numerusform>
+        <numerusform>Петбайти</numerusform>
       </translation>
     </message>
     <message>
@@ -1395,10 +1395,6 @@
       <translation>Записати в журнал</translation>
     </message>
     <message>
-      <source>Show notification</source>
-      <translation>Показати сповіщення</translation>
-    </message>
-    <message>
       <source>Repeat sound</source>
       <translation>Повторити звук</translation>
     </message>
@@ -1951,6 +1947,30 @@
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
       <translation>Причина: Перевищено ліміт потужності (%1)</translation>
+    </message>
+    <message>
+      <source>Show desktop notification</source>
+      <translation type="unfinished">Show desktop notification</translation>
+    </message>
+    <message>
+      <source>Send mobile notification</source>
+      <translation type="unfinished">Send mobile notification</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
     </message>
   </context>
   <context>

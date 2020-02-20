@@ -1251,10 +1251,6 @@
       <translation>寫入至日誌</translation>
     </message>
     <message>
-      <source>Show notification</source>
-      <translation>顯示通知</translation>
-    </message>
-    <message>
       <source>Repeat sound</source>
       <translation>重複播放聲音</translation>
     </message>
@@ -1771,6 +1767,30 @@
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
       <translation>原因：超出供電上限（%1）</translation>
+    </message>
+    <message>
+      <source>Show desktop notification</source>
+      <translation type="unfinished">Show desktop notification</translation>
+    </message>
+    <message>
+      <source>Send mobile notification</source>
+      <translation type="unfinished">Send mobile notification</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
     </message>
   </context>
   <context>

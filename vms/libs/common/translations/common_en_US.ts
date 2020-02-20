@@ -22,8 +22,8 @@
         <source>Bytes</source>
         <comment>Full suffix for displaying bytes</comment>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Byte</numerusform>
+            <numerusform>Bytes</numerusform>
         </translation>
     </message>
     <message>
@@ -35,8 +35,8 @@
         <source>Kilobytes</source>
         <comment>Full suffix for displaying kilobytes</comment>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Kilobyte</numerusform>
+            <numerusform>Kilobytes</numerusform>
         </translation>
     </message>
     <message>
@@ -48,8 +48,8 @@
         <source>Megabytes</source>
         <comment>Full suffix for displaying megabytes</comment>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Megabyte</numerusform>
+            <numerusform>Megabytes</numerusform>
         </translation>
     </message>
     <message>
@@ -61,8 +61,8 @@
         <source>Gigabytes</source>
         <comment>Full suffix for displaying gigabytes</comment>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Gigabyte</numerusform>
+            <numerusform>Gigabytes</numerusform>
         </translation>
     </message>
     <message>
@@ -74,8 +74,8 @@
         <source>Terabytes</source>
         <comment>Full suffix for displaying terabytes</comment>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Terabyte</numerusform>
+            <numerusform>Terabytes</numerusform>
         </translation>
     </message>
     <message>
@@ -87,8 +87,8 @@
         <source>Petabytes</source>
         <comment>Full suffix for displaying petabytes</comment>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Petabyte</numerusform>
+            <numerusform>Petabytes</numerusform>
         </translation>
     </message>
     <message>
@@ -1299,10 +1299,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Show notification</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Repeat sound</source>
         <translation></translation>
     </message>
@@ -1831,6 +1827,30 @@
         <source>Reason: Power limit exceeded (%1)</source>
         <comment>%1 is consumption</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Show desktop notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send mobile notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Consumption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module was disconnected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

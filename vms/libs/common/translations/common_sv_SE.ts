@@ -1299,10 +1299,6 @@
       <translation>Skriv till logg</translation>
     </message>
     <message>
-      <source>Show notification</source>
-      <translation>Visa avisering</translation>
-    </message>
-    <message>
       <source>Repeat sound</source>
       <translation>Upprepa ljudet</translation>
     </message>
@@ -1831,6 +1827,30 @@
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
       <translation>Anledning: Effektbegränsningen överskridits (%1)</translation>
+    </message>
+    <message>
+      <source>Show desktop notification</source>
+      <translation>Aktivera skrivbordsnotifiering</translation>
+    </message>
+    <message>
+      <source>Send mobile notification</source>
+      <translation>Skicka mobilavisering</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Förbrukning</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation>Enhet kopplades bort</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation>Kamera kopplades bort</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation>I/O-modul kopplades bort</translation>
     </message>
   </context>
   <context>

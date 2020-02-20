@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>empty</source>
-      <translation>空</translation>
+      <translation>未找到</translation>
     </message>
     <message>
       <source>less than an hour</source>
@@ -1251,10 +1251,6 @@
       <translation>写入日志</translation>
     </message>
     <message>
-      <source>Show notification</source>
-      <translation>显示通知</translation>
-    </message>
-    <message>
       <source>Repeat sound</source>
       <translation>循环播放声音</translation>
     </message>
@@ -1771,6 +1767,30 @@
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
       <translation>原因：超出供电上限（%1）</translation>
+    </message>
+    <message>
+      <source>Show desktop notification</source>
+      <translation type="unfinished">Show desktop notification</translation>
+    </message>
+    <message>
+      <source>Send mobile notification</source>
+      <translation type="unfinished">Send mobile notification</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
     </message>
   </context>
   <context>
