@@ -164,11 +164,16 @@ std::optional<SocketAddress> CameraDiscoveryListener::obtainDiscoverySocketAddre
     if (!socketAddress)
         return;
 
-    if (!discoverySocket->setReuseAddrFlag(true))
-        return error(lm("Unable tor set the reuse address flag on the discovery socket."));
+    if (m_networkOptions.reuseDiscoveryPort)
+    {
+        NX_LOGGER_DEBUG(m_logger, "Will reuse discovery port.");
 
-    if (!discoverySocket->setReusePortFlag(true))
-        return error(lm("Unable tor set the reuse port flag on the discovery socket."));
+        if (!discoverySocket->setReuseAddrFlag(true))
+            return error(lm("Unable tor set the reuse address flag on the discovery socket."));
+
+        if (!discoverySocket->setReusePortFlag(true))
+            return error(lm("Unable tor set the reuse port flag on the discovery socket."));
+    }
 
     if (!discoverySocket->bind(*socketAddress))
         return error(lm("Unable to bind discovery socket to %1").args(socketAddress));
