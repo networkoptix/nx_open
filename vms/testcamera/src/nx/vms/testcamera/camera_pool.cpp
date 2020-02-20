@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <QtCore/QCoreApplication>
+
 #include <nx/kit/utils.h>
 #include <nx/network/nettools.h>
 #include <nx/vms/testcamera/test_camera_ini.h>
@@ -176,6 +178,12 @@ bool CameraPool::startDiscovery()
 
     if (!m_discoveryListener->initialize())
         return false;
+
+    // If any thread finishes (e.g. due to an error), testcamera must exit.
+    connect(m_discoveryListener.get(), &CameraDiscoveryListener::finished,
+        QCoreApplication::instance(), &QCoreApplication::quit);
+    connect(this, &CameraPool::finished,
+        QCoreApplication::instance(), &QCoreApplication::quit);
 
     m_discoveryListener->start();
     start(); //< QnTcpListener
