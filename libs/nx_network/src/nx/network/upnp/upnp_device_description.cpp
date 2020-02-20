@@ -28,6 +28,7 @@ QString fromUpnpUrn(const QString& urn, const QString& suffix, int version)
 
 bool DeviceDescriptionHandler::startDocument()
 {
+    m_deviceStack.clear();
     m_deviceInfo = DeviceInfo();
     m_paramElement.clear();
     m_lastService = nullptr;
