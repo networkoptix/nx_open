@@ -17,11 +17,11 @@ static constexpr std::chrono::milliseconds kOneDay = std::chrono::hours(24);
 } // namespace
 
 UplinkSpeedReporter::UplinkSpeedReporter(
+    const nx::utils::Url& cloudModulesXmlUrl,
     hpm::api::MediatorConnector* mediatorConnector,
-    const std::optional<nx::utils::Url>& speedTestUrlMockup,
     std::unique_ptr<nx::network::aio::Scheduler> scheduler):
+    m_cloudModulesXmlUrl(cloudModulesXmlUrl),
     m_mediatorConnector(mediatorConnector),
-    m_speedTestUrlMockup(speedTestUrlMockup),
     m_scheduler(std::move(scheduler))
 {
     m_mediatorConnector->subsribeToSystemCredentialsSet(
@@ -60,8 +60,8 @@ void UplinkSpeedReporter::stopWhileInAioThread()
 void UplinkSpeedReporter::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
-    if (m_cloudModuleUrlFetcher)
-        m_cloudModuleUrlFetcher->bindToAioThread(aioThread);
+    if (m_speedTestUrlFetcher)
+        m_speedTestUrlFetcher->bindToAioThread(aioThread);
     if (m_uplinkSpeedTester)
         m_uplinkSpeedTester->bindToAioThread(aioThread);
     if (m_mediatorApiClient)
@@ -76,11 +76,18 @@ void UplinkSpeedReporter::setAboutToRunSpeedTestHandler(
     m_aboutToRunSpeedTestHandler = std::move(handler);
 }
 
+void UplinkSpeedReporter::setFetchMediatorAddressHandler(
+    FetchMediatorAddressHandler handler)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_fetchMediatorAddressHandler = std::move(handler);
+}
+
 void UplinkSpeedReporter::stopTest()
 {
     m_testInProgress = false;
     m_peerConnectionSpeed = std::nullopt;
-    m_cloudModuleUrlFetcher.reset();
+    m_speedTestUrlFetcher.reset();
     m_uplinkSpeedTester.reset();
     m_mediatorApiClient.reset();
 }
@@ -112,25 +119,15 @@ void UplinkSpeedReporter::fetchSpeedTestUrl()
             }
             m_testInProgress = true;
 
-            m_cloudModuleUrlFetcher =
+            m_speedTestUrlFetcher =
                 std::make_unique<CloudModuleUrlFetcher>(network::cloud::kSpeedTestModuleName);
-            m_cloudModuleUrlFetcher->bindToAioThread(getAioThread());
+            m_speedTestUrlFetcher->bindToAioThread(getAioThread());
 
-            {
-                QnMutexLocker lock(&m_mutex);
-                if (m_speedTestUrlMockup)
-                    m_cloudModuleUrlFetcher->setUrl(*m_speedTestUrlMockup);
-            }
+            NX_VERBOSE(this, "Fetching speed test url from %1...", m_cloudModulesXmlUrl);
 
-            NX_VERBOSE(this, "Fetching speed test url...");
+            m_speedTestUrlFetcher->setModulesXmlUrl(m_cloudModulesXmlUrl);
 
-            // NOTE: if setUrl has been called, calling setModulesXmlUrl() has no effect.
-            // get() will return immediately.
-            m_cloudModuleUrlFetcher->setModulesXmlUrl(
-                AppInfo::defaultCloudModulesXmlUrl(
-                    AppInfo::defaultCloudHostName()));
-
-            m_cloudModuleUrlFetcher->get(
+            m_speedTestUrlFetcher->get(
                 std::bind(&UplinkSpeedReporter::onFetchSpeedTestUrlComplete, this, _1, _2));
         });
 }
@@ -138,12 +135,12 @@ void UplinkSpeedReporter::fetchSpeedTestUrl()
 void UplinkSpeedReporter::onSystemCredentialsSet(
     std::optional<hpm::api::SystemCredentials> credentials)
 {
-    NX_VERBOSE(this, "Cloud System Credentials have been set");
+    NX_VERBOSE(this, "Cloud system credentials have been set: %1", credentials.has_value());
 
     if (!credentials)
         return disable(__func__);
 
-    if (m_cloudModuleUrlFetcher)
+    if (m_speedTestUrlFetcher)
         return;
 
     NX_VERBOSE(this, "Starting scheduler");
@@ -212,6 +209,12 @@ void UplinkSpeedReporter::onFetchMediatorAddressComplete(
         "Fetched Mediator adress, http status code = %1, mediator address = {%2}",
         http::StatusCode::toString(statusCode), mediatorAddress);
 
+    {
+        QnMutexLocker lock(&m_mutex);
+        if(m_fetchMediatorAddressHandler)
+            m_fetchMediatorAddressHandler(statusCode, mediatorAddress);
+    }
+
     if (!http::StatusCode::isSuccessCode(statusCode))
     {
         NX_VERBOSE(this, "Failed to fetch mediator address, speed test will not be performed");
@@ -238,6 +241,7 @@ void UplinkSpeedReporter::onFetchMediatorAddressComplete(
         [this](auto resultCode)
         {
             NX_VERBOSE(this, "reportUplinkSpeed complete, resultCode = %1", resultCode);
+            m_testInProgress = false;
         });
 }
 

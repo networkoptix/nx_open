@@ -1,40 +1,38 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/app_info.h>
 #include <nx/network/aio/scheduler.h>
 #include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/cloud/speed_test/uplink_speed_tester.h>
 #include <nx/network/cloud/speed_test/uplink_speed_tester_factory.h>
 #include <nx/network/cloud/speed_test/uplink_speed_reporter.h>
 #include <nx/network/cloud/speed_test/http_api_paths.h>
+#include <nx/network/cloud/test_support/cloud_modules_xml_server.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx::network::cloud::speed_test::test {
 
+using namespace cloud::test;
+
 namespace {
+
+static constexpr char kDiscoveryPrefix[] = "/discovery";
 
 class UplinkSpeedTestServer
 {
 public:
-    UplinkSpeedTestServer()
+    void registerRequestHandlers(
+        const std::string& basePath,
+        network::http::server::rest::MessageDispatcher* messageDispatcher)
     {
-		m_server.registerRequestProcessorFunc(
-			speed_test::http::kApiPath,
+		messageDispatcher->registerRequestProcessorFunc(
+            network::http::kAnyMethod,
+			url::joinPath(basePath, speed_test::http::kApiPath),
 			[this](auto&& ... args) { serve(std::forward<decltype(args)>(args)...); });
-    }
-
-    bool bindAndListen()
-    {
-        return m_server.bindAndListen();
-    }
-
-    nx::utils::Url url() const
-    {
-        return url::Builder()
-            .setScheme(nx::network::http::kUrlSchemeName)
-            .setEndpoint(m_server.serverAddress());
     }
 
 private:
@@ -50,12 +48,9 @@ private:
 		}
         completionHandler(nx::network::http::StatusCode::ok);
     }
-
-private:
-    nx::network::http::TestHttpServer m_server;
 };
 
-class MockUplinkSpeedTester: public AbstractSpeedTester
+class MockUplinkSpeedTester: public UplinkSpeedTester
 {
 public:
     MockUplinkSpeedTester(
@@ -66,10 +61,15 @@ public:
     {
     }
 
-    virtual void start(const nx::utils::Url& /*url*/, CompletionHandler handler) override
+    virtual void start(const nx::utils::Url& url, CompletionHandler handler) override
     {
-        m_testRunEvent->push(std::make_tuple(SystemError::noError, hpm::api::ConnectionSpeed{}));
-        handler(SystemError::noError, hpm::api::ConnectionSpeed{});
+        UplinkSpeedTester::start(
+            url,
+            [this, handler = std::move(handler)](const auto systemError, const auto uplinkSpeed)
+            {
+                m_testRunEvent->push(std::make_tuple(systemError, uplinkSpeed));
+                handler(systemError, std::move(uplinkSpeed));
+            });
     }
 
 private:
@@ -85,15 +85,25 @@ class TestFixture : public testing::Test
 protected:
 	virtual void SetUp() override
 	{
-		ASSERT_TRUE(m_speedTestServer.bindAndListen());
+		ASSERT_TRUE(m_testHttpServer.bindAndListen());
+        m_speedTestServer.registerRequestHandlers(
+            std::string(),
+            &m_testHttpServer.httpMessageDispatcher());
 	}
 
-	nx::utils::Url validSpeedTestUrl()
+    nx::utils::Url testHttpServerUrl() const
+    {
+        return url::Builder()
+            .setScheme(network::http::kUrlSchemeName)
+            .setEndpoint(m_testHttpServer.serverAddress());
+    }
+
+	nx::utils::Url validSpeedTestUrl() const
 	{
-		return m_speedTestServer.url();
+        return testHttpServerUrl();
 	}
 
-	nx::utils::Url invalidSpeedTestUrl()
+	nx::utils::Url invalidSpeedTestUrl() const
 	{
 		return "http://127.0.0.1:1";
 	}
@@ -123,6 +133,7 @@ protected:
 	}
 
 protected:
+    nx::network::http::TestHttpServer m_testHttpServer;
 	UplinkSpeedTestServer m_speedTestServer;
 
 	nx::utils::SyncQueue<std::tuple<
@@ -150,7 +161,7 @@ private:
     std::unique_ptr<speed_test::UplinkSpeedTester> m_speedTester;
 };
 
-TEST_F(UplinkSpeedTester, succeeds_with_valid_url_local)
+TEST_F(UplinkSpeedTester, succeeds_with_valid_url)
 {
 	whenStartSpeedTest(validSpeedTestUrl());
 	thenTestSucceeds();
@@ -178,37 +189,67 @@ public:
     }
 
 protected:
+    using FetchMediatorAddressResult =
+        std::pair<network::http::StatusCode::Value, nx::hpm::api::MediatorAddress>;
+
     virtual void SetUp() override
     {
+        TestFixture::SetUp();
+
+        overrideSpeedTestFactory();
         initializeFakeMediator();
-        mockupFactoryFunc();
 
-        m_mediatorConnector = std::make_unique<hpm::api::MediatorConnector>("");
+        m_mediatorConnector = std::make_unique<hpm::api::MediatorConnector>(
+            testHttpServerUrl().host().toStdString());
 
-        hpm::api::MediatorAddress address;
-        address.tcpUrl = url::Builder().setEndpoint(m_fakeMediator.serverAddress())
-            .setScheme(network::http::kUrlSchemeName);
-        m_mediatorConnector->mockupMediatorAddress(std::move(address));
+        m_mediatorConnector->mockupCloudModulesXmlUrl(cloudModulesXmlUrl());
 
-        using namespace nx::network::aio;
-
-        auto scheduler = std::make_unique<Scheduler>(
+        auto scheduler = std::make_unique<network::aio::Scheduler>(
             std::chrono::milliseconds(100),
             std::set{std::chrono::milliseconds(99)});
 
         m_scheduler = scheduler.get();
 
         m_reporter = std::make_unique<speed_test::UplinkSpeedReporter>(
+            cloudModulesXmlUrl(),
             m_mediatorConnector.get(),
-            m_speedTestServer.url(),
             std::move(scheduler));
 
         m_reporter->setAboutToRunSpeedTestHandler(
             [this](bool aboutToRunSpeedTest)
             {
                 NX_DEBUG(this, "About to start speed test: %1", aboutToRunSpeedTest);
-                ++m_testAttempts;
+                if (aboutToRunSpeedTest)
+                    ++m_testAttempts;
             });
+
+        m_reporter->setFetchMediatorAddressHandler(
+            [this](const auto& httpStatusCode, const auto& mediatorAddress)
+            {
+                m_fetchMediatorAddressEvent.push({httpStatusCode, mediatorAddress});
+            });
+    }
+
+    void givenValidCloudModules()
+    {
+        CloudModulesXmlServer::Modules modules;
+        modules.setSpeedTestUrl(validSpeedTestUrl());
+        modules.setHpmTcpUrl(mediatorHttpUrl());
+        modules.setHpmUdpUrl("stun://dummy");
+        initializeCloudModulesServer(std::move(modules));
+    }
+
+    void givenCloudModulesWithInvalidMediatorAddress()
+    {
+        CloudModulesXmlServer::Modules modules;
+        modules.setSpeedTestUrl(validSpeedTestUrl());
+        initializeCloudModulesServer(std::move(modules));
+    }
+
+    void givenSpeedTestWasRun()
+    {
+        whenSetSystemCredentials();
+        thenSpeedTestIsRun();
     }
 
     void whenSetSystemCredentials()
@@ -218,19 +259,43 @@ protected:
         m_mediatorConnector->setSystemCredentials(hpm::api::SystemCredentials());
     }
 
+    FetchMediatorAddressResult whenFetchMediatorAddress()
+    {
+        return m_fetchMediatorAddressEvent.pop();
+    }
+
+    void thenFetchMediatorAddressFailed(const FetchMediatorAddressResult& mediatorAddressResult)
+    {
+        ASSERT_NE(network::http::StatusCode::ok, mediatorAddressResult.first);
+    }
+
+    void thenFetchMediatorAddressSucceeded(const FetchMediatorAddressResult& mediatorAddressResult)
+    {
+        ASSERT_EQ(network::http::StatusCode::ok, mediatorAddressResult.first);
+        ASSERT_EQ(mediatorHttpUrl(), mediatorAddressResult.second.tcpUrl);
+    }
+
     void thenSpeedTestIsRun()
     {
         thenTestSucceeds();
         andTestResultIsValid();
     }
 
+    void thenMediatorAddressIsFetched()
+    {
+        const auto mediatorAddress = whenFetchMediatorAddress();
+        thenFetchMediatorAddressSucceeded(mediatorAddress);
+    }
+
     void thenUplinkSpeedIsReportedToMediator()
     {
+        NX_DEBUG(this, __func__);
         ASSERT_TRUE(m_reportReceivedEvent.pop());
     }
 
     void andTestIsPerformedExpectedNumberOfTimes()
     {
+        NX_DEBUG(this, __func__);
         // NOTE: <= because the SpeedTestReporter invokes one additional speed test when the
         // System credentials are set.
         while (m_testAttempts <= (int) m_scheduler->schedule().size())
@@ -238,7 +303,7 @@ protected:
     }
 
 private:
-    void mockupFactoryFunc()
+    void overrideSpeedTestFactory()
     {
         m_factoryFuncBak = UplinkSpeedTesterFactory::instance().setCustomFunc(
             [this]()
@@ -263,7 +328,29 @@ private:
             });
     }
 
+    void initializeCloudModulesServer(CloudModulesXmlServer::Modules modules)
+    {
+        m_cloudModulesServer.setModules(std::move(modules));
+        m_cloudModulesServer.registerHandler(
+            kDiscoveryPrefix,
+            &m_testHttpServer.httpMessageDispatcher());
+    }
+
+    nx::utils::Url cloudModulesXmlUrl() const
+    {
+        return url::Builder(testHttpServerUrl()).setPath(
+            url::joinPath(kDiscoveryPrefix, m_cloudModulesServer.kRequestPath));
+    }
+
+    nx::utils::Url mediatorHttpUrl() const
+    {
+        return network::url::Builder()
+            .setScheme(network::http::kUrlSchemeName)
+            .setEndpoint(m_fakeMediator.serverAddress());
+    }
+
 private:
+    cloud::test::CloudModulesXmlServer m_cloudModulesServer;
     nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractSpeedTester>(void)> m_factoryFuncBak;
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     std::unique_ptr<speed_test::UplinkSpeedReporter> m_reporter;
@@ -271,14 +358,32 @@ private:
     nx::utils::SyncQueue<bool> m_reportReceivedEvent;
     std::atomic_int m_testAttempts = 0;
     nx::network::aio::Scheduler* m_scheduler = nullptr;
+    nx::utils::SyncQueue<FetchMediatorAddressResult> m_fetchMediatorAddressEvent;
 };
 
 TEST_F(UplinkSpeedReporter, fetches_speed_test_url_and_performs_test_and_reports_results)
 {
+    givenValidCloudModules();
+
     whenSetSystemCredentials();
+
     thenSpeedTestIsRun();
+    thenMediatorAddressIsFetched();
     thenUplinkSpeedIsReportedToMediator();
+
     andTestIsPerformedExpectedNumberOfTimes();
+}
+
+TEST_F(UplinkSpeedReporter, doesnt_crash_when_fetching_mediator_address_fails)
+{
+    givenCloudModulesWithInvalidMediatorAddress();
+    givenSpeedTestWasRun();
+
+    const auto mediatorAddress = whenFetchMediatorAddress();
+
+    thenFetchMediatorAddressFailed(mediatorAddress);
+
+    // and process does not crash;
 }
 
 } // namespace nx::network::cloud::speed_test::test

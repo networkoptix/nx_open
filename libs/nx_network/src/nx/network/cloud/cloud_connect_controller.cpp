@@ -43,7 +43,9 @@ struct CloudConnectControllerImpl
         addressPublisher(
             mediatorConnector.systemConnection(),
             &mediatorConnector),
-        uplinkSpeedReporter(&mediatorConnector)
+        uplinkSpeedReporter(
+            AppInfo::defaultCloudModulesXmlUrl(cloudHost),
+            &mediatorConnector)
     {
     }
 

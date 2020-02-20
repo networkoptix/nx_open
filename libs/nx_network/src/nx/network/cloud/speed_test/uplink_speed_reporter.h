@@ -24,14 +24,19 @@ namespace speed_test {
 
 class AbstractSpeedTester;
 
+using FetchMediatorAddressHandler =
+    nx::utils::MoveOnlyFunc<void(
+        http::StatusCode::Value statusCode,
+        const hpm::api::MediatorAddress& mediatorAddress)>;
+
 class NX_NETWORK_API UplinkSpeedReporter:
     public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;
 public:
     UplinkSpeedReporter(
+        const nx::utils::Url& cloudModulesXmlUrl,
         hpm::api::MediatorConnector* mediatorConnector,
-        const std::optional<nx::utils::Url>& speedTestUrlMockup = std::nullopt,
         std::unique_ptr<nx::network::aio::Scheduler> scheduler = nullptr);
     ~UplinkSpeedReporter();
 
@@ -47,6 +52,8 @@ public:
      */
     void setAboutToRunSpeedTestHandler(
         nx::utils::MoveOnlyFunc<void(bool /*aboutToStart*/)> handler);
+
+    void setFetchMediatorAddressHandler(FetchMediatorAddressHandler handler);
 
 private:
     void onSystemCredentialsSet(std::optional<hpm::api::SystemCredentials> credentials);
@@ -69,18 +76,19 @@ private:
     void fetchSpeedTestUrl();
 
 private:
+    nx::utils::Url m_cloudModulesXmlUrl;
     hpm::api::MediatorConnector* m_mediatorConnector;
-    utils::SubscriptionId m_systemCredentialsSubscriptionId = nx::utils::kInvalidSubscriptionId;
+    nx::utils::SubscriptionId m_systemCredentialsSubscriptionId = nx::utils::kInvalidSubscriptionId;
     std::unique_ptr<AbstractSpeedTester> m_uplinkSpeedTester;
     std::unique_ptr<hpm::api::Client> m_mediatorApiClient;
-    std::unique_ptr<CloudModuleUrlFetcher> m_cloudModuleUrlFetcher;
+    std::unique_ptr<CloudModuleUrlFetcher> m_speedTestUrlFetcher;
     std::atomic_bool m_testInProgress = false;
     std::optional<hpm::api::PeerConnectionSpeed> m_peerConnectionSpeed;
 
     QnMutex m_mutex;
-    std::optional<nx::utils::Url> m_speedTestUrlMockup;
     std::unique_ptr<nx::network::aio::Scheduler> m_scheduler;
     nx::utils::MoveOnlyFunc<void(bool /*inProgress*/)> m_aboutToRunSpeedTestHandler;
+    FetchMediatorAddressHandler m_fetchMediatorAddressHandler;
 };
 
 } // namespace speed_test
