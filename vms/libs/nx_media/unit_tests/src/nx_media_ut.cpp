@@ -52,7 +52,7 @@ static QString qSizeToString(const QSize& size)
 static QString qSizeToString(const std::optional<QSize>& size)
 {
     if (size)
-        return qSizeToString(size);
+        return qSizeToString(*size);
 
     return "<missing>";
 }
