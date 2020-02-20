@@ -291,6 +291,11 @@ private:
 
 QN_FUSION_DECLARE_FUNCTIONS(Player::VideoQuality, (lexical))
 
+/**
+ * @param videoQuality Either one of the enum Player::VideoQuality values, or the video frame
+ *     height in pixels, which denotes a custom quality. Note that to denote the frame height, the
+ *     value must be greater or equal to Player::VideoQuality::CustomVideoQuality.
+ */
 QString videoQualityToString(int videoQuality);
 
 } // namespace media
