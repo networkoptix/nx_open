@@ -107,33 +107,34 @@ private:
         NetworkSettings result;
         result.localInterfacesToListen = options.localInterfaces;
 
-        const auto assignValue = [this](
-            int* target,
-            const std::optional<int>& cliOptionValue,
-            int iniOptionValue,
-            const QString& cliOptionKey,
-            const QString& parameterName)
-        {
-            if (cliOptionValue)
+        const auto assignValue =
+            [this](
+                int* target,
+                const std::optional<int>& cliOptionValue,
+                int iniOptionValue,
+                const QString& cliOptionKey,
+                const QString& parameterName)
             {
-                *target = *cliOptionValue;
-                NX_DEBUG(this,
-                    "Taking a value for the camera %1 from the command line options: %2",
-                    parameterName,
-                    *target);
+                if (cliOptionValue)
+                {
+                    *target = *cliOptionValue;
+                    NX_DEBUG(this,
+                        "Taking a %1 value for the camera from the command line options: %2",
+                        parameterName,
+                        *target);
 
-            }
-            else
-            {
-                *target = iniOptionValue;
-                NX_DEBUG(this,
-                    "%1 CLI option is not specified or is incorrect. "
-                    "Taking a value for the camera %2 from the ini file: %3",
-                    cliOptionKey,
-                    parameterName,
-                    *target);
-            }
-        };
+                }
+                else
+                {
+                    *target = iniOptionValue;
+                    NX_DEBUG(this,
+                        "%1 CLI option is not specified or is incorrect. "
+                        "Taking a value for the camera %2 from the ini file: %3",
+                        cliOptionKey,
+                        parameterName,
+                        *target);
+                }
+            };
 
         assignValue(
             &result.mediaPort,
