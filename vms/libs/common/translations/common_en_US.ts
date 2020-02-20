@@ -18,83 +18,83 @@
 </context>
 <context>
     <name>HumanReadable</name>
-    <message numerus="yes">
-        <source>Bytes</source>
-        <comment>Full suffix for displaying bytes</comment>
-        <translation>
-            <numerusform>Byte</numerusform>
-            <numerusform>Bytes</numerusform>
-        </translation>
-    </message>
     <message>
         <source>B</source>
         <comment>Suffix for displaying bytes</comment>
         <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Kilobytes</source>
-        <comment>Full suffix for displaying kilobytes</comment>
-        <translation>
-            <numerusform>Kilobyte</numerusform>
-            <numerusform>Kilobytes</numerusform>
-        </translation>
     </message>
     <message>
         <source>KB</source>
         <comment>Suffix for displaying kilobytes</comment>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>Megabytes</source>
-        <comment>Full suffix for displaying megabytes</comment>
-        <translation>
-            <numerusform>Megabyte</numerusform>
-            <numerusform>Megabytes</numerusform>
-        </translation>
-    </message>
     <message>
         <source>MB</source>
         <comment>Suffix for displaying megabytes</comment>
         <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Gigabytes</source>
-        <comment>Full suffix for displaying gigabytes</comment>
-        <translation>
-            <numerusform>Gigabyte</numerusform>
-            <numerusform>Gigabytes</numerusform>
-        </translation>
     </message>
     <message>
         <source>GB</source>
         <comment>Suffix for displaying gigabytes</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>TB</source>
+        <comment>Suffix for displaying terabytes</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>PB</source>
+        <comment>Suffix for displaying petabytes</comment>
+        <translation></translation>
+    </message>
     <message numerus="yes">
-        <source>Terabytes</source>
+        <source>Byte(s)</source>
+        <comment>Full suffix for displaying bytes</comment>
+        <translation>
+            <numerusform>Byte</numerusform>
+            <numerusform>Bytes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Kilobyte(s)</source>
+        <comment>Full suffix for displaying kilobytes</comment>
+        <translation>
+            <numerusform>Kilobyte</numerusform>
+            <numerusform>Kilobytes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Megabyte(s)</source>
+        <comment>Full suffix for displaying megabytes</comment>
+        <translation>
+            <numerusform>Megabyte</numerusform>
+            <numerusform>Megabytes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Gigabyte(s)</source>
+        <comment>Full suffix for displaying gigabytes</comment>
+        <translation>
+            <numerusform>Gigabyte</numerusform>
+            <numerusform>Gigabytes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Terabyte(s)</source>
         <comment>Full suffix for displaying terabytes</comment>
         <translation>
             <numerusform>Terabyte</numerusform>
             <numerusform>Terabytes</numerusform>
         </translation>
     </message>
-    <message>
-        <source>TB</source>
-        <comment>Suffix for displaying terabytes</comment>
-        <translation></translation>
-    </message>
     <message numerus="yes">
-        <source>Petabytes</source>
+        <source>Petabyte(s)</source>
         <comment>Full suffix for displaying petabytes</comment>
         <translation>
             <numerusform>Petabyte</numerusform>
             <numerusform>Petabytes</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>PB</source>
-        <comment>Suffix for displaying petabytes</comment>
-        <translation></translation>
     </message>
 </context>
 <context>

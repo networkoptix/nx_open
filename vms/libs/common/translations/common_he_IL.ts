@@ -18,95 +18,95 @@
   </context>
   <context>
     <name>HumanReadable</name>
-    <message numerus="yes">
-      <source>Bytes</source>
-      <comment>Full suffix for displaying bytes</comment>
-      <translation>
-        <numerusform>בתים</numerusform>
-        <numerusform>בתים</numerusform>
-        <numerusform>בתים</numerusform>
-        <numerusform>בתים</numerusform>
-      </translation>
-    </message>
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
       <translation>B</translation>
-    </message>
-    <message numerus="yes">
-      <source>Kilobytes</source>
-      <comment>Full suffix for displaying kilobytes</comment>
-      <translation>
-        <numerusform>קילובייט</numerusform>
-        <numerusform>קילובייט</numerusform>
-        <numerusform>קילובייט</numerusform>
-        <numerusform>קילובייט</numerusform>
-      </translation>
     </message>
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
       <translation>ק"ב</translation>
     </message>
-    <message numerus="yes">
-      <source>Megabytes</source>
-      <comment>Full suffix for displaying megabytes</comment>
-      <translation>
-        <numerusform>מגהבייט</numerusform>
-        <numerusform>מגהבייט</numerusform>
-        <numerusform>מגהבייט</numerusform>
-        <numerusform>מגהבייט</numerusform>
-      </translation>
-    </message>
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
       <translation>מ"ב</translation>
-    </message>
-    <message numerus="yes">
-      <source>Gigabytes</source>
-      <comment>Full suffix for displaying gigabytes</comment>
-      <translation>
-        <numerusform>ג'יגה-בייט</numerusform>
-        <numerusform>ג'יגה-בייט</numerusform>
-        <numerusform>ג'יגה-בייט</numerusform>
-        <numerusform>ג'יגה-בייט</numerusform>
-      </translation>
     </message>
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
       <translation>ג"ב</translation>
     </message>
-    <message numerus="yes">
-      <source>Terabytes</source>
-      <comment>Full suffix for displaying terabytes</comment>
-      <translation>
-        <numerusform>טרה-בייטים</numerusform>
-        <numerusform>טרה-בייטים</numerusform>
-        <numerusform>טרה-בייטים</numerusform>
-        <numerusform>טרה-בייטים</numerusform>
-      </translation>
-    </message>
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
       <translation>TB</translation>
     </message>
-    <message numerus="yes">
-      <source>Petabytes</source>
-      <comment>Full suffix for displaying petabytes</comment>
-      <translation>
-        <numerusform>פטאבייטים</numerusform>
-        <numerusform>פטאבייטים</numerusform>
-        <numerusform>פטאבייטים</numerusform>
-        <numerusform>פטאבייטים</numerusform>
-      </translation>
-    </message>
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
       <translation>PB</translation>
+    </message>
+    <message numerus="yes">
+      <source>Byte(s)</source>
+      <comment>Full suffix for displaying bytes</comment>
+      <translation type="unfinished">
+        <numerusform>Byte(s)</numerusform>
+        <numerusform>Byte(s)</numerusform>
+        <numerusform>Byte(s)</numerusform>
+        <numerusform>Byte(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Kilobyte(s)</source>
+      <comment>Full suffix for displaying kilobytes</comment>
+      <translation type="unfinished">
+        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilobyte(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Megabyte(s)</source>
+      <comment>Full suffix for displaying megabytes</comment>
+      <translation type="unfinished">
+        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megabyte(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Gigabyte(s)</source>
+      <comment>Full suffix for displaying gigabytes</comment>
+      <translation type="unfinished">
+        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigabyte(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Terabyte(s)</source>
+      <comment>Full suffix for displaying terabytes</comment>
+      <translation type="unfinished">
+        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Terabyte(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Petabyte(s)</source>
+      <comment>Full suffix for displaying petabytes</comment>
+      <translation type="unfinished">
+        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petabyte(s)</numerusform>
+      </translation>
     </message>
   </context>
   <context>
