@@ -57,17 +57,16 @@ QString makeLogFileName(
     return dir.absoluteFilePath(fileName);
 }
 
-static QString makeObjectsLogLinesIfNeeded(
+static QString makeRectLogLinesIfNeeded(
     const std::vector<ObjectMetadata>& objectMetadataList,
-    const QString& objectLogLinePrefix = QString(),
-    const QString& wholeLineBlockPrefix = ":\n")
+    const QString& objectLogLinePrefix = QString())
 {
     if (!loggingIni().logObjectMetadataDetails || objectMetadataList.empty())
         return "";
 
     static const QString kIndent = "    ";
 
-    QString result = wholeLineBlockPrefix;
+    QString result;
     for (int i = 0; i < (int) objectMetadataList.size(); ++i)
     {
         const auto& object = objectMetadataList.at(i);
@@ -99,16 +98,15 @@ static QString makeBestShotDescriptionLines(const std::vector<ObjectMetadata>& o
 
     NX_ASSERT(!bestShotMetadataList.empty());
 
-    QString result = makeObjectsLogLinesIfNeeded(
+    QString result = makeRectLogLinesIfNeeded(
         bestShotMetadataList,
         (bestShotMetadataList.size() == 1
             ? ""
-            : "WARNING! Multiple best shot items in the object packet:"));
+            : "WARNING: Multiple best shot items in the object packet:"));
 
-    result += makeObjectsLogLinesIfNeeded(
+    result += makeRectLogLinesIfNeeded(
         nonBestShotObjectMetadataList,
-        "WARNING! Best shot packet contains non-best-shot metadata:",
-        /*whole line block prefix*/ "");
+        "WARNING: Best shot packet contains non-best-shot metadata:");
 
     return result;
 }
@@ -276,9 +274,9 @@ QString MetadataLogger::buildObjectMetadataLogString(
         + "diffFromCurrentTimeMs " + toMsString(currentPacketTimestamp - vmsSystemTime)
         + additionalInfoStr
         + (metadataPacket.containsBestShotMetadata()
-            ? "; bestShot" + makeBestShotDescriptionLines(metadataPacket.objectMetadataList)
-            : "; objects: " + QString::number(metadataPacket.objectMetadataList.size())
-                + makeObjectsLogLinesIfNeeded(metadataPacket.objectMetadataList));
+            ? "; bestShot:" + makeBestShotDescriptionLines(metadataPacket.objectMetadataList)
+            : "; objects: " + QString::number(metadataPacket.objectMetadataList.size()) + ":\n"
+                + makeRectLogLinesIfNeeded(metadataPacket.objectMetadataList));
 }
 
 void MetadataLogger::logLine(QString lineStr)

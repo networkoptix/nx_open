@@ -970,7 +970,10 @@ Result<> CRcvQueue::processUnit(
     return success();
 }
 
-int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
+int CRcvQueue::recvfrom(
+    int32_t id,
+    CPacket& packet,
+    std::chrono::microseconds timeout)
 {
     std::unique_lock<std::mutex> lock(m_PassLock);
 
@@ -978,7 +981,7 @@ int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
 
     if (i == m_mBuffer.end())
     {
-        m_PassCond.wait_for(lock, std::chrono::seconds(1));
+        m_PassCond.wait_for(lock, timeout);
 
         i = m_mBuffer.find(id);
         if (i == m_mBuffer.end())

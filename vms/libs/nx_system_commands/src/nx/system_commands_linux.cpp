@@ -508,7 +508,7 @@ std::string SystemCommands::serializedFileList(const std::string& path)
         if (::stat64(pathBuf, &statBuf) != 0)
             continue;
 
-        out << pathBuf << "," << (S_ISDIR(statBuf.st_mode) ? statBuf.st_size : 0) << ","
+        out << pathBuf << "," << (S_ISDIR(statBuf.st_mode) ? 0 : statBuf.st_size) << ","
             << S_ISDIR(statBuf.st_mode) << ",";
     }
 

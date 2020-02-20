@@ -390,6 +390,8 @@ private:
 class CRcvQueue
 {
 public:
+    static constexpr auto kDefaultRecvTimeout = std::chrono::seconds(1);
+
     /**
      * Initialize the receiving queue.
      * @param size queue size
@@ -413,7 +415,10 @@ public:
     // Returned value:
     //    Data size of the packet
 
-    int recvfrom(int32_t id, CPacket& packet);
+    int recvfrom(
+        int32_t id,
+        CPacket& packet,
+        std::chrono::microseconds timeout = kDefaultRecvTimeout);
 
     bool setListener(std::weak_ptr<ServerSideConnectionAcceptor> listener);
 

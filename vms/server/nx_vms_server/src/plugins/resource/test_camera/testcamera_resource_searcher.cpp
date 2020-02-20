@@ -272,7 +272,7 @@ QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils
 
     const auto socket = nx::network::SocketFactory::createDatagramSocket();
 
-    sendDiscoveryMessage(socket.get(),url.host(), discoveryPort);
+    sendDiscoveryMessage(socket.get(), url.host(), discoveryPort);
 
     socket->setRecvTimeout(1s);
 
