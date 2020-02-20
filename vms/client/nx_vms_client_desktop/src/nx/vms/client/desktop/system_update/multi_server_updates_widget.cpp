@@ -1400,6 +1400,8 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
             auto targets = m_stateTracker->peersIssued() + m_stateTracker->peersInstalling();
             setTargetState(WidgetUpdateState::installingStalled, targets);
         }
+
+        qnClientMessageProcessor->setHoldConnection(false);
     }
     else
     {
@@ -2115,7 +2117,6 @@ void MultiServerUpdatesWidget::setTargetState(
             case WidgetUpdateState::finishingInstall:
                 clearTaskSet = false;
                 m_serverUpdateTool->requestFinishUpdate(/*skipActivePeers=*/true);
-                qnClientMessageProcessor->setHoldConnection(false);
                 break;
             case WidgetUpdateState::complete:
                 stopProcess = true;
