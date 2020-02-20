@@ -525,6 +525,11 @@ BoxFigure::BoxFigure(QObject* parent):
 {
 }
 
+ObjectSizeConstraints::ObjectSizeConstraints(QObject* parent):
+    ValueItem(QStringLiteral("ObjectSizeConstraints"), parent)
+{
+}
+
 //-------------------------------------------------------------------------------------------------
 // Items factory.
 
@@ -582,6 +587,7 @@ void Factory::registerTypes()
     registerType<LineFigure>("LineFigure");
     registerType<BoxFigure>("BoxFigure");
     registerType<PolygonFigure>("PolygonFigure");
+    registerType<ObjectSizeConstraints>("ObjectSizeConstraints");
 }
 
 Item* Factory::createItem(const QString& type, QObject* parent)

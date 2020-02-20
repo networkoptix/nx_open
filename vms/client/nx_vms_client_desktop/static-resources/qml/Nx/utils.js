@@ -15,3 +15,8 @@ function isRotated90(angle)
 {
     return angle % 90 == 0 && angle % 180 != 0
 }
+
+function getValue(value, defaultValue)
+{
+    return value !== undefined ? value : defaultValue
+}

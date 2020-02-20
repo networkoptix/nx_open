@@ -516,6 +516,14 @@ public:
     PolygonFigure(QObject* parent = nullptr);
 };
 
+class ObjectSizeConstraints: public ValueItem
+{
+    Q_OBJECT
+
+public:
+    ObjectSizeConstraints(QObject* parent = nullptr);
+};
+
 //-------------------------------------------------------------------------------------------------
 // Items factory.
 

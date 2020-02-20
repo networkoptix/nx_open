@@ -48,6 +48,8 @@ Item
                 return "private/FigureEditor/Box.qml"
             else if (figureType === "polygon")
                 return "private/FigureEditor/Polygon.qml"
+            else if (figureType === "size_constraints")
+                return "private/FigureEditor/SizeConstraints.qml"
             else
                 return ""
         }

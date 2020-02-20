@@ -39,6 +39,8 @@ Item
             loader.source = "private/FigurePreview/Box.qml"
         else if (figureType === "polygon")
             loader.source = "private/FigurePreview/Polygon.qml"
+        else if (figureType === "size_constraints")
+            loader.source = "private/FigurePreview/SizeConstraints.qml"
         else
             loader.source = ""
     }

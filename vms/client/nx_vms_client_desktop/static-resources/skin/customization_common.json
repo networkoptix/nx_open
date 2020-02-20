@@ -104,6 +104,8 @@
         "roi6": "#b2ff59",
         "roi7": "#7c4dff",
         "roi8": "#ff4081",
+        "roiMinimum": "#536dfe",
+        "roiMaximum": "#ff4081",
 
         "timeline_main":    "#3a911e",
         "timeline_bg":      "#223925",

@@ -78,6 +78,12 @@
             ]
         },
         {
+            "type": "ObjectSizeConstraints",
+            "caption": "Size constraints",
+            "name": "sizeConstraints",
+            "defaultValue": {"minimum": [0.1, 0.3], "maximum": [0.3, 0.9]}
+        },
+        {
             "type": "GroupBox",
             "caption": "Polygons",
             "items": [
