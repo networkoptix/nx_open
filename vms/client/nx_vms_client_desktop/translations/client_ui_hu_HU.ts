@@ -2175,6 +2175,11 @@
       <source>Force Acknowledgment</source>
       <translation>Nyugtázás kényszerítése</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use custom text:</source>
+      <translation>Egyedi szöveg használata:</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -2263,6 +2268,19 @@
       <location/>
       <source>Hotkey:</source>
       <translation>Gyorsbillentyű:</translation>
+    </message>
+  </context>
+  <context>
+    <name>PushNotificationBusinessActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
+      <source>for</source>
+      <translation>érintett</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Use custom text:</source>
+      <translation>Egyedi szöveg használata:</translation>
     </message>
   </context>
   <context>

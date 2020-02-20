@@ -2644,6 +2644,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -8888,30 +8895,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>Acknowledge</source>
       <translation>Riconoscimento</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Evento generico</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>Il dispositivo è disconnesso</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>La telecamera è stata scollegata</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>Il modulo I / O è stato scollegato</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Evento diagnostico plugin sconosciuto</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation>Consumo</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9123,6 +9106,13 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Adding</source>
       <translation>Aggiungendo</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation type="unfinished">Cloud users</translation>
     </message>
   </context>
   <context>

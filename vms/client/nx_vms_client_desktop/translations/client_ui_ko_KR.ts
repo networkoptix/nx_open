@@ -2175,6 +2175,11 @@
       <source>Force Acknowledgment</source>
       <translation>강제 승인</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use custom text:</source>
+      <translation>사용자 임의 내용 추가</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -2263,6 +2268,19 @@
       <location/>
       <source>Hotkey:</source>
       <translation>단축키:</translation>
+    </message>
+  </context>
+  <context>
+    <name>PushNotificationBusinessActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
+      <source>for</source>
+      <translation>for</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Use custom text:</source>
+      <translation>사용자 임의 내용 추가</translation>
     </message>
   </context>
   <context>

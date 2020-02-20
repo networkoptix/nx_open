@@ -2643,6 +2643,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -8886,30 +8893,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Acknowledge</source>
       <translation>Kabul edilen</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Genel olay</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>Aygıt Bağlantısı Kesildi</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>Kamera Bağlantısı Kesildi</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>G/Ç modülünün bağlantısı kesildi</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Bilinmeyen Eklenti Teşhis Olayı</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation>Tüketim</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9121,6 +9104,13 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Adding</source>
       <translation>Ekleniyor</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation type="unfinished">Cloud users</translation>
     </message>
   </context>
   <context>

@@ -7,14 +7,6 @@
         <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Camera stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select video stream from the camera for analysis</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>Box</name>
@@ -55,28 +47,16 @@
 <context>
     <name>Figure</name>
     <message>
-        <source>No shape</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>click to add</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Display on camera</source>
         <translation></translation>
     </message>
     <message>
         <source>Figure</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Click to add</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -104,6 +84,14 @@
         <source>Vendor</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Camera stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select video stream from the camera for analysis</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Line</name>
@@ -124,6 +112,13 @@
         <translation>
             <numerusform>Maximum points count is reached (%n point).</numerusform>
             <numerusform>Maximum points count is reached (%n points).</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>This line requires at least %n points.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -191,6 +186,20 @@
             <numerusform>Maximum points count is reached (%n point).</numerusform>
             <numerusform>Maximum points count is reached (%n points).</numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>This polygon requires at least %n points.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>Repeater</name>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

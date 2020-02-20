@@ -7,14 +7,6 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
     </message>
-    <message>
-      <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
-    </message>
-    <message>
-      <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
-    </message>
   </context>
   <context>
     <name>Box</name>
@@ -55,28 +47,16 @@
   <context>
     <name>Figure</name>
     <message>
-      <source>No shape</source>
-      <translation type="unfinished">No shape</translation>
-    </message>
-    <message>
-      <source>click to add</source>
-      <translation type="unfinished">click to add</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>Edit</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Delete</translation>
-    </message>
-    <message>
       <source>Display on camera</source>
       <translation type="unfinished">Display on camera</translation>
     </message>
     <message>
       <source>Figure</source>
       <translation type="unfinished">Figure</translation>
+    </message>
+    <message>
+      <source>Click to add</source>
+      <translation type="unfinished">Click to add</translation>
     </message>
   </context>
   <context>
@@ -104,6 +84,14 @@
       <source>Vendor</source>
       <translation type="unfinished">Vendor</translation>
     </message>
+    <message>
+      <source>Camera stream</source>
+      <translation type="unfinished">Camera stream</translation>
+    </message>
+    <message>
+      <source>Select video stream from the camera for analysis</source>
+      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+    </message>
   </context>
   <context>
     <name>Line</name>
@@ -124,6 +112,13 @@
       <translation type="unfinished">
         <numerusform>Maximum points count is reached (%n points).</numerusform>
         <numerusform>Maximum points count is reached (%n points).</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This line requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
       </translation>
     </message>
   </context>
@@ -191,6 +186,20 @@
         <numerusform>Maximum points count is reached (%n points).</numerusform>
         <numerusform>Maximum points count is reached (%n points).</numerusform>
       </translation>
+    </message>
+    <message numerus="yes">
+      <source>This polygon requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>This polygon requires at least %n points.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>Repeater</name>
+    <message>
+      <source>Add</source>
+      <translation type="unfinished">Add</translation>
     </message>
   </context>
   <context>

@@ -2646,6 +2646,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -8890,30 +8897,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>Acknowledge</source>
       <translation>Nyugtázás</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Általános esemény</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>Az eszköz lecsatlakozott</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>A kamera lecsatlakozott</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I/O modul szétkapcsolt</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Ismeretlen plugin diagnosztikai esemény</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9125,6 +9108,13 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Adding</source>
       <translation>Hozzáadás</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation type="unfinished">Cloud users</translation>
     </message>
   </context>
   <context>

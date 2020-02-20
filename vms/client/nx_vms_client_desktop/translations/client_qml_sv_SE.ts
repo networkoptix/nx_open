@@ -7,14 +7,6 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Kameraanalys fungerar bara när kameran visas. Aktivera inspelning så att den fungerar hela tiden.</translation>
     </message>
-    <message>
-      <source>Camera stream</source>
-      <translation>Kameraström</translation>
-    </message>
-    <message>
-      <source>Select video stream from the camera for analysis</source>
-      <translation>Välj videoström från kameran för analys</translation>
-    </message>
   </context>
   <context>
     <name>Box</name>
@@ -55,28 +47,16 @@
   <context>
     <name>Figure</name>
     <message>
-      <source>No shape</source>
-      <translation>Ingen form</translation>
-    </message>
-    <message>
-      <source>click to add</source>
-      <translation>klicka för att lägga till</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>Redigera</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Radera</translation>
-    </message>
-    <message>
       <source>Display on camera</source>
       <translation>Visa på kamera</translation>
     </message>
     <message>
       <source>Figure</source>
       <translation>Figur</translation>
+    </message>
+    <message>
+      <source>Click to add</source>
+      <translation>Klicka för att lägga till</translation>
     </message>
   </context>
   <context>
@@ -104,6 +84,14 @@
       <source>Vendor</source>
       <translation>Leverantör</translation>
     </message>
+    <message>
+      <source>Camera stream</source>
+      <translation>Kameraström</translation>
+    </message>
+    <message>
+      <source>Select video stream from the camera for analysis</source>
+      <translation>Välj videoström från kameran för analys</translation>
+    </message>
   </context>
   <context>
     <name>Line</name>
@@ -124,6 +112,13 @@
       <translation>
         <numerusform>Maximalt antal punkter uppnått (%n punkter).</numerusform>
         <numerusform>Maximalt antal punkter uppnått (%n punkter).</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This line requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
       </translation>
     </message>
   </context>
@@ -191,6 +186,20 @@
         <numerusform>Maximalt antal punkter uppnått (%n punkter).</numerusform>
         <numerusform>Maximalt antal punkter uppnått (%n punkter).</numerusform>
       </translation>
+    </message>
+    <message numerus="yes">
+      <source>This polygon requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>This polygon requires at least %n points.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>Repeater</name>
+    <message>
+      <source>Add</source>
+      <translation type="unfinished">Add</translation>
     </message>
   </context>
   <context>

@@ -2643,6 +2643,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -8887,30 +8894,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Acknowledge</source>
       <translation>Bestätigen</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Generisches Ereignis</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>Gerät wurde getrennt</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>Kamera wurde getrennt</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I/O-Modul wurde getrennt</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Unbekanntes Plugin-Diagnoseereignis</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation>Verbrauch</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9122,6 +9105,13 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Adding</source>
       <translation>Hinzufügen</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation type="unfinished">Cloud users</translation>
     </message>
   </context>
   <context>

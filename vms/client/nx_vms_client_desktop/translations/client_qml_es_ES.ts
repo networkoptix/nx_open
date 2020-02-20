@@ -7,14 +7,6 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>La analítica de la cámara solo funcionará cuando se esté viendo la cámara. Habilita la grabación para que funcione todo el tiempo.</translation>
     </message>
-    <message>
-      <source>Camera stream</source>
-      <translation>Flujo de cámara</translation>
-    </message>
-    <message>
-      <source>Select video stream from the camera for analysis</source>
-      <translation>Seleccionar flujo de vídeo de la cámara para análisis</translation>
-    </message>
   </context>
   <context>
     <name>Box</name>
@@ -55,28 +47,16 @@
   <context>
     <name>Figure</name>
     <message>
-      <source>No shape</source>
-      <translation>Sin forma</translation>
-    </message>
-    <message>
-      <source>click to add</source>
-      <translation>haga clic para agregar</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>Corregir</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Borrar</translation>
-    </message>
-    <message>
       <source>Display on camera</source>
       <translation>Mostrar en cámara</translation>
     </message>
     <message>
       <source>Figure</source>
       <translation>Figura</translation>
+    </message>
+    <message>
+      <source>Click to add</source>
+      <translation type="unfinished">Click to add</translation>
     </message>
   </context>
   <context>
@@ -104,6 +84,14 @@
       <source>Vendor</source>
       <translation>Fabricante</translation>
     </message>
+    <message>
+      <source>Camera stream</source>
+      <translation type="unfinished">Camera stream</translation>
+    </message>
+    <message>
+      <source>Select video stream from the camera for analysis</source>
+      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+    </message>
   </context>
   <context>
     <name>Line</name>
@@ -124,6 +112,13 @@
       <translation>
         <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
         <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This line requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
       </translation>
     </message>
   </context>
@@ -191,6 +186,20 @@
         <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
         <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
       </translation>
+    </message>
+    <message numerus="yes">
+      <source>This polygon requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>This polygon requires at least %n points.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>Repeater</name>
+    <message>
+      <source>Add</source>
+      <translation type="unfinished">Add</translation>
     </message>
   </context>
   <context>
