@@ -18,7 +18,7 @@ namespace nx::vms::testcamera {
 
 CameraPool::CameraPool(
     const FileCache* const fileCache,
-    NetworkSettings networkSettings,
+    NetworkOptions networkSettings,
     QnCommonModule* commonModule,
     bool noSecondaryStream,
     std::optional<int> fpsPrimary,
@@ -231,7 +231,7 @@ bool CameraPool::startDiscovery()
         return false;
 
     m_discoveryListener->start();
-    base_type::start();
+    start(); //< QnTcpListener
 
     return true;
 }

@@ -11,7 +11,7 @@
 
 #include "camera.h"
 #include "video_layout.h"
-#include "network_settings.h"
+#include "network_options.h"
 
 class QnCommonModule;
 
@@ -28,14 +28,13 @@ class CameraDiscoveryResponse;
  */
 class CameraPool: public QnTcpListener
 {
-    using base_type = QnTcpListener;
 public:
     /**
      * @param localInterfacesToListen If empty, all local interfaces are being listened to.
      */
     CameraPool(
         const FileCache* fileCache,
-        NetworkSettings networkSettings,
+        NetworkOptions networkSettings,
         QnCommonModule* commonModule,
         bool noSecondaryStream,
         std::optional<int> fpsPrimary,
@@ -87,7 +86,7 @@ private:
 
 private:
     const FileCache* const m_fileCache;
-    const NetworkSettings m_networkSettings;
+    const NetworkOptions m_networkSettings;
     const std::unique_ptr<Logger> m_logger;
     const std::unique_ptr<FrameLogger> m_frameLogger;
     std::map<nx::utils::MacAddress, std::unique_ptr<Camera>> m_cameraByMacAddress;

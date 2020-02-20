@@ -86,11 +86,15 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
      Force FPS for the primary stream to the given positive integer value.
  --fps-secondary[=]<value>
      Force FPS for the secondary stream to the given positive integer value.
- )help" + kDiscoveryPortCliKey.toStdString() + R"help([=]<value>
-     Port on which testcamera expects discovery packets.
-     Used for the Server camera auto discovery feature.
- )help" + kMediaPortCliKey.toStdString() + R"help([=]<value>
-     Port on which testcamera serves the media stream.
+ --discovery-port[=]<value>
+     Port on which testcamera expects discovery messages from Servers which have camera
+     auto-discovery feature enabled. When running multiple testcamera processes on a single host,
+     even if in different subnets via --local-interface, using the same discovery ports is possible
+     only if --reuse-discovery-port is specified.
+ --media-port[=]<value>
+     Port on which testcamera serves the media stream. When running multiple testcamera processes
+     on a single host, even if in different subnets via --local-interface, media ports must be
+     different.
 
 Example:
  )help" + baseExeName + R"help( files=c:/test.264;count=20
@@ -509,9 +513,9 @@ static void parseOption(
         options->macAddressPrefix = *v;
     else if (const auto v = parse(argv, argp, logLevelArg, "--log-level", "-L"))
         options->logLevel = *v;
-    else if (const auto v = parse(argv, argp, portNumberArg, kDiscoveryPortCliKey))
+    else if (const auto v = parse(argv, argp, portNumberArg, "--discovery-port"))
         options->discoveryPort = v;
-    else if (const auto v = parse(argv, argp, portNumberArg, kMediaPortCliKey))
+    else if (const auto v = parse(argv, argp, portNumberArg, "--media-port"))
         options->mediaPort = v;
     else if (arg.startsWith("-"))
         throw InvalidArgs("Unknown arg " + enquoteAndEscape(arg) + ".");

@@ -2,7 +2,7 @@
 
 #include<QtCore/QStringList>
 
-struct NetworkSettings
+struct NetworkOptions
 {
     QStringList localInterfacesToListen;
     int discoveryPort = 0;

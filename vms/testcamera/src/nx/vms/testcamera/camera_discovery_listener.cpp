@@ -20,7 +20,7 @@ namespace nx::vms::testcamera {
 CameraDiscoveryListener::CameraDiscoveryListener(
     const Logger* logger,
     std::function<QByteArray()> obtainDiscoveryResponseMessageFunc,
-    NetworkSettings networkSettings)
+    NetworkOptions networkSettings)
     :
     m_logger(logger),
     m_obtainDiscoveryResponseMessageFunc(std::move(obtainDiscoveryResponseMessageFunc)),

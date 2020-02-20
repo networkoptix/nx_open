@@ -4,12 +4,11 @@
 #include <vector>
 
 #include <QtCore/QByteArray>
-#include <QtCore/QStringList>
 
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/math/math.h>
 
-#include "network_settings.h"
+#include "network_options.h"
 
 namespace nx::network {
 
@@ -32,7 +31,7 @@ public:
     CameraDiscoveryListener(
         const Logger* logger,
         std::function<QByteArray()> obtainDiscoveryResponseMessageFunc,
-        NetworkSettings networkSettings);
+        NetworkOptions networkSettings);
 
     virtual ~CameraDiscoveryListener();
 
@@ -65,7 +64,7 @@ protected:
 private:
     const Logger* const m_logger;
     const std::function<QByteArray()> m_obtainDiscoveryResponseMessageFunc;
-    const NetworkSettings m_networkSettings;
+    const NetworkOptions m_networkSettings;
     std::vector<IpRangeV4> m_allowedIpRanges;
 };
 
