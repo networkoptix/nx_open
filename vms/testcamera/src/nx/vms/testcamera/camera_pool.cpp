@@ -43,6 +43,7 @@ CameraPool::CameraPool(
 
 CameraPool::~CameraPool()
 {
+    stop();
 }
 
 void CameraPool::reportAddingCameras(
