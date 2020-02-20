@@ -37,6 +37,8 @@ struct CliOptions
     OptionalUs shiftPtsPrimaryPeriod;
     OptionalUs shiftPtsSecondaryPeriod;
     QStringList localInterfaces;
+    std::optional<int> discoveryPort;
+    std::optional<int> mediaPort;
     std::vector<CameraSet> cameraSets;
 };
 

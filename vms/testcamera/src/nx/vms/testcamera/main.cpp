@@ -16,6 +16,7 @@
 #include "camera_pool.h"
 #include "camera_options.h"
 #include "file_cache.h"
+#include "network_options.h"
 
 namespace nx::vms::testcamera {
 
@@ -42,6 +43,25 @@ static CameraOptions makeCameraOptions(
     result.shiftPtsSecondaryPeriod = options.shiftPtsSecondaryPeriod;
 
     result.offlineFreq = cameraSet.offlineFreq;
+
+    return result;
+}
+
+NetworkOptions makeNetworkOptions(const CliOptions& options)
+{
+    NetworkOptions result;
+
+    result.localInterfacesToListen = options.localInterfaces;
+
+    if (options.discoveryPort)
+        result.discoveryPort = *options.discoveryPort;
+    else
+        result.discoveryPort = ini().discoveryPort;
+
+    if (options.mediaPort)
+        result.mediaPort = *options.mediaPort;
+    else
+        result.mediaPort = ini().mediaPort;
 
     return result;
 }
@@ -74,7 +94,7 @@ public:
 
         m_cameraPool = std::make_unique<CameraPool>(
             m_fileCache.get(),
-            options.localInterfaces,
+            makeNetworkOptions(options),
             m_commonModule.get(),
             options.noSecondary,
             options.fpsPrimary,
