@@ -39,7 +39,7 @@ UplinkSpeedReporter::UplinkSpeedReporter(
             kOneDay,
             std::set{randomTime});
     }
-    m_scheduler->bindToAioThread(getAioThread());
+    bindToAioThread(m_mediatorConnector->getAioThread());
 
     onSystemCredentialsSet(m_mediatorConnector->getSystemCredentials());
 }
@@ -121,7 +121,6 @@ void UplinkSpeedReporter::fetchSpeedTestUrl()
 
             m_speedTestUrlFetcher =
                 std::make_unique<CloudModuleUrlFetcher>(network::cloud::kSpeedTestModuleName);
-            m_speedTestUrlFetcher->bindToAioThread(getAioThread());
 
             NX_VERBOSE(this, "Fetching speed test url from %1...", m_cloudModulesXmlUrl);
 
@@ -164,8 +163,6 @@ void UplinkSpeedReporter::onFetchSpeedTestUrlComplete(
 
     if (!m_uplinkSpeedTester)
         m_uplinkSpeedTester = UplinkSpeedTesterFactory::instance().create();
-
-    m_uplinkSpeedTester->bindToAioThread(getAioThread());
 
     m_uplinkSpeedTester->start(
         speedTestUrl,
@@ -231,7 +228,6 @@ void UplinkSpeedReporter::onFetchMediatorAddressComplete(
     {
         m_mediatorApiClient = std::make_unique<hpm::api::Client>(
             url::Builder(mediatorAddress.tcpUrl).setScheme(http::kUrlSchemeName));
-        m_mediatorApiClient->bindToAioThread(getAioThread());
     }
 
     NX_VERBOSE(this, "Reporting PeerConnectionSpeed %1 to Mediator...", *m_peerConnectionSpeed);
@@ -241,7 +237,7 @@ void UplinkSpeedReporter::onFetchMediatorAddressComplete(
         [this](auto resultCode)
         {
             NX_VERBOSE(this, "reportUplinkSpeed complete, resultCode = %1", resultCode);
-            m_testInProgress = false;
+            stopTest();
         });
 }
 

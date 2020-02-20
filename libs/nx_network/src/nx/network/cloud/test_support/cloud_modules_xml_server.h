@@ -24,34 +24,15 @@ public:
     class Modules
     {
         public:
-            void setCdbUrl(const nx::utils::Url& url)
-            {
-                m_modules["cdb"] = url;
-            }
+            void setCdbUrl(const nx::utils::Url& url);
+            void setHpmTcpUrl(const nx::utils::Url& url);
+            void setHpmUdpUrl(const nx::utils::Url& url);
+            void setNotificationModuleUrl(const nx::utils::Url& url);
+            void setSpeedTestUrl(const nx::utils::Url& url);
 
-            void setHpmTcpUrl(const nx::utils::Url& url)
-            {
-                m_modules["hpm.tcpUrl"] = url;
-            }
-
-            void setHpmUdpUrl(const nx::utils::Url& url)
-            {
-                m_modules["hpm.udpUrl"] = url;
-            }
-
-            void setNotificationModuleUrl(const nx::utils::Url& url)
-            {
-                m_modules["notification_module"] = url;
-            }
-
-            void setSpeedTestUrl(const nx::utils::Url& url)
-            {
-                m_modules["speedtest_module"] = url;
-            }
+            QByteArray toXml() const;
 
         private:
-            friend class CloudModulesXmlServer;
-
             std::map<std::string/*resName*/, nx::utils::Url/*resValue*/> m_modules;
     };
 

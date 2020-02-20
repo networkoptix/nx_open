@@ -27,6 +27,8 @@ namespace cloud {
 
 NX_NETWORK_API extern const char* const kCloudDbModuleName;
 NX_NETWORK_API extern const char* const kConnectionMediatorModuleName;
+NX_NETWORK_API extern const char* const kConnectionMediatorTcpUrlName;
+NX_NETWORK_API extern const char* const kConnectionMediatorUdpUrlName;
 NX_NETWORK_API extern const char* const kNotificationModuleName;
 NX_NETWORK_API extern const char* const kSpeedTestModuleName;
 
