@@ -899,17 +899,9 @@ CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 
         setStatus(status);
     }
-    if (isNvr())
-    {
-        // Update video related parameters in database for more accurate metrics.
-        QSet<QString> videoParametersIds;
-        for (const auto [id, info]: m_advancedParameterInfos)
-        {
-            if (id.contains("videoprofile"))
-                videoParametersIds.insert(id);
-        }
-        setApiParameters(getApiParameters(videoParametersIds));
-    }
+
+    saveProperties();
+
     return result;
 }
 
@@ -1771,6 +1763,20 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
         return CameraDiagnostics::NoErrorResult();
 
     m_advancedParametersProvider.assign(filterParameters(parameters));
+
+    if (isNvr())
+    {
+        // Update video related parameters in database for more accurate metrics.
+        QSet<QString> videoParametersIds;
+        for (const auto [id, info]: m_advancedParameterInfos)
+        {
+            if (id.contains("videoprofile"))
+                videoParametersIds.insert(id);
+
+            storeCurrentVideoParametersToProperties(getApiParameters(videoParametersIds));
+        }
+    }
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -4081,6 +4087,20 @@ QnLiveStreamParams HanwhaResource::liveStreamParams(Qn::ConnectionRole role) con
     result.fps = streamFrameRate(role, QnLiveStreamParams::kFpsNotInitialized);
     result.bitrateKbps = streamBitrate(role, result);
     return result;
+}
+
+void HanwhaResource::storeCurrentVideoParametersToProperties(
+    const QnCameraAdvancedParamValueMap& parameters)
+{
+    for (auto it = parameters.begin(); it != parameters.end(); ++it)
+    {
+        const auto info = advancedParameterInfo(it.key());
+        if (!info)
+            continue;
+
+        if (const QString propertyName = info->resourceProperty(); !propertyName.isEmpty())
+            setProperty(propertyName, it.value());
+    }
 }
 
 QnAdvancedStreamParams HanwhaResource::advancedLiveStreamParams() const
