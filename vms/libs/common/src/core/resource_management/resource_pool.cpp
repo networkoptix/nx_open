@@ -147,12 +147,6 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         connect(resource, &QnResource::statusChanged, this, &QnResourcePool::statusChanged);
         connect(resource, &QnResource::statusChanged, this, &QnResourcePool::resourceChanged);
         connect(resource, &QnResource::resourceChanged, this, &QnResourcePool::resourceChanged);
-
-        if (!resource->hasFlags(Qn::foreigner))
-        {
-            if (resource->getStatus() != Qn::Offline)
-                resource->initAsync(false);
-        }
     }
 
     for (const auto& resource: addedResources)

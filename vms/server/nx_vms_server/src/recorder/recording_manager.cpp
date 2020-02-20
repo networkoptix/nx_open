@@ -465,6 +465,8 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         connect(camera.data(), &QnVirtualCameraResource::recordingActionChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         updateCamera(camera);
+        if (!camera->hasFlags(Qn::foreigner))
+            resource->initAsync(/*optional*/ true);
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);
