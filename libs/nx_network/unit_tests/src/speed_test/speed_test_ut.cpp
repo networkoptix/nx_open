@@ -350,7 +350,7 @@ private:
     }
 
 private:
-    cloud::test::CloudModulesXmlServer m_cloudModulesServer;
+    CloudModulesXmlServer m_cloudModulesServer;
     nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractSpeedTester>(void)> m_factoryFuncBak;
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     std::unique_ptr<speed_test::UplinkSpeedReporter> m_reporter;
