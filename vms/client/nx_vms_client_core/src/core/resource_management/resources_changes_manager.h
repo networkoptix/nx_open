@@ -29,6 +29,7 @@ public:
     using ServerChangesFunction = std::function<void(const QnMediaServerResourcePtr&)>;
     using UserChangesFunction = std::function<void(const QnUserResourcePtr&)>;
     using UserCallbackFunction = std::function<void(bool, const QnUserResourcePtr&)>;
+    using RoleCallbackFunction = std::function<void(bool, const nx::vms::api::UserRoleData&)>;
     using VideoWallChangesFunction = std::function<void(const QnVideoWallResourcePtr&)>;
     using VideoWallCallbackFunction = std::function<void(bool, const QnVideoWallResourcePtr&)>;
     using LayoutChangesFunction = std::function<void(const QnLayoutResourcePtr&)>;
@@ -90,7 +91,8 @@ public:
     /** Clean accessible resources for the given user */
     void cleanAccessibleResources(const QnUuid& subject);
 
-    void saveUserRole(const nx::vms::api::UserRoleData& role);
+    void saveUserRole(const nx::vms::api::UserRoleData& role,
+        RoleCallbackFunction callback = RoleCallbackFunction());
     void removeUserRole(const QnUuid& id);
 
     /** Apply changes to the given videoWall. */
