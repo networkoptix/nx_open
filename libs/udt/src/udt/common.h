@@ -42,6 +42,8 @@ Yunhong Gu, last updated 08/01/2009
 #define __UDT_COMMON_H__
 
 #include <chrono>
+#include <cstring>
+#include <memory>
 
 #ifndef _WIN32
 #include <sys/time.h>
