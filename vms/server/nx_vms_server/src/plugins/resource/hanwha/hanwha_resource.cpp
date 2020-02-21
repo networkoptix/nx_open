@@ -2815,7 +2815,7 @@ QString HanwhaResource::defaultValue(const QString& parameter, Qn::ConnectionRol
             : camera->getSecondaryReader();
 
         if (!provider)
-            QString::number(defaultBitrateForStream(role));
+            return QString::number(defaultBitrateForStream(role));
 
         const auto liveStreamParameters = provider->getLiveParams();
         return QString::number(streamBitrate(role, liveStreamParameters));
