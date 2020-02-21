@@ -176,7 +176,7 @@ void CPacket::setLength(int len)
     m_payload.resize(std::max(len, 0));
 }
 
-void CPacket::pack1(ControlPacketType pkttype, void* lparam, int payloadSize)
+void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
 {
     // Set (bit-0 = 1) and (bit-1~15 = type)
     m_nHeader[0] = 0x80000000 | (((int)pkttype) << 16);
@@ -316,9 +316,9 @@ int32_t CPacket::getMsgSeq() const
     return m_nHeader[1] & 0x1FFFFFFF;
 }
 
-CPacket* CPacket::clone() const
+std::unique_ptr<CPacket> CPacket::clone() const
 {
-    CPacket* pkt = new CPacket;
+    auto pkt = std::make_unique<CPacket>();
     memcpy(pkt->m_nHeader, m_nHeader, kPacketHeaderSize);
     pkt->m_payload = m_payload;
     return pkt;

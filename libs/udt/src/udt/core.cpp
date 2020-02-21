@@ -612,7 +612,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
 
     // Inform the server my configurations.
     CPacket request;
-    request.pack1(ControlPacketType::Handshake, NULL, m_iPayloadSize);
+    request.pack(ControlPacketType::Handshake, NULL, m_iPayloadSize);
     // ID = 0, connection request
     request.m_iID = 0;
 
@@ -630,7 +630,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
 
     // Wait for the negotiated configurations from the peer side.
     CPacket response;
-    response.pack1(ControlPacketType::Handshake, NULL, m_iPayloadSize);
+    response.pack(ControlPacketType::Handshake, NULL, m_iPayloadSize);
 
     Error error(OsErrorCode::ok);
     Result<> internalConnectResult;
@@ -902,7 +902,7 @@ Result<> CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
     //send the response to the peer, see listen() for more discussions about this
     CPacket response;
     int size = CHandShake::m_iContentSize;
-    response.pack1(ControlPacketType::Handshake, NULL, size);
+    response.pack(ControlPacketType::Handshake, NULL, size);
     hs->serialize(response.payload().data(), size);
     response.m_iID = m_PeerID;
     sndQueue().sendto(peer, response);
@@ -1620,7 +1620,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             // to save time on buffer processing and bandwidth/AS measurement, a lite ACK only feeds back an ACK number
             if (4 == size)
             {
-                ctrlpkt.pack1(pkttype, NULL, size);
+                ctrlpkt.pack(pkttype, NULL, size);
                 memcpy(ctrlpkt.payload().data(), &ack, size);
                 ctrlpkt.m_iID = m_PeerID;
                 sndQueue().sendto(m_pPeerAddr, ctrlpkt);
@@ -1677,14 +1677,14 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 {
                     data[4] = m_pRcvTimeWindow->getPktRcvSpeed();
                     data[5] = m_pRcvTimeWindow->getBandwidth();
-                    ctrlpkt.pack1(pkttype, &m_iAckSeqNo, 24);
+                    ctrlpkt.pack(pkttype, &m_iAckSeqNo, 24);
                     memcpy(ctrlpkt.payload().data(), data, 24);
 
                     m_ullLastAckTime = CTimer::getTime();
                 }
                 else
                 {
-                    ctrlpkt.pack1(pkttype, &m_iAckSeqNo, 16);
+                    ctrlpkt.pack(pkttype, &m_iAckSeqNo, 16);
                     memcpy(ctrlpkt.payload().data(), data, 16);
                 }
 
@@ -1701,7 +1701,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         }
 
         case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgement of Acknowledgement
-            ctrlpkt.pack1(pkttype, lparam);
+            ctrlpkt.pack(pkttype, lparam);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
@@ -1714,13 +1714,13 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 if (1 == size)
                 {
                     // only 1 loss packet
-                    ctrlpkt.pack1(pkttype, NULL, 4);
+                    ctrlpkt.pack(pkttype, NULL, 4);
                     ctrlpkt.payload().assign((const char*)((int32_t*)rparam + 1), 4);
                 }
                 else
                 {
                     // more than 1 loss packets
-                    ctrlpkt.pack1(pkttype, NULL, 8);
+                    ctrlpkt.pack(pkttype, NULL, 8);
                     ctrlpkt.payload().assign((const char*) rparam, 8);
                 }
 
@@ -1735,22 +1735,22 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 // this is periodically NAK report; make sure NAK cannot be sent back too often
 
                 // read loss list from the local receiver loss list
-                int32_t* data = new int32_t[m_iPayloadSize / 4];
-                int losslen;
-                m_pRcvLossList->getLossArray(data, losslen, m_iPayloadSize / 4);
+                ctrlpkt.pack(pkttype, NULL, (m_iPayloadSize / 4) * sizeof(int32_t));
 
-                if (0 < losslen)
+                int losslen;
+                m_pRcvLossList->getLossArray(
+                    (int32_t*) ctrlpkt.payload().data(), losslen, m_iPayloadSize / 4);
+
+                if (losslen > 0)
                 {
-                    ctrlpkt.pack1(pkttype, NULL, losslen * 4);
-                    ctrlpkt.payload().assign((const char*) data, losslen * 4);
+                    ctrlpkt.payload().resize(losslen * sizeof(int32_t));
+
                     ctrlpkt.m_iID = m_PeerID;
                     sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
                     ++m_iSentNAK;
                     ++m_iSentNAKTotal;
                 }
-
-                delete[] data;
             }
 
             // update next NAK time, which should wait enough time for the retansmission, but not too long
@@ -1768,7 +1768,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         }
 
         case ControlPacketType::DelayWarning: //100 - Congestion Warning
-            ctrlpkt.pack1(pkttype);
+            ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
@@ -1777,14 +1777,14 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             break;
 
         case ControlPacketType::KeepAlive: //001 - Keep-alive
-            ctrlpkt.pack1(pkttype);
+            ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
         case ControlPacketType::Handshake: //000 - Handshake
-            ctrlpkt.pack1(pkttype, NULL, sizeof(CHandShake));
+            ctrlpkt.pack(pkttype, NULL, sizeof(CHandShake));
             ctrlpkt.payload().assign((const char*) rparam, sizeof(CHandShake));
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
@@ -1792,14 +1792,14 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             break;
 
         case ControlPacketType::Shutdown: //101 - Shutdown
-            ctrlpkt.pack1(pkttype);
+            ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
         case ControlPacketType::MsgDropRequest: //111 - Msg drop request
-            ctrlpkt.pack1(pkttype, lparam, 8);
+            ctrlpkt.pack(pkttype, lparam, 8);
             ctrlpkt.payload().assign((const char*) rparam, 8);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
@@ -1807,7 +1807,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             break;
 
         case ControlPacketType::RemotePeerFailure: //1000 - acknowledge the peer side a special error
-            ctrlpkt.pack1(pkttype, lparam);
+            ctrlpkt.pack(pkttype, lparam);
             ctrlpkt.m_iID = m_PeerID;
             sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
