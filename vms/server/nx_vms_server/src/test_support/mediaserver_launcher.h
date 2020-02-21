@@ -18,28 +18,30 @@ class MediaServerLauncher: public QObject
     Q_OBJECT
 public:
 
-    enum DisabledFeature
+    enum MediaServerFeature
     {
         none                = 0,
-        noResourceDiscovery = 1 << 0,
-        noMonitorStatistics = 1 << 1,
-        noStorageDiscovery  = 1 << 2,
-        noPlugins  = 1 << 3,
-        noPublicIp  = 1 << 4,
-        noOnlineResourceData = 1 << 5,
-        noOutgoingConnectionsMetric = 1 << 6,
-        noUseTwoSockets = 1 << 7,
+        resourceDiscovery = 1 << 0,
+        monitorStatistics = 1 << 1,
+        storageDiscovery  = 1 << 2,
+        plugins  = 1 << 3,
+        publicIp  = 1 << 4,
+        onlineResourceData = 1 << 5,
+        outgoingConnectionsMetric = 1 << 6,
+        useTwoSockets = 1 << 7,
         count = 1 << 8,
         all = count - 1
     };
-    Q_DECLARE_FLAGS(DisabledFeatures, DisabledFeature)
+    Q_DECLARE_FLAGS(MediaServerFeatures, MediaServerFeature)
 
 
     MediaServerLauncher(
         const QString& tmpDir = QString(),
-        int port = 0,
-        DisabledFeatures disabledFeatures = DisabledFeature::all);
+        int port = 0);
     ~MediaServerLauncher();
+
+    void addFeatures(MediaServerFeatures enabledFeatures);
+    void removeFeatures(MediaServerFeatures disabledFeatures);
 
     nx::network::SocketAddress endpoint() const;
     int port() const;
@@ -88,6 +90,7 @@ private:
     void setLowDelayIntervals();
     void prepareToStart();
     void fillDefaultSettings();
+    void setFeatures(MediaServerFeatures features, bool isEnabled);
 
     std::ofstream m_configFile;
     nx::ut::utils::WorkDirResource m_workDirResource;

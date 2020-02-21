@@ -122,6 +122,7 @@ class Storage: public ::testing::TestWithParam<Param>
 protected:
     virtual void SetUp() override
     {
+        m_server.addFeatures(MediaServerLauncher::MediaServerFeature::storageDiscovery);
         whenServerStarted();
         m_viewer = test_support::createUser(
             &m_server, nx::vms::api::GlobalPermission::advancedViewerPermissions, "viewer");
@@ -232,11 +233,8 @@ private:
     static constexpr const char* const kMigrationFileName =
         ":/updates/99_20200122_encrypt_storage_url_credentials.sql";
 
-    MediaServerLauncher m_server = MediaServerLauncher(QString(),
-        0,
-        {MediaServerLauncher::DisabledFeature::noPlugins,
-            MediaServerLauncher::DisabledFeature::noMonitorStatistics,
-            MediaServerLauncher::DisabledFeature::noResourceDiscovery});
+    MediaServerLauncher m_server;
+
     QSqlDatabase m_db;
     nx::vms::api::UserDataEx m_viewer;
     nx::vms::api::UserDataEx m_admin;

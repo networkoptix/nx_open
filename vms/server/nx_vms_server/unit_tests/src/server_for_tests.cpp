@@ -12,18 +12,21 @@ namespace nx::vms::server::test {
 
 using namespace nx::test;
 
-ServerForTests::ServerForTests(DisabledFeature disabledFeatures):
-    MediaServerLauncher(/*tmpDir*/ QString(), /*port*/ 0, disabledFeatures),
-    id((
-        serverStartTimer.restart(),
-        NX_CRITICAL(start()) /* skip critical result */,
-        commonModule()->moduleGUID().toSimpleString()))
+bool ServerForTests::start()
 {
+    serverStartTimer.restart();
+    return base_type::start();
+}
+
+QString ServerForTests::id() const
+{
+    return commonModule()->moduleGUID().toSimpleString();
 }
 
 std::unique_ptr<ServerForTests> ServerForTests::addServer()
 {
     auto server = std::make_unique<ServerForTests>();
+    server->start();
     server->connectTo(this);
     return server;
 }
