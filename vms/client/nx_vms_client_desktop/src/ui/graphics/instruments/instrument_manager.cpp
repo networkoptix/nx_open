@@ -353,6 +353,13 @@ void InstrumentManager::setAnimationsEnabled(bool enabled)
         d_func()->timer()->deactivate();
 }
 
+void InstrumentManager::setFpsLimit(int limit)
+{
+    Q_D(InstrumentManager);
+
+    d->paintSyncer->setFpsLimit(limit);
+}
+
 bool InstrumentManager::installInstrument(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference) {
     Q_D(InstrumentManager);
 
