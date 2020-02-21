@@ -5,14 +5,15 @@
 namespace nx::network::cloud::test {
 
 void CloudModulesXmlServer::registerRequestHandlers(
-    const std::string& basePath, 
+    const std::string& basePath,
     network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
     static constexpr char kCloudModulesXml[] = "/cloud_modules.xml";
 
     m_cloudModulesXmlPath = network::url::joinPath(basePath, kCloudModulesXml);
 
-    messageDispatcher->registerRequestProcessorFunc(network::http::Method::get,
+    messageDispatcher->registerRequestProcessorFunc(
+        network::http::Method::get,
         *m_cloudModulesXmlPath,
         [this](auto&&... args) { serve(std::forward<decltype(args)>(args)...); });
 }
@@ -76,7 +77,7 @@ void CloudModulesXmlServer::serve(
     network::http::RequestResult result(network::http::StatusCode::ok);
     result.dataSource =
         std::make_unique<network::http::BufferSource>(
-            "application/xml", 
+            "application/xml",
             serializeModules());
 
     handler(std::move(result));
