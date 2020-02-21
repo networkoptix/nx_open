@@ -1,4 +1,5 @@
 import QtQuick 2.0
+
 import Nx.Controls 1.0
 
 import "private"
@@ -19,8 +20,7 @@ Item
 
     function processFilledChanged()
     {
-        if (!addButton.wasClicked)
-            visibleItemsCount = lastFilledItemIndex() + 1
+        visibleItemsCount = Math.max(visibleItemsCount, lastFilledItemIndex() + 1)
     }
 
     AlignedColumn
@@ -28,31 +28,37 @@ Item
         id: column
         width: parent.width
 
-        onChildrenChanged:
-        {
-            visibleItemsCount = lastFilledItemIndex() + 1
-            updateVisibility()
-        }
+        onChildrenChanged: initialVisibilityUpdateTimer.restart()
     }
 
     Button
     {
         id: addButton
 
-        property bool wasClicked: false
-
-        anchors.bottom: parent.bottom
         x: column.labelWidth + 8
+        y: column.y + column.height + buttonSpacing
         text: addButtonCaption || qsTr("Add")
 
         visible: visibleItemsCount < column.children.length
+        iconUrl: "qrc:///skin/buttons/plus.png"
 
         onClicked:
         {
-            wasClicked = true
-
             if (visibleItemsCount < column.children.length)
                 ++visibleItemsCount
+        }
+    }
+
+    Timer
+    {
+        // Queued update of visible items count.
+        id: initialVisibilityUpdateTimer
+        interval: 0
+        running: false
+        onTriggered:
+        {
+            visibleItemsCount = lastFilledItemIndex() + 1
+            updateVisibility()
         }
     }
 

@@ -1419,19 +1419,19 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 
     if (vms::event::requiresServerResource(m_actionType))
     {
-        if (actionIsUsingSourceServer())
-            return tr("Source Server");
-
-        QnMediaServerResourceList targetServers =
+        const QnMediaServerResourceList targetServers =
             resourcePool()->getResourcesByIds<QnMediaServerResource>(m_actionResources);
 
         if (targetServers.isEmpty())
-            return tr("Select Server");
+            return actionIsUsingSourceServer() ? tr("Source Server") : tr("Select Server");
 
-        if (targetServers.count() > 1)
-            return tr("%n Servers", "", targetServers.count());
+        const auto targetServersString = (targetServers.count() > 1)
+            ? tr("%n Servers", "", targetServers.count())
+            : targetServers.first()->getName();
 
-        return targetServers.first()->getName();
+        return actionIsUsingSourceServer()
+            ? tr("Source Server and %1").arg(targetServersString)
+            : targetServersString;
     }
 
     if (vms::event::requiresUserResource(m_actionType))

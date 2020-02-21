@@ -12,7 +12,7 @@ Item
     implicitWidth: contentItem ? contentItem.implicitWidth : 0
     implicitHeight: contentItem ? contentItem.implicitHeight : 0
 
-    property bool filled: true
+    property bool filled: false
 
     onContentItemChanged:
     {
@@ -73,4 +73,6 @@ Item
 
         filled = false
     }
+
+    Component.onCompleted: updateFilled()
 }

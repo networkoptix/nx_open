@@ -195,6 +195,27 @@ private:
     QStringList m_rows;
 };
 
+QnLayoutResourceList layoutsToShare(const QnResourcePool* resourcePool,
+    const QnUuidSet& accessibleResources)
+{
+    if (!NX_ASSERT(resourcePool))
+        return {};
+
+    return resourcePool->getResourcesByIds(accessibleResources).filtered<QnLayoutResource>(
+        [](const QnLayoutResourcePtr& layout)
+        {
+            return !layout->isFile() && !layout->isShared();
+        });
+}
+
+bool isCustomUser(const QnUserResourcePtr& user)
+{
+    if (!NX_ASSERT(user))
+        return false;
+
+    return user->userRole() == Qn::UserRole::customPermissions;
+}
+
 }; // namespace
 
 QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
@@ -489,58 +510,57 @@ void QnUserSettingsDialog::applyChanges()
 
     // TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
 
-    auto applyChangesFunction =
-        [this](const QnUserResourcePtr& /*user*/)
+    using CustomUserAccessibleResources = std::optional<QnUuidSet>;
+    using CustomUserAccessibleResourcesPtr = std::shared_ptr<CustomUserAccessibleResources>;
+
+    CustomUserAccessibleResourcesPtr customUserResources =
+        std::make_shared<CustomUserAccessibleResources>(std::nullopt);
+
+    QnResourcesChangesManager::UserChangesFunction applyChangesFunction =
+        [this, customUserResources](const QnUserResourcePtr& /*user*/)
         {
             //here accessible resources will also be filled to model
             applyChangesInternal();
             if (m_user->getId().isNull())
                 m_user->fillIdUnsafe();
+
+            if (isCustomUser(m_user))
+                *customUserResources = m_model->accessibleResources();
         };
 
     // Handle new user creating.
-    auto callbackFunction =
-        [actionManager = QPointer<action::Manager>(menu()), mode]
-            (bool success, const QnUserResourcePtr& user)
+    const auto actionManager = QPointer<action::Manager>(menu());
+    QnResourcesChangesManager::UserCallbackFunction callbackFunction =
+        [actionManager, mode, customUserResources](bool success, const QnUserResourcePtr& user)
         {
-            if (!actionManager)
+            if (!success || !actionManager)
                 return;
 
-            if (mode != QnUserSettingsModel::NewUser)
+            // Cannot capture the resource directly because real resource pointer may differ if
+            // the transaction is received before the request callback.
+            if (!NX_ASSERT(user))
                 return;
 
-            // Cannot capture the resource directly because real resource pointer may differ if the
-            // transaction is received before the request callback.
-            NX_ASSERT(user);
-            if (success && user)
+            if (isCustomUser(user))
+            {
+                const auto resourcePool = user->resourcePool();
+                const auto layouts = layoutsToShare(resourcePool, **customUserResources);
+                for (const auto& layout: layouts)
+                {
+                    actionManager->trigger(action::ShareLayoutAction,
+                        action::Parameters(layout).withArgument(Qn::UserResourceRole, user));
+                }
+                qnResourcesChangesManager->saveAccessibleResources(user, **customUserResources);
+            }
+
+            if (mode == QnUserSettingsModel::NewUser)
                 actionManager->trigger(action::SelectNewItemAction, user);
         };
 
     qnResourcesChangesManager->saveUser(m_user, applyChangesFunction, callbackFunction);
 
-    if (m_user->userRole() == Qn::UserRole::customPermissions)
-    {
-        auto accessibleResources = m_model->accessibleResources();
-
-        QnLayoutResourceList layoutsToShare = resourcePool()->getResourcesByIds(accessibleResources)
-            .filtered<QnLayoutResource>(
-                [](const QnLayoutResourcePtr& layout)
-            {
-                return !layout->isFile() && !layout->isShared();
-            });
-
-        for (const auto& layout : layoutsToShare)
-        {
-            menu()->trigger(action::ShareLayoutAction,
-                action::Parameters(layout).withArgument(Qn::UserResourceRole, m_user));
-        }
-
-        qnResourcesChangesManager->saveAccessibleResources(m_user, accessibleResources);
-    }
-    else
-    {
+    if (!isCustomUser(m_user) && (m_model->mode() != QnUserSettingsModel::NewUser))
         qnResourcesChangesManager->cleanAccessibleResources(m_user->getId());
-    }
 
     /* We may fill password field to change current user password. */
     m_user->resetPassword();

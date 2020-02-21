@@ -27,6 +27,9 @@ Window
     property alias figureType: editor.figureType
     property alias figureSettings: editor.figureSettings
 
+    property bool showPalette: true
+    property bool showClearButton: true
+
     property var resourceId
 
     MediaResourceHelper
@@ -165,6 +168,7 @@ Window
                 id: palette
 
                 anchors.verticalCenter: parent.verticalCenter
+                visible: dialog.showPalette
 
                 colors: ColorTheme.groupKeys("roi").map(
                     function(key) { return ColorTheme.colors[key] })
@@ -177,6 +181,7 @@ Window
                 text: qsTr("Clear")
                 icon.source: "qrc:/skin/text_buttons/refresh.png"
                 anchors.verticalCenter: parent.verticalCenter
+                visible: dialog.showClearButton
                 onClicked: editor.clear()
             }
         }

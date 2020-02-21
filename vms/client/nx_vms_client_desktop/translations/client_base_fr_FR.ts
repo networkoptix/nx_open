@@ -2648,6 +2648,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -8892,30 +8899,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Acknowledge</source>
       <translation>Reconnaître</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Événement Générique</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>Périphérique a été déconnecté</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>Caméra a été déconnectée</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>Module E/S a été déconnecté</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Evénement de diagnostic de plugin inconnu</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9127,6 +9110,13 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Adding</source>
       <translation>Ajouter</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation type="unfinished">Cloud users</translation>
     </message>
   </context>
   <context>

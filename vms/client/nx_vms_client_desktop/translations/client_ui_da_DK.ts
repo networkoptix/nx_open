@@ -2175,6 +2175,11 @@
       <source>Force Acknowledgment</source>
       <translation type="unfinished">Force Acknowledgment</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use custom text:</source>
+      <translation type="unfinished">Use custom text:</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -2263,6 +2268,19 @@
       <location/>
       <source>Hotkey:</source>
       <translation type="unfinished">Hotkey:</translation>
+    </message>
+  </context>
+  <context>
+    <name>PushNotificationBusinessActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
+      <source>for</source>
+      <translation type="unfinished">for</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Use custom text:</source>
+      <translation type="unfinished">Use custom text:</translation>
     </message>
   </context>
   <context>

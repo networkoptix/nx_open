@@ -67,13 +67,6 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::common;
 
-#define DEBUG_RESOURCE_TREE_MODEL
-#ifdef DEBUG_RESOURCE_TREE_MODEL
-#define TRACE(...) qDebug() << "QnResourceTreeModel: " << __VA_ARGS__;
-#else
-#define TRACE(...)
-#endif
-
 namespace {
 
 static const QString pureTreeResourcesOnlyMimeType = lit("application/x-noptix-pure-tree-resources-only");
@@ -851,17 +844,25 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::dropNode(const QMimeData* mimeDa
         return {};
 
     auto check =
-        [](const QnResourceTreeModelNodePtr& node, Qn::ResourceFlags flags)
+        [this](const QnResourceTreeModelNodePtr& node, Qn::ResourceFlags flags)
         {
             //NX_ASSERT(node && node->resource() && node->resource()->hasFlags(flags));
             auto result = node && node->resource() && node->resource()->hasFlags(flags);
-            TRACE("Check drop on " << node->data(Qt::DisplayRole, 0).toString() << "result " <<
-                result);
+            NX_VERBOSE(this, "Check drop on %1 result %2",
+                node->data(Qt::DisplayRole, 0).toString(), result);
             return result;
         };
 
-    TRACE((checkOnly ? "Checking if drop allowed on the node" : "Dropping on the node ")
-        << node->data(Qt::DisplayRole, 0).toString() << " type " << (int) node->type());
+    if (checkOnly)
+    {
+        NX_VERBOSE(this, "Checking if drop allowed on the node %1 type %2",
+            node->data(Qt::DisplayRole, 0).toString(), (int) node->type());
+    }
+    else
+    {
+        NX_VERBOSE(this, "Dropping on the node %1 type %2",
+            node->data(Qt::DisplayRole, 0).toString(), (int) node->type());
+    }
 
     // There are some drag&drop behaviours, that require to move up through the tree
 
@@ -988,8 +989,8 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
         QnUuid roleId = node->uuid();
         for (const auto& layout: layoutsToShare)
         {
-            TRACE("Sharing layout " << layout->getName() << " with role "
-                << node->m_displayName);
+            NX_VERBOSE(this, "Sharing layout %1 with role %2",
+                layout->getName(), node->m_displayName);
 
             menu()->trigger(action::ShareLayoutAction,
                 action::Parameters(layout).withArgument(Qn::UuidRole, roleId));
@@ -997,8 +998,8 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
         auto camerasToShare = data.resources().filtered<QnVirtualCameraResource>();
         for (const auto& camera: camerasToShare)
         {
-            TRACE("Sharing camera " << camera->getName() << " with role "
-                << node->m_displayName);
+            NX_VERBOSE(this, "Sharing camera %1 with role %2",
+                camera->getName(), node->m_displayName);
 
             menu()->trigger(action::ShareCameraAction,
                 action::Parameters(camera).withArgument(Qn::UuidRole, roleId));
@@ -1254,14 +1255,17 @@ void QnResourceTreeModel::handleDrop(
             if (sourceLayout->isFile())
                 continue;
 
-            TRACE("Sharing layout " << sourceLayout->getName() << " with " << targetUser->getName())
+            NX_VERBOSE(this, "Sharing layout %1 with %2",
+                sourceLayout->getName(), targetUser->getName());
+
             menu()->trigger(action::ShareLayoutAction, action::Parameters(sourceLayout)
                 .withArgument(Qn::UserResourceRole, targetUser));
         }
 
         for (const auto& sourceCamera: sourceResources.filtered<QnVirtualCameraResource>())
         {
-            TRACE("Sharing camera " << sourceCamera->getName() << " with " << targetUser->getName());
+            NX_VERBOSE(this, "Sharing camera %1 with %2",
+                sourceCamera->getName(), targetUser->getName());
 
             menu()->trigger(action::ShareCameraAction, action::Parameters(sourceCamera)
                 .withArgument(Qn::UserResourceRole, targetUser));

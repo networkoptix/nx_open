@@ -20,6 +20,11 @@ Item
     signal moved()
     signal clicked(int button)
 
+    property real minX: 0
+    property real minY: 0
+    property real maxX: parent ? parent.width : 0
+    property real maxY: parent ? parent.height : 0
+
     Rectangle
     {
         id: rect
@@ -47,10 +52,10 @@ Item
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         hoverEnabled: grip.enabled && grip.hoverEnabled
 
-        drag.minimumX: 0
-        drag.maximumX: grip.parent ? grip.parent.width : 0
-        drag.minimumY: 0
-        drag.maximumY: grip.parent ? grip.parent.height : 0
+        drag.minimumX: grip.minX
+        drag.maximumX: grip.maxX
+        drag.minimumY: grip.minY
+        drag.maximumY: grip.maxY
         drag.axis: grip.axis
         drag.threshold: 0
 

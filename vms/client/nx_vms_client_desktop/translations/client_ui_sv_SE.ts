@@ -2175,6 +2175,11 @@
       <source>Force Acknowledgment</source>
       <translation>Tvinga bekräftelse</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use custom text:</source>
+      <translation>Använd anpassad text:</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -2263,6 +2268,19 @@
       <location/>
       <source>Hotkey:</source>
       <translation>Snabbtangent:</translation>
+    </message>
+  </context>
+  <context>
+    <name>PushNotificationBusinessActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
+      <source>for</source>
+      <translation>för</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Use custom text:</source>
+      <translation>Använd anpassad text:</translation>
     </message>
   </context>
   <context>

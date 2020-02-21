@@ -477,17 +477,16 @@ void BaseFigure::setValue(const QVariant& value)
     m_value.setValue(mergeFigures(QJsonValue::fromVariant(m_value).toObject(), valueJsonObject));
 }
 
-LineFigure::LineFigure(QObject* parent):
-    BaseFigure(QStringLiteral("LineFigure"), parent)
+void PolyFigure::setMinPoints(int minPoints)
 {
+    if (m_minPoints == minPoints)
+        return;
+
+    m_minPoints = minPoints;
+    emit minPointsChanged();
 }
 
-PolygonFigure::PolygonFigure(QObject* parent):
-    BaseFigure(QStringLiteral("PolygonFigure"), parent)
-{
-}
-
-void PolygonFigure::setMaxPoints(int maxPoints)
+void PolyFigure::setMaxPoints(int maxPoints)
 {
     if (m_maxPoints == maxPoints)
         return;
@@ -496,8 +495,38 @@ void PolygonFigure::setMaxPoints(int maxPoints)
     emit maxPointsChanged();
 }
 
+QJsonObject PolyFigure::serialize() const
+{
+    auto result = base_type::serialize();
+    result[QStringLiteral("minPoints")] = minPoints();
+    result[QStringLiteral("maxPoints")] = maxPoints();
+    return result;
+}
+
+LineFigure::LineFigure(QObject* parent):
+    PolyFigure(QStringLiteral("LineFigure"), parent)
+{
+}
+
+QJsonObject LineFigure::serialize() const
+{
+    auto result = PolyFigure::serialize();
+    result[QStringLiteral("allowedDirections")] = m_allowedDirections;
+    return result;
+}
+
+PolygonFigure::PolygonFigure(QObject* parent):
+    PolyFigure(QStringLiteral("PolygonFigure"), parent)
+{
+}
+
 BoxFigure::BoxFigure(QObject* parent):
     BaseFigure(QStringLiteral("BoxFigure"), parent)
+{
+}
+
+ObjectSizeConstraints::ObjectSizeConstraints(QObject* parent):
+    ValueItem(QStringLiteral("ObjectSizeConstraints"), parent)
 {
 }
 
@@ -558,6 +587,7 @@ void Factory::registerTypes()
     registerType<LineFigure>("LineFigure");
     registerType<BoxFigure>("BoxFigure");
     registerType<PolygonFigure>("PolygonFigure");
+    registerType<ObjectSizeConstraints>("ObjectSizeConstraints");
 }
 
 Item* Factory::createItem(const QString& type, QObject* parent)

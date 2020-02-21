@@ -11,9 +11,9 @@ Figure
 {
     id: figure
 
-    readonly property alias geometricMinPoints: pointMakerInstrument.minPoints
+    readonly property int geometricMinPoints: polygon ? 3 : 2
     readonly property int minPoints:
-        (figureSettings && figureSettings.minPoints) || geometricMinPoints
+        (figureSettings && figureSettings.minPoints > geometricMinPoints) || geometricMinPoints
     readonly property int maxPoints:
         (figureSettings && figureSettings.maxPoints && figureSettings.maxPoints >= minPoints)
             ? figureSettings.maxPoints

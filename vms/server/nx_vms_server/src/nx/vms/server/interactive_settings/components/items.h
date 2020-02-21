@@ -461,7 +461,41 @@ private:
         const QJsonObject& newFigureValue);
 };
 
-class LineFigure: public BaseFigure
+class BoxFigure: public BaseFigure
+{
+public:
+    BoxFigure(QObject* parent = nullptr);
+};
+
+class PolyFigure: public BaseFigure
+{
+    Q_OBJECT
+    Q_PROPERTY(int minPoints READ minPoints WRITE setMinPoints NOTIFY minPointsChanged)
+    Q_PROPERTY(int maxPoints READ maxPoints WRITE setMaxPoints NOTIFY maxPointsChanged)
+
+    using base_type = BaseFigure;
+
+public:
+    using BaseFigure::BaseFigure;
+
+    int minPoints() const { return m_minPoints; }
+    void setMinPoints(int minPoints);
+
+    int maxPoints() const { return m_maxPoints; }
+    void setMaxPoints(int maxPoints);
+
+    virtual QJsonObject serialize() const override;
+
+signals:
+    void minPointsChanged();
+    void maxPointsChanged();
+
+private:
+    int m_minPoints = 0;
+    int m_maxPoints = 0;
+};
+
+class LineFigure: public PolyFigure
 {
     Q_OBJECT
     Q_PROPERTY(QString allowedDirections MEMBER m_allowedDirections)
@@ -469,36 +503,25 @@ class LineFigure: public BaseFigure
 public:
     LineFigure(QObject* parent = nullptr);
 
+    virtual QJsonObject serialize() const override;
+
 private:
     QString m_allowedDirections;
 };
 
-class BoxFigure: public BaseFigure
+class PolygonFigure: public PolyFigure
 {
-public:
-    BoxFigure(QObject* parent = nullptr);
-};
-
-class PolygonFigure: public BaseFigure
-{
-    Q_OBJECT
-    Q_PROPERTY(int maxPoints READ maxPoints WRITE setMaxPoints NOTIFY maxPointsChanged)
 
 public:
     PolygonFigure(QObject* parent = nullptr);
+};
 
-    int maxPoints() const
-    {
-        return m_maxPoints;
-    }
+class ObjectSizeConstraints: public ValueItem
+{
+    Q_OBJECT
 
-    void setMaxPoints(int maxPoints);
-
-signals:
-    void maxPointsChanged();
-
-private:
-    int m_maxPoints = 0;
+public:
+    ObjectSizeConstraints(QObject* parent = nullptr);
 };
 
 //-------------------------------------------------------------------------------------------------

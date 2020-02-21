@@ -747,6 +747,19 @@ std::string Engine::manifestString() const
                                 "maxPoints": 8
                             }
                         ]
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Size Constraints",
+                        "items": [
+                            {
+                                "type": "ObjectSizeConstraints",
+                                "name": "testSizeConstraints",
+                                "caption": "Object size constraints",
+                                "description": "Size range an object should fit into to be detected",
+                                "defaultValue": {"minimum": [0.1, 0.4], "maximum": [0.2, 0.8]}
+                            }
+                        ]
                     }
                 ]
             }

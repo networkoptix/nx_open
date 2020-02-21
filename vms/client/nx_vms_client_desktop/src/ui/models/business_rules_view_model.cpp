@@ -138,9 +138,6 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
                     || actionType == vms::api::ActionType::playSoundOnceAction
                     || actionType == vms::api::ActionType::sayTextAction)
                 flags |= Qt::ItemIsEditable;
-
-            if (m_rules[index.row()]->actionIsUsingSourceServer())
-                flags.setFlag(Qt::ItemIsEditable, false);
         }
         break;
 

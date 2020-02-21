@@ -18,83 +18,83 @@
 </context>
 <context>
     <name>HumanReadable</name>
-    <message numerus="yes">
-        <source>Bytes</source>
-        <comment>Full suffix for displaying bytes</comment>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>B</source>
         <comment>Suffix for displaying bytes</comment>
         <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Kilobytes</source>
-        <comment>Full suffix for displaying kilobytes</comment>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <source>KB</source>
         <comment>Suffix for displaying kilobytes</comment>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>Megabytes</source>
-        <comment>Full suffix for displaying megabytes</comment>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>MB</source>
         <comment>Suffix for displaying megabytes</comment>
         <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Gigabytes</source>
-        <comment>Full suffix for displaying gigabytes</comment>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <source>GB</source>
         <comment>Suffix for displaying gigabytes</comment>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>Terabytes</source>
-        <comment>Full suffix for displaying terabytes</comment>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>TB</source>
         <comment>Suffix for displaying terabytes</comment>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>Petabytes</source>
-        <comment>Full suffix for displaying petabytes</comment>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>PB</source>
         <comment>Suffix for displaying petabytes</comment>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Byte(s)</source>
+        <comment>Full suffix for displaying bytes</comment>
+        <translation>
+            <numerusform>Byte</numerusform>
+            <numerusform>Bytes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Kilobyte(s)</source>
+        <comment>Full suffix for displaying kilobytes</comment>
+        <translation>
+            <numerusform>Kilobyte</numerusform>
+            <numerusform>Kilobytes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Megabyte(s)</source>
+        <comment>Full suffix for displaying megabytes</comment>
+        <translation>
+            <numerusform>Megabyte</numerusform>
+            <numerusform>Megabytes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Gigabyte(s)</source>
+        <comment>Full suffix for displaying gigabytes</comment>
+        <translation>
+            <numerusform>Gigabyte</numerusform>
+            <numerusform>Gigabytes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Terabyte(s)</source>
+        <comment>Full suffix for displaying terabytes</comment>
+        <translation>
+            <numerusform>Terabyte</numerusform>
+            <numerusform>Terabytes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Petabyte(s)</source>
+        <comment>Full suffix for displaying petabytes</comment>
+        <translation>
+            <numerusform>Petabyte</numerusform>
+            <numerusform>Petabytes</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1299,10 +1299,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Show notification</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Repeat sound</source>
         <translation></translation>
     </message>
@@ -1831,6 +1827,30 @@
         <source>Reason: Power limit exceeded (%1)</source>
         <comment>%1 is consumption</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Show desktop notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send mobile notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Consumption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module was disconnected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

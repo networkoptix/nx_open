@@ -2614,6 +2614,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -8768,30 +8775,6 @@ If you intended to move analytics data to another storage location, please conta
       <source>Acknowledge</source>
       <translation>확인함</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>일반 이벤트</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>장치 연결 끊김</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>카메라 연결끊김</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I/O 모듈 이 끊어졌습니다.</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>알 수없는 플러그인 진단 이벤트</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9003,6 +8986,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Adding</source>
       <translation>추가 중</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation type="unfinished">Cloud users</translation>
     </message>
   </context>
   <context>

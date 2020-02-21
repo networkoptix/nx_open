@@ -7,14 +7,6 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
     </message>
-    <message>
-      <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
-    </message>
-    <message>
-      <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
-    </message>
   </context>
   <context>
     <name>Box</name>
@@ -55,28 +47,16 @@
   <context>
     <name>Figure</name>
     <message>
-      <source>No shape</source>
-      <translation>لا شكل</translation>
-    </message>
-    <message>
-      <source>click to add</source>
-      <translation>انقر للإضافة</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>Edit</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>حذف</translation>
-    </message>
-    <message>
       <source>Display on camera</source>
       <translation>عرض على كاميرا</translation>
     </message>
     <message>
       <source>Figure</source>
       <translation>الشكل</translation>
+    </message>
+    <message>
+      <source>Click to add</source>
+      <translation type="unfinished">Click to add</translation>
     </message>
   </context>
   <context>
@@ -104,6 +84,14 @@
       <source>Vendor</source>
       <translation type="unfinished">Vendor</translation>
     </message>
+    <message>
+      <source>Camera stream</source>
+      <translation type="unfinished">Camera stream</translation>
+    </message>
+    <message>
+      <source>Select video stream from the camera for analysis</source>
+      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+    </message>
   </context>
   <context>
     <name>Line</name>
@@ -128,6 +116,17 @@
         <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
         <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
         <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This line requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
       </translation>
     </message>
   </context>
@@ -199,6 +198,24 @@
         <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
         <numerusform>تم الوصول إلى الحد الأقصى لعدد النقاط (%n نقطة).</numerusform>
       </translation>
+    </message>
+    <message numerus="yes">
+      <source>This polygon requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>This polygon requires at least %n points.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>Repeater</name>
+    <message>
+      <source>Add</source>
+      <translation type="unfinished">Add</translation>
     </message>
   </context>
   <context>

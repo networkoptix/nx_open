@@ -2614,6 +2614,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -8767,30 +8774,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Acknowledge</source>
       <translation>Công nhận</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Sự kiện chung</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>Thiết bị đã được ngắt kết nối</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>Máy ảnh đã được ngắt kết nối</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I / O Module đã bị ngắt kết nối</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Sự kiện chẩn đoán plugin không xác định</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9002,6 +8985,13 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Adding</source>
       <translation>Thêm</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation type="unfinished">Cloud users</translation>
     </message>
   </context>
   <context>

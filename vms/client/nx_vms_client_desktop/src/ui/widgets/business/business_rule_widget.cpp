@@ -261,7 +261,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
             vms::event::requiresServerResource(m_model->actionType()));
         ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
         ui->useEventSourceServerCheckBox->setChecked(m_model->actionIsUsingSourceServer());
-        ui->actionResourcesHolder->setEnabled(!m_model->actionIsUsingSourceServer());
 
         initActionParameters();
     }
@@ -270,7 +269,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
     {
         ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
         ui->useEventSourceServerCheckBox->setChecked(m_model->actionIsUsingSourceServer());
-        ui->actionResourcesHolder->setEnabled(!m_model->actionIsUsingSourceServer());
         if (!ui->useEventSourceServerCheckBox->isEnabled())
             ui->useEventSourceServerCheckBox->setChecked(false);
     }

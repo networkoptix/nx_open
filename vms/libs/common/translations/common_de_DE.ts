@@ -18,83 +18,83 @@
   </context>
   <context>
     <name>HumanReadable</name>
-    <message numerus="yes">
-      <source>Bytes</source>
-      <comment>Full suffix for displaying bytes</comment>
-      <translation>
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
-      </translation>
-    </message>
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
       <translation>B</translation>
-    </message>
-    <message numerus="yes">
-      <source>Kilobytes</source>
-      <comment>Full suffix for displaying kilobytes</comment>
-      <translation>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-      </translation>
     </message>
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
       <translation>KB</translation>
     </message>
-    <message numerus="yes">
-      <source>Megabytes</source>
-      <comment>Full suffix for displaying megabytes</comment>
-      <translation>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-      </translation>
-    </message>
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
       <translation>MB</translation>
-    </message>
-    <message numerus="yes">
-      <source>Gigabytes</source>
-      <comment>Full suffix for displaying gigabytes</comment>
-      <translation>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-      </translation>
     </message>
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
       <translation>GB</translation>
     </message>
-    <message numerus="yes">
-      <source>Terabytes</source>
-      <comment>Full suffix for displaying terabytes</comment>
-      <translation>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-      </translation>
-    </message>
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
       <translation>TB</translation>
     </message>
-    <message numerus="yes">
-      <source>Petabytes</source>
-      <comment>Full suffix for displaying petabytes</comment>
-      <translation>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-      </translation>
-    </message>
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
       <translation>PB</translation>
+    </message>
+    <message numerus="yes">
+      <source>Byte(s)</source>
+      <comment>Full suffix for displaying bytes</comment>
+      <translation>
+        <numerusform>Byte</numerusform>
+        <numerusform>Bytes</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Kilobyte(s)</source>
+      <comment>Full suffix for displaying kilobytes</comment>
+      <translation>
+        <numerusform>Kilobyte</numerusform>
+        <numerusform>Kilobytes</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Megabyte(s)</source>
+      <comment>Full suffix for displaying megabytes</comment>
+      <translation>
+        <numerusform>Megabyte</numerusform>
+        <numerusform>Megabytes</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Gigabyte(s)</source>
+      <comment>Full suffix for displaying gigabytes</comment>
+      <translation>
+        <numerusform>Gigabyte</numerusform>
+        <numerusform>Gigabytes</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Terabyte(s)</source>
+      <comment>Full suffix for displaying terabytes</comment>
+      <translation>
+        <numerusform>Terabyte</numerusform>
+        <numerusform>Terabytes</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Petabyte(s)</source>
+      <comment>Full suffix for displaying petabytes</comment>
+      <translation>
+        <numerusform>Petabyte</numerusform>
+        <numerusform>Petabytes</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1299,10 +1299,6 @@
       <translation>In Log schreiben</translation>
     </message>
     <message>
-      <source>Show notification</source>
-      <translation>Benachrichtigung anzeigen</translation>
-    </message>
-    <message>
       <source>Repeat sound</source>
       <translation>Ton wiederholen</translation>
     </message>
@@ -1831,6 +1827,30 @@
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
       <translation>Grund: Leistungsgrenze überschritten (%1)</translation>
+    </message>
+    <message>
+      <source>Show desktop notification</source>
+      <translation>Desktopbenachrichtigung anzeigen</translation>
+    </message>
+    <message>
+      <source>Send mobile notification</source>
+      <translation>Mobile Benachrichtigung senden</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Verbrauch</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation>Gerät wurde getrennt</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation>Kamera wurde getrennt</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation>I/O-Modul wurde getrennt</translation>
     </message>
   </context>
   <context>
