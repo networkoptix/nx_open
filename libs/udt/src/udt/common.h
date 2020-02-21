@@ -435,16 +435,17 @@ public:
     bool empty() const;
 
 private:
-    std::shared_ptr<ValueType[]> m_data;
+    std::shared_ptr<ValueType> m_data;
     size_type m_offset = 0;
     size_type m_size = 0;
 
     // Substring initializer.
     BasicBuffer(
-        std::shared_ptr<ValueType[]> data,
+        std::shared_ptr<ValueType> data,
         std::size_t offset,
         std::size_t size);
 
+    std::shared_ptr<ValueType> allocate(size_type size);
     void ensureExclusiveOwnershipOverData();
 };
 
@@ -455,7 +456,7 @@ BasicBuffer<ValueType>::BasicBuffer(std::size_t initialSize):
     m_size(initialSize)
 {
     if (m_size > 0)
-        m_data = std::shared_ptr<ValueType[]>(new ValueType[m_size]);
+        m_data = allocate(m_size);
 }
 
 template<typename ValueType>
@@ -491,7 +492,7 @@ void BasicBuffer<ValueType>::resize(size_type newSize)
 
     if (newSize > 0)
     {
-        auto newData = std::shared_ptr<ValueType[]>(new ValueType[newSize]);
+        auto newData = allocate(newSize);
         memcpy(newData.get(), ((const BasicBuffer*)this)->data(), std::min(m_size, newSize));
         m_data = std::move(newData);
     }
@@ -513,7 +514,7 @@ void BasicBuffer<ValueType>::assign(const value_type* data, size_type count)
     m_offset = 0;
     if (m_size > 0)
     {
-        m_data = std::shared_ptr<ValueType[]>(new ValueType[m_size]);
+        m_data = allocate(m_size);
         memcpy(m_data.get(), data, count);
     }
 }
@@ -560,7 +561,7 @@ bool BasicBuffer<ValueType>::empty() const
 
 template<typename ValueType>
 BasicBuffer<ValueType>::BasicBuffer(
-    std::shared_ptr<ValueType[]> data,
+    std::shared_ptr<ValueType> data,
     std::size_t offset,
     std::size_t size)
     :
@@ -575,12 +576,18 @@ void BasicBuffer<ValueType>::ensureExclusiveOwnershipOverData()
 {
     if (m_data.use_count() > 1)
     {
-        auto newData = std::shared_ptr<ValueType[]>(new ValueType[m_size]);
+        auto newData = allocate(m_size);
         memcpy(newData.get(), m_data.get() + m_offset, m_size);
 
         m_data = std::move(newData);
         m_offset = 0;
     }
+}
+
+template<typename ValueType>
+std::shared_ptr<ValueType> BasicBuffer<ValueType>::allocate(size_type size)
+{
+    return std::shared_ptr<ValueType>(new ValueType[size], std::default_delete<ValueType[]>());
 }
 
 using Buffer = BasicBuffer<char>;

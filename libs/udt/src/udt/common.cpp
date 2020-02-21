@@ -109,7 +109,7 @@ int pthread_cond_wait_monotonic_timepoint(
     pthread_cond_t* condition, pthread_mutex_t* mutex, uint64_t timeMks)
 {
 #ifdef __APPLE__
-    const auto now = CTimer::getTime();
+    const auto now = CTimer::getTime().count();
     if (now > timeMks)
         return ETIMEDOUT;
 
