@@ -19,7 +19,9 @@ class BasicFixture:
 public:
     void initializeUdt();
     void deinitializeUdt();
+
     void setIpVersion(int ipVersion);
+    int ipVersion() const;
 
     void givenListeningServerSocket();
     void startAcceptingAsync();
@@ -29,6 +31,7 @@ public:
     detail::SocketAddress serverAddress() const;
     void closeServerSocket();
 
+    void givenClientSocket();
     void givenConnectingClientSocket();
     void givenConnectedClientSocket();
     void setRecvTimeout(std::chrono::milliseconds timeout);
@@ -39,6 +42,8 @@ public:
     void closeClientSocket();
 
     void givenTwoConnectedSockets();
+
+    UDTSOCKET clientSocket() { return m_clientSocket; }
 
 private:
     int m_ipVersion = AF_INET;
