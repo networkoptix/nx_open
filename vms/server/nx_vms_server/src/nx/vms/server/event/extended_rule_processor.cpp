@@ -1452,6 +1452,19 @@ PushPayload ExtendedRuleProcessor::makePushPayload(
     return {url.toString(), imageUrlOverride.isEmpty() ? imageUrl.toString() : imageUrlOverride};
 }
 
+static const QString utf8Icon(const vms::event::Level level)
+{
+    static const auto defaultIcon = ini().pushNotifyCommonUtfIcon
+        ? QString(QChar(0x2615)) //< UTF for ":)".
+        : QString();
+    return nx::utils::switch_(level,
+        vms::event::Level::critical, [] { return QString(QChar(0x203C)); }, //< UTF for "!!".
+        vms::event::Level::important, [] { return QString(QChar(0x26A0)); }, //< UTF for "(!)".
+        vms::event::Level::success, [] { return QString(QChar(0x2705)); }, //< UTF for "[v]".
+        nx::utils::default_, [] { return defaultIcon; }
+    );
+}
+
 PushNotification ExtendedRuleProcessor::makePushNotification(
     const vms::event::AbstractActionPtr& action) const
 {
@@ -1479,18 +1492,8 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
     vms::event::StringsHelper strings(common);
     return {
         join(" ", {
-            nx::utils::switch_(vms::event::levelOf(action),
-                vms::event::Level::critical,
-                [] { return QString(QChar(0x203C)); }, //< UTF for "!!".
-                vms::event::Level::important,
-                [] { return QString(QChar(0x26A0)); }, //< UTF for "(!)".
-                vms::event::Level::success,
-                [] { return QString(QChar(0x2705)); }, //< UTF for "[v]".
-                nx::utils::default_,
-                [] { return ini().pushNotifyCommonUtfIcon ? QString(QChar(0x2615)) : QString(); }
-            ),
-            // TODO: May return HTML. Make sure it works on android and iOS.
-            strings.notificationCaption(event, camera, /*includeHtml*/ false),
+            utf8Icon(vms::event::levelOf(action)),
+            strings.notificationCaption(event, camera, /*useHtml*/ false),
         }),
         join("\n", {
             resource ? resource->getName() : QString(),
