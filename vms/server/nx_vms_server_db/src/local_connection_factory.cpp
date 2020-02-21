@@ -280,10 +280,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<QnUuid, ResourceStatusDataList>(p, ApiCommand::getStatusList);
 
-    // AbstractMediaServerManager::getServers
+    /**%apidoc[proprietary] GET /ec2/getMediaServers
+     * %// TODO: Write apidoc comment.
+     * %// AbstractMediaServerManager::getServers
+     */
     regGet<QnUuid, MediaServerDataList>(p, ApiCommand::getMediaServers);
 
-    // AbstractMediaServerManager::save
+    /**%apidoc[proprietary] POST /ec2/saveMediaServer
+     * %// TODO: Write apidoc comment.
+     * %// AbstractMediaServerManager::save
+     */
     regUpdate<MediaServerData>(p, ApiCommand::saveMediaServer);
 
     /**%apidoc POST /ec2/saveMediaServerUserAttributes
@@ -391,7 +397,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     */
     regGet<QnUuid, MediaServerUserAttributesDataList>(p, ApiCommand::getMediaServerUserAttributesList);
 
-    // AbstractMediaServerManager::remove
+    /**%apidoc[proprietary] POST /ec2/removeMediaServer
+     * %// TODO: Write apidoc comment.
+     * %// AbstractMediaServerManager::remove
+     */
     regUpdate<IdData>(p, ApiCommand::removeMediaServer);
 
     /**%apidoc GET /ec2/getMediaServersEx
@@ -402,6 +411,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<QnUuid, MediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
+    /**%apidoc[proprietary] POST /ec2/saveStorages
+     * %// TODO: Write apidoc comment.
+     */
     regUpdate<StorageDataList>(p, ApiCommand::saveStorages);
 
     /**%apidoc[proprietary] POST /ec2/saveStorage
@@ -436,17 +448,37 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regUpdate<StorageData>(p, ApiCommand::saveStorage);
 
+    /**%apidoc[proprietary] POST /ec2/removeStorages
+     * %// TODO: Write apidoc comment.
+     */
     regUpdate<IdDataList>(p, ApiCommand::removeStorages);
+    
+    /**%apidoc[proprietary] POST /ec2/removeStorage
+     * %// TODO: Write apidoc comment.
+     */
     regUpdate<IdData>(p, ApiCommand::removeStorage);
+    
+    /**%apidoc[proprietary] POST /ec2/removeResources
+     * %// TODO: Write apidoc comment.
+     */
     regUpdate<IdDataList>(p, ApiCommand::removeResources);
 
-    // AbstractCameraManager::addCamera
+    /**%apidoc[proprietary] POST /ec2/saveCamera
+     * %// TODO: Write apidoc comment.
+     * %// AbstractCameraManager::addCamera
+     */
     regUpdate<CameraData>(p, ApiCommand::saveCamera);
 
-    // AbstractCameraManager::save
+    /**%apidoc[proprietary] POST /ec2/saveCameras
+     * %// TODO: Write apidoc comment.
+     * %// AbstractCameraManager::save
+     */
     regUpdate<CameraDataList>(p, ApiCommand::saveCameras);
 
-    // AbstractCameraManager::getCameras
+    /**%apidoc[proprietary] GET /ec2/getCameras
+     * %// TODO: Write apidoc comment.
+     * %// AbstractCameraManager::getCameras
+     */
     regGet<QnCameraUuid, CameraDataList>(p, ApiCommand::getCameras);
 
     /**%apidoc:arrayParams POST /ec2/saveCameraUserAttributesList
@@ -749,7 +781,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<QnCameraUuid, CameraAttributesDataList>(p, ApiCommand::getCameraUserAttributesList);
 
-    // AbstractCameraManager::addCameraHistoryItem
+    /**%apidoc[proprietary] POST /ec2/addCameraHistoryItem
+     * %// TODO: Write apidoc comment.
+     * %// AbstractCameraManager::addCameraHistoryItem
+     */
     regUpdate<ServerFootageData>(p, ApiCommand::addCameraHistoryItem);
 
     /**%apidoc GET /ec2/getCameraHistoryItems
@@ -924,9 +959,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<StorageParentId, StorageDataList>(p, ApiCommand::getStorages);
 
-    // AbstractLicenseManager::addLicenses
+    /**%apidoc[proprietary] POST /ec2/addLicenses
+     * %// TODO: Write apidoc comment.
+     * %// AbstractLicenseManager::addLicenses
+     */
     regUpdate<LicenseDataList>(p, ApiCommand::addLicenses);
-    // AbstractLicenseManager::removeLicense
+    
+    /**%apidoc[proprietary] POST /ec2/removeLicense
+     * %// TODO: Write apidoc comment.
+     * %// AbstractLicenseManager::removeLicense
+     */
     regUpdate<LicenseData>(p, ApiCommand::removeLicense);
 
     /**%apidoc GET /ec2/getEventRules
@@ -1083,6 +1125,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<QnUuid, EventRuleDataList>(p, ApiCommand::getEventRules);
 
+    /**%apidoc[proprietary] GET /ec2/getTransactionLog
+     * %// TODO: Write apidoc comment.
+     */
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
     /**%apidoc POST /ec2/saveEventRule
@@ -1116,10 +1161,20 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     */
     regUpdate<EventRuleData>(p, ApiCommand::saveEventRule);
 
-    // AbstractEventRulesManager::deleteRule
+    /**%apidoc[proprietary] POST /ec2/removeEventRule
+     * %// TODO: Write apidoc comment.
+     * %// AbstractEventRulesManager::deleteRule
+     */
     regUpdate<IdData>(p, ApiCommand::removeEventRule);
 
+    /**%apidoc[proprietary] POST /ec2/resetEventRules
+     * %// TODO: Write apidoc comment.
+     */
     regUpdate<ResetEventRulesData>(p, ApiCommand::resetEventRules);
+    
+    /**%apidoc[proprietary] POST /ec2/broadcastAction
+     * %// TODO: Write apidoc comment.
+     */
     regUpdate<EventActionData>(p, ApiCommand::broadcastAction);
 
     /**%apidoc[proprietary] POST /ec2/execAction
@@ -1363,11 +1418,27 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %// AbstractVideowallManager::getVideowalls
      */
     regGet<QnUuid, VideowallDataList>(p, ApiCommand::getVideowalls);
-    // AbstractVideowallManager::save
+    
+    /**%apidoc[proprietary] POST /ec2/saveVideowall
+     * %// TODO: Write apidoc comment.
+     * %// AbstractVideowallManager::save
+     */
     regUpdate<VideowallData>(p, ApiCommand::saveVideowall);
-    // AbstractVideowallManager::remove
+    
+    /**%apidoc[proprietary] POST /ec2/removeVideowall
+     * %// TODO: Write apidoc comment.
+     * %// AbstractVideowallManager::remove
+     */
     regUpdate<IdData>(p, ApiCommand::removeVideowall);
+    
+    /**%apidoc[proprietary] POST /ec2/videowallControl
+     * %// TODO: Write apidoc comment.
+     */
     regUpdate<VideowallControlMessageData>(p, ApiCommand::videowallControl);
+    
+    /**%apidoc[proprietary] POST /ec2/runtimeInfoChanged
+     * %// TODO: Write apidoc comment.
+     */
     regUpdate<RuntimeData>(p, ApiCommand::runtimeInfoChanged);
 
     /**%apidoc GET /ec2/getWebPages
@@ -1679,27 +1750,64 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<StoredFilePath, StoredFileData>(p, ApiCommand::getStoredFile);
 
-    // AbstractStoredFileManager::addStoredFile
+    /**%apidoc[proprietary] POST /ec2/addStoredFile
+     * %// TODO: Write apidoc comment.
+     * %// AbstractStoredFileManager::addStoredFile
+     */
     regUpdate<StoredFileData>(p, ApiCommand::addStoredFile);
-    // AbstractStoredFileManager::updateStoredFile
+    
+    /**%apidoc[proprietary] POST /ec2/updateStoredFile
+     * %// TODO: Write apidoc comment.
+     * %// AbstractStoredFileManager::updateStoredFile
+     */
     regUpdate<StoredFileData>(p, ApiCommand::updateStoredFile);
-    // AbstractStoredFileManager::deleteStoredFile
+    
+    /**%apidoc[proprietary] POST /ec2/removeStoredFile
+     * %// TODO: Write apidoc comment.
+     * %// AbstractStoredFileManager::deleteStoredFile
+     */
     regUpdate<StoredFilePath>(p, ApiCommand::removeStoredFile);
 
-    // AbstractDiscoveryManager::discoveredServerChanged
+    /**%apidoc[proprietary] POST /ec2/discoveredServerChanged
+     * %// TODO: Write apidoc comment.
+     * %// AbstractDiscoveryManager::discoveredServerChanged
+     */
     regUpdate<DiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
-    // AbstractDiscoveryManager::discoveredServersList
+    
+    /**%apidoc[proprietary] POST /ec2/discoveredServersList
+     * %// TODO: Write apidoc comment.
+     * %// AbstractDiscoveryManager::discoveredServersList
+     */
     regUpdate<DiscoveredServerDataList>(p, ApiCommand::discoveredServersList);
 
-    // AbstractDiscoveryManager::discoverPeer
+    /**%apidoc[proprietary] POST /ec2/discoverPeer
+     * %// TODO: Write apidoc comment.
+     * %// AbstractDiscoveryManager::discoverPeer
+     */
     regUpdate<DiscoverPeerData>(p, ApiCommand::discoverPeer);
-    // AbstractDiscoveryManager::addDiscoveryInformation
+    
+    /**%apidoc[proprietary] POST /ec2/addDiscoveryInformation
+     * %// TODO: Write apidoc comment.
+     * %// AbstractDiscoveryManager::addDiscoveryInformation
+     */
     regUpdate<DiscoveryData>(p, ApiCommand::addDiscoveryInformation);
-    // AbstractDiscoveryManager::removeDiscoveryInformation
+    
+    /**%apidoc[proprietary] POST /ec2/removeDiscoveryInformation
+     * %// TODO: Write apidoc comment.
+     * %// AbstractDiscoveryManager::removeDiscoveryInformation
+     */
     regUpdate<DiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
-    // AbstractDiscoveryManager::getDiscoveryData
+    
+    /**%apidoc[proprietary] GET /ec2/getDiscoveryData
+     * %// TODO: Write apidoc comment.
+     * %// AbstractDiscoveryManager::getDiscoveryData
+     */
     regGet<QnUuid, DiscoveryDataList>(p, ApiCommand::getDiscoveryData);
-    // AbstractMiscManager::changeSystemId
+    
+    /**%apidoc[proprietary] POST /ec2/changeSystemId
+     * %// TODO: Write apidoc comment.
+     * %// AbstractMiscManager::changeSystemId
+     */
     regUpdate<SystemIdData>(p, ApiCommand::changeSystemId);
 
     /**%apidoc POST /ec2/restoreDatabase
@@ -1737,9 +1845,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<StoredFilePath, DatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 
-    // AbstractECConnectionFactory
+    /**%apidoc[proprietary] GET /ec2/connect
+     * %// TODO: Write apidoc comment.
+     * %// AbstractECConnectionFactory
+     */
     regFunctorWithResponse<ConnectionData, QnConnectionInfo>(p, ApiCommand::connect,
         std::bind(&LocalConnectionFactory::fillConnectionInfo, this, _1, _2, _3));
+    
+    /**%apidoc[proprietary] GET /ec2/testConnection
+     * %// TODO: Write apidoc comment.
+     */
     regFunctorWithResponse<ConnectionData, QnConnectionInfo>(p, ApiCommand::testConnection,
         std::bind(&LocalConnectionFactory::fillConnectionInfo, this, _1, _2, _3));
 
@@ -1751,7 +1866,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regFunctor<std::nullptr_t, ResourceParamDataList>(p, ApiCommand::getSettings,
         std::bind(&LocalConnectionFactory::getSettings, this, _1, _2, _3));
 
-    // Ec2StaticticsReporter
+    /**%apidoc[proprietary] GET /ec2/getStatisticsReport
+     * %// TODO: Write apidoc comment.
+     * %// Ec2StaticticsReporter
+     */
     regFunctor<std::nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
         [this](std::nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
         {
@@ -1759,6 +1877,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
                 return ErrorCode::failure;
             return m_directConnection->getStaticticsReporter()->collectReportData(nullptr, out);
         });
+    
+    /**%apidoc[proprietary] GET /ec2/triggerStatisticsReport
+     * %// TODO: Write apidoc comment.
+     */
     regFunctor<ApiStatisticsServerArguments, ApiStatisticsServerInfo>(
         p, ApiCommand::triggerStatisticsReport,
         [this](const ApiStatisticsServerArguments& in,

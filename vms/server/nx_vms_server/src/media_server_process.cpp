@@ -1772,6 +1772,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler(serverModule()));
 
+    /**%apidoc[proprietary] TODO /api/wearableCamera
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/wearableCamera", new QnWearableCameraRestHandler(serverModule()));
 
     /**%apidoc GET /api/ptz
@@ -1873,6 +1876,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg(kGetTimePath, new nx::vms::server::rest::GetTimeHandler());
 
+    /**%apidoc[proprietary] TODO /ec2/getTimeOfServers
+     * %// TODO: Write apidoc comment.
+     */
     reg("ec2/getTimeOfServers", new nx::vms::server::rest::ServerTimeHandler("/" + kGetTimePath));
 
     /**%apidoc GET /api/gettime
@@ -1926,9 +1932,24 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getNonce", new QnGetNonceRestHandler());
 
+    /**%apidoc[proprietary] TODO /api/getRemoteNonce
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/getRemoteNonce", new QnGetNonceRestHandler("/api/getNonce"));
+    
+    /**%apidoc[proprietary] TODO /api/cookieLogin
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
+    
+    /**%apidoc[proprietary] TODO /api/cookieLogout
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/cookieLogout", new QnCookieLogoutRestHandler());
+    
+    /**%apidoc[proprietary] TODO /api/getCurrentUser
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/getCurrentUser", new QnCurrentUserRestHandler());
 
     /**%apidoc POST /api/activateLicense
@@ -1939,6 +1960,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/activateLicense", new QnActivateLicenseRestHandler());
 
+    /**%apidoc[proprietary] TODO /api/testEmailSettings
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/testEmailSettings", new QnTestEmailSettingsHandler());
 
     /**%apidoc[proprietary] GET /api/getHardwareInfo
@@ -1947,6 +1971,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getHardwareInfo", new QnGetHardwareInfoHandler());
 
+    /**%apidoc[proprietary] TODO /api/testLdapSettings
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
 
     /**%apidoc GET /api/ping
@@ -1971,6 +1998,10 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/metrics", new QnMetricsRestHandler());
 
     reg(::rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
+    
+    /**%apidoc[proprietary] TODO /api/recStats
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/recStats", new QnRecordingStatsRestHandler(serverModule()));
 
     /**%apidoc GET /api/auditLog
@@ -1988,6 +2019,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/auditLog", new QnAuditLogRestHandler(serverModule()), kAdmin);
 
+    /**%apidoc[proprietary] TODO /api/checkDiscovery
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
 
     /**%apidoc GET /api/pingSystem
@@ -2202,7 +2236,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getEvents", new QnEventLog2RestHandler(serverModule()), kViewLogs); //< new version
 
-    // TODO: Add apidoc comment.
+    /**%apidoc[proprietary] TODO /ec2/getEvents
+     * %// TODO: Write apidoc comment.
+     */
     reg("ec2/getEvents", new QnMultiserverEventsRestHandler(serverModule(), "ec2/getEvents"), kViewLogs);
 
     /**%apidoc GET /api/showLog
@@ -2216,6 +2252,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/showLog", new QnLogRestHandler(), kAdmin);
 
+    /**%apidoc[proprietary] TODO /api/getSystemId
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
 
     /**%apidoc GET /api/doCameraDiagnosticsStep
@@ -2241,6 +2280,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/restart", new QnRestartRestHandler(), kAdmin);
 
+    /**%apidoc[proprietary] TODO /api/connect
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/connect", new QnOldClientConnectRestHandler());
 
     /**%apidoc GET /api/moduleInformation
@@ -2308,6 +2350,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
+    /**%apidoc[proprietary] TODO /api/downloads/
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/downloads/", new nx::vms::server::rest::handlers::Downloads(serverModule()));
 
     /**%apidoc[proprietary] GET /api/settime
@@ -2520,12 +2565,18 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/systemSettings", new QnSystemSettingsHandler());
 
+    /**%apidoc[proprietary] TODO /api/transmitAudio
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/transmitAudio", new QnAudioTransmissionRestHandler(serverModule()));
 
     // TODO: Introduce constants for API methods registered here, also use them in
     // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors,
     // except when it is the path of some other api method.
 
+    /**%apidoc[proprietary] TODO /api/RecordedTimePeriods
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler(serverModule())); //< deprecated
 
     /**%apidoc GET /ec2/recordedTimePeriods
@@ -2603,6 +2654,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg(QnMultiserverChunksRestHandler::kUrlPath, new QnMultiserverChunksRestHandler(serverModule())); //< new version
 
+    /**%apidoc[proprietary] TODO /ec2/cameraHistory
+     * %// TODO: Write apidoc comment.
+     */
     reg("ec2/cameraHistory", new QnCameraHistoryRestHandler(serverModule()));
 
     /**%apidoc GET /ec2/bookmarks
@@ -2687,6 +2741,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler(serverModule(), "ec2/bookmarks"));
 
+    /**%apidoc[proprietary] TODO /api/mergeLdapUsers
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 
     /**%apidoc GET /ec2/updateInformation
@@ -2795,6 +2852,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler(serverModule(), "ec2/cameraThumbnail"));
 
+    /**%apidoc[proprietary] TODO /ec2/statistics
+     * %// TODO: Write apidoc comment.
+     */
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
@@ -2962,12 +3022,22 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/debug", new QnDebugHandler(), kAdmin);
 
+    /**%apidoc[proprietary] TODO /api/startLiteClient
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/startLiteClient", new QnStartLiteClientRestHandler(serverModule()));
 
     #if defined(_DEBUG)
+        
+        /**%apidoc[proprietary] TODO /api/debugEvent
+         * %// TODO: Write apidoc comment.
+         */
         reg("api/debugEvent", new QnDebugEventsRestHandler(serverModule()));
     #endif
 
+    /**%apidoc[proprietary] TODO /ec2/runtimeInfo
+     * %// TODO: Write apidoc comment.
+     */
     reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
 
     static const char kGetHardwareIdsPath[] = "api/getHardwareIds";
@@ -3059,6 +3129,9 @@ void MediaServerProcess::registerRestHandlers(
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
 
+    /**%apidoc[proprietary] TODO /api/metrics/
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
         m_metricsController.get()), kAdmin);
 
