@@ -142,7 +142,8 @@ public:
         "disk, since FFmpeg sometimes seeks to the left from current file position to fill in some "
         "media file structure size. Minimal value for adaptive buffer."
     };
-    Option<int> mediaFileDuration{this, "mediaFileDuration", 60, ""};
+    Option<int> mediaFileDuration{this, "mediaFileDuration", 60, 
+        "average file duration in seconds for recording"};
     Option<int> hlsInactivityPeriod{this, "hlsInactivityPeriod", 10,
         "If no one uses HLS for thid time period (in seconds), than live media cache is stopped "
         "and cleaned. It will be restarted with next HLS request."
@@ -343,9 +344,6 @@ public:
     Option<bool> ignoreRootTool{this, "ignoreRootTool", false,
         "Ignore root tool executable presence (if set to true, the Server will try to execute all "
         "commands that require root access directly)."};
-
-    Option<int> recordingChunkDurationSec{ this, "recordingChunkDurationSec", 60,
-        "average file duration in seconds for recording"};
 
 
 #if defined(Q_OS_LINUX)
