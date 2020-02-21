@@ -23,13 +23,6 @@ using namespace Mustache;
 
 namespace {
 
-QString Mustache::renderTemplate(const QString& templateString, const QVariantHash& args)
-{
-    Mustache::QtVariantContext context(args);
-    Mustache::Renderer renderer;
-    return renderer.render(templateString, &context);
-}
-
 QString escapeHtml(const QString& input)
 {
     QString escaped(input);
@@ -70,6 +63,13 @@ QString unescapeHtml(const QString& escaped)
 }
 
 } // namespace
+
+QString Mustache::renderTemplate(const QString& templateString, const QVariantHash& args)
+{
+    Mustache::QtVariantContext context(args);
+    Mustache::Renderer renderer;
+    return renderer.render(templateString, &context);
+}
 
 Context::Context(PartialResolver* resolver)
     : m_partialResolver(resolver)
