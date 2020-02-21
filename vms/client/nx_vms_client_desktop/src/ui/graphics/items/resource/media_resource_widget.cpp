@@ -1448,8 +1448,8 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr& display)
         }
 
         setChannelLayout(display->videoLayout());
-        display->addRenderer(m_renderer);
         m_renderer->setChannelCount(display->videoLayout()->channelCount());
+        display->addRenderer(m_renderer);
         updateCustomAspectRatio();
     }
     else
