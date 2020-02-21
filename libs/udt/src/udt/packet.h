@@ -183,7 +183,7 @@ public:
     // Returned value:
     //    None.
 
-    void pack1(ControlPacketType pkttype, void* lparam = NULL, int payloadSize = 0);
+    void pack(ControlPacketType pkttype, void* lparam = NULL, int payloadSize = 0);
 
     // Functionality:
     //    Read the packet flag.

@@ -176,7 +176,7 @@ void CPacket::setLength(int len)
     m_payload.resize(std::max(len, 0));
 }
 
-void CPacket::pack1(ControlPacketType pkttype, void* lparam, int payloadSize)
+void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
 {
     // Set (bit-0 = 1) and (bit-1~15 = type)
     m_nHeader[0] = 0x80000000 | (((int)pkttype) << 16);

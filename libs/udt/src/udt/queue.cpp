@@ -756,7 +756,7 @@ void CRendezvousQueue::updateConnStatus()
             }
 
             CPacket request;
-            request.pack1(ControlPacketType::Handshake, nullptr, udtSocket->payloadSize());
+            request.pack(ControlPacketType::Handshake, nullptr, udtSocket->payloadSize());
             // ID = 0, connection request
             request.m_iID = !udtSocket->rendezvous() ? 0 : udtSocket->connRes().m_iID;
             int hs_size = udtSocket->payloadSize();
