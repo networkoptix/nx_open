@@ -259,8 +259,6 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
 
     int res = ::sendmsg(m_iSocket, &mh, 0);
 #else
-    m_inSend = true;
-
     DWORD size = kPacketHeaderSize + packet.getLength();
     int res = ::WSASendTo(
         m_iSocket,
@@ -268,8 +266,6 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
         addr.get(), addr.size(),
         NULL, NULL);
     res = (0 == res) ? size : -1;
-
-    m_inSend = false;
 #endif
 
     // convert back into local host order
@@ -331,55 +327,20 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet)
     DWORD size = kPacketHeaderSize + packet.getLength();
     DWORD flag = 0;
 
-#define WRITE_TO_TMP_BUF
-
-#ifdef WRITE_TO_TMP_BUF
-    std::string buf;
-    buf.resize(kPacketHeaderSize + packet.getLength());
-    WSABUF tmpBuf;
-    tmpBuf.buf = buf.data();
-    tmpBuf.len = buf.size();
-#endif
-
-    if (!m_recvThreadId)
-        m_recvThreadId = std::this_thread::get_id();
-    else if (std::this_thread::get_id() != m_recvThreadId)
-        abort();
-
-    packet.lockPacketVector();
-
-    m_inRecv = true;
-
     int res = ::WSARecvFrom(
         m_iSocket,
-#ifdef WRITE_TO_TMP_BUF
-        (LPWSABUF) &tmpBuf, 1,
-#else
         (LPWSABUF) bufs, bufsCount,
-#endif,
         &size, &flag,
         addr.get(), &addr.length(),
         NULL, NULL);
     res = (0 == res) ? size : -1;
 #endif
 
-    m_inRecv = false;
-
-    packet.unlockPacketVector();
-
     if (res <= 0)
     {
         packet.setLength(-1);
         return OsError();
     }
-
-#ifdef WRITE_TO_TMP_BUF
-    assert(res > kPacketHeaderSize);
-    assert(kPacketHeaderSize + packet.getLength() == buf.size());
-
-    memcpy(bufs[0].buf, buf.data(), kPacketHeaderSize);
-    memcpy(bufs[1].buf, buf.data() + kPacketHeaderSize, res - kPacketHeaderSize);
-#endif
 
     packet.setLength(res - kPacketHeaderSize);
 

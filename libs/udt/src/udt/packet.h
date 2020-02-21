@@ -42,8 +42,6 @@ Yunhong Gu, last updated 01/02/2011
 #define __UDT_PACKET_H__
 
 #include <array>
-#include <atomic>
-#include <cassert>
 #include <iostream>
 #include <memory>
 #include <tuple>
@@ -93,33 +91,16 @@ public:
 
     const IoBuf& operator[](int i) const
     {
-        if (m_locked)
-            abort();
-
         return m_bufs[i];
     }
 
     IoBuf& operator[](int i)
     {
-        if (m_locked)
-            abort();
-
         return m_bufs[i];
-    }
-
-    void lock()
-    {
-        m_locked = true;
-    }
-
-    void unlock()
-    {
-        m_locked = false;
     }
 
 private:
     std::array<IoBuf, N> m_bufs;
-    std::atomic<bool> m_locked = false;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -281,10 +262,6 @@ public:
 
     std::tuple<const iovec*, std::size_t> ioBufs() const;
     std::tuple<iovec*, std::size_t> ioBufs();
-
-    // TODO: #ak These are debug functions. Drop them!
-    void lockPacketVector() { m_PacketVector.lock(); }
-    void unlockPacketVector() { m_PacketVector.unlock(); }
 
 private:
     int32_t __pad = 0;

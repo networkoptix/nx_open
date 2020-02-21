@@ -2129,7 +2129,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
 int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
 {
-    std::optional<Buffer> payload;
+    Buffer payload;
     bool probe = false;
 
     const auto entertime = CTimer::getTime();
@@ -2149,9 +2149,8 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
 
         int msglen;
 
-        payload = m_pSndBuffer->readData(offset, packet.m_iMsgNo, msglen);
-
-        if (!payload)
+        auto data = m_pSndBuffer->readData(offset, packet.m_iMsgNo, msglen);
+        if (!data)
         {
             int32_t seqpair[2];
             seqpair[0] = packet.m_iSeqNo;
@@ -2167,11 +2166,12 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
 
             return 0;
         }
-        else if (payload->empty())
+        else if (data->empty())
         {
             return 0;
         }
 
+        payload = std::move(*data);
         ++m_iTraceRetrans;
         ++m_iRetransTotal;
     }
@@ -2183,8 +2183,8 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
         int cwnd = (m_iFlowWindowSize < (int)m_dCongestionWindow) ? m_iFlowWindowSize : (int)m_dCongestionWindow;
         if (cwnd >= CSeqNo::seqlen(m_iSndLastAck, CSeqNo::incseq(m_iSndCurrSeqNo)))
         {
-            payload = m_pSndBuffer->readData(packet.m_iMsgNo);
-            if (payload && !payload->empty())
+            auto data = m_pSndBuffer->readData(packet.m_iMsgNo);
+            if (data && !data->empty())
             {
                 m_iSndCurrSeqNo = CSeqNo::incseq(m_iSndCurrSeqNo);
                 m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
@@ -2202,6 +2202,8 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
                 ts = std::chrono::microseconds::zero();
                 return 0;
             }
+
+            payload = std::move(*data);
         }
         else
         {
@@ -2215,9 +2217,8 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
     packet.m_iTimeStamp = (int) (CTimer::getTime() - m_StartTime).count();
     packet.m_iID = m_PeerID;
 
-    assert(payload);
-    const auto payloadSize = payload->size();
-    packet.setPayload(std::move(*payload));
+    const auto payloadSize = payload.size();
+    packet.setPayload(std::move(payload));
 
     m_pCC->onPktSent(&packet);
     //m_pSndTimeWindow->onPktSent(packet.m_iTimeStamp);
