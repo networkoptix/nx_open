@@ -94,15 +94,9 @@ protected:
 
     void checkVisibility()
     {
+        // Everyone should be able to see everyone else.
+        const size_t expectedDiscoveryLinks = m_servers.size() * (m_servers.size() - 1);
         size_t totalDiscoveryLinks = 0;
-        #if defined(Q_OS_MAC)
-            // Can join different UDT sockets to the same multicast group on OSX. So at least one
-            // should be able to see everyone else.
-            const size_t expectedDiscoveryLinks = m_servers.size() - 1;
-        #else
-            // Everyone should be able to see everyone else.
-            const size_t expectedDiscoveryLinks = m_servers.size() * (m_servers.size() - 1);
-        #endif
 
         const auto startTime = std::chrono::steady_clock::now();
         while (std::chrono::steady_clock::now() - startTime < kWaitForDiscoveryTimeout)
