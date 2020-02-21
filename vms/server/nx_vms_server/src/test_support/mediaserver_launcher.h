@@ -41,7 +41,16 @@ public:
         int port = 0);
     ~MediaServerLauncher();
 
+    /**
+     * Turn some media server features on.
+     * Can be called wnen server is not running. Before start() or after stop() call.
+     */
     void addFeatures(MediaServerFeatures enabledFeatures);
+
+    /**
+     * Turn some media server features off.
+     * Can be called wnen server is not running. Before start() or after stop() call.
+     */
     void removeFeatures(MediaServerFeatures disabledFeatures);
 
     nx::network::SocketAddress endpoint() const;
