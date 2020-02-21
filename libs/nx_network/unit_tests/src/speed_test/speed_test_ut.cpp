@@ -198,6 +198,9 @@ protected:
 
         overrideSpeedTestFactory();
         initializeFakeMediator();
+        
+        m_cloudModulesServer.registerRequestHandlers(
+            kDiscoveryPrefix, &m_testHttpServer.httpMessageDispatcher());
 
         m_mediatorConnector = std::make_unique<hpm::api::MediatorConnector>(
             testHttpServerUrl().host().toStdString());
@@ -232,18 +235,16 @@ protected:
 
     void givenValidCloudModules()
     {
-        CloudModulesXmlServer::Modules modules;
-        modules.setSpeedTestUrl(validSpeedTestUrl());
-        modules.setHpmTcpUrl(mediatorHttpUrl());
-        modules.setHpmUdpUrl("stun://dummy");
-        initializeCloudModulesServer(std::move(modules));
+        m_cloudModulesServer.setSpeedTestUrl(validSpeedTestUrl());
+        m_cloudModulesServer.setHpmTcpUrl(mediatorHttpUrl());
+        //stun url is required for hpm::api::MediatorConnector to fetch correctly
+        m_cloudModulesServer.setHpmUdpUrl("stun://dummy");
     }
 
     void givenCloudModulesWithInvalidMediatorAddress()
     {
-        CloudModulesXmlServer::Modules modules;
-        modules.setSpeedTestUrl(validSpeedTestUrl());
-        initializeCloudModulesServer(std::move(modules));
+        m_cloudModulesServer.setSpeedTestUrl(validSpeedTestUrl());
+        //Skipping mediator urls
     }
 
     void givenSpeedTestWasRun()
@@ -257,6 +258,7 @@ protected:
         // Setting SystemCredentials with a valid structure causes UplinkSpeedReporter
         // to receive systemCredentialsSet event, starting the test.
         m_mediatorConnector->setSystemCredentials(hpm::api::SystemCredentials());
+        m_reporter->start();
     }
 
     FetchMediatorAddressResult whenFetchMediatorAddress()
@@ -328,18 +330,10 @@ private:
             });
     }
 
-    void initializeCloudModulesServer(CloudModulesXmlServer::Modules modules)
-    {
-        m_cloudModulesServer.setModules(std::move(modules));
-        m_cloudModulesServer.registerHandler(
-            kDiscoveryPrefix,
-            &m_testHttpServer.httpMessageDispatcher());
-    }
-
     nx::utils::Url cloudModulesXmlUrl() const
     {
         return url::Builder(testHttpServerUrl()).setPath(
-            url::joinPath(kDiscoveryPrefix, m_cloudModulesServer.kRequestPath));
+            *m_cloudModulesServer.cloudModulesXmlPath());
     }
 
     nx::utils::Url mediatorHttpUrl() const

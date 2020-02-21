@@ -24,13 +24,6 @@ UplinkSpeedReporter::UplinkSpeedReporter(
     m_mediatorConnector(mediatorConnector),
     m_scheduler(std::move(scheduler))
 {
-    m_mediatorConnector->subsribeToSystemCredentialsSet(
-        std::bind(
-            &UplinkSpeedReporter::onSystemCredentialsSet,
-            this,
-            std::placeholders::_1),
-    &m_systemCredentialsSubscriptionId);
-
     if (!m_scheduler)
     {
         const auto randomTime = std::chrono::milliseconds(
@@ -40,8 +33,6 @@ UplinkSpeedReporter::UplinkSpeedReporter(
             std::set{randomTime});
     }
     bindToAioThread(m_mediatorConnector->getAioThread());
-
-    onSystemCredentialsSet(m_mediatorConnector->getSystemCredentials());
 }
 
 UplinkSpeedReporter::~UplinkSpeedReporter()
@@ -72,15 +63,24 @@ void UplinkSpeedReporter::bindToAioThread(aio::AbstractAioThread* aioThread)
 void UplinkSpeedReporter::setAboutToRunSpeedTestHandler(
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
-    QnMutexLocker lock(&m_mutex);
     m_aboutToRunSpeedTestHandler = std::move(handler);
 }
 
 void UplinkSpeedReporter::setFetchMediatorAddressHandler(
     FetchMediatorAddressHandler handler)
 {
-    QnMutexLocker lock(&m_mutex);
     m_fetchMediatorAddressHandler = std::move(handler);
+}
+
+void UplinkSpeedReporter::start()
+{
+    m_mediatorConnector->subsribeToSystemCredentialsSet(
+        std::bind(
+            &UplinkSpeedReporter::onSystemCredentialsSet,
+            this,
+            std::placeholders::_1),
+    &m_systemCredentialsSubscriptionId);
+    onSystemCredentialsSet(m_mediatorConnector->getSystemCredentials());
 }
 
 void UplinkSpeedReporter::stopTest()
@@ -106,11 +106,8 @@ void UplinkSpeedReporter::fetchSpeedTestUrl()
         {
             using namespace std::placeholders;
 
-            {
-                QnMutexLocker lock(&m_mutex);
-                if (m_aboutToRunSpeedTestHandler)
-                    m_aboutToRunSpeedTestHandler(!m_testInProgress.load());
-            }
+            if (m_aboutToRunSpeedTestHandler)
+                m_aboutToRunSpeedTestHandler(!m_testInProgress.load());
 
             if (m_testInProgress)
             {
@@ -206,11 +203,8 @@ void UplinkSpeedReporter::onFetchMediatorAddressComplete(
         "Fetched Mediator adress, http status code = %1, mediator address = {%2}",
         http::StatusCode::toString(statusCode), mediatorAddress);
 
-    {
-        QnMutexLocker lock(&m_mutex);
-        if(m_fetchMediatorAddressHandler)
-            m_fetchMediatorAddressHandler(statusCode, mediatorAddress);
-    }
+    if(m_fetchMediatorAddressHandler)
+        m_fetchMediatorAddressHandler(statusCode, mediatorAddress);
 
     if (!http::StatusCode::isSuccessCode(statusCode))
     {

@@ -47,6 +47,7 @@ struct CloudConnectControllerImpl
             AppInfo::defaultCloudModulesXmlUrl(cloudHost),
             &mediatorConnector)
     {
+        uplinkSpeedReporter.start();
     }
 
     ~CloudConnectControllerImpl()

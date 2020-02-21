@@ -19,39 +19,34 @@ namespace nx::network::cloud::test {
 class NX_NETWORK_API CloudModulesXmlServer
 {
 public:
-    static constexpr char kRequestPath[] = "/cloud_modules.xml";
-
-    class NX_NETWORK_API Modules
-    {
-        public:
-            void setCdbUrl(const nx::utils::Url& url);
-            void setHpmTcpUrl(const nx::utils::Url& url);
-            void setHpmUdpUrl(const nx::utils::Url& url);
-            void setNotificationModuleUrl(const nx::utils::Url& url);
-            void setSpeedTestUrl(const nx::utils::Url& url);
-
-            QByteArray toXml() const;
-
-        private:
-            std::map<std::string/*resName*/, nx::utils::Url/*resValue*/> m_modules;
-    };
-
-public:
-    void setModules(Modules modules);
-
-    void registerHandler(
+    void registerRequestHandlers(
         const std::string& basePath,
         network::http::server::rest::MessageDispatcher* messageDispatcher);
+    
+    /**
+     * @return a string containing {basePath}/cloud_modules.xml, or nothing if registerRequestHandlers
+     * hasn't been called.
+     */
+    std::optional<std::string> cloudModulesXmlPath() const;
 
-private:
+    void setCdbUrl(const nx::utils::Url& url);
+    void setHpmTcpUrl(const nx::utils::Url& url);
+    void setHpmUdpUrl(const nx::utils::Url& url);
+    void setNotificationModuleUrl(const nx::utils::Url& url);
+    void setSpeedTestUrl(const nx::utils::Url& url);
+
+private:    
+    void setModule(const char* resName, const nx::utils::Url& resValue);
+    QByteArray serializeModules() const;
+
     void serve(
         network::http::RequestContext requestContext,
-        network::http::RequestProcessedHandler handler);
-
-    static QByteArray toXml(const Modules& modules);
+        network::http::RequestProcessedHandler handler);    
 
 private:
-    Modules m_modules;
+    std::optional<std::string> m_cloudModulesXmlPath;
+    mutable QnMutex m_mutex;
+    std::map<std::string /*resName*/, nx::utils::Url /*resValue*/> m_modules;
 };
 
 } // namespace nx::network::cloud::test
