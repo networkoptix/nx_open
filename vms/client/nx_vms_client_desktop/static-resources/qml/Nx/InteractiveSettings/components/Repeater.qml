@@ -1,4 +1,5 @@
 import QtQuick 2.0
+
 import Nx.Controls 1.0
 
 import "private"
@@ -34,8 +35,8 @@ Item
     {
         id: addButton
 
-        anchors.bottom: parent.bottom
         x: column.labelWidth + 8
+        y: column.y + column.height + buttonSpacing
         text: addButtonCaption || qsTr("Add")
 
         visible: visibleItemsCount < column.children.length
