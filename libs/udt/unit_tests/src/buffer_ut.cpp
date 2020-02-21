@@ -83,6 +83,19 @@ TEST_F(Buffer, data_shared_implicitely)
     assertDifferentMemoryIsUsedToHoldData(one, two);
 }
 
+TEST_F(Buffer, data_modification_causes_realocation)
+{
+    static constexpr std::string_view kData = "Hello, world";
+
+    ::Buffer one(kData.data(), kData.size());
+
+    ::Buffer two(one);
+    two[7] = 'W';
+
+    assertEqual(one, std::string_view("Hello, world"));
+    assertEqual(two, std::string_view("Hello, World"));
+}
+
 TEST_F(Buffer, assign)
 {
     static constexpr std::string_view kData = "Hello, world";
