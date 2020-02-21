@@ -316,9 +316,9 @@ int32_t CPacket::getMsgSeq() const
     return m_nHeader[1] & 0x1FFFFFFF;
 }
 
-CPacket* CPacket::clone() const
+std::unique_ptr<CPacket> CPacket::clone() const
 {
-    CPacket* pkt = new CPacket;
+    auto pkt = std::make_unique<CPacket>();
     memcpy(pkt->m_nHeader, m_nHeader, kPacketHeaderSize);
     pkt->m_payload = m_payload;
     return pkt;

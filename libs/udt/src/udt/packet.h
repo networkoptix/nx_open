@@ -248,14 +248,8 @@ public:
 
     int32_t getMsgSeq() const;
 
-    // Functionality:
-    //    Clone this packet.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    Pointer to the new packet.
-
-    CPacket* clone() const;
+    // TODO: #ak Get rid of this function. Replace it with a copy constructor.
+    std::unique_ptr<CPacket> clone() const;
 
     const uint32_t* header() const { return m_nHeader; }
     uint32_t* header() { return m_nHeader; }

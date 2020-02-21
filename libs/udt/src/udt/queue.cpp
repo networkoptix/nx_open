@@ -799,15 +799,7 @@ CRcvQueue::~CRcvQueue()
     m_pRendezvousQueue.reset();
 
     // remove all queued messages
-    for (auto i = m_mBuffer.begin(); i != m_mBuffer.end(); ++i)
-    {
-        while (!i->second.empty())
-        {
-            CPacket* pkt = i->second.front();
-            delete pkt;
-            i->second.pop();
-        }
-    }
+    m_packets.clear();
 }
 
 void CRcvQueue::start()
@@ -970,14 +962,14 @@ int CRcvQueue::recvfrom(
 {
     std::unique_lock<std::mutex> lock(m_PassLock);
 
-    map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
+    auto i = m_packets.find(id);
 
-    if (i == m_mBuffer.end())
+    if (i == m_packets.end())
     {
         m_PassCond.wait_for(lock, timeout);
 
-        i = m_mBuffer.find(id);
-        if (i == m_mBuffer.end())
+        i = m_packets.find(id);
+        if (i == m_packets.end())
         {
             packet.setLength(-1);
             return -1;
@@ -985,7 +977,7 @@ int CRcvQueue::recvfrom(
     }
 
     // retrieve the earliest packet
-    CPacket* newpkt = i->second.front();
+    auto& newpkt = i->second.front();
 
     if (packet.getLength() < newpkt->getLength())
     {
@@ -996,15 +988,12 @@ int CRcvQueue::recvfrom(
     // copy packet content
     memcpy(packet.header(), newpkt->header(), kPacketHeaderSize);
     packet.setPayload(newpkt->payload());
-    packet.setLength(newpkt->getLength());
-
-    delete newpkt;
 
     // remove this message from queue,
     // if no more messages left for this socket, release its data structure
     i->second.pop();
     if (i->second.empty())
-        m_mBuffer.erase(i);
+        m_packets.erase(i);
 
     return packet.getLength();
 }
@@ -1035,16 +1024,7 @@ void CRcvQueue::removeConnector(const UDTSOCKET& id)
 
     std::lock_guard<std::mutex> bufferlock(m_PassLock);
 
-    map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
-    if (i != m_mBuffer.end())
-    {
-        while (!i->second.empty())
-        {
-            delete i->second.front();
-            i->second.pop();
-        }
-        m_mBuffer.erase(i);
-    }
+    m_packets.erase(id);
 }
 
 void CRcvQueue::addNewEntry(const std::weak_ptr<CUDT>& u)
@@ -1068,15 +1048,15 @@ std::shared_ptr<CUDT> CRcvQueue::takeNewEntry()
     return u;
 }
 
-void CRcvQueue::storePkt(int32_t id, CPacket* pkt)
+void CRcvQueue::storePkt(int32_t id, std::unique_ptr<CPacket> pkt)
 {
     std::lock_guard<std::mutex> bufferlock(m_PassLock);
 
-    map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
+    auto i = m_packets.find(id);
 
-    if (i == m_mBuffer.end())
+    if (i == m_packets.end())
     {
-        m_mBuffer[id].push(pkt);
+        m_packets[id].push(std::move(pkt));
 
         m_PassCond.notify_all();
     }
@@ -1086,6 +1066,6 @@ void CRcvQueue::storePkt(int32_t id, CPacket* pkt)
         if (i->second.size() > 16)
             return;
 
-        i->second.push(pkt);
+        i->second.push(std::move(pkt));
     }
 }
