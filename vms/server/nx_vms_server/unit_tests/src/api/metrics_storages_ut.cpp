@@ -29,7 +29,6 @@ public:
         nx::vms::server::metrics::setTimerMultiplier(100);
 
         launcher = std::make_unique<ServerForTests>();
-        launcher->start();
 
         vms::api::StorageDataList storages;
         vms::api::StorageData storage;

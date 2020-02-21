@@ -14,7 +14,7 @@ class ServerForTests: public MediaServerLauncher
 {
     using base_type = MediaServerLauncher;
 public:
-    ServerForTests() = default;
+    ServerForTests(bool autoStart = true);
 
     /** Creates a server, merged to this server. */
     std::unique_ptr<ServerForTests> addServer();

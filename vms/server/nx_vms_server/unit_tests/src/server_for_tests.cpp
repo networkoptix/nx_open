@@ -12,6 +12,12 @@ namespace nx::vms::server::test {
 
 using namespace nx::test;
 
+ServerForTests::ServerForTests(bool autoStart)
+{
+    if (autoStart)
+        start();
+}
+
 bool ServerForTests::start()
 {
     serverStartTimer.restart();
@@ -26,7 +32,6 @@ QString ServerForTests::id() const
 std::unique_ptr<ServerForTests> ServerForTests::addServer()
 {
     auto server = std::make_unique<ServerForTests>();
-    server->start();
     server->connectTo(this);
     return server;
 }
