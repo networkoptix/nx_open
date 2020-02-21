@@ -132,7 +132,7 @@ enum class PacketFlag
 // The 128-bit header field.
 using PacketHeader = uint32_t[4];
 
-static constexpr auto kPacketHeaderSize = sizeof(PacketHeader);
+static constexpr int kPacketHeaderSize = sizeof(PacketHeader);
 
 class UDT_API CPacket
 {
@@ -154,22 +154,11 @@ public:
     CPacket();
     ~CPacket();
 
-    // Functionality:
-    //    Get the payload or the control information field length.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    the payload or the control information field length.
-
+    // TODO: #ak Remove this. Replace usages with payload().size().
     int getLength() const;
 
-    // Functionality:
-    //    Set the payload or the control information field length.
-    // Parameters:
-    //    0) [in] len: the payload or the control information field length.
-    // Returned value:
-    //    None.
-
+    // TODO: #ak Remove this function. Replace usages with payload().resize() or
+    // corresponding error reporting.
     void setLength(int len);
 
     // Functionality:

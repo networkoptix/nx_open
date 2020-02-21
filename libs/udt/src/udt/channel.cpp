@@ -311,24 +311,8 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet)
 
     packet.setLength(res - kPacketHeaderSize);
 
-    // convert back into local host order
-    //for (int i = 0; i < 4; ++ i)
-    //   packet.m_nHeader[i] = ntohl(packet.m_nHeader[i]);
-    uint32_t* p = packet.header();
-    for (int i = 0; i < 4; ++i)
-    {
-        *p = ntohl(*p);
-        ++p;
-    }
-
-    if (packet.getFlag() == PacketFlag::Control)
-    {
-        for (int j = 0, n = packet.getLength() / 4; j < n; ++j)
-        {
-            *((uint32_t *)packet.payload().data() + j) =
-                ntohl(*((uint32_t *)packet.payload().data() + j));
-        }
-    }
+    // convert into local host order
+    decodePacket(&packet);
 
     return success(packet.getLength());
 }
@@ -366,7 +350,18 @@ void UdpChannel::closeSocket()
 }
 
 template<typename Func>
-void UdpChannel::convertPacket(CPacket* packet, Func func)
+void UdpChannel::convertHeader(CPacket* packet, Func func)
+{
+    auto p = packet->header();
+    for (int j = 0; j < 4; ++j)
+    {
+        *p = func(*p);
+        ++p;
+    }
+}
+
+template<typename Func>
+void UdpChannel::convertPayload(CPacket* packet, Func func)
 {
     if (packet->getFlag() == PacketFlag::Control)
     {
@@ -376,21 +371,16 @@ void UdpChannel::convertPacket(CPacket* packet, Func func)
                 func(*((uint32_t*)packet->payload().data() + i));
         }
     }
-
-    auto p = packet->header();
-    for (int j = 0; j < 4; ++j)
-    {
-        *p = func(*p);
-        ++p;
-    }
 }
 
 void UdpChannel::encodePacket(CPacket* packet)
 {
-    convertPacket(packet, [](auto val) { return htonl(val); });
+    convertPayload(packet, [](auto val) { return htonl(val); });
+    convertHeader(packet, [](auto val) { return htonl(val); });
 }
 
 void UdpChannel::decodePacket(CPacket* packet)
 {
-    convertPacket(packet, [](auto val) { return ntohl(val); });
+    convertHeader(packet, [](auto val) { return ntohl(val); });
+    convertPayload(packet, [](auto val) { return ntohl(val); });
 }
