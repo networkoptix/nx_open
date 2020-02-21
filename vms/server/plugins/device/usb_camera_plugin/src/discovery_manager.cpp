@@ -24,6 +24,12 @@ std::string buildNxId(const device::DeviceData& device)
     if (nxId.empty())
         nxId = device.path;
 
+#ifdef Q_OS_WIN
+    HW_PROFILE_INFO HwProfInfo;
+    if (GetCurrentHwProfile(&HwProfInfo))
+        nxId += QString::fromUtf16((const ushort*) HwProfInfo.szHwProfileGuid).toStdString();
+#endif
+
     // Convert the id to one guaranteed to work with the media server - no special characters.
     nxId = QCryptographicHash::hash(
         nxId.c_str(),

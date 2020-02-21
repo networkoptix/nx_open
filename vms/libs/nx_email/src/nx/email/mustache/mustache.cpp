@@ -21,14 +21,9 @@ and/or other materials provided with the distribution.
 
 using namespace Mustache;
 
-QString Mustache::renderTemplate(const QString& templateString, const QVariantHash& args)
-{
-    Mustache::QtVariantContext context(args);
-    Mustache::Renderer renderer;
-    return renderer.render(templateString, &context);
-}
+namespace {
 
-QString escapeHtml(const QString& input)
+static QString escapeHtml(const QString& input)
 {
     QString escaped(input);
     for (int i = 0; i < escaped.count();) {
@@ -57,7 +52,7 @@ QString escapeHtml(const QString& input)
     return escaped;
 }
 
-QString unescapeHtml(const QString& escaped)
+static QString unescapeHtml(const QString& escaped)
 {
     QString unescaped(escaped);
     unescaped.replace(QLatin1String("&lt;"), QLatin1String("<"));
@@ -65,6 +60,15 @@ QString unescapeHtml(const QString& escaped)
     unescaped.replace(QLatin1String("&quot;"), QLatin1String("\""));
     unescaped.replace(QLatin1String("&amp;"), QLatin1String("&"));
     return unescaped;
+}
+
+} // namespace
+
+QString Mustache::renderTemplate(const QString& templateString, const QVariantHash& args)
+{
+    Mustache::QtVariantContext context(args);
+    Mustache::Renderer renderer;
+    return renderer.render(templateString, &context);
 }
 
 Context::Context(PartialResolver* resolver)

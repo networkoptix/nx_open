@@ -23,6 +23,7 @@ CameraManager::CameraManager(const std::shared_ptr<Camera> camera):
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
         nxcip::BaseCameraManager::cameraTimeCapability |
+        nxcip::BaseCameraManager::ServerBoundCapability |
         nxcip::BaseCameraManager::dontAutoOpenCamera)
 {
     m_pluginRef->addRef();
