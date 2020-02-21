@@ -93,7 +93,7 @@ Item
                 if (!resourceThumbnailProvider || !resourceId || resourceId.isNull())
                     return
 
-                resourceThumbnailProvider.refresh(resourceId)
+                resourceThumbnailProvider.load(resourceId)
             }
 
             Component.onCompleted:
