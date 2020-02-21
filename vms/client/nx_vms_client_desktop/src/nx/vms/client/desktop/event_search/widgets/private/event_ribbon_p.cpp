@@ -353,7 +353,7 @@ void EventRibbon::Private::updateTilePreview(int index)
 
     const auto rotation = int(mediaResource->defaultRotation());
     const auto previewCropRect = nx::vms::client::core::Geometry::rotatedRelativeRectangle(
-        modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>(), rotation / 90);
+        modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>(), -rotation / 90);
 
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? defaultThumbnailWidth
