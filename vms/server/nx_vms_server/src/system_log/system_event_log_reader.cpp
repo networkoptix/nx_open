@@ -255,7 +255,7 @@ bool RaidEventLogReader::isMessageSignificant(
     if (parsedMessage.providerName != providerName())
         return false;
 
-    // These event identificators are selected by Daniel Gonzalez <d.gonzalez@hanwha.com>.
+    // These event identifiers are selected by Daniel Gonzalez <d.gonzalez@hanwha.com>.
     const std::vector<int> significantIds = {
         0x003d, //<  61: Consistency Check failed on %s
         0x0044, //<  68: Initialization failed on %s

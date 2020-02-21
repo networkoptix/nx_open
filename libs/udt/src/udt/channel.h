@@ -121,7 +121,7 @@ public:
     // Returned value:
     //    Actual size of data sent.
 
-    Result<int> sendto(const detail::SocketAddress& addr, CPacket& packet) const;
+    Result<int> sendto(const detail::SocketAddress& addr, CPacket& packet);
 
     // Functionality:
     //    Receive a packet from the channel and record the source address.
@@ -131,7 +131,7 @@ public:
     // Returned value:
     //    Actual size of data received.
 
-    Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet) const;
+    Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet);
 
     Result<> shutdown();
 

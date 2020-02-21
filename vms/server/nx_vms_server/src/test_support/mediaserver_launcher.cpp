@@ -12,8 +12,7 @@
 
 MediaServerLauncher::MediaServerLauncher(
     const QString& tmpDir,
-    int port,
-    DisabledFeatures disabledFeatures)
+    int port)
     :
     m_workDirResource(tmpDir),
     m_serverEndpoint(nx::network::HostAddress::localhost, port),
@@ -22,34 +21,12 @@ MediaServerLauncher::MediaServerLauncher(
     m_serverGuid = QnUuid::createUuid();
     fillDefaultSettings();
 
-    if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
-        addSetting("noResourceDiscovery", "1");
-    if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
-        addSetting("noMonitorStatistics", "1");
-
-    if (disabledFeatures.testFlag(DisabledFeature::noStorageDiscovery))
-        addSetting(QnServer::kNoInitStoragesOnStartup, "1");
-
-    if (disabledFeatures.testFlag(DisabledFeature::noPlugins))
-        addSetting(QnServer::kNoPlugins, "1");
-
-    if (disabledFeatures.testFlag(DisabledFeature::noPublicIp))
-        addSetting(QnServer::publicIPEnabled, "0");
-
-    if (disabledFeatures.testFlag(DisabledFeature::noOnlineResourceData))
-        addSetting(QnServer::onlineResourceDataEnabled, "0");
-
-    if (disabledFeatures.testFlag(DisabledFeature::noOutgoingConnectionsMetric))
-        addSetting("noOutgoingConnectionsMetric", "1");
-
-    if (disabledFeatures.testFlag(DisabledFeature::noUseTwoSockets))
-        addSetting("useTwoSockets", "0");
-
+    removeFeatures(MediaServerFeature::all);
     m_cmdOptions.push_back("");
     m_cmdOptions.push_back("-e");
 }
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(MediaServerLauncher::DisabledFeatures)
+Q_DECLARE_OPERATORS_FOR_FLAGS(MediaServerLauncher::MediaServerFeatures)
 
 void MediaServerLauncher::fillDefaultSettings()
 {
@@ -65,6 +42,51 @@ void MediaServerLauncher::fillDefaultSettings()
 MediaServerLauncher::~MediaServerLauncher()
 {
     stop();
+}
+
+void MediaServerLauncher::addFeatures(MediaServerFeatures enabledFeatures)
+{
+    setFeatures(enabledFeatures, true);
+}
+
+void MediaServerLauncher::removeFeatures(MediaServerFeatures disabledFeatures)
+{
+    setFeatures(disabledFeatures, false);
+}
+
+void MediaServerLauncher::setFeatures(MediaServerFeatures features, bool isEnabled)
+{
+    auto setSetting =
+        [this](const std::string& key, bool value)
+    {
+        addSetting(key, value ? "1" : "0");
+    };
+
+    if (features.testFlag(MediaServerFeature::resourceDiscovery))
+        addSetting("noResourceDiscovery", !isEnabled);
+    if (features.testFlag(MediaServerFeature::monitorStatistics))
+        addSetting("noMonitorStatistics", !isEnabled);
+
+    if (features.testFlag(MediaServerFeature::storageDiscovery))
+        addSetting(QnServer::kNoInitStoragesOnStartup, !isEnabled);
+
+    if (features.testFlag(MediaServerFeature::plugins))
+        addSetting(QnServer::kNoPlugins, !isEnabled);
+    
+    if (features.testFlag(MediaServerFeature::publicIp))
+        addSetting(QnServer::publicIPEnabled, isEnabled);
+
+    if (features.testFlag(MediaServerFeature::onlineResourceData))
+        addSetting(QnServer::onlineResourceDataEnabled, isEnabled);
+
+    if (features.testFlag(MediaServerFeature::outgoingConnectionsMetric))
+        addSetting("noOutgoingConnectionsMetric", !isEnabled);
+
+    if (features.testFlag(MediaServerFeature::useTwoSockets))
+        addSetting("useTwoSockets", isEnabled);
+
+    if (features.testFlag(MediaServerFeature::useSetupWizard))
+        addSetting("noSetupWizard", !isEnabled);
 }
 
 nx::network::SocketAddress MediaServerLauncher::endpoint() const

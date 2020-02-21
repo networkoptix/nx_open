@@ -16,7 +16,7 @@
 #include "camera_pool.h"
 #include "camera_options.h"
 #include "file_cache.h"
-#include "network_settings.h"
+#include "network_options.h"
 
 namespace nx::vms::testcamera {
 
@@ -43,6 +43,27 @@ static CameraOptions makeCameraOptions(
     result.shiftPtsSecondaryPeriod = options.shiftPtsSecondaryPeriod;
 
     result.offlineFreq = cameraSet.offlineFreq;
+
+    return result;
+}
+
+NetworkOptions makeNetworkOptions(const CliOptions& options)
+{
+    NetworkOptions result;
+
+    result.localInterfacesToListen = options.localInterfaces;
+
+    if (options.discoveryPort)
+        result.discoveryPort = *options.discoveryPort;
+    else
+        result.discoveryPort = ini().discoveryPort;
+
+    if (options.mediaPort)
+        result.mediaPort = *options.mediaPort;
+    else
+        result.mediaPort = ini().mediaPort;
+
+    result.reuseDiscoveryPort = options.reuseDiscoveryPort;
 
     return result;
 }
@@ -75,7 +96,7 @@ public:
 
         m_cameraPool = std::make_unique<CameraPool>(
             m_fileCache.get(),
-            makeNetworkSettings(options),
+            makeNetworkOptions(options),
             m_commonModule.get(),
             options.noSecondary,
             options.fpsPrimary,
@@ -102,57 +123,6 @@ private:
     std::unique_ptr<CameraPool> m_cameraPool;
 
 private:
-    NetworkSettings makeNetworkSettings(CliOptions options)
-    {
-        NetworkSettings result;
-        result.localInterfacesToListen = options.localInterfaces;
-
-        const auto assignValue =
-            [this](
-                int* target,
-                const std::optional<int>& cliOptionValue,
-                int iniOptionValue,
-                const QString& cliOptionKey,
-                const QString& parameterName)
-            {
-                if (cliOptionValue)
-                {
-                    *target = *cliOptionValue;
-                    NX_DEBUG(this,
-                        "Taking a %1 value for the camera from the command line options: %2",
-                        parameterName,
-                        *target);
-
-                }
-                else
-                {
-                    *target = iniOptionValue;
-                    NX_DEBUG(this,
-                        "%1 CLI option is not specified or is incorrect. "
-                        "Taking a value for the camera %2 from the ini file: %3",
-                        cliOptionKey,
-                        parameterName,
-                        *target);
-                }
-            };
-
-        assignValue(
-            &result.mediaPort,
-            options.mediaPort,
-            ini().mediaPort,
-            kMediaPortCliKey,
-            "media port");
-
-        assignValue(
-            &result.discoveryPort,
-            options.discoveryPort,
-            ini().discoveryPort,
-            kDiscoveryPortCliKey,
-            "discovery port");
-
-        return result;
-    }
-
     bool loadFilesAndAddCameras(const CliOptions& options) const
     {
         for (const auto& cameraSet: options.cameraSets)

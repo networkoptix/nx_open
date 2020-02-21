@@ -192,11 +192,8 @@ protected:
             0ms, &m_thread,
             [this, p = std::move(p)]() mutable
             {
-                const MediaServerLauncher::DisabledFeatures disabledFeatures = {
-                    MediaServerLauncher::DisabledFeature::noPlugins,
-                    MediaServerLauncher::DisabledFeature::noMonitorStatistics,
-                    MediaServerLauncher::DisabledFeature::noResourceDiscovery };
-                m_server.reset(new MediaServerLauncher(/*tmpDir*/ "", /*port*/ 0, disabledFeatures));
+                m_server.reset(new MediaServerLauncher());
+                m_server->addFeatures(MediaServerLauncher::MediaServerFeature::storageDiscovery);
                 p.set_value();
             });
         f.wait();

@@ -12,8 +12,9 @@ namespace nx::vms::server::test {
 
 class ServerForTests: public MediaServerLauncher
 {
+    using base_type = MediaServerLauncher;
 public:
-    ServerForTests(DisabledFeature disabledFeatures = DisabledFeature::all);
+    ServerForTests() = default;
 
     /** Creates a server, merged to this server. */
     std::unique_ptr<ServerForTests> addServer();
@@ -28,10 +29,11 @@ public:
 
     template<typename T>
     auto getFlat(const QString& api) { return nx::utils::flat_map(get<T>(api)); }
+    QString id() const;
 
+    bool start();
 public:
     nx::utils::ElapsedTimer serverStartTimer;
-    const QString id; //< For debug.
 };
 
 template<typename T>

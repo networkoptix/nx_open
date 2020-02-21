@@ -851,10 +851,6 @@ void QnServerStreamRecorder::getStoragesAndFileNames(
         if (isRedundantSyncOn())
             backupStorage = m_serverModule->backupStorageManager()->getOptimalStorageRoot();
 
-        if (normalStorage || backupStorage)
-            setTruncateInterval(
-                m_serverModule->settings().mediaFileDuration());
-
         if (normalStorage)
             m_recordingContextVector.emplace_back(
                 m_serverModule->normalStorageManager()->getFileName(

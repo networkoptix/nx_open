@@ -29,6 +29,7 @@ public:
         nx::vms::server::metrics::setTimerMultiplier(100);
 
         launcher = std::make_unique<ServerForTests>();
+        launcher->start();
 
         vms::api::StorageDataList storages;
         vms::api::StorageData storage;
@@ -62,7 +63,7 @@ TEST_F(MetricsStoragesApi, info)
     auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
     auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
     auto infoData = storageData["info"];
-    EXPECT_EQ(launcher->id, infoData["server"].toString());
+    EXPECT_EQ(launcher->id(), infoData["server"].toString());
     EXPECT_EQ("local", infoData["type"].toString());
 }
 

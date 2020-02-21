@@ -120,7 +120,7 @@ private:
     struct CQEntry
     {
         CUnit* m_pUnit = nullptr;        // unit queue
-        char* m_pBuffer = nullptr;        // data buffer
+        Buffer m_pBuffer;
         int m_iSize = 0;        // size of each queue
 
         CQEntry* next = nullptr;
@@ -414,6 +414,7 @@ public:
     //    2) [out] packet: received packet
     // Returned value:
     //    Data size of the packet
+    // TODO: #ak Refactor this function to return packet, not copy it.
 
     int recvfrom(
         int32_t id,
@@ -468,7 +469,7 @@ private:
     volatile bool m_bClosing = false;
 
 private:
-    void storePkt(int32_t id, CPacket* pkt);
+    void storePkt(int32_t id, std::unique_ptr<CPacket> pkt);
 
 private:
     std::mutex m_LSLock;
@@ -482,7 +483,7 @@ private:
     std::mutex m_IDLock;
 
     // temporary buffer for rendezvous connection request
-    std::map<int32_t, std::queue<CPacket*> > m_mBuffer;
+    std::map<int32_t, std::queue<std::unique_ptr<CPacket>>> m_packets;
     std::mutex m_PassLock;
     std::condition_variable m_PassCond;
 

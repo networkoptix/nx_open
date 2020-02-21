@@ -157,7 +157,6 @@ CUnitQueue::~CUnitQueue()
     while (p != nullptr)
     {
         delete[] p->m_pUnit;
-        delete[] p->m_pBuffer;
 
         CQEntry* q = p;
         if (p == m_pLastQueue)
@@ -172,19 +171,18 @@ int CUnitQueue::init(int size, int mss)
 {
     CQEntry* tempq = nullptr;
     CUnit* tempu = nullptr;
-    char* tempb = nullptr;
 
     tempq = new CQEntry;
     tempu = new CUnit[size];
-    tempb = new char[size * mss];
+    auto tempb = Buffer(size * mss);
 
     for (int i = 0; i < size; ++i)
     {
         tempu[i].m_iFlag = 0;
-        tempu[i].m_Packet.m_pcData = tempb + i * mss;
+        tempu[i].m_Packet.setPayload(tempb.substr(i * mss));
     }
     tempq->m_pUnit = tempu;
-    tempq->m_pBuffer = tempb;
+    tempq->m_pBuffer = std::move(tempb);
     tempq->m_iSize = size;
 
     m_pQEntry = m_pCurrQueue = m_pLastQueue = tempq;
@@ -224,22 +222,21 @@ int CUnitQueue::increase()
 
     CQEntry* tempq = nullptr;
     CUnit* tempu = nullptr;
-    char* tempb = nullptr;
 
     // all queues have the same size
     int size = m_pQEntry->m_iSize;
 
     tempq = new CQEntry;
     tempu = new CUnit[size];
-    tempb = new char[size * m_iMSS];
+    Buffer tempb(size * m_iMSS);
 
     for (int i = 0; i < size; ++i)
     {
         tempu[i].m_iFlag = 0;
-        tempu[i].m_Packet.m_pcData = tempb + i * m_iMSS;
+        tempu[i].m_Packet.setPayload(tempb.substr(i * m_iMSS));
     }
     tempq->m_pUnit = tempu;
-    tempq->m_pBuffer = tempb;
+    tempq->m_pBuffer = std::move(tempb);
     tempq->m_iSize = size;
 
     m_pLastQueue->next = tempq;
@@ -759,16 +756,14 @@ void CRendezvousQueue::updateConnStatus()
             }
 
             CPacket request;
-            char* reqdata = new char[udtSocket->payloadSize()];
-            request.pack(ControlPacketType::Handshake, nullptr, reqdata, udtSocket->payloadSize());
+            request.pack(ControlPacketType::Handshake, nullptr, udtSocket->payloadSize());
             // ID = 0, connection request
             request.m_iID = !udtSocket->rendezvous() ? 0 : udtSocket->connRes().m_iID;
             int hs_size = udtSocket->payloadSize();
-            udtSocket->connReq().serialize(reqdata, hs_size);
+            udtSocket->connReq().serialize(request.payload().data(), hs_size);
             request.setLength(hs_size);
             udtSocket->sndQueue().sendto(i->peerAddr, request);
             udtSocket->setLastReqTime(CTimer::getTime());
-            delete[] reqdata;
         }
     }
 }
@@ -804,16 +799,7 @@ CRcvQueue::~CRcvQueue()
     m_pRendezvousQueue.reset();
 
     // remove all queued messages
-    for (auto i = m_mBuffer.begin(); i != m_mBuffer.end(); ++i)
-    {
-        while (!i->second.empty())
-        {
-            CPacket* pkt = i->second.front();
-            delete[] pkt->m_pcData;
-            delete pkt;
-            i->second.pop();
-        }
-    }
+    m_packets.clear();
 }
 
 void CRcvQueue::start()
@@ -857,10 +843,9 @@ void CRcvQueue::worker()
         {
             // no space, skip this packet
             CPacket temp;
-            temp.m_pcData = new char[m_iPayloadSize];
+            temp.setPayload(Buffer(m_iPayloadSize));
             temp.setLength(m_iPayloadSize);
             m_channel->recvfrom(addr, temp);
-            delete[] temp.m_pcData;
             timerCheck();
             continue;
         }
@@ -977,14 +962,14 @@ int CRcvQueue::recvfrom(
 {
     std::unique_lock<std::mutex> lock(m_PassLock);
 
-    map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
+    auto i = m_packets.find(id);
 
-    if (i == m_mBuffer.end())
+    if (i == m_packets.end())
     {
         m_PassCond.wait_for(lock, timeout);
 
-        i = m_mBuffer.find(id);
-        if (i == m_mBuffer.end())
+        i = m_packets.find(id);
+        if (i == m_packets.end())
         {
             packet.setLength(-1);
             return -1;
@@ -992,7 +977,7 @@ int CRcvQueue::recvfrom(
     }
 
     // retrieve the earliest packet
-    CPacket* newpkt = i->second.front();
+    auto& newpkt = i->second.front();
 
     if (packet.getLength() < newpkt->getLength())
     {
@@ -1002,17 +987,13 @@ int CRcvQueue::recvfrom(
 
     // copy packet content
     memcpy(packet.header(), newpkt->header(), kPacketHeaderSize);
-    memcpy(packet.m_pcData, newpkt->m_pcData, newpkt->getLength());
-    packet.setLength(newpkt->getLength());
-
-    delete[] newpkt->m_pcData;
-    delete newpkt;
+    packet.setPayload(newpkt->payload());
 
     // remove this message from queue,
     // if no more messages left for this socket, release its data structure
     i->second.pop();
     if (i->second.empty())
-        m_mBuffer.erase(i);
+        m_packets.erase(i);
 
     return packet.getLength();
 }
@@ -1043,17 +1024,7 @@ void CRcvQueue::removeConnector(const UDTSOCKET& id)
 
     std::lock_guard<std::mutex> bufferlock(m_PassLock);
 
-    map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
-    if (i != m_mBuffer.end())
-    {
-        while (!i->second.empty())
-        {
-            delete[] i->second.front()->m_pcData;
-            delete i->second.front();
-            i->second.pop();
-        }
-        m_mBuffer.erase(i);
-    }
+    m_packets.erase(id);
 }
 
 void CRcvQueue::addNewEntry(const std::weak_ptr<CUDT>& u)
@@ -1077,15 +1048,15 @@ std::shared_ptr<CUDT> CRcvQueue::takeNewEntry()
     return u;
 }
 
-void CRcvQueue::storePkt(int32_t id, CPacket* pkt)
+void CRcvQueue::storePkt(int32_t id, std::unique_ptr<CPacket> pkt)
 {
     std::lock_guard<std::mutex> bufferlock(m_PassLock);
 
-    map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
+    auto i = m_packets.find(id);
 
-    if (i == m_mBuffer.end())
+    if (i == m_packets.end())
     {
-        m_mBuffer[id].push(pkt);
+        m_packets[id].push(std::move(pkt));
 
         m_PassCond.notify_all();
     }
@@ -1095,6 +1066,6 @@ void CRcvQueue::storePkt(int32_t id, CPacket* pkt)
         if (i->second.size() > 16)
             return;
 
-        i->second.push(pkt);
+        i->second.push(std::move(pkt));
     }
 }

@@ -693,7 +693,7 @@ void QnRecordingManager::disableLicensesIfNeed()
 
 int QnRecordingManager::recordingChunkDurationSec() const
 {
-    return serverModule()->settings().recordingChunkDurationSec();
+    return serverModule()->settings().mediaFileDuration();
 }
 
 void QnRecordingManager::at_licenseMutexTimeout()
