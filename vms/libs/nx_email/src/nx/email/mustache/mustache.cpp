@@ -23,7 +23,7 @@ using namespace Mustache;
 
 namespace {
 
-QString escapeHtml(const QString& input)
+static QString escapeHtml(const QString& input)
 {
     QString escaped(input);
     for (int i = 0; i < escaped.count();) {
@@ -52,7 +52,7 @@ QString escapeHtml(const QString& input)
     return escaped;
 }
 
-QString unescapeHtml(const QString& escaped)
+static QString unescapeHtml(const QString& escaped)
 {
     QString unescaped(escaped);
     unescaped.replace(QLatin1String("&lt;"), QLatin1String("<"));
