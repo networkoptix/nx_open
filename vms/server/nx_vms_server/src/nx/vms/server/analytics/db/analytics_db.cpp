@@ -134,7 +134,7 @@ bool EventsStorage::initialize(const Settings& settings)
     m_objectTrackCache = std::make_unique<ObjectTrackCache>(
         kTrackAggregationPeriod,
         settings.maxCachedObjectLifeTime,
-        m_mediaServerModule ? m_mediaServerModule->iframeSearchHelper() : nullptr);
+        m_mediaServerModule ? m_mediaServerModule->iFrameSearchHelper() : nullptr);
 
     auto dbConnectionOptions = settings.dbConnectionOptions;
     dbConnectionOptions.dbName = closeDirPath(settings.path) + dbConnectionOptions.dbName;
