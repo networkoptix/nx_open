@@ -129,6 +129,16 @@ TEST_F(Buffer, resize)
     ASSERT_EQ(0, one.size());
 }
 
+TEST_F(Buffer, resize_down_does_not_reallocate)
+{
+    auto one = generate<::Buffer>(1024);
+    auto oneBuf = one.data();
+
+    one.resize(one.size() / 2);
+
+    ASSERT_EQ(oneBuf, one.data());
+}
+
 TEST_F(Buffer, substr_bounds_checking)
 {
     auto one = generate<::Buffer>(1024);
