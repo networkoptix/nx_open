@@ -61,6 +61,9 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_pane_settings.h>
+#include <ui/workbench/workbench_item.h>
+#include <core/resource/camera_resource.h>
+#include <camera/fps_calculator.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/desktop/workbench/panels/special_layout_panel.h>
@@ -252,6 +255,38 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 
     connect(action(action::ShowTimeLineOnVideowallAction), &QAction::triggered,
         this, [this] { updateControlsVisibility(false); });
+
+    if (ini().autoFpsLimit)
+    {
+        static constexpr auto kIdleFps = 10;
+        m_instrumentManager->setFpsLimit(kIdleFps);
+        connect(workbench(), &QnWorkbench::currentLayoutItemsChanged, this,
+            [this]()
+            {
+                QnVirtualCameraResourceList cameras;
+                int count = 0;
+                if (auto workbenchLayout = workbench()->currentLayout())
+                {
+                    const auto items = workbenchLayout->items();
+                    count = items.count();
+                    for (const auto& item: items)
+                    {
+                        if (const auto camera =
+                                item->resource().dynamicCast<QnVirtualCameraResource>())
+                            cameras.append(camera);
+                    }
+                }
+
+                QPair<int, int> result = Qn::calculateMaxFps(cameras);
+
+                if (result.second != std::numeric_limits<int>::max())
+                    m_instrumentManager->setFpsLimit(result.second);
+                else if (count == 0)
+                    m_instrumentManager->setFpsLimit(kIdleFps);
+                else
+                    m_instrumentManager->setFpsLimit(0);
+            });
+    }
 }
 
 WorkbenchUi::~WorkbenchUi()

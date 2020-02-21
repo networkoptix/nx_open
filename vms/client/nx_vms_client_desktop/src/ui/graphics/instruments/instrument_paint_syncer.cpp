@@ -4,13 +4,31 @@
 #include <QtCore/QDateTime>
 #include <QtWidgets/QWidget>
 
+namespace {
+
+using namespace std::chrono;
+
+static constexpr milliseconds kOneSecond = 1000ms;
+
+} // namespace
+
 InstrumentPaintSyncer::InstrumentPaintSyncer(QObject* parent):
     QObject(parent),
     m_animationTimer(new QAnimationTimer(this)),
-    m_currentWidget(nullptr)
+    m_currentWidget(nullptr),
+    m_update(new nx::utils::PendingOperation())
 {
+    setFpsLimit(0);
+    m_update->setFlags(nx::utils::PendingOperation::FireImmediately);
+    m_update->setCallback([this]() { m_currentWidget->update(); });
+
     m_animationTimer->addListener(this);
     startListening();
+}
+
+void InstrumentPaintSyncer::setFpsLimit(int limit)
+{
+    m_update->setInterval(limit > 0 ? kOneSecond / limit : 0ms);
 }
 
 bool InstrumentPaintSyncer::eventFilter(QObject* watched, QEvent* event)
@@ -32,7 +50,7 @@ void InstrumentPaintSyncer::tick(int /*deltaTime*/)
 {
     if (currentWatched() && m_currentWidget)
     {
-       m_currentWidget->update();
+       m_update->requestOperation();
     }
 }
 
