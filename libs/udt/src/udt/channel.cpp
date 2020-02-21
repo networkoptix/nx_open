@@ -387,10 +387,10 @@ void UdpChannel::convertPacket(CPacket* packet, Func func)
 
 void UdpChannel::encodePacket(CPacket* packet)
 {
-    convertPacket(packet, htonl);
+    convertPacket(packet, [](auto val) { return htonl(val); });
 }
 
 void UdpChannel::decodePacket(CPacket* packet)
 {
-    convertPacket(packet, ntohl);
+    convertPacket(packet, [](auto val) { return ntohl(val); });
 }
