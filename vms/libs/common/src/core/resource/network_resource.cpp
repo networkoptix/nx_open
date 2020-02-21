@@ -202,7 +202,8 @@ int QnNetworkResource::mediaPort() const
 
 void QnNetworkResource::setMediaPort(int value)
 {
-    setProperty(mediaPortKey(), value > 0 ? QString::number(value) : QString());
+    if (value != mediaPort())
+        setProperty(mediaPortKey(), value > 0 ? QString::number(value) : QString());
 }
 
 void QnNetworkResource::addNetworkStatus(NetworkStatus status)
