@@ -217,10 +217,18 @@ void ModuleConnector::InformationReader::readUntilError()
         }
 
         nx::vms::api::ModuleInformation moduleInformation;
-        if (!QJson::deserialize(restResult.reply, &moduleInformation)
-            || moduleInformation.id.isNull())
+        if (!QJson::deserialize(restResult.reply, &moduleInformation))
+            return nx::utils::swapAndCall(m_handler, boost::none, "Deserializiation has failed");
+
+        if (moduleInformation.id.isNull())
+            return nx::utils::swapAndCall(m_handler, boost::none, "Module id is null");
+
+        const auto host = m_endpoint.address.toString();
+        if (network::SocketGlobals::addressResolver().isCloudHostName(host)
+            && host != moduleInformation.cloudId())
         {
-            return nx::utils::swapAndCall(m_handler, boost::none, restResult.errorString);
+            return nx::utils::swapAndCall(
+                m_handler, boost::none, "Wrong cloud host: " + moduleInformation.cloudId());
         }
 
         nx::utils::ObjectDestructionFlag::Watcher destructionWatcher(&m_destructionFlag);
