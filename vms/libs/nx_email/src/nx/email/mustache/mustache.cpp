@@ -21,6 +21,8 @@ and/or other materials provided with the distribution.
 
 using namespace Mustache;
 
+namespace {
+
 QString Mustache::renderTemplate(const QString& templateString, const QVariantHash& args)
 {
     Mustache::QtVariantContext context(args);
@@ -66,6 +68,8 @@ QString unescapeHtml(const QString& escaped)
     unescaped.replace(QLatin1String("&amp;"), QLatin1String("&"));
     return unescaped;
 }
+
+} // namespace
 
 Context::Context(PartialResolver* resolver)
     : m_partialResolver(resolver)
