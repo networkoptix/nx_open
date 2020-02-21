@@ -84,6 +84,9 @@ void MediaServerLauncher::setFeatures(MediaServerFeatures features, bool isEnabl
 
     if (features.testFlag(MediaServerFeature::useTwoSockets))
         addSetting("useTwoSockets", isEnabled);
+
+    if (features.testFlag(MediaServerFeature::useSetupWizard))
+        addSetting("noSetupWizard", !isEnabled);
 }
 
 nx::network::SocketAddress MediaServerLauncher::endpoint() const

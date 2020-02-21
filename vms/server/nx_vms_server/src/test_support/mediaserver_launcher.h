@@ -29,7 +29,8 @@ public:
         onlineResourceData = 1 << 5,
         outgoingConnectionsMetric = 1 << 6,
         useTwoSockets = 1 << 7,
-        count = 1 << 8,
+        useSetupWizard = 1 << 8,
+        count = 1 << 9,
         all = count - 1
     };
     Q_DECLARE_FLAGS(MediaServerFeatures, MediaServerFeature)
