@@ -778,8 +778,10 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto eventTypeDescriptor = camera->commonModule()->analyticsEventTypeDescriptorManager()
-        ->descriptor(eventTypeId);
+    const auto eventTypeDescriptor = camera && camera->commonModule()
+        ? camera->commonModule()->analyticsEventTypeDescriptorManager()->descriptor(eventTypeId)
+        : std::nullopt;
+
     return eventTypeDescriptor ? eventTypeDescriptor->name : tr("Analytics Event");
 }
 
