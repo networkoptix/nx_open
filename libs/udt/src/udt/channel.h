@@ -42,7 +42,6 @@ Yunhong Gu, last updated 01/27/2011
 #define __UDT_CHANNEL_H__
 
 #include <optional>
-#include <thread>
 
 #include "udt.h"
 #include "packet.h"
@@ -143,12 +142,9 @@ private:
     int m_iIPversion;                    // IP version
 
     UDPSOCKET m_iSocket;                 // socket descriptor
-    std::optional<std::thread::id> m_recvThreadId;
 
     int m_iSndBufSize;                   // UDP sending buffer size
     int m_iRcvBufSize;                   // UDP receiving buffer size
-    std::atomic<bool> m_inRecv = false;
-    std::atomic<bool> m_inSend = false;
 
                                          // Functionality:
                                          //    Disconnect and close the UDP entity.
