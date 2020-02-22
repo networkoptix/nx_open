@@ -144,7 +144,7 @@ protected:
     void forceHttpConnectionUpgradeTunnel()
     {
         m_tunnelFactoryBak = http::tunneling::detail::ClientFactory::instance().setCustomFunc(
-            [this](const std::string& /*tag*/, const nx::utils::Url& url)
+            [](const std::string& /*tag*/, const nx::utils::Url& url)
             {
                 return std::make_unique<http::tunneling::detail::ConnectionUpgradeTunnelClient>(
                     url, nullptr);
