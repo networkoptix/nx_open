@@ -128,6 +128,7 @@ public:
 
     int totalRequestsSentViaCurrentConnection() const;
     int totalRequestsSent() const;
+
 private:
     std::unique_ptr<nx::network::http::AsyncClient> m_asyncHttpClient;
     QnWaitCondition m_cond;
@@ -158,7 +159,9 @@ private:
     bool m_expectOnlyBody = false;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
 
-    void instantiateHttpClient();
+    void instantiateAsyncClient();
+    void configureAsyncClient();
+
     template<typename AsyncClientFunc>
         bool doRequest(AsyncClientFunc func);
 
