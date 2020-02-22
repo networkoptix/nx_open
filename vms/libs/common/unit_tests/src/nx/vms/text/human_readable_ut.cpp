@@ -82,7 +82,7 @@ TEST(HumanReadableTest, digitalVolumeSizeFixed)
 TEST(HumanReadableTest, digitalVolumeSizeFixedOverflow)
 {
     const auto size = 1315333734400;
-    ASSERT_EQ("1315333734400 Bytes", HumanReadable::digitalSize(size,
+    ASSERT_EQ("1315333734400 Byte(s)", HumanReadable::digitalSize(size,
         HumanReadable::Bytes,
         HumanReadable::DigitalSizeMultiplier::Binary,
         HumanReadable::SuffixFormat::Full,
