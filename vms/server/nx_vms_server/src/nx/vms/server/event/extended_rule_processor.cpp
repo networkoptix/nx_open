@@ -1092,7 +1092,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                 params.eventResourceId);
 
             cameraHistoryPool()->updateCameraHistorySync(camera);
-            if (camera->hasVideo(nullptr))
+            if (camera && camera->hasVideo(nullptr))
             {
                 QByteArray screenshotData = getEventScreenshotEncoded(params.eventResourceId,
                     params.eventTimestampUsec, SCREENSHOT_SIZE).frame;
