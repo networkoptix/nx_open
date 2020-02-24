@@ -84,6 +84,8 @@ using ThreadId = pthread_t;
 ThreadId GetCurrentThreadId();
 #endif
 
+void setCurrentThreadName(const std::string& name);
+
 ////////////////////////////////////////////////////////////////////////////////
 
 class UDT_API CTimer

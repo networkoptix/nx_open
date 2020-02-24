@@ -498,6 +498,8 @@ void CSndQueue::start()
 
 void CSndQueue::worker()
 {
+    setCurrentThreadName(typeid(*this).name());
+
     while (!m_bClosing)
     {
         const auto ts = m_pSndUList->getNextProcTime();
@@ -818,6 +820,8 @@ void CRcvQueue::stop()
 
 void CRcvQueue::worker()
 {
+    setCurrentThreadName(typeid(*this).name());
+
     detail::SocketAddress addr(m_iIPversion);
 
     while (!m_bClosing)
