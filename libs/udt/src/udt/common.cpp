@@ -152,9 +152,11 @@ pthread_cond_t CTimer::m_EventCond = CreateEvent(NULL, false, false, NULL);
 
 void setCurrentThreadName(const std::string& name)
 {
-#ifdef _WIN32
+#if defined(_WIN32)
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     SetThreadDescription(GetCurrentThread(), converter.from_bytes(name).c_str());
+#elif defined(__APPLE__)
+    pthread_setname_np(name.c_str());
 #else
     pthread_setname_np(pthread_self(), name.c_str());
 #endif
