@@ -81,8 +81,8 @@ protected:
         m_aioThread.stopMonitoring(m_tcpSocket.get(), aio::EventType::etRead);
     }
 
-    std::unique_ptr<TCPSocket> m_tcpSocket;
     aio::AIOThread m_aioThread;
+    std::unique_ptr<TCPSocket> m_tcpSocket;
     nx::utils::SyncQueue<aio::EventType> m_eventsReported;
 
 private:

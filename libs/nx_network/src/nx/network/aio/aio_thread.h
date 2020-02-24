@@ -32,6 +32,8 @@ public:
      * Cancels calls scheduled with aio::AIOThread::post and aio::AIOThread::dispatch.
      */
     virtual void cancelPostedCalls(Pollable* const sock) = 0;
+
+    virtual bool isSocketBeingMonitored(Pollable* sock) const = 0;
 };
 
 /**
@@ -91,7 +93,7 @@ public:
      */
     size_t socketsHandled() const;
 
-    bool isSocketBeingMonitored(Pollable* sock) const;
+    virtual bool isSocketBeingMonitored(Pollable* sock) const override;
 
 protected:
     virtual void run() override;
