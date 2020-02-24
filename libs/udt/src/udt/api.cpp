@@ -1247,6 +1247,8 @@ static constexpr std::chrono::milliseconds kGarbageCollectTickPeriod(100);
 
 void CUDTUnited::garbageCollect()
 {
+    setCurrentThreadName(typeid(*this).name());
+
     std::unique_lock<std::mutex> gcguard(m_GCStopLock);
 
     while (!m_bClosing)
