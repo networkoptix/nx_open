@@ -107,6 +107,8 @@ CSndBuffer::~CSndBuffer()
 
 void CSndBuffer::addBuffer(const char* data, int len, std::chrono::milliseconds ttl, bool order)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int size = len / m_iMSS;
     if ((len % m_iMSS) != 0)
         size++;
@@ -142,10 +144,7 @@ void CSndBuffer::addBuffer(const char* data, int len, std::chrono::milliseconds 
     }
     m_pLastBlock = s;
 
-    {
-        std::lock_guard<std::mutex> lock(m_BufLock);
-        m_iCount += size;
-    }
+    m_iCount += size;
 
     m_iNextMsgNo++;
     if (m_iNextMsgNo == CMsgNo::m_iMaxMsgNo)
@@ -154,6 +153,8 @@ void CSndBuffer::addBuffer(const char* data, int len, std::chrono::milliseconds 
 
 int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int size = len / m_iMSS;
     if ((len % m_iMSS) != 0)
         size++;
@@ -192,10 +193,7 @@ int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
     }
     m_pLastBlock = s;
 
-    {
-        std::lock_guard<std::mutex> lock(m_BufLock);
-        m_iCount += size;
-    }
+    m_iCount += size;
 
     m_iNextMsgNo++;
     if (m_iNextMsgNo == CMsgNo::m_iMaxMsgNo)
@@ -206,6 +204,8 @@ int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
 
 std::optional<Buffer> CSndBuffer::readData(int32_t& msgno)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     // No data to read
     if (m_pCurrBlock == m_pLastBlock)
         return 0;
@@ -224,7 +224,7 @@ std::optional<Buffer> CSndBuffer::readData(int32_t& msgno)
 
 std::optional<Buffer> CSndBuffer::readData(const int offset, int32_t& msgno, int& msglen)
 {
-    std::lock_guard<std::mutex> lock(m_BufLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     Block* p = m_pFirstBlock;
 
@@ -261,7 +261,7 @@ std::optional<Buffer> CSndBuffer::readData(const int offset, int32_t& msgno, int
 
 void CSndBuffer::ackData(int offset)
 {
-    std::lock_guard<std::mutex> lock(m_BufLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     for (int i = 0; i < offset; ++i)
         m_pFirstBlock = m_pFirstBlock->m_pNext;
@@ -273,6 +273,8 @@ void CSndBuffer::ackData(int offset)
 
 int CSndBuffer::getCurrBufSize() const
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     return m_iCount;
 }
 
@@ -350,6 +352,8 @@ CRcvBuffer::~CRcvBuffer()
 
 bool CRcvBuffer::addData(CUnit* unit, int offset)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int pos = (m_iLastAckPos + offset) % m_iSize;
     if (offset > m_iMaxPos)
         m_iMaxPos = offset;
@@ -367,6 +371,8 @@ bool CRcvBuffer::addData(CUnit* unit, int offset)
 
 int CRcvBuffer::readBuffer(char* data, int len)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int p = m_iStartPos;
     int lastack = m_iLastAckPos;
     int rs = len;
@@ -404,6 +410,8 @@ int CRcvBuffer::readBuffer(char* data, int len)
 
 int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int p = m_iStartPos;
     int lastack = m_iLastAckPos;
     int rs = len;
@@ -443,6 +451,8 @@ int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
 
 void CRcvBuffer::ackData(int len)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     m_iLastAckPos = (m_iLastAckPos + len) % m_iSize;
     m_iMaxPos -= len;
     if (m_iMaxPos < 0)
@@ -453,11 +463,19 @@ void CRcvBuffer::ackData(int len)
 
 int CRcvBuffer::getAvailBufSize() const
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     // One slot must be empty in order to tell the difference between "empty buffer" and "full buffer"
-    return m_iSize - getRcvDataSize() - 1;
+    return m_iSize - getRcvDataSize(lock) - 1;
 }
 
 int CRcvBuffer::getRcvDataSize() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return getRcvDataSize(lock);
+}
+
+int CRcvBuffer::getRcvDataSize(const std::lock_guard<std::mutex>&) const
 {
     if (m_iLastAckPos >= m_iStartPos)
         return m_iLastAckPos - m_iStartPos;
@@ -467,6 +485,8 @@ int CRcvBuffer::getRcvDataSize() const
 
 void CRcvBuffer::dropMsg(int32_t msgno)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     for (int i = m_iStartPos, n = (m_iLastAckPos + m_iMaxPos) % m_iSize; i != n; i = (i + 1) % m_iSize)
         if ((NULL != m_pUnit[i]) && (msgno == m_pUnit[i]->packet().m_iMsgNo))
             m_pUnit[i]->setFlag(3);
@@ -474,9 +494,11 @@ void CRcvBuffer::dropMsg(int32_t msgno)
 
 int CRcvBuffer::readMsg(char* data, int len)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int p, q;
     bool passack;
-    if (!scanMsg(p, q, passack))
+    if (!scanMsg(lock, p, q, passack))
         return 0;
 
     int rs = len;
@@ -515,12 +537,16 @@ int CRcvBuffer::readMsg(char* data, int len)
 
 int CRcvBuffer::getRcvMsgNum()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int p, q;
     bool passack;
-    return scanMsg(p, q, passack) ? 1 : 0;
+    return scanMsg(lock, p, q, passack) ? 1 : 0;
 }
 
-bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
+bool CRcvBuffer::scanMsg(
+    const std::lock_guard<std::mutex>& lock,
+    int& p, int& q, bool& passack)
 {
     // empty buffer
     if ((m_iStartPos == m_iLastAckPos) && (m_iMaxPos <= 0))
@@ -575,7 +601,7 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
     bool found = false;
 
     // looking for the first message
-    for (int i = 0, n = m_iMaxPos + getRcvDataSize(); i <= n; ++i)
+    for (int i = 0, n = m_iMaxPos + getRcvDataSize(lock); i <= n; ++i)
     {
         if ((NULL != m_pUnit[q]) && (1 == m_pUnit[q]->flag()))
         {
