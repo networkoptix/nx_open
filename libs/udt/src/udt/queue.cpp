@@ -59,16 +59,18 @@ Yunhong Gu, last updated 05/05/2011
 using namespace std;
 
 //#define DEBUG_RECORD_PACKET_HISTORY
+//#define TRACE_PACKETS
 
-#ifdef DEBUG_RECORD_PACKET_HISTORY
 namespace {
 
 static std::string dumpPacket(const CPacket& packet)
 {
     std::ostringstream ss;
-    ss <<
-        "id " << packet.m_iID << ", "
-        "type " << (int)packet.getType();
+    ss << "[" << packet.m_iID << ", " << (int)packet.getType() <<"]. ";
+    if (packet.getFlag() == PacketFlag::Data)
+       ss << std::string(packet.payload().data(), packet.payload().size());
+    else
+       ss << "[unparsed control data]";
     return ss.str();
 }
 
@@ -85,13 +87,8 @@ static void dumpAddr(std::ostream& os, const sockaddr* addr)
 static std::string dumpPacket(const CPacket& packet, const sockaddr* addr)
 {
     std::ostringstream ss;
-    ss <<
-        "id " << packet.m_iID << ", "
-        "type " << (int)packet.getType()<<", "
-        "addr ";
-
+    ss << dumpPacket(packet) << ", addr ";
     dumpAddr(ss, addr);
-
     return ss.str();
 }
 
@@ -101,6 +98,26 @@ static std::string dumpAddr(const sockaddr* addr)
     dumpAddr(ss, addr);
     return ss.str();
 }
+
+#if defined(TRACE_PACKETS)
+
+static std::mutex tracePacketMutex;
+
+void tracePacket(
+    const std::string& direction,
+    const detail::SocketAddress& remoteAddr,
+    const CPacket& packet)
+{
+    std::lock_guard<std::mutex> lock(tracePacketMutex);
+
+    std::cout << direction << ". "
+        "addr " << remoteAddr.toString() << ". " <<
+        dumpPacket(packet) << std::endl;
+}
+
+#endif // TRACE_PACKETS
+
+#if defined(DEBUG_RECORD_PACKET_HISTORY)
 
 class SendedPacketVerifier
 {
@@ -144,9 +161,9 @@ private:
 
 static SendedPacketVerifier packetVerifier;
 
-} // namespace
-
 #endif // DEBUG_RECORD_PACKET_HISTORY
+
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 
@@ -579,6 +596,11 @@ int CSndQueue::sendPacket(const detail::SocketAddress& addr, CPacket packet)
 
     // send out the packet immediately (high priority), this is a control packet
     const auto packetLength = packet.getLength();
+
+#ifdef TRACE_PACKETS
+    tracePacket("send", addr, packet);
+#endif
+
     m_channel->sendto(addr, std::move(packet));
     return packetLength;
 }
@@ -907,7 +929,13 @@ void CRcvQueue::worker()
             // no space, skip this packet
             CPacket temp;
             temp.payload().resize(m_iPayloadSize);
-            m_channel->recvfrom(addr, temp);
+            if (m_channel->recvfrom(addr, temp).ok())
+            {
+                #ifdef TRACE_PACKETS
+                    tracePacket("recv", addr, temp);
+                #endif
+            }
+
             timerCheck();
             continue;
         }
@@ -920,6 +948,10 @@ void CRcvQueue::worker()
             timerCheck();
             continue;
         }
+
+#ifdef TRACE_PACKETS
+        tracePacket("recv", addr, unit->packet());
+#endif
 
         processUnit(unit, addr);
         // Ignoring error since the socket could be removed before connect finished.

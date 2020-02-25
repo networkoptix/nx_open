@@ -8,6 +8,7 @@
 #endif
 
 #include <cstdint>
+#include <string>
 
 #ifdef _WIN32
     using socklen_t = int;
@@ -54,6 +55,8 @@ public:
     const sockaddr_in6& v6() const;
 
     bool operator==(const SocketAddress& right) const;
+
+    std::string toString() const;
 
 private:
     union {
