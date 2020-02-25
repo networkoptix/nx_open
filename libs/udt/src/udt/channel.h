@@ -155,8 +155,6 @@ private:
                                          // Returned value:
                                          //    None.
 
-    std::optional<std::thread::id> m_sendThreadId;
-
     void closeSocket();
 
     template<typename Func>
