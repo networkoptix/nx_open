@@ -1,6 +1,8 @@
 #include "session.h"
 
 #include <random>
+#include <iomanip>
+#include <chrono>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/datetime.h>
@@ -10,6 +12,18 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/utils/random_qt_device.h>
 
+
+static std::string toString(std::chrono::system_clock::time_point time)
+{
+    using namespace std::chrono;
+    const auto msec = duration_cast<milliseconds>(time.time_since_epoch()) % 1000;
+    std::time_t t = std::chrono::system_clock::to_time_t(time);
+    std::stringstream str;
+    str << std::put_time(std::localtime(&t), "%F %T") << "." <<
+        std::setfill('0') << std::setw(3) << msec.count();
+    return str.str();
+}
+
 /**
  * Print the message to stdout, intended to be parsed by programs calling this tool.
  *
@@ -17,7 +31,13 @@
  */
 static void report(const QString& message)
 {
-    printf("%s\n", message.toUtf8().constData());
+    auto beg = std::chrono::high_resolution_clock::now();
+    printf("%s %s\n",
+        toString(std::chrono::system_clock::now()).c_str(), message.toUtf8().constData());
+    auto end = std::chrono::high_resolution_clock::now();
+    auto reportDuration = std::chrono::duration_cast<std::chrono::milliseconds>(end - beg);
+    if (reportDuration > std::chrono::milliseconds(30))
+        printf("WARNING: Print to stdout too slow: %d ms.\n", reportDuration.count());
 }
 
 static const char* streamTypeToString(uint16_t flags)
@@ -59,7 +79,7 @@ void Session::run(const QString& url, const Config& config, bool live)
     CameraDiagnostics::Result result = rtspClient.open(url);
     if (result.errorCode != 0)
     {
-        report(lm("Failed to open rtsp stream: %1").args(nullptr));
+        report(lm("Failed to open rtsp stream: %1, error: %2").args(url, result.toString(nullptr)));
         failed = true;
         ++failedCount;
         return;
