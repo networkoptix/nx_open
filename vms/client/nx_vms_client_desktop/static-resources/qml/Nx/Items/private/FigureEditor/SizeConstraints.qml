@@ -120,6 +120,7 @@ Figure
             id: maxTopLeftGrip
 
             color: maxBoxColor
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.maxP1.x = F.relX(x, figure))
             onYChanged: dragging && (d.maxP1.y = F.relY(y, figure))
@@ -146,6 +147,7 @@ Figure
             id: maxBottomRightGrip
 
             color: maxBoxColor
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.maxP2.x = F.relX(x, figure))
             onYChanged: dragging && (d.maxP2.y = F.relY(y, figure))
@@ -172,6 +174,7 @@ Figure
             id: maxTopRightGrip
 
             color: maxBoxColor
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.maxP2.x = F.relX(x, figure))
             onYChanged: dragging && (d.maxP1.y = F.relY(y, figure))
@@ -198,6 +201,7 @@ Figure
             id: maxBottomLeftGrip
 
             color: maxBoxColor
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.maxP1.x = F.relX(x, figure))
             onYChanged: dragging && (d.maxP2.y = F.relY(y, figure))
@@ -228,6 +232,7 @@ Figure
             cursorShape: Qt.SizeHorCursor
             axis: Drag.XAxis
             y: (maxTopLeftGrip.y + maxBottomLeftGrip.y) / 2
+            z: (hovered || dragging) ? 2 : 0
 
             onXChanged: dragging && (d.maxP1.x = F.relX(x, figure))
 
@@ -249,6 +254,7 @@ Figure
             cursorShape: Qt.SizeHorCursor
             axis: Drag.XAxis
             y: maxLeftGrip.y
+            z: (hovered || dragging) ? 2 : 0
 
             onXChanged: dragging && (d.maxP2.x = F.relX(x, figure))
 
@@ -270,6 +276,7 @@ Figure
             cursorShape: Qt.SizeVerCursor
             axis: Drag.YAxis
             x: (maxTopLeftGrip.x + maxTopRightGrip.x) / 2
+            z: (hovered || dragging) ? 2 : 0
 
             onYChanged: dragging && (d.maxP1.y = F.relY(y, figure))
 
@@ -291,6 +298,7 @@ Figure
             cursorShape: Qt.SizeVerCursor
             axis: Drag.YAxis
             x: maxTopGrip.x
+            z: (hovered || dragging) ? 2 : 0
 
             onYChanged: dragging && (d.maxP2.y = F.relY(y, figure))
 
@@ -330,6 +338,7 @@ Figure
             id: minTopLeftGrip
 
             color: minBoxColor
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.minP1.x = F.relX(x, figure))
             onYChanged: dragging && (d.minP1.y = F.relY(y, figure))
@@ -356,6 +365,7 @@ Figure
             id: minBottomRightGrip
 
             color: minBoxColor
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.minP2.x = F.relX(x, figure))
             onYChanged: dragging && (d.minP2.y = F.relY(y, figure))
@@ -382,6 +392,7 @@ Figure
             id: minTopRightGrip
 
             color: minBoxColor
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.minP2.x = F.relX(x, figure))
             onYChanged: dragging && (d.minP1.y = F.relY(y, figure))
@@ -408,6 +419,7 @@ Figure
             id: minBottomLeftGrip
 
             color: minBoxColor
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.minP1.x = F.relX(x, figure))
             onYChanged: dragging && (d.minP2.y = F.relY(y, figure))
@@ -438,6 +450,7 @@ Figure
             cursorShape: Qt.SizeHorCursor
             axis: Drag.XAxis
             y: (minTopLeftGrip.y + minBottomLeftGrip.y) / 2
+            z: (hovered || dragging) ? 2 : 0
 
             onXChanged: dragging && (d.minP1.x = F.relX(x, figure))
 
@@ -459,6 +472,7 @@ Figure
             cursorShape: Qt.SizeHorCursor
             axis: Drag.XAxis
             y: minLeftGrip.y
+            z: (hovered || dragging) ? 2 : 0
 
             onXChanged: dragging && (d.minP2.x = F.relX(x, figure))
 
@@ -480,6 +494,7 @@ Figure
             cursorShape: Qt.SizeVerCursor
             axis: Drag.YAxis
             x: (minTopLeftGrip.x + minTopRightGrip.x) / 2
+            z: (hovered || dragging) ? 2 : 0
 
             onYChanged: dragging && (d.minP1.y = F.relY(y, figure))
 
@@ -501,6 +516,7 @@ Figure
             cursorShape: Qt.SizeVerCursor
             axis: Drag.YAxis
             x: minTopGrip.x
+            z: (hovered || dragging) ? 2 : 0
 
             onYChanged: dragging && (d.minP2.y = F.relY(y, figure))
 
