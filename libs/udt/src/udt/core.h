@@ -77,7 +77,7 @@ public:
     /**
      * If packet does not contain connection request, non-zero is returned.
      */
-    int processConnectionRequest(const detail::SocketAddress& addr, CPacket& packet);
+    int processConnectionRequest(const detail::SocketAddress& addr, const CPacket& packet);
 
     void addEPoll(const int eid);
     void removeEPoll(const int eid);

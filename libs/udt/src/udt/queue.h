@@ -360,13 +360,12 @@ public:
     // Returned value:
     //    Size of data sent out.
 
-    int sendto(const detail::SocketAddress& addr, CPacket& packet);
+    int sendto(const detail::SocketAddress& addr, CPacket packet);
 
     // List of UDT instances for data sending.
     CSndUList& sndUList() { return *m_pSndUList; }
 
-    // The UDP channel for data sending.
-    UdpChannel* channel() { return m_channel; }
+    detail::SocketAddress getLocalAddr() const;
 
 private:
     void worker();

@@ -163,6 +163,20 @@ CPacket::~CPacket()
 {
 }
 
+CPacket::CPacket(const CPacket& right):
+    CPacket()
+{
+    memcpy(m_nHeader, right.m_nHeader, sizeof(m_nHeader));
+    m_payload = right.m_payload;
+}
+
+CPacket::CPacket(CPacket&& right):
+    CPacket()
+{
+    memcpy(m_nHeader, right.m_nHeader, sizeof(m_nHeader));
+    m_payload = std::move(right.m_payload);
+}
+
 int CPacket::getLength() const
 {
     return m_payload.size();

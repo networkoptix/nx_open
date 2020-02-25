@@ -154,6 +154,9 @@ public:
     CPacket();
     ~CPacket();
 
+    CPacket(const CPacket&);
+    CPacket(CPacket&&);
+
     // TODO: #ak Remove this. Replace usages with payload().size().
     int getLength() const;
 
@@ -247,7 +250,7 @@ public:
     std::tuple<iovec*, std::size_t> ioBufs();
 
 private:
-    int32_t __pad = 0;
+    const int32_t __pad = 0;
     // TODO: #ak Remove mutable.
     mutable Buffer m_payload;
     // TODO: #ak Remove mutable.

@@ -85,16 +85,6 @@ void CCC::setRTO(std::chrono::microseconds usRTO)
     m_iRTO = usRTO;
 }
 
-void CCC::sendCustomMsg(CPacket& pkt) const
-{
-    auto udt = CUDT::getUDTHandle(m_UDT);
-    if (udt.ok())
-    {
-        pkt.m_iID = udt.get()->peerId();
-        udt.get()->sndQueue().sendto(udt.get()->peerAddr(), pkt);
-    }
-}
-
 const CPerfMon* CCC::getPerfInfo()
 {
     auto udt = CUDT::getUDTHandle(m_UDT);

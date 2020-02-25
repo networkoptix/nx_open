@@ -527,7 +527,7 @@ void CSndQueue::worker()
             packetVerifier.beforeSendingPacket(pkt);
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
-            m_channel->sendto(addr, pkt);
+            sendto(addr, std::move(pkt));
         }
         else
         {
@@ -540,15 +540,21 @@ void CSndQueue::worker()
     }
 }
 
-int CSndQueue::sendto(const detail::SocketAddress& addr, CPacket& packet)
+int CSndQueue::sendto(const detail::SocketAddress& addr, CPacket packet)
 {
 #ifdef DEBUG_RECORD_PACKET_HISTORY
     packetVerifier.beforeSendingPacket(packet);
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
     // send out the packet immediately (high priority), this is a control packet
-    m_channel->sendto(addr, packet);
-    return packet.getLength();
+    const auto packetLength = packet.getLength();
+    m_channel->sendto(addr, std::move(packet));
+    return packetLength;
+}
+
+detail::SocketAddress CSndQueue::getLocalAddr() const
+{
+    return m_channel->getSockAddr();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -770,7 +776,7 @@ void CRendezvousQueue::updateConnStatus()
             int hs_size = udtSocket->payloadSize();
             udtSocket->connReq().serialize(request.payload().data(), hs_size);
             request.setLength(hs_size);
-            udtSocket->sndQueue().sendto(i->peerAddr, request);
+            udtSocket->sndQueue().sendto(i->peerAddr, std::move(request));
             udtSocket->setLastReqTime(CTimer::getTime());
         }
     }

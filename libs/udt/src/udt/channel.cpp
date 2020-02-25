@@ -219,9 +219,14 @@ detail::SocketAddress UdpChannel::getPeerAddr() const
     return socketAddress;
 }
 
-Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packet)
+Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket packet)
 {
     assert(m_iSocket != INVALID_SOCKET);
+
+    //if (!m_sendThreadId)
+    //    m_sendThreadId = std::this_thread::get_id();
+    //else
+    //    assert(m_sendThreadId == std::this_thread::get_id());
 
     // converting packet into network order
     encodePacket(&packet);
