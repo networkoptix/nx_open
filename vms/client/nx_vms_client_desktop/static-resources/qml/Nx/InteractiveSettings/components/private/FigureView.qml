@@ -7,6 +7,7 @@ import Nx.Core.Items 1.0
 import Nx.Items 1.0
 
 import nx.client.core 1.0
+import nx.client.desktop 1.0
 
 Item
 {
@@ -161,16 +162,14 @@ Item
             editRequested()
     }
 
-    Rectangle
+    FocusFrame
     {
         id: focusMarker
 
         anchors.fill: parent
-        radius: background.radius
         visible: figureView.activeFocus
-        color: "transparent"
-        border.color: ColorTheme.transparent(ColorTheme.highlight, 0.5)
-        border.width: 1
+        color: ColorTheme.transparent(ColorTheme.highlight, 0.5)
+        frameWidth: 1
     }
 
     onResourceIdChanged:
