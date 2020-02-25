@@ -575,6 +575,9 @@ private: // for UDP multiplexer
 
 private: // for epoll
     std::set<int> m_sPollID;            // set of epoll ID to trigger
+
+private:
+    void initializeConnectedSocket(const detail::SocketAddress& addr);
 };
 
 #endif

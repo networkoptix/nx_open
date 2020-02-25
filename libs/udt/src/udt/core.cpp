@@ -760,8 +760,6 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
     // Re-configure according to the negotiated values.
     m_iMSS = m_ConnRes.m_iMSS;
     m_iFlowWindowSize = m_ConnRes.m_iFlightFlagSize;
-    m_iPktSize = m_iMSS - 28;
-    m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
     m_iPeerISN = m_ConnRes.m_iISN;
     m_iRcvLastAck = m_ConnRes.m_iISN;
     m_iRcvLastAckAck = m_ConnRes.m_iISN;
@@ -769,44 +767,9 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
     m_PeerID = m_ConnRes.m_iID;
     memcpy(m_piSelfIP, m_ConnRes.m_piPeerIP, 16);
 
-    // Prepare all data structures
-    m_pSndBuffer = std::make_unique<CSndBuffer>(32, m_iPayloadSize);
-    m_pRcvBuffer = std::make_unique<CRcvBuffer>(rcvQueue().unitQueue(), m_iRcvBufSize);
-    // after introducing lite ACK, the sndlosslist may not be cleared in time, so it requires twice space.
-    m_pSndLossList = std::make_unique<CSndLossList>(m_iFlowWindowSize * 2);
-    m_pRcvLossList = std::make_unique<CRcvLossList>(m_iFlightFlagSize);
-    m_pACKWindow = std::make_unique<CACKWindow>(1024);
-    m_pRcvTimeWindow = std::make_unique<CPktTimeWindow>(16, 64);
-    m_pSndTimeWindow = std::make_unique<CPktTimeWindow>();
-
-    CInfoBlock ib;
-    ib.m_iIPversion = m_iIPversion;
-    CInfoBlock::convert(m_pPeerAddr, ib.m_piIP);
-    if (m_pCache->lookup(&ib) >= 0)
-    {
-        m_iRTT = ib.m_iRTT;
-        m_iBandwidth = ib.m_iBandwidth;
-    }
-
-    m_pCC = m_pCCFactory->create();
-    m_pCC->m_UDT = m_SocketId;
-    m_pCC->setMSS(m_iMSS);
-    m_pCC->setMaxCWndSize(m_iFlowWindowSize);
-    m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
-    m_pCC->setRcvRate(m_iDeliveryRate);
-    m_pCC->setRTT(m_iRTT);
-    m_pCC->setBandwidth(m_iBandwidth);
-    m_pCC->init();
-
-    m_ullInterval = std::chrono::microseconds((uint64_t)(m_pCC->m_dPktSndPeriod * m_ullCPUFrequency));
-    m_dCongestionWindow = m_pCC->m_dCWndSize;
-
-    // And, I am connected too.
     setConnecting(false);
-    m_bConnected = true;
 
-    // register this socket for receiving data packets
-    rcvQueue().addNewEntry(shared_from_this());
+    initializeConnectedSocket(m_pPeerAddr);
 
     // acknowledge the management module.
     if (auto result = s_UDTUnited->connect_complete(m_SocketId); !result.ok())
@@ -858,46 +821,10 @@ Result<> CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
     memcpy(m_piSelfIP, hs->m_piPeerIP, 16);
     peer.copy(hs->m_piPeerIP);
 
-    m_iPktSize = m_iMSS - 28;
-    m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
-
-    m_pSndBuffer = std::make_unique<CSndBuffer>(32, m_iPayloadSize);
-    m_pRcvBuffer = std::make_unique<CRcvBuffer>(rcvQueue().unitQueue(), m_iRcvBufSize);
-    m_pSndLossList = std::make_unique<CSndLossList>(m_iFlowWindowSize * 2);
-    m_pRcvLossList = std::make_unique<CRcvLossList>(m_iFlightFlagSize);
-    m_pACKWindow = std::make_unique<CACKWindow>(1024);
-    m_pRcvTimeWindow = std::make_unique<CPktTimeWindow>(16, 64);
-    m_pSndTimeWindow = std::make_unique<CPktTimeWindow>();
-
-    CInfoBlock ib;
-    ib.m_iIPversion = peer.family();
-    CInfoBlock::convert(peer, ib.m_piIP);
-    if (m_pCache->lookup(&ib) >= 0)
-    {
-        m_iRTT = ib.m_iRTT;
-        m_iBandwidth = ib.m_iBandwidth;
-    }
-
-    m_pCC = m_pCCFactory->create();
-    m_pCC->m_UDT = m_SocketId;
-    m_pCC->setMSS(m_iMSS);
-    m_pCC->setMaxCWndSize(m_iFlowWindowSize);
-    m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
-    m_pCC->setRcvRate(m_iDeliveryRate);
-    m_pCC->setRTT(m_iRTT);
-    m_pCC->setBandwidth(m_iBandwidth);
-    m_pCC->init();
-
-    m_ullInterval = std::chrono::microseconds((uint64_t)(m_pCC->m_dPktSndPeriod * m_ullCPUFrequency));
-    m_dCongestionWindow = m_pCC->m_dCWndSize;
-
+    m_iIPversion = peer.family();
     m_pPeerAddr = peer;
 
-    // And of course, it is connected.
-    m_bConnected = true;
-
-    // register this socket for receiving data packets
-    rcvQueue().addNewEntry(shared_from_this());
+    initializeConnectedSocket(peer);
 
     //send the response to the peer, see listen() for more discussions about this
     CPacket response;
@@ -2711,6 +2638,48 @@ Result<std::shared_ptr<CUDT>> CUDT::getUDTHandle(UDTSOCKET u)
 UDTSTATUS CUDT::getsockstate(UDTSOCKET u)
 {
     return s_UDTUnited->getStatus(u);
+}
+
+void CUDT::initializeConnectedSocket(const detail::SocketAddress& addr)
+{
+    m_iPktSize = m_iMSS - 28;
+    m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
+
+    m_pSndBuffer = std::make_unique<CSndBuffer>(32, m_iPayloadSize);
+    m_pRcvBuffer = std::make_unique<CRcvBuffer>(rcvQueue().unitQueue(), m_iRcvBufSize);
+    // after introducing lite ACK, the sndlosslist may not be cleared in time, so it requires twice space.
+    m_pSndLossList = std::make_unique<CSndLossList>(m_iFlowWindowSize * 2);
+    m_pRcvLossList = std::make_unique<CRcvLossList>(m_iFlightFlagSize);
+    m_pACKWindow = std::make_unique<CACKWindow>(1024);
+    m_pRcvTimeWindow = std::make_unique<CPktTimeWindow>(16, 64);
+    m_pSndTimeWindow = std::make_unique<CPktTimeWindow>();
+
+    CInfoBlock ib;
+    ib.m_iIPversion = m_iIPversion;
+    CInfoBlock::convert(addr, ib.m_piIP);
+    if (m_pCache->lookup(&ib) >= 0)
+    {
+        m_iRTT = ib.m_iRTT;
+        m_iBandwidth = ib.m_iBandwidth;
+    }
+
+    m_pCC = m_pCCFactory->create();
+    m_pCC->m_UDT = m_SocketId;
+    m_pCC->setMSS(m_iMSS);
+    m_pCC->setMaxCWndSize(m_iFlowWindowSize);
+    m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
+    m_pCC->setRcvRate(m_iDeliveryRate);
+    m_pCC->setRTT(m_iRTT);
+    m_pCC->setBandwidth(m_iBandwidth);
+    m_pCC->init();
+
+    m_ullInterval = std::chrono::microseconds((uint64_t)(m_pCC->m_dPktSndPeriod * m_ullCPUFrequency));
+    m_dCongestionWindow = m_pCC->m_dCWndSize;
+
+    m_bConnected = true;
+
+    // register this socket for receiving data packets
+    rcvQueue().addNewEntry(shared_from_this());
 }
 
 //-------------------------------------------------------------------------------------------------
