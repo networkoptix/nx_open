@@ -926,8 +926,8 @@ struct PushPayload
 struct PushOptions
 {
     // Allow editing on iOS.
-    int content_available = 1;
-    int mutable_content = 1;
+    bool content_available = true;
+    bool mutable_content = true;
 };
 #define PushOptions_Fields (content_available)(mutable_content)
 

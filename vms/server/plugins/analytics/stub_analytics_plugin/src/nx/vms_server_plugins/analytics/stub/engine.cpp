@@ -741,6 +741,13 @@ std::string Engine::manifestString() const
                         "caption": "Polyline",
                         "items": [
                             {
+                                "type": "PolygonFigure",
+                                "name": "testPolygon",
+                                "caption": "Polygon outside a repeater (points are plugin side)",
+                                "minPoints": 3,
+                                "maxPoints": 8
+                            },
+                            {
                                 "type": "LineFigure",
                                 "name": "testPolyLine",
                                 "caption": "Polyline",
