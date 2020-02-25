@@ -14,7 +14,7 @@ ObjectTrackCache::ObjectTrackCache(
     m_aggregationPeriod(aggregationPeriod),
     m_maxObjectLifetime(maxObjectLifetime),
     m_timerPool([this](const QnUuid& trackId) { removeTrack(trackId); }),
-    m_iframeHelper(helper)
+    m_iFrameHelper(helper)
 {
 }
 
@@ -221,38 +221,38 @@ void ObjectTrackCache::updateObject(
         std::max(trackContext.track.lastAppearanceTimeUs, packet.timestampUs);
 
     auto assignBestShotFromPacket =
-        [](auto& track, const auto& packet, const auto& boundingBox)
+        [](ObjectTrack* outTrack, const auto& packet, const auto& boundingBox)
         {
-            track.bestShot.timestampUs = packet.timestampUs;
-            track.bestShot.rect = boundingBox;
+            outTrack->bestShot.timestampUs = packet.timestampUs;
+            outTrack->bestShot.rect = boundingBox;
         };
 
     if (objectMetadata.bestShot)
     {
-        assignBestShotFromPacket(trackContext.track, packet, objectMetadata.boundingBox);
-        trackContext.roughBestShot = false; //< Do not auto reassign any more.
+        assignBestShotFromPacket(&trackContext.track, packet, objectMetadata.boundingBox);
+        trackContext.roughBestShot = false; //< Do not auto reassign anymore.
         // "Best shot" packet contains only information about the best shot, not a real object movement.
         return;
     }
 
     if (!trackContext.track.bestShot.initialized())
     {
-        assignBestShotFromPacket(trackContext.track, packet, objectMetadata.boundingBox);
-        trackContext.roughBestShot = true; //< Auto assign the first frame.
+        assignBestShotFromPacket(&trackContext.track, packet, objectMetadata.boundingBox);
+        trackContext.roughBestShot = true; //< Auto-assign the first frame.
     }
 
-    // Update best shot to the first I-frame of the track in case of it not defined by driver.
-    if (trackContext.roughBestShot && m_iframeHelper)
+    // Update best shot to the first I-frame of the track in case of it not being defined by driver.
+    if (trackContext.roughBestShot && m_iFrameHelper)
     {
         using namespace nx::vms::api;
         // TODO: Get stream index from the packet.
         auto streamIndex = ini().analyzeSecondaryStream ? StreamIndex::secondary : StreamIndex::primary;
-        const auto timeUs = m_iframeHelper->findAfter(
+        const auto timeUs = m_iFrameHelper->findAfter(
             trackContext.track.deviceId, streamIndex, trackContext.track.bestShot.timestampUs);
         if (timeUs >= trackContext.track.bestShot.timestampUs && timeUs <= packet.timestampUs)
         {
-            assignBestShotFromPacket(trackContext.track, packet, objectMetadata.boundingBox);
-            trackContext.roughBestShot = false; //< Do not auto reassign any more.
+            assignBestShotFromPacket(&trackContext.track, packet, objectMetadata.boundingBox);
+            trackContext.roughBestShot = false; //< Do not auto-reassign anymore.
         }
     }
 

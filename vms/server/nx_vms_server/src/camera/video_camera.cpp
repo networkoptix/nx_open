@@ -79,7 +79,7 @@ public:
 
     virtual void beforeDisconnectFromResource();
 
-    int copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, bool iFramesOnly);
+    int copyLastGop(qint64 skipTimeUs, QnDataPacketQueue& dstQueue, bool iFramesOnly);
 
     virtual bool canAcceptData() const;
     virtual void putData(const QnAbstractDataPacketPtr& data);
@@ -96,13 +96,13 @@ public:
     void clearVideoData();
 
     std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
-        qint64 timeUs, int channel, ImageRequest::RoundMethod roundMethod) const;
+        qint64 timestampUs, int channel, ImageRequest::RoundMethod roundMethod) const;
 
     QnConstCompressedVideoDataPtr getIframeByTime(
-        qint64 time, int channel, ImageRequest::RoundMethod roundMethod) const;
+        qint64 timestampUs, int channel, ImageRequest::RoundMethod roundMethod) const;
 private:
     QnConstCompressedVideoDataPtr getIframeByTimeUnsafe(
-        qint64 time, int channel, ImageRequest::RoundMethod roundMethod) const;
+        qint64 timestampUs, int channel, ImageRequest::RoundMethod roundMethod) const;
 
     std::unique_ptr<QnConstDataPacketQueue> getGopTillTime(qint64 time, int channel) const;
 
@@ -858,56 +858,56 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(
 
 int QnVideoCamera::copyLastGop(
     StreamIndex streamIndex,
-    qint64 skipTime,
+    qint64 skipTimeUs,
     QnDataPacketQueue& dstQueue,
     bool iFramesOnly)
 {
     if (streamIndex == StreamIndex::primary && m_primaryGopKeeper)
-        return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, iFramesOnly);
+        return m_primaryGopKeeper->copyLastGop(skipTimeUs, dstQueue, iFramesOnly);
     if (m_secondaryGopKeeper)
-        return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue, iFramesOnly);
+        return m_secondaryGopKeeper->copyLastGop(skipTimeUs, dstQueue, iFramesOnly);
     return 0;
 }
 
 std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
     StreamIndex streamIndex,
-    qint64 time,
+    qint64 timestampUs,
     int channel,
     ImageRequest::RoundMethod roundMethod) const
 {
     NX_VERBOSE(this, "%1(%2, %3 us, channel: %4, %5)", __func__,
-        streamIndex, time, channel, roundMethod);
+        streamIndex, timestampUs, channel, roundMethod);
 
-    if (auto gopKeeper = getGopKeeper(streamIndex))
-        return gopKeeper->getFrameSequenceByTime(time, channel, roundMethod);
+    if (const auto gopKeeper = getGopKeeper(streamIndex))
+        return gopKeeper->getFrameSequenceByTime(timestampUs, channel, roundMethod);
     return nullptr;
 }
 
 QnConstCompressedVideoDataPtr QnVideoCamera::getIFrameByTime(
     StreamIndex streamIndex,
-    qint64 time,
+    qint64 timestampUs,
     int channel,
     nx::api::ImageRequest::RoundMethod roundMethod) const
 {
     NX_VERBOSE(this, "%1(%2, %3 us, channel: %4, %5)", __func__,
-        streamIndex, time, channel, roundMethod);
+        streamIndex, timestampUs, channel, roundMethod);
 
-    if (auto gopKeeper = getGopKeeper(streamIndex))
-        return gopKeeper->getIframeByTime(time, channel, roundMethod);
+    if (const auto gopKeeper = getGopKeeper(streamIndex))
+        return gopKeeper->getIframeByTime(timestampUs, channel, roundMethod);
     return nullptr;
 }
 
 QnConstCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(
     StreamIndex streamIndex, int channel) const
 {
-    if (auto gopKeeper = getGopKeeper(streamIndex))
+    if (const auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getLastVideoFrame(channel);
     return nullptr;
 }
 
 QnConstCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(StreamIndex streamIndex) const
 {
-    if (auto gopKeeper = getGopKeeper(streamIndex))
+    if (const auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getLastAudioFrame();
     return nullptr;
 }
@@ -915,14 +915,14 @@ QnConstCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(StreamIndex strea
 QnConstCompressedVideoDataPtr QnVideoCamera::getLastVideoFrameRtsp(
     StreamIndex streamIndex, int channel) const
 {
-    if (auto gopKeeper = getGopKeeper(streamIndex))
+    if (const auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getLastVideoFrameRtsp(channel);
     return nullptr;
 }
 
 QnConstCompressedAudioDataPtr QnVideoCamera::getLastAudioFrameRtsp(StreamIndex streamIndex) const
 {
-    if (auto gopKeeper = getGopKeeper(streamIndex))
+    if (const auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getLastAudioFrameRtsp();
     return nullptr;
 }

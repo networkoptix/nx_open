@@ -174,22 +174,18 @@ std::optional<BufferType> HttpClient::fetchEntireMessageBody()
 void HttpClient::addAdditionalHeader(const StringType& key, const StringType& value)
 {
     m_additionalHeaders.emplace_back(key, value);
-
-    if (m_asyncHttpClient)
-        m_asyncHttpClient->addAdditionalHeader(key, value);
 }
 
 void HttpClient::removeAdditionalHeader(const StringType& key)
 {
     m_additionalHeaders.erase(
-        std::remove_if(m_additionalHeaders.begin(), m_additionalHeaders.end(),
-        [&key](const auto& header)
-        {
-            return header.first == key;
-        }), m_additionalHeaders.end());
-
-    if (m_asyncHttpClient)
-        m_asyncHttpClient->removeAdditionalHeader(key);
+        std::remove_if(
+            m_additionalHeaders.begin(), m_additionalHeaders.end(),
+            [&key](const auto& header)
+            {
+                return header.first == key;
+            }),
+        m_additionalHeaders.end());
 }
 
 const nx::utils::Url& HttpClient::url() const
@@ -344,7 +340,7 @@ bool HttpClient::fetchResource(
     return true;
 }
 
-void HttpClient::instantiateHttpClient()
+void HttpClient::instantiateAsyncClient()
 {
     m_asyncHttpClient = std::make_unique<nx::network::http::AsyncClient>(std::move(m_socket));
 
@@ -358,29 +354,11 @@ void HttpClient::instantiateHttpClient()
         [this]() { m_asyncHttpClient->post([this]() { onDone(); }); });
 }
 
-template<typename AsyncClientFunc>
-bool HttpClient::doRequest(AsyncClientFunc func)
+void HttpClient::configureAsyncClient()
 {
-    QnMutexLocker lk(&m_mutex);
-
-    if (!m_done || m_error)
-    {
-        lk.unlock();
-
-        // Have to re-establish connection if the previous message has not been read up to the end.
-        if (m_asyncHttpClient)
-        {
-            m_asyncHttpClient->pleaseStopSync();
-            m_asyncHttpClient.reset();
-        }
-        instantiateHttpClient();
-
-        //setting up attributes
-        for (const auto& keyValue : m_additionalHeaders)
-            m_asyncHttpClient->addAdditionalHeader(keyValue.first, keyValue.second);
-
-        lk.relock();
-    }
+    m_asyncHttpClient->setAdditionalHeaders({});
+    for (const auto& keyValue: m_additionalHeaders)
+        m_asyncHttpClient->addAdditionalHeader(keyValue.first, keyValue.second);
 
     if (m_subsequentReconnectTries)
         m_asyncHttpClient->setSubsequentReconnectTries(*m_subsequentReconnectTries);
@@ -411,6 +389,29 @@ bool HttpClient::doRequest(AsyncClientFunc func)
 
     m_asyncHttpClient->setDisablePrecalculatedAuthorization(m_precalculatedAuthorizationDisabled);
     m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);
+}
+
+template<typename AsyncClientFunc>
+bool HttpClient::doRequest(AsyncClientFunc func)
+{
+    QnMutexLocker lk(&m_mutex);
+
+    if (!m_done || m_error)
+    {
+        lk.unlock();
+
+        // Have to re-establish connection if the previous message has not been read up to the end.
+        if (m_asyncHttpClient)
+        {
+            m_asyncHttpClient->pleaseStopSync();
+            m_asyncHttpClient.reset();
+        }
+        instantiateAsyncClient();
+
+        lk.relock();
+    }
+
+    configureAsyncClient();
 
     m_lastResponse = std::nullopt;
 

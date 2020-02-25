@@ -65,7 +65,7 @@ public:
      */
     virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
         StreamIndex streamIndex,
-        qint64 time,
+        qint64 timestampUs,
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const = 0;
 
@@ -100,7 +100,7 @@ public:
 
     virtual QnConstCompressedVideoDataPtr getIFrameByTime(
         StreamIndex streamIndex,
-        qint64 time,
+        qint64 timestampUs,
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const = 0;
 };

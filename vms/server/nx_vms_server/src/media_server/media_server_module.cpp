@@ -101,7 +101,7 @@
 #include <plugins/storage/dts/vmax480/vmax480_resource.h>
 #include <nx_vms_server_ini.h>
 #include <nx/metrics/metrics_storage.h>
-#include <nx/vms/server/analytics/iframe_search_helper.h>
+#include <nx/vms/server/analytics/i_frame_search_helper.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -799,7 +799,9 @@ QString QnMediaServerModule::metadataDatabaseDir() const
     return closeDirPath(pathBase);
 }
 
-nx::vms::server::analytics::AbstractIFrameSearchHelper* QnMediaServerModule::iframeSearchHelper()
+using namespace nx::vms::server::analytics;
+
+AbstractIFrameSearchHelper* QnMediaServerModule::iFrameSearchHelper() const
 {
     return m_analyticsIFrameSearchHelper;
 }

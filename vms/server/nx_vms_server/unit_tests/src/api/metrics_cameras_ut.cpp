@@ -55,7 +55,6 @@ public:
         nx::vms::server::metrics::setTimerMultiplier(100);
 
         launcher = std::make_unique<ServerForTests>();
-        launcher->start();
 
         auto storage = launcher->addStorage(lm("Storage 1"));
         auto storageIndex = launcher->serverModule()->storageDbPool()->getStorageIndex(storage);

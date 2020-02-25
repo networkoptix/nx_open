@@ -57,6 +57,12 @@ Yunhong Gu, last updated 07/25/2010
 #endif
 #endif
 
+#ifdef _WIN32
+#include <codecvt>
+#else
+#include <pthread.h>
+#endif
+
 #include <cmath>
 #include "md5.h"
 #include "common.h"
@@ -141,6 +147,20 @@ int CTimer::m_EventCondInit = pthread_cond_init_monotonic(&CTimer::m_EventCond);
 pthread_mutex_t CTimer::m_EventLock = CreateMutex(NULL, false, NULL);
 pthread_cond_t CTimer::m_EventCond = CreateEvent(NULL, false, false, NULL);
 #endif
+
+//-------------------------------------------------------------------------------------------------
+
+void setCurrentThreadName(const std::string& name)
+{
+#if defined(_WIN32)
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    SetThreadDescription(GetCurrentThread(), converter.from_bytes(name).c_str());
+#elif defined(__APPLE__)
+    pthread_setname_np(name.c_str());
+#else
+    pthread_setname_np(pthread_self(), name.c_str());
+#endif
+}
 
 CTimer::CTimer()
     :

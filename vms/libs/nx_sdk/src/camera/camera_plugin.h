@@ -57,7 +57,6 @@ namespace nxcip
     static const int NX_INVALID_PARAM_VALUE = -42;
     static const int NX_OTHER_ERROR = -100;
 
-
     class BaseCameraManager;
 
     // {0D06134F-16D0-41c8-9752-A33E81FE9C75}
@@ -68,7 +67,6 @@ namespace nxcip
 
     // {FEA0452D-8493-4FF3-83E9-72D5BF75A9DE}
     static const nxpl::NX_GUID IID_CameraDiscoveryManager3 = { { 0xFE, 0xA0, 0x45, 0x2D, 0x84, 0x93, 0x4F, 0xF3, 0x83, 0xE9, 0x72, 0xD5, 0xBF, 0x75, 0xA9, 0xDE } };
-    
 
     //!Contains base camera information
     struct CameraInfo
@@ -249,7 +247,6 @@ namespace nxcip
     class CameraDiscoveryManager3 : public CameraDiscoveryManager2
     {
     public:
-
         enum Capability
         {
             noCapability = 0,

@@ -8,7 +8,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <analytics/common/object_metadata.h>
-#include <nx/vms/server/analytics/abstract_iframe_search_helper.h>
+#include <nx/vms/server/analytics/abstract_i_frame_search_helper.h>
 #include <analytics/db/analytics_db_types.h>
 
 namespace nx::analytics::db {
@@ -118,7 +118,7 @@ private:
     mutable QnMutex m_mutex;
     std::map<QnUuid, ObjectTrackContext> m_tracksById;
     nx::utils::ElapsedTimerPool<QnUuid> m_timerPool;
-    nx::vms::server::analytics::AbstractIFrameSearchHelper* m_iframeHelper = nullptr;
+    nx::vms::server::analytics::AbstractIFrameSearchHelper* m_iFrameHelper = nullptr;
 
     void updateObject(
         const nx::common::metadata::ObjectMetadata& objectMetadata,

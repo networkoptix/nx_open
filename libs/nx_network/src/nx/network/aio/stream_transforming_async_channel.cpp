@@ -37,6 +37,9 @@ void StreamTransformingAsyncChannel::bindToAioThread(aio::AbstractAioThread* aio
 {
     const auto aioThreadBak = getAioThread();
 
+    if (getAioThread() != aioThread)
+        m_aioInterruptionFlag.interrupt();
+
     base_type::bindToAioThread(aioThread);
 
     m_readScheduler.bindToAioThread(aioThread);
@@ -92,7 +95,7 @@ void StreamTransformingAsyncChannel::tryToCompleteUserTasks(
 {
     for (const std::shared_ptr<UserTask>& task: tasksToProcess)
     {
-        InterruptionFlag::ScopeWatcher watcher(this, &m_aioInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_aioInterruptionFlag);
         processTask(task.get());
         if (watcher.interrupted())
             return;
@@ -335,11 +338,8 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
         completedIoRange.second = m_rawWriteQueue.end();
     }
 
-    if (completeRawSendTasks(takeRawSendTasks(completedIoRange), resultCode) !=
-        InterruptionFlag::StateChange::noChange)
-    {
+    if (!completeRawSendTasks(takeRawSendTasks(completedIoRange), resultCode))
         return;
-    }
 
     if (resultCode == SystemError::noError)
     {
@@ -371,7 +371,7 @@ std::deque<StreamTransformingAsyncChannel::RawSendContext>
     return rawSendTasks;
 }
 
-InterruptionFlag::StateChange StreamTransformingAsyncChannel::completeRawSendTasks(
+bool StreamTransformingAsyncChannel::completeRawSendTasks(
     std::deque<RawSendContext> completedRawSendTasks,
     SystemError::ErrorCode sysErrorCode)
 {
@@ -380,16 +380,16 @@ InterruptionFlag::StateChange StreamTransformingAsyncChannel::completeRawSendTas
         if (!sendTask.userHandler)
             continue;
 
-        InterruptionFlag::ScopeWatcher interruptionWatcher(this, &m_aioInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_aioInterruptionFlag);
         nx::utils::swapAndCall(
             sendTask.userHandler,
             sysErrorCode,
             sysErrorCode == SystemError::noError ? sendTask.userByteCount : (size_t) -1);
-        if (interruptionWatcher.interrupted())
-            return interruptionWatcher.stateChange();
+        if (watcher.interrupted())
+            return false;
     }
 
-    return InterruptionFlag::StateChange::noChange;
+    return true;
 }
 
 void StreamTransformingAsyncChannel::scheduleNextRawSendTaskIfAny()
@@ -432,7 +432,7 @@ void StreamTransformingAsyncChannel::reportFailureToTasksFilteredByType(
     for (auto& userTask: userTaskQueue)
     {
         auto handler = std::move(userTask->handler);
-        InterruptionFlag::ScopeWatcher interruptionWatcher(this, &m_aioInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_aioInterruptionFlag);
         if (sysErrorCode == SystemError::noError) //< Connection closed.
         {
             if (userTask->type == UserTaskType::read)
@@ -444,7 +444,7 @@ void StreamTransformingAsyncChannel::reportFailureToTasksFilteredByType(
         {
             handler(sysErrorCode, (std::size_t)-1);
         }
-        if (interruptionWatcher.interrupted())
+        if (watcher.interrupted())
             return;
     }
 }
@@ -502,7 +502,10 @@ void StreamTransformingAsyncChannel::cancelIoInAioThread(aio::EventType eventTyp
     // Needed for pleaseStop to work correctly.
     // Should be removed when AbstractStreamSocket inherits BasicPollable.
     if (eventType == aio::EventType::etNone)
+    {
+        m_aioInterruptionFlag.interrupt();
         m_rawDataChannel->cancelIOSync(aio::EventType::etNone);
+    }
 }
 
 std::string StreamTransformingAsyncChannel::toString(

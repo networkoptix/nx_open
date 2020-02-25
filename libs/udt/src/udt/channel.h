@@ -154,6 +154,15 @@ private:
                                          //    None.
 
     void closeSocket();
+
+    template<typename Func>
+    static void convertHeader(CPacket* packet, Func func);
+
+    template<typename Func>
+    static void convertPayload(CPacket* packet, Func func);
+
+    static void encodePacket(CPacket* packet);
+    static void decodePacket(CPacket* packet);
 };
 
 #endif

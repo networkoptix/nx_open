@@ -159,19 +159,19 @@ public:
 
     /**
      * Shutdown TCP socket and terminate current IO operation. Can be called from the other thread.
-     * Thread safe. Can be called from another thread.
+     * Thread safe.
      */
     void shutdown();
 
     /**
-     * @return true if RTSP connection is opened
-     * Thread safe. Can be called from another thread.
+     * Thread safe.
+     * @return true if RTSP connection is opened.
      */
     bool isOpened() const;
 
     /**
-     * Set TCP time on RTSP connection.
-     * Thread safe. Can be called from another thread.
+     * Set TCP timeout on RTSP connection.
+     * Thread safe.
      */
     void setTCPTimeout(std::chrono::milliseconds timeout);
 

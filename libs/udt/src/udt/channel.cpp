@@ -223,25 +223,8 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
 {
     assert(m_iSocket != INVALID_SOCKET);
 
-    // convert control information into network order
-    if (packet.getFlag() == PacketFlag::Control)
-    {
-        for (int i = 0, n = packet.getLength() / 4; i < n; ++i)
-        {
-            *((uint32_t *)packet.payload().data() + i) =
-                htonl(*((uint32_t *)packet.payload().data() + i));
-        }
-    }
-
-    // convert packet header into network order
-    //for (int j = 0; j < 4; ++ j)
-    //   packet.m_nHeader[j] = htonl(packet.m_nHeader[j]);
-    uint32_t* p = packet.header();
-    for (int j = 0; j < 4; ++j)
-    {
-        *p = htonl(*p);
-        ++p;
-    }
+    // converting packet into network order
+    encodePacket(&packet);
 
     auto [bufs, bufsCount] = packet.ioBufs();
 
@@ -268,24 +251,8 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
     res = (0 == res) ? size : -1;
 #endif
 
-    // convert back into local host order
-    //for (int k = 0; k < 4; ++ k)
-    //   packet.m_nHeader[k] = ntohl(packet.m_nHeader[k]);
-    p = packet.header();
-    for (int k = 0; k < 4; ++k)
-    {
-        *p = ntohl(*p);
-        ++p;
-    }
-
-    if (packet.getFlag() == PacketFlag::Control)
-    {
-        for (int l = 0, n = packet.getLength() / 4; l < n; ++l)
-        {
-            *((uint32_t *)packet.payload().data() + l) =
-                ntohl(*((uint32_t *)packet.payload().data() + l));
-        }
-    }
+    // converting packet back into host order
+    decodePacket(&packet);
 
     if (res < 0)
         return OsError();
@@ -344,24 +311,8 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet)
 
     packet.setLength(res - kPacketHeaderSize);
 
-    // convert back into local host order
-    //for (int i = 0; i < 4; ++ i)
-    //   packet.m_nHeader[i] = ntohl(packet.m_nHeader[i]);
-    uint32_t* p = packet.header();
-    for (int i = 0; i < 4; ++i)
-    {
-        *p = ntohl(*p);
-        ++p;
-    }
-
-    if (packet.getFlag() == PacketFlag::Control)
-    {
-        for (int j = 0, n = packet.getLength() / 4; j < n; ++j)
-        {
-            *((uint32_t *)packet.payload().data() + j) =
-                ntohl(*((uint32_t *)packet.payload().data() + j));
-        }
-    }
+    // convert into local host order
+    decodePacket(&packet);
 
     return success(packet.getLength());
 }
@@ -396,4 +347,40 @@ void UdpChannel::closeSocket()
 #endif
 
     m_iSocket = INVALID_SOCKET;
+}
+
+template<typename Func>
+void UdpChannel::convertHeader(CPacket* packet, Func func)
+{
+    auto p = packet->header();
+    for (int j = 0; j < 4; ++j)
+    {
+        *p = func(*p);
+        ++p;
+    }
+}
+
+template<typename Func>
+void UdpChannel::convertPayload(CPacket* packet, Func func)
+{
+    if (packet->getFlag() == PacketFlag::Control)
+    {
+        for (int i = 0, n = packet->getLength() / 4; i < n; ++i)
+        {
+            *((uint32_t*)packet->payload().data() + i) =
+                func(*((uint32_t*)packet->payload().data() + i));
+        }
+    }
+}
+
+void UdpChannel::encodePacket(CPacket* packet)
+{
+    convertPayload(packet, [](auto val) { return htonl(val); });
+    convertHeader(packet, [](auto val) { return htonl(val); });
+}
+
+void UdpChannel::decodePacket(CPacket* packet)
+{
+    convertHeader(packet, [](auto val) { return ntohl(val); });
+    convertPayload(packet, [](auto val) { return ntohl(val); });
 }

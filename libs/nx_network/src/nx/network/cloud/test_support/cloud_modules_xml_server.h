@@ -22,7 +22,7 @@ public:
     void registerRequestHandlers(
         const std::string& basePath,
         network::http::server::rest::MessageDispatcher* messageDispatcher);
-    
+
     /**
      * @return a string containing {basePath}/cloud_modules.xml, or nothing if registerRequestHandlers
      * hasn't been called.
@@ -35,13 +35,13 @@ public:
     void setNotificationModuleUrl(const nx::utils::Url& url);
     void setSpeedTestUrl(const nx::utils::Url& url);
 
-private:    
+private:
     void setModule(const char* resName, const nx::utils::Url& resValue);
     QByteArray serializeModules() const;
 
     void serve(
         network::http::RequestContext requestContext,
-        network::http::RequestProcessedHandler handler);    
+        network::http::RequestProcessedHandler handler);
 
 private:
     std::optional<std::string> m_cloudModulesXmlPath;

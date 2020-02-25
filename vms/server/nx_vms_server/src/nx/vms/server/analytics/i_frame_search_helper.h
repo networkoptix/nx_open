@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abstract_iframe_search_helper.h"
+#include "abstract_i_frame_search_helper.h"
 
 class QnResourcePool;
 class QnVideoCameraPool;

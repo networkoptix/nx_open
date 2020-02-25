@@ -1,4 +1,4 @@
-#include "iframe_search_helper.h"
+#include "i_frame_search_helper.h"
 
 #include <camera/camera_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -23,18 +23,19 @@ qint64 IFrameSearchHelper::findAfter(
     nx::vms::api::StreamIndex streamIndex,
     qint64 timestampUs) const
 {
-    auto resource = m_resourcePool->getResourceById(deviceId).dynamicCast<QnSecurityCamResource>();
+    const auto resource = 
+        m_resourcePool->getResourceById(deviceId).dynamicCast<QnSecurityCamResource>();
     if (!resource)
         return -1;
 
-    auto camera = m_cameraPool->getVideoCamera(resource);
+    const auto camera = m_cameraPool->getVideoCamera(resource);
     if (!camera)
         return -1;
 
     const auto iFrame = camera->getIFrameByTime(
         streamIndex,
         timestampUs,
-        /*channel */ 0,
+        /*channel*/ 0,
         nx::api::ImageRequest::RoundMethod::iFrameAfter);
     if (!iFrame)
         return -1;

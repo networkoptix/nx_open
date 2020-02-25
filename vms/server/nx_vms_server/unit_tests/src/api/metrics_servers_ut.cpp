@@ -33,7 +33,7 @@ public:
         hardware.physicalCores = 4;
     }
 
-    MetricsServersApi(): ServerForTests()
+    MetricsServersApi(): ServerForTests(/*autoStart*/ false)
     {
         addFeatures(MediaServerFeature::outgoingConnectionsMetric);
         NX_CRITICAL(start());

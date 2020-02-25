@@ -84,6 +84,8 @@ using ThreadId = pthread_t;
 ThreadId GetCurrentThreadId();
 #endif
 
+void setCurrentThreadName(const std::string& name);
+
 ////////////////////////////////////////////////////////////////////////////////
 
 class UDT_API CTimer
@@ -417,6 +419,9 @@ public:
     const value_type* data() const;
     size_type size() const;
 
+    /**
+     * NOTE: Decreasing size does not cause reallocation.
+     */
     void resize(size_type newSize);
 
     void assign(const value_type* data, size_type count);
@@ -487,8 +492,11 @@ typename BasicBuffer<ValueType>::size_type BasicBuffer<ValueType>::size() const
 template<typename ValueType>
 void BasicBuffer<ValueType>::resize(size_type newSize)
 {
-    if (m_size == newSize)
+    if (newSize <= m_size && newSize > 0)
+    {
+        m_size = newSize;
         return;
+    }
 
     if (newSize > 0)
     {
