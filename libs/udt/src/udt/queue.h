@@ -61,8 +61,15 @@ class CUDT;
 
 struct CUnit
 {
-    CPacket m_Packet;        // packet
-    int m_iFlag = 0;            // 0: free, 1: occupied, 2: msg read but not freed (out-of-order), 3: msg dropped
+    CPacket& packet();
+
+    void setFlag(int val);
+    int flag() const;
+
+private:
+    CPacket m_Packet;
+    // 0: free, 1: occupied, 2: msg read but not freed (out-of-order), 3: msg dropped.
+    int m_iFlag = 0;
 };
 
 class ServerSideConnectionAcceptor;
@@ -119,9 +126,8 @@ public:
 private:
     struct CQEntry
     {
-        CUnit* m_pUnit = nullptr;        // unit queue
+        std::vector<CUnit> unitQueue;
         Buffer m_pBuffer;
-        int m_iSize = 0;        // size of each queue
 
         CQEntry* next = nullptr;
     };

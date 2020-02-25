@@ -340,7 +340,7 @@ CRcvBuffer::~CRcvBuffer()
     {
         if (NULL != m_pUnit[i])
         {
-            m_pUnit[i]->m_iFlag = 0;
+            m_pUnit[i]->setFlag(0);
             m_pUnitQueue->decCount();
         }
     }
@@ -359,7 +359,7 @@ bool CRcvBuffer::addData(CUnit* unit, int offset)
 
     m_pUnit[pos] = unit;
 
-    unit->m_iFlag = 1;
+    unit->setFlag(1);
     m_pUnitQueue->incCount();
 
     return true;
@@ -373,18 +373,18 @@ int CRcvBuffer::readBuffer(char* data, int len)
 
     while ((p != lastack) && (rs > 0) && m_pUnit[p] != NULL)
     {
-        int unitsize = m_pUnit[p]->m_Packet.getLength() - m_iNotch;
+        int unitsize = m_pUnit[p]->packet().getLength() - m_iNotch;
         if (unitsize > rs)
             unitsize = rs;
 
-        memcpy(data, m_pUnit[p]->m_Packet.payload().data() + m_iNotch, unitsize);
+        memcpy(data, m_pUnit[p]->packet().payload().data() + m_iNotch, unitsize);
         data += unitsize;
 
-        if ((rs > unitsize) || (rs == m_pUnit[p]->m_Packet.getLength() - m_iNotch))
+        if ((rs > unitsize) || (rs == m_pUnit[p]->packet().getLength() - m_iNotch))
         {
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
-            tmp->m_iFlag = 0;
+            tmp->setFlag(0);
             m_pUnitQueue->decCount();
 
             if (++p == m_iSize)
@@ -410,19 +410,19 @@ int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
 
     while ((p != lastack) && (rs > 0) && (m_pUnit[p] != NULL))
     {
-        int unitsize = m_pUnit[p]->m_Packet.getLength() - m_iNotch;
+        int unitsize = m_pUnit[p]->packet().getLength() - m_iNotch;
         if (unitsize > rs)
             unitsize = rs;
 
-        ofs.write(m_pUnit[p]->m_Packet.payload().data() + m_iNotch, unitsize);
+        ofs.write(m_pUnit[p]->packet().payload().data() + m_iNotch, unitsize);
         if (ofs.fail())
             break;
 
-        if ((rs > unitsize) || (rs == m_pUnit[p]->m_Packet.getLength() - m_iNotch))
+        if ((rs > unitsize) || (rs == m_pUnit[p]->packet().getLength() - m_iNotch))
         {
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
-            tmp->m_iFlag = 0;
+            tmp->setFlag(0);
             m_pUnitQueue->decCount();
 
             if (++p == m_iSize)
@@ -468,8 +468,8 @@ int CRcvBuffer::getRcvDataSize() const
 void CRcvBuffer::dropMsg(int32_t msgno)
 {
     for (int i = m_iStartPos, n = (m_iLastAckPos + m_iMaxPos) % m_iSize; i != n; i = (i + 1) % m_iSize)
-        if ((NULL != m_pUnit[i]) && (msgno == m_pUnit[i]->m_Packet.m_iMsgNo))
-            m_pUnit[i]->m_iFlag = 3;
+        if ((NULL != m_pUnit[i]) && (msgno == m_pUnit[i]->packet().m_iMsgNo))
+            m_pUnit[i]->setFlag(3);
 }
 
 int CRcvBuffer::readMsg(char* data, int len)
@@ -482,13 +482,13 @@ int CRcvBuffer::readMsg(char* data, int len)
     int rs = len;
     while ((p != (q + 1) % m_iSize) && m_pUnit[p] != NULL)
     {
-        int unitsize = m_pUnit[p]->m_Packet.getLength();
+        int unitsize = m_pUnit[p]->packet().getLength();
         if ((rs >= 0) && (unitsize > rs))
             unitsize = rs;
 
         if (unitsize > 0)
         {
-            memcpy(data, m_pUnit[p]->m_Packet.payload().data(), unitsize);
+            memcpy(data, m_pUnit[p]->packet().payload().data(), unitsize);
             data += unitsize;
             rs -= unitsize;
         }
@@ -497,11 +497,11 @@ int CRcvBuffer::readMsg(char* data, int len)
         {
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
-            tmp->m_iFlag = 0;
+            tmp->setFlag(0);
             m_pUnitQueue->decCount();
         }
         else
-            m_pUnit[p]->m_iFlag = 2;
+            m_pUnit[p]->setFlag(2);
 
         if (++p == m_iSize)
             p = 0;
@@ -536,20 +536,20 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
             continue;
         }
 
-        if ((1 == m_pUnit[m_iStartPos]->m_iFlag) && (m_pUnit[m_iStartPos]->m_Packet.getMsgBoundary() > 1))
+        if ((1 == m_pUnit[m_iStartPos]->flag()) && (m_pUnit[m_iStartPos]->packet().getMsgBoundary() > 1))
         {
             bool good = true;
 
             // look ahead for the whole message
             for (int i = m_iStartPos; i != m_iLastAckPos;)
             {
-                if ((NULL == m_pUnit[i]) || (1 != m_pUnit[i]->m_iFlag))
+                if ((NULL == m_pUnit[i]) || (1 != m_pUnit[i]->flag()))
                 {
                     good = false;
                     break;
                 }
 
-                if ((m_pUnit[i]->m_Packet.getMsgBoundary() == 1) || (m_pUnit[i]->m_Packet.getMsgBoundary() == 3))
+                if ((m_pUnit[i]->packet().getMsgBoundary() == 1) || (m_pUnit[i]->packet().getMsgBoundary() == 3))
                     break;
 
                 if (++i == m_iSize)
@@ -562,7 +562,7 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
 
         CUnit* tmp = m_pUnit[m_iStartPos];
         m_pUnit[m_iStartPos] = NULL;
-        tmp->m_iFlag = 0;
+        tmp->setFlag(0);
         m_pUnitQueue->decCount();
 
         if (++m_iStartPos == m_iSize)
@@ -577,9 +577,9 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
     // looking for the first message
     for (int i = 0, n = m_iMaxPos + getRcvDataSize(); i <= n; ++i)
     {
-        if ((NULL != m_pUnit[q]) && (1 == m_pUnit[q]->m_iFlag))
+        if ((NULL != m_pUnit[q]) && (1 == m_pUnit[q]->flag()))
         {
-            switch (m_pUnit[q]->m_Packet.getMsgBoundary())
+            switch (m_pUnit[q]->packet().getMsgBoundary())
             {
                 case 3: // 11
                     p = q;
@@ -604,7 +604,7 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
         if (found)
         {
             // the msg has to be ack'ed or it is allowed to read out of order, and was not read before
-            if (!passack || !m_pUnit[q]->m_Packet.getMsgOrderFlag())
+            if (!passack || !m_pUnit[q]->packet().getMsgOrderFlag())
                 break;
 
             found = false;

@@ -257,6 +257,7 @@ private:
     void preparePacketVector() const;
 
     CPacket& operator=(const CPacket&) = delete;
+    CPacket& operator=(CPacket&&) = delete;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -2257,7 +2257,7 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
 
 Result<> CUDT::processData(CUnit* unit)
 {
-    CPacket& packet = unit->m_Packet;
+    CPacket& packet = unit->packet();
 
     // Just heard from the peer, reset the expiration count.
     m_iEXPCount = 1;
