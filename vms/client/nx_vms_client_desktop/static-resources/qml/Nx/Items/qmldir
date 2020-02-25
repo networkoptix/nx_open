@@ -1,6 +1,6 @@
 module Nx.Items
 
-RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml
 FigureEditor 1.0 FigureEditor.qml
 FigurePreview 1.0 FigurePreview.qml
 Line 1.0 Line.qml
+RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml
