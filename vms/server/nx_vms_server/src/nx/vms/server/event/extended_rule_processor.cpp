@@ -1482,13 +1482,10 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
     const auto resource = resourcePool()->getResourceById(event.eventResourceId);
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
-    // FIXME: VMS-17538.
-    #if !defined(_WIN32)
-        const auto language = common->globalSettings()->pushNotificationsLanguage();
-        NX_VERBOSE(this, "Translate push notification to %1", language);
-        QnTranslationManager::LocaleRollback localeGuard(
-            serverModule()->findInstance<QnTranslationManager>(), language);
-    #endif
+    const auto language = common->globalSettings()->pushNotificationsLanguage();
+    NX_VERBOSE(this, "Translate push notification to %1", language);
+    QnTranslationManager::LocaleRollback localeGuard(
+        serverModule()->findInstance<QnTranslationManager>(), language);
 
     const auto join =
         [](const QString& delimiter, QStringList items)
