@@ -276,7 +276,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(
     core::PathUtil pathUtil;
     pathUtil.setPoints(points);
 
-    if (line.direction == Line::Direction::left)
+    if (line.direction == Line::Direction::left || line.direction == Line::Direction::none)
     {
         drawDirectionMark(
             painter,
@@ -286,7 +286,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(
             widget);
     }
 
-    if (line.direction == Line::Direction::right)
+    if (line.direction == Line::Direction::right || line.direction == Line::Direction::none)
     {
         drawDirectionMark(
             painter,
