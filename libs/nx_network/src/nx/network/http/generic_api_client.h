@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <tuple>
 
 #include <nx/network/aio/basic_pollable.h>
@@ -16,7 +17,7 @@ namespace nx::network::http {
  * Base class for client of some API. E.g., REST API based on HTTP/json.
  * ApiResultCodeDescriptor MUST define:
  * - ResultCode type.
- * - If ResultCode is different from nx::network::http::StatusCode, then following method MUST be 
+ * - If ResultCode is different from nx::network::http::StatusCode, then following method MUST be
  * defined too:
  * <pre><code>
  * template<typename Output>
@@ -39,6 +40,8 @@ public:
 
     virtual void bindToAioThread(
         network::aio::AbstractAioThread* aioThread) override;
+
+    void setRequestTimeout(std::optional<std::chrono::milliseconds> timeout);
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -71,6 +74,7 @@ private:
     const utils::Url m_baseApiUrl;
     std::map<network::aio::BasicPollable*, Context> m_activeRequests;
     QnMutex m_mutex;
+    std::optional<std::chrono::milliseconds> m_requestTimeout;
 
     template<typename Output, typename... InputArgs>
     auto createHttpClient(
@@ -123,6 +127,13 @@ void GenericApiClient<ApiResultCodeDescriptor>::bindToAioThread(
     QnMutexLocker lock(&m_mutex);
     for (const auto& context : m_activeRequests)
         context.second.client->bindToAioThread(aioThread);
+}
+
+template<typename ApiResultCodeDescriptor>
+void GenericApiClient<ApiResultCodeDescriptor>::setRequestTimeout(
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    m_requestTimeout = timeout;
 }
 
 template<typename ApiResultCodeDescriptor>
@@ -196,6 +207,9 @@ auto GenericApiClient<ApiResultCodeDescriptor>::createHttpClient(
             std::move(inputArgs)...);
     httpClient->bindToAioThread(getAioThread());
 
+    if (m_requestTimeout)
+        httpClient->setRequestTimeout(*m_requestTimeout);
+
     auto httpClientPtr = httpClient.get();
     {
         QnMutexLocker lock(&m_mutex);
@@ -215,14 +229,14 @@ void GenericApiClient<ApiResultCodeDescriptor>::processResponse(
     Output... output)
 {
     Context context = takeContextOfRequest(requestPtr);
-    
+
     const auto resultCode = getResultCode(error, response, output...);
-    
+
     handler(resultCode, std::move(output)...);
 }
 
 template<typename ApiResultCodeDescriptor>
-typename GenericApiClient<ApiResultCodeDescriptor>::Context 
+typename GenericApiClient<ApiResultCodeDescriptor>::Context
     GenericApiClient<ApiResultCodeDescriptor>::takeContextOfRequest(
         nx::network::aio::BasicPollable* httpClientPtr)
 {
