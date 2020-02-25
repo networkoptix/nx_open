@@ -1,7 +1,8 @@
-#include "rtsp_perf.h"
 #include <nx/utils/log/log.h>
 
 #include <QtCore/QCommandLineParser>
+
+#include "rtsp_perf.h"
 
 bool validateConfig(RtspPerf::Config& config)
 {
@@ -13,7 +14,7 @@ bool validateConfig(RtspPerf::Config& config)
     if (config.livePercent > 100 || config.livePercent < 0)
     {
         fprintf(stderr, "ERROR: "
-            "Live persent streams should be in interval [0..100], use '-c <count>' option\n");
+            "Percentage of live streams should be in interval [0..100], use '-c <count>' option\n");
         return false;
     }
     if (config.server.isEmpty())
@@ -26,7 +27,7 @@ bool validateConfig(RtspPerf::Config& config)
 
 int main(int argc, char** argv)
 {
-    // Reduce window size to disable log reducing
+    // Reduce window size to disable log reducing.
     nx::kit::IniConfig::Tweaks iniTweaks;
     iniTweaks.set(&nx::utils::ini().logLevelReducerWindowSizeS, 0);
 
@@ -46,7 +47,7 @@ int main(int argc, char** argv)
         "Rtsp session count. By default: 1", "count", "1");
     parser.addOption(countOption);
     QCommandLineOption livePercentOption(QStringList() << "l" << "live_percent",
-        "Percent of live streams. By default: 100", "live percent", "100");
+        "Percentage of live streams. By default: 100", "live percent", "100");
     parser.addOption(livePercentOption);
     QCommandLineOption timeoutOption(QStringList() << "t" << "timeout",
         "RTSP read timeout in milliseconds. By default: 5000ms", "timeout", "5000");

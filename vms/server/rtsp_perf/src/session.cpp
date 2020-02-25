@@ -12,33 +12,7 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/utils/random_qt_device.h>
 
-
-static std::string toString(std::chrono::system_clock::time_point time)
-{
-    using namespace std::chrono;
-    const auto msec = duration_cast<milliseconds>(time.time_since_epoch()) % 1000;
-    std::time_t t = std::chrono::system_clock::to_time_t(time);
-    std::stringstream str;
-    str << std::put_time(std::localtime(&t), "%F %T") << "." <<
-        std::setfill('0') << std::setw(3) << msec.count();
-    return str.str();
-}
-
-/**
- * Print the message to stdout, intended to be parsed by programs calling this tool.
- *
- * ATTENTION: The format of such messages should be changed responsibly, revising their usages.
- */
-static void report(const QString& message)
-{
-    auto beg = std::chrono::high_resolution_clock::now();
-    printf("%s %s\n",
-        toString(std::chrono::system_clock::now()).c_str(), message.toUtf8().constData());
-    auto end = std::chrono::high_resolution_clock::now();
-    auto reportDuration = std::chrono::duration_cast<std::chrono::milliseconds>(end - beg);
-    if (reportDuration > std::chrono::milliseconds(30))
-        printf("WARNING: Print to stdout too slow: %d ms.\n", reportDuration.count());
-}
+#include "report.h"
 
 static const char* streamTypeToString(uint16_t flags)
 {
@@ -79,7 +53,8 @@ void Session::run(const QString& url, const Config& config, bool live)
     CameraDiagnostics::Result result = rtspClient.open(url);
     if (result.errorCode != 0)
     {
-        report(lm("Failed to open rtsp stream: %1, error: %2").args(url, result.toString(nullptr)));
+        report("Failed to open rtsp stream: %1, error: %2",
+            url, result.toString(/*resourcePool*/ nullptr));
         failed = true;
         ++failedCount;
         return;
@@ -108,7 +83,7 @@ void Session::run(const QString& url, const Config& config, bool live)
         }
         if (bytesRead <= 0)
         {
-            report(lm("WARNING: Camera %1: Failed to read data.").args(url));
+            report("WARNING: Camera %1: Failed to read data.", url);
             failed = true;
             ++failedCount;
             break;
@@ -124,13 +99,13 @@ void Session::checkDiff(std::chrono::microseconds diff, int64_t timestampUs, con
     constexpr auto kZeroUs = std::chrono::microseconds::zero();
     if (m_config.maxTimestampDiff != kZeroUs && diff > m_config.maxTimestampDiff)
     {
-        report(lm("WARNING: Camera %1: Frame timestamp %2 us: diff %3 us is more than %4 us.")
-            .args(url, timestampUs, diff.count(), m_config.maxTimestampDiff.count()));
+        report("WARNING: Camera %1: Frame timestamp %2 us: diff %3 us is more than %4 us.",
+            url, timestampUs, diff.count(), m_config.maxTimestampDiff.count());
     }
     else if (m_config.minTimestampDiff != kZeroUs && diff < m_config.minTimestampDiff)
     {
-        report(lm("WARNING: Camera %1: Frame timestamp %2 us: diff %3 us is less than %4 us.")
-            .args(url, timestampUs, diff.count(), m_config.minTimestampDiff.count()));
+        report("WARNING: Camera %1: Frame timestamp %2 us: diff %3 us is less than %4 us.",
+            url, timestampUs, diff.count(), m_config.minTimestampDiff.count());
     }
 }
 
@@ -143,11 +118,11 @@ bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
         if (m_config.printTimestamps)
         {
             const int64_t timestampDiffUs = packet.timestampUs - m_prevTimestampUs;
-            report(lm("Camera %1: Frame timestamp %2 us, diff %3 us, stream %4.").args(
+            report("Camera %1: Frame timestamp %2 us, diff %3 us, stream %4.",
                 url,
                 packet.timestampUs,
                 (m_prevTimestampUs == -1) ? -1 : timestampDiffUs,
-                streamTypeToString(packet.flags)));
+                streamTypeToString(packet.flags));
 
             if (m_prevTimestampUs != -1)
                 checkDiff(std::chrono::microseconds(timestampDiffUs), packet.timestampUs, url);
@@ -161,8 +136,8 @@ bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
         std::chrono::duration<double> timeFromLastFrame = nowTime - m_lastFrameTime;
         if (timeFromLastFrame > m_config.timeout)
         {
-            report(lm("WARNING: Camera %1: Video frame was not received for %2 s.")
-                .args(url, timeFromLastFrame.count()));
+            report("WARNING: Camera %1: Video frame was not received for %2 s.",
+                url, timeFromLastFrame.count());
             return false;
         }
     }
