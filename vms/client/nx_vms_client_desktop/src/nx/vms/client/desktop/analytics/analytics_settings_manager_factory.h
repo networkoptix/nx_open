@@ -11,7 +11,7 @@ class AnalyticsSettingsManager;
 
 /**
  * Initializes Analytics Settings Manager and creates actual implementations of all it's external
- * interfaces (listening to
+ * interfaces (listening to the message bus and sending requests over server rest api).
  */
 class AnalyticsSettingsManagerFactory
 {

@@ -1,6 +1,7 @@
 import QtQuick 2.0
 
 import Nx 1.0
+import Nx.Controls 1.0
 import Nx.Instruments 1.0
 
 import nx.vms.client.core 1.0
@@ -14,7 +15,7 @@ Figure
 
     readonly property bool hasFigure: true
 
-    acceptable: true
+    acceptable: minRect.width <= maxRect.width && minRect.height <= maxRect.height
 
     readonly property rect minRect: Qt.rect(
         Math.min(d.minP1.x, d.minP2.x),
@@ -97,6 +98,9 @@ Figure
     {
         id: maxDraggable
 
+        width: parent.width
+        height: parent.height
+
         Rectangle
         {
             id: maxBox
@@ -116,8 +120,7 @@ Figure
             id: maxTopLeftGrip
 
             color: maxBoxColor
-            maxX: F.absX(d.maxP2.x - minRect.width, figure)
-            maxY: F.absY(d.maxP2.y - minRect.height, figure)
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.maxP1.x = F.relX(x, figure))
             onYChanged: dragging && (d.maxP1.y = F.relY(y, figure))
@@ -144,10 +147,7 @@ Figure
             id: maxBottomRightGrip
 
             color: maxBoxColor
-            minX: F.absX(d.maxP1.x + minRect.width, figure)
-            minY: F.absY(d.maxP1.y + minRect.height, figure)
-            maxX: figure.width
-            maxY: figure.height
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.maxP2.x = F.relX(x, figure))
             onYChanged: dragging && (d.maxP2.y = F.relY(y, figure))
@@ -174,9 +174,7 @@ Figure
             id: maxTopRightGrip
 
             color: maxBoxColor
-            minX: F.absX(d.maxP1.x + minRect.width, figure)
-            maxX: figure.width
-            maxY: F.absY(d.maxP2.y - minRect.height, figure)
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.maxP2.x = F.relX(x, figure))
             onYChanged: dragging && (d.maxP1.y = F.relY(y, figure))
@@ -203,9 +201,7 @@ Figure
             id: maxBottomLeftGrip
 
             color: maxBoxColor
-            maxX: F.absX(d.maxP2.x - minRect.width, figure)
-            minY: F.absY(d.maxP1.y + minRect.height, figure)
-            maxY: figure.height
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.maxP1.x = F.relX(x, figure))
             onYChanged: dragging && (d.maxP2.y = F.relY(y, figure))
@@ -235,9 +231,8 @@ Figure
             borderColor: "transparent"
             cursorShape: Qt.SizeHorCursor
             axis: Drag.XAxis
-            maxX: F.absX(d.maxP2.x - minRect.width, figure)
-            maxY: figure.height
             y: (maxTopLeftGrip.y + maxBottomLeftGrip.y) / 2
+            z: (hovered || dragging) ? 2 : 0
 
             onXChanged: dragging && (d.maxP1.x = F.relX(x, figure))
 
@@ -258,10 +253,8 @@ Figure
             borderColor: "transparent"
             cursorShape: Qt.SizeHorCursor
             axis: Drag.XAxis
-            minX: F.absX(d.maxP1.x + minRect.width, figure)
-            maxX: figure.width
-            maxY: figure.height
             y: maxLeftGrip.y
+            z: (hovered || dragging) ? 2 : 0
 
             onXChanged: dragging && (d.maxP2.x = F.relX(x, figure))
 
@@ -282,9 +275,8 @@ Figure
             borderColor: "transparent"
             cursorShape: Qt.SizeVerCursor
             axis: Drag.YAxis
-            maxX: figure.width
-            maxY: F.absY(d.maxP2.y - minRect.height, figure)
             x: (maxTopLeftGrip.x + maxTopRightGrip.x) / 2
+            z: (hovered || dragging) ? 2 : 0
 
             onYChanged: dragging && (d.maxP1.y = F.relY(y, figure))
 
@@ -305,10 +297,8 @@ Figure
             borderColor: "transparent"
             cursorShape: Qt.SizeVerCursor
             axis: Drag.YAxis
-            maxX: figure.width
-            minY: F.absY(d.maxP1.y + minRect.height, figure)
-            maxY: figure.height
             x: maxTopGrip.x
+            z: (hovered || dragging) ? 2 : 0
 
             onYChanged: dragging && (d.maxP2.y = F.relY(y, figure))
 
@@ -325,6 +315,9 @@ Figure
     Item
     {
         id: minDraggable
+
+        width: parent.width
+        height: parent.height
 
         Rectangle
         {
@@ -345,10 +338,7 @@ Figure
             id: minTopLeftGrip
 
             color: minBoxColor
-            minX: Math.max(F.absX(d.minP2.x - maxRect.width, figure), 0)
-            maxX: Math.min(F.absX(d.minP2.x + maxRect.width, figure), figure.width)
-            minY: Math.max(F.absY(d.minP2.y - maxRect.height, figure), 0)
-            maxY: Math.min(F.absY(d.minP2.y + maxRect.height, figure), figure.height)
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.minP1.x = F.relX(x, figure))
             onYChanged: dragging && (d.minP1.y = F.relY(y, figure))
@@ -375,10 +365,7 @@ Figure
             id: minBottomRightGrip
 
             color: minBoxColor
-            minX: Math.max(F.absX(d.minP1.x - maxRect.width, figure), 0)
-            maxX: Math.min(F.absX(d.minP1.x + maxRect.width, figure), figure.width)
-            minY: Math.max(F.absY(d.minP1.y - maxRect.height, figure), 0)
-            maxY: Math.min(F.absY(d.minP1.y + maxRect.height, figure), figure.height)
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.minP2.x = F.relX(x, figure))
             onYChanged: dragging && (d.minP2.y = F.relY(y, figure))
@@ -405,10 +392,7 @@ Figure
             id: minTopRightGrip
 
             color: minBoxColor
-            minX: Math.max(F.absX(d.minP1.x - maxRect.width, figure), 0)
-            maxX: Math.min(F.absX(d.minP1.x + maxRect.width, figure), figure.width)
-            minY: Math.max(F.absY(d.minP2.y - maxRect.height, figure), 0)
-            maxY: Math.min(F.absY(d.minP2.y + maxRect.height, figure), figure.height)
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.minP2.x = F.relX(x, figure))
             onYChanged: dragging && (d.minP1.y = F.relY(y, figure))
@@ -435,10 +419,7 @@ Figure
             id: minBottomLeftGrip
 
             color: minBoxColor
-            minX: Math.max(F.absX(d.minP2.x - maxRect.width, figure), 0)
-            maxX: Math.min(F.absX(d.minP2.x + maxRect.width, figure), figure.width)
-            minY: Math.max(F.absY(d.minP1.y - maxRect.height, figure), 0)
-            maxY: Math.min(F.absY(d.minP1.y + maxRect.height, figure), figure.height)
+            z: (hovered || dragging) ? 3 : 1
 
             onXChanged: dragging && (d.minP1.x = F.relX(x, figure))
             onYChanged: dragging && (d.minP2.y = F.relY(y, figure))
@@ -468,9 +449,8 @@ Figure
             borderColor: "transparent"
             cursorShape: Qt.SizeHorCursor
             axis: Drag.XAxis
-            minX: Math.max(F.absX(d.minP2.x - maxRect.width, figure), 0)
-            maxX: Math.min(F.absX(d.minP2.x + maxRect.width, figure), figure.width)
             y: (minTopLeftGrip.y + minBottomLeftGrip.y) / 2
+            z: (hovered || dragging) ? 2 : 0
 
             onXChanged: dragging && (d.minP1.x = F.relX(x, figure))
 
@@ -491,9 +471,8 @@ Figure
             borderColor: "transparent"
             cursorShape: Qt.SizeHorCursor
             axis: Drag.XAxis
-            minX: Math.max(F.absX(d.minP1.x - maxRect.width, figure), 0)
-            maxX: Math.min(F.absX(d.minP1.x + maxRect.width, figure), figure.width)
             y: minLeftGrip.y
+            z: (hovered || dragging) ? 2 : 0
 
             onXChanged: dragging && (d.minP2.x = F.relX(x, figure))
 
@@ -514,9 +493,8 @@ Figure
             borderColor: "transparent"
             cursorShape: Qt.SizeVerCursor
             axis: Drag.YAxis
-            minY: Math.max(F.absY(d.minP2.y - maxRect.height, figure), 0)
-            maxY: Math.min(F.absY(d.minP2.y + maxRect.height, figure), figure.height)
             x: (minTopLeftGrip.x + minTopRightGrip.x) / 2
+            z: (hovered || dragging) ? 2 : 0
 
             onYChanged: dragging && (d.minP1.y = F.relY(y, figure))
 
@@ -537,9 +515,8 @@ Figure
             borderColor: "transparent"
             cursorShape: Qt.SizeVerCursor
             axis: Drag.YAxis
-            minY: Math.max(F.absY(d.minP1.y - maxRect.height, figure), 0)
-            maxY: Math.min(F.absY(d.minP1.y + maxRect.height, figure), figure.height)
             x: minTopGrip.x
+            z: (hovered || dragging) ? 2 : 0
 
             onYChanged: dragging && (d.minP2.y = F.relY(y, figure))
 
@@ -553,7 +530,17 @@ Figure
         }
     }
 
-    hint: d.dragging ? null : qsTr("Set minimum and maximum object sizes.")
+    hint:
+    {
+        if (d.dragging)
+            return null
+
+        return acceptable
+            ? qsTr("Set minimum and maximum object sizes.")
+            : qsTr("Minimum object size cannot be greater than maximum.")
+    }
+
+    hintStyle: acceptable ? Banner.Style.Info : Banner.Style.Error
 
     hoverInstrument: Instrument { item: mouseArea }
 
@@ -622,8 +609,11 @@ Figure
     {
         id: d
 
+        // Diagonal points of minimum object size rectangle (any two diagonal points).
         property point minP1
         property point minP2
+
+        // Diagonal points of maximum object size rectangle (any two diagonal points).
         property point maxP1
         property point maxP2
 

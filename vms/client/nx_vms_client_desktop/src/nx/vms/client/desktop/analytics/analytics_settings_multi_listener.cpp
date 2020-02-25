@@ -71,6 +71,7 @@ void AnalyticsSettingsMultiListener::Private::resubscribe()
 {
     // Store listeners to prevent cache from wiping their data.
     QHash<QnUuid, AnalyticsSettingsListenerPtr> oldListeners = listeners;
+    listeners.clear();
 
     const auto engines = resourcePool()->getResources<common::AnalyticsEngineResource>();
     for (const auto& engine: engines)

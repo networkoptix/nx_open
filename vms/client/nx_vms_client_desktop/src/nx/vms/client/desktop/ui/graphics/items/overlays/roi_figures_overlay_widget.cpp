@@ -276,7 +276,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(
     core::PathUtil pathUtil;
     pathUtil.setPoints(points);
 
-    if (line.direction == Line::Direction::left)
+    if (line.direction == Line::Direction::left || line.direction == Line::Direction::none)
     {
         drawDirectionMark(
             painter,
@@ -286,7 +286,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(
             widget);
     }
 
-    if (line.direction == Line::Direction::right)
+    if (line.direction == Line::Direction::right || line.direction == Line::Direction::none)
     {
         drawDirectionMark(
             painter,
@@ -376,12 +376,7 @@ qreal RoiFiguresOverlayWidget::Private::realLineWidth(QWidget* widget) const
 void RoiFiguresOverlayWidget::Private::updateFigureKeys(
     const QnUuid& engineId, const DeviceAgentData& data)
 {
-    if (!settingsListener)
-        return;
-
     figureKeysByEngineId.insert(engineId, findFigureKeys(data.model));
-
-    updateFigures();
 }
 
 void RoiFiguresOverlayWidget::Private::updateFigures()
@@ -446,14 +441,20 @@ RoiFiguresOverlayWidget::RoiFiguresOverlayWidget(
             AnalyticsSettingsMultiListener::ListenPolicy::enabledEngines,
             this);
 
-        connect(d->settingsListener, &AnalyticsSettingsMultiListener::dataChanged, d.get(),
-            &Private::updateFigureKeys);
+        connect(d->settingsListener, &AnalyticsSettingsMultiListener::dataChanged, this,
+            [this](const QnUuid& engineId, const DeviceAgentData& data)
+            {
+                d->updateFigureKeys(engineId, data);
+                d->updateFigures();
+            });
 
         auto initializeKeys =
             [this]()
             {
+                d->figureKeysByEngineId.clear();
                 for (const QnUuid& engineId: d->settingsListener->engineIds())
                     d->updateFigureKeys(engineId, d->settingsListener->data(engineId));
+                d->updateFigures();
             };
         connect(
             d->settingsListener, &AnalyticsSettingsMultiListener::enginesChanged,

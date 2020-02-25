@@ -153,8 +153,13 @@ pthread_cond_t CTimer::m_EventCond = CreateEvent(NULL, false, false, NULL);
 void setCurrentThreadName(const std::string& name)
 {
 #if defined(_WIN32)
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    SetThreadDescription(GetCurrentThread(), converter.from_bytes(name).c_str());
+    using SetThreadDescription = std::add_pointer_t<HRESULT WINAPI(HANDLE, PCWSTR)>;
+    if (const auto setThreadDescription = reinterpret_cast<SetThreadDescription>(
+        GetProcAddress(GetModuleHandleA("kernel32.dll"), "SetThreadDescription")))
+    {
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+        setThreadDescription(GetCurrentThread(), converter.from_bytes(name).c_str());
+    }
 #elif defined(__APPLE__)
     pthread_setname_np(name.c_str());
 #else

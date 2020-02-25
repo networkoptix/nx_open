@@ -30,22 +30,35 @@ nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
 # Variables used for configuring files.
 set(common_depends
     "zlib1g (>= 1:1.1.4)"
-    "debconf (>= 0.5) | debconf-2.0"
-    "libpulse-mainloop-glib0"
-    "libpulse0"
+    "libglib2.0-0"
+    "libsecret-1-0"
+    "libudev1"
+    "libx11-6"
     "libxi6"
     "libxrender1"
     "libxcomposite1"
     "libxcursor1"
     "libxfixes3"
-    "libxt6"
+    "libxss1"
+    "libxrandr2"
+    "libxtst6"
+    "libxkbcommon0"
+    "libpng12-0"
     "libfontconfig1"
     "libfreetype6 (>= 2.6.0)"
-    "libsm6"
-    "libice6"
-    "libaudio2"
+    "libasound2"
+    "libopenal1"
+    "libpulse-mainloop-glib0"
+    "libpulse0"
     "libgl1-mesa-glx | libgl1"
+    "libglu1-mesa-glx | libglu1"
     "libegl1-mesa | libegl1-x11"
+    # Extra WebEngine dependencies.
+    "libdbus-1-3"
+    "libnss3"
+    "libnspr4"
+    # DEB package dependencies.
+    "debconf (>= 0.5) | debconf-2.0"
 )
 string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
 
