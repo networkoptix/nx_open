@@ -167,6 +167,10 @@ int main(int argc, char* argv[])
     {
         nx::kit::OutputRedirector::ensureOutputRedirection();
 
+        // Reduce window size to disable log reducing.
+        nx::kit::IniConfig::Tweaks iniTweaks;
+        iniTweaks.set(&nx::utils::ini().logLevelReducerWindowSizeS, 0);
+
         ini().reload(); //< Make .ini appear on the console even when help is requested.
 
         QCoreApplication::setOrganizationName(nx::utils::AppInfo::organizationName());
