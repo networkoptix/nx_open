@@ -91,8 +91,10 @@ protected:
 
     void whenTimerRestarted()
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_invocationsSoFar = m_invocations.size();
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_invocationsSoFar = m_invocations.size();
+        }
 
         QTimer::singleShot(
             0ms,
@@ -115,7 +117,10 @@ protected:
         std::unique_lock<std::mutex> lock(m_mutex);
         m_newHandlerCondition.wait(lock, [this]() { return m_newHandlerInvoked; });
 
-        ASSERT_EQ(m_invocationsSoFar, m_invocations.size());
+        // Due to race between timer thread and main thread one extra callback might be called
+        // when restarted (in case if it's already been called is waiting on the mutex,
+        // locked by whenTimerStarted()).
+        ASSERT_TRUE(m_invocations.size() - m_invocationsSoFar <= 1);
     }
 
 private:
