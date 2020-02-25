@@ -317,7 +317,7 @@ CSndUList::~CSndUList()
 
 void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
 {
-    std::lock_guard<std::mutex> listguard(m_ListLock);
+    std::lock_guard<std::mutex> listguard(m_mutex);
 
     CSNode* n = u->sNode();
 
@@ -344,7 +344,7 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
     // When this method destroyes CUDT, it must do it with no mutex lock.
     std::shared_ptr<CUDT> u;
 
-    std::lock_guard<std::mutex> listguard(m_ListLock);
+    std::lock_guard<std::mutex> listguard(m_mutex);
 
     if (-1 == m_iLastEntry)
         return -1;
@@ -375,14 +375,14 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
 
 void CSndUList::remove(CUDT* u)
 {
-    std::lock_guard<std::mutex> listguard(m_ListLock);
+    std::lock_guard<std::mutex> listguard(m_mutex);
 
     remove_(u->sNode());
 }
 
-std::chrono::microseconds CSndUList::getNextProcTime()
+std::chrono::microseconds CSndUList::getNextProcTime() const
 {
-    std::lock_guard<std::mutex> listguard(m_ListLock);
+    std::lock_guard<std::mutex> listguard(m_mutex);
 
     if (-1 == m_iLastEntry)
         return std::chrono::microseconds::zero();
@@ -475,7 +475,7 @@ void CSndUList::remove_(CSNode* n)
 
 //
 CSndQueue::CSndQueue(UdpChannel* c, CTimer* t):
-    m_pSndUList(std::make_unique<CSndUList>(t, &m_WindowLock, &m_WindowCond)),
+    m_pSndUList(std::make_unique<CSndUList>(t, &m_mutex, &m_cond)),
     m_channel(c),
     m_timer(t)
 {
@@ -486,8 +486,8 @@ CSndQueue::~CSndQueue()
     m_bClosing = true;
 
     {
-        std::lock_guard<std::mutex> lock(m_WindowLock);
-        m_WindowCond.notify_all();
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_cond.notify_all();
     }
 
     if (m_WorkerThread.joinable())
@@ -508,14 +508,26 @@ void CSndQueue::worker()
 
     while (!m_bClosing)
     {
-        const auto ts = m_pSndUList->getNextProcTime();
+        sendPostedPackets();
 
+        const auto ts = m_pSndUList->getNextProcTime();
         if (ts > std::chrono::microseconds::zero())
         {
             // wait until next processing time of the first socket on the list
             const auto currtime = CTimer::getTime();
             if (currtime < ts)
-                m_timer->sleepto(ts);
+            {
+                std::unique_lock<std::mutex> lock(m_mutex);
+                if (m_cond.wait_for(
+                        lock,
+                        ts - currtime,
+                        [this]() { return !m_sendTasks.empty(); }))
+                {
+                    // m_sendTasks is not empty.
+                    continue;
+                }
+                //m_timer->sleepto(ts);
+            }
 
             // it is time to send the next pkt
             detail::SocketAddress addr;
@@ -527,28 +539,70 @@ void CSndQueue::worker()
             packetVerifier.beforeSendingPacket(pkt);
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
-            m_channel->sendto(addr, pkt);
+            sendPacket(addr, std::move(pkt));
         }
         else
         {
             // wait here if there is no sockets with data to be sent
-            std::unique_lock<std::mutex> lock(m_WindowLock);
-            m_WindowCond.wait(
+            std::unique_lock<std::mutex> lock(m_mutex);
+            m_cond.wait(
                 lock,
-                [this]() { return m_bClosing || m_pSndUList->lastEntry() >= 0; });
+                [this]() { return m_bClosing || m_pSndUList->lastEntry() >= 0 || !m_sendTasks.empty(); });
         }
     }
 }
 
-int CSndQueue::sendto(const detail::SocketAddress& addr, CPacket& packet)
+int CSndQueue::sendto(const detail::SocketAddress& addr, CPacket packet)
+{
+    if (std::this_thread::get_id() == m_WorkerThread.get_id())
+    {
+        return sendPacket(addr, std::move(packet));
+    }
+    else
+    {
+        const auto packetLength = packet.getLength();
+        postPacket(addr, std::move(packet));
+        return packetLength;
+    }
+}
+
+detail::SocketAddress CSndQueue::getLocalAddr() const
+{
+    return m_channel->getSockAddr();
+}
+
+int CSndQueue::sendPacket(const detail::SocketAddress& addr, CPacket packet)
 {
 #ifdef DEBUG_RECORD_PACKET_HISTORY
     packetVerifier.beforeSendingPacket(packet);
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
     // send out the packet immediately (high priority), this is a control packet
-    m_channel->sendto(addr, packet);
-    return packet.getLength();
+    const auto packetLength = packet.getLength();
+    m_channel->sendto(addr, std::move(packet));
+    return packetLength;
+}
+
+void CSndQueue::postPacket(const detail::SocketAddress& addr, CPacket packet)
+{
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_sendTasks.push_back({addr, std::move(packet)});
+    }
+
+    m_cond.notify_all();
+}
+
+void CSndQueue::sendPostedPackets()
+{
+    decltype(m_sendTasks) sendTasks;
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        sendTasks = std::exchange(m_sendTasks, {});
+    }
+
+    for (auto& task: sendTasks)
+        sendPacket(task.addr, std::move(task.packet));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -770,7 +824,7 @@ void CRendezvousQueue::updateConnStatus()
             int hs_size = udtSocket->payloadSize();
             udtSocket->connReq().serialize(request.payload().data(), hs_size);
             request.setLength(hs_size);
-            udtSocket->sndQueue().sendto(i->peerAddr, request);
+            udtSocket->sndQueue().sendto(i->peerAddr, std::move(request));
             udtSocket->setLastReqTime(CTimer::getTime());
         }
     }

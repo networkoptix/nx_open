@@ -611,15 +611,18 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
     m_ullSndLastAck2Time = CTimer::getTime();
 
     // Inform the server my configurations.
-    CPacket request;
-    request.pack(ControlPacketType::Handshake, NULL, m_iPayloadSize);
-    // ID = 0, connection request
-    request.m_iID = 0;
+    {
+        CPacket request;
+        request.pack(ControlPacketType::Handshake, NULL, m_iPayloadSize);
+        // ID = 0, connection request
+        request.m_iID = 0;
 
-    int hs_size = m_iPayloadSize;
-    m_ConnReq.serialize(request.payload().data(), hs_size);
-    request.setLength(hs_size);
-    sndQueue().sendto(serv_addr, request);
+        int hs_size = m_iPayloadSize;
+        m_ConnReq.serialize(request.payload().data(), hs_size);
+        request.setLength(hs_size);
+        sndQueue().sendto(serv_addr, std::move(request));
+    }
+
     m_llLastReqTime = CTimer::getTime();
 
     setConnecting(true);
@@ -640,11 +643,17 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
         // avoid sending too many requests, at most 1 request per 250ms
         if (CTimer::getTime() - m_llLastReqTime > kSyncRepeatMinPeriod)
         {
+            CPacket request;
+            request.pack(ControlPacketType::Handshake, NULL, m_iPayloadSize);
+            // ID = 0, connection request
+            request.m_iID = 0;
+
+            int hs_size = m_iPayloadSize;
             m_ConnReq.serialize(request.payload().data(), hs_size);
             request.setLength(hs_size);
             if (m_bRendezvous)
                 request.m_iID = m_ConnRes.m_iID;
-            sndQueue().sendto(serv_addr, request);
+            sndQueue().sendto(serv_addr, std::move(request));
             m_llLastReqTime = CTimer::getTime();
         }
 
@@ -832,7 +841,7 @@ Result<> CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
     response.pack(ControlPacketType::Handshake, NULL, size);
     hs->serialize(response.payload().data(), size);
     response.m_iID = m_PeerID;
-    sndQueue().sendto(peer, response);
+    sndQueue().sendto(peer, std::move(response));
 
     return success();
 }
@@ -1525,12 +1534,12 @@ void CUDT::releaseSynch()
 
 void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int size)
 {
-    CPacket ctrlpkt;
-
     switch (pkttype)
     {
         case ControlPacketType::Acknowledgement: //010 - Acknowledgement
         {
+            CPacket ctrlpkt;
+
             int32_t ack;
 
             // If there is no loss, the ACK is the current largest sequence number plus 1;
@@ -1550,7 +1559,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 ctrlpkt.pack(pkttype, NULL, size);
                 memcpy(ctrlpkt.payload().data(), &ack, size);
                 ctrlpkt.m_iID = m_PeerID;
-                sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+                sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                 break;
             }
@@ -1616,7 +1625,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 }
 
                 ctrlpkt.m_iID = m_PeerID;
-                sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+                sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                 m_pACKWindow->store(m_iAckSeqNo, m_iRcvLastAck);
 
@@ -1628,14 +1637,19 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         }
 
         case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgement of Acknowledgement
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype, lparam);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::LossReport: //011 - Loss Report
         {
+            CPacket ctrlpkt;
+
             if (NULL != rparam)
             {
                 if (1 == size)
@@ -1652,7 +1666,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 }
 
                 ctrlpkt.m_iID = m_PeerID;
-                sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+                sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                 ++m_iSentNAK;
                 ++m_iSentNAKTotal;
@@ -1673,7 +1687,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                     ctrlpkt.payload().resize(losslen * sizeof(int32_t));
 
                     ctrlpkt.m_iID = m_PeerID;
-                    sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+                    sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                     ++m_iSentNAK;
                     ++m_iSentNAKTotal;
@@ -1695,50 +1709,68 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         }
 
         case ControlPacketType::DelayWarning: //100 - Congestion Warning
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             CTimer::rdtsc(m_ullLastWarningTime);
 
             break;
+        }
 
         case ControlPacketType::KeepAlive: //001 - Keep-alive
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::Handshake: //000 - Handshake
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype, NULL, sizeof(CHandShake));
             ctrlpkt.payload().assign((const char*) rparam, sizeof(CHandShake));
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::Shutdown: //101 - Shutdown
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::MsgDropRequest: //111 - Msg drop request
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype, lparam, 8);
             ctrlpkt.payload().assign((const char*) rparam, 8);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::RemotePeerFailure: //1000 - acknowledge the peer side a special error
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype, lparam);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::Reserved: //0x7FFF - Resevered for future use
             break;
@@ -2701,7 +2733,7 @@ ServerSideConnectionAcceptor::ServerSideConnectionAcceptor(
 
 int ServerSideConnectionAcceptor::processConnectionRequest(
     const detail::SocketAddress& addr,
-    CPacket& packet)
+    const CPacket& packet)
 {
     if (m_closing)
         return 1002;
@@ -2729,11 +2761,13 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
 
     if (1 == hs.m_iReqType)
     {
+        auto response = packet;
+
         hs.m_iCookie = *(int*)cookie;
-        packet.m_iID = hs.m_iID;
-        int size = packet.getLength();
-        hs.serialize(packet.payload().data(), size);
-        m_sendQueue->sendto(addr, packet);
+        response.m_iID = hs.m_iID;
+        int size = response.getLength();
+        hs.serialize(response.payload().data(), size);
+        m_sendQueue->sendto(addr, std::move(response));
         return 0;
     }
     else
@@ -2757,11 +2791,12 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
         if ((hs.m_iVersion != CUDT::m_iVersion) || (hs.m_iType != m_iSockType))
         {
             // mismatch, reject the request
+            auto response = packet;
             hs.m_iReqType = 1002;
             int size = CHandShake::m_iContentSize;
-            hs.serialize(packet.payload().data(), size);
-            packet.m_iID = id;
-            m_sendQueue->sendto(addr, packet);
+            hs.serialize(response.payload().data(), size);
+            response.m_iID = id;
+            m_sendQueue->sendto(addr, std::move(response));
         }
         else
         {
@@ -2773,10 +2808,11 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
             // new connection response should be sent in connect()
             if (!result.ok() || result.get() != 1)
             {
+                auto response = packet;
                 int size = CHandShake::m_iContentSize;
-                hs.serialize(packet.payload().data(), size);
-                packet.m_iID = id;
-                m_sendQueue->sendto(addr, packet);
+                hs.serialize(response.payload().data(), size);
+                response.m_iID = id;
+                m_sendQueue->sendto(addr, std::move(response));
             }
             else
             {

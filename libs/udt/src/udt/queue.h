@@ -206,7 +206,7 @@ public:
     // Returned value:
     //    Scheduled processing time of the first UDT socket in the list.
 
-    std::chrono::microseconds getNextProcTime();
+    std::chrono::microseconds getNextProcTime() const;
 
     int lastEntry() const { return m_iLastEntry; }
 
@@ -222,7 +222,7 @@ private:
     // position of last entry on the heap array
     int m_iLastEntry = 0;
 
-    std::mutex m_ListLock;
+    mutable std::mutex m_mutex;
 
     std::mutex* m_pWindowLock = nullptr;
     std::condition_variable* m_pWindowCond = nullptr;
@@ -360,13 +360,12 @@ public:
     // Returned value:
     //    Size of data sent out.
 
-    int sendto(const detail::SocketAddress& addr, CPacket& packet);
+    int sendto(const detail::SocketAddress& addr, CPacket packet);
 
     // List of UDT instances for data sending.
     CSndUList& sndUList() { return *m_pSndUList; }
 
-    // The UDP channel for data sending.
-    UdpChannel* channel() { return m_channel; }
+    detail::SocketAddress getLocalAddr() const;
 
 private:
     void worker();
@@ -374,19 +373,30 @@ private:
     std::thread m_WorkerThread;
 
 private:
+    struct SendTask
+    {
+        detail::SocketAddress addr;
+        CPacket packet;
+    };
+
     // List of UDT instances for data sending
     std::unique_ptr<CSndUList> m_pSndUList;
     // The UDP channel for data sending
     UdpChannel* m_channel = nullptr;
     // Timing facility
     CTimer* m_timer = nullptr;
+    std::vector<SendTask> m_sendTasks;
 
-    std::mutex m_WindowLock;
-    std::condition_variable m_WindowCond;
+    std::mutex m_mutex;
+    std::condition_variable m_cond;
 
     volatile bool m_bClosing = false;        // closing the worker
 
 private:
+    int sendPacket(const detail::SocketAddress& addr, CPacket packet);
+    void postPacket(const detail::SocketAddress& addr, CPacket packet);
+    void sendPostedPackets();
+
     CSndQueue(const CSndQueue&);
     CSndQueue& operator=(const CSndQueue&);
 };
