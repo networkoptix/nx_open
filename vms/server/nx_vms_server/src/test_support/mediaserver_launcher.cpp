@@ -56,12 +56,6 @@ void MediaServerLauncher::removeFeatures(MediaServerFeatures disabledFeatures)
 
 void MediaServerLauncher::setFeatures(MediaServerFeatures features, bool isEnabled)
 {
-    auto setSetting =
-        [this](const std::string& key, bool value)
-    {
-        addSetting(key, value ? "1" : "0");
-    };
-
     if (features.testFlag(MediaServerFeature::resourceDiscovery))
         addSetting("noResourceDiscovery", !isEnabled);
     if (features.testFlag(MediaServerFeature::monitorStatistics))
