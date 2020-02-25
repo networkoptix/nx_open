@@ -45,11 +45,11 @@ bool SystemCommands::checkOwnerPermissions(const std::string& /*path*/)
     return true;
 }
 
-bool SystemCommands::execute(
+int SystemCommands::execute(
     const std::string& /*command*/,
     std::function<void(const char*)> /*outputAction*/)
 {
-    return false;
+    return -1;
 }
 
 bool SystemCommands::removePath(const std::string& path)
