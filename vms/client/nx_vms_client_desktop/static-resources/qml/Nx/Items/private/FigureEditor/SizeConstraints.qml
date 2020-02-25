@@ -609,8 +609,11 @@ Figure
     {
         id: d
 
+        // Diagonal points of minimum object size rectangle (any two diagonal points).
         property point minP1
         property point minP2
+
+        // Diagonal points of maximum object size rectangle (any two diagonal points).
         property point maxP1
         property point maxP2
 
