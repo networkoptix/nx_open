@@ -268,7 +268,9 @@ protected:
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         EXPECT_TRUE(socket->setRendezvous(true));
         if (m_connectTimeout)
+        {
             EXPECT_TRUE(socket->setSendTimeout(m_connectTimeout->count()));
+        }
         EXPECT_TRUE(socket->setNonBlockingMode(true));
         EXPECT_TRUE(socket->bind(SocketAddress(HostAddress::localhost, 0)));
         return socket;
