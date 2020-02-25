@@ -113,6 +113,35 @@ Figure
             y: F.absY(maxRect.y, figure)
             width: F.absX(maxRect.width, figure)
             height: F.absY(maxRect.height, figure)
+
+            Text
+            {
+                text: qsTr("MAX")
+                color: maxBoxColor
+                font.bold: true
+
+                x: position.x
+                y: position.y
+
+                readonly property point position:
+                {
+                    if (maxBox.width >= width)
+                    {
+                        if (maxDraggable.y + maxBox.y >= height + 8)
+                            return Qt.point(0, -height - 8)
+
+                        if (maxBox.width >= width + 16 && maxBox.height >= height + 16)
+                            return Qt.point(8, 8)
+
+                        if (figure.height - maxDraggable.y - maxBox.y - maxBox.height >= height + 8)
+                            return Qt.point(0, maxBox.height + 8)
+                    }
+
+                    return maxDraggable.x + maxBox.x >= width + 8
+                        ? Qt.point(-width - 8, 0)
+                        : Qt.point(maxBox.width + 8, 0)
+                }
+            }
         }
 
         PointGrip
@@ -331,6 +360,35 @@ Figure
             y: F.absY(minRect.y, figure)
             width: F.absX(minRect.width, figure)
             height: F.absY(minRect.height, figure)
+
+            Text
+            {
+                text: qsTr("MIN")
+                color: minBoxColor
+                font.bold: true
+
+                x: position.x
+                y: position.y
+
+                readonly property point position:
+                {
+                    if (minBox.width >= width)
+                    {
+                        if (figure.height - minDraggable.y - minBox.y - minBox.height >= height + 8)
+                            return Qt.point(minBox.width - width, minBox.height + 8)
+
+                        if (minBox.width >= width + 16 && minBox.height >= height + 16)
+                            return Qt.point(minBox.width - width - 8, minBox.height - height - 8)
+
+                        if (minDraggable.y + minBox.y >= height + 8)
+                            return Qt.point(minBox.width - width - 8, -height - 8)
+                    }
+
+                    return figure.width - minDraggable.x - minBox.x - minBox.width >= width + 8
+                        ? Qt.point(minBox.width + 8, minBox.height - height)
+                        : Qt.point(-width - 8, minBox.height - height)
+                }
+            }
         }
 
         PointGrip
