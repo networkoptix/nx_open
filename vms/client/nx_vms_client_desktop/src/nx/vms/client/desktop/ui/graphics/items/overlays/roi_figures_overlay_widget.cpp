@@ -452,6 +452,7 @@ RoiFiguresOverlayWidget::RoiFiguresOverlayWidget(
         auto initializeKeys =
             [this]()
             {
+                d->figureKeysByEngineId.clear();
                 for (const QnUuid& engineId: d->settingsListener->engineIds())
                     d->updateFigureKeys(engineId, d->settingsListener->data(engineId));
             };
