@@ -382,7 +382,7 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
     {
         auto usersButton = new QnSelectUsersDialogButton(parent);
         usersButton->setSubjectValidationPolicy(new QnCloudUsersValidationPolicy(commonModule()));
-        // TODO: #spanasenko Set user filter.
+        usersButton->setDialogOptions(SubjectSelectionDialog::CustomizableOptions::cloudUsers());
         editorButton = usersButton;
     }
     else if (actionType == ActionType::playSoundAction ||

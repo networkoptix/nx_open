@@ -48,14 +48,7 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
 
     setValidationPolicy(new QnCloudUsersValidationPolicy(commonModule()));
 
-    nx::vms::client::desktop::ui::SubjectSelectionDialog::CustomizableOptions options;
-    options.userListHeader = tr("Cloud users");
-    options.userFilter =
-        [](const QnUserResource& user) -> bool
-        {
-            return user.isCloud();
-        };
-    setDialogOptions(options);
+    setDialogOptions(ui::SubjectSelectionDialog::CustomizableOptions::cloudUsers());
 }
 
 PushNotificationBusinessActionWidget::~PushNotificationBusinessActionWidget()

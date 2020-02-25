@@ -34,6 +34,11 @@ void QnSelectUsersDialogButton::setSubjectValidationPolicy(QnSubjectValidationPo
     m_subjectValidation.reset(policy);
 }
 
+void QnSelectUsersDialogButton::setDialogOptions(const CustomizableOptions& options)
+{
+    m_options.emplace(options);
+}
+
 void QnSelectUsersDialogButton::handleButtonClicked()
 {
     // Dialog will be destroyed by delegate editor.
@@ -74,6 +79,8 @@ void QnSelectUsersDialogButton::handleButtonClicked()
                     ? m_subjectValidation->userValidity(user)
                     : true;
             });
+        if (m_options)
+            dialog->setOptions(m_options.value());
     }
 
     const auto updateAlert =

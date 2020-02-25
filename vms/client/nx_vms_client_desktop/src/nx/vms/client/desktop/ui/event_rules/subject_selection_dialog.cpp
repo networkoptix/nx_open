@@ -22,6 +22,19 @@
 namespace nx::vms::client::desktop {
 namespace ui {
 
+SubjectSelectionDialog::CustomizableOptions
+    SubjectSelectionDialog::CustomizableOptions::cloudUsers()
+{
+    CustomizableOptions options;
+    options.userListHeader = tr("Cloud users");
+    options.userFilter =
+        [](const QnUserResource& user) -> bool
+        {
+            return user.isCloud();
+        };
+    return options;
+}
+
 using namespace subject_selection_dialog_private;
 
 SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags windowFlags):
