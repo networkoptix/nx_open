@@ -376,12 +376,7 @@ qreal RoiFiguresOverlayWidget::Private::realLineWidth(QWidget* widget) const
 void RoiFiguresOverlayWidget::Private::updateFigureKeys(
     const QnUuid& engineId, const DeviceAgentData& data)
 {
-    if (!settingsListener)
-        return;
-
     figureKeysByEngineId.insert(engineId, findFigureKeys(data.model));
-
-    updateFigures();
 }
 
 void RoiFiguresOverlayWidget::Private::updateFigures()
@@ -446,8 +441,12 @@ RoiFiguresOverlayWidget::RoiFiguresOverlayWidget(
             AnalyticsSettingsMultiListener::ListenPolicy::enabledEngines,
             this);
 
-        connect(d->settingsListener, &AnalyticsSettingsMultiListener::dataChanged, d.get(),
-            &Private::updateFigureKeys);
+        connect(d->settingsListener, &AnalyticsSettingsMultiListener::dataChanged, this,
+            [this](const QnUuid& engineId, const DeviceAgentData& data)
+            {
+                d->updateFigureKeys(engineId, data);
+                d->updateFigures();
+            });
 
         auto initializeKeys =
             [this]()
@@ -455,6 +454,7 @@ RoiFiguresOverlayWidget::RoiFiguresOverlayWidget(
                 d->figureKeysByEngineId.clear();
                 for (const QnUuid& engineId: d->settingsListener->engineIds())
                     d->updateFigureKeys(engineId, d->settingsListener->data(engineId));
+                d->updateFigures();
             };
         connect(
             d->settingsListener, &AnalyticsSettingsMultiListener::enginesChanged,
