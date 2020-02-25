@@ -923,14 +923,22 @@ struct PushPayload
 };
 #define PushPayload_Fields (url)(imageUrl)
 
+struct PushOptions
+{
+    // Allow editing on iOS.
+    int content_available = 1;
+    int mutable_content = 1;
+};
+#define PushOptions_Fields (content_available)(mutable_content)
+
 struct PushNotification
 {
     QString title;
     QString body;
     PushPayload payload;
-    // TODO: options?
+    PushOptions options;
 };
-#define PushNotification_Fields (title)(body)(payload)
+#define PushNotification_Fields (title)(body)(payload)(options)
 
 struct PushRequest
 {
@@ -941,7 +949,7 @@ struct PushRequest
 #define PushRequest_Fields (systemId)(targets)(notification)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (PushPayload)(PushNotification)(PushRequest), (json), _Fields);
+    (PushPayload)(PushOptions)(PushNotification)(PushRequest), (json), _Fields);
 
 bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActionPtr& action)
 {
