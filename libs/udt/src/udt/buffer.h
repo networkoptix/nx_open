@@ -119,7 +119,7 @@ private:
     void increase();
 
 private:
-    std::mutex m_BufLock;           // used to synchronize buffer operation
+    mutable std::mutex m_mutex;           // used to synchronize buffer operation
 
     struct Block
     {
@@ -251,9 +251,15 @@ public:
     int getRcvMsgNum();
 
 private:
-    bool scanMsg(int& start, int& end, bool& passack);
+    int getRcvDataSize(const std::lock_guard<std::mutex>&) const;
+
+    bool scanMsg(
+        const std::lock_guard<std::mutex>& lock,
+        int& start, int& end, bool& passack);
 
 private:
+    mutable std::mutex m_mutex;           // used to synchronize buffer operation
+
     CUnit** m_pUnit;                     // pointer to the protocol buffer
     int m_iSize;                         // size of the protocol buffer
     CUnitQueue* m_pUnitQueue;        // the shared unit queue
