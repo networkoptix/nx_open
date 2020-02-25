@@ -399,6 +399,8 @@ void TextToWaveServer::waitForStarted()
 void TextToWaveServer::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
+
+    // TODO: Instead of pushing an empty marker, consider calling setTerminated(true).
     m_textQueue.push(QSharedPointer<SynthesizeSpeechTask>(new SynthesizeSpeechTask()));
 }
 
