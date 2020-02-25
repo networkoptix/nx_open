@@ -38,12 +38,18 @@ void TranslationOverlay::addThreadContext(const Qt::HANDLE& context)
         // As result, it is impossible to call this method from any other thread.
         // Additionally, we copy translators list in the lambda closure to be sure
         // that the list is not modified or deleted during the call processing.
-        executeInThread(qApp->thread(),
+        auto func =
             [translators = m_translators]()
             {
                 for (auto& translator: translators)
                     qApp->installTranslator(translator.get());
-            });
+            };
+
+        if (QThread::currentThread() == qApp->thread())
+            func();
+        else
+            QMetaObject::invokeMethod(qApp, func, Qt::BlockingQueuedConnection);
+
         m_installed = true;
     }
 
@@ -72,12 +78,18 @@ void TranslationOverlay::uninstallIfUnused()
         // As result, it is impossible to call this method from any other thread.
         // Additionally, we copy translators list in the lambda closure to be sure
         // that the list is not modified or deleted during the call processing.
-        executeInThread(qApp->thread(),
+        auto func =
             [translators = m_translators]()
             {
                 for (auto& translator: translators)
                     qApp->removeTranslator(translator.get());
-            });
+            };
+
+        if (QThread::currentThread() == qApp->thread())
+            func();
+        else
+            QMetaObject::invokeMethod(qApp, func, Qt::BlockingQueuedConnection);
+
         m_installed = false;
     }
 }
