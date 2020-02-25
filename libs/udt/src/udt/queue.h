@@ -478,7 +478,6 @@ private:
     void storePkt(int32_t id, std::unique_ptr<CPacket> pkt);
 
 private:
-    std::mutex m_LSLock;
     // pointer to the (unique, if any) listening UDT entity
     std::weak_ptr<ServerSideConnectionAcceptor> m_listener;
     // The list of sockets in rendezvous mode
@@ -486,12 +485,11 @@ private:
 
     // newly added entries, to be inserted
     std::vector<std::weak_ptr<CUDT>> m_vNewEntry;
-    std::mutex m_IDLock;
+    std::mutex m_mutex;
+    std::condition_variable m_cond;
 
     // temporary buffer for rendezvous connection request
     std::map<int32_t, std::queue<std::unique_ptr<CPacket>>> m_packets;
-    std::mutex m_PassLock;
-    std::condition_variable m_PassCond;
 
 private:
     CRcvQueue(const CRcvQueue&);

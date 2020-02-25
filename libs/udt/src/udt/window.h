@@ -49,6 +49,9 @@ Yunhong Gu, last updated 01/22/2011
 #include "udt.h"
 
 
+/**
+ * NOTE: Not thread-safe.
+ */
 class CACKWindow
 {
 public:
@@ -91,6 +94,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * NOTE: Not thread-safe.
+ */
 class CPktTimeWindow
 {
 public:

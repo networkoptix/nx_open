@@ -737,10 +737,10 @@ std::shared_ptr<CUDT> CRendezvousQueue::getByAddr(
 
 void CRendezvousQueue::updateConnStatus()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     if (m_rendezvousSockets.empty())
         return;
-
-    std::lock_guard<std::mutex> lock(m_mutex);
 
     for (auto i = m_rendezvousSockets.begin(); i != m_rendezvousSockets.end(); ++i)
     {
@@ -794,7 +794,7 @@ CRcvQueue::CRcvQueue(
     m_bClosing(false),
     m_pRendezvousQueue(std::make_unique<CRendezvousQueue>())
 {
-    m_iPayloadSize = payload;
+    assert(m_iPayloadSize > 0);
 
     m_UnitQueue.init(size, payload);
 }
@@ -837,30 +837,28 @@ void CRcvQueue::worker()
 #endif
 
         // check waiting list, if new socket, insert it to the list
-        while (!m_vNewEntry.empty())
+        while (std::shared_ptr<CUDT> ne = takeNewEntry())
         {
-            std::shared_ptr<CUDT> ne = takeNewEntry();
-            if (ne)
-            {
-                m_pRcvUList->insert(ne);
-                m_socketByIdDict.insert(ne->socketId(), ne);
-            }
+            m_pRcvUList->insert(ne);
+            m_socketByIdDict.insert(ne->socketId(), ne);
         }
 
         // find next available slot for incoming packet
         CUnit* unit = m_UnitQueue.getNextAvailUnit();
         if (!unit)
         {
+            // TODO: #ak Actual read may happen much later, so buffer size should be checked
+            // after receiving packet.
+
             // no space, skip this packet
             CPacket temp;
-            temp.setPayload(Buffer(m_iPayloadSize));
-            temp.setLength(m_iPayloadSize);
+            temp.payload().resize(m_iPayloadSize);
             m_channel->recvfrom(addr, temp);
             timerCheck();
             continue;
         }
 
-        unit->packet().setLength(m_iPayloadSize);
+        unit->packet().payload().resize(m_iPayloadSize);
 
         // Reading next incoming packet, recvfrom returns -1 if nothing has been received.
         if (!m_channel->recvfrom(addr, unit->packet()).ok())
@@ -970,13 +968,13 @@ int CRcvQueue::recvfrom(
     CPacket& packet,
     std::chrono::microseconds timeout)
 {
-    std::unique_lock<std::mutex> lock(m_PassLock);
+    std::unique_lock<std::mutex> lock(m_mutex);
 
     auto i = m_packets.find(id);
 
     if (i == m_packets.end())
     {
-        m_PassCond.wait_for(lock, timeout);
+        m_cond.wait_for(lock, timeout);
 
         i = m_packets.find(id);
         if (i == m_packets.end())
@@ -1010,7 +1008,7 @@ int CRcvQueue::recvfrom(
 
 bool CRcvQueue::setListener(std::weak_ptr<ServerSideConnectionAcceptor> listener)
 {
-    std::lock_guard<std::mutex> lock(m_LSLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     if (m_listener.lock())
         return false;
@@ -1032,14 +1030,14 @@ void CRcvQueue::removeConnector(const UDTSOCKET& id)
 {
     m_pRendezvousQueue->remove(id);
 
-    std::lock_guard<std::mutex> bufferlock(m_PassLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     m_packets.erase(id);
 }
 
 void CRcvQueue::addNewEntry(const std::weak_ptr<CUDT>& u)
 {
-    std::lock_guard<std::mutex> lock(m_IDLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_vNewEntry.push_back(u);
 }
 
@@ -1047,7 +1045,7 @@ std::shared_ptr<CUDT> CRcvQueue::takeNewEntry()
 {
     std::shared_ptr<CUDT> u;
 
-    std::lock_guard<std::mutex> lock(m_IDLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     if (m_vNewEntry.empty())
         return nullptr;
@@ -1060,7 +1058,7 @@ std::shared_ptr<CUDT> CRcvQueue::takeNewEntry()
 
 void CRcvQueue::storePkt(int32_t id, std::unique_ptr<CPacket> pkt)
 {
-    std::lock_guard<std::mutex> bufferlock(m_PassLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     auto i = m_packets.find(id);
 
@@ -1068,7 +1066,7 @@ void CRcvQueue::storePkt(int32_t id, std::unique_ptr<CPacket> pkt)
     {
         m_packets[id].push(std::move(pkt));
 
-        m_PassCond.notify_all();
+        m_cond.notify_all();
     }
     else
     {

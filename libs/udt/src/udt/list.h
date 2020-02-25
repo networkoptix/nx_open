@@ -46,7 +46,9 @@ Yunhong Gu, last updated 01/22/2011
 #include "udt.h"
 #include "common.h"
 
-
+/**
+ * NOTE: Thread-safe.
+ */
 class CSndLossList
 {
 public:
@@ -91,24 +93,27 @@ public:
     int32_t getLostSeq();
 
 private:
-    int32_t* m_piData1;                  // sequence number starts
-    int32_t* m_piData2;                  // seqnence number ends
-    int* m_piNext;                       // next node in the list
+    int32_t* m_piData1 = nullptr;                  // sequence number starts
+    int32_t* m_piData2 = nullptr;                  // seqnence number ends
+    int* m_piNext = nullptr;                       // next node in the list
 
-    int m_iHead;                         // first node
-    int m_iLength;                       // loss length
-    int m_iSize;                         // size of the static array
-    int m_iLastInsertPos;                // position of last insert node
+    int m_iHead = -1;                         // first node
+    int m_iLength = 0;                       // loss length
+    int m_iSize = 0;                         // size of the static array
+    int m_iLastInsertPos = -1;                // position of last insert node
 
-    std::mutex m_ListLock;
+    std::mutex m_mutex;
 
 private:
     CSndLossList(const CSndLossList&);
     CSndLossList& operator=(const CSndLossList&);
 };
 
-////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
 
+/**
+ * NOTE: Thread-safe.
+ */
 class CRcvLossList
 {
 public:
@@ -119,7 +124,7 @@ public:
     //    Insert a series of loss seq. no. between "seqno1" and "seqno2" into the receiver's loss list.
     // Parameters:
     //    0) [in] seqno1: sequence number starts.
-    //    1) [in] seqno2: seqeunce number ends.
+    //    1) [in] seqno2: sequence number ends.
     // Returned value:
     //    None.
 
@@ -184,15 +189,17 @@ public:
     void getLossArray(int32_t* array, int& len, int limit);
 
 private:
-    int32_t* m_piData1;                  // sequence number starts
-    int32_t* m_piData2;                  // sequence number ends
-    int* m_piNext;                       // next node in the list
-    int* m_piPrior;                      // prior node in the list;
+    int32_t* m_piData1 = nullptr;                  // sequence number starts
+    int32_t* m_piData2 = nullptr;                  // sequence number ends
+    int* m_piNext = nullptr;                       // next node in the list
+    int* m_piPrior = nullptr;                      // prior node in the list;
 
-    int m_iHead;                         // first node in the list
-    int m_iTail;                         // last node in the list;
-    int m_iLength;                       // loss length
-    int m_iSize;                         // size of the static array
+    int m_iHead = -1;                         // first node in the list
+    int m_iTail = -1;                         // last node in the list;
+    int m_iLength = 0;                       // loss length
+    int m_iSize = 0;                         // size of the static array
+
+    mutable std::mutex m_mutex;
 
 private:
     CRcvLossList(const CRcvLossList&);
