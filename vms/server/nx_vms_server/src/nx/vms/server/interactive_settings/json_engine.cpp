@@ -12,7 +12,11 @@
 
 #include <nx/utils/log/log.h>
 
-#include "components/items.h"
+#include "components/value_item.h"
+#include "components/group.h"
+#include "components/section.h"
+#include "components/repeater.h"
+#include "components/factory.h"
 
 namespace nx::vms::server::interactive_settings {
 

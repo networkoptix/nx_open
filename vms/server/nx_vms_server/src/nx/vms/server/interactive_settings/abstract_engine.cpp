@@ -7,7 +7,9 @@
 
 #include <nx/utils/log/log_message.h>
 
-#include "components/items.h"
+#include "components/value_item.h"
+#include "components/group.h"
+#include "components/section.h"
 
 namespace nx::vms::server::interactive_settings {
 
