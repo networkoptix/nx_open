@@ -679,9 +679,9 @@ void IniConfig::reload()
 //-------------------------------------------------------------------------------------------------
 // Tweaks
 
-/*static*/ IniConfig::Tweaks::MutexHolder IniConfig::Tweaks::m_mutexHolder;
-/*static*/ int IniConfig::Tweaks::tweaksInstanceCount = 0;
-/*static*/ bool IniConfig::Tweaks::originalValueOfIsEnabled = 0;
+/*static*/ IniConfig::Tweaks::MutexHolder IniConfig::Tweaks::s_mutexHolder;
+/*static*/ int IniConfig::Tweaks::s_tweaksInstanceCount = 0;
+/*static*/ bool IniConfig::Tweaks::s_originalValueOfIsEnabled = false;
 
 } // namespace kit
 } // namespace nx
