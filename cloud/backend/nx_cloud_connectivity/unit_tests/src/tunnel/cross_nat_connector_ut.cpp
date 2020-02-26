@@ -49,7 +49,7 @@ protected:
     void whenEstablishConnection()
     {
         auto connectResult = doSimpleConnectTest(
-            std::chrono::milliseconds::zero(),
+            nx::network::kNoTimeout,
             nx::hpm::MediaServerEmulator::ActionToTake::proceedWithConnection,
             hpm::api::MediatorAddress{mediator().httpUrl(), mediator().stunUdpEndpoint()});
         m_tunnelConnection = std::move(connectResult.connection);

@@ -77,7 +77,7 @@ public:
     /**
      * If packet does not contain connection request, non-zero is returned.
      */
-    int processConnectionRequest(const detail::SocketAddress& addr, CPacket& packet);
+    int processConnectionRequest(const detail::SocketAddress& addr, const CPacket& packet);
 
     void addEPoll(const int eid);
     void removeEPoll(const int eid);
@@ -575,6 +575,9 @@ private: // for UDP multiplexer
 
 private: // for epoll
     std::set<int> m_sPollID;            // set of epoll ID to trigger
+
+private:
+    void initializeConnectedSocket(const detail::SocketAddress& addr);
 };
 
 #endif

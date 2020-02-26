@@ -91,6 +91,10 @@ public:
         Q* m_q = nullptr;
     };
 
+    /**
+     * @param maxSize Is not used by the implementation of this class, but rather intended to be
+     *     checked by pushers via maxSize().
+     */
     QnSafeQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
         : m_headIndex(0),
         m_bufferLen(0),
@@ -128,9 +132,6 @@ public:
 
         if ((uint)m_bufferLen == m_buffer.size())
             reallocateBufferUnsafe(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
-
-        // we can have 2 threads independetlly put data at the same queue; so we need to put data any way. client is responsible for max size of the quue
-        //if ( m_queue.size()>=m_maxSize )    return false; <- wrong aproach
 
         int index = (m_headIndex + m_bufferLen) % m_buffer.size();
         m_buffer[index] = std::forward<ValueRef>(val);

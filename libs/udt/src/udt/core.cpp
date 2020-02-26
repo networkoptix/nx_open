@@ -611,15 +611,18 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
     m_ullSndLastAck2Time = CTimer::getTime();
 
     // Inform the server my configurations.
-    CPacket request;
-    request.pack(ControlPacketType::Handshake, NULL, m_iPayloadSize);
-    // ID = 0, connection request
-    request.m_iID = 0;
+    {
+        CPacket request;
+        request.pack(ControlPacketType::Handshake, NULL, m_iPayloadSize);
+        // ID = 0, connection request
+        request.m_iID = 0;
 
-    int hs_size = m_iPayloadSize;
-    m_ConnReq.serialize(request.payload().data(), hs_size);
-    request.setLength(hs_size);
-    sndQueue().sendto(serv_addr, request);
+        int hs_size = m_iPayloadSize;
+        m_ConnReq.serialize(request.payload().data(), hs_size);
+        request.setLength(hs_size);
+        sndQueue().sendto(serv_addr, std::move(request));
+    }
+
     m_llLastReqTime = CTimer::getTime();
 
     setConnecting(true);
@@ -640,11 +643,17 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
         // avoid sending too many requests, at most 1 request per 250ms
         if (CTimer::getTime() - m_llLastReqTime > kSyncRepeatMinPeriod)
         {
+            CPacket request;
+            request.pack(ControlPacketType::Handshake, NULL, m_iPayloadSize);
+            // ID = 0, connection request
+            request.m_iID = 0;
+
+            int hs_size = m_iPayloadSize;
             m_ConnReq.serialize(request.payload().data(), hs_size);
             request.setLength(hs_size);
             if (m_bRendezvous)
                 request.m_iID = m_ConnRes.m_iID;
-            sndQueue().sendto(serv_addr, request);
+            sndQueue().sendto(serv_addr, std::move(request));
             m_llLastReqTime = CTimer::getTime();
         }
 
@@ -760,8 +769,6 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
     // Re-configure according to the negotiated values.
     m_iMSS = m_ConnRes.m_iMSS;
     m_iFlowWindowSize = m_ConnRes.m_iFlightFlagSize;
-    m_iPktSize = m_iMSS - 28;
-    m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
     m_iPeerISN = m_ConnRes.m_iISN;
     m_iRcvLastAck = m_ConnRes.m_iISN;
     m_iRcvLastAckAck = m_ConnRes.m_iISN;
@@ -769,44 +776,9 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
     m_PeerID = m_ConnRes.m_iID;
     memcpy(m_piSelfIP, m_ConnRes.m_piPeerIP, 16);
 
-    // Prepare all data structures
-    m_pSndBuffer = std::make_unique<CSndBuffer>(32, m_iPayloadSize);
-    m_pRcvBuffer = std::make_unique<CRcvBuffer>(rcvQueue().unitQueue(), m_iRcvBufSize);
-    // after introducing lite ACK, the sndlosslist may not be cleared in time, so it requires twice space.
-    m_pSndLossList = std::make_unique<CSndLossList>(m_iFlowWindowSize * 2);
-    m_pRcvLossList = std::make_unique<CRcvLossList>(m_iFlightFlagSize);
-    m_pACKWindow = std::make_unique<CACKWindow>(1024);
-    m_pRcvTimeWindow = std::make_unique<CPktTimeWindow>(16, 64);
-    m_pSndTimeWindow = std::make_unique<CPktTimeWindow>();
-
-    CInfoBlock ib;
-    ib.m_iIPversion = m_iIPversion;
-    CInfoBlock::convert(m_pPeerAddr, ib.m_piIP);
-    if (m_pCache->lookup(&ib) >= 0)
-    {
-        m_iRTT = ib.m_iRTT;
-        m_iBandwidth = ib.m_iBandwidth;
-    }
-
-    m_pCC = m_pCCFactory->create();
-    m_pCC->m_UDT = m_SocketId;
-    m_pCC->setMSS(m_iMSS);
-    m_pCC->setMaxCWndSize(m_iFlowWindowSize);
-    m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
-    m_pCC->setRcvRate(m_iDeliveryRate);
-    m_pCC->setRTT(m_iRTT);
-    m_pCC->setBandwidth(m_iBandwidth);
-    m_pCC->init();
-
-    m_ullInterval = std::chrono::microseconds((uint64_t)(m_pCC->m_dPktSndPeriod * m_ullCPUFrequency));
-    m_dCongestionWindow = m_pCC->m_dCWndSize;
-
-    // And, I am connected too.
     setConnecting(false);
-    m_bConnected = true;
 
-    // register this socket for receiving data packets
-    rcvQueue().addNewEntry(shared_from_this());
+    initializeConnectedSocket(m_pPeerAddr);
 
     // acknowledge the management module.
     if (auto result = s_UDTUnited->connect_complete(m_SocketId); !result.ok())
@@ -858,46 +830,10 @@ Result<> CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
     memcpy(m_piSelfIP, hs->m_piPeerIP, 16);
     peer.copy(hs->m_piPeerIP);
 
-    m_iPktSize = m_iMSS - 28;
-    m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
-
-    m_pSndBuffer = std::make_unique<CSndBuffer>(32, m_iPayloadSize);
-    m_pRcvBuffer = std::make_unique<CRcvBuffer>(rcvQueue().unitQueue(), m_iRcvBufSize);
-    m_pSndLossList = std::make_unique<CSndLossList>(m_iFlowWindowSize * 2);
-    m_pRcvLossList = std::make_unique<CRcvLossList>(m_iFlightFlagSize);
-    m_pACKWindow = std::make_unique<CACKWindow>(1024);
-    m_pRcvTimeWindow = std::make_unique<CPktTimeWindow>(16, 64);
-    m_pSndTimeWindow = std::make_unique<CPktTimeWindow>();
-
-    CInfoBlock ib;
-    ib.m_iIPversion = peer.family();
-    CInfoBlock::convert(peer, ib.m_piIP);
-    if (m_pCache->lookup(&ib) >= 0)
-    {
-        m_iRTT = ib.m_iRTT;
-        m_iBandwidth = ib.m_iBandwidth;
-    }
-
-    m_pCC = m_pCCFactory->create();
-    m_pCC->m_UDT = m_SocketId;
-    m_pCC->setMSS(m_iMSS);
-    m_pCC->setMaxCWndSize(m_iFlowWindowSize);
-    m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
-    m_pCC->setRcvRate(m_iDeliveryRate);
-    m_pCC->setRTT(m_iRTT);
-    m_pCC->setBandwidth(m_iBandwidth);
-    m_pCC->init();
-
-    m_ullInterval = std::chrono::microseconds((uint64_t)(m_pCC->m_dPktSndPeriod * m_ullCPUFrequency));
-    m_dCongestionWindow = m_pCC->m_dCWndSize;
-
+    m_iIPversion = peer.family();
     m_pPeerAddr = peer;
 
-    // And of course, it is connected.
-    m_bConnected = true;
-
-    // register this socket for receiving data packets
-    rcvQueue().addNewEntry(shared_from_this());
+    initializeConnectedSocket(peer);
 
     //send the response to the peer, see listen() for more discussions about this
     CPacket response;
@@ -905,7 +841,7 @@ Result<> CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
     response.pack(ControlPacketType::Handshake, NULL, size);
     hs->serialize(response.payload().data(), size);
     response.m_iID = m_PeerID;
-    sndQueue().sendto(peer, response);
+    sndQueue().sendto(peer, std::move(response));
 
     return success();
 }
@@ -1598,12 +1534,12 @@ void CUDT::releaseSynch()
 
 void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int size)
 {
-    CPacket ctrlpkt;
-
     switch (pkttype)
     {
         case ControlPacketType::Acknowledgement: //010 - Acknowledgement
         {
+            CPacket ctrlpkt;
+
             int32_t ack;
 
             // If there is no loss, the ACK is the current largest sequence number plus 1;
@@ -1623,7 +1559,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 ctrlpkt.pack(pkttype, NULL, size);
                 memcpy(ctrlpkt.payload().data(), &ack, size);
                 ctrlpkt.m_iID = m_PeerID;
-                sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+                sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                 break;
             }
@@ -1689,7 +1625,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 }
 
                 ctrlpkt.m_iID = m_PeerID;
-                sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+                sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                 m_pACKWindow->store(m_iAckSeqNo, m_iRcvLastAck);
 
@@ -1701,14 +1637,19 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         }
 
         case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgement of Acknowledgement
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype, lparam);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::LossReport: //011 - Loss Report
         {
+            CPacket ctrlpkt;
+
             if (NULL != rparam)
             {
                 if (1 == size)
@@ -1725,7 +1666,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 }
 
                 ctrlpkt.m_iID = m_PeerID;
-                sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+                sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                 ++m_iSentNAK;
                 ++m_iSentNAKTotal;
@@ -1746,7 +1687,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                     ctrlpkt.payload().resize(losslen * sizeof(int32_t));
 
                     ctrlpkt.m_iID = m_PeerID;
-                    sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+                    sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
                     ++m_iSentNAK;
                     ++m_iSentNAKTotal;
@@ -1768,50 +1709,68 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         }
 
         case ControlPacketType::DelayWarning: //100 - Congestion Warning
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             CTimer::rdtsc(m_ullLastWarningTime);
 
             break;
+        }
 
         case ControlPacketType::KeepAlive: //001 - Keep-alive
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::Handshake: //000 - Handshake
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype, NULL, sizeof(CHandShake));
             ctrlpkt.payload().assign((const char*) rparam, sizeof(CHandShake));
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::Shutdown: //101 - Shutdown
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::MsgDropRequest: //111 - Msg drop request
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype, lparam, 8);
             ctrlpkt.payload().assign((const char*) rparam, 8);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::RemotePeerFailure: //1000 - acknowledge the peer side a special error
+        {
+            CPacket ctrlpkt;
             ctrlpkt.pack(pkttype, lparam);
             ctrlpkt.m_iID = m_PeerID;
-            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, std::move(ctrlpkt));
 
             break;
+        }
 
         case ControlPacketType::Reserved: //0x7FFF - Resevered for future use
             break;
@@ -2713,6 +2672,48 @@ UDTSTATUS CUDT::getsockstate(UDTSOCKET u)
     return s_UDTUnited->getStatus(u);
 }
 
+void CUDT::initializeConnectedSocket(const detail::SocketAddress& addr)
+{
+    m_iPktSize = m_iMSS - 28;
+    m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
+
+    m_pSndBuffer = std::make_unique<CSndBuffer>(32, m_iPayloadSize);
+    m_pRcvBuffer = std::make_unique<CRcvBuffer>(rcvQueue().unitQueue(), m_iRcvBufSize);
+    // after introducing lite ACK, the sndlosslist may not be cleared in time, so it requires twice space.
+    m_pSndLossList = std::make_unique<CSndLossList>(m_iFlowWindowSize * 2);
+    m_pRcvLossList = std::make_unique<CRcvLossList>(m_iFlightFlagSize);
+    m_pACKWindow = std::make_unique<CACKWindow>(1024);
+    m_pRcvTimeWindow = std::make_unique<CPktTimeWindow>(16, 64);
+    m_pSndTimeWindow = std::make_unique<CPktTimeWindow>();
+
+    CInfoBlock ib;
+    ib.m_iIPversion = m_iIPversion;
+    CInfoBlock::convert(addr, ib.m_piIP);
+    if (m_pCache->lookup(&ib) >= 0)
+    {
+        m_iRTT = ib.m_iRTT;
+        m_iBandwidth = ib.m_iBandwidth;
+    }
+
+    m_pCC = m_pCCFactory->create();
+    m_pCC->m_UDT = m_SocketId;
+    m_pCC->setMSS(m_iMSS);
+    m_pCC->setMaxCWndSize(m_iFlowWindowSize);
+    m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
+    m_pCC->setRcvRate(m_iDeliveryRate);
+    m_pCC->setRTT(m_iRTT);
+    m_pCC->setBandwidth(m_iBandwidth);
+    m_pCC->init();
+
+    m_ullInterval = std::chrono::microseconds((uint64_t)(m_pCC->m_dPktSndPeriod * m_ullCPUFrequency));
+    m_dCongestionWindow = m_pCC->m_dCWndSize;
+
+    m_bConnected = true;
+
+    // register this socket for receiving data packets
+    rcvQueue().addNewEntry(shared_from_this());
+}
+
 //-------------------------------------------------------------------------------------------------
 
 ServerSideConnectionAcceptor::ServerSideConnectionAcceptor(
@@ -2732,7 +2733,7 @@ ServerSideConnectionAcceptor::ServerSideConnectionAcceptor(
 
 int ServerSideConnectionAcceptor::processConnectionRequest(
     const detail::SocketAddress& addr,
-    CPacket& packet)
+    const CPacket& packet)
 {
     if (m_closing)
         return 1002;
@@ -2760,11 +2761,13 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
 
     if (1 == hs.m_iReqType)
     {
+        auto response = packet;
+
         hs.m_iCookie = *(int*)cookie;
-        packet.m_iID = hs.m_iID;
-        int size = packet.getLength();
-        hs.serialize(packet.payload().data(), size);
-        m_sendQueue->sendto(addr, packet);
+        response.m_iID = hs.m_iID;
+        int size = response.getLength();
+        hs.serialize(response.payload().data(), size);
+        m_sendQueue->sendto(addr, std::move(response));
         return 0;
     }
     else
@@ -2788,11 +2791,12 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
         if ((hs.m_iVersion != CUDT::m_iVersion) || (hs.m_iType != m_iSockType))
         {
             // mismatch, reject the request
+            auto response = packet;
             hs.m_iReqType = 1002;
             int size = CHandShake::m_iContentSize;
-            hs.serialize(packet.payload().data(), size);
-            packet.m_iID = id;
-            m_sendQueue->sendto(addr, packet);
+            hs.serialize(response.payload().data(), size);
+            response.m_iID = id;
+            m_sendQueue->sendto(addr, std::move(response));
         }
         else
         {
@@ -2804,10 +2808,11 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
             // new connection response should be sent in connect()
             if (!result.ok() || result.get() != 1)
             {
+                auto response = packet;
                 int size = CHandShake::m_iContentSize;
-                hs.serialize(packet.payload().data(), size);
-                packet.m_iID = id;
-                m_sendQueue->sendto(addr, packet);
+                hs.serialize(response.payload().data(), size);
+                response.m_iID = id;
+                m_sendQueue->sendto(addr, std::move(response));
             }
             else
             {

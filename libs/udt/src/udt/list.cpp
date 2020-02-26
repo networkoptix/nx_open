@@ -41,13 +41,7 @@ Yunhong Gu, last updated 01/22/2011
 #include "list.h"
 
 CSndLossList::CSndLossList(int size):
-    m_piData1(NULL),
-    m_piData2(NULL),
-    m_piNext(NULL),
-    m_iHead(-1),
-    m_iLength(0),
-    m_iSize(size),
-    m_iLastInsertPos(-1)
+    m_iSize(size)
 {
     m_piData1 = new int32_t[m_iSize];
     m_piData2 = new int32_t[m_iSize];
@@ -70,7 +64,7 @@ CSndLossList::~CSndLossList()
 
 int CSndLossList::insert(int32_t seqno1, int32_t seqno2)
 {
-    std::lock_guard<std::mutex> lock(m_ListLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     if (0 == m_iLength)
     {
@@ -201,7 +195,7 @@ int CSndLossList::insert(int32_t seqno1, int32_t seqno2)
             return 0;
     }
 
-    // coalesce with next node. E.g., [3, 7], ..., [6, 9] becomes [3, 9] 
+    // coalesce with next node. E.g., [3, 7], ..., [6, 9] becomes [3, 9]
     while ((-1 != m_piNext[loc]) && (-1 != m_piData2[loc]))
     {
         int i = m_piNext[loc];
@@ -242,7 +236,7 @@ int CSndLossList::insert(int32_t seqno1, int32_t seqno2)
 
 void CSndLossList::remove(int32_t seqno)
 {
-    std::lock_guard<std::mutex> lock(m_ListLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     if (0 == m_iLength)
         return;
@@ -354,17 +348,14 @@ void CSndLossList::remove(int32_t seqno)
 
 int CSndLossList::getLossLength()
 {
-    std::lock_guard<std::mutex> lock(m_ListLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     return m_iLength;
 }
 
 int32_t CSndLossList::getLostSeq()
 {
-    if (0 == m_iLength)
-        return -1;
-
-    std::lock_guard<std::mutex> lock(m_ListLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     if (0 == m_iLength)
         return -1;
@@ -403,16 +394,9 @@ int32_t CSndLossList::getLostSeq()
     return seqno;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
 
 CRcvLossList::CRcvLossList(int size):
-    m_piData1(NULL),
-    m_piData2(NULL),
-    m_piNext(NULL),
-    m_piPrior(NULL),
-    m_iHead(-1),
-    m_iTail(-1),
-    m_iLength(0),
     m_iSize(size)
 {
     m_piData1 = new int32_t[m_iSize];
@@ -438,6 +422,8 @@ CRcvLossList::~CRcvLossList()
 
 void CRcvLossList::insert(int32_t seqno1, int32_t seqno2)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     // Data to be inserted must be larger than all those in the list
     // guaranteed by the UDT receiver
 
@@ -486,6 +472,8 @@ void CRcvLossList::insert(int32_t seqno1, int32_t seqno2)
 
 bool CRcvLossList::remove(int32_t seqno)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     if (0 == m_iLength)
         return false;
 
@@ -634,6 +622,8 @@ bool CRcvLossList::remove(int32_t seqno1, int32_t seqno2)
 
 bool CRcvLossList::find(int32_t seqno1, int32_t seqno2) const
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     if (0 == m_iLength)
         return false;
 
@@ -654,11 +644,15 @@ bool CRcvLossList::find(int32_t seqno1, int32_t seqno2) const
 
 int CRcvLossList::getLossLength() const
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     return m_iLength;
 }
 
 int CRcvLossList::getFirstLostSeq() const
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     if (0 == m_iLength)
         return -1;
 
@@ -667,6 +661,8 @@ int CRcvLossList::getFirstLostSeq() const
 
 void CRcvLossList::getLossArray(int32_t* array, int& len, int limit)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     len = 0;
 
     int i = m_iHead;

@@ -165,15 +165,6 @@ protected:
     void setRTO(std::chrono::microseconds usRTO);
 
     // Functionality:
-    //    Send a user defined control packet.
-    // Parameters:
-    //    0) [in] pkt: user defined packet.
-    // Returned value:
-    //    None.
-
-    void sendCustomMsg(CPacket& pkt) const;
-
-    // Functionality:
     //    retrieve performance information.
     // Parameters:
     //    None.

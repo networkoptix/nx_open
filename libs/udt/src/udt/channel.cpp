@@ -219,7 +219,7 @@ detail::SocketAddress UdpChannel::getPeerAddr() const
     return socketAddress;
 }
 
-Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packet)
+Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket packet)
 {
     assert(m_iSocket != INVALID_SOCKET);
 

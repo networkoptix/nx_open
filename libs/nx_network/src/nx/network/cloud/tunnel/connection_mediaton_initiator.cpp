@@ -34,6 +34,12 @@ void ConnectionMediationInitiator::bindToAioThread(
         m_mediatorApiClient->bindToAioThread(aioThread);
 }
 
+void ConnectionMediationInitiator::setTimeout(
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    m_timeout = timeout;
+}
+
 void ConnectionMediationInitiator::start(
     const hpm::api::ConnectRequest& request,
     Handler handler)
@@ -85,6 +91,8 @@ void ConnectionMediationInitiator::initiateConnectOverTcp()
     m_mediatorApiClient = std::make_unique<nx::hpm::api::Client>(
         m_mediatorAddress.tcpUrl);
     m_mediatorApiClient->bindToAioThread(getAioThread());
+
+    m_mediatorApiClient->setRequestTimeout(m_timeout);
 
     m_mediatorApiClient->initiateConnection(
         m_request,
