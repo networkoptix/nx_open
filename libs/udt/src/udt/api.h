@@ -224,7 +224,7 @@ private:
     std::mutex m_IDLock;                         // used to synchronize ID generation
     UDTSOCKET m_SocketId = 0;                             // seed to generate a new unique socket ID
 
-    std::map<int64_t, std::set<UDTSOCKET> > m_PeerRec;// record sockets from peers to avoid repeated connection request, int64_t = (socker_id << 30) + isn
+    std::map<uint64_t, std::set<UDTSOCKET> > m_PeerRec;// record sockets from peers to avoid repeated connection request, int64_t = (socker_id << 30) + isn
 
 private:
     std::map<ThreadId, Error> m_mTLSRecord;
@@ -236,8 +236,18 @@ private:
 
     std::shared_ptr<CUDTSocket> locate(const UDTSOCKET u);
 
-    std::shared_ptr<CUDTSocket> locate(
+    void saveSocketByHandshakeInfo(
+        const std::unique_lock<std::mutex>& lock,
+        const CUDTSocket& sock);
+
+    std::shared_ptr<CUDTSocket> locateByHandshakeInfo(
         const detail::SocketAddress& peer, const UDTSOCKET id, int32_t isn);
+
+    void removeSocketByHandshakeInfo(
+        const std::unique_lock<std::mutex>& lock,
+        const CUDTSocket& sock);
+
+    uint64_t handshakeKey(UDTSOCKET peerId, int32_t isn) const;
 
     Result<> updateMux(
         CUDTSocket* s,
@@ -268,7 +278,9 @@ private:
     std::map<UDTSOCKET, std::shared_ptr<CUDTSocket>> m_ClosedSockets;   // temporarily store closed sockets
 
     void checkBrokenSockets();
+
     void removeSocket(
+        const std::unique_lock<std::mutex>& lock,
         const UDTSOCKET u,
         std::vector<std::shared_ptr<Multiplexer>>* const multiplexersToRemove);
 
