@@ -15,13 +15,13 @@ TranslationOverlayItem::~TranslationOverlayItem()
 
 void TranslationOverlayItem::addThreadContext(const Qt::HANDLE& context)
 {
-    QWriteLocker l(&m_lock);
+    NX_WRITE_LOCKER l(&m_lock);
     m_threads << context;
 }
 
 void TranslationOverlayItem::removeThreadContext(const Qt::HANDLE& context)
 {
-    QWriteLocker l(&m_lock);
+    NX_WRITE_LOCKER l(&m_lock);
     m_threads.removeAll(context);
 }
 
@@ -31,7 +31,7 @@ QString TranslationOverlayItem::translate(
         const char* disambiguation,
         int n) const
 {
-    QReadLocker l(&m_lock);
+    NX_READ_LOCKER l(&m_lock);
 
     return m_threads.contains(QThread::currentThreadId())
         ? QTranslator::translate(context, sourceText, disambiguation, n)

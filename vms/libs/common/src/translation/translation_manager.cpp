@@ -4,7 +4,7 @@
 #include <QtCore/QTranslator>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QThread>
- 
+
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
@@ -284,8 +284,7 @@ bool QnTranslationManager::setCurrentThreadTranslationLocale(const QString& loca
         {
             // Load the required translation.
             auto translation = loadTranslation(locale);
-            if (!NX_ASSERT(!translation.isEmpty(),
-                QString("Could not load translation locale '%1'").arg(locale)))
+            if (!NX_ASSERT(!translation.isEmpty(), "Could not load translation locale '%1'", locale))
             {
                 return false;
             }
@@ -313,9 +312,7 @@ bool QnTranslationManager::setCurrentThreadTranslationLocale(const QString& loca
 QString QnTranslationManager::getCurrentThreadTranslationLocale() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    Qt::HANDLE id = QThread::currentThreadId();
-
-    return m_threadLocales.value(id);
+    return m_threadLocales.value(QThread::currentThreadId());
 }
 
 void QnTranslationManager::uninstallUnusedOverlays()
