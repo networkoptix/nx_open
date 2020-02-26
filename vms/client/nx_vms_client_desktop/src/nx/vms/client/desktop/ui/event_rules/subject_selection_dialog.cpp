@@ -16,6 +16,9 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <ui/common/palette.h>
+
 #include <nx/vms/client/desktop/common/utils/item_view_utils.h>
 #include <nx/vms/client/desktop/common/models/natural_string_sort_proxy_model.h>
 
@@ -32,6 +35,7 @@ SubjectSelectionDialog::CustomizableOptions
         {
             return user.isCloud();
         };
+    options.alertColor = colorTheme()->color("brand_d5");
     return options;
 }
 
@@ -245,6 +249,8 @@ void SubjectSelectionDialog::setOptions(const CustomizableOptions& options)
     ui->showAllUsers->setVisible(options.showAllUsersSwitcher);
     ui->usersGroupBox->setVisible(true);
     ui->usersGroupBox->setTitle(options.userListHeader);
+
+    setPaletteColor(ui->alertBar, QPalette::Window, options.alertColor);
 
     m_userListDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 
