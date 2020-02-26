@@ -45,7 +45,7 @@ bool QuickSyncVideoDecoder::decode(
     if (!result)
         return false;
 
-    std::weak_ptr<void> decoderWeakPtr = m_impl;
+    std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> decoderWeakPtr = m_impl;
     outFrame->attachToVideoMemory(result, std::move(decoderWeakPtr));
     return true;
 }

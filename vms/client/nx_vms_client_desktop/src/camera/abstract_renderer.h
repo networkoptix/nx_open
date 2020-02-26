@@ -85,7 +85,7 @@ public:
      *
      * \param image                     New video frame.
      */
-    virtual void draw(const QSharedPointer<CLVideoDecoderOutput>& image) = 0;
+    virtual void draw(const QSharedPointer<CLVideoDecoderOutput>& image, const QSize& onScreenSize) = 0;
 
     /**
      * Inform drawer about video is temporary absent

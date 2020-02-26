@@ -9,7 +9,6 @@
 #include <nx/media/media_player.h>
 #include <utils/common/app_info.h>
 
-#include <nx/utils/log/log.h>
 #include "video_output.h"
 #include "video_item_surface.h"
 #include "videonode_rgb.h"

@@ -61,6 +61,7 @@ public:
         void setColorFormat(AVPixelFormat newFormat );
         int width() const;
         int height() const;
+        QSize displaySize() const { return m_onScreenSize; }
         //const QVector2D& texCoords() const;
         QRectF textureRect() const;
         /*!
@@ -111,6 +112,7 @@ public:
         QnGlRendererTexturePack* m_texturePack;
         void* m_vaglx_surface = nullptr;
         void* m_display = nullptr;
+        QSize m_onScreenSize;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
@@ -164,7 +166,8 @@ public:
     */
     void uploadDecodedPicture(
         const QSharedPointer<CLVideoDecoderOutput>& decodedPicture,
-        const QRectF displayedRect = QRectF(0.0, 0.0, 1.0, 1.0) );
+        const QRectF displayedRect = QRectF(0.0, 0.0, 1.0, 1.0),
+        const QSize& onScreenSize = QSize());
     bool isUsingFrame( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
     //!Returns latest uploaded picture. Used by GUI thread
     /*!

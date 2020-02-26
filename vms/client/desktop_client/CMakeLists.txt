@@ -4,7 +4,7 @@ nx_add_target(desktop_client EXECUTABLE SIGNED
     NO_MOC
     NO_PCH
     PRIVATE_LIBS
-        nx_vms_client_desktop)
+        nx_vms_client_desktop /usr/local/lib/libva-x11.so)
 
 if(LINUX)
     # Security requirement (see hardening-check).

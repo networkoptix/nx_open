@@ -17,7 +17,6 @@ mark_as_advanced(Qt5MultimediaQuick_LIBRARY)
 
 nx_add_target(nx_vms_client_core LIBRARY
     PUBLIC_LIBS
-        /usr/local/lib/libva-glx.so
         Qt5::Quick ${Qt5MultimediaQuick_LIBRARY}
         appserver2 nx_vms_utils cloud_db_client nx_media nx_network nx_utils nx_update
         )

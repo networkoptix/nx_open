@@ -77,6 +77,9 @@ private:
     friend class QnCamDisplay;
 
     void waitForFramesDisplayed();
+    QSize getMaxScreenSizeUnsafe() const;
+    QnAbstractVideoDecoder* createVideoDecoder(
+        QnCompressedVideoDataPtr data, bool mtDecoding) const;
     /**
       * Return last decoded frame
       */

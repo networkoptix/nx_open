@@ -29,7 +29,7 @@ extern "C"
 #include <nx/streaming/config.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 
-#include <va/va_glx.h>
+#include <nx/media/quick_sync/glx/va_glx.h>
 #include <nx/media/quick_sync/va_surface_info.h>
 
 namespace
@@ -782,7 +782,8 @@ void DecodedPictureToOpenGLUploader::pleaseStop()
 
 void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
     const QSharedPointer<CLVideoDecoderOutput>& decodedPicture,
-    const QRectF displayedRect )
+    const QRectF displayedRect,
+    const QSize& onScreenSize)
 {
     NX_VERBOSE(this,
         lm("Uploading decoded picture to gl textures. dts %1").arg(decodedPicture->pkt_dts));
@@ -888,6 +889,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
     emptyPictureBuf->m_flags = decodedPicture->flags;
     emptyPictureBuf->m_skippingForbidden = false;
     emptyPictureBuf->m_displayedRect = displayedRect;
+    emptyPictureBuf->m_onScreenSize = onScreenSize;
 
 
     //have go through upload thread, since opengl uploading does not scale good on Intel HD Graphics and
@@ -1231,7 +1233,6 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
     if (frame->memoryType() == MemoryType::VideoMemory)
     {
-        //NX_DEBUG(this, "draw start");
         auto surfaceInfo = frame->handle().value<VaSurfaceInfo>();
         auto decoder = frame->decoder().lock();
         if (!decoder)
@@ -1242,22 +1243,29 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
         QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
         VAStatus status;
-        if (texture->ensureInitialized(frame->width, frame->height, frame->width, 1, GL_RGBA, 1, -1)
+        QSize displaySize = emptyPictureBuf->displaySize();
+        if (displaySize.isEmpty())
+            displaySize = QSize(frame->width, frame->height);
+        displaySize.setWidth(qPower2Ceil((unsigned)displaySize.width(), 32));
+        displaySize.setHeight(qPower2Ceil((unsigned)displaySize.height(), 32));
+
+        displaySize.setWidth(std::min(displaySize.width(), frame->width));
+        displaySize.setHeight(std::min(displaySize.height(), frame->height));
+        if (texture->ensureInitialized(displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1)
             || emptyPictureBuf->m_display != surfaceInfo.display)
         {
-            //NX_DEBUG(this, "draw init");
             emptyPictureBuf->m_display = surfaceInfo.display;
             if (emptyPictureBuf->m_vaglx_surface)
                 vaDestroySurfaceGLX(emptyPictureBuf->m_display, emptyPictureBuf->m_vaglx_surface);
 
-            status = vaCreateSurfaceGLX(emptyPictureBuf->m_display, GL_TEXTURE_2D, texture->id(), &emptyPictureBuf->m_vaglx_surface);
+            status = vaCreateSurfaceGLX_nx(emptyPictureBuf->m_display, GL_TEXTURE_2D, texture->id(), frame->width, frame->height, &emptyPictureBuf->m_vaglx_surface);
             if (status != VA_STATUS_SUCCESS)
             {
                 NX_DEBUG(this, "vaCreateSurfaceGLX failed: %1", status);
                 return false;
             }
         }
-        status = vaCopySurfaceGLX(emptyPictureBuf->m_display, emptyPictureBuf->m_vaglx_surface, surfaceInfo.id, 0);
+        status = vaCopySurfaceGLX_nx(emptyPictureBuf->m_display, emptyPictureBuf->m_vaglx_surface, surfaceInfo.id, VA_SRC_COLOR_MASK);
         if (status != VA_STATUS_SUCCESS)
         {
             NX_DEBUG(this, "vaCopySurfaceGLX failed: %1", status);
@@ -1272,7 +1280,6 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         }
 
         d->glBindTexture(GL_TEXTURE_2D, texture->id());
-        //NX_DEBUG(this, "draw end");
         return true;
     }
 

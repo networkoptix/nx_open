@@ -258,7 +258,7 @@ void QnResourceWidgetRenderer::setEnabled(int channel, bool enabled)
         ctx.uploader->discardAllFramesPostedToDisplay();
 }
 
-void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image)
+void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image, const QSize& onScreenSize)
 {
     auto& ctx = m_renderingContexts[image->channel];
     if (!ctx.uploader)
@@ -270,7 +270,7 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
         if (!ctx.renderingEnabled)
             return;
 
-        ctx.uploader->uploadDecodedPicture(image, ctx.displayRect);
+        ctx.uploader->uploadDecodedPicture(image, ctx.displayRect, onScreenSize);
         ++ctx.framesSinceJump;
     }
 

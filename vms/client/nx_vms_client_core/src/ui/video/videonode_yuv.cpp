@@ -51,6 +51,7 @@ QList<QVideoFrame::PixelFormat> QSGVideoNodeFactory_YUV::supportedPixelFormats(
         formats << QVideoFrame::Format_YUV420P << QVideoFrame::Format_YV12
                 << QVideoFrame::Format_NV12 << QVideoFrame::Format_NV21;
     }
+
     return formats;
 }
 

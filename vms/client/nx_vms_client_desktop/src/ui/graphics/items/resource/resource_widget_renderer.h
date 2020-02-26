@@ -37,7 +37,7 @@ public:
      * Note renderer is not required to draw image immediately. It is allowed to add frame to some
      * internal render queue and draw when appropriate.
      */
-    virtual void draw(const QSharedPointer<CLVideoDecoderOutput>& image) override;
+    virtual void draw(const QSharedPointer<CLVideoDecoderOutput>& image, const QSize& onScreenSize) override;
 
     /** Ignore frames currently in render queue. */
     virtual void discardAllFramesPostedToDisplay(int channel) override;

@@ -42,9 +42,8 @@
 
 #include <QtX11Extras/QX11Info>
 
-#include <va/va_glx.h>
-
 #include <nx/media/quick_sync/va_surface_info.h>
+#include <nx/media/quick_sync/glx/va_glx.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -180,114 +179,120 @@ public:
         m_textureDirty = true;
     }
 
+    void renderVaSurface()
+    {
+        QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
+        auto surfaceInfo = m_frame.handle().value<VaSurfaceInfo>();
+        m_display = surfaceInfo.display;
+
+        if (m_textureSize != m_frame.size()) {
+            if (!m_textureSize.isEmpty())
+                functions->glDeleteTextures(1, &m_textureId);
+            functions->glGenTextures(1, &m_textureId);
+            m_textureSize = m_frame.size();
+
+            functions->glActiveTexture(GL_TEXTURE0);
+            functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
+            functions->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+                m_textureSize.width(), m_textureSize.height(), 0,
+                GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+            functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            if (m_vaglx_surface)
+                vaDestroySurfaceGLX(m_display, m_vaglx_surface);
+
+            const auto status = vaCreateSurfaceGLX_nx(m_display, GL_TEXTURE_2D, m_textureId, 0, 0, &m_vaglx_surface);
+            if (status != VA_STATUS_SUCCESS)
+                NX_WARNING(this, "vaCreateSurfaceGLX failed: %1", status);
+        }
+
+        auto status = vaCopySurfaceGLX_nx(m_display, m_vaglx_surface, surfaceInfo.id, 0);
+        if (status != VA_STATUS_SUCCESS)
+            NX_WARNING(this, "vaCopySurfaceGLX failed: %1", status);
+
+        m_textureDirty = false;
+        status = vaSyncSurface(m_display, surfaceInfo.id);
+        if (status != VA_STATUS_SUCCESS)
+            NX_WARNING(this, "vaSyncSurface failed: %1", status);
+
+        functions->glActiveTexture(GL_TEXTURE0);
+        functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
+    }
+
+    void renderSysMemory()
+    {
+        QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
+        if (m_frame.map(QAbstractVideoBuffer::ReadOnly)) {
+            QSize textureSize = m_frame.size();
+
+            int stride = m_frame.bytesPerLine();
+            switch (m_frame.pixelFormat()) {
+            case QVideoFrame::Format_RGB565:
+                stride /= 2;
+                break;
+            default:
+                stride /= 4;
+            }
+
+            m_width = qreal(m_frame.width()) / stride;
+            textureSize.setWidth(stride);
+
+            if (m_textureSize != textureSize) {
+                if (!m_textureSize.isEmpty())
+                    functions->glDeleteTextures(1, &m_textureId);
+                functions->glGenTextures(1, &m_textureId);
+                m_textureSize = textureSize;
+            }
+
+            GLint dataType = GL_UNSIGNED_BYTE;
+            GLint dataFormat = GL_RGBA;
+
+            if (m_frame.pixelFormat() == QVideoFrame::Format_RGB565) {
+                dataType = GL_UNSIGNED_SHORT_5_6_5;
+                dataFormat = GL_RGB;
+            }
+
+            GLint previousAlignment;
+            functions->glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
+            functions->glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+            functions->glActiveTexture(GL_TEXTURE0);
+            functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
+            functions->glTexImage2D(GL_TEXTURE_2D, 0, dataFormat,
+                                    m_textureSize.width(), m_textureSize.height(),
+                                    0, dataFormat, dataType, m_frame.bits());
+
+            functions->glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
+
+            functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            m_frame.unmap();
+        }
+        m_frame = QVideoFrame();
+    }
+
     void bind()
     {
         QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
 
         QMutexLocker lock(&m_frameMutex);
-        if (!m_textureDirty && m_frame.handleType() == kHandleTypeVaSurface)
+        if (!m_frame.isValid() || (!m_textureDirty && m_frame.handleType() == kHandleTypeVaSurface))
         {
             functions->glActiveTexture(GL_TEXTURE0);
             functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
             return;
         }
 
-        if (m_frame.isValid() && m_frame.handleType() == kHandleTypeVaSurface) {
-
-            auto surfaceInfo = m_frame.handle().value<VaSurfaceInfo>();
-            m_display = surfaceInfo.display;
-
-            if (m_textureSize != m_frame.size()) {
-                if (!m_textureSize.isEmpty())
-                    functions->glDeleteTextures(1, &m_textureId);
-                functions->glGenTextures(1, &m_textureId);
-                m_textureSize = m_frame.size();
-
-                functions->glActiveTexture(GL_TEXTURE0);
-                functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
-                functions->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-                    m_textureSize.width(), m_textureSize.height(), 0,
-                    GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-
-                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-                if (m_vaglx_surface)
-                    vaDestroySurfaceGLX(m_display, m_vaglx_surface);
-
-                const auto status = vaCreateSurfaceGLX(m_display, GL_TEXTURE_2D, m_textureId, &m_vaglx_surface);
-                if (status != VA_STATUS_SUCCESS)
-                    qWarning() << "failed vaCreateSurfaceGLX" << status;
-            }
-
-            auto status = vaCopySurfaceGLX(m_display, m_vaglx_surface, surfaceInfo.id, 0);
-            if (status != VA_STATUS_SUCCESS)
-                qWarning() << "failed vaCopySurfaceGLX" << status;
-
-            m_textureDirty = false;
-            status = vaSyncSurface(m_display, surfaceInfo.id);
-            if (status != VA_STATUS_SUCCESS)
-                qWarning() << "failed vaSyncSurface" << status;
-
-            functions->glActiveTexture(GL_TEXTURE0);
-            functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
-        } else if (m_frame.isValid()) {
-            if (m_frame.map(QAbstractVideoBuffer::ReadOnly)) {
-                QSize textureSize = m_frame.size();
-
-                int stride = m_frame.bytesPerLine();
-                switch (m_frame.pixelFormat()) {
-                case QVideoFrame::Format_RGB565:
-                    stride /= 2;
-                    break;
-                default:
-                    stride /= 4;
-                }
-
-                m_width = qreal(m_frame.width()) / stride;
-                textureSize.setWidth(stride);
-
-                if (m_textureSize != textureSize) {
-                    if (!m_textureSize.isEmpty())
-                        functions->glDeleteTextures(1, &m_textureId);
-                    functions->glGenTextures(1, &m_textureId);
-                    m_textureSize = textureSize;
-                }
-
-                GLint dataType = GL_UNSIGNED_BYTE;
-                GLint dataFormat = GL_RGBA;
-
-                if (m_frame.pixelFormat() == QVideoFrame::Format_RGB565) {
-                    dataType = GL_UNSIGNED_SHORT_5_6_5;
-                    dataFormat = GL_RGB;
-                }
-
-                GLint previousAlignment;
-                functions->glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
-                functions->glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-                functions->glActiveTexture(GL_TEXTURE0);
-                functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
-                functions->glTexImage2D(GL_TEXTURE_2D, 0, dataFormat,
-                                        m_textureSize.width(), m_textureSize.height(),
-                                        0, dataFormat, dataType, m_frame.bits());
-
-                functions->glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
-
-                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-                m_frame.unmap();
-            }
-            m_frame = QVideoFrame();
-        } else {
-            functions->glActiveTexture(GL_TEXTURE0);
-            functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
-        }
+        if (m_frame.handleType() == kHandleTypeVaSurface)
+            renderVaSurface();
+        else
+            renderSysMemory();
     }
 
     QVideoFrame m_frame;

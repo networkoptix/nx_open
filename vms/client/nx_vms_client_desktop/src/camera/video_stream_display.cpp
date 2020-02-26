@@ -100,7 +100,7 @@ int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
         QnMutexLocker lock( &m_mtx );
         renderer->setPaused(m_isPaused);
         if (m_lastDisplayedFrame)
-            renderer->draw(m_lastDisplayedFrame);
+            renderer->draw(m_lastDisplayedFrame, getMaxScreenSizeUnsafe());
     }
 
     QnMutexLocker lock( &m_renderListMtx );
@@ -353,7 +353,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
         if (!downscaleFrame(tmpFrame, outFrame, scaleFactor, pixFmt))
             continue;
         foreach(QnAbstractRenderer* render, m_renderList)
-            render->draw(outFrame);
+            render->draw(outFrame, getMaxScreenSizeUnsafe());
         foreach(QnAbstractRenderer* render, m_renderList)
             render->finishPostedFramesRender(channelNum);
     }
@@ -415,6 +415,24 @@ MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding
     if (useMtDecoding)
         return MultiThreadDecodePolicy::enabled;
     return MultiThreadDecodePolicy::autoDetect;
+}
+
+QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
+    QnCompressedVideoDataPtr data, bool mtDecoding) const
+{
+    QnAbstractVideoDecoder* decoder;
+    if (!m_reverseMode && QuickSyncVideoDecoder::isSupported())
+    {
+        decoder = new QuickSyncVideoDecoder();
+    }
+    else
+    {
+        DecoderConfig config;
+        config.mtDecodePolicy = toEncoderPolicy(mtDecoding);
+        decoder = new QnFfmpegVideoDecoder(config, /*metrics*/ nullptr, data);
+    }
+    decoder->setLightCpuMode(m_decodeMode);
+    return decoder;
 }
 
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor force_factor)
@@ -494,27 +512,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         m_decoderData.decoder.reset();
         m_prevReverseMode = reverseMode;
         m_needResetDecoder = false;
-        //data->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice;
     }
 
 
     auto dec = m_decoderData.decoder.get();
     if (!dec || m_decoderData.compressionType != data->compressionType)
     {
-        DecoderConfig config;
-        config.mtDecodePolicy = toEncoderPolicy(/*mtDecoding*/ enableFrameQueue);
-
-        if (!m_reverseMode && QuickSyncVideoDecoder::isSupported())
-            dec = new QuickSyncVideoDecoder();
-        else
-            dec = new QnFfmpegVideoDecoder(config, /*metrics*/ nullptr, data);
-        if (dec == nullptr)
-        {
-            NX_VERBOSE(this, lit("Can't find create decoder for compression type %1").arg(data->compressionType));
-            return Status_Displayed;
-        }
-
-        dec->setLightCpuMode(m_decodeMode);
+        dec = createVideoDecoder(data, enableFrameQueue);
         m_decoderData.decoder.reset(dec);
         m_decoderData.compressionType = data->compressionType;
     }
@@ -731,7 +735,6 @@ bool QnVideoStreamDisplay::downscaleFrame(const CLVideoDecoderOutputPtr& src, CL
     dst->metadata = src->metadata;
     dst->flags = src->flags;
     dst->channel = src->channel;
-
     return true;
 }
 
@@ -794,7 +797,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(
 
     qnClientModule->videoCache()->add(m_resource->toResource()->getId(), outFrame);
 
-    if (enableFrameQueue /*&& outFrame->memoryType() != MemoryType::VideoMemory*/)
+    if (enableFrameQueue)
     {
         NX_ASSERT(!outFrame->isExternalData());
 
@@ -824,7 +827,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(
                 }
             }
             for (const auto render: m_renderList)
-                render->draw(outFrame); //< Send the new one.
+                render->draw(outFrame, getMaxScreenSizeUnsafe()); //< Send the new one.
         }
         // Allow frame queue for selected video.
         m_frameQueueIndex = (m_frameQueueIndex + 1) % kMaxFrameQueueSize;
@@ -833,7 +836,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(
     else
     {
         for (const auto render: m_renderList)
-            render->draw(outFrame);
+            render->draw(outFrame, getMaxScreenSizeUnsafe());
 
         for (const auto render: m_renderList)
             render->waitForFrameDisplayed(outFrame->channel);
@@ -1147,9 +1150,8 @@ bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSh
     return true;
 }
 
-QSize QnVideoStreamDisplay::getMaxScreenSize() const
+QSize QnVideoStreamDisplay::getMaxScreenSizeUnsafe() const
 {
-    QnMutexLocker lock(&m_renderListMtx);
     int maxW = 0, maxH = 0;
     foreach(QnAbstractRenderer* render, m_renderList)
     {
@@ -1158,4 +1160,10 @@ QSize QnVideoStreamDisplay::getMaxScreenSize() const
         maxH = qMax(sz.height(), maxH);
     }
     return QSize(maxW, maxH);
+}
+
+QSize QnVideoStreamDisplay::getMaxScreenSize() const
+{
+    QnMutexLocker lock(&m_renderListMtx);
+    return getMaxScreenSizeUnsafe();
 }

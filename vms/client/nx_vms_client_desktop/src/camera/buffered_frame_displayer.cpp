@@ -144,7 +144,7 @@ void QnBufferedFrameDisplayer::run()
             {
                 QnMutexLocker lock( &m_renderMtx );
                 foreach(QnAbstractRenderer* render, m_renderList)
-                    render->draw(frame);
+                    render->draw(frame, QSize());
             }
         }
         else {

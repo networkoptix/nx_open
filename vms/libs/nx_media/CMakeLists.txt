@@ -5,8 +5,9 @@ nx_add_target(nx_media LIBRARY
         /home/lbusygin/develop/msdk/build/__bin/release/libmfxhw64.so
         /home/lbusygin/develop/msdk/build/__bin/release/libmfx.so
         /usr/local/lib/libva.so
-        /usr/local/lib/libva-glx.so
+        libva-x11.so
         X11
+        GL
 )
 
 target_include_directories(nx_media PRIVATE ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS} /home/lbusygin/develop/msdk/api/include /usr/local/include)
@@ -28,5 +29,3 @@ endif()
 if(withTests)
     add_subdirectory(unit_tests)
 endif()
-
-add_subdirectory(examples)

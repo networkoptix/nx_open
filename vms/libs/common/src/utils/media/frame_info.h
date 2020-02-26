@@ -29,6 +29,12 @@ enum class MemoryType
     VideoMemory,
 };
 
+namespace nx::media {
+
+class QuickSyncVideoDecoderImpl;
+
+};
+
 /**
  * Decoded frame, ready to be rendered.
  *
@@ -46,9 +52,9 @@ public:
     ~CLVideoDecoderOutput();
 
     MemoryType memoryType() const { return m_memoryType; }
-    void attachToVideoMemory(const std::shared_ptr<QVideoFrame>& frame, std::weak_ptr<void> decoder);
+    void attachToVideoMemory(const std::shared_ptr<QVideoFrame>& frame, std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> decoder);
     QVariant handle();
-    std::weak_ptr<void> decoder();
+    std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> decoder();
 
     QImage toImage() const;
 
@@ -105,7 +111,7 @@ public:
     // Contain video surface in case of video memory usage
     std::shared_ptr<QVideoFrame> m_frame;
     // Contain reference to video decoder to ensure that it still alive
-    std::weak_ptr<void> m_decoder;
+    std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> m_decoder;
 
     FrameMetadata metadata; // addition data associated with video frame
 

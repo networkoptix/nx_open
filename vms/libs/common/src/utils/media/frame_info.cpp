@@ -80,7 +80,7 @@ static bool convertImageFormat(
 }
 
 void CLVideoDecoderOutput::attachToVideoMemory(
-    const std::shared_ptr<QVideoFrame>& frame, std::weak_ptr<void> decoder)
+    const std::shared_ptr<QVideoFrame>& frame, std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> decoder)
 {
     m_memoryType = MemoryType::VideoMemory;
     flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
@@ -91,7 +91,7 @@ void CLVideoDecoderOutput::attachToVideoMemory(
     m_decoder = std::move(decoder);
 }
 
-std::weak_ptr<void> CLVideoDecoderOutput::decoder()
+std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> CLVideoDecoderOutput::decoder()
 {
     return m_decoder;
 }
