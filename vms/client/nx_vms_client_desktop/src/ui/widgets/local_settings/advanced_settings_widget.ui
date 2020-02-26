@@ -66,6 +66,43 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,1">
+     <property name="spacing">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>8</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="autoFpsLimitCheckbox">
+       <property name="text">
+        <string>Limit Frame Rate to save CPU</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="nx::vms::client::desktop::HintButton" name="autoFpsLimitCheckboxHint" native="true">
+       <property name="hint" stdset="0">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="maximumLiveBufferLengthLabelLayout" stretch="0,1,0">
      <property name="spacing">
       <number>4</number>
