@@ -1496,7 +1496,7 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
             strings.notificationCaption(event, camera, /*useHtml*/ false),
         }),
         join("\n", {
-            resource ? resource->getName() : QString(),
+            camera ? camera->getUserDefinedName() : (resource ? resource->getName() : QString()),
             params.text,
             strings.notificationDescription(event),
         }),
