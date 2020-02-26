@@ -9,7 +9,9 @@
 
 namespace nx::vms::client::desktop {
 
-class AnalyticsSettingsMultiListener: public QObject
+class AnalyticsSettingsManager;
+
+class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsMultiListener: public QObject
 {
     Q_OBJECT
 
@@ -21,6 +23,7 @@ public:
     };
 
     AnalyticsSettingsMultiListener(
+        AnalyticsSettingsManager* manager,
         const QnVirtualCameraResourcePtr& camera,
         ListenPolicy listenPolicy,
         QObject* parent = nullptr);
