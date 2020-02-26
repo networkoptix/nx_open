@@ -29,7 +29,7 @@ SystemError::ErrorCode readPartitionsInformation(
     AbstractPartitionsInformationProvider* partitionsInfoProvider,
     std::list<PartitionInfo>* const partitionInfoList)
 {
-    QByteArray fileContent = partitionsInfoProvider->mountsFileContent();
+    QByteArray fileContent = partitionsInfoProvider->mountsFileContents();
     if (fileContent.isNull())
         return SystemError::fileNotFound;
 

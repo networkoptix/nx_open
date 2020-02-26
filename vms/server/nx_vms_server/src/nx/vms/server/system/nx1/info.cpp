@@ -46,7 +46,7 @@ QString Nx1::getSerial()
     return readFile("/tmp/serial");
 }
 
-bool Nx1::isBootedFromSD(nx::vms::server::RootFileSystem* footFs)
+bool Nx1::isBootedFromSD(QnMediaServerModule* serverModule)
 {
     // On Nx1 in both modes (recovery and normal) both `mount` and `cat /proc/mounts` commands
     // shows the root device partition as "/dev/root". Further, /dev/root always is a link to
@@ -58,7 +58,7 @@ bool Nx1::isBootedFromSD(nx::vms::server::RootFileSystem* footFs)
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     namespace fs = nx::vms::server::fs;
 
-    fs::PartitionsInformationProvider partitionsInfoProvider(footFs);
+    fs::PartitionsInformationProvider partitionsInfoProvider(serverModule);
     std::list<fs::PartitionInfo> partitionInfoList;
 
     if (fs::readPartitionsInformation(&partitionsInfoProvider, &partitionInfoList)

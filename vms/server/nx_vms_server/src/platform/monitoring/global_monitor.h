@@ -38,8 +38,8 @@ public:
     virtual std::chrono::milliseconds processUptime() const override;
     virtual std::chrono::milliseconds updatePeriod() const override;
     virtual int thisProcessThreads() override;
-    virtual void setRootFileSystem(nx::vms::server::RootFileSystem* rootFs) override;
-
+    virtual void setPartitionInformationProvider(
+        std::unique_ptr<nx::vms::server::fs::AbstractPartitionsInformationProvider> partitionInformationProvider) override;
 private:
     std::unique_ptr<nx::vms::server::PlatformMonitor> m_monitorBase = nullptr;
 

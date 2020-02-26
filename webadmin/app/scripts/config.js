@@ -134,8 +134,9 @@
 
             maxWearableArchiveSynchronizationThreads: {type: 'number'},
             maxEventLogRecords: {type: 'number'},
-            
-            forceLiveCacheForPrimaryStream: {type: 'text'}
+
+            forceLiveCacheForPrimaryStream: {type: 'text'},
+            additionalLocalFsTypes: {type: 'text'}
         },
         webclient: {
             useServerTime: true,

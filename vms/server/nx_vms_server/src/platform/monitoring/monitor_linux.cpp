@@ -1,7 +1,6 @@
 #include "monitor_linux.h"
 #include <iostream>
 #include <map>
-#include <memory>
 #include <set>
 #include <chrono>
 #include <thread>
@@ -28,7 +27,6 @@
 #include <nx/utils/mac_address.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/fs/partitions/read_partitions_linux.h>
-#include <nx/vms/server/fs/partitions/partitions_information_provider_linux.h>
 #include <platform/hardware_information.h>
 
 static const int BYTES_PER_MB = 1024*1024;
@@ -367,7 +365,7 @@ private:
 
     time_t lastPartitionsUpdateTime;
     struct timespec lastDiskUsageUpdateTime;
-    std::unique_ptr<nx::vms::server::fs::PartitionsInformationProvider> partitionsInfoProvider;
+    std::unique_ptr<nx::vms::server::fs::AbstractPartitionsInformationProvider> partitionsInfoProvider;
 
 private:
     Q_DECLARE_PUBLIC(QnLinuxMonitor)
@@ -510,7 +508,9 @@ QList<PlatformMonitor::NetworkLoad> QnLinuxMonitor::totalNetworkLoad()
     return d_ptr->totalNetworkLoad();
 }
 
-static PlatformMonitor::PartitionType fsNameToType( const QString& fsName )
+static PlatformMonitor::PartitionType fsNameToType(
+    const QString& fsName,
+    nx::vms::server::fs::AbstractPartitionsInformationProvider* provider)
 {
     if( fsName == "sysfs" )
         return PlatformMonitor::UnknownPartition;
@@ -580,8 +580,10 @@ static PlatformMonitor::PartitionType fsNameToType( const QString& fsName )
         return PlatformMonitor::NetworkPartition;
     else if( fsName == "fuse.osxfs" ) // Mounted volumes when Docker host is macOS.
         return PlatformMonitor::LocalDiskPartition;
-    else
-        return PlatformMonitor::UnknownPartition;
+
+    return provider->additionalLocalFsTypes().contains(fsName)
+        ? PlatformMonitor::LocalDiskPartition
+        : PlatformMonitor::UnknownPartition;
 }
 
 /*!
@@ -607,7 +609,8 @@ QList<PlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
         partitionInfo.devName = data.devName;
         partitionInfo.path = data.path;
         partitionInfo.type = data.isUsb
-            ? PlatformMonitor::RemovableDiskPartition : fsNameToType(data.fsName);
+            ? PlatformMonitor::RemovableDiskPartition
+            : fsNameToType(data.fsName, d_ptr->partitionsInfoProvider.get());
         partitionInfo.sizeBytes = data.sizeBytes;
         partitionInfo.freeBytes = data.freeBytes;
         result.push_back(partitionInfo);
@@ -616,10 +619,10 @@ QList<PlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
     return result;
 }
 
-void QnLinuxMonitor::setRootFileSystem(nx::vms::server::RootFileSystem* rootFs)
+void QnLinuxMonitor::setPartitionInformationProvider(
+    std::unique_ptr<nx::vms::server::fs::AbstractPartitionsInformationProvider> partitionInformationProvider)
 {
-    d_ptr->partitionsInfoProvider.reset(
-        new nx::vms::server::fs::PartitionsInformationProvider(rootFs));
+    d_ptr->partitionsInfoProvider = std::move(partitionInformationProvider);
 }
 
 int QnLinuxMonitor::thisProcessThreads()

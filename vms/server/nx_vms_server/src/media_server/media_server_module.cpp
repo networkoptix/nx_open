@@ -209,7 +209,7 @@ QnMediaServerModule::QnMediaServerModule(
         isRootToolEnabled,
         qApp->applicationFilePath());
 
-    m_platform = store(new QnPlatformAbstraction(m_rootFileSystem.get(), timerManager()));
+    m_platform = store(new QnPlatformAbstraction(this, timerManager()));
     m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
 
     nx::vms::server::registerSerializers();
@@ -314,10 +314,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_context->backupStorageManager->startAuxTimerTasks();
 
     if (QnAppInfo::isNx1())
-    {
-        m_settings->mutableSettings()->setBootedFromSdCard(
-            Nx1::isBootedFromSD(m_rootFileSystem.get()));
-    }
+        m_settings->mutableSettings()->setBootedFromSdCard(Nx1::isBootedFromSD(this));
 
     m_fileDeletor = store(new QnFileDeletor(this));
 
