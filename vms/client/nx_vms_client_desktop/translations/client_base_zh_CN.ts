@@ -8993,7 +8993,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
       <source>Cloud users</source>
-      <translation type="unfinished">Cloud users</translation>
+      <translation>云用户</translation>
     </message>
   </context>
   <context>

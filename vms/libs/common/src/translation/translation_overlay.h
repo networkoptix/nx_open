@@ -31,7 +31,7 @@ public:
 
 private:
     QnTranslation m_translation;
-    std::vector<std::shared_ptr<TranslationOverlayItem>> m_translators;
+    std::vector<std::unique_ptr<TranslationOverlayItem>> m_translators;
 
     bool m_installed = false;
     QList<Qt::HANDLE> m_threads;

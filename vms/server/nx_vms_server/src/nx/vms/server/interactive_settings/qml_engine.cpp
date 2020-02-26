@@ -3,7 +3,8 @@
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlComponent>
 
-#include "components/items.h"
+#include "components/section.h"
+#include "components/factory.h"
 
 namespace nx::vms::server::interactive_settings {
 

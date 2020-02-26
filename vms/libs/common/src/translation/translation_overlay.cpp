@@ -4,8 +4,6 @@
 
 #include <QCoreApplication>
 
-#include <utils/common/delayed.h>
-
 namespace nx::vms::translation {
 
 TranslationOverlay::TranslationOverlay(QnTranslation&& translation):
@@ -13,7 +11,7 @@ TranslationOverlay::TranslationOverlay(QnTranslation&& translation):
 {
     for (const QString& file: translation.filePaths())
     {
-        auto translator = std::make_shared<TranslationOverlayItem>();
+        auto translator = std::make_unique<TranslationOverlayItem>();
         if (translator->load(file))
             m_translators.push_back(std::move(translator));
     }
@@ -34,16 +32,20 @@ void TranslationOverlay::addThreadContext(const Qt::HANDLE& context)
 
     if (!m_installed)
     {
+        const auto installTranslators =
+            [this]()
+            {
+                for (auto& translator: m_translators)
+                    qApp->installTranslator(translator.get());
+            };
+
         // QCoreApplication sends a signal for itself inside of qApp->installTranslator().
         // As result, it is impossible to call this method from any other thread.
-        // Additionally, we copy translators list in the lambda closure to be sure
-        // that the list is not modified or deleted during the call processing.
-        executeInThread(qApp->thread(),
-            [translators = m_translators]()
-            {
-                for (auto& translator: translators)
-                    qApp->installTranslator(translator.get());
-            });
+        if (QThread::currentThread() == qApp->thread())
+            installTranslators();
+        else
+            QMetaObject::invokeMethod(qApp, installTranslators, Qt::BlockingQueuedConnection);
+
         m_installed = true;
     }
 
@@ -68,16 +70,20 @@ void TranslationOverlay::uninstallIfUnused()
 
     if (m_installed)
     {
+        auto uninstallTranslators =
+            [this]()
+            {
+                for (auto& translator: m_translators)
+                    qApp->removeTranslator(translator.get());
+            };
+
         // QCoreApplication sends a signal for itself inside of qApp->removeTranslator().
         // As result, it is impossible to call this method from any other thread.
-        // Additionally, we copy translators list in the lambda closure to be sure
-        // that the list is not modified or deleted during the call processing.
-        executeInThread(qApp->thread(),
-            [translators = m_translators]()
-            {
-                for (auto& translator: translators)
-                    qApp->removeTranslator(translator.get());
-            });
+        if (QThread::currentThread() == qApp->thread())
+            uninstallTranslators();
+        else
+            QMetaObject::invokeMethod(qApp, uninstallTranslators, Qt::BlockingQueuedConnection);
+
         m_installed = false;
     }
 }

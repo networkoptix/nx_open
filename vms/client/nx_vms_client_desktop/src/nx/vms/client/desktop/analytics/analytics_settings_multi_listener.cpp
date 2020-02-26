@@ -1,17 +1,14 @@
 #include "analytics_settings_multi_listener.h"
 
-#include <client/client_module.h>
-
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <client_core/connection_context_aware.h>
 
 #include "analytics_settings_manager.h"
 
 namespace nx::vms::client::desktop {
 
-class AnalyticsSettingsMultiListener::Private: public QObject, public QnConnectionContextAware
+class AnalyticsSettingsMultiListener::Private: public QObject
 {
     AnalyticsSettingsMultiListener* q;
 
@@ -25,7 +22,10 @@ public:
     QSet<QnUuid> enabledEngines;
 
 public:
-    Private(AnalyticsSettingsMultiListener* q, ListenPolicy listenPolicy);
+    Private(
+        AnalyticsSettingsMultiListener* q,
+        AnalyticsSettingsManager* manager,
+        ListenPolicy listenPolicy);
     bool isSuitableEngine(const common::AnalyticsEngineResourcePtr& engine) const;
     void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
@@ -36,12 +36,14 @@ public:
 
 AnalyticsSettingsMultiListener::Private::Private(
     AnalyticsSettingsMultiListener* q,
+    AnalyticsSettingsManager* manager,
     ListenPolicy listenPolicy)
     :
     q(q),
-    settingsManager(qnClientModule->analyticsSettingsManager()),
+    settingsManager(manager),
     listenPolicy(listenPolicy)
 {
+    NX_ASSERT(settingsManager);
 }
 
 bool AnalyticsSettingsMultiListener::Private::isSuitableEngine(
@@ -73,7 +75,7 @@ void AnalyticsSettingsMultiListener::Private::resubscribe()
     QHash<QnUuid, AnalyticsSettingsListenerPtr> oldListeners = listeners;
     listeners.clear();
 
-    const auto engines = resourcePool()->getResources<common::AnalyticsEngineResource>();
+    const auto engines = camera->resourcePool()->getResources<common::AnalyticsEngineResource>();
     for (const auto& engine: engines)
     {
         if (isSuitableEngine(engine))
@@ -123,20 +125,21 @@ void AnalyticsSettingsMultiListener::Private::addListener(const QnUuid& engineId
 }
 
 AnalyticsSettingsMultiListener::AnalyticsSettingsMultiListener(
+    AnalyticsSettingsManager* manager,
     const QnVirtualCameraResourcePtr& camera,
     ListenPolicy listenPolicy,
     QObject* parent)
     :
     QObject(parent),
-    d(new Private(this, listenPolicy))
+    d(new Private(this, manager, listenPolicy))
 {
     d->camera = camera;
     connect(camera.data(), &QnResource::propertyChanged, d.data(),
         &Private::handleDevicePropertyChanged);
 
-    connect(d->resourcePool(), &QnResourcePool::resourceAdded, d.data(),
+    connect(camera->resourcePool(), &QnResourcePool::resourceAdded, d.data(),
         &Private::handleResourceAdded);
-    connect(d->resourcePool(), &QnResourcePool::resourceRemoved, d.data(),
+    connect(camera->resourcePool(), &QnResourcePool::resourceRemoved, d.data(),
         &Private::handleResourceRemoved);
 
     d->enabledEngines = camera->enabledAnalyticsEngines();

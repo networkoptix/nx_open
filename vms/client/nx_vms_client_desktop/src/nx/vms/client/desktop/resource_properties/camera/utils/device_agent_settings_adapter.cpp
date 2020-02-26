@@ -52,6 +52,7 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
         if (camera)
         {
             d->settingsListener = std::make_unique<AnalyticsSettingsMultiListener>(
+                qnClientModule->analyticsSettingsManager(),
                 camera,
                 AnalyticsSettingsMultiListener::ListenPolicy::allEngines);
 

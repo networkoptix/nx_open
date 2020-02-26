@@ -44,8 +44,7 @@ void LiveThumbnailProvider::refresh(const QnUuid& cameraId)
 
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    rest::Handle& currentRequestId = m_requestByCameraId[cameraId];
-    if (currentRequestId != rest::Handle()) //< Already requested.
+    if (m_requestByCameraId.value(cameraId) != rest::Handle()) //< Request is running.
         return;
 
     const auto handleReply =
@@ -64,11 +63,10 @@ void LiveThumbnailProvider::refresh(const QnUuid& cameraId)
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
 
-                rest::Handle& currentRequestId = m_requestByCameraId[cameraId];
-                if (requestId != currentRequestId)
+                if (requestId != m_requestByCameraId.value(cameraId))
                     return;
 
-                currentRequestId = -1;
+                m_requestByCameraId.remove(cameraId);
                 if (pixmap.isNull())
                     return;
 
@@ -87,8 +85,11 @@ void LiveThumbnailProvider::refresh(const QnUuid& cameraId)
     request.size.setHeight(m_thumbnailHeight);
     request.rotation = m_rotation;
 
-    currentRequestId = server->restConnection()->cameraThumbnailAsync(
+    const auto requestId = server->restConnection()->cameraThumbnailAsync(
         request, nx::utils::guarded(this, handleReply), m_decompressionThread);
+
+    if (requestId != rest::Handle())
+        m_requestByCameraId[cameraId] = requestId;
 }
 
 void LiveThumbnailProvider::refresh(const QString& cameraId)

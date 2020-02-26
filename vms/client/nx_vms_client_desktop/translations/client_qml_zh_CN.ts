@@ -86,7 +86,7 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>摄像机视频流</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
@@ -195,7 +195,7 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>添加</translation>
     </message>
   </context>
   <context>

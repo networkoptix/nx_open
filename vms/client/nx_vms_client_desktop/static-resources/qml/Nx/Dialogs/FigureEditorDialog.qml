@@ -19,6 +19,8 @@ Window
 
     width: 600
     height: 400
+    minimumWidth: 600
+    minimumHeight: 400
 
     color: ColorTheme.colors.dark3
 

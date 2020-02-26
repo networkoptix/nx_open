@@ -195,7 +195,7 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>新增</translation>
     </message>
   </context>
   <context>

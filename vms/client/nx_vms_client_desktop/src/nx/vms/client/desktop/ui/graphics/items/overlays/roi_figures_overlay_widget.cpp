@@ -8,6 +8,8 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QOpenGLWidget>
 
+#include <client/client_module.h>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/core/common/utils/path_util.h>
@@ -437,6 +439,7 @@ RoiFiguresOverlayWidget::RoiFiguresOverlayWidget(
     if (const auto camera = resourceWidget->resource().dynamicCast<QnVirtualCameraResource>())
     {
         d->settingsListener = new AnalyticsSettingsMultiListener(
+            qnClientModule->analyticsSettingsManager(),
             camera,
             AnalyticsSettingsMultiListener::ListenPolicy::enabledEngines,
             this);
