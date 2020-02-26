@@ -22,6 +22,8 @@
 #include <nx/vms/client/desktop/common/utils/item_view_utils.h>
 #include <nx/vms/client/desktop/common/models/natural_string_sort_proxy_model.h>
 
+#include <nx/network/app_info.h>
+
 namespace nx::vms::client::desktop {
 namespace ui {
 
@@ -29,7 +31,9 @@ SubjectSelectionDialog::CustomizableOptions
     SubjectSelectionDialog::CustomizableOptions::cloudUsers()
 {
     CustomizableOptions options;
-    options.userListHeader = tr("Cloud users");
+    options.userListHeader = tr("%1 users",
+        "%1 here will be substituted with short cloud name e.g. 'Cloud'.")
+        .arg(nx::network::AppInfo::shortCloudName());
     options.userFilter =
         [](const QnUserResource& user) -> bool
         {
