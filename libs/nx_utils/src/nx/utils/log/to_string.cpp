@@ -144,7 +144,7 @@ QString demangleTypeName(const char* type)
         };
 
         QString result;
-        result.reserve(strlen(type)); //< Result is not shorter than the input.
+        result.reserve((int) strlen(type)); //< Result is not shorter than the input.
 
         const char* p = type;
         for (int i = 0; i < (int) (sizeof(kTypePrefixes) / sizeof(kTypePrefixes[0])); ++i)
