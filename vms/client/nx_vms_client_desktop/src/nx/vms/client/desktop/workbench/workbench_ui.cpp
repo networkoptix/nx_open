@@ -256,7 +256,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
     connect(action(action::ShowTimeLineOnVideowallAction), &QAction::triggered,
         this, [this] { updateControlsVisibility(false); });
 
-    if (ini().autoFpsLimit)
+    if (qnSettings->isAutoFpsLimit())
     {
         static constexpr auto kIdleFps = 15;
         m_instrumentManager->setFpsLimit(kIdleFps);
