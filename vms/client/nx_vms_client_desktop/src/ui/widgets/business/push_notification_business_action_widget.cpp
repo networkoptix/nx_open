@@ -2,17 +2,22 @@
 #include "ui_push_notification_business_action_widget.h"
 
 #include <QtCore/QScopedValueRollback>
+#include <QtWidgets/QAction>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <api/global_settings.h>
+
 #include <business/business_resource_validation.h>
 #include <core/resource/user_resource.h>
+
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include "ui/style/skin.h"
+#include <ui/style/skin.h>
 
 using namespace nx::vms::client::desktop::ui;
 
@@ -20,6 +25,7 @@ namespace nx::vms::client::desktop {
 
 PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidget* parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::PushNotificationBusinessActionWidget)
 {
     ui->setupUi(this);
@@ -46,9 +52,22 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
 
     setSubjectsButton(ui->selectUsersButton);
 
-    setValidationPolicy(new QnCloudUsersValidationPolicy(commonModule()));
+    setValidationPolicy(new QnCloudUsersValidationPolicy(base_type::commonModule()));
 
     setDialogOptions(ui::SubjectSelectionDialog::CustomizableOptions::cloudUsers());
+
+    connect(
+        ui->cloudSettingsButton,
+        &QPushButton::clicked,
+        action(action::PreferencesCloudTabAction),
+        &QAction::triggered);
+
+    connect(
+        base_type::qnGlobalSettings,
+        &QnGlobalSettings::cloudSettingsChanged,
+        this,
+        &PushNotificationBusinessActionWidget::updateCurrentTab);
+    updateCurrentTab();
 }
 
 PushNotificationBusinessActionWidget::~PushNotificationBusinessActionWidget()
@@ -91,6 +110,12 @@ void PushNotificationBusinessActionWidget::parametersChanged()
     params.text = ui->customTextCheckBox->isChecked() ? ui->customTextEdit->toPlainText() : QString();
     model()->setActionParams(params);
     updateSubjectsButton();
+}
+
+void PushNotificationBusinessActionWidget::updateCurrentTab()
+{
+    ui->stackedWidget->setCurrentIndex(
+        base_type::qnGlobalSettings->cloudSystemId().isEmpty() ? 0 : 1);
 }
 
 } // namespace nx::vms::client::desktop

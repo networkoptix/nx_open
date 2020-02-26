@@ -15,6 +15,7 @@
 #include <business/business_resource_validation.h>
 #include <business/business_types_comparator.h>
 
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 #include <client/client_settings.h>
@@ -1201,6 +1202,9 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 }
                 case ActionType::pushNotificationAction:
                 {
+                    if (qnGlobalSettings->cloudSystemId().isEmpty())
+                        return false;
+
                     static const QnCloudUsersValidationPolicy cloudUsersPolicy(commonModule());
                     const auto subjects = filterSubjectIds(m_actionParams.additionalResources);
                     const auto validationState = cloudUsersPolicy.validity(

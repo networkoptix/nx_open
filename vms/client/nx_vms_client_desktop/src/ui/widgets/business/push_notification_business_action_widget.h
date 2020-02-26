@@ -8,7 +8,9 @@ namespace Ui { class PushNotificationBusinessActionWidget; }
 
 namespace nx::vms::client::desktop {
 
-class PushNotificationBusinessActionWidget: public QnSubjectTargetActionWidget
+class PushNotificationBusinessActionWidget:
+    public QnSubjectTargetActionWidget,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = QnSubjectTargetActionWidget;
@@ -24,6 +26,7 @@ protected slots:
 
 private:
     void parametersChanged();
+    void updateCurrentTab();
 
 private:
     QScopedPointer<Ui::PushNotificationBusinessActionWidget> ui;
