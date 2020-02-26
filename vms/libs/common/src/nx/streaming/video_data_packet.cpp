@@ -1,8 +1,13 @@
 #include "video_data_packet.h"
 
+#include <nx/utils/app_info.h>
+
 namespace {
 
-constexpr unsigned int MAX_VALID_CAPACITY = 256 * 1024 * 1024;
+static const unsigned int kMaxValidCapacityMB =
+    (nx::utils::AppInfo::isEdgeServer() || nx::utils::AppInfo::isNx1()) ? 10 : 256;
+
+static const unsigned int kMaxValidCapacity = kMaxValidCapacityMB * 1024 * 1024;
 
 } // namespace
 
@@ -36,7 +41,7 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnCompressedVideoData( ctx ),
     m_data(alignment, capacity)
 {
-    NX_ASSERT(capacity <= MAX_VALID_CAPACITY);
+    NX_ASSERT(capacity <= kMaxValidCapacity);
 }
 
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
@@ -48,7 +53,7 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnCompressedVideoData( ctx ),
     m_data(allocator, alignment, capacity)
 {
-    NX_ASSERT(capacity <= MAX_VALID_CAPACITY);
+    NX_ASSERT(capacity <= kMaxValidCapacity);
 }
 
 //!Implementation of QnAbstractMediaData::clone
