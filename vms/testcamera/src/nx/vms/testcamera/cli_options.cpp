@@ -89,10 +89,10 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
      Port on which testcamera serves the media stream. When running multiple testcamera processes
      on a single host, even if in different subnets via --local-interface, media ports must be
      different.
---reuse-discovery-port
+ --reuse-discovery-port
      Allow multiple testcamera processes on a single host with the same discovery port. To be able
-     to work properly with this option, each testcamera needs to have its own --local-interface and
-     --mac-address-prefix.
+     to work properly with this option, each testcamera needs to have its own --local-interface,
+     --mac-address-prefix and --media-port.
 
 Example:
  )help" + baseExeName + R"help( files=c:/test.264;count=20
