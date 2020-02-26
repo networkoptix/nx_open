@@ -104,6 +104,7 @@ if(WINDOWS)
     add_compile_options(
         /MP
         /bigobj
+        /Zc:inline
 
         /wd4290
         /wd4661
