@@ -923,20 +923,12 @@ struct PushPayload
 };
 #define PushPayload_Fields (url)(imageUrl)
 
-struct PushOptions
-{
-    // Allow editing on iOS.
-    bool content_available = true;
-    bool mutable_content = true;
-};
-#define PushOptions_Fields (content_available)(mutable_content)
-
 struct PushNotification
 {
     QString title;
     QString body;
     PushPayload payload;
-    PushOptions options;
+    QJsonObject options;
 };
 #define PushNotification_Fields (title)(body)(payload)(options)
 
@@ -949,7 +941,7 @@ struct PushRequest
 #define PushRequest_Fields (systemId)(targets)(notification)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (PushPayload)(PushOptions)(PushNotification)(PushRequest), (json), _Fields);
+    (PushPayload)(PushNotification)(PushRequest), (json), _Fields);
 
 bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActionPtr& action)
 {
@@ -1482,6 +1474,9 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
     const auto resource = resourcePool()->getResourceById(event.eventResourceId);
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
+    QJsonObject options;
+    NX_ASSERT(QJson::deserialize(QByteArray(ini().pushNotifyOptions), &options));
+
     const auto language = common->globalSettings()->pushNotificationsLanguage();
     NX_VERBOSE(this, "Translate push notification to %1", language);
     QnTranslationManager::LocaleRollback localeGuard(
@@ -1506,6 +1501,7 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
             strings.notificationDescription(event),
         }),
         makePushPayload(event, camera),
+        options,
     };
 }
 
