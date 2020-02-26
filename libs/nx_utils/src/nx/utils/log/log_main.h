@@ -52,7 +52,7 @@ public:
 
     std::pair<Level, bool /*isOnLimit*/> nextLevel()
     {
-        if (m_level > Level::warning)
+        if (!s_isEnabled || (m_level > Level::warning))
             return {m_level, /*isOnLimit*/ false};
 
         const auto limit = (uint32_t) ini().logLevelReducerPassLimit;
@@ -64,8 +64,8 @@ public:
         const auto windowStartS = m_windowStartS.load();
         if (m_passCount == 0 || windowStartS + windowSizeS <= nowS || windowStartS > nowS)
         {
-            // It is possible to have a rase on these 2 atomics and actual log writing, but it would
-            // only affect the number of records on each level and their order.
+            // It is possible to have a race on these 2 atomics and actual log writing, but it
+            // would only affect the number of records on each level and their order.
             m_windowStartS = nowS;
             m_passCount = 0;
         }
@@ -77,7 +77,11 @@ public:
         };
     }
 
+    static void setEnabled(bool value) { s_isEnabled = value; }
+
 private:
+    NX_UTILS_API static bool s_isEnabled /*= true*/;
+
     const Level m_level;
     std::atomic<uint32_t> m_passCount{0};
     std::atomic<uint32_t> m_windowStartS{0};
@@ -152,6 +156,11 @@ private:
 };
 
 } // namespace detail
+
+inline void setLevelReducerEnabled(bool value)
+{
+    detail::LevelReducer::setEnabled(value);
+}
 
 /**
  * NOTE: Preserves current system error code (SystemError::getLastOSErrorCode()).

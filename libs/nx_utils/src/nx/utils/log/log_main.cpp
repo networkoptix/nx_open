@@ -8,6 +8,12 @@ namespace nx {
 namespace utils {
 namespace log {
 
+namespace detail {
+
+/*static*/ bool LevelReducer::s_isEnabled = true;
+
+} // namespace detail
+
 namespace {
 
 class LoggerCollection
@@ -67,7 +73,7 @@ public:
                 ? m_mainLogger
                 : it->second;
         }
-		
+
         for (auto& it: m_loggersByFilters)
         {
             if (it.first.accepts(tag))

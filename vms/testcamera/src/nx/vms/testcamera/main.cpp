@@ -165,10 +165,7 @@ int main(int argc, char* argv[])
     try
     {
         nx::kit::OutputRedirector::ensureOutputRedirection();
-
-        // Reduce window size to disable log reducing.
-        nx::kit::IniConfig::Tweaks iniTweaks;
-        iniTweaks.set(&nx::utils::ini().logLevelReducerWindowSizeS, 0);
+        nx::utils::log::setLevelReducerEnabled(false);
 
         ini().reload(); //< Make .ini appear on the console even when help is requested.
 

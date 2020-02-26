@@ -27,9 +27,7 @@ bool validateConfig(RtspPerf::Config& config)
 
 int main(int argc, char** argv)
 {
-    // Reduce window size to disable log reducing.
-    nx::kit::IniConfig::Tweaks iniTweaks;
-    iniTweaks.set(&nx::utils::ini().logLevelReducerWindowSizeS, 0);
+    nx::utils::log::setLevelReducerEnabled(false);
 
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("RtspPerf");
