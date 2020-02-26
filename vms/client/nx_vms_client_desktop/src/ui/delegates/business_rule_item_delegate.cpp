@@ -381,7 +381,7 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
     else if (actionType == ActionType::pushNotificationAction)
     {
         auto usersButton = new QnSelectUsersDialogButton(parent);
-        usersButton->setSubjectValidationPolicy(new QnCloudUsersValidationPolicy(commonModule()));
+        usersButton->setSubjectValidationPolicy(new QnCloudUsersValidationPolicy());
         usersButton->setDialogOptions(SubjectSelectionDialog::CustomizableOptions::cloudUsers());
         editorButton = usersButton;
     }

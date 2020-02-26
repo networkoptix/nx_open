@@ -1205,7 +1205,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     if (qnGlobalSettings->cloudSystemId().isEmpty())
                         return false;
 
-                    static const QnCloudUsersValidationPolicy cloudUsersPolicy(commonModule());
+                    static const QnCloudUsersValidationPolicy cloudUsersPolicy;
                     const auto subjects = filterSubjectIds(m_actionParams.additionalResources);
                     const auto validationState = cloudUsersPolicy.validity(
                         m_actionParams.allUsers,
