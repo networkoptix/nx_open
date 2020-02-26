@@ -52,17 +52,8 @@ NetworkOptions makeNetworkOptions(const CliOptions& options)
     NetworkOptions result;
 
     result.localInterfacesToListen = options.localInterfaces;
-
-    if (options.discoveryPort)
-        result.discoveryPort = *options.discoveryPort;
-    else
-        result.discoveryPort = ini().discoveryPort;
-
-    if (options.mediaPort)
-        result.mediaPort = *options.mediaPort;
-    else
-        result.mediaPort = ini().mediaPort;
-
+    result.discoveryPort = options.discoveryPort ? *options.discoveryPort : ini().discoveryPort;
+    result.mediaPort = options.mediaPort ? *options.mediaPort : ini().mediaPort;
     result.reuseDiscoveryPort = options.reuseDiscoveryPort;
 
     return result;
