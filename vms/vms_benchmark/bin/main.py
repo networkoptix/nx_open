@@ -349,9 +349,11 @@ def _get_storages(api, ini) -> List[Storage]:
             raise exceptions.ServerApiError(
                 "Unable to get Server Storages via REST HTTP: invalid reply.")
         if reply:
-            storages = [Storage(item) for item in reply]
-            if all(storage.initialized for storage in storages):
+            storages = [Storage(item) for item in reply if Storage(item).initialized]
+            if storages:
                 return storages
+
+            raise exceptions.ServerApiError("There are no initialized Storages on the box.")
         time.sleep(ini["getStoragesAttemptIntervalSeconds"])
     raise exceptions.ServerApiError(
         "Unable to get Server Storages via REST HTTP: not all Storages are initialized.")
@@ -653,6 +655,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                 streams_started_flags = dict((stream_id, False) for stream_id, _ in streams.items())
 
+                # TODO: @alevenkov: Move magick number to the INI
                 while time.time() - stream_opening_started_at_s < 25:
                     if stream_reader_process.poll() is not None:
                         raise exceptions.RtspPerfError(
@@ -686,11 +689,14 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 }
                 streaming_ended_expectedly = False
                 issues = []
-                first_cpu_times = last_cpu_times = _BoxCpuTimes(box, box_platform.cpu_count)
-                first_tx_rx_errors = box_tx_rx_errors(box)
-                last_tx_rx_errors = first_tx_rx_errors
+                first_cpu_times = None
+                first_tx_rx_errors = None
+                last_tx_rx_errors = None
                 cpu_usage_max = None
+
                 box_poller = _BoxPoller(api, box, box_platform.cpu_count, ini['reportingPeriodSeconds'])
+
+                first_cycle = True
 
                 try:
                     while True:
@@ -718,6 +724,15 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             ] = box_poller.get_results()
                         except LookupError:
                             continue
+
+                        if first_cycle is True:
+                            first_cpu_times = last_cpu_times = cpu_times
+                            first_tx_rx_errors = tx_rx_errors
+                            last_tx_rx_errors = first_tx_rx_errors
+
+                            first_cycle = False
+                            continue
+
                         if cpu_times is not None:
                             cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
                             if cpu_usage_max is None:
@@ -798,6 +813,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                                 "virtual camera(s) finished."
                             )
                             break
+
                 finally:
                     box_poller.please_stop()
 
