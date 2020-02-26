@@ -258,18 +258,20 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 
     if (ini().autoFpsLimit)
     {
-        static constexpr auto kIdleFps = 10;
+        static constexpr auto kIdleFps = 15;
         m_instrumentManager->setFpsLimit(kIdleFps);
         connect(workbench(), &QnWorkbench::currentLayoutItemsChanged, this,
             [this]()
             {
+                int itemsCount = 0;
+
+                // Gather cameras placed on current layout.
                 QnVirtualCameraResourceList cameras;
-                int count = 0;
                 if (auto workbenchLayout = workbench()->currentLayout())
                 {
                     const auto items = workbenchLayout->items();
-                    count = items.count();
-                    for (const auto& item: items)
+                    itemsCount = items.count();
+                    for (const auto& item: items) 
                     {
                         if (const auto camera =
                                 item->resource().dynamicCast<QnVirtualCameraResource>())
@@ -277,14 +279,25 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
                     }
                 }
 
-                QPair<int, int> result = Qn::calculateMaxFps(cameras);
-
-                if (result.second != std::numeric_limits<int>::max())
-                    m_instrumentManager->setFpsLimit(result.second);
-                else if (count == 0)
+                if (itemsCount == 0) // Empty layout.
+                {
                     m_instrumentManager->setFpsLimit(kIdleFps);
-                else
-                    m_instrumentManager->setFpsLimit(0);
+                    return;
+                }
+
+                if (itemsCount == cameras.count()) // Layout contains cameras only.
+                {
+                    QPair<int, int> result = Qn::calculateMaxFps(cameras);
+
+                    if (result.second != std::numeric_limits<int>::max())
+                    {
+                        m_instrumentManager->setFpsLimit(result.second);
+                        return;
+                    }
+                }
+
+                // We do not have any info about items fps - do not limit fps.
+                m_instrumentManager->setFpsLimit(0);
             });
     }
 }
