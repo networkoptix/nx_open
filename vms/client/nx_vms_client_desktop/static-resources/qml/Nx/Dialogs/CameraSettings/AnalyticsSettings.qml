@@ -108,6 +108,8 @@ Item
             if (currentEngineId)
                 header.currentStreamIndex = store.analyticsStreamIndex(currentEngineId)
 
+            updateCurrentSection()
+
             banner.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
         }
     }
@@ -135,16 +137,7 @@ Item
         {
             currentSectionPath = item.sections
             store.setCurrentAnalyticsEngineId(item.engineId)
-
-            var container = settingsView.contentItem.sectionsItem
-            for (var i = 0; i < currentSectionPath.length; ++i)
-            {
-                container.currentIndex = currentSectionPath[i] + 1
-                container = container.children[container.currentIndex].sectionsItem;
-            }
-
-            if (container)
-                container.currentIndex = 0
+            updateCurrentSection()
         }
 
         Repeater
@@ -281,5 +274,27 @@ Item
                 engines.splice(index, 1)
         }
         store.setEnabledAnalyticsEngines(engines)
+    }
+
+    function updateCurrentSection()
+    {
+        var container = settingsView.contentItem.sectionsItem
+        for (var i = 0; i < currentSectionPath.length; ++i)
+        {
+            var sectionIndex = currentSectionPath[i] + 1
+            if (sectionIndex >= container.count)
+            {
+                currentSectionPath.length = i
+                navigationMenu.currentItemId =
+                    [currentEngineId.toString()].concat(currentSectionPath).join("\n")
+                break
+            }
+
+            container.currentIndex = sectionIndex
+            container = container.children[sectionIndex].sectionsItem
+        }
+
+        if (container)
+            container.currentIndex = 0
     }
 }
