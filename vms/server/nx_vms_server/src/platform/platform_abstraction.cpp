@@ -31,6 +31,9 @@ QnPlatformAbstraction::QnPlatformAbstraction(QnMediaServerModule* serverModule, 
 
     m_monitor.reset(new nx::vms::server::GlobalMonitor(
         std::make_unique<QnMonitorImpl>(), timerManager));
-    m_monitor->setPartitionInformationProvider(
-        std::make_unique<nx::vms::server::fs::PartitionsInformationProvider>(serverModule));
+
+    #if defined(Q_OS_LINUX)
+        m_monitor->setPartitionInformationProvider(
+            std::make_unique<nx::vms::server::fs::PartitionsInformationProvider>(serverModule));
+    #endif
 }

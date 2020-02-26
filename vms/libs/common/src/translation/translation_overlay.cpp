@@ -3,6 +3,7 @@
 #include "translation_overlay_item.h"
 
 #include <QCoreApplication>
+#include <QtCore/QThread>
 
 namespace nx::vms::translation {
 
