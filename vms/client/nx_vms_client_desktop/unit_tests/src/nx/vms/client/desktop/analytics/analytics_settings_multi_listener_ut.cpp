@@ -13,9 +13,10 @@ using namespace nx::vms::common;
 class AnalyticsSettingsMultiListenerTest: public AnalyticsSettingsManagerTest
 {
     using base_type = AnalyticsSettingsManagerTest;
-    using ListenPolicy = AnalyticsSettingsMultiListener::ListenPolicy;
 
 protected:
+    using ListenPolicy = AnalyticsSettingsMultiListener::ListenPolicy;
+
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp() override
     {
