@@ -13,7 +13,9 @@ Figure
 
     readonly property int geometricMinPoints: polygon ? 3 : 2
     readonly property int minPoints:
-        (figureSettings && figureSettings.minPoints > geometricMinPoints) || geometricMinPoints
+        (figureSettings && figureSettings.minPoints > geometricMinPoints)
+            ? figureSettings.minPoints
+            : geometricMinPoints
     readonly property int maxPoints:
         (figureSettings && figureSettings.maxPoints && figureSettings.maxPoints >= minPoints)
             ? figureSettings.maxPoints
