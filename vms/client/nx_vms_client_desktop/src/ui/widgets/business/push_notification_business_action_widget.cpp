@@ -19,6 +19,8 @@
 #include <nx/vms/event/strings_helper.h>
 #include <ui/style/skin.h>
 
+#include <nx/network/app_info.h>
+
 using namespace nx::vms::client::desktop::ui;
 
 namespace nx::vms::client::desktop {
@@ -29,6 +31,16 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
     ui(new Ui::PushNotificationBusinessActionWidget)
 {
     ui->setupUi(this);
+
+    ui->notConnectedLabel->setText(
+        tr("The system is not connected to %1. "
+            "Mobile notifications work only when the system is connected to %1.",
+            "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
+            .arg(nx::network::AppInfo::cloudName()));
+
+    ui->cloudSettingsButton->setText(
+        tr("%1 Settings", "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
+            .arg(nx::network::AppInfo::cloudName()));
 
     setHelpTopic(this, Qn::EventsActions_SendMobileNotification_Help);
 
