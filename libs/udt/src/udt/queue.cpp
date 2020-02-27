@@ -63,6 +63,7 @@ using namespace std;
 
 namespace {
 
+#if defined(TRACE_PACKETS) || defined(DEBUG_RECORD_PACKET_HISTORY)
 static std::string dumpPacket(const CPacket& packet)
 {
     std::ostringstream ss;
@@ -73,6 +74,7 @@ static std::string dumpPacket(const CPacket& packet)
        ss << "[unparsed control data]";
     return ss.str();
 }
+#endif
 
 #if defined(TRACE_PACKETS)
 
