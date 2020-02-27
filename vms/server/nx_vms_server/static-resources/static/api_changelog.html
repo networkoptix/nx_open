@@ -43,14 +43,14 @@ supported for a while, when noted below.
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>
 <p>
-In method <strong><code>analyticsLookupObjectTracks</code></strong>, parameter
+In method <strong><code>GET /ec2/analyticsLookupObjectTracks</code></strong>, parameter
 <strong><code><i>maxObjectTrackSize</i></code></strong> changed to
 <strong><code><b>needFullTrack</b></code></strong>. Previously this parameter was used to limit the
 number of object track metadata items (each item is related to a video frame). The new parameter is
 just a flag showing whether to select all of them or not.
 </p>
 <p>
-In method <strong><code>deviceAnalyticsSettings (POST)</code></strong> parameters
+In method <strong><code>POST /ec2/deviceAnalyticsSettings</code></strong> parameters
 <strong><code>deviceId</code></strong> and <strong><code>analyticsEngineId</code></strong> have to
 be passed not as URL query parameters but as keys of a JSON request in the request body. Optional
 parameter <strong><code>analyzedStreamIndex</code></strong> has been added to the JSON request.
@@ -62,7 +62,7 @@ respectively. Parameter <strong><code>analyzedStreamIndex</code></strong> has be
 JSON response.
 </p>
 <p>
-In method <strong><code>deviceAnalyticsSettings (GET)</code></strong> parameters
+In method <strong><code>GET /ec2/deviceAnalyticsSettings</code></strong> parameters
 <strong><code>values</code></strong> and <strong><code>model</code></strong> of the JSON response
 have been renamed to <strong><code>settingsValues</code></strong> and
 <strong><code>settingsModel</code></strong> respectively. Parameter
