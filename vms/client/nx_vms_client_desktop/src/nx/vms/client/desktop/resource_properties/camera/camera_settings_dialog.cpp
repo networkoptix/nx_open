@@ -181,9 +181,10 @@ struct CameraSettingsDialog::Private: public QObject
             ? cameras.first()
             : QnVirtualCameraResourcePtr();
 
-        store->loadCameras(cameras);
-        deviceAgentSettingsAdaptor->setCamera(singleCamera);
-        analyticsEnginesWatcher->update();
+        store->loadCameras(
+            cameras,
+            deviceAgentSettingsAdaptor,
+            analyticsEnginesWatcher);
 
         handleCamerasChanged();
     }
@@ -430,7 +431,6 @@ bool CameraSettingsDialog::tryClose(bool force)
 
 void CameraSettingsDialog::forcedUpdate()
 {
-    d->analyticsEnginesWatcher->update();
 }
 
 bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
@@ -464,12 +464,18 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     const auto singleCamera = cameras.size() == 1 ? cameras.first() : QnVirtualCameraResourcePtr();
 
     d->cameras = cameras;
+
+    // All correctly implemented watchers are going before 'resetChanges' as their 'setCamera'
+    // method is clean and does not send anything to the store.
+    d->analyticsEnginesWatcher->setCamera(singleCamera);
+    d->deviceAgentSettingsAdaptor->setCamera(singleCamera);
     d->resetChanges();
+
+    // These watchers can modify store during 'setCamera' call.
     d->licenseWatcher->setCameras(cameras);
     d->readOnlyWatcher->setCameras(cameras);
     d->wearableStateWatcher->setCameras(cameras);
     d->previewManager->selectCamera(singleCamera);
-    d->analyticsEnginesWatcher->setCamera(singleCamera);
     d->cameraPropertyWatcher->setCameras(cameras.toSet());
 
     d->previewManager->refreshSelectedCamera();

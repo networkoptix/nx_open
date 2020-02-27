@@ -345,6 +345,9 @@ private:
 
     void setPtzCalibarionTimer();
     QnLiveStreamParams liveStreamParams(Qn::ConnectionRole role) const;
+
+    void storeCurrentVideoParametersToProperties(const QnCameraAdvancedParamValueMap& parameters);
+
 private:
     using AdvancedParameterId = QString;
 

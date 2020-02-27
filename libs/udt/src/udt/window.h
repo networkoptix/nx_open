@@ -49,6 +49,9 @@ Yunhong Gu, last updated 01/22/2011
 #include "udt.h"
 
 
+/**
+ * NOTE: Not thread-safe.
+ */
 class CACKWindow
 {
 public:
@@ -78,7 +81,7 @@ public:
 private:
     int32_t* m_piACKSeqNo;       // Seq. No. for the ACK packet
     int32_t* m_piACK;            // Data Seq. No. carried by the ACK packet
-    uint64_t* m_pTimeStamp;      // The timestamp when the ACK was sent
+    std::vector<std::chrono::microseconds> m_pTimestamp;      // The timestamp when the ACK was sent
 
     int m_iSize;                 // Size of the ACK history window
     int m_iHead;                 // Pointer to the lastest ACK record
@@ -91,6 +94,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * NOTE: Not thread-safe.
+ */
 class CPktTimeWindow
 {
 public:
@@ -174,9 +180,14 @@ private:
     int m_iLastSentTime;         // last packet sending time
     int m_iMinPktSndInt;         // Minimum packet sending interval
 
-    uint64_t m_LastArrTime;      // last packet arrival time
-    uint64_t m_CurrArrTime;      // current packet arrival time
-    uint64_t m_ProbeTime;        // arrival time of the first probing packet
+    // last packet arrival time.
+    std::chrono::microseconds m_LastArrTime = std::chrono::microseconds::zero();
+
+    // current packet arrival time.
+    std::chrono::microseconds m_CurrArrTime = std::chrono::microseconds::zero();
+
+    // arrival time of the first probing packet.
+    std::chrono::microseconds m_ProbeTime = std::chrono::microseconds::zero();
 
 private:
     CPktTimeWindow(const CPktTimeWindow&);

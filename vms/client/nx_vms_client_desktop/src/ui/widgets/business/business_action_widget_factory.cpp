@@ -19,6 +19,7 @@
 #include <ui/widgets/business/buzzer_business_action_widget.h>
 
 using namespace nx;
+using namespace nx::vms::client::desktop;
 
 QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
     vms::api::ActionType actionType,
@@ -35,7 +36,7 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
         case vms::api::ActionType::showPopupAction:
             return new QnPopupBusinessActionWidget(parent);
         case vms::api::ActionType::pushNotificationAction:
-            return new vms::client::desktop::PushNotificationBusinessActionWidget(parent);
+            return new PushNotificationBusinessActionWidget(parent);
         case vms::api::ActionType::playSoundAction:
         case vms::api::ActionType::playSoundOnceAction:
             return new QnPlaySoundBusinessActionWidget(parent);
@@ -52,13 +53,13 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
         case vms::api::ActionType::execHttpRequestAction:
             return new QnExecHttpRequestActionWidget(parent);
         case vms::api::ActionType::openLayoutAction:
-            return new vms::client::desktop::OpenLayoutActionWidget(parent);
+            return new OpenLayoutActionWidget(parent);
         case vms::api::ActionType::fullscreenCameraAction:
             return new QnFullscreenCameraActionWidget(parent);
         case vms::api::ActionType::exitFullscreenAction:
             return new QnExitFullscreenActionWidget(parent);
         case vms::api::ActionType::buzzerAction:
-            return new vms::client::desktop::BuzzerBusinessActionWidget(parent);
+            return new BuzzerBusinessActionWidget(parent);
 
         default:
             break;

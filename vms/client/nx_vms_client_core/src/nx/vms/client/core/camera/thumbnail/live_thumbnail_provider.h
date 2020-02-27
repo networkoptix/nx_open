@@ -27,6 +27,15 @@ public:
 
     virtual QPixmap pixmap(const QString& thumbnailId) const override;
 
+    /**
+     * Request thumbnail if it has not been loaded yet, else emit thumbnailUpdated immediately.
+     */
+    Q_INVOKABLE void load(const QnUuid& cameraId, const QnUuid& engineId);
+    Q_INVOKABLE void load(const QString& cameraId, const QString& engineId);
+
+    /**
+    * Request new thumbnail even it has been already loaded.
+    */
     Q_INVOKABLE void refresh(const QnUuid& cameraId, const QnUuid& engineId);
     Q_INVOKABLE void refresh(const QString& cameraId, const QString& engineId);
 
@@ -39,21 +48,18 @@ public:
 signals:
     void thumbnailsHeightChanged();
     void rotationChanged();
-    void thumbnailUpdated(
-        const QnUuid& cameraId, const QString& thumbnailId, const QUrl& thumbnailUrl);
+
+    /**
+     * Emitted when a thumbnail for specified camera is ready for use.
+     */
+    void thumbnailUpdated(const QnUuid& cameraId, const QUrl& thumbnailUrl);
 
 public:
     static void registerQmlType();
 
 private:
-    struct ThumbnailData
-    {
-        QString id;
-        rest::Handle requestId = -1;
-    };
-
     mutable nx::utils::Mutex m_mutex;
-    QHash<QnUuid, ThumbnailData> m_dataByCameraId;
+    QHash<QnUuid, rest::Handle> m_requestByCameraId;
     QHash<QString, QPixmap> m_pixmapById;
     QThread* m_decompressionThread = nullptr;
     int m_thumbnailHeight = 240;

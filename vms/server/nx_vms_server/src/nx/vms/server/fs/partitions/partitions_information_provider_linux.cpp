@@ -2,16 +2,18 @@
 
 #include <nx/utils/app_info.h>
 #include <nx/vms/server/root_fs.h>
+#include <api/global_settings.h>
 
 namespace nx::vms::server::fs {
 
-PartitionsInformationProvider::PartitionsInformationProvider(RootFileSystem* rootFs):
-    m_rootFs(rootFs),
+PartitionsInformationProvider::PartitionsInformationProvider(QnMediaServerModule* serverModule):
+    m_serverModule(serverModule),
+    m_rootFs(serverModule ? serverModule->rootFileSystem() : nullptr),
     m_fileName("/proc/mounts")
 {
 }
 
-QByteArray PartitionsInformationProvider::mountsFileContent() const
+QByteArray PartitionsInformationProvider::mountsFileContents() const
 {
     QFile mountsFile(m_fileName);
 
@@ -73,6 +75,12 @@ bool PartitionsInformationProvider::isFolder(const QByteArray& fsPath) const
         return false;
 
     return fileStats.type == SystemCommands::Stats::FileType::directory;
+}
+
+QStringList PartitionsInformationProvider::additionalLocalFsTypes() const
+{
+    return m_serverModule->globalSettings()->additionalLocalFsTypes().split(
+        ",", QString::SkipEmptyParts);
 }
 
 } // namesapce nx::vms::server::fs

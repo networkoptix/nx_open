@@ -7,7 +7,7 @@
 
 #include <nx/vms/server/interactive_settings/qml_engine.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
-#include <nx/vms/server/interactive_settings/components/items.h>
+#include <nx/vms/server/interactive_settings/components/section.h>
 
 static void PrintTo(const QJsonObject& object, ::std::ostream* os)
 {

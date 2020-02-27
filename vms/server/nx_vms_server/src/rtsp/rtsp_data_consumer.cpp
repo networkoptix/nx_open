@@ -344,7 +344,9 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
     {
         QnAbstractDataPacketPtr tmp;
         m_dataQueue.pop(tmp);
-        NX_WARNING(this, "Too long frame queue, drop frame");
+
+        // This may occur when client stops paint video (e.g. when minimized).
+        NX_VERBOSE(this, "Too long frame queue, drop frame");
     }
 }
 

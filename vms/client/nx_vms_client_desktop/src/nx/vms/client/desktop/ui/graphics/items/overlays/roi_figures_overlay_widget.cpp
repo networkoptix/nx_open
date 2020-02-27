@@ -8,6 +8,8 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QOpenGLWidget>
 
+#include <client/client_module.h>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/core/common/utils/path_util.h>
@@ -184,7 +186,7 @@ public:
 
     qreal realLineWidth(QWidget* widget) const;
 
-    void updateFigureKeys(const QnUuid& engineId, const QJsonObject& model);
+    void updateFigureKeys(const QnUuid& engineId, const DeviceAgentData& data);
     void updateFigures();
 };
 
@@ -276,7 +278,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(
     core::PathUtil pathUtil;
     pathUtil.setPoints(points);
 
-    if (line.direction == Line::Direction::left)
+    if (line.direction == Line::Direction::left || line.direction == Line::Direction::none)
     {
         drawDirectionMark(
             painter,
@@ -286,7 +288,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(
             widget);
     }
 
-    if (line.direction == Line::Direction::right)
+    if (line.direction == Line::Direction::right || line.direction == Line::Direction::none)
     {
         drawDirectionMark(
             painter,
@@ -374,14 +376,9 @@ qreal RoiFiguresOverlayWidget::Private::realLineWidth(QWidget* widget) const
 }
 
 void RoiFiguresOverlayWidget::Private::updateFigureKeys(
-    const QnUuid& engineId, const QJsonObject& model)
+    const QnUuid& engineId, const DeviceAgentData& data)
 {
-    if (!settingsListener)
-        return;
-
-    figureKeysByEngineId.insert(engineId, findFigureKeys(model));
-
-    updateFigures();
+    figureKeysByEngineId.insert(engineId, findFigureKeys(data.model));
 }
 
 void RoiFiguresOverlayWidget::Private::updateFigures()
@@ -398,7 +395,7 @@ void RoiFiguresOverlayWidget::Private::updateFigures()
         if (keys.isEmpty())
             continue;
 
-        const QJsonObject& values = settingsListener->values(engineId);
+        const QJsonObject& values = settingsListener->data(engineId).values;
 
         for (auto it = keys.begin(); it != keys.end(); ++it)
         {
@@ -442,20 +439,25 @@ RoiFiguresOverlayWidget::RoiFiguresOverlayWidget(
     if (const auto camera = resourceWidget->resource().dynamicCast<QnVirtualCameraResource>())
     {
         d->settingsListener = new AnalyticsSettingsMultiListener(
+            qnClientModule->analyticsSettingsManager(),
             camera,
             AnalyticsSettingsMultiListener::ListenPolicy::enabledEngines,
             this);
 
-        connect(d->settingsListener, &AnalyticsSettingsMultiListener::modelChanged, d.data(),
-            &Private::updateFigureKeys);
-        connect(d->settingsListener, &AnalyticsSettingsMultiListener::valuesChanged, d.data(),
-            &Private::updateFigures);
+        connect(d->settingsListener, &AnalyticsSettingsMultiListener::dataChanged, this,
+            [this](const QnUuid& engineId, const DeviceAgentData& data)
+            {
+                d->updateFigureKeys(engineId, data);
+                d->updateFigures();
+            });
 
         auto initializeKeys =
             [this]()
             {
+                d->figureKeysByEngineId.clear();
                 for (const QnUuid& engineId: d->settingsListener->engineIds())
-                    d->updateFigureKeys(engineId, d->settingsListener->model(engineId));
+                    d->updateFigureKeys(engineId, d->settingsListener->data(engineId));
+                d->updateFigures();
             };
         connect(
             d->settingsListener, &AnalyticsSettingsMultiListener::enginesChanged,

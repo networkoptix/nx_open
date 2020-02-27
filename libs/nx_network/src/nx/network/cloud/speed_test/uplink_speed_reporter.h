@@ -24,14 +24,19 @@ namespace speed_test {
 
 class AbstractSpeedTester;
 
+using FetchMediatorAddressHandler =
+    nx::utils::MoveOnlyFunc<void(
+        http::StatusCode::Value statusCode,
+        const hpm::api::MediatorAddress& mediatorAddress)>;
+
 class NX_NETWORK_API UplinkSpeedReporter:
     public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;
 public:
     UplinkSpeedReporter(
+        const nx::utils::Url& cloudModulesXmlUrl,
         hpm::api::MediatorConnector* mediatorConnector,
-        const std::optional<nx::utils::Url>& speedTestUrlMockup = std::nullopt,
         std::unique_ptr<nx::network::aio::Scheduler> scheduler = nullptr);
     ~UplinkSpeedReporter();
 
@@ -39,14 +44,26 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     /**
-     * Invoked right before the SpeedTestService url is fetched.
+     * Invoked right before the speed test url is fetched.
      * NOTE: There may already be a test in progress when this handler is invoked. In that case,
      * aboutToStart will be false, otherwise true.
      * NOTE: handler is invoked before each attempt to run the speed test.
      * It is not discarded after invokation.
      */
     void setAboutToRunSpeedTestHandler(
-        nx::utils::MoveOnlyFunc<void(bool /*aboutToStart*/)> handler);
+        nx::utils::MoveOnlyFunc<void(bool)> handler);
+
+    /**
+     * Invoked when fetching the mediator address completes.
+     */
+    void setFetchMediatorAddressHandler(FetchMediatorAddressHandler handler);
+
+    /**
+     * Checks for valid system credentials and listens for them to be set, invoking a speed test
+     * if they are.
+     * NOTE: Event handler functions above should be installed before start is invoked.
+     */
+    void start();
 
 private:
     void onSystemCredentialsSet(std::optional<hpm::api::SystemCredentials> credentials);
@@ -69,18 +86,18 @@ private:
     void fetchSpeedTestUrl();
 
 private:
+    nx::utils::Url m_cloudModulesXmlUrl;
     hpm::api::MediatorConnector* m_mediatorConnector;
-    utils::SubscriptionId m_systemCredentialsSubscriptionId = nx::utils::kInvalidSubscriptionId;
+    nx::utils::SubscriptionId m_systemCredentialsSubscriptionId = nx::utils::kInvalidSubscriptionId;
     std::unique_ptr<AbstractSpeedTester> m_uplinkSpeedTester;
     std::unique_ptr<hpm::api::Client> m_mediatorApiClient;
-    std::unique_ptr<CloudModuleUrlFetcher> m_cloudModuleUrlFetcher;
+    std::unique_ptr<CloudModuleUrlFetcher> m_speedTestUrlFetcher;
     std::atomic_bool m_testInProgress = false;
     std::optional<hpm::api::PeerConnectionSpeed> m_peerConnectionSpeed;
 
-    QnMutex m_mutex;
-    std::optional<nx::utils::Url> m_speedTestUrlMockup;
     std::unique_ptr<nx::network::aio::Scheduler> m_scheduler;
     nx::utils::MoveOnlyFunc<void(bool /*inProgress*/)> m_aboutToRunSpeedTestHandler;
+    FetchMediatorAddressHandler m_fetchMediatorAddressHandler;
 };
 
 } // namespace speed_test

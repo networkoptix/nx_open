@@ -33,10 +33,10 @@ public:
         hardware.physicalCores = 4;
     }
 
-    MetricsServersApi():
-        ServerForTests(DisabledFeature(
-        (int)DisabledFeature::all & ~DisabledFeature::noOutgoingConnectionsMetric))
+    MetricsServersApi(): ServerForTests(/*autoStart*/ false)
     {
+        addFeatures(MediaServerFeature::outgoingConnectionsMetric);
+        NX_CRITICAL(start());
         serverModule()->platform()->setCustomMonitor(std::make_unique<StubMonitor>());
     }
 };
@@ -52,7 +52,7 @@ TEST_F(MetricsServersApi, oneServer)
     systemMonitor->thisProcessCpuUsage_ = 0.1;
     systemMonitor->thisProcessRamUsageBytes_ = 1_GB;
 
-    auto startValues = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    auto startValues = get<SystemValues>("/ec2/metrics/values")["servers"][id()];
     EXPECT_EQ(startValues["_"]["name"], mediaServerProcess()->thisServer()->getName());
     EXPECT_EQ(startValues["availability"]["status"], "Online");
     EXPECT_EQ(startValues["availability"]["offlineEvents"], 1);
@@ -99,7 +99,7 @@ TEST_F(MetricsServersApi, oneServer)
     systemMonitor->thisProcessRamUsageBytes_ = 6_GB;
     systemMonitor->processUptime_ = std::chrono::minutes{1};
 
-    auto runValues = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    auto runValues = get<SystemValues>("/ec2/metrics/values")["servers"][id()];
     EXPECT_EQ(runValues["_"]["name"], mediaServerProcess()->thisServer()->getName());
     EXPECT_EQ(runValues["availability"]["uptimeS"], 60);
     EXPECT_DOUBLE(runValues["load"]["cpuUsageP"], 0.95);
@@ -113,13 +113,13 @@ TEST_F(MetricsServersApi, oneServer)
     runAlarms = nx::utils::copy_if(
         runAlarms, [](auto k, auto /*v*/) { return !k.contains(".load.logLevel."); });
     ASSERT_EQ(runAlarms.size(), 2) << QJson::serialized(runAlarms).data();
-    EXPECT_EQ(runAlarms["servers." + id + ".load.cpuUsageP.0"].level, api::metrics::AlarmLevel::warning);
-    EXPECT_EQ(runAlarms["servers." + id + ".load.ramUsageP.0"].level, api::metrics::AlarmLevel::warning);
+    EXPECT_EQ(runAlarms["servers." + id() + ".load.cpuUsageP.0"].level, api::metrics::AlarmLevel::warning);
+    EXPECT_EQ(runAlarms["servers." + id() + ".load.ramUsageP.0"].level, api::metrics::AlarmLevel::warning);
 
     for (int i = 0; i < 5; ++i)
         addCamera(i);
 
-    while (get<SystemValues>("/ec2/metrics/values")["servers"][id]["load"]["cameras"].toDouble() != 5)
+    while (get<SystemValues>("/ec2/metrics/values")["servers"][id()]["load"]["cameras"].toDouble() != 5)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
@@ -218,15 +218,15 @@ TEST_F(MetricsServersApi, threeServers)
         [&](const ServerForTests* server)
         {
             auto values = server->get<SystemValues>("/ec2/metrics/values")["servers"];
-            return values[this->id]["availability"]["uptimeS"].toDouble() > 0
-                && values[left->id]["availability"]["uptimeS"].toDouble() > 0
-                && values[right->id]["availability"]["uptimeS"].toDouble() > 0;
+            return values[this->id()]["availability"]["uptimeS"].toDouble() > 0
+                && values[left->id()]["availability"]["uptimeS"].toDouble() > 0
+                && values[right->id()]["availability"]["uptimeS"].toDouble() > 0;
         };
 
     const auto waitForUptimes =
         [&](const ServerForTests* server, const QString& label)
         {
-            NX_INFO(this, "Wait for sync on %1 server %2", label, server->id);
+            NX_INFO(this, "Wait for sync on %1 server %2", label, server->id());
             while (!hasUptimes(this))
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
         };
@@ -241,7 +241,7 @@ TEST_F(MetricsServersApi, streamCount)
     auto checkCounters =
         [this](int primary, int secondary)
         {
-            auto valuess = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+            auto valuess = get<SystemValues>("/ec2/metrics/values")["servers"][id()];
             EXPECT_EQ(valuess["load"]["primaryStreams"], primary);
             EXPECT_EQ(valuess["load"]["secondaryStreams"], secondary);
         };
@@ -263,12 +263,12 @@ TEST_F(MetricsServersApi, apiCalls)
 {
     nx::vms::server::metrics::setTimerMultiplier(100);
 
-    auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id()];
     int apiCalls1 = values["activity"]["apiCalls1m"].toDouble();
     int apiCalls2 = 0;
     do
     {
-        values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+        values = get<SystemValues>("/ec2/metrics/values")["servers"][id()];
         apiCalls2 = values["activity"]["apiCalls1m"].toDouble();
     } while (apiCalls2 == apiCalls1);
     ASSERT_GT(apiCalls2, apiCalls1);
@@ -318,7 +318,7 @@ TEST_F(MetricsServersApi, thumbnailAndDecodingSpeed)
     bool done = false;
     do
     {
-        auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+        auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id()];
         thumbnailsRate = std::max(thumbnailsRate, values["activity"]["thumbnails1m"].toDouble());
         pixelsRate = std::max(pixelsRate, values["load"]["decodingSpeed3s"].toDouble());
         const double seconds = serverStartTimer.elapsedMs() / 1000.0;
@@ -336,7 +336,7 @@ TEST_F(MetricsServersApi, thumbnailAndDecodingSpeed)
 
 TEST_F(MetricsServersApi, outgoingConnections)
 {
-    auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    auto values = get<SystemValues>("/ec2/metrics/values")["servers"][id()];
     int connections1 = values["load"]["outgoingConnections"].toInt();
 
     std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> tmpData;
@@ -344,11 +344,11 @@ TEST_F(MetricsServersApi, outgoingConnections)
     for (int i = 0; i < kIterations; ++i)
         tmpData.emplace_back(nx::network::SocketFactory::createStreamSocket());
 
-    values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    values = get<SystemValues>("/ec2/metrics/values")["servers"][id()];
     int connections2 = values["load"]["outgoingConnections"].toInt();
 
     tmpData.clear();
-    values = get<SystemValues>("/ec2/metrics/values")["servers"][id];
+    values = get<SystemValues>("/ec2/metrics/values")["servers"][id()];
     int connections3 = values["load"]["outgoingConnections"].toInt();
 
     int incomingConnections = values["load"]["incomingConnections"].toInt();

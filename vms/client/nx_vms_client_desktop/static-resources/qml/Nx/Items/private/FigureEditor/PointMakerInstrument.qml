@@ -128,6 +128,15 @@ Instrument
 
         d.processMove(mouse)
 
+        if (count === 2)
+        {
+            const p1 = getPoint(0)
+            const p2 = getPoint(1)
+
+            if (F.distance(p1.x, p1.y, p2.x, p2.y) < snapDistance)
+                return
+        }
+
         if (count > minPoints && pointsModel.shouldFinish())
         {
             pointsModel.remove(count - 1)

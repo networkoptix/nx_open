@@ -536,7 +536,8 @@ void QnResourcesChangesManager::cleanAccessibleResources(const QnUuid& subject)
         makeReplyProcessor(this, handler));
 }
 
-void QnResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& role)
+void QnResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& role,
+    RoleCallbackFunction callback)
 {
     auto connection = commonModule()->ec2Connection();
     if (!connection)
@@ -546,16 +547,18 @@ void QnResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& r
     userRolesManager()->addOrUpdateUserRole(role);
 
     auto handler =
-        [this, backup, role](int /*reqID*/, ec2::ErrorCode errorCode)
+        [this, backup, role, callback](int /*reqID*/, ec2::ErrorCode errorCode)
         {
-            /* Check if all OK */
-            if (errorCode == ec2::ErrorCode::ok)
-                return;
-
-            if (backup.id.isNull())
-                userRolesManager()->removeUserRole(role.id);  /*< New group was not added */
-            else
-                userRolesManager()->addOrUpdateUserRole(backup);
+            const bool success = (errorCode == ec2::ErrorCode::ok);
+            if (!success)
+            {
+                if (backup.id.isNull())
+                    userRolesManager()->removeUserRole(role.id);  //< New group was not added.
+                else
+                    userRolesManager()->addOrUpdateUserRole(backup);
+            }
+            if (callback)
+                callback(success, role);
         };
 
     connection->getUserManager(Qn::kSystemAccess)->saveUserRole(role, this,

@@ -368,6 +368,9 @@
             },
             "availability": {
                 "values": {
+                    "offlineFromOnlineStatus": {
+                        "isOptional": true
+                    },
                     "status": {
                         "name": "Status",
                         "format": "shortText",

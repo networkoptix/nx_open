@@ -28,6 +28,8 @@
 #include <nx/utils/app_info.h>
 #include <nx/fusion/model_functions.h>
 
+#include <nx/kit/utils.h>
+
 namespace {
 
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
@@ -81,6 +83,9 @@ const QString QnVirtualCameraResource::kDeviceAgentManifestsProperty(
 
 const QString QnVirtualCameraResource::kAnalyzedStreamIndexes(
     "analyzedStreamIndexes");
+	
+const QString QnVirtualCameraResource::kWearableClientTimeZone(
+    "wearableClientTimeZone");
 
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -256,6 +261,19 @@ void QnVirtualCameraResource::cleanCameraIssues() {
         removeStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag);
         saveAsync();
     }
+}
+
+bool QnVirtualCameraResource::isWearableClientTimeZone() const
+{
+    return QnLexical::deserialized(
+        getProperty(kWearableClientTimeZone),
+        false);
+}
+
+void QnVirtualCameraResource::setWearableClientTimeZone(bool value)
+{
+    NX_ASSERT(hasFlags(Qn::wearable_camera));
+    setProperty(kWearableClientTimeZone, value ? true : QVariant());
 }
 
 int QnVirtualCameraResource::issuesTimeoutMs() {
@@ -652,21 +670,6 @@ std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedObjectType
     return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), enabledAnalyticsEngines());
 }
 
-std::optional<QJsonObject> QnVirtualCameraResource::deviceAgentSettingsModel(QnUuid engineId) const
-{
-    const auto manifest = deviceAgentManifest(engineId);
-    if (manifest && manifest->deviceAgentSettingsModel.isObject())
-        return manifest->deviceAgentSettingsModel.toObject();
-
-    const auto engine =
-        resourcePool()->getResourceById<nx::vms::common::AnalyticsEngineResource>(engineId);
-
-    if (!engine)
-        return std::nullopt;
-
-    return engine->manifest().deviceAgentSettingsModel;
-}
-
 QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines() const
 {
     return QJson::deserialized<QSet<QnUuid>>(
@@ -731,33 +734,6 @@ QnVirtualCameraResource::DeviceAgentManifestMap
         getProperty(kDeviceAgentManifestsProperty).toUtf8());
 }
 
-QHash<QnUuid, QJsonObject> QnVirtualCameraResource::deviceAgentSettingsValues() const
-{
-    return QJson::deserialized<QHash<QnUuid, QJsonObject>>(
-        getProperty(kDeviceAgentsSettingsValuesProperty).toUtf8());
-}
-
-void QnVirtualCameraResource::setDeviceAgentSettingsValues(
-    const QHash<QnUuid, QJsonObject>& settingsValues)
-{
-    setProperty(kDeviceAgentsSettingsValuesProperty,
-        QString::fromUtf8(QJson::serialized(settingsValues)));
-    saveProperties();
-}
-
-QJsonObject QnVirtualCameraResource::deviceAgentSettingsValues(const QnUuid& engineId) const
-{
-    return deviceAgentSettingsValues()[engineId];
-}
-
-void QnVirtualCameraResource::setDeviceAgentSettingsValues(
-    const QnUuid& engineId, const QJsonObject& settingsValues)
-{
-    auto settingsValuesByEngineId = deviceAgentSettingsValues();
-    settingsValuesByEngineId[engineId] = settingsValues;
-    setDeviceAgentSettingsValues(settingsValuesByEngineId);
-}
-
 std::optional<nx::vms::api::analytics::DeviceAgentManifest>
     QnVirtualCameraResource::deviceAgentManifest(const QnUuid& engineId) const
 {
@@ -796,7 +772,8 @@ nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid en
         NX_WARNING(this,
             "%1 Unable to deserialize the analyzedStreamIndex map for the Device %2 (%3), "
             "\"%4\" property content: %5",
-            __func__, getUserDefinedName(), getId(), kAnalyzedStreamIndexes, serializedProperty);
+            __func__, getUserDefinedName(), getId(), kAnalyzedStreamIndexes,
+            nx::kit::utils::toString(serializedProperty));
         return kDefaultAnalyzedStreamIndex;
     }
 
@@ -827,7 +804,7 @@ void QnVirtualCameraResource::setAnalyzedStreamIndex(
 
     bool success = false;
     auto analyzedStreamIndexMap = QJson::deserialized(
-        serializedProperty.toUtf8(), AnalyzedStreamIndexMap());
+        serializedProperty.toUtf8(), AnalyzedStreamIndexMap(), &success);
 
     if (!success && !serializedProperty.isEmpty())
     {

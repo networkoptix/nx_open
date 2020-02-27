@@ -47,7 +47,7 @@
               *ngIf="localFilter.tags && localFilter.tags.length || localFilter.selects && localFilter.selects.length || localFilter.multiselects && localFilter.multiselects.length">
 
             <div class="drop-container row col-12 m-0 p-0"
-                 [ngClass]="{'mt-3 flex-row' : layout != 'selectors'}"
+                 [ngClass]="{'flex-row' : layout != 'selectors'}"
                  [ngStyle]="{'max-width': layout == 'selectors' ? '100%': '992px'}"
                  *ngIf="localFilter.selects && localFilter.selects.length || localFilter.multiselects && localFilter.multiselects.length">
 
@@ -92,7 +92,7 @@
             </div>
 
             <div class="search-tags m-0 p-0"
-                 [ngClass]="{'mt-2' : layout != 'full', 'mt-3': layout == 'full'}"
+                 [ngClass]="{'mt-2' : layout != 'full'}"
                  *ngIf="localFilter.tags && localFilter.tags.length">
 
                 <div class="col-12 p-0">

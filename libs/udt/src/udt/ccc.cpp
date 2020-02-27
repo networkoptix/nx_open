@@ -57,7 +57,6 @@ CCC::CCC():
     m_pcParam(NULL),
     m_iPSize(0),
     m_UDT(),
-    m_iACKPeriod(0),
     m_iACKInterval(0),
     m_bUserDefinedRTO(false),
     m_iRTO(-1),
@@ -70,7 +69,7 @@ CCC::~CCC()
     delete[] m_pcParam;
 }
 
-void CCC::setACKTimer(int msINT)
+void CCC::setACKTimer(std::chrono::microseconds msINT)
 {
     m_iACKPeriod = msINT > m_iSYNInterval ? m_iSYNInterval : msINT;
 }
@@ -80,20 +79,10 @@ void CCC::setACKInterval(int pktINT)
     m_iACKInterval = pktINT;
 }
 
-void CCC::setRTO(int usRTO)
+void CCC::setRTO(std::chrono::microseconds usRTO)
 {
     m_bUserDefinedRTO = true;
     m_iRTO = usRTO;
-}
-
-void CCC::sendCustomMsg(CPacket& pkt) const
-{
-    auto udt = CUDT::getUDTHandle(m_UDT);
-    if (udt.ok())
-    {
-        pkt.m_iID = udt.get()->peerId();
-        udt.get()->sndQueue().sendto(udt.get()->peerAddr(), pkt);
-    }
 }
 
 const CPerfMon* CCC::getPerfInfo()
@@ -133,7 +122,7 @@ void CCC::setMaxCWndSize(int cwnd)
     m_dMaxCWndSize = cwnd;
 }
 
-void CCC::setRTT(int rtt)
+void CCC::setRTT(std::chrono::microseconds rtt)
 {
     m_iRTT = rtt;
 }
@@ -148,8 +137,6 @@ void CCC::setUserParam(const char* param, int size)
 
 //
 CUDTCC::CUDTCC():
-    m_iRCInterval(),
-    m_LastRCTime(),
     m_bSlowStart(),
     m_iLastAck(),
     m_bLoss(),
@@ -191,8 +178,8 @@ void CUDTCC::onACK(int32_t ack)
     // for long time.
     const double min_inc = 0.01;
 
-    uint64_t currtime = CTimer::getTime();
-    if (currtime - m_LastRCTime < (uint64_t)m_iRCInterval)
+    const auto currtime = CTimer::getTime();
+    if (currtime - m_LastRCTime < m_iRCInterval)
         return;
 
     m_LastRCTime = currtime;
@@ -208,11 +195,11 @@ void CUDTCC::onACK(int32_t ack)
             if (m_iRcvRate > 0)
                 m_dPktSndPeriod = 1000000.0 / m_iRcvRate;
             else
-                m_dPktSndPeriod = (m_iRTT + m_iRCInterval) / m_dCWndSize;
+                m_dPktSndPeriod = (m_iRTT + m_iRCInterval).count() / m_dCWndSize;
         }
     }
     else
-        m_dCWndSize = m_iRcvRate / 1000000.0 * (m_iRTT + m_iRCInterval) + 16;
+        m_dCWndSize = m_iRcvRate / 1000000.0 * (m_iRTT + m_iRCInterval).count() + 16;
 
     // During Slow Start, no rate increase
     if (m_bSlowStart)
@@ -240,7 +227,9 @@ void CUDTCC::onACK(int32_t ack)
             inc = min_inc;
     }
 
-    m_dPktSndPeriod = (m_dPktSndPeriod * m_iRCInterval) / (m_dPktSndPeriod * inc + m_iRCInterval);
+    m_dPktSndPeriod =
+        (m_dPktSndPeriod * m_iRCInterval).count() /
+        (m_dPktSndPeriod * inc + m_iRCInterval.count());
 }
 
 void CUDTCC::onLoss(const int32_t* losslist, int)
@@ -258,7 +247,7 @@ void CUDTCC::onLoss(const int32_t* losslist, int)
         // If no receiving rate is observed, we have to compute the sending
         // rate according to the current window size, and decrease it
         // using the method below.
-        m_dPktSndPeriod = m_dCWndSize / (m_iRTT + m_iRCInterval);
+        m_dPktSndPeriod = m_dCWndSize / (m_iRTT + m_iRCInterval).count();
     }
 
     m_bLoss = true;
@@ -296,7 +285,7 @@ void CUDTCC::onTimeout()
         if (m_iRcvRate > 0)
             m_dPktSndPeriod = 1000000.0 / m_iRcvRate;
         else
-            m_dPktSndPeriod = m_dCWndSize / (m_iRTT + m_iRCInterval);
+            m_dPktSndPeriod = m_dCWndSize / (m_iRTT + m_iRCInterval).count();
     }
     else
     {

@@ -14,6 +14,7 @@
 
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/analytics/settings.h>
 #include <nx/vms/server/analytics/rule_holder.h>
 #include <nx/vms/server/metrics/i_plugin_metrics_provider.h>
 
@@ -62,7 +63,7 @@ public:
         const QString& engineId,
         const QJsonObject& deviceAgentSettings);
 
-    QJsonObject getSettings(const QString& deviceId, const QString& engineId) const;
+    std::optional<Settings> getSettings(const QString& deviceId, const QString& engineId) const;
 
     void setSettings(const QString& engineId, const QJsonObject& engineSettings);
     QJsonObject getSettings(const QString& engineId) const;

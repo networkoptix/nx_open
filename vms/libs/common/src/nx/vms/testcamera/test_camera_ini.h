@@ -8,10 +8,12 @@ struct Ini: public nx::kit::IniConfig
 {
     Ini(): IniConfig("test_camera.ini") { reload(); }
 
-    NX_INI_INT(4984, discoveryPort, "Port on which test camera expects discovery packets used\n"
-        "for Server's auto camera discovery feature.");
+    NX_INI_INT(4984, discoveryPort, "Default port (used when the corresponding command-line\n"
+        "option is not specified) on which testcamera expects discovery messages from Servers\n"
+        "which have camera auto-discovery feature enabled.");
 
-    NX_INI_INT(4985, mediaPort, "Port on which testcamera serves the media stream.");
+    NX_INI_INT(4985, mediaPort, "Default port (used when the corresponding command-line\n"
+        "option is not specified) on which testcamera serves the media stream.");
 
     NX_INI_STRING(
         "Network Optix Camera Emulator 3.0 discovery",

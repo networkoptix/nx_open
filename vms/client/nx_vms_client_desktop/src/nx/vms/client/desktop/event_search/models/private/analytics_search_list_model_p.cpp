@@ -98,7 +98,9 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     connect(q, &AbstractSearchListModel::camerasChanged, this, &Private::updateMetadataReceivers);
 
     auto serverChangesListener = new QnResourceChangesListener(q);
-    serverChangesListener->connectToResources<QnVirtualCameraResource>(&QnResource::statusChanged,
+    serverChangesListener->connectToResources<QnVirtualCameraResource>(
+        q->resourcePool(),
+        &QnResource::statusChanged,
         [this](const QnResourcePtr& resource)
         {
             if (!this->q->isOnline())

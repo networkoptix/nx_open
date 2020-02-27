@@ -12,7 +12,7 @@ import { NxMenuService }             from '../../../components/menu/menu.service
 import { NxHealthService }           from '../health.service';
 import { NxUriService }              from '../../../services/uri.service';
 import { NxLanguageProviderService } from '../../../services/nx-language-provider';
-import { SubscriptionLike }          from 'rxjs';
+import { of, SubscriptionLike }      from 'rxjs';
 import { AutoUnsubscribe }           from 'ngx-auto-unsubscribe';
 import { NxScrollMechanicsService }  from '../../../services/scroll-mechanics.service';
 import { delay, throttleTime }       from 'rxjs/operators';
@@ -39,6 +39,7 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
     metricId: any;
     initialId: any;
 
+    fromBrowserNav: boolean;
     layoutReady: boolean;
     fixedLayoutClass: string;
     breakpoint: string;
@@ -62,9 +63,11 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
     breakpointSubscription: SubscriptionLike;
     windowSizeSubscription: SubscriptionLike;
     locationSubscription: SubscriptionLike;
+    locationReadySubscription: SubscriptionLike;
     layoutReadySubscription: SubscriptionLike;
     fixedLayoutClassSubscription: SubscriptionLike;
     activeEntitySubscription: SubscriptionLike;
+    elementReadySubscription: SubscriptionLike;
 
     @ViewChild('search', { static: false }) searchElement: ElementRef;
     @ViewChild('area', { static: false }) areaElement: ElementRef;
@@ -94,11 +97,14 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
 
         this.locationSubscription = this.location.subscribe((event: PopStateEvent) => {
             // force view component update without URI update
-            setTimeout(() => {
+            this.locationReadySubscription = of('').pipe(delay(0)).subscribe(() => {
                 const params = {...this.route.snapshot.queryParams};
-
                 if (params.id) {
-                    this.setActiveEntity(params.id);
+                    this.fromBrowserNav = true;
+                    // Avoid selecting and entity from non updated selectItems
+                    this.elementReadySubscription = of('').pipe(delay(0)).subscribe(() => {
+                        this.setActiveEntity(params.id);
+                    });
                 } else {
                     this.resetActiveEntity(false);
                 }
@@ -126,7 +132,12 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
                 this.selectedData = this.healthService.tableHeaders[this.metricId];
                 this.selectedPanelData = this.healthService.panelParams[this.metricId];
                 this.healthLayoutService.metricsValuesCount = this.metricId in this.healthService.values ? Object.values(this.healthService.values[this.metricId]).length : 0;
-                this.resetActiveEntity(false);
+
+                if (!this.fromBrowserNav) {
+                    this.resetActiveEntity(false);
+                } else {
+                    this.fromBrowserNav = false;
+                }
 
                 if (!searchParam || !searchParam.length) {
                     this.filterModel.query = '';
@@ -151,8 +162,12 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit() {
         this.healthLayoutService.dimensions = [];
-        this.healthLayoutService.searchTableArea = this.areaElement;
-        this.healthLayoutService.searchElement = this.searchElement;
+
+        // TODO: Create emitter inside search so we'll know when component is ready
+        this.elementReadySubscription = of('').pipe(delay(0)).subscribe(() => {
+            this.healthLayoutService.searchTableArea = this.areaElement;
+            this.healthLayoutService.searchElement = this.searchElement;
+        });
 
         this.fixedLayoutClassSubscription = this.healthLayoutService.fixedLayoutClassSubject.pipe(delay(0)).subscribe((className: string) => {
             this.fixedLayoutClass = className;

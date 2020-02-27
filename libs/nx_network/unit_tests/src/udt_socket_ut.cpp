@@ -67,15 +67,57 @@ public:
             });
     }
 
+protected:
+    void startSilentUdpServer()
+    {
+        m_udpSocket = std::make_unique<UDPSocket>(AF_INET);
+        ASSERT_TRUE(m_udpSocket->bind(SocketAddress::anyPrivateAddress));
+
+        m_serverEndpoint = m_udpSocket->getLocalAddress();
+    }
+
+    void whenConnectWithTimeout(std::chrono::milliseconds timeout)
+    {
+        initializeClientSocketIfNeeded();
+
+        m_lastConnectResult = m_clientSocket->connect(m_serverEndpoint, timeout)
+            ? SystemError::noError
+            : SystemError::getLastOSErrorCode();
+    }
+
+    void thenConnectFailedWithError(SystemError::ErrorCode expected)
+    {
+        ASSERT_EQ(expected, *m_lastConnectResult);
+    }
+
 private:
     boost::optional<SocketFactory::CreateStreamSocketFuncType> m_createStreamSocketFunc;
     boost::optional<SocketFactory::CreateStreamServerSocketFuncType> m_createStreamServerSocketFunc;
+    std::unique_ptr<UDPSocket> m_udpSocket;
+    std::unique_ptr<UdtStreamSocket> m_clientSocket;
+    SocketAddress m_serverEndpoint;
+    std::optional<SystemError::ErrorCode> m_lastConnectResult;
+
+    void initializeClientSocketIfNeeded()
+    {
+        m_clientSocket = std::make_unique<UdtStreamSocket>(AF_INET);
+    }
 };
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST_F, SocketUdt,
     [](){ return std::make_unique<UdtStreamServerSocket>(AF_INET); },
     [](){ return std::make_unique<UdtStreamSocket>(AF_INET); })
+
+//-------------------------------------------------------------------------------------------------
+
+TEST_F(SocketUdt, connect_timeout)
+{
+    startSilentUdpServer();
+
+    whenConnectWithTimeout(std::chrono::milliseconds(1));
+    thenConnectFailedWithError(SystemError::timedOut);
+}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -96,7 +138,6 @@ public:
     }
 
 protected:
-    static const std::chrono::seconds kConnectTimeout;
     static const std::chrono::seconds kConnectDelay;
     static const size_t kBytesToEcho;
     static const int kMaxSimultaneousConnections;
@@ -104,18 +145,22 @@ protected:
 
     virtual void SetUp() override
     {
-        m_serverSocket = createRendezvousUdtSocket(kConnectTimeout);
-        m_clientSocket = createRendezvousUdtSocket(kConnectTimeout);
+        m_serverSocket = createRendezvousUdtSocket();
+        m_clientSocket = createRendezvousUdtSocket();
 
         setUdtSocketFunctions();
+    }
+
+    void setConnectTimeout(std::chrono::milliseconds timeout)
+    {
+        m_connectTimeout = timeout;
     }
 
     void startConnectingServerSocket()
     {
         m_serverSocket->connectAsync(
             m_clientSocket->getLocalAddress(),
-            [this](
-                SystemError::ErrorCode code)
+            [this](SystemError::ErrorCode code)
             {
                 m_clientSocketConnected.set_value(code);
             });
@@ -136,6 +181,11 @@ protected:
                 // No data is supposed to be sent using through this connection.
                 EXPECT_TRUE(code != SystemError::noError || size == 0);
             });
+    }
+
+    void assertServerSocketConnectCompleted()
+    {
+        m_clientSocketConnected.get_future().wait();
     }
 
     void startConnectingClientSocket()
@@ -163,6 +213,18 @@ protected:
                 // no data is supposed to send using this socket
                 ASSERT_TRUE(code != SystemError::noError || size == 0);
             });
+    }
+
+    void closeClientSocket()
+    {
+        m_clientSocket->pleaseStopSync();
+        m_clientSocket.reset();
+    }
+
+    void closeServerSocket()
+    {
+        m_serverSocket->pleaseStopSync();
+        m_serverSocket.reset();
     }
 
     void startConnectionGenerator()
@@ -201,12 +263,14 @@ protected:
         }
     }
 
-    static std::unique_ptr<UdtStreamSocket> createRendezvousUdtSocket(
-        std::chrono::milliseconds connectTimeout)
+    std::unique_ptr<UdtStreamSocket> createRendezvousUdtSocket()
     {
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         EXPECT_TRUE(socket->setRendezvous(true));
-        EXPECT_TRUE(socket->setSendTimeout(connectTimeout.count()));
+        if (m_connectTimeout)
+        {
+            EXPECT_TRUE(socket->setSendTimeout(m_connectTimeout->count()));
+        }
         EXPECT_TRUE(socket->setNonBlockingMode(true));
         EXPECT_TRUE(socket->bind(SocketAddress(HostAddress::localhost, 0)));
         return socket;
@@ -219,24 +283,26 @@ private:
     std::unique_ptr<ConnectionsGenerator> m_generator;
     nx::utils::promise<SystemError::ErrorCode> m_serverSocketConnected;
     nx::utils::promise<SystemError::ErrorCode> m_clientSocketConnected;
+    std::optional<std::chrono::milliseconds> m_connectTimeout;
 };
 
-const std::chrono::seconds SocketUdtRendezvous::kConnectTimeout = std::chrono::seconds::zero();
 const std::chrono::seconds SocketUdtRendezvous::kConnectDelay(1);
 const size_t SocketUdtRendezvous::kBytesToEcho(128 * 1024);
 const int SocketUdtRendezvous::kMaxSimultaneousConnections(25);
 const std::chrono::seconds SocketUdtRendezvous::kTestDuration(3);
 
-TEST_F(SocketUdtRendezvous, connect_works)
+TEST_F(SocketUdtRendezvous, reusing_rendezvous_connection_stress_test)
 {
     const std::chrono::seconds kConnectTimeout(2);
     const size_t kBytesToSendThroughConnection(128 * 1024);
     const int kMaxSimultaneousConnections(25);
     const std::chrono::seconds kTestDuration(3);
 
+    setConnectTimeout(kConnectTimeout);
+
     //creating two sockets, performing randezvous connect
-    const auto connectorSocket = createRendezvousUdtSocket(kConnectTimeout);
-    const auto acceptorSocket = createRendezvousUdtSocket(kConnectTimeout);
+    const auto connectorSocket = createRendezvousUdtSocket();
+    const auto acceptorSocket = createRendezvousUdtSocket();
 
     auto socketStoppedGuard = nx::utils::makeScopeGuard(
         [&connectorSocket, &acceptorSocket]
@@ -299,6 +365,28 @@ TEST_F(SocketUdtRendezvous, connect_works)
     ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0U);
     ASSERT_GT(connectionsGenerator.totalBytesSent(), 0U);
     ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0U);
+}
+
+TEST_F(SocketUdtRendezvous, connect_works)
+{
+    startConnectingServerSocket();
+    startConnectingClientSocket();
+
+    assertClientSocketHasConnected();
+    assertServerSocketHasConnected();
+}
+
+TEST_F(SocketUdtRendezvous, socket_is_closed_during_connect)
+{
+    setConnectTimeout(std::chrono::milliseconds(1));
+
+    startConnectingServerSocket();
+    startConnectingClientSocket();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 10));
+
+    closeClientSocket();
+    closeServerSocket();
 }
 
 TEST_F(SocketUdtRendezvous, connect_works_with_delay_between_server_and_client)

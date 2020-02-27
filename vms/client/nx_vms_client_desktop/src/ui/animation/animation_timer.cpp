@@ -1,7 +1,9 @@
 #include "animation_timer.h"
+
 #include <cassert>
 #include <QtCore/QAbstractAnimation>
 #include <utils/common/warnings.h>
+#include <nx/utils/log/assert.h>
 
 // -------------------------------------------------------------------------- //
 // AnimationTimerListener
@@ -43,7 +45,7 @@ void AnimationTimerListener::setTimer(AnimationTimer *timer) {
         timer->addListener(this);
     } else if(m_timer != NULL) {
         m_timer->removeListener(this);
-    } 
+    }
 }
 
 
@@ -90,30 +92,40 @@ void AnimationTimer::reset() {
     m_lastTickTime = -1;
 }
 
-void AnimationTimer::updateCurrentTime(qint64 time) {
-    if(m_lastTickTime == -1)
+void AnimationTimer::updateCurrentTime(qint64 time)
+{
+    if (m_lastTickTime == -1)
         m_lastTickTime = time;
 
-    if(isActive()) {
-        int deltaTime = static_cast<int>(time - m_lastTickTime);
-        if(deltaTime > 0) {
+    if (isActive())
+    {
+        const int deltaTime = static_cast<int>(time - m_lastTickTime);
+        if (deltaTime > 0)
+        {
             bool hasNullListeners = false;
 
-            /* Listeners may be added/removed in the process, 
-             * this is why we have to iterate by index. */
-            for(int i = 0; i < m_listeners.size(); i++) {
-                AnimationTimerListener *listener = m_listeners[i];
-                if(listener == NULL) {
+            // Listeners may be added/removed in the process, this is why we have to iterate by index.
+            for (int i = 0; i < m_listeners.size(); i++)
+            {
+                AnimationTimerListener* listener = m_listeners[i];
+                if (!listener)
+                {
                     hasNullListeners = true;
-                } else if(m_listeners[i]->isListening()) {
-                    m_listeners[i]->tick(deltaTime);
+                }
+                else if (listener->isListening())
+                {
+                    listener->tick(deltaTime);
                 }
             }
 
-            if(hasNullListeners)
-                m_listeners.removeAll(NULL);
+            if (hasNullListeners)
+                m_listeners.removeAll(nullptr);
         }
     }
+
+    NX_ASSERT(m_listeners.indexOf(nullptr) < 0, "Null listeners while delta %1, isActive %2",
+        static_cast<int>(time - m_lastTickTime),
+        isActive());
 
     m_lastTickTime = time;
 }
@@ -162,6 +174,9 @@ void AnimationTimer::removeListener(AnimationTimerListener *listener) {
     if(listener->m_timer != this)
         return; /* Removing a listener that is not there is OK. */
 
+    NX_ASSERT(m_listeners.count(nullptr) < 1000, "Null listeners while isActive %1",
+        isActive());
+
     if(listener->isListening())
         listenerStoppedListening(listener);
     m_listeners[m_listeners.indexOf(listener)] = NULL;
@@ -192,7 +207,7 @@ void AnimationTimer::listenerStoppedListening(AnimationTimerListener *listener) 
 // -------------------------------------------------------------------------- //
 // QAnimationTimer
 // -------------------------------------------------------------------------- //
-QAnimationTimer::QAnimationTimer(QObject *parent): 
+QAnimationTimer::QAnimationTimer(QObject *parent):
     QAbstractAnimation(parent)
 {}
 

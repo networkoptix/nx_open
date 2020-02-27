@@ -29,7 +29,7 @@ ClientFactory::ClientFactory():
 {
     registerClientType<GetPostTunnelClient>();
     registerClientType<ConnectionUpgradeTunnelClient>();
-    registerClientType<ExperimentalTunnelClient>();
+    // registerClientType<ExperimentalTunnelClient>();
     registerClientType<SslTunnelClient>();
 }
 

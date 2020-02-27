@@ -91,14 +91,15 @@ protected:
 
     void whenTimerRestarted()
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_invocationsSoFar = m_invocations.size();
-
         QTimer::singleShot(
             0ms,
             &m_thread,
             [this]()
             {
+                {
+                    std::lock_guard<std::mutex> lock(m_mutex);
+                    m_invocationsSoFar = m_invocations.size();
+                }
                 m_timer->start(
                     200ms,
                     [this]()

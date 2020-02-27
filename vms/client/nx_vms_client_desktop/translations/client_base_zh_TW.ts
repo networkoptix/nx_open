@@ -989,7 +989,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation>連接此伺服器</translation>
+      <translation>連接至此伺服器</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -2619,6 +2619,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -3881,8 +3888,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>可重置次數: %n</numerusform>
       </translation>
     </message>
   </context>
@@ -3906,7 +3913,7 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>欲取得離線授權檔，請提供授權碼和硬體ID到 %1，</translation>
     </message>
   </context>
   <context>
@@ -4459,7 +4466,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>支援PoE監控的伺服器</translation>
     </message>
   </context>
   <context>
@@ -8283,11 +8290,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>代理伺服器 %1需要使用者名稱和密碼。</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>請選擇要上傳的資料夾</translation>
     </message>
   </context>
   <context>
@@ -8381,7 +8388,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>該ID已在系統中使用。請使用“產生”按鈕查找可使用的ID。</translation>
     </message>
   </context>
   <context>
@@ -8773,30 +8780,6 @@ If you intended to move analytics data to another storage location, please conta
       <source>Acknowledge</source>
       <translation>確認</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>通用事件</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>裝置已斷線</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>攝影機已斷線</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I/O 模組已斷線</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>不明的插件診斷事件</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation>消耗量</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8954,16 +8937,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>供電中</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>未知狀態</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>未供電</translation>
     </message>
     <message>
       <source>&lt; Unknown device %1 &gt;</source>
@@ -8972,7 +8955,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Port</source>
-      <translation>通訊埠</translation>
+      <translation>網路孔</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -8980,7 +8963,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Consumption</source>
-      <translation>消耗量</translation>
+      <translation>耗電量</translation>
     </message>
     <message>
       <source>Speed</source>
@@ -8992,7 +8975,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Power</source>
-      <translation>電力</translation>
+      <translation>電源</translation>
     </message>
     <message>
       <source>&lt; Unknown device &gt;</source>
@@ -9008,6 +8991,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Adding</source>
       <translation>新增中</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation>雲端使用者</translation>
     </message>
   </context>
   <context>

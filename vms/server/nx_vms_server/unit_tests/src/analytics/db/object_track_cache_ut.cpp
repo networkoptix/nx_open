@@ -7,7 +7,7 @@
 #include <nx/vms/server/analytics/db/object_track_cache.h>
 
 #include "attribute_dictionary.h"
-#include <nx/vms/server/analytics/abstract_iframe_search_helper.h>
+#include <nx/vms/server/analytics/abstract_i_frame_search_helper.h>
 
 class QnResourcePool;
 class QnVideoCameraPool;
@@ -25,7 +25,8 @@ public:
     MocIFrameSearchHelper(
         const QnResourcePool* resourcePool,
         const QnVideoCameraPool* cameraPool)
-    {}
+    {
+    }
 
     virtual qint64 findAfter(
         const QnUuid& deviceId,

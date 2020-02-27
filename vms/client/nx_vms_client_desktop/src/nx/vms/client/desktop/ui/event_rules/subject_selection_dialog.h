@@ -36,6 +36,10 @@ class SubjectSelectionDialog: public QnSessionAwareButtonBoxDialog
 public:
     struct CustomizableOptions
     {
+        // Initializes options with values suitable for Cloud users selection dialog.
+        // TODO: #spanasenko Refactor the whole dialog customizaion.
+        static CustomizableOptions cloudUsers();
+
         QString userListHeader;
         std::function<bool(const QnUserResource&)> userFilter;
         bool showAllUsersSwitcher = false;

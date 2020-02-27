@@ -6,6 +6,8 @@ namespace cloud {
 
 const char* const kCloudDbModuleName = "cdb";
 const char* const kConnectionMediatorModuleName = "hpm";
+const char* const kConnectionMediatorTcpUrlName = "hpm.tcpUrl";
+const char* const kConnectionMediatorUdpUrlName = "hpm.udpUrl";
 const char* const kNotificationModuleName = "notification_module";
 const char* const kSpeedTestModuleName = "speedtest_module";
 
@@ -25,8 +27,8 @@ CloudInstanceSelectionAttributeNameset::CloudInstanceSelectionAttributeNameset()
     registerResource(cdbUrl, kCloudDbModuleName, QVariant::String);
 
     registerResource(hpmUrl, kConnectionMediatorModuleName, QVariant::String);
-    registerResource(hpmTcpUrl, "hpm.tcpUrl", QVariant::String);
-    registerResource(hpmUdpUrl, "hpm.udpUrl", QVariant::String);
+    registerResource(hpmTcpUrl, kConnectionMediatorTcpUrlName, QVariant::String);
+    registerResource(hpmUdpUrl, kConnectionMediatorUdpUrlName, QVariant::String);
 
     registerResource(notificationModuleUrl, kNotificationModuleName, QVariant::String);
     registerResource(speedTestModuleUrl, kSpeedTestModuleName, QVariant::String);

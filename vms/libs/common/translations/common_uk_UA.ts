@@ -18,95 +18,95 @@
   </context>
   <context>
     <name>HumanReadable</name>
-    <message numerus="yes">
-      <source>Bytes</source>
-      <comment>Full suffix for displaying bytes</comment>
-      <translation>
-        <numerusform>Байт</numerusform>
-        <numerusform>Байтів</numerusform>
-        <numerusform>Байтів</numerusform>
-        <numerusform>Байтів</numerusform>
-      </translation>
-    </message>
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
       <translation>Б</translation>
-    </message>
-    <message numerus="yes">
-      <source>Kilobytes</source>
-      <comment>Full suffix for displaying kilobytes</comment>
-      <translation>
-        <numerusform>Кілобайт</numerusform>
-        <numerusform>Кілобайти</numerusform>
-        <numerusform>Кілобайтів</numerusform>
-        <numerusform>Кілобайтів</numerusform>
-      </translation>
     </message>
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
       <translation>КБ</translation>
     </message>
-    <message numerus="yes">
-      <source>Megabytes</source>
-      <comment>Full suffix for displaying megabytes</comment>
-      <translation>
-        <numerusform>Мегабайт</numerusform>
-        <numerusform>Мегабайтів</numerusform>
-        <numerusform>Мегабайтів</numerusform>
-        <numerusform>Мегабайтів</numerusform>
-      </translation>
-    </message>
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
       <translation>МБ</translation>
-    </message>
-    <message numerus="yes">
-      <source>Gigabytes</source>
-      <comment>Full suffix for displaying gigabytes</comment>
-      <translation>
-        <numerusform>Гігабайт</numerusform>
-        <numerusform>Гігабайти</numerusform>
-        <numerusform>Гігабайтів</numerusform>
-        <numerusform>Гігабайтів</numerusform>
-      </translation>
     </message>
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
       <translation>ГБ</translation>
     </message>
-    <message numerus="yes">
-      <source>Terabytes</source>
-      <comment>Full suffix for displaying terabytes</comment>
-      <translation>
-        <numerusform>Теребайт</numerusform>
-        <numerusform>Терабайти</numerusform>
-        <numerusform>Терабайтів</numerusform>
-        <numerusform>Терабайтів</numerusform>
-      </translation>
-    </message>
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
       <translation>ТБ</translation>
     </message>
-    <message numerus="yes">
-      <source>Petabytes</source>
-      <comment>Full suffix for displaying petabytes</comment>
-      <translation>
-        <numerusform>Петабайт</numerusform>
-        <numerusform>Петабайти</numerusform>
-        <numerusform>Петабайтів</numerusform>
-        <numerusform>Петабайтів</numerusform>
-      </translation>
-    </message>
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
       <translation>ПБ</translation>
+    </message>
+    <message numerus="yes">
+      <source>Byte(s)</source>
+      <comment>Full suffix for displaying bytes</comment>
+      <translation type="unfinished">
+        <numerusform>Byte(s)</numerusform>
+        <numerusform>Byte(s)</numerusform>
+        <numerusform>Byte(s)</numerusform>
+        <numerusform>Byte(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Kilobyte(s)</source>
+      <comment>Full suffix for displaying kilobytes</comment>
+      <translation type="unfinished">
+        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilobyte(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Megabyte(s)</source>
+      <comment>Full suffix for displaying megabytes</comment>
+      <translation type="unfinished">
+        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megabyte(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Gigabyte(s)</source>
+      <comment>Full suffix for displaying gigabytes</comment>
+      <translation type="unfinished">
+        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigabyte(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Terabyte(s)</source>
+      <comment>Full suffix for displaying terabytes</comment>
+      <translation type="unfinished">
+        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Terabyte(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Petabyte(s)</source>
+      <comment>Full suffix for displaying petabytes</comment>
+      <translation type="unfinished">
+        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petabyte(s)</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1395,10 +1395,6 @@
       <translation>Записати в журнал</translation>
     </message>
     <message>
-      <source>Show notification</source>
-      <translation>Показати сповіщення</translation>
-    </message>
-    <message>
       <source>Repeat sound</source>
       <translation>Повторити звук</translation>
     </message>
@@ -1951,6 +1947,30 @@
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
       <translation>Причина: Перевищено ліміт потужності (%1)</translation>
+    </message>
+    <message>
+      <source>Show desktop notification</source>
+      <translation type="unfinished">Show desktop notification</translation>
+    </message>
+    <message>
+      <source>Send mobile notification</source>
+      <translation type="unfinished">Send mobile notification</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation type="unfinished">Consumption</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
     </message>
   </context>
   <context>

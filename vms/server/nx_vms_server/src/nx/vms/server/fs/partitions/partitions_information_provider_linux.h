@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/vms/server/fs/partitions/abstract_partitions_information_provider_linux.h>
+#include <media_server/media_server_module.h>
 #include <nx/vms/server/root_fs.h>
 
 namespace  nx::vms::server::fs {
@@ -8,12 +9,13 @@ namespace  nx::vms::server::fs {
 class PartitionsInformationProvider: public AbstractPartitionsInformationProvider
 {
   public:
-    PartitionsInformationProvider(RootFileSystem* rootFs);
+    PartitionsInformationProvider(QnMediaServerModule* serverModule);
 
-    virtual QByteArray mountsFileContent() const override;
+    virtual QByteArray mountsFileContents() const override;
     virtual qint64 totalSpace(const QByteArray& fsPath) const override;
     virtual qint64 freeSpace(const QByteArray& fsPath) const override;
     virtual bool isFolder(const QByteArray& fsPath) const override;
+    virtual QStringList additionalLocalFsTypes() const override;
 
   private:
     static const qint64 kUnknownValue = std::numeric_limits<qint64>::min();
@@ -23,7 +25,8 @@ class PartitionsInformationProvider: public AbstractPartitionsInformationProvide
         qint64 totalSpace = kUnknownValue;
     };
 
-    RootFileSystem* m_rootFs = nullptr;
+    QnMediaServerModule* m_serverModule = nullptr;
+    nx::vms::server::RootFileSystem* m_rootFs = nullptr;
     mutable QMap<QString, DeviceSpaces> m_deviceSpacesCache;
     mutable QnMutex m_mutex;
     mutable int m_tries;

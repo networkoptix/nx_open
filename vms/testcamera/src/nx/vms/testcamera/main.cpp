@@ -16,6 +16,7 @@
 #include "camera_pool.h"
 #include "camera_options.h"
 #include "file_cache.h"
+#include "network_options.h"
 
 namespace nx::vms::testcamera {
 
@@ -42,6 +43,18 @@ static CameraOptions makeCameraOptions(
     result.shiftPtsSecondaryPeriod = options.shiftPtsSecondaryPeriod;
 
     result.offlineFreq = cameraSet.offlineFreq;
+
+    return result;
+}
+
+NetworkOptions makeNetworkOptions(const CliOptions& options)
+{
+    NetworkOptions result;
+
+    result.localInterfacesToListen = options.localInterfaces;
+    result.discoveryPort = options.discoveryPort ? *options.discoveryPort : ini().discoveryPort;
+    result.mediaPort = options.mediaPort ? *options.mediaPort : ini().mediaPort;
+    result.reuseDiscoveryPort = options.reuseDiscoveryPort;
 
     return result;
 }
@@ -74,7 +87,7 @@ public:
 
         m_cameraPool = std::make_unique<CameraPool>(
             m_fileCache.get(),
-            options.localInterfaces,
+            makeNetworkOptions(options),
             m_commonModule.get(),
             options.noSecondary,
             options.fpsPrimary,
@@ -135,43 +148,50 @@ private:
     }
 };
 
+static int run(int argc, char* argv[], const QCoreApplication& app)
+{
+    Executor executor;
+
+    if (!executor.initialize(argc, argv))
+        return 1;
+
+    return app.exec();
+}
+
 } // namespace
 
 } using namespace nx::vms::testcamera;
 
 int main(int argc, char* argv[])
 {
+    int exitStatus;
     try
     {
         nx::kit::OutputRedirector::ensureOutputRedirection();
+        nx::utils::log::setLevelReducerEnabled(false);
 
         ini().reload(); //< Make .ini appear on the console even when help is requested.
 
         QCoreApplication::setOrganizationName(nx::utils::AppInfo::organizationName());
         QCoreApplication::setApplicationName(nx::utils::AppInfo::vmsName() + " Test Camera");
         QCoreApplication::setApplicationVersion(nx::utils::AppInfo::applicationVersion());
-        QCoreApplication app(argc, argv); //< Each user may have their own testcamera running.
+        const QCoreApplication app(argc, argv); //< Each user may run their own executable.
 
         // NOTE: Print blank lines before (after ini-config printout) and after to emphasize.
         print(std::cout, "\n%1 version %2\n", app.applicationName(), app.applicationVersion());
 
-        Executor executor;
-        if (!executor.initialize(argc, argv))
-            return 1;
-
-        const int exitStatus = app.exec();
-
-        print(std::cerr, "Finished with exit status %1.", exitStatus);
-        return exitStatus;
+        exitStatus = run(argc, argv, app);
     }
     catch (const std::exception& e)
     {
         print(std::cerr, "INTERNAL ERROR: Exception raised: %1", e.what());
-        return 70;
+        exitStatus = 70;
     }
     catch (...)
     {
         print(std::cerr, "INTERNAL ERROR: Unknown exception raised.");
-        return 70;
+        exitStatus = 71;
     }
+    print(std::cerr, "Finished with exit status %1.", exitStatus);
+    return exitStatus;
 }

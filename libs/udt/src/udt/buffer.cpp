@@ -38,9 +38,10 @@ written by
 Yunhong Gu, last updated 03/12/2011
 *****************************************************************************/
 
+#include "buffer.h"
+
 #include <cstring>
 #include <cmath>
-#include "buffer.h"
 
 using namespace std;
 
@@ -56,7 +57,7 @@ CSndBuffer::CSndBuffer(int size, int mss):
     m_iCount(0)
 {
     // initial physical buffer of "size"
-    m_pBuffer = new Buffer;
+    m_pBuffer = new BufferNode;
     m_pBuffer->m_pcData = new char[m_iSize * m_iMSS];
     m_pBuffer->m_iSize = m_iSize;
     m_pBuffer->m_pNext = NULL;
@@ -97,15 +98,17 @@ CSndBuffer::~CSndBuffer()
 
     while (m_pBuffer != NULL)
     {
-        Buffer* temp = m_pBuffer;
+        BufferNode* temp = m_pBuffer;
         m_pBuffer = m_pBuffer->m_pNext;
         delete[] temp->m_pcData;
         delete temp;
     }
 }
 
-void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
+void CSndBuffer::addBuffer(const char* data, int len, std::chrono::milliseconds ttl, bool order)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int size = len / m_iMSS;
     if ((len % m_iMSS) != 0)
         size++;
@@ -114,7 +117,7 @@ void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
     while (size + m_iCount >= m_iSize)
         increase();
 
-    uint64_t time = CTimer::getTime();
+    const auto time = CTimer::getTime();
     int32_t inorder = order;
     inorder <<= 29;
 
@@ -141,10 +144,7 @@ void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
     }
     m_pLastBlock = s;
 
-    {
-        std::lock_guard<std::mutex> lock(m_BufLock);
-        m_iCount += size;
-    }
+    m_iCount += size;
 
     m_iNextMsgNo++;
     if (m_iNextMsgNo == CMsgNo::m_iMaxMsgNo)
@@ -153,6 +153,8 @@ void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
 
 int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int size = len / m_iMSS;
     if ((len % m_iMSS) != 0)
         size++;
@@ -184,17 +186,14 @@ int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
             s->m_iMsgNo |= 0x40000000;
 
         s->m_iLength = pktlen;
-        s->m_iTTL = -1;
+        s->m_iTTL = std::chrono::milliseconds(-1);
         s = s->m_pNext;
 
         total += pktlen;
     }
     m_pLastBlock = s;
 
-    {
-        std::lock_guard<std::mutex> lock(m_BufLock);
-        m_iCount += size;
-    }
+    m_iCount += size;
 
     m_iNextMsgNo++;
     if (m_iNextMsgNo == CMsgNo::m_iMaxMsgNo)
@@ -203,31 +202,37 @@ int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
     return total;
 }
 
-int CSndBuffer::readData(char** data, int32_t& msgno)
+std::optional<Buffer> CSndBuffer::readData(int32_t& msgno)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     // No data to read
     if (m_pCurrBlock == m_pLastBlock)
         return 0;
 
-    *data = m_pCurrBlock->m_pcData;
-    int readlen = m_pCurrBlock->m_iLength;
+    std::optional<Buffer> data;
+    // TODO: #ak Avoid copying here by switching Block::m_pcData to Buffer.
+    if (m_pCurrBlock->m_iLength >= 0)
+        data = Buffer(m_pCurrBlock->m_pcData, m_pCurrBlock->m_iLength);
+
     msgno = m_pCurrBlock->m_iMsgNo;
 
     m_pCurrBlock = m_pCurrBlock->m_pNext;
 
-    return readlen;
+    return data;
 }
 
-int CSndBuffer::readData(char** data, const int offset, int32_t& msgno, int& msglen)
+std::optional<Buffer> CSndBuffer::readData(const int offset, int32_t& msgno, int& msglen)
 {
-    std::lock_guard<std::mutex> lock(m_BufLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     Block* p = m_pFirstBlock;
 
     for (int i = 0; i < offset; ++i)
         p = p->m_pNext;
 
-    if ((p->m_iTTL >= 0) && ((CTimer::getTime() - p->m_OriginTime) / 1000 >(uint64_t)p->m_iTTL))
+    if ((p->m_iTTL >= std::chrono::milliseconds::zero()) &&
+        ((CTimer::getTime() - p->m_OriginTime) > p->m_iTTL))
     {
         msgno = p->m_iMsgNo & 0x1FFFFFFF;
 
@@ -244,19 +249,19 @@ int CSndBuffer::readData(char** data, const int offset, int32_t& msgno, int& msg
             msglen++;
         }
 
-        return -1;
+        return std::nullopt;
     }
 
-    *data = p->m_pcData;
-    int readlen = p->m_iLength;
+    // TODO: #ak Avoid copying here by switching Block::m_pcData to Buffer.
+    auto data = Buffer(p->m_pcData, p->m_iLength);
     msgno = p->m_iMsgNo;
 
-    return readlen;
+    return data;
 }
 
 void CSndBuffer::ackData(int offset)
 {
-    std::lock_guard<std::mutex> lock(m_BufLock);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     for (int i = 0; i < offset; ++i)
         m_pFirstBlock = m_pFirstBlock->m_pNext;
@@ -268,6 +273,8 @@ void CSndBuffer::ackData(int offset)
 
 int CSndBuffer::getCurrBufSize() const
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     return m_iCount;
 }
 
@@ -276,13 +283,13 @@ void CSndBuffer::increase()
     int unitsize = m_pBuffer->m_iSize;
 
     // new physical buffer
-    Buffer* nbuf = new Buffer;
+    BufferNode* nbuf = new BufferNode;
     nbuf->m_pcData = new char[unitsize * m_iMSS];
     nbuf->m_iSize = unitsize;
     nbuf->m_pNext = NULL;
 
     // insert the buffer at the end of the buffer list
-    Buffer* p = m_pBuffer;
+    BufferNode* p = m_pBuffer;
     while (NULL != p->m_pNext)
         p = p->m_pNext;
     p->m_pNext = nbuf;
@@ -335,8 +342,8 @@ CRcvBuffer::~CRcvBuffer()
     {
         if (NULL != m_pUnit[i])
         {
-            m_pUnit[i]->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            m_pUnit[i]->setFlag(0);
+            m_pUnitQueue->decCount();
         }
     }
 
@@ -345,6 +352,8 @@ CRcvBuffer::~CRcvBuffer()
 
 bool CRcvBuffer::addData(CUnit* unit, int offset)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int pos = (m_iLastAckPos + offset) % m_iSize;
     if (offset > m_iMaxPos)
         m_iMaxPos = offset;
@@ -354,33 +363,35 @@ bool CRcvBuffer::addData(CUnit* unit, int offset)
 
     m_pUnit[pos] = unit;
 
-    unit->m_iFlag = 1;
-    ++m_pUnitQueue->m_iCount;
+    unit->setFlag(1);
+    m_pUnitQueue->incCount();
 
     return true;
 }
 
 int CRcvBuffer::readBuffer(char* data, int len)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int p = m_iStartPos;
     int lastack = m_iLastAckPos;
     int rs = len;
 
     while ((p != lastack) && (rs > 0) && m_pUnit[p] != NULL)
     {
-        int unitsize = m_pUnit[p]->m_Packet.getLength() - m_iNotch;
+        int unitsize = m_pUnit[p]->packet().getLength() - m_iNotch;
         if (unitsize > rs)
             unitsize = rs;
 
-        memcpy(data, m_pUnit[p]->m_Packet.m_pcData + m_iNotch, unitsize);
+        memcpy(data, m_pUnit[p]->packet().payload().data() + m_iNotch, unitsize);
         data += unitsize;
 
-        if ((rs > unitsize) || (rs == m_pUnit[p]->m_Packet.getLength() - m_iNotch))
+        if ((rs > unitsize) || (rs == m_pUnit[p]->packet().getLength() - m_iNotch))
         {
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
-            tmp->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            tmp->setFlag(0);
+            m_pUnitQueue->decCount();
 
             if (++p == m_iSize)
                 p = 0;
@@ -399,26 +410,28 @@ int CRcvBuffer::readBuffer(char* data, int len)
 
 int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int p = m_iStartPos;
     int lastack = m_iLastAckPos;
     int rs = len;
 
     while ((p != lastack) && (rs > 0) && (m_pUnit[p] != NULL))
     {
-        int unitsize = m_pUnit[p]->m_Packet.getLength() - m_iNotch;
+        int unitsize = m_pUnit[p]->packet().getLength() - m_iNotch;
         if (unitsize > rs)
             unitsize = rs;
 
-        ofs.write(m_pUnit[p]->m_Packet.m_pcData + m_iNotch, unitsize);
+        ofs.write(m_pUnit[p]->packet().payload().data() + m_iNotch, unitsize);
         if (ofs.fail())
             break;
 
-        if ((rs > unitsize) || (rs == m_pUnit[p]->m_Packet.getLength() - m_iNotch))
+        if ((rs > unitsize) || (rs == m_pUnit[p]->packet().getLength() - m_iNotch))
         {
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
-            tmp->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            tmp->setFlag(0);
+            m_pUnitQueue->decCount();
 
             if (++p == m_iSize)
                 p = 0;
@@ -438,6 +451,8 @@ int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
 
 void CRcvBuffer::ackData(int len)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     m_iLastAckPos = (m_iLastAckPos + len) % m_iSize;
     m_iMaxPos -= len;
     if (m_iMaxPos < 0)
@@ -448,11 +463,19 @@ void CRcvBuffer::ackData(int len)
 
 int CRcvBuffer::getAvailBufSize() const
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     // One slot must be empty in order to tell the difference between "empty buffer" and "full buffer"
-    return m_iSize - getRcvDataSize() - 1;
+    return m_iSize - getRcvDataSize(lock) - 1;
 }
 
 int CRcvBuffer::getRcvDataSize() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return getRcvDataSize(lock);
+}
+
+int CRcvBuffer::getRcvDataSize(const std::lock_guard<std::mutex>&) const
 {
     if (m_iLastAckPos >= m_iStartPos)
         return m_iLastAckPos - m_iStartPos;
@@ -462,28 +485,32 @@ int CRcvBuffer::getRcvDataSize() const
 
 void CRcvBuffer::dropMsg(int32_t msgno)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     for (int i = m_iStartPos, n = (m_iLastAckPos + m_iMaxPos) % m_iSize; i != n; i = (i + 1) % m_iSize)
-        if ((NULL != m_pUnit[i]) && (msgno == m_pUnit[i]->m_Packet.m_iMsgNo))
-            m_pUnit[i]->m_iFlag = 3;
+        if ((NULL != m_pUnit[i]) && (msgno == m_pUnit[i]->packet().m_iMsgNo))
+            m_pUnit[i]->setFlag(3);
 }
 
 int CRcvBuffer::readMsg(char* data, int len)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int p, q;
     bool passack;
-    if (!scanMsg(p, q, passack))
+    if (!scanMsg(lock, p, q, passack))
         return 0;
 
     int rs = len;
     while ((p != (q + 1) % m_iSize) && m_pUnit[p] != NULL)
     {
-        int unitsize = m_pUnit[p]->m_Packet.getLength();
+        int unitsize = m_pUnit[p]->packet().getLength();
         if ((rs >= 0) && (unitsize > rs))
             unitsize = rs;
 
         if (unitsize > 0)
         {
-            memcpy(data, m_pUnit[p]->m_Packet.m_pcData, unitsize);
+            memcpy(data, m_pUnit[p]->packet().payload().data(), unitsize);
             data += unitsize;
             rs -= unitsize;
         }
@@ -492,11 +519,11 @@ int CRcvBuffer::readMsg(char* data, int len)
         {
             CUnit* tmp = m_pUnit[p];
             m_pUnit[p] = NULL;
-            tmp->m_iFlag = 0;
-            --m_pUnitQueue->m_iCount;
+            tmp->setFlag(0);
+            m_pUnitQueue->decCount();
         }
         else
-            m_pUnit[p]->m_iFlag = 2;
+            m_pUnit[p]->setFlag(2);
 
         if (++p == m_iSize)
             p = 0;
@@ -510,12 +537,16 @@ int CRcvBuffer::readMsg(char* data, int len)
 
 int CRcvBuffer::getRcvMsgNum()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int p, q;
     bool passack;
-    return scanMsg(p, q, passack) ? 1 : 0;
+    return scanMsg(lock, p, q, passack) ? 1 : 0;
 }
 
-bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
+bool CRcvBuffer::scanMsg(
+    const std::lock_guard<std::mutex>& lock,
+    int& p, int& q, bool& passack)
 {
     // empty buffer
     if ((m_iStartPos == m_iLastAckPos) && (m_iMaxPos <= 0))
@@ -531,20 +562,20 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
             continue;
         }
 
-        if ((1 == m_pUnit[m_iStartPos]->m_iFlag) && (m_pUnit[m_iStartPos]->m_Packet.getMsgBoundary() > 1))
+        if ((1 == m_pUnit[m_iStartPos]->flag()) && (m_pUnit[m_iStartPos]->packet().getMsgBoundary() > 1))
         {
             bool good = true;
 
             // look ahead for the whole message
             for (int i = m_iStartPos; i != m_iLastAckPos;)
             {
-                if ((NULL == m_pUnit[i]) || (1 != m_pUnit[i]->m_iFlag))
+                if ((NULL == m_pUnit[i]) || (1 != m_pUnit[i]->flag()))
                 {
                     good = false;
                     break;
                 }
 
-                if ((m_pUnit[i]->m_Packet.getMsgBoundary() == 1) || (m_pUnit[i]->m_Packet.getMsgBoundary() == 3))
+                if ((m_pUnit[i]->packet().getMsgBoundary() == 1) || (m_pUnit[i]->packet().getMsgBoundary() == 3))
                     break;
 
                 if (++i == m_iSize)
@@ -557,8 +588,8 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
 
         CUnit* tmp = m_pUnit[m_iStartPos];
         m_pUnit[m_iStartPos] = NULL;
-        tmp->m_iFlag = 0;
-        --m_pUnitQueue->m_iCount;
+        tmp->setFlag(0);
+        m_pUnitQueue->decCount();
 
         if (++m_iStartPos == m_iSize)
             m_iStartPos = 0;
@@ -570,11 +601,11 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
     bool found = false;
 
     // looking for the first message
-    for (int i = 0, n = m_iMaxPos + getRcvDataSize(); i <= n; ++i)
+    for (int i = 0, n = m_iMaxPos + getRcvDataSize(lock); i <= n; ++i)
     {
-        if ((NULL != m_pUnit[q]) && (1 == m_pUnit[q]->m_iFlag))
+        if ((NULL != m_pUnit[q]) && (1 == m_pUnit[q]->flag()))
         {
-            switch (m_pUnit[q]->m_Packet.getMsgBoundary())
+            switch (m_pUnit[q]->packet().getMsgBoundary())
             {
                 case 3: // 11
                     p = q;
@@ -599,7 +630,7 @@ bool CRcvBuffer::scanMsg(int& p, int& q, bool& passack)
         if (found)
         {
             // the msg has to be ack'ed or it is allowed to read out of order, and was not read before
-            if (!passack || !m_pUnit[q]->m_Packet.getMsgOrderFlag())
+            if (!passack || !m_pUnit[q]->packet().getMsgOrderFlag())
                 break;
 
             found = false;

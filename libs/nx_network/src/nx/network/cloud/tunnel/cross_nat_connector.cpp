@@ -81,8 +81,7 @@ void CrossNatConnector::connect(
         [this, timeout, handler = std::move(handler)]() mutable
         {
             m_completionHandler = std::move(handler);
-            if (timeout > std::chrono::milliseconds::zero())
-                m_connectTimeout = timeout;
+            m_connectTimeout = timeout;
 
             fetchMediatorUdpEndpoint();
         });
@@ -184,7 +183,7 @@ void CrossNatConnector::issueConnectRequestToMediator()
         .args(m_connectSessionId, m_targetPeerAddress.host.toString(),
             m_connectTimeout, m_localAddress.port));
 
-    if (m_connectTimeout)
+    if (m_connectTimeout && m_connectTimeout != nx::network::kNoTimeout)
         m_timer->start(*m_connectTimeout, [this]() { onTimeout(); });
 
     m_connectResultReport.resultCode =
@@ -197,6 +196,8 @@ void CrossNatConnector::issueConnectRequestToMediator()
                 m_cloudConnectController->settings(),
                 *m_mediatorAddress,
                 std::move(mediatorUdpClient));
+
+        m_connectionMediationInitiator->setTimeout(m_connectTimeout);
     }
 
     m_connectionMediationInitiator->start(
@@ -267,8 +268,8 @@ std::chrono::milliseconds CrossNatConnector::calculateTimeLeftForConnect()
 {
     using namespace std::chrono;
 
-    milliseconds effectiveConnectTimeout(0);
-    if (m_connectTimeout)
+    milliseconds effectiveConnectTimeout = nx::network::kNoTimeout;
+    if (m_connectTimeout && m_connectTimeout != nx::network::kNoTimeout)
     {
         if (const auto timeToEvent = m_timer->timeToEvent())
             effectiveConnectTimeout = duration_cast<milliseconds>(*timeToEvent);

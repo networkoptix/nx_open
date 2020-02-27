@@ -111,6 +111,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_manager_factory.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -217,8 +218,14 @@ QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
 
 } // namespace
 
+struct QnClientModule::Private
+{
+    std::unique_ptr<AnalyticsSettingsManager> analyticsSettingsManager;
+};
+
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
     QObject(parent),
+    d(new Private()),
     m_startupParameters(startupParams)
 {
 #if defined(Q_OS_WIN)
@@ -442,7 +449,7 @@ void QnClientModule::initSingletons()
 
     commonModule->store(new QnPlatformAbstraction());
 
-    commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>();
+    auto messageProcessor = commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>();
     commonModule->store(new QnClientResourceFactory());
 
     commonModule->store(new QnCameraBookmarksManager());
@@ -486,7 +493,10 @@ void QnClientModule::initSingletons()
     commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
 
-    commonModule->store(new AnalyticsSettingsManager());
+    d->analyticsSettingsManager = AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
+        commonModule->resourcePool(),
+        messageProcessor);
+
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
 
@@ -800,6 +810,11 @@ nx::vms::client::desktop::ResourceDirectoryBrowser*
     QnClientModule::resourceDirectoryBrowser() const
 {
     return m_resourceDirectoryBrowser.data();
+}
+
+AnalyticsSettingsManager* QnClientModule::analyticsSettingsManager() const
+{
+    return d->analyticsSettingsManager.get();
 }
 
 void QnClientModule::initLocalInfo()

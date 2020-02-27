@@ -2703,6 +2703,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -9127,30 +9134,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <source>Acknowledge</source>
       <translation>Vzít na vědomí</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Obecná událost</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>Zařízení bylo odpojeno</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>Kamera byla odpojena</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I/O modul byl odpojen</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Neznámá diagnosticka události pluginu</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9362,6 +9345,13 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>Adding</source>
       <translation>Přidávání</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation type="unfinished">Cloud users</translation>
     </message>
   </context>
   <context>

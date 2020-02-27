@@ -1,30 +1,28 @@
 #include "actions.h"
 
-#include <core/resource/device_dependent_strings.h>
-
-#include <nx/vms/client/desktop/ini.h>
-
 #include <client/client_runtime_settings.h>
-
-#include <nx/vms/client/desktop/ui/actions/menu_factory.h>
-#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
-#include <nx/vms/client/desktop/ui/actions/action_factories.h>
-#include <nx/vms/client/desktop/ui/actions/factories/rotate_action_factory.h>
-#include <nx/vms/client/desktop/radass/radass_action_factory.h>
-#include <nx/vms/client/desktop/ui/actions/action_text_factories.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/layout_tour/layout_tour_actions.h>
-#include <nx/vms/client/desktop/analytics/analytics_menu_action_factory.h>
-#include <nx/vms/client/desktop/integrations/integrations.h>
+#include <core/resource/device_dependent_strings.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_layout.h>
 
 #include <nx/fusion/model_functions.h>
-
 #include <nx/network/app_info.h>
-
 #include <nx/utils/app_info.h>
+#include <nx/vms/client/desktop/analytics/analytics_menu_action_factory.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
+#include <nx/vms/client/desktop/layout_tour/layout_tour_actions.h>
+#include <nx/vms/client/desktop/radass/radass_action_factory.h>
+#include <nx/vms/client/desktop/ui/actions/action.h>
+#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
+#include <nx/vms/client/desktop/ui/actions/action_factories.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action_text_factories.h>
+#include <nx/vms/client/desktop/ui/actions/factories/rotate_action_factory.h>
+#include <nx/vms/client/desktop/ui/actions/menu_factory.h>
+
+#include "actions.h"
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::vms::client::desktop::ui::action, IDType)
 
@@ -570,7 +568,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Open in Browser..."));
 
     factory(SystemAdministrationAction)
-        .flags(Main | Tree | GlobalHotkey)
+        .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
         .text(ContextMenu::tr("System Administration..."))
         .shortcut(lit("Ctrl+Alt+A"))
@@ -690,6 +688,22 @@ void initialize(Manager* manager, Action* root)
             && !condition::isSafeMode()
             && ConditionWrapper(new RequiresOwnerCondition())
         );
+
+    // TODO: Implement proxy actions to allow the same action to be shown in different locations.
+    const auto systemAdministrationAction = manager->action(SystemAdministrationAction);
+    const auto systemAdministrationAlias = factory.registerAction()
+        .flags(Tree | NoTarget)
+        .mode(DesktopMode)
+        .text(systemAdministrationAction->text())
+        .shortcut("Ctrl+Alt+A")
+        .requiredGlobalPermission(GlobalPermission::admin)
+        .condition(
+            condition::treeNodeType(
+                {ResourceTreeNodeType::currentSystem, ResourceTreeNodeType::servers})
+            && !condition::tourIsRunning()).action();
+
+    QObject::connect(systemAdministrationAlias, &QAction::triggered,
+        systemAdministrationAction, &QAction::trigger);
 
     factory()
         .flags(Main)

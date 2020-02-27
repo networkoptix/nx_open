@@ -86,6 +86,19 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
      Force FPS for the primary stream to the given positive integer value.
  --fps-secondary[=]<value>
      Force FPS for the secondary stream to the given positive integer value.
+ --discovery-port[=]<value>
+     Port on which testcamera expects discovery messages from Servers which have camera
+     auto-discovery feature enabled. When running multiple testcamera processes on a single host,
+     even if in different subnets via --local-interface, using the same discovery ports is possible
+     only with --reuse-discovery-port and different values of --mac-address-prefix.
+ --media-port[=]<value>
+     Port on which testcamera serves the media stream. When running multiple testcamera processes
+     on a single host, even if in different subnets via --local-interface, media ports must be
+     different.
+ --reuse-discovery-port
+     Allow multiple testcamera processes on a single host with the same discovery port. To be able
+     to work properly with this option, each testcamera needs to have its own --local-interface,
+     --mac-address-prefix and --media-port.
 
 Example:
  )help" + baseExeName + R"help( files=c:/test.264;count=20
@@ -197,6 +210,19 @@ static nx::utils::log::Level logLevelArg(const QString& argName, const QString& 
             + enquoteAndEscape(argValue) + ".");
     }
     return logLevel;
+}
+
+static int portNumberArg(const QString& argName, const QString& argValue)
+{
+    bool ok = false;
+    const int value = argValue.toInt(&ok);
+    if (!ok || value < 1 || value > 65535)
+    {
+        throw InvalidArgs(
+            "Invalid value (expected an integer in the range [1, 65535]) for arg '"
+                + argName + "': " + enquoteAndEscape(argValue) + ".");
+    }
+    return value;
 }
 
 /**
@@ -311,6 +337,9 @@ static QString optionsToJsonString(const CliOptions& options)
         result += "\n";
     }
     result += "    ],\n";
+    result += "    \"discoveryPort\": " + optionalIntToJson(options.discoveryPort) + ",\n";
+    result += "    \"mediaPort\": " + optionalIntToJson(options.mediaPort) + ",\n";
+    result += "    \"reuseDiscoveryPort\": " + boolToJson(options.reuseDiscoveryPort) + ",\n";
 
     result += "    \"cameraSets\":\n";
     result += "    [\n";
@@ -489,6 +518,12 @@ static void parseOption(
         options->macAddressPrefix = *v;
     else if (const auto v = parse(argv, argp, logLevelArg, "--log-level", "-L"))
         options->logLevel = *v;
+    else if (const auto v = parse(argv, argp, portNumberArg, "--discovery-port"))
+        options->discoveryPort = v;
+    else if (const auto v = parse(argv, argp, portNumberArg, "--media-port"))
+        options->mediaPort = v;
+    else if (const auto v = parseFlag(argv, argp, "--reuse-discovery-port"))
+        options->reuseDiscoveryPort = *v;
     else if (arg.startsWith("-"))
         throw InvalidArgs("Unknown arg " + enquoteAndEscape(arg) + ".");
     else

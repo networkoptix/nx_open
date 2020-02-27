@@ -146,38 +146,51 @@ Yunhong Gu, last updated 02/12/2011
 #include <cstring>
 #include "packet.h"
 
-
 // Set up the aliases in the constructure
 CPacket::CPacket():
     m_iSeqNo((int32_t&)(m_nHeader[0])),
     m_iMsgNo((int32_t&)(m_nHeader[1])),
     m_iTimeStamp((int32_t&)(m_nHeader[2])),
-    m_iID((int32_t&)(m_nHeader[3])),
-    m_pcData(m_PacketVector[1].data())
+    m_iID((int32_t&)(m_nHeader[3]))
 {
     memset(m_nHeader, 0, sizeof(m_nHeader));
 
-    m_PacketVector[0].data() = (char *)m_nHeader;
-    m_PacketVector[0].setSize(CPacket::m_iPktHdrSize);
-    m_PacketVector[1].data() = NULL;
-    m_PacketVector[1].setSize(0);
+    m_PacketVector[0].data() = (char*)m_nHeader;
+    m_PacketVector[0].setSize(kPacketHeaderSize);
 }
 
 CPacket::~CPacket()
 {
 }
 
+CPacket::CPacket(const CPacket& right):
+    CPacket()
+{
+    memcpy(m_nHeader, right.m_nHeader, sizeof(m_nHeader));
+    m_payload = right.m_payload;
+}
+
+CPacket::CPacket(CPacket&& right):
+    CPacket()
+{
+    memcpy(m_nHeader, right.m_nHeader, sizeof(m_nHeader));
+    m_payload = std::move(right.m_payload);
+}
+
 int CPacket::getLength() const
 {
-    return m_PacketVector[1].size();
+    return m_payload.size();
 }
 
 void CPacket::setLength(int len)
 {
-    m_PacketVector[1].setSize(len);
+    // NOTE: Forbidding negative values.
+    // 1. The underlying buffer size is unsigned.
+    // 2. Error reporting must be done directly with error codes, not with buffer size.
+    m_payload.resize(std::max(len, 0));
 }
 
-void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int size)
+void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
 {
     // Set (bit-0 = 1) and (bit-1~15 = type)
     m_nHeader[0] = 0x80000000 | (((int)pkttype) << 16);
@@ -192,8 +205,7 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
 
             // data ACK seq. no.
             // optional: RTT (microsends), RTT variance (microseconds) advertised flow window size (packets), and estimated link capacity (packets per second)
-            m_PacketVector[1].data() = (char *)rparam;
-            m_PacketVector[1].setSize(size);
+            m_payload.resize(payloadSize);
 
             break;
 
@@ -203,46 +215,40 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
 
             // control info field should be none
             // but "writev" does not allow this
-            m_PacketVector[1].data() = (char *)&__pad; //NULL;
-            m_PacketVector[1].setSize(4); //0;
+            m_payload.assign((char*) &__pad, 4);
 
             break;
 
         case ControlPacketType::LossReport: //0011 - Loss Report (NAK)
                                      // loss list
-            m_PacketVector[1].data() = (char *)rparam;
-            m_PacketVector[1].setSize(size);
+            m_payload.resize(payloadSize);
 
             break;
 
         case ControlPacketType::DelayWarning: //0100 - Congestion Warning
                                        // control info field should be none
                                        // but "writev" does not allow this
-            m_PacketVector[1].data() = (char *)&__pad; //NULL;
-            m_PacketVector[1].setSize(4); //0;
+            m_payload.assign((char*)&__pad, 4);
 
             break;
 
         case ControlPacketType::KeepAlive: //0001 - Keep-alive
                                     // control info field should be none
                                     // but "writev" does not allow this
-            m_PacketVector[1].data() = (char *)&__pad; //NULL;
-            m_PacketVector[1].setSize(4); //0;
+            m_payload.assign((char*)&__pad, 4);
 
             break;
 
         case ControlPacketType::Handshake: //0000 - Handshake
                                     // control info filed is handshake info
-            m_PacketVector[1].data() = (char *)rparam;
-            m_PacketVector[1].setSize(size); //sizeof(CHandShake);
+            m_payload.resize(payloadSize);
 
             break;
 
         case ControlPacketType::Shutdown: //0101 - Shutdown
                                    // control info field should be none
                                    // but "writev" does not allow this
-            m_PacketVector[1].data() = (char *)&__pad; //NULL;
-            m_PacketVector[1].setSize(4); //0;
+            m_payload.assign((char*)&__pad, 4);
 
             break;
 
@@ -251,8 +257,7 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
             m_nHeader[1] = *(int32_t *)lparam;
 
             //first seq no, last seq no
-            m_PacketVector[1].data() = (char *)rparam;
-            m_PacketVector[1].setSize(size);
+            m_payload.resize(payloadSize);
 
             break;
 
@@ -262,27 +267,19 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int si
 
             // control info field should be none
             // but "writev" does not allow this
-            m_PacketVector[1].data() = (char *)&__pad; //NULL;
-            m_PacketVector[1].setSize(4); //0;
+            m_payload.assign((char*)&__pad, 4);
 
             break;
 
         case ControlPacketType::Reserved: //0x7FFF - Reserved for user defined control packets
                                    // for extended control packet
                                    // "lparam" contains the extended type information for bit 16 - 31
-                                   // "rparam" is the control information
             m_nHeader[0] |= *(int32_t *)lparam;
 
-            if (NULL != rparam)
-            {
-                m_PacketVector[1].data() = (char *)rparam;
-                m_PacketVector[1].setSize(size);
-            }
+            if (payloadSize > 0)
+                m_payload.resize(payloadSize);
             else
-            {
-                m_PacketVector[1].data() = (char *)&__pad;
-                m_PacketVector[1].setSize(4);
-            }
+                m_payload.assign((char*)&__pad, 4);
 
             break;
 
@@ -333,16 +330,33 @@ int32_t CPacket::getMsgSeq() const
     return m_nHeader[1] & 0x1FFFFFFF;
 }
 
-CPacket* CPacket::clone() const
+std::unique_ptr<CPacket> CPacket::clone() const
 {
-    CPacket* pkt = new CPacket;
-    memcpy(pkt->m_nHeader, m_nHeader, m_iPktHdrSize);
-    pkt->m_pcData = new char[m_PacketVector[1].size()];
-    memcpy(pkt->m_pcData, m_pcData, m_PacketVector[1].size());
-    pkt->m_PacketVector[1].setSize(m_PacketVector[1].size());
-
+    auto pkt = std::make_unique<CPacket>();
+    memcpy(pkt->m_nHeader, m_nHeader, kPacketHeaderSize);
+    pkt->m_payload = m_payload;
     return pkt;
 }
+
+std::tuple<const iovec*, std::size_t> CPacket::ioBufs() const
+{
+    preparePacketVector();
+    return std::make_tuple(m_PacketVector.bufs(), m_PacketVector.size());
+}
+
+std::tuple<iovec*, std::size_t> CPacket::ioBufs()
+{
+    preparePacketVector();
+    return std::make_tuple(m_PacketVector.bufs(), m_PacketVector.size());
+}
+
+void CPacket::preparePacketVector() const
+{
+    m_PacketVector[1].data() = m_payload.data();
+    m_PacketVector[1].setSize(m_payload.size());
+}
+
+//-------------------------------------------------------------------------------------------------
 
 CHandShake::CHandShake()
 {

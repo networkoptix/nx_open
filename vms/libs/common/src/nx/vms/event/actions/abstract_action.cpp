@@ -189,6 +189,7 @@ bool allowsAggregation(ActionType actionType)
     switch (actionType)
     {
         case ActionType::bookmarkAction:
+        case ActionType::pushNotificationAction:
         case ActionType::showTextOverlayAction:
         case ActionType::cameraOutputAction:
         case ActionType::playSoundAction:

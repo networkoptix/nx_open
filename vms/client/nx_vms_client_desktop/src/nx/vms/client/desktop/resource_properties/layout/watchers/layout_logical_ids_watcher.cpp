@@ -28,7 +28,9 @@ public:
             return;
 
         m_resourceListener = new QnResourceChangesListener(this);
-        m_resourceListener->connectToResources<QnLayoutResource>(&QnLayoutResource::logicalIdChanged,
+        m_resourceListener->connectToResources<QnLayoutResource>(
+            resourcePool(),
+            &QnLayoutResource::logicalIdChanged,
             [this](const QnLayoutResourcePtr& layout) { update(layout); });
 
         for (const auto& layout: resourcePool()->getResources<QnLayoutResource>())

@@ -85,7 +85,9 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
         toggleItem(index, systemHealthState->state(index));
 
     auto userChangesListener = new QnResourceChangesListener(this);
-    userChangesListener->connectToResources<QnUserResource>(&QnUserResource::nameChanged,
+    userChangesListener->connectToResources<QnUserResource>(
+        resourcePool(),
+        &QnUserResource::nameChanged,
         [this](const QnUserResourcePtr& user)
         {
             if (m_usersWithInvalidEmail.contains(user))

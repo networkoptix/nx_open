@@ -8,7 +8,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <analytics/common/object_metadata.h>
-#include <nx/vms/server/analytics/abstract_iframe_search_helper.h>
+#include <nx/vms/server/analytics/abstract_i_frame_search_helper.h>
 #include <analytics/db/analytics_db_types.h>
 
 namespace nx::analytics::db {

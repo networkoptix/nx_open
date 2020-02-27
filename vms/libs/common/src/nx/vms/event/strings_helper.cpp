@@ -17,6 +17,7 @@
 #include <nx/network/nettools.h> /* For resolveAddress. */
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
+#include <utils/common/html.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
@@ -778,8 +779,10 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto eventTypeDescriptor = camera->commonModule()->analyticsEventTypeDescriptorManager()
-        ->descriptor(eventTypeId);
+    const auto eventTypeDescriptor = camera && camera->commonModule()
+        ? camera->commonModule()->analyticsEventTypeDescriptorManager()->descriptor(eventTypeId)
+        : std::nullopt;
+
     return eventTypeDescriptor ? eventTypeDescriptor->name : tr("Analytics Event");
 }
 
@@ -877,14 +880,17 @@ QString StringsHelper::poeConsumptionStringFromParams(const EventParameters& par
 
 QString StringsHelper::notificationCaption(
     const EventParameters& parameters,
-    const QnVirtualCameraResourcePtr& camera) const
+    const QnVirtualCameraResourcePtr& camera,
+    bool useHtml) const
 {
     switch (parameters.eventType)
     {
         case EventType::softwareTriggerEvent:
-            return lit("%1 <b>%2</b>").arg(
-                eventName(parameters.eventType),
-                getSoftwareTriggerName(parameters));
+        {
+            const auto event = eventName(parameters.eventType);
+            const auto trigger = getSoftwareTriggerName(parameters);
+            return lit("%1 %2").arg(event, useHtml ? htmlBold(trigger) : trigger);
+        }
 
         case EventType::userDefinedEvent:
             return parameters.caption.isEmpty()

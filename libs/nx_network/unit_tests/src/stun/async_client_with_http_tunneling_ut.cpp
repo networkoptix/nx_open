@@ -27,14 +27,19 @@ class AsyncClientWithHttpTunneling:
 
 public:
     AsyncClientWithHttpTunneling():
-        m_client(AbstractAsyncClient::Settings()),
         m_stunServer(&dispatcher(), false)
     {
+        AbstractAsyncClient::Settings clientSettings;
+        clientSettings.sendTimeout = kNoTimeout;
+        clientSettings.recvTimeout = kNoTimeout;
+
+        m_client = std::make_unique<stun::AsyncClientWithHttpTunneling>(
+            clientSettings);
     }
 
     ~AsyncClientWithHttpTunneling()
     {
-        m_client.pleaseStopSync();
+        m_client->pleaseStopSync();
 
         if (m_tunnelFactoryBak)
         {
@@ -56,7 +61,7 @@ protected:
 
     void givenScheduledStunRequest()
     {
-        m_client.sendRequest(
+        m_client->sendRequest(
             prepareRequest(),
             [this](auto&&... args)
             {
@@ -86,7 +91,7 @@ protected:
 
     void whenConnectToHttpServer()
     {
-        m_client.connect(
+        m_client->connect(
             httpUrl(),
             [this](SystemError::ErrorCode sysErrorCode)
             {
@@ -97,7 +102,7 @@ protected:
     void whenConnectToRegularStunServer()
     {
         nx::utils::promise<SystemError::ErrorCode> done;
-        m_client.connect(
+        m_client->connect(
             network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName)
                 .setEndpoint(m_stunServer.address()),
             [&done](SystemError::ErrorCode sysErrorCode)
@@ -119,7 +124,7 @@ protected:
 
     void thenHttpTunnelIsOpened()
     {
-        assertStunClientIsAbleToPerformRequest(&m_client);
+        assertStunClientIsAbleToPerformRequest(m_client.get());
     }
 
     void thenScheduledRequestIsServed()
@@ -133,13 +138,13 @@ protected:
 
     void thenConnectionIsEstablished()
     {
-        assertStunClientIsAbleToPerformRequest(&m_client);
+        assertStunClientIsAbleToPerformRequest(m_client.get());
     }
 
     void forceHttpConnectionUpgradeTunnel()
     {
         m_tunnelFactoryBak = http::tunneling::detail::ClientFactory::instance().setCustomFunc(
-            [this](const std::string& /*tag*/, const nx::utils::Url& url)
+            [](const std::string& /*tag*/, const nx::utils::Url& url)
             {
                 return std::make_unique<http::tunneling::detail::ConnectionUpgradeTunnelClient>(
                     url, nullptr);
@@ -147,7 +152,7 @@ protected:
     }
 
 private:
-    stun::AsyncClientWithHttpTunneling m_client;
+    std::unique_ptr<stun::AsyncClientWithHttpTunneling> m_client;
     nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::network::stun::Message>> m_responses;
     nx::network::stun::SocketServer m_stunServer;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResults;

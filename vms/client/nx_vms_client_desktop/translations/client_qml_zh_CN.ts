@@ -7,20 +7,12 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>摄像机分析功能将只在观看影像时有作用. 请启用录影来使其全时运作.</translation>
     </message>
-    <message>
-      <source>Camera stream</source>
-      <translation>摄像机视频流</translation>
-    </message>
-    <message>
-      <source>Select video stream from the camera for analysis</source>
-      <translation>从摄像机中选择视频流进行分析</translation>
-    </message>
   </context>
   <context>
     <name>Box</name>
     <message>
       <source>Click on video to start box.</source>
-      <translation type="unfinished">Click on video to start box.</translation>
+      <translation>点击画面以启用圈选区域</translation>
     </message>
   </context>
   <context>
@@ -55,28 +47,16 @@
   <context>
     <name>Figure</name>
     <message>
-      <source>No shape</source>
-      <translation type="unfinished">No shape</translation>
-    </message>
-    <message>
-      <source>click to add</source>
-      <translation>点选新增</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>编辑</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>删除</translation>
-    </message>
-    <message>
       <source>Display on camera</source>
       <translation>在摄像机上显示</translation>
     </message>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>图形</translation>
+    </message>
+    <message>
+      <source>Click to add</source>
+      <translation>点选新增</translation>
     </message>
   </context>
   <context>
@@ -104,12 +84,20 @@
       <source>Vendor</source>
       <translation>厂商:</translation>
     </message>
+    <message>
+      <source>Camera stream</source>
+      <translation>摄像机视频流</translation>
+    </message>
+    <message>
+      <source>Select video stream from the camera for analysis</source>
+      <translation>从摄像机中选择视频流进行分析</translation>
+    </message>
   </context>
   <context>
     <name>Line</name>
     <message>
       <source>Click on video to start line.</source>
-      <translation type="unfinished">Click on video to start line.</translation>
+      <translation>点击画面以启用画线功能</translation>
     </message>
     <message>
       <source>Click arrows to toggle the desired directions.</source>
@@ -117,12 +105,18 @@
     </message>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>设定区域有误，请移除线条交错部分。</translation>
     </message>
     <message numerus="yes">
       <source>Maximum points count is reached (%n points).</source>
+      <translation>
+        <numerusform>顶点数已达最大值 (已有 %n 个顶点)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This line requires at least %n points.</source>
       <translation type="unfinished">
-        <numerusform>Maximum points count is reached (%n points).</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
       </translation>
     </message>
   </context>
@@ -178,17 +172,30 @@
     <name>Polygon</name>
     <message>
       <source>Click on video to start polygon.</source>
-      <translation type="unfinished">Click on video to start polygon.</translation>
+      <translation>点击画面以启用圈选区域</translation>
     </message>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>设定区域有误，请移除线条交错部分。</translation>
     </message>
     <message numerus="yes">
       <source>Maximum points count is reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>Maximum points count is reached (%n points).</numerusform>
+      <translation>
+        <numerusform>顶点数已达最大值 (已有 %n 个顶点)</numerusform>
       </translation>
+    </message>
+    <message numerus="yes">
+      <source>This polygon requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This polygon requires at least %n points.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>Repeater</name>
+    <message>
+      <source>Add</source>
+      <translation>添加</translation>
     </message>
   </context>
   <context>

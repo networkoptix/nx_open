@@ -377,8 +377,8 @@ void QnVideoStreamDisplay::updateRenderList()
         {
             renderer->inUse();
 
-            if (m_timeBlocked)
-                renderer->blockTimeValue(m_channelNumber, m_blockedTimeValue);
+            if (m_blockedTimeValue)
+                renderer->blockTimeValue(m_channelNumber, *m_blockedTimeValue);
             else
                 renderer->unblockTimeValue(m_channelNumber);
         }
@@ -962,10 +962,9 @@ qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const
 void QnVideoStreamDisplay::blockTimeValue(qint64 time)
 {
     m_blockedTimeValue = microseconds(time);
-    m_timeBlocked = true;
 
     foreach (QnAbstractRenderer* renderer, m_renderList)
-        renderer->blockTimeValue(m_channelNumber, m_blockedTimeValue);
+        renderer->blockTimeValue(m_channelNumber, *m_blockedTimeValue);
 }
 
 void QnVideoStreamDisplay::setPausedSafe(bool value)
@@ -987,7 +986,7 @@ void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
 bool QnVideoStreamDisplay::isTimeBlocked() const
 {
     QnMutexLocker lock(&m_renderListMtx);
-    return m_timeBlocked;
+    return (bool) m_blockedTimeValue;
 }
 
 void QnVideoStreamDisplay::unblockTimeValue()
@@ -999,7 +998,7 @@ void QnVideoStreamDisplay::unblockTimeValue()
     m_timeChangeEnabled = true;
     */
 
-    m_timeBlocked = false;
+    m_blockedTimeValue = {};
 
     foreach (QnAbstractRenderer* renderer, m_renderList)
         renderer->unblockTimeValue(m_channelNumber);

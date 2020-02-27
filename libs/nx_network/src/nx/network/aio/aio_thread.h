@@ -17,7 +17,8 @@ namespace aio {
 
 namespace detail { class AioTaskQueue; }
 
-class NX_NETWORK_API AbstractAioThread
+class NX_NETWORK_API AbstractAioThread:
+    public nx::utils::Thread
 {
 public:
     virtual ~AbstractAioThread() = default;
@@ -31,6 +32,8 @@ public:
      * Cancels calls scheduled with aio::AIOThread::post and aio::AIOThread::dispatch.
      */
     virtual void cancelPostedCalls(Pollable* const sock) = 0;
+
+    virtual bool isSocketBeingMonitored(Pollable* sock) const = 0;
 };
 
 /**
@@ -40,8 +43,7 @@ public:
  *   - Maximum timeout to wait for desired event.
  */
 class NX_NETWORK_API AIOThread:
-    public AbstractAioThread,
-    public nx::utils::Thread
+    public AbstractAioThread
 {
 public:
     /**
@@ -91,7 +93,7 @@ public:
      */
     size_t socketsHandled() const;
 
-    bool isSocketBeingMonitored(Pollable* sock) const;
+    virtual bool isSocketBeingMonitored(Pollable* sock) const override;
 
 protected:
     virtual void run() override;

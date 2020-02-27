@@ -5,9 +5,13 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include "analytics_settings_types.h"
+
 namespace nx::vms::client::desktop {
 
-class AnalyticsSettingsMultiListener: public QObject
+class AnalyticsSettingsManager;
+
+class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsMultiListener: public QObject
 {
     Q_OBJECT
 
@@ -19,20 +23,19 @@ public:
     };
 
     AnalyticsSettingsMultiListener(
+        AnalyticsSettingsManager* manager,
         const QnVirtualCameraResourcePtr& camera,
         ListenPolicy listenPolicy,
         QObject* parent = nullptr);
     virtual ~AnalyticsSettingsMultiListener() override;
 
-    QJsonObject values(const QnUuid& engineId) const;
-    QJsonObject model(const QnUuid& engineId) const;
+    DeviceAgentData data(const QnUuid& engineId) const;
 
     QSet<QnUuid> engineIds() const;
 
 signals:
     void enginesChanged();
-    void valuesChanged(const QnUuid& engineId, const QJsonObject& values);
-    void modelChanged(const QnUuid& engineId, const QJsonObject& values);
+    void dataChanged(const QnUuid& engineId, const DeviceAgentData& data);
 
 private:
     class Private;

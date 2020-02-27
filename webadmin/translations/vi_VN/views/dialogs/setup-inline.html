@@ -233,11 +233,21 @@
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
                    type="password" autocomplete="new-password" placeholder="Lặp lại mật khẩu" required>
         </div>
-        <div class="checkbox text-left" ng-if="settings.thickClient">
-            <labe>
-                <input ng-model="settings.savePassword" type="checkbox">
-                Lưu mật khẩu
-            </labe>
+
+        <div class="form-group" ng-if="settings.thickClient">
+            <label class="checkbox text-left" >
+                <input type="checkbox"
+                       ng-model="settings.savePassword">
+                <span class="checkmark">
+                            <svg viewbox="0 0 20 16">
+                                <polygon class="box" points="2.5,2.5 2.5,13.5 13.5,13.6 13.5,2.5"></polygon>
+                                <polyline class="box" points="12.5,2.5 2.5,2.5 2.5,13.5 13.5,13.6 13.5,8.5"></polyline>
+                                <polyline class="tick" points="5,7.5 8,10.5 15.5,3"></polyline>
+                                <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
+                            </svg>
+                        </span>
+                <span class="text">Save password</span>
+            </label>
         </div>
 
         <div class="form-group"

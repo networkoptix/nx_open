@@ -54,6 +54,27 @@ namespace {
 
 static const QString kBypassPrefix("Bypass");
 
+static Ptz::Capabilities mergeCapabilities(
+    Ptz::Capabilities directPtzCapabilities,
+    Ptz::Capabilities bypassPtzCapabilities)
+{
+    static const std::vector<Ptz::Capability> absoluteMovementCapabilities = {
+        Ptz::Capability::AbsolutePanCapability,
+        Ptz::Capability::AbsoluteTiltCapability,
+        Ptz::Capability::AbsoluteZoomCapability,
+        Ptz::Capability::ViewportPtzCapability,
+    };
+
+    Ptz::Capabilities capabilities = directPtzCapabilities;
+    for (const Ptz::Capability capability: absoluteMovementCapabilities)
+    {
+        if (bypassPtzCapabilities.testFlag(capability))
+            capabilities |= capability;
+    }
+
+    return capabilities;
+}
+
 enum class PtzOperation
 {
     add,
@@ -899,17 +920,9 @@ CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 
         setStatus(status);
     }
-    if (isNvr())
-    {
-        // Update video related parameters in database for more accurate metrics.
-        QSet<QString> videoParametersIds;
-        for (const auto [id, info]: m_advancedParameterInfos)
-        {
-            if (id.contains("videoprofile"))
-                videoParametersIds.insert(id);
-        }
-        setApiParameters(getApiParameters(videoParametersIds));
-    }
+
+    saveProperties();
+
     return result;
 }
 
@@ -1455,8 +1468,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         NX_VERBOSE(this, "Supported PTZ capabilities bypass: %1",
             ptzCapabilityBits(bypassPtzCapabilities));
 
-        // We consider capability is true if it's supported both by a NVR and a camera.
-        capabilities &= bypassPtzCapabilities;
+        capabilities = mergeCapabilities(capabilities, bypassPtzCapabilities);
         NX_VERBOSE(this, "Supported PTZ capabilities both: %1", ptzCapabilityBits(capabilities));
     }
 
@@ -1771,6 +1783,20 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
         return CameraDiagnostics::NoErrorResult();
 
     m_advancedParametersProvider.assign(filterParameters(parameters));
+
+    if (isNvr())
+    {
+        // Update video related parameters in database for more accurate metrics.
+        QSet<QString> videoParametersIds;
+        for (const auto [id, info]: m_advancedParameterInfos)
+        {
+            if (id.contains("videoprofile"))
+                videoParametersIds.insert(id);
+
+            storeCurrentVideoParametersToProperties(getApiParameters(videoParametersIds));
+        }
+    }
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -2809,7 +2835,7 @@ QString HanwhaResource::defaultValue(const QString& parameter, Qn::ConnectionRol
             : camera->getSecondaryReader();
 
         if (!provider)
-            QString::number(defaultBitrateForStream(role));
+            return QString::number(defaultBitrateForStream(role));
 
         const auto liveStreamParameters = provider->getLiveParams();
         return QString::number(streamBitrate(role, liveStreamParameters));
@@ -4079,8 +4105,22 @@ QnLiveStreamParams HanwhaResource::liveStreamParams(Qn::ConnectionRole role) con
     result.codec = toHanwhaString(streamCodec(role));
     result.resolution = streamResolution(role);
     result.fps = streamFrameRate(role, QnLiveStreamParams::kFpsNotInitialized);
-    result.bitrateKbps = streamBitrate(role, QnLiveStreamParams());
+    result.bitrateKbps = streamBitrate(role, result);
     return result;
+}
+
+void HanwhaResource::storeCurrentVideoParametersToProperties(
+    const QnCameraAdvancedParamValueMap& parameters)
+{
+    for (auto it = parameters.begin(); it != parameters.end(); ++it)
+    {
+        const auto info = advancedParameterInfo(it.key());
+        if (!info)
+            continue;
+
+        if (const QString propertyName = info->resourceProperty(); !propertyName.isEmpty())
+            setProperty(propertyName, it.value());
+    }
 }
 
 QnAdvancedStreamParams HanwhaResource::advancedLiveStreamParams() const

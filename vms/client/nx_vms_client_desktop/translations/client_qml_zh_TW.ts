@@ -7,14 +7,6 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>攝影機分析功能將只在觀看影像時有作用. 請啟用錄影來使其全時運作.</translation>
     </message>
-    <message>
-      <source>Camera stream</source>
-      <translation>攝影機串流</translation>
-    </message>
-    <message>
-      <source>Select video stream from the camera for analysis</source>
-      <translation>從攝影機中選擇影片串流進行分析</translation>
-    </message>
   </context>
   <context>
     <name>Box</name>
@@ -55,28 +47,16 @@
   <context>
     <name>Figure</name>
     <message>
-      <source>No shape</source>
-      <translation type="unfinished">No shape</translation>
-    </message>
-    <message>
-      <source>click to add</source>
-      <translation>點選新增</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>編輯</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>刪除</translation>
-    </message>
-    <message>
       <source>Display on camera</source>
       <translation>在攝影機上顯示</translation>
     </message>
     <message>
       <source>Figure</source>
       <translation>圖形</translation>
+    </message>
+    <message>
+      <source>Click to add</source>
+      <translation>點選新增</translation>
     </message>
   </context>
   <context>
@@ -104,6 +84,14 @@
       <source>Vendor</source>
       <translation>供應商</translation>
     </message>
+    <message>
+      <source>Camera stream</source>
+      <translation>攝影機串流</translation>
+    </message>
+    <message>
+      <source>Select video stream from the camera for analysis</source>
+      <translation>從攝影機中選擇影片串流進行分析</translation>
+    </message>
   </context>
   <context>
     <name>Line</name>
@@ -123,6 +111,12 @@
       <source>Maximum points count is reached (%n points).</source>
       <translation>
         <numerusform>頂點數已達最大值 (已有 %n 個頂點)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This line requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This line requires at least %n points.</numerusform>
       </translation>
     </message>
   </context>
@@ -189,6 +183,19 @@
       <translation>
         <numerusform>頂點數已達最大值 (已有 %n 個頂點)</numerusform>
       </translation>
+    </message>
+    <message numerus="yes">
+      <source>This polygon requires at least %n points.</source>
+      <translation type="unfinished">
+        <numerusform>This polygon requires at least %n points.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>Repeater</name>
+    <message>
+      <source>Add</source>
+      <translation>新增</translation>
     </message>
   </context>
   <context>

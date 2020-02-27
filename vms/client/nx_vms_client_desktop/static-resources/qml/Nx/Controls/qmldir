@@ -1,34 +1,32 @@
 module Nx.Controls
 
-Button 1.0 Button.qml
-FlatButton 1.0 FlatButton.qml
-SwitchButton 1.0 SwitchButton.qml
+ArrowIcon 1.0 ArrowIcon.qml
 AutoScalableItem 1.0 AutoScalableItem.qml
+Banner 1.0 Banner.qml
+Button 1.0 Button.qml
+CheckBox 1.0 CheckBox.qml
+ComboBox 1.0 ComboBox.qml
 ContextHintButton 1.0 ContextHintButton.qml
 ContextHintLabel 1.0 ContextHintLabel.qml
-TextField 1.0 TextField.qml
-TextFieldWithWarning 1.0 TextFieldWithWarning.qml
-SpinBox 1.0 SpinBox.qml
-DoubleSpinBox 1.0 DoubleSpinBox.qml
-ComboBox 1.0 ComboBox.qml
-CheckBox 1.0 CheckBox.qml
-GroupBox 1.0 GroupBox.qml
-Panel 1.0 Panel.qml
 DialogPanel 1.0 DialogPanel.qml
-ScrollView 1.0 ScrollView.qml
-ScrollBar 1.0 ScrollBar.qml
-Scrollable 1.0 Scrollable.qml
-Banner 1.0 Banner.qml
-ToolTip 1.0 ToolTip.qml
-TextArea 1.0 TextArea.qml
-TextButton 1.0 TextButton.qml
+DoubleSpinBox 1.0 DoubleSpinBox.qml
+FlatButton 1.0 FlatButton.qml
+GroupBox 1.0 GroupBox.qml
 LinearPaletteColorPicker 1.0 LinearPaletteColorPicker.qml
 MultiColumn 1.0 MultiColumn.qml
-RadioButton 1.0 RadioButton.qml
-
-ArrowIcon 1.0 ArrowIcon.qml
-SwitchIcon 1.0 SwitchIcon.qml
-
 NxCircle 1.0 NxCircle.qml
 NxCirclesPreloader 1.0 NxCirclesPreloader.qml
 NxDotPreloader 1.0 NxDotPreloader.qml
+Panel 1.0 Panel.qml
+RadioButton 1.0 RadioButton.qml
+Scrollable 1.0 Scrollable.qml
+ScrollBar 1.0 ScrollBar.qml
+ScrollView 1.0 ScrollView.qml
+SpinBox 1.0 SpinBox.qml
+SwitchButton 1.0 SwitchButton.qml
+SwitchIcon 1.0 SwitchIcon.qml
+TextArea 1.0 TextArea.qml
+TextButton 1.0 TextButton.qml
+TextField 1.0 TextField.qml
+TextFieldWithWarning 1.0 TextFieldWithWarning.qml
+ToolTip 1.0 ToolTip.qml

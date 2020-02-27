@@ -16,6 +16,7 @@
 <div class="date">
     Trigger has been activated {{count}} times, first:<br/>
     <b>{{timestampDate}} {{timestampTime}}</b>
+    <br/>{{description}}
 </div>
 
 {{/count}}
@@ -25,6 +26,7 @@
 <div class="date">
     Trigger has been activated at:<br/>
     <b>{{timestampDate}} {{timestampTime}}</b>
+    <br/>{{description}}
 </div>
 
 {{/count}}

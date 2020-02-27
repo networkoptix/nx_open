@@ -263,14 +263,12 @@ export class NxHeaderComponent implements OnInit, OnDestroy {
         if (!this.systems) {
             return;
         }
-        if (this.systemId) {
-            if (this.singleSystem) { // Special case for a single system - it always active
-                this.activeSystem = this.systems[0];
-            } else {
-                this.activeSystem = this.systems.find((system) => {
-                    return this.systemId === system.id;
-                });
-            }
+        if (this.singleSystem) { // Special case for a single system - it always active
+            this.activeSystem = this.systems[0];
+        } else if (this.systemId) {
+            this.activeSystem = this.systems.find((system) => {
+                return this.systemId === system.id;
+            });
         } else {
             this.activeSystem = undefined;
         }

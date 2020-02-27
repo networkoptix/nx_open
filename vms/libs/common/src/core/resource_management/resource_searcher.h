@@ -114,6 +114,7 @@ public:
     // checks this QHostAddress and creates a QnResource in case of success
     // this function is designed for manual resource addition
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) = 0;
-	// Searcher is able to find not network resources.
+
+	// Searcher is able to find non-network resources.
     virtual bool canFindLocalResources() const { return false; }
 };

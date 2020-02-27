@@ -105,7 +105,8 @@ public:
 
     QString notificationCaption(
         const EventParameters& parameters,
-        const QnVirtualCameraResourcePtr& camera) const;
+        const QnVirtualCameraResourcePtr& camera,
+        bool useHtml = true) const;
 
     QString notificationDescription(const EventParameters& parameters) const;
 };

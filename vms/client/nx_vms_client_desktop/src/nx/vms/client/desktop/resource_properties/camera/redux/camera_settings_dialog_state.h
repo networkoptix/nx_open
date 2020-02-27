@@ -14,6 +14,7 @@
 #include <core/misc/schedule_task.h>
 #include <utils/common/aspect_ratio.h>
 
+#include <nx/vms/client/desktop/analytics/analytics_settings_types.h>
 #include <nx/vms/client/desktop/common/data/rotation.h>
 #include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
 #include <nx/vms/client/desktop/common/redux/redux_types.h>
@@ -276,9 +277,14 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         // Engines, which are enabled by the user.
         UserEditable<QSet<QnUuid>> enabledEngines;
 
-        QHash<QnUuid, UserEditable<QJsonObject>> settingsValuesByEngineId;
-        QHash<QnUuid, QJsonObject> settingsModelByEngineId;
-        bool loading = false;
+        struct EngineSettings
+        {
+            QJsonObject model;
+            UserEditable<QJsonObject> values;
+            bool loading = false;
+        };
+        QHash<QnUuid /*engineId*/, EngineSettings> settingsByEngineId;
+
         QnUuid currentEngineId;
 
         // This dictionary may contain engine ids that are no longer valid.
@@ -294,6 +300,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         UserEditableMultiple<int> sensitivity;
     };
     WearableCameraMotionDetection wearableMotion;
+
+    bool wearableClientTimeZone = false;
 
     // Helper methods.
 

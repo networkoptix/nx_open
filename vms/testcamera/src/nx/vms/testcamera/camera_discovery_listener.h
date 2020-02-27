@@ -4,10 +4,11 @@
 #include <vector>
 
 #include <QtCore/QByteArray>
-#include <QtCore/QStringList>
 
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/math/math.h>
+
+#include "network_options.h"
 
 namespace nx::network {
 
@@ -30,7 +31,7 @@ public:
     CameraDiscoveryListener(
         const Logger* logger,
         std::function<QByteArray()> obtainDiscoveryResponseMessageFunc,
-        QStringList localInterfacesToListen);
+        NetworkOptions networkOptions);
 
     virtual ~CameraDiscoveryListener();
 
@@ -55,7 +56,7 @@ private:
         nx::network::AbstractDatagramSocket* discoverySocket,
         const nx::network::SocketAddress& serverAddress) const;
 
-    bool obtainDiscoverySocketAddress(nx::network::SocketAddress* outSocketAddress) const;
+    std::optional<nx::network::SocketAddress> obtainDiscoverySocketAddress() const;
 
 protected:
     virtual void run() override;
@@ -63,7 +64,7 @@ protected:
 private:
     const Logger* const m_logger;
     const std::function<QByteArray()> m_obtainDiscoveryResponseMessageFunc;
-    const QStringList m_localInterfacesToListen;
+    const NetworkOptions m_networkOptions;
     std::vector<IpRangeV4> m_allowedIpRanges;
 };
 

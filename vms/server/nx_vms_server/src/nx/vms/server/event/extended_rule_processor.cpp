@@ -149,7 +149,7 @@ static const int kEmailSendDelay = 0;
 static const QChar kOldEmailDelimiter(L';');
 static const QChar kNewEmailDelimiter(L' ');
 
-static const size_t kPushThumbnailHeight = 64;
+static const size_t kPushThumbnailHeight = 480;
 
 } // namespace
 
@@ -919,51 +919,51 @@ void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
 struct PushPayload
 {
     QString url;
-    QString image;
+    QString imageUrl;
 };
-#define PushPayload_Fields (url)(image)
+#define PushPayload_Fields (url)(imageUrl)
 
 struct PushNotification
 {
     QString title;
     QString body;
     PushPayload payload;
-    // TODO: options?
+    QJsonObject options;
 };
-#define PushNotification_Fields (title)(body)(payload)
+#define PushNotification_Fields (title)(body)(payload)(options)
 
-struct PushNotificationMessage
+struct PushRequest
 {
     QString systemId;
     std::set<QString> targets;
     PushNotification notification;
 };
-#define PushNotificationMessage_Fields (systemId)(targets)(notification)
+#define PushRequest_Fields (systemId)(targets)(notification)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (PushPayload)(PushNotification)(PushNotificationMessage), (json), _Fields);
+    (PushPayload)(PushNotification)(PushRequest), (json), _Fields);
 
 bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActionPtr& action)
 {
-    PushNotificationMessage message;
+    PushRequest request;
     const auto settings = serverModule()->commonModule()->globalSettings();
-    message.systemId = settings->cloudSystemId();
-    if (message.systemId.isEmpty())
+    request.systemId = settings->cloudSystemId();
+    if (request.systemId.isEmpty())
     {
         NX_DEBUG(this, "Not sending push notification, system is not connected to cloud");
         return true;
     }
 
-    message.targets = cloudUsers(action->getParams().additionalResources);
-    if (message.targets.empty())
+    request.targets = cloudUsers(action->getParams().additionalResources);
+    if (request.targets.empty())
     {
         NX_DEBUG(this, "Not sending push notification, no targets found");
         return true;
     }
 
-    message.notification = makePushNotification(action);
+    request.notification = makePushNotification(action);
     NX_VERBOSE(this, "Push Notification: %1\n%2",
-        message.notification.title, message.notification.body);
+        request.notification.title, request.notification.body);
 
     const auto url = nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
@@ -975,11 +975,16 @@ bool ExtendedRuleProcessor::sendPushNotification(const vms::event::AbstractActio
     client.setUserPassword(settings->cloudAuthKey());
     client.setAuthType(nx::network::http::AuthType::authBasic);
 
-    const auto serialized = QJson::serialized(message);
-    const auto result = client.doPost(url, "application/json", serialized);
-    NX_DEBUG(this, "Send push notification to %1: %2 -- %3", url, serialized, client.response()
-        ? client.response()->toString()
-        : SystemError::toString(client.lastSysErrorCode()));
+    const auto serialized = QJson::serialized(request);
+    const auto result = client.doPost(url, "application/json", serialized)
+        && client.hasRequestSucceeded();
+
+    NX_UTILS_LOG(
+        result ? nx::utils::log::Level::debug : nx::utils::log::Level::warning,
+        this,
+        "Send push notification to %1: %2 -- %3", url, serialized, client.response()
+            ? client.response()->toString()
+            : SystemError::toString(client.lastSysErrorCode()));
 
     return result;
 }
@@ -1087,7 +1092,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                 params.eventResourceId);
 
             cameraHistoryPool()->updateCameraHistorySync(camera);
-            if (camera->hasVideo(nullptr))
+            if (camera && camera->hasVideo(nullptr))
             {
                 QByteArray screenshotData = getEventScreenshotEncoded(params.eventResourceId,
                     params.eventTimestampUsec, SCREENSHOT_SIZE).frame;
@@ -1430,11 +1435,11 @@ PushPayload ExtendedRuleProcessor::makePushPayload(
         .setPathParts("client", settings->cloudSystemId(), "view")
         .addQueryItem("timestamp", event.eventTimestampUsec / 1000);
 
-    nx::network::url::Builder image;
+    nx::network::url::Builder imageUrl;
     if (isCamera)
     {
         url.addQueryItem("resources", event.eventResourceId.toSimpleString());
-        image = nx::network::url::Builder()
+        imageUrl = nx::network::url::Builder()
             .setScheme(nx::network::http::kSecureUrlSchemeName)
             .setHost(settings->cloudSystemId())
             .setPath("ec2/cameraThumbnail")
@@ -1443,7 +1448,21 @@ PushPayload ExtendedRuleProcessor::makePushPayload(
             .addQueryItem("height", kPushThumbnailHeight);
     }
 
-    return {url.toString(), image.toString()};
+    const QString imageUrlOverride(ini().pushNotifyImageUrl);
+    return {url.toString(), imageUrlOverride.isEmpty() ? imageUrl.toString() : imageUrlOverride};
+}
+
+static const QString utf8Icon(const vms::event::Level level)
+{
+    static const auto defaultIcon = ini().pushNotifyCommonUtfIcon
+        ? QString(QChar(0x2615)) //< UTF for ":)".
+        : QString();
+    return nx::utils::switch_(level,
+        vms::event::Level::critical, [] { return QString(QChar(0x203C)); }, //< UTF for "!!".
+        vms::event::Level::important, [] { return QString(QChar(0x26A0)); }, //< UTF for "(!)".
+        vms::event::Level::success, [] { return QString(QChar(0x2705)); }, //< UTF for "[v]".
+        nx::utils::default_, [] { return defaultIcon; }
+    );
 }
 
 PushNotification ExtendedRuleProcessor::makePushNotification(
@@ -1455,7 +1474,9 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
     const auto resource = resourcePool()->getResourceById(event.eventResourceId);
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
-    // TODO: Get the language for each user as soon as users have it in VMS server DB.
+    QJsonObject options;
+    NX_ASSERT(QJson::deserialize(QByteArray(ini().pushNotifyOptions), &options));
+
     const auto language = common->globalSettings()->pushNotificationsLanguage();
     NX_VERBOSE(this, "Translate push notification to %1", language);
     QnTranslationManager::LocaleRollback localeGuard(
@@ -1471,21 +1492,16 @@ PushNotification ExtendedRuleProcessor::makePushNotification(
     vms::event::StringsHelper strings(common);
     return {
         join(" ", {
-            nx::utils::switch_(vms::event::levelOf(action),
-                vms::event::Level::critical, [] { return "\u203C"; }, //< UTF for !!
-                vms::event::Level::important, [] { return "\u26A0"; }, //< UFT for (!)
-                vms::event::Level::success, [] { return "\u2705"; }, //< UTF for [v]
-                nx::utils::default_, [] { return ""; }
-            ),
-            // TODO: May return HTML. Make sure it works on android and iOS.
-            strings.notificationCaption(event, camera),
+            utf8Icon(vms::event::levelOf(action)),
+            strings.notificationCaption(event, camera, /*useHtml*/ false),
         }),
         join("\n", {
-            resource ? resource->getName() : QString(),
+            camera ? camera->getUserDefinedName() : (resource ? resource->getName() : QString()),
             params.text,
             strings.notificationDescription(event),
         }),
         makePushPayload(event, camera),
+        options,
     };
 }
 

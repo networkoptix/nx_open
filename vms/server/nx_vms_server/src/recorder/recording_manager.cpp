@@ -78,11 +78,6 @@ QnRecordingManager::QnRecordingManager(
 
 QnRecordingManager::~QnRecordingManager()
 {
-    QnMutexLocker lock(&m_resourceConnectionMutex);
-    // We shouldn't receive any new recording orders if the destructor is called
-    for (auto& camera: resourcePool()->getResources<QnVirtualCameraResource>())
-        camera->disconnect(camera.data(), nullptr, this, nullptr);
-
     stop();
 }
 
@@ -113,6 +108,13 @@ void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
 
 void QnRecordingManager::stop()
 {
+    {
+        QnMutexLocker lock(&m_resourceConnectionMutex);
+        // We shouldn't receive any new recording orders if the destructor is called
+        for (auto& camera: resourcePool()->getResources<QnVirtualCameraResource>())
+            camera->disconnect(camera.data(), nullptr, this, nullptr);
+    }
+
     exit();
     wait(); // stop QT event loop
 
@@ -465,6 +467,8 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         connect(camera.data(), &QnVirtualCameraResource::recordingActionChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         updateCamera(camera);
+        if (!camera->hasFlags(Qn::foreigner))
+            resource->initAsync(/*optional*/ true);
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);
@@ -691,7 +695,7 @@ void QnRecordingManager::disableLicensesIfNeed()
 
 int QnRecordingManager::recordingChunkDurationSec() const
 {
-    return serverModule()->settings().recordingChunkDurationSec();
+    return serverModule()->settings().mediaFileDuration();
 }
 
 void QnRecordingManager::at_licenseMutexTimeout()

@@ -81,7 +81,7 @@ public:
     /**
      *  If handler is not added for deviceType, nothing is done
      *  NOTE: if deviceType is empty, handler will be unregistered for ALL device types
-     *      even if they were registered by separate calls with certain types
+     *  even if they were registered by separate calls with certain types
      */
     void unregisterHandler(SearchHandler* handler, const QString& deviceType = QString());
 
@@ -95,7 +95,7 @@ private:
         HostAddress deviceAddress;
         /** Address of local interface, device has been discovered on. */
         QHostAddress localInterfaceAddress;
-        /** Device uuid. Places as a separater member because it becomes known before devInfo. */
+        /** Device uuid. Places as a separator member because it becomes known before devInfo. */
         QByteArray uuid;
         nx::utils::Url descriptionUrl;
         DeviceInfo devInfo;

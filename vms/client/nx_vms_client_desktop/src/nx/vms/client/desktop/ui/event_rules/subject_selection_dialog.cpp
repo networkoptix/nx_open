@@ -16,11 +16,32 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <ui/common/palette.h>
+
 #include <nx/vms/client/desktop/common/utils/item_view_utils.h>
 #include <nx/vms/client/desktop/common/models/natural_string_sort_proxy_model.h>
 
+#include <nx/network/app_info.h>
+
 namespace nx::vms::client::desktop {
 namespace ui {
+
+SubjectSelectionDialog::CustomizableOptions
+    SubjectSelectionDialog::CustomizableOptions::cloudUsers()
+{
+    CustomizableOptions options;
+    options.userListHeader = tr("%1 users",
+        "%1 here will be substituted with short cloud name e.g. 'Cloud'.")
+        .arg(nx::network::AppInfo::shortCloudName());
+    options.userFilter =
+        [](const QnUserResource& user) -> bool
+        {
+            return user.isCloud();
+        };
+    options.alertColor = colorTheme()->color("brand_d5");
+    return options;
+}
 
 using namespace subject_selection_dialog_private;
 
@@ -232,6 +253,8 @@ void SubjectSelectionDialog::setOptions(const CustomizableOptions& options)
     ui->showAllUsers->setVisible(options.showAllUsersSwitcher);
     ui->usersGroupBox->setVisible(true);
     ui->usersGroupBox->setTitle(options.userListHeader);
+
+    setPaletteColor(ui->alertBar, QPalette::Window, options.alertColor);
 
     m_userListDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 

@@ -30,6 +30,7 @@
 #include <nx/analytics/descriptor_manager.h>
 
 #include <utils/email/email.h>
+#include <nx/network/app_info.h>
 
 namespace {
 
@@ -841,10 +842,6 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
 //-------------------------------------------------------------------------------------------------
 // QnCloudUsersValidationPolicy
 
-QnCloudUsersValidationPolicy::QnCloudUsersValidationPolicy(QnCommonModule* common)
-{
-}
-
 QValidator::State QnCloudUsersValidationPolicy::roleValidity(const QnUuid& roleId) const
 {
     const auto& users = commonModule()->resourceAccessSubjectsCache()->usersInRole(roleId);
@@ -920,9 +917,13 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
         return nx::vms::event::StringsHelper::needToSelectUserText();
 
     if (nonCloudCount != 0)
-        return tr("%1 of %2 selected users are not Cloud users and will not get mobile notifications.")
+    {
+        return tr("%1 of %2 selected users are not %3 users and will not get mobile notifications.",
+            "%3 here will be substituted with short cloud name e.g. 'Cloud'.")
             .arg(nonCloudCount)
-            .arg(totalCount);
+            .arg(totalCount)
+            .arg(nx::network::AppInfo::shortCloudName());
+    }
 
     return QString();
 }

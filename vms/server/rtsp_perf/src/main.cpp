@@ -1,40 +1,48 @@
-#include "rtsp_perf.h"
 #include <nx/utils/log/log.h>
+
+#include <optional>
 
 #include <QtCore/QCommandLineParser>
 
-bool validateConfig(RtspPerf::Config& config)
+#include <nx/kit/output_redirector.h>
+#include <nx/utils/app_info.h>
+
+#include "rtsp_perf.h"
+#include "rtsp_perf_ini.h"
+
+namespace {
+
+template<typename... Args>
+void print(std::ostream& stream, const QString& message, Args... args)
+{
+    stream << nx::utils::log::makeMessage(message + "\n", args...).toStdString();
+}
+
+static bool validateConfig(const RtspPerf::Config& config)
 {
     if (config.count < 1)
     {
-        fprintf(stderr, "ERROR: At least one session needed, use '-c <count>' option\n");
+        print(std::cerr, "ERROR: At least one session needed, use '-c <count>' option.");
         return false;
     }
     if (config.livePercent > 100 || config.livePercent < 0)
     {
-        fprintf(stderr, "ERROR: "
-            "Live persent streams should be in interval [0..100], use '-c <count>' option\n");
+        print(std::cerr,
+            "ERROR: Percentage of live streams must be [0..100], use '-c <count>' option.");
         return false;
     }
     if (config.server.isEmpty())
     {
-        fprintf(stderr, "ERROR: Wrong server url, use '-u <url>' option\n");
+        print(std::cerr, "ERROR: Wrong server url, use '-u <url>' option.");
         return false;
     }
     return true;
 }
 
-int main(int argc, char** argv)
+static std::optional<RtspPerf::Config> makeConfig(const QCoreApplication& app)
 {
-    // Reduce window size to disable log reducing
-    nx::kit::IniConfig::Tweaks iniTweaks;
-    iniTweaks.set(&nx::utils::ini().logLevelReducerWindowSizeS, 0);
-
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("RtspPerf");
-    QCoreApplication::setApplicationVersion("1.0");
-
     QCommandLineParser parser;
+
     parser.setApplicationDescription("Rtsp performance test");
     parser.addHelpOption();
     parser.addVersionOption();
@@ -46,7 +54,7 @@ int main(int argc, char** argv)
         "Rtsp session count. By default: 1", "count", "1");
     parser.addOption(countOption);
     QCommandLineOption livePercentOption(QStringList() << "l" << "live_percent",
-        "Percent of live streams. By default: 100", "live percent", "100");
+        "Percentage of live streams. By default: 100", "live percent", "100");
     parser.addOption(livePercentOption);
     QCommandLineOption timeoutOption(QStringList() << "t" << "timeout",
         "RTSP read timeout in milliseconds. By default: 5000ms", "timeout", "5000");
@@ -84,10 +92,11 @@ int main(int argc, char** argv)
     QCommandLineOption minTimestampDiffUs(QStringList() << "min-timestamp-diff-us",
         "Min timestamp diff in microseconds.", "min-diff", "0");
     parser.addOption(minTimestampDiffUs);
+
     parser.process(app);
 
-
     RtspPerf::Config config;
+
     config.count = parser.value(countOption).toInt();
     config.startInterval = std::chrono::milliseconds(parser.value(intervalOption).toInt());
     config.livePercent = parser.value(livePercentOption).toInt();
@@ -111,19 +120,61 @@ int main(int argc, char** argv)
         const auto level = nx::utils::log::levelFromString(logLevel);
         if (level == nx::utils::log::Level::undefined)
         {
-            fprintf(stderr, "ERROR: Invalid log level: %s\n", logLevel.toUtf8().data());
-            return 1;
+            print(std::cerr, "ERROR: Invalid log level: %1", logLevel);
+            return std::nullopt;
         }
         nx::utils::log::mainLogger()->setDefaultLevel(level);
     }
 
     if (parser.isSet(serverOption) && !config.urls.isEmpty())
-        fprintf(stderr, "WARNING: Url configured, '--server' option will ignored\n");
+        print(std::cerr, "WARNING: Url configured, '--server' option will be ignored.");
 
-    if (!validateConfig(config))
+    return config;
+}
+
+static int run(int argc, char* argv[], const QCoreApplication& app)
+{
+    const std::optional<RtspPerf::Config> config = makeConfig(app);
+    if (!config || !validateConfig(*config))
         return 1;
 
-    RtspPerf perf(config);
+    RtspPerf perf(*config);
     perf.run();
-    return 0;
+    return 1; //< Fatal error, because normally RtspPerf::run() runs an infinite loop.
+}
+
+} // namespace
+
+int main(int argc, char** argv)
+{
+    int exitStatus;
+    try
+    {
+        nx::kit::OutputRedirector::ensureOutputRedirection();
+        nx::utils::log::setLevelReducerEnabled(false);
+
+        ini().reload(); //< Make .ini appear on the console even when help is requested.
+
+        QCoreApplication::setOrganizationName(nx::utils::AppInfo::organizationName());
+        QCoreApplication::setApplicationName(nx::utils::AppInfo::vmsName() + " Test Camera");
+        QCoreApplication::setApplicationVersion(nx::utils::AppInfo::applicationVersion());
+        const QCoreApplication app(argc, argv); //< Each user may run their own executable.
+
+        // NOTE: Print blank lines before (after ini-config printout) and after to emphasize.
+        print(std::cout, "\n%1 version %2\n", app.applicationName(), app.applicationVersion());
+
+        exitStatus = run(argc, argv, app);
+    }
+    catch (const std::exception& e)
+    {
+        print(std::cerr, "INTERNAL ERROR: Exception raised: %1", e.what());
+        exitStatus = 70;
+    }
+    catch (...)
+    {
+        print(std::cerr, "INTERNAL ERROR: Unknown exception raised.");
+        exitStatus = 71;
+    }
+    print(std::cerr, "Finished with exit status %1.", exitStatus);
+    return exitStatus;
 }

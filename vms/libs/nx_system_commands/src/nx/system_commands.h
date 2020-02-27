@@ -46,8 +46,8 @@ public:
     MountCode mount(
         const std::string& url,
         const std::string& directory,
-        const std::optional<std::string>& maybeUsername,
-        const std::optional<std::string>& maybePassword);
+        const std::optional<std::string>& user,
+        const std::optional<std::string>& pass);
 
     /** Unounts NAS from directory. */
     UnmountCode unmount(const std::string& directory);
@@ -124,7 +124,7 @@ private:
 
     bool checkMountPermissions(const std::string& directory);
     bool checkOwnerPermissions(const std::string& path);
-    bool execute(const std::string& command, std::function<void(const char*)> outputAction = nullptr);
+    int execute(const std::string& command, std::function<void(const char*)> outputAction = nullptr);
 };
 
 } // namespace nx

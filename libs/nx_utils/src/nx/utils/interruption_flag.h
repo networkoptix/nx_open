@@ -78,6 +78,9 @@ public:
 private:
     std::vector<bool*> m_watcherStates;
     std::thread::id m_lastWatchingThreadId;
+
+    void pushWatcherState(bool* watcherState);
+    void popWatcherState(bool* watcherState);
 };
 
 } // namespace nx

@@ -37,9 +37,11 @@ class QnVirtualCameraResource : public QnSecurityCamResource
 public:
     static const QString kCompatibleAnalyticsEnginesProperty;
     static const QString kUserEnabledAnalyticsEnginesProperty;
+    // This property kept here only because of statistics filtering.
     static const QString kDeviceAgentsSettingsValuesProperty;
     static const QString kDeviceAgentManifestsProperty;
     static const QString kAnalyzedStreamIndexes;
+    static const QString kWearableClientTimeZone;
 
     static const nx::vms::api::StreamIndex kDefaultAnalyzedStreamIndex =
         nx::vms::api::StreamIndex::primary;
@@ -63,6 +65,14 @@ public:
 
     void issueOccured();
     void cleanCameraIssues();
+
+    bool isWearableClientTimeZone() const;
+    /**
+     * Meaningful only for wearable camera.
+     * If the value is true, video's timestamps is considered as local client time.
+     * Otherwise, timestamps is considered as UTC.
+     */
+    void setWearableClientTimeZone(bool value);
 
     nx::vms::api::RtpTransportType preferredRtpTransport() const;
     CameraMediaStreams mediaStreams() const;
@@ -145,14 +155,6 @@ public:
      */
     std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
 
-    std::optional<QJsonObject> deviceAgentSettingsModel(QnUuid engineId) const;
-
-    QHash<QnUuid, QJsonObject> deviceAgentSettingsValues() const;
-    void setDeviceAgentSettingsValues(const QHash<QnUuid, QJsonObject>& settingsValues);
-
-    QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
-    void setDeviceAgentSettingsValues(const QnUuid& engineId, const QJsonObject& settingsValues);
-
     std::optional<nx::vms::api::analytics::DeviceAgentManifest> deviceAgentManifest(
         const QnUuid& engineId) const;
 
@@ -214,7 +216,7 @@ private:
 };
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
-const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 360);
+const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(512, 384);
 const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
 const QSize UNLIMITED_RESOLUTION(INT_MAX, INT_MAX);
 

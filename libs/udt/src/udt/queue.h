@@ -55,21 +55,27 @@ Yunhong Gu, last updated 01/12/2011
 #include "common.h"
 #include "packet.h"
 
+static constexpr auto kSyncRepeatMinPeriod = std::chrono::milliseconds(250);
+
 class CUDT;
 
 struct CUnit
 {
-    CPacket m_Packet;        // packet
-    int m_iFlag = 0;            // 0: free, 1: occupied, 2: msg read but not freed (out-of-order), 3: msg dropped
+    CPacket& packet();
+
+    void setFlag(int val);
+    int flag() const;
+
+private:
+    CPacket m_Packet;
+    // 0: free, 1: occupied, 2: msg read but not freed (out-of-order), 3: msg dropped.
+    int m_iFlag = 0;
 };
 
 class ServerSideConnectionAcceptor;
 
 class CUnitQueue
 {
-    friend class CRcvQueue;
-    friend class CRcvBuffer;
-
 public:
     CUnitQueue();
     ~CUnitQueue();
@@ -85,7 +91,7 @@ public:
     // Returned value:
     //    0: success, -1: failure.
 
-    int init(int size, int mss, int version);
+    int init(int size, int mss);
 
     // Functionality:
     //    Increase (double) the unit queue size.
@@ -114,12 +120,14 @@ public:
 
     CUnit* getNextAvailUnit();
 
+    int decCount() { return --m_iCount; }
+    int incCount() { return ++m_iCount; }
+
 private:
     struct CQEntry
     {
-        CUnit* m_pUnit = nullptr;        // unit queue
-        char* m_pBuffer = nullptr;        // data buffer
-        int m_iSize = 0;        // size of each queue
+        std::vector<CUnit> unitQueue;
+        Buffer m_pBuffer;
 
         CQEntry* next = nullptr;
     };
@@ -134,7 +142,6 @@ private:
     int m_iCount = 0;        // total number of valid packets in the queue
 
     int m_iMSS = 0;            // unit buffer size
-    int m_iIPversion = 0;        // IP version
 
 private:
     CUnitQueue(const CUnitQueue&);
@@ -146,7 +153,7 @@ private:
 struct CSNode
 {
     std::weak_ptr<CUDT> socket;
-    uint64_t timestamp = 0;
+    std::chrono::microseconds timestamp = std::chrono::microseconds::zero();
 
     // -1 means not on the heap.
     int locationOnHeap = -1;
@@ -199,12 +206,12 @@ public:
     // Returned value:
     //    Scheduled processing time of the first UDT socket in the list.
 
-    uint64_t getNextProcTime();
+    std::chrono::microseconds getNextProcTime() const;
 
     int lastEntry() const { return m_iLastEntry; }
 
 private:
-    void insert_(int64_t ts, std::shared_ptr<CUDT> u);
+    void insert_(std::chrono::microseconds ts, std::shared_ptr<CUDT> u);
     void remove_(CSNode* n);
 
 private:
@@ -215,7 +222,7 @@ private:
     // position of last entry on the heap array
     int m_iLastEntry = 0;
 
-    std::mutex m_ListLock;
+    mutable std::mutex m_mutex;
 
     std::mutex* m_pWindowLock = nullptr;
     std::condition_variable* m_pWindowCond = nullptr;
@@ -233,7 +240,7 @@ struct CRNode
 {
     UDTSOCKET socketId = -1;
     std::weak_ptr<CUDT> socket;
-    uint64_t timestamp = 0;
+    std::chrono::microseconds timestamp = std::chrono::microseconds::zero();
 
     CRNode* prev = nullptr;
     CRNode* next = nullptr;
@@ -308,7 +315,7 @@ public:
         const UDTSOCKET& id,
         std::weak_ptr<CUDT> u,
         const detail::SocketAddress& addr,
-        uint64_t ttl);
+        std::chrono::microseconds ttl);
 
     void remove(const UDTSOCKET& id);
 
@@ -326,7 +333,7 @@ private:
         // UDT sonnection peer address
         detail::SocketAddress peerAddr;
         // the time that this request expires
-        uint64_t ttl = 0;
+        std::chrono::microseconds ttl = std::chrono::microseconds::zero();
 
         CRL();
     };
@@ -353,13 +360,12 @@ public:
     // Returned value:
     //    Size of data sent out.
 
-    int sendto(const detail::SocketAddress& addr, CPacket& packet);
+    int sendto(const detail::SocketAddress& addr, CPacket packet);
 
     // List of UDT instances for data sending.
     CSndUList& sndUList() { return *m_pSndUList; }
 
-    // The UDP channel for data sending.
-    UdpChannel* channel() { return m_channel; }
+    detail::SocketAddress getLocalAddr() const;
 
 private:
     void worker();
@@ -367,19 +373,30 @@ private:
     std::thread m_WorkerThread;
 
 private:
+    struct SendTask
+    {
+        detail::SocketAddress addr;
+        CPacket packet;
+    };
+
     // List of UDT instances for data sending
     std::unique_ptr<CSndUList> m_pSndUList;
     // The UDP channel for data sending
     UdpChannel* m_channel = nullptr;
     // Timing facility
     CTimer* m_timer = nullptr;
+    std::vector<SendTask> m_sendTasks;
 
-    std::mutex m_WindowLock;
-    std::condition_variable m_WindowCond;
+    std::mutex m_mutex;
+    std::condition_variable m_cond;
 
     volatile bool m_bClosing = false;        // closing the worker
 
 private:
+    int sendPacket(const detail::SocketAddress& addr, CPacket packet);
+    void postPacket(const detail::SocketAddress& addr, CPacket packet);
+    void sendPostedPackets();
+
     CSndQueue(const CSndQueue&);
     CSndQueue& operator=(const CSndQueue&);
 };
@@ -389,6 +406,8 @@ private:
 class CRcvQueue
 {
 public:
+    static constexpr auto kDefaultRecvTimeout = std::chrono::seconds(1);
+
     /**
      * Initialize the receiving queue.
      * @param size queue size
@@ -411,8 +430,12 @@ public:
     //    2) [out] packet: received packet
     // Returned value:
     //    Data size of the packet
+    // TODO: #ak Refactor this function to return packet, not copy it.
 
-    int recvfrom(int32_t id, CPacket& packet);
+    int recvfrom(
+        int32_t id,
+        CPacket& packet,
+        std::chrono::microseconds timeout = kDefaultRecvTimeout);
 
     bool setListener(std::weak_ptr<ServerSideConnectionAcceptor> listener);
 
@@ -420,7 +443,7 @@ public:
         const UDTSOCKET& id,
         std::shared_ptr<CUDT> u,
         const detail::SocketAddress& addr,
-        uint64_t ttl);
+        std::chrono::microseconds ttl);
 
     void removeConnector(const UDTSOCKET& id);
 
@@ -453,6 +476,7 @@ private:
     UdpChannel* m_channel = nullptr;
     // shared timer with the snd queue
     CTimer* m_timer = nullptr;
+    const int m_iIPversion;
 
     // packet payload size
     int m_iPayloadSize = 0;
@@ -461,10 +485,9 @@ private:
     volatile bool m_bClosing = false;
 
 private:
-    void storePkt(int32_t id, CPacket* pkt);
+    void storePkt(int32_t id, std::unique_ptr<CPacket> pkt);
 
 private:
-    std::mutex m_LSLock;
     // pointer to the (unique, if any) listening UDT entity
     std::weak_ptr<ServerSideConnectionAcceptor> m_listener;
     // The list of sockets in rendezvous mode
@@ -472,12 +495,11 @@ private:
 
     // newly added entries, to be inserted
     std::vector<std::weak_ptr<CUDT>> m_vNewEntry;
-    std::mutex m_IDLock;
+    std::mutex m_mutex;
+    std::condition_variable m_cond;
 
     // temporary buffer for rendezvous connection request
-    std::map<int32_t, std::queue<CPacket*> > m_mBuffer;
-    std::mutex m_PassLock;
-    std::condition_variable m_PassCond;
+    std::map<int32_t, std::queue<std::unique_ptr<CPacket>>> m_packets;
 
 private:
     CRcvQueue(const CRcvQueue&);

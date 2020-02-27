@@ -33,6 +33,13 @@ void ClientOverHttpConnect::beginListening(
         [this, peerName, completionHandler = std::move(completionHandler)]() mutable
         {
             auto httpClient = std::make_unique<network::http::AsyncClient>();
+            if (timeout())
+            {
+                httpClient->setSendTimeout(*timeout());
+                httpClient->setResponseReadTimeout(*timeout());
+                httpClient->setMessageBodyReadTimeout(*timeout());
+            }
+
             httpClient->bindToAioThread(getAioThread());
             auto httpClientPtr = httpClient.get();
             m_activeRequests.push_back(std::move(httpClient));

@@ -1,4 +1,5 @@
 #include "system_commands.h"
+
 #include <nx/system_commands/domain_socket/send_linux.h>
 #include <nx/system_commands/system_commands_ini.h>
 
@@ -29,6 +30,8 @@
 #include <sys/wait.h>
 #include <sys/resource.h>
 #include <unistd.h>
+#include <sys/mount.h>
+#include <errno.h>
 
 #include <nx/kit/debug.h>
 
@@ -46,6 +49,13 @@ namespace nx {
 #endif
 
 namespace {
+
+struct ScopeGuard
+{
+    std::function<void()> f;
+    ScopeGuard(std::function<void()> f): f(f) {}
+    ~ScopeGuard() {if (f) f();}
+};
 
 static std::string formatImpl(const char* pstr, std::stringstream& out)
 {
@@ -103,129 +113,21 @@ std::string format(const std::string& formatString, Args&&... args)
     return formatImpl(pstr, out, std::forward<Args>(args)...);
 }
 
-enum MountParamIndex
-{
-    Ind_username = 0,
-    Ind_domain,
-    Ind_password,
-    Ind_ver,
-    Ind_url,
-    Ind_localPath,
-};
-
-using MountParams = std::tuple<
-    std::optional<std::string>, std::optional<std::string>, std::optional<std::string>,
-    std::string, std::string, std::string>;
-
-namespace detail {
-
-template<typename T>
-void combineImpl(std::vector<T>& r, T& t)
-{
-    r.push_back(t);
-}
-
-template<typename T, typename Head, typename ... Tail>
-void combineImpl(
-    std::vector<T>& r, T& tuple, const std::vector<Head>& head, const std::vector<Tail>& ... tail)
-{
-    for (const auto& h: head)
-    {
-        constexpr size_t currentIndex = std::tuple_size_v<T> - sizeof...(Tail) - 1;
-        std::get<currentIndex>(tuple) = h;
-        combineImpl(r, tuple, tail...);
-    }
-}
-
-} // namespace detail
-
-template<typename... Args>
-auto combine(const std::vector<Args>& ... args) -> std::vector<std::tuple<Args...>>
-{
-    std::vector<std::tuple<Args...>> result;
-    std::tuple<Args...> t;
-    detail::combineImpl(result, t, args...);
-    return result;
-}
-
-std::string escapeSingleQuotes(const std::string& arg)
-{
-    std::stringstream ss;
-    for (const char c: arg)
-    {
-        if (c == '\'')
-            ss << "'\\''";
-        else
-            ss << c;
-    }
-
-    return ss.str();
-}
-
-std::string makeMountCommand(const MountParams& params)
-{
-    std::ostringstream ss;
-    ss << "mount -t cifs '" << std::get<Ind_url>(params) << "' '" << std::get<Ind_localPath>(params) << "' -o ";
-
-    if (std::get<Ind_username>(params))
-        ss << " username='" << escapeSingleQuotes(*std::get<Ind_username>(params)) << "',";
-    else
-        ss << "guest,";
-
-    if (std::get<Ind_password>(params))
-        ss << "password='" << escapeSingleQuotes(*std::get<Ind_password>(params)) << "',";
-    else
-        ss << "password='',";
-
-    if (std::get<Ind_domain>(params))
-        ss << "domain='" << escapeSingleQuotes(*std::get<Ind_domain>(params)) << "',";
-
-    ss << "vers=" << std::get<Ind_ver>(params);
-
-    return ss.str();
-}
-
 std::pair<std::optional<std::string>, std::optional<std::string>> extractNameDomain(
     const std::optional<std::string>& username)
 {
-    static const std::string kWorkgroupDomain = "WORKGROUP";
     if (!username)
-        return {std::nullopt, kWorkgroupDomain};
+        return {std::nullopt, std::nullopt};
 
     const auto sep = username->find('\\');
     if (sep == std::string::npos
         || sep == username->size() - 1
         || sep == 0)
     {
-        return {username, kWorkgroupDomain};
+        return {username, std::nullopt};
     }
 
     return {username->substr(0, sep), username->substr(sep + 1)};
-}
-
-auto generateMountParams(
-    const std::string& url,
-    const std::string& localPath,
-    const std::optional<std::string>& maybeUsername,
-    const std::optional<std::string>& maybePassword)
-{
-    #define vecS std::vector<std::string>
-    #define vecMS std::vector<std::optional<std::string>>
-    const auto [username, domain] = extractNameDomain(maybeUsername);
-    const vecS versions = {
-        /*Win10*/"3.1",
-        /*Win7*/"2.1",
-        /*Win2012, Win8*/"3.0",
-        /*Win2008, Vista*/"2.0",
-        /*NT, old linux kernels*/"1.0"
-    };
-
-    return combine(
-        vecMS{username}, vecMS{domain, std::nullopt}, vecMS{maybePassword}, versions,
-        vecS{url}, vecS{localPath});
-
-    #undef vecS
-    #undef vecMS
 }
 
 } // namespace
@@ -279,14 +181,22 @@ bool SystemCommands::checkOwnerPermissions(const std::string& path)
     return true;
 }
 
-bool SystemCommands::execute(
+int SystemCommands::execute(
     const std::string& command, std::function<void(const char*)> outputAction)
 {
+    m_lastError.clear();
+    const auto onExit = ScopeGuard(
+        [this, &command]()
+        {
+            NX_OUTPUT << "Execute '" << command << "': "
+                << (m_lastError.empty() ? "succeded" : m_lastError);
+        });
+
     const auto pipe = popen((command + " 2>&1").c_str(), "r");
     if (pipe == nullptr)
     {
-        m_lastError = format("popen for % has failed", command);
-        return false;
+        m_lastError = format("popen for '%' has failed", command);
+        return -1;
     }
 
     std::ostringstream output;
@@ -299,22 +209,27 @@ bool SystemCommands::execute(
     }
 
     int retCode = pclose(pipe);
-    if (retCode != 0)
+    if (!WIFEXITED(retCode))
     {
-        m_lastError = format(
-            "Command % failed with return code %. Output: %",
-            command, retCode, output.str());
-        return false;
+        m_lastError = format("child '%' crashed", command);
+        return -1;
     }
 
-    return true;
+    if (WEXITSTATUS(retCode) != 0)
+    {
+        m_lastError = format(
+            "Command '%' failed with return code '%'. Output: '%'",
+            command, retCode, output.str());
+    }
+
+    return WEXITSTATUS(retCode);
 }
 
 SystemCommands::MountCode SystemCommands::mount(
     const std::string& url,
     const std::string& localPath,
-    const std::optional<std::string>& maybeUsername,
-    const std::optional<std::string>& maybePassword)
+    const std::optional<std::string>& user,
+    const std::optional<std::string>& pass)
 {
     if (!checkMountPermissions(localPath))
     {
@@ -322,22 +237,38 @@ SystemCommands::MountCode SystemCommands::mount(
         return SystemCommands::MountCode::otherError;
     }
 
-    for (const auto& t: generateMountParams(url, localPath, maybeUsername, maybePassword))
+    const auto [username, domain] = extractNameDomain(user);
+    const auto versions = {
+        /*Win10*/"3.1",
+        /*Win7*/"2.1",
+        /*Win2012, Win8*/"3.0",
+        /*Win2008, Vista*/"2.0",
+        /*NT, old linux kernels*/"1.0"};
+
+    std::stringstream optionStream;
+    optionStream << "user=" << (user ? *user : "") << ",";
+    if (domain)
+        optionStream << "domain=" << *domain << ",";
+    optionStream << "pass=" << (pass ? *pass : "") << ",";
+    optionStream << "vers=";
+    const auto options = optionStream.str();
+    for (const auto& v: versions)
     {
-        const auto command = makeMountCommand(t);
-        if (execute(command))
+        if (::mount(url.c_str(), localPath.c_str(), "cifs", 0, (options + v).c_str()) == 0)
         {
-            NX_OUTPUT << "Mount command \"" << command << "\" succeeded";
+            NX_OUTPUT << "Mount '" << url << "' to '" << localPath << "' succeeded";
             return SystemCommands::MountCode::ok;
         }
 
-        if (m_lastError.find("13") != std::string::npos)
+        NX_OUTPUT << "Mount '" << url << "' to '" << localPath << "' failed. Errno: " << errno;
+        if (errno == EACCES
+            || errno == ENOKEY
+            || errno == EKEYEXPIRED
+            || errno == EKEYREVOKED
+            || errno == EKEYREJECTED)
         {
-            NX_OUTPUT << "Mount command \"" << command << "\" failed with 'permission denied'";
             return SystemCommands::MountCode::wrongCredentials;
         }
-
-        NX_OUTPUT << "Mount command \"" << command << "\" failed";
     }
 
     return SystemCommands::MountCode::otherError;
@@ -388,12 +319,12 @@ bool SystemCommands::changeOwner(const std::string& path, int uid, int gid, bool
     std::ostringstream command;
     command << "chown " << (isRecursive ? "-R " : "") << uid << ":" << gid << " '" << path << "'";
 
-    return execute(command.str());
+    return execute(command.str()) == 0;
 }
 
 bool SystemCommands::makeDirectory(const std::string& directoryPath)
 {
-    if (!checkOwnerPermissions(directoryPath) || !execute("mkdir -p '" + directoryPath + "'"))
+    if (!checkOwnerPermissions(directoryPath) || execute("mkdir -p '" + directoryPath + "'"))
         return false;
 
     return true;
@@ -401,7 +332,7 @@ bool SystemCommands::makeDirectory(const std::string& directoryPath)
 
 bool SystemCommands::removePath(const std::string& path)
 {
-    if (!checkOwnerPermissions(path) || !execute("rm -rf '" + path + "'"))
+    if (!checkOwnerPermissions(path) || execute("rm -rf '" + path + "'"))
         return false;
 
     return true;
@@ -508,7 +439,7 @@ std::string SystemCommands::serializedFileList(const std::string& path)
         if (::stat64(pathBuf, &statBuf) != 0)
             continue;
 
-        out << pathBuf << "," << (S_ISDIR(statBuf.st_mode) ? statBuf.st_size : 0) << ","
+        out << pathBuf << "," << (S_ISDIR(statBuf.st_mode) ? 0 : statBuf.st_size) << ","
             << S_ISDIR(statBuf.st_mode) << ",";
     }
 
@@ -586,7 +517,7 @@ std::string SystemCommands::serializedDmiInfo()
 
     std::string result;
     std::set<std::string> values[prefixes.size()];
-    if (execute(
+    if (!execute(
         "/usr/sbin/dmidecode -t17",
         [&values, &prefixes, trim](const char* line)
         {

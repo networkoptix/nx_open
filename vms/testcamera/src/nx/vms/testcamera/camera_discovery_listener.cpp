@@ -20,11 +20,11 @@ namespace nx::vms::testcamera {
 CameraDiscoveryListener::CameraDiscoveryListener(
     const Logger* logger,
     std::function<QByteArray()> obtainDiscoveryResponseMessageFunc,
-    QStringList localInterfacesToListen)
+    NetworkOptions networkOptions)
     :
     m_logger(logger),
     m_obtainDiscoveryResponseMessageFunc(std::move(obtainDiscoveryResponseMessageFunc)),
-    m_localInterfacesToListen(std::move(localInterfacesToListen))
+    m_networkOptions(std::move(networkOptions))
 {
 }
 
@@ -35,7 +35,7 @@ CameraDiscoveryListener::~CameraDiscoveryListener()
 
 bool CameraDiscoveryListener::initialize()
 {
-    for (const auto& addr: m_localInterfacesToListen)
+    for (const auto& addr: m_networkOptions.localInterfacesToListen)
     {
         for (const auto& iface: nx::network::getAllIPv4Interfaces(
             nx::network::InterfaceListPolicy::keepAllAddressesPerInterface,
@@ -53,7 +53,7 @@ bool CameraDiscoveryListener::initialize()
         }
     }
 
-    if (m_allowedIpRanges.size() == 0 && m_localInterfacesToListen.size() > 0)
+    if (m_allowedIpRanges.size() == 0 && m_networkOptions.localInterfacesToListen.size() > 0)
     {
         NX_LOGGER_ERROR(m_logger, "Unable to obtain IP ranges to accept discovery messages.");
         return false;
@@ -138,47 +138,18 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
             serverAddress, nx::kit::utils::toString(response));
     }
 }
-/** @return False on error, having logged the error message. */
-bool CameraDiscoveryListener::obtainDiscoverySocketAddress(
-    SocketAddress* outSocketAddress) const
+
+/** @return Nullopt on error, having logged the error message. */
+std::optional<SocketAddress> CameraDiscoveryListener::obtainDiscoverySocketAddress() const
 {
-    if (!NX_ASSERT(outSocketAddress))
-        return false;
-
-    const int port = ini().discoveryPort;
-    if (port <= 0 || port >= 65536)
+    if (m_networkOptions.discoveryPort <= 0 || m_networkOptions.discoveryPort >= 65536)
     {
-        NX_LOGGER_ERROR(m_logger, "Invalid discoveryPort in .ini: %1.", port);
-        return false;
+        NX_LOGGER_ERROR(m_logger, "Invalid discoveryPort in .ini: %1.",
+            m_networkOptions.discoveryPort);
+        return std::nullopt;
     }
 
-    if (m_localInterfacesToListen.size() != 1)
-    {
-        // Will bind the discovery socket to all local interfaces.
-        *outSocketAddress = SocketAddress(HostAddress::anyHost, port);
-        NX_LOGGER_INFO(m_logger, "Listening to discovery messages from any host, port %1.", port);
-        return true;
-    }
-
-    // Will bind the discovery socket to this only interface.
-
-    const QString hostAddressStr = m_localInterfacesToListen.at(0);
-
-    // Validate host address string before creating HostAddress, because its constructor asserts
-    // the string to be valid.
-    nx::utils::Url url;
-    url.setHost(hostAddressStr);
-    if (!url.isValid())
-    {
-        NX_LOGGER_ERROR(m_logger, "Invalid local interface for discovery: %1.",
-            nx::kit::utils::toString(hostAddressStr)); //< Enquote and escape.
-        return false;
-    }
-
-    *outSocketAddress = SocketAddress(HostAddress(hostAddressStr), port);
-    NX_LOGGER_INFO(m_logger, "Listening to discovery messages from %1.", *outSocketAddress);
-
-    return true;
+    return SocketAddress(HostAddress::anyHost, m_networkOptions.discoveryPort);
 }
 
 /*virtual*/ void CameraDiscoveryListener::run()
@@ -190,10 +161,22 @@ bool CameraDiscoveryListener::obtainDiscoverySocketAddress(
     if (!discoverySocket)
         return error("Unable to create discovery socket.");
 
-    SocketAddress socketAddress;
-    if (!obtainDiscoverySocketAddress(&socketAddress))
+    const std::optional<SocketAddress> socketAddress = obtainDiscoverySocketAddress();
+    if (!socketAddress)
         return;
-    if (!discoverySocket->bind(socketAddress))
+
+    if (m_networkOptions.reuseDiscoveryPort)
+    {
+        NX_LOGGER_DEBUG(m_logger, "Will reuse discovery port.");
+
+        if (!discoverySocket->setReuseAddrFlag(true))
+            return error(lm("Unable tor set the reuse address flag on the discovery socket."));
+
+        if (!discoverySocket->setReusePortFlag(true))
+            return error(lm("Unable tor set the reuse port flag on the discovery socket."));
+    }
+
+    if (!discoverySocket->bind(*socketAddress))
         return error(lm("Unable to bind discovery socket to %1").args(socketAddress));
 
     const int socketTimeout = ini().discoveryMessageTimeoutMs;

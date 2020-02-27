@@ -2648,6 +2648,13 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -8892,30 +8899,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <source>Acknowledge</source>
       <translation>Reconhecer</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Evento Genérico</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>Dispositivo desconectado</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>A câmera foi desconectada</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>Módulo I/O foi desconectado</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Evento de Diagnóstico de Plugin Desconhecido</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9127,6 +9110,13 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>Adding</source>
       <translation>Adicionando</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation type="unfinished">Cloud users</translation>
     </message>
   </context>
   <context>

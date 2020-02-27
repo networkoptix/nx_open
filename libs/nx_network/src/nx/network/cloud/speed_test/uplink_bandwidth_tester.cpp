@@ -221,8 +221,11 @@ void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
 
 	if (!m_testContext.sendRequests && *sequence == m_testContext.sequence)
 	{
-		if (*sequence == 0 || currentDuration < kMinTestDuration)
+		if (*sequence == 0)
 			return testFailed(SystemError::invalidData);
+
+		if (currentDuration < kMinTestDuration)
+			currentDuration = kMinTestDuration;
 
         testComplete(
             m_testContext.totalBytesSent / duration_cast<milliseconds>(currentDuration).count());
@@ -272,7 +275,7 @@ void UplinkBandwidthTester::testComplete(int bytesPerMsec)
 		const auto kilobitsPerSec = ((long long)bytesPerMsec * 1000 * 8) / 1024;
 
 		NX_VERBOSE(this, "Test complete, reporting bytes per msec %1 (%2 Kbps)",
-			bytesPerMsec, (int) kilobitsPerSec);
+			bytesPerMsec, kilobitsPerSec);
 
         nx::utils::swapAndCall(m_handler, SystemError::noError, (int) kilobitsPerSec);
     }

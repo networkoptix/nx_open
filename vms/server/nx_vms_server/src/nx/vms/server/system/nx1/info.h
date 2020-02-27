@@ -2,13 +2,13 @@
 
 #include <QtCore/QString>
 
-namespace nx::vms::server { class RootFileSystem; }
+class QnMediaServerModule;
 
 namespace Nx1 {
 
 QString getMac();
 QString getSerial();
-bool isBootedFromSD(nx::vms::server::RootFileSystem* footFs);
+bool isBootedFromSD(QnMediaServerModule* serverModule);
 
 }
 

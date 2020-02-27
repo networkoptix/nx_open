@@ -26,18 +26,28 @@ void InterruptionFlag::interrupt()
     m_watcherStates.clear();
 }
 
+void InterruptionFlag::pushWatcherState(bool* watcherState)
+{
+    NX_ASSERT(
+        m_watcherStates.empty() ||
+        m_lastWatchingThreadId == std::this_thread::get_id());
+
+    m_lastWatchingThreadId = std::this_thread::get_id();
+    m_watcherStates.push_back(watcherState);
+}
+
+void InterruptionFlag::popWatcherState(bool* watcherState)
+{
+    NX_ASSERT(m_watcherStates.back() == watcherState);
+    m_watcherStates.pop_back();
+}
+
 //-------------------------------------------------------------------------------------------------
 
 InterruptionFlag::Watcher::Watcher(InterruptionFlag* const flag):
     m_objectDestructionFlag(flag)
 {
-    NX_ASSERT(
-        m_objectDestructionFlag->m_watcherStates.empty() ||
-        m_objectDestructionFlag->m_lastWatchingThreadId == std::this_thread::get_id());
-
-    m_objectDestructionFlag->m_lastWatchingThreadId = std::this_thread::get_id();
-
-    m_objectDestructionFlag->m_watcherStates.push_back(&m_interrupted);
+    m_objectDestructionFlag->pushWatcherState(&m_interrupted);
 }
 
 InterruptionFlag::Watcher::~Watcher()
@@ -45,8 +55,7 @@ InterruptionFlag::Watcher::~Watcher()
     if (m_interrupted)
         return; //< Object has been destroyed and m_objectDestructionFlag is invalid.
 
-    NX_ASSERT(m_objectDestructionFlag->m_watcherStates.back() == &m_interrupted);
-    m_objectDestructionFlag->m_watcherStates.pop_back();
+    m_objectDestructionFlag->popWatcherState(&m_interrupted);
 }
 
 bool InterruptionFlag::Watcher::interrupted() const

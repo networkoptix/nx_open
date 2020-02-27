@@ -27,7 +27,7 @@ class StunClient:
 public:
     StunClient()
     {
-        m_stunClient = std::make_shared<nx::network::stun::AsyncClient>();
+        initializeStunClient();
     }
 
     ~StunClient()
@@ -113,8 +113,7 @@ protected:
 
     void givenStunClientWithPredefinedConnection()
     {
-        m_stunClient = std::make_shared<nx::network::stun::AsyncClient>(
-            std::move(m_tcpConnectionToTheServer));
+        initializeStunClient(std::exchange(m_tcpConnectionToTheServer, nullptr));
     }
 
     void whenServerTerminatedAbruptly()
@@ -176,7 +175,7 @@ protected:
             m_stunClient->pleaseStopSync();
             m_stunClient.reset();
         }
-        m_stunClient = std::make_shared<nx::network::stun::AsyncClient>();
+        initializeStunClient();
 
         auto url = serverUrl();
         url.setScheme(urlScheme);
@@ -193,6 +192,17 @@ private:
     nx::network::stun::MessageDispatcher m_dispatcher;
     std::unique_ptr<stun::SocketServer> m_server;
     std::unique_ptr<nx::network::TCPSocket> m_tcpConnectionToTheServer;
+
+    void initializeStunClient(std::unique_ptr<AbstractStreamSocket> connection = nullptr)
+    {
+        stun::AbstractAsyncClient::Settings settings;
+        settings.sendTimeout = kNoTimeout;
+        settings.recvTimeout = kNoTimeout;
+
+        m_stunClient = std::make_shared<nx::network::stun::AsyncClient>(
+            std::move(connection),
+            settings);
+    }
 
     void closeConnection(
         std::shared_ptr<stun::AbstractServerConnection> connection,

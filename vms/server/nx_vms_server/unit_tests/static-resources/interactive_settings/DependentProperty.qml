@@ -5,6 +5,7 @@ Settings
     readonly property var _serializedModel:
     {
         "type": "Settings",
+        "filledCheckItems": [],
         "items": [
             {
                 "type": "CheckBox",

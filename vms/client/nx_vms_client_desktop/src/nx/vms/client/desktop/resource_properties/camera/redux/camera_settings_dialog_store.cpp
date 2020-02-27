@@ -57,6 +57,22 @@ const State& CameraSettingsDialogStore::state() const
     return d->state;
 }
 
+void CameraSettingsDialogStore::loadCameras(
+    const QnVirtualCameraResourceList& cameras,
+    DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
+    CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::loadCameras(
+                std::move(state),
+                cameras,
+                deviceAgentSettingsAdapter,
+                analyticsEnginesWatcher);
+        });
+}
+
 void CameraSettingsDialogStore::setReadOnly(bool value)
 {
     d->executeAction([&](State state) { return Reducer::setReadOnly(std::move(state), value); });
@@ -81,11 +97,6 @@ void CameraSettingsDialogStore::setSingleWearableState(const WearableState& valu
 {
     d->executeAction(
         [&](State state) { return Reducer::setSingleWearableState(std::move(state), value); });
-}
-
-void CameraSettingsDialogStore::loadCameras(const QnVirtualCameraResourceList& cameras)
-{
-    d->executeAction([&](State state) { return Reducer::loadCameras(std::move(state), cameras); });
 }
 
 void CameraSettingsDialogStore::setSingleCameraUserName(const QString& text)
@@ -407,16 +418,7 @@ void CameraSettingsDialogStore::setCurrentAnalyticsEngineId(const QnUuid& value)
 
 bool CameraSettingsDialogStore::analyticsSettingsLoading() const
 {
-    return d->state.analytics.loading;
-}
-
-void CameraSettingsDialogStore::setAnalyticsSettingsLoading(bool value)
-{
-    d->executeAction(
-        [&](State state)
-        {
-            return Reducer::setAnalyticsSettingsLoading(std::move(state), value);
-        });
+    return d->state.analytics.settingsByEngineId.value(currentAnalyticsEngineId()).loading;
 }
 
 void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QVariantList& value)
@@ -450,22 +452,12 @@ void CameraSettingsDialogStore::setAnalyticsStreamIndex(
 
 QJsonObject CameraSettingsDialogStore::deviceAgentSettingsModel(const QnUuid& engineId) const
 {
-    return d->state.analytics.settingsModelByEngineId.value(engineId);
-}
-
-void CameraSettingsDialogStore::setDeviceAgentSettingsModel(
-    const QnUuid& engineId, const QJsonObject& value)
-{
-    d->executeAction(
-        [&](State state)
-        {
-            return Reducer::setDeviceAgentSettingsModel(std::move(state), engineId, value);
-        });
+    return d->state.analytics.settingsByEngineId.value(engineId).model;
 }
 
 QJsonObject CameraSettingsDialogStore::deviceAgentSettingsValues(const QnUuid& engineId) const
 {
-    return d->state.analytics.settingsValuesByEngineId.value(engineId).get();
+    return d->state.analytics.settingsByEngineId.value(engineId).values.get();
 }
 
 void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
@@ -478,13 +470,13 @@ void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
         });
 }
 
-void CameraSettingsDialogStore::resetDeviceAgentSettingsValues(
-    const QnUuid& engineId, const QJsonObject& values)
+void CameraSettingsDialogStore::resetDeviceAgentData(
+    const QnUuid& engineId, const DeviceAgentData& data)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::resetDeviceAgentSettingsValues(std::move(state), engineId, values);
+            return Reducer::resetDeviceAgentData(std::move(state), engineId, data);
         });
 }
 
@@ -496,6 +488,15 @@ bool CameraSettingsDialogStore::dualStreamingEnabled() const
 bool CameraSettingsDialogStore::recordingEnabled() const
 {
     return d->state.recording.enabled();
+}
+
+void CameraSettingsDialogStore::setWearableClientTimeZone(bool value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setWearableClientTimeZone(std::move(state), value);
+        });
 }
 
 void CameraSettingsDialogStore::setWearableMotionDetectionEnabled(bool value)

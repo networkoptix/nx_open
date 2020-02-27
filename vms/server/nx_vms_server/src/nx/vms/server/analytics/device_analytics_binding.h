@@ -45,6 +45,10 @@ public:
 
     virtual ~DeviceAnalyticsBinding() override;
 
+    bool canAcceptData() const override;
+
+    void setMaxQueueDuration(std::chrono::microseconds value);
+
     bool startAnalytics(const QJsonObject& settings);
     void stopAnalytics();
     bool restartAnalytics(const QJsonObject& settings);
@@ -110,6 +114,7 @@ private:
     nx::analytics::MetadataLogger m_incomingFrameLogger;
     std::optional<sdk_support::MetadataTypes> m_lastNeededMetadataTypes;
     std::optional<StreamRequirements> m_cachedStreamRequirements;
+    std::chrono::microseconds m_maxQueueDuration{};
 };
 
 } // namespace nx::vms::server::analytics

@@ -1772,6 +1772,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler(serverModule()));
 
+    /**%apidoc[proprietary] TODO /api/wearableCamera
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/wearableCamera", new QnWearableCameraRestHandler(serverModule()));
 
     /**%apidoc GET /api/ptz
@@ -1873,6 +1876,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg(kGetTimePath, new nx::vms::server::rest::GetTimeHandler());
 
+    /**%apidoc[proprietary] TODO /ec2/getTimeOfServers
+     * %// TODO: Write apidoc comment.
+     */
     reg("ec2/getTimeOfServers", new nx::vms::server::rest::ServerTimeHandler("/" + kGetTimePath));
 
     /**%apidoc GET /api/gettime
@@ -1926,9 +1932,24 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getNonce", new QnGetNonceRestHandler());
 
+    /**%apidoc[proprietary] TODO /api/getRemoteNonce
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/getRemoteNonce", new QnGetNonceRestHandler("/api/getNonce"));
+    
+    /**%apidoc[proprietary] TODO /api/cookieLogin
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
+    
+    /**%apidoc[proprietary] TODO /api/cookieLogout
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/cookieLogout", new QnCookieLogoutRestHandler());
+    
+    /**%apidoc[proprietary] TODO /api/getCurrentUser
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/getCurrentUser", new QnCurrentUserRestHandler());
 
     /**%apidoc POST /api/activateLicense
@@ -1939,6 +1960,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/activateLicense", new QnActivateLicenseRestHandler());
 
+    /**%apidoc[proprietary] TODO /api/testEmailSettings
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/testEmailSettings", new QnTestEmailSettingsHandler());
 
     /**%apidoc[proprietary] GET /api/getHardwareInfo
@@ -1947,6 +1971,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getHardwareInfo", new QnGetHardwareInfoHandler());
 
+    /**%apidoc[proprietary] TODO /api/testLdapSettings
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
 
     /**%apidoc GET /api/ping
@@ -1971,6 +1998,10 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/metrics", new QnMetricsRestHandler());
 
     reg(::rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
+    
+    /**%apidoc[proprietary] TODO /api/recStats
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/recStats", new QnRecordingStatsRestHandler(serverModule()));
 
     /**%apidoc GET /api/auditLog
@@ -1988,6 +2019,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/auditLog", new QnAuditLogRestHandler(serverModule()), kAdmin);
 
+    /**%apidoc[proprietary] TODO /api/checkDiscovery
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
 
     /**%apidoc GET /api/pingSystem
@@ -2202,7 +2236,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getEvents", new QnEventLog2RestHandler(serverModule()), kViewLogs); //< new version
 
-    // TODO: Add apidoc comment.
+    /**%apidoc[proprietary] TODO /ec2/getEvents
+     * %// TODO: Write apidoc comment.
+     */
     reg("ec2/getEvents", new QnMultiserverEventsRestHandler(serverModule(), "ec2/getEvents"), kViewLogs);
 
     /**%apidoc GET /api/showLog
@@ -2216,6 +2252,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/showLog", new QnLogRestHandler(), kAdmin);
 
+    /**%apidoc[proprietary] TODO /api/getSystemId
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
 
     /**%apidoc GET /api/doCameraDiagnosticsStep
@@ -2241,6 +2280,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/restart", new QnRestartRestHandler(), kAdmin);
 
+    /**%apidoc[proprietary] TODO /api/connect
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/connect", new QnOldClientConnectRestHandler());
 
     /**%apidoc GET /api/moduleInformation
@@ -2308,6 +2350,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
+    /**%apidoc[proprietary] TODO /api/downloads/
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/downloads/", new nx::vms::server::rest::handlers::Downloads(serverModule()));
 
     /**%apidoc[proprietary] GET /api/settime
@@ -2520,12 +2565,18 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/systemSettings", new QnSystemSettingsHandler());
 
+    /**%apidoc[proprietary] TODO /api/transmitAudio
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/transmitAudio", new QnAudioTransmissionRestHandler(serverModule()));
 
     // TODO: Introduce constants for API methods registered here, also use them in
     // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors,
     // except when it is the path of some other api method.
 
+    /**%apidoc[proprietary] TODO /api/RecordedTimePeriods
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler(serverModule())); //< deprecated
 
     /**%apidoc GET /ec2/recordedTimePeriods
@@ -2542,8 +2593,8 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
      * %param[opt]:arrayJson filter This parameter is used for Motion and Analytics Search
-     *     ("periodsType" must be set to 1 or 2). Search motion or analytics event on a video
-     *     according to the specified attributes values.
+     *     (if "periodsType" is set to 1 or 2). Search motion or analytics event on a video
+     *     according to the specified attribute values.
      *     <br/>Motion Search Format: string with a JSON list of <i>sensors</i>,
      *     each <i>sensor</i> is a JSON list of <i>rectangles</i>, each <i>rectangle</i> is:
      *     <br/>
@@ -2557,18 +2608,18 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>[[{"x":0,"y":0,"width":43,"height":31}]]</code>
      *     <br/>Example of two rectangles for a single-sensor camera:
      *     <code>[[{"x":0,"y":0,"width":5,"height":7},{"x":12,"y":10,"width":8,"height":6}]]</code>
-     *     <br/>Analytics Search Format: string with a JSON object that might take the following attributes
-     *     as an input:
+     *     <br/>Analytics Search Format: string with a JSON object that might take the following
+     *     attributes as an input:
      *     <br/>
      *     <ul>
-     *     <li>"boundingBox" key represents a <i>rectangle</i>. Value is a dictionary with same format
-     *     as for Motion Search rectangle;</li>
-     *     <li>"freeText" key for full-text search over analytics data attributes. Value is expected to be a
-     *     string with search input;
+     *     <li>"boundingBox" key represents a <i>rectangle</i>. The value is a dictionary with the
+     *     same format as for Motion Search rectangle;</li>
+     *     <li>"freeText" key for full-text search over analytics data attributes. The value is
+     *     expected to be a string with the search input;
      *     </li>
      *     </ul>
-     *     <br/>Example of JSON object:
-     *     <code>{"boundingBox":{"height":0,"width":0.1,"x":0.,"y":1.},"freeText":"Test"}</code>
+     *     <br/>Example of the JSON object:
+     *     <code>{"boundingBox":{"height":0,"width":0.1,"x":0.0,"y":1.0},"freeText":"Test"}</code>
      * %param[proprietary]:enum format Data format. Default value is "json".
      *     %value ubjson Universal Binary JSON data format.
      *     %value json JSON data format.
@@ -2578,8 +2629,8 @@ void MediaServerProcess::registerRestHandlers(
      *     amount of microseconds per screen pixel.
      * %param[opt]:integer periodsType Chunk type.
      *     %value 0 All records.
-     *     %value 1 Only chunks with motion (parameter "filter" is required).
-     *     %value 2 Only chunks with analytics event(parameter "filter" might be applied).
+     *     %value 1 Only chunks with motion (parameter "filter" might be applied).
+     *     %value 2 Only chunks with analytics event (parameter "filter" might be applied).
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
      * %param[opt]:integer limit Maximum number of chunks to return.
@@ -2603,6 +2654,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg(QnMultiserverChunksRestHandler::kUrlPath, new QnMultiserverChunksRestHandler(serverModule())); //< new version
 
+    /**%apidoc[proprietary] TODO /ec2/cameraHistory
+     * %// TODO: Write apidoc comment.
+     */
     reg("ec2/cameraHistory", new QnCameraHistoryRestHandler(serverModule()));
 
     /**%apidoc GET /ec2/bookmarks
@@ -2687,6 +2741,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler(serverModule(), "ec2/bookmarks"));
 
+    /**%apidoc[proprietary] TODO /api/mergeLdapUsers
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 
     /**%apidoc GET /ec2/updateInformation
@@ -2794,6 +2851,9 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler(serverModule(), "ec2/cameraThumbnail"));
 
+    /**%apidoc[proprietary] TODO /ec2/statistics
+     * %// TODO: Write apidoc comment.
+     */
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
@@ -2961,12 +3021,22 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/debug", new QnDebugHandler(), kAdmin);
 
+    /**%apidoc[proprietary] TODO /api/startLiteClient
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/startLiteClient", new QnStartLiteClientRestHandler(serverModule()));
 
     #if defined(_DEBUG)
+        
+        /**%apidoc[proprietary] TODO /api/debugEvent
+         * %// TODO: Write apidoc comment.
+         */
         reg("api/debugEvent", new QnDebugEventsRestHandler(serverModule()));
     #endif
 
+    /**%apidoc[proprietary] TODO /ec2/runtimeInfo
+     * %// TODO: Write apidoc comment.
+     */
     reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
 
     static const char kGetHardwareIdsPath[] = "api/getHardwareIds";
@@ -3058,6 +3128,9 @@ void MediaServerProcess::registerRestHandlers(
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
 
+    /**%apidoc[proprietary] TODO /api/metrics/
+     * %// TODO: Write apidoc comment.
+     */
     reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
         m_metricsController.get()), kAdmin);
 
@@ -4707,7 +4780,7 @@ void MediaServerProcess::writeMutableSettingsData()
     serverModule()->mutableSettings()->appserverPassword.set("");
 #ifdef _DEBUG
     NX_ASSERT(serverModule()->settings().appserverPassword().isEmpty(),
-        "appserverPassword is not emptyu in registry. Restart the server as Administrator");
+        "appserverPassword is not empty in registry. Restart the server as Administrator");
 #endif
 
     // show our cloud host value in registry in case of installer will check it

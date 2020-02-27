@@ -20,6 +20,7 @@
 #include <ui/widgets/properties/permissions_widget.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -31,6 +32,23 @@ using namespace nx::vms::client::desktop::ui;
 
 using nx::vms::api::UserRoleData;
 using nx::vms::api::UserRoleDataList;
+
+namespace {
+
+QnLayoutResourceList layoutsToShare(const QnResourcePool* resourcePool,
+    const QnUuidSet& accessibleResources)
+{
+    if (!NX_ASSERT(resourcePool))
+        return {};
+
+    return resourcePool->getResourcesByIds(accessibleResources).filtered<QnLayoutResource>(
+        [](const QnLayoutResourcePtr& layout)
+        {
+            return !layout->isFile() && !layout->isShared();
+        });
+}
+
+} // namespace
 
 QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
     base_type(parent),
@@ -190,24 +208,30 @@ void QnUserRolesDialog::applyChanges()
         userRolesLeft << userRole.id;
         auto existing = userRolesManager()->userRole(userRole.id);
 
-        if (existing != userRole)
-            qnResourcesChangesManager->saveUserRole(userRole);
+        const auto accessibleResources = m_model->accessibleResources(userRole);
+        const auto resourcePool = QPointer<QnResourcePool>(context()->resourcePool());
+        const auto actionManager = QPointer<action::Manager>(menu());
 
-        auto resources = m_model->accessibleResources(userRole);
-        QnLayoutResourceList layoutsToShare = resourcePool()->getResourcesByIds(resources)
-            .filtered<QnLayoutResource>(
-                [](const QnLayoutResourcePtr& layout)
+        QnResourcesChangesManager::RoleCallbackFunction setupAccessbleResources =
+            [accessibleResources, resourcePool, actionManager](bool roleIsStored,
+                const UserRoleData& role)
+            {
+                if (!roleIsStored || !resourcePool || !actionManager)
+                    return;
+
+                const auto layouts = layoutsToShare(resourcePool, accessibleResources);
+                for (const auto& layout: layouts)
                 {
-                    return !layout->isFile() && !layout->isShared();
-                });
+                    actionManager->trigger(action::ShareLayoutAction,
+                        action::Parameters(layout).withArgument(Qn::UuidRole, role.id));
+                }
+                qnResourcesChangesManager->saveAccessibleResources(role, accessibleResources);
+            };
 
-        for (const auto& layout: layoutsToShare)
-        {
-            menu()->trigger(action::ShareLayoutAction,
-                action::Parameters(layout).withArgument(Qn::UuidRole, userRole.id));
-        }
-
-        qnResourcesChangesManager->saveAccessibleResources(userRole, resources);
+        if (existing != userRole)
+            qnResourcesChangesManager->saveUserRole(userRole, setupAccessbleResources);
+        else
+            setupAccessbleResources(/*roleIsStored*/ true, userRole);
     }
 
     for (const auto& userRole: userRolesManager()->userRoles())

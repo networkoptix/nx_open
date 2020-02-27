@@ -101,7 +101,7 @@
 #include <plugins/storage/dts/vmax480/vmax480_resource.h>
 #include <nx_vms_server_ini.h>
 #include <nx/metrics/metrics_storage.h>
-#include <nx/vms/server/analytics/iframe_search_helper.h>
+#include <nx/vms/server/analytics/i_frame_search_helper.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -209,7 +209,7 @@ QnMediaServerModule::QnMediaServerModule(
         isRootToolEnabled,
         qApp->applicationFilePath());
 
-    m_platform = store(new QnPlatformAbstraction(m_rootFileSystem.get(), timerManager()));
+    m_platform = store(new QnPlatformAbstraction(this, timerManager()));
     m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
 
     nx::vms::server::registerSerializers();
@@ -314,10 +314,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_context->backupStorageManager->startAuxTimerTasks();
 
     if (QnAppInfo::isNx1())
-    {
-        m_settings->mutableSettings()->setBootedFromSdCard(
-            Nx1::isBootedFromSD(m_rootFileSystem.get()));
-    }
+        m_settings->mutableSettings()->setBootedFromSdCard(Nx1::isBootedFromSD(this));
 
     m_fileDeletor = store(new QnFileDeletor(this));
 
@@ -376,12 +373,14 @@ QnMediaServerModule::QnMediaServerModule(
     m_multicastAddressRegistry = store(new nx::vms::server::network::MulticastAddressRegistry());
 
     // Initialize TranslationManager.
-    auto translationManager = instance<QnTranslationManager>();
+    QPointer<QnTranslationManager> translationManager = instance<QnTranslationManager>();
 
     // Right now QTranslators are created with qApp as a parent,
     // so we need to call installTranslation() in the main thread.
     auto installProc = [translationManager]()
     {
+        if (!translationManager)
+            return;
         auto locale = QnAppInfo::defaultLanguage();
         auto defaultTranslation = translationManager->loadTranslation(locale);
         QnTranslationManager::installTranslation(defaultTranslation);
@@ -797,7 +796,9 @@ QString QnMediaServerModule::metadataDatabaseDir() const
     return closeDirPath(pathBase);
 }
 
-nx::vms::server::analytics::AbstractIFrameSearchHelper* QnMediaServerModule::iframeSearchHelper()
+using namespace nx::vms::server::analytics;
+
+AbstractIFrameSearchHelper* QnMediaServerModule::iFrameSearchHelper() const
 {
     return m_analyticsIFrameSearchHelper;
 }

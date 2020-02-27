@@ -38,6 +38,7 @@
 
 #include <nx/analytics/analytics_logging_ini.h>
 #include <nx/analytics/frame_info.h>
+#include <nx/vms/server/put_in_order_data_provider.h>
 
 namespace nx::vms::server::analytics {
 
@@ -62,6 +63,8 @@ DeviceAnalyticsBinding::DeviceAnalyticsBinding(
     m_engine(std::move(engine)),
     m_incomingFrameLogger("incoming_frame_", m_device->getId(), m_engine->getId())
 {
+    const std::chrono::milliseconds kMaxPipelineDelay(500);
+    setMaxQueueDuration(AbstractDataReorderer::kMaxQueueDuration - kMaxPipelineDelay);
 }
 
 DeviceAnalyticsBinding::~DeviceAnalyticsBinding()
@@ -524,6 +527,22 @@ void DeviceAnalyticsBinding::recalculateStreamRequirements()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_cachedStreamRequirements = calculateStreamRequirements();
+}
+
+bool DeviceAnalyticsBinding::canAcceptData() const
+{
+    auto queue = m_dataQueue.lock();
+    if (queue.size() > 0 && m_maxQueueDuration.count() > 0
+        && queue.last()->timestamp - queue.front()->timestamp >= m_maxQueueDuration.count())
+    {
+        return false;
+    }
+    return QnAbstractDataConsumer::canAcceptData();
+}
+
+void DeviceAnalyticsBinding::setMaxQueueDuration(std::chrono::microseconds value)
+{
+    m_maxQueueDuration = value;
 }
 
 bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)

@@ -42,6 +42,7 @@ Yunhong Gu, last updated 01/27/2011
 #define __UDT_CHANNEL_H__
 
 #include <optional>
+#include <thread>
 
 #include "udt.h"
 #include "packet.h"
@@ -120,8 +121,9 @@ public:
     //    1) [in] packet: reference to a CPacket entity.
     // Returned value:
     //    Actual size of data sent.
+    // TODO: #ak Should accept "const CPacket&".
 
-    Result<int> sendto(const detail::SocketAddress& addr, CPacket& packet) const;
+    Result<int> sendto(const detail::SocketAddress& addr, CPacket packet);
 
     // Functionality:
     //    Receive a packet from the channel and record the source address.
@@ -131,7 +133,7 @@ public:
     // Returned value:
     //    Actual size of data received.
 
-    Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet) const;
+    Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet);
 
     Result<> shutdown();
 
@@ -154,6 +156,15 @@ private:
                                          //    None.
 
     void closeSocket();
+
+    template<typename Func>
+    static void convertHeader(CPacket* packet, Func func);
+
+    template<typename Func>
+    static void convertPayload(CPacket* packet, Func func);
+
+    static void encodePacket(CPacket* packet);
+    static void decodePacket(CPacket* packet);
 };
 
 #endif

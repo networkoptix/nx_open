@@ -221,28 +221,28 @@ void ObjectTrackCache::updateObject(
         std::max(trackContext.track.lastAppearanceTimeUs, packet.timestampUs);
 
     auto assignBestShotFromPacket =
-        [](auto& track, const auto& packet, const auto& boundingBox)
+        [](ObjectTrack* outTrack, const auto& packet, const auto& boundingBox)
         {
-            track.bestShot.timestampUs = packet.timestampUs;
-            track.bestShot.rect = boundingBox;
-            track.bestShot.streamIndex = packet.streamIndex;
+            outTrack->bestShot.timestampUs = packet.timestampUs;
+            outTrack->bestShot.rect = boundingBox;
+            outTrack->bestShot.streamIndex = packet.streamIndex;
         };
 
     if (objectMetadata.bestShot)
     {
-        assignBestShotFromPacket(trackContext.track, packet, objectMetadata.boundingBox);
-        trackContext.roughBestShot = false; //< Do not auto reassign any more.
+        assignBestShotFromPacket(&trackContext.track, packet, objectMetadata.boundingBox);
+        trackContext.roughBestShot = false; //< Do not auto reassign anymore.
         // "Best shot" packet contains only information about the best shot, not a real object movement.
         return;
     }
 
     if (!trackContext.track.bestShot.initialized())
     {
-        assignBestShotFromPacket(trackContext.track, packet, objectMetadata.boundingBox);
-        trackContext.roughBestShot = true; //< Auto assign the first frame.
+        assignBestShotFromPacket(&trackContext.track, packet, objectMetadata.boundingBox);
+        trackContext.roughBestShot = true; //< Auto-assign the first frame.
     }
 
-    // Update best shot to the first I-frame of the track in case it is not defined by a Plugin.
+    // Update best shot to the first I-frame of the track in case of it not being defined by driver.
     if (trackContext.roughBestShot && m_iframeHelper)
     {
         using namespace nx::vms::api;
@@ -251,8 +251,8 @@ void ObjectTrackCache::updateObject(
             trackContext.track.deviceId, packet.streamIndex, trackContext.track.bestShot.timestampUs);
         if (timeUs >= trackContext.track.bestShot.timestampUs && timeUs <= packet.timestampUs)
         {
-            assignBestShotFromPacket(trackContext.track, packet, objectMetadata.boundingBox);
-            trackContext.roughBestShot = false; //< Do not auto reassign any more.
+            assignBestShotFromPacket(&trackContext.track, packet, objectMetadata.boundingBox);
+            trackContext.roughBestShot = false; //< Do not auto-reassign anymore.
         }
     }
 

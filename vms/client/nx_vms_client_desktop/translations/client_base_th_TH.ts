@@ -2614,6 +2614,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message>
+      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
+      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
@@ -8767,30 +8774,6 @@ If you intended to move analytics data to another storage location, please conta
       <source>Acknowledge</source>
       <translation>รับทราบ</translation>
     </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>เหตุการณ์ทั่วไป</translation>
-    </message>
-    <message>
-      <source>Device was disconnected</source>
-      <translation>อุปกรณ์ถูกตัดการเชื่อมต่อ</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>กล้องถูกตัดการเชื่อมต่อ</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>โมดูล I / O ถูกตัดการเชื่อมต่อ</translation>
-    </message>
-    <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>เหตุการณ์การวิเคราะห์ปลั๊กอินที่ไม่รู้จัก</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9003,6 +8986,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Adding</source>
       <translation>เพิ่ม</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>Cloud users</source>
+      <translation type="unfinished">Cloud users</translation>
     </message>
   </context>
   <context>

@@ -47,6 +47,7 @@ Yunhong Gu, last updated 09/28/2010
 #include <mutex>
 #include <optional>
 #include <thread>
+#include <tuple>
 #include <vector>
 
 #include "udt.h"
@@ -70,7 +71,8 @@ public:
 
     UDTSTATUS m_Status = INIT;                       // current socket state
 
-    uint64_t m_TimeStamp = 0;                     // time when the socket is closed
+    // time when the socket is closed.
+    std::chrono::microseconds m_TimeStamp = std::chrono::microseconds::zero();
 
     int m_iIPversion = 0;                         // IP version
     detail::SocketAddress m_pSelfAddr;                    // pointer to the local address of the socket
@@ -216,6 +218,8 @@ private:
     //   void init();
 
 private:
+    using HandshakeKey = std::tuple<UDTSOCKET /*id*/, int32_t /*ISN*/>;
+
     std::map<UDTSOCKET, std::shared_ptr<CUDTSocket>> m_Sockets;       // stores all the socket structures
 
     std::mutex m_ControlLock;                    // used to synchronize UDT API
@@ -223,7 +227,10 @@ private:
     std::mutex m_IDLock;                         // used to synchronize ID generation
     UDTSOCKET m_SocketId = 0;                             // seed to generate a new unique socket ID
 
-    std::map<int64_t, std::set<UDTSOCKET> > m_PeerRec;// record sockets from peers to avoid repeated connection request, int64_t = (socker_id << 30) + isn
+    /**
+     * Recording accepted connections to detect connection request retransmits.
+     */
+    std::map<HandshakeKey, std::set<UDTSOCKET>> m_PeerRec;
 
 private:
     std::map<ThreadId, Error> m_mTLSRecord;
@@ -235,8 +242,16 @@ private:
 
     std::shared_ptr<CUDTSocket> locate(const UDTSOCKET u);
 
-    std::shared_ptr<CUDTSocket> locate(
+    void saveSocketHandshakeInfo(
+        const std::unique_lock<std::mutex>& lock,
+        const CUDTSocket& sock);
+
+    std::shared_ptr<CUDTSocket> locateSocketByHandshakeInfo(
         const detail::SocketAddress& peer, const UDTSOCKET id, int32_t isn);
+
+    void removeSocketHandshakeInfo(
+        const std::unique_lock<std::mutex>& lock,
+        const CUDTSocket& sock);
 
     Result<> updateMux(
         CUDTSocket* s,
@@ -267,7 +282,9 @@ private:
     std::map<UDTSOCKET, std::shared_ptr<CUDTSocket>> m_ClosedSockets;   // temporarily store closed sockets
 
     void checkBrokenSockets();
+
     void removeSocket(
+        const std::unique_lock<std::mutex>& lock,
         const UDTSOCKET u,
         std::vector<std::shared_ptr<Multiplexer>>* const multiplexersToRemove);
 

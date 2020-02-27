@@ -2175,6 +2175,11 @@
       <source>Force Acknowledgment</source>
       <translation>强制确认</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use custom text:</source>
+      <translation>使用自定义文本:</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -2263,6 +2268,19 @@
       <location/>
       <source>Hotkey:</source>
       <translation>热键:</translation>
+    </message>
+  </context>
+  <context>
+    <name>PushNotificationBusinessActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
+      <source>for</source>
+      <translation>执行</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Use custom text:</source>
+      <translation>使用自定义文本:</translation>
     </message>
   </context>
   <context>

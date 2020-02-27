@@ -1464,5 +1464,15 @@ void Player::setPlaybackMask(const QnTimePeriodList& periods)
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Player, VideoQuality)
 
+QString videoQualityToString(int videoQuality)
+{
+    if (videoQuality >= Player::CustomVideoQuality)
+    {
+        return lm("%1 [h: %2]").args(
+            QnLexical::serialized(Player::CustomVideoQuality), videoQuality);
+    }
+    return QnLexical::serialized(videoQuality);
+}
+
 } // namespace media
 } // namespace nx

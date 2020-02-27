@@ -45,9 +45,11 @@ UserEmailsWatcher::UserEmailsWatcher(QObject* parent):
 
     auto userChangesListener = new QnResourceChangesListener(this);
     userChangesListener->connectToResources<QnUserResource>(
+        resourcePool(),
         &QnUserResource::emailChanged, runtimeCheckUser);
 
     userChangesListener->connectToResources<QnUserResource>(
+        resourcePool(),
         &QnUserResource::enabledChanged, runtimeCheckUser);
 
     checkAll();

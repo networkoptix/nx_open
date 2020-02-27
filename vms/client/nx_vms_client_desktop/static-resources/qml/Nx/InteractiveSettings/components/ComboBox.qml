@@ -8,7 +8,7 @@ LabeledItem
 {
     id: control
 
-    property var defaultTooltip: itemCaptions && itemCaptions[defaultValue] || defaultValue
+    property var defaultTooltip: (itemCaptions && itemCaptions[defaultValue]) || defaultValue
     property var range
     property var value: defaultValue
     property var defaultValue
@@ -27,7 +27,7 @@ LabeledItem
                 return null
 
             return range.map(
-                function (name) { return itemCaptions && itemCaptions[name] || name })
+                function (name) { return (itemCaptions && itemCaptions[name]) || name })
         }
     }
 }

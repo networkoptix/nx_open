@@ -6,6 +6,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 
+#include "report.h"
+
 std::chrono::milliseconds kMinStartInterval{100};
 std::chrono::milliseconds kMaxStartInterval{10000};
 
@@ -130,7 +132,7 @@ void RtspPerf::run()
         m_config.startInterval : kMinStartInterval;
     BitrateCounter bitrateCounter;
     auto startSessionThread = std::thread([urls, this]() { startSessionsThread(urls); });
-    while (true)
+    for (;;)
     {
         std::this_thread::sleep_for(kStatisticPrintInterval);
         int64_t totalBytesRead = 0;
@@ -143,8 +145,8 @@ void RtspPerf::run()
                 ++successSessions;
             failedSessions += session.failedCount;
         }
-        float bitrate = bitrateCounter.update(totalBytesRead);
-        NX_INFO(this, "Total bitrate %1 MBit/s, working sessions %2, failed %3, bytes read %4",
+        const float bitrate = bitrateCounter.update(totalBytesRead);
+        report("Total bitrate %1 MBit/s, working sessions %2, failed %3, bytes read %4",
             QString::number(bitrate, 'f', 3), successSessions, failedSessions, totalBytesRead);
     }
 }

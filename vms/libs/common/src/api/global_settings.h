@@ -403,6 +403,8 @@ public:
     nx::utils::Url resourceFileUri() const;
     QString pushNotificationsLanguage() const;
 
+    QString additionalLocalFsTypes() const;
+
 signals:
     void initialized();
 
@@ -571,6 +573,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_pushNotificationsLanguageAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_additionalLocalFsTypesAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

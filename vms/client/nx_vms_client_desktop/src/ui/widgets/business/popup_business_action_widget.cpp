@@ -21,6 +21,11 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
+    // It was decided not to include custom desktop notification text in v4.1.
+    // TODO: remove the following lines in the next release.
+    ui->customTextCheckBox->hide();
+    ui->customTextEdit->hide();
+
     setHelpTopic(this, Qn::EventsActions_ShowDesktopNotification_Help);
 
     ui->hintLabel->setHint(tr("Notification will be shown until one of the users who see it "

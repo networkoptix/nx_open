@@ -41,12 +41,12 @@ Yunhong Gu, last updated 05/05/2009
 #ifndef __UDT_BUFFER_H__
 #define __UDT_BUFFER_H__
 
-#include <mutex>
-
-#include "udt.h"
-#include "list.h"
-#include "queue.h"
 #include <fstream>
+#include <mutex>
+#include <optional>
+
+#include "common.h"
+#include "queue.h"
 
 
 static const int kDefaultMtuSize = 1400;
@@ -67,7 +67,9 @@ public:
     // Returned value:
     //    None.
 
-    void addBuffer(const char* data, int len, int ttl = -1, bool order = false);
+    void addBuffer(
+        const char* data, int len,
+        std::chrono::milliseconds ttl = std::chrono::milliseconds(-1), bool order = false);
 
     // Functionality:
     //    Read a block of data from file and insert it into the sending list.
@@ -82,24 +84,18 @@ public:
     // Functionality:
     //    Find data position to pack a DATA packet from the furthest reading point.
     // Parameters:
-    //    0) [out] data: the pointer to the data position.
-    //    1) [out] msgno: message number of the packet.
-    // Returned value:
-    //    Actual length of data read.
+    //    0) [out] msgno: message number of the packet.
 
-    int readData(char** data, int32_t& msgno);
+    std::optional<Buffer> readData(int32_t& msgno);
 
     // Functionality:
     //    Find data position to pack a DATA packet for a retransmission.
     // Parameters:
-    //    0) [out] data: the pointer to the data position.
-    //    1) [in] offset: offset from the last ACK point.
-    //    2) [out] msgno: message number of the packet.
-    //    3) [out] msglen: length of the message
-    // Returned value:
-    //    Actual length of data read.
+    //    0) [in] offset: offset from the last ACK point.
+    //    1) [out] msgno: message number of the packet.
+    //    2) [out] msglen: length of the message
 
-    int readData(char** data, const int offset, int32_t& msgno, int& msglen);
+    std::optional<Buffer> readData(const int offset, int32_t& msgno, int& msglen);
 
     // Functionality:
     //    Update the ACK point and may release/unmap/return the user data according to the flag.
@@ -123,7 +119,7 @@ private:
     void increase();
 
 private:
-    std::mutex m_BufLock;           // used to synchronize buffer operation
+    mutable std::mutex m_mutex;           // used to synchronize buffer operation
 
     struct Block
     {
@@ -131,8 +127,8 @@ private:
         int m_iLength;                    // length of the block
 
         int32_t m_iMsgNo;                 // message number
-        uint64_t m_OriginTime;            // original request time
-        int m_iTTL;                       // time to live (milliseconds)
+        std::chrono::microseconds m_OriginTime;            // original request time
+        std::chrono::milliseconds m_iTTL;                       // time to live (milliseconds)
 
         Block* m_pNext;                   // next block
     } *m_pBlock, *m_pFirstBlock, *m_pCurrBlock, *m_pLastBlock;
@@ -142,11 +138,11 @@ private:
     // m_pCurrBlock:    The current block
     // m_pLastBlock:     The last block (if first == last, buffer is empty)
 
-    struct Buffer
+    struct BufferNode
     {
         char* m_pcData;            // buffer
         int m_iSize;            // size
-        Buffer* m_pNext;            // next buffer
+        BufferNode* m_pNext;            // next buffer
     } *m_pBuffer;            // physical buffer
 
     int32_t m_iNextMsgNo;                // next message number
@@ -165,8 +161,6 @@ private:
 
 class CRcvBuffer
 {
-    friend class CUDT;
-
 public:
     CRcvBuffer(CUnitQueue* queue, int bufsize = 65536);
     ~CRcvBuffer();
@@ -257,9 +251,15 @@ public:
     int getRcvMsgNum();
 
 private:
-    bool scanMsg(int& start, int& end, bool& passack);
+    int getRcvDataSize(const std::lock_guard<std::mutex>&) const;
+
+    bool scanMsg(
+        const std::lock_guard<std::mutex>& lock,
+        int& start, int& end, bool& passack);
 
 private:
+    mutable std::mutex m_mutex;           // used to synchronize buffer operation
+
     CUnit** m_pUnit;                     // pointer to the protocol buffer
     int m_iSize;                         // size of the protocol buffer
     CUnitQueue* m_pUnitQueue;        // the shared unit queue

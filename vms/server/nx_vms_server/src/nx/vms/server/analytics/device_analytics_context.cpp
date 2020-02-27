@@ -11,6 +11,7 @@
 
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <nx/vms/server/analytics/device_analytics_binding.h>
 #include <nx/vms/server/analytics/data_converter.h>
@@ -40,8 +41,8 @@ static bool isAliveStatus(Qn::ResourceStatus status)
 }
 
 static std::optional<QJsonObject> mergeWithDbAndDefaultSettings(
-    const QnVirtualCameraResourcePtr& device,
-    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
+    const resource::CameraPtr& device,
+    const resource::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settingsFromUser)
 {
     const auto engineManifest = engine->manifest();
@@ -64,7 +65,7 @@ static std::optional<QJsonObject> mergeWithDbAndDefaultSettings(
 
 DeviceAnalyticsContext::DeviceAnalyticsContext(
     QnMediaServerModule* serverModule,
-    const QnVirtualCameraResourcePtr& device)
+    const resource::CameraPtr& device)
     :
     base_type(serverModule),
     m_device(device),
@@ -160,7 +161,7 @@ void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor
         binding->setMetadataSink(m_metadataSink);
 }
 
-void DeviceAnalyticsContext::setSettings(const QString& engineId, const QJsonObject& settings)
+void DeviceAnalyticsContext::setSettingsValues(const QString& engineId, const QJsonObject& settings)
 {
     QnUuid analyticsEngineId(engineId);
     const QJsonObject effectiveSettings = prepareSettings(analyticsEngineId, settings);
@@ -263,7 +264,7 @@ std::optional<QJsonObject> DeviceAnalyticsContext::loadSettingsFromSpecificFile(
     return sdk_support::toQJsonObject(*settingsString);
 }
 
-QJsonObject DeviceAnalyticsContext::getSettings(const QString& engineId) const
+std::optional<Settings> DeviceAnalyticsContext::getSettings(const QString& engineId) const
 {
     const QnUuid analyticsEngineId(engineId);
     const auto engine = serverModule()
@@ -304,12 +305,12 @@ QJsonObject DeviceAnalyticsContext::getSettings(const QString& engineId) const
         NX_DEBUG(this, "No DeviceAnalyticsBinding for the Device %1 and the Engine %2",
             m_device, engineId);
 
-        return jsonEngine.values();
+        return Settings{jsonEngine.serializeModel(), jsonEngine.values()};
     }
 
     const QJsonObject pluginSideSettings = binding->getSettings();
     jsonEngine.applyValues(pluginSideSettings);
-    return jsonEngine.values();
+    return Settings{jsonEngine.serializeModel(), jsonEngine.values()};
 }
 
 std::map<QnUuid, bool> DeviceAnalyticsContext::bindingStatuses() const

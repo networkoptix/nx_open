@@ -8,6 +8,7 @@
 #include <nx/vms/client/desktop/radass/radass_fwd.h>
 
 #include <nx/utils/singleton.h>
+#include <nx/utils/impl_ptr.h>
 
 class QOpenGLWidget;
 class QnClientCoreModule;
@@ -23,6 +24,7 @@ class UploadManager;
 class WearableManager;
 class VideoCache;
 class ResourceDirectoryBrowser;
+class AnalyticsSettingsManager;
 
 } // namespace nx::vms::client::desktop
 
@@ -48,6 +50,7 @@ public:
     nx::vms::client::desktop::WearableManager* wearableManager() const;
     nx::vms::client::desktop::VideoCache* videoCache() const;
     nx::vms::client::desktop::ResourceDirectoryBrowser* resourceDirectoryBrowser() const;
+    nx::vms::client::desktop::AnalyticsSettingsManager* analyticsSettingsManager() const;
 
 private:
     void initApplication();
@@ -66,6 +69,9 @@ private:
     void registerResourceDataProviders();
 
 private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
+
     QnStartupParameters m_startupParameters;
     QScopedPointer<QnStaticCommonModule> m_staticCommon;
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;

@@ -28,7 +28,7 @@ Button
 
     property bool showBackground: true
 
-    leftPadding: 16
+    leftPadding: iconUrl ? 4 : 16
     rightPadding: 16
 
     implicitHeight: 28
@@ -49,8 +49,6 @@ Button
 
     contentItem: IconLabel
     {
-        anchors.centerIn: parent
-
         text: control.text
         icon.source:
         {
@@ -64,6 +62,7 @@ Button
 
         font: control.font
         color: control.textColor
+        spacing: 4
 
         function nonEmptyIcon(target, base)
         {

@@ -70,7 +70,7 @@
             <small ng-if="param.proprietary">(proprietary)</small>
         </label>
         <div class="col-sm-10">
-            <div ng-switch on="param.formType">
+            <div ng-switch on="param.formType" ng-if="apiMethod.method !=='POST' || allowProprietary">
 
                 <select class="form-control input-sm"
                         ng-switch-when="enum"
@@ -166,7 +166,14 @@
                 </div>
 
 
-                <span ng-switch-when="info"></span>
+                <div ng-switch-when="info">
+                    <textarea id="{{param.name}}" class="form-control"
+                              name="{{param.name}}"
+                              ng-required="!param.optional"
+                              ng-model="apiMethod.params[param.name]"
+                              rows="5"
+                    ></textarea>
+                </div>
 
                 <input type="text" class="form-control input-sm"
                        ng-switch-default
@@ -181,7 +188,7 @@
     </div>
 
 
-    <div class="form-group">
+    <div class="form-group" ng-if="apiMethod.method !=='POST' || allowProprietary">
         <div class="col-sm-offset-2 col-sm-10">
             <label class="checkbox">
                 <input type="checkbox"
@@ -229,7 +236,7 @@
             </p>
         </div>
     </div>
-    <div class="form-group" ng-if="apiMethod.method=='POST'">
+    <div class="form-group" ng-if="apiMethod.method=='POST' && allowProprietary">
         <label class="col-sm-2 control-label">Données POST</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
@@ -242,7 +249,7 @@
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
-                    ng-if="userAuthenticated && (apiMethod.method=='GET' || apiMethod.method=='POST')"
+                    ng-if="userAuthenticated && (apiMethod.method !=='POST' || allowProprietary)"
                     class="btn btn-primary" ng-click="testMethod()">Test method</button>
             <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
                ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>

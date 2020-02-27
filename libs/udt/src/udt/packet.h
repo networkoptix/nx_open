@@ -42,10 +42,11 @@ Yunhong Gu, last updated 01/02/2011
 #define __UDT_PACKET_H__
 
 #include <array>
-#include <atomic>
-#include <cassert>
 #include <iostream>
+#include <memory>
+#include <tuple>
 
+#include "common.h"
 #include "udt.h"
 
 #ifdef _WIN32
@@ -85,36 +86,21 @@ public:
         return N;
     }
 
-    iovec* bufs()
-    {
-        return (iovec*) m_bufs.data();
-    }
+    iovec* bufs() { return (iovec*)m_bufs.data(); }
+    const iovec* bufs() const { return (iovec*) m_bufs.data(); }
 
     const IoBuf& operator[](int i) const
     {
-        assert(!m_locked);
         return m_bufs[i];
     }
 
     IoBuf& operator[](int i)
     {
-        assert(!m_locked);
         return m_bufs[i];
-    }
-
-    void lock()
-    {
-        m_locked = true;
-    }
-
-    void unlock()
-    {
-        m_locked = false;
     }
 
 private:
     std::array<IoBuf, N> m_bufs;
-    std::atomic<bool> m_locked = false;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -143,45 +129,39 @@ enum class PacketFlag
     Control = 1,
 };
 
+// The 128-bit header field.
+using PacketHeader = uint32_t[4];
+
+static constexpr int kPacketHeaderSize = sizeof(PacketHeader);
+
 class UDT_API CPacket
 {
-    friend class UdpChannel;
-    friend class CSndQueue;
-    friend class CRcvQueue;
-
 private:
-    uint32_t m_nHeader[4];               // The 128-bit header field
-    BufArray<2> m_PacketVector;             // The 2-demension vector of UDT packet [header, data]
+    PacketHeader m_nHeader;
 
 public:
     int32_t& m_iSeqNo;                   // alias: sequence number
     int32_t& m_iMsgNo;                   // alias: message number
     int32_t& m_iTimeStamp;               // alias: timestamp
-    int32_t& m_iID;            // alias: socket ID
-    char*& m_pcData;                     // alias: data/control information
+    int32_t& m_iID;                      // alias: socket ID
 
-    static constexpr int m_iPktHdrSize = 16;    // packet header size
+    const Buffer& payload() const { return m_payload; }
+    Buffer& payload() { return m_payload; }
+
+    void setPayload(Buffer buffer) { m_payload = std::move(buffer); }
 
 public:
     CPacket();
     ~CPacket();
 
-    // Functionality:
-    //    Get the payload or the control information field length.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    the payload or the control information field length.
+    CPacket(const CPacket&);
+    CPacket(CPacket&&);
 
+    // TODO: #ak Remove this. Replace usages with payload().size().
     int getLength() const;
 
-    // Functionality:
-    //    Set the payload or the control information field length.
-    // Parameters:
-    //    0) [in] len: the payload or the control information field length.
-    // Returned value:
-    //    None.
-
+    // TODO: #ak Remove this function. Replace usages with payload().resize() or
+    // corresponding error reporting.
     void setLength(int len);
 
     // Functionality:
@@ -189,12 +169,13 @@ public:
     // Parameters:
     //    0) [in] pkttype: packet type filed.
     //    1) [in] lparam: pointer to the first data structure, explained by the packet type.
-    //    2) [in] rparam: pointer to the second data structure, explained by the packet type.
-    //    3) [in] size: size of rparam, in number of bytes;
+    //    2) [in] size: size of payload, in number of bytes;
+    // NOTE: This function allocates the payload buffer, but it has to be filled
+    // by the caller after this function returns.
     // Returned value:
     //    None.
 
-    void pack(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
+    void pack(ControlPacketType pkttype, void* lparam = NULL, int payloadSize = 0);
 
     // Functionality:
     //    Read the packet flag.
@@ -259,21 +240,27 @@ public:
 
     int32_t getMsgSeq() const;
 
-    // Functionality:
-    //    Clone this packet.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    Pointer to the new packet.
+    // TODO: #ak Get rid of this function. Replace it with a copy constructor.
+    std::unique_ptr<CPacket> clone() const;
 
-    CPacket* clone() const;
+    const uint32_t* header() const { return m_nHeader; }
+    uint32_t* header() { return m_nHeader; }
 
-protected:
+    std::tuple<const iovec*, std::size_t> ioBufs() const;
+    std::tuple<iovec*, std::size_t> ioBufs();
 
-    int32_t __pad = 0;
+private:
+    const int32_t __pad = 0;
+    // TODO: #ak Remove mutable.
+    mutable Buffer m_payload;
+    // TODO: #ak Remove mutable.
+    mutable BufArray<2> m_PacketVector;          // The 2-dimension vector of UDT packet [header, data]
 
-protected:
-    CPacket& operator=(const CPacket&);
+    // TODO: #ak Remove const.
+    void preparePacketVector() const;
+
+    CPacket& operator=(const CPacket&) = delete;
+    CPacket& operator=(CPacket&&) = delete;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

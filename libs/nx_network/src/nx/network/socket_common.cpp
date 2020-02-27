@@ -23,7 +23,9 @@ bool operator==(const in6_addr& left, const in6_addr& right)
 #       undef htonl
 #   endif
 
-    const in_addr in4addr_loopback{ htonl(INADDR_LOOPBACK) };
+    // NOTE: calcLoopbackAddr() fixes a compile error on clang in release mode.
+    auto calcLoopbackAddr() { return htonl(INADDR_LOOPBACK); }
+    const in_addr in4addr_loopback{ calcLoopbackAddr() };
 #endif
 
 namespace nx {
