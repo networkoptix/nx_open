@@ -8,6 +8,9 @@
 #include <ui/style/globals.h>
 #include <test_support/resource/camera_resource_stub.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_settings_dialog_state_conversion_functions.h>
+#include <nx/core/access/access_types.h>
+#include <common/common_module.h>
+#include <common/common_module_aware.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -383,6 +386,36 @@ TEST_F(CameraSettingsDialogStateReducerTest, disableMotionIfSecondaryStreamDisab
     State forcedMdOnPrimaryStream = Reducer::setForcedMotionStreamType(
         std::move(disabledDualStreaming), nx::vms::api::StreamIndex::primary);
     ASSERT_TRUE(forcedMdOnPrimaryStream.isMotionDetectionEnabled());
+}
+
+// "wearableClientTimeZone" property test
+TEST_F(CameraSettingsDialogStateReducerTest, wearableClientTimeZone)
+{
+    // Test default state value
+    State state1 = Reducer::setSettingsOptimizationEnabled({}, true);
+    ASSERT_FALSE(state1.wearableClientTimeZone);
+    state1 = Reducer::setWearableClientTimeZone(std::move(state1), true);
+    ASSERT_TRUE(state1.wearableClientTimeZone);
+
+    // Test default camera state
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    ASSERT_FALSE(camera->isWearableClientTimeZone());
+    State state2 = Reducer::loadCameras({}, { camera });
+    ASSERT_FALSE(state2.wearableClientTimeZone);
+
+    // Test value ignoring for non wearable cameras
+    ASSERT_EQ(state2.devicesDescription.isWearable, CombinedValue::None);
+    state2 = Reducer::setWearableClientTimeZone(std::move(state2), true);
+    CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state2, {camera});
+    ASSERT_FALSE(camera->isWearableClientTimeZone());
+
+    // Test value setting for wearable cameras
+    camera->addFlags(Qn::wearable_camera);
+    State state3 = Reducer::loadCameras({}, { camera });
+    ASSERT_EQ(state3.devicesDescription.isWearable, CombinedValue::All);
+    state3 = Reducer::setWearableClientTimeZone(std::move(state3), true);
+    CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state3, {camera});
+    ASSERT_TRUE(camera->isWearableClientTimeZone());
 }
 
 } // namespace test

@@ -448,6 +448,15 @@ bool CameraSettingsDialogStore::recordingEnabled() const
     return d->state.recording.enabled();
 }
 
+void CameraSettingsDialogStore::setWearableClientTimeZone(bool value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setWearableClientTimeZone(std::move(state), value);
+        });
+}
+
 void CameraSettingsDialogStore::setWearableMotionDetectionEnabled(bool value)
 {
     d->executeAction(

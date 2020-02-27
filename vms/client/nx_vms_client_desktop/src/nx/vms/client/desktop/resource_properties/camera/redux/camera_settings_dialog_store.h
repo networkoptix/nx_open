@@ -99,6 +99,7 @@ public:
         const QnUuid& engineId, const QVariantMap& values);
     Q_INVOKABLE bool recordingEnabled() const;
 
+    void setWearableClientTimeZone(bool value);
     void setWearableMotionDetectionEnabled(bool value);
     void setWearableMotionSensitivity(int value);
     void setCredentials(const std::optional<QString>& login, const std::optional<QString>& password);

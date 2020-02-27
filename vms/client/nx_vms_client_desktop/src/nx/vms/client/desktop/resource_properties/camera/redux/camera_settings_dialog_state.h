@@ -282,6 +282,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     };
     WearableCameraMotionDetection wearableMotion;
 
+    bool wearableClientTimeZone = false;
+
     // Helper methods.
 
     bool isSingleCamera() const { return devicesCount == 1; }

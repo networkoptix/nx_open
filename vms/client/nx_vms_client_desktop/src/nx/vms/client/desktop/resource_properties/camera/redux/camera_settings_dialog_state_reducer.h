@@ -70,6 +70,8 @@ public:
         State state, const QnUuid& engineId, const QVariantMap& values);
     static std::pair<bool, State> resetDeviceAgentSettingsValues(
         State state, const QnUuid& engineId, const QVariantMap& values);
+
+    static State setWearableClientTimeZone(State state, bool value);
     static State setWearableMotionDetectionEnabled(State state, bool value);
     static State setWearableMotionSensitivity(State state, int value);
     static State setCredentials(

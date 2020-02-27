@@ -39,6 +39,7 @@ public:
     static const QString kUserEnabledAnalyticsEnginesProperty;
     static const QString kDeviceAgentsSettingsValuesProperty;
     static const QString kDeviceAgentManifestsProperty;
+    static const QString kWearableClientTimeZone;
 
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
@@ -59,6 +60,14 @@ public:
 
     void issueOccured();
     void cleanCameraIssues();
+
+    bool isWearableClientTimeZone() const;
+    /**
+     * Meaningful only for wearable camera.
+     * If the value is true, video's timestamps is considered as local client time.
+     * Otherwise, timestamps is considered as UTC.
+     */
+    void setWearableClientTimeZone(bool value);
 
     nx::vms::api::RtpTransportType preferredRtpTransport() const;
     CameraMediaStreams mediaStreams() const;
