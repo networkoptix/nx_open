@@ -140,13 +140,6 @@ AnalyticsEngineResourcePtr AnalyticsSettingsTestFixture::addEngine()
     return engine;
 }
 
-DeviceAgentId AnalyticsSettingsTestFixture::makeDeviceAgent()
-{
-    auto camera = addCamera();
-    auto engine = addEngine();
-    return DeviceAgentId{ camera->getId(), engine->getId() };
-}
-
 AnalyticsSettingsManager* AnalyticsSettingsTestFixture::manager() const
 {
     return m_manager.data();

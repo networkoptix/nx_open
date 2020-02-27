@@ -84,8 +84,6 @@ protected:
 
     nx::vms::common::AnalyticsEngineResourcePtr addEngine();
 
-    DeviceAgentId makeDeviceAgent();
-
     AnalyticsSettingsManager* manager() const;
 
     QnResourcePool* resourcePool() const;

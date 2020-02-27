@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/api/analytics/device_analytics_settings_data.h>
 
 #include <nx/fusion/model_functions.h>
@@ -10,6 +11,7 @@ namespace nx::vms::client::desktop {
 namespace test {
 
 using namespace nx::vms::api::analytics; //< TODO: Remove lexical reduplication.
+using namespace nx::vms::common;
 
 static const auto kEmptyReply = QJson::deserialized<DeviceAnalyticsSettingsResponse>(R"json(
     {
@@ -43,6 +45,60 @@ static const auto kData2Reply= QJson::deserialized<DeviceAnalyticsSettingsRespon
 
 class AnalyticsSettingsManagerTest: public AnalyticsSettingsTestFixture
 {
+    using base_type = AnalyticsSettingsTestFixture;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+    }
+
+    virtual void TearDown() override
+    {
+        m_notifier.reset();
+        m_listener.reset();
+        m_deviceAgentId.reset();
+        base_type::TearDown();
+    }
+
+    DeviceAgentId deviceAgentId() const
+    {
+        return *m_deviceAgentId;
+    }
+
+    AnalyticsSettingsListenerPtr listener() const
+    {
+        return m_listener;
+    }
+
+    ListenerNotifier* notifier() const
+    {
+        return m_notifier.get();
+    }
+
+    void givenDeviceAgent()
+    {
+        auto camera = addCamera();
+        auto engine = addEngine();
+        m_deviceAgentId.reset(new DeviceAgentId{camera->getId(), engine->getId()});
+        m_listener = manager()->getListener(deviceAgentId());
+        m_notifier.reset(new ListenerNotifier(listener()));
+    }
+
+    void whenDataReceived(const DeviceAnalyticsSettingsResponse& data)
+    {
+        m_serverInterfaceMock->sendReply(deviceAgentId(), data);
+    }
+
+    bool requestWasSent() const
+    {
+        return m_serverInterfaceMock->requestWasSent(deviceAgentId());
+    }
+
+private:
+    QScopedPointer<DeviceAgentId> m_deviceAgentId;
+    AnalyticsSettingsListenerPtr m_listener;
+    QScopedPointer<ListenerNotifier> m_notifier;
 };
 
 /**
@@ -51,41 +107,51 @@ class AnalyticsSettingsManagerTest: public AnalyticsSettingsTestFixture
  */
 TEST_F(AnalyticsSettingsManagerTest, statusUpdateOnEmptyReply)
 {
-    const auto agentId = makeDeviceAgent();
-    auto listener = manager()->getListener(agentId);
-    ListenerNotifier notifier(listener);
-
+    givenDeviceAgent();
     // Check manager made a request here.
-    ASSERT_TRUE(m_serverInterfaceMock->requestWasSent(agentId));
+    EXPECT_TRUE(requestWasSent());
+
     // Check listener is still waiting.
-    ASSERT_TRUE(listener->data().status == DeviceAgentData::Status::loading);
+    ASSERT_TRUE(listener()->data().status == DeviceAgentData::Status::loading);
 
     // Emulate network response.
-    const auto reply = kEmptyReply;
-    m_serverInterfaceMock->sendReply(agentId, reply);
+    whenDataReceived(kEmptyReply);
 
     // Check listener sent actual data notification.
-    ASSERT_EQ(notifier.counter, 1);
-    ASSERT_TRUE(listener->data().status == DeviceAgentData::Status::ok);
+    ASSERT_EQ(notifier()->counter, 1);
+    ASSERT_TRUE(listener()->data().status == DeviceAgentData::Status::ok);
 }
 
 TEST_F(AnalyticsSettingsManagerTest, listenToExternalChanges)
 {
-    const auto agentId = makeDeviceAgent();
-    auto listener = manager()->getListener(agentId);
-    ListenerNotifier notifier(listener);
-    m_serverInterfaceMock->sendReply(agentId, kData1Reply);
+    givenDeviceAgent();
+    whenDataReceived(kData1Reply);
+    EXPECT_FALSE(requestWasSent());
 
-    ASSERT_FALSE(m_serverInterfaceMock->requestWasSent(agentId));
-    manager()->refreshSettings(agentId);
-    ASSERT_TRUE(m_serverInterfaceMock->requestWasSent(agentId));
+    manager()->refreshSettings(deviceAgentId());
+    ASSERT_TRUE(m_serverInterfaceMock->requestWasSent(deviceAgentId()));
 
     // Emulate network response.
-    m_serverInterfaceMock->sendReply(agentId, kData2Reply);
+    whenDataReceived(kData2Reply);
 
     // Check consumer received actual data.
-    ASSERT_EQ(notifier.lastData.model, kData2Reply.settingsModel);
-    ASSERT_EQ(notifier.lastData.values, kData2Reply.settingsValues);
+    ASSERT_EQ(notifier()->lastData.model, kData2Reply.settingsModel);
+    ASSERT_EQ(notifier()->lastData.values, kData2Reply.settingsValues);
+}
+
+// Update actual values on applying changes.
+TEST_F(AnalyticsSettingsManagerTest, immediateUpdateOnApplyChanges)
+{
+    givenDeviceAgent();
+    whenDataReceived(kData1Reply);
+    EXPECT_EQ(notifier()->counter, 1); //< First update here.
+
+    auto actualValues = kData1Reply.settingsValues;
+    actualValues["generateCars"] = false;
+    manager()->applyChanges({{deviceAgentId(), actualValues}});
+    EXPECT_TRUE(requestWasSent());
+    EXPECT_EQ(notifier()->counter, 2); //< Update immediately on changed values.
+    ASSERT_EQ(listener()->data().values, actualValues);
 }
 
 } // namespace test
