@@ -181,11 +181,11 @@ bool CameraPool::startDiscovery()
     if (!m_discoveryListener->initialize())
         return false;
 
-    // If any thread finishes (e.g. due to an error), testcamera must exit.
+    // If any thread finishes (happens only due to an error), testcamera must exit.
     connect(m_discoveryListener.get(), &CameraDiscoveryListener::finished,
-        QCoreApplication::instance(), &QCoreApplication::quit);
+        QCoreApplication::instance(), []() { QCoreApplication::exit(1); });
     connect(this, &CameraPool::finished,
-        QCoreApplication::instance(), &QCoreApplication::quit);
+        QCoreApplication::instance(), []() { QCoreApplication::exit(1); });
 
     m_discoveryListener->start();
 
