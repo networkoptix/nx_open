@@ -209,7 +209,7 @@ nx::network::http::StatusCode::Value
 
         serverConnections.push_back(
             std::make_unique<rest::ServerConnection>(m_commonModule, server->getId()));
-        serverConnections.back()->lookupObjectTracks(
+        const auto handle = serverConnections.back()->lookupObjectTracks(
             filter,
             true /*isLocal*/,
             [&requestResultQueue](
@@ -220,8 +220,8 @@ nx::network::http::StatusCode::Value
                 requestResultQueue.push(
                     std::make_tuple(hasSucceded, std::move(lookupResult)));
             });
-
-        ++requestCount;
+        if (handle)
+            ++requestCount;
     }
 
     for (int i = 0; i != requestCount; ++i)
