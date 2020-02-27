@@ -582,6 +582,24 @@ static void validateOptions(const CliOptions& options)
         validateCameraSet(cameraSet, options);
 }
 
+static void printArgsAndOptionsIfNeeded(
+    int argc, const char* const argv[], const CliOptions* options)
+{
+    if (!ini().printOptions)
+        return;
+
+    std::cerr << std::string() //< allow `+`
+        + "Command-line args:\n"
+        + "argv[0]: " + nx::kit::utils::toString(argv[0]) + "\n"
+        + "{\n";
+    for (int i = 0; i < argc; ++i)
+        std::cerr << std::string(4, ' ') + nx::kit::utils::toString(argv[i]) + "\n";
+    std::cerr << "}\n\n";
+
+    std::cerr << lm("Options parsed from command-line args:\n%1\n\n").args(
+        optionsToJsonString(*options)).toStdString();
+}
+
 } // namespace
 
 bool parseCliOptions(int argc, const char* const argv[], CliOptions* options)
@@ -615,11 +633,7 @@ bool parseCliOptions(int argc, const char* const argv[], CliOptions* options)
             options->fpsSecondary = fps;
         }
 
-        if (ini().printOptions)
-        {
-            std::cerr << lm("Options parsed from command-line args:\n%1\n\n").args(
-                optionsToJsonString(*options)).toStdString();
-        }
+        printArgsAndOptionsIfNeeded(argc, argv, options);
 
         validateOptions(*options);
 
