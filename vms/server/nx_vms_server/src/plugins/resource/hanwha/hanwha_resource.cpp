@@ -58,21 +58,13 @@ static Ptz::Capabilities mergeCapabilities(
     Ptz::Capabilities directPtzCapabilities,
     Ptz::Capabilities bypassPtzCapabilities)
 {
-    static const std::vector<Ptz::Capability> absoluteMovementCapabilities = {
-        Ptz::Capability::AbsolutePanCapability,
-        Ptz::Capability::AbsoluteTiltCapability,
-        Ptz::Capability::AbsoluteZoomCapability,
-        Ptz::Capability::ViewportPtzCapability,
-    };
+    static const Ptz::Capabilities absoluteMovementCapabilities =
+        Ptz::Capability::AbsolutePanCapability
+        | Ptz::Capability::AbsoluteTiltCapability
+        | Ptz::Capability::AbsoluteZoomCapability
+        | Ptz::Capability::ViewportPtzCapability;
 
-    Ptz::Capabilities capabilities = directPtzCapabilities;
-    for (const Ptz::Capability capability: absoluteMovementCapabilities)
-    {
-        if (bypassPtzCapabilities.testFlag(capability))
-            capabilities |= capability;
-    }
-
-    return capabilities;
+    return directPtzCapabilities | (bypassPtzCapabilities & absoluteMovementCapabilities);
 }
 
 enum class PtzOperation
