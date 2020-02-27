@@ -261,12 +261,17 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
             : vms::event::allowsAggregation(m_model->actionType());
         ui->aggregationWidget->setVisible(aggregationIsVisible);
 
+        // Push notification action widget has non-standard placeholder that is shown when system
+        // is not connected to Cloud. When this placeholder is shown, interval of action checkbox
+        // should be hidden for better user experience.
+        // User may connect to Cloud when the widget is shown, so we need to update visibility.
         if (m_intervalOfActionUpdater)
         {
             disconnect(m_intervalOfActionUpdater.value());
             m_intervalOfActionUpdater.reset();
         }
-        if (m_model->actionType() == ActionType::pushNotificationAction)
+        if (m_model->actionType() == ActionType::pushNotificationAction
+            && qnGlobalSettings->cloudSystemId().isNull())
         {
             m_intervalOfActionUpdater.emplace(
                 connect(qnGlobalSettings, &QnGlobalSettings::cloudCredentialsChanged, this,
