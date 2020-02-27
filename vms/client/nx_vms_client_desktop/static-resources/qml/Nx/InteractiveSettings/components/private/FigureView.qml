@@ -128,6 +128,30 @@ Item
             }
         }
 
+        Rectangle
+        {
+            id: noDataIndicator
+
+            color: ColorTheme.colors.dark6
+            anchors.fill: preview
+            visible: hasFigure && backgroundImage.status !== Image.Ready
+
+            Text
+            {
+                id: noData
+
+                anchors.fill: parent
+                verticalAlignment: Qt.AlignVCenter
+                horizontalAlignment: Qt.AlignHCenter
+                color: ColorTheme.colors.light16
+                font.pixelSize: 16
+                font.weight: Font.Light
+                fontSizeMode: Text.Fit
+                padding: 4
+                text: qsTr("NO PREVIEW")
+            }
+        }
+
         FigurePreview
         {
             id: preview
