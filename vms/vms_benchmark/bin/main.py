@@ -108,6 +108,7 @@ ini_definition = {
     "testStreamFpsLow": {"type": "int", "range": [1, 999], "default": 7},
     "enableSecondaryStream": {"type": "bool", "default": True},
     "testcameraOutputFile": {"type": "str", "default": ""},
+    "testcameraExtraArgs": {"type": "str", "default": ""},
     "testcameraLocalInterface": {"type": "str", "default": ""},
     "cpuUsageThreshold": {"type": "float", "range": [0.0, 1.0], "default": 0.5},
     "archiveBitratePerCameraMbps": {"type": "int", "range": [1, 999], "default": 10},
@@ -158,6 +159,7 @@ def load_configs(conf_file, ini_file_if_passed, ini_file_default):
     test_camera_runner.ini_test_file_high_resolution = abspath(ini['testFileHighResolution'])
     test_camera_runner.ini_test_file_low_resolution = abspath(ini['testFileLowResolution'])
     test_camera_runner.ini_testcamera_output_file = ini['testcameraOutputFile']
+    test_camera_runner.ini_testcamera_extra_args = ini['testcameraExtraArgs']
     test_camera_runner.ini_unloop_via_testcamera = ini['unloopViaTestcamera']
     test_camera_runner.ini_test_file_high_period_us = ini['testFileHighPeriodUs']
     test_camera_runner.ini_test_file_low_period_us = ini['testFileLowPeriodUs']
