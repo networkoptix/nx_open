@@ -4,7 +4,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include "analytics_settings_manager_test.h"
+#include "analytics_settings_test_fixture.h"
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -40,6 +40,10 @@ static const auto kData2Reply= QJson::deserialized<DeviceAnalyticsSettingsRespon
         "settingsValues": { "generatePersons": false }
     }
 )json");
+
+class AnalyticsSettingsManagerTest: public AnalyticsSettingsTestFixture
+{
+};
 
 /**
  * Validate VMS-17327: camera settings dialog did not get an update when a loaded model was empty.
