@@ -91,7 +91,8 @@ public:
             m_commonModule.get(),
             options.noSecondary,
             options.fpsPrimary,
-            options.fpsSecondary);
+            options.fpsSecondary,
+            options.frameLogFilename);
 
         if (!loadFilesAndAddCameras(options))
         {

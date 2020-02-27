@@ -93,6 +93,8 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
      Allow multiple testcamera processes on a single host with the same discovery port. To be able
      to work properly with this option, each testcamera needs to have its own --local-interface,
      --mac-address-prefix and --media-port.
+ --frame-log[=]<filename>
+     Log each video frame being sent to the specified file.
 
 Example:
  )help" + baseExeName + R"help( files=c:/test.264;count=20
@@ -331,6 +333,11 @@ static QString optionsToJsonString(const CliOptions& options)
     result += "    \"discoveryPort\": " + optionalIntToJson(options.discoveryPort) + ",\n";
     result += "    \"mediaPort\": " + optionalIntToJson(options.mediaPort) + ",\n";
     result += "    \"reuseDiscoveryPort\": " + boolToJson(options.reuseDiscoveryPort) + ",\n";
+    result += "    \"frameLogFilename\": " +
+        (options.frameLogFilename
+            ? QString::fromLatin1(nx::kit::utils::toString(*options.frameLogFilename).c_str())
+            : "null"
+        ) + ",\n";
 
     result += "    \"cameraSets\":\n";
     result += "    [\n";
@@ -501,6 +508,8 @@ static void parseOption(
         options->mediaPort = v;
     else if (const auto v = parseFlag(argv, argp, "--reuse-discovery-port"))
         options->reuseDiscoveryPort = *v;
+    else if (const auto v = parse(argv, argp, nonEmptyStringArg, "--frame-log"))
+        options->frameLogFilename = *v;
     else if (arg.startsWith("-"))
         throw InvalidArgs("Unknown arg " + enquoteAndEscape(arg) + ".");
     else

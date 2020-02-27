@@ -24,7 +24,8 @@ CameraPool::CameraPool(
     QnCommonModule* commonModule,
     bool noSecondaryStream,
     std::optional<int> fpsPrimary,
-    std::optional<int> fpsSecondary)
+    std::optional<int> fpsSecondary,
+    const std::optional<QString>& frameLogFilename)
     :
     QnTcpListener(
         commonModule,
@@ -34,7 +35,7 @@ CameraPool::CameraPool(
     m_fileCache(fileCache),
     m_networkOptions(std::move(networkOptions)),
     m_logger(new Logger("CameraPool")),
-    m_frameLogger(new FrameLogger()),
+    m_frameLogger(new FrameLogger(frameLogFilename)),
     m_noSecondaryStream(noSecondaryStream),
     m_fpsPrimary(fpsPrimary),
     m_fpsSecondary(fpsSecondary)

@@ -15,40 +15,22 @@ static QString currentDateTime()
     return QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz");
 }
 
-/** @return Empty string in case no logging has been requested. */
-static QString obtainLogFramesFilename()
+FrameLogger::FrameLogger(const std::optional<QString>& frameLogFilename)
 {
-    const QString logFramesFile = QDir::cleanPath(ini().logFramesFile);
-    if (logFramesFile.isEmpty())
-        return "";
-
-    if (QDir::isAbsolutePath(logFramesFile))
-        return logFramesFile;
-
-    return nx::kit::IniConfig::iniFilesDir() + logFramesFile;
-}
-
-FrameLogger::FrameLogger()
-{
-    const QString logFramesFilename = obtainLogFramesFilename();
-    if (logFramesFilename.isEmpty())
-        return;
-
-    const auto logger = std::make_unique<Logger>("FrameLogger");
-
-    // Open frame log file on first need.
-    if (!m_logFramesFile)
+    if (frameLogFilename)
     {
-        m_logFramesFile = std::make_unique<QFile>(logFramesFilename);
+        const auto logger = std::make_unique<Logger>("FrameLogger");
+
+        m_logFramesFile = std::make_unique<QFile>(*frameLogFilename);
 
         if (!m_logFramesFile->open(QIODevice::WriteOnly))
         {
-            NX_LOGGER_ERROR(logger, "Unable to open frames logging file: %1", logFramesFilename);
+            NX_LOGGER_ERROR(logger, "Unable to open frames logging file: %1", *frameLogFilename);
             m_logFramesFile.reset();
             return;
         }
 
-        NX_LOGGER_INFO(logger, "INI: Logging frames to file: %1",
+        NX_LOGGER_INFO(logger, "Logging frames to file: %1",
             QFileInfo(*m_logFramesFile).absoluteFilePath());
     }
 }

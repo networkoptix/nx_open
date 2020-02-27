@@ -28,16 +28,14 @@ class CameraDiscoveryResponse;
 class CameraPool: public QnTcpListener
 {
 public:
-    /**
-     * @param localInterfacesToListen If empty, all local interfaces are being listened to.
-     */
     CameraPool(
         const FileCache* fileCache,
         NetworkOptions networkOptions,
         QnCommonModule* commonModule,
         bool noSecondaryStream,
         std::optional<int> fpsPrimary,
-        std::optional<int> fpsSecondary);
+        std::optional<int> fpsSecondary,
+        const std::optional<QString>& frameLogFilename);
 
     virtual ~CameraPool();
 

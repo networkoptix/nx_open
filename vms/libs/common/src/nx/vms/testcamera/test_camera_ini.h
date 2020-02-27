@@ -27,9 +27,6 @@ struct Ini: public nx::kit::IniConfig
         "Prefix for the message that is sent by testcamera to the Server when the Camera gets\n"
         "discovered. Must be specified without a trailing newline.");
 
-    NX_INI_STRING("", logFramesFile, "If not empty, log video frames to this file (absolute or\n"
-        "relative to .ini dir).");
-
     NX_INI_FLAG(0, printOptions, "Print parsed command-line options to stderr.");
 
     NX_INI_FLAG(1, stopStreamingOnErrors,
