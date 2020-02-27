@@ -52,12 +52,13 @@ public:
 
     void printMessage(const QString& message)
     {
-        const auto begin = std::chrono::high_resolution_clock::now();
+        const auto begin = std::chrono::steady_clock::now();
 
         printf("%s %s\n", nowStr().c_str(), message.toUtf8().constData());
 
-        const auto end = std::chrono::high_resolution_clock::now();
-        const auto printDuration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+        const auto end = std::chrono::steady_clock::now();
+        const auto printDuration =
+            std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 
         if (printDuration > std::chrono::milliseconds(ini().printDurationToWarnMs))
         {

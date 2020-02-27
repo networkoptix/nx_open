@@ -201,7 +201,7 @@ Result<int> CUDTUnited::createConnection(
 
     std::shared_ptr<CUDTSocket> ns;
     // if this connection has already been processed
-    if (nullptr != (ns = locate(remotePeerAddress, hs->m_iID, hs->m_iISN)))
+    if (ns = locateSocketByHandshakeInfo(remotePeerAddress, hs->m_iID, hs->m_iISN); ns != nullptr)
     {
         if (ns->m_pUDT->broken())
         {
@@ -276,9 +276,9 @@ Result<int> CUDTUnited::createConnection(
     CIPAddress::pton(&ns->m_pSelfAddr, ns->m_pUDT->selfIp(), ns->m_iIPversion);
 
     {
-        std::lock_guard<std::mutex> lock(m_ControlLock);
+        std::unique_lock<std::mutex> lock(m_ControlLock);
         m_Sockets[ns->m_SocketId] = ns;
-        m_PeerRec[(ns->m_PeerID << 30) + ns->m_iISN].insert(ns->m_SocketId);
+        saveSocketHandshakeInfo(lock, *ns);
     }
 
     {
@@ -934,29 +934,49 @@ std::shared_ptr<CUDTSocket> CUDTUnited::locate(const UDTSOCKET u)
     return i->second;
 }
 
-std::shared_ptr<CUDTSocket> CUDTUnited::locate(
+void CUDTUnited::saveSocketHandshakeInfo(
+    const std::unique_lock<std::mutex>& /*lock*/,
+    const CUDTSocket& sock)
+{
+    m_PeerRec[HandshakeKey{sock.m_PeerID, sock.m_iISN}].insert(sock.m_SocketId);
+}
+
+std::shared_ptr<CUDTSocket> CUDTUnited::locateSocketByHandshakeInfo(
     const detail::SocketAddress& peer,
     const UDTSOCKET id,
     int32_t isn)
 {
     std::lock_guard<std::mutex> lock(m_ControlLock);
 
-    auto i = m_PeerRec.find((id << 30) + isn);
-    if (i == m_PeerRec.end())
+    auto it = m_PeerRec.find(HandshakeKey{id, isn});
+    if (it == m_PeerRec.end())
         return nullptr;
 
-    for (auto j = i->second.begin(); j != i->second.end(); ++j)
+    for (const auto& sockId: it->second)
     {
-        auto k = m_Sockets.find(*j);
+        auto it = m_Sockets.find(sockId);
         // this socket might have been closed and moved m_ClosedSockets
-        if (k == m_Sockets.end())
+        if (it == m_Sockets.end())
             continue;
 
-        if (peer == k->second->m_pPeerAddr)
-            return k->second;
+        if (peer == it->second->m_pPeerAddr)
+            return it->second;
     }
 
     return nullptr;
+}
+
+void CUDTUnited::removeSocketHandshakeInfo(
+    const std::unique_lock<std::mutex>& /*lock*/,
+    const CUDTSocket& sock)
+{
+    auto it = m_PeerRec.find(HandshakeKey{sock.m_PeerID, sock.m_iISN});
+    if (it == m_PeerRec.end())
+        return;
+
+    it->second.erase(sock.m_SocketId);
+    if (it->second.empty())
+        m_PeerRec.erase(it);
 }
 
 static constexpr std::chrono::microseconds kSomeUnclearTimeout = std::chrono::seconds(3);
@@ -1045,7 +1065,7 @@ void CUDTUnited::checkBrokenSockets()
     std::vector<std::shared_ptr<Multiplexer>> multiplexersToRemove;
     // remove those timed out sockets
     for (auto l = tbr.begin(); l != tbr.end(); ++l)
-        removeSocket(*l, &multiplexersToRemove);
+        removeSocket(cg, *l, &multiplexersToRemove);
 
     cg.unlock();
 
@@ -1055,6 +1075,7 @@ void CUDTUnited::checkBrokenSockets()
 }
 
 void CUDTUnited::removeSocket(
+    const std::unique_lock<std::mutex>& lock,
     const UDTSOCKET u,
     std::vector<std::shared_ptr<Multiplexer>>* const multiplexersToRemove)
 {
@@ -1083,13 +1104,7 @@ void CUDTUnited::removeSocket(
     }
 
     // remove from peer rec
-    auto j = m_PeerRec.find((i->second->m_PeerID << 30) + i->second->m_iISN);
-    if (j != m_PeerRec.end())
-    {
-        j->second.erase(u);
-        if (j->second.empty())
-            m_PeerRec.erase(j);
-    }
+    removeSocketHandshakeInfo(lock, *i->second);
 
     // delete this one
     i->second->m_pUDT->close();

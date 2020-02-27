@@ -19,7 +19,8 @@ public:
     virtual QList<nx::vms::server::PlatformMonitor::NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
 
-    virtual void setRootFileSystem(nx::vms::server::RootFileSystem* rootFs) override;
+    virtual void setPartitionInformationProvider(
+        std::unique_ptr<nx::vms::server::fs::AbstractPartitionsInformationProvider> partitionInformationProvider) override;
 
     virtual int thisProcessThreads() override;
 

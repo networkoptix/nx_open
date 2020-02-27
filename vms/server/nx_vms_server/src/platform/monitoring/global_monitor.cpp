@@ -256,9 +256,10 @@ int GlobalMonitor::thisProcessThreads()
     return m_monitorBase->thisProcessThreads();
 }
 
-void GlobalMonitor::setRootFileSystem(nx::vms::server::RootFileSystem* rootFs)
+void GlobalMonitor::setPartitionInformationProvider(
+    std::unique_ptr<nx::vms::server::fs::AbstractPartitionsInformationProvider> partitionInformationProvider)
 {
-    return m_monitorBase->setRootFileSystem(rootFs);
+    return m_monitorBase->setPartitionInformationProvider(std::move(partitionInformationProvider));
 }
 
 std::chrono::milliseconds GlobalMonitor::processUptime() const

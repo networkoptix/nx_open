@@ -1,5 +1,12 @@
 #include "socket_addresss.h"
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#endif
+
 #include <cstring>
 #include <algorithm>
 
@@ -134,6 +141,27 @@ bool SocketAddress::operator==(const SocketAddress& right) const
     {
         return memcmp(&v6().sin6_addr, &right.v6().sin6_addr, sizeof(v6().sin6_addr)) == 0
             && v6().sin6_port == right.v6().sin6_port;
+    }
+}
+
+std::string SocketAddress::toString() const
+{
+    char buffer[1024];
+
+    switch (m_address.v4.sin_family)
+    {
+        case AF_INET:
+            if (inet_ntop(AF_INET, (void*)&m_address.v4.sin_addr, buffer, sizeof(buffer)))
+                return std::string(buffer) + ":" + std::to_string(m_address.v4.sin_port);
+            return "invalid";
+
+        case AF_INET6:
+            if (inet_ntop(AF_INET6, (void*)&m_address.v6.sin6_addr, buffer, sizeof(buffer)))
+                return std::string(buffer) + ":" + std::to_string(m_address.v6.sin6_port);
+            return "invalid";
+
+        default:
+            return std::string("Invalid address family ") + std::to_string(m_address.v4.sin_family);
     }
 }
 

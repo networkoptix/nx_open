@@ -8,6 +8,12 @@ namespace nx {
 namespace utils {
 namespace log {
 
+namespace detail {
+
+/*static*/ bool LevelReducer::s_isEnabled = true;
+
+} // namespace detail
+
 namespace {
 
 class LoggerCollection

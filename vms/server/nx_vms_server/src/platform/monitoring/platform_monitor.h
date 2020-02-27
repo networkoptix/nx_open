@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint> /* For std::intptr_t. */
+#include <memory>
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
@@ -8,6 +9,7 @@
 
 #include <nx/utils/mac_address.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/server/fs/partitions/partitions_information_provider_linux.h>
 
 namespace nx::vms::server { class RootFileSystem; }
 
@@ -135,7 +137,8 @@ public:
     PlatformMonitor(): QObject() {}
     virtual ~PlatformMonitor() {}
 
-    virtual void setRootFileSystem(nx::vms::server::RootFileSystem* /*rootFs*/) {}
+    virtual void setPartitionInformationProvider(
+            std::unique_ptr<nx::vms::server::fs::AbstractPartitionsInformationProvider>) {}
     virtual void logStatistics() {}
 
     /**

@@ -59,48 +59,43 @@ Yunhong Gu, last updated 05/05/2011
 using namespace std;
 
 //#define DEBUG_RECORD_PACKET_HISTORY
+//#define TRACE_PACKETS
 
-#ifdef DEBUG_RECORD_PACKET_HISTORY
 namespace {
 
+#if defined(TRACE_PACKETS) || defined(DEBUG_RECORD_PACKET_HISTORY)
 static std::string dumpPacket(const CPacket& packet)
 {
     std::ostringstream ss;
-    ss <<
-        "id " << packet.m_iID << ", "
-        "type " << (int)packet.getType();
+    ss << "[" << packet.m_iID << ", " << (int)packet.getType() <<"]. ";
+    if (packet.getFlag() == PacketFlag::Data)
+       ss << std::string(packet.payload().data(), packet.payload().size());
+    else
+       ss << "[unparsed control data]";
     return ss.str();
 }
+#endif
 
-static void dumpAddr(std::ostream& os, const sockaddr* addr)
+#if defined(TRACE_PACKETS)
+
+static std::mutex tracePacketMutex;
+
+void tracePacket(
+    const std::string& direction,
+    const detail::SocketAddress& from,
+    const detail::SocketAddress& to,
+    const CPacket& packet)
 {
-    if (addr->sa_family == AF_INET)
-    {
-        os <<
-            std::hex << ntohl(((const sockaddr_in*)addr)->sin_addr.s_addr) << ":" <<
-            std::dec << ntohs(((const sockaddr_in*)addr)->sin_port);
-    }
+    std::lock_guard<std::mutex> lock(tracePacketMutex);
+
+    std::cout << direction << ". " <<
+        from.toString() << "->" << to.toString() << ". " <<
+        dumpPacket(packet) << std::endl;
 }
 
-static std::string dumpPacket(const CPacket& packet, const sockaddr* addr)
-{
-    std::ostringstream ss;
-    ss <<
-        "id " << packet.m_iID << ", "
-        "type " << (int)packet.getType()<<", "
-        "addr ";
+#endif // TRACE_PACKETS
 
-    dumpAddr(ss, addr);
-
-    return ss.str();
-}
-
-static std::string dumpAddr(const sockaddr* addr)
-{
-    std::ostringstream ss;
-    dumpAddr(ss, addr);
-    return ss.str();
-}
+#if defined(DEBUG_RECORD_PACKET_HISTORY)
 
 class SendedPacketVerifier
 {
@@ -144,9 +139,9 @@ private:
 
 static SendedPacketVerifier packetVerifier;
 
-} // namespace
-
 #endif // DEBUG_RECORD_PACKET_HISTORY
+
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 
@@ -579,6 +574,11 @@ int CSndQueue::sendPacket(const detail::SocketAddress& addr, CPacket packet)
 
     // send out the packet immediately (high priority), this is a control packet
     const auto packetLength = packet.getLength();
+
+#ifdef TRACE_PACKETS
+    tracePacket("send", m_channel->getSockAddr(), addr, packet);
+#endif
+
     m_channel->sendto(addr, std::move(packet));
     return packetLength;
 }
@@ -907,7 +907,13 @@ void CRcvQueue::worker()
             // no space, skip this packet
             CPacket temp;
             temp.payload().resize(m_iPayloadSize);
-            m_channel->recvfrom(addr, temp);
+            if (m_channel->recvfrom(addr, temp).ok())
+            {
+                #ifdef TRACE_PACKETS
+                    tracePacket("recv-ign", addr, m_channel->getSockAddr(), temp);
+                #endif
+            }
+
             timerCheck();
             continue;
         }
@@ -920,6 +926,10 @@ void CRcvQueue::worker()
             timerCheck();
             continue;
         }
+
+#ifdef TRACE_PACKETS
+        tracePacket("recv", addr, m_channel->getSockAddr(), unit->packet());
+#endif
 
         processUnit(unit, addr);
         // Ignoring error since the socket could be removed before connect finished.

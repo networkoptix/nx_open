@@ -1,7 +1,14 @@
 #include <nx/vms/server/fs/partitions/read_partitions_linux.h>
 #include <nx/vms/server/fs/partitions/abstract_partitions_information_provider_linux.h>
-#include <gtest/gtest.h>
+#include <platform/monitoring/monitor_linux.h>
+#include <test_support/mediaserver_launcher.h>
+#include <api/global_settings.h>
+#include <api/resource_property_adaptor.h>
+
 #include <string.h>
+
+#include <gtest/gtest.h>
+
 #include <QtCore>
 
 namespace nx::vms::server::fs::test {
@@ -17,8 +24,11 @@ void assertDecodedStrings(QByteArray source, const QByteArray& desired)
 class TestPartitionsInformationProvider: public AbstractPartitionsInformationProvider
 {
 public:
+    QStringList additionalFsTypes;
+    QByteArray mountsFile;
+
     TestPartitionsInformationProvider():
-        m_initialMountsFileContent(R"(sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+        mountsFile(R"(sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
 proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
 udev /dev devtmpfs rw,nosuid,relatime,size=6680584k,nr_inodes=1670146,mode=755 0 0
 devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 0 0
@@ -62,7 +72,7 @@ gvfsd-fuse /run/user/1000/gvfs fuse.gvfsd-fuse rw,nosuid,nodev,relatime,user_id=
 
     void replaceMountsLineByPattern(const QByteArray& pattern, const QByteArray& newLine)
     {
-        QBuffer buf(&m_initialMountsFileContent);
+        QBuffer buf(&mountsFile);
         buf.open(QIODevice::ReadOnly);
         QByteArray newContent;
 
@@ -74,12 +84,12 @@ gvfsd-fuse /run/user/1000/gvfs fuse.gvfsd-fuse rw,nosuid,nodev,relatime,user_id=
                 newContent.append(line);
         }
 
-        m_initialMountsFileContent = newContent;
+        mountsFile = newContent;
     }
 
-    virtual QByteArray mountsFileContent() const
+    virtual QByteArray mountsFileContents() const override
     {
-        return m_initialMountsFileContent;
+        return mountsFile;
     }
 
     virtual bool isScanfLongPattern() const
@@ -87,30 +97,34 @@ gvfsd-fuse /run/user/1000/gvfs fuse.gvfsd-fuse rw,nosuid,nodev,relatime,user_id=
         return false;
     }
 
-    virtual qint64 totalSpace(const QByteArray& fsPath) const
+    virtual qint64 totalSpace(const QByteArray& fsPath) const override
     {
         if (hasInvalidSpaceSubPathMatch(fsPath))
             return -1;
         return 1;
     }
 
-    virtual qint64 freeSpace(const QByteArray& fsPath) const
+    virtual qint64 freeSpace(const QByteArray& fsPath) const override
     {
         if (hasInvalidSpaceSubPathMatch(fsPath))
             return -1;
         return 1;
     }
 
-    virtual bool isFolder(const QByteArray& fsPath) const
+    virtual bool isFolder(const QByteArray& fsPath) const override
     {
         if (fsPath.contains("etc"))
             return false;
         return true;
     }
 
+    virtual QStringList additionalLocalFsTypes() const override
+    {
+        return additionalFsTypes;
+    }
+
 private:
-    QList<QString> m_invalidSpaceSubPaths;
-    QByteArray m_initialMountsFileContent;
+    QList<QString> m_invalidSpaceSubPaths;    
 
     bool hasInvalidSpaceSubPathMatch(const QString& fsPath) const
     {
@@ -190,6 +204,54 @@ protected:
             }));
     }
 
+    void setAdditionalLocalFsTypes(const QStringList& l)
+    {
+        m_partitionsInformationProvider.additionalFsTypes = l;
+    }
+
+    QStringList addPartitions(const QStringList& fsTypes)
+    {
+        QStringList result;
+        for (int i = 0; i < fsTypes.size(); ++i)
+        {
+            const QString newPartitionRecord =
+                QString("/dev/sda_200%1 /mnt/disk_%1 %2 rw,relatime,errors=remount-ro,data=ordered 0 0\n")
+                .arg(i)
+                .arg(fsTypes[i]);
+
+            m_partitionsInformationProvider.mountsFile.append(newPartitionRecord);
+            result.append(newPartitionRecord);
+        }
+
+        return result;
+    }
+
+    void assertAdditionalPartitionsOnList(
+        const QStringList& expected,
+        const QList<PlatformMonitor::PartitionSpace>& actual)
+    {
+        for (const auto& entry: expected)
+        {
+            ASSERT_TRUE(std::any_of(
+                actual.cbegin(), actual.cend(),
+                [&entry](const auto& p)
+                {
+                    if (entry.contains(p.path))
+                        return p.type == PlatformMonitor::PartitionType::LocalDiskPartition;
+
+                    return false;
+                }));
+        }
+    }
+
+    std::unique_ptr<QnLinuxMonitor> createMonitor()
+    {
+        auto monitor = std::make_unique<QnLinuxMonitor>();
+        monitor->setPartitionInformationProvider(
+            std::make_unique<TestPartitionsInformationProvider>(m_partitionsInformationProvider));
+        return monitor;
+    }
+
 private:
     TestPartitionsInformationProvider m_partitionsInformationProvider;
     std::list<PartitionInfo> m_partitionInfoList;
@@ -213,6 +275,54 @@ TEST_F(ReadPartitions, PathsWithSpacesShouldBeReturned)
     whenThereIsASuitablePathWithSpacesOnSda1();
     whenProcMountsContainingBoundFilesRead();
     thenPathWithSpacesShouldBeSelected();
+}
+
+TEST_F(ReadPartitions, AdditionalLocalFsTypes)
+{
+    const QStringList additionalFsTypes = {"btrfs", "lolfs"};
+    setAdditionalLocalFsTypes(additionalFsTypes);    
+    const auto newFsPartitons = addPartitions(additionalFsTypes);
+    auto monitor = createMonitor();
+    assertAdditionalPartitionsOnList(newFsPartitons, monitor->totalPartitionSpaceInfo());
+}
+
+class FtServerPartitionsInformationProvider: public ::testing::Test
+{
+protected:
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(m_server.start());
+    }
+
+    void whenLocalFsTypesSet(const QStringList& l)
+    {
+        for (const auto setting: m_server.serverModule()->globalSettings()->allSettings())
+        {
+            if (setting->key() == "additionalLocalFsTypes")
+            {
+                setting->setValue(l.join(","));
+                return;
+            }
+        }
+
+        ASSERT_TRUE(false) << "additionalLocalFsTypes setting not found";
+    }
+
+    void thenServerPartitionInformationProviderShouldReturnThem(const QStringList& expected)
+    {
+        const auto p = nx::vms::server::fs::PartitionsInformationProvider(m_server.serverModule());
+        ASSERT_EQ(expected, p.additionalLocalFsTypes());
+    }
+
+private:
+    MediaServerLauncher m_server;
+};
+
+TEST_F(FtServerPartitionsInformationProvider, LocalFsTypesAreTakenFromGlobalSettings)
+{
+    const QStringList additionalFsTypes = {"btrfs", "lolfs"};
+    whenLocalFsTypesSet(additionalFsTypes);
+    thenServerPartitionInformationProviderShouldReturnThem(additionalFsTypes);
 }
 
 } // namespace nx::vms::server::fs::test

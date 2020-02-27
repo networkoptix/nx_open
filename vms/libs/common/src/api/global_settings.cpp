@@ -746,6 +746,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         QnAppInfo::defaultLanguage(),
         this);
 
+    m_additionalLocalFsTypesAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        "additionalLocalFsTypes",
+        "",
+        this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -760,7 +765,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         &QnGlobalSettings::localSystemIdChanged,
         Qt::QueuedConnection);
 
-    // TODO: #GDM Revert this hack when sync global settings will be implemented.
+    // TODO: #GDM Revert this hack when sync global settings will be implemented.O
     connect(
         m_localSystemIdAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -977,6 +982,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxRtpRetryCount
         << m_specificFeaturesAdaptor
         << m_pushNotificationsLanguageAdaptor
+        << m_additionalLocalFsTypesAdaptor
     ;
 
     return result;
@@ -1838,6 +1844,11 @@ nx::utils::Url QnGlobalSettings::resourceFileUri() const
 QString QnGlobalSettings::pushNotificationsLanguage() const
 {
     return m_pushNotificationsLanguageAdaptor->value();
+}
+
+QString QnGlobalSettings::additionalLocalFsTypes() const
+{
+    return m_additionalLocalFsTypesAdaptor->value();
 }
 
 void QnGlobalSettings::setLowQualityScreenVideoCodec(const QString& value)
