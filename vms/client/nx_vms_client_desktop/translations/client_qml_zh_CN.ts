@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>点选新增</translation>
     </message>
   </context>
   <context>
@@ -90,7 +90,7 @@
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>从摄像机中选择视频流进行分析</translation>
     </message>
   </context>
   <context>

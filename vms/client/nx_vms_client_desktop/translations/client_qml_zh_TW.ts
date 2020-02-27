@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>點選新增</translation>
     </message>
   </context>
   <context>
@@ -86,11 +86,11 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>攝影機串流</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>從攝影機中選擇影片串流進行分析</translation>
     </message>
   </context>
   <context>
