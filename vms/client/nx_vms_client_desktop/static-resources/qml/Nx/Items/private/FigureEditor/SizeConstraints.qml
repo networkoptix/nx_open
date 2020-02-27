@@ -594,7 +594,7 @@ Figure
             return null
 
         return acceptable
-            ? qsTr("Set minimum and maximum object sizes.")
+            ? qsTr("Set minimum and maximum object size.")
             : qsTr("Minimum object size cannot be greater than maximum.")
     }
 
