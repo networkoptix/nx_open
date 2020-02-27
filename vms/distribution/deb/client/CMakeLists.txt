@@ -43,7 +43,6 @@ set(common_depends
     "libxrandr2"
     "libxtst6"
     "libxkbcommon0"
-    "libpng12-0"
     "libfontconfig1"
     "libfreetype6 (>= 2.6.0)"
     "libasound2"

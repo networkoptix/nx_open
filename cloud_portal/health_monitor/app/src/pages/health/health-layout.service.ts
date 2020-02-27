@@ -10,6 +10,7 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class NxHealthLayoutService {
     CONFIG: any;
+    previousActiveEntity = undefined;
     activeEntitySubject = new BehaviorSubject(undefined);
     fixedLayoutClassSubject = new BehaviorSubject('');
     dimensionsSubject = new BehaviorSubject([]);
@@ -36,6 +37,7 @@ export class NxHealthLayoutService {
     }
 
     set activeEntity(entity: any) {
+        this.previousActiveEntity = this.activeEntity;
         this.activeEntitySubject.next(entity);
     }
 
@@ -52,9 +54,7 @@ export class NxHealthLayoutService {
     }
 
     set dimensions(dimensions: number[]) {
-        if (dimensions !== this.dimensions) {
-            this.dimensionsSubject.next(dimensions);
-        }
+        this.dimensionsSubject.next(dimensions);
     }
 
     get fixedLayoutClass() {
@@ -174,7 +174,8 @@ export class NxHealthLayoutService {
         if (!this.mobileDetailMode) {
             this.dimensions = [elementTilesHeight, searchElementHeight, 17 /*separator = 1px + padding*/];
         }
-        this.setLayout();
+        const cannotSetSearch = this.previousActiveEntity === undefined;
+        this.setLayout(cannotSetSearch);
     }
 
     setMetricsLayout() {
@@ -215,7 +216,7 @@ export class NxHealthLayoutService {
         this.healthService.tableReady = true;
     }
 
-    private setLayout() {
+    private setLayout(cannotSearchStyle?: boolean) {
         if (!this.tableElement || !this.healthService.tableReady) {
             return;
         }
@@ -230,7 +231,7 @@ export class NxHealthLayoutService {
             const isTableFit = (areaWidth > this.tableWidth + widthPanel + 16); // +gutter
             this.fixedLayoutClass = (isTableFit) ? '' : 'fixedLayout--with-panel';
 
-            if (this.searchElement) {
+            if (!cannotSearchStyle && this.searchElement) {
                 this.searchElement.nativeElement.style.width = 'auto';
             }
         } else {

@@ -66,6 +66,7 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
     pager: any = {};
     pagedItems: any[];
     pagerMaxSize: number;
+    pagerEllipses: boolean;
     serviceParams;
     serviceHeaders;
 
@@ -183,8 +184,10 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
     private setPagerSize() {
         if (this.healthLayoutService.activeEntity && this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.xl)) {
             this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSizeSmall;
+            this.pagerEllipses = false;
         } else {
             this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSize;
+            this.pagerEllipses = true;
         }
     }
 

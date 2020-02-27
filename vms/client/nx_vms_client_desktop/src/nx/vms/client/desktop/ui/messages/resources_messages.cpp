@@ -90,9 +90,14 @@ namespace messages {
 
 void Resources::layoutAlreadyExists(QWidget* parent)
 {
-    QnSessionAwareMessageBox::warning(parent,
-        tr("There is another layout with the same name"),
-        tr("You do not have permission to overwrite it."));
+    // TODO: #spanasenko Use static helpers here when they'll be implemented.
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setText(tr("There is another layout with the same name"));
+    messageBox.setInformativeText(tr("You do not have permission to overwrite it."));
+    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.addButton(QDialogButtonBox::Ok);
+    messageBox.setDefaultButton(QDialogButtonBox::Ok);
+    messageBox.exec();
 }
 
 bool Resources::overrideLayout(QWidget* parent)
@@ -326,7 +331,7 @@ bool Resources::stopWearableUploads(QWidget* parent, const QnResourceList& resou
     if (resources.isEmpty())
         return true;
 
-    QString text = tr("Some video files are still being uploaded to %n virtual cameras:", 
+    QString text = tr("Some video files are still being uploaded to %n virtual cameras:",
         "", resources.size());
     QString extra = tr("Stop uploading?");
 

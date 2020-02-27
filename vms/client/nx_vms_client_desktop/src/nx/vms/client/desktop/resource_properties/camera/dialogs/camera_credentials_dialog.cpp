@@ -15,7 +15,7 @@ CameraCredentialsDialog::CameraCredentialsDialog(QWidget* parent):
     ui->loginInputField->setTitle(tr("Login"));
     ui->passwordInputField->setTitle(tr("Password"));
 
-    ui->passwordInputField->setEchoMode(QLineEdit::PasswordEchoOnEdit);
+    ui->passwordInputField->setEchoMode(QLineEdit::Password);
 
     auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());

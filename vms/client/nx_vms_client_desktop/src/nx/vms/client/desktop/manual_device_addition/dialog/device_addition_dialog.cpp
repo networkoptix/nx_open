@@ -484,8 +484,15 @@ void DeviceAdditionDialog::handleStartSearchClicked()
 
     if (m_currentSearch->status().state == QnManualResourceSearchStatus::Aborted)
     {
+        // TODO: #spanasenko Use static helpers here when they'll be implemented.
+        QnSessionAwareMessageBox messageBox(this);
+        messageBox.setText(tr("Device search failed"));
+        messageBox.setInformativeText(m_currentSearch->initialError());
+        messageBox.setIcon(QnMessageBoxIcon::Critical);
+        messageBox.addButton(QDialogButtonBox::Ok);
+        messageBox.setDefaultButton(QDialogButtonBox::Ok);
+        messageBox.exec();
 
-        QnMessageBox::critical(this, tr("Device search failed"), m_currentSearch->initialError());
         stopSearch();
         return;
     }
@@ -594,13 +601,14 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
 
 void DeviceAdditionDialog::showAdditionFailedDialog(const FakeResourceList& resources)
 {
-    QnMessageBox dialog(QnMessageBoxIcon::Critical,
-        tr("Failed to add %n devices", "", resources.size()), QString(),
-        QDialogButtonBox::Ok, QDialogButtonBox::Ok,
-        this);
-
-    dialog.addCustomWidget(new FakeResourceListView(resources, this));
-    dialog.exec();
+    // TODO: #spanasenko Use static helpers here when they'll be implemented.
+    QnSessionAwareMessageBox messageBox(this);
+    messageBox.setText(tr("Failed to add %n devices", "", resources.size()));
+    messageBox.setIcon(QnMessageBoxIcon::Critical);
+    messageBox.addButton(QDialogButtonBox::Ok);
+    messageBox.setDefaultButton(QDialogButtonBox::Ok);
+    messageBox.addCustomWidget(new FakeResourceListView(resources, this));
+    messageBox.exec();
 }
 
 void DeviceAdditionDialog::stopSearch()
@@ -731,7 +739,14 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     if (m_currentSearch->status().state == QnManualResourceSearchStatus::Aborted
         && !m_currentSearch->initialError().isEmpty())
     {
-        QnMessageBox::critical(this, tr("Device search failed"));
+        // TODO: #spanasenko Use static helpers here when they'll be implemented.
+        QnSessionAwareMessageBox messageBox(this);
+        messageBox.setText(tr("Device search failed"));
+        messageBox.setInformativeText(m_currentSearch->initialError());
+        messageBox.setIcon(QnMessageBoxIcon::Critical);
+        messageBox.addButton(QDialogButtonBox::Ok);
+        messageBox.setDefaultButton(QDialogButtonBox::Ok);
+        messageBox.exec();
     }
 }
 

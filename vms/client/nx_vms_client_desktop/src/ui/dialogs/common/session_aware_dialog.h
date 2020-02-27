@@ -46,7 +46,22 @@ protected:
 #undef ID
 #undef COMMA
 
-using QnSessionAwareMessageBox = QnSessionAware<QnMessageBox>;
+class QnSessionAwareMessageBox: public QnSessionAware<QnMessageBox>
+{
+    using base_type = QnSessionAware<QnMessageBox>;
+
+public:
+    using base_type::base_type;
+
+    // Static members of QnMessageBox can not be used from derived class
+    // since their implementation creates a new, not session-aware, window.
+private:
+    using QnMessageBox::information;
+    using QnMessageBox::warning;
+    using QnMessageBox::question;
+    using QnMessageBox::critical;
+    using QnMessageBox::success;
+};
 using QnSessionAwareDialog = QnSessionAware<QnDialog>;
 using QnSessionAwareFileDialog = QnSessionAware<QnCustomFileDialog>;
 

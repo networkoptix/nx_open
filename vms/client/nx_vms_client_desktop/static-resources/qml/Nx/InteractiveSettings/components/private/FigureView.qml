@@ -26,6 +26,8 @@ Item
 
     property bool editable: true
 
+    property int thumbnailReloadIntervalSeconds: 10
+
     signal editRequested()
 
     readonly property size implicitSize:
@@ -83,18 +85,34 @@ Item
 
                 onThumbnailUpdated:
                 {
-                    if (cameraId === resourceId)
-                        backgroundImage.source = thumbnailUrl
+                    if (cameraId !== resourceId)
+                        return
+
+                    backgroundImage.source = thumbnailUrl
+                    updateTimer.stop()
                 }
+            }
+
+            Timer
+            {
+                id: updateTimer
+
+                interval: thumbnailReloadIntervalSeconds * 1000
+
+                onTriggered:
+                    backgroundImage.updateThumbnail()
             }
 
             function updateThumbnail()
             {
                 backgroundImage.source = ""
+                updateTimer.stop()
+
                 if (!resourceThumbnailProvider || !resourceId || resourceId.isNull())
                     return
 
                 resourceThumbnailProvider.load(resourceId)
+                updateTimer.start()
             }
 
             Component.onCompleted:
@@ -107,6 +125,30 @@ Item
                 anchors.fill: parent
                 color: ColorTheme.transparent("black",
                     mouseArea.containsMouse && !mouseArea.pressed ? 0.4 : 0.5)
+            }
+        }
+
+        Rectangle
+        {
+            id: noDataIndicator
+
+            color: ColorTheme.colors.dark6
+            anchors.fill: preview
+            visible: hasFigure && backgroundImage.status !== Image.Ready
+
+            Text
+            {
+                id: noData
+
+                anchors.fill: parent
+                verticalAlignment: Qt.AlignVCenter
+                horizontalAlignment: Qt.AlignHCenter
+                color: ColorTheme.colors.light16
+                font.pixelSize: 16
+                font.weight: Font.Light
+                fontSizeMode: Text.Fit
+                padding: 4
+                text: qsTr("NO PREVIEW")
             }
         }
 

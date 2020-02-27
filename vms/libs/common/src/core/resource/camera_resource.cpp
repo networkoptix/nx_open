@@ -88,6 +88,9 @@ const QString QnVirtualCameraResource::kWearableClientTimeZone(
     "wearableClientTimeZone");
 
 
+const QString QnVirtualCameraResource::kWearableClientTimeZone(
+    "wearableClientTimeZone");
+
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_issueCounter(0),

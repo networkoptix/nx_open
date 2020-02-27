@@ -738,6 +738,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state.analytics.enabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
         state.analytics.enabledEngines.resetUser();
+
         state.wearableClientTimeZone = firstCamera->isWearableClientTimeZone();
     }
 

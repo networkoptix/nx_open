@@ -76,7 +76,7 @@ export class NxPermissionsDropdown implements OnInit {
     // }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes.roles && changes.roles.currentValue && !this.system.pauseUpdate) {
+        if (changes.roles && changes.roles.currentValue) {
             this.processAccessRoles();
             const role = this.accessRoles.filter(x => x.name === this.selected.name)[ 0 ];
             this.selection = '';
@@ -87,7 +87,7 @@ export class NxPermissionsDropdown implements OnInit {
             }
         }
 
-        if (changes.selected && changes.selected.currentValue && !this.system.pauseUpdate) {
+        if (changes.selected && changes.selected.currentValue) {
             this.selection = this.accessRoles.find(x => x.name === changes.selected.currentValue.name).optionLabel;
         }
     }
