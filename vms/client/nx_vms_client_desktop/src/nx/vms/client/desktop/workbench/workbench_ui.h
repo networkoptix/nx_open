@@ -197,6 +197,7 @@ private:
     void updateCursor();
 
     bool calculateTimelineVisible(QnResourceWidget* widget) const;
+    static int calculateAutoFpsLimit(QnWorkbenchLayout* layout);
 
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
