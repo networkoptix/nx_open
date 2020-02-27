@@ -74,44 +74,20 @@ static std::string dumpPacket(const CPacket& packet)
     return ss.str();
 }
 
-static void dumpAddr(std::ostream& os, const sockaddr* addr)
-{
-    if (addr->sa_family == AF_INET)
-    {
-        os <<
-            std::hex << ntohl(((const sockaddr_in*)addr)->sin_addr.s_addr) << ":" <<
-            std::dec << ntohs(((const sockaddr_in*)addr)->sin_port);
-    }
-}
-
-static std::string dumpPacket(const CPacket& packet, const sockaddr* addr)
-{
-    std::ostringstream ss;
-    ss << dumpPacket(packet) << ", addr ";
-    dumpAddr(ss, addr);
-    return ss.str();
-}
-
-static std::string dumpAddr(const sockaddr* addr)
-{
-    std::ostringstream ss;
-    dumpAddr(ss, addr);
-    return ss.str();
-}
-
 #if defined(TRACE_PACKETS)
 
 static std::mutex tracePacketMutex;
 
 void tracePacket(
     const std::string& direction,
-    const detail::SocketAddress& remoteAddr,
+    const detail::SocketAddress& from,
+    const detail::SocketAddress& to,
     const CPacket& packet)
 {
     std::lock_guard<std::mutex> lock(tracePacketMutex);
 
-    std::cout << direction << ". "
-        "addr " << remoteAddr.toString() << ". " <<
+    std::cout << direction << ". " <<
+        from.toString() << "->" << to.toString() << ". " <<
         dumpPacket(packet) << std::endl;
 }
 
@@ -598,7 +574,7 @@ int CSndQueue::sendPacket(const detail::SocketAddress& addr, CPacket packet)
     const auto packetLength = packet.getLength();
 
 #ifdef TRACE_PACKETS
-    tracePacket("send", addr, packet);
+    tracePacket("send", m_channel->getSockAddr(), addr, packet);
 #endif
 
     m_channel->sendto(addr, std::move(packet));
@@ -932,7 +908,7 @@ void CRcvQueue::worker()
             if (m_channel->recvfrom(addr, temp).ok())
             {
                 #ifdef TRACE_PACKETS
-                    tracePacket("recv", addr, temp);
+                    tracePacket("recv-ign", addr, m_channel->getSockAddr(), temp);
                 #endif
             }
 
@@ -950,7 +926,7 @@ void CRcvQueue::worker()
         }
 
 #ifdef TRACE_PACKETS
-        tracePacket("recv", addr, unit->packet());
+        tracePacket("recv", addr, m_channel->getSockAddr(), unit->packet());
 #endif
 
         processUnit(unit, addr);
