@@ -81,9 +81,10 @@
                             *ngIf="healthService.tableReady"
                             [collectionSize]="_elements.length"
                             [maxSize]="pagerMaxSize"
+                            [ellipses]="pagerEllipses"
+                            [rotate]="true"
                             [pageSize]="pageSize"
                             [page]="currentPage"
-                            [rotate]="true"
                             (pageChange)="setPage($event, undefined, true)"></ngb-pagination>
                 </nav>
             </div>
