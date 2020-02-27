@@ -935,7 +935,7 @@ std::shared_ptr<CUDTSocket> CUDTUnited::locate(const UDTSOCKET u)
 }
 
 void CUDTUnited::saveSocketByHandshakeInfo(
-    const std::unique_lock<std::mutex>& lock,
+    const std::unique_lock<std::mutex>& /*lock*/,
     const CUDTSocket& sock)
 {
     m_PeerRec[handshakeKey(sock.m_PeerID, sock.m_iISN)].insert(sock.m_SocketId);
@@ -967,7 +967,7 @@ std::shared_ptr<CUDTSocket> CUDTUnited::locateByHandshakeInfo(
 }
 
 void CUDTUnited::removeSocketByHandshakeInfo(
-    const std::unique_lock<std::mutex>& lock,
+    const std::unique_lock<std::mutex>& /*lock*/,
     const CUDTSocket& sock)
 {
     auto j = m_PeerRec.find(handshakeKey(sock.m_PeerID, sock.m_iISN));
