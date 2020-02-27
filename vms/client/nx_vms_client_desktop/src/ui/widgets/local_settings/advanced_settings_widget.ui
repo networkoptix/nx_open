@@ -33,9 +33,6 @@
      <property name="spacing">
       <number>4</number>
      </property>
-     <property name="bottomMargin">
-      <number>8</number>
-     </property>
      <item>
       <widget class="QCheckBox" name="doubleBufferCheckbox">
        <property name="text">
