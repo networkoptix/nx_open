@@ -109,15 +109,17 @@ Figure
             border.color: maxBoxColor
             color: ColorTheme.transparent(maxBoxColor, 0.3)
 
-            x: F.absX(maxRect.x, figure)
-            y: F.absY(maxRect.y, figure)
-            width: F.absX(maxRect.width, figure)
-            height: F.absY(maxRect.height, figure)
+            x: F.absX(maxRect.x, figure) - 1
+            y: F.absY(maxRect.y, figure) - 1
+            width: F.absX(maxRect.width, figure) + 2
+            height: F.absY(maxRect.height, figure) + 2
 
             Text
             {
                 text: qsTr("MAX")
                 color: maxBoxColor
+                style: Text.Outline
+                styleColor: "black"
                 font.bold: true
 
                 x: position.x
@@ -356,15 +358,17 @@ Figure
             border.color: minBoxColor
             color: ColorTheme.transparent(minBoxColor, 0.3)
 
-            x: F.absX(minRect.x, figure)
-            y: F.absY(minRect.y, figure)
-            width: F.absX(minRect.width, figure)
-            height: F.absY(minRect.height, figure)
+            x: F.absX(minRect.x, figure) - 1
+            y: F.absY(minRect.y, figure) - 1
+            width: F.absX(minRect.width, figure) + 2
+            height: F.absY(minRect.height, figure) + 2
 
             Text
             {
                 text: qsTr("MIN")
                 color: minBoxColor
+                style: Text.Outline
+                styleColor: "black"
                 font.bold: true
 
                 x: position.x
