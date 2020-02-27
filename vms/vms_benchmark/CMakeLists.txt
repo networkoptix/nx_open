@@ -71,6 +71,7 @@ add_custom_command(
         testcamera
         rtsp_perf
         ${benchmark_sources}
+        ${CMAKE_CURRENT_SOURCE_DIR}/vms_benchmark.builddir.ini
 )
 
 add_custom_target(vms_benchmark ALL DEPENDS ${CMAKE_BINARY_DIR}/bin/vms_benchmark${exe_extension})
