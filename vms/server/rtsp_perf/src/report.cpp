@@ -5,7 +5,6 @@
 #include <sstream>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/common/threadqueue.h>
 
@@ -29,7 +28,7 @@ static std::string nowStr()
     return toString(std::chrono::system_clock::now());
 }
 
-class Reporter: public QnLongRunnable, public Singleton<Reporter>
+class Reporter: public QnLongRunnable
 {
 public:
     Reporter() {}
