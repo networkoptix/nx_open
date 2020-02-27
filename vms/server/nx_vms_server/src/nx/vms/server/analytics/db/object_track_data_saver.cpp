@@ -104,8 +104,8 @@ void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
     query->prepare(R"sql(
         INSERT INTO track (device_id, object_type_id, guid,
             track_start_ms, track_end_ms, track_detail, attributes_id,
-            best_shot_timestamp_ms, best_shot_rect)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            best_shot_timestamp_ms, best_shot_rect, stream_index)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     )sql");
 
     for (const auto& track: m_tracksToInsert)
@@ -132,6 +132,8 @@ void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         query->addBindValue(track.bestShot.initialized()
             ? TrackSerializer::serialized(track.bestShot.rect)
             : QByteArray());
+
+        query->addBindValue((int) track.bestShot.streamIndex);
 
         query->exec();
 
@@ -226,7 +228,8 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
             track_start_ms = min(track_start_ms, ?),
             track_end_ms = max(track_end_ms, ?),
             best_shot_timestamp_ms = coalesce(?, best_shot_timestamp_ms),
-            best_shot_rect = coalesce(?, best_shot_rect)
+            best_shot_rect = coalesce(?, best_shot_rect),
+            stream_index = ?
         WHERE id = ?
     )sql");
 
@@ -259,6 +262,11 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
             updateObjectQuery->addBindValue(QVariant());
             updateObjectQuery->addBindValue(QVariant());
         }
+
+        NX_ASSERT(trackUpdate.bestShot.streamIndex == nx::vms::api::StreamIndex::primary
+            || trackUpdate.bestShot.streamIndex == nx::vms::api::StreamIndex::secondary);
+
+        updateObjectQuery->addBindValue((int) trackUpdate.bestShot.streamIndex);
         updateObjectQuery->addBindValue(dbId);
 
         updateObjectQuery->exec();

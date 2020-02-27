@@ -30,14 +30,14 @@ public:
     /**
      * Request thumbnail if it has not been loaded yet, else emit thumbnailUpdated immediately.
      */
-    Q_INVOKABLE void load(const QnUuid& cameraId);
-    Q_INVOKABLE void load(const QString& cameraId);
+    Q_INVOKABLE void load(const QnUuid& cameraId, const QnUuid& engineId);
+    Q_INVOKABLE void load(const QString& cameraId, const QString& engineId);
 
     /**
     * Request new thumbnail even it has been already loaded.
     */
-    Q_INVOKABLE void refresh(const QnUuid& cameraId);
-    Q_INVOKABLE void refresh(const QString& cameraId);
+    Q_INVOKABLE void refresh(const QnUuid& cameraId, const QnUuid& engineId);
+    Q_INVOKABLE void refresh(const QString& cameraId, const QString& engineId);
 
     int thumbnailsHeight() const { return m_thumbnailHeight; }
     void setThumbnailsHeight(int height);

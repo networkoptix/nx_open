@@ -140,7 +140,7 @@ private:
      */
     int64_t m_lastLiveFrameTime[2] {0};
 
-    std::unique_ptr<nx::analytics::MetadataLogger> m_primarypProcessDataLogger;
+    std::unique_ptr<nx::analytics::MetadataLogger> m_primaryProcessDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryProcessDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_primarypPutDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryPutDataLogger;

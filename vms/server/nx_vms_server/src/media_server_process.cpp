@@ -2834,7 +2834,6 @@ void MediaServerProcess::registerRestHandlers(
      *         primary one is not available.
      *     %value forcedSecondary Secondary stream is forced. Primary stream will be used if the
      *         secondary one is not available.
-     *     %value sameAsAnalytics Use the same stream as the one used by analytics engine.
      *     %value sameAsMotion Use the same stream as the one used by software motion detection.
      * %param[opt]:enum aspectRatio Allows to avoid scaling the image to the aspect ratio from
      *     camera settings.

@@ -359,43 +359,28 @@ std::optional<ExtendedAnalyticsActionData>
     if (!needBestShotObjectPosition && !needBestShotVideoFrame)
         return extendedAnalyticsActionData;
 
-    // Either an Object position or the best shot video frame is needed.
-    const int64_t bestShotTimestampUs = objectTrack->bestShot.initialized()
-        ? objectTrack->bestShot.timestampUs
-        : objectTrack->firstAppearanceTimeUs;
+    if (!NX_ASSERT(objectTrack->bestShot.initialized(), "Best shot must be initialized"))
+        return std::nullopt;
 
-    if (!NX_ASSERT(bestShotTimestampUs != AV_NOPTS_VALUE))
+    const BestShot& bestShot = objectTrack->bestShot;
+    if (!NX_ASSERT(bestShot.timestampUs != AV_NOPTS_VALUE,
+        "Failed to fetch the best shot timestamp for the Object Track %1.", trackId))
     {
-        NX_ERROR(this,
-            "Failed to fetch the best shot timestamp for the Object Track %1.", trackId);
         return std::nullopt;
     }
 
     if (needBestShotObjectPosition)
     {
-        if (objectTrack->bestShot.initialized())
-        {
-            extendedAnalyticsActionData.bestShotObjectPosition->timestampUs =
-                objectTrack->bestShot.timestampUs;
-            extendedAnalyticsActionData.bestShotObjectPosition->boundingBox =
-                objectTrack->bestShot.rect;
-        }
-        else
-        {
-            extendedAnalyticsActionData.bestShotObjectPosition->timestampUs =
-                objectTrack->firstAppearanceTimeUs;
-            extendedAnalyticsActionData.bestShotObjectPosition->boundingBox =
-                objectTrack->objectPositionSequence.empty()
-                ? objectTrack->objectPosition.boundingBox()//< Whole object track rect.
-                : objectTrack->objectPositionSequence.begin()->boundingBox; //< First frame rect.
-        }
+        extendedAnalyticsActionData.bestShotObjectPosition->timestampUs = bestShot.timestampUs;
+        extendedAnalyticsActionData.bestShotObjectPosition->boundingBox = bestShot.rect;
     }
 
     if (needBestShotVideoFrame)
     {
         extendedAnalyticsActionData.bestShotVideoFrame = imageByTimestamp(
             action.deviceId,
-            bestShotTimestampUs);
+            bestShot.timestampUs,
+            objectTrack->bestShot.streamIndex);
     }
 
     return extendedAnalyticsActionData;
@@ -475,10 +460,24 @@ std::optional<ObjectTrackEx>
 
 CLVideoDecoderOutputPtr  QnExecuteAnalyticsActionRestHandler::imageByTimestamp(
     const QnUuid& deviceId,
-    const int64_t timestampUs)
+    const int64_t timestampUs,
+    nx::vms::api::StreamIndex streamIndex)
 {
-    NX_DEBUG(this, "Trying to fetch image by timestamp. Device id: %1, timestamp: %2.",
-        deviceId, timestampUs);
+    if (!NX_ASSERT(!deviceId.isNull()))
+        return CLVideoDecoderOutputPtr();
+
+    if (!NX_ASSERT(timestampUs != AV_NOPTS_VALUE))
+        return CLVideoDecoderOutputPtr();
+
+    if (!NX_ASSERT(streamIndex == nx::vms::api::StreamIndex::primary
+        || streamIndex == nx::vms::api::StreamIndex::secondary))
+    {
+        return CLVideoDecoderOutputPtr();
+    }
+
+    NX_DEBUG(this,
+        "Trying to fetch image by timestamp. Device id: %1, timestamp: %2, stream index: %3",
+        deviceId, timestampUs, streamIndex);
 
     const auto device = resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
     if (!device)
@@ -493,8 +492,9 @@ CLVideoDecoderOutputPtr  QnExecuteAnalyticsActionRestHandler::imageByTimestamp(
     imageRequest.roundMethod = nx::api::ImageRequest::RoundMethod::precise;
 
     nx::api::CameraImageRequest cameraImageRequest(device, imageRequest);
-    cameraImageRequest.streamSelectionMode =
-        nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics;
+    cameraImageRequest.streamSelectionMode = streamIndex == nx::vms::api::StreamIndex::primary
+        ? nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary
+        : nx::api::CameraImageRequest::StreamSelectionMode::forcedSecondary;
 
     QnGetImageHelper helper(serverModule());
     CLVideoDecoderOutputPtr result = helper.getImage(cameraImageRequest);

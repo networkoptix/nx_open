@@ -120,7 +120,7 @@ std::optional<ObjectTrack> ObjectTrackSearcher::fetchTrackById(
     query->setForwardOnly(true);
     query->prepare(R"sql(
         SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
-            ua.content AS content, best_shot_timestamp_ms, best_shot_rect
+            ua.content AS content, best_shot_timestamp_ms, best_shot_rect, stream_index
         FROM track t, unique_attributes ua
         WHERE t.attributes_id=ua.id AND guid=?
     )sql");
@@ -219,7 +219,7 @@ void ObjectTrackSearcher::fetchTracksFromDb(
     query->setForwardOnly(true);
     query->prepare(lm(R"sql(
         SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
-            ua.content AS content, best_shot_timestamp_ms, best_shot_rect
+            ua.content AS content, best_shot_timestamp_ms, best_shot_rect, stream_index
         FROM track t, unique_attributes ua, track_group tg
         WHERE t.attributes_id=ua.id AND t.id=tg.track_id AND %1
         ORDER BY track_start_ms DESC
@@ -270,7 +270,7 @@ void ObjectTrackSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* quer
 
     query->prepare(lm(R"sql(
         SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
-            ua.content AS content, best_shot_timestamp_ms, best_shot_rect
+            ua.content AS content, best_shot_timestamp_ms, best_shot_rect, stream_index
         FROM track t, unique_attributes ua
         WHERE t.attributes_id=ua.id %1
         ORDER BY track_start_ms %2
@@ -325,6 +325,7 @@ std::optional<ObjectTrack> ObjectTrackSearcher::loadTrack(
 
     track.bestShot.timestampUs =
         query->value("best_shot_timestamp_ms").toLongLong() * kUsecInMs;
+    track.bestShot.streamIndex = (nx::vms::api::StreamIndex) query->value("stream_index").toInt();
     if (track.bestShot.initialized())
     {
         track.bestShot.rect =

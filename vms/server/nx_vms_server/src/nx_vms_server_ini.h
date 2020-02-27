@@ -13,19 +13,6 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, ignoreApiModuleInformationInAutoRequestForwarder, "");
     NX_INI_FLAG(0, enableApiDebug, "Enables /api/debug RestAPI method.");
 
-    NX_INI_FLAG(1, enableMetadataProcessing, "Enables processing data from metadata plugins.");
-    NX_INI_FLAG(0, analyzeKeyFramesOnly, "Whether to use only key frames for metadata plugins.");
-    NX_INI_FLAG(0, analyzeSecondaryStream,
-        "Whether to use secondary stream for Analytics instead of primary.\n"
-        "\n"
-        "Enabling may reduce the CPU usage on the Server, but may cause the degradation of\n"
-        "detection quality, especially for plugins that need high-resolution frames, such as\n"
-        "face detection and plugins that detect fast-moving objects (fps rate on the secondary\n"
-        "stream is usually lower than on the primary stream.");
-    NX_INI_FLAG(1, enablePersistentAnalyticsDeviceAgent,
-        "Disables recreating of Analytics DeviceAgents on resource changes (workaround of\n"
-        "libtegra_video.so bug).");
-
     NX_INI_FLAG(0, forceLiteClient, "Force Lite Client for this server.");
 
     #define NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP \

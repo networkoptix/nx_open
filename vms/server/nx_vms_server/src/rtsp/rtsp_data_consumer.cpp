@@ -90,7 +90,7 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
 
     if (nx::analytics::loggingIni().isLoggingEnabled())
     {
-        m_primarypProcessDataLogger = std::make_unique<nx::analytics::MetadataLogger>(
+        m_primaryProcessDataLogger = std::make_unique<nx::analytics::MetadataLogger>(
             "rtsp_consumer_process_data_",
             camera->getId(),
             /*engineId*/ QnUuid(),
@@ -273,7 +273,8 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
     {
         const bool isSecondaryProvider =
             mediaData->flags & QnAbstractMediaData::MediaFlags_LowQuality;
-        const auto& logger = (ini().analyzeSecondaryStream || isSecondaryProvider)
+
+        const auto& logger = isSecondaryProvider
             ? m_secondaryPutDataLogger
             : m_primarypPutDataLogger;
 
@@ -571,13 +572,16 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
                 return true; // data for other live quality stream
         }
 
-        StreamIndex index = isSecondaryProvider ? StreamIndex::secondary : StreamIndex::primary;
-        m_streamMetricHelper.setStream(index);
+        const StreamIndex streamIndex = isSecondaryProvider
+            ? StreamIndex::secondary
+            : StreamIndex::primary;
+
+        m_streamMetricHelper.setStream(streamIndex);
     }
 
-    const auto& logger = (ini().analyzeSecondaryStream || isSecondaryProvider)
+    const auto& logger = isSecondaryProvider
         ? m_secondaryProcessDataLogger
-        : m_primarypProcessDataLogger;
+        : m_primaryProcessDataLogger;
 
     if (logger)
         logger->pushData(media, lm("Queue size %1").args(m_dataQueue.size()));

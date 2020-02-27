@@ -118,7 +118,7 @@ private:
     mutable QnMutex m_mutex;
     std::map<QnUuid, ObjectTrackContext> m_tracksById;
     nx::utils::ElapsedTimerPool<QnUuid> m_timerPool;
-    nx::vms::server::analytics::AbstractIFrameSearchHelper* m_iFrameHelper = nullptr;
+    nx::vms::server::analytics::AbstractIFrameSearchHelper* m_iframeHelper = nullptr;
 
     void updateObject(
         const nx::common::metadata::ObjectMetadata& objectMetadata,

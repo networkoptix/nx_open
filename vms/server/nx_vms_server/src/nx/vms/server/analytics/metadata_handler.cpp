@@ -162,6 +162,9 @@ void MetadataHandler::handleObjectMetadataPacket(
     data.durationUs = objectMetadataPacket->durationUs();
     data.deviceId = m_resource->getId();
 
+    // This is not very precise, but is ok, since stream index isn't changed very often.
+    data.streamIndex = m_resource->analyzedStreamIndex(m_engineId);
+
     if (data.timestampUs <= 0)
         NX_WARNING(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUs);
 
@@ -192,6 +195,10 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
     bestShotPacket.durationUs = 0;
     bestShotPacket.deviceId = m_resource->getId();
 
+    // This is not very precise, but is ok, since stream index isn't changed very often.
+    const nx::vms::api::StreamIndex currentStreamIndex = m_resource->analyzedStreamIndex(m_engineId);
+    bestShotPacket.streamIndex = currentStreamIndex;
+
     nx::common::metadata::ObjectMetadata bestShot;
     bestShot.trackId =
         nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(objectTrackBestShotPacket->trackId());
@@ -203,7 +210,15 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
     bestShotPacket.objectMetadataList.push_back(std::move(bestShot));
 
     if (m_metadataSink)
-        m_metadataSink->putData(nx::common::metadata::toCompressedMetadataPacket(bestShotPacket));
+    {
+        QnCompressedMetadataPtr compressedMetadata =
+            nx::common::metadata::toCompressedMetadataPacket(bestShotPacket);
+
+        if (currentStreamIndex == nx::vms::api::StreamIndex::secondary)
+            compressedMetadata->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
+
+        m_metadataSink->putData(compressedMetadata);
+    }
 
     if (nx::analytics::loggingIni().isLoggingEnabled())
         m_metadataLogger.pushObjectMetadata(bestShotPacket);
