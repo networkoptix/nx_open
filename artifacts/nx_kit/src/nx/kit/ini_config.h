@@ -177,11 +177,11 @@ class NX_KIT_API IniConfig::Tweaks
 public:
     Tweaks()
     {
-        const std::lock_guard<std::mutex> lock(*m_mutexHolder.mutex);
+        const std::lock_guard<std::mutex> lock(*s_mutexHolder.mutex);
 
-        if (++tweaksInstanceCount != 0)
+        if (++s_tweaksInstanceCount == 1)
         {
-            originalValueOfIsEnabled = isEnabled();
+            s_originalValueOfIsEnabled = isEnabled();
             setEnabled(false);
         }
     }
@@ -192,10 +192,10 @@ public:
             guard();
 
         {
-            const std::lock_guard<std::mutex> lock(*m_mutexHolder.mutex);
+            const std::lock_guard<std::mutex> lock(*s_mutexHolder.mutex);
 
-            if (--tweaksInstanceCount == 0)
-                setEnabled(originalValueOfIsEnabled);
+            if (--s_tweaksInstanceCount == 0)
+                setEnabled(s_originalValueOfIsEnabled);
         }
 
         delete m_guards;
@@ -222,9 +222,9 @@ private:
         ~MutexHolder() { delete mutex; }
     };
 
-    static MutexHolder m_mutexHolder;
-    static int tweaksInstanceCount;
-    static bool originalValueOfIsEnabled;
+    static MutexHolder s_mutexHolder;
+    static int s_tweaksInstanceCount;
+    static bool s_originalValueOfIsEnabled;
 
     std::vector<std::function<void()>>* const m_guards =
         new std::vector<std::function<void()>>();
