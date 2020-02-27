@@ -573,6 +573,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.analytics.settingsByEngineId = {};
     state.analytics.streamByEngineId = {};
     state.enableMotionDetection = {};
+    state.wearableClientTimeZone = false;
 
     state.deviceType = firstCamera
         ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
@@ -737,6 +738,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state.analytics.enabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
         state.analytics.enabledEngines.resetUser();
+
+        state.wearableClientTimeZone = firstCamera->isWearableClientTimeZone();
     }
 
     fetchFromCameras<bool>(state.recording.enabled, cameras,
@@ -1563,6 +1566,13 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
     settings.values.resetUser();
     settings.loading = data.status != DeviceAgentData::Status::ok;
     return std::make_pair(true, std::move(state));
+}
+
+State CameraSettingsDialogStateReducer::setWearableClientTimeZone(State state, bool value)
+{
+    state.wearableClientTimeZone = value;
+    state.hasChanges = true;
+    return state;
 }
 
 State CameraSettingsDialogStateReducer::setWearableMotionDetectionEnabled(State state, bool value)

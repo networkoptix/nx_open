@@ -205,6 +205,15 @@ void setWearableMotionEnabled(bool value, const Cameras& cameras)
     }
 }
 
+void setWearableClientTimeZoneEnabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+    {
+        if (camera->hasFlags(Qn::wearable_camera))
+            camera->setWearableClientTimeZone(value);
+    }
+}
+
 void setRemoteArchiveMotionDetection(bool value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)
@@ -369,6 +378,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         if (state.wearableMotion.enabled.hasValue())
         {
             setWearableMotionEnabled(state.wearableMotion.enabled(), cameras);
+            setWearableClientTimeZoneEnabled(state.wearableClientTimeZone, cameras);
 
             if (state.wearableMotion.enabled() && state.wearableMotion.sensitivity.hasValue())
                 setWearableMotionSensitivity(state.wearableMotion.sensitivity(), cameras);

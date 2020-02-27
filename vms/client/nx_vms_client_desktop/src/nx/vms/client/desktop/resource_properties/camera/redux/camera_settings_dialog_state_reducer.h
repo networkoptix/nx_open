@@ -81,6 +81,7 @@ public:
     static std::pair<bool, State> resetDeviceAgentData(
         State state, const QnUuid& engineId, const DeviceAgentData& values);
 
+    static State setWearableClientTimeZone(State state, bool value);
     static State setWearableMotionDetectionEnabled(State state, bool value);
     static State setWearableMotionSensitivity(State state, int value);
     static State setCredentials(
