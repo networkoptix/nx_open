@@ -74,5 +74,5 @@ protected:
 
 private:
     Q_DECLARE_PRIVATE(QnScrollableItemsWidget);
-    QnScrollableItemsWidgetPrivate* const d_ptr;
+    QScopedPointer<QnScrollableItemsWidgetPrivate> const d_ptr;
 };
