@@ -256,50 +256,58 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
     connect(action(action::ShowTimeLineOnVideowallAction), &QAction::triggered,
         this, [this] { updateControlsVisibility(false); });
 
-    if (qnSettings->isAutoFpsLimit())
+    connect(qnSettings->notifier(QnClientSettings::AUTO_FPS_LIMIT),
+        &QnPropertyNotifier::valueChanged,
+        this,
+        &WorkbenchUi::updateAutoFpsLimit);
+
+    updateAutoFpsLimit();
+
+    connect(workbench(),
+        &QnWorkbench::currentLayoutItemsChanged,
+        this,
+        &WorkbenchUi::updateAutoFpsLimit);
+}
+
+void WorkbenchUi::updateAutoFpsLimit()
+{
+    static constexpr auto kIdleFps = 15;
+
+    if (!qnSettings->isAutoFpsLimit())
     {
-        static constexpr auto kIdleFps = 15;
-        m_instrumentManager->setFpsLimit(kIdleFps);
-        connect(workbench(), &QnWorkbench::currentLayoutItemsChanged, this,
-            [this]()
-            {
-                int itemsCount = 0;
-
-                // Gather cameras placed on current layout.
-                QnVirtualCameraResourceList cameras;
-                if (auto workbenchLayout = workbench()->currentLayout())
-                {
-                    const auto items = workbenchLayout->items();
-                    itemsCount = items.count();
-                    for (const auto& item: items) 
-                    {
-                        if (const auto camera =
-                                item->resource().dynamicCast<QnVirtualCameraResource>())
-                            cameras.append(camera);
-                    }
-                }
-
-                if (itemsCount == 0) // Empty layout.
-                {
-                    m_instrumentManager->setFpsLimit(kIdleFps);
-                    return;
-                }
-
-                if (itemsCount == cameras.count()) // Layout contains cameras only.
-                {
-                    QPair<int, int> result = Qn::calculateMaxFps(cameras);
-
-                    if (result.second != std::numeric_limits<int>::max())
-                    {
-                        m_instrumentManager->setFpsLimit(result.second);
-                        return;
-                    }
-                }
-
-                // We do not have any info about items fps - do not limit fps.
-                m_instrumentManager->setFpsLimit(0);
-            });
+        m_instrumentManager->setFpsLimit(0);
+        return;
     }
+
+    int itemsCount = 0;
+
+    // Gather cameras placed on current layout.
+    QnVirtualCameraResourceList cameras;
+    if (auto workbenchLayout = workbench()->currentLayout())
+    {
+        cameras = workbenchLayout->itemResources().filtered<QnVirtualCameraResource>();
+        itemsCount = workbenchLayout->items().count();
+    }
+
+    if (itemsCount == 0) // Empty layout.
+    {
+        m_instrumentManager->setFpsLimit(kIdleFps);
+        return;
+    }
+
+    if (itemsCount == cameras.count()) // Layout contains cameras only.
+    {
+        QPair<int, int> result = Qn::calculateMaxFps(cameras);
+
+        if (result.second != std::numeric_limits<int>::max())
+        {
+            m_instrumentManager->setFpsLimit(result.second);
+            return;
+        }
+    }
+
+    // We do not have any info about items fps - do not limit fps.
+    m_instrumentManager->setFpsLimit(0);
 }
 
 WorkbenchUi::~WorkbenchUi()

@@ -54,9 +54,6 @@ public:
         /** Allow client updates. */
         ALLOW_CLIENT_UPDATE,
 
-        /** Automatically limit FPS. */
-        AUTO_FPS_LIMIT,
-
         VARIABLE_COUNT
     };
 
@@ -90,7 +87,6 @@ private:
             MAX_SCENE_ITEMS_OVERRIDE, 0)
         QN_DECLARE_RW_PROPERTY(bool, isClientUpdateAllowed, setClientUpdateAllowed,
             ALLOW_CLIENT_UPDATE, true)
-        QN_DECLARE_RW_PROPERTY(bool, isAutoFpsLimit, setAutoFpsLimit, AUTO_FPS_LIMIT, false)
     QN_END_PROPERTY_STORAGE()
 };
 

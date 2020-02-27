@@ -204,6 +204,8 @@ private:
     void updateCalendarVisibilityAnimated();
     void updateControlsVisibilityAnimated();
 
+    void updateAutoFpsLimit();
+
     void at_freespaceAction_triggered();
     void at_activityStopped();
     void at_activityStarted();
