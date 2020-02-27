@@ -105,8 +105,8 @@ QString toString(const ObjectMetadataPacket& packet)
             packet.timestampUs,
             packet.durationUs,
             packet.deviceId,
-            packet.objectMetadataList.size(),
-            packet.streamIndex);
+            packet.streamIndex,
+            packet.objectMetadataList.size());
 
     for (const auto& object: packet.objectMetadataList)
         s += "    " + toString(object) + "\n";

@@ -283,6 +283,7 @@ protected:
             {
                 auto packet = generateRandomPacket(&m_attributeDictionary);
                 packet->deviceId = deviceId;
+                packet->streamIndex = nx::vms::api::StreamIndex::primary;
                 if (m_allowedTimeRange.second > m_allowedTimeRange.first)
                 {
                     packet->timestampUs = nx::utils::random::number<qint64>(
@@ -392,6 +393,7 @@ protected:
 
         NX_ASSERT(!m_allowedDeviceIds.empty());
         packet->deviceId = nx::utils::random::choice(m_allowedDeviceIds);
+        packet->streamIndex = nx::vms::api::StreamIndex::primary;
 
         m_lastTimestamp = packet->timestampUs;
 
@@ -499,6 +501,7 @@ private:
             {
                 packet.bestShot.timestampUs = packet.firstAppearanceTimeUs;
                 packet.bestShot.rect = firstRect(packet.id);
+                packet.bestShot.streamIndex = nx::vms::api::StreamIndex::primary;
             }
         }
 
