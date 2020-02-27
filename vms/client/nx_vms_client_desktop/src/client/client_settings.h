@@ -266,7 +266,7 @@ private:
         QN_DECLARE_R_PROPERTY(bool,                         allowMtDecoding,                                    ALLOW_MT_DECODING,          true)
 
         // Always force MT decoding if true
-        QN_DECLARE_R_PROPERTY(bool,                         forceMtDecoding,                                    FORCE_MT_DECODING,          true)
+        QN_DECLARE_R_PROPERTY(bool,                         forceMtDecoding,                                    FORCE_MT_DECODING,          false)
 
         QN_DECLARE_R_PROPERTY(bool, saveCredentialsAllowed, SAVE_CREDENTIALS_ALLOWED, true)
     QN_END_PROPERTY_STORAGE()
