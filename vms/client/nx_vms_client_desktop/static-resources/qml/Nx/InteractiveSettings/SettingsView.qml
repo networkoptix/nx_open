@@ -17,6 +17,7 @@ Item
     property Item headerItem: null
 
     property var resourceId
+    property var engineId
 
     function loadModel(model, initialValues)
     {

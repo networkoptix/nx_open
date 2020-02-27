@@ -21,6 +21,7 @@ Item
     property alias pressed: mouseArea.containsPress
 
     property var resourceId
+    property var engineId
     property var resourceThumbnailProvider
     property alias previewRotation: videoPositioner.videoRotation
 
@@ -108,10 +109,13 @@ Item
                 backgroundImage.source = ""
                 updateTimer.stop()
 
-                if (!resourceThumbnailProvider || !resourceId || resourceId.isNull())
+                if (!resourceThumbnailProvider || !resourceId || resourceId.isNull()
+                    || !engineId || engineId.isNull())
+                {
                     return
+                }
 
-                resourceThumbnailProvider.load(resourceId)
+                resourceThumbnailProvider.load(resourceId, engineId)
                 updateTimer.start()
             }
 
