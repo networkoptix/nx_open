@@ -386,7 +386,7 @@
                             {
                                 "level": "error",
                                 "condition": "equal %status Server_Offline",
-                                "text": "is Unavailable: parent Server is Offline"
+                                "text": "is Unavailable: parent server is offline"
                             }
                         ]
                     },
@@ -618,7 +618,7 @@
                             {
                                 "level": "error",
                                 "condition": "equal %status Server_Offline",
-                                "text": "is Inaccessible: parent Server is Offline"
+                                "text": "is Inaccessible: parent server is offline"
                             }
                         ]
                     },
