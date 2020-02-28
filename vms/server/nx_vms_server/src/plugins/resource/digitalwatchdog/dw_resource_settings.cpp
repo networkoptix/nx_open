@@ -26,10 +26,28 @@ DWAbstractCameraProxy::DWAbstractCameraProxy(const QString& host, int port, unsi
     m_auth(auth)
 {}
 
+QList<QString> DWAbstractCameraProxy::maintenanceParameters() const
+{
+    return {};
+}
+
 // --------------- QnWin4NetCameraProxy ------------------
+/*static*/ const QMap<QString, QnWin4NetCameraProxy::MaintenanceParameter>
+    QnWin4NetCameraProxy::m_maitenanceParameters =
+{
+    { "mReboot", {"cgi-bin/system.cgi", "reboot=true"} },
+    { "mSoftReset", { "cgi-bin/system.cgi", "factory=1" } },
+    { "mHardReset", {"cgi-bin/bootparam.cgi", "factory=1"} }
+};
+
 QnWin4NetCameraProxy::QnWin4NetCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
     DWAbstractCameraProxy(host, port, timeout, auth)
 {
+}
+
+QList<QString> QnWin4NetCameraProxy::maintenanceParameters() const
+{
+    return m_maitenanceParameters.keys();
 }
 
 QnCameraAdvancedParamValueList QnWin4NetCameraProxy::fetchParamsFromHttpResponse(const QByteArray& body) const {
@@ -57,10 +75,22 @@ QnCameraAdvancedParamValueList QnWin4NetCameraProxy::fetchParamsFromHttpResponse
     return result;
 }
 
+bool QnWin4NetCameraProxy::executeMaintenanceCommand(const QString& id)
+{
+    const auto parameters = m_maitenanceParameters[id];
+    CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
+    return (httpClient.doPOST(parameters.path, parameters.body) == CL_HTTP_SUCCESS);
+}
+
 bool QnWin4NetCameraProxy::setParams(
     const QVector<QPair<QnCameraAdvancedParameter,
     QString>>& parameters, QnCameraAdvancedParamValueList* result)
 {
+    if (parameters.size() == 1 && parameters[0].second.isEmpty()
+        && m_maitenanceParameters.keys().contains(parameters[0].first.id))
+    {
+        return executeMaintenanceCommand(parameters[0].first.id);
+    }
     QnCameraAdvancedParamValueList tmpList;
     QString postMsgBody;
     for (const auto& data: parameters)

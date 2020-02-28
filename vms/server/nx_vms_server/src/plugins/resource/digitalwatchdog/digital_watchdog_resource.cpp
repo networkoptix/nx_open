@@ -215,6 +215,9 @@ QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() 
     for (const QnCameraAdvancedParamValue& value: m_cameraProxy->getParamsList())
         result.insert(value.id);
 
+    for (const auto& parameter: m_cameraProxy->maintenanceParameters())
+        result.insert(parameter);
+
     return result;
 }
 
