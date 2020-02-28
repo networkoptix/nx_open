@@ -358,6 +358,24 @@ TEST_F(DeviceFileCatalogTest, chunksBefore)
     ASSERT_EQ(referenceDeque, catalog->chunksBefore(cutoffTimepoint, 0));
 }
 
+TEST_F(DeviceFileCatalogTest, chunksAfter)
+{
+    const auto chunks = generateChunks(1000);
+    auto catalog = createCatalog();
+    catalog->addChunks(chunks);
+    const auto cutoffTimepoint = chunks[500].startTimeMs;
+    std::deque<Chunk> referenceDeque;
+    std::copy_if(
+        chunks.cbegin(), chunks.cend(), std::back_inserter(referenceDeque),
+        [cutoffTimepoint](const auto& c)
+        {
+            return c.startTimeMs >= cutoffTimepoint && c.storageIndex == 0;
+        });
+
+    const auto after = catalog->chunksAfter(cutoffTimepoint, 0);
+    ASSERT_EQ(referenceDeque, after);
+}
+
 TEST_F(DeviceFileCatalogTest, chunksBefore_EmptyCatalog)
 {
     auto catalog = createCatalog();

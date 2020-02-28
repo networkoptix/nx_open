@@ -170,6 +170,27 @@ std::deque<Chunk> DeviceFileCatalog::chunksBefore(int64_t timepointMs, int stora
     return result;
 }
 
+std::deque<Chunk> DeviceFileCatalog::chunksAfter(int64_t timepointMs, int storageIndex) const
+{
+    std::deque<Chunk> result;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        for (auto rit = m_chunks.rbegin(); rit != m_chunks.rend(); ++rit)
+        {
+            if (rit->storageIndex != storageIndex)
+                continue;
+
+            if (rit->startTimeMs < timepointMs)
+                break;
+
+            result.push_back(*rit);
+        }
+    }
+
+    std::reverse(result.begin(), result.end());
+    return result;
+}
+
 bool DeviceFileCatalog::addChunk(const Chunk& chunk)
 {
     QnMutexLocker lk( &m_mutex );
