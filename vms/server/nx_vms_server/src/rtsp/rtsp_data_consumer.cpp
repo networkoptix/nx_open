@@ -638,7 +638,7 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
     const auto flushBuffer = nx::utils::makeScopeGuard(
         [this]()
         {
-            if (m_dataQueue.isEmpty() && m_sendBuffer.size() > 0)
+            if (!m_needStop && m_dataQueue.isEmpty() && m_sendBuffer.size() > 0)
             {
                 m_owner->sendBuffer(m_sendBuffer);
                 m_sendBuffer.clear();
@@ -757,7 +757,9 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
             recvRtcpReport(trackInfo->rtcpSocket);
         }
     }
-    sendRangeHeaderIfChanged();
+
+    if (!m_needStop)
+        sendRangeHeaderIfChanged();
 
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
