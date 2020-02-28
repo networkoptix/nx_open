@@ -16,7 +16,7 @@ class Logger;
 class FrameLogger final
 {
 public:
-    FrameLogger();
+    FrameLogger(const std::optional<QString>& frameLogFilename);
     ~FrameLogger();
 
     /**

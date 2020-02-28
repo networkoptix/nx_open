@@ -57,6 +57,7 @@ struct BestShot
 {
     qint64 timestampUs = 0;
     QRectF rect;
+    nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
 
     bool initialized() const { return timestampUs > 0; }
 
@@ -64,7 +65,7 @@ struct BestShot
 };
 
 #define BestShot_analytics_storage_Fields \
-    (timestampUs)(rect)
+    (timestampUs)(rect)(streamIndex)
 
 QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson));
 

@@ -74,7 +74,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     
     if (m_cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
     {
-        // Reopen stream in case the user changes it.
+        // Reopen the stream in case the user changes it.
         Qn::directConnect(
             res.data(), &QnResource::propertyChanged,
             this,

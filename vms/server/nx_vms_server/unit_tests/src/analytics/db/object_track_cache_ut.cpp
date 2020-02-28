@@ -14,8 +14,10 @@ class QnVideoCameraPool;
 
 namespace nx::analytics::db::test {
 
-static const qint64 kUserDefinedBestShotTime = 2;
+static const qint64 kUserDefinedBestShotTime = 5;
 static const qint64 kAutoAlignBestShotTime = 2;
+
+using StreamIndex = nx::vms::api::StreamIndex;
 
 class MocIFrameSearchHelper: public nx::vms::server::analytics::AbstractIFrameSearchHelper
 {
@@ -114,10 +116,12 @@ protected:
         m_objectTrackCache.add(m_analyticsDataPackets.back());
     }
 
-    void givenSequentialAnalyticsData()
+    void givenSequentialAnalyticsData(
+        int packetCount = 100,
+        StreamIndex streamIndex = StreamIndex::primary)
     {
         qint64 timestampUs = 0;
-        for (int i = 0; i < 100; ++i)
+        for (int i = 0; i < packetCount; ++i)
         {
             auto packet = generateRandomPacket(1);
             if (!m_analyticsDataPackets.empty())
@@ -129,15 +133,18 @@ protected:
                     m_analyticsDataPackets.back()->objectMetadataList.front().typeId;
             }
 
+            packet->streamIndex = streamIndex;
             packet->timestampUs = timestampUs++;
             m_analyticsDataPackets.push_back(std::move(packet));
             m_objectTrackCache.add(m_analyticsDataPackets.back());
         }
     }
 
-    void givenUserDefinedBestShot()
+    void givenUserDefinedBestShot(StreamIndex streamIndex = StreamIndex::primary)
     {
         auto packet = generateRandomPacket(1);
+        packet->streamIndex = streamIndex;
+
         if (!m_analyticsDataPackets.empty())
         {
             packet->deviceId = m_analyticsDataPackets.back()->deviceId;
@@ -157,6 +164,29 @@ protected:
     {
         ASSERT_EQ(1, m_objectsToInsert.size());
         ASSERT_EQ(kAutoAlignBestShotTime, m_objectsToInsert[0].bestShot.timestampUs);
+    }
+
+    void thenTrackBestShotStreamIndexEqualToIframeStreamIndex(StreamIndex streamIndexToCheck)
+    {
+        ASSERT_EQ(1, m_objectsToInsert.size());
+
+        const auto objectMetadataPacket = findMetadataPacketCorrespondingToTime(
+            kAutoAlignBestShotTime, /*isBestShot*/ false);
+        ASSERT_TRUE(objectMetadataPacket);
+
+        ASSERT_EQ(objectMetadataPacket->streamIndex, m_objectsToInsert[0].bestShot.streamIndex);
+        ASSERT_EQ(objectMetadataPacket->streamIndex, streamIndexToCheck);
+    }
+
+    void thenTrackBestShotStreamIndexEqualToUserDefinedBestShotStreamIndex()
+    {
+        ASSERT_EQ(1, m_objectsToInsert.size());
+        const auto bestShotMetadataPacket = findMetadataPacketCorrespondingToTime(
+            kUserDefinedBestShotTime, /*isBestShot*/ true);
+
+        ASSERT_TRUE(bestShotMetadataPacket);
+
+        ASSERT_EQ(bestShotMetadataPacket->streamIndex, m_objectsToInsert[0].bestShot.streamIndex);
     }
 
     void thenBestShotMatchToUserDefinedValue()
@@ -250,6 +280,21 @@ private:
         }
 
         return result;
+    }
+
+    nx::common::metadata::ObjectMetadataPacketPtr findMetadataPacketCorrespondingToTime(
+        int timestampUs, bool isBestShot)
+    {
+        for (const auto& metadataPacket: m_analyticsDataPackets)
+        {
+            if (metadataPacket->timestampUs == timestampUs
+                && metadataPacket->containsBestShotMetadata() == isBestShot)
+            {
+                return metadataPacket;
+            }
+        }
+
+        return nullptr;
     }
 };
 
@@ -358,6 +403,69 @@ TEST_F(AnalyticsDbObjectTrackCache, custom_best_shot_time)
     whenFetchObjectsToInsert();
 
     thenBestShotMatchToUserDefinedValue();
+}
+
+TEST_F(AnalyticsDbObjectTrackCache,
+    track_best_shot_stream_index_equal_to_stream_index_of_the_closest_iframe_1)
+{
+    givenSequentialAnalyticsData(10, StreamIndex::primary); //< Ends after I-frame.
+    givenSequentialAnalyticsData(100, StreamIndex::secondary);
+
+    whenWaitForAggregationPeriod();
+    whenFetchObjectsToInsert();
+
+    thenBestShotAlignedToIFrame();
+    thenTrackBestShotStreamIndexEqualToIframeStreamIndex(StreamIndex::primary);
+}
+
+TEST_F(AnalyticsDbObjectTrackCache,
+    track_best_shot_stream_index_equal_to_stream_index_of_the_closest_iframe_2)
+{
+    givenSequentialAnalyticsData(1, StreamIndex::primary); //< Ends before I-frame.
+    givenSequentialAnalyticsData(100, StreamIndex::secondary);
+
+    whenWaitForAggregationPeriod();
+    whenFetchObjectsToInsert();
+
+    thenBestShotAlignedToIFrame();
+    thenTrackBestShotStreamIndexEqualToIframeStreamIndex(StreamIndex::secondary);
+}
+
+TEST_F(AnalyticsDbObjectTrackCache,
+    track_best_shot_stream_index_equal_stream_index_of_explicit_best_shot_packet_1)
+{
+    givenUserDefinedBestShot(StreamIndex::primary);
+    givenSequentialAnalyticsData(100, StreamIndex::secondary);
+
+    whenWaitForAggregationPeriod();
+    whenFetchObjectsToInsert();
+
+    thenTrackBestShotStreamIndexEqualToUserDefinedBestShotStreamIndex();
+}
+
+TEST_F(AnalyticsDbObjectTrackCache,
+    track_best_shot_stream_index_equal_stream_index_of_explicit_best_shot_packet_2)
+{
+    givenSequentialAnalyticsData(100, StreamIndex::primary);
+    givenUserDefinedBestShot(StreamIndex::secondary);
+    givenSequentialAnalyticsData(100, StreamIndex::primary);
+
+    whenWaitForAggregationPeriod();
+    whenFetchObjectsToInsert();
+
+    thenTrackBestShotStreamIndexEqualToUserDefinedBestShotStreamIndex();
+}
+
+TEST_F(AnalyticsDbObjectTrackCache,
+    track_best_shot_stream_index_equal_stream_index_of_explicit_best_shot_packet_3)
+{
+    givenSequentialAnalyticsData(100, StreamIndex::primary);
+    givenUserDefinedBestShot(StreamIndex::secondary);
+
+    whenWaitForAggregationPeriod();
+    whenFetchObjectsToInsert();
+
+    thenTrackBestShotStreamIndexEqualToUserDefinedBestShotStreamIndex();
 }
 
 } // namespace nx::analytics::db::test

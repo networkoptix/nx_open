@@ -46,6 +46,7 @@ LabeledItem
                 figureType: control.figureType
 
                 resourceId: settingsView.resourceId
+                engineId: settingsView.engineId
 
                 resourceThumbnailProvider: (typeof thumbnailProvider !== "undefined")
                     ? thumbnailProvider

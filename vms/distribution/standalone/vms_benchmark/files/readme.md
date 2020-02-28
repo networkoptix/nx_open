@@ -16,7 +16,7 @@ streams from virtual cameras, and creates a detailed report about potential perf
 The tool can run on either Linux or Windows PC called "Host" here, and can connect to any other
 device (it may be ARM or x64) with Linux called "Box" here.
 
-The following prerequisites should be assured before running the tool:
+The following prerequisites must be assured before running the tool:
 
 * Host PC hardware: A physical PC with at least Core i5 quad-core or equivalent, 8 GB RAM, 1 GB
     free disk space.
@@ -24,23 +24,31 @@ The following prerequisites should be assured before running the tool:
     * The tool may work with other OS versions, but it is not officially supported.
     * On Windows, running VMS Benchmark from a Cygwin shell may or may not work, and is not
         officially supported.
-* Host PC should not run any other software at the time of running VMS Benchmark, besides built-in
-    OS components. Such software may or may not interfere with VMS Benchmark and may or may not
+* Host PC must not run any other software at the time of running VMS Benchmark, besides built-in
+    OS components, and all OS background activities like auto-updating, search indexing, antivirus
+    and other scheduled tasks like storage optimization must be turned off. Also, in case an SSD
+    storage is used on the Host, it must not be too worn-out or have less than 10% free space,
+    because otherwise an SSD may introduce system-wide freezes for fractions of a second which is
+    long enough compared to the video stream frame rate.
+    Such software/activities may or may not interfere with VMS Benchmark and may or may not
     affect its ability to run or the accuracy of its report.
-* Linux Host: `ssh` and `sshpass` tools should be installed on the Host.
-* Windows Host: Firewall should be disabled completely to enable spawning virtual cameras in the
+* Both the Host and the Box should have the system clock set to the same date/time and time zone.
+    Network time synchronization (e.g. via NTP protocol) or other means of automatically adjusting
+    the system date/time must be disabled on both the Host and the Box - otherwise the tool may
+    falsely report issues like frame drops and stream lags.
+* Linux Host: `ssh` and `sshpass` tools must be installed on the Host.
+* Windows Host: Firewall must be disabled completely to enable spawning virtual cameras in the
     isolated network.
-* VMS Server should be installed on the Box and VMS System should be set up via the Setup Wizard
+* VMS Server must be installed on the Box and VMS System must be set up via the Setup Wizard
     in the Server web-admin.
     * No other manipulations with the installed VMS Server should be performed before running the
         tool, including adding cameras and changing the Server setting from the Client - such
         activities may influence the Server state and thus lead to an incorrect report.
-* No more than one VMS should be installed on the Box.
-* If the Box Linux user is not root, it should be in sudoers and `sudo` should not ask for
-    password.
-* The Box should be connected to an isolated network together with the host, and this network
-    should have the full bandwidth that the Box is planned to work with, e.g. 100 Mbps or 1 Gbps.
-    There should be no cameras in this network, but it may be connected to the internet.
+* No more than one VMS must be installed on the Box.
+* If the Box Linux user is not root, it must be in sudoers and `sudo` must not ask for password.
+* The Box must be connected to an isolated network together with the host, and this network
+    must have the full bandwidth that the Box is planned to work with, e.g. 100 Mbps or 1 Gbps.
+    There must be no cameras in this network, but it may be connected to the internet.
 
 If there is a need to contact the Support Team regarding an issue with the VMS Benchmark tool
 itself, make sure that all the above listed prerequisites are fulfilled.
@@ -54,7 +62,7 @@ tool's zip file can be found among VMS distribution files for the respective pla
 Linux x64).
 
 All configuration options for the tool are supplied via a configuration file - a name-value text
-file called `vms_benchmark.conf` which should reside next to the tool's executable. Each option has
+file called `vms_benchmark.conf` which must reside next to the tool's executable. Each option has
 a detailed comment in this file.
 
 The tool has a few command-line options which do not influence the test procedure but allow to

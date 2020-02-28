@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <nx/network/aio/timer.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <nx/vms/server/nvr/i_buzzer_manager.h>
 

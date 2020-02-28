@@ -60,7 +60,7 @@ void MediaStreamStatistics::onData(
     removeRange(toIterator(timestamp + m_windowSize), m_data.end());
     if (!m_data.empty())
         removeRange(m_data.begin(), toIterator(m_data.back().timestamp - m_windowSize));
-    const int extraFrames = m_data.size() - m_maxDurationInFrames;
+    const int extraFrames = (int) m_data.size() - m_maxDurationInFrames;
     if (extraFrames > 0 && m_maxDurationInFrames > 0)
         removeRange(m_data.begin(), m_data.begin() + extraFrames);
     m_lastDataTimer = steady_clock::now();

@@ -14,7 +14,7 @@ class QnPlatformAbstraction: public QnCorePlatformAbstraction
     typedef QnCorePlatformAbstraction base_type;
 
 public:
-    QnPlatformAbstraction(QnMediaServerModule* serverModule, nx::utils::TimerManager* timerManager);
+    QnPlatformAbstraction(nx::utils::TimerManager* timerManager);
     nx::vms::server::PlatformMonitor *monitor() const { return m_monitor.get(); }
     void setCustomMonitor(std::unique_ptr<nx::vms::server::PlatformMonitor> monitor);
 private:

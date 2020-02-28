@@ -23,7 +23,7 @@ void QnPlatformAbstraction::setCustomMonitor(std::unique_ptr<nx::vms::server::Pl
     m_monitor = std::move(monitor);
 }
 
-QnPlatformAbstraction::QnPlatformAbstraction(QnMediaServerModule* serverModule, nx::utils::TimerManager* timerManager):
+QnPlatformAbstraction::QnPlatformAbstraction(nx::utils::TimerManager* timerManager):
     base_type()
 {
     if (!qApp)
@@ -32,8 +32,5 @@ QnPlatformAbstraction::QnPlatformAbstraction(QnMediaServerModule* serverModule, 
     m_monitor.reset(new nx::vms::server::GlobalMonitor(
         std::make_unique<QnMonitorImpl>(), timerManager));
 
-    #if defined(Q_OS_LINUX)
-        m_monitor->setPartitionInformationProvider(
-            std::make_unique<nx::vms::server::fs::PartitionsInformationProvider>(serverModule));
-    #endif
+
 }

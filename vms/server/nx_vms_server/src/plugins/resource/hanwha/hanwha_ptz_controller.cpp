@@ -167,7 +167,10 @@ bool HanwhaPtzController::absoluteMove(
     if (space != Qn::DevicePtzCoordinateSpace)
         return false;
 
-    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
+    HanwhaRequestHelper helper(
+        m_hanwhaResource->sharedContext(),
+        m_hanwhaResource->bypassChannel());
+
     const auto hanwhaPosition = toHanwhaPosition(position);
 
     const auto response = helper.control(
@@ -229,7 +232,10 @@ bool HanwhaPtzController::viewportMove(
         return false;
     }
 
-    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
+    HanwhaRequestHelper helper(
+        m_hanwhaResource->sharedContext(),
+        m_hanwhaResource->bypassChannel());
+
     const auto response = helper.control(
         lit("ptzcontrol/areazoom"),
         makeViewPortParameters(aspectRatio, viewport));

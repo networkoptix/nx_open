@@ -130,7 +130,8 @@ bool ObjectRegion::operator==(const ObjectRegion& right) const
 bool BestShot::operator==(const BestShot& right) const
 {
     return timestampUs == right.timestampUs
-        && equalWithPrecision(rect, right.rect, kCoordinateDecimalDigits);
+        && equalWithPrecision(rect, right.rect, kCoordinateDecimalDigits)
+        && streamIndex == right.streamIndex;
 }
 
 
@@ -331,7 +332,7 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
     params->insert(lit("sortOrder"), QnLexical::serialized(filter.sortOrder));
 }
 
-bool deserializeFromParams(const QnRequestParamList& params, Filter* filter, 
+bool deserializeFromParams(const QnRequestParamList& params, Filter* filter,
     QnResourcePool* resourcePool)
 {
     const auto kLogTag = nx::utils::log::Tag(std::string("nx::analytics::db::Filter"));

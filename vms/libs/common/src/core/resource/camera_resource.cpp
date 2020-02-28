@@ -83,7 +83,7 @@ const QString QnVirtualCameraResource::kDeviceAgentManifestsProperty(
 
 const QString QnVirtualCameraResource::kAnalyzedStreamIndexes(
     "analyzedStreamIndexes");
-
+	
 const QString QnVirtualCameraResource::kWearableClientTimeZone(
     "wearableClientTimeZone");
 

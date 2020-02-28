@@ -47,7 +47,7 @@ std::string Engine::manifestString() const
     //
     // Note that this format is used internally by the Server, therefore requires minimum
     // resources for decoding, thus it is the recommended format.
-    return /*suppress newline*/ 1 + R"json(
+    return /*suppress newline*/ 1 + (const char*) R"json(
 {
     "capabilities": "needUncompressedVideoFrames_yuv420"
 }

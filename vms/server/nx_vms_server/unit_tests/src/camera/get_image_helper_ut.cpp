@@ -150,9 +150,6 @@ TEST(GetImageHelper, determineStreamIndex)
     EXPECT_EQ(StreamIndex::primary, helper.determineStreamIndex(request));
     request.streamSelectionMode = StreamSelectionMode::forcedSecondary;
     EXPECT_EQ(StreamIndex::secondary, helper.determineStreamIndex(request));
-    request.streamSelectionMode = StreamSelectionMode::sameAsAnalytics;
-    EXPECT_EQ(ini().analyzeSecondaryStream ? StreamIndex::secondary : StreamIndex::primary,
-        helper.determineStreamIndex(request));
     request.streamSelectionMode = StreamSelectionMode::sameAsMotion;
     EXPECT_EQ(request.camera->motionStreamIndex().index, helper.determineStreamIndex(request));
 
@@ -163,9 +160,6 @@ TEST(GetImageHelper, determineStreamIndex)
     EXPECT_EQ(StreamIndex::primary, helper.determineStreamIndex(request));
     request.streamSelectionMode = StreamSelectionMode::forcedSecondary;
     EXPECT_EQ(StreamIndex::secondary, helper.determineStreamIndex(request));
-    request.streamSelectionMode = StreamSelectionMode::sameAsAnalytics;
-    EXPECT_EQ(ini().analyzeSecondaryStream ? StreamIndex::secondary : StreamIndex::primary,
-        helper.determineStreamIndex(request));
     request.streamSelectionMode = StreamSelectionMode::sameAsMotion;
     EXPECT_EQ(request.camera->motionStreamIndex().index, helper.determineStreamIndex(request));
 

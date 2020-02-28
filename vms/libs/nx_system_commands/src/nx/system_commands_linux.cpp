@@ -28,9 +28,11 @@
 #include <sys/types.h>
 #include <sys/un.h>
 #include <sys/wait.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/resource.h>
 #include <unistd.h>
-#include <sys/mount.h>
 #include <errno.h>
 
 #include <nx/kit/debug.h>
@@ -252,23 +254,101 @@ SystemCommands::MountCode SystemCommands::mount(
     optionStream << "pass=" << (pass ? *pass : "") << ",";
     optionStream << "vers=";
     const auto options = optionStream.str();
-    for (const auto& v: versions)
+
+    const char* hostStart = url.c_str();
+    const char* hostEnd = nullptr;
+
+    while (*hostStart && *hostStart == '/')
+        ++hostStart;
+
+    hostEnd = hostStart;
+    while (*hostEnd && *hostEnd != '/')
+        ++hostEnd;
+
+    if (hostEnd - hostStart == 0)
     {
-        if (::mount(url.c_str(), localPath.c_str(), "cifs", 0, (options + v).c_str()) == 0)
+        NX_OUTPUT << "Mount failed: empty host";
+        return SystemCommands::MountCode::otherError;
+    }
+
+    char host[256];
+    memset(host, 0, sizeof(host));
+    strncpy(host, hostStart, std::min<size_t>(sizeof(host) - 1, hostEnd - hostStart));
+    addrinfo hints;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = 0;
+    hints.ai_flags = AI_NUMERICSERV | AI_V4MAPPED | AI_ADDRCONFIG | AI_ALL;
+
+    addrinfo* resolved = nullptr;
+    if (int code = getaddrinfo(host, nullptr, &hints, &resolved); code != 0)
+    {
+        NX_OUTPUT <<"Mount: getaddrinfo failed. code: " << code << ", errno: " << errno;
+        return SystemCommands::MountCode::otherError;
+    }
+    const auto onExit = ScopeGuard([resolved](){ freeaddrinfo(resolved); });
+    for (const addrinfo* presolved = resolved; presolved; presolved = presolved->ai_next)
+    {
+        const void* inaddrp = nullptr;;
+        switch (presolved->ai_family)
         {
-            NX_OUTPUT << "Mount '" << url << "' to '" << localPath << "' succeeded";
-            return SystemCommands::MountCode::ok;
+            case AF_INET:
+                inaddrp = &((sockaddr_in*)presolved->ai_addr)->sin_addr;
+                break;
+            case AF_INET6:
+                inaddrp = &((sockaddr_in6*)presolved->ai_addr)->sin6_addr;
+                break;
+            default:
+                inaddrp = NULL;
         }
 
-        NX_OUTPUT << "Mount '" << url << "' to '" << localPath << "' failed. Errno: " << errno;
-        if (errno == EACCES
-            || errno == ENOKEY
-            || errno == EKEYEXPIRED
-            || errno == EKEYREVOKED
-            || errno == EKEYREJECTED)
+        if (!inaddrp)
         {
-            return SystemCommands::MountCode::wrongCredentials;
+            NX_OUTPUT << "Mount: unexpected family: " << presolved->ai_family;
+            continue;
         }
+
+        memset(host, 0, sizeof(host));
+        if (!inet_ntop(presolved->ai_family, inaddrp, host, sizeof(host)))
+        {
+            NX_OUTPUT << "Mount: inet_ntop failed. errno: " << errno;
+            continue;
+        }
+
+        char resultUrl[2048];
+        if (url.size() - (hostEnd - hostStart) + strlen(host) + 1 > sizeof(resultUrl))
+        {
+            NX_OUTPUT << "Mount: output url buffer is not large enough";
+            return SystemCommands::MountCode::otherError;
+        }
+
+        memset(resultUrl, 0, sizeof(resultUrl));
+        memcpy(resultUrl, "//", 2);
+        strcat(resultUrl, host);
+        strcat(resultUrl, hostEnd);
+
+        for (const auto& v: versions)
+        {
+            if (::mount(resultUrl, localPath.c_str(), "cifs", 0, (options + v).c_str()) == 0)
+            {
+                NX_OUTPUT << "Mount '" << url << "' to '" << localPath << "' succeeded";
+                return SystemCommands::MountCode::ok;
+            }
+
+            NX_OUTPUT << "Mount '" << url << "' to '" << localPath << "' failed. Errno: " << errno;
+            if (errno == EACCES
+                || errno == ENOKEY
+                || errno == EKEYEXPIRED
+                || errno == EKEYREVOKED
+                || errno == EKEYREJECTED)
+            {
+                return SystemCommands::MountCode::wrongCredentials;
+            }
+        }
+
+        NX_OUTPUT << "Mount failed. errno: %d" << errno;
+        continue;
     }
 
     return SystemCommands::MountCode::otherError;

@@ -1,15 +1,17 @@
 #pragma once
 
 #include <nx/vms/server/fs/partitions/abstract_partitions_information_provider_linux.h>
-#include <media_server/media_server_module.h>
-#include <nx/vms/server/root_fs.h>
+#include <nx/utils/thread/mutex.h>
+
+class QnGlobalSettings;
+namespace nx::vms::server { class RootFileSystem; }
 
 namespace  nx::vms::server::fs {
 
 class PartitionsInformationProvider: public AbstractPartitionsInformationProvider
 {
   public:
-    PartitionsInformationProvider(QnMediaServerModule* serverModule);
+    PartitionsInformationProvider(QnGlobalSettings* globalSettings, RootFileSystem* rootFs);
 
     virtual QByteArray mountsFileContents() const override;
     virtual qint64 totalSpace(const QByteArray& fsPath) const override;
@@ -25,7 +27,7 @@ class PartitionsInformationProvider: public AbstractPartitionsInformationProvide
         qint64 totalSpace = kUnknownValue;
     };
 
-    QnMediaServerModule* m_serverModule = nullptr;
+    QnGlobalSettings* m_globalSettings = nullptr;
     nx::vms::server::RootFileSystem* m_rootFs = nullptr;
     mutable QMap<QString, DeviceSpaces> m_deviceSpacesCache;
     mutable QnMutex m_mutex;

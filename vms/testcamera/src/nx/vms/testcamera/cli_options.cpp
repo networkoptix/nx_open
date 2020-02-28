@@ -21,7 +21,7 @@ void showHelp(const char* exeName)
 
     const std::string baseExeName = QFileInfo(exeName).baseName().toStdString();
 
-    std::cout << /*suppress newline*/1 + R"help(
+    std::cout << /*suppress newline*/ 1 + (const char*) R"help(
 Usage:
  )help" + baseExeName + R"help( [<option> | <cameraSet>]...
 
@@ -99,6 +99,8 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
      Allow multiple testcamera processes on a single host with the same discovery port. To be able
      to work properly with this option, each testcamera needs to have its own --local-interface,
      --mac-address-prefix and --media-port.
+ --frame-log[=]<filename>
+     Log each video frame being sent to the specified file.
 
 Example:
  )help" + baseExeName + R"help( files=c:/test.264;count=20
@@ -340,6 +342,11 @@ static QString optionsToJsonString(const CliOptions& options)
     result += "    \"discoveryPort\": " + optionalIntToJson(options.discoveryPort) + ",\n";
     result += "    \"mediaPort\": " + optionalIntToJson(options.mediaPort) + ",\n";
     result += "    \"reuseDiscoveryPort\": " + boolToJson(options.reuseDiscoveryPort) + ",\n";
+    result += "    \"frameLogFilename\": " +
+        (options.frameLogFilename
+            ? QString::fromLatin1(nx::kit::utils::toString(*options.frameLogFilename).c_str())
+            : "null"
+        ) + ",\n";
 
     result += "    \"cameraSets\":\n";
     result += "    [\n";
@@ -524,6 +531,8 @@ static void parseOption(
         options->mediaPort = v;
     else if (const auto v = parseFlag(argv, argp, "--reuse-discovery-port"))
         options->reuseDiscoveryPort = *v;
+    else if (const auto v = parse(argv, argp, nonEmptyStringArg, "--frame-log"))
+        options->frameLogFilename = *v;
     else if (arg.startsWith("-"))
         throw InvalidArgs("Unknown arg " + enquoteAndEscape(arg) + ".");
     else
@@ -596,6 +605,24 @@ static void validateOptions(const CliOptions& options)
         validateCameraSet(cameraSet, options);
 }
 
+static void printArgsAndOptionsIfNeeded(
+    int argc, const char* const argv[], const CliOptions* options)
+{
+    if (!ini().printOptions)
+        return;
+
+    std::cerr << std::string() //< allow `+`
+        + "Command-line args:\n"
+        + "argv[0]: " + nx::kit::utils::toString(argv[0]) + "\n"
+        + "{\n";
+    for (int i = 0; i < argc; ++i)
+        std::cerr << std::string(4, ' ') + nx::kit::utils::toString(argv[i]) + "\n";
+    std::cerr << "}\n\n";
+
+    std::cerr << lm("Options parsed from command-line args:\n%1\n\n").args(
+        optionsToJsonString(*options)).toStdString();
+}
+
 } // namespace
 
 bool parseCliOptions(int argc, const char* const argv[], CliOptions* options)
@@ -629,11 +656,7 @@ bool parseCliOptions(int argc, const char* const argv[], CliOptions* options)
             options->fpsSecondary = fps;
         }
 
-        if (ini().printOptions)
-        {
-            std::cerr << lm("Options parsed from command-line args:\n%1\n\n").args(
-                optionsToJsonString(*options)).toStdString();
-        }
+        printArgsAndOptionsIfNeeded(argc, argv, options);
 
         validateOptions(*options);
 

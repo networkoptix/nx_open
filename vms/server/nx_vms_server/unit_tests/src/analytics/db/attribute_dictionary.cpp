@@ -111,7 +111,7 @@ static std::vector<common::metadata::Attribute> getUniqueAttributes(
 }
 
 common::metadata::ObjectMetadataPacketPtr generateRandomPacket(
-    int eventCount,
+    int objectCount,
     const AttributeDictionary* attributeDictionary)
 {
     const int minAttributeCount = 0;
@@ -122,7 +122,7 @@ common::metadata::ObjectMetadataPacketPtr generateRandomPacket(
     packet->timestampUs = (nx::utils::random::number<qint64>() / 1000) * 1000;
     packet->durationUs = nx::utils::random::number<qint64>(0, 30) * 1000;
 
-    for (int i = 0; i < eventCount; ++i)
+    for (int i = 0; i < objectCount; ++i)
     {
         common::metadata::ObjectMetadata objectMetadata;
         objectMetadata.typeId = QnUuid::createUuid().toString();

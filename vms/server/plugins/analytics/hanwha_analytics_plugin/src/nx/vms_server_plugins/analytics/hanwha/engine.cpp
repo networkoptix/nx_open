@@ -350,7 +350,7 @@ std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> Engine::share
 
 namespace {
 
-static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
+static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.hanwha",
     "name": "Hanwha analytics plugin",

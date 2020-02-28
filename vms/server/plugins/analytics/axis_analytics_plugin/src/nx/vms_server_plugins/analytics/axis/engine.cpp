@@ -135,7 +135,7 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 namespace {
 
-static const std::string kPluginManifest = /*suppress newline*/ 1 + R"json(
+static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.axis",
     "name": "Axis analytics plugin",

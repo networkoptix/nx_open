@@ -72,7 +72,10 @@ private:
         const QnUuid& objectTrackId,
         bool needFullTrack);
 
-    CLVideoDecoderOutputPtr imageByTimestamp(const QnUuid& deviceId, const int64_t timestampUs);
+    CLVideoDecoderOutputPtr imageByTimestamp(
+        const QnUuid& deviceId,
+        const int64_t timestampUs,
+        nx::vms::api::StreamIndex streamIndex);
 
     std::optional<nx::analytics::db::LookupResult> makeDatabaseRequest(
         const nx::analytics::db::Filter& filter);

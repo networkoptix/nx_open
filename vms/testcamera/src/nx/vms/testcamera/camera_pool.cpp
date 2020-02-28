@@ -24,7 +24,8 @@ CameraPool::CameraPool(
     QnCommonModule* commonModule,
     bool noSecondaryStream,
     std::optional<int> fpsPrimary,
-    std::optional<int> fpsSecondary)
+    std::optional<int> fpsSecondary,
+    const std::optional<QString>& frameLogFilename)
     :
     QnTcpListener(
         commonModule,
@@ -34,7 +35,7 @@ CameraPool::CameraPool(
     m_fileCache(fileCache),
     m_networkOptions(std::move(networkOptions)),
     m_logger(new Logger("CameraPool")),
-    m_frameLogger(new FrameLogger()),
+    m_frameLogger(new FrameLogger(frameLogFilename)),
     m_noSecondaryStream(noSecondaryStream),
     m_fpsPrimary(fpsPrimary),
     m_fpsSecondary(fpsSecondary)
@@ -233,11 +234,11 @@ bool CameraPool::startDiscovery()
     if (!m_discoveryListener->initialize())
         return false;
 
-    // If any thread finishes (e.g. due to an error), testcamera must exit.
+    // If any thread finishes (happens only due to an error), testcamera must exit.
     connect(m_discoveryListener.get(), &CameraDiscoveryListener::finished,
-        QCoreApplication::instance(), &QCoreApplication::quit);
+        QCoreApplication::instance(), []() { QCoreApplication::exit(1); });
     connect(this, &CameraPool::finished,
-        QCoreApplication::instance(), &QCoreApplication::quit);
+        QCoreApplication::instance(), []() { QCoreApplication::exit(1); });
 
     m_discoveryListener->start();
 

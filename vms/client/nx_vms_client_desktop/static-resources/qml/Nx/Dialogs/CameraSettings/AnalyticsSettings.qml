@@ -93,6 +93,8 @@ Item
 
                 currentSettingsModel = store.deviceAgentSettingsModel(engineInfo.id)
                 var actualValues = store.deviceAgentSettingsValues(engineInfo.id)
+
+                settingsView.engineId = currentEngineId
                 settingsView.loadModel(currentSettingsModel, actualValues)
             }
             else

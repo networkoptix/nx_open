@@ -32,7 +32,7 @@ QPixmap LiveThumbnailProvider::pixmap(const QString& thumbnailId) const
     return m_pixmapById.value(thumbnailId);
 }
 
-void LiveThumbnailProvider::refresh(const QnUuid& cameraId)
+void LiveThumbnailProvider::refresh(const QnUuid& cameraId, const QnUuid& engineId)
 {
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
     if (!camera)
@@ -48,7 +48,7 @@ void LiveThumbnailProvider::refresh(const QnUuid& cameraId)
         return;
 
     const auto handleReply =
-        [this, cameraId](
+        [this, cameraId, engineId](
             bool success,
             rest::Handle requestId,
             QByteArray imageData,
@@ -70,7 +70,7 @@ void LiveThumbnailProvider::refresh(const QnUuid& cameraId)
                 if (pixmap.isNull())
                     return;
 
-                thumbnailId = cameraId.toSimpleString();
+                thumbnailId = cameraId.toSimpleString() + "_" + engineId.toSimpleString();
                 m_pixmapById[thumbnailId] = pixmap;
             }
 
@@ -80,35 +80,38 @@ void LiveThumbnailProvider::refresh(const QnUuid& cameraId)
 
     nx::api::CameraImageRequest request;
     request.camera = camera;
-    request.streamSelectionMode =
-        nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics;
+
+    const nx::vms::api::StreamIndex analyzedStreamIndex = camera->analyzedStreamIndex(engineId);
+    request.streamSelectionMode = analyzedStreamIndex == nx::vms::api::StreamIndex::primary
+        ? nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary
+        : nx::api::CameraImageRequest::StreamSelectionMode::forcedSecondary;
+
     request.size.setHeight(m_thumbnailHeight);
     request.rotation = m_rotation;
 
     const auto requestId = server->restConnection()->cameraThumbnailAsync(
         request, nx::utils::guarded(this, handleReply), m_decompressionThread);
-
     if (requestId != rest::Handle())
         m_requestByCameraId[cameraId] = requestId;
 }
 
-void LiveThumbnailProvider::refresh(const QString& cameraId)
+void LiveThumbnailProvider::refresh(const QString& cameraId, const QString& engineId)
 {
-    refresh(QnUuid::fromStringSafe(cameraId));
+    refresh(QnUuid::fromStringSafe(cameraId), QnUuid::fromStringSafe(engineId));
 }
 
-void LiveThumbnailProvider::load(const QnUuid& cameraId)
+void LiveThumbnailProvider::load(const QnUuid& cameraId, const QnUuid& engineId)
 {
-    const auto thumbnailId = cameraId.toSimpleString();
+    const auto thumbnailId = cameraId.toSimpleString() + "_" + engineId.toSimpleString();
     if (const bool loaded = !pixmap(thumbnailId).isNull())
         emit thumbnailUpdated(cameraId, makeUrl(thumbnailId));
     else
-        refresh(cameraId);
+        refresh(cameraId, engineId);
 }
 
-void LiveThumbnailProvider::load(const QString& cameraId)
+void LiveThumbnailProvider::load(const QString& cameraId, const QString& engineId)
 {
-    load(QnUuid::fromStringSafe(cameraId));
+    load(QnUuid::fromStringSafe(cameraId), QnUuid::fromStringSafe(engineId));
 }
 
 void LiveThumbnailProvider::setThumbnailsHeight(int height)

@@ -198,6 +198,8 @@ void CameraAdvancedParamWidgetsManager::updateParametersVisibility(ParameterVisi
 
     for (int i = m_groupWidget->topLevelItemCount() - 1; i >= 0; --i)
         updateItemVisibility(m_groupWidget->topLevelItem(i), updateItemVisibility);
+
+    runAllHandlerChains();
 }
 
 bool CameraAdvancedParamWidgetsManager::hasItemsAvailableInOffline() const

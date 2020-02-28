@@ -54,6 +54,19 @@ namespace {
 
 static const QString kBypassPrefix("Bypass");
 
+static Ptz::Capabilities mergeCapabilities(
+    Ptz::Capabilities directPtzCapabilities,
+    Ptz::Capabilities bypassPtzCapabilities)
+{
+    static const Ptz::Capabilities absoluteMovementCapabilities =
+        Ptz::Capability::AbsolutePanCapability
+        | Ptz::Capability::AbsoluteTiltCapability
+        | Ptz::Capability::AbsoluteZoomCapability
+        | Ptz::Capability::ViewportPtzCapability;
+
+    return directPtzCapabilities | (bypassPtzCapabilities & absoluteMovementCapabilities);
+}
+
 enum class PtzOperation
 {
     add,
@@ -1447,8 +1460,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         NX_VERBOSE(this, "Supported PTZ capabilities bypass: %1",
             ptzCapabilityBits(bypassPtzCapabilities));
 
-        // We consider capability is true if it's supported both by a NVR and a camera.
-        capabilities &= bypassPtzCapabilities;
+        capabilities = mergeCapabilities(capabilities, bypassPtzCapabilities);
         NX_VERBOSE(this, "Supported PTZ capabilities both: %1", ptzCapabilityBits(capabilities));
     }
 

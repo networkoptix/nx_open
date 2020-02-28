@@ -158,8 +158,11 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
 
-    if (role != Qn::ConnectionRole::CR_LiveVideo && role != Qn::ConnectionRole::CR_SecondaryLiveVideo)
+    if (role != Qn::ConnectionRole::CR_LiveVideo
+        && role != Qn::ConnectionRole::CR_SecondaryLiveVideo)
+    {
         return;
+    }
 
     updateSoftwareMotion();
 

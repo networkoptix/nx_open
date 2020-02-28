@@ -144,7 +144,7 @@ protected:
         ASSERT_EQ(expected, m_prevLookupResult->tracksFound);
     }
 
-    std::vector<ObjectTrackEx> toObjectTrack(
+    std::vector<ObjectTrackEx> toObjectTracks(
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& objectMetadataPackets) const
     {
         std::vector<ObjectTrackEx> objectTracks;
@@ -283,6 +283,7 @@ protected:
             {
                 auto packet = generateRandomPacket(&m_attributeDictionary);
                 packet->deviceId = deviceId;
+                packet->streamIndex = nx::vms::api::StreamIndex::primary;
                 if (m_allowedTimeRange.second > m_allowedTimeRange.first)
                 {
                     packet->timestampUs = nx::utils::random::number<qint64>(
@@ -392,6 +393,7 @@ protected:
 
         NX_ASSERT(!m_allowedDeviceIds.empty());
         packet->deviceId = nx::utils::random::choice(m_allowedDeviceIds);
+        packet->streamIndex = nx::vms::api::StreamIndex::primary;
 
         m_lastTimestamp = packet->timestampUs;
 
@@ -488,10 +490,10 @@ private:
                 return QRectF();
             };
 
-        auto objectMetadataPackets = toObjectTrack(packets);
-        objectMetadataPackets = filterObjectTracksAndApplySortOrder(
-            filter, std::move(objectMetadataPackets));
-        for (auto& packet : objectMetadataPackets)
+        auto objectTracks = toObjectTracks(packets);
+        objectTracks = filterObjectTracksAndApplySortOrder(
+            filter, std::move(objectTracks));
+        for (auto& packet : objectTracks)
         {
             packet.firstAppearanceTimeUs -= packet.firstAppearanceTimeUs % 1000;
             packet.lastAppearanceTimeUs -= packet.lastAppearanceTimeUs % 1000;
@@ -499,11 +501,12 @@ private:
             {
                 packet.bestShot.timestampUs = packet.firstAppearanceTimeUs;
                 packet.bestShot.rect = firstRect(packet.id);
+                packet.bestShot.streamIndex = nx::vms::api::StreamIndex::primary;
             }
         }
 
         std::vector<nx::analytics::db::ObjectTrack> result;
-        for (const auto& value: objectMetadataPackets)
+        for (const auto& value: objectTracks)
             result.push_back(nx::analytics::db::ObjectTrack(value));
         return result;
     }
@@ -601,6 +604,7 @@ private:
                 {
                     track.bestShot.timestampUs = packet->timestampUs;
                     track.bestShot.rect = objectMetadata.boundingBox;
+                    track.bestShot.streamIndex = packet->streamIndex;
                 }
 
                 tracks->push_back(std::move(track));
@@ -833,7 +837,7 @@ protected:
     void addMaxObjectTracksLimitToFilter()
     {
         const auto filteredObjectCount = (int) filterObjectTracks(
-            toObjectTrack(analyticsDataPackets()), m_filter).size();
+            toObjectTracks(analyticsDataPackets()), m_filter).size();
 
         if (filteredObjectCount > 0)
         {

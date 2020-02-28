@@ -250,6 +250,7 @@ void QnCommonModule::setEngineVersion(const nx::utils::SoftwareVersion& version)
 QnCommonModule::~QnCommonModule()
 {
     resourcePool()->threadPool()->waitForDone();
+    m_moduleDiscoveryManager->beforeDestroy();
     /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
     clear();
     setResourceDiscoveryManager(nullptr);

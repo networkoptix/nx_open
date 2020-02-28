@@ -10,7 +10,7 @@ TEST(GlobalMonitor, threadCount)
 {
     nx::utils::TimerManager timerManager;
     timerManager.stop(); //< Don't create one more thread async.
-    QnPlatformAbstraction platform(/*rootFs*/ nullptr, &timerManager);
+    QnPlatformAbstraction platform(&timerManager);
     static const int kThreadsToCreate = 10;
 
     std::vector<std::thread> threads;

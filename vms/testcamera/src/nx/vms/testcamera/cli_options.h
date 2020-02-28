@@ -43,6 +43,7 @@ struct CliOptions
     std::optional<int> discoveryPort;
     std::optional<int> mediaPort;
     bool reuseDiscoveryPort = false;
+    std::optional<QString> frameLogFilename;
     std::vector<CameraSet> cameraSets;
 };
 

@@ -91,7 +91,6 @@ struct CameraImageRequest: ImageRequest
         forcedPrimary,
         forcedSecondary,
         sameAsMotion,
-        sameAsAnalytics,
     };
 
     QnVirtualCameraResourcePtr camera;

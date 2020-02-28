@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include<string_view>
+#include <string_view>
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
@@ -19,6 +19,7 @@
 #include "engine.h"
 #include "metadata_monitor.h"
 #include "settings.h"
+#include "objectMetadataXmlParser.h"
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
@@ -97,6 +98,8 @@ private:
     Settings m_settings;
     FrameSize m_frameSize;
     bool m_serverHasSentInitialSettings = false;
+
+    ObjectMetadataXmlParser m_objectMetadataXmlParser;
 };
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

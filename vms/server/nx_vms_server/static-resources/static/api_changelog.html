@@ -43,14 +43,14 @@ supported for a while, when noted below.
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>
 <p>
-In method <strong><code>analyticsLookupObjectTracks</code></strong>, parameter
+In method <strong><code>GET /ec2/analyticsLookupObjectTracks</code></strong>, parameter
 <strong><code><i>maxObjectTrackSize</i></code></strong> changed to
 <strong><code><b>needFullTrack</b></code></strong>. Previously this parameter was used to limit the
 number of object track metadata items (each item is related to a video frame). The new parameter is
 just a flag showing whether to select all of them or not.
 </p>
 <p>
-In method <strong><code>deviceAnalyticsSettings (POST)</code></strong> parameters
+In method <strong><code>POST /ec2/deviceAnalyticsSettings</code></strong> parameters
 <strong><code>deviceId</code></strong> and <strong><code>analyticsEngineId</code></strong> have to
 be passed not as URL query parameters but as keys of a JSON request in the request body. Optional
 parameter <strong><code>analyzedStreamIndex</code></strong> has been added to the JSON request.
@@ -62,11 +62,24 @@ respectively. Parameter <strong><code>analyzedStreamIndex</code></strong> has be
 JSON response.
 </p>
 <p>
-In method <strong><code>deviceAnalyticsSettings (GET)</code></strong> parameters
+In method <strong><code>GET /ec2/deviceAnalyticsSettings</code></strong> parameters
 <strong><code>values</code></strong> and <strong><code>model</code></strong> of the JSON response
 have been renamed to <strong><code>settingsValues</code></strong> and
 <strong><code>settingsModel</code></strong> respectively. Parameter
 <strong><code>analyzedStreamIndex</code></strong> has been added to the JSON response.
+</p>
+<p>
+In method <strong><code>/ec2/cameraThumbnail</code></strong> the
+<strong><code>sameAsAnalytics</code></strong> option has been removed from possible values of the 
+<strong><code>streamSelectionMode</code></strong> URL parameter.
+<strong><code>forcedPrimary</code></strong> and <strong><code>forcedSecondary</code></strong>
+values have to be used for retrieving thumbnails of objects detected by analytics plugins.
+Information about the stream that have been used by analytics to detect a particular object is
+contained in metadata that comes in the RTSP stream and in the response of
+<strong><code>/ec2/analyticsLookupObjectTracks</code></strong> as a value of the
+<strong><code>bestShot.streamIndex</strong></code> field. The index of the stream that is currently
+used by a particular Engine on a particular Device can be retrieved via the
+<strong><code>/ec2/deviceAnalyticsSettings</strong></code> request.
 </p>
 <!--============================================================================================-->
 <hr/><h2>VMS <b>4.0</b> relative to <i>3.2</i></h2>
