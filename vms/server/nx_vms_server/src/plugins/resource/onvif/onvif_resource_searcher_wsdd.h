@@ -102,6 +102,8 @@ private:
         const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const;
 
 private:
+    bool createReadMulticastContext();
+
     class ProbeContext
     {
     public:
@@ -123,9 +125,11 @@ private:
     bool m_shouldStop;
     mutable std::map<QString, ProbeContext*> m_ifaceToSock;
     bool m_isFirstSearch;
+    std::unique_ptr<ProbeContext> m_readMulticastContext;
 
     bool sendProbe( const nx::network::QnInterfaceAndAddr& iface );
     bool readProbeMatches( const nx::network::QnInterfaceAndAddr& iface, EndpointInfoHash& result );
+	void readHelloMessage(ProbeContext* ctx, EndpointInfoHash& result);
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(OnvifResourceSearcherWsdd::ObtainMacFromMulticast)
 QN_FUSION_DECLARE_FUNCTIONS(OnvifResourceSearcherWsdd::ObtainMacFromMulticast, (metatype)(numeric)(lexical))
