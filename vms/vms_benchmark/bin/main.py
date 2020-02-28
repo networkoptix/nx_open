@@ -174,8 +174,12 @@ def load_configs(conf_file, ini_file_if_passed, ini_file_default):
 
     if ini.OPTIONS_FROM_FILE is not None:
         report(f"\nOverriding default options via {ini.filepath!r}:")
+        isReported = False
         for k, v in ini.OPTIONS_FROM_FILE.items():
+            isReported = True
             report(f"    {k}={v}")
+        if not isReported:
+            report(f"    No overriding values found in .ini file.")
 
     report(f"\nConfiguration defined in {conf.filepath!r}:")
     for k, v in conf.options.items():
@@ -459,7 +463,10 @@ class _StreamTypeStats:
         self._max_lag_us = max(self._max_lag_us, lag_us)
 
     def worst_lag_us(self):
-        return self._max_lag_us - self._min_lag_us
+        # If min_lag is negative, it means that the latency of the first frame is not less than
+        # abs(min_lag), and thus we can consider the actual maximum lag to be less than max_lag
+        # by that value.
+        return self._max_lag_us if self._min_lag_us >= 0 else self._max_lag_us + self._min_lag_us
 
 
 class _BoxPoller:
