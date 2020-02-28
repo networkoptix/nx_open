@@ -152,32 +152,28 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
     const auto resource = resourcePool()->getResourceById(event.eventResourceId);
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
-    QJsonObject options;
-    NX_ASSERT(QJson::deserialize(QByteArray(ini().pushNotifyOptions), &options));
-
     const auto language = common->globalSettings()->pushNotificationsLanguage();
     NX_VERBOSE(this, "Translate notification to %1", language);
     QnTranslationManager::LocaleRollback localeGuard(
         serverModule()->findInstance<QnTranslationManager>(), language);
 
-    const auto join =
-        [](const QString& delimiter, QStringList items)
-        {
-            items.removeAll("");
-            return items.join(delimiter);
-        };
-
     vms::event::StringsHelper strings(common);
+    const auto caption = strings.notificationCaption(event, camera, /*useHtml*/ false);
+    const auto description = strings.notificationDescription(event);
+
+    const auto icon = utf8Icon(vms::event::levelOf(action));
+    const auto isMultilineBody = !params.text.isEmpty() && !description.isEmpty();
+    const auto resourceName = camera
+        ? camera->getUserDefinedName()
+        : (resource ? resource->getName() : QString());
+
+    QJsonObject options;
+    NX_ASSERT(QJson::deserialize(QByteArray(ini().pushNotifyOptions), &options));
+
     return {
-        join(" ", {
-            utf8Icon(vms::event::levelOf(action)),
-            strings.notificationCaption(event, camera, /*useHtml*/ false),
-        }),
-        join("\n", {
-            camera ? camera->getUserDefinedName() : (resource ? resource->getName() : QString()),
-            params.text,
-            strings.notificationDescription(event),
-        }),
+        (icon.isEmpty() ? QString() : (icon + " ")) + caption,
+        (resourceName.isEmpty() ? QString() : ("[" + resourceName + "] ")) + params.text
+            + (isMultilineBody ? "\n" : "") + description,
         makePayload(event, camera),
         options,
     };
