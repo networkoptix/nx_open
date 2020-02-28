@@ -72,11 +72,29 @@ Yunhong Gu, last updated 01/27/2011
 #   define NET_ERROR WSAGetLastError()
 #endif
 
+//-------------------------------------------------------------------------------------------------
 
-UdpChannel::UdpChannel():
-    UdpChannel(AF_INET)
+std::unique_ptr<AbstractUdpChannel> UdpChannelFactory::create(int ipVersion)
 {
+    if (m_customFunc)
+        return m_customFunc(ipVersion);
+    else
+        return std::make_unique<UdpChannel>(ipVersion);
 }
+
+UdpChannelFactory::FactoryFunc UdpChannelFactory::setCustomFunc(
+    FactoryFunc func)
+{
+    return std::exchange(m_customFunc, std::move(func));
+}
+
+UdpChannelFactory& UdpChannelFactory::instance()
+{
+    static UdpChannelFactory instance;
+    return instance;
+}
+
+//-------------------------------------------------------------------------------------------------
 
 UdpChannel::UdpChannel(int version):
     m_iIPversion(version),
@@ -209,13 +227,6 @@ detail::SocketAddress UdpChannel::getSockAddr() const
 {
     detail::SocketAddress socketAddress;
     ::getsockname(m_iSocket, socketAddress.get(), &socketAddress.length());
-    return socketAddress;
-}
-
-detail::SocketAddress UdpChannel::getPeerAddr() const
-{
-    detail::SocketAddress socketAddress;
-    ::getpeername(m_iSocket, socketAddress.get(), &socketAddress.length());
     return socketAddress;
 }
 

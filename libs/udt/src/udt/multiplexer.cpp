@@ -13,7 +13,7 @@ Multiplexer::Multiplexer(
     maximumSegmentSize(maximumSegmentSize),
     reusable(reusable),
     id(id),
-    m_udpChannel(std::make_unique<UdpChannel>(ipVersion)),
+    m_udpChannel(UdpChannelFactory::instance().create(ipVersion)),
     m_timer(std::make_unique<CTimer>()),
     m_sendQueue(std::make_unique<CSndQueue>(m_udpChannel.get(), m_timer.get())),
     m_recvQueue(std::make_unique<CRcvQueue>(
@@ -48,7 +48,7 @@ void Multiplexer::shutdown()
     m_udpChannel.reset();
 }
 
-UdpChannel& Multiplexer::channel()
+AbstractUdpChannel& Multiplexer::channel()
 {
     return *m_udpChannel;
 }

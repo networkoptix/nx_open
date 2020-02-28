@@ -71,7 +71,7 @@ static std::string dumpPacket(const CPacket& packet)
     if (packet.getFlag() == PacketFlag::Data)
        ss << std::string(packet.payload().data(), packet.payload().size());
     else
-       ss << "[unparsed control data]";
+       ss << "type: "<<to_string(packet.getType())<<" [other flags]";
     return ss.str();
 }
 #endif
@@ -469,7 +469,7 @@ void CSndUList::remove_(CSNode* n)
 }
 
 //
-CSndQueue::CSndQueue(UdpChannel* c, CTimer* t):
+CSndQueue::CSndQueue(AbstractUdpChannel* c, CTimer* t):
     m_pSndUList(std::make_unique<CSndUList>(t, &m_mutex, &m_cond)),
     m_channel(c),
     m_timer(t)
@@ -608,98 +608,27 @@ void CSndQueue::sendPostedPackets()
 //-------------------------------------------------------------------------------------------------
 // CRcvUList
 
-CRcvUList::~CRcvUList()
+void CRcvUList::push_back(std::shared_ptr<CUDT> u)
 {
-    for (auto node = m_nodeListHead; node != nullptr;)
-    {
-        auto nodeToDelete = node;
-        node = node->next;
-        delete nodeToDelete;
-    }
+    m_sockets.push_back(CRNode{u->socketId(), u, CTimer::getTime()});
+    m_socketIdToNode[u->socketId()] = --m_sockets.end();
 }
 
-void CRcvUList::insert(std::shared_ptr<CUDT> u)
+void CRcvUList::erase(std::list<CRNode>::iterator it)
 {
-    auto n = new CRNode();
-    n->socketId = u->socketId();
-    n->socket = u;
-    n->timestamp = std::chrono::microseconds(1);
-
-    m_socketIdToNode[n->socketId] = n;
-
-    n->timestamp = CTimer::getTime();
-
-    if (!m_nodeListHead)
-    {
-        // empty list, insert as the single node
-        n->prev = n->next = nullptr;
-        m_nodeListTail = m_nodeListHead = n;
-        return;
-    }
-
-    // always insert at the end for RcvUList
-    n->prev = m_nodeListTail;
-    n->next = nullptr;
-    m_nodeListTail->next = n;
-    m_nodeListTail = n;
+    m_socketIdToNode.erase(it->socketId);
+    m_sockets.erase(it);
 }
 
-void CRcvUList::remove(CRNode* n)
-{
-    if (nullptr == n->prev)
-    {
-        // n is the first node
-        m_nodeListHead = n->next;
-        if (nullptr == m_nodeListHead)
-            m_nodeListTail = nullptr;
-        else
-            m_nodeListHead->prev = nullptr;
-    }
-    else
-    {
-        n->prev->next = n->next;
-        if (nullptr == n->next)
-        {
-            // n is the last node
-            m_nodeListTail = n->prev;
-        }
-        else
-            n->next->prev = n->prev;
-    }
-
-    m_socketIdToNode.erase(n->socketId);
-    delete n;
-}
-
-void CRcvUList::update(UDTSOCKET socketId)
+void CRcvUList::sink(UDTSOCKET socketId)
 {
     auto it = m_socketIdToNode.find(socketId);
     if (it == m_socketIdToNode.end())
         return;
 
-    auto n = it->second;
-
-    n->timestamp = CTimer::getTime();
-
-    // if n is the last node, do not need to change
-    if (nullptr == n->next)
-        return;
-
-    if (nullptr == n->prev)
-    {
-        m_nodeListHead = n->next;
-        m_nodeListHead->prev = nullptr;
-    }
-    else
-    {
-        n->prev->next = n->next;
-        n->next->prev = n->prev;
-    }
-
-    n->prev = m_nodeListTail;
-    n->next = nullptr;
-    m_nodeListTail->next = n;
-    m_nodeListTail = n;
+    it->second->timestamp = CTimer::getTime();
+    m_sockets.splice(m_sockets.end(), m_sockets, it->second);
+    it->second = --m_sockets.end();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -837,10 +766,9 @@ CRcvQueue::CRcvQueue(
     int size,
     int payload,
     int ipVersion,
-    UdpChannel* c,
+    AbstractUdpChannel* c,
     CTimer* t)
     :
-    m_pRcvUList(std::make_unique<CRcvUList>()),
     m_channel(c),
     m_timer(t),
     m_iIPversion(ipVersion),
@@ -857,7 +785,6 @@ CRcvQueue::~CRcvQueue()
 {
     stop();
 
-    m_pRcvUList.reset();
     m_pRendezvousQueue.reset();
 
     // remove all queued messages
@@ -893,7 +820,7 @@ void CRcvQueue::worker()
         // check waiting list, if new socket, insert it to the list
         while (std::shared_ptr<CUDT> ne = takeNewEntry())
         {
-            m_pRcvUList->insert(ne);
+            m_rcvUList.push_back(ne);
             m_socketByIdDict.insert(ne->socketId(), ne);
         }
 
@@ -943,27 +870,24 @@ static constexpr auto kSomeThreshold = std::chrono::milliseconds(100);
 
 void CRcvQueue::timerCheck()
 {
-    const auto currtime = CTimer::getTime();
-
-    CRNode* ul = m_pRcvUList->m_nodeListHead;
-    const auto ctime = currtime - kSomeThreshold;
-    while ((nullptr != ul) && (ul->timestamp < ctime))
+    const auto ctime = CTimer::getTime() - kSomeThreshold;
+    for (auto ul = m_rcvUList.begin();
+        ((ul != m_rcvUList.end()) && (ul->timestamp < ctime));
+        ul = m_rcvUList.begin())
     {
         std::shared_ptr<CUDT> u = ul->socket.lock();
 
         if (u && u->connected() && !u->broken() && !u->isClosing())
         {
             u->checkTimers(false);
-            m_pRcvUList->update(ul->socketId);
+            m_rcvUList.sink(ul->socketId);
         }
         else
         {
             // the socket must be removed from Hash table first, then RcvUList
             m_socketByIdDict.remove(ul->socketId);
-            m_pRcvUList->remove(ul);
+            m_rcvUList.erase(ul);
         }
-
-        ul = m_pRcvUList->m_nodeListHead;
     }
 
     // Check connection requests status for all sockets in the RendezvousQueue.
@@ -1011,7 +935,7 @@ Result<> CRcvQueue::processUnit(
                         u->processCtrl(unit->packet());
 
                     u->checkTimers(false);
-                    m_pRcvUList->update(id);
+                    m_rcvUList.sink(id);
                 }
             }
         }

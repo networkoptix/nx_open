@@ -1,8 +1,12 @@
 #include "test_fixture.h"
 
+#include <algorithm>
+#include <mutex>
 #include <thread>
 
 #include <nx/utils/thread/sync_queue.h>
+
+#include <udt/channel.h>
 
 namespace udt::test {
 
@@ -72,10 +76,10 @@ protected:
 
     void whenSendData()
     {
-        m_data.resize(129);
+        m_data.resize(32);
         std::generate(
             m_data.begin(), m_data.end(),
-            []() { return (char)(rand() % 128); });
+            []() { return (char)(rand() % ('z' - 'A') + 'A'); });
 
         whenClientSends(m_data);
     }
@@ -115,6 +119,155 @@ TEST_F(Io, shutdown_interrupts_recv)
     givenSocketBlockedInRecv();
     whenShutdownClientSocket();
     thenRecvCompleted();
+}
+
+TEST_F(Io, the_data_is_received_after_sending_socket_closure)
+{
+    givenTwoConnectedSockets();
+
+    whenSendData();
+    closeClientSocket();
+
+    thenDataIsReceivedOnTheOtherSide();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class ReorderingChannel:
+    public UdpChannel
+{
+    using base_type = UdpChannel;
+
+public:
+    ReorderingChannel::ReorderingChannel(int ipVersion):
+        base_type(ipVersion)
+    {
+        m_sendThread = std::thread([this]() { sendThreadMain(); });
+    }
+
+    ~ReorderingChannel()
+    {
+        {
+            std::unique_lock<std::mutex> lock(m_mutex);
+            m_terminated = true;
+            m_cond.notify_all();
+        }
+
+        m_sendThread.join();
+    }
+
+    virtual Result<int> sendto(const detail::SocketAddress& addr, CPacket packet) override
+    {
+        static constexpr auto kMaxDelay = std::chrono::milliseconds(999);
+
+        std::lock_guard<std::mutex> lock(m_mutex);
+
+        if (packet.getFlag() == PacketFlag::Control)
+            return base_type::sendto(addr, std::move(packet));
+
+        // Delaying every data packet to force FIN before the last data.
+
+        const auto [ioBufs, count] = packet.ioBufs();
+        const auto packetSize = std::accumulate(
+            ioBufs, ioBufs + count, 0,
+            [](auto one, auto two) { return one + two.len; });
+
+        m_sendTasks.emplace(
+            std::chrono::steady_clock::now() + kMaxDelay,
+            SendTask{addr, std::move(packet)});
+
+        m_cond.notify_all();
+
+        return packetSize;
+    }
+
+private:
+    struct SendTask
+    {
+        detail::SocketAddress addr;
+        CPacket packet;
+    };
+
+    std::mutex m_mutex;
+    std::thread m_sendThread;
+    bool m_terminated = false;
+    std::map<std::chrono::steady_clock::time_point /*deadline*/, SendTask> m_sendTasks;
+    std::condition_variable m_cond;
+
+    void sendThreadMain()
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        while (!m_terminated)
+        {
+            const auto curTime = std::chrono::steady_clock::now();
+
+            if (!m_sendTasks.empty() && m_sendTasks.begin()->first <= curTime)
+            {
+                send(std::move(m_sendTasks.begin()->second));
+                m_sendTasks.erase(m_sendTasks.begin());
+            }
+            else if (m_sendTasks.empty())
+            {
+                m_cond.wait(lock);
+            }
+            else if (m_sendTasks.begin()->first > curTime)
+            {
+                m_cond.wait_for(lock, m_sendTasks.begin()->first - curTime);
+            }
+        }
+    }
+
+    void send(SendTask sendTask)
+    {
+        base_type::sendto(sendTask.addr, std::move(sendTask.packet));
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class IoOverReorderingChannel:
+    public Io
+{
+    using base_type = Io;
+
+public:
+    ~IoOverReorderingChannel()
+    {
+        if (m_channelFactoryBak)
+        {
+            UdpChannelFactory::instance().setCustomFunc(std::move(*m_channelFactoryBak));
+            m_channelFactoryBak = std::nullopt;
+        }
+    }
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        installReorderingChannel();
+    }
+
+private:
+    std::optional<UdpChannelFactory::FactoryFunc> m_channelFactoryBak;
+
+    void installReorderingChannel()
+    {
+        m_channelFactoryBak = UdpChannelFactory::instance().setCustomFunc(
+            [this](int ipVersion) { return std::make_unique<ReorderingChannel>(ipVersion); });
+    }
+};
+
+// TODO: #ak Remove copy-paste. Make test template.
+TEST_F(IoOverReorderingChannel, the_data_is_received_after_sending_socket_closure)
+{
+    givenTwoConnectedSockets();
+
+    whenSendData();
+    closeClientSocket();
+
+    thenDataIsReceivedOnTheOtherSide();
 }
 
 //-------------------------------------------------------------------------------------------------

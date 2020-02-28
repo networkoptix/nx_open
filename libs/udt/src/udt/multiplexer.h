@@ -4,7 +4,7 @@
 
 class CSndQueue;
 class CRcvQueue;
-class UdpChannel;
+class AbstractUdpChannel;
 class CTimer;
 
 /**
@@ -25,7 +25,7 @@ public:
 
     void shutdown();
 
-    UdpChannel& channel();
+    AbstractUdpChannel& channel();
     CSndQueue& sendQueue();
     CRcvQueue& recvQueue();
 
@@ -40,7 +40,7 @@ public:
     int refCount = 0;
 
 private:
-    std::unique_ptr<UdpChannel> m_udpChannel;
+    std::unique_ptr<AbstractUdpChannel> m_udpChannel;
     std::unique_ptr<CTimer> m_timer;
     std::unique_ptr<CSndQueue> m_sendQueue;
     std::unique_ptr<CRcvQueue> m_recvQueue;

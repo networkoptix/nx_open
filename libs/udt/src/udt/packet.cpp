@@ -146,6 +146,35 @@ Yunhong Gu, last updated 02/12/2011
 #include <cstring>
 #include "packet.h"
 
+std::string to_string(ControlPacketType packetType)
+{
+    switch (packetType)
+    {
+        case ControlPacketType::Handshake:
+            return "Handshake";
+        case ControlPacketType::KeepAlive:
+            return "KeepAlive";
+        case ControlPacketType::Acknowledgement:
+            return "Acknowledgement";
+        case ControlPacketType::LossReport:
+            return "LossReport";
+        case ControlPacketType::DelayWarning:
+            return "DelayWarning";
+        case ControlPacketType::Shutdown:
+            return "Shutdown";
+        case ControlPacketType::AcknowledgementOfAcknowledgement:
+            return "AcknowledgementOfAcknowledgement";
+        case ControlPacketType::MsgDropRequest:
+            return "MsgDropRequest";
+        case ControlPacketType::RemotePeerFailure:
+            return "RemotePeerFailure";
+        default:
+            return "Unknown " + std::to_string((int) packetType);
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
 // Set up the aliases in the constructure
 CPacket::CPacket():
     m_iSeqNo((int32_t&)(m_nHeader[0])),

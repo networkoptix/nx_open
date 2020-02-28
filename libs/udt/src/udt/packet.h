@@ -105,8 +105,6 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class UdpChannel;
-
 enum class ControlPacketType
 {
     Handshake = 0,
@@ -122,6 +120,8 @@ enum class ControlPacketType
     /** 0x7FFF - reserved and user defined messages. */
     Reserved = 32767,
 };
+
+std::string to_string(ControlPacketType);
 
 enum class PacketFlag
 {
