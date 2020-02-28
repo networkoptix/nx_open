@@ -466,7 +466,11 @@ class _StreamTypeStats:
         # If min_lag is negative, it means that the latency of the first frame is not less than
         # abs(min_lag), and thus we can consider the actual maximum lag to be less than max_lag
         # by that value.
-        return self._max_lag_us if self._min_lag_us >= 0 else self._max_lag_us + self._min_lag_us
+        result = (
+            self._max_lag_us if self._min_lag_us >= 0 else self._max_lag_us + self._min_lag_us)
+        if result < 0:
+            return 0
+        return result
 
 
 class _BoxPoller:
