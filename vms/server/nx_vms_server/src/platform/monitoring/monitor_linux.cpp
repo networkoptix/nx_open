@@ -581,7 +581,7 @@ static PlatformMonitor::PartitionType fsNameToType(
     else if( fsName == "fuse.osxfs" ) // Mounted volumes when Docker host is macOS.
         return PlatformMonitor::LocalDiskPartition;
 
-    return provider->additionalLocalFsTypes().contains(fsName)
+    return provider->additionalLocalFsTypes().contains(fsName, Qt::CaseInsensitive)
         ? PlatformMonitor::LocalDiskPartition
         : PlatformMonitor::UnknownPartition;
 }

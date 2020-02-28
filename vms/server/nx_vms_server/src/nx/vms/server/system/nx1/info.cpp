@@ -13,6 +13,7 @@
 #include "utils/common/app_info.h"
 #include <nx/vms/server/fs/partitions/partitions_information_provider_linux.h>
 #include <nx/vms/server/fs/partitions/read_partitions_linux.h>
+#include <media_server/media_server_module.h>
 #include <nx/network/nettools.h>
 #include <nx/vms/server/root_fs.h>
 
@@ -58,7 +59,7 @@ bool Nx1::isBootedFromSD(QnMediaServerModule* serverModule)
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     namespace fs = nx::vms::server::fs;
 
-    fs::PartitionsInformationProvider partitionsInfoProvider(serverModule);
+    fs::PartitionsInformationProvider partitionsInfoProvider(serverModule->globalSettings(), serverModule->rootFileSystem());
     std::list<fs::PartitionInfo> partitionInfoList;
 
     if (fs::readPartitionsInformation(&partitionsInfoProvider, &partitionInfoList)

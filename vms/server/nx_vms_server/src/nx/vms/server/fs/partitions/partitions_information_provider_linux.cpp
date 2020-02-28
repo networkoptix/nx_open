@@ -6,9 +6,9 @@
 
 namespace nx::vms::server::fs {
 
-PartitionsInformationProvider::PartitionsInformationProvider(QnMediaServerModule* serverModule):
-    m_serverModule(serverModule),
-    m_rootFs(serverModule ? serverModule->rootFileSystem() : nullptr),
+PartitionsInformationProvider::PartitionsInformationProvider(QnGlobalSettings *globalSettings, RootFileSystem *rootFs):
+    m_globalSettings(globalSettings),
+    m_rootFs(rootFs),
     m_fileName("/proc/mounts")
 {
 }
@@ -79,7 +79,7 @@ bool PartitionsInformationProvider::isFolder(const QByteArray& fsPath) const
 
 QStringList PartitionsInformationProvider::additionalLocalFsTypes() const
 {
-    return m_serverModule->globalSettings()->additionalLocalFsTypes().split(
+    return m_globalSettings->additionalLocalFsTypes().split(
         ",", QString::SkipEmptyParts);
 }
 

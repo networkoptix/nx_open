@@ -209,7 +209,14 @@ QnMediaServerModule::QnMediaServerModule(
         isRootToolEnabled,
         qApp->applicationFilePath());
 
-    m_platform = store(new QnPlatformAbstraction(this, timerManager()));
+    m_platform = store(new QnPlatformAbstraction(timerManager()));
+    #if defined(Q_OS_LINUX)
+        m_platform->monitor()->setPartitionInformationProvider(
+            std::make_unique<nx::vms::server::fs::PartitionsInformationProvider>(
+                m_commonModule->globalSettings(),
+                m_rootFileSystem.get()));
+    #endif
+
     m_platform->process(nullptr)->setPriority(QnPlatformProcess::HighPriority);
 
     nx::vms::server::registerSerializers();
