@@ -310,7 +310,9 @@ protected:
 
     void thenServerPartitionInformationProviderShouldReturnThem(const QStringList& expected)
     {
-        const auto p = nx::vms::server::fs::PartitionsInformationProvider(m_server.serverModule());
+        const auto p = nx::vms::server::fs::PartitionsInformationProvider(
+            m_server.serverModule()->globalSettings(),
+            m_server.serverModule()->rootFileSystem());
         ASSERT_EQ(expected, p.additionalLocalFsTypes());
     }
 
