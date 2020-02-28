@@ -2,6 +2,15 @@
 
 @echo off
 
+if [%1] == [/?] goto :show_usage
+if [%1] == [-h] goto :show_usage
+if [%1] == [--help] goto :show_usage
+goto :skip_show_usage
+:show_usage
+    echo Usage: %~n0%~x0 [--no-tests] [--release] [^<cmake-generation-args^>...]
+    exit /b
+:skip_show_usage
+
 :: Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 set BASE_DIR_WITH_BACKSLASH=%~dp0
 set BASE_DIR=%BASE_DIR_WITH_BACKSLASH:~0,-1%

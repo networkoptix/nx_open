@@ -1,11 +1,16 @@
 #!/bin/bash
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-# NOTE: If cmake cannot find Qt, add the following arg to this script (will be passed to cmake):
-# -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
-
 set -e #< Exit on error.
 set -u #< Prohibit undefined variables.
+
+if [[ $# > 0 && ($1 == "/?" || $1 == "-h" || $1 == "--help") ]]
+then
+    echo "Usage: $(basename "$0") [--with-rpi-samples] [--release] [<cmake-generation-args>...]"
+    echo "NOTE: If cmake cannot find Qt, add the following arg to this script (will be passed to cmake):"
+    echo "-DCMAKE_PREFIX_PATH=<full-path-to-Qt5-dir>"
+    exit
+fi
 
 # Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 BASE_DIR=$(readlink -f "$(dirname "$0")") #< Absolute path to this script's dir.

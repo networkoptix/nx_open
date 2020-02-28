@@ -4,6 +4,12 @@
 set -e #< Exit on error.
 set -u #< Prohibit undefined variables.
 
+if [[ $# > 0 && ($1 == "/?" || $1 == "-h" || $1 == "--help") ]]
+then
+    echo "Usage: $(basename "$0") [--release] [<cmake-generation-args>...]"
+    exit
+fi
+
 # Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 BASE_DIR=$(readlink -f "$(dirname "$0")") #< Absolute path to this script's dir.
 BUILD_DIR="$BASE_DIR-build"

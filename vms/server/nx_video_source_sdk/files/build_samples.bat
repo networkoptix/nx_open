@@ -2,8 +2,16 @@
 
 @echo off
 
-:: NOTE: If cmake cannot find Qt, add the following arg to this script (will be passed to cmake):
-:: "-DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>"
+if [%1] == [/?] goto :show_usage
+if [%1] == [-h] goto :show_usage
+if [%1] == [--help] goto :show_usage
+goto :skip_show_usage
+:show_usage
+    echo Usage: %~n0%~x0 [--release] [^<cmake-generation-args^>...]
+    echo NOTE: If cmake cannot find Qt, add the following arg to this script (will be passed to cmake):
+    echo -DCMAKE_PREFIX_PATH=^<full-path-to-Qt5-dir^>
+    exit /b
+:skip_show_usage
 
 :: Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 set BASE_DIR_WITH_BACKSLASH=%~dp0
