@@ -10,6 +10,17 @@ set BASE_DIR_WITH_BACKSLASH=%~dp0
 set BASE_DIR=%BASE_DIR_WITH_BACKSLASH:~0,-1%
 set BUILD_DIR=%BASE_DIR%-build
 
+if [%1] == [--release] (
+    shift
+    set BUILD_TYPE=Release
+) else (
+    set BUILD_TYPE=Debug
+)
+
+if [%BUILD_TYPE%] == [Release] (
+    set BUILD_OPTIONS=--config %BUILD_TYPE%
+)
+
 echo on
     rmdir /S /Q "%BUILD_DIR%/" 2>NUL
 @echo off
@@ -33,9 +44,9 @@ exit /b
         cd "%SAMPLE_BUILD_DIR%" || @exit /b
         
         cmake "%SOURCE_DIR%\src" -Ax64 %1 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
-        cmake --build . || @exit /b
+        cmake --build . %BUILD_OPTIONS% || @exit /b
     @echo off
-    set ARTIFACT=%SAMPLE_BUILD_DIR%\Debug\%SAMPLE%.dll
+    set ARTIFACT=%SAMPLE_BUILD_DIR%\%BUILD_TYPE%\%SAMPLE%.dll
     if not exist "%ARTIFACT%" (
         echo ERROR: Failed to build plugin %SAMPLE%.
         exit /b 70

@@ -13,6 +13,18 @@ if [%1] == [--no-tests] (
 ) else (
     set NO_TESTS=0
 )
+
+if [%1] == [--release] (
+    shift
+    set BUILD_TYPE=Release
+) else (
+    set BUILD_TYPE=Debug
+)
+
+if [%BUILD_TYPE%] == [Release] (
+    set BUILD_OPTIONS=--config %BUILD_TYPE%
+)
+
 echo on
     rmdir /S /Q "%BUILD_DIR%/" 2>NUL
 @echo off
@@ -27,7 +39,7 @@ echo on
     :: Currently, nx_kit and nx_sdk unit tests are built in the scope of stub_analytics_plugin.
     cd "%BUILD_DIR%/stub_analytics_plugin" || @goto :error
 
-    ctest --output-on-failure -C Debug || @goto :error
+    ctest --output-on-failure -C %BUILD_TYPE% || @goto :error
 @echo off
 :skip_tests
 
@@ -46,9 +58,9 @@ exit /b
         cd "%SAMPLE_BUILD_DIR%" || @exit /b
         
         cmake "%SOURCE_DIR%" -Ax64 %1 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
-        cmake --build . || @exit /b
+        cmake --build . %BUILD_OPTIONS% || @exit /b
     @echo off
-    set ARTIFACT=%SAMPLE_BUILD_DIR%\Debug\%SAMPLE%.dll
+    set ARTIFACT=%SAMPLE_BUILD_DIR%\%BUILD_TYPE%\%SAMPLE%.dll
     if not exist "%ARTIFACT%" (
         echo ERROR: Failed to build plugin %SAMPLE%.
         exit /b 70
