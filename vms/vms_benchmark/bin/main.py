@@ -120,7 +120,7 @@ ini_definition = {
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
     "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
     "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
-    "sshCommandTimeoutS": {"type": "int", "range": [1, None], "default": 5},
+    "sshCommandTimeoutS": {"type": "int", "range": [1, None], "default": 15},
     "sshServiceCommandTimeoutS": {"type": "int", "range": [1, None], "default": 30},
     "sshGetFileContentTimeoutS": {"type": "int", "range": [1, None], "default": 30},
     "sshGetProcMeminfoTimeoutS": {"type": "int", "range": [1, None], "default": 10},
