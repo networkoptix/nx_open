@@ -21,13 +21,13 @@ exit /b
 :build_sample
     set SOURCE_DIR=%1
     set SAMPLE=%~n1
+    shift
     set SAMPLE_BUILD_DIR=%BUILD_DIR%\%SAMPLE%
     echo on
         mkdir "%SAMPLE_BUILD_DIR%" || @exit /b
         cd "%SAMPLE_BUILD_DIR%" || @exit /b
         
-        :: Not using %* to allow using `shift`.
-        cmake "%SOURCE_DIR%\src" -Ax64 -Tv140,host=x64 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
+        cmake "%SOURCE_DIR%\src" -Ax64 %1 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
         cmake --build . || @exit /b
     @echo off
     set ARTIFACT=%SAMPLE_BUILD_DIR%\Debug\%SAMPLE%.dll

@@ -18,7 +18,7 @@ fi
 
 case "$(uname -s)" in #< Check if running in Windows from Cygwin/MinGW.
     CYGWIN*|MINGW*)
-        GEN_OPTIONS=( -Ax64 -Tv140,host=x64 ) #< Generate for Visual Studio 2015 compiler.
+        GEN_OPTIONS=( -Ax64 )
         BASE_DIR=$(cygpath -w "$BASE_DIR") #< Windows-native cmake requires Windows path.
         BUILD_OPTIONS=()
         ;;
