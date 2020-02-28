@@ -93,6 +93,38 @@ constexpr int kHideControlsTimeoutMs = 2000;
 
 constexpr qreal kZoomedTimelineOpacity = 0.9;
 
+int calculateAutoFpsLimit(QnWorkbenchLayout* layout)
+{
+    static constexpr auto kIdleFps = 15;
+    static constexpr auto kUnlimitedFps = 0;
+
+    if (!qnSettings->isAutoFpsLimit())
+        return kUnlimitedFps;
+
+    if (!layout)
+        return kIdleFps;
+
+    const auto itemsCount = layout->items().count();
+
+    if (itemsCount == 0) // Empty layout.
+        return kIdleFps;
+
+    // Gather cameras placed on current layout.
+    const QnVirtualCameraResourceList cameras =
+        layout->itemResources().filtered<QnVirtualCameraResource>();
+
+    if (itemsCount == cameras.count()) // Layout contains only cameras.
+    {
+        QPair<int, int> result = Qn::calculateMaxFps(cameras);
+
+        if (result.second != std::numeric_limits<int>::max())
+            return result.second;
+    }
+
+    // We do not have any info about items fps - do not limit fps.
+    return kUnlimitedFps;
+}
+
 } // namespace
 
 static QtMessageHandler previousMsgHandler = 0;
@@ -272,38 +304,6 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 void WorkbenchUi::updateAutoFpsLimit()
 {
     m_instrumentManager->setFpsLimit(calculateAutoFpsLimit(workbench()->currentLayout()));
-}
-
-int WorkbenchUi::calculateAutoFpsLimit(QnWorkbenchLayout* layout)
-{
-    static constexpr auto kIdleFps = 15;
-    static constexpr auto kUnlimitedFps = 0;
-
-    if (!qnSettings->isAutoFpsLimit())
-        return kUnlimitedFps;
-
-    if (!layout)
-        return kIdleFps;
-
-    const auto itemsCount = layout->items().count();
-
-    if (itemsCount == 0) // Empty layout.
-        return kIdleFps;
-
-    // Gather cameras placed on current layout.
-    const QnVirtualCameraResourceList cameras =
-        layout->itemResources().filtered<QnVirtualCameraResource>();
-
-    if (itemsCount == cameras.count()) // Layout contains only cameras.
-    {
-        QPair<int, int> result = Qn::calculateMaxFps(cameras);
-
-        if (result.second != std::numeric_limits<int>::max())
-            return result.second;
-    }
-
-    // We do not have any info about items fps - do not limit fps.
-    return kUnlimitedFps;
 }
 
 WorkbenchUi::~WorkbenchUi()
