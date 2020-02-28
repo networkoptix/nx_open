@@ -144,7 +144,7 @@ protected:
         ASSERT_EQ(expected, m_prevLookupResult->tracksFound);
     }
 
-    std::vector<ObjectTrackEx> toObjectTrack(
+    std::vector<ObjectTrackEx> toObjectTracks(
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& objectMetadataPackets) const
     {
         std::vector<ObjectTrackEx> objectTracks;
@@ -490,10 +490,10 @@ private:
                 return QRectF();
             };
 
-        auto objectMetadataPackets = toObjectTrack(packets);
-        objectMetadataPackets = filterObjectTracksAndApplySortOrder(
-            filter, std::move(objectMetadataPackets));
-        for (auto& packet : objectMetadataPackets)
+        auto objectTracks = toObjectTracks(packets);
+        objectTracks = filterObjectTracksAndApplySortOrder(
+            filter, std::move(objectTracks));
+        for (auto& packet : objectTracks)
         {
             packet.firstAppearanceTimeUs -= packet.firstAppearanceTimeUs % 1000;
             packet.lastAppearanceTimeUs -= packet.lastAppearanceTimeUs % 1000;
@@ -506,7 +506,7 @@ private:
         }
 
         std::vector<nx::analytics::db::ObjectTrack> result;
-        for (const auto& value: objectMetadataPackets)
+        for (const auto& value: objectTracks)
             result.push_back(nx::analytics::db::ObjectTrack(value));
         return result;
     }
@@ -604,6 +604,7 @@ private:
                 {
                     track.bestShot.timestampUs = packet->timestampUs;
                     track.bestShot.rect = objectMetadata.boundingBox;
+                    track.bestShot.streamIndex = packet->streamIndex;
                 }
 
                 tracks->push_back(std::move(track));
@@ -836,7 +837,7 @@ protected:
     void addMaxObjectTracksLimitToFilter()
     {
         const auto filteredObjectCount = (int) filterObjectTracks(
-            toObjectTrack(analyticsDataPackets()), m_filter).size();
+            toObjectTracks(analyticsDataPackets()), m_filter).size();
 
         if (filteredObjectCount > 0)
         {
