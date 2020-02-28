@@ -7,6 +7,12 @@ set BASE_DIR_WITH_BACKSLASH=%~dp0
 set BASE_DIR=%BASE_DIR_WITH_BACKSLASH:~0,-1%
 set BUILD_DIR=%BASE_DIR%-build
 
+if [%1] == [--no-tests] (
+    shift
+    set NO_TESTS=1
+) else (
+    set NO_TESTS=0
+)
 echo on
     rmdir /S /Q "%BUILD_DIR%/" 2>NUL
 @echo off
@@ -16,8 +22,7 @@ for /d %%S in (%BASE_DIR%\samples\*) do (
 )
 
 :: Run unit tests if needed.
-if [%1] == [--no-tests] echo NOTE: Unit tests were not run. & goto :skip_tests
-shift
+if [%NO_TESTS%] == [1] echo NOTE: Unit tests were not run. & goto :skip_tests
 echo on
     :: Currently, nx_kit and nx_sdk unit tests are built in the scope of stub_analytics_plugin.
     cd "%BUILD_DIR%/stub_analytics_plugin" || @goto :error
