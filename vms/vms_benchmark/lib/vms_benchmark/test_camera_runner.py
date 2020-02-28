@@ -10,6 +10,7 @@ ini_testcamera_bin: str
 ini_test_file_high_resolution: str
 ini_test_file_low_resolution: str
 ini_testcamera_output_file: str
+ini_testcamera_frame_log_file: str
 ini_testcamera_extra_args: str
 ini_unloop_via_testcamera: bool
 ini_test_file_high_period_us: int
@@ -47,6 +48,11 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
         ]
         if ini_enable_secondary_stream:
             camera_args += ["--shift-pts-secondary-period-us", str(ini_test_file_low_period_us)]
+
+    if ini_testcamera_frame_log_file:
+        camera_args += [
+            "--frame-log", ini_testcamera_frame_log_file
+        ]
 
     if ini_testcamera_extra_args:
         camera_args += ini_testcamera_extra_args.split()
