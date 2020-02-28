@@ -139,19 +139,6 @@ void CameraDiscoveryListener::sendDiscoveryResponseMessage(
     }
 }
 
-/** @return Nullopt on error, having logged the error message. */
-std::optional<SocketAddress> CameraDiscoveryListener::obtainDiscoverySocketAddress() const
-{
-    if (m_networkOptions.discoveryPort <= 0 || m_networkOptions.discoveryPort >= 65536)
-    {
-        NX_LOGGER_ERROR(m_logger, "Invalid discoveryPort in .ini: %1.",
-            m_networkOptions.discoveryPort);
-        return std::nullopt;
-    }
-
-    return SocketAddress(HostAddress::anyHost, m_networkOptions.discoveryPort);
-}
-
 /*virtual*/ void CameraDiscoveryListener::run()
 {
     const auto error = //< Intended to be called like: return error("...");
@@ -161,9 +148,12 @@ std::optional<SocketAddress> CameraDiscoveryListener::obtainDiscoverySocketAddre
     if (!discoverySocket)
         return error("Unable to create discovery socket.");
 
-    const std::optional<SocketAddress> socketAddress = obtainDiscoverySocketAddress();
-    if (!socketAddress)
+    if (!NX_ASSERT(m_networkOptions.discoveryPort > 0)
+        || !NX_ASSERT(m_networkOptions.discoveryPort < 65536))
+    {
         return;
+    }
+    const SocketAddress socketAddress(HostAddress::anyHost, m_networkOptions.discoveryPort);
 
     if (m_networkOptions.reuseDiscoveryPort)
     {
@@ -176,7 +166,7 @@ std::optional<SocketAddress> CameraDiscoveryListener::obtainDiscoverySocketAddre
             return error(lm("Unable tor set the reuse port flag on the discovery socket."));
     }
 
-    if (!discoverySocket->bind(*socketAddress))
+    if (!discoverySocket->bind(socketAddress))
         return error(lm("Unable to bind discovery socket to %1").args(socketAddress));
 
     const int socketTimeout = ini().discoveryMessageTimeoutMs;
