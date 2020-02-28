@@ -7,15 +7,13 @@
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/email/email_manager_impl.h>
 #include <nx/utils/elapsed_timer.h>
+#include <nx/vms/server/event/push_notifications.h>
 
 class QnMediaServerModule;
 
 namespace nx {
 namespace vms::server {
 namespace event {
-
-struct PushPayload;
-struct PushNotification;
 
 /*
 * ExtendedRuleProcessor can execute business actions
@@ -69,7 +67,6 @@ private:
     void sendAggregationEmail(const QnUuid& ruleId);
     bool sendMailInternal(const vms::event::SendMailActionPtr& action, int aggregatedResCount);
     void sendEmailAsync(vms::event::SendMailActionPtr action, QStringList recipients, int aggregatedResCount);
-    bool sendPushNotification(const vms::event::AbstractActionPtr& action);
 
     /**
      * This method is called once per action, calculates all recipients and packs them into
@@ -106,10 +103,8 @@ private:
         const QList<vms::event::InfoDetail>& aggregationDetailList,
         Qn::ResourceInfoLevel detailLevel) const;
 
-    PushPayload makePushPayload(const vms::event::EventParameters& event, bool isCamera) const;
-    PushNotification makePushNotification(const vms::event::AbstractActionPtr& action) const;
-
-    std::set<QString> cloudUsers(std::vector<QnUuid> filter) const;
+private:
+    PushManager m_pushManager;
 };
 
 } // namespace event
