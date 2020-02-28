@@ -73,6 +73,7 @@ public:
             (ptr->*foundSlot)(module);
     }
 
+    void beforeDestroy();
 signals:
     /** New reachable module is found. */
     void found(nx::vms::discovery::ModuleEndpoint module);

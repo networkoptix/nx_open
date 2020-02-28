@@ -27,6 +27,11 @@ Manager::Manager(bool clientMode, QObject* parent):
 
 Manager::~Manager()
 {
+    beforeDestroy();
+}
+
+void Manager::beforeDestroy()
+{
     m_legacyMulticastFinder->stop();
     m_multicastFinder->pleaseStopSync();
     m_moduleConnector->pleaseStopSync();
