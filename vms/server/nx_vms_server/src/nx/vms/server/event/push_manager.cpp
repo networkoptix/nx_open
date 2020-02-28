@@ -1,4 +1,4 @@
-#include "push_notifications.h"
+#include "push_manager.h"
 
 #include <QtCore/QJsonObject>
 
