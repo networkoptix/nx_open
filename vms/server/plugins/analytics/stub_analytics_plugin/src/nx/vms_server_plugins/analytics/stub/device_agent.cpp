@@ -130,8 +130,8 @@ DeviceAgent::~DeviceAgent()
  * DeviceAgent manifest may declare eventTypes and objectTypes similarly to how an Engine declares
  * them - semantically the set from the Engine manifest is joined with the set from the DeviceAgent
  * manifest. Also this manifest should declare supportedEventTypeIds and supportedObjectTypeIds
- * lists which are treated as white-list filters for the respective set (absent lists are treated
- * as empty lists, thus, disabling all types from the Engine).
+ * lists which are treated as white-list filters for the respective set from Engine manifest
+ * (absent lists are treated as empty lists, thus, disabling all types from the Engine).
  */
 std::string DeviceAgent::manifestString() const
 {
