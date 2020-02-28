@@ -86,8 +86,8 @@ public:
         return N;
     }
 
-    iovec* bufs() { return (iovec*)m_bufs.data(); }
-    const iovec* bufs() const { return (iovec*) m_bufs.data(); }
+    IoBuf* bufs() { return m_bufs.data(); }
+    const IoBuf* bufs() const { return m_bufs.data(); }
 
     const IoBuf& operator[](int i) const
     {
@@ -246,8 +246,8 @@ public:
     const uint32_t* header() const { return m_nHeader; }
     uint32_t* header() { return m_nHeader; }
 
-    std::tuple<const iovec*, std::size_t> ioBufs() const;
-    std::tuple<iovec*, std::size_t> ioBufs();
+    std::tuple<const IoBuf*, std::size_t> ioBufs() const;
+    std::tuple<IoBuf*, std::size_t> ioBufs();
 
 private:
     const int32_t __pad = 0;

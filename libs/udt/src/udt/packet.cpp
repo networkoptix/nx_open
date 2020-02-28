@@ -367,13 +367,13 @@ std::unique_ptr<CPacket> CPacket::clone() const
     return pkt;
 }
 
-std::tuple<const iovec*, std::size_t> CPacket::ioBufs() const
+std::tuple<const IoBuf*, std::size_t> CPacket::ioBufs() const
 {
     preparePacketVector();
     return std::make_tuple(m_PacketVector.bufs(), m_PacketVector.size());
 }
 
-std::tuple<iovec*, std::size_t> CPacket::ioBufs()
+std::tuple<IoBuf*, std::size_t> CPacket::ioBufs()
 {
     preparePacketVector();
     return std::make_tuple(m_PacketVector.bufs(), m_PacketVector.size());
