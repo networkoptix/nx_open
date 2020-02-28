@@ -136,7 +136,7 @@ void Engine::initCapabilities()
 
 std::string Engine::manifestString() const
 {
-    return /*suppress newline*/ 1 + R"json(
+    return /*suppress newline*/ 1 + (const char*) R"json(
 {
     "eventTypes": [
         {

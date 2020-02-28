@@ -122,7 +122,7 @@ void Engine::getManifest(Result<const IString*>* outResult) const
         }
     }
 
-    m_manifest = /*suppress newline*/1 + R"json(
+    m_manifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "objectTypes": [
 )json" + objectTypesManifest + R"json(
@@ -253,7 +253,7 @@ std::vector<std::string> Engine::loadClassGuids(const std::string& guidsFilePath
 /** Use indentation of 8 spaces, and no trailing whitespace. */
 std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& description) const
 {
-    return /*suppress newline*/1 + R"json(
+    return /*suppress newline*/ 1 + (const char*) R"json(
         {
             "id": ")json" + description.typeId + R"json(",
             "name": ")json" + description.name + R"json("
@@ -277,7 +277,7 @@ bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 
 namespace {
 
-static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
+static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.deepstream",
     "name": "DeepStream analytics plugin",

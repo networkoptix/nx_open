@@ -42,7 +42,7 @@ std::string DeviceAgent::manifestString() const
     // `{vendor_id}.{plugin_id}.{event_type_id/object_type_id}`.
     //
     // See the plugin manifest for the explanation of vendor_id and plugin_id.
-    return /*suppress newline*/ 1 + R"json(
+    return /*suppress newline*/ 1 + (const char*) R"json(
 {
     "eventTypes": [
         {

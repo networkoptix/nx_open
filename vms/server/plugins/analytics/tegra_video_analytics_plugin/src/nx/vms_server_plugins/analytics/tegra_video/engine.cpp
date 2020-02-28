@@ -29,7 +29,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
 std::string Engine::manifestString() const
 {
-    return /*suppress newline*/1 + R"json(
+    return /*suppress newline*/ 1 + (const char*) R"json(
     "eventTypes": [
         {
             "id": "nx.tegraVideo.humanEnteredTheArea",
@@ -61,7 +61,7 @@ std::string Engine::manifestString() const
 
 namespace {
 
-static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
+static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.tegra_video",
     "name": "TegraVideo analytics plugin",

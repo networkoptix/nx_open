@@ -6,7 +6,7 @@ namespace nx {
 namespace test {
 
 // NOTE: The hard-coded cameraId should match the hard-coded physicalId.
-static const QByteArray kCameraAttributesData = /*suppress newline*/1 + R"json(
+static const QByteArray kCameraAttributesData = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "audioEnabled": false,
     "backupType": "CameraBackupDefault",

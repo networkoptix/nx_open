@@ -28,7 +28,7 @@ namespace {
 
 static const QString kSerialPortsIniFilename = "SerialPorts.ini";
 
-static const QByteArray defaultConfiguration = /*suppress newline*/1 + R"json(
+static const QByteArray defaultConfiguration = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "useAllPorts": false,
     "values":
@@ -390,7 +390,7 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 namespace {
 
-static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
+static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.ssc",
     "name": "SSC analytics plugin",

@@ -171,7 +171,7 @@ std::string DeviceAgent::manifestString() const
         ]
     })json";
 
-    return /*suppress newline*/1 + R"json(
+    return /*suppress newline*/ 1 + (const char*) R"json(
 {
     "supportedEventTypeIds": [
         ")json" + kLineCrossingEventType + R"json(",

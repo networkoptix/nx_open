@@ -144,7 +144,7 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
         }
     }
 
-    m_manifest = /*suppress newline*/1 + R"json(
+    m_manifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "supportedObjectTypeIds": [
 )json" + objectTypeIds + R"json(

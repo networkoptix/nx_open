@@ -32,7 +32,7 @@ Result<IEngine*> Plugin::doObtainEngine()
  */
 std::string Plugin::manifestString() const
 {
-    return /*suppress newline*/ 1 + R"json(
+    return /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.sample",
     "name": "Sample analytics plugin",
