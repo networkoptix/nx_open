@@ -257,7 +257,6 @@ SystemCommands::MountCode SystemCommands::mount(
 
     const char* hostStart = url.c_str();
     const char* hostEnd = nullptr;
-    char host[256];
 
     while (*hostStart && *hostStart == '/')
         ++hostStart;
@@ -272,35 +271,33 @@ SystemCommands::MountCode SystemCommands::mount(
         return SystemCommands::MountCode::otherError;
     }
 
+    char host[256];
     memset(host, 0, sizeof(host));
     strncpy(host, hostStart, std::min<size_t>(sizeof(host) - 1, hostEnd - hostStart));
-    struct addrinfo hints;
+    addrinfo hints;
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = 0;
     hints.ai_flags = AI_NUMERICSERV | AI_V4MAPPED | AI_ADDRCONFIG | AI_ALL;
 
-    int code = -1;
-    struct addrinfo* resolved = nullptr;
-    if ((code = getaddrinfo(host, nullptr, &hints, &resolved)) != 0) {
+    addrinfo* resolved = nullptr;
+    if (int code = getaddrinfo(host, nullptr, &hints, &resolved); code != 0)
+    {
         NX_OUTPUT <<"Mount: getaddrinfo failed. code: " << code << ", errno: " << errno;
         return SystemCommands::MountCode::otherError;
     }
-
     const auto onExit = ScopeGuard([resolved](){ freeaddrinfo(resolved); });
-    struct addrinfo* presolved;
-    const void* inaddrp;
-
-    for (presolved = resolved; presolved; presolved = presolved->ai_next)
+    for (const addrinfo* presolved = resolved; presolved; presolved = presolved->ai_next)
     {
+        const void* inaddrp = nullptr;;
         switch (presolved->ai_family)
         {
             case AF_INET:
-                inaddrp = &((struct sockaddr_in*)presolved->ai_addr)->sin_addr;
+                inaddrp = &((sockaddr_in*)presolved->ai_addr)->sin_addr;
                 break;
             case AF_INET6:
-                inaddrp = &((struct sockaddr_in6*)presolved->ai_addr)->sin6_addr;
+                inaddrp = &((sockaddr_in6*)presolved->ai_addr)->sin6_addr;
                 break;
             default:
                 inaddrp = NULL;
