@@ -47,8 +47,7 @@ do
         exit 64
     fi
     echo ""
-    echo "Plugin built:"
-    echo "$ARTIFACT"
+    echo "Plugin built: $ARTIFACT"
     echo ""
 done
 

@@ -8,7 +8,7 @@ set -u #< Prohibit undefined variables.
 BASE_DIR=$(readlink -f "$(dirname "$0")") #< Absolute path to this script's dir.
 BUILD_DIR="$BASE_DIR-build"
 
-if (($# > 0)) && [[ $1 == "--no-tests" ]]
+if [[ $# > 0 && $1 == "--no-tests" ]]
 then
     shift
     NO_TESTS=1
@@ -55,8 +55,7 @@ do
         exit 64
     fi
     echo ""
-    echo "Plugin built:"
-    echo "$ARTIFACT"
+    echo "Plugin built: $ARTIFACT"
     echo ""
 done
 

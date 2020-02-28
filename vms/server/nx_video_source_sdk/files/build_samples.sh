@@ -11,7 +11,7 @@ set -u #< Prohibit undefined variables.
 BASE_DIR=$(readlink -f "$(dirname "$0")") #< Absolute path to this script's dir.
 BUILD_DIR="$BASE_DIR-build"
 
-if (($# > 0)) && [[ $1 == "--with-rpi-samples" ]]
+if [[ $# > 0 && $1 == "--with-rpi-samples" ]]
 then
     shift
     WITH_RPI_SAMPLES=1
@@ -64,8 +64,7 @@ do
         exit 64
     fi
     echo ""
-    echo "Plugin built:"
-    echo "$ARTIFACT"
+    echo "Plugin built: $ARTIFACT"
     echo ""
 done
 

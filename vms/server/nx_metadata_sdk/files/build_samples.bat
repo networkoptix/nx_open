@@ -12,7 +12,7 @@ echo on
 @echo off
 
 for /d %%S in (%BASE_DIR%\samples\*) do (
-    call :build_sample %%S %1 %2 %3 %4 %5 %6 %7 %8 || @goto :error
+    call :build_sample %%S %1 %2 %3 %4 %5 %6 %7 %8 %9 || @goto :error
 )
 
 :: Run unit tests if needed.
@@ -25,8 +25,8 @@ echo on
     ctest --output-on-failure -C Debug || @goto :error
 @echo off
 :skip_tests
-echo:
 
+echo:
 echo Samples built successfully, see the binaries in %BUILD_DIR%
 exit /b
 
@@ -46,15 +46,11 @@ exit /b
     set ARTIFACT=%SAMPLE_BUILD_DIR%\Debug\%SAMPLE%.dll
     if not exist "%ARTIFACT%" (
         echo ERROR: Failed to build plugin %SAMPLE%.
-        exit /b 64
+        exit /b 70
     )
     echo:
-    echo Plugin built:
-    echo %ARTIFACT%
-    echo:
+    echo Plugin built: %ARTIFACT%
 exit /b
 
 :error
-    @echo off
-    set RESULT=%ERRORLEVEL%
-exit /b %RESULT%
+    @exit /b %ERRORLEVEL%
