@@ -174,8 +174,12 @@ def load_configs(conf_file, ini_file_if_passed, ini_file_default):
 
     if ini.OPTIONS_FROM_FILE is not None:
         report(f"\nOverriding default options via {ini.filepath!r}:")
+        isReported = False
         for k, v in ini.OPTIONS_FROM_FILE.items():
+            isReported = True
             report(f"    {k}={v}")
+        if not isReported:
+            report(f"    No overriding values found in .ini file.")
 
     report(f"\nConfiguration defined in {conf.filepath!r}:")
     for k, v in conf.options.items():
