@@ -8,6 +8,7 @@
 
 #include <gtest/gtest.h>
 
+#include <udt/channel.h>
 #include <udt/socket_addresss.h>
 #include <udt/udt.h>
 
@@ -17,6 +18,8 @@ class BasicFixture:
     public ::testing::Test
 {
 public:
+    ~BasicFixture();
+
     void initializeUdt();
     void deinitializeUdt();
 
@@ -45,12 +48,15 @@ public:
 
     UDTSOCKET clientSocket() { return m_clientSocket; }
 
+    void installReorderingChannel();
+
 private:
     int m_ipVersion = AF_INET;
     UDTSOCKET m_serverSocket = -1;
     UDTSOCKET m_acceptedConnection = -1;
     detail::SocketAddress m_serverAddress;
     UDTSOCKET m_clientSocket = -1;
+    std::optional<UdpChannelFactory::FactoryFunc> m_channelFactoryBak;
 
     void connectToServer();
 
