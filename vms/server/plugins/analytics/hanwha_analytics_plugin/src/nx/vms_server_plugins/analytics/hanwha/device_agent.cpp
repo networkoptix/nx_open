@@ -156,7 +156,8 @@ void copySettingsFromServerToCamera(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
 } // namespace
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    m_engine(engine)
+    m_engine(engine),
+    m_objectMetadataXmlParser(m_engine->engineManifest())
 {
     this->setDeviceInfo(deviceInfo);
 }
@@ -213,9 +214,11 @@ void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPac
     const auto incomingPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
     QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
 
-    static int i = 0;
-    std::cout << "========================" << std::endl;
-    std::cout << ++i << std::endl << (const char*)xmlData << std::endl << std::endl << std::endl;
+    //if (incomingPacket->dataSize() > 2000) {
+    //    static int i = 0;
+    //    std::cout << "========================" << std::endl;
+    //    std::cout << ++i << " " << incomingPacket->dataSize() << std::endl << (const char*)xmlData << std::endl << std::endl << std::endl;
+    //}
 
     const auto ts = incomingPacket->timestampUs();
 
@@ -224,12 +227,11 @@ void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPac
     // For now client does not support packets with multiple objects. When GUI team fix it
     // we'll pass one packet with many objects instead of many packets with one object.
 
-    Ptr<ObjectMetadataPacket> outcomingPacket = parseObjectMetadataXml(
-        xmlData, m_engine->engineManifest());
+    Ptr<ObjectMetadataPacket> outcomingPacket = m_objectMetadataXmlParser.parse(xmlData);
 
     if (outcomingPacket && outcomingPacket->count())
     {
-        std::cout << outcomingPacket->count() << std::endl;
+        //std::cout << outcomingPacket->count() << std::endl;
 
         outcomingPacket->setTimestampUs(ts);
         outcomingPacket->setDurationUs(1'000'000); // 1 second

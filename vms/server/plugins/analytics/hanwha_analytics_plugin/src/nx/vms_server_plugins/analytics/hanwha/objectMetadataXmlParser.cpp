@@ -1,14 +1,16 @@
 #include "objectMetadataXmlParser.h"
 
-#include <charconv>
 #include <cmath>
-
-#include <QtXml/QDomDocument>
+#include <ctime>
+#include <optional>
+#include <vector>
 
 #include <nx/utils/log/log.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 
 namespace nx::vms_server_plugins::analytics::hanwha {
+
+using namespace std::chrono_literals;
 
 using nx::sdk::Ptr;
 using nx::sdk::makePtr;
@@ -18,13 +20,10 @@ using nx::sdk::analytics::ObjectMetadata;
 using nx::sdk::analytics::IObjectMetadata;
 using nx::sdk::analytics::ObjectMetadataPacket;
 using nx::sdk::analytics::Rect;
+
+namespace {
 //-------------------------------------------------------------------------------------------------
 
-struct FrameScales
-{
-    float x;
-    float y;
-};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -48,21 +47,6 @@ Uuid deviceObjectNumberToUuid(T deviceObjectNumber)
 
 //-------------------------------------------------------------------------------------------------
 
-std::chrono::time_point<std::chrono::system_clock> QDateTimeToTimePoint(QDateTime dateTime)
-{
-    const qint64 millisec = dateTime.toMSecsSinceEpoch();
-    const std::chrono::time_point<std::chrono::system_clock> epocBegin{};
-    return epocBegin + std::chrono::milliseconds(millisec);
-}
-
-//-------------------------------------------------------------------------------------------------
-std::string timePointToString(std::chrono::time_point<std::chrono::system_clock> timePoint)
-{
-    std::time_t epoch_time = std::chrono::system_clock::to_time_t(timePoint);
-    return std::ctime(&epoch_time);
-}
-//-------------------------------------------------------------------------------------------------
-
 /**
  * Find first sub-element with tag `childElement`, where `childElement` doesn't contain  namespace.
  * Should be used instead of QDomElement::firstChildElement(), that needs child tag namespace,
@@ -79,51 +63,6 @@ QDomElement getChildElement(const QDomElement& parent, const QString& childTagNa
             return e;
     }
     return QDomElement();
-}
-
-//-------------------------------------------------------------------------------------------------
-
-std::optional<FrameScales> extractScales(const QDomElement& transformation)
-{
-    double xNumerator = 0.0;
-    double yNumerator = 0.0;
-    double xDenominator = 0.0;
-    double yDenominator = 0.0;
-    for (QDomElement e = transformation.firstChildElement(); !e.isNull(); e = e.nextSiblingElement())
-    {
-        if (e.tagName() == "Translate")
-        {
-            xDenominator = e.attribute("x").toFloat();
-            yDenominator = e.attribute("y").toFloat();
-        }
-        else
-        if (e.tagName() == "Scale")
-        {
-            xNumerator = e.attribute("x").toFloat();
-            yNumerator = e.attribute("y").toFloat();
-        }
-    }
-    std::optional<FrameScales> result;
-    if (xNumerator && yNumerator && xDenominator && yDenominator)
-    {
-        // The origin of this factor is unknown, but it works much better with it.
-        static const float kScaleFactor= 2.0f;
-        result = { float(std::abs(xNumerator / xDenominator / kScaleFactor)),
-            float(std::abs(yNumerator / yDenominator / kScaleFactor)) };
-    }
-    return result;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-std::optional<QDateTime> extractTimestamp(const QDomElement& frame)
-{
-    QString deviceTimestampAsString = frame.attribute("UtcTime");
-    QDateTime deviceTimestamp = QDateTime::fromString(deviceTimestampAsString, Qt::ISODateWithMs);
-    std::optional<QDateTime> result;
-    if (deviceTimestamp != QDateTime())
-        result = deviceTimestamp;
-    return result;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -148,13 +87,6 @@ std::optional<Rect> extractRect(const QDomElement& shape)
 
 //-------------------------------------------------------------------------------------------------
 
-[[nodiscard]] Rect scale(Rect rect, FrameScales frameScales)
-{
-
-    return { rect.x * frameScales.x, rect.y * frameScales.y,
-        rect.width * frameScales.x, rect.height * frameScales.y };
-}
-
 //-------------------------------------------------------------------------------------------------
 
 std::optional<ClassInfo> extractClassInfo(const QDomElement& class_)
@@ -169,54 +101,29 @@ std::optional<ClassInfo> extractClassInfo(const QDomElement& class_)
     result = { internalName, likelihood};
     return result;
 }
-//-------------------------------------------------------------------------------------------------
-Ptr<ObjectMetadata> extractObject(
-    const QDomElement& object, FrameScales frameScales, const Hanwha::EngineManifest& manifest)
+
+template <typename F>
+void forEachChildElement(const QDomElement& element, const QString& tagName, F f)
 {
-    Ptr<ObjectMetadata> result;
-    int objectId = object.attribute("ObjectId").toInt();
-
-    const QDomElement appearance = getChildElement(object, "Appearance");
-    if (appearance.isNull())
-        return result;
-
-    const QDomElement shape = getChildElement(appearance, "Shape");
-    if (shape.isNull())
-        return result;
-
-    const QDomElement class_ = getChildElement(appearance, "Class");
-    if (class_.isNull())
-        return result;
-
-    const auto rect = extractRect(shape);
-    const auto classInfo = extractClassInfo(class_);
-    if (!rect || !classInfo)
-        return result;
-
-    std::string objectTypeId = manifest.objectTypeIdByInternalName(
-        QString::fromStdString(classInfo->internalClassName)).toStdString();
-
-    if (objectTypeId.empty())
-        return result;
-
-    result = makePtr<ObjectMetadata>();
-    const nx::sdk::Uuid trackId = deviceObjectNumberToUuid(objectId);
-    result->setTrackId(trackId);
-
-    result->setTypeId(objectTypeId);
-
-    const Rect relativeRect = scale(*rect, frameScales);
-    result->setBoundingBox(relativeRect);
-
-    return result;
+    for (auto child = element.firstChildElement(tagName);
+         !child.isNull(); child = child.nextSiblingElement(tagName))
+    {
+        f(child);
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
 
+} // namespace
+
 //-------------------------------------------------------------------------------------------------
 
-Ptr<ObjectMetadataPacket> parseObjectMetadataXml(
-    const QByteArray& data, const Hanwha::EngineManifest& manifest)
+ObjectMetadataXmlParser::ObjectMetadataXmlParser(const Hanwha::EngineManifest& engineManifest):
+    m_engineManifest(engineManifest)
+{
+}
+
+Ptr<ObjectMetadataPacket> ObjectMetadataXmlParser::parse(const QByteArray& data)
 {
     Ptr<ObjectMetadataPacket> result;
 
@@ -235,56 +142,205 @@ Ptr<ObjectMetadataPacket> parseObjectMetadataXml(
     if (frame.isNull())
         return result;
 
-    const auto timestamp = extractTimestamp(frame);
-    Ptr<Attribute> timestampAttribute;
-    if (timestamp)
-    {
-        std::chrono::time_point<std::chrono::system_clock> moment =
-            QDateTimeToTimePoint(*timestamp);
-
-        std::time_t epoch_time = std::chrono::system_clock::to_time_t(moment);
-        std::string t = std::ctime(&epoch_time);
-
-        timestampAttribute = makePtr<Attribute>(nx::sdk::IAttribute::Type::string,
-            "timestamp", timePointToString(moment));
-    }
     const QDomElement transformation = getChildElement(frame, "Transformation");
-    if (frame.isNull())
+    if (transformation.isNull())
         return result;
 
-    auto frameScales = extractScales(transformation);
-    if (!frameScales)
+    if (!extractFrameScale(transformation))
         return result;
 
     result = makePtr<ObjectMetadataPacket>();
-    QDomElement object = transformation.nextSiblingElement();
-    for (; !object.isNull(); object = object.nextSiblingElement())
+
+    for (auto object = frame.firstChildElement("Object");
+         !object.isNull(); object = object.nextSiblingElement("Object"))
     {
-        if (Ptr<ObjectMetadata> objectMetadata = extractObject(object, *frameScales, manifest))
-        {
-            if (timestampAttribute)
-                objectMetadata->addAttribute(timestampAttribute);
+        if (Ptr<ObjectMetadata> objectMetadata = extractObject(object))
             result->addItem(objectMetadata.releasePtr());
-        }
     }
 
-    //static int i = 0;
-    //++i;
-    //auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
-    ////const auto ts = dataPacket->timestampUs();
-    //objectMetadataPacket->setTimestampUs(timestamp);
-    //objectMetadataPacket->setDurationUs(1000'000);
-
-    //auto objectMetadata = makePtr<ObjectMetadata>();
-    //static const nx::sdk::Uuid trackId = deviceObjectNumberToUuid(i % 10);
-    //objectMetadata->setTrackId(trackId);
-    //objectMetadata->setTypeId("nx.hanwha.ObjectDetection.Face");
-    //objectMetadata->setBoundingBox(Rect(0.0, 0.0, 0.5, 0.5));
-
-    //objectMetadataPacket->addItem(objectMetadata.get());
-
-    //result.push_back(objectMetadataPacket);
     return result;
+}
+
+bool ObjectMetadataXmlParser::extractFrameScale(const QDomElement& transformation)
+{
+    double xNumerator = 0.0;
+    double yNumerator = 0.0;
+    double xDenominator = 0.0;
+    double yDenominator = 0.0;
+    for (QDomElement e = transformation.firstChildElement(); !e.isNull(); e = e.nextSiblingElement())
+    {
+        if (e.tagName() == "Translate")
+        {
+            xDenominator = e.attribute("x").toFloat();
+            yDenominator = e.attribute("y").toFloat();
+        }
+        else
+        if (e.tagName() == "Scale")
+        {
+            xNumerator = e.attribute("x").toFloat();
+            yNumerator = e.attribute("y").toFloat();
+        }
+    }
+    if (xNumerator && yNumerator && xDenominator && yDenominator)
+    {
+        // The origin of this factor is unknown, but it works much better with it.
+        static const float kScaleFactor = 2.0f;
+        m_frameScale = {
+            float(std::abs(xNumerator / xDenominator / kScaleFactor)),
+            float(std::abs(yNumerator / yDenominator / kScaleFactor)),
+        };
+        return true;
+    }
+    return false;
+}
+
+[[nodiscard]] Rect ObjectMetadataXmlParser::applyFrameScale(Rect rect) const {
+    return {
+        rect.x * m_frameScale.x,
+        rect.y * m_frameScale.y,
+        rect.width * m_frameScale.x,
+        rect.height * m_frameScale.y,
+    };
+}
+
+std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
+    ObjectId objectId, const QDomElement& appearance)
+{
+    auto& attributes = m_objectAttributes[objectId];
+
+    const auto walk =
+        [&](auto walk, QString key, const QDomElement& element)
+        {
+            static auto const appendDot =
+                [](const QString& string) {
+                    if (string.isEmpty())
+                        return string;
+                    return string + ".";
+                };
+
+            const auto domAttrs = element.attributes();
+            for (int i = 0; i < domAttrs.length(); ++i) {
+                const auto domAttr = domAttrs.item(i);
+                const auto name = domAttr.nodeName();
+                const auto value = domAttr.nodeValue();
+                attributes[(appendDot(key) + "@" + name).toStdString()] = value.toStdString();
+            }
+
+            std::unordered_map<std::string, int> counts;
+            forEachChildElement(element, "",
+                [&](const auto& child) {
+                    ++counts[child.tagName().toStdString()];
+                });
+
+            if (counts.empty())
+            {
+                if (const auto child = element.firstChild(); child.isText()) {
+                    const QString value = child.toText().data();
+                    attributes[key.toStdString()] = value.toStdString();
+                }
+            }
+
+            std::unordered_map<std::string, int> indices;
+            forEachChildElement(element, "",
+                [&](const auto& child) {
+                    const auto name  = child.tagName().toStdString();
+
+                    QString suffix;
+                    if (counts[name] > 1)
+                        suffix = QString("[%1]").arg(++indices[name]);
+
+                    walk(walk, appendDot(key) + child.tagName() + suffix, child);
+                });
+        };
+
+    // This set might be incomplete.
+    static const std::vector<QString> rootTags = {
+        "HumanBody",
+        "HumanFace",
+        "VehicleInfo",
+    };
+    for (const auto& rootTag: rootTags)
+        forEachChildElement(appearance, rootTag,
+            [&](const auto& element) {
+                // Since it appears that single object cannot have multiple
+                // root tags, we can just clear all the attributes.
+                attributes.clear();
+
+                walk(walk, "", element);
+            });
+
+    attributes.timeStamp = std::chrono::steady_clock::now();
+
+    std::vector<Ptr<Attribute>> result;
+    result.reserve(attributes.size());
+    for (const auto& [name, value]: attributes)
+    {
+        auto attribute = makePtr<Attribute>(Attribute::Type::string, name, value);
+        result.push_back(std::move(attribute));
+    }
+    std::sort(result.begin(), result.end(),
+        [](const auto& a, const auto& b)
+        {
+            return std::strcmp(a->name(), b->name()) < 0;
+        });
+
+    return result;
+}
+
+Ptr<ObjectMetadata> ObjectMetadataXmlParser::extractObject(const QDomElement& object)
+{
+    Ptr<ObjectMetadata> result;
+    const int objectId = object.attribute("ObjectId").toInt();
+
+    const QDomElement appearance = getChildElement(object, "Appearance");
+    if (appearance.isNull())
+        return result;
+
+    const QDomElement shape = getChildElement(appearance, "Shape");
+    if (shape.isNull())
+        return result;
+
+    const QDomElement class_ = getChildElement(appearance, "Class");
+    if (class_.isNull())
+        return result;
+
+    const auto rect = extractRect(shape);
+    const auto classInfo = extractClassInfo(class_);
+    if (!rect || !classInfo)
+        return result;
+
+    std::string objectTypeId = m_engineManifest.objectTypeIdByInternalName(
+        QString::fromStdString(classInfo->internalClassName)).toStdString();
+    if (objectTypeId.empty())
+        return result;
+
+    result = makePtr<ObjectMetadata>();
+
+    const nx::sdk::Uuid trackId = deviceObjectNumberToUuid(objectId);
+    result->setTrackId(trackId);
+
+    result->setTypeId(objectTypeId);
+
+    const Rect relativeRect = applyFrameScale(*rect);
+    result->setBoundingBox(relativeRect);
+
+    result->addAttributes(extractAttributes(objectId, appearance));
+
+    return result;
+}
+
+void ObjectMetadataXmlParser::collectGarbage()
+{
+    static const auto timeout = 5min;
+
+    auto now = std::chrono::steady_clock::now();
+    for (auto it = m_objectAttributes.begin(); it != m_objectAttributes.end(); ) {
+        auto [objectId, attributes] = *it;
+        if (now - attributes.timeStamp > timeout)
+            it = m_objectAttributes.erase(it);
+        else
+            ++it;
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
