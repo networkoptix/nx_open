@@ -428,7 +428,7 @@ void socketSyncAsyncSwitch(
     ASSERT_EQ(SystemError::noError, connectPromise.get_future().get());
 
     auto accepted = server->accept();
-    ASSERT_TRUE((bool) accepted);
+    ASSERT_TRUE((bool) accepted) << SystemError::getLastOSErrorText().toStdString();
     const auto acceptedGuard = nx::utils::makeScopeGuard(
         [&accepted]() { accepted->pleaseStopSync(); });
 
