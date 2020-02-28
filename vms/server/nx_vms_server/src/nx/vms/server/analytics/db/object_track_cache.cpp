@@ -9,7 +9,7 @@ namespace nx::analytics::db {
 ObjectTrackCache::ObjectTrackCache(
     std::chrono::milliseconds aggregationPeriod,
     std::chrono::milliseconds maxObjectLifetime,
-    nx::vms::server::analytics::AbstractIFrameSearchHelper* helper)
+    nx::vms::server::analytics::AbstractIframeSearchHelper* helper)
     :
     m_aggregationPeriod(aggregationPeriod),
     m_maxObjectLifetime(maxObjectLifetime),

@@ -101,7 +101,7 @@
 #include <plugins/storage/dts/vmax480/vmax480_resource.h>
 #include <nx_vms_server_ini.h>
 #include <nx/metrics/metrics_storage.h>
-#include <nx/vms/server/analytics/i_frame_search_helper.h>
+#include <nx/vms/server/analytics/iframe_search_helper.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -293,8 +293,8 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_context.reset(new UniquePtrContext());
 
-    m_analyticsIFrameSearchHelper = store(
-        new nx::vms::server::analytics::IFrameSearchHelper(
+    m_analyticsIframeSearchHelper = store(
+        new nx::vms::server::analytics::IframeSearchHelper(
             commonModule()->resourcePool(), m_videoCameraPool));
 
     m_analyticsEventsStorage = store(
@@ -805,7 +805,7 @@ QString QnMediaServerModule::metadataDatabaseDir() const
 
 using namespace nx::vms::server::analytics;
 
-AbstractIFrameSearchHelper* QnMediaServerModule::iFrameSearchHelper() const
+AbstractIframeSearchHelper* QnMediaServerModule::iFrameSearchHelper() const
 {
-    return m_analyticsIFrameSearchHelper;
+    return m_analyticsIframeSearchHelper;
 }

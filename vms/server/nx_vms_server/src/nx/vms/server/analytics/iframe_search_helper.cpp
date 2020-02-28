@@ -1,4 +1,4 @@
-#include "i_frame_search_helper.h"
+#include "iframe_search_helper.h"
 
 #include <camera/camera_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -9,7 +9,7 @@ using namespace nx::vms::api;
 
 namespace nx::vms::server::analytics {
 
-IFrameSearchHelper::IFrameSearchHelper(
+IframeSearchHelper::IframeSearchHelper(
     const QnResourcePool* resourcePool,
     const QnVideoCameraPool* cameraPool)
     :
@@ -18,7 +18,7 @@ IFrameSearchHelper::IFrameSearchHelper(
 {
 }
 
-qint64 IFrameSearchHelper::findAfter(
+qint64 IframeSearchHelper::findAfter(
     const QnUuid& deviceId,
     nx::vms::api::StreamIndex streamIndex,
     qint64 timestampUs) const
