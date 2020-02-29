@@ -521,7 +521,6 @@ void CSndQueue::worker()
                     // m_sendTasks is not empty.
                     continue;
                 }
-                //m_timer->sleepto(ts);
             }
 
             // it is time to send the next pkt
@@ -534,7 +533,7 @@ void CSndQueue::worker()
             packetVerifier.beforeSendingPacket(pkt);
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
-            sendPacket(addr, std::move(pkt));
+            postPacket(addr, std::move(pkt));
         }
         else
         {
@@ -549,16 +548,9 @@ void CSndQueue::worker()
 
 int CSndQueue::sendto(const detail::SocketAddress& addr, CPacket packet)
 {
-    if (std::this_thread::get_id() == m_WorkerThread.get_id())
-    {
-        return sendPacket(addr, std::move(packet));
-    }
-    else
-    {
-        const auto packetLength = packet.getLength();
-        postPacket(addr, std::move(packet));
-        return packetLength;
-    }
+    const auto packetLength = packet.getLength();
+    postPacket(addr, std::move(packet));
+    return packetLength;
 }
 
 detail::SocketAddress CSndQueue::getLocalAddr() const

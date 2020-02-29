@@ -5,6 +5,7 @@
 #endif
 
 #include <algorithm>
+#include <condition_variable>
 #include <mutex>
 
 #include <gtest/gtest.h>
