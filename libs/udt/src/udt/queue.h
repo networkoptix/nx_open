@@ -236,55 +236,32 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-struct CRNode
-{
-    UDTSOCKET socketId = -1;
-    std::weak_ptr<CUDT> socket;
-    std::chrono::microseconds timestamp = std::chrono::microseconds::zero();
-
-    CRNode* prev = nullptr;
-    CRNode* next = nullptr;
-};
-
+/**
+ * List of sockets sorted by timestamp in ascending order.
+ */
 class CRcvUList
 {
 public:
-    CRcvUList() = default;
-    ~CRcvUList();
+    struct CRNode
+    {
+        UDTSOCKET socketId = -1;
+        std::weak_ptr<CUDT> socket;
+        std::chrono::microseconds timestamp = std::chrono::microseconds::zero();
+    };
 
-    CRcvUList(const CRcvUList&) = delete;
-    CRcvUList& operator=(const CRcvUList&) = delete;
+    using iterator = std::list<CRNode>::iterator;
 
-    // Functionality:
-    //    Insert a new UDT instance to the list.
-    // Parameters:
-    //    1) [in] u: pointer to the UDT instance
-    // Returned value:
-    //    None.
+    void push_back(std::shared_ptr<CUDT> u);
+    void erase(iterator it);
+    void sink(UDTSOCKET socketId);
 
-    void insert(std::shared_ptr<CUDT> u);
-
-    // Functionality:
-    //    Remove the UDT instance from the list.
-    // Returned value:
-    //    None.
-
-    void remove(CRNode* node);
-
-    // Functionality:
-    //    Move the UDT instance to the end of the list, if it already exists; otherwise, do nothing.
-    // Returned value:
-    //    None.
-
-    void update(UDTSOCKET socketId);
-
-public:
-    // TODO: #ak Replace this double-linked list implementation with std container.
-    CRNode* m_nodeListHead = nullptr;        // the head node
+    bool empty() const { return m_sockets.empty(); }
+    iterator begin() { return m_sockets.begin(); }
+    iterator end() { return m_sockets.end(); }
 
 private:
-    CRNode* m_nodeListTail = nullptr;        // the last node
-    std::map<UDTSOCKET, CRNode*> m_socketIdToNode;
+    std::list<CRNode> m_sockets;
+    std::map<UDTSOCKET, std::list<CRNode>::iterator> m_socketIdToNode;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -347,7 +324,7 @@ private:
 class CSndQueue
 {
 public:
-    CSndQueue(UdpChannel* c, CTimer* t);
+    CSndQueue(AbstractUdpChannel* c, CTimer* t);
     ~CSndQueue();
 
     void start();
@@ -382,7 +359,7 @@ private:
     // List of UDT instances for data sending
     std::unique_ptr<CSndUList> m_pSndUList;
     // The UDP channel for data sending
-    UdpChannel* m_channel = nullptr;
+    AbstractUdpChannel* m_channel = nullptr;
     // Timing facility
     CTimer* m_timer = nullptr;
     std::vector<SendTask> m_sendTasks;
@@ -415,7 +392,12 @@ public:
      * @param c UDP channel to be associated to the queue
      * @param t timer
      */
-    CRcvQueue(int size, int payload, int ipVersion, UdpChannel* c, CTimer* t);
+    CRcvQueue(
+        int size,
+        int payload,
+        int ipVersion,
+        AbstractUdpChannel* c,
+        CTimer* t);
     ~CRcvQueue();
 
     void start();
@@ -469,11 +451,11 @@ private:
     CUnitQueue m_UnitQueue;        // The received packet queue
 
     // List of UDT instances that will read packets from the queue.
-    std::unique_ptr<CRcvUList> m_pRcvUList;
+    CRcvUList m_rcvUList;
     // Hash table for UDT socket looking up
     SocketByIdDict m_socketByIdDict;
     // UDP channel for receving packets
-    UdpChannel* m_channel = nullptr;
+    AbstractUdpChannel* m_channel = nullptr;
     // shared timer with the snd queue
     CTimer* m_timer = nullptr;
     const int m_iIPversion;
