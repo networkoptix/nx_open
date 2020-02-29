@@ -519,7 +519,7 @@ private:
         // tracks and filter.sortOrder is applied AFTER filtering.
         std::sort(
             objectTracks.begin(), objectTracks.end(),
-            [&filter](const ObjectTrack& left, const ObjectTrack& right)
+            [](const ObjectTrack& left, const ObjectTrack& right)
             {
                 return left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
             });

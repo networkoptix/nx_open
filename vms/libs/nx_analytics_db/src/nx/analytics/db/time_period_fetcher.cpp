@@ -12,22 +12,16 @@
 
 namespace nx::analytics::db {
 
-static const QSize kSearchResolution(
-    kTrackSearchResolutionX,
-    kTrackSearchResolutionY);
-
 TimePeriodFetcher::TimePeriodFetcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
     AttributesDao* attributesDao,
-    AnalyticsArchiveDirectory* analyticsArchive,
-    std::chrono::milliseconds maxRecordedTimestamp)
+    AnalyticsArchiveDirectory* analyticsArchive)
     :
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
     m_attributesDao(attributesDao),
-    m_analyticsArchive(analyticsArchive),
-    m_maxRecordedTimestamp(maxRecordedTimestamp)
+    m_analyticsArchive(analyticsArchive)
 {
 }
 

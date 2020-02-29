@@ -98,7 +98,6 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
         const int64_t callDurationUs = duration_cast<microseconds>(
             high_resolution_clock::now() - startTime).count();
 
-        const auto endTime = high_resolution_clock::now();
         m_metadataLogger->pushObjectMetadata(
             std::move(copy),
             lm("save() call took %1 us").args(callDurationUs));

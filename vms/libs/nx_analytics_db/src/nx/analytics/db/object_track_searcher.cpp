@@ -12,10 +12,6 @@
 
 namespace nx::analytics::db {
 
-static const QSize kSearchResolution(
-    kTrackSearchResolutionX,
-    kTrackSearchResolutionY);
-
 static constexpr int kMaxObjectLookupIterations = kMaxObjectLookupResultSet;
 
 ObjectTrackSearcher::ObjectTrackSearcher(

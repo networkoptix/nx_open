@@ -24,15 +24,15 @@ class MocIFrameSearchHelper:
 {
 public:
     MocIFrameSearchHelper(
-        const QnResourcePool* resourcePool,
-        const QnVideoCameraPool* cameraPool)
+        const QnResourcePool* /*resourcePool*/,
+        const QnVideoCameraPool* /*cameraPool*/)
     {
     }
 
     virtual qint64 findAfter(
-        const QnUuid& deviceId,
-        nx::vms::api::StreamIndex streamIndex,
-        qint64 timestampUs) const override
+        const QnUuid& /*deviceId*/,
+        nx::vms::api::StreamIndex /*streamIndex*/,
+        qint64 /*timestampUs*/) const override
     {
         return kAutoAlignBestShotTime;
     }

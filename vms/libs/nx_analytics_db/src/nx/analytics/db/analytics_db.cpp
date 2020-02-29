@@ -89,7 +89,8 @@ bool EventsStorage::makePath(const QString& path)
     return true;
 }
 
-bool EventsStorage::changeOwner(const std::vector<PathAndMode>& pathAndModeList)
+bool EventsStorage::changeOwner(
+    [[maybe_unused]] const std::vector<PathAndMode>& pathAndModeList)
 {
 #ifdef SERVER_SPECIFIC_CODE
     if (!m_mediaServerModule) //< #TODO #akulikov Hack for tests. Refactor it.
@@ -362,8 +363,7 @@ void EventsStorage::lookupTimePeriods(
                 m_deviceDao,
                 m_objectTypeDao,
                 &m_attributesDao,
-                m_analyticsArchiveDirectory.get(),
-                m_maxRecordedTimestamp);
+                m_analyticsArchiveDirectory.get());
             return timePeriodFetcher.selectTimePeriods(
                 queryContext, filter, options, result.get());
         },

@@ -23,8 +23,7 @@ public:
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
         AttributesDao* attributesDao,
-        AnalyticsArchiveDirectory* analyticsArchive,
-        std::chrono::milliseconds maxRecordedTimestamp);
+        AnalyticsArchiveDirectory* analyticsArchive);
 
     nx::sql::DBResult selectTimePeriods(
         nx::sql::QueryContext* queryContext,
@@ -37,7 +36,6 @@ private:
     const ObjectTypeDao& m_objectTypeDao;
     AttributesDao* m_attributesDao = nullptr;
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
-    const std::chrono::milliseconds m_maxRecordedTimestamp;
 
     QnTimePeriodList selectTimePeriodsByObject(
         nx::sql::QueryContext* queryContext,
