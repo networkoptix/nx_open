@@ -681,7 +681,7 @@ private:
         bool active,
         unsigned int autoResetTimeoutMS);
     QnAbstractPtzController* createSpecialPtzController() const;
-    bool trustMaxFPS();
+    bool trustMaxFPS(int currentlyDetectedMaxFps) const;
     CameraDiagnostics::Result fetchOnvifCapabilities(
         DeviceSoapWrapper& soapWrapper,
         _onvifDevice__GetCapabilitiesResponse* response);
