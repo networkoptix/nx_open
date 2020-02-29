@@ -50,7 +50,7 @@ Yunhong Gu, last updated 01/02/2011
 #include "udt.h"
 
 #ifdef _WIN32
-struct IoBuf: protected WSABUF
+struct IoBuf: public WSABUF
 {
     char*& data() { return buf; };
     const char* data() const { return buf; };
@@ -61,7 +61,7 @@ struct IoBuf: protected WSABUF
 
 using iovec = WSABUF;
 #else
-struct IoBuf: protected iovec
+struct IoBuf: public iovec
 {
     char*& data() { return (char*&) iov_base; };
     const char* data() const { return (const char*&) iov_base; };

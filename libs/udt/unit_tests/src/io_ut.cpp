@@ -105,33 +105,33 @@ TYPED_TEST_CASE_P(Io);
 
 TYPED_TEST_P(Io, ping)
 {
-    givenTwoConnectedSockets();
-    whenSendData();
-    thenDataIsReceivedOnTheOtherSide();
+    this->givenTwoConnectedSockets();
+    this->whenSendData();
+    this->thenDataIsReceivedOnTheOtherSide();
 }
 
 TYPED_TEST_P(Io, closing_socket_while_reading_in_another_thread_is_supported)
 {
-    givenThreadThatIssuesMultipleRecv();
-    whenCloseSocket();
-    //thenRecvCompleted();
+    this->givenThreadThatIssuesMultipleRecv();
+    this->whenCloseSocket();
+    //this->thenRecvCompleted();
 }
 
 TYPED_TEST_P(Io, shutdown_interrupts_recv)
 {
-    givenSocketBlockedInRecv();
-    whenShutdownClientSocket();
-    thenRecvCompleted();
+    this->givenSocketBlockedInRecv();
+    this->whenShutdownClientSocket();
+    this->thenRecvCompleted();
 }
 
 TYPED_TEST_P(Io, the_data_is_received_after_sending_socket_closure)
 {
-    givenTwoConnectedSockets();
+    this->givenTwoConnectedSockets();
 
-    whenSendData();
-    closeClientSocket();
+    this->whenSendData();
+    this->closeClientSocket();
 
-    thenDataIsReceivedOnTheOtherSide();
+    this->thenDataIsReceivedOnTheOtherSide();
 }
 
 REGISTER_TYPED_TEST_CASE_P(Io,

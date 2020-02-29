@@ -17,7 +17,7 @@ class ReorderingChannel:
     using base_type = UdpChannel;
 
 public:
-    ReorderingChannel::ReorderingChannel(int ipVersion):
+    ReorderingChannel(int ipVersion):
         base_type(ipVersion)
     {
         m_sendThread = std::thread([this]() { sendThreadMain(); });
@@ -48,7 +48,7 @@ public:
         const auto [ioBufs, count] = packet.ioBufs();
         const auto packetSize = std::accumulate(
             ioBufs, ioBufs + count, 0,
-            [](auto one, auto two) { return one + two.len; });
+            [](auto one, auto two) { return one + two.size(); });
 
         m_sendTasks.emplace(
             std::chrono::steady_clock::now() + kMaxDelay,
@@ -270,7 +270,7 @@ void BasicFixture::givenTwoConnectedSockets()
 void BasicFixture::installReorderingChannel()
 {
     m_channelFactoryBak = UdpChannelFactory::instance().setCustomFunc(
-        [this](int ipVersion) { return std::make_unique<ReorderingChannel>(ipVersion); });
+        [](int ipVersion) { return std::make_unique<ReorderingChannel>(ipVersion); });
 }
 
 void BasicFixture::connectToServer()
