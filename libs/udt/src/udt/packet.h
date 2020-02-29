@@ -50,7 +50,7 @@ Yunhong Gu, last updated 01/02/2011
 #include "udt.h"
 
 #ifdef _WIN32
-struct IoBuf: protected WSABUF
+struct IoBuf: public WSABUF
 {
     char*& data() { return buf; };
     const char* data() const { return buf; };
@@ -61,7 +61,7 @@ struct IoBuf: protected WSABUF
 
 using iovec = WSABUF;
 #else
-struct IoBuf: protected iovec
+struct IoBuf: public iovec
 {
     char*& data() { return (char*&) iov_base; };
     const char* data() const { return (const char*&) iov_base; };
@@ -86,8 +86,8 @@ public:
         return N;
     }
 
-    iovec* bufs() { return (iovec*)m_bufs.data(); }
-    const iovec* bufs() const { return (iovec*) m_bufs.data(); }
+    IoBuf* bufs() { return m_bufs.data(); }
+    const IoBuf* bufs() const { return m_bufs.data(); }
 
     const IoBuf& operator[](int i) const
     {
@@ -105,8 +105,6 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class UdpChannel;
-
 enum class ControlPacketType
 {
     Handshake = 0,
@@ -122,6 +120,8 @@ enum class ControlPacketType
     /** 0x7FFF - reserved and user defined messages. */
     Reserved = 32767,
 };
+
+std::string to_string(ControlPacketType);
 
 enum class PacketFlag
 {
@@ -246,8 +246,8 @@ public:
     const uint32_t* header() const { return m_nHeader; }
     uint32_t* header() { return m_nHeader; }
 
-    std::tuple<const iovec*, std::size_t> ioBufs() const;
-    std::tuple<iovec*, std::size_t> ioBufs();
+    std::tuple<const IoBuf*, std::size_t> ioBufs() const;
+    std::tuple<IoBuf*, std::size_t> ioBufs();
 
 private:
     const int32_t __pad = 0;

@@ -1076,17 +1076,13 @@ void QnCamDisplay::processNewSpeed(float speed)
 
     if (!m_forceMtDecoding)
     {
-        // Force MT decoding on for fast speed and negative speed.
-        // Force MT decoding off for previous/next frame.
-        if (qAbs(speed) > 1.0 + FPS_EPS || speed <= 0)
-        {
-            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; i++)
-                m_display[i]->setMTDecoding(speed != 0);
-        }
-        else if (speed != 0)
-        {
-            setMTDecoding(m_useMtDecoding);
-        }
+        bool mtDecoding = m_useMtDecoding; //< Current recommended value.
+        if (qAbs(speed) > 1.0 + FPS_EPS || speed < 0)
+            mtDecoding = true; //< Force MT decoding on for fast speed and negative speed.
+        else if (speed == 0)
+            mtDecoding = false; //< Force MT decoding off for previous/next frame.
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; i++)
+            m_display[i]->setMTDecoding(mtDecoding);
     }
 
     if (speed < 0 && m_prevSpeed >= 0)

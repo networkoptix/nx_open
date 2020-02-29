@@ -21,6 +21,7 @@ public:
     virtual bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>>& parameters,
         QnCameraAdvancedParamValueList* result = nullptr) = 0;
     virtual void setCameraAdvancedParams(const QnCameraAdvancedParams& params) = 0;
+    virtual QList<QString> maintenanceParameters() const;
 protected:
     const QString m_host;
     int m_port;
@@ -30,6 +31,11 @@ protected:
 
 class QnWin4NetCameraProxy: public DWAbstractCameraProxy
 {
+    struct MaintenanceParameter
+    {
+        QString path;
+        QString body;
+    };
 public:
     QnWin4NetCameraProxy(const QString& host, int port, unsigned int timeout,
         const QAuthenticator& auth);
@@ -45,10 +51,13 @@ private:
     QnCameraAdvancedParamValueList requestParamValues(const QString& request) const;
     QString toInnerValue(const QnCameraAdvancedParameter& parameter, const QString& value) const;
     QString fromInnerValue(const QnCameraAdvancedParameter& parameter, const QString &value) const;
+    bool executeMaintenanceCommand(const QString& id);
     bool setParam(const QnCameraAdvancedParameter& parameter, const QString& value);
+    virtual QList<QString> maintenanceParameters() const override;
 
 private:
     QnCameraAdvancedParams m_params;
+    static const QMap<QString, MaintenanceParameter> m_maitenanceParameters;
 };
 
 class QnPravisCameraProxy: public DWAbstractCameraProxy

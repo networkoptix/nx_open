@@ -53,7 +53,7 @@ namespace nx::vms::server::hls { class SessionPool; }
 namespace nx::vms::server { class CmdLineArguments; }
 namespace nx::vms::server::analytics {
     class SdkObjectFactory;
-    class AbstractIFrameSearchHelper;
+    class AbstractIframeSearchHelper;
 } // namespace nx::vms::server::analytics
 
 namespace nx::vms::server::network { class MulticastAddressRegistry;  }
@@ -176,7 +176,7 @@ public:
     bool isStopping() const { return m_isStopping.load(); }
     void initOutgoingSocketCounter();
 
-    nx::vms::server::analytics::AbstractIFrameSearchHelper* iFrameSearchHelper() const;
+    nx::vms::server::analytics::AbstractIframeSearchHelper* iFrameSearchHelper() const;
 private:
     void registerResourceDataProviders();
     /**
@@ -238,7 +238,7 @@ private:
     nx::vms::server::network::MulticastAddressRegistry* m_multicastAddressRegistry = nullptr;
     std::unique_ptr<nx::vms::server::nvr::IService> m_nvrService;
     StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
-    nx::vms::server::analytics::AbstractIFrameSearchHelper* m_analyticsIFrameSearchHelper = nullptr;
+    nx::vms::server::analytics::AbstractIframeSearchHelper* m_analyticsIframeSearchHelper = nullptr;
     std::unique_ptr<nx::vms::server::event::ServerRuntimeEventManager> m_serverRuntimeEventManager;
 
     // When server stops, QnResourcePropertyDictionary is destroyed before QnResource objects

@@ -180,6 +180,7 @@ public:
 
     /** Returns chunks for those startTimeMs < 'timepointMs' and storageIndex == 'storageIndex' */
     std::deque<Chunk> chunksBefore(int64_t timepointMs, int storageIndex) const;
+    std::deque<Chunk> chunksAfter(int64_t timepointMs, int storageIndex) const;
 
     void replaceChunks(int storageIndex, const nx::vms::server::ChunksDeque &newCatalog);
 

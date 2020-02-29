@@ -81,6 +81,7 @@
 
 #include <nx/vms/server/nvr/i_service.h>
 #include <nx_vms_server_ini.h>
+#include <nx/vms/server/event/push_manager.h>
 
 namespace {
 
@@ -235,7 +236,7 @@ struct EmailAttachmentData
 ExtendedRuleProcessor::ExtendedRuleProcessor(QnMediaServerModule* serverModule):
     base_type(serverModule),
     m_emailManager(new EmailManagerImpl(serverModule->commonModule())),
-    m_pushManager(serverModule)
+    m_pushManager(std::make_unique<PushManager>(serverModule))
 {
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, &ExtendedRuleProcessor::onRemoveResource, Qt::QueuedConnection);
@@ -327,10 +328,10 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
                 break;
             case ActionType::showPopupAction:
                 if (ini().pushNotifyOnPopup)
-                    result = m_pushManager.send(action);
+                    result = m_pushManager->send(action);
                 break;
             case ActionType::pushNotificationAction:
-                result = m_pushManager.send(action);
+                result = m_pushManager->send(action);
                 break;
             default:
                 break;

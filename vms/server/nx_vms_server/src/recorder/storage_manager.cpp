@@ -2659,6 +2659,8 @@ void QnStorageManager::replaceChunks(
 
     qint64 newArchiveBorder = qMin(rebuildPeriod.startTimeMs, newArchiveFirstChunkStartTimeMs);
     newCatalog->addChunks(ownCatalog->chunksBefore(newArchiveBorder, storageIndex));
+    newCatalog->addChunks(ownCatalog->chunksAfter(
+        ownCatalog->lastChunkStartTime(storageIndex), storageIndex));
     const auto newChunks = newCatalog->takeChunks();
     ownCatalog->replaceChunks(storageIndex, newChunks);
     QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);

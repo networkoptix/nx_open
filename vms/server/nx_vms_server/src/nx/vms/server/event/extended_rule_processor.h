@@ -7,13 +7,14 @@
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/email/email_manager_impl.h>
 #include <nx/utils/elapsed_timer.h>
-#include <nx/vms/server/event/push_notifications.h>
 
 class QnMediaServerModule;
 
 namespace nx {
 namespace vms::server {
 namespace event {
+
+class PushManager;
 
 /*
 * ExtendedRuleProcessor can execute business actions
@@ -104,7 +105,7 @@ private:
         Qn::ResourceInfoLevel detailLevel) const;
 
 private:
-    PushManager m_pushManager;
+    std::unique_ptr<PushManager> m_pushManager;
 };
 
 } // namespace event

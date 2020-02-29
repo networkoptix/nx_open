@@ -2,50 +2,66 @@
 
 @echo off
 
-:: NOTE: If cmake cannot find Qt, add the following arg to this script (will be passed to cmake):
-:: "-DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>"
+if [%1] == [/?] goto :show_usage
+if [%1] == [-h] goto :show_usage
+if [%1] == [--help] goto :show_usage
+goto :skip_show_usage
+:show_usage
+    echo Usage: %~n0%~x0 [--release] [^<cmake-generation-args^>...]
+    echo NOTE: If cmake cannot find Qt, add the following arg to this script (will be passed to cmake):
+    echo -DCMAKE_PREFIX_PATH=^<full-path-to-Qt5-dir^>
+    exit /b
+:skip_show_usage
 
 :: Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 set BASE_DIR_WITH_BACKSLASH=%~dp0
 set BASE_DIR=%BASE_DIR_WITH_BACKSLASH:~0,-1%
 set BUILD_DIR=%BASE_DIR%-build
 
+if [%1] == [--release] (
+    shift
+    set BUILD_TYPE=Release
+) else (
+    set BUILD_TYPE=Debug
+)
+
+if [%BUILD_TYPE%] == [Release] (
+    set BUILD_OPTIONS=--config %BUILD_TYPE%
+)
+
 echo on
     rmdir /S /Q "%BUILD_DIR%/" 2>NUL
 @echo off
 
 for /d %%S in (%BASE_DIR%\samples\*) do (
-    call :build_sample %%S %1 %2 %3 %4 %5 %6 %7 %8 || @goto :error
+    call :build_sample %%S %1 %2 %3 %4 %5 %6 %7 %8 %9 || @goto :error
 )
 
+echo:
 echo Samples built successfully, see the binaries in %BUILD_DIR%
 exit /b
 
 :build_sample
     set SOURCE_DIR=%1
     set SAMPLE=%~n1
+    shift
     if /i "%SAMPLE:~0,4%" == "rpi_" exit /b
     set SAMPLE_BUILD_DIR=%BUILD_DIR%\%SAMPLE%
     echo on
         mkdir "%SAMPLE_BUILD_DIR%" || @exit /b
         cd "%SAMPLE_BUILD_DIR%" || @exit /b
         
-        :: Not using %* to allow using `shift`.
-        cmake "%SOURCE_DIR%\src" -Ax64 -Tv140,host=x64 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
-        cmake --build . || @exit /b
+        cmake "%SOURCE_DIR%\src" -Ax64 %1 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
+        cmake --build . %BUILD_OPTIONS% || @exit /b
     @echo off
-    set ARTIFACT=%SAMPLE_BUILD_DIR%\Debug\%SAMPLE%.dll
+    set ARTIFACT=%SAMPLE_BUILD_DIR%\%BUILD_TYPE%\%SAMPLE%.dll
     if not exist "%ARTIFACT%" (
         echo ERROR: Failed to build plugin %SAMPLE%.
-        exit /b 64
+        exit /b 70
     )
     echo:
-    echo Plugin built:
-    echo %ARTIFACT%
-    echo:
+    echo Plugin built: %ARTIFACT%
 exit /b
 
 :error
-    @echo off
-    set RESULT=%ERRORLEVEL%
-exit /b %RESULT%
+    @exit /b %ERRORLEVEL%

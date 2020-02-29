@@ -108,6 +108,7 @@ ini_definition = {
     "testStreamFpsLow": {"type": "int", "range": [1, 999], "default": 7},
     "enableSecondaryStream": {"type": "bool", "default": True},
     "testcameraOutputFile": {"type": "str", "default": ""},
+    "testcameraFrameLogFile": {"type": "str", "default": ""},
     "testcameraExtraArgs": {"type": "str", "default": ""},
     "testcameraLocalInterface": {"type": "str", "default": ""},
     "cpuUsageThreshold": {"type": "float", "range": [0.0, 1.0], "default": 0.5},
@@ -119,7 +120,7 @@ ini_definition = {
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
     "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
     "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
-    "sshCommandTimeoutS": {"type": "int", "range": [1, None], "default": 5},
+    "sshCommandTimeoutS": {"type": "int", "range": [1, None], "default": 15},
     "sshServiceCommandTimeoutS": {"type": "int", "range": [1, None], "default": 30},
     "sshGetFileContentTimeoutS": {"type": "int", "range": [1, None], "default": 30},
     "sshGetProcMeminfoTimeoutS": {"type": "int", "range": [1, None], "default": 10},
@@ -159,6 +160,7 @@ def load_configs(conf_file, ini_file_if_passed, ini_file_default):
     test_camera_runner.ini_test_file_high_resolution = abspath(ini['testFileHighResolution'])
     test_camera_runner.ini_test_file_low_resolution = abspath(ini['testFileLowResolution'])
     test_camera_runner.ini_testcamera_output_file = ini['testcameraOutputFile']
+    test_camera_runner.ini_testcamera_frame_log_file = ini['testcameraFrameLogFile']
     test_camera_runner.ini_testcamera_extra_args = ini['testcameraExtraArgs']
     test_camera_runner.ini_unloop_via_testcamera = ini['unloopViaTestcamera']
     test_camera_runner.ini_test_file_high_period_us = ini['testFileHighPeriodUs']
@@ -466,7 +468,11 @@ class _StreamTypeStats:
         # If min_lag is negative, it means that the latency of the first frame is not less than
         # abs(min_lag), and thus we can consider the actual maximum lag to be less than max_lag
         # by that value.
-        return self._max_lag_us if self._min_lag_us >= 0 else self._max_lag_us + self._min_lag_us
+        result = (
+            self._max_lag_us if self._min_lag_us >= 0 else self._max_lag_us + self._min_lag_us)
+        if result < 0:
+            return 0
+        return result
 
 
 class _BoxPoller:

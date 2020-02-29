@@ -6,6 +6,7 @@
 
 namespace udt::test {
 
+template<typename Config>
 class Io:
     public BasicFixture
 {
@@ -29,6 +30,8 @@ protected:
     virtual void SetUp() override
     {
         base_type::SetUp();
+
+        Config::SetUp(this);
 
         givenListeningServerSocket();
     }
@@ -70,12 +73,19 @@ protected:
         closeClientSocket();
     }
 
+    void setNonBlockingMode(UDTSOCKET socket, bool mode)
+    {
+        bool value = !mode;
+        ASSERT_EQ(0, UDT::setsockopt(socket, 0, UDT_SNDSYN, &value, sizeof(value)));
+        ASSERT_EQ(0, UDT::setsockopt(socket, 0, UDT_RCVSYN, &value, sizeof(value)));
+    }
+
     void whenSendData()
     {
-        m_data.resize(129);
+        m_data.resize(32);
         std::generate(
             m_data.begin(), m_data.end(),
-            []() { return (char)(rand() % 128); });
+            []() { return (char)(rand() % ('z' - 'A') + 'A'); });
 
         whenClientSends(m_data);
     }
@@ -96,31 +106,85 @@ private:
     std::string m_data;
 };
 
-TEST_F(Io, ping)
+TYPED_TEST_CASE_P(Io);
+
+//-------------------------------------------------------------------------------------------------
+
+TYPED_TEST_P(Io, ping)
 {
-    givenTwoConnectedSockets();
-    whenSendData();
-    thenDataIsReceivedOnTheOtherSide();
+    this->givenTwoConnectedSockets();
+    this->whenSendData();
+    this->thenDataIsReceivedOnTheOtherSide();
 }
 
-TEST_F(Io, closing_socket_while_reading_in_another_thread_is_supported)
+TYPED_TEST_P(Io, closing_socket_while_reading_in_another_thread_is_supported)
 {
-    givenThreadThatIssuesMultipleRecv();
-    whenCloseSocket();
-    //thenRecvCompleted();
+    this->givenThreadThatIssuesMultipleRecv();
+    this->whenCloseSocket();
+    //this->thenRecvCompleted();
 }
 
-TEST_F(Io, shutdown_interrupts_recv)
+TYPED_TEST_P(Io, shutdown_interrupts_recv)
 {
-    givenSocketBlockedInRecv();
-    whenShutdownClientSocket();
-    thenRecvCompleted();
+    this->givenSocketBlockedInRecv();
+    this->whenShutdownClientSocket();
+    this->thenRecvCompleted();
 }
+
+TYPED_TEST_P(Io, the_data_is_received_after_sending_socket_closure)
+{
+    this->givenTwoConnectedSockets();
+
+    this->whenSendData();
+    this->closeClientSocket();
+
+    this->thenDataIsReceivedOnTheOtherSide();
+}
+
+TYPED_TEST_P(Io, the_data_is_received_after_sending_socket_closure_async)
+{
+    this->givenTwoConnectedSockets();
+
+    this->setNonBlockingMode(this->clientSocket(), true);
+    this->whenSendData();
+    this->closeClientSocket();
+
+    this->thenDataIsReceivedOnTheOtherSide();
+}
+
+REGISTER_TYPED_TEST_CASE_P(Io,
+    ping,
+    closing_socket_while_reading_in_another_thread_is_supported,
+    shutdown_interrupts_recv,
+    the_data_is_received_after_sending_socket_closure,
+    the_data_is_received_after_sending_socket_closure_async
+);
+
+//-------------------------------------------------------------------------------------------------
+
+struct CommonConfig
+{
+    static void SetUp(BasicFixture*) {}
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(Common, Io, CommonConfig);
+
+//-------------------------------------------------------------------------------------------------
+
+struct ReorderedPacketsConfig
+{
+    static void SetUp(BasicFixture* basicFixture)
+    {
+        basicFixture->installReorderingChannel();
+    }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ReorderedPackets, Io, ReorderedPacketsConfig);
 
 //-------------------------------------------------------------------------------------------------
 
 class Connect:
-    public Io
+    public Io<CommonConfig>
 {
     using base_type = Io;
 

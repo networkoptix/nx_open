@@ -41,6 +41,7 @@ Yunhong Gu, last updated 01/27/2011
 #ifndef __UDT_CHANNEL_H__
 #define __UDT_CHANNEL_H__
 
+#include <functional>
 #include <optional>
 #include <thread>
 
@@ -49,70 +50,18 @@ Yunhong Gu, last updated 01/27/2011
 #include "result.h"
 #include "socket_addresss.h"
 
-
-class UdpChannel
+class UDT_API AbstractUdpChannel
 {
 public:
-    UdpChannel();
-    UdpChannel(int version);
-    ~UdpChannel();
+    virtual ~AbstractUdpChannel() = default;
 
-    Result<> open(const std::optional<detail::SocketAddress>& localAddrToUse);
-    Result<> open(UDPSOCKET udpsock);
-
-    // Functionality:
-    //    Get the UDP sending buffer size.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    Current UDP sending buffer size.
-
-    int getSndBufSize();
-
-    // Functionality:
-    //    Get the UDP receiving buffer size.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    Current UDP receiving buffer size.
-
-    int getRcvBufSize();
-
-    // Functionality:
-    //    Set the UDP sending buffer size.
-    // Parameters:
-    //    0) [in] size: expected UDP sending buffer size.
-    // Returned value:
-    //    None.
-
-    void setSndBufSize(int size);
-
-    // Functionality:
-    //    Set the UDP receiving buffer size.
-    // Parameters:
-    //    0) [in] size: expected UDP receiving buffer size.
-    // Returned value:
-    //    None.
-
-    void setRcvBufSize(int size);
-
-    // Functionality:
-    //    Query the socket address that the channel is using.
-    // Parameters:
-    //    0) [out] addr: pointer to store the returned socket address.
-    // Returned value:
-    //    None.
-
-    detail::SocketAddress getSockAddr() const;
-
-    // Functionality:
-    //    Query the peer side socket address that the channel is connect to.
-    // Parameters:
-    //    0) [out] addr: pointer to store the returned socket address.
-    // Returned value:
-    //    None.
-
-    detail::SocketAddress getPeerAddr() const;
+    virtual Result<> open(const std::optional<detail::SocketAddress>& localAddrToUse) = 0;
+    virtual Result<> open(UDPSOCKET udpsock) = 0;
+    virtual int getSndBufSize() = 0;
+    virtual int getRcvBufSize() = 0;
+    virtual void setSndBufSize(int size) = 0;
+    virtual void setRcvBufSize(int size) = 0;
+    virtual detail::SocketAddress getSockAddr() const = 0;
 
     // Functionality:
     //    Send a packet to the given address.
@@ -122,8 +71,7 @@ public:
     // Returned value:
     //    Actual size of data sent.
     // TODO: #ak Should accept "const CPacket&".
-
-    Result<int> sendto(const detail::SocketAddress& addr, CPacket packet);
+    virtual Result<int> sendto(const detail::SocketAddress& addr, CPacket packet) = 0;
 
     // Functionality:
     //    Receive a packet from the channel and record the source address.
@@ -132,10 +80,51 @@ public:
     //    1) [in] packet: reference to a CPacket entity.
     // Returned value:
     //    Actual size of data received.
+    virtual Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet) = 0;
 
-    Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet);
+    virtual Result<> shutdown() = 0;
+};
 
-    Result<> shutdown();
+//-------------------------------------------------------------------------------------------------
+
+class UDT_API UdpChannelFactory
+{
+public:
+    using FactoryFunc = std::function<std::unique_ptr<AbstractUdpChannel>(int /*ipVersion*/)>;
+
+    std::unique_ptr<AbstractUdpChannel> create(int ipVersion);
+
+    /**
+     * @return The previous function.
+     */
+    FactoryFunc setCustomFunc(FactoryFunc func);
+
+    static UdpChannelFactory& instance();
+
+private:
+    FactoryFunc m_customFunc;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class UDT_API UdpChannel:
+    public AbstractUdpChannel
+{
+public:
+    UdpChannel(int version);
+    ~UdpChannel();
+
+    virtual Result<> open(const std::optional<detail::SocketAddress>& localAddrToUse) override;
+    virtual Result<> open(UDPSOCKET udpsock) override;
+
+    virtual int getSndBufSize() override;
+    virtual int getRcvBufSize() override;
+    virtual void setSndBufSize(int size) override;
+    virtual void setRcvBufSize(int size) override;
+    virtual detail::SocketAddress getSockAddr() const override;
+    virtual Result<int> sendto(const detail::SocketAddress& addr, CPacket packet) override;
+    virtual Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet) override;
+    virtual Result<> shutdown() override;
 
 private:
     Result<> setUDPSockOpt();
