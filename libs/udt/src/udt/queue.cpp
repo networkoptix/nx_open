@@ -59,7 +59,7 @@ Yunhong Gu, last updated 05/05/2011
 using namespace std;
 
 //#define DEBUG_RECORD_PACKET_HISTORY
-//#define TRACE_PACKETS
+#define TRACE_PACKETS
 
 namespace {
 

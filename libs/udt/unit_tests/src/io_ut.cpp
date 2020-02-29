@@ -73,6 +73,13 @@ protected:
         closeClientSocket();
     }
 
+    void setNonBlockingMode(UDTSOCKET socket, bool mode)
+    {
+        bool value = !mode;
+        ASSERT_EQ(0, UDT::setsockopt(socket, 0, UDT_SNDSYN, &value, sizeof(value)));
+        ASSERT_EQ(0, UDT::setsockopt(socket, 0, UDT_RCVSYN, &value, sizeof(value)));
+    }
+
     void whenSendData()
     {
         m_data.resize(32);
@@ -134,11 +141,23 @@ TYPED_TEST_P(Io, the_data_is_received_after_sending_socket_closure)
     this->thenDataIsReceivedOnTheOtherSide();
 }
 
+TYPED_TEST_P(Io, the_data_is_received_after_sending_socket_closure_async)
+{
+    this->givenTwoConnectedSockets();
+
+    this->setNonBlockingMode(this->clientSocket(), true);
+    this->whenSendData();
+    this->closeClientSocket();
+
+    this->thenDataIsReceivedOnTheOtherSide();
+}
+
 REGISTER_TYPED_TEST_CASE_P(Io,
     ping,
     closing_socket_while_reading_in_another_thread_is_supported,
     shutdown_interrupts_recv,
-    the_data_is_received_after_sending_socket_closure
+    the_data_is_received_after_sending_socket_closure,
+    the_data_is_received_after_sending_socket_closure_async
 );
 
 //-------------------------------------------------------------------------------------------------
