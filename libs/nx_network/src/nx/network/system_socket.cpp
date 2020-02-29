@@ -622,12 +622,62 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
 }
 
 template<typename SocketInterfaceToImplement>
-int CommunicatingSocket<SocketInterfaceToImplement>::recv(
-    void* buffer, unsigned int bufferLen, int flags)
+int CommunicatingSocket<SocketInterfaceToImplement>::asyncOperation(
+    Operation op,
+    const void* buffer,
+    unsigned int bufferLen,
+    DWORD flags)
 {
-#ifdef _WIN32
-    int bytesRead = -1;
+    WSAOVERLAPPED overlapped = {};
+    overlapped.hEvent = m_eventObject;
+    WSABUF wsaBuffer;
+    wsaBuffer.len = bufferLen;
+    wsaBuffer.buf = (char*)buffer;
+    DWORD bytes = -1;
+    const int wsaResult = (op == Read)
+        ? WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, &flags, &overlapped, nullptr)
+        : WSASend(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, flags, &overlapped, nullptr);
+    if (wsaResult != SOCKET_ERROR)
+        return bytes;
+    if (SystemError::getLastOSErrorCode() != WSA_IO_PENDING)
+        return -1;
+    const auto timeout = (op == Read) ? m_readTimeoutMS : m_writeTimeoutMS;
+    WaitForSingleObject(m_eventObject, timeout ? timeout : INFINITE);
+    if (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &flags))
+    {
+        if (SystemError::getLastOSErrorCode() == WSA_IO_INCOMPLETE)
+        {
+            ::CancelIo((HANDLE)m_fd);
+            // Wait for:
+            // 1. CancelIo has been finished.
+            // 2. WSARecv or WSASend has been finished.
+            // 3. Shutdown called.
+            WaitForSingleObject(m_eventObject, INFINITE);
+            // Check status again in case of race condition between CancelIo and other conditions
+            while (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &flags))
+            {
+                const auto errCode = SystemError::getLastOSErrorCode();
+                if (errCode == WSA_IO_INCOMPLETE)
+                {
+                    ::Sleep(0);
+                    continue;
+                }
+                if (errCode == WSA_OPERATION_ABORTED)
+                    SystemError::setLastErrorCode(SystemError::timedOut); //< emulate timeout code
+                return -1;
+            }
+        }
+    }
+    return bytes;
+}
 
+template<typename SocketInterfaceToImplement>
+int CommunicatingSocket<SocketInterfaceToImplement>::performOperation(
+    Operation op,
+    const void* buffer,
+    unsigned int bufferLen,
+    DWORD flags)
+{
     bool isNonBlockingMode;
     if (!getNonBlockingMode(&isNonBlockingMode))
         return -1;
@@ -639,9 +689,9 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(
             if (!setNonBlockingMode(true))
                 return -1;
         }
-
-        bytesRead = ::recv(m_fd, (raw_type *)buffer, bufferLen, flags & ~MSG_DONTWAIT);
-
+        const int bytes = (op == Read)
+            ? ::recv(m_fd, (raw_type*)buffer, bufferLen, flags & ~MSG_DONTWAIT)
+            : ::send(m_fd, (raw_type*)buffer, bufferLen, flags & ~MSG_DONTWAIT);
         if (!isNonBlockingMode)
         {
             // Save error code as changing mode will drop it.
@@ -650,53 +700,18 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(
                 return -1;
             SystemError::setLastErrorCode(sysErrorCodeBak);
         }
+        return bytes;
     }
-    else
-    {
-        WSAOVERLAPPED overlapped;
-        memset(&overlapped, 0, sizeof(overlapped));
-        overlapped.hEvent = m_eventObject;
 
-        WSABUF wsaBuffer;
-        wsaBuffer.len = bufferLen;
-        wsaBuffer.buf = (char*)buffer;
-        DWORD wsaFlags = flags;
-        DWORD* wsaBytesRead = (DWORD*)&bytesRead;
+    return asyncOperation(op, buffer, bufferLen, flags);
+}
 
-        auto wsaResult = WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, wsaBytesRead,
-            &wsaFlags, &overlapped, nullptr);
-        if (wsaResult == SOCKET_ERROR && SystemError::getLastOSErrorCode() == WSA_IO_PENDING)
-        {
-            auto timeout = m_readTimeoutMS ? m_readTimeoutMS : INFINITE;
-
-            WaitForSingleObject(m_eventObject, timeout);
-            if (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
-            {
-                auto errCode = SystemError::getLastOSErrorCode();
-                if (errCode == WSA_IO_INCOMPLETE)
-                {
-                    ::CancelIo((HANDLE)m_fd);
-                    // Wait for:
-                    // 1. CancelIo have been finished.
-                    // 2. WSARecv have been finished.
-                    // 3. Shutdown called.
-                    WaitForSingleObject(m_eventObject, INFINITE);
-                    // Check status again in case of race condition between CancelIo and other conditions
-                    while (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
-                    {
-                        errCode = SystemError::getLastOSErrorCode();
-                        if (errCode != WSA_IO_INCOMPLETE)
-                        {
-                            if (errCode == WSA_OPERATION_ABORTED)
-                                SystemError::setLastErrorCode(SystemError::timedOut); //< emulate timeout code
-                            return -1;
-                        }
-                        ::Sleep(0);
-                    }
-                }
-            }
-        }
-    }
+template<typename SocketInterfaceToImplement>
+int CommunicatingSocket<SocketInterfaceToImplement>::recv(
+    void* buffer, unsigned int bufferLen, int flags)
+{
+#ifdef _WIN32
+    int bytesRead = performOperation(Read, buffer, bufferLen, flags);
 #else
     unsigned int recvTimeout = 0;
     if (!this->getRecvTimeout(&recvTimeout))
@@ -726,13 +741,13 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     const void* buffer, unsigned int bufferLen)
 {
 #ifdef _WIN32
-    int sended = ::send(m_fd, (raw_type*)buffer, bufferLen, 0);
+    int sent = performOperation(Write, buffer, bufferLen, 0);
 #else
     unsigned int sendTimeout = 0;
     if (!this->getSendTimeout(&sendTimeout))
         return -1;
 
-    int sended = doInterruptableSystemCallWithTimeout<>(
+    int sent = doInterruptableSystemCallWithTimeout<>(
         this,
         std::bind(&::send, this->m_fd, (const void*)buffer, (size_t)bufferLen,
 #ifdef __linux__
@@ -745,20 +760,20 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
         0);
 #endif
 
-    if (sended < 0)
+    if (sent < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
         if (socketCannotRecoverFromError(errCode))
             m_connected = false;
     }
-    else if (sended == 0)
+    else if (sent == 0)
     {
         m_connected = false;
     }
 #if !defined(__arm__)
-    m_totalSocketBytesSent += sended;
+    m_totalSocketBytesSent += sent;
 #endif
-    return sended;
+    return sent;
 }
 
 template<typename SocketInterfaceToImplement>

@@ -162,6 +162,15 @@ public:
     virtual bool shutdown() override;
 
 protected:
+#ifdef WIN32
+    enum Operation
+    {
+        Read = 0,
+        Write = 1
+    };
+    int asyncOperation(Operation op, const void* buffer, unsigned int bufferLen, DWORD flags);
+    int performOperation(Operation op, const void* buffer, unsigned int bufferLen, DWORD flags);
+#endif
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
     bool connectToIp(
