@@ -1,6 +1,6 @@
 #include "analytics_archive.h"
 
-namespace nx::vms::server::metadata {
+namespace nx::vms::metadata {
 
 static const int kRecordSize = QnMetaDataV1::kMotionDataBufferSize + sizeof(BinaryRecordEx);
 const std::chrono::seconds AnalyticsArchive::kAggregationInterval{ 5 };
@@ -101,7 +101,7 @@ bool AnalyticsArchive::saveToArchive(
     int64_t allAttributesHash)
 {
     QnMetaDataV1Ptr packet(
-        new QnMetaDataV1(0 /*filler*/, sizeof(BinaryRecordEx) /*extraBufferSize*/));
+        new QnMetaDataV1(startTime, 0 /*filler*/, sizeof(BinaryRecordEx) /*extraBufferSize*/));
     packet->timestamp = std::chrono::microseconds(startTime).count();
     packet->m_duration = std::chrono::microseconds(kAggregationInterval).count();
 
@@ -130,4 +130,4 @@ template bool AnalyticsArchive::saveToArchive<QRectF>(
     uint32_t objectType,
     int64_t allAttributesHash);
 
-} // namespace nx::vms::server::metadata
+} // namespace nx::vms::metadata

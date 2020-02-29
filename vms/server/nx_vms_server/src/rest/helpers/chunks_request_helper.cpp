@@ -13,7 +13,7 @@
 #include "motion/motion_helper.h"
 #include "recorder/storage_manager.h"
 #include "media_server/media_server_module.h"
-#include <nx/vms/server/metadata/analytics_helper.h>
+#include <nx/vms/metadata/analytics_helper.h>
 #include <nx/utils/log/log_main.h>
 
 static const auto kAllArchive = QList<QnServer::ChunksCatalog>()

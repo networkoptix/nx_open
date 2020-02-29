@@ -16,13 +16,13 @@ namespace nx::analytics::db {
 static constexpr QRect kFullRegion(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight);
 
 AnalyticsArchiveDirectory::AnalyticsArchiveDirectory(
-    QnMediaServerModule* mediaServerModule,
+    QnCommonModule* commonModule,
     const QString& dataDir)
     :
-    m_mediaServerModule(mediaServerModule),
+    m_commonModule(commonModule),
     m_dataDir(dataDir)
 {
-    if (!m_mediaServerModule)
+    if (!m_commonModule)
     {
         QDir dir(m_dataDir + "/metadata");
         const auto cameraDirs = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
@@ -220,9 +220,9 @@ AnalyticsArchiveImpl* AnalyticsArchiveDirectory::openOrGetArchive(
     auto& archive = m_deviceIdToArchive[deviceId];
     if (!archive)
     {
-        if (m_mediaServerModule)
+        if (m_commonModule)
         {
-            auto camera = m_mediaServerModule->resourcePool()
+            auto camera = m_commonModule->resourcePool()
                 ->getResourceById<QnVirtualCameraResource>(deviceId);
             if (!camera)
                 return nullptr;
@@ -248,7 +248,7 @@ void AnalyticsArchiveDirectory::fixFilter(ArchiveFilter* filter)
         filter->region = filter->region.intersected(kFullRegion);
 }
 
-nx::vms::server::metadata::AnalyticsArchive::MatchObjectsResult AnalyticsArchiveDirectory::matchObjects(
+nx::vms::metadata::AnalyticsArchive::MatchObjectsResult AnalyticsArchiveDirectory::matchObjects(
     const QnUuid& deviceId,
     const ArchiveFilter& filter)
 {
@@ -265,11 +265,10 @@ nx::vms::server::metadata::AnalyticsArchive::MatchObjectsResult AnalyticsArchive
 
 void AnalyticsArchiveDirectory::copyAllDeviceIds(std::vector<QnUuid>* deviceIds)
 {
-    if (m_mediaServerModule)
+    if (m_commonModule)
     {
-        const auto cameraResources = m_mediaServerModule->resourcePool()->getAllCameras(
-            m_mediaServerModule->resourcePool()->getResourceById(
-                m_mediaServerModule->commonModule()->moduleGUID()));
+        const auto cameraResources = m_commonModule->resourcePool()->getAllCameras(
+            m_commonModule->resourcePool()->getResourceById(m_commonModule->moduleGUID()));
 
         for (const auto& camera: cameraResources)
             openOrGetArchive(camera->getId());

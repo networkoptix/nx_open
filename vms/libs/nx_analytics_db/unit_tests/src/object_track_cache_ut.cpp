@@ -4,10 +4,10 @@
 
 #include <nx/utils/time.h>
 
-#include <nx/vms/server/analytics/db/object_track_cache.h>
+#include <nx/analytics/db/object_track_cache.h>
 
 #include "attribute_dictionary.h"
-#include <nx/vms/server/analytics/abstract_iframe_search_helper.h>
+#include <nx/analytics/db/abstract_iframe_search_helper.h>
 
 class QnResourcePool;
 class QnVideoCameraPool;
@@ -19,7 +19,8 @@ static const qint64 kAutoAlignBestShotTime = 2;
 
 using StreamIndex = nx::vms::api::StreamIndex;
 
-class MocIFrameSearchHelper: public nx::vms::server::analytics::AbstractIframeSearchHelper
+class MocIFrameSearchHelper:
+    public nx::analytics::db::AbstractIframeSearchHelper
 {
 public:
     MocIFrameSearchHelper(

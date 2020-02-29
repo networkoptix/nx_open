@@ -4,10 +4,9 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <nx/vms/server/metadata/analytics_archive.h>
 #include <analytics/db/analytics_db_types.h>
-
-#include "media_server/media_server_module.h"
+#include <nx/vms/metadata/analytics_archive.h>
+#include <common/common_module.h>
 
 namespace nx::sql { class QueryContext; }
 
@@ -16,10 +15,10 @@ namespace nx::analytics::db {
 class AttributesDao;
 class ObjectTypeDao;
 
-using ArchiveFilter = nx::vms::server::metadata::AnalyticsArchive::AnalyticsFilter;
-using AnalyticsArchiveImpl = nx::vms::server::metadata::AnalyticsArchive;
+using ArchiveFilter = nx::vms::metadata::AnalyticsArchive::AnalyticsFilter;
+using AnalyticsArchiveImpl = nx::vms::metadata::AnalyticsArchive;
 
-class AnalyticsArchiveDirectory
+class NX_ANALYTICS_DB_API AnalyticsArchiveDirectory
 {
 public:
     struct ObjectTrackMatchResult
@@ -29,7 +28,7 @@ public:
     };
 
     AnalyticsArchiveDirectory(
-        QnMediaServerModule* mediaServerModule,
+        QnCommonModule* commonModule,
         const QString& dataDir);
 
     virtual ~AnalyticsArchiveDirectory() = default;
@@ -72,7 +71,7 @@ public:
         AttributesDao* attributesDao);
 
 private:
-    QnMediaServerModule* m_mediaServerModule = nullptr;
+    QnCommonModule* m_commonModule = nullptr;
     const QString m_dataDir;
     std::map<QnUuid, std::unique_ptr<AnalyticsArchiveImpl>> m_deviceIdToArchive;
     QnMutex m_mutex;
@@ -81,7 +80,7 @@ private:
 
     void fixFilter(ArchiveFilter* filter);
 
-    nx::vms::server::metadata::AnalyticsArchive::MatchObjectsResult matchObjects(
+    nx::vms::metadata::AnalyticsArchive::MatchObjectsResult matchObjects(
         const QnUuid& deviceId,
         const ArchiveFilter& filter);
 

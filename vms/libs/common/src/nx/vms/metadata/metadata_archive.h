@@ -10,7 +10,7 @@
 
 #include <recording/time_period_list.h>
 
-namespace nx::vms::server::metadata {
+namespace nx::vms::metadata {
 
 #pragma pack(push, 1)
     struct IndexRecord
@@ -140,4 +140,4 @@ protected:
     int m_channel;
 };
 
-} // namespace nx::vms::server::metadata
+} // namespace nx::vms::metadata

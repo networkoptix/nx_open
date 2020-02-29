@@ -1,13 +1,15 @@
 #pragma once
 
-#include "abstract_iframe_search_helper.h"
+#include <nx/analytics/db/abstract_iframe_search_helper.h>
 
 class QnResourcePool;
 class QnVideoCameraPool;
 
 namespace nx::vms::server::analytics {
 
-class IframeSearchHelper: public QObject, public AbstractIframeSearchHelper
+class IframeSearchHelper:
+    public QObject,
+    public nx::analytics::db::AbstractIframeSearchHelper
 {
     Q_OBJECT
 public:

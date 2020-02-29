@@ -5,7 +5,7 @@
 #include <api/helpers/chunks_request_data.h>
 #include "analytics_archive.h"
 
-namespace nx::vms::server::metadata {
+namespace nx::vms::metadata {
 
 class AnalyticsHelper: public MetadataHelper
 {
@@ -16,4 +16,4 @@ public:
         const AnalyticsArchive::AnalyticsFilter& filter);
 };
 
-} // namespace nx::vms::server::metadata
+} // namespace nx::vms::metadata

@@ -4,7 +4,7 @@
 #include "analytics_archive.h"
 #include <core/resource/camera_resource.h>
 
-namespace nx::vms::server::metadata {
+namespace nx::vms::metadata {
 
 QnTimePeriodList AnalyticsHelper::matchImage(
     const QnSecurityCamResourceList& resourceList,
@@ -19,4 +19,4 @@ QnTimePeriodList AnalyticsHelper::matchImage(
     return QnTimePeriodList::mergeTimePeriods(timePeriods, filter.limit, filter.sortOrder);
 }
 
-} // namespace nx::vms::server::metadata
+} // namespace nx::vms::metadata

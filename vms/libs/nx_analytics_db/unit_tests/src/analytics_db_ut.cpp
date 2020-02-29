@@ -12,9 +12,9 @@
 
 #include <analytics/db/config.h>
 
-#include <nx/vms/server/analytics/db/analytics_db.h>
-#include <nx/vms/server/analytics/db/object_track_searcher.h>
-#include <nx/vms/server/analytics/db/serializers.h>
+#include <nx/analytics/db/analytics_db.h>
+#include <nx/analytics/db/object_track_searcher.h>
+#include <nx/analytics/db/serializers.h>
 
 #include "attribute_dictionary.h"
 #include "utils.h"
@@ -462,7 +462,7 @@ private:
 
     bool initializeStorage()
     {
-        m_eventsStorage = EventsStorageFactory::instance().create(nullptr);
+        m_eventsStorage = EventsStorageFactory::instance().create(nullptr, nullptr);
         return m_eventsStorage->initialize(m_settings);
     }
 

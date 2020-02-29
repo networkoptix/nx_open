@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <analytics/db/config.h>
-#include <nx/vms/server/analytics/db/object_track_aggregator.h>
+#include <nx/analytics/db/object_track_aggregator.h>
 
 #include "attribute_dictionary.h"
 

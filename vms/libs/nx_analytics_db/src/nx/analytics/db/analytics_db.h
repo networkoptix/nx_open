@@ -24,15 +24,17 @@
 #include "object_track_aggregator.h"
 #include "object_type_dao.h"
 
-class QnMediaServerModule;
+class QnCommonModule;
 
 namespace nx::analytics::db {
 
-class EventsStorage:
+class NX_ANALYTICS_DB_API EventsStorage:
     public AbstractEventsStorage
 {
 public:
-    EventsStorage(QnMediaServerModule* mediaServerModule);
+    EventsStorage(
+        QnCommonModule* commonModule,
+        AbstractIframeSearchHelper* iframeSearchHelper);
     virtual ~EventsStorage();
 
     /**
@@ -65,6 +67,7 @@ public:
     virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override;
 
     virtual std::optional<nx::sql::QueryStatistics> statistics() const override;
+
 private:
     enum class ChownMode
     {
@@ -74,7 +77,8 @@ private:
 
     using PathAndMode = std::tuple<QString, ChownMode>;
 
-    QnMediaServerModule* m_mediaServerModule = nullptr;
+    QnCommonModule* m_commonModule = nullptr;
+    AbstractIframeSearchHelper* m_iframeSearchHelper = nullptr;
     std::unique_ptr<DbController> m_dbController;
     std::list<AbstractCursor*> m_openedCursors;
     std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
@@ -124,7 +128,9 @@ class MovableAnalyticsDb:
     public AbstractEventsStorage
 {
 public:
-    MovableAnalyticsDb(QnMediaServerModule* mediaServerModule);
+    MovableAnalyticsDb(
+        QnCommonModule* commonModule,
+        AbstractIframeSearchHelper* iframeSearchHelper);
     virtual ~MovableAnalyticsDb();
 
     virtual bool initialize(const Settings& settings) override;
@@ -153,9 +159,11 @@ public:
     virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override;
 
     virtual std::optional<nx::sql::QueryStatistics> statistics() const override;
+
 private:
     mutable QnMutex m_mutex;
-    QnMediaServerModule* m_mediaServerModule = nullptr;
+    QnCommonModule* m_commonModule = nullptr;
+    AbstractIframeSearchHelper* m_iframeSearchHelper = nullptr;
     std::shared_ptr<EventsStorage> m_db;
 
     std::shared_ptr<EventsStorage> getDb();
@@ -165,9 +173,9 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 using EventsStorageFactoryFunction =
-    std::unique_ptr<AbstractEventsStorage>(QnMediaServerModule*);
+    std::unique_ptr<AbstractEventsStorage>(QnCommonModule*, AbstractIframeSearchHelper*);
 
-class EventsStorageFactory:
+class NX_ANALYTICS_DB_API EventsStorageFactory:
     public nx::utils::BasicFactory<EventsStorageFactoryFunction>
 {
     using base_type = nx::utils::BasicFactory<EventsStorageFactoryFunction>;
@@ -178,7 +186,9 @@ public:
     static EventsStorageFactory& instance();
 
 private:
-    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(QnMediaServerModule*);
+    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(
+        QnCommonModule*,
+        AbstractIframeSearchHelper*);
 };
 
 } // namespace nx::analytics::db

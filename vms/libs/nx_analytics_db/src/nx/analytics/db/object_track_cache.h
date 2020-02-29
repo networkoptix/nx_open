@@ -8,8 +8,9 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <analytics/common/object_metadata.h>
-#include <nx/vms/server/analytics/abstract_iframe_search_helper.h>
 #include <analytics/db/analytics_db_types.h>
+
+#include "abstract_iframe_search_helper.h"
 
 namespace nx::analytics::db {
 
@@ -33,7 +34,7 @@ struct ObjectTrackUpdate
 /**
  * NOTE: All methods of this class are thread-safe.
  */
-class ObjectTrackCache
+class NX_ANALYTICS_DB_API ObjectTrackCache
 {
 public:
     /**
@@ -50,7 +51,7 @@ public:
     ObjectTrackCache(
         std::chrono::milliseconds aggregationPeriod,
         std::chrono::milliseconds maxObjectLifetime,
-        nx::vms::server::analytics::AbstractIframeSearchHelper* helper);
+        AbstractIframeSearchHelper* helper);
 
     void add(const common::metadata::ConstObjectMetadataPacketPtr& packet);
 
@@ -118,7 +119,7 @@ private:
     mutable QnMutex m_mutex;
     std::map<QnUuid, ObjectTrackContext> m_tracksById;
     nx::utils::ElapsedTimerPool<QnUuid> m_timerPool;
-    nx::vms::server::analytics::AbstractIframeSearchHelper* m_iframeHelper = nullptr;
+    AbstractIframeSearchHelper* m_iframeHelper = nullptr;
 
     void updateObject(
         const nx::common::metadata::ObjectMetadata& objectMetadata,

@@ -4,7 +4,7 @@
 
 #include "metadata_archive.h"
 
-namespace nx::vms::server::metadata {
+namespace nx::vms::metadata {
 
 #pragma pack(push, 1)
     struct BinaryRecordEx
@@ -67,4 +67,4 @@ public:
     MatchObjectsResult matchObjects(const AnalyticsFilter& filter);
 };
 
-} // namespace nx::vms::server::metadata
+} // namespace nx::vms::metadata

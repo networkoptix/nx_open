@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QDate>
 
-namespace nx::vms::server::metadata {
+namespace nx::vms::metadata {
 
 static const int kMetadataIndexHeaderSize = 16;
 static const int kIndexRecordSize = 8;
@@ -23,4 +23,4 @@ protected:
     const QString m_dataDir;
 };
 
-} // namespace nx::vms::server::metadata
+} // namespace nx::vms::metadata

@@ -3,16 +3,16 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types_fwd.h>
 
-namespace nx::vms::server::analytics {
+namespace nx::analytics::db {
 
 /**
- * Allows to find the nearest I-frame next to the specified time. It is used in analytics, 
+ * Allows to find the nearest I-frame next to the specified time. It is used in analytics,
  * to round default bestShot timestamp to the nearest I-frame.
  */
-class AbstractIframeSearchHelper
+class NX_ANALYTICS_DB_API AbstractIframeSearchHelper
 {
 public:
-    virtual ~AbstractIframeSearchHelper() {}
+    virtual ~AbstractIframeSearchHelper() = default;
 
     /**
      * @param deviceId Device UUID.
@@ -23,9 +23,9 @@ public:
      *     otherwise.
      */
     virtual qint64 findAfter(
-        const QnUuid& deviceId, 
+        const QnUuid& deviceId,
         nx::vms::api::StreamIndex streamIndex,
         qint64 timestampUs) const = 0;
 };
 
-} // namespace nx::vms::server::analytics
+} // namespace nx::analytics::db

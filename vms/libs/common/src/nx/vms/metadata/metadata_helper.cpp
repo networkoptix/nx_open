@@ -9,7 +9,7 @@
 #include <utils/common/util.h>
 #include <motion/motion_detection.h>
 
-namespace nx::vms::server::metadata {
+namespace nx::vms::metadata {
 
 MetadataHelper::MetadataHelper(const QString& dataDir, QObject* parent) :
     QObject(parent),
@@ -91,4 +91,4 @@ QList<QRegion> MetadataHelper::regionsFromFilter(const QString& filter, int chan
     return QJson::deserialized<QList<QRegion>>(filter.toUtf8());
 }
 
-} // namespace nx::vms::server::metadata
+} // namespace nx::vms::metadata

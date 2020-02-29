@@ -71,7 +71,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     m_audioLayout.reset( new QnResourceCustomAudioLayout() );
 
     m_camManager.getCameraCapabilities( &m_cameraCapabilities );
-    
+
     if (m_cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
     {
         // Reopen the stream in case the user changes it.
@@ -396,7 +396,7 @@ QnMetaDataV1Ptr ThirdPartyStreamReader::getCameraMetadata()
     if( m_lastMetadata )
         rez.swap( m_lastMetadata );
     else
-        rez = QnMetaDataV1Ptr(new QnMetaDataV1());
+        rez = QnMetaDataV1Ptr(new QnMetaDataV1(qnSyncTime->currentTimePoint()));
     return rez;
 }
 
@@ -686,7 +686,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
                     if( srcMotionData->pixelFormat() == nxcip::AV_PIX_FMT_MONOBLACK )
                     {
                         //adding motion data
-                        QnMetaDataV1Ptr motion( new QnMetaDataV1() );
+                        QnMetaDataV1Ptr motion( new QnMetaDataV1(qnSyncTime->currentTimePoint()) );
                         const nxcip::Picture& motionPicture = *srcMotionData;
 
                         if( motionPicture.pixelFormat() == nxcip::AV_PIX_FMT_MONOBLACK )

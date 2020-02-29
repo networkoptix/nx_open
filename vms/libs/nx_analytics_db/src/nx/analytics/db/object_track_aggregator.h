@@ -28,7 +28,7 @@ struct AggregatedTrackData
 /**
  * NOTE: The class is not thread-safe.
  */
-class ObjectTrackAggregator
+class NX_ANALYTICS_DB_API ObjectTrackAggregator
 {
 public:
     ObjectTrackAggregator(

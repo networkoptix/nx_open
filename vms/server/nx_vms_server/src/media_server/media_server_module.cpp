@@ -69,7 +69,7 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
-#include <nx/vms/server/analytics/db/analytics_db.h>
+#include <nx/analytics/db/analytics_db.h>
 
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
@@ -298,7 +298,8 @@ QnMediaServerModule::QnMediaServerModule(
             commonModule()->resourcePool(), m_videoCameraPool));
 
     m_analyticsEventsStorage = store(
-        nx::analytics::db::EventsStorageFactory::instance().create(this).release());
+        nx::analytics::db::EventsStorageFactory::instance().create(
+            commonModule(), m_analyticsIframeSearchHelper).release());
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
@@ -805,7 +806,7 @@ QString QnMediaServerModule::metadataDatabaseDir() const
 
 using namespace nx::vms::server::analytics;
 
-AbstractIframeSearchHelper* QnMediaServerModule::iFrameSearchHelper() const
+nx::analytics::db::AbstractIframeSearchHelper* QnMediaServerModule::iFrameSearchHelper() const
 {
     return m_analyticsIframeSearchHelper;
 }

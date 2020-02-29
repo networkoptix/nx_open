@@ -1,6 +1,4 @@
 #include "object_track_cache.h"
-#include "nx_vms_server_ini.h"
-#include <nx/vms/api/types/motion_types.h>
 
 #include <nx/vms/api/types/motion_types.h>
 
@@ -9,7 +7,7 @@ namespace nx::analytics::db {
 ObjectTrackCache::ObjectTrackCache(
     std::chrono::milliseconds aggregationPeriod,
     std::chrono::milliseconds maxObjectLifetime,
-    nx::vms::server::analytics::AbstractIframeSearchHelper* helper)
+    AbstractIframeSearchHelper* helper)
     :
     m_aggregationPeriod(aggregationPeriod),
     m_maxObjectLifetime(maxObjectLifetime),

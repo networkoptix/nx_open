@@ -2,12 +2,13 @@
 
 #include <QtCore/QDir>
 
-#include <nx/vms/server/metadata/metadata_helper.h>
-#include "utils/media/sse_helper.h"
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log_main.h>
 
-namespace nx::vms::server::metadata {
+#include "metadata_helper.h"
+#include "utils/media/sse_helper.h"
+
+namespace nx::vms::metadata {
 
 static const char kVersion = 1;
 static const int kRecordsPerIteration = 1024;
@@ -512,4 +513,4 @@ int MetadataArchive::getChannel() const
     return m_channel;
 }
 
-} // namespace nx::vms::server::metadata
+} // namespace nx::vms::metadata

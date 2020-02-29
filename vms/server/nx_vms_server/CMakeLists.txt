@@ -95,6 +95,7 @@ nx_add_target(nx_vms_server LIBRARY
         nx_update
         nx_system_commands
         nx_plugin_utils
+        nx_analytics_db
     PRIVATE_LIBS
         Qt5::Qml
         qtservice

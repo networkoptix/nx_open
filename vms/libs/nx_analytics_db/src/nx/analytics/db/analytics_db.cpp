@@ -1,5 +1,9 @@
 #include "analytics_db.h"
 
+#include <QtCore/QDir>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QFileInfo>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/sql/filter.h>
@@ -8,19 +12,23 @@
 
 #include <analytics/db/config.h>
 
-#include <nx/vms/server/root_fs.h>
-
 #include "cleaner.h"
 #include "object_track_searcher.h"
 #include "serializers.h"
 #include "time_period_fetcher.h"
 
 #include <cmath>
-#include <media_server/media_server_module.h>
+#include <common/common_module.h>
+#include <utils/common/util.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/dataprovider/data_provider_factory.h>
-#include <plugins/resource/server_archive/server_archive_delegate.h>
 #include <analytics/common/object_metadata.h>
+
+//#define SERVER_SPECIFIC_CODE
+#ifdef SERVER_SPECIFIC_CODE
+#include <plugins/resource/server_archive/server_archive_delegate.h>
+#include <nx/vms/server/root_fs.h>
+#endif
 
 namespace nx::analytics::db {
 
@@ -28,8 +36,12 @@ static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833
 
 //-------------------------------------------------------------------------------------------------
 
-EventsStorage::EventsStorage(QnMediaServerModule* mediaServerModule):
-    m_mediaServerModule(mediaServerModule),
+EventsStorage::EventsStorage(
+    QnCommonModule* commonModule,
+    AbstractIframeSearchHelper* iframeSearchHelper)
+    :
+    m_commonModule(commonModule),
+    m_iframeSearchHelper(iframeSearchHelper),
     m_trackAggregator(
         kTrackSearchResolutionX,
         kTrackSearchResolutionY,
@@ -60,10 +72,14 @@ EventsStorage::~EventsStorage()
 
 bool EventsStorage::makePath(const QString& path)
 {
-    if (!m_mediaServerModule) //< #TODO #akulikov Hack for tests. Refactor it.
+    if (!m_commonModule) //< #TODO #akulikov Hack for tests. Refactor it.
         return true;
 
+#ifdef SERVER_SPECIFIC_CODE
     if (!m_mediaServerModule->rootFileSystem()->makeDirectory(path))
+#else
+    if (!QDir().mkpath(path))
+#endif
     {
         NX_WARNING(this, "Failed to create directory %1", path);
         return false;
@@ -75,6 +91,7 @@ bool EventsStorage::makePath(const QString& path)
 
 bool EventsStorage::changeOwner(const std::vector<PathAndMode>& pathAndModeList)
 {
+#ifdef SERVER_SPECIFIC_CODE
     if (!m_mediaServerModule) //< #TODO #akulikov Hack for tests. Refactor it.
         return true;
 
@@ -103,6 +120,7 @@ bool EventsStorage::changeOwner(const std::vector<PathAndMode>& pathAndModeList)
         NX_DEBUG(
             this, "Suceeded to change access rights. Mode: %1. Path: %2", modeString, path);
     }
+#endif
 
     return true;
 }
@@ -134,7 +152,7 @@ bool EventsStorage::initialize(const Settings& settings)
     m_objectTrackCache = std::make_unique<ObjectTrackCache>(
         kTrackAggregationPeriod,
         settings.maxCachedObjectLifeTime,
-        m_mediaServerModule ? m_mediaServerModule->iFrameSearchHelper() : nullptr);
+        m_iframeSearchHelper);
 
     auto dbConnectionOptions = settings.dbConnectionOptions;
     dbConnectionOptions.dbName = closeDirPath(settings.path) + dbConnectionOptions.dbName;
@@ -168,7 +186,7 @@ bool EventsStorage::initialize(const Settings& settings)
     NX_DEBUG(this, "Initializing archive directory at %1", archivePath);
 
     m_analyticsArchiveDirectory = std::make_unique<AnalyticsArchiveDirectory>(
-        m_mediaServerModule,
+        m_commonModule,
         archivePath);
 
     NX_DEBUG(this, "Analytics DB initialized");
@@ -242,12 +260,14 @@ std::vector<ObjectPosition> EventsStorage::lookupTrackDetailsSync(const ObjectTr
     }
 
     std::vector<ObjectPosition> result;
-    auto resource = m_mediaServerModule->resourcePool()->getResourceById(track.deviceId);
+    auto resource = m_commonModule->resourcePool()->getResourceById(track.deviceId);
     if (!resource)
     {
         NX_DEBUG(this, "Failed to to lookup detail track info for deviceId: %1", track.deviceId);
         return result;
     }
+
+#ifdef SERVER_SPECIFIC_CODE
     QnServerArchiveDelegate archive(m_mediaServerModule, MediaQuality::MEDIA_Quality_High);
     if (!archive.open(resource, m_mediaServerModule->archiveIntegrityWatcher()))
     {
@@ -283,6 +303,8 @@ std::vector<ObjectPosition> EventsStorage::lookupTrackDetailsSync(const ObjectTr
             }
         }
     }
+#endif
+
     NX_VERBOSE(this, "track details data has read from media archive. Request duration %1",
         timer.elapsed());
     return result;
@@ -582,8 +604,12 @@ void EventsStorage::logDataSaveResult(sql::DBResult resultCode)
 
 //-------------------------------------------------------------------------------------------------
 
-MovableAnalyticsDb::MovableAnalyticsDb(QnMediaServerModule* mediaServerModule):
-    m_mediaServerModule(mediaServerModule)
+MovableAnalyticsDb::MovableAnalyticsDb(
+    QnCommonModule* commonModule,
+    AbstractIframeSearchHelper* iframeSearchHelper)
+    :
+    m_commonModule(commonModule),
+    m_iframeSearchHelper(iframeSearchHelper)
 {
 }
 
@@ -593,7 +619,7 @@ MovableAnalyticsDb::~MovableAnalyticsDb()
 
 bool MovableAnalyticsDb::initialize(const Settings& settings)
 {
-    auto otherDb = std::make_shared<EventsStorage>(m_mediaServerModule);
+    auto otherDb = std::make_shared<EventsStorage>(m_commonModule, m_iframeSearchHelper);
     bool result = otherDb->initialize(settings);
     if (!result)
     {
@@ -756,9 +782,10 @@ EventsStorageFactory& EventsStorageFactory::instance()
 }
 
 std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunction(
-    QnMediaServerModule* mediaServerModule)
+    QnCommonModule* commonModule,
+    AbstractIframeSearchHelper* iframeSearchHelper)
 {
-    return std::make_unique<MovableAnalyticsDb>(mediaServerModule);
+    return std::make_unique<MovableAnalyticsDb>(commonModule, iframeSearchHelper);
 }
 
 } // namespace nx::analytics::db

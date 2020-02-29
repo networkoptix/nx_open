@@ -6,6 +6,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
+#include <utils/common/synctime.h>
+
 static const int kHttpTimeoutMs = 3000;
 
 QnMetaDataV1Ptr ArecontMetaReader::parseMotionMetadata(
@@ -16,7 +18,7 @@ QnMetaDataV1Ptr ArecontMetaReader::parseMotionMetadata(
         return nullptr;
 
     QString motionStr = response.mid(index + 1);
-    QnMetaDataV1Ptr motion(new QnMetaDataV1());
+    QnMetaDataV1Ptr motion(new QnMetaDataV1(qnSyncTime->currentTimePoint()));
     motion->channelNumber = channel;
     if (motionStr == lit("no motion"))
         return motion; // no motion detected

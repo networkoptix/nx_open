@@ -10,7 +10,7 @@ namespace nx::analytics::db {
 
 class AbstractEventsStorage;
 
-class AnalyticsEventsReceptor:
+class NX_ANALYTICS_DB_API AnalyticsEventsReceptor:
     public QnAbstractDataReceptor,
     public QnCommonModuleAware
 {

@@ -32,7 +32,7 @@
 #include <QtNetwork/QNetworkInterface>
 
 #include <api/global_settings.h>
-#include <nx/vms/server/analytics/db/analytics_db.h>
+#include <nx/analytics/db/analytics_db.h>
 
 #include <appserver/processor.h>
 
@@ -1936,17 +1936,17 @@ void MediaServerProcess::registerRestHandlers(
      * %// TODO: Write apidoc comment.
      */
     reg("api/getRemoteNonce", new QnGetNonceRestHandler("/api/getNonce"));
-    
+
     /**%apidoc[proprietary] TODO /api/cookieLogin
      * %// TODO: Write apidoc comment.
      */
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
-    
+
     /**%apidoc[proprietary] TODO /api/cookieLogout
      * %// TODO: Write apidoc comment.
      */
     reg("api/cookieLogout", new QnCookieLogoutRestHandler());
-    
+
     /**%apidoc[proprietary] TODO /api/getCurrentUser
      * %// TODO: Write apidoc comment.
      */
@@ -1998,7 +1998,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/metrics", new QnMetricsRestHandler());
 
     reg(::rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
-    
+
     /**%apidoc[proprietary] TODO /api/recStats
      * %// TODO: Write apidoc comment.
      */
@@ -3027,7 +3027,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/startLiteClient", new QnStartLiteClientRestHandler(serverModule()));
 
     #if defined(_DEBUG)
-        
+
         /**%apidoc[proprietary] TODO /api/debugEvent
          * %// TODO: Write apidoc comment.
          */

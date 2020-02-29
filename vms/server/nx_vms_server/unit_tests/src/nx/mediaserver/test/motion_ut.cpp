@@ -3,6 +3,8 @@
 #include <media_server_module_fixture.h>
 #include <media_server/media_server_module.h>
 #include <motion/motion_helper.h>
+#include <utils/common/synctime.h>
+
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include "../camera_mock.h"
 #include <nx/fusion/model_functions.h>
@@ -31,7 +33,7 @@ class MotionArchive: public MediaServerModuleFixture
 
       void createTestData()
       {
-          QnMetaDataV1Ptr motion(new QnMetaDataV1());
+          QnMetaDataV1Ptr motion(new QnMetaDataV1(qnSyncTime->currentTimePoint()));
           for (int x = 0; x < Qn::kMotionGridWidth / 2; ++x)
           {
               for (int y = 0; y < Qn::kMotionGridHeight / 2; ++y)
@@ -172,7 +174,7 @@ TEST_F(MotionArchive, addMotion)
 {
     auto checkMotion = [](const QRectF& rectF)
     {
-        QnMetaDataV1 packet;
+        QnMetaDataV1 packet(qnSyncTime->currentTimePoint());
         packet.addMotion(rectF);
 
         QRect rect = QnMetaDataV1::rectFromNormalizedRect(rectF);

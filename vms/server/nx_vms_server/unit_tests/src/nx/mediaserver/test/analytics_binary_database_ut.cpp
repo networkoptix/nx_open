@@ -6,8 +6,8 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include "../camera_mock.h"
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/server/metadata/analytics_archive.h>
-#include <nx/vms/server/metadata/analytics_helper.h>
+#include <nx/vms/metadata/analytics_archive.h>
+#include <nx/vms/metadata/analytics_helper.h>
 
 namespace nx::vms::server::test
 {
@@ -24,7 +24,7 @@ auto kBaseDateMs2 =
     QDateTime::fromString("2018-01-31T00:23:50", Qt::ISODate).toMSecsSinceEpoch();
 
 using namespace std::chrono;
-using namespace nx::vms::server::metadata;
+using namespace nx::vms::metadata;
 
 class AnalyticsArchive: public MediaServerModuleFixture
 {
@@ -46,7 +46,7 @@ class AnalyticsArchive: public MediaServerModuleFixture
 
       void createTestData()
       {
-          nx::vms::server::metadata::AnalyticsArchive archive(
+          nx::vms::metadata::AnalyticsArchive archive(
               serverModule().metadataDatabaseDir(),
               m_camera->getPhysicalId());
 
@@ -93,7 +93,7 @@ TEST_F(AnalyticsArchive, findAnalyticsAsc)
 {
     createTestData();
 
-    nx::vms::server::metadata::AnalyticsHelper archive(
+    nx::vms::metadata::AnalyticsHelper archive(
         serverModule().metadataDatabaseDir());
 
     auto request = createRequest(Qt::SortOrder::AscendingOrder);
@@ -111,7 +111,7 @@ TEST_F(AnalyticsArchive, findAnalyticsDesc)
 {
     createTestData();
 
-    nx::vms::server::metadata::AnalyticsHelper archive(
+    nx::vms::metadata::AnalyticsHelper archive(
         serverModule().metadataDatabaseDir());
 
     auto request = createRequest(Qt::SortOrder::DescendingOrder);
@@ -129,7 +129,7 @@ TEST_F(AnalyticsArchive, findAnalyticsDesc)
     ASSERT_EQ(1, result.size());
     ASSERT_EQ(m_numericDates[m_numericDates.size()-1], result[0].startTimeMs);
     static const std::chrono::milliseconds kAggregationInterval(
-        nx::vms::server::metadata::AnalyticsArchive::kAggregationInterval);
+        nx::vms::metadata::AnalyticsArchive::kAggregationInterval);
 
     auto deltaMs = m_numericDates[0] - m_numericDates[m_numericDates.size() - 1]
         + kAggregationInterval.count();
@@ -140,7 +140,7 @@ TEST_F(AnalyticsArchive, findAnalyticsWithFilter)
 {
     createTestData();
 
-    nx::vms::server::metadata::AnalyticsHelper archive(
+    nx::vms::metadata::AnalyticsHelper archive(
         serverModule().metadataDatabaseDir());
 
     auto request = createRequest(Qt::SortOrder::AscendingOrder);
@@ -178,7 +178,7 @@ TEST_F(AnalyticsArchive, findAnalyticsWithFilter)
 TEST_F(AnalyticsArchive, matchObjectGroups)
 {
     static const std::chrono::milliseconds kAggregationInterval(
-        nx::vms::server::metadata::AnalyticsArchive::kAggregationInterval);
+        nx::vms::metadata::AnalyticsArchive::kAggregationInterval);
 
     createTestData();
 
@@ -224,12 +224,12 @@ TEST_F(AnalyticsArchive, matchObjectGroups)
 TEST_F(AnalyticsArchive, matchLongArchive)
 {
     static const std::chrono::milliseconds kAggregationInterval(
-        nx::vms::server::metadata::AnalyticsArchive::kAggregationInterval);
+        nx::vms::metadata::AnalyticsArchive::kAggregationInterval);
 
     const std::vector<qint64> timePointsMs = {kBaseDateMs, kBaseDateMs2, kBaseDateMs2 + kDeltaMs};
     for (auto timestampMs: timePointsMs)
     {
-        nx::vms::server::metadata::AnalyticsArchive archive(
+        nx::vms::metadata::AnalyticsArchive archive(
             serverModule().metadataDatabaseDir(),
             m_camera->getPhysicalId());
         std::vector<QRectF> rects{QRectF(0.0, 0.0, 0.5, 0.5)};
