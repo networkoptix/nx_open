@@ -92,6 +92,21 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
     }
     m_engineManifest = QJson::deserialized<Hanwha::EngineManifest>(m_manifest);
     m_engineManifest.InitializeObjectTypeMap();
+
+    QByteArray attributeFiltersData;
+    QFile attributeFiltersFile(":/hanwha/object_metadata_attribute_filters.json");
+    if (attributeFiltersFile.open(QFile::ReadOnly))
+        attributeFiltersData = attributeFiltersFile.readAll();
+    {
+        QFile file("plugins/hanwha/object_metadata_attribute_filters.json");
+        if (file.open(QFile::ReadOnly))
+        {
+            NX_INFO(this,
+                lm("Switch to external object metatdata attribute filters file %1").arg(QFileInfo(file).absoluteFilePath()));
+            attributeFiltersData = file.readAll();
+        }
+    }
+    m_objectMetadataAttributeFilters = QJson::deserialized<Hanwha::ObjectMetadataAttributeFilters>(attributeFiltersData);
 }
 
 void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
@@ -239,6 +254,11 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
 const Hanwha::EngineManifest& Engine::engineManifest() const
 {
     return m_engineManifest;
+}
+
+const Hanwha::ObjectMetadataAttributeFilters& Engine::objectMetadataAttributeFilters() const
+{
+    return m_objectMetadataAttributeFilters;
 }
 
 MetadataMonitor* Engine::monitor(
