@@ -46,6 +46,9 @@ public:
 
     virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
 
+    /**
+     * Returns track details taken from the cache only.
+     */
     virtual std::vector<ObjectPosition> lookupTrackDetailsSync(const ObjectTrack& track) override;
 
     virtual void lookup(
@@ -67,7 +70,7 @@ public:
 
     virtual std::optional<nx::sql::QueryStatistics> statistics() const override;
 
-private:
+protected:
     enum class ChownMode
     {
         recursive,
@@ -76,6 +79,19 @@ private:
 
     using PathAndMode = std::tuple<QString, ChownMode>;
 
+    /**
+     * Creates directory including all parents folders.
+     * @return true if path exists after return and it is a directory. false otherwise.
+     */
+    virtual bool makePath(const QString& path);
+
+    /**
+     * Makes all files and directories from the pathAndModeList writable.
+     * @return true if succeeded for all entries.
+     */
+    virtual bool makeWritable(const std::vector<PathAndMode>& pathAndModeList);
+
+private:
     QnCommonModule* m_commonModule = nullptr;
     AbstractIframeSearchHelper* m_iframeSearchHelper = nullptr;
     std::unique_ptr<DbController> m_dbController;
@@ -115,58 +131,8 @@ private:
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 
     void logDataSaveResult(sql::DBResult resultCode);
-    bool makePath(const QString& path);
-    bool changeOwner(const std::vector<PathAndMode>& pathAndModeList);
 
     static std::vector<PathAndMode> enumerateSqlFiles(const QString& dbFileName);
-};
-
-//-------------------------------------------------------------------------------------------------
-
-class MovableAnalyticsDb:
-    public AbstractEventsStorage
-{
-public:
-    MovableAnalyticsDb(
-        QnCommonModule* commonModule,
-        AbstractIframeSearchHelper* iframeSearchHelper);
-    virtual ~MovableAnalyticsDb();
-
-    virtual bool initialize(const Settings& settings) override;
-
-    virtual bool initialized() const override;
-
-    virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
-
-    virtual std::vector<ObjectPosition> lookupTrackDetailsSync(const ObjectTrack& track) override;
-
-    virtual void lookup(
-        Filter filter,
-        LookupCompletionHandler completionHandler) override;
-
-    virtual void lookupTimePeriods(
-        Filter filter,
-        TimePeriodsLookupOptions options,
-        TimePeriodsLookupCompletionHandler completionHandler) override;
-
-    virtual void markDataAsDeprecated(
-        QnUuid deviceId,
-        std::chrono::milliseconds oldestDataToKeepTimestamp) override;
-
-    virtual void flush(StoreCompletionHandler completionHandler) override;
-
-    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override;
-
-    virtual std::optional<nx::sql::QueryStatistics> statistics() const override;
-
-private:
-    mutable QnMutex m_mutex;
-    QnCommonModule* m_commonModule = nullptr;
-    AbstractIframeSearchHelper* m_iframeSearchHelper = nullptr;
-    std::shared_ptr<EventsStorage> m_db;
-
-    std::shared_ptr<EventsStorage> getDb();
-    std::shared_ptr<const EventsStorage> getDb() const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -174,13 +140,23 @@ private:
 using EventsStorageFactoryFunction =
     std::unique_ptr<AbstractEventsStorage>(QnCommonModule*, AbstractIframeSearchHelper*);
 
+/**
+ * NOTE: The db must always be instantiated via EventsStorageFactory::create() call,
+ * even if a custom AbstractEventsStorage descendant is used.
+ * That's because this factory wraps AbstractEventsStorage instance to MovableAnalyticsDb.
+ */
 class NX_ANALYTICS_DB_API EventsStorageFactory:
-    public nx::utils::BasicFactory<EventsStorageFactoryFunction>
+    private nx::utils::BasicFactory<EventsStorageFactoryFunction>
 {
     using base_type = nx::utils::BasicFactory<EventsStorageFactoryFunction>;
 
 public:
     EventsStorageFactory();
+
+    std::unique_ptr<AbstractEventsStorage> create(
+        QnCommonModule*, AbstractIframeSearchHelper*);
+
+    using base_type::setCustomFunc;
 
     static EventsStorageFactory& instance();
 

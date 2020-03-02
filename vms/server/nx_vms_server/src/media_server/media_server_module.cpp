@@ -61,6 +61,7 @@
 #include <nx/vms/server/nvr/service_factory.h>
 #include <nx/vms/server/nvr/hanwha/service_provider.h>
 
+#include <nx/vms/server/analytics/analytics_db.h>
 #include <nx/vms/server/analytics/sdk_object_factory.h>
 
 #include <media_server/serverutil.h>
@@ -296,6 +297,15 @@ QnMediaServerModule::QnMediaServerModule(
     m_analyticsIframeSearchHelper = store(
         new nx::vms::server::analytics::IframeSearchHelper(
             commonModule()->resourcePool(), m_videoCameraPool));
+
+    nx::analytics::db::EventsStorageFactory::instance().setCustomFunc(
+        [this](
+            QnCommonModule* /*commonModule*/,
+            nx::analytics::db::AbstractIframeSearchHelper* iframeSearchHelper)
+        {
+            return std::make_unique<nx::vms::server::analytics::AnalyticsDb>(
+                this, iframeSearchHelper);
+        });
 
     m_analyticsEventsStorage = store(
         nx::analytics::db::EventsStorageFactory::instance().create(

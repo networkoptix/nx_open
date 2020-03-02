@@ -1,5 +1,7 @@
 #include "analytics_db.h"
 
+#include <cmath>
+
 #include <QtCore/QDir>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QFileInfo>
@@ -14,21 +16,12 @@
 
 #include "cleaner.h"
 #include "object_track_searcher.h"
+#include "movable_analytics_db.h"
 #include "serializers.h"
 #include "time_period_fetcher.h"
 
-#include <cmath>
 #include <common/common_module.h>
 #include <utils/common/util.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/dataprovider/data_provider_factory.h>
-#include <analytics/common/object_metadata.h>
-
-//#define SERVER_SPECIFIC_CODE
-#ifdef SERVER_SPECIFIC_CODE
-#include <plugins/resource/server_archive/server_archive_delegate.h>
-#include <nx/vms/server/root_fs.h>
-#endif
 
 namespace nx::analytics::db {
 
@@ -72,14 +65,7 @@ EventsStorage::~EventsStorage()
 
 bool EventsStorage::makePath(const QString& path)
 {
-    if (!m_commonModule) //< #TODO #akulikov Hack for tests. Refactor it.
-        return true;
-
-#ifdef SERVER_SPECIFIC_CODE
-    if (!m_mediaServerModule->rootFileSystem()->makeDirectory(path))
-#else
     if (!QDir().mkpath(path))
-#endif
     {
         NX_WARNING(this, "Failed to create directory %1", path);
         return false;
@@ -89,40 +75,9 @@ bool EventsStorage::makePath(const QString& path)
     return true;
 }
 
-bool EventsStorage::changeOwner(
-    [[maybe_unused]] const std::vector<PathAndMode>& pathAndModeList)
+bool EventsStorage::makeWritable(
+    const std::vector<PathAndMode>& /*pathAndModeList*/)
 {
-#ifdef SERVER_SPECIFIC_CODE
-    if (!m_mediaServerModule) //< #TODO #akulikov Hack for tests. Refactor it.
-        return true;
-
-    for (const auto& entry: pathAndModeList)
-    {
-        const ChownMode mode = std::get<ChownMode>(entry);
-        const QString path = std::get<QString>(entry);
-        const QString modeString = mode == ChownMode::recursive ? "recursive" : "non-recursive";
-        const auto rootFs = m_mediaServerModule->rootFileSystem();
-
-        if (!rootFs->isPathExists(path))
-        {
-            NX_DEBUG(
-                this,
-                "Requested to change owner for a path %1, but it doesn't exist. Skipping.", path);
-            continue;
-        }
-
-        if (!rootFs->changeOwner(path, mode == ChownMode::recursive))
-        {
-            NX_WARNING(
-                this, "Failed to change access rights. Mode: %1. Path: %2", modeString, path);
-            return false;
-        }
-
-        NX_DEBUG(
-            this, "Suceeded to change access rights. Mode: %1. Path: %2", modeString, path);
-    }
-#endif
-
     return true;
 }
 
@@ -163,10 +118,10 @@ bool EventsStorage::initialize(const Settings& settings)
     const auto archivePath = closeDirPath(settings.path) + "archive/";
 
     if (!makePath(archivePath)
-        || !changeOwner({
+        || !makeWritable({
             {settings.path, ChownMode::nonRecursive},
             {archivePath, ChownMode::nonRecursive}})
-        || !changeOwner(enumerateSqlFiles(dbConnectionOptions.dbName)))
+        || !makeWritable(enumerateSqlFiles(dbConnectionOptions.dbName)))
     {
         m_dbController.reset();
         NX_WARNING(this, "Failed to initialize analytics DB directories at %1", settings.path);
@@ -251,64 +206,13 @@ std::optional<nx::sql::QueryStatistics> EventsStorage::statistics() const
 
 std::vector<ObjectPosition> EventsStorage::lookupTrackDetailsSync(const ObjectTrack& track)
 {
-    nx::utils::ElapsedTimer timer;
-    timer.restart();
-
     if (auto details = m_objectTrackCache->getTrackById(track.id))
     {
         NX_VERBOSE(this, "Return trackId %1 from the cache", track.id);
         return details->objectPositionSequence;
     }
 
-    std::vector<ObjectPosition> result;
-    auto resource = m_commonModule->resourcePool()->getResourceById(track.deviceId);
-    if (!resource)
-    {
-        NX_DEBUG(this, "Failed to to lookup detail track info for deviceId: %1", track.deviceId);
-        return result;
-    }
-
-#ifdef SERVER_SPECIFIC_CODE
-    QnServerArchiveDelegate archive(m_mediaServerModule, MediaQuality::MEDIA_Quality_High);
-    if (!archive.open(resource, m_mediaServerModule->archiveIntegrityWatcher()))
-    {
-        NX_DEBUG(this, "Failed to to lookup detail track info for objectTraclId: %1", track.id);
-        return result;
-    }
-    archive.seek(track.firstAppearanceTimeUs, true);
-    const auto lastTime = track.lastAppearanceTimeUs;
-    while (auto data = std::dynamic_pointer_cast<QnAbstractMediaData>(archive.getNextData()))
-    {
-        if (data->timestamp > lastTime || data->dataType == QnAbstractMediaData::EMPTY_DATA)
-            break;
-
-        auto metadata = std::dynamic_pointer_cast<QnCompressedMetadata>(data);
-        if (!metadata)
-            continue;
-
-        auto packet = nx::common::metadata::fromCompressedMetadataPacket(metadata);
-        if (!packet)
-            break;
-
-        for (const auto& detailData : packet->objectMetadataList)
-        {
-            if (detailData.trackId == track.id)
-            {
-                ObjectPosition position;
-                position.deviceId = track.deviceId;
-                position.timestampUs = packet->timestampUs;
-                position.durationUs = packet->durationUs;
-                position.attributes = detailData.attributes;
-                position.boundingBox = detailData.boundingBox;
-                result.emplace_back(position);
-            }
-        }
-    }
-#endif
-
-    NX_VERBOSE(this, "track details data has read from media archive. Request duration %1",
-        timer.elapsed());
-    return result;
+    return std::vector<ObjectPosition>();
 }
 
 void EventsStorage::lookup(
@@ -604,175 +508,20 @@ void EventsStorage::logDataSaveResult(sql::DBResult resultCode)
 
 //-------------------------------------------------------------------------------------------------
 
-MovableAnalyticsDb::MovableAnalyticsDb(
-    QnCommonModule* commonModule,
-    AbstractIframeSearchHelper* iframeSearchHelper)
-    :
-    m_commonModule(commonModule),
-    m_iframeSearchHelper(iframeSearchHelper)
-{
-}
-
-MovableAnalyticsDb::~MovableAnalyticsDb()
-{
-}
-
-bool MovableAnalyticsDb::initialize(const Settings& settings)
-{
-    auto otherDb = std::make_shared<EventsStorage>(m_commonModule, m_iframeSearchHelper);
-    bool result = otherDb->initialize(settings);
-    if (!result)
-    {
-        NX_INFO(this, "Failed to initialize analytics DB at %1", settings.path);
-        otherDb.reset();
-    }
-
-    // NOTE: Switching to the new DB object anyway. That's a functional requirement.
-    // So, DB becomes non-operational in case of a failure to re-initialize it.
-
-    {
-        QnMutexLocker locker(&m_mutex);
-        std::swap(m_db, otherDb);
-    }
-
-    // Waiting for the old DB to become unused.
-    // NOTE: Using loop with a delay to make things simpler here.
-    // Anyway, closing / opening a DB is a time-consuming operation.
-    // Extra millisecond sleep does not make it worse.
-    while (otherDb.use_count() > 1)
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-    return result;
-}
-
-bool MovableAnalyticsDb::initialized() const
-{
-    return m_db != nullptr;
-}
-
-void MovableAnalyticsDb::save(common::metadata::ConstObjectMetadataPacketPtr packet)
-{
-    auto db = getDb();
-    if (!db)
-    {
-        NX_DEBUG(this, "Attempt to write to non-initialized analytics DB");
-        return;
-    }
-
-    return db->save(std::move(packet));
-}
-
-std::vector<ObjectPosition> MovableAnalyticsDb::lookupTrackDetailsSync(const ObjectTrack& track)
-{
-    auto db = getDb();
-    if (!db)
-    {
-        NX_DEBUG(this, "Attempt to lookup to non-initialized analytics DB");
-        return std::vector<ObjectPosition>();
-    }
-
-    return db->lookupTrackDetailsSync(track);
-}
-
-void MovableAnalyticsDb::lookup(
-    Filter filter,
-    LookupCompletionHandler completionHandler)
-{
-    auto db = getDb();
-    if (!db)
-    {
-        NX_DEBUG(this, "Attempt to look up tracks in non-initialized analytics DB");
-        return completionHandler(ResultCode::ok, LookupResult());
-    }
-
-    return db->lookup(
-        std::move(filter),
-        std::move(completionHandler));
-}
-
-void MovableAnalyticsDb::lookupTimePeriods(
-    Filter filter,
-    TimePeriodsLookupOptions options,
-    TimePeriodsLookupCompletionHandler completionHandler)
-{
-    auto db = getDb();
-    if (!db)
-    {
-        NX_DEBUG(this, "Attempt to look up time periods in non-initialized analytics DB");
-        return completionHandler(ResultCode::error, QnTimePeriodList());
-    }
-
-    return db->lookupTimePeriods(
-        std::move(filter),
-        std::move(options),
-        std::move(completionHandler));
-}
-
-void MovableAnalyticsDb::markDataAsDeprecated(
-    QnUuid deviceId,
-    std::chrono::milliseconds oldestDataToKeepTimestamp)
-{
-    auto db = getDb();
-    if (!db)
-    {
-        NX_DEBUG(this, "Attempt to remove from non-initialized analytics DB");
-        return;
-    }
-
-    return db->markDataAsDeprecated(
-        deviceId,
-        oldestDataToKeepTimestamp);
-}
-
-void MovableAnalyticsDb::flush(StoreCompletionHandler completionHandler)
-{
-    auto db = getDb();
-    if (!db)
-    {
-        NX_DEBUG(this, "Attempt to flush non-initialized analytics DB");
-        return completionHandler(ResultCode::error);
-    }
-
-    return db->flush(std::move(completionHandler));
-}
-
-std::optional<nx::sql::QueryStatistics> MovableAnalyticsDb::statistics() const
-{
-    if (const auto db = getDb())
-        return db->statistics();
-    return std::nullopt;
-}
-
-bool MovableAnalyticsDb::readMinimumEventTimestamp(std::chrono::milliseconds* outResult)
-{
-    auto db = getDb();
-    if (!db)
-    {
-        NX_DEBUG(this, "Attempt to read min timestamp from non-initialized analytics DB");
-        return false;
-    }
-
-    return db->readMinimumEventTimestamp(outResult);
-}
-
-std::shared_ptr<EventsStorage> MovableAnalyticsDb::getDb()
-{
-    QnMutexLocker locker(&m_mutex);
-    return m_db;
-}
-
-std::shared_ptr<const EventsStorage> MovableAnalyticsDb::getDb() const
-{
-    QnMutexLocker locker(&m_mutex);
-    return m_db;
-}
-
-//-------------------------------------------------------------------------------------------------
-
 EventsStorageFactory::EventsStorageFactory():
     base_type([this](auto&&... args)
         { return defaultFactoryFunction(std::forward<decltype(args)>(args)...); })
 {
+}
+
+std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::create(
+    QnCommonModule* commonModule, AbstractIframeSearchHelper* iframeSearchHelper)
+{
+    return std::make_unique<MovableAnalyticsDb>(
+        [this, commonModule, iframeSearchHelper]()
+        {
+            return base_type::create(commonModule, iframeSearchHelper);
+        });
 }
 
 EventsStorageFactory& EventsStorageFactory::instance()
@@ -785,7 +534,7 @@ std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunct
     QnCommonModule* commonModule,
     AbstractIframeSearchHelper* iframeSearchHelper)
 {
-    return std::make_unique<MovableAnalyticsDb>(commonModule, iframeSearchHelper);
+    return std::make_unique<EventsStorage>(commonModule, iframeSearchHelper);
 }
 
 } // namespace nx::analytics::db
