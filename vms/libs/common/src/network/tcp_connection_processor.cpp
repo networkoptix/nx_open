@@ -1,5 +1,8 @@
 #include "tcp_connection_processor.h"
 
+#include <chrono>
+#include <optional>
+
 #include <QtCore/QTime>
 
 #include <nx/network/aio/unified_pollset.h>
@@ -223,19 +226,21 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
     Q_D(QnTCPConnectionProcessor);
     while (!needToStop() && size > 0 && d->socket->isConnected())
     {
-        const int sendResult = d->socket->send(data, size);
+        const auto sendDataResult = d->sendData(data, size);
 
-        if (sendResult == 0)
+        if (sendDataResult.sendResult == 0)
         {
             NX_DEBUG(this, "Socket was closed by the other peer (send() -> 0).");
             return false;
         }
 
-        if (sendResult < 0)
+        if (sendDataResult.sendResult < 0)
         {
-            const auto errorCode = SystemError::getLastOSErrorCode();
+            if (sendDataResult.errorCode == SystemError::interrupted)
+                continue; //< Retrying interrupted call.
 
-            if (errorCode == SystemError::wouldBlock || errorCode == SystemError::again)
+            if (sendDataResult.errorCode == SystemError::wouldBlock
+                || sendDataResult.errorCode == SystemError::again)
             {
                 unsigned int sendTimeout = 0;
                 if (!d->socket->getSendTimeout(&sendTimeout))
@@ -258,17 +263,14 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
                 }
                 continue; //< socket in async mode
             }
-            else if (SystemError::getLastOSErrorCode() == SystemError::interrupted)
-            {
-                continue; //< Retrying interrupted call.
-            }
 
-            NX_DEBUG(this, "Unable to send data to socket: %1(%2)", errorCode, SystemError::toString(errorCode));
+            NX_DEBUG(this, "Unable to send data to socket: %1 (OS code %2).",
+                SystemError::toString(sendDataResult.errorCode), sendDataResult.errorCode);
             return false;
         }
 
-        data += sendResult;
-        size -= sendResult;
+        data += sendDataResult.sendResult;
+        size -= sendDataResult.sendResult;
     }
 
     if (!d->socket->isConnected())

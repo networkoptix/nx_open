@@ -399,6 +399,32 @@ void QnRtspDataConsumer::doRealtimeDelay(QnConstAbstractMediaDataPtr media)
     m_lastRtTime = media->timestamp;
 }
 
+void QnRtspDataConsumer::sendBufferViaTcp(std::optional<int64_t> timestampForLogging)
+{
+    using namespace std::chrono;
+
+    const auto beforeSendBuffer = steady_clock::now();
+    const bool sendBufferResult = m_owner->sendBuffer(m_sendBuffer); //< Error is already logged.
+    const auto afterSendBuffer = steady_clock::now();
+
+    // NOTE: On sending error, there seems to be no better option rather than ignore the error -
+    // the peer will have a broken stream but streaming will not stop, which is preferred.
+
+    m_sendBuffer.clear();
+
+    NX_VERBOSE(this, "sendBuffer(%1 bytes): %2, timestamp %3, duration %4 us, since last send %5",
+        m_sendBuffer.size(),
+        sendBufferResult ? "success" : "FAILURE",
+        timestampForLogging ? lm("%1 us").args(*timestampForLogging) : "n/a",
+        duration_cast<microseconds>(afterSendBuffer - beforeSendBuffer).count(),
+        m_lastSendBufferViaTcpTime
+            ? lm("%1 us").args(duration_cast<microseconds>(
+                beforeSendBuffer - *m_lastSendBufferViaTcpTime).count())
+            : "n/a");
+
+    m_lastSendBufferViaTcpTime = beforeSendBuffer;
+}
+
 void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
 {
     RtspServerTrackInfo* metadataTrack = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
@@ -420,10 +446,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
             *lenPtr = htons(m_sendBuffer.size() - kRtpTcpHeaderSize - dataStartIndex);
 
             if (m_sendBuffer.size() >= kTcpSendBlockSize)
-            {
-                m_owner->sendBuffer(m_sendBuffer);
-                m_sendBuffer.clear();
-            }
+                sendBufferViaTcp();
         }
         else  if (metadataTrack->mediaSocket)
         {
@@ -636,13 +659,10 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
 {
     const auto flushBuffer = nx::utils::makeScopeGuard(
-        [this]()
+        [this, &media]()
         {
             if (!m_needStop && m_dataQueue.isEmpty() && m_sendBuffer.size() > 0)
-            {
-                m_owner->sendBuffer(m_sendBuffer);
-                m_sendBuffer.clear();
-            }
+                sendBufferViaTcp(media->timestamp);
         });
 
     if ((m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1))
@@ -738,11 +758,7 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
             quint16* lenPtr = (quint16*)(m_sendBuffer.data() + dataStartIndex + 2);
             *lenPtr = htons(m_sendBuffer.size() - kRtpTcpHeaderSize - dataStartIndex);
             if (m_sendBuffer.size() >= kTcpSendBlockSize)
-            {
-                [[maybe_unused]] const bool sendResult =
-                    m_owner->sendBuffer(m_sendBuffer); //< Error is already logged.
-                m_sendBuffer.clear();
-            }
+                sendBufferViaTcp(media->timestamp);
         }
         else
         {

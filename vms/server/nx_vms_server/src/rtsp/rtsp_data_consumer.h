@@ -1,5 +1,8 @@
 #pragma once
 
+#include <chrono>
+#include <optional>
+
 #include <QtCore/QElapsedTimer>
 
 #include <nx/streaming/abstract_data_consumer.h>
@@ -95,6 +98,8 @@ private:
     void switchQualityIfNeeded(bool isSecondaryProvider);
     void processMediaData(const QnAbstractMediaDataPtr& nonConstData);
     void flushReorderingBuffer();
+    void sendBufferViaTcp(std::optional<int64_t> timestampForLogging = std::nullopt);
+
 private:
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
@@ -116,6 +121,8 @@ private:
     int m_liveMarker;
     MediaQuality m_liveQuality;
     MediaQuality m_newLiveQuality;
+
+    std::optional<std::chrono::time_point<std::chrono::steady_clock>> m_lastSendBufferViaTcpTime;
 
     int m_streamingSpeed;
     bool m_multiChannelVideo;
