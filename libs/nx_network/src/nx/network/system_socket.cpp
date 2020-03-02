@@ -621,6 +621,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
     m_aioHelper->bindToAioThread(aioThread);
 }
 
+#ifdef _WIN32
 template<typename SocketInterfaceToImplement>
 int CommunicatingSocket<SocketInterfaceToImplement>::asyncOperation(
     Operation op,
@@ -705,6 +706,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::performOperation(
 
     return asyncOperation(op, buffer, bufferLen, flags);
 }
+#endif // _WIN32
 
 template<typename SocketInterfaceToImplement>
 int CommunicatingSocket<SocketInterfaceToImplement>::recv(
