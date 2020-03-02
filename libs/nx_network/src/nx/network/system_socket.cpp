@@ -757,7 +757,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
             this,
             std::bind(
                 &::send,
-                m_fd,
+                this->m_fd,
                 buffer,
                 (size_t)bufferLen,
                 #if defined(Q_OS_LINUX)
