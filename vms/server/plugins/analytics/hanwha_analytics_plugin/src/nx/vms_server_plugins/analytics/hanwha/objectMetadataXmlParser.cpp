@@ -214,8 +214,9 @@ std::optional<QString> ObjectMetadataXmlParser::filterAttribute(const QString& n
         if (wildcardMatch(pattern, name))
             return std::nullopt;
     }
-    for (const auto& [pattern, replacement]: m_objectAttributeFilters.rename)
+    for (const auto& pair: m_objectAttributeFilters.rename)
     {
+        const auto& [pattern, replacement] = pair;
         if (wildcardMatch(pattern, name))
             return replacement;
     }
