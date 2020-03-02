@@ -54,14 +54,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 static const QString utf8Icon(const vms::event::Level level)
 {
-    static const auto defaultIcon = ini().pushNotifyCommonUtfIcon
-        ? QString(QChar(0x2615)) //< UTF for ":)".
-        : QString();
+    static const auto commonIcon = ini().pushNotifyCommonUtfIcon;
     return nx::utils::switch_(level,
-        vms::event::Level::critical, [] { return QString(QChar(0x203C)); }, //< UTF for "!!".
+        vms::event::Level::critical, [] { return QString(QChar(0x274C)); }, //< UTF for "X".
         vms::event::Level::important, [] { return QString(QChar(0x26A0)); }, //< UTF for "(!)".
         vms::event::Level::success, [] { return QString(QChar(0x2705)); }, //< UTF for "[v]".
-        nx::utils::default_, [] { return defaultIcon; }
+        nx::utils::default_, [] { return commonIcon ? QString(QChar(commonIcon)) : QString(); }
     );
 }
 
