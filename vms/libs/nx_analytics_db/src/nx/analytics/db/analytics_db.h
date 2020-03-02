@@ -12,8 +12,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <analytics/db/abstract_storage.h>
-
+#include "abstract_storage.h"
 #include "analytics_db_controller.h"
 #include "analytics_archive_directory.h"
 #include "attributes_dao.h"

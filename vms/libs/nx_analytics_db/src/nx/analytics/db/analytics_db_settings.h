@@ -4,13 +4,13 @@
 
 #include <nx/sql/types.h>
 
-#include "config.h"
+#include <analytics/db/config.h>
 
 class QnSettings;
 
 namespace nx::analytics::db {
 
-class Settings
+class NX_ANALYTICS_DB_API Settings
 {
 public:
     QString path;

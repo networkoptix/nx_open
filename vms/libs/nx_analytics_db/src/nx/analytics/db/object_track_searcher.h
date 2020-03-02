@@ -7,9 +7,9 @@
 #include <nx/sql/query_context.h>
 #include <nx/sql/sql_cursor.h>
 
-#include <analytics/db/abstract_cursor.h>
 #include <analytics/db/analytics_db_types.h>
 
+#include "abstract_cursor.h"
 #include "device_dao.h"
 #include "object_type_dao.h"
 

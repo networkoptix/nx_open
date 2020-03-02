@@ -5,11 +5,12 @@
 #include <nx/utils/log/log.h>
 
 #include <analytics/common/object_metadata.h>
-#include <analytics/db/abstract_storage.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/analytics/analytics_logging_ini.h>
+
+#include "abstract_storage.h"
 
 namespace nx::analytics::db {
 

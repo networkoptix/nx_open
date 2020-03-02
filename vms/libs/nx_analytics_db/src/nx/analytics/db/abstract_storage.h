@@ -1,17 +1,17 @@
 #pragma once
 
-#include <QtCore/QObject>
-
 #include <memory>
 
+#include <QtCore/QObject>
+
+#include <nx/sql/db_statistics_collector.h>
 #include <nx/utils/move_only_func.h>
 
 #include <recording/time_period_list.h>
+#include <analytics/db/analytics_db_types.h>
 
-#include "abstract_cursor.h"
 #include "analytics_db_settings.h"
-#include "analytics_db_types.h"
-#include <nx/sql/db_statistics_collector.h>
+#include "abstract_cursor.h"
 
 namespace nx::analytics::db {
 
@@ -34,9 +34,11 @@ using CreateCursorCompletionHandler =
  * Generally, any error does not mean storage cannot continue.
  * New operations may be completed successfully.
  */
-class AbstractEventsStorage: public QObject
+class NX_ANALYTICS_DB_API AbstractEventsStorage:
+    public QObject
 {
     Q_OBJECT
+
 public:
     virtual ~AbstractEventsStorage() = default;
 
