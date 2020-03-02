@@ -427,6 +427,11 @@ void socketSyncAsyncSwitch(
         });
     ASSERT_EQ(SystemError::noError, connectPromise.get_future().get());
 
+    // A finite timeout does not work here because client socket reports connected
+    // just after sending ACK to the server.
+    // But server reports accepted socket only after receiving that ACK.
+    ASSERT_TRUE(server->setRecvTimeout(kNoTimeout.count()));
+
     auto accepted = server->accept();
     ASSERT_TRUE((bool) accepted) << SystemError::getLastOSErrorText().toStdString();
     const auto acceptedGuard = nx::utils::makeScopeGuard(
