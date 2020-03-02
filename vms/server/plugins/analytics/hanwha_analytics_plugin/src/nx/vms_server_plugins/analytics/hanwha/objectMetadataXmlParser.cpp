@@ -209,24 +209,16 @@ bool ObjectMetadataXmlParser::extractFrameScale(const QDomElement& transformatio
 
 std::optional<QString> ObjectMetadataXmlParser::filterAttribute(const QString& name) const
 {
-    std::cout << name.toStdString();
     for (const auto& pattern: m_objectAttributeFilters.discard)
     {
         if (wildcardMatch(pattern, name))
-        {
-            std::cout << " discarded because it matches " << pattern.toStdString() << "\n";
             return std::nullopt;
-        }
     }
     for (const auto& [pattern, replacement]: m_objectAttributeFilters.rename)
     {
         if (wildcardMatch(pattern, name))
-        {
-            std::cout << " replaced with " << replacement.toStdString() << " because it matches " << pattern.toStdString() << "\n";
             return replacement;
-        }
     }
-    std::cout << " passed as-is\n";
     return name;
 }
 
