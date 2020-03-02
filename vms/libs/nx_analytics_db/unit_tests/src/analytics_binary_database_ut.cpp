@@ -48,8 +48,8 @@ public:
                 std::chrono::milliseconds(valueMs),
                 rects,
                 i + 1,
-                kObjectTypeId,/* bjectType*/
-                kAllAttributesHash /*allAttributesHash*/);
+                kObjectTypeId
+                kAllAttributesHash);
         }
     }
 
@@ -73,13 +73,11 @@ public:
 
     QString metadataDatabaseDir() const
     {
-        //return serverModule().metadataDatabaseDir();
         return testDataDir() + "/analytics_archive";
     }
 
     QString cameraPhysicalId() const
     {
-        //return m_camera->getPhysicalId();
         return "analytics binary archive test";
     }
 
@@ -103,9 +101,6 @@ public:
         return archive.matchObjects(filter);
     }
 
-    //QnVirtualCameraResourcePtr m_camera;
-    //QnSecurityCamResourceList m_resList;
-    //std::unique_ptr<QnAbstractStreamDataProvider> m_dataProviderStub;
     std::vector<qint64> m_numericDates;
 };
 
@@ -247,7 +242,7 @@ TEST_F(AnalyticsDbArchive, matchLongArchive)
             rects,
             /*trackGroupId*/ 0,
             kObjectTypeId,
-            kAllAttributesHash /*allAttributesHash*/);
+            kAllAttributesHash);
     }
 
     auto result = matchObjects(createRequest(Qt::SortOrder::AscendingOrder));
