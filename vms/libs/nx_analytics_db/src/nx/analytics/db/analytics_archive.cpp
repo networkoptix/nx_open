@@ -71,7 +71,7 @@ AnalyticsArchive::MatchObjectsResult  AnalyticsArchive::matchObjects(
     auto checkLimitInResult =
         [&result, &filter]()
         {
-            return (int) result.data.size() >= filter.limit;
+            return filter.limit >= 0 && ((int) result.data.size()) >= filter.limit;
         };
 
     auto timePeriods = base_type::matchPeriodInternal(filter, matchExtraData, checkLimitInResult);
