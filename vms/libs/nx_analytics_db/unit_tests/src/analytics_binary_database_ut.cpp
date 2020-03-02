@@ -226,7 +226,7 @@ TEST_F(AnalyticsDbArchive, matchObjectGroups)
     request.startTime = milliseconds(kBaseDateMs + kDeltaMs);
     request.endTime = milliseconds(kBaseDateMs + (kSteps - 1) * kDeltaMs - 1);
     result = matchObjects(request);
-    for (int i = 0; i < result.data.size(); ++i)
+    for (std::size_t i = 0; i < result.data.size(); ++i)
         ASSERT_EQ(kSteps - 1 - i, result.data[i].trackGroupId);
 }
 
@@ -253,7 +253,7 @@ TEST_F(AnalyticsDbArchive, matchLongArchive)
     auto result = matchObjects(createRequest(Qt::SortOrder::AscendingOrder));
 
     ASSERT_EQ(timePointsMs.size(), result.data.size());
-    for (int i = 0; i < timePointsMs.size(); ++i)
+    for (std::size_t i = 0; i < timePointsMs.size(); ++i)
         ASSERT_EQ(timePointsMs[i], result.data[i].timestampMs);
 }
 

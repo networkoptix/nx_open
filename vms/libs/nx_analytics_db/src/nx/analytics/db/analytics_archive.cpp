@@ -20,7 +20,7 @@ AnalyticsArchive::AnalyticsArchive(const QString& dataDir, const QString& unique
 bool matchAdditionData(
     int64_t /*timestampMs*/,
     const AnalyticsArchive::Filter& filter,
-    const quint8* data, int size)
+    const quint8* data, int /*size*/)
 {
     auto matchIntInList = [](int64_t value, const std::vector<int64_t>& values)
     {
@@ -71,7 +71,7 @@ AnalyticsArchive::MatchObjectsResult  AnalyticsArchive::matchObjects(
     auto checkLimitInResult =
         [&result, &filter]()
         {
-            return result.data.size() >= filter.limit;
+            return (int) result.data.size() >= filter.limit;
         };
 
     auto timePeriods = base_type::matchPeriodInternal(filter, matchExtraData, checkLimitInResult);

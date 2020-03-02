@@ -56,7 +56,7 @@
 #include <media_server/media_server_module.h>
 #include <media_server_process_aux.h>
 #include <nx/sql/database.h>
-#include <nx/vms/metadata/analytics_helper.h>
+#include <nx/analytics/db/analytics_archive_helper.h>
 #include <nx/vms/server/fs/media_paths/media_paths.h>
 #include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 #include <nx/analytics/utils.h>
@@ -2230,7 +2230,7 @@ void QnStorageManager::clearUnusedMetadata()
         serverModule()->motionHelper()->deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
 
     baseDir = serverModule()->metadataDatabaseDir();
-    nx::vms::metadata::AnalyticsHelper helper(serverModule()->metadataDatabaseDir());
+    nx::analytics::db::AnalyticsHelper helper(serverModule()->metadataDatabaseDir());
     for (const QString& dir: baseDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
         helper.deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
 }
