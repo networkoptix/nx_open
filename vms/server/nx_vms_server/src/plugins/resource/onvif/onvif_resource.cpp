@@ -2317,10 +2317,18 @@ bool QnPlOnvifResource::checkResultAndSetStatus(const CameraDiagnostics::Result&
     return !!result;
 }
 
-bool QnPlOnvifResource::trustMaxFPS()
+bool QnPlOnvifResource::trustMaxFPS(int currentlyDetectedMaxFps) const
 {
-    bool result = resourceData().value<bool>(QString("trustMaxFPS"), false);
-    return result;
+    const auto previouslyDetectedMaxFps = 
+        cameraMediaCapability().streamCapabilities.value(StreamIndex::primary).maxFps;
+    if (previouslyDetectedMaxFps > 0)
+        return true; //< The value is already detected.
+    if (currentlyDetectedMaxFps <= 0)
+        return false; //< The value is not provided by camera. Detect it.
+
+    if (m_maxChannels > 1)
+        return true; //< Do not detect for multi-channel cameras because it is too slow.
+    return resourceData().value<bool>(QString("trustMaxFPS"), false);
 }
 
 bool QnPlOnvifResource::getVideoEncoder1Tokens(BaseSoapWrapper& soapWrapper,
@@ -2686,14 +2694,17 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
             SecondaryStreamCapabilitiesSorter(channelProfileNameList));
     }
 
-    if (optionsList[0].frameRateMax > 0)
-        setMaxFps(optionsList[0].frameRateMax);
-
+    const auto maxFps = optionsList[0].frameRateMax;
+    const bool trustMaxFps = this->trustMaxFPS(maxFps); //< Call it before saving a new maxFps value.
+    
+    if (maxFps > 0)
+        setMaxFps(maxFps);
     fillStreamCapabilityLists(optionsList);
+
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    if (m_maxChannels == 1 && !trustMaxFPS() && !isCameraControlDisabled())
+    if (!trustMaxFps && !isCameraControlDisabled())
     {
         const auto videoEncoder = optionsList[0].videoEncoderToken;
         if (isMedia2Supported)
