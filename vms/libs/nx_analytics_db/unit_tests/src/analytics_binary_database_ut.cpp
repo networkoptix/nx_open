@@ -48,7 +48,7 @@ public:
                 std::chrono::milliseconds(valueMs),
                 rects,
                 i + 1,
-                kObjectTypeId
+                kObjectTypeId,
                 kAllAttributesHash);
         }
     }
