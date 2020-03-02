@@ -624,25 +624,23 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
 #if defined(Q_OS_WIN)
     template<typename SocketInterfaceToImplement>
     int CommunicatingSocket<SocketInterfaceToImplement>::performOperation(
-        Operation op,
-        const void* buffer,
-        unsigned int bufferLen,
-        DWORD flags)
+        Operation op, char* buffer, ULONG bufferLen, DWORD readFlags)
     {
         bool isNonBlockingMode;
         if (!getNonBlockingMode(&isNonBlockingMode))
             return -1;
 
-        if (isNonBlockingMode || (op == Read && (flags & MSG_DONTWAIT) == MSG_DONTWAIT))
+        if (isNonBlockingMode
+            || (op == Operation::read && (readFlags & MSG_DONTWAIT) == MSG_DONTWAIT))
         {
             if (!isNonBlockingMode)
             {
                 if (!setNonBlockingMode(true))
                     return -1;
             }
-            const int bytes = (op == Read)
-                ? ::recv(m_fd, (raw_type*)buffer, bufferLen, flags & ~MSG_DONTWAIT)
-                : ::send(m_fd, (raw_type*)buffer, bufferLen, 0);
+            const int bytes = (op == Operation::read)
+                ? ::recv(m_fd, buffer, bufferLen, readFlags & ~MSG_DONTWAIT)
+                : ::send(m_fd, buffer, bufferLen, 0);
             if (!isNonBlockingMode)
             {
                 // Save error code as changing mode will drop it.
@@ -654,32 +652,29 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
             return bytes;
         }
 
-        return nonBlockingOperation(op, buffer, bufferLen, flags);
+        return performInterruptableOperation(op, buffer, bufferLen, readFlags);
     }
 
     template<typename SocketInterfaceToImplement>
-    int CommunicatingSocket<SocketInterfaceToImplement>::nonBlockingOperation(
-        Operation op,
-        const void* buffer,
-        unsigned int bufferLen,
-        DWORD flags)
+    int CommunicatingSocket<SocketInterfaceToImplement>::performInterruptableOperation(
+        Operation op, char* buffer, ULONG bufferLen, DWORD readFlags)
     {
         WSAOVERLAPPED overlapped = {};
         overlapped.hEvent = m_eventObject;
         WSABUF wsaBuffer;
         wsaBuffer.len = bufferLen;
-        wsaBuffer.buf = (char*)buffer;
+        wsaBuffer.buf = buffer;
         DWORD bytes = -1;
-        const int wsaResult = (op == Read)
-            ? WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, &flags, &overlapped, nullptr)
+        const int wsaResult = (op == Operation::read)
+            ? WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, &readFlags, &overlapped, nullptr)
             : WSASend(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, 0, &overlapped, nullptr);
         if (wsaResult != SOCKET_ERROR)
             return bytes;
         if (SystemError::getLastOSErrorCode() != WSA_IO_PENDING)
             return -1;
-        const auto timeout = (op == Read) ? m_readTimeoutMS : m_writeTimeoutMS;
+        const auto timeout = (op == Operation::read) ? m_readTimeoutMS : m_writeTimeoutMS;
         WaitForSingleObject(m_eventObject, timeout ? timeout : INFINITE);
-        if (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &flags))
+        if (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &readFlags))
         {
             if (SystemError::getLastOSErrorCode() == WSA_IO_INCOMPLETE)
             {
@@ -691,7 +686,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
                 WaitForSingleObject(m_eventObject, INFINITE);
                 // Check status again in case of race condition between CancelIo and other
                 // conditions
-                while (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &flags))
+                while (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &readFlags))
                 {
                     const auto errCode = SystemError::getLastOSErrorCode();
                     if (errCode == WSA_IO_INCOMPLETE)
@@ -717,7 +712,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(
     void* buffer, unsigned int bufferLen, int flags)
 {
     #if defined(Q_OS_WIN)
-        int bytesRead = performOperation(Read, buffer, bufferLen, flags);
+        int bytesRead = performOperation(Operation::read, (char*)buffer, bufferLen, flags);
     #else
         unsigned int recvTimeout = 0;
         if (!this->getRecvTimeout(&recvTimeout))
@@ -747,7 +742,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     const void* buffer, unsigned int bufferLen)
 {
     #if defined(Q_OS_WIN)
-        int sent = performOperation(Write, buffer, bufferLen, 0);
+        int sent = performOperation(Operation::write, (char*)buffer, bufferLen, 0);
     #else
         unsigned int sendTimeout = 0;
         if (!this->getSendTimeout(&sendTimeout))
