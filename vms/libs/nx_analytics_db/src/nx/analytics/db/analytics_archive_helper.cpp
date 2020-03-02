@@ -1,10 +1,11 @@
-#include "analytics_helper.h"
+#include "analytics_archive_helper.h"
 
-#include <motion/motion_detection.h>
-#include "analytics_archive.h"
 #include <core/resource/camera_resource.h>
+#include <motion/motion_detection.h>
 
-namespace nx::vms::metadata {
+#include "analytics_archive.h"
+
+namespace nx::analytics::db {
 
 QnTimePeriodList AnalyticsHelper::matchImage(
     const QnSecurityCamResourceList& resourceList,
@@ -19,4 +20,4 @@ QnTimePeriodList AnalyticsHelper::matchImage(
     return QnTimePeriodList::mergeTimePeriods(timePeriods, filter.limit, filter.sortOrder);
 }
 
-} // namespace nx::vms::metadata
+} // namespace nx::analytics::db

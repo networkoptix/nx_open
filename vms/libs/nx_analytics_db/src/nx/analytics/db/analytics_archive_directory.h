@@ -5,8 +5,9 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <analytics/db/analytics_db_types.h>
-#include <nx/vms/metadata/analytics_archive.h>
 #include <common/common_module.h>
+
+#include "analytics_archive.h"
 
 namespace nx::sql { class QueryContext; }
 
@@ -15,8 +16,8 @@ namespace nx::analytics::db {
 class AttributesDao;
 class ObjectTypeDao;
 
-using ArchiveFilter = nx::vms::metadata::AnalyticsArchive::AnalyticsFilter;
-using AnalyticsArchiveImpl = nx::vms::metadata::AnalyticsArchive;
+using ArchiveFilter = AnalyticsArchive::AnalyticsFilter;
+using AnalyticsArchiveImpl = AnalyticsArchive;
 
 class NX_ANALYTICS_DB_API AnalyticsArchiveDirectory
 {
@@ -80,7 +81,7 @@ private:
 
     void fixFilter(ArchiveFilter* filter);
 
-    nx::vms::metadata::AnalyticsArchive::MatchObjectsResult matchObjects(
+    AnalyticsArchive::MatchObjectsResult matchObjects(
         const QnUuid& deviceId,
         const ArchiveFilter& filter);
 

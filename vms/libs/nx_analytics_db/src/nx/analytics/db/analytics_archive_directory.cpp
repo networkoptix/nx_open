@@ -248,7 +248,7 @@ void AnalyticsArchiveDirectory::fixFilter(ArchiveFilter* filter)
         filter->region = filter->region.intersected(kFullRegion);
 }
 
-nx::vms::metadata::AnalyticsArchive::MatchObjectsResult AnalyticsArchiveDirectory::matchObjects(
+AnalyticsArchive::MatchObjectsResult AnalyticsArchiveDirectory::matchObjects(
     const QnUuid& deviceId,
     const ArchiveFilter& filter)
 {

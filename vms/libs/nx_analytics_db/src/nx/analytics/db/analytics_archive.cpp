@@ -1,12 +1,12 @@
 #include "analytics_archive.h"
 
-namespace nx::vms::metadata {
+namespace nx::analytics::db {
 
 static const int kRecordSize = QnMetaDataV1::kMotionDataBufferSize + sizeof(BinaryRecordEx);
 const std::chrono::seconds AnalyticsArchive::kAggregationInterval{ 5 };
 
 AnalyticsArchive::AnalyticsArchive(const QString& dataDir, const QString& uniqueId):
-    MetadataArchive(
+    base_type(
         "analytics" /*File name prefix*/,
         kRecordSize,
         std::chrono::seconds(kAggregationInterval).count(),
@@ -92,6 +92,36 @@ AnalyticsArchive::MatchObjectsResult  AnalyticsArchive::matchObjects(
     return result;
 }
 
+bool AnalyticsArchive::saveToArchive(
+    std::chrono::milliseconds startTime,
+    const std::vector<QRect>& data,
+    uint32_t trackGroupId,
+    uint32_t objectType,
+    int64_t allAttributesHash)
+{
+    return saveToArchive<QRect>(
+        startTime,
+        data,
+        trackGroupId,
+        objectType,
+        allAttributesHash);
+}
+
+bool AnalyticsArchive::saveToArchive(
+    std::chrono::milliseconds startTime,
+    const std::vector<QRectF>& data,
+    uint32_t trackGroupId,
+    uint32_t objectType,
+    int64_t allAttributesHash)
+{
+    return saveToArchive<QRectF>(
+        startTime,
+        data,
+        trackGroupId,
+        objectType,
+        allAttributesHash);
+}
+
 template <typename RectType>
 bool AnalyticsArchive::saveToArchive(
     std::chrono::milliseconds startTime,
@@ -116,18 +146,4 @@ bool AnalyticsArchive::saveToArchive(
     return saveToArchiveInternal(packet);
 }
 
-template bool AnalyticsArchive::saveToArchive<QRect>(
-    std::chrono::milliseconds startTime,
-    const std::vector<QRect>& data,
-    uint32_t trackGroupId,
-    uint32_t objectType,
-    int64_t allAttributesHash);
-
-template bool AnalyticsArchive::saveToArchive<QRectF>(
-    std::chrono::milliseconds startTime,
-    const std::vector<QRectF>& data,
-    uint32_t trackGroupId,
-    uint32_t objectType,
-    int64_t allAttributesHash);
-
-} // namespace nx::vms::metadata
+} // namespace nx::analytics::db

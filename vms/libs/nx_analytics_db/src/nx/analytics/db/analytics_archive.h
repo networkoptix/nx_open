@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "metadata_archive.h"
+#include <nx/vms/metadata/metadata_archive.h>
 
-namespace nx::vms::metadata {
+namespace nx::analytics::db {
 
 #pragma pack(push, 1)
     struct BinaryRecordEx
@@ -23,19 +23,29 @@ namespace nx::vms::metadata {
     };
 #pragma pack(pop)
 
-class AnalyticsArchive: public MetadataArchive
-{
-    using base_type = MetadataArchive;
-public:
 
+//-------------------------------------------------------------------------------------------------
+
+class NX_ANALYTICS_DB_API AnalyticsArchive:
+    public nx::vms::metadata::MetadataArchive
+{
+    using base_type = nx::vms::metadata::MetadataArchive;
+
+public:
     static const std::chrono::seconds kAggregationInterval;
 
     AnalyticsArchive(const QString& dataDir, const QString& uniqueId);
 
-    template <typename RectType>
     bool saveToArchive(
         std::chrono::milliseconds startTime,
-        const std::vector<RectType>& data,
+        const std::vector<QRect>& data,
+        uint32_t trackGroupId,
+        uint32_t objectType,
+        int64_t allAttributesHash);
+
+    bool saveToArchive(
+        std::chrono::milliseconds startTime,
+        const std::vector<QRectF>& data,
         uint32_t trackGroupId,
         uint32_t objectType,
         int64_t allAttributesHash);
@@ -65,6 +75,15 @@ public:
      * database.
      */
     MatchObjectsResult matchObjects(const AnalyticsFilter& filter);
+
+private:
+    template <typename RectType>
+    bool saveToArchive(
+        std::chrono::milliseconds startTime,
+        const std::vector<RectType>& data,
+        uint32_t trackGroupId,
+        uint32_t objectType,
+        int64_t allAttributesHash);
 };
 
-} // namespace nx::vms::metadata
+} // namespace nx::analytics::db
