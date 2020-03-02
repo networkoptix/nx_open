@@ -218,6 +218,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     AVStream *stream;
     while (1)
     {
+        packet.reset();
         double time_base;
         if (av_read_frame(m_formatContext, &packet) < 0)
             return QnAbstractMediaDataPtr();
@@ -313,8 +314,6 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     else {
         m_lastPacketTimes[packet.stream_index] = data->timestamp;
     }
-
-    av_free_packet(&packet);
 
     return data;
 }

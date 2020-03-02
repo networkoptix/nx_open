@@ -556,6 +556,11 @@ QnFfmpegAvPacket::QnFfmpegAvPacket(uint8_t* data, int size)
 
 QnFfmpegAvPacket::~QnFfmpegAvPacket()
 {
+    reset();
+}
+
+void QnFfmpegAvPacket::reset()
+{
     av_packet_unref(this);
 }
 
