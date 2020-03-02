@@ -1,5 +1,7 @@
 #include "movable_analytics_db.h"
 
+#include <thread>
+
 namespace nx::analytics::db {
 
 MovableAnalyticsDb::MovableAnalyticsDb(ActualAnalyticsDbFactoryFunc func):
