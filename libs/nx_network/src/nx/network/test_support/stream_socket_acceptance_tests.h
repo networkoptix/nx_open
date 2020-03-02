@@ -1894,8 +1894,8 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     change_aio_thread_of_accepted_connection,
     DISABLED_socket_is_usable_after_send_cancellation,
 
-    // This test is disabled because currently it does not work on Mac. In future, we may introduce
-    // connect implementation with shutdown support.
+    // This test is disabled because currently it does not work on Linux and Mac. In future, we may
+    // introduce connect implementation with shutdown support.
     DISABLED_shutdown_interrupts_connect,
 
     shutdown_interrupts_send,
