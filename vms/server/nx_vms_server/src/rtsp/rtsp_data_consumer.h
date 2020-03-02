@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QtNetwork/QHostAddress>
 #include <QtCore/QElapsedTimer>
 
 #include <nx/streaming/abstract_data_consumer.h>
@@ -113,7 +112,7 @@ private:
     bool m_pauseNetwork;
     QnMutex m_dataQueueMtx;
     bool m_singleShotMode;
-    int m_packetSended;
+    int m_packetSent;
     int m_liveMarker;
     MediaQuality m_liveQuality;
     MediaQuality m_newLiveQuality;
@@ -142,7 +141,7 @@ private:
 
     std::unique_ptr<nx::analytics::MetadataLogger> m_primaryProcessDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryProcessDataLogger;
-    std::unique_ptr<nx::analytics::MetadataLogger> m_primarypPutDataLogger;
+    std::unique_ptr<nx::analytics::MetadataLogger> m_primaryPutDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryPutDataLogger;
     nx::vms::metrics::StreamMetricHelper m_streamMetricHelper;
     std::unique_ptr<nx::vms::server::SimpleReorderer> m_reorderingProvider;

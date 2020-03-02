@@ -62,10 +62,9 @@ void Session::run(const QString& url, const Config& config, bool live)
     rtspClient.play(position, AV_NOPTS_VALUE, 1.0);
     int channel = -1;
     std::vector<QnByteArray*> dataArrays;
-    m_lastFrameTime = std::chrono::system_clock::now();
-    while (true)
+    for (;;)
     {
-        int bytesRead = rtspClient.readBinaryResponse(dataArrays, channel);
+        const int bytesRead = rtspClient.readBinaryResponse(dataArrays, channel);
         if (channel >= 0 && (int)dataArrays.size() > channel && dataArrays[channel])
         {
             if (bytesRead > 0)
@@ -129,7 +128,6 @@ bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
         }
         m_prevTimestampUs = packet.timestampUs;
         m_lastFrameTime = nowTime;
-
     }
     else
     {

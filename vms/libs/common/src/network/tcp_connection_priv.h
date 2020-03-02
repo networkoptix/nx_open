@@ -1,16 +1,13 @@
-#ifndef __TCP_CONNECTION_PRIV_H__
-#define __TCP_CONNECTION_PRIV_H__
+#pragma once
 
 #include <QDateTime>
 #include <QtCore/QByteArray>
 
 #include "tcp_connection_processor.h"
 
-#include "utils/common/byte_array.h"
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/http_stream_reader.h>
 #include <core/resource_access/user_access_data.h>
-
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
 
@@ -61,10 +58,9 @@ public:
     bool authenticatedOnce;
     QnTcpListener* owner;
     mutable QnMutex socketMutex;
+
 private:
     QByteArray interleavedMessageData;
     size_t interleavedMessageDataPos;
     size_t currentRequestSize;
 };
-
-#endif // __TCP_CONNECTION_PRIV_H__

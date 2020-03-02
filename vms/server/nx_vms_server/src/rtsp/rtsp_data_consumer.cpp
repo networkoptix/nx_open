@@ -60,7 +60,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_liveMode(false),
     m_pauseNetwork(false),
     m_singleShotMode(false),
-    m_packetSended(false),
+    m_packetSent(false),
     m_liveQuality(MEDIA_Quality_High),
     m_newLiveQuality(MEDIA_Quality_None),
     m_streamingSpeed(MAX_STREAMING_SPEED),
@@ -102,7 +102,7 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
             /*engineId*/ QnUuid(),
             StreamIndex::secondary);
 
-        m_primarypPutDataLogger = std::make_unique<nx::analytics::MetadataLogger>(
+        m_primaryPutDataLogger = std::make_unique<nx::analytics::MetadataLogger>(
             "rtsp_consumer_put_data_",
             camera->getId(),
             /*engineId*/ QnUuid(),
@@ -276,7 +276,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 
         const auto& logger = isSecondaryProvider
             ? m_secondaryPutDataLogger
-            : m_primarypPutDataLogger;
+            : m_primaryPutDataLogger;
 
         if (logger)
             logger->pushData(mediaData, lm("Queue size %1").args(m_dataQueue.size()));
@@ -761,7 +761,7 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
     if (!m_needStop)
         sendRangeHeaderIfChanged();
 
-    if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
+    if (m_packetSent++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
 }
 
@@ -816,7 +816,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(
 void QnRtspDataConsumer::setSingleShotMode(bool value)
 {
     m_singleShotMode = value;
-    m_packetSended = 0;
+    m_packetSent = 0;
 }
 
 qint64 QnRtspDataConsumer::lastQueuedTime()
