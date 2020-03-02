@@ -24,7 +24,7 @@ export class NxSettingsService implements OnDestroy {
                 private configService: NxConfigService,
                 private uriService: NxUriService,
                 private menuService: NxMenuService,
-                private dialogs: NxDialogsService
+                private dialogs: NxDialogsService,
     ) {
         this.config = this.configService.getConfig();
     }
@@ -55,7 +55,6 @@ export class NxSettingsService implements OnDestroy {
 
     addUser() {
         // Call share dialog, run process inside
-        this.system.pauseUpdate = true;
         return this.dialogs
                    .addUser(this.accountService, this.system)
                    .then((userId) => {
@@ -68,8 +67,7 @@ export class NxSettingsService implements OnDestroy {
                        // dialog was dismissed ... this handler is required if dialog is dismissible
                        // if we don't handle it will raise a JS error
                        // ERROR Error: Uncaught (in promise): [object Number]
-                   })
-                   .finally(() => this.system.pauseUpdate = false);
+                   });
     }
 
     ngOnDestroy() {

@@ -8,6 +8,10 @@ export class Utils {
     constructor(private array: Array) {
     }
 
+    static isEqual(obj1, obj2) {
+        return JSON.stringify(obj1) === JSON.stringify(obj2);
+    }
+
     static move (arr, old_index, new_index): Array {
         while (old_index < 0) {
             old_index += arr.length;

@@ -23,9 +23,13 @@ export class NxScrollMechanicsService {
     windowScrollSubject = new BehaviorSubject(0);
     elementTableWidthSubject = new BehaviorSubject(0);
     elementViewWidthSubject = new BehaviorSubject(0);
-    offsetSubject = new BehaviorSubject(undefined);
+    searchViewHeightSubject = new BehaviorSubject(0);
     panelSubject = new BehaviorSubject(false);
 
+    // trigger offset change
+    offsetSubject = new BehaviorSubject(undefined);
+
+    public static HEADER_OFFSET: number = 48;
     public static SCROLL_OFFSET: number = 48 + 16; // header + padding
     public static MEDIA = GRID_BREAKPOINTS;
 
@@ -37,16 +41,16 @@ export class NxScrollMechanicsService {
         this.CONFIG = this.config.getConfig();
     }
 
-    setOffset(height: number) {
-        this.offsetSubject.next(height);
-    }
-
     setElementTableWidth(width: number) {
         this.elementTableWidthSubject.next(width);
     }
 
     setElementViewWidth(width: number) {
         this.elementViewWidthSubject.next(width);
+    }
+
+    setSearchViewHeight(height: number) {
+        this.searchViewHeightSubject.next(height);
     }
 
     setWindowSize(height, width) {
@@ -56,12 +60,6 @@ export class NxScrollMechanicsService {
 
     setWindowScroll(value) {
         this.windowScrollSubject.next(value);
-    }
-
-    getElementOffset(el) {
-        const rect = el.getBoundingClientRect();
-
-        return rect.top + window.pageYOffset;
     }
 
     panelVisible(value) {

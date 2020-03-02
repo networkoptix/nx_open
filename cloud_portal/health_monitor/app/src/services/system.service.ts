@@ -8,6 +8,7 @@ import { NxSystemAPIService } from './system-api.service';
 import { BehaviorSubject, from, of } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 import { NxPollService } from './poll.service';
+import { Utils } from '../utils/helpers';
 
 
 export interface NxSystemRole {
@@ -158,9 +159,11 @@ class UserManager {
     }
 
     deleteUser(removedUser: NxSystemUser) {
-        return this.mediaserver.deleteUser(removedUser.id).toPromise().then(() => {
-            this.users = this.users.filter((user) => user !== removedUser);
-        });
+        return this.mediaserver.deleteUser(removedUser.id).toPromise().then(data => {
+            this.users = this.users.filter((user) => {
+                return user.id !== data.id;
+            });
+        }).catch(() => {});
     }
 
     findAccessRole(user: NxSystemUser) {
@@ -233,8 +236,7 @@ class UserManager {
 
             if (user.email === this.currentUserEmail) {
                 this.currentUser = user;
-                this._accessRole = user.accessRole;
-                this.checkPermissions();
+                this.accessRole = user.accessRole;
             }
             return user;
         }).sort((userA, userB) => {
@@ -275,12 +277,13 @@ class UserManager {
         // TODO: remove later
         // this.cloudApi.share(this.id, user.email, accessRole);
 
-        return this.mediaserver.saveUser(user).toPromise().then((result) => {
+        return this.mediaserver.saveUser(user).toPromise().then(result => {
+            user.id = result.id;
+            user.role = role;
+            user.accessRole = role.name || role.label;
             if (userCreated) {
                 this.users.push(user);
             }
-            user.role = role;
-            user.accessRole = role.name || role.label;
             return result;
         });
     }
@@ -299,8 +302,10 @@ class UserManager {
             return userRoleA.name < userRoleB.name ? -1 : 1;
         });
 
-        this.accessRoles = Array.from(new Set([...predefinedRoles, ...userRolesList]));
-        this.accessRoles.push(this.CONFIG.accessRoles.customPermission);
+        const newRoles = Array.from(new Set([...predefinedRoles, ...userRolesList, this.CONFIG.accessRoles.customPermission]));
+        if (!Utils.isEqual(newRoles, this.accessRoles)) {
+            this.accessRoles = newRoles;
+        }
         return this.accessRoles;
     }
 }
@@ -323,8 +328,6 @@ export class NxSystem extends System implements OnDestroy {
     infoPromise: any;
     usersPromise: any;
     systemPoll: any;
-
-    pauseUpdate = false;
 
     connectionSubject = new BehaviorSubject<boolean>(false);
     infoSubject = new BehaviorSubject<NxSystem>(undefined);
@@ -484,7 +487,9 @@ export class NxSystem extends System implements OnDestroy {
                 this.canMerge = this.userManager.isMine && (this.info.capabilities && this.info.capabilities.cloudMerge);
                 this.mergeInfo = response.mergeInfo;
                 this.systemInfo = this;
-                this.userManager.accessRole = this.info.accessRole;
+                if (!this.userManager.accessRole) {
+                    this.userManager.accessRole = this.info.accessRole;
+                }
                 return Promise.resolve(this);
             });
     }
@@ -526,13 +531,15 @@ export class NxSystem extends System implements OnDestroy {
                 usersPromise = this.userManager.getUsersDataFromTheSystem().then(() => {
                     this.isAvailable = true;
                 }).catch(() => {
-                    this.isAvailable = false;
                     return this.getUsersCachedInCloud();
                 });
-            } else { // or we get old cached data from the cloud
+            } else if (this.isAdmin) { // or we get old cached data from the cloud
                 usersPromise = this.getUsersCachedInCloud().then((users) => {
                     return this.userManager.processUsers(users);
                 });
+            } else {
+                this.isAvailable = false;
+                usersPromise = Promise.resolve();
             }
 
             this.usersPromise = usersPromise.then(() => {
@@ -554,9 +561,9 @@ export class NxSystem extends System implements OnDestroy {
     }
 
     deleteFromCurrentAccount() {
-        if (this.currentUser && this.isAvailable) {
-            // Handling promise to satisfy the linter.
-            this.userManager.deleteUser(this.currentUser).toPromise().then(() => {}); // Try to remove me from the system directly
+        if (this.isAvailable && this.currentUser && !this.currentUser.isAdmin) {
+            // Try to remove me from the system directly
+            this.userManager.deleteUser(this.currentUser);
         }
         // Anyway - send another request to cloud_db to remove my this
         return this.cloudApi.unshare(this.id, this.currentUserEmail).toPromise();
@@ -566,9 +573,8 @@ export class NxSystem extends System implements OnDestroy {
         if (this.subscriberCount === 0) {
             if (this.mediaserver.authGet) {
                 this.subscriberCount++;
-                this.activeSubscription = this.systemPoll.subscribe(() => {
-                    this.systemInfo = this;
-                });
+                this.activeSubscription = this.systemPoll
+                    .subscribe(() => this.systemInfo = this);
             } else {
                 setTimeout(() => this.startPoll(), 1000);
             }
@@ -598,10 +604,7 @@ export class NxSystem extends System implements OnDestroy {
     update() {
         return of('').pipe(flatMap(() => {
             return this.getInfo(true, false).then(() => {
-                if (this.permissions.editUsers) {
-                    return from(this.getUsers(true));
-                }
-                return of('');
+                return from(this.getUsers(true));
             }).catch(() => {
                 this.isAvailable = false;
                 this.lostConnection = true;
