@@ -213,17 +213,18 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     if (!findStreams() || m_eofReached)
         return QnAbstractMediaDataPtr();
 
-    QnFfmpegAvPacket packet;
     QnAbstractMediaDataPtr data;
     AVStream *stream;
+    int streamIndex = 0;
     while (1)
     {
-        packet.reset();
+        QnFfmpegAvPacket packet;
         double time_base;
         if (av_read_frame(m_formatContext, &packet) < 0)
             return QnAbstractMediaDataPtr();
 
-        stream= m_formatContext->streams[packet.stream_index];
+        streamIndex = packet.stream_index;
+        stream = m_formatContext->streams[packet.stream_index];
         if (stream->codecpar->codec_id == AV_CODEC_ID_H264 && packet.size == 6)
         {
             // may be H264 delimiter as separate packet. remove it
@@ -276,11 +277,11 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 continue;
             }
         }
+        data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
         break;
     }
 
     data->compressionType = stream->codecpar->codec_id;
-    data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
 
     // ffmpeg sets key frame flag for every received h263 frames (bug?), update flag manually.
     if (data->compressionType == AV_CODEC_ID_H263)
@@ -299,20 +300,20 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         m_keyFrameFound[data->channelNumber] = true;
     }
 
-    while (packet.stream_index >= m_lastPacketTimes.size())
+    while (streamIndex >= m_lastPacketTimes.size())
         m_lastPacketTimes << m_startTimeUs;
     if (data->timestamp == AV_NOPTS_VALUE) {
         /*
-        AVStream* stream = m_formatContext->streams[packet.stream_index];
+        AVStream* stream = m_formatContext->streams[streamIndex];
         if (stream->r_frame_rate.num)
-            m_lastPacketTimes[packet.stream_index] += 1000000ll * stream->r_frame_rate.den / stream->r_frame_rate.num;
+            m_lastPacketTimes[streamIndex] += 1000000ll * stream->r_frame_rate.den / stream->r_frame_rate.num;
         else if (stream->time_base.den)
-            m_lastPacketTimes[packet.stream_index] += 1000000ll * stream->time_base.num / stream->time_base.den;
+            m_lastPacketTimes[streamIndex] += 1000000ll * stream->time_base.num / stream->time_base.den;
         */
-        data->timestamp = m_lastPacketTimes[packet.stream_index];
+        data->timestamp = m_lastPacketTimes[streamIndex];
     }
     else {
-        m_lastPacketTimes[packet.stream_index] = data->timestamp;
+        m_lastPacketTimes[streamIndex] = data->timestamp;
     }
 
     return data;
