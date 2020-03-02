@@ -51,61 +51,61 @@
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
+      <translation>
+        <numerusform>Bajt</numerusform>
+        <numerusform>Bajty</numerusform>
+        <numerusform>Bajtów</numerusform>
+        <numerusform>Bajtów</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
+      <translation>
+        <numerusform>Kilobajt</numerusform>
+        <numerusform>Kilobajty</numerusform>
+        <numerusform>Kilobajtów</numerusform>
+        <numerusform>Kilobajtów</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
+      <translation>
+        <numerusform>Megabajt</numerusform>
+        <numerusform>Megabajty</numerusform>
+        <numerusform>Megabajtów</numerusform>
+        <numerusform>Megabajtów</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
+      <translation>
+        <numerusform>Gigabajt</numerusform>
+        <numerusform>Gigabajty</numerusform>
+        <numerusform>Gigabajtów</numerusform>
+        <numerusform>Gigabajtów</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
+      <translation>
+        <numerusform>Terabajt</numerusform>
+        <numerusform>Terabajty</numerusform>
+        <numerusform>Terabajtów</numerusform>
+        <numerusform>Terabajtów</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
+      <translation>
+        <numerusform>Petabajt</numerusform>
+        <numerusform>Petabajty</numerusform>
+        <numerusform>Petabajtów</numerusform>
+        <numerusform>Petabajtów</numerusform>
       </translation>
     </message>
   </context>
@@ -1946,31 +1946,31 @@
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Reason: Power limit exceeded (%1)</translation>
+      <translation>Przyczyna: Przekroczono limit mocy (%1)</translation>
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation type="unfinished">Show desktop notification</translation>
+      <translation>Pokaż powiadomienie na pulpicie</translation>
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation type="unfinished">Send mobile notification</translation>
+      <translation>Wyślij mobilne powiadomienie</translation>
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Zużycie</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Urządzenie zostało odłączone</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Kamera została odłączona</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>Moduł I/O został odłączony</translation>
     </message>
   </context>
   <context>
