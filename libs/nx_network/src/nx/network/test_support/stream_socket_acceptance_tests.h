@@ -1721,7 +1721,7 @@ TYPED_TEST_P(StreamSocketAcceptance, DISABLED_socket_is_usable_after_send_cancel
     }
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, shutdown_interrupts_connect)
+TYPED_TEST_P(StreamSocketAcceptance, DISABLED_shutdown_interrupts_connect)
 {
     this->givenConnectionBlockedInConnect();
     this->whenInvokeShutdown();
