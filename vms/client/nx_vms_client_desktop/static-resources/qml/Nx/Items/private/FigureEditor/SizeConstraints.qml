@@ -597,9 +597,7 @@ Figure
         if (d.dragging)
             return null
 
-        return acceptable
-            ? qsTr("Set minimum and maximum object size.")
-            : qsTr("Minimum object size cannot be greater than maximum.")
+        return !acceptable ? qsTr("Minimum size cannot be greater than maximum.") : ""
     }
 
     hintStyle: acceptable ? Banner.Style.Info : Banner.Style.Error

@@ -19,7 +19,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>Kliknij, aby dowiedzieć się więcej</translation>
     </message>
   </context>
   <context>
@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Kliknij, aby dodać</translation>
     </message>
   </context>
   <context>
@@ -78,19 +78,19 @@
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Wersja</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Producent</translation>
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Strumień kamery</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Wybierz strumień wideo z kamery do analizy</translation>
     </message>
   </context>
   <context>
@@ -118,11 +118,11 @@
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Ta linia wymaga co najmniej %n punktu.</numerusform>
+        <numerusform>Ta linia wymaga co najmniej %n punktów.</numerusform>
+        <numerusform>Ta linia wymaga co najmniej %n punktów.</numerusform>
+        <numerusform>Ta linia wymaga co najmniej %n punktów.</numerusform>
       </translation>
     </message>
   </context>
@@ -195,11 +195,11 @@
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Ten wielokąt wymaga co najmniej %n punktu.</numerusform>
+        <numerusform>Ten wielokąt wymaga co najmniej %n punktów.</numerusform>
+        <numerusform>Ten wielokąt wymaga co najmniej %n punktów.</numerusform>
+        <numerusform>Ten wielokąt wymaga co najmniej %n punktów.</numerusform>
       </translation>
     </message>
   </context>
@@ -207,7 +207,7 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Dodaj</translation>
     </message>
   </context>
   <context>

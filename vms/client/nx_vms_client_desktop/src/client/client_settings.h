@@ -163,6 +163,9 @@ public:
 
         SAVE_CREDENTIALS_ALLOWED,
 
+        // Automatically limit FPS.
+        AUTO_FPS_LIMIT,
+
         VARIABLE_COUNT
     };
 
@@ -269,6 +272,8 @@ private:
         QN_DECLARE_R_PROPERTY(bool,                         forceMtDecoding,                                    FORCE_MT_DECODING,          false)
 
         QN_DECLARE_R_PROPERTY(bool, saveCredentialsAllowed, SAVE_CREDENTIALS_ALLOWED, true)
+
+        QN_DECLARE_RW_PROPERTY(bool, isAutoFpsLimit, setAutoFpsLimit, AUTO_FPS_LIMIT, false)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

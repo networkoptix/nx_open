@@ -19,6 +19,7 @@ class QnScrollableItemsWidgetPrivate: public QObject
 
 public:
     QnScrollableItemsWidgetPrivate(QnScrollableItemsWidget* parent);
+    ~QnScrollableItemsWidgetPrivate();
 
     Qt::Alignment alignment() const;
     void setAlignment(Qt::Alignment alignment);

@@ -498,7 +498,7 @@
     <message>
       <location/>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>Użyj serwera źródłowego dla zdarzenia</translation>
     </message>
   </context>
   <context>
@@ -947,7 +947,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Łączenie...</translation>
     </message>
   </context>
   <context>

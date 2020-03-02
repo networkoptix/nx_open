@@ -210,16 +210,6 @@ Figure
         }
     }
 
-    hint:
-    {
-        if (pointMakerInstrument.enabled)
-        {
-            if (pointMakerInstrument.count === 0)
-                return qsTr("Click on video to start box.")
-        }
-        return ""
-    }
-
     function startCreation()
     {
         pointMakerInstrument.start()

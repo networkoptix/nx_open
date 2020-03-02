@@ -30,6 +30,18 @@ public:
     }
 };
 
+class VisibilityOpacityAccessor: public OpacityAccessor
+{
+public:
+    virtual void set(QObject* object, const QVariant& value) const override
+    {
+        auto obj = static_cast<QGraphicsObject*>(object);
+        const auto opacity = value.toReal();
+        obj->setOpacity(opacity);
+        obj->setVisible(opacity > 0.0);
+    }
+};
+
 } // namespace
 
 Q_GLOBAL_STATIC(VariantAnimator, staticVariantAnimator);
@@ -55,7 +67,7 @@ VariantAnimator* takeOpacityAnimator(QGraphicsObject* item)
     return animator;
 }
 
-VariantAnimator* opacityAnimator(QGraphicsObject* item, qreal speed)
+VariantAnimator* opacityAnimator(QGraphicsObject* item, qreal speed, bool controlVisibility)
 {
     NX_ASSERT(item, "Item cannot be null here");
     if (!item)
@@ -85,7 +97,8 @@ VariantAnimator* opacityAnimator(QGraphicsObject* item, qreal speed)
 
     auto animator = new VariantAnimator(item);
     animator->setTimer(animationTimer);
-    animator->setAccessor(new OpacityAccessor());
+    animator->setAccessor(
+        controlVisibility ? new VisibilityOpacityAccessor() : new OpacityAccessor());
     animator->setTargetObject(item);
     animator->setTimeLimit(kOpacityAnimatorTimeLimitMs);
     animator->setSpeed(speed);

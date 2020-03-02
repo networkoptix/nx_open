@@ -9,11 +9,11 @@ class ConsumingMotionMetadataProvider::Private
 public:
     Private();
 
-    QSharedPointer<media::CachingMetadataConsumer> metadataConsumer;
+    QSharedPointer<media::CachingMetadataConsumer<MetaDataV1Ptr>> metadataConsumer;
 };
 
 ConsumingMotionMetadataProvider::Private::Private():
-    metadataConsumer(new media::CachingMetadataConsumer(MetadataType::Motion))
+    metadataConsumer(new media::CachingMetadataConsumer<MetaDataV1Ptr>(MetadataType::Motion))
 {
 }
 
@@ -29,8 +29,7 @@ ConsumingMotionMetadataProvider::ConsumingMotionMetadataProvider():
 MetaDataV1Ptr ConsumingMotionMetadataProvider::metadata(
     const std::chrono::microseconds timestamp, int channel) const
 {
-    return std::dynamic_pointer_cast<QnMetaDataV1>(
-        d->metadataConsumer->metadata(timestamp, channel));
+    return d->metadataConsumer->metadata(timestamp, channel);
 }
 
 QSharedPointer<media::AbstractMetadataConsumer>
