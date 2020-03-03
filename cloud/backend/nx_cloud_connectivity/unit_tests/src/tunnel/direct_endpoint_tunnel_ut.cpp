@@ -43,7 +43,7 @@ public:
         aio::AbstractAioThread* aioThread, std::string sessionId)
     {
         auto socket = std::make_unique<TCPSocket>(AF_INET);
-        if (!socket->connect(m_testServer->serverAddress(), nx::network::deprecated::kDefaultConnectTimeout) ||
+        if (!socket->connect(m_testServer->serverAddress(), nx::network::kNoTimeout) ||
             !socket->setNonBlockingMode(true))
         {
             return nullptr;
@@ -58,6 +58,7 @@ public:
         m_tunnel = makeTunnel(
             nx::network::SocketGlobals::aioService().getRandomAioThread(),
             nx::utils::generateRandomName(7).toStdString());
+        ASSERT_NE(nullptr, m_tunnel) << SystemError::getLastOSErrorText().toStdString();
 
         m_tunnel->setControlConnectionClosedHandler(
             [this](SystemError::ErrorCode code) { m_tunnelClosedPromise.set_value(code); });
@@ -136,6 +137,7 @@ TEST_F(TcpTunnel, cancellation)
     for (int i = 0; i < 50; ++i)
     {
         const auto tunnel = makeTunnel(timer.getAioThread(), "sessionId");
+        ASSERT_NE(nullptr, tunnel) << SystemError::getLastOSErrorText().toStdString();
         for (int j = 0; j < 3; ++j)
         {
             SocketAttributes socketAttributes;
