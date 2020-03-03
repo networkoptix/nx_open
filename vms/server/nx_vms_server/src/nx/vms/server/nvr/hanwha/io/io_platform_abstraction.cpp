@@ -83,7 +83,7 @@ public:
             outputPort.id = makeOutputId(i);
             outputPort.outputName = lm("Alarm Output %1").args(i + 1);
             outputPort.portType = Qn::IOPortType::PT_Output;
-            outputPort.supportedPortTypes = Qn::IOPortType::PT_Output;            
+            outputPort.supportedPortTypes = Qn::IOPortType::PT_Output;
             outputPort.oDefaultState = Qn::IODefaultState::IO_OpenCircuit;
 
             result.push_back(std::move(outputPort));

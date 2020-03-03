@@ -27,7 +27,7 @@ IoModuleResource::IoModuleResource(QnMediaServerModule* serverModule):
 
 CameraDiagnostics::Result IoModuleResource::initializeCameraDriver()
 {
-    setFlags(flags() | Qn::io_module);
+    setFlags(flags() | Qn::io_module | Qn::no_analytics);
     setProperty(ResourcePropertyKey::kIoConfigCapability, QString("1"));
     setForcedLicenseType(Qn::LicenseType::LC_Free);
 

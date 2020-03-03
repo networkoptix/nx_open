@@ -215,8 +215,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Server-only flag. */
         foreigner                   = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
 
-        /* Server-only flag. */
-        no_last_gop                 = 0x80000,      /**< Do not use last GOP for this when stream is opened */
+        // Server-only flag.
+        // Analytics Engines mustn't bind to the resource.
+        no_analytics                 = 0x80000,
 
         /* Client-only flag */
         fake                        = 0x100000,     /**< Fake server (belonging to other system). */
@@ -243,7 +244,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         removed                     = 0x40000000,   /**< resource removed from pool. */
 
         wearable_camera             = 0x80000000,   /**< Wearable camera resource. */
-
 
         local_media = local | media | url,
         exported_media = local_media | exported,

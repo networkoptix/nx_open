@@ -825,7 +825,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(
 {
     // Fast channel zapping
     int copySize = 0;
-    if (camera /* && !res->hasFlags(Qn::no_last_gop) */) //< TODO: Add comment.
+    if (camera) //< TODO: Add comment.
         copySize = camera->copyLastGop(streamIndex, skipTime, m_dataQueue, iFramesOnly);
 
     NX_DEBUG(this, "%1 frames copied from saved gop", copySize);
