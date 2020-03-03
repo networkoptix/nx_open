@@ -72,7 +72,7 @@ bool IoModuleResource::setOutputPortState(
 
 void IoModuleResource::updatePortDescriptions(QnIOPortDataList portDescriptors)
 {
-    NX_INFO(this, "Got port descriptors: %1", containerString(portDescriptors));
+    NX_DEBUG(this, "Got port descriptors: %1", containerString(portDescriptors));
 
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_portDescriptorsById.clear();
@@ -82,12 +82,16 @@ void IoModuleResource::updatePortDescriptions(QnIOPortDataList portDescriptors)
 
 void IoModuleResource::startInputPortStatesMonitoring()
 {
+    updatePortDescriptions(ioPortDescriptions());
+
     nvr::IIoManager* const ioManager = getIoManager(serverModule());
     if (!NX_ASSERT(ioManager, "Unable to access IO manager while trying to register handler"))
         return;
 
     m_handlerId = ioManager->registerStateChangeHandler(
         [this](const QnIOStateDataList& state) { handleStateChange(state); });
+
+    handleStateChange(ioManager->portStates());
 }
 
 void IoModuleResource::stopInputPortStatesMonitoring()
