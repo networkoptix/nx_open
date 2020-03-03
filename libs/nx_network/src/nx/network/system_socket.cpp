@@ -624,14 +624,13 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
 #if defined(Q_OS_WIN)
     template<typename SocketInterfaceToImplement>
     int CommunicatingSocket<SocketInterfaceToImplement>::performOperation(
-        Operation op, char* buffer, ULONG bufferLen, DWORD readFlags)
+        Operation op, char* buffer, ULONG bufferLen, DWORD flags)
     {
         bool isNonBlockingMode;
         if (!getNonBlockingMode(&isNonBlockingMode))
             return -1;
 
-        if (isNonBlockingMode
-            || (op == Operation::read && (readFlags & MSG_DONTWAIT) == MSG_DONTWAIT))
+        if (isNonBlockingMode || (flags & MSG_DONTWAIT) == MSG_DONTWAIT)
         {
             if (!isNonBlockingMode)
             {
@@ -639,7 +638,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
                     return -1;
             }
             const int bytes = (op == Operation::read)
-                ? ::recv(m_fd, buffer, bufferLen, readFlags & ~MSG_DONTWAIT)
+                ? ::recv(m_fd, buffer, bufferLen, flags & ~MSG_DONTWAIT)
                 : ::send(m_fd, buffer, bufferLen, 0);
             if (!isNonBlockingMode)
             {
@@ -652,12 +651,12 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
             return bytes;
         }
 
-        return performInterruptableOperation(op, buffer, bufferLen, readFlags);
+        return performInterruptableOperation(op, buffer, bufferLen, flags);
     }
 
     template<typename SocketInterfaceToImplement>
     int CommunicatingSocket<SocketInterfaceToImplement>::performInterruptableOperation(
-        Operation op, char* buffer, ULONG bufferLen, DWORD readFlags)
+        Operation op, char* buffer, ULONG bufferLen, DWORD flags)
     {
         WSAOVERLAPPED overlapped = {};
         overlapped.hEvent = m_eventObject;
@@ -666,7 +665,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
         wsaBuffer.buf = buffer;
         DWORD bytes = -1;
         const int wsaResult = (op == Operation::read)
-            ? WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, &readFlags, &overlapped, nullptr)
+            ? WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, &flags, &overlapped, nullptr)
             : WSASend(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, 0, &overlapped, nullptr);
         if (wsaResult != SOCKET_ERROR)
             return bytes;
@@ -674,7 +673,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
             return -1;
         const auto timeout = (op == Operation::read) ? m_readTimeoutMS : m_writeTimeoutMS;
         WaitForSingleObject(m_eventObject, timeout ? timeout : INFINITE);
-        if (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &readFlags))
+        if (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &flags))
         {
             if (SystemError::getLastOSErrorCode() == WSA_IO_INCOMPLETE)
             {
@@ -686,7 +685,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
                 WaitForSingleObject(m_eventObject, INFINITE);
                 // Check status again in case of race condition between CancelIo and other
                 // conditions
-                while (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &readFlags))
+                while (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &flags))
                 {
                     const auto errCode = SystemError::getLastOSErrorCode();
                     if (errCode == WSA_IO_INCOMPLETE)
