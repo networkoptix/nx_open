@@ -7,18 +7,20 @@ Repeater::Repeater(QObject* parent):
 {
 }
 
-QVariant Repeater::itemTemplate() const
+void Repeater::setItemTemplate(const QJsonValue& itemTemplate)
 {
-    return m_itemTemplate.toVariantMap();
-}
+    if (itemTemplate.type() != QJsonValue::Object)
+    {
+        emitError(Issue::Code::parseError, "Repeater template must be an Object.");
+        return;
+    }
 
-void Repeater::setItemTemplate(const QVariant& itemTemplate)
-{
-    const auto templateJson = QJsonObject::fromVariantMap(itemTemplate.toMap());
-    if (m_itemTemplate == templateJson)
+    const auto& object = itemTemplate.toObject();
+
+    if (m_itemTemplate == object)
         return;
 
-    m_itemTemplate = templateJson;
+    m_itemTemplate = object;
     emit itemTemplateChanged();
 }
 
@@ -49,9 +51,9 @@ void Repeater::setAddButtonCaption(const QString& caption)
     emit addButtonCaptionChanged();
 }
 
-QJsonObject Repeater::serialize() const
+QJsonObject Repeater::serializeModel() const
 {
-    auto result = base_type::serialize();
+    auto result = base_type::serializeModel();
     result[QStringLiteral("addButtonCaption")] = m_addButtonCaption;
     return result;
 }

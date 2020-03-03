@@ -3,7 +3,7 @@
 namespace nx::vms::server::interactive_settings::components {
 
 TextArea::TextArea(QObject* parent):
-    ValueItem(QStringLiteral("TextArea"), parent)
+    StringValueItem(QStringLiteral("TextArea"), parent)
 {
 }
 

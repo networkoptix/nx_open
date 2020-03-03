@@ -56,8 +56,8 @@ void Factory::registerTypes()
 
     registerUncreatableType<Item>("Item");
     registerUncreatableType<ValueItem>("ValueItem");
-    registerUncreatableType<EnumerationItem>("EnumerationItem");
-    registerUncreatableType<IntegerNumberItem>("IntegerNumberItem");
+    registerUncreatableType<EnumerationValueItem>("EnumerationItem");
+    registerUncreatableType<IntegerValueItem>("IntegerValueItem");
 
     registerType<Settings>("Settings");
     registerType<GroupBox>("GroupBox");

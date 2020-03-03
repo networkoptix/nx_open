@@ -3,7 +3,7 @@
 namespace nx::vms::server::interactive_settings::components {
 
 ComboBox::ComboBox(QObject* parent):
-    EnumerationItem(QStringLiteral("ComboBox"), parent)
+    EnumerationValueItem(QStringLiteral("ComboBox"), parent)
 {
 }
 

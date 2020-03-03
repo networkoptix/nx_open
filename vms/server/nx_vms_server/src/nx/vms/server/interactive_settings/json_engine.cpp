@@ -183,85 +183,134 @@ QJsonValue processItemTemplate(const QJsonValue& value, const int index, const i
     return value;
 }
 
-std::variant<AbstractEngine::Error, Item*> createItem(
-    Item* parent, const QJsonObject& object, int repeaterDepth)
+std::unique_ptr<Item> createItem(
+    JsonEngine* engine, Item* parent, const QJsonObject& object, int repeaterDepth)
 {
     const auto type = object["type"].toString();
     if (type.isEmpty())
     {
-        return AbstractEngine::Error(
-            AbstractEngine::ErrorCode::parseError,
+        engine->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
             lm("Object does not have type: %1").arg(
-                QString::fromUtf8(QJsonDocument(object).toJson(QJsonDocument::Compact))));
+                QString::fromUtf8(QJsonDocument(object).toJson(QJsonDocument::Compact)))));
+        return {};
     }
 
     std::unique_ptr<Item> item(Factory::createItem(type, parent));
     if (!item)
     {
-        return AbstractEngine::Error(AbstractEngine::ErrorCode::parseError,
-            lm("Unknown item type: %1").arg(type));
+        engine->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
+            lm("Unknown item type: %1").arg(type)));
+        return {};
     }
 
-    const auto metaObject = item->metaObject();
-    const int skippedProperties = QObject::staticMetaObject.propertyCount();
-    for (int i = skippedProperties; i < metaObject->propertyCount(); ++i)
-    {
-        const auto property = metaObject->property(i);
-        if (!property.isWritable())
-            continue;
+    item->setEngine(engine);
 
-        const auto value = object[property.name()].toVariant();
-        if (!value.isValid())
-            continue;
+    const auto group = qobject_cast<Group*>(item.get());
+    const auto sectionContainer = qobject_cast<SectionContainer*>(item.get());
+    const auto repeater = qobject_cast<Repeater*>(item.get());
 
-        if (!property.write(item.get(), value))
+    const auto& writeProperty =
+        [engine, type, item = item.get(), metaObject = item->metaObject()](
+            const QString& key, const QJsonValue& value)
         {
-            NX_WARNING(NX_SCOPE_TAG, lm("Cannot write value %1 to property %2").args(
-                value, property.name()));
+            const int propertyIndex = metaObject->indexOfProperty(key.toUtf8().constData());
+            if (propertyIndex == -1)
+            {
+                if (key.startsWith(L'_'))
+                {
+                    // This allows us to leave comments or metadata in the JSON.
+                    return;
+                }
+
+                engine->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
+                    lm("Property \"%1\" does not exist in \"%2\".").args(key, type)));
+                return;
+            }
+
+            const auto property = metaObject->property(propertyIndex);
+            if (!property.isWritable())
+            {
+                engine->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
+                    lm("Property \"%1\" of \"%2\" is read-only.").args(key, type)));
+                return;
+            }
+
+            if (!property.write(item, value.toVariant()))
+                NX_WARNING(NX_SCOPE_TAG, "Cannot write value %1 to property %2", value, key);
+        };
+
+    for (auto it = object.begin(); it != object.end(); ++it)
+    {
+        const QString& key = it.key();
+
+        if (key == QStringLiteral("value"))
+        {
+            engine->addIssue(Issue(Issue::Type::warning, Issue::Code::parseError,
+                "Settings model should not contain values."));
+            continue;
         }
+
+        // Skip the specific keys.
+        if (key == QStringLiteral("type"))
+            continue;
+        if (group && key == QStringLiteral("items"))
+            continue;
+        if (sectionContainer && key == QStringLiteral("sections"))
+            continue;
+        if (repeater && key == QStringLiteral("items"))
+        {
+            engine->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
+                "Repeater cannot have \"items\". Use \"template\" instead."));
+            return {};
+        }
+
+        writeProperty(key, it.value());
     }
 
-    if (const auto group = qobject_cast<Group*>(item.get()))
+    if (group)
     {
         auto itemsProperty = group->items();
 
         for (const QJsonValue itemValue: object["items"].toArray())
         {
             const QJsonObject itemObject = itemValue.toObject();
-            const auto result = createItem(item.get(), itemObject, repeaterDepth);
+            auto childItem = createItem(engine, item.get(), itemObject, repeaterDepth);
 
-            if (const auto childItem = std::get_if<Item*>(&result))
-                itemsProperty.append(&itemsProperty, *childItem);
+            if (childItem)
+                itemsProperty.append(&itemsProperty, childItem.release());
             else
-                return result;
+                return {};
         }
     }
 
-    if (const auto sectionContainer = qobject_cast<SectionContainer*>(item.get()))
+    if (sectionContainer)
     {
         auto sectionsProperty = sectionContainer->sections();
 
         for (const QJsonValue sectionValue: object["sections"].toArray())
         {
-            const auto result = createItem(item.get(), sectionValue.toObject(), repeaterDepth);
-            const auto childItem = std::get_if<Item*>(&result);
+            auto childItem = createItem(
+                engine, item.get(), sectionValue.toObject(), repeaterDepth);
             if (!childItem)
-                return result;
+                return {};
 
-            const auto childSection = qobject_cast<Section*>(*childItem);
+            const auto childSection = qobject_cast<Section*>(childItem.get());
             if (!childSection)
             {
-                return AbstractEngine::Error(AbstractEngine::ErrorCode::parseError,
-                    "A section must be of type \"Section\"");
+                engine->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
+                    lm("\"sections\" must contain items of \"Section\" type, but \"%1\" is found.")
+                        .arg(childItem->type())));
+                return {};
             }
 
+            childItem.release();
             sectionsProperty.append(&sectionsProperty, childSection);
         }
     }
 
-    if (const auto repeater = qobject_cast<Repeater*>(item.get()))
+    if (repeater)
     {
-        const auto& itemTemplate = QJsonObject::fromVariantMap(repeater->itemTemplate().toMap());
+        const auto& itemTemplate = repeater->itemTemplate();
         const int count = repeater->count();
         const int startIndex = repeater->startIndex();
         auto itemsProperty = repeater->items();
@@ -270,16 +319,16 @@ std::variant<AbstractEngine::Error, Item*> createItem(
         {
             const QJsonObject& model =
                 processItemTemplate(itemTemplate, i + startIndex, repeaterDepth).toObject();
-            const auto result = createItem(repeater, model, repeaterDepth + 1);
+            auto childItem = createItem(engine, repeater, model, repeaterDepth + 1);
 
-            if (const auto childItem = std::get_if<Item*>(&result))
-                itemsProperty.append(&itemsProperty, *childItem);
+            if (childItem)
+                itemsProperty.append(&itemsProperty, childItem.release());
             else
-                return result;
+                return {};
         }
     }
 
-    return item.release();
+    return item;
 }
 
 } // namespace
@@ -289,24 +338,32 @@ JsonEngine::JsonEngine()
     components::Factory::registerTypes();
 }
 
-AbstractEngine::Error JsonEngine::loadModelFromJsonObject(const QJsonObject& json)
+bool JsonEngine::loadModelFromJsonObject(const QJsonObject& json)
 {
-    auto object = json;
-    object["type"] = "Settings";
+    startUpdatingValues();
+    auto item = createItem(this, nullptr, json, 1);
+    stopUpdatingValues();
 
-    const auto result = createItem(nullptr, object, 1);
-    if (const auto item = std::get_if<Item*>(&result))
-        return setSettingsItem(static_cast<Settings*>(*item));
+    if (!item)
+        return false;
 
-    return std::get<Error>(result);
+    if (!setSettingsItem(std::move(item)))
+        return false;
+
+    initValues();
+
+    return !hasErrors();
 }
 
-AbstractEngine::Error JsonEngine::loadModelFromData(const QByteArray& data)
+bool JsonEngine::loadModelFromData(const QByteArray& data)
 {
     QJsonParseError error;
     const auto& json = QJsonDocument::fromJson(data, &error);
     if (error.error != QJsonParseError::NoError)
-        return Error(ErrorCode::parseError, error.errorString());
+    {
+        addIssue(Issue(Issue::Type::error, Issue::Code::parseError, error.errorString()));
+        return false;
+    }
 
     return loadModelFromJsonObject(json.object());
 }

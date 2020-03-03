@@ -1,15 +1,13 @@
 #pragma once
 
-#include "enumeration_item.h"
+#include "string_array_value_item.h"
 
 namespace nx::vms::server::interactive_settings::components {
 
-class CheckBoxGroup: public EnumerationItem
+class CheckBoxGroup: public StringArrayValueItem
 {
 public:
     CheckBoxGroup(QObject* parent = nullptr);
-
-    virtual void setValue(const QVariant& value);
 };
 
 } // namespace nx::vms::server::interactive_settings::components

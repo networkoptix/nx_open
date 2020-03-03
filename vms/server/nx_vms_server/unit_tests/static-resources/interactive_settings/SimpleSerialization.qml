@@ -81,6 +81,26 @@ Settings
         "checkbox": true
     }
 
+    readonly property var _stringValues:
+    {
+        "text": "a text",
+        "textArea": "a text",
+        "number": "15",
+        "double": "2.71828",
+        "combobox": "value2",
+        "checkbox": "true"
+    }
+
+    readonly property var _resultValues:
+    {
+        "text": "a text",
+        "textArea": "a text",
+        "number": 15,
+        "double": 2.71828,
+        "combobox": "value2",
+        "checkbox": true
+    }
+
     TextField
     {
         name: "text"

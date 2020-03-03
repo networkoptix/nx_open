@@ -9,8 +9,8 @@ class JsonEngine: public AbstractEngine
 public:
     JsonEngine();
 
-    Error loadModelFromJsonObject(const QJsonObject& json);
-    virtual Error loadModelFromData(const QByteArray& data) override;
+    bool loadModelFromJsonObject(const QJsonObject& json);
+    virtual bool loadModelFromData(const QByteArray& data) override;
 };
 
 } // namespace nx::vms::server::interactive_settings

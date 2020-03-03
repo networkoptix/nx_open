@@ -1,10 +1,10 @@
 #pragma once
 
-#include "value_item.h"
+#include "string_value_item.h"
 
 namespace nx::vms::server::interactive_settings::components {
 
-class TextArea: public ValueItem
+class TextArea: public StringValueItem
 {
 public:
     TextArea(QObject* parent = nullptr);

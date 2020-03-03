@@ -309,7 +309,7 @@ std::optional<Settings> DeviceAnalyticsContext::getSettings(const QString& engin
     }
 
     const QJsonObject pluginSideSettings = binding->getSettings();
-    jsonEngine.applyValues(pluginSideSettings);
+    jsonEngine.applyStringValues(pluginSideSettings);
     return Settings{jsonEngine.serializeModel(), jsonEngine.values()};
 }
 
