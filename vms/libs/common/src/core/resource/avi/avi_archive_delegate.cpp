@@ -213,11 +213,11 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     if (!findStreams() || m_eofReached)
         return QnAbstractMediaDataPtr();
 
-    QnFfmpegAvPacket packet;
     QnAbstractMediaDataPtr data;
     AVStream *stream;
     while (1)
     {
+        QnFfmpegAvPacket packet;
         double time_base;
         if (av_read_frame(m_formatContext, &packet) < 0)
             return QnAbstractMediaDataPtr();
@@ -288,11 +288,19 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 continue;
             }
         }
+
+        data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
+        while (packet.stream_index >= m_lastPacketTimes.size())
+            m_lastPacketTimes << m_startTimeUs;
+        if (data->timestamp == AV_NOPTS_VALUE)
+            data->timestamp = m_lastPacketTimes[packet.stream_index];
+        else
+            m_lastPacketTimes[packet.stream_index] = data->timestamp;
+
         break;
     }
 
     data->compressionType = stream->codecpar->codec_id;
-    data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
 
     // ffmpeg sets key frame flag for every received h263 frames (bug?), update flag manually.
     if (data->compressionType == AV_CODEC_ID_H263)
@@ -310,24 +318,6 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         data->flags |= QnAbstractMediaData::MediaFlag::MediaFlags_AVKey;
         m_keyFrameFound[data->channelNumber] = true;
     }
-
-    while (packet.stream_index >= m_lastPacketTimes.size())
-        m_lastPacketTimes << m_startTimeUs;
-    if (data->timestamp == AV_NOPTS_VALUE) {
-        /*
-        AVStream* stream = m_formatContext->streams[packet.stream_index];
-        if (stream->r_frame_rate.num)
-            m_lastPacketTimes[packet.stream_index] += 1000000ll * stream->r_frame_rate.den / stream->r_frame_rate.num;
-        else if (stream->time_base.den)
-            m_lastPacketTimes[packet.stream_index] += 1000000ll * stream->time_base.num / stream->time_base.den;
-        */
-        data->timestamp = m_lastPacketTimes[packet.stream_index];
-    }
-    else {
-        m_lastPacketTimes[packet.stream_index] = data->timestamp;
-    }
-
-    av_free_packet(&packet);
 
     return data;
 }
