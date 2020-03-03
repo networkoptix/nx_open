@@ -83,6 +83,7 @@ QStringList PartitionsInformationProvider::additionalLocalFsTypes() const
     NX_MUTEX_LOCKER lock(&m_fsTypesMutex);
     if (settingsValue != m_additionalFsTypesString)
     {
+        m_additionalFsTypesString = settingsValue;
         m_additionalFsTypes.clear();
         const auto splits = settingsValue.split(",", QString::SkipEmptyParts);
         std::transform(
