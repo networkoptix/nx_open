@@ -49,11 +49,16 @@ protected:
 
     void thenSerializedMessageBodyIsEqualTo(BufferType expectedBody)
     {
+        QnMutexLocker lock(&m_mutex);
+
         while (expectedBody.startsWith(m_msgBody))
         {
             if (m_msgBody == expectedBody)
                 return;
+
+            lock.unlock();
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            lock.relock();
         }
 
         ASSERT_EQ(expectedBody, m_msgBody);
@@ -80,6 +85,8 @@ protected:
     }
 
 private:
+    QnMutex m_mutex;
+
     void onSomeBodyBytesRead(SystemError::ErrorCode errorCode, BufferType buffer)
     {
         ASSERT_EQ(SystemError::noError, errorCode);
@@ -92,7 +99,11 @@ private:
 
         using namespace std::placeholders;
 
-        m_msgBody += std::move(buffer);
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_msgBody += std::move(buffer);
+        }
+
         m_msgBodySource->readAsync(
             std::bind(&HttpMultipartMessageBodySource::onSomeBodyBytesRead, this, _1, _2));
     }
