@@ -580,6 +580,7 @@ namespace nxcip
             MulticastStreamCapability           = 0x80000,    //!< Camera supports multicast streaming.
             ServerBoundCapability               = 0x100000,   //!< Camera is bound to a particular server.
             dontAutoOpenCamera                  = 0x200000,   //!< Server should not open video from camera at its will.
+            noAnalytics                         = 0x400000,   //!< Analytics Engine mustn't bind to the Device.
         };
 
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
