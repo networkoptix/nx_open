@@ -1,11 +1,8 @@
 #pragma once
 
-#include <QtCore/QUrl>
-
 #include <common/common_module_aware.h>
 
 #include <api/model/audit/auth_session.h>
-#include <nx/network/http/http_types.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/socket.h>

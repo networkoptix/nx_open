@@ -1728,7 +1728,7 @@ TYPED_TEST_P(StreamSocketAcceptance, DISABLED_shutdown_interrupts_connect)
     this->thenConnectionOperationIsInterrupted();
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, DISABLED_shutdown_interrupts_send)
+TYPED_TEST_P(StreamSocketAcceptance, shutdown_interrupts_send)
 {
     this->givenConnectionBlockedInSend();
     this->whenInvokeShutdown();
@@ -1893,13 +1893,12 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_send_completion,
     change_aio_thread_of_accepted_connection,
     DISABLED_socket_is_usable_after_send_cancellation,
-    /**
-     * These tests are disabled because currently it is not supported on mswin.
-     * In future, we may introduce send and connect implementation with shutdown support
-     * similar to recv.
-     */
+
+    // This test is disabled because currently it does not work on Linux and Mac. In future, we may
+    // introduce connect implementation with shutdown support.
     DISABLED_shutdown_interrupts_connect,
-    DISABLED_shutdown_interrupts_send,
+
+    shutdown_interrupts_send,
     shutdown_interrupts_recv,
     pollable_is_valid_after_shutdown,
 

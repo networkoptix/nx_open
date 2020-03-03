@@ -1,0 +1,28 @@
+{
+    "roots": [
+        "HumanBody",
+        "HumanFace",
+        "VehicleInfo"
+    ],
+    "discard": [
+        "HumanBody.Clothing.*.Color.ColorCluster.Color.@*"
+    ],
+    "rename": [
+        ["HumanFace.Accessory.Hat.Wear", "WearsHat"],
+        ["HumanFace.Accessory.Opticals.Wear", "WearsOpticals"],
+
+        ["HumanFace.AgeType", "Age"],
+
+        ["*.Gender", "Gender"],
+
+        ["HumanBody.Clothing.Hat.Wear", "WearsHat"],
+
+        ["HumanBody.Clothing.Bottoms.Color.ColorCluster.ColorString", "BottomsColor"],
+        ["HumanBody.Clothing.Bottoms.Length", "BottomsLength"],
+
+        ["HumanBody.Clothing.Tops.Color.ColorCluster.ColorString", "TopsColor"],
+        ["HumanBody.Clothing.Tops.Length", "TopsLength"],
+
+        ["HumanBody.Belonging.Bag.Category", "BagCategory"]
+    ]
+}

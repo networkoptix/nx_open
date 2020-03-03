@@ -124,7 +124,7 @@ gvfsd-fuse /run/user/1000/gvfs fuse.gvfsd-fuse rw,nosuid,nodev,relatime,user_id=
     }
 
 private:
-    QList<QString> m_invalidSpaceSubPaths;    
+    QList<QString> m_invalidSpaceSubPaths;
 
     bool hasInvalidSpaceSubPathMatch(const QString& fsPath) const
     {
@@ -280,7 +280,7 @@ TEST_F(ReadPartitions, PathsWithSpacesShouldBeReturned)
 TEST_F(ReadPartitions, AdditionalLocalFsTypes)
 {
     const QStringList additionalFsTypes = {"btrfs", "lolfs"};
-    setAdditionalLocalFsTypes(additionalFsTypes);    
+    setAdditionalLocalFsTypes(additionalFsTypes);
     const auto newFsPartitons = addPartitions(additionalFsTypes);
     auto monitor = createMonitor();
     assertAdditionalPartitionsOnList(newFsPartitons, monitor->totalPartitionSpaceInfo());
@@ -313,7 +313,11 @@ protected:
         const auto p = nx::vms::server::fs::PartitionsInformationProvider(
             m_server.serverModule()->globalSettings(),
             m_server.serverModule()->rootFileSystem());
-        ASSERT_EQ(expected, p.additionalLocalFsTypes());
+        QStringList expectedTrimmed;
+        std::transform(
+            expected.cbegin(), expected.cend(), std::back_inserter(expectedTrimmed),
+            [](const auto& s) { return s.trimmed(); });
+        ASSERT_EQ(expectedTrimmed, p.additionalLocalFsTypes());
     }
 
 private:
@@ -323,6 +327,23 @@ private:
 TEST_F(FtServerPartitionsInformationProvider, LocalFsTypesAreTakenFromGlobalSettings)
 {
     const QStringList additionalFsTypes = {"btrfs", "lolfs"};
+    whenLocalFsTypesSet(additionalFsTypes);
+    thenServerPartitionInformationProviderShouldReturnThem(additionalFsTypes);
+}
+
+TEST_F(FtServerPartitionsInformationProvider, LocalFsTypes_NamesWithSpaces)
+{
+    const QStringList additionalFsTypes = {" btrfs", "lolfs ", " weirdfs "};
+    whenLocalFsTypesSet(additionalFsTypes);
+    thenServerPartitionInformationProviderShouldReturnThem(additionalFsTypes);
+}
+
+TEST_F(FtServerPartitionsInformationProvider, LocalFsTypes_SettingsUpdated)
+{
+    QStringList additionalFsTypes = {" btrfs", "lolfs ", " weirdfs "};
+    whenLocalFsTypesSet(additionalFsTypes);
+    thenServerPartitionInformationProviderShouldReturnThem(additionalFsTypes);
+    additionalFsTypes.append(" newfs");
     whenLocalFsTypesSet(additionalFsTypes);
     thenServerPartitionInformationProviderShouldReturnThem(additionalFsTypes);
 }

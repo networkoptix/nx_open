@@ -162,6 +162,20 @@ public:
     virtual bool shutdown() override;
 
 protected:
+    #if defined(Q_OS_WIN)
+        enum Operation
+        {
+            Read = 0,
+            Write = 1,
+        };
+
+        int nonBlockingOperation(
+            Operation op, const void* buffer, unsigned int bufferLen, DWORD flags);
+
+        int performOperation(
+            Operation op, const void* buffer, unsigned int bufferLen, DWORD flags);
+    #endif
+
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
     bool connectToIp(

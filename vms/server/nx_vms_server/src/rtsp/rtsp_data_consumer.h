@@ -1,6 +1,8 @@
 #pragma once
 
-#include <QtNetwork/QHostAddress>
+#include <chrono>
+#include <optional>
+
 #include <QtCore/QElapsedTimer>
 
 #include <nx/streaming/abstract_data_consumer.h>
@@ -96,6 +98,8 @@ private:
     void switchQualityIfNeeded(bool isSecondaryProvider);
     void processMediaData(const QnAbstractMediaDataPtr& nonConstData);
     void flushReorderingBuffer();
+    void sendBufferViaTcp(std::optional<int64_t> timestampForLogging = std::nullopt);
+
 private:
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
@@ -113,10 +117,12 @@ private:
     bool m_pauseNetwork;
     QnMutex m_dataQueueMtx;
     bool m_singleShotMode;
-    int m_packetSended;
+    int m_packetSent;
     int m_liveMarker;
     MediaQuality m_liveQuality;
     MediaQuality m_newLiveQuality;
+
+    std::optional<std::chrono::time_point<std::chrono::steady_clock>> m_lastSendBufferViaTcpTime;
 
     int m_streamingSpeed;
     bool m_multiChannelVideo;
@@ -142,7 +148,7 @@ private:
 
     std::unique_ptr<nx::analytics::MetadataLogger> m_primaryProcessDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryProcessDataLogger;
-    std::unique_ptr<nx::analytics::MetadataLogger> m_primarypPutDataLogger;
+    std::unique_ptr<nx::analytics::MetadataLogger> m_primaryPutDataLogger;
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryPutDataLogger;
     nx::vms::metrics::StreamMetricHelper m_streamMetricHelper;
     std::unique_ptr<nx::vms::server::SimpleReorderer> m_reorderingProvider;

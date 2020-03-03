@@ -70,13 +70,22 @@ public:
         QMap<QString, QString> m_objectTypeIdByInternalName;
     };
     #define HanwhaEngineManifest_Fields EngineManifestBase_Fields (eventTypes)(objectTypes)
+
+    struct ObjectMetadataAttributeFilters
+    {
+        QList<QString> roots;
+        QList<QString> discard;
+        QList<QPair<QString, QString>> rename;
+    };
+    #define HanwhaObjectMetadataAttributeFilters_Fields (roots)(discard)(rename)
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventItemType)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Hanwha::EventType)
     (Hanwha::ObjectType)
-    (Hanwha::EngineManifest),
+    (Hanwha::EngineManifest)
+    (Hanwha::ObjectMetadataAttributeFilters),
     (json)
 )
 

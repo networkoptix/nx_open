@@ -5,7 +5,9 @@
 #include <chrono>
 #include <unordered_map>
 #include <string>
+#include <optional>
 
+#include <QString>
 #include <QByteArray>
 #include <QtXml/QDomDocument>
 
@@ -20,7 +22,9 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 class ObjectMetadataXmlParser
 {
 public:
-    explicit ObjectMetadataXmlParser(const Hanwha::EngineManifest& engineManifest);
+    explicit ObjectMetadataXmlParser(
+        const Hanwha::EngineManifest& engineManifest,
+        const Hanwha::ObjectMetadataAttributeFilters& objectAttributeFilters);
 
     nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> parse(const QByteArray& data);
 
@@ -45,6 +49,8 @@ private:
 
     [[nodiscard]] nx::sdk::analytics::Rect applyFrameScale(nx::sdk::analytics::Rect rect) const;
 
+    std::optional<QString> filterAttribute(const QString& name) const;
+
     std::vector<nx::sdk::Ptr<nx::sdk::Attribute>> extractAttributes(
         ObjectId objectId, const QDomElement& appearance);
 
@@ -54,6 +60,7 @@ private:
 
 private:
     const Hanwha::EngineManifest& m_engineManifest;
+    const Hanwha::ObjectMetadataAttributeFilters& m_objectAttributeFilters;
     FrameScale m_frameScale;
     std::unordered_map<ObjectId, ObjectAttributes> m_objectAttributes;
 };

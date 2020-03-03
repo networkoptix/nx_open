@@ -33,6 +33,9 @@ class PartitionsInformationProvider: public AbstractPartitionsInformationProvide
     mutable QnMutex m_mutex;
     mutable int m_tries;
     QString m_fileName;
+    mutable QnMutex m_fsTypesMutex;
+    QString m_additionalFsTypesString;
+    mutable QStringList m_additionalFsTypes;
 };
 
 } // namespace nx::vms::server::fs

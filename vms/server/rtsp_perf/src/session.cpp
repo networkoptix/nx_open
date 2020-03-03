@@ -62,10 +62,9 @@ void Session::run(const QString& url, const Config& config, bool live)
     rtspClient.play(position, AV_NOPTS_VALUE, 1.0);
     int channel = -1;
     std::vector<QnByteArray*> dataArrays;
-    m_lastFrameTime = std::chrono::system_clock::now();
-    while (true)
+    for (;;)
     {
-        int bytesRead = rtspClient.readBinaryResponse(dataArrays, channel);
+        const int bytesRead = rtspClient.readBinaryResponse(dataArrays, channel);
         if (channel >= 0 && (int)dataArrays.size() > channel && dataArrays[channel])
         {
             if (bytesRead > 0)
@@ -111,7 +110,7 @@ void Session::checkDiff(std::chrono::microseconds diff, int64_t timestampUs, con
 
 bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
 {
-    const auto nowTime = std::chrono::system_clock::now();
+    const auto nowTime = std::chrono::steady_clock::now();
     Packet packet;
     if (parsePacket(data, size, packet, url))
     {
@@ -129,16 +128,18 @@ bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
         }
         m_prevTimestampUs = packet.timestampUs;
         m_lastFrameTime = nowTime;
-
     }
     else
     {
-        std::chrono::duration<double> timeFromLastFrame = nowTime - m_lastFrameTime;
-        if (timeFromLastFrame > m_config.timeout)
+        if (m_lastFrameTime)
         {
-            report("WARNING: Camera %1: Video frame was not received for %2 s.",
-                url, timeFromLastFrame.count());
-            return false;
+            const std::chrono::duration<double> timeFromLastFrame = nowTime - *m_lastFrameTime;
+            if (timeFromLastFrame > m_config.timeout)
+            {
+                report("WARNING: Camera %1: Video frame was not received for %2 s.",
+                    url, timeFromLastFrame.count());
+                return false;
+            }
         }
     }
     return true;

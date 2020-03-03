@@ -1,16 +1,18 @@
-#ifndef __TCP_CONNECTION_PRIV_H__
-#define __TCP_CONNECTION_PRIV_H__
+#pragma once
+
+#include <chrono>
+#include <optional>
 
 #include <QDateTime>
 #include <QtCore/QByteArray>
 
 #include "tcp_connection_processor.h"
 
-#include "utils/common/byte_array.h"
+#include <nx/utils/log/log.h>
+#include <nx/utils/system_error.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/http_stream_reader.h>
 #include <core/resource_access/user_access_data.h>
-
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
 
@@ -40,6 +42,46 @@ public:
         delete [] tcpReadBuffer;
     }
 
+    struct SendDataResult
+    {
+        /** Result of socket->send(). */
+        int sendResult;
+
+        /** Valid only if sendResult < 0. */
+        SystemError::ErrorCode errorCode = SystemError::noError;
+    };
+
+    SendDataResult sendData(const char* data, int size)
+    {
+        using namespace std::chrono;
+
+        const auto beforeSend = steady_clock::now();
+        SendDataResult result;
+        result.sendResult = socket->send(data, size);
+        const auto afterSend = steady_clock::now();
+
+        if (result.sendResult < 0)
+            result.errorCode = SystemError::getLastOSErrorCode();
+
+        NX_VERBOSE(this, "send(%1 bytes) -> %2, duration %3 us, since last send %4%5",
+            size,
+            lm("%1%2").args(
+                result.sendResult,
+                (result.sendResult >= 0) ? "" : lm(" (OS code %1)").args((int) result.errorCode)
+            ),
+            duration_cast<microseconds>(afterSend - beforeSend).count(),
+            lastSendTime
+                ? lm("%1 us").args(duration_cast<microseconds>(beforeSend - *lastSendTime).count())
+                : "n/a",
+            (result.sendResult < 0)
+                ? ("; OS error text: " + SystemError::toString(result.errorCode))
+                : ""
+        );
+
+        lastSendTime = beforeSend;
+        return result;
+    }
+
 public:
     std::unique_ptr<nx::network::AbstractStreamSocket> socket;
     nx::network::http::Request request;
@@ -61,10 +103,10 @@ public:
     bool authenticatedOnce;
     QnTcpListener* owner;
     mutable QnMutex socketMutex;
+
 private:
     QByteArray interleavedMessageData;
     size_t interleavedMessageDataPos;
     size_t currentRequestSize;
+    std::optional<std::chrono::time_point<std::chrono::steady_clock>> lastSendTime;
 };
-
-#endif // __TCP_CONNECTION_PRIV_H__
