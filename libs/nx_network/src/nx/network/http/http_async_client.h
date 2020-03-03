@@ -65,7 +65,7 @@ public:
     /**
      * 0 means infinity for any timeout.
      */
-    class NX_NETWORK_API Timeouts
+    class Timeouts
     {
     public:
         constexpr static const std::chrono::milliseconds kDefaultSendTimeout =
@@ -75,17 +75,22 @@ public:
         constexpr static const std::chrono::milliseconds kDefaultMessageBodyReadTimeout =
             std::chrono::milliseconds(10003);
 
-        std::chrono::milliseconds sendTimeout;
-        std::chrono::milliseconds responseReadTimeout;
-        std::chrono::milliseconds messageBodyReadTimeout;
+        std::chrono::milliseconds sendTimeout = kDefaultSendTimeout;
+        std::chrono::milliseconds responseReadTimeout = kDefaultResponseReadTimeout;
+        std::chrono::milliseconds messageBodyReadTimeout = kDefaultMessageBodyReadTimeout;
 
-        Timeouts(
-            std::chrono::milliseconds send = kDefaultSendTimeout,
-            std::chrono::milliseconds recv = kDefaultResponseReadTimeout,
-            std::chrono::milliseconds msgBody = kDefaultMessageBodyReadTimeout);
-
-        bool operator==(const Timeouts& rhs) const;
+        bool operator==(const Timeouts& rhs) const
+        {
+            return sendTimeout == rhs.sendTimeout
+                && responseReadTimeout == rhs.responseReadTimeout
+                && messageBodyReadTimeout == rhs.messageBodyReadTimeout;
+        }
     };
+
+    static constexpr auto kNoTimeout = Timeouts{
+        nx::network::kNoTimeout,
+        nx::network::kNoTimeout,
+        nx::network::kNoTimeout};
 
     static const int UNLIMITED_RECONNECT_TRIES = -1;
 
@@ -284,6 +289,8 @@ public:
      * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
      */
     void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
+
+    void setTimeouts(Timeouts timeouts);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
     /**
