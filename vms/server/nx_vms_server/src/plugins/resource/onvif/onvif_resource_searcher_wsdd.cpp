@@ -279,21 +279,18 @@ QString OnvifResourceSearcherWsdd::getAppropriateAddress(const T* source, const 
 {
     QString appropriateAddr;
 
-    if (!source || !source->XAddrs) {
+    if (!source || !source->XAddrs)
         return appropriateAddr;
-    }
 
     int relevantLevel = 0;
     QString addrListStr = QLatin1String(source->XAddrs);
-    QStringList addrList = addrListStr.split(QLatin1Char(' '));
+    const QStringList addrList = addrListStr.split(QLatin1Char(' '));
+    if (!addrList.isEmpty() && prefixes.size() < 3)
+        return addrList[0];
+
     for (const QString& addrStr: addrList) 
     {
-        if (prefixes.isEmpty())
-        {
-            appropriateAddr = addrStr;
-            break;
-        }
-        else if (prefixes.size() >= 2 && addrStr.startsWith(prefixes[2])) 
+        if (addrStr.startsWith(prefixes[2])) 
         {
             if (addrStr.startsWith(prefixes[0])) 
             {
@@ -690,7 +687,8 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const nx::network::QnInterface
 
 bool OnvifResourceSearcherWsdd::createReadMulticastContext()
 {
-    auto address = nx::network::SocketAddress(nx::network::HostAddress::anyHost, WSDD_MULTICAST_PORT);
+    const auto address = 
+        nx::network::SocketAddress(nx::network::HostAddress::anyHost, WSDD_MULTICAST_PORT);
     m_readMulticastContext = std::make_unique<ProbeContext>();
     m_readMulticastContext->sock = nx::network::SocketFactory::createDatagramSocket();
     if (!m_readMulticastContext->sock->setReuseAddrFlag(true)
@@ -698,6 +696,7 @@ bool OnvifResourceSearcherWsdd::createReadMulticastContext()
         || !m_readMulticastContext->sock->bind(address)
         || !m_readMulticastContext->sock->setNonBlockingMode(true))
     {
+        NX_DEBUG(this, "Can not initialize WSDD socket to read 'hello' messages");
         m_readMulticastContext.reset();
         return false;
     }
