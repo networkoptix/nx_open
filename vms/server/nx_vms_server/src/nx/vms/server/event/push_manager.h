@@ -22,7 +22,7 @@ public:
 private:
     PushPayload makePayload(const vms::event::EventParameters& event, bool isCamera) const;
     PushNotification makeNotification(const vms::event::AbstractActionPtr& action) const;
-    std::set<QString> cloudUsers(std::vector<QnUuid> filter) const;
+    std::set<QString> cloudUsers(const vms::event::ActionParameters& params) const;
 };
 
 } // namespace nx::vms::server::event

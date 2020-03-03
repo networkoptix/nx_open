@@ -19,13 +19,13 @@ QString QnDesktopCameraResource::getDriverName() const
 QnDesktopCameraResource::QnDesktopCameraResource(QnMediaServerModule* serverModule):
     nx::vms::server::resource::Camera(serverModule)
 {
-    setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
+    setFlags(flags() | Qn::desktop_camera);
 }
 
 QnDesktopCameraResource::QnDesktopCameraResource(QnMediaServerModule* serverModule, const QString& userName):
     nx::vms::server::resource::Camera(serverModule)
 {
-    setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
+    setFlags(flags() | Qn::desktop_camera);
     setName(userName);
 }
 

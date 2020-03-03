@@ -105,7 +105,7 @@ private:
     QByteArray m_codecCtxData;
     QElapsedTimer m_timer;
     nx::utils::ElapsedTimer m_keepAliveTimer;
-    QnRtspConnectionProcessor* m_owner;
+    QnRtspConnectionProcessor* const m_owner;
     qint64 m_lastSendTime;
     qint64 m_rtStartTime; // used for realtime streaming mode
     qint64 m_lastRtTime; // used for realtime streaming mode

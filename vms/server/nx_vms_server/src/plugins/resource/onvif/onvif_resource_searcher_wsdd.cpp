@@ -28,7 +28,12 @@ QString OnvifResourceSearcherWsdd::LOCAL_ADDR(QLatin1String("127.0.0.1"));
 const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.org/name/";
 const char OnvifResourceSearcherWsdd::SCOPES_HARDWARE_PREFIX[] = "onvif://www.onvif.org/hardware/";
 const char OnvifResourceSearcherWsdd::SCOPES_LOCATION_PREFIX[] = "onvif://www.onvif.org/location/";
-const char OnvifResourceSearcherWsdd::PROBE_TYPE[] = "onvifDiscovery:NetworkVideoTransmitter";
+const static std::array<const char*, 3> kProbeTypes =
+{
+    "NetworkVideoTransmitter",
+    "NetworkVideoDisplay",
+    "Device"
+};
 const char OnvifResourceSearcherWsdd::WSA_ADDRESS[] =
     "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
 const char OnvifResourceSearcherWsdd::WSDD_ADDRESS[] =
@@ -76,7 +81,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 </s:Header>\
 <s:Body>\
 <Probe xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
-<d:Types xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" xmlns:dp0=\"http://www.onvif.org/ver10/network/wsdl\">dp0:NetworkVideoTransmitter</d:Types>\
+<d:Types xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" xmlns:dp0=\"http://www.onvif.org/ver10/network/wsdl\">dp0:%2</d:Types>\
 </Probe>\
 </s:Body>\
 </s:Envelope>";
@@ -100,11 +105,13 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
         QString msgId;
         nx::network::AbstractDatagramSocket* qSocket = reinterpret_cast<nx::network::AbstractDatagramSocket*>(soap->user);
 
-        QString guid = QnUuid::createUuid().toString();
-        guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
-        QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLatin1();
-
-        qSocket->sendTo(data.data(), data.size(), WSDD_MULTICAST_ENDPOINT);
+        for (const auto& probeType: kProbeTypes)
+        {
+            QString guid = QnUuid::createUuid().toString();
+            guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
+            QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).arg(probeType).toLatin1();
+            qSocket->sendTo(data.data(), data.size(), WSDD_MULTICAST_ENDPOINT);
+        }
         return SOAP_OK;
     }
 }
@@ -272,21 +279,18 @@ QString OnvifResourceSearcherWsdd::getAppropriateAddress(const T* source, const 
 {
     QString appropriateAddr;
 
-    if (!source || !source->XAddrs) {
+    if (!source || !source->XAddrs)
         return appropriateAddr;
-    }
 
     int relevantLevel = 0;
     QString addrListStr = QLatin1String(source->XAddrs);
-    QStringList addrList = addrListStr.split(QLatin1Char(' '));
+    const QStringList addrList = addrListStr.split(QLatin1Char(' '));
+    if (!addrList.isEmpty() && prefixes.size() < 3)
+        return addrList[0];
+
     for (const QString& addrStr: addrList) 
     {
-        if (prefixes.isEmpty())
-        {
-            appropriateAddr = addrStr;
-            break;
-        }
-        else if (prefixes.size() >= 2 && addrStr.startsWith(prefixes[2])) 
+        if (addrStr.startsWith(prefixes[2])) 
         {
             if (addrStr.startsWith(prefixes[0])) 
             {
@@ -436,7 +440,6 @@ void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa5__En
     // (possibly, char* instead of const char* is a gsoap bug
     // So const_cast should be safety
 
-    probe.Types = const_cast<char*>(PROBE_TYPE);
     probe.Scopes = NULL;
 
     endpoint.Address = const_cast<char*>(WSA_ADDRESS);
@@ -684,7 +687,8 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const nx::network::QnInterface
 
 bool OnvifResourceSearcherWsdd::createReadMulticastContext()
 {
-    auto address = nx::network::SocketAddress(nx::network::HostAddress::anyHost, WSDD_MULTICAST_PORT);
+    const auto address = 
+        nx::network::SocketAddress(nx::network::HostAddress::anyHost, WSDD_MULTICAST_PORT);
     m_readMulticastContext = std::make_unique<ProbeContext>();
     m_readMulticastContext->sock = nx::network::SocketFactory::createDatagramSocket();
     if (!m_readMulticastContext->sock->setReuseAddrFlag(true)
@@ -692,6 +696,7 @@ bool OnvifResourceSearcherWsdd::createReadMulticastContext()
         || !m_readMulticastContext->sock->bind(address)
         || !m_readMulticastContext->sock->setNonBlockingMode(true))
     {
+        NX_DEBUG(this, "Can not initialize WSDD socket to read 'hello' messages");
         m_readMulticastContext.reset();
         return false;
     }

@@ -11,9 +11,9 @@ QnIOPortData::QnIOPortData()
 {
 }
 
-QString QnIOPortData::toString() const
+QString toString(const QnIOPortData& ioPortData)
 {
-    return QJson::serialized(*this);
+    return QJson::serialized(ioPortData);
 }
 
 QString QnIOPortData::getName() const
