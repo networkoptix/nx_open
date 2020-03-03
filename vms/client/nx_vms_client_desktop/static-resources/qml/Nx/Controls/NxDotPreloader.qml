@@ -9,10 +9,11 @@ BusyIndicator
     property int dotAnimationOffsetMs: 200;
     property color color: "white";
 
+    visible: running
+
     contentItem: Row
     {
         spacing: 6;
-        visible: control.running
 
         Repeater
         {
