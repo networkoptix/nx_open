@@ -371,7 +371,7 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         return vms::api::EventReason::backupFailedNoBackupStorageError;
     }
 
-    NX_VERBOSE(this, "[Backup] Starting...");
+    NX_DEBUG(this, "[Backup] Starting...");
     QnMutexLocker lock(&m_syncPointMutex);
     auto chunk = findLastSyncChunkUnsafe();
     m_syncTimePoint = chunk.startTimeMs;
@@ -427,6 +427,7 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
             break;
         }
     }
+    NX_DEBUG(this, "[Backup] successfully finished...");
     m_interrupted = true; // we are done till the next backup period
     return vms::api::EventReason::backupDone;
 }
