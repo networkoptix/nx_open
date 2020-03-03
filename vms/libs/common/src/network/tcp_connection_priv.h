@@ -8,6 +8,7 @@
 
 #include "tcp_connection_processor.h"
 
+#include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
 #include <nx/network/http/http_types.h>
@@ -51,7 +52,8 @@ public:
         SystemError::ErrorCode errorCode = SystemError::noError;
     };
 
-    SendDataResult sendData(const char* data, int size)
+    SendDataResult sendData(
+        const char* data, int size, std::optional<int64_t> timestampForLogging = std::nullopt)
     {
         using namespace std::chrono;
 
@@ -63,15 +65,20 @@ public:
         if (result.sendResult < 0)
             result.errorCode = SystemError::getLastOSErrorCode();
 
-        NX_VERBOSE(this, "send(%1 bytes) -> %2, duration %3 us, since last send %4%5",
+        NX_VERBOSE(this,
+            "Called send(@%1, %2 bytes) -> %3, timestamp %4, duration %5 us, since last send %6%7",
+            nx::kit::utils::toString((const void*) data),
             size,
-            lm("%1%2").args(
-                result.sendResult,
-                (result.sendResult >= 0) ? "" : lm(" (OS code %1)").args((int) result.errorCode)
+            (
+                ((result.sendResult == size) ? "ok" : QString::number(result.sendResult))
+                +
+                ((result.sendResult >= 0) ? "" : lm(" (OS code %1)").args((int) result.errorCode))
             ),
+            timestampForLogging ? lm("%1 us").args(*timestampForLogging) : "n/a",
             duration_cast<microseconds>(afterSend - beforeSend).count(),
             lastSendTime
-                ? lm("%1 us").args(duration_cast<microseconds>(beforeSend - *lastSendTime).count())
+                ? lm("%1 us").args(duration_cast<microseconds>(
+                    beforeSend - *lastSendTime).count())
                 : "n/a",
             (result.sendResult < 0)
                 ? ("; OS error text: " + SystemError::toString(result.errorCode))

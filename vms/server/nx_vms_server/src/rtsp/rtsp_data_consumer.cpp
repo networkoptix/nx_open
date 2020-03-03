@@ -2,6 +2,7 @@
 
 #include "rtsp_data_consumer.h"
 
+#include <nx/kit/utils.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/config.h>
 #include <rtsp/rtsp_connection.h>
@@ -404,15 +405,15 @@ void QnRtspDataConsumer::sendBufferViaTcp(std::optional<int64_t> timestampForLog
     using namespace std::chrono;
 
     const auto beforeSendBuffer = steady_clock::now();
-    const bool sendBufferResult = m_owner->sendBuffer(m_sendBuffer); //< Error is already logged.
+    const bool sendBufferResult = m_owner->sendBuffer(m_sendBuffer, timestampForLogging);
     const auto afterSendBuffer = steady_clock::now();
 
     // NOTE: On sending error, there seems to be no better option rather than ignore the error -
     // the peer will have a broken stream but streaming will not stop, which is preferred.
 
-    m_sendBuffer.clear();
-
-    NX_VERBOSE(this, "sendBuffer(%1 bytes): %2, timestamp %3, duration %4 us, since last send %5",
+    NX_VERBOSE(this, "Called sendBuffer(@%1, %2 bytes): "
+        "%3, timestamp %4, duration %5 us, since last send %6, frame queue size %7",
+        nx::kit::utils::toString((const void*) m_sendBuffer.constData()),
         m_sendBuffer.size(),
         sendBufferResult ? "success" : "FAILURE",
         timestampForLogging ? lm("%1 us").args(*timestampForLogging) : "n/a",
@@ -420,7 +421,11 @@ void QnRtspDataConsumer::sendBufferViaTcp(std::optional<int64_t> timestampForLog
         m_lastSendBufferViaTcpTime
             ? lm("%1 us").args(duration_cast<microseconds>(
                 beforeSendBuffer - *m_lastSendBufferViaTcpTime).count())
-            : "n/a");
+            : "n/a",
+        m_dataQueue.lock().size()
+    );
+
+    m_sendBuffer.clear();
 
     m_lastSendBufferViaTcpTime = beforeSendBuffer;
 }

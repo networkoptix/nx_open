@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <common/common_module_aware.h>
 
 #include <api/model/audit/auth_session.h>
@@ -52,8 +54,11 @@ public:
     nx::network::SocketAddress getForeignAddress() const;
     nx::utils::Url getDecodedUrl() const;
 
-    bool sendBuffer(const QnByteArray& sendBuffer);
-    bool sendBuffer(const QByteArray& sendBuffer);
+    bool sendBuffer(
+        const QnByteArray& sendBuffer, std::optional<int64_t> timestampForLogging = std::nullopt);
+
+    bool sendBuffer(
+        const QByteArray& sendBuffer, std::optional<int64_t> timestampForLogging = std::nullopt);
 
     /*!
         \bug In case of interleaved requests, this method reads everything after first HTTP request as message body
@@ -118,8 +123,15 @@ protected:
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnCommonModule* commonModule);
 
-    bool sendData(const char* data, int size);
-    inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
+    bool sendData(
+        const char* data, int size, std::optional<int64_t> timestampForLogging = std::nullopt);
+
+    inline bool sendData(
+        const QByteArray& data, std::optional<int64_t> timestampForLogging = std::nullopt)
+    {
+        return sendData(data.constData(), data.size(), timestampForLogging);
+    }
+
     void sendErrorResponse(nx::network::http::StatusCode::Value httpResult);
     void sendUnauthorizedResponse(
         nx::network::http::StatusCode::Value httpResult,
@@ -131,4 +143,11 @@ protected:
     QnTCPConnectionProcessorPrivate *d_ptr;
 
     bool isConnectionCanBePersistent() const;
+
+private:
+    bool sendBufferThreadSafe(
+        const char* data,
+        int size,
+        std::optional<int64_t> timestampForLogging,
+        const QString& captionForLogging);
 };

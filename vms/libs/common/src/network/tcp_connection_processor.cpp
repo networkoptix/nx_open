@@ -205,28 +205,53 @@ void QnTCPConnectionProcessor::clearBuffer()
     d->sendBuffer.clear();
 }
 */
-bool QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
+
+bool QnTCPConnectionProcessor::sendBuffer(
+    const QnByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
+{
+    return sendBufferThreadSafe(
+        sendBuffer.constData(), (int) sendBuffer.size(), timestampForLogging, "QnByteArray");
+}
+
+bool QnTCPConnectionProcessor::sendBuffer(
+    const QByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
+{
+    return sendBufferThreadSafe(
+        sendBuffer.constData(), sendBuffer.size(), timestampForLogging, "QByteArray");
+}
+
+bool QnTCPConnectionProcessor::sendBufferThreadSafe(
+    const char* data,
+    int size,
+    std::optional<int64_t> timestampForLogging,
+    const QString& captionForLogging)
 {
     Q_D(QnTCPConnectionProcessor);
 
-    QnMutexLocker lock( &d->sockMutex );
-    return sendData(sendBuffer.data(), sendBuffer.size());
+    using namespace std::chrono;
+
+    const auto beforeMutex = steady_clock::now();
+    QnMutexLocker lock(&d->sockMutex);
+    const auto afterMutex = steady_clock::now();
+
+    NX_VERBOSE(this, "sendBuffer(%1 @%2, %3 bytes): mutex %4 us, timestamp %5",
+        captionForLogging,
+        nx::kit::utils::toString((const void*) data),
+        size,
+        duration_cast<microseconds>(afterMutex - beforeMutex).count(),
+        timestampForLogging ? lm("%1 us").args(*timestampForLogging) : "n/a"
+    );
+
+    return sendData(data, size, timestampForLogging);
 }
 
-bool QnTCPConnectionProcessor::sendBuffer(const QByteArray& sendBuffer)
-{
-    Q_D(QnTCPConnectionProcessor);
-
-    QnMutexLocker lock( &d->sockMutex );
-    return sendData(sendBuffer.data(), sendBuffer.size());
-}
-
-bool QnTCPConnectionProcessor::sendData(const char* data, int size)
+bool QnTCPConnectionProcessor::sendData(
+    const char* data, int size, std::optional<int64_t> timestampForLogging)
 {
     Q_D(QnTCPConnectionProcessor);
     while (!needToStop() && size > 0 && d->socket->isConnected())
     {
-        const auto sendDataResult = d->sendData(data, size);
+        const auto sendDataResult = d->sendData(data, size, timestampForLogging);
 
         if (sendDataResult.sendResult == 0)
         {
