@@ -60,9 +60,11 @@ protected:
     {
         auto baseUrl = getUrl();
         baseUrl.setPath("/");
+
         m_registrar = std::make_unique<discovery::ModuleRegistrar<PeerInformation>>(
             baseUrl,
             m_moduleId);
+        m_registrar->setTimeout(nx::network::kNoTimeout);
     }
 
     void whenAddMultipleModuleInformation()

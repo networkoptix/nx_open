@@ -1,34 +1,67 @@
-/**********************************************************
-* Dec 23, 2015
-* akolesnikov
-***********************************************************/
-
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 
 #include <nx/cloud/mediator/test_support/mediaserver_emulator.h>
+#include <nx/network/cloud/mediator_client_connections.h>
 
 #include "functional_tests/mediator_functional_test.h"
-
 
 namespace nx {
 namespace hpm {
 namespace test {
 
-TEST_F(MediatorFunctionalTest, resolve_generic)
+class Resolve:
+    public MediatorFunctionalTest
+{
+    using base_type = MediatorFunctionalTest;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        ASSERT_TRUE(startAndWaitUntilStarted());
+
+        nx::network::stun::AbstractAsyncClient::Settings clientSettings;
+        clientSettings.sendTimeout = nx::network::kNoTimeout;
+        clientSettings.recvTimeout = nx::network::kNoTimeout;
+        m_stunClient = std::make_shared<nx::network::stun::AsyncClientWithHttpTunneling>(clientSettings);
+        m_stunClient->connect(httpTunnelUrl(), [](auto&&...) {});
+
+        m_client = std::make_unique<api::MediatorClientTcpConnection>(m_stunClient);
+    }
+
+    virtual void TearDown() override
+    {
+        if (m_client)
+        {
+            m_client->pleaseStopSync();
+            m_client.reset();
+        }
+
+        if (m_stunClient)
+            m_stunClient->pleaseStopSync();
+    }
+
+    nx::hpm::api::MediatorClientTcpConnection& client()
+    {
+        return *m_client;
+    }
+
+private:
+    std::shared_ptr<nx::network::stun::AsyncClientWithHttpTunneling> m_stunClient;
+    std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> m_client;
+};
+
+TEST_F(Resolve, common)
 {
     //TODO #ak adding multiple server to a system, checking that each very server is found
 
     using namespace nx::hpm;
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    const auto client = clientConnection();
-    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     const auto system1 = addRandomSystem();
     auto system1Servers = addRandomServers(system1, 2);
@@ -40,7 +73,7 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
         std::tie(resultCode, resolveResponse) =
             makeSyncCall<api::ResultCode, api::ResolveDomainResponse>(std::bind(
                 &nx::hpm::api::MediatorClientTcpConnection::resolveDomain,
-                client.get(),
+                &client(),
                 api::ResolveDomainRequest(system1.id),
                 std::placeholders::_1));
         ASSERT_EQ(api::ResultCode::ok, resultCode);
@@ -64,7 +97,7 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
         std::tie(resultCode, resolveResponse) =
             makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
                 &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
-                client.get(),
+                &client(),
                 api::ResolvePeerRequest(
                     system1Servers[i]->serverId() + "." + system1.id),
                 std::placeholders::_1));
@@ -77,14 +110,9 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
     }
 }
 
-TEST_F(MediatorFunctionalTest, resolve_same_server_name)
+TEST_F(Resolve, same_server_name)
 {
     using namespace nx::hpm;
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    const auto client = clientConnection();
-    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     const auto system1 = addRandomSystem();
     auto server1 = addServer(system1, QnUuid::createUuid().toSimpleString().toUtf8());
@@ -96,7 +124,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
     std::tie(resultCode, resolveResponse) =
         makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
             &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
-            client.get(),
+            &client(),
             api::ResolvePeerRequest(server1->serverId() + "." + system1.id),
             std::placeholders::_1));
 
@@ -107,14 +135,9 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
         resolveResponse.endpoints.front().toString());
 }
 
-TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
+TEST_F(Resolve, unkown_domain)
 {
     using namespace nx::hpm;
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    const auto client = clientConnection();
-    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     //resolving unknown system
     api::ResolveDomainResponse resolveResponse;
@@ -122,21 +145,16 @@ TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
     std::tie(resultCode, resolveResponse) =
         makeSyncCall<api::ResultCode, api::ResolveDomainResponse>(std::bind(
             &nx::hpm::api::MediatorClientTcpConnection::resolveDomain,
-            client.get(),
+            &client(),
             api::ResolveDomainRequest(nx::utils::generateRandomName(16)),
             std::placeholders::_1));
 
     ASSERT_EQ(api::ResultCode::notFound, resultCode);
 }
 
-TEST_F(MediatorFunctionalTest, resolve_unkownHost)
+TEST_F(Resolve, unkown_host)
 {
     using namespace nx::hpm;
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    const auto client = clientConnection();
-    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     const auto system1 = addRandomSystem();
 
@@ -146,21 +164,16 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
     std::tie(resultCode, resolveResponse) =
         makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
             &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
-            client.get(),
+            &client(),
             api::ResolvePeerRequest(system1.id),
             std::placeholders::_1));
 
     ASSERT_EQ(api::ResultCode::notFound, resultCode);
 }
 
-TEST_F(MediatorFunctionalTest, resolve_by_system_name)
+TEST_F(Resolve, resolve_by_system_name)
 {
     using namespace nx::hpm;
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    const auto client = clientConnection();
-    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     const auto system1 = addRandomSystem();
 
@@ -175,7 +188,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
     std::tie(resultCode, resolveResponse) =
         makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
             &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
-            client.get(),
+            &client(),
             api::ResolvePeerRequest(mserverEmulator.serverId() + "." + system1.id),
             std::placeholders::_1));
 
@@ -189,7 +202,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
     std::tie(resultCode, resolveResponse) =
         makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
             &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
-            client.get(),
+            &client(),
             api::ResolvePeerRequest(system1.id),
             std::placeholders::_1));
 
