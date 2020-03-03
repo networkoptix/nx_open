@@ -103,6 +103,7 @@ public:
     bool authenticatedOnce;
     QnTcpListener* owner;
     mutable QnMutex socketMutex;
+    // TODO: #rvasilenko Fix socketMutex used for takeSocket() vs sockMutex used for send().
 
 private:
     QByteArray interleavedMessageData;
