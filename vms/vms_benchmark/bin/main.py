@@ -401,8 +401,8 @@ def _rtsp_perf_frames(stdout, output_file_path):
             output_file.write(f'{prefix}{line}\n')
 
         warning_prefix = 'WARNING: '
-        if line.startswith(warning_prefix):
-            raise exceptions.RtspPerfError("Streaming error: " + line[len(warning_prefix):])
+        if warning_prefix in line:
+            raise exceptions.RtspPerfError(f'Streaming error: {line}')
 
         match_res = _rtsp_perf_frame_regex.match(line)
         if match_res is not None:
