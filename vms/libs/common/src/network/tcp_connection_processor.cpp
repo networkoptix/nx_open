@@ -194,6 +194,12 @@ bool QnTCPConnectionProcessor::sendBuffer(
         sendBuffer.constData(), sendBuffer.size(), timestampForLogging, "QByteArray");
 }
 
+bool QnTCPConnectionProcessor::sendBuffer(
+    const char* data, int size, std::optional<int64_t> timestampForLogging)
+{
+    return sendBufferThreadSafe(data, size, timestampForLogging, "char*");
+}
+
 bool QnTCPConnectionProcessor::sendBufferThreadSafe(
     const char* data,
     int size,
