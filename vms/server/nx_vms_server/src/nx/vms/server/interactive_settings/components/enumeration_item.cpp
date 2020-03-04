@@ -21,10 +21,21 @@ void EnumerationItem::setRange(const QVariantList& range)
         setValue(defaultValue());
 }
 
+void EnumerationItem::setItemCaptions(const QVariantMap& value)
+{
+    if (m_itemCaptions == value)
+        return;
+
+    m_itemCaptions = value;
+    emit itemCaptionsChanged();
+}
+
 QJsonObject EnumerationItem::serialize() const
 {
     auto result = base_type::serialize();
     result[QLatin1String("range")] = QJsonArray::fromVariantList(m_range);
+    if (!m_itemCaptions.empty())
+        result[QLatin1String("itemCaptions")] = QJsonObject::fromVariantMap(m_itemCaptions);
     return result;
 }
 
