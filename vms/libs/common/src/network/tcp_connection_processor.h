@@ -60,6 +60,9 @@ public:
     bool sendBuffer(
         const QByteArray& sendBuffer, std::optional<int64_t> timestampForLogging = std::nullopt);
 
+    bool sendBuffer(
+        const char* data, int size, std::optional<int64_t> timestampForLogging = std::nullopt);
+
     /*!
         \bug In case of interleaved requests, this method reads everything after first HTTP request as message body
     */
