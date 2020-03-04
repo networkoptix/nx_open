@@ -57,6 +57,7 @@ private:
     QVector4D  m_color;
 
     unsigned short m_indices_for_render_quads[6];
+    GLuint m_elementBuffer;
 
     QScopedPointer<QnColorGLShaderProgram>          m_colorProgram;
     QScopedPointer<QnTextureGLShaderProgram>  m_textureColorProgram;
