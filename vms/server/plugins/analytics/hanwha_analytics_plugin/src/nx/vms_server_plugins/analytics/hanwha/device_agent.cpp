@@ -158,7 +158,7 @@ void copySettingsFromServerToCamera(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     m_engine(engine),
     m_objectMetadataXmlParser(
-        m_engine->engineManifest(),
+        m_engine->manifest(),
         m_engine->objectMetadataAttributeFilters())
 {
     this->setDeviceInfo(deviceInfo);

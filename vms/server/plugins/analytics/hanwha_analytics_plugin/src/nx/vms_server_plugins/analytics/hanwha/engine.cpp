@@ -78,20 +78,21 @@ void Engine::SharedResources::setResourceAccess(
 
 Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
+    QByteArray manifestData;
     QFile f(":/hanwha/manifest.json");
     if (f.open(QFile::ReadOnly))
-        m_manifest = f.readAll();
+        manifestData = f.readAll();
     {
         QFile file("plugins/hanwha/manifest.json");
         if (file.open(QFile::ReadOnly))
         {
             NX_INFO(this,
                 lm("Switch to external manifest file %1").arg(QFileInfo(file).absoluteFilePath()));
-            m_manifest = file.readAll();
+            manifestData = file.readAll();
         }
     }
-    m_engineManifest = QJson::deserialized<Hanwha::EngineManifest>(m_manifest);
-    m_engineManifest.InitializeObjectTypeMap();
+    m_manifest = QJson::deserialized<Hanwha::EngineManifest>(manifestData);
+    m_manifest.InitializeObjectTypeMap();
 
     QByteArray attributeFiltersData;
     QFile attributeFiltersFile(":/hanwha/object_metadata_attribute_filters.json");
@@ -137,8 +138,8 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
     // DeviceAgent should understand all engine's object types.
-    deviceAgentManifest.supportedObjectTypeIds.reserve(m_engineManifest.objectTypes.size());
-    for (const nx::vms::api::analytics::ObjectType& objectType: m_engineManifest.objectTypes)
+    deviceAgentManifest.supportedObjectTypeIds.reserve(m_manifest.objectTypes.size());
+    for (const nx::vms::api::analytics::ObjectType& objectType: m_manifest.objectTypes)
         deviceAgentManifest.supportedObjectTypeIds.push_back(objectType.id);
 
     const auto deviceAgent = new DeviceAgent(this, deviceInfo);
@@ -153,7 +154,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
 void Engine::getManifest(Result<const IString*>* outResult) const
 {
-    *outResult = new nx::sdk::String(m_manifest);
+    *outResult = new nx::sdk::String(QJson::serialized(m_manifest));
 }
 
 void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
@@ -224,7 +225,7 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
     NX_VERBOSE(this, lm("camera %1 report supported analytics events %2").arg(url).arg(supportedEvents));
     for (const auto& eventName: supportedEvents)
     {
-        auto eventTypeId = m_engineManifest.eventTypeIdByName(eventName);
+        auto eventTypeId = m_manifest.eventTypeIdByName(eventName);
         if (!eventTypeId.isEmpty())
             result.insert(eventTypeId);
 
@@ -240,7 +241,7 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
 
                 if (isMatched)
                 {
-                    eventTypeId = m_engineManifest.eventTypeIdByName(fullEventName);
+                    eventTypeId = m_manifest.eventTypeIdByName(fullEventName);
                     if (!eventTypeId.isNull())
                         result.insert(eventTypeId);
                 }
@@ -251,9 +252,9 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
     return QList<QString>::fromSet(result);
 }
 
-const Hanwha::EngineManifest& Engine::engineManifest() const
+const Hanwha::EngineManifest& Engine::manifest() const
 {
-    return m_engineManifest;
+    return m_manifest;
 }
 
 const Hanwha::ObjectMetadataAttributeFilters& Engine::objectMetadataAttributeFilters() const
@@ -276,7 +277,7 @@ MetadataMonitor* Engine::monitor(
                 sharedId,
                 std::make_shared<SharedResources>(
                     sharedId,
-                    engineManifest(),
+                    m_manifest,
                     url,
                     auth));
         }
@@ -331,7 +332,7 @@ std::shared_ptr<Engine::SharedResources> Engine::sharedResources(const IDeviceIn
             deviceInfo->sharedId(),
             std::make_shared<SharedResources>(
                 deviceInfo->sharedId(),
-                engineManifest(),
+                m_manifest,
                 url,
                 auth));
     }
