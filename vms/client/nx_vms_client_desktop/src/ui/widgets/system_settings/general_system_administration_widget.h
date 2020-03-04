@@ -35,6 +35,9 @@ public:
 protected:
     void setReadOnlyInternal(bool readOnly) override;
 
+private slots:
+    void loadSystemName();
+
 private:
     bool isDatabaseBackupAvailable() const;
 
