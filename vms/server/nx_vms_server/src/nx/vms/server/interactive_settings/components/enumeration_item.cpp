@@ -34,8 +34,7 @@ QJsonObject EnumerationItem::serialize() const
 {
     auto result = base_type::serialize();
     result[QLatin1String("range")] = QJsonArray::fromVariantList(m_range);
-    if (!m_itemCaptions.empty())
-        result[QLatin1String("itemCaptions")] = QJsonObject::fromVariantMap(m_itemCaptions);
+    result[QLatin1String("itemCaptions")] = QJsonObject::fromVariantMap(m_itemCaptions);
     return result;
 }
 
