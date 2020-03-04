@@ -10,6 +10,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
 namespace network {
@@ -77,7 +78,9 @@ protected:
 
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_controlConnection;
-    std::list<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedSockets;
+    nx::utils::SyncQueue<std::tuple<
+        SystemError::ErrorCode,
+        std::unique_ptr<nx::network::AbstractStreamSocket>>> m_acceptedSockets;
 
     std::vector<ConnectContext> startConnections(
         udp::OutgoingTunnelConnection* const tunnelConnection,
@@ -148,11 +151,7 @@ private:
         }
         else
         {
-            if (errorCode == SystemError::noError)
-            {
-                m_acceptedSockets.emplace_back(std::move(socket));
-                //TODO #ak waiting for accepted socket to close
-            }
+            m_acceptedSockets.push({errorCode, std::move(socket)});
         }
 
         m_serverSocket->acceptAsync(
@@ -162,7 +161,7 @@ private:
     }
 };
 
-TEST_F(OutgoingTunnelConnectionTest, common)
+TEST_F(OutgoingTunnelConnectionTest, opening_multiple_concurrent_connections_is_supported)
 {
     const int connectionsToCreate = 100;
 
@@ -187,9 +186,11 @@ TEST_F(OutgoingTunnelConnectionTest, common)
         connectResults.emplace_back(connectContext.connectedPromise.get_future().get());
 
     //checking that connection uses right port to connect
-    for (const auto& sock : m_acceptedSockets)
+    for (std::size_t i = 0; i < connectContexts.size(); ++i)
     {
-        ASSERT_EQ(localAddress, sock->getForeignAddress());
+        const auto [resultCode, socket] = m_acceptedSockets.pop();
+        ASSERT_EQ(SystemError::noError, resultCode);
+        ASSERT_EQ(localAddress, socket->getForeignAddress());
     }
 
     for (auto& result: connectResults)
