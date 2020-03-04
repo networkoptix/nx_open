@@ -278,7 +278,7 @@ public:
     QString errorMessage;
     QnMutex archiveDpMutex;
     QnMediaServerModule* serverModule = nullptr;
-    std::atomic<CameraParameters> m_cameraParameters = CameraParameter::noParams;
+    std::atomic<CameraParameters> m_cameraParameters{CameraParameter::noParams};
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
