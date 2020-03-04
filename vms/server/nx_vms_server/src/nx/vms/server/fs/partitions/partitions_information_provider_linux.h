@@ -34,7 +34,7 @@ class PartitionsInformationProvider: public AbstractPartitionsInformationProvide
     mutable int m_tries;
     QString m_fileName;
     mutable QnMutex m_fsTypesMutex;
-    QString m_additionalFsTypesString;
+    mutable QString m_additionalFsTypesString;
     mutable QStringList m_additionalFsTypes;
 };
 
