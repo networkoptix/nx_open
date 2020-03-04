@@ -24,8 +24,7 @@
 
             <div class="gridMetricContentComponent" [hidden]="healthLayoutService.mobileDetailMode && healthLayoutService.activeEntity">
                 <div class="gridMetricContentComponentWrapper" >
-                    <div *ngIf="canSeeTable()"
-                         [hidden]="healthLayoutService.mobileDetailMode"
+                    <div [hidden]="healthLayoutService.mobileDetailMode"
                          [ngClass]="{'data-wrapper' : !healthLayoutService.activeEntity}">
 
                         <div class="" *ngIf="!healthLayoutService.mobileDetailMode" #search >

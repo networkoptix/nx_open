@@ -170,8 +170,10 @@ export class LoginModalContent implements OnInit {
             } else if (this.next) {
                 // sanitize this.next
                 this.next = NxUtilsService.getRelativeLocation(this.next);
-                this.location.go(this.next);
-                window.location.reload(); // ensure language reload
+                // *** this.location.go(this.next);
+                // *** window.location.reload(); // ensure language reload
+                // *** admin section is not a part of Angular project
+                window.location.href = this.next;
             } else {
                 setTimeout(() => {
                     this.location.go(this.CONFIG.redirectAuthorised);

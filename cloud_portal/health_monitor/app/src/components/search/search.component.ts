@@ -15,6 +15,7 @@ import { NxScrollMechanicsService }       from '../../services/scroll-mechanics.
 import { AutoUnsubscribe }                from 'ngx-auto-unsubscribe';
 import { debounceTime }                   from 'rxjs/operators';
 import { NxUtilsService }                 from '../../services/utils.service';
+import { Utils } from '../../utils/helpers';
 /* Usage
  <nx-search
      name="NAME"
@@ -220,7 +221,7 @@ export class NxSearchComponent implements OnInit, OnDestroy, ControlValueAccesso
              (value.selects && value.selects.length) ||
              (value.multiselects && value.multiselects.length))) {
 
-            if (JSON.stringify(this.localFilter) === JSON.stringify(value)) {
+            if (Utils.isEqual(this.localFilter, value)) {
                 return;
             }
             this.localFilter = NxUtilsService.deepCopy(value);

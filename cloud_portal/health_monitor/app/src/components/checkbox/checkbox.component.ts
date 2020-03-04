@@ -1,7 +1,7 @@
 import {
     Component, Input, Output,
     EventEmitter, forwardRef,
-    OnInit, ViewEncapsulation
+    OnInit, ViewEncapsulation, SimpleChanges, OnChanges
 } from '@angular/core';
 import {
     NG_VALUE_ACCESSOR, ControlValueAccessor,
@@ -38,7 +38,7 @@ import {
     ],
     encapsulation: ViewEncapsulation.None
 })
-export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Validator {
+export class NxCheckboxComponent implements OnInit, OnChanges, ControlValueAccessor, Validator {
     @Input() componentId: string;
     @Input() required: any;
     @Input() checked: any;
@@ -92,6 +92,13 @@ export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Valida
             }
             this.setState();
         });
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes.checked) {
+            this.value = changes.checked.currentValue;
+            this.state = this.cbxStates[this.value];
+        }
     }
 
     /**

@@ -280,7 +280,8 @@ export class NxConfigService {
                 carouselImageLeave: '0.25s ease-out'
             },
             ipvd: {
-                pagerMaxSizeSmall               : 3,
+                pagerMaxSizeSmall               : 2,
+                pagerMaxSizeMedium              : 3,
                 pagerMaxSize                    : 4,
                 firmwaresToShow                 : 4,
                 analyticsToShow                 : 4,

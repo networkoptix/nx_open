@@ -410,10 +410,6 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
         this.healthLayoutService.resetActiveEntity();
     }
 
-    canSeeTable() {
-        return this.tableHeaders && this.healthService.alertsValues && !this.healthLayoutService.mobileDetailMode;
-    }
-
     private setLayout() {
         this.healthLayoutService.setAlertLayout();
     }
