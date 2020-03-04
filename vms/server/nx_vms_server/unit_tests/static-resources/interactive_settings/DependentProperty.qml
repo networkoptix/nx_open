@@ -10,12 +10,14 @@ Settings
             {
                 "type": "CheckBox",
                 "name": "master",
-                "defaultValue": false
+                "defaultValue": false,
             },
             {
                 "type": "ComboBox",
                 "name": "slave",
                 "defaultValue": "one",
+                "itemCaptions": {
+                },
                 "range": master.value ? ["one", "two"] : ["one"]
             }
         ]
