@@ -618,7 +618,7 @@ void ProgressiveDownloadingServer::run()
 
     QnByteArray emptyChunk((unsigned)0,0);
     sendChunk(emptyChunk);
-    sendData(QByteArray("\r\n"));
+    sendBuffer(QByteArray("\r\n"));
 
     dataProvider->removeDataProcessor(&dataConsumer);
     if (camera)

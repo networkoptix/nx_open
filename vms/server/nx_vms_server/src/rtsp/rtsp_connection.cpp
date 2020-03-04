@@ -428,8 +428,7 @@ void QnRtspConnectionProcessor::sendResponse(
         d->socket->getForeignAddress(),
         response);
 
-    QnMutexLocker lock(&d->sockMutex);
-    sendData(response.constData(), response.size());
+    sendBuffer(response);
 }
 
 int QnRtspConnectionProcessor::getMetadataChannelNum() const

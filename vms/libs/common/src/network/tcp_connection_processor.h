@@ -123,15 +123,6 @@ protected:
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnCommonModule* commonModule);
 
-    bool sendData(
-        const char* data, int size, std::optional<int64_t> timestampForLogging = std::nullopt);
-
-    inline bool sendData(
-        const QByteArray& data, std::optional<int64_t> timestampForLogging = std::nullopt)
-    {
-        return sendData(data.constData(), data.size(), timestampForLogging);
-    }
-
     void sendErrorResponse(nx::network::http::StatusCode::Value httpResult);
     void sendUnauthorizedResponse(
         nx::network::http::StatusCode::Value httpResult,

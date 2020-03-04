@@ -100,7 +100,6 @@ public:
     //QByteArray responseBody;
     QByteArray clientRequest;
     QByteArray receiveBuffer;
-    QnMutex sockMutex;
     quint8* tcpReadBuffer;
     bool chunkedMode;
     int clientRequestOffset;
@@ -113,6 +112,7 @@ public:
     // TODO: #rvasilenko Fix socketMutex used for takeSocket() vs sockMutex used for send().
 
 private:
+    QnMutex sendDataMutex;
     QByteArray interleavedMessageData;
     size_t interleavedMessageDataPos;
     size_t currentRequestSize;
