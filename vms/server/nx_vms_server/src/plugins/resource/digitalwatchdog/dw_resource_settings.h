@@ -57,7 +57,7 @@ private:
 
 private:
     QnCameraAdvancedParams m_params;
-    static const QMap<QString, MaintenanceParameter> m_maitenanceParameters;
+    static const QMap<QString, MaintenanceParameter> kMaitenanceParameters;
 };
 
 class QnPravisCameraProxy: public DWAbstractCameraProxy

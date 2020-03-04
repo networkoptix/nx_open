@@ -49,7 +49,7 @@ static bool isEngineCompatibleWithDevice(
     if (!NX_ASSERT(device))
         return false;
 
-    if (device->hasFlags(Qn::no_analytics))
+    if (device->hasCameraCapabilities(Qn::CameraCapability::noAnalytics))
         return false;
 
     return engine->isCompatible(device);

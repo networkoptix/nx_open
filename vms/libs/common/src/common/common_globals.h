@@ -58,6 +58,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         MulticastStreamCapability           = 0x80000, //< Camera supports multicast streaming.
         ServerBoundCapability               = 0x100000, //< Camera is bound to a particular server.
         dontAutoOpenCamera                  = 0x200000, //< Server should not open video from camera at its will.
+        noAnalytics                         = 0x400000, //< Analytics Engines should not bind to Device.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -214,10 +215,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* Server-only flag. */
         foreigner                   = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
-
-        // Server-only flag.
-        // Analytics Engines mustn't bind to the resource.
-        no_analytics                 = 0x80000,
 
         /* Client-only flag */
         fake                        = 0x100000,     /**< Fake server (belonging to other system). */

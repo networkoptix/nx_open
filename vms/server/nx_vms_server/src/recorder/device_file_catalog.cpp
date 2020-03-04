@@ -180,7 +180,7 @@ std::deque<Chunk> DeviceFileCatalog::chunksAfter(int64_t timepointMs, int storag
             if (rit->storageIndex != storageIndex)
                 continue;
 
-            if (rit->startTimeMs < timepointMs)
+            if (rit->startTimeMs <= timepointMs)
                 break;
 
             result.push_back(*rit);

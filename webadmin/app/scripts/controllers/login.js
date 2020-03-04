@@ -41,17 +41,15 @@ angular.module('webadminApp')
         }
 
         $scope.login = function (form) {
-            touchForm(form);
-            
-            if ($scope.loginForm.$valid) {
+            if ($scope.loginForm.$valid && !$scope.authorized) {
+                $scope.authorizing = true;
+                touchForm(form);
                 var login = $scope.user.username.toLowerCase();
                 var password = $scope.user.password;
-                $scope.authorizing = true;
                 
                 mediaserver
                     .login(login, password)
                     .then(reload, function(error) {
-                        $scope.authorizing = false;
                         if (error.authResult !== '') {
                             switch (error.authResult) {
                                 case 'Auth_WrongLogin':
@@ -71,6 +69,8 @@ angular.module('webadminApp')
                         }
                     }).then(function(){
                         nativeClient.updateCredentials(login, password, false, false);
+                    }).finally(function() {
+                        $scope.authorizing = false;
                     });
             }
         };

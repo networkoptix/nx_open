@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <deque>
+#include <optional>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -135,6 +136,9 @@ public:
                 nx::cloud::discovery::http::kModuleKeepAliveConnectionPath, {m_moduleId}).c_str()));
 
         m_webSocketConnector = std::make_unique<nx::network::http::AsyncClient>();
+        if (m_timeout)
+            m_webSocketConnector->setTimeouts({*m_timeout, *m_timeout, *m_timeout});
+
         nx::network::websocket::addClientHeaders(
             m_webSocketConnector.get(), "NxDiscovery",
             nx::network::websocket::CompressionType::perMessageDeflate);
@@ -144,6 +148,11 @@ public:
             nx::network::http::Method::post,
             nx::network::websocket::kWebsocketProtocolName,
             std::bind(&ModuleRegistrar::onWebSocketConnectFinished, this));
+    }
+
+    void setTimeout(std::optional<std::chrono::milliseconds> timeout)
+    {
+        m_timeout = timeout;
     }
 
 protected:
@@ -161,6 +170,7 @@ private:
     nx::Buffer m_sendBuffer;
     std::deque<InstanceInformation> m_sendQueue;
     std::string m_moduleId;
+    std::optional<std::chrono::milliseconds> m_timeout;
 
     void onWebSocketConnectFinished()
     {

@@ -180,32 +180,6 @@ void QnTCPConnectionProcessor::parseRequest()
         d->owner->applyModToRequest(&d->request);
 }
 
-/*
-void QnTCPConnectionProcessor::bufferData(const char* data, int size)
-{
-    Q_D(QnTCPConnectionProcessor);
-    d->sendBuffer.write(data, size);
-}
-
-QnByteArray& QnTCPConnectionProcessor::getSendBuffer()
-{
-    Q_D(QnTCPConnectionProcessor);
-    return d->sendBuffer;
-}
-
-void QnTCPConnectionProcessor::sendBuffer()
-{
-    Q_D(QnTCPConnectionProcessor);
-    sendData(d->sendBuffer.data(), d->sendBuffer.size());
-}
-
-void QnTCPConnectionProcessor::clearBuffer()
-{
-    Q_D(QnTCPConnectionProcessor);
-    d->sendBuffer.clear();
-}
-*/
-
 bool QnTCPConnectionProcessor::sendBuffer(
     const QnByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
 {
@@ -231,7 +205,7 @@ bool QnTCPConnectionProcessor::sendBufferThreadSafe(
     using namespace std::chrono;
 
     const auto beforeMutex = steady_clock::now();
-    QnMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock(&d->sendDataMutex);
     const auto afterMutex = steady_clock::now();
 
     NX_VERBOSE(this, "sendBuffer(%1 @%2, %3 bytes): mutex %4 us, timestamp %5",
@@ -242,13 +216,6 @@ bool QnTCPConnectionProcessor::sendBufferThreadSafe(
         timestampForLogging ? lm("%1 us").args(*timestampForLogging) : "n/a"
     );
 
-    return sendData(data, size, timestampForLogging);
-}
-
-bool QnTCPConnectionProcessor::sendData(
-    const char* data, int size, std::optional<int64_t> timestampForLogging)
-{
-    Q_D(QnTCPConnectionProcessor);
     while (!needToStop() && size > 0 && d->socket->isConnected())
     {
         const auto sendDataResult = d->sendData(data, size, timestampForLogging);
@@ -418,8 +385,7 @@ void QnTCPConnectionProcessor::sendResponse(
     auto response = createResponse(httpStatusCode, contentType, contentEncoding, multipartBoundary,
         displayDebug, isUndefinedContentLength);
 
-    QnMutexLocker lock(&d->sockMutex);
-    sendData(response.data(), response.size());
+    sendBuffer(response);
 }
 
 bool QnTCPConnectionProcessor::sendChunk( const QnByteArray& chunk )
@@ -439,7 +405,7 @@ bool QnTCPConnectionProcessor::sendChunk( const char* data, int size )
     result.append(data, size);  //TODO/IMPL avoid copying by implementing writev in socket
     result.append("\r\n");
 
-    return sendData( result.constData(), result.size() );
+    return sendBuffer(result);
 }
 
 void QnTCPConnectionProcessor::pleaseStop()
@@ -457,7 +423,7 @@ nx::network::SocketAddress QnTCPConnectionProcessor::getForeignAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
     QnMutexLocker lock(&d->socketMutex);
-    return d->socket->getForeignAddress();
+    return d->socket ? d->socket->getForeignAddress() : nx::network::SocketAddress();
 }
 
 int QnTCPConnectionProcessor::readSocket( quint8* buffer, int bufSize )

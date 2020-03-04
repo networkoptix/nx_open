@@ -517,7 +517,9 @@ private:
 
         lock->unlock();
         m_owner->scanMediaCatalog(
-            scanTask.storage, scanTask.catalog, DeviceFileCatalog::ScanFilter(),
+            scanTask.storage,
+            scanTask.catalog,
+            DeviceFileCatalog::ScanFilter(QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch())),
             &archiveCameras);
         lock->relock();
 
@@ -2645,22 +2647,42 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqu
 }
 
 void QnStorageManager::replaceChunks(
-    const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage,
-    DeviceFileCatalogPtr&& newCatalog, const QString& cameraUniqueId,
+    const QnTimePeriod& rebuildPeriod,
+    const QnStorageResourcePtr &storage,
+    DeviceFileCatalogPtr&& newCatalog,
+    const QString& cameraUniqueId,
     QnServer::ChunksCatalog catalog)
 {
     QnMutexLocker lock( &m_mutexCatalog );
     int storageIndex = storageDbPool()->getStorageIndex(storage);
-
     DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
     qint64 newArchiveFirstChunkStartTimeMs = newCatalog->minTime() == AV_NOPTS_VALUE
         ? std::numeric_limits<qint64>::max()
         : newCatalog->minTime();
+    const qint64 leftNewArchiveBorder = qMin(rebuildPeriod.startTimeMs, newArchiveFirstChunkStartTimeMs);
+    newCatalog->addChunks(ownCatalog->chunksBefore(leftNewArchiveBorder, storageIndex));
 
-    qint64 newArchiveBorder = qMin(rebuildPeriod.startTimeMs, newArchiveFirstChunkStartTimeMs);
-    newCatalog->addChunks(ownCatalog->chunksBefore(newArchiveBorder, storageIndex));
-    newCatalog->addChunks(ownCatalog->chunksAfter(
-        ownCatalog->lastChunkStartTime(storageIndex), storageIndex));
+    NX_ASSERT(rebuildPeriod.endTimeMs() > 0);
+    const qint64 rightNewArchiveBorder = qMax(
+        rebuildPeriod.endTimeMs() - serverModule()->settings().mediaFileDuration() * 1000 * 1.5,
+        newCatalog->lastChunkStartTime(storageIndex));
+    auto chunksAfter = ownCatalog->chunksAfter(rightNewArchiveBorder, storageIndex);
+    chunksAfter.erase(std::remove_if(
+            chunksAfter.begin(), chunksAfter.end(),
+            [ownCatalog, storage](const auto& c)
+            {
+                const auto dirContents = storage->getFileList(ownCatalog->fileDir(c));
+                return std::none_of(
+                    dirContents.cbegin(), dirContents.cend(),
+                    [c](const auto& fileInfo)
+                    {
+                        return !fileInfo.isDir()
+                            && fileInfo.absoluteFilePath().contains(QString::number(c.startTimeMs));
+                    });
+            }),
+        chunksAfter.end());
+    newCatalog->addChunks(chunksAfter);
+
     const auto newChunks = newCatalog->takeChunks();
     ownCatalog->replaceChunks(storageIndex, newChunks);
     QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);

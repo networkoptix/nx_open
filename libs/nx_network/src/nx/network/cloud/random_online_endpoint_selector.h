@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <optional>
 
 #include <nx/network/socket.h>
 #include <nx/utils/thread/mutex.h>
@@ -27,6 +28,11 @@ public:
         std::vector<SocketAddress> endpoints,
         std::function<void(nx::network::http::StatusCode::Value, SocketAddress)> handler) override;
 
+    /**
+     * @param std::nullopt means "use default timeout".
+     */
+    void setTimeout(std::optional<std::chrono::milliseconds> timeout);
+
 private:
     void done(
         AbstractStreamSocket* sock,
@@ -38,6 +44,7 @@ private:
     std::map<AbstractStreamSocket*, std::unique_ptr<AbstractStreamSocket>> m_sockets;
     size_t m_socketsStillConnecting;
     mutable QnMutex m_mutex;
+    std::optional<std::chrono::milliseconds> m_timeout;
 };
 
 } // namespace cloud

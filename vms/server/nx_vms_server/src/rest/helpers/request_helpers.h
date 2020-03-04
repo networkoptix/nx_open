@@ -63,10 +63,10 @@ void runMultiserverDownloadRequest(
                 requestCompletionFunc,
                 headers,
                 nx::network::http::AuthType::authBasicAndDigest,
-                nx::network::http::AsyncHttpClient::Timeouts(
+                nx::network::http::AsyncHttpClient::Timeouts{
                     std::chrono::milliseconds(10000),
                     std::chrono::milliseconds(10000),
-                    std::chrono::milliseconds(10000)));
+                    std::chrono::milliseconds(10000)});
             context->incRequestsCount();
         });
     };

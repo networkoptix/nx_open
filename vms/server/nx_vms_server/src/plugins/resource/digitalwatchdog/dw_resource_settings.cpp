@@ -33,11 +33,11 @@ QList<QString> DWAbstractCameraProxy::maintenanceParameters() const
 
 // --------------- QnWin4NetCameraProxy ------------------
 /*static*/ const QMap<QString, QnWin4NetCameraProxy::MaintenanceParameter>
-    QnWin4NetCameraProxy::m_maitenanceParameters =
+    QnWin4NetCameraProxy::kMaitenanceParameters =
 {
-    { "mReboot", {"cgi-bin/system.cgi", "reboot=true"} },
+    { "mReboot", { "cgi-bin/system.cgi", "reboot=true" } },
     { "mSoftReset", { "cgi-bin/system.cgi", "factory=1" } },
-    { "mHardReset", {"cgi-bin/bootparam.cgi", "factory=1"} }
+    { "mHardReset", { "cgi-bin/bootparam.cgi", "factory=1" } }
 };
 
 QnWin4NetCameraProxy::QnWin4NetCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
@@ -47,7 +47,7 @@ QnWin4NetCameraProxy::QnWin4NetCameraProxy(const QString& host, int port, unsign
 
 QList<QString> QnWin4NetCameraProxy::maintenanceParameters() const
 {
-    return m_maitenanceParameters.keys();
+    return kMaitenanceParameters.keys();
 }
 
 QnCameraAdvancedParamValueList QnWin4NetCameraProxy::fetchParamsFromHttpResponse(const QByteArray& body) const {
@@ -77,7 +77,7 @@ QnCameraAdvancedParamValueList QnWin4NetCameraProxy::fetchParamsFromHttpResponse
 
 bool QnWin4NetCameraProxy::executeMaintenanceCommand(const QString& id)
 {
-    const auto parameters = m_maitenanceParameters[id];
+    const auto parameters = kMaitenanceParameters[id];
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
     return (httpClient.doPOST(parameters.path, parameters.body) == CL_HTTP_SUCCESS);
 }
@@ -86,28 +86,33 @@ bool QnWin4NetCameraProxy::setParams(
     const QVector<QPair<QnCameraAdvancedParameter,
     QString>>& parameters, QnCameraAdvancedParamValueList* result)
 {
-    if (parameters.size() == 1 && parameters[0].second.isEmpty()
-        && m_maitenanceParameters.keys().contains(parameters[0].first.id))
-    {
-        return executeMaintenanceCommand(parameters[0].first.id);
-    }
     QnCameraAdvancedParamValueList tmpList;
     QString postMsgBody;
     for (const auto& data: parameters)
     {
         const QnCameraAdvancedParameter& parameter = data.first;
         const QString& value = data.second;
-        if (parameter.tag == lit("POST")) {
+
+        if (data.second.isEmpty())
+        {
+            if (!executeMaintenanceCommand(parameter.id))
+                return false;
+        }
+        else if (parameter.tag == lit("POST"))
+        {
             bool success = setParam(parameter, value); // we can't set such parameters together
-            if (success) {
+            if (success)
+            {
                 if (result)
                     result->push_back(QnCameraAdvancedParamValue(parameter.id, value));
             }
-            else {
+            else
+            {
                 return false;
             }
         }
-        else {
+        else
+        {
             QString innerValue = toInnerValue(parameter, value);
             if (!postMsgBody.isEmpty())
                 postMsgBody.append(L'&');
