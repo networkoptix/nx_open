@@ -336,7 +336,9 @@ void QnClientModule::initMetaInfo()
 
 void QnClientModule::initSurfaceFormat()
 {
-    QSurfaceFormat format;
+    // Warning: do not set version or profile here.
+
+    auto format = QSurfaceFormat::defaultFormat();
 
     if (qnRuntime->lightMode().testFlag(Qn::LightModeNoMultisampling))
         format.setSamples(2);
