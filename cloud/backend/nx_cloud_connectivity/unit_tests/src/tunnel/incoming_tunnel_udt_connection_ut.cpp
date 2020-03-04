@@ -26,7 +26,7 @@ class UdpIncomingTunnelConnectionTest:
 protected:
     void SetUp() override
     {
-        m_connectionParameters.udpTunnelKeepAliveInterval = kDefaultKeepAliveInterval;
+        m_connectionParameters.udpTunnelKeepAliveInterval = kNoTimeout;
         m_connectionParameters.udpTunnelKeepAliveRetries = 1;
     }
 
@@ -176,8 +176,6 @@ TEST_F(UdpIncomingTunnelConnectionTest, Timeout)
 
 TEST_F(UdpIncomingTunnelConnectionTest, Connections)
 {
-    setControlConnectionKeepAliveTimeout(std::chrono::hours(1));
-
     givenStartedIncomingConnection();
 
     runConnectingSockets(kTestConnections);

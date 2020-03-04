@@ -152,6 +152,7 @@ protected:
         m_client = std::make_unique<typename ClientTypeSet::Client>(
             m_baseUrl,
             std::bind(&RelayApiClientAcceptance::saveFeedback, this, _1));
+        m_client->setTimeout(nx::network::kNoTimeout);
 
         m_client->startSession(
             "sessionId",
