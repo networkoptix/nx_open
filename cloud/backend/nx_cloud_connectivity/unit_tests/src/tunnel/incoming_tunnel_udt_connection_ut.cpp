@@ -145,6 +145,18 @@ protected:
         m_connectedSockets.push_back(std::move(socket));
     }
 
+    void thenConnectionsEstablished(int count)
+    {
+        for (size_t i = 0; i < kTestConnections; ++i)
+            ASSERT_EQ(SystemError::noError, m_connectResults.pop()) << "i = " << i;
+    }
+
+    void thenConnectionsAccepted(int count)
+    {
+        for (size_t i = 0; i < kTestConnections; ++i)
+            ASSERT_EQ(SystemError::noError, m_acceptResults.pop()) << "i = " << i;
+    }
+
     std::unique_ptr<udp::IncomingTunnelConnection> takeConnection()
     {
         QnMutexLocker lock(&m_mutex);
@@ -158,8 +170,8 @@ protected:
     nx::network::SocketAddress m_connectionAddress;
     std::unique_ptr<udp::IncomingTunnelConnection> m_connection;
     std::unique_ptr<UdtStreamSocket> m_freeSocket;
-    utils::TestSyncQueue<SystemError::ErrorCode> m_acceptResults;
-    utils::TestSyncQueue<SystemError::ErrorCode> m_connectResults;
+    utils::SyncQueue<SystemError::ErrorCode> m_acceptResults;
+    utils::SyncQueue<SystemError::ErrorCode> m_connectResults;
     std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedSockets;
     std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_connectedSockets;
     std::optional<std::chrono::milliseconds> m_socketTimeout;
@@ -179,11 +191,9 @@ TEST_F(UdpIncomingTunnelConnectionTest, Connections)
     givenStartedIncomingConnection();
 
     runConnectingSockets(kTestConnections);
-    for (size_t i = 0; i < kTestConnections; ++i)
-    {
-        ASSERT_EQ(m_connectResults.pop(), SystemError::noError) << "i = " << i;
-        ASSERT_EQ(m_acceptResults.pop(), SystemError::noError) << "i = " << i;
-    }
+
+    thenConnectionsEstablished(kTestConnections);
+    thenConnectionsAccepted(kTestConnections);
 }
 
 TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
