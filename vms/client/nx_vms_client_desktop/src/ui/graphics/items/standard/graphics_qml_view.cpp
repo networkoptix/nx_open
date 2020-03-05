@@ -598,7 +598,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     d->ensureFbo();
 
-    if (glWidget->context()->makeCurrent(d->m_offscreenSurface.data()))
+    if (d->m_fbo && glWidget->context()->makeCurrent(d->m_offscreenSurface.data()))
     {
         d->m_renderControl->polishItems();
         d->m_renderControl->sync();
@@ -606,7 +606,6 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
         d->m_renderControl->render();
         d->m_quickWindow->resetOpenGLState();
         glWidget->context()->functions()->glFlush();
-        //glWidget->context()->doneCurrent();
     }
 
     QnGlNativePainting::end(painter);
