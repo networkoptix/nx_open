@@ -161,7 +161,7 @@ void detail::OverlayedBase::updateOverlayWidgetsGeometry()
 
 void detail::OverlayedBase::updateOverlayWidgetsVisibility(bool animate)
 {
-    for(const OverlayWidget &overlay: m_overlayWidgets)
+    for (const OverlayWidget& overlay: m_overlayWidgets)
     {
         if (overlay.visibility == UserVisible)
             continue;
@@ -173,7 +173,7 @@ void detail::OverlayedBase::updateOverlayWidgetsVisibility(bool animate)
         else if(overlay.visibility == Visible)
             visible = true;
 
-        setOverlayWidgetVisible(overlay.widget, visible, animate);
+        setOverlayWidgetVisible(overlay.childWidget, visible, animate);
     }
 }
 
