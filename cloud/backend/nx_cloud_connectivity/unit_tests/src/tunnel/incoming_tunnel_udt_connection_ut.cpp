@@ -145,15 +145,15 @@ protected:
         m_connectedSockets.push_back(std::move(socket));
     }
 
-    void thenConnectionsEstablished(int count)
+    void thenConnectionsEstablished(size_t count)
     {
-        for (size_t i = 0; i < kTestConnections; ++i)
+        for (size_t i = 0; i < count; ++i)
             ASSERT_EQ(SystemError::noError, m_connectResults.pop()) << "i = " << i;
     }
 
-    void thenConnectionsAccepted(int count)
+    void thenConnectionsAccepted(size_t count)
     {
-        for (size_t i = 0; i < kTestConnections; ++i)
+        for (size_t i = 0; i < count; ++i)
             ASSERT_EQ(SystemError::noError, m_acceptResults.pop()) << "i = " << i;
     }
 
