@@ -47,6 +47,11 @@ QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
     m_projectionMatrix.setToIdentity();
 }
 
+QnOpenGLRenderer::~QnOpenGLRenderer()
+{
+    glDeleteBuffers(1, &m_elementBuffer);
+}
+
 void  QnOpenGLRenderer::setColor(const QVector4D& c)
 {
     m_color = c;

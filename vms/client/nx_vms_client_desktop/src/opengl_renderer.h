@@ -23,6 +23,7 @@ class QnOpenGLRenderer: public QOpenGLFunctions
 
 public:
     QnOpenGLRenderer(QObject *parent = NULL);
+    virtual ~QnOpenGLRenderer();
 
     void                setColor(const QVector4D& c);
     void                setColor(const QColor& c);
