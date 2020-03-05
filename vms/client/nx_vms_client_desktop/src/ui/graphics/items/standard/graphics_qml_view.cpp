@@ -627,8 +627,9 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     functions->glActiveTexture(GL_TEXTURE0);
     functions->glBindTexture(GL_TEXTURE_2D, d->m_fbo->texture());
 
-    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    const auto filter = d->m_resizeTimer->isActive() ? GL_LINEAR : GL_NEAREST;
+    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
     const GLfloat posArray[kQuadArrayCount] = {
         (float)channelRect.left(), (float)channelRect.bottom(),
