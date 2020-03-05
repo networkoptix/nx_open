@@ -156,7 +156,7 @@ int main(int argc, char** argv)
         ini().reload(); //< Make .ini appear on the console even when help is requested.
 
         QCoreApplication::setOrganizationName(nx::utils::AppInfo::organizationName());
-        QCoreApplication::setApplicationName(nx::utils::AppInfo::vmsName() + " Test Camera");
+        QCoreApplication::setApplicationName(nx::utils::AppInfo::vmsName() + " RtspPerf");
         QCoreApplication::setApplicationVersion(nx::utils::AppInfo::applicationVersion());
         const QCoreApplication app(argc, argv); //< Each user may run their own executable.
 
