@@ -78,8 +78,13 @@ protected:
         const nx::sdk::analytics::IAction* action) override;
 
 private:
+    boost::optional<Hanwha::DeviceAgentManifest> buildDeviceAgentManifest(
+        const std::shared_ptr<SharedResources>& sharedRes,
+        const nx::sdk::IDeviceInfo* deviceInfo) const;
+
     boost::optional<QList<QString>> fetchSupportedEventTypeIds(
-        const nx::sdk::IDeviceInfo* deviceInfo);
+        const std::shared_ptr<SharedResources>& sharedRes,
+        int channel) const;
 
     boost::optional<QList<QString>> eventTypeIdsFromParameters(
         const nx::utils::Url& url,

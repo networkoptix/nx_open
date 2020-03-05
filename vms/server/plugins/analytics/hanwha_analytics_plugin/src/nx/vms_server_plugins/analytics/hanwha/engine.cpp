@@ -126,25 +126,13 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
                 m_sharedResources.remove(QString::fromUtf8(deviceInfo->sharedId()));
         });
 
-    auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
-    if (!supportedEventTypeIds)
-    {
-        NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
-            deviceInfo->name(), deviceInfo->id());
+    auto deviceAgentManifest = buildDeviceAgentManifest(sharedRes, deviceInfo);
+    if (!deviceAgentManifest)
         return;
-    }
-
-    Hanwha::DeviceAgentManifest deviceAgentManifest;
-    deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
-
-    // DeviceAgent should understand all engine's object types.
-    deviceAgentManifest.supportedObjectTypeIds.reserve(m_manifest.objectTypes.size());
-    for (const nx::vms::api::analytics::ObjectType& objectType: m_manifest.objectTypes)
-        deviceAgentManifest.supportedObjectTypeIds.push_back(objectType.id);
 
     const auto deviceAgent = new DeviceAgent(this, deviceInfo);
     deviceAgent->readCameraSettings();
-    deviceAgent->setManifest(std::move(deviceAgentManifest));
+    deviceAgent->setManifest(std::move(*deviceAgentManifest));
 
     ++sharedRes->deviceAgentCount;
 
@@ -174,12 +162,34 @@ void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IActi
 {
 }
 
+boost::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
+    const std::shared_ptr<SharedResources>& sharedRes,
+    const IDeviceInfo* deviceInfo) const
+{
+    Hanwha::DeviceAgentManifest deviceAgentManifest;
+
+    auto supportedEventTypeIds = fetchSupportedEventTypeIds(sharedRes, deviceInfo->channelNumber());
+    if (!supportedEventTypeIds)
+    {
+        NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
+        return boost::none;
+    }
+    deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
+
+    // DeviceAgent should understand all engine's object types.
+    deviceAgentManifest.supportedObjectTypeIds.reserve(m_manifest.objectTypes.size());
+    for (const nx::vms::api::analytics::ObjectType& objectType: m_manifest.objectTypes)
+        deviceAgentManifest.supportedObjectTypeIds.push_back(objectType.id);
+
+    return deviceAgentManifest;
+}
+
 boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
-    const IDeviceInfo* deviceInfo)
+    const std::shared_ptr<SharedResources>& sharedRes,
+    int channel) const
 {
     using namespace nx::vms::server::plugins;
-
-    auto sharedRes = sharedResources(deviceInfo);
 
     const auto& information = sharedRes->sharedContext->information();
     if (!information)
@@ -194,7 +204,7 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
 
     return eventTypeIdsFromParameters(
         sharedRes->sharedContext->url(),
-        cgiParameters, eventStatuses.value, deviceInfo->channelNumber());
+        cgiParameters, eventStatuses.value, channel);
 }
 
 boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
