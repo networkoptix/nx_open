@@ -288,13 +288,9 @@ private:
             int bytesRead = m_socket->recv(readBuf.data(), readBuf.capacity(), 0);
             if (bytesRead < 0)
             {
-                if (SystemError::getLastOSErrorCode() == SystemError::timedOut ||
-                    SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
-                {
-                    continue;
-                }
-
-                break;
+                if (socketCannotRecoverFromError(SystemError::getLastOSErrorCode()))
+                    break;
+                continue;
             }
 
             if (bytesRead == 0)
@@ -320,10 +316,9 @@ private:
                 const auto sent = m_socket->send(dataToSend->data() + (size - remain), remain);
                 if (sent < 0)
                 {
-                    const auto error = SystemError::getLastOSErrorCode();
-                    if (error == SystemError::timedOut || error == SystemError::wouldBlock)
-                        continue;
-                    return;
+                    if (socketCannotRecoverFromError(SystemError::getLastOSErrorCode()))
+                        return;
+                    continue;
                 }
                 if (sent == 0)
                     return;
@@ -1206,14 +1201,8 @@ protected:
 
     void thenBothSocketsReceiveExpectedData()
     {
-        auto waitFunc =
-            [this]()
-            {
-                for (auto& pipe: m_concurrentSocketPipes)
-                    pipe->waitUntilReceivedDataMatch(m_sentData);
-            };
-        auto future = std::async(std::launch::async, std::move(waitFunc));
-        ASSERT_EQ(future.wait_for(std::chrono::seconds(5)), std::future_status::ready);
+        for (auto& pipe: m_concurrentSocketPipes)
+            pipe->waitUntilReceivedDataMatch(m_sentData);
     }
 
     //---------------------------------------------------------------------------------------------
