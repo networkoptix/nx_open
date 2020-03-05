@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.210",
+    "version": "1.0.1.212",
     "data": [
         {
             "keys": [
@@ -1137,7 +1137,8 @@
                 "ACTI|I96","ACTI|I98",
                 "UNIVIEW|IPC6242SR-X22",
                 "Milesight*|MS-C2961-EB",
-                "Dahua|DH-SD22404T-GN"
+                "Dahua|DH-SD22404T-GN",
+                "dahua|XVR5116HS*"
             ],
             "ptzOverride": {
                 "operational": {"traits": "EightWayPtz"}
