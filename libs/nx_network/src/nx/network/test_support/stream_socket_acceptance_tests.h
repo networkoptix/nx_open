@@ -313,8 +313,22 @@ private:
             if (!dataToSend)
                 continue;
 
-            if (m_socket->send(dataToSend->data(), dataToSend->size()) < 0)
-                break;
+            const auto size = dataToSend->size();
+            auto remain = size;
+            while (remain > 0)
+            {
+                const auto sent = m_socket->send(dataToSend->data() + (size - remain), remain);
+                if (sent < 0)
+                {
+                    const auto error = SystemError::getLastOSErrorCode();
+                    if (error == SystemError::timedOut || error == SystemError::wouldBlock)
+                        continue;
+                    return;
+                }
+                if (sent == 0)
+                    return;
+                remain -= sent;
+            }
         }
     }
 };
@@ -1171,7 +1185,7 @@ protected:
 
     void whenSendDataConcurrentlyThroughConnectedSockets()
     {
-        m_sentData = nx::utils::generateRandomName(16 * 1024);
+        m_sentData = nx::utils::generateRandomName(1024 * 1024);
 
         givenListeningServerSocket();
         startAcceptingConnections();
@@ -1192,8 +1206,14 @@ protected:
 
     void thenBothSocketsReceiveExpectedData()
     {
-        for (auto& pipe: m_concurrentSocketPipes)
-            pipe->waitUntilReceivedDataMatch(m_sentData);
+        auto waitFunc =
+            [this]()
+            {
+                for (auto& pipe: m_concurrentSocketPipes)
+                    pipe->waitUntilReceivedDataMatch(m_sentData);
+            };
+        auto future = std::async(std::launch::async, std::move(waitFunc));
+        ASSERT_EQ(future.wait_for(std::chrono::seconds(5)), std::future_status::ready);
     }
 
     //---------------------------------------------------------------------------------------------

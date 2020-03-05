@@ -33,11 +33,7 @@ int Pipeline::write(const void* data, size_t size)
         SystemError::setLastErrorCode(SystemError::invalidData);
         return utils::bstream::StreamIoError::nonRecoverableError;
     }
-
-    const auto resultCode = performSslIoOperation(&SSL_write, data, size);
-    if (m_state >= State::handshakeDone && resultCode < 0)
-        m_failed = true;
-    return resultCode;
+    return performSslIoOperation(&SSL_write, data, size);
 }
 
 int Pipeline::read(void* data, size_t size)
