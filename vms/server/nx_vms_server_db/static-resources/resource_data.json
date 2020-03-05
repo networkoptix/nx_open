@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.216",
+    "version": "1.0.1.218",
     "data": [
         {
             "keys": [
@@ -988,7 +988,20 @@
                 "un1a-32x16|network video recorder",
                 "ds-7204huhi-k1/p|leroy dvr",
                 "xnss|ipm32r16p",
-                "xnss|ipm32r32p"
+                "xnss|ipm32r32p",
+                "rvi-r16la*|rvi",
+                "*-1hdr16k|rvi",
+                "ds-8116*|embedded net dvr",
+                "dahua|x51a2*",
+                "nv4108-hs|ac",
+                "uniview|nvr301*",
+                "ds-7204*|casa",
+                "ltd8316k*|embedded net dvr",
+                "dh-nvr616*|private",
+                "st-hdvr-161|embedded_net_dvr",
+                "bx100|indigovision bx100",
+                "panasonic|wj-gxe100",
+                "st-hdvr162pro-d-v2|general"
             ],
             "analogEncoder": true
         },
@@ -3378,7 +3391,10 @@
             "avigilon|9c-h4a-3mh-180",
             "panomera s7 76/22 c|panomera s7",
             "vivotek|ms9321-ehv",
-            "Arecont Vision|*"
+            "Arecont Vision|*",
+            "flir systems|pt-644*",
+            "axis|p3719*",
+            "digital watchdog|nvm2-a21"
             ],
             "canShareLicenseGroup": true
         },
