@@ -35,6 +35,7 @@ public:
     virtual void setGeometry(const QRectF& geometry) override;
 
     void updateScale();
+    virtual void updateGeometry() override;
 
     qreal scale() const; //< Absolute scale
     qreal sceneScale() const;
