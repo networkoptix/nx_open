@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.214",
+    "version": "1.0.1.216",
     "data": [
         {
             "keys": [
@@ -3799,7 +3799,7 @@
         {
             "_comment1": "Mapping for firmware: IPC_HCMN2108-B0009P30D1809",
             "keys": [
-                "hikvision|DS-2DE4225W-DE"
+                "hikvision|DS-2DE4225*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
