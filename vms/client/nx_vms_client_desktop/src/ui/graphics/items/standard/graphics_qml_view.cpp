@@ -24,6 +24,7 @@
 #include <QtCore/QtMath>
 
 #include <client_core/client_core_module.h>
+#include <memory>
 #include <ui/workaround/gl_native_painting.h>
 #include <opengl_renderer.h>
 #include <ui/graphics/shaders/texture_color_shader_program.h>
@@ -212,7 +213,7 @@ QWindow* RenderControl::renderWindow(QPoint* offset)
 struct GraphicsQmlView::Private
 {
     GraphicsQmlView* m_view;
-    bool m_initialized = false;
+    bool m_offscreenInitialized = false;
     QScopedPointer<QQuickWindow> m_quickWindow;
     QScopedPointer<QQuickItem> m_rootItem;
     QScopedPointer<RenderControl> m_renderControl;
@@ -229,10 +230,10 @@ struct GraphicsQmlView::Private
 
     Private(GraphicsQmlView* view): m_view(view) {}
 
-    void initialize(const QRectF& rect, QOpenGLWidget* glWidget);
+    void ensureOffscreen(const QRectF& rect, QOpenGLWidget* glWidget);
     void ensureVao(QnTextureGLShaderProgram* shader);
     void updateSizes();
-    void ensureFbo();
+    void tryInitializeFbo();
     void scheduleUpdateSizes();
 };
 
@@ -257,13 +258,6 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
     d->m_quickWindow.reset(new QQuickWindow(d->m_renderControl.data()));
     d->m_quickWindow->setTitle(QString::fromLatin1("Offscreen"));
     d->m_quickWindow->setGeometry(0, 0, 640, 480); //< Will be resized later.
-
-    connect(d->m_quickWindow.data(), &QQuickWindow::sceneGraphInitialized, this,
-        [this]()
-        {
-            d->ensureFbo();
-        }
-    );
 
     d->m_resizeTimer = new QTimer(this);
     d->m_resizeTimer->setSingleShot(true);
@@ -350,21 +344,25 @@ QQmlEngine* GraphicsQmlView::engine() const
     return d->m_qmlEngine;
 }
 
-void GraphicsQmlView::Private::ensureFbo()
+void GraphicsQmlView::Private::tryInitializeFbo()
 {
     if (!m_quickWindow)
         return;
 
-    QSize fboSize = m_quickWindow->size() * qApp->devicePixelRatio();
+    const QSize requiredSize = m_quickWindow->size() * qApp->devicePixelRatio();
 
-    if (m_fbo && m_fbo->size() != fboSize)
-        m_fbo.reset();
+    if (m_fbo && m_fbo->size() == requiredSize)
+        return;
 
-    if (!m_fbo)
-    {
-        m_fbo.reset(new QOpenGLFramebufferObject(fboSize, QOpenGLFramebufferObject::CombinedDepthStencil));
-        m_quickWindow->setRenderTarget(m_fbo.data());
-    }
+    QScopedPointer<QOpenGLFramebufferObject> fbo(
+        new QOpenGLFramebufferObject(
+            requiredSize, QOpenGLFramebufferObject::CombinedDepthStencil));
+
+    if (!fbo->isValid())
+        return;
+
+    m_fbo.swap(fbo);
+    m_quickWindow->setRenderTarget(m_fbo.data());
 }
 
 bool GraphicsQmlView::event(QEvent* event)
@@ -430,8 +428,11 @@ void GraphicsQmlView::Private::updateSizes()
     m_quickWindow->setGeometry(pos.x(), pos.y(), qCeil(size.width()), qCeil(size.height()));
 }
 
-void GraphicsQmlView::Private::initialize(const QRectF&, QOpenGLWidget* glWidget)
+void GraphicsQmlView::Private::ensureOffscreen(const QRectF&, QOpenGLWidget* glWidget)
 {
+    if (m_offscreenInitialized)
+        return;
+
     auto context = glWidget->context();
 
     m_offscreenSurface.reset(new QOffscreenSurface());
@@ -448,7 +449,7 @@ void GraphicsQmlView::Private::initialize(const QRectF&, QOpenGLWidget* glWidget
     m_renderControl->initialize(context);
     context->doneCurrent();
 
-    m_initialized = true;
+    m_offscreenInitialized = true;
 }
 
 void GraphicsQmlView::Private::ensureVao(QnTextureGLShaderProgram* shader)
@@ -593,19 +594,21 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     QnGlNativePainting::begin(glWidget, painter);
 
-    if (!d->m_initialized)
-        d->initialize(channelRect, glWidget);
+    d->ensureOffscreen(channelRect, glWidget);
 
-    d->ensureFbo();
-
-    if (d->m_fbo && glWidget->context()->makeCurrent(d->m_offscreenSurface.data()))
+    if (glWidget->context()->makeCurrent(d->m_offscreenSurface.data()))
     {
-        d->m_renderControl->polishItems();
-        d->m_renderControl->sync();
+        d->tryInitializeFbo();
 
-        d->m_renderControl->render();
-        d->m_quickWindow->resetOpenGLState();
-        glWidget->context()->functions()->glFlush();
+        if (d->m_fbo)
+        {
+            d->m_renderControl->polishItems();
+            d->m_renderControl->sync();
+
+            d->m_renderControl->render();
+            d->m_quickWindow->resetOpenGLState();
+            glWidget->context()->functions()->glFlush();
+        }
     }
 
     QnGlNativePainting::end(painter);
