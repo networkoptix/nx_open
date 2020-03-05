@@ -801,7 +801,7 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
 
     if (!shader->initialized()) {
         shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
-        shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
+        shader->bindAttributeLocation("aTexCoord",VERTEX_TEXCOORD0_INDX);
         shader->markInitialized();
     };
 

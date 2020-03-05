@@ -100,9 +100,9 @@ void remapInputMethodQueryEvent(QObject* object, QInputMethodQueryEvent* e)
 }
 
 void initializeQuadBuffer(
-    QOpenGLBuffer* buffer,
     QnTextureGLShaderProgram* shader,
-    const int location,
+    const char* attributeName,
+    QOpenGLBuffer* buffer,
     const QOpenGLBuffer::UsagePattern pattern,
     const GLfloat* values)
 {
@@ -111,6 +111,9 @@ void initializeQuadBuffer(
 
     buffer->bind();
     buffer->allocate(values, kQuadArrayCount * sizeof(GLfloat));
+
+    const auto location = shader->attributeLocation(attributeName);
+    NX_ASSERT(location != -1, attributeName);
 
     shader->enableAttributeArray(location);
     shader->setAttributeBuffer(location, GL_FLOAT, 0, kCoordPerVertex);
@@ -467,24 +470,20 @@ void GraphicsQmlView::Private::ensureVao(QnTextureGLShaderProgram* shader)
     m_vertices.create();
     m_vertices.bind();
 
-    const auto VERTEX_POS_LOCATION = 0;
     initializeQuadBuffer(
-        &m_positionBuffer,
         shader,
-        VERTEX_POS_LOCATION,
+        "aPosition",
+        &m_positionBuffer,
         QOpenGLBuffer::DynamicDraw,
         coordArray);
 
-    const auto VERTEX_TEXCOORD0_LOCATION = 1;
     initializeQuadBuffer(
-        &m_texcoordBuffer,
         shader,
-        VERTEX_TEXCOORD0_LOCATION,
+        "aTexCoord",
+        &m_texcoordBuffer,
         QOpenGLBuffer::StaticDraw,
         coordArray);
 
-    shader->bindAttributeLocation("aPosition", VERTEX_POS_LOCATION);
-    shader->bindAttributeLocation("aTexcoord", VERTEX_TEXCOORD0_LOCATION);
     shader->markInitialized();
 
     m_vertices.release();
