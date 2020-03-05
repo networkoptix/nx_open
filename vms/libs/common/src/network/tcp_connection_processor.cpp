@@ -196,7 +196,7 @@ bool QnTCPConnectionProcessor::sendBuffer(
 bool QnTCPConnectionProcessor::sendBuffer(
     const char* data, int size, std::optional<int64_t> timestampForLogging)
 {
-    return sendBufferThreadSafe(data, size, timestampForLogging, "char*");
+    return sendBufferThreadSafe(data, size, timestampForLogging);
 }
 
 bool QnTCPConnectionProcessor::sendBufferThreadSafe(
