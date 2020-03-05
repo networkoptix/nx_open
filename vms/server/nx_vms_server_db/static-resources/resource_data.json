@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.212",
+    "version": "1.0.1.214",
     "data": [
         {
             "keys": [
@@ -3347,7 +3347,7 @@
 			"MA9321-EHTV|VIVOTEK MA9321-EHTV",
             "avigilon|32c-h4a-4mh-360",
             "dahua|psd81602-a360",
-            "dahua|IPC-HDBW4231F-E2-M",
+            "dahua|IPC-HDBW4231F*",
             "avigilon|32c-h4a-4mh-360",
             "dahua|psd81602-a360",
             "dahua|ipc-hdbw4233x*",
