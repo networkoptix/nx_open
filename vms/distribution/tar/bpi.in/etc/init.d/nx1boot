@@ -10,7 +10,7 @@
 # Description:       Provides the ability to boot up automatically depending on available
 #                    boot devices and ability to override boot using the boot menu.
 ### END INIT INFO
-# VERSION: @release.version@.@buildNumber@
+# VERSION: 4.0.0.29987
 
 export NX1LOG=/var/log/nx1.log
 set -x
@@ -28,8 +28,8 @@ exec 2>&1
 
 echo `date` "++++++++++++++++++++++ Starting Boot Process ++++++++++++++++++++++++"
 
-export CUSTOMIZATION="@customization.companyId@"
-export DISTRIB="@server_distribution_name@.tar.gz"
+export CUSTOMIZATION="networkoptix"
+export DISTRIB="nxwitness-server-4.0.0.29987-bpi.tar.gz"
 
 export CHECKBOOTHDDPART=
 export CHECKDATAHDDPART=
@@ -414,6 +414,16 @@ upgrade_sd() {
     installDebs fonts-arphic-ukai
 }
 
+remove_core() {
+    CRASHDUMPDIR="$MNTDATAHDDPART/crashdumps"
+    if [ ! -d "$CRASHDUMPDIR" ]; then 
+        mkdir -p "$CRASHDUMPDIR"
+    else
+        rm -Rf $MNTDATAHDDPART/crashdumps/*.*
+    fi    
+    if ls /opt/$CUSTOMIZATION/mediaserver/bin/core* 1> /dev/null 2>&1; then mv -f /opt/$CUSTOMIZATION/mediaserver/bin/core* $MNTDATAHDDPART/crashdumps; fi
+}
+
 default_sequence () {
     get_reset_button_presense
     # Upgrading sdcard on first boot.
@@ -443,6 +453,7 @@ default_sequence () {
     if [ "$BOOTDEVICE" = "ata" ]; then
         echo `date` "MOUNTING DATA HDD PARTITION..."
         mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
+        remove_core
         /etc/init.d/nx1led boot_hdd
     fi
     start_server
