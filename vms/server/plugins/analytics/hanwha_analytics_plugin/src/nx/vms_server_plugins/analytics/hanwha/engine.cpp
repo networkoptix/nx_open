@@ -50,6 +50,33 @@ QString specialEventName(const QString& eventName)
     return itr->second;
 }
 
+template <typename Pred>
+QJsonValue pruneJsonObjects(QJsonValue value, Pred pred)
+{
+    if (value.isObject())
+    {
+        auto object = value.toObject();
+        if (pred(object))
+            return QJsonValue::Undefined;
+        for (auto elementValueRef: object)
+            elementValueRef = pruneJsonObjects(elementValueRef, pred);
+        return object;
+    }
+    if (value.isArray())
+    {
+        auto array = value.toArray();
+        for (auto it = array.begin(); it != array.end(); )
+        {
+            if (auto elementValue = pruneJsonObjects(*it, pred); elementValue.isUndefined())
+                it = array.erase(it);
+            else
+                ++it;
+        }
+        return array;
+    }
+    return value;
+}
+
 } // namespace
 
 using namespace nx::sdk;
@@ -168,6 +195,26 @@ boost::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
 {
     Hanwha::DeviceAgentManifest deviceAgentManifest;
 
+    const auto supportsObjectDetection = fetchSupportsObjectDetection(sharedRes, deviceInfo->channelNumber());
+    if (supportsObjectDetection)
+    {
+        // DeviceAgent should understand all engine's object types.
+        deviceAgentManifest.supportedObjectTypeIds.reserve(m_manifest.objectTypes.size());
+        for (const nx::vms::api::analytics::ObjectType& objectType: m_manifest.objectTypes)
+            deviceAgentManifest.supportedObjectTypeIds.push_back(objectType.id);
+    }
+    else
+    {
+        NX_DEBUG(this, "Device %1 (%2): doesn't support object detection/tracking.",
+            deviceInfo->name(), deviceInfo->id());
+
+        deviceAgentManifest.deviceAgentSettingsModel = pruneJsonObjects(
+            m_manifest.deviceAgentSettingsModel,
+            [](const QJsonObject& node) {
+                return node["requiresObjectDetection"].toBool();
+            });
+    }
+
     auto supportedEventTypeIds = fetchSupportedEventTypeIds(sharedRes, deviceInfo->channelNumber());
     if (!supportedEventTypeIds)
     {
@@ -177,20 +224,29 @@ boost::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
     }
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
-    // DeviceAgent should understand all engine's object types.
-    deviceAgentManifest.supportedObjectTypeIds.reserve(m_manifest.objectTypes.size());
-    for (const nx::vms::api::analytics::ObjectType& objectType: m_manifest.objectTypes)
-        deviceAgentManifest.supportedObjectTypeIds.push_back(objectType.id);
-
     return deviceAgentManifest;
+}
+
+bool Engine::fetchSupportsObjectDetection(
+    const std::shared_ptr<SharedResources>& sharedRes,
+    int channel)
+{
+    const auto& information = sharedRes->sharedContext->information();
+    if (!information)
+        return false;
+
+    const auto& attributes = information->attributes;
+    if (!attributes.isValid())
+        return false;
+
+    // What Hanwha calls "object detection" we at NX usually call "object tracking".
+    return attributes.attribute<bool>("Eventsource", "ObjectDetection", channel).value_or(false);
 }
 
 boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     const std::shared_ptr<SharedResources>& sharedRes,
     int channel) const
 {
-    using namespace nx::vms::server::plugins;
-
     const auto& information = sharedRes->sharedContext->information();
     if (!information)
         return boost::none;

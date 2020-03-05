@@ -548,7 +548,8 @@
                             }
                         ]
                     }
-                ]
+                ],
+                "requiresObjectDetection": true
             },
             {
                 "type": "Section",
@@ -583,7 +584,8 @@
                         "name": "ObjectDetection.ExcludeArea4.Points",
                         "caption": "Area 4"
                     }
-                ]
+                ],
+                "requiresObjectDetection": true
             },
             {
                 "type": "Section",

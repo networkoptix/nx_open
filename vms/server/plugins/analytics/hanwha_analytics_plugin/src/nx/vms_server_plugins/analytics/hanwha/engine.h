@@ -82,6 +82,10 @@ private:
         const std::shared_ptr<SharedResources>& sharedRes,
         const nx::sdk::IDeviceInfo* deviceInfo) const;
 
+    static bool fetchSupportsObjectDetection(
+        const std::shared_ptr<SharedResources>& sharedRes,
+        int channel);
+
     boost::optional<QList<QString>> fetchSupportedEventTypeIds(
         const std::shared_ptr<SharedResources>& sharedRes,
         int channel) const;
