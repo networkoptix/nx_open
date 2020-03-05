@@ -134,7 +134,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
         return;
     }
 
-    nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
+    Hanwha::DeviceAgentManifest deviceAgentManifest;
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
     // DeviceAgent should understand all engine's object types.
@@ -144,8 +144,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
     const auto deviceAgent = new DeviceAgent(this, deviceInfo);
     deviceAgent->readCameraSettings();
-    //deviceAgent->addSettingModel(&deviceAgentManifest);
-    deviceAgent->setDeviceAgentManifest(QJson::serialized(deviceAgentManifest));
+    deviceAgent->setManifest(std::move(deviceAgentManifest));
 
     ++sharedRes->deviceAgentCount;
 
