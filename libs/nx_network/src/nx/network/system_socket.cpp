@@ -642,7 +642,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
             }
             const int bytes = (op == Operation::read)
                 ? ::recv(m_fd, buffer, bufferLen, flags & ~MSG_DONTWAIT)
-                : ::send(m_fd, buffer, bufferLen, 0);
+                : ::send(m_fd, buffer, bufferLen, flags & ~MSG_DONTWAIT);
             if (!isNonBlockingMode)
             {
                 // Save error code as changing mode will drop it.
@@ -669,7 +669,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
         DWORD bytes = -1;
         const int wsaResult = (op == Operation::read)
             ? WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, &flags, &overlapped, nullptr)
-            : WSASend(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, 0, &overlapped, nullptr);
+            : WSASend(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, flags, &overlapped, nullptr);
         if (wsaResult != SOCKET_ERROR)
             return bytes;
         if (SystemError::getLastOSErrorCode() != WSA_IO_PENDING)

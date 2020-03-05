@@ -37,7 +37,7 @@ public:
         nx::sdk::analytics::IDeviceAgent::IHandler* IHandler) override;
 
     void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
-    void setDeviceAgentManifest(const QByteArray& manifest);
+    void setManifest(Hanwha::DeviceAgentManifest manifest);
     void setMonitor(MetadataMonitor* monitor);
 
     void readCameraSettings();
@@ -78,11 +78,9 @@ public:
     void addSettingModel(nx::vms::api::analytics::DeviceAgentManifest* destinastionManifest);
 
 private:
-
     Engine* const m_engine;
 
-    // Json string representation of nx::vms::api::analytics::DeviceAgentManifest.
-    QByteArray m_manifest;
+    Hanwha::DeviceAgentManifest m_manifest;
 
     nx::utils::Url m_url;
     QString m_model;

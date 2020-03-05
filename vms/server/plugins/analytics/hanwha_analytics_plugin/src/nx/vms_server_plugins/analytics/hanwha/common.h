@@ -5,8 +5,10 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <nx/vms_server_plugins/utils/analytics/engine_manifest_base.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/serialization/json.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -52,7 +54,7 @@ public:
     };
     #define HanwhaObjectType_Fields ObjectType_Fields (internalName)
 
-    struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestBase
+    struct EngineManifest: nx::vms::api::analytics::EngineManifest
     {
         QList<EventType> eventTypes;
         QList<ObjectType> objectTypes;
@@ -69,7 +71,12 @@ public:
 
         QMap<QString, QString> m_objectTypeIdByInternalName;
     };
-    #define HanwhaEngineManifest_Fields EngineManifestBase_Fields (eventTypes)(objectTypes)
+    #define HanwhaEngineManifest_Fields EngineManifest_Fields
+
+    struct DeviceAgentManifest: nx::vms::api::analytics::DeviceAgentManifest
+    {
+    };
+    #define HanwhaDeviceAgentManifest_Fields DeviceAgentManifest_Fields
 
     struct ObjectMetadataAttributeFilters
     {
@@ -85,6 +92,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Hanwha::EventType)
     (Hanwha::ObjectType)
     (Hanwha::EngineManifest)
+    (Hanwha::DeviceAgentManifest)
     (Hanwha::ObjectMetadataAttributeFilters),
     (json)
 )

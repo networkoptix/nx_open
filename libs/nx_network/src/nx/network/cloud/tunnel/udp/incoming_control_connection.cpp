@@ -73,6 +73,9 @@ void IncomingControlConnection::monitorKeepAlive(
 {
     using namespace std::chrono;
 
+    if (m_maxKeepAliveInterval == kNoTimeout)
+        return;
+
     const auto delay = std::max(
         floor<milliseconds>(m_lastKeepAliveTime + m_maxKeepAliveInterval - currentTime),
         milliseconds(1));

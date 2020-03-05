@@ -106,6 +106,27 @@ Qn::Permission requiredPermission(PlaybackMode mode)
     return Qn::ViewLivePermission;
 }
 
+enum class CameraParameter
+{
+    noParams = 0,
+    audioEnabled = 1,
+    hasDualStreaming = 2,
+    cameraControlDisabled = 4,
+};
+Q_DECLARE_FLAGS(CameraParameters, CameraParameter)
+
+CameraParameters cameraParameters(const QnVirtualCameraResourcePtr& camera)
+{
+    CameraParameters result = CameraParameter::noParams;
+    if (camera->isAudioEnabled())
+        result |= CameraParameter::audioEnabled;
+    if (camera->hasDualStreaming())
+        result |= CameraParameter::hasDualStreaming;
+    if (camera->isCameraControlDisabled())
+        result |= CameraParameter::cameraControlDisabled;
+    return result;
+}
+
 } // namespace
 
 bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
@@ -141,8 +162,6 @@ bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 class QnRtspConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
-
     QnRtspConnectionProcessorPrivate():
         QnTCPConnectionProcessorPrivate(),
         playbackMode(PlaybackMode::Live),
@@ -157,9 +176,6 @@ public:
         quality(MEDIA_Quality_High),
         qualityFastSwitch(true),
         metadataChannelNum(7),
-        audioEnabled(false),
-        wasDualStreaming(false),
-        wasCameraControlDisabled(false),
         tcpMode(true),
         serverModule(nullptr)
     {
@@ -258,13 +274,11 @@ public:
     MediaQuality quality;
     bool qualityFastSwitch;
     int metadataChannelNum;
-    bool audioEnabled;
-    bool wasDualStreaming;
-    bool wasCameraControlDisabled;
     bool tcpMode;
     QString errorMessage;
     QnMutex archiveDpMutex;
     QnMediaServerModule* serverModule = nullptr;
+    std::atomic<CameraParameters> m_cameraParameters{CameraParameter::noParams};
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -717,13 +731,14 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
 
     int numAudio = 0;
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-    if (cameraResource) {
+    if (cameraResource) 
+    {
         // avoid race condition if camera is starting now
-        d->audioEnabled = cameraResource->isAudioEnabled();
-        if (d->audioEnabled)
+        if (cameraResource->isAudioEnabled())
             numAudio = 1;
     }
-    else {
+    else 
+    {
         QnConstResourceAudioLayoutPtr audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
         if (audioLayout)
             numAudio = audioLayout->channelCount();
@@ -916,18 +931,11 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
 void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & /*resource*/)
 {
     Q_D(QnRtspConnectionProcessor);
-    QnMutexLocker lock( &d->mutex );
 
-    QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-    if (cameraResource) {
-        if (cameraResource->isAudioEnabled() != d->audioEnabled ||
-            cameraResource->hasDualStreaming() != d->wasDualStreaming ||
-            (!cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled))
-        {
-            m_needStop = true;
-            if (d->socket)
-                d->socket->shutdown();
-        }
+    if (auto cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes))
+    {
+        if (cameraParameters(cameraResource) != d->m_cameraParameters.load())
+            pleaseStop();
     }
 }
 
@@ -935,13 +943,8 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr & 
 {
     Q_D(QnRtspConnectionProcessor);
 
-    QnMutexLocker lock( &d->mutex );
     if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner))
-    {
-        m_needStop = true;
-        if (d->socket)
-            d->socket->shutdown();
-    }
+        pleaseStop();
 }
 
 void QnRtspConnectionProcessor::waitForResourceInitializing(const QnNetworkResourcePtr& resource)
@@ -1103,11 +1106,6 @@ void QnRtspConnectionProcessor::checkQuality()
                 "Primary stream has big fps for camera %1 . Secondary stream is disabled.",
                 d->mediaRes->toResource()->getUniqueId());
         }
-    }
-    QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
-    if (cameraRes) {
-        d->wasDualStreaming = cameraRes->hasDualStreaming();
-        d->wasCameraControlDisabled = cameraRes->isCameraControlDisabled();
     }
 }
 
@@ -1553,7 +1551,8 @@ bool QnRtspConnectionProcessor::processRequest()
         return false;
     }
 
-    QnMutexLocker lock(&d->mutex);
+    if (auto cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>())
+        d->m_cameraParameters = cameraParameters(cameraRes);
 
     if (d->dataProcessor)
         d->dataProcessor->pauseNetwork();
@@ -1642,14 +1641,10 @@ void QnRtspConnectionProcessor::run()
 
     initSystemThreadId();
 
-    //d->socket->setNoDelay(true);
-
     // NOTE: Sending data bigger than socket's send buffer size causes unexpected delays in some
     // scenarios. E.g., when streaming within a single Linux PC (VMS-11880).
     // Also, send buffer size cannot be set to a value less than 32K in Linux.
     d->socket->setSendBufferSize(64*1024);
-    //d->socket->setRecvTimeout(1000*1000);
-    //d->socket->setSendTimeout(1000*1000);
 
     if (d->clientRequest.isEmpty())
         readRequest();
@@ -1662,7 +1657,6 @@ void QnRtspConnectionProcessor::run()
         {
             d->socket->shutdown();
             d->deleteDP();
-            d->socket->close();
             d->trackInfo.clear();
         });
 

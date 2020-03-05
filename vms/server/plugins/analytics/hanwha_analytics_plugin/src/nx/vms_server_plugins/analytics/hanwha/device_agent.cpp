@@ -158,7 +158,7 @@ void copySettingsFromServerToCamera(nx::sdk::Ptr<nx::sdk::StringMap>& errorMap,
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     m_engine(engine),
     m_objectMetadataXmlParser(
-        m_engine->engineManifest(),
+        m_engine->manifest(),
         m_engine->objectMetadataAttributeFilters())
 {
     this->setDeviceInfo(deviceInfo);
@@ -483,10 +483,7 @@ void DeviceAgent::stopFetchingMetadata()
 
 void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    if (m_manifest.isEmpty())
-        *outResult = error(ErrorCode::internalError, "DeviceAgent manifest is empty");
-    else
-        *outResult = new nx::sdk::String(m_manifest);
+    *outResult = new nx::sdk::String(QJson::serialized(m_manifest));
 }
 
 void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
@@ -501,7 +498,7 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_channelNumber = deviceInfo->channelNumber();
 }
 
-void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)
+void DeviceAgent::setManifest(Hanwha::DeviceAgentManifest manifest)
 {
     m_manifest = manifest;
 }
