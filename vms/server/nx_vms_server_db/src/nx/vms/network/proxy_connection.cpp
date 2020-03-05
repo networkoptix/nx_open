@@ -93,15 +93,17 @@ bool isProtocol(const QString& protocol)
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 ProxyConnectionProcessor::ProxyConnectionProcessor(
-    ::nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
     std::unique_ptr<::nx::network::AbstractStreamSocket> socket,
-    QnHttpConnectionListener* owner)
+    QnHttpConnectionListener* owner,
+    ::nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
+    bool allowThirdPartyProxy)
 :
     QnTCPConnectionProcessor(new ProxyConnectionProcessorPrivate, std::move(socket), owner)
 {
     Q_D(ProxyConnectionProcessor);
     d->connectTimeout = commonModule()->globalSettings()->proxyConnectTimeout();
     d->reverseConnectionManager = reverseConnectionManager;
+    d->allowThirdPartyProxy = allowThirdPartyProxy;
 }
 
 ProxyConnectionProcessor::~ProxyConnectionProcessor()
@@ -351,7 +353,6 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
     if (isStandardProxyNeeded(commonModule(), d->request))
     {
         dstUrl = d->request.requestLine.url;
-        isGeneralProxyRequest = true;
     }
     else
     {
@@ -444,8 +445,10 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
                 replaceCameraRefererHeader(camera);
             }
         }
-        else if (isGeneralProxyRequest)
+        else if (isStandardProxyNeeded(commonModule(), d->request) || isGeneralProxyRequest)
         {
+            if (isGeneralProxyRequest && !d->allowThirdPartyProxy)
+                return false;
             nx::utils::Url url = d->request.requestLine.url;
             int defaultPort = getDefaultPortByProtocol(dstUrl.scheme());
             dstRoute.addr = nx::network::SocketAddress(dstUrl.host(), dstUrl.port(defaultPort));

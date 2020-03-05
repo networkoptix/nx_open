@@ -28,6 +28,7 @@ public:
     std::chrono::milliseconds connectTimeout;
     std::chrono::steady_clock::time_point lastIoTimePoint;
     ::nx::vms::network::ReverseConnectionManager* reverseConnectionManager = nullptr;
+    bool allowThirdPartyProxy = false;
 };
 
 } // namespace network

@@ -3267,7 +3267,9 @@ bool MediaServerProcess::initTcpListener(
     //regTcp<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
     registerTcpHandler<nx::vms::network::ProxyConnectionProcessor>(
-        "*", "proxy", ec2ConnectionFactory->serverConnector());
+        "*", "proxy", ec2ConnectionFactory->serverConnector(),
+        serverModule()->settings().allowThirdPartyProxy());
+
     registerTcpHandler<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio", serverModule());
 
     if( !serverModule()->settings().authenticationEnabled())
@@ -5050,7 +5052,8 @@ void MediaServerProcess::run()
 
     m_universalTcpListener->setProxyHandler<nx::vms::network::ProxyConnectionProcessor>(
         &nx::vms::network::ProxyConnectionProcessor::isProxyNeeded,
-        m_ec2ConnectionFactory->serverConnector());
+        m_ec2ConnectionFactory->serverConnector(),
+        serverModule->settings().allowThirdPartyProxy());
 
     m_ec2ConnectionFactory->registerTransactionListener(m_universalTcpListener.get());
 

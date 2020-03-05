@@ -142,9 +142,9 @@ private:
 typedef QSharedPointer<QnProxyDesktopDataProvider> QnProxyDesktopDataProviderPtr;
 
 QnAudioProxyReceiver::QnAudioProxyReceiver(
-    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnHttpConnectionListener* owner)
+    QnHttpConnectionListener* owner,
+    QnMediaServerModule* serverModule)
     :
     QnTCPConnectionProcessor(std::move(socket), owner),
     m_serverModule(serverModule)

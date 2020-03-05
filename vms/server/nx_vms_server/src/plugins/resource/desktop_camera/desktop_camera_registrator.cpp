@@ -12,9 +12,9 @@
 #include <media_server/media_server_resource_searchers.h>
 
 QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(
-    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnTcpListener* owner)
+    QnTcpListener* owner,
+    QnMediaServerModule* serverModule)
     :
     nx::vms::server::ServerModuleAware(serverModule),
     QnTCPConnectionProcessor(std::move(socket), owner)

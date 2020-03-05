@@ -27,9 +27,9 @@ namespace {
 namespace nx::vms::server::http_audio {
 
 AudioRequestProcessor::AudioRequestProcessor(
-    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnTcpListener* owner)
+    QnTcpListener* owner,
+    QnMediaServerModule* serverModule)
     :
     QnTCPConnectionProcessor(std::move(socket), owner),
     ServerModuleAware(serverModule)

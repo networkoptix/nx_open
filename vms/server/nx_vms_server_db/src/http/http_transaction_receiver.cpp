@@ -41,9 +41,9 @@ namespace ec2
     };
 
     QnHttpTransactionReceiver::QnHttpTransactionReceiver(
-        ServerTransactionMessageBus* messageBus,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        QnTcpListener* owner )
+        QnTcpListener* owner,
+        ServerTransactionMessageBus* messageBus)
     :
         QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, std::move(socket), owner)
     {

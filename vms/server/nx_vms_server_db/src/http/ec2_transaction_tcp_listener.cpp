@@ -39,9 +39,9 @@ public:
 };
 
 QnTransactionTcpProcessor::QnTransactionTcpProcessor(
-    ServerTransactionMessageBus* messageBus,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnTcpListener* owner)
+    QnTcpListener* owner,
+    ServerTransactionMessageBus* messageBus)
     :
     QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, std::move(socket), owner)
 {

@@ -9,9 +9,9 @@ namespace vms {
 namespace network {
 
 ReverseConnectionListener::ReverseConnectionListener(
-    ReverseConnectionManager* reverseConnectionManager,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnHttpConnectionListener* owner)
+    QnHttpConnectionListener* owner,
+    ReverseConnectionManager* reverseConnectionManager)
 :
     QnTCPConnectionProcessor(std::move(socket), owner),
     m_reverseConnectionManager(reverseConnectionManager)
