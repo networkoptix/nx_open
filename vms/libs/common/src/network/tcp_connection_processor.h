@@ -140,8 +140,5 @@ protected:
 
 private:
     bool sendBufferThreadSafe(
-        const char* data,
-        int size,
-        std::optional<int64_t> timestampForLogging,
-        const QString& captionForLogging);
+        const char* data, int size, std::optional<int64_t> timestampForLogging);
 };

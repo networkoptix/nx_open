@@ -57,15 +57,23 @@ public:
     {
         using namespace std::chrono;
 
-        const auto beforeSend = steady_clock::now();
+        const auto beforeSendTime = steady_clock::now();
         SendDataResult result;
         result.sendResult = socket->send(data, size);
-        const auto afterSend = steady_clock::now();
+        const auto afterSendTime = steady_clock::now();
 
         if (result.sendResult < 0)
             result.errorCode = SystemError::getLastOSErrorCode();
 
-        NX_VERBOSE(this,
+        const int64_t sendDurationUs =
+            duration_cast<microseconds>(afterSendTime - beforeSendTime).count();
+
+        const auto logLevel =
+            (sendDurationUs >= nx::network::SocketGlobals::ini().minSocketSendDurationUs)
+                ? nx::utils::log::Level::warning
+                : nx::utils::log::Level::verbose;
+
+        NX_UTILS_LOG(logLevel, this,
             "Called send(@%1, %2 bytes) -> %3, timestamp %4, duration %5 us, since last send %6%7",
             nx::kit::utils::toString((const void*) data),
             size,
@@ -75,17 +83,17 @@ public:
                 ((result.sendResult >= 0) ? "" : lm(" (OS code %1)").args((int) result.errorCode))
             ),
             timestampForLogging ? lm("%1 us").args(*timestampForLogging) : "n/a",
-            duration_cast<microseconds>(afterSend - beforeSend).count(),
+            duration_cast<microseconds>(afterSendTime - beforeSendTime).count(),
             lastSendTime
                 ? lm("%1 us").args(duration_cast<microseconds>(
-                    beforeSend - *lastSendTime).count())
+                    beforeSendTime - *lastSendTime).count())
                 : "n/a",
             (result.sendResult < 0)
                 ? ("; OS error text: " + SystemError::toString(result.errorCode))
                 : ""
         );
 
-        lastSendTime = beforeSend;
+        lastSendTime = beforeSendTime;
         return result;
     }
 

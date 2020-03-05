@@ -8,7 +8,6 @@
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 
@@ -184,14 +183,14 @@ bool QnTCPConnectionProcessor::sendBuffer(
     const QnByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
 {
     return sendBufferThreadSafe(
-        sendBuffer.constData(), (int) sendBuffer.size(), timestampForLogging, "QnByteArray");
+        sendBuffer.constData(), (int) sendBuffer.size(), timestampForLogging);
 }
 
 bool QnTCPConnectionProcessor::sendBuffer(
     const QByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
 {
     return sendBufferThreadSafe(
-        sendBuffer.constData(), sendBuffer.size(), timestampForLogging, "QByteArray");
+        sendBuffer.constData(), sendBuffer.size(), timestampForLogging);
 }
 
 bool QnTCPConnectionProcessor::sendBuffer(
@@ -203,24 +202,11 @@ bool QnTCPConnectionProcessor::sendBuffer(
 bool QnTCPConnectionProcessor::sendBufferThreadSafe(
     const char* data,
     int size,
-    std::optional<int64_t> timestampForLogging,
-    const QString& captionForLogging)
+    std::optional<int64_t> timestampForLogging)
 {
     Q_D(QnTCPConnectionProcessor);
 
-    using namespace std::chrono;
-
-    const auto beforeMutex = steady_clock::now();
     QnMutexLocker lock(&d->sendDataMutex);
-    const auto afterMutex = steady_clock::now();
-
-    NX_VERBOSE(this, "sendBuffer(%1 @%2, %3 bytes): mutex %4 us, timestamp %5",
-        captionForLogging,
-        nx::kit::utils::toString((const void*) data),
-        size,
-        duration_cast<microseconds>(afterMutex - beforeMutex).count(),
-        timestampForLogging ? lm("%1 us").args(*timestampForLogging) : "n/a"
-    );
 
     while (!needToStop() && size > 0 && d->socket->isConnected())
     {

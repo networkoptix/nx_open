@@ -27,6 +27,10 @@ struct NX_NETWORK_API Ini:
 
     NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
     NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
+
+    NX_INI_INT(10000000, minSocketSendDurationUs,
+        "Minimum duration of socket send() to log as WARNING, in microseconds. Lesser durations\n"
+        "are logged as VERBOSE.");
 };
 
 class NX_NETWORK_API SocketGlobals
