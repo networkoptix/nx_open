@@ -447,7 +447,7 @@ class _StreamTypeStats:
         if pts_diff_deviation_us > self._ini['maxAllowedPtsDiffDeviationUs']:
             self.frame_drops += 1
             logging.info(
-                f'Detected frame drop on {self._type} stream '
+                f'Detected frame-dropping situation(s) on {self._type} stream '
                 f'from camera {camera_id}: '
                 f'diff {pts_diff_us} us '
                 f'deviates from the expected {self._expected_pts_diff_us} us '
@@ -869,10 +869,12 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                     cpu_usage_max_report = 'N/A'
 
                 streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
+                live_frame_drops = stream_stats['live'].frame_drops
+                archive_frame_drops = stream_stats['archive'].frame_drops
                 report(
                     f"    Streaming test statistics:\n"
-                    f"        Frame drops in live stream: {stream_stats['live'].frame_drops} (expected 0)\n"
-                    f"        Frame drops in archive stream: {stream_stats['archive'].frame_drops} (expected 0)\n"
+                    f"        Frame-dropping situation(s) in live stream: {live_frame_drops} (expected 0)\n"
+                    f"        Frame-dropping situation(s) in archive stream: {archive_frame_drops} (expected 0)\n"
                     f"        Box network errors: {tx_rx_errors_during_test_report} (expected 0)\n"
                     f"        Maximum box CPU usage: {cpu_usage_max_report}\n"
                     f"        Average box CPU usage: {cpu_usage_avg_report}\n"
