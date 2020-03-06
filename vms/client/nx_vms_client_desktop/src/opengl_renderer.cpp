@@ -11,13 +11,15 @@
 #include <ui/graphics/shaders/texture_color_shader_program.h>
 #include <ui/graphics/shaders/per_vertex_colored_shader_program.h>
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
+#include <ui/graphics/shaders/color_line_shader_program.h>
 
 
 QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
     m_colorProgram(new QnColorGLShaderProgram(parent)),
     m_textureColorProgram(new QnTextureGLShaderProgram(parent)),
     m_colorPerVertexShader(new QnColorPerVertexGLShaderProgram(parent)),
-    m_textureTransitionShader(new QnTextureTransitionShaderProgram(parent))
+    m_textureTransitionShader(new QnTextureTransitionShaderProgram(parent)),
+    m_colorLineShader(new QnColorLineGLShaderProgram(parent))
 {
     QOpenGLFunctions::initializeOpenGLFunctions();
 
@@ -25,6 +27,7 @@ QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
     m_textureColorProgram->compile();
     m_colorPerVertexShader->compile();
     m_textureTransitionShader->compile();
+    m_colorLineShader->compile();
 
     m_indices_for_render_quads[0] = 0;
     m_indices_for_render_quads[1] = 1;
@@ -188,6 +191,11 @@ QnColorGLShaderProgram* QnOpenGLRenderer::getColorShader() const {
 
 QnTextureTransitionShaderProgram* QnOpenGLRenderer::getTextureTransitionShader() const {
     return m_textureTransitionShader.data();
+}
+
+QnColorLineGLShaderProgram* QnOpenGLRenderer::getColorLineShader() const
+{
+    return m_colorLineShader.data();
 }
 
 QMatrix4x4 QnOpenGLRenderer::getModelViewMatrix() const {

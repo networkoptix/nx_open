@@ -400,8 +400,6 @@ int runApplication(int argc, char** argv)
         // Mac computers OpenGL versions:
         //   https://support.apple.com/en-us/HT202823
         format.setProfile(QSurfaceFormat::CoreProfile);
-        // OpenGL 1.5 functions are required for ROI figures overlay widget and Web widget.
-        format.setOption(QSurfaceFormat::DeprecatedFunctions);
         // Chromium requires OpenGL 4.1 on macOS for WebGL and other HW accelerated staff.
         format.setVersion(4, 1);
 

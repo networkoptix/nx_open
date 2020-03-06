@@ -4,7 +4,8 @@
 
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
-#include <QtGui/QOpenGLFunctions_1_5>
+#include <QtGui/QOpenGLVertexArrayObject>
+#include <QtGui/QOpenGLBuffer>
 #include <QtGui/QPainter>
 #include <QtWidgets/QOpenGLWidget>
 
@@ -19,6 +20,11 @@
 #include <core/resource/camera_resource.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workaround/gl_native_painting.h>
+
+#include <opengl_renderer.h>
+#include <ui/graphics/shaders/color_shader_program.h>
+#include <ui/graphics/shaders/color_line_shader_program.h>
+
 
 namespace nx::vms::client::desktop {
 
@@ -150,6 +156,14 @@ class RoiFiguresOverlayWidget::Private: public QObject
 {
     RoiFiguresOverlayWidget* q;
 
+    QOpenGLVertexArrayObject m_lineVertices;
+    QOpenGLBuffer m_lineBuffer;
+    bool m_lineVaoInitialized = false;
+
+    QOpenGLVertexArrayObject m_triangleVertices;
+    QOpenGLBuffer m_trianglePosBuffer;
+    bool m_triangleVaoInitialized = false;
+
 public:
     qreal lineWidth = 2;
     qreal regionOpacity = 0.15;
@@ -184,15 +198,77 @@ public:
         const QColor& color,
         QWidget* widget);
 
-    qreal realLineWidth(QWidget* widget) const;
-
     void updateFigureKeys(const QnUuid& engineId, const DeviceAgentData& data);
     void updateFigures();
+
+    void ensureLineVao(QnGLShaderProgram* shader);
+    void ensureTriangleVao(QnGLShaderProgram* shader);
 };
 
 RoiFiguresOverlayWidget::Private::Private(RoiFiguresOverlayWidget* q):
     q(q)
 {
+}
+
+void RoiFiguresOverlayWidget::Private::ensureTriangleVao(QnGLShaderProgram* shader)
+{
+    if (m_triangleVaoInitialized)
+        return;
+
+    m_triangleVertices.create();
+    m_triangleVertices.bind();
+
+    m_trianglePosBuffer.create();
+    m_trianglePosBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    m_trianglePosBuffer.bind();
+
+    static constexpr auto kPositionAttribute = "aPosition";
+    const auto posLocation = shader->attributeLocation(kPositionAttribute);
+    NX_ASSERT(posLocation != -1, kPositionAttribute);
+
+    std::vector<GLdouble> vertices;
+    for (const auto& point: kDirectionMark)
+    {
+        vertices.push_back(point.x());
+        vertices.push_back(point.y());
+    }
+    m_trianglePosBuffer.allocate(vertices.data(), sizeof(GLdouble) * vertices.size());
+
+    shader->enableAttributeArray(posLocation);
+    shader->setAttributeBuffer(posLocation, GL_DOUBLE, 0, 2);
+
+    m_trianglePosBuffer.release();
+
+    m_triangleVertices.release();
+
+    m_triangleVaoInitialized = true;
+}
+
+void RoiFiguresOverlayWidget::Private::ensureLineVao(QnGLShaderProgram* shader)
+{
+    if (m_lineVaoInitialized)
+        return;
+
+    m_lineVertices.create();
+    m_lineVertices.bind();
+
+    m_lineBuffer.create();
+    m_lineBuffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);
+    m_lineBuffer.bind();
+
+    static constexpr auto kDataAttribute = "vData";
+    const auto location = shader->attributeLocation(kDataAttribute);
+    NX_ASSERT(location != -1, kDataAttribute);
+
+    shader->enableAttributeArray(location);
+    shader->setAttributeBuffer(
+        location, GL_DOUBLE, 0, QnColorLineGLShaderProgram::kComponentPerVertex);
+
+    m_lineBuffer.release();
+
+    m_lineVertices.release();
+
+    m_lineVaoInitialized = true;
 }
 
 QPointF RoiFiguresOverlayWidget::Private::absolutePos(const QPointF& relativePos) const
@@ -217,46 +293,51 @@ void RoiFiguresOverlayWidget::Private::strokePolyline(
     qreal lineWidth,
     bool beginNativePainting)
 {
+    const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
+    const auto functions = QOpenGLContext::currentContext()->functions();
+
     if (beginNativePainting)
     {
-        const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
         QnGlNativePainting::begin(glWidget, painter);
+
+        functions->glEnable(GL_BLEND);
+        functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    const auto functions =
-        QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_1_5>();
+    // Make the line slightly wider for better antialiasing.
+    constexpr auto kLineScale = 1.2;
+    constexpr auto kLineFeather = 0.3;
 
-    functions->glEnable(GL_LINE_SMOOTH);
-    functions->glEnable(GL_BLEND);
-    functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    functions->glLineWidth((GLfloat) lineWidth);
-    functions->glPointSize((GLfloat) (lineWidth - 0.5 * widget->devicePixelRatioF()));
-    functions->glColor3d(color.redF(), color.greenF(), color.blueF());
+    auto renderer = QnOpenGLRendererManager::instance(glWidget);
+    auto shader = renderer->getColorLineShader();
+    ensureLineVao(shader);
 
-    functions->glBegin(GL_LINE_STRIP);
+    const std::vector<GLdouble> triangles = QnColorLineGLShaderProgram::genVericesFromLineStrip(
+        points, closed, lineWidth * kLineScale);
+    m_lineBuffer.bind();
+    m_lineBuffer.allocate(triangles.data(), sizeof(GLdouble) * triangles.size());
+    m_lineBuffer.release();
 
-    for (const auto& point: points)
-        functions->glVertex2d(point.x(), point.y());
-    if (closed)
-        functions->glVertex2d(points.first().x(), points.first().y());
+    shader->bind();
+    shader->setModelViewProjectionMatrix(
+        renderer->getProjectionMatrix() * renderer->getModelViewMatrix());
+    shader->setColor(QVector4D(color.redF(), color.greenF(), color.blueF(), painter->opacity()));
+    shader->setFeather(kLineFeather);
 
-    functions->glEnd();
+    m_lineVertices.bind();
+    functions->glDrawArrays(
+        GL_TRIANGLES, 0, triangles.size() / QnColorLineGLShaderProgram::kComponentPerVertex);
+    m_lineVertices.release();
 
-    if (lineWidth >= 2.0)
-    {
-        functions->glEnable(GL_POINT_SMOOTH);
-        functions->glBegin(GL_POINTS);
-        for (const auto& point: points)
-            functions->glVertex2d(point.x(), point.y());
-        functions->glEnd();
-        functions->glDisable(GL_POINT_SMOOTH);
-    }
-
-    functions->glDisable(GL_BLEND);
-    functions->glDisable(GL_LINE_SMOOTH);
+    shader->release();
 
     if (beginNativePainting)
+    {
+        functions->glDisable(GL_BLEND);
+        functions->glDisable(GL_LINE_SMOOTH);
+
         QnGlNativePainting::end(painter);
+    }
 }
 
 void RoiFiguresOverlayWidget::Private::drawLine(
@@ -273,7 +354,7 @@ void RoiFiguresOverlayWidget::Private::drawLine(
         points,
         line.color,
         false,
-        realLineWidth(widget));
+        lineWidth);
 
     core::PathUtil pathUtil;
     pathUtil.setPoints(points);
@@ -317,7 +398,7 @@ void RoiFiguresOverlayWidget::Private::drawBox(QPainter* painter, const Box& box
         points,
         box.color,
         true,
-        realLineWidth(widget));
+        lineWidth);
 }
 
 void RoiFiguresOverlayWidget::Private::drawPolygon(
@@ -340,39 +421,51 @@ void RoiFiguresOverlayWidget::Private::drawPolygon(
         points,
         polygon.color,
         true,
-        realLineWidth(widget));
+        lineWidth);
 }
 
 void RoiFiguresOverlayWidget::Private::drawDirectionMark(
     QPainter* painter, const QPointF& position, qreal angle, const QColor& color, QWidget* widget)
 {
     const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
+
     QnGlNativePainting::begin(glWidget, painter);
 
-    const auto functions =
-        QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_1_5>();
+    const auto functions = QOpenGLContext::currentContext()->functions();
 
-    functions->glPushMatrix();
-    functions->glTranslated(position.x(), position.y(), 0);
-    functions->glRotated(angle / M_PI * 180, 0, 0, 1);
+    functions->glEnable(GL_BLEND);
+    functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    functions->glColor3d(color.redF(), color.greenF(), color.blueF());
+    auto renderer = QnOpenGLRendererManager::instance(glWidget);
 
-    functions->glBegin(GL_TRIANGLES);
-    for (const auto& point: kDirectionMark)
-        functions->glVertex2d(point.x(), point.y());
-    functions->glEnd();
+    auto modelViewMatrix = renderer->getModelViewMatrix();
+
+    modelViewMatrix.translate(position.x(), position.y());
+    modelViewMatrix.rotate(angle / M_PI * 180, 0.0, 0.0, 1.0);
+
+    renderer->pushModelViewMatrix();
+    renderer->setModelViewMatrix(modelViewMatrix);
+
+    auto shader = renderer->getColorShader();
+    ensureTriangleVao(shader);
+
+    shader->bind();
+    shader->setModelViewProjectionMatrix(renderer->getProjectionMatrix() * renderer->getModelViewMatrix());
+    shader->setColor(QVector4D(color.redF(), color.greenF(), color.blueF(), painter->opacity()));
+
+    m_triangleVertices.bind();
+    functions->glDrawArrays(GL_TRIANGLES, 0, kDirectionMark.size());
+    m_triangleVertices.release();
+
+    shader->release();
 
     strokePolyline(painter, widget, kDirectionMark, color, true, 1, false);
 
-    functions->glPopMatrix();
+    renderer->popModelViewMatrix();
+
+    functions->glDisable(GL_BLEND);
 
     QnGlNativePainting::end(painter);
-}
-
-qreal RoiFiguresOverlayWidget::Private::realLineWidth(QWidget* widget) const
-{
-    return lineWidth * widget->devicePixelRatioF();
 }
 
 void RoiFiguresOverlayWidget::Private::updateFigureKeys(
