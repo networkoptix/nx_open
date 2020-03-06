@@ -419,7 +419,7 @@ move_crashdump() {
     if [ ! -d "$CRASHDUMPDIR" ]; then 
         mkdir -p "$CRASHDUMPDIR"
     else
-        rm -Rf $CRASHDUMPDIR/*.*
+        rm -Rf $CRASHDUMPDIR/*
     fi    
     find "/opt/$CUSTOMIZATION/mediaserver/bin" -name "core*" -exec mv {} "$CRASHDUMPDIR" \;
 }
