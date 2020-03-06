@@ -281,83 +281,118 @@ void DeviceAgent::doSetSettings(
 
     auto errorMap = makePtr<nx::sdk::StringMap>();
 
+    // Here we use temporary error map, because setting empty exclude area leads to false
+    // error report.
+    auto unusedErrorMap = makePtr<nx::sdk::StringMap>();
+
     const auto sender = [this](const std::string& s) {return this->sendWritingRequestToDeviceSync(s); };
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.shockDetection, sender, m_frameSize, m_channelNumber);
-
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.motion, sender, m_frameSize, m_channelNumber);
-
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.motionDetectionObjectSize, sender, m_frameSize, m_channelNumber);
-
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber);
-
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.ShockDetection"))
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.motionDetectionIncludeArea[i], sender, m_frameSize, m_channelNumber, i);
+            m_settings.shockDetection, sender, m_frameSize, m_channelNumber);
     }
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.Tampering"))
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.motionDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+            m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber);
     }
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.MotionDetection"))
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.motion, sender, m_frameSize, m_channelNumber);
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.motionDetectionObjectSize, sender, m_frameSize, m_channelNumber);
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+        {
+            copySettingsFromServerToCamera(errorMap, sourceMap,
+                m_settings.motionDetectionIncludeArea[i], sender, m_frameSize, m_channelNumber, i);
+        }
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+        {
+            copySettingsFromServerToCamera(errorMap, sourceMap,
+                m_settings.motionDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+        }
+    }
+
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Passing")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Entering")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Exiting")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.AppearDisappear")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Intrusion")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Loitering"))
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber);
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+        {
+            copySettingsFromServerToCamera(errorMap, sourceMap,
+                m_settings.ivaLine[i], sender, m_frameSize, m_channelNumber, i);
+        }
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+        {
+            copySettingsFromServerToCamera(errorMap, sourceMap,
+                m_settings.ivaIncludeArea[i], sender, m_frameSize, m_channelNumber, i);
+        }
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+        {
+            copySettingsFromServerToCamera(errorMap, sourceMap,
+                m_settings.ivaExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
+        }
+    }
+
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.DefocusDetection"))
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
+    }
 
 #if 0
     // Fog detection is currently unavailable.
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.fogDetection, sender, m_frameSize, m_channelNumber);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.FogDetection"))
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.fogDetection, sender, m_frameSize, m_channelNumber);
+    }
 #endif
 
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.objectDetectionGeneral, sender, m_frameSize, m_channelNumber);
-
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.objectDetectionBestShot, sender, m_frameSize, m_channelNumber);
-
+    if (!m_manifest.supportedObjectTypeIds.isEmpty())
     {
-        auto unusedErrorMap = makePtr<nx::sdk::StringMap>();
-        // Here we use temporary error map, because setting empty exclude area leads to false
-        // error report.
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.objectDetectionGeneral, sender, m_frameSize, m_channelNumber);
+
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
             copySettingsFromServerToCamera(unusedErrorMap, sourceMap,
                 m_settings.objectDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
         }
+
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.objectDetectionBestShot, sender, m_frameSize, m_channelNumber);
     }
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
+
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioDetection"))
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.ivaLine[i], sender, m_frameSize, m_channelNumber, i);
+            m_settings.audioDetection, sender, m_frameSize, m_channelNumber);
     }
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Scream")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Gunshot")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Explosion")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.GlassBreak"))
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.ivaIncludeArea[i], sender, m_frameSize, m_channelNumber, i);
+            m_settings.soundClassification, sender, m_frameSize, m_channelNumber);
     }
-
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-    {
-        copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.ivaExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
-    }
-
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.audioDetection, sender, m_frameSize, m_channelNumber);
-
-    copySettingsFromServerToCamera(errorMap, sourceMap,
-        m_settings.soundClassification, sender, m_frameSize, m_channelNumber);
 
     *outResult = errorMap.releasePtr();
 }
@@ -366,48 +401,74 @@ void DeviceAgent::getPluginSideSettings(
     Result<const ISettingsResponse*>* outResult) const
 {
     const auto response = new nx::sdk::SettingsResponse();
-    m_settings.shockDetection.writeToServer(response);
 
-    m_settings.motion.writeToServer(response);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.ShockDetection"))
+        m_settings.shockDetection.writeToServer(response);
 
-    m_settings.motionDetectionObjectSize.writeToServer(response);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.Tampering"))
+        m_settings.tamperingDetection.writeToServer(response);
 
-    m_settings.ivaObjectSize.writeToServer(response);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.MotionDetection"))
+    {
+        m_settings.motion.writeToServer(response);
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        m_settings.motionDetectionIncludeArea[i].writeToServer(response);
+        m_settings.motionDetectionObjectSize.writeToServer(response);
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        m_settings.motionDetectionExcludeArea[i].writeToServer(response);
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            m_settings.motionDetectionIncludeArea[i].writeToServer(response);
 
-    m_settings.tamperingDetection.writeToServer(response);
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            m_settings.motionDetectionExcludeArea[i].writeToServer(response);
+    }
 
-    m_settings.defocusDetection.writeToServer(response);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Passing")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Entering")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Exiting")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.AppearDisappear")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Intrusion")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Loitering"))
+    {
+        m_settings.ivaObjectSize.writeToServer(response);
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            m_settings.ivaLine[i].writeToServer(response);
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            m_settings.ivaIncludeArea[i].writeToServer(response);
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            m_settings.ivaExcludeArea[i].writeToServer(response);
+    }
+
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.DefocusDetection"))
+        m_settings.defocusDetection.writeToServer(response);
 
 #if 0
-// Fog detection is currently unavailable.
-    m_settings.fogDetection.writeToServer(response);
+    // Fog detection is currently unavailable.
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.FogDetection"))
+        m_settings.fogDetection.writeToServer(response);
 #endif
 
-    m_settings.objectDetectionGeneral.writeToServer(response);
+    if (!m_manifest.supportedObjectTypeIds.isEmpty())
+    {
+        m_settings.objectDetectionGeneral.writeToServer(response);
 
-    m_settings.objectDetectionBestShot.writeToServer(response);
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            m_settings.objectDetectionExcludeArea[i].writeToServer(response);
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        m_settings.objectDetectionExcludeArea[i].writeToServer(response);
+        m_settings.objectDetectionBestShot.writeToServer(response);
+    }
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        m_settings.ivaLine[i].writeToServer(response);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioDetection"))
+        m_settings.audioDetection.writeToServer(response);
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        m_settings.ivaIncludeArea[i].writeToServer(response);
-
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        m_settings.ivaExcludeArea[i].writeToServer(response);
-
-    m_settings.audioDetection.writeToServer(response);
-
-    m_settings.soundClassification.writeToServer(response);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Scream")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Gunshot")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Explosion")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.GlassBreak"))
+    {
+        m_settings.soundClassification.writeToServer(response);
+    }
 
     *outResult = response;
 }
@@ -617,75 +678,107 @@ void DeviceAgent::loadFrameSize()
         m_frameSize = *frameSize;
 }
 
-void DeviceAgent::loadSupportedEventTypes()
-{
-    /* http://<ip>/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=check&Channel=0 */
-    std::string jsonReply = sendReadingRequestToDeviceSync("eventstatus", "eventstatus", "check");
-    std::optional<SupportedEventCategories> cats = parseSupportedEventCategories(jsonReply);
-
-}
-
 void DeviceAgent::readCameraSettings()
 {
     std::string sunapiReply;
 
     loadFrameSize();
 
-    ////loadSupportedEventTypes();
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.ShockDetection"))
+    {
+        sunapiReply = loadEventSettings("shockdetection");
+        readFromDeviceReply(sunapiReply, &m_settings.shockDetection, m_frameSize, m_channelNumber);
+    }
 
-    sunapiReply = loadEventSettings("shockdetection");
-    readFromDeviceReply(sunapiReply, &m_settings.shockDetection, m_frameSize, m_channelNumber);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.Tampering"))
+    {
+        sunapiReply = loadEventSettings("tamperingdetection");
+        readFromDeviceReply(sunapiReply, &m_settings.tamperingDetection, m_frameSize, m_channelNumber);
+    }
 
-    sunapiReply = loadEventSettings("tamperingdetection");
-    readFromDeviceReply(sunapiReply, &m_settings.tamperingDetection, m_frameSize, m_channelNumber);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.MotionDetection"))
+    {
+        sunapiReply = loadEventSettings("videoanalysis2");
+        readFromDeviceReply(sunapiReply, &m_settings.motion, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.motionDetectionObjectSize, m_frameSize, m_channelNumber);
 
-    sunapiReply = loadEventSettings("videoanalysis2");
-    readFromDeviceReply(sunapiReply, &m_settings.motion, m_frameSize, m_channelNumber);
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            readFromDeviceReply(sunapiReply, &m_settings.motionDetectionIncludeArea[i], m_frameSize, m_channelNumber, i);
 
-    readFromDeviceReply(sunapiReply, &m_settings.motionDetectionObjectSize, m_frameSize, m_channelNumber);
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            readFromDeviceReply(sunapiReply, &m_settings.motionDetectionExcludeArea[i], m_frameSize, m_channelNumber, i);
+    }
+    else
+        sunapiReply.clear();
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        readFromDeviceReply(sunapiReply, &m_settings.motionDetectionIncludeArea[i], m_frameSize, m_channelNumber, i);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Passing")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Entering")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Exiting")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.AppearDisappear")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Intrusion")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Loitering"))
+    {
+        if (sunapiReply.empty()) 
+            sunapiReply = loadEventSettings("videoanalysis2");
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        readFromDeviceReply(sunapiReply, &m_settings.motionDetectionExcludeArea[i], m_frameSize, m_channelNumber, i);
+        readFromDeviceReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, m_channelNumber);
 
-    readFromDeviceReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, m_channelNumber);
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            readFromDeviceReply(sunapiReply, &m_settings.ivaLine[i], m_frameSize, m_channelNumber, i);
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        readFromDeviceReply(sunapiReply, &m_settings.ivaLine[i], m_frameSize, m_channelNumber, i);
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            readFromDeviceReply(sunapiReply, &m_settings.ivaIncludeArea[i], m_frameSize, m_channelNumber, i);
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        readFromDeviceReply(sunapiReply, &m_settings.ivaIncludeArea[i], m_frameSize, m_channelNumber, i);
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            readFromDeviceReply(sunapiReply, &m_settings.ivaExcludeArea[i], m_frameSize, m_channelNumber, i);
+    }
 
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        readFromDeviceReply(sunapiReply, &m_settings.ivaExcludeArea[i], m_frameSize, m_channelNumber, i);
-
-    sunapiReply = loadEventSettings("defocusdetection");
-    readFromDeviceReply(sunapiReply, &m_settings.defocusDetection, m_frameSize, m_channelNumber);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.DefocusDetection"))
+    {
+        sunapiReply = loadEventSettings("defocusdetection");
+        readFromDeviceReply(sunapiReply, &m_settings.defocusDetection, m_frameSize, m_channelNumber);
+    }
 
 #if 0
     // Fog detection is currently unavailable.
-    sunapiReply = loadEventSettings("fogdetection");
-    readFromDeviceReply(sunapiReply, &m_settings.fogDetection, m_frameSize, m_channelNumber);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.FogDetection"))
+    {
+        sunapiReply = loadEventSettings("fogdetection");
+        readFromDeviceReply(sunapiReply, &m_settings.fogDetection, m_frameSize, m_channelNumber);
+    }
 #endif
 
-    //sunapiReply = loadEventSettings("facedetection");
-    //readFromDeviceReply(sunapiReply, &m_settings.faceDetectionGeneral, m_frameSize, m_channelNumber);
+    //if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.FaceDetection"))
+    //{
+    //    sunapiReply = loadEventSettings("facedetection");
+    //    readFromDeviceReply(sunapiReply, &m_settings.faceDetectionGeneral, m_frameSize, m_channelNumber);
+    //}
 
-    sunapiReply = loadEventSettings("objectdetection");
-    readFromDeviceReply(sunapiReply, &m_settings.objectDetectionGeneral, m_frameSize, m_channelNumber);
-    for (int i = 0; i < Settings::kMultiplicity; ++i)
-        readFromDeviceReply(sunapiReply, &m_settings.objectDetectionExcludeArea[i], m_frameSize, m_channelNumber, i);
+    if (!m_manifest.supportedObjectTypeIds.isEmpty())
+    {
+        sunapiReply = loadEventSettings("objectdetection");
+        readFromDeviceReply(sunapiReply, &m_settings.objectDetectionGeneral, m_frameSize, m_channelNumber);
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            readFromDeviceReply(sunapiReply, &m_settings.objectDetectionExcludeArea[i], m_frameSize, m_channelNumber, i);
 
-    sunapiReply = loadEventSettings("metaimagetransfer");
-    readFromDeviceReply(sunapiReply, &m_settings.objectDetectionBestShot, m_frameSize, m_channelNumber);
+        sunapiReply = loadEventSettings("metaimagetransfer");
+        readFromDeviceReply(sunapiReply, &m_settings.objectDetectionBestShot, m_frameSize, m_channelNumber);
+    }
 
-    sunapiReply = loadEventSettings("audiodetection");
-    readFromDeviceReply(sunapiReply, &m_settings.audioDetection, m_frameSize, m_channelNumber);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioDetection"))
+    {
+        sunapiReply = loadEventSettings("audiodetection");
+        readFromDeviceReply(sunapiReply, &m_settings.audioDetection, m_frameSize, m_channelNumber);
+    }
 
-    sunapiReply = loadEventSettings("audioanalysis");
-    readFromDeviceReply(sunapiReply, &m_settings.soundClassification, m_frameSize, m_channelNumber);
+    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Scream")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Gunshot")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Explosion")
+     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.GlassBreak"))
+    {
+        sunapiReply = loadEventSettings("audioanalysis");
+        readFromDeviceReply(sunapiReply, &m_settings.soundClassification, m_frameSize, m_channelNumber);
+    }
 }
 
 void DeviceAgent::addSettingModel(nx::vms::api::analytics::DeviceAgentManifest* destinastionManifest)

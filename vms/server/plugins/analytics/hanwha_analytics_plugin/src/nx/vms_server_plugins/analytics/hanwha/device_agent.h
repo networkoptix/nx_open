@@ -71,9 +71,8 @@ private:
 
     void loadFrameSize();
 
-    void loadSupportedEventTypes(); // page 9 Application Programmers Guide
-
     std::unique_ptr<nx::network::http::HttpClient> createSettingsHttpClient() const;
+
 public:
     void addSettingModel(nx::vms::api::analytics::DeviceAgentManifest* destinastionManifest);
 

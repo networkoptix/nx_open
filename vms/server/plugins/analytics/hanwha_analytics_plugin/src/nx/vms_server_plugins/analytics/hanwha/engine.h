@@ -86,11 +86,11 @@ private:
         const std::shared_ptr<SharedResources>& sharedRes,
         int channel);
 
-    boost::optional<QList<QString>> fetchSupportedEventTypeIds(
+    boost::optional<QSet<QString>> fetchSupportedEventTypeIds(
         const std::shared_ptr<SharedResources>& sharedRes,
         int channel) const;
 
-    boost::optional<QList<QString>> eventTypeIdsFromParameters(
+    boost::optional<QSet<QString>> eventTypeIdsFromParameters(
         const nx::utils::Url& url,
         const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
         const nx::vms::server::plugins::HanwhaResponse& eventStatuses,

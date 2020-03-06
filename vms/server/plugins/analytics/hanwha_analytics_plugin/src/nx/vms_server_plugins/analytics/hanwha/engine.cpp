@@ -51,7 +51,7 @@ QString specialEventName(const QString& eventName)
 }
 
 template <typename Pred>
-QJsonValue pruneJsonObjects(QJsonValue value, Pred pred)
+QJsonValue filterJsonObjects(QJsonValue value, Pred pred)
 {
     if (value.isObject())
     {
@@ -59,7 +59,7 @@ QJsonValue pruneJsonObjects(QJsonValue value, Pred pred)
         if (pred(object))
             return QJsonValue::Undefined;
         for (auto elementValueRef: object)
-            elementValueRef = pruneJsonObjects(elementValueRef, pred);
+            elementValueRef = filterJsonObjects(elementValueRef, pred);
         return object;
     }
     if (value.isArray())
@@ -67,7 +67,7 @@ QJsonValue pruneJsonObjects(QJsonValue value, Pred pred)
         auto array = value.toArray();
         for (auto it = array.begin(); it != array.end(); )
         {
-            if (auto elementValue = pruneJsonObjects(*it, pred); elementValue.isUndefined())
+            if (auto elementValue = filterJsonObjects(*it, pred); elementValue.isUndefined())
                 it = array.erase(it);
             else
                 ++it;
@@ -158,8 +158,8 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
         return;
 
     const auto deviceAgent = new DeviceAgent(this, deviceInfo);
-    deviceAgent->readCameraSettings();
     deviceAgent->setManifest(std::move(*deviceAgentManifest));
+    deviceAgent->readCameraSettings();
 
     ++sharedRes->deviceAgentCount;
 
@@ -207,12 +207,6 @@ boost::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
     {
         NX_DEBUG(this, "Device %1 (%2): doesn't support object detection/tracking.",
             deviceInfo->name(), deviceInfo->id());
-
-        deviceAgentManifest.deviceAgentSettingsModel = pruneJsonObjects(
-            m_manifest.deviceAgentSettingsModel,
-            [](const QJsonObject& node) {
-                return node["requiresObjectDetection"].toBool();
-            });
     }
 
     auto supportedEventTypeIds = fetchSupportedEventTypeIds(sharedRes, deviceInfo->channelNumber());
@@ -222,7 +216,31 @@ boost::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
             deviceInfo->name(), deviceInfo->id());
         return boost::none;
     }
-    deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
+    deviceAgentManifest.supportedEventTypeIds = QList<QString>::fromSet(*supportedEventTypeIds);
+
+    deviceAgentManifest.deviceAgentSettingsModel = filterJsonObjects(
+        m_manifest.deviceAgentSettingsModel,
+        [&](const QJsonObject& node) {
+            bool keep = true;
+
+            if (const auto required = node["requiredForObjectDetection"]; !required.isUndefined() && !keep) {
+                if (required.toBool() && supportsObjectDetection)
+                    keep = true;
+            }
+
+            if (const auto eventTypeIds = node["requiredForEventTypeIds"]; !eventTypeIds.isUndefined() && !keep) {
+                for (const auto eventTypeId: eventTypeIds.toArray())
+                {
+                    if (supportedEventTypeIds->contains(eventTypeId.toString()))
+                    {
+                        keep = true;
+                        break;
+                    }
+                }
+            }
+
+            return keep;
+        });
 
     return deviceAgentManifest;
 }
@@ -243,7 +261,7 @@ bool Engine::fetchSupportsObjectDetection(
     return attributes.attribute<bool>("Eventsource", "ObjectDetection", channel).value_or(false);
 }
 
-boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
+boost::optional<QSet<QString>> Engine::fetchSupportedEventTypeIds(
     const std::shared_ptr<SharedResources>& sharedRes,
     int channel) const
 {
@@ -263,7 +281,7 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
         cgiParameters, eventStatuses.value, channel);
 }
 
-boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
+boost::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
     const nx::utils::Url& url,
     const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
     const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
@@ -314,7 +332,7 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
         }
     }
 
-    return QList<QString>::fromSet(result);
+    return result;
 }
 
 const Hanwha::EngineManifest& Engine::manifest() const
