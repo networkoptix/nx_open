@@ -465,6 +465,8 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
     {
         connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
+        // TODO: resource::update() has not trigger signal resourceChanged. So, connect to the 'parentIdChanged' additionally.
+        connect(camera.data(), &QnResource::parentIdChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         connect(camera.data(), &QnVirtualCameraResource::recordingActionChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         updateCamera(camera);
         if (!camera->hasFlags(Qn::foreigner))
