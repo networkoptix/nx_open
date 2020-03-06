@@ -260,8 +260,11 @@ public:
 
     bool start()
     {
-        if (!m_socket->setRecvTimeout(std::chrono::milliseconds(1)))
+        if (!m_socket->setNonBlockingMode(false) ||
+            !m_socket->setRecvTimeout(std::chrono::milliseconds(1)))
+        {
             return false;
+        }
 
         m_readThread = std::thread(
             std::bind(&ConcurrentSocketPipe::readThreadMain, this));
