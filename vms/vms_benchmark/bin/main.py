@@ -533,7 +533,7 @@ class _BoxPoller:
         if isinstance(self._exception, exceptions.VmsBenchmarkIssue):
             return [self._exception]
         return [exceptions.TestCameraStreamingIssue(
-            'Unexpected error during acquiring VMS Server CPU usage. '
+            'Unexpected error during acquiring VMS Server CPU usage, storage or network errors or swap occupation. '
             'Can be caused by network issues or Server issues.',
             original_exception=self._exception)]
 
