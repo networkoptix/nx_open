@@ -381,6 +381,10 @@ _rtsp_perf_summary_regex = re.compile(
     r'bytes read (?P<bytes>\d+)'
 )
 
+_rtsp_perf_warning_regex = re.compile(
+    r'.* WARNING: (?P<message>.*)'
+)
+
 
 def _rtsp_perf_frames(stdout, output_file_path):
     if output_file_path:
@@ -400,9 +404,9 @@ def _rtsp_perf_frames(stdout, output_file_path):
                 prefix = timestamp_str + ' '
             output_file.write(f'{prefix}{line}\n')
 
-        warning_prefix = 'WARNING: '
-        if warning_prefix in line:
-            raise exceptions.RtspPerfError(f'Streaming error: {line}')
+        match_res = _rtsp_perf_warning_regex.match(line)
+        if match_res is not None:
+            raise exceptions.RtspPerfError(f'Streaming error: {match_res.group("message")}')
 
         match_res = _rtsp_perf_frame_regex.match(line)
         if match_res is not None:
