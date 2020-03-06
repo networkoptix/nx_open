@@ -14,6 +14,7 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, QWidget* parent):
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setTransformationAnchor(QGraphicsView::NoAnchor);
+    setViewportUpdateMode(QGraphicsView::NoViewportUpdate);
 }
 
 QnGraphicsView::~QnGraphicsView()
@@ -24,7 +25,7 @@ void QnGraphicsView::paintEvent(QPaintEvent* event)
 {
     // Always make QOpenGLWidget context to be the current context.
     // This is what item paint functions expect and doing otherwise
-    // may lead unpredictable behavior.
+    // may lead to unpredictable behavior.
     if (const auto glWidget = qobject_cast<QOpenGLWidget*>(viewport()))
         glWidget->makeCurrent();
 

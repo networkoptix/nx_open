@@ -46,6 +46,12 @@ void QnViewportBoundWidget::setFixedSize(const QSizeF& fixedSize)
     updateScale();
 }
 
+void QnViewportBoundWidget::updateGeometry()
+{
+    base_type::updateGeometry();
+    updateScale();
+}
+
 void QnViewportBoundWidget::updateScale()
 {
     if (m_fixedSize.isNull())

@@ -40,6 +40,11 @@ QnScrollableItemsWidgetPrivate::QnScrollableItemsWidgetPrivate(
         parent, &QnScrollableItemsWidget::contentHeightChanged);
 }
 
+QnScrollableItemsWidgetPrivate::~QnScrollableItemsWidgetPrivate()
+{
+    disconnect(m_scrollArea->contentWidget(), nullptr, q_ptr, nullptr);
+}
+
 Qt::Alignment QnScrollableItemsWidgetPrivate::alignment() const
 {
     return m_alignment;

@@ -61,6 +61,9 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_pane_settings.h>
+#include <ui/workbench/workbench_item.h>
+#include <core/resource/camera_resource.h>
+#include <camera/fps_calculator.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/desktop/workbench/panels/special_layout_panel.h>
@@ -89,6 +92,38 @@ Qn::PaneState makePaneState(bool opened, bool pinned = true)
 constexpr int kHideControlsTimeoutMs = 2000;
 
 constexpr qreal kZoomedTimelineOpacity = 0.9;
+
+int calculateAutoFpsLimit(QnWorkbenchLayout* layout)
+{
+    static constexpr auto kIdleFps = 15;
+    static constexpr auto kUnlimitedFps = 0;
+
+    if (!qnSettings->isAutoFpsLimit())
+        return kUnlimitedFps;
+
+    if (!layout)
+        return kIdleFps;
+
+    const auto itemsCount = layout->items().count();
+
+    if (itemsCount == 0) // Empty layout.
+        return kIdleFps;
+
+    // Gather cameras placed on current layout.
+    const QnVirtualCameraResourceList cameras =
+        layout->itemResources().filtered<QnVirtualCameraResource>();
+
+    if (itemsCount == cameras.count()) // Layout contains only cameras.
+    {
+        QPair<int, int> result = Qn::calculateMaxFps(cameras);
+
+        if (result.second != std::numeric_limits<int>::max())
+            return result.second;
+    }
+
+    // We do not have any info about items fps - do not limit fps.
+    return kUnlimitedFps;
+}
 
 } // namespace
 
@@ -252,6 +287,23 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 
     connect(action(action::ShowTimeLineOnVideowallAction), &QAction::triggered,
         this, [this] { updateControlsVisibility(false); });
+
+    connect(qnSettings->notifier(QnClientSettings::AUTO_FPS_LIMIT),
+        &QnPropertyNotifier::valueChanged,
+        this,
+        &WorkbenchUi::updateAutoFpsLimit);
+
+    updateAutoFpsLimit();
+
+    connect(workbench(),
+        &QnWorkbench::currentLayoutItemsChanged,
+        this,
+        &WorkbenchUi::updateAutoFpsLimit);
+}
+
+void WorkbenchUi::updateAutoFpsLimit()
+{
+    m_instrumentManager->setFpsLimit(calculateAutoFpsLimit(workbench()->currentLayout()));
 }
 
 WorkbenchUi::~WorkbenchUi()

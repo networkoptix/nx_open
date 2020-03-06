@@ -164,6 +164,11 @@ public:
 
     static AnimationTimer *animationTimer(QGraphicsScene *scene);
 
+    /**
+     * Limit viewport updates generated via animation timer.
+     */
+    void setFpsLimit(int limit);
+
 signals:
     void sceneChanged();
 

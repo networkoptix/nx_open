@@ -4,37 +4,67 @@
 #include <QtCore/QDateTime>
 #include <QtWidgets/QWidget>
 
-InstrumentPaintSyncer::InstrumentPaintSyncer(QObject *parent):
+namespace {
+
+using namespace std::chrono;
+
+static constexpr milliseconds kOneSecond = 1000ms;
+
+} // namespace
+
+InstrumentPaintSyncer::InstrumentPaintSyncer(QObject* parent):
     QObject(parent),
     m_animationTimer(new QAnimationTimer(this)),
-    m_currentWidget(NULL)
+    m_currentWidget(nullptr),
+    m_update(new nx::utils::PendingOperation())
 {
+    setFpsLimit(0);
+    m_update->setFlags(nx::utils::PendingOperation::FireImmediately);
+    m_update->setCallback([this]() { m_currentWidget->update(); });
+
     m_animationTimer->addListener(this);
     startListening();
 }
 
-bool InstrumentPaintSyncer::eventFilter(QObject *watched, QEvent *event) {
-    if(event->type() != QEvent::Paint)
+void InstrumentPaintSyncer::setFpsLimit(int limit)
+{
+    m_update->setInterval(limit > 0 ? kOneSecond / limit : 0ms);
+}
+
+bool InstrumentPaintSyncer::eventFilter(QObject* watched, QEvent* event)
+{
+    if (event->type() != QEvent::Paint)
         return false;
 
-    if(currentWatched() != watched) {
+    if (currentWatched() != watched)
+    {
         m_currentWatched = watched;
-        m_currentWidget = qobject_cast<QWidget *>(watched);
+        m_currentWidget = qobject_cast<QWidget*>(watched);
     }
 
     updateCurrentTime(QDateTime::currentMSecsSinceEpoch());
     return false;
 }
 
-void InstrumentPaintSyncer::tick(int /*deltaTime*/) {
-    if(currentWatched() && m_currentWidget)
-        m_currentWidget->update();
+void InstrumentPaintSyncer::tick(int /*deltaTime*/)
+{
+    if (currentWatched() && m_currentWidget)
+    {
+       m_update->requestOperation();
+    }
 }
 
-void InstrumentPaintSyncer::activatedNotify() {
+void InstrumentPaintSyncer::activatedNotify()
+{
     m_animationTimer->activate();
 }
 
-void InstrumentPaintSyncer::deactivatedNotify() {
+void InstrumentPaintSyncer::deactivatedNotify()
+{
     m_animationTimer->deactivate();
+}
+
+QObject* InstrumentPaintSyncer::currentWatched() const
+{
+    return m_currentWatched.data();
 }

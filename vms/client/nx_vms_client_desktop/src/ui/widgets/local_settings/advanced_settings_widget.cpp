@@ -39,6 +39,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     setHelpTopic(ui->browseLogsButton,          Qn::SystemSettings_General_Logs_Help);
     setHelpTopic(ui->doubleBufferCheckbox,      Qn::SystemSettings_General_DoubleBuffering_Help);
     ui->doubleBufferCheckboxHint->setHint(tr("Helps avoid problems with OpenGL drawing which result in 100% CPU load."));
+    ui->autoFpsLimitCheckboxHint->setHint(tr("Warning! This is an experimental option that saves CPU but may affect animation."));
     ui->maximumLiveBufferLengthLabelHint->setHint(tr("Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters."));
     // Being replaced by new HintButton
     //setHelpTopic(ui->doubleBufferWarningLabel,  Qn::SystemSettings_General_DoubleBuffering_Help);
@@ -61,6 +62,12 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
             /* Show warning message if the user disables double buffering. */
             // TODO: Being replaced by HintButton
             //ui->doubleBufferWarningLabel->setVisible(!toggled && qnSettings->isGlDoubleBuffer());
+            emit hasChangesChanged();
+        });
+
+    connect(ui->autoFpsLimitCheckbox, &QCheckBox::toggled, this,
+        [this](bool toggled)
+        {
             emit hasChangesChanged();
         });
 
@@ -91,6 +98,7 @@ void QnAdvancedSettingsWidget::applyChanges()
 {
     qnSettings->setAudioDownmixed(isAudioDownmixed());
     qnSettings->setGLDoubleBuffer(isDoubleBufferingEnabled());
+    qnSettings->setAutoFpsLimit(isAutoFpsLimitEnabled());
     qnSettings->setMaximumLiveBufferMs(maximumLiveBufferMs());
     qnSettings->setGlBlurEnabled(isBlurEnabled());
 }
@@ -99,6 +107,7 @@ void QnAdvancedSettingsWidget::loadDataToUi()
 {
     setAudioDownmixed(qnSettings->isAudioDownmixed());
     setDoubleBufferingEnabled(qnSettings->isGlDoubleBuffer());
+    setAutoFpsLimitEnabled(qnSettings->isAutoFpsLimit());
     setMaximumLiveBufferMs(qnSettings->maximumLiveBufferMs());
     setBlurEnabled(qnSettings->isGlBlurEnabled());
 }
@@ -107,6 +116,7 @@ bool QnAdvancedSettingsWidget::hasChanges() const
 {
     return qnSettings->isAudioDownmixed() != isAudioDownmixed()
         || qnSettings->isGlDoubleBuffer() != isDoubleBufferingEnabled()
+        || qnSettings->isAutoFpsLimit() != isAutoFpsLimitEnabled()
         || qnSettings->maximumLiveBufferMs() != maximumLiveBufferMs()
         || qnSettings->isGlBlurEnabled() != isBlurEnabled();
 }
@@ -174,6 +184,16 @@ bool QnAdvancedSettingsWidget::isDoubleBufferingEnabled() const
 void QnAdvancedSettingsWidget::setDoubleBufferingEnabled(bool value)
 {
     ui->doubleBufferCheckbox->setChecked(value);
+}
+
+bool QnAdvancedSettingsWidget::isAutoFpsLimitEnabled() const
+{
+    return ui->autoFpsLimitCheckbox->isChecked();
+}
+
+void QnAdvancedSettingsWidget::setAutoFpsLimitEnabled(bool value)
+{
+    ui->autoFpsLimitCheckbox->setChecked(value);
 }
 
 bool QnAdvancedSettingsWidget::isBlurEnabled() const
