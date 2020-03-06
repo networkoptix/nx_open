@@ -223,12 +223,14 @@ boost::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
         [&](const QJsonObject& node) {
             bool keep = true;
 
-            if (const auto required = node["requiredForObjectDetection"]; !required.isUndefined() && !keep) {
+            if (const auto required = node["requiredForObjectDetection"]; !required.isUndefined() && !keep)
+            {
                 if (required.toBool() && supportsObjectDetection)
                     keep = true;
             }
 
-            if (const auto eventTypeIds = node["requiredForEventTypeIds"]; !eventTypeIds.isUndefined() && !keep) {
+            if (const auto eventTypeIds = node["requiredForEventTypeIds"]; !eventTypeIds.isUndefined() && !keep)
+            {
                 for (const auto eventTypeId: eventTypeIds.toArray())
                 {
                     if (supportedEventTypeIds->contains(eventTypeId.toString()))
