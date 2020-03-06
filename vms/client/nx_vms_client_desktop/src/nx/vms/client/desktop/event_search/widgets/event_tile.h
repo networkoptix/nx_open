@@ -55,6 +55,10 @@ public:
     QString footerText() const;
     void setFooterText(const QString& value);
 
+    using AttributeList = QList<QPair<QString, QString>>;
+    AttributeList attributeList() const;
+    void setAttributeList(const AttributeList& value);
+
     QString timestamp() const;
     void setTimestamp(const QString& value);
 

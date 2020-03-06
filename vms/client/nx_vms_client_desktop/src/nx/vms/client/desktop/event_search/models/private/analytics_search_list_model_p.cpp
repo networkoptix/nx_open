@@ -158,8 +158,8 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qn::DescriptionTextRole:
             return description(track);
 
-        case Qn::AdditionalTextRole:
-            return attributes(track);
+        case Qn::AttributeTableRole:
+            return QVariant::fromValue(attributes(track));
 
         case Qn::TimestampRole:
             return QVariant::fromValue(std::chrono::microseconds(track.firstAppearanceTimeUs));
@@ -745,26 +745,26 @@ QString AnalyticsSearchListModel::Private::description(
         text::HumanReadable::timeSpan(duration_cast<milliseconds>(duration)));
 }
 
-QString AnalyticsSearchListModel::Private::attributes(
+QList<QPair<QString, QString>> AnalyticsSearchListModel::Private::attributes(
     const ObjectTrack& track) const
 {
     if (track.attributes.empty())
-        return QString();
+        return {};
 
-    static const auto kCss = QString::fromLatin1(R"(
-            <style type = 'text/css'>
-                th { color: %1; font-weight: normal; text-align: left; }
-            </style>)");
-
-    static const auto kTableTemplate = QString("<table cellpadding='0' cellspacing='0'>%1</table>");
-    static const auto kMultiValuesTemplate = lm("%1 <span style='color: %3'>(%2)</span>");
-    static const auto kRowTemplate = lm(QString("<tr><th>%1</th>")
-        + QString("<td width='%1'/>").arg(style::Metrics::kStandardPadding) //< Spacing.
-        + QString("<td>%2</td></tr>"));
-
-    QString rows;
     const QString darkerColor = QPalette().color(QPalette::WindowText).name();
 
+    const auto value =
+        [darkerColor](const QString& source, int count)
+        {
+            if (count < 2)
+                return source;
+
+            return lm("%1 <font color=\"%3\">(%2)</font>").args(source,
+                AnalyticsSearchListModel::tr("+%n values", "", count - 1),
+                darkerColor).toQString();
+        };
+
+    QList<QPair<QString, QString>> result;
     for (auto begin = track.attributes.cbegin(); begin != track.attributes.cend(); )
     {
         if (begin->name.isEmpty() || isAnalyticsAttributeHidden(begin->name))
@@ -777,24 +777,11 @@ QString AnalyticsSearchListModel::Private::attributes(
         while (end != track.attributes.cend() && end->name == begin->name)
             ++end;
 
-        const int count = end - begin;
-        if (count > 1)
-        {
-            rows += kRowTemplate.args(begin->name, kMultiValuesTemplate.args(begin->value,
-                tr("+%n values", "", count - 1), darkerColor).toQString()).toQString();
-        }
-        else
-        {
-            rows += kRowTemplate.args(begin->name, begin->value);
-        }
-
+        result.push_back({begin->name, value(begin->value, end - begin)});
         begin = end;
     }
 
-    if (rows.isEmpty())
-        return QString();
-
-    return kCss.arg(darkerColor) + kTableTemplate.arg(rows);
+    return result;
 }
 
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
