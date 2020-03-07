@@ -381,16 +381,24 @@ void QnOnvifStreamReader::fixDahuaStreamUrl(
 {
     NX_ASSERT(urlString);
 
-    // 1. Try to detect the Profile index. Common profile name is something like "MediaProfile102".
-    // Last three digits encode channel and subtype. The first digit is channel number.
-    // The two next - is subtype number minus 1 (subtype number corresponds to videoEncoder token).
+    // 1. Try to detect the Profile index. Common profile name is something like "MediaProfile102"
+    // for cameras or something like "MediaProfile00102" for NVRs/DVRs.
+    // The two lower digits - is subtype number (subtype number corresponds to videoEncoder token.
+    // The higher digits is a channel number minus 1 .
 
     const QString token = QString::fromStdString(profileToken);
-    bool isNumber = false;
-    const int code = token.right(3).toInt(&isNumber);
-    if (!isNumber)
-        return; //< Failed to detect index => can not fix url.
 
+    constexpr int kLongFormatDigits = 5;
+    constexpr int kShortFormatDigits = 3;
+
+    bool isNumber = false;
+    int code = token.right(kLongFormatDigits).toInt(&isNumber);
+    if (!isNumber)
+    {
+        int code = token.right(kShortFormatDigits).toInt(&isNumber);
+        if (!isNumber)
+            return; //< Failed to detect index => can not fix url.
+    }
     const int neededSubtypeNumber = code % 100;
     const int neededChannelNumber = code / 100 + 1;
 
