@@ -776,7 +776,7 @@ public:
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             NX_MUTEX_LOCKER lock(&m_mutex);
-            if (expectedUrls == toUrlSet(m_storages))
+            if (toUrlSet(m_storages).contains(expectedUrls))
             {
                 NX_DEBUG(
                     typeid(MediaServerProcess),
