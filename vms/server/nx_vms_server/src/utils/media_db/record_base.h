@@ -5,7 +5,10 @@ namespace nx
 namespace media_db
 {
 
-inline quint64 getBitMask(int width) { return (quint64)std::pow(2, width) - 1; }
+constexpr quint64 getBitMask(int width) 
+{ 
+    return (quint64) (1LL << width) - 1; 
+}
 
 enum class RecordType
 {
