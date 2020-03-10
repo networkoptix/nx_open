@@ -451,7 +451,7 @@ void QnStorageDb::putRecordsToCatalog(
         QnServer::StoragePool::None));
 
     std::sort(chunks.begin(), chunks.end());
-    newFileCatalog->addChunks(chunks);
+    newFileCatalog->addChunks(std::move(chunks));
     deviceFileCatalog->push_back(newFileCatalog);
 }
 

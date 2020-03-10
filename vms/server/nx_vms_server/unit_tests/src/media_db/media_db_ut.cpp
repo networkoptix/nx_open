@@ -719,7 +719,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
                 (j + 10) * j + 10, 0, nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION,
                 1, 0, 1, 1));
         }
-        catalog->addChunks(chunks);
+        catalog->addChunks(std::move(chunks));
 
         referenceCatalogs.push_back(catalog);
     }
