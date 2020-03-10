@@ -28,18 +28,16 @@ std::string Pipeline::serverNameFromClientHello() const
 
 int Pipeline::write(const void* data, size_t size)
 {
-    const auto resultCode = performSslIoOperation(&SSL_write, data, size);
-    if (m_state >= State::handshakeDone
-        && resultCode < 0
-        && resultCode != utils::bstream::StreamIoError::wouldBlock)
-    {
-        m_failed = true;
-    }
     if (m_failed)
     {
         SystemError::setLastErrorCode(SystemError::invalidData);
         return utils::bstream::StreamIoError::nonRecoverableError;
     }
+
+    const auto resultCode = performSslIoOperation(&SSL_write, data, size);
+    if (m_state >= State::handshakeDone && resultCode < 0)
+        m_failed = true;
+
     return resultCode;
 }
 
