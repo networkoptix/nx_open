@@ -2662,7 +2662,7 @@ void QnStorageManager::replaceChunks(
         ? std::numeric_limits<qint64>::max()
         : newCatalog->minTime();
     const qint64 leftNewArchiveBorder = qMin(rebuildPeriod.startTimeMs, newArchiveFirstChunkStartTimeMs);
-    newCatalog->addChunks(std::move(ownCatalog->chunksBefore(leftNewArchiveBorder, storageIndex)));
+    newCatalog->addChunks(ownCatalog->chunksBefore(leftNewArchiveBorder, storageIndex));
 
     NX_ASSERT(rebuildPeriod.endTimeMs() > 0);
     const qint64 rightNewArchiveBorder = qMax(
