@@ -4843,12 +4843,13 @@ void QnPlOnvifResource::updateFirmware()
     DeviceSoapWrapper soapWrapper(onvifTimeouts(),
         getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
+    nx::utils::ElapsedTimer t;
+    t.restart();
+
     DeviceInfoReq request;
     DeviceInfoResp response;
     int soapRes = soapWrapper.getDeviceInformation(request, response);
 
-    nx::utils::ElapsedTimer t;
-    t.restart();
     if (soapRes != SOAP_OK)
     {
         NX_DEBUG(this, makeSoapFailMessage(
