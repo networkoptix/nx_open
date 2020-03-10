@@ -448,7 +448,8 @@ protected:
 
         ASSERT_GT(another->read(buf.data(), buf.size()), 0);
 
-        ASSERT_GT(one->write(buf.data(), buf.size()), 0);
+        // NOTE: SSL pipeline cannot recover from write errors.
+        ASSERT_LT(one->write(buf.data(), buf.size()), 0);
     }
 };
 
