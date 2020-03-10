@@ -117,7 +117,6 @@ struct MediaFileOperation: RecordBase
 
     void setFileSize(qint64 fileSize)
     {
-        const quint64 kFileSizeMaskLength = 0x27ULL;
         const quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
 
         part2 &= ~(getBitMask(kFileSizeMaskLength) << 0x17);
