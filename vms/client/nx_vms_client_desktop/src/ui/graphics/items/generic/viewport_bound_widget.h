@@ -51,4 +51,5 @@ private:
     QSizeF m_fixedSize;
     QGraphicsScale* m_scale;
     QnViewportScaleWatcher* m_scaleWatcher;
+    bool m_inUpdateScale = false;
 };
