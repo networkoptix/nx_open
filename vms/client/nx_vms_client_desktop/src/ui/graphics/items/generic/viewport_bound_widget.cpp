@@ -1,5 +1,6 @@
 #include "viewport_bound_widget.h"
 
+#include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QGraphicsScale>
 
 #include <nx/utils/math/fuzzy.h>
@@ -46,10 +47,18 @@ void QnViewportBoundWidget::setFixedSize(const QSizeF& fixedSize)
     updateScale();
 }
 
+void QnViewportBoundWidget::updateGeometry()
+{
+    base_type::updateGeometry();
+    updateScale();
+}
+
 void QnViewportBoundWidget::updateScale()
 {
-    if (m_fixedSize.isNull())
+    if (m_inUpdateScale || m_fixedSize.isNull())
         return;
+
+    QScopedValueRollback updateGuard(m_inUpdateScale, true);
 
     qreal scale = m_scaleWatcher->scale();
 

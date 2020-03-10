@@ -11,12 +11,12 @@ BusyIndicator
     implicitWidth: (repeater.count > 0 ? radiusByIndex(repeater.count - 1) * 2 : 30);
     implicitHeight: implicitWidth;
     contentItem: null;
+    visible: running
 
     Repeater
     {
         id: repeater;
 
-        visible: control.running
         model: 3;
         delegate: NxCircle
         {

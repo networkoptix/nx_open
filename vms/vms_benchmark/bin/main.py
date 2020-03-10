@@ -356,15 +356,13 @@ def _get_storages(api, ini) -> List[Storage]:
         if reply is None:
             raise exceptions.ServerApiError(
                 "Unable to get Server Storages via REST HTTP: invalid reply.")
-        if reply:
-            storages = [Storage(item) for item in reply if Storage(item).initialized]
-            if storages:
-                return storages
-
-            raise exceptions.ServerApiError("There are no initialized Storages on the box.")
+        storages = [Storage(item) for item in reply if Storage(item).initialized]
+        if storages:
+            return storages
         time.sleep(ini["getStoragesAttemptIntervalSeconds"])
+
     raise exceptions.ServerApiError(
-        "Unable to get Server Storages via REST HTTP: not all Storages are initialized.")
+        "Unable to get Server Storages via REST HTTP: no Storages are initialized.")
 
 
 _rtsp_perf_frame_regex = re.compile(
@@ -379,6 +377,10 @@ _rtsp_perf_summary_regex = re.compile(
     r'working sessions (?P<working>\d+), '
     r'failed (?P<failed>\d+), '
     r'bytes read (?P<bytes>\d+)'
+)
+
+_rtsp_perf_warning_regex = re.compile(
+    r'.* WARNING: (?P<message>.*)'
 )
 
 
@@ -400,9 +402,9 @@ def _rtsp_perf_frames(stdout, output_file_path):
                 prefix = timestamp_str + ' '
             output_file.write(f'{prefix}{line}\n')
 
-        warning_prefix = 'WARNING: '
-        if warning_prefix in line:
-            raise exceptions.RtspPerfError(f'Streaming error: {line}')
+        match_res = _rtsp_perf_warning_regex.match(line)
+        if match_res is not None:
+            raise exceptions.RtspPerfError(f'Streaming error: {match_res.group("message")}')
 
         match_res = _rtsp_perf_frame_regex.match(line)
         if match_res is not None:
@@ -443,7 +445,7 @@ class _StreamTypeStats:
         if pts_diff_deviation_us > self._ini['maxAllowedPtsDiffDeviationUs']:
             self.frame_drops += 1
             logging.info(
-                f'Detected frame drop on {self._type} stream '
+                f'Detected frame-dropping situation(s) on {self._type} stream '
                 f'from camera {camera_id}: '
                 f'diff {pts_diff_us} us '
                 f'deviates from the expected {self._expected_pts_diff_us} us '
@@ -529,7 +531,7 @@ class _BoxPoller:
         if isinstance(self._exception, exceptions.VmsBenchmarkIssue):
             return [self._exception]
         return [exceptions.TestCameraStreamingIssue(
-            'Unexpected error during acquiring VMS Server CPU usage. '
+            'Unexpected error during acquiring VMS Server CPU usage, storage or network errors or swap occupation. '
             'Can be caused by network issues or Server issues.',
             original_exception=self._exception)]
 
@@ -872,10 +874,12 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                     cpu_usage_max_report = 'N/A'
 
                 streaming_test_duration_s = round(time.time() - streaming_test_started_at_s)
+                live_frame_drops = stream_stats['live'].frame_drops
+                archive_frame_drops = stream_stats['archive'].frame_drops
                 report(
                     f"    Streaming test statistics:\n"
-                    f"        Frame drops in live stream: {stream_stats['live'].frame_drops} (expected 0)\n"
-                    f"        Frame drops in archive stream: {stream_stats['archive'].frame_drops} (expected 0)\n"
+                    f"        Frame-dropping situation(s) in live stream: {live_frame_drops} (expected 0)\n"
+                    f"        Frame-dropping situation(s) in archive stream: {archive_frame_drops} (expected 0)\n"
                     f"        Box network errors: {tx_rx_errors_during_test_report} (expected 0)\n"
                     f"        Maximum box CPU usage: {cpu_usage_max_report}\n"
                     f"        Average box CPU usage: {cpu_usage_avg_report}\n"
