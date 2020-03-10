@@ -167,7 +167,7 @@ public:
         "It allows to save CPU for slow ARM devices."
     };
 
-    Option<int> mediaStatisticsWindowSize{ this, "mediaStatisticsWindowSize", 2,
+    Option<int> mediaStatisticsWindowSize{ this, "mediaStatisticsWindowSize", 10,
         "Time period in seconds for media stream statistics."
     };
     Option<int> mediaStatisticsMaxDurationInFrames{ this, "mediaStatisticsMaxDurationInFrames", 0,
