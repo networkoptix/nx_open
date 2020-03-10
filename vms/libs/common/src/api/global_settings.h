@@ -401,7 +401,9 @@ public:
     void setLicenseServerUrl(const QString& value);
 
     nx::utils::Url resourceFileUri() const;
+
     QString pushNotificationsLanguage() const;
+    void setPushNotificationsLanguage(const QString& value);
 
     QString additionalLocalFsTypes() const;
 
