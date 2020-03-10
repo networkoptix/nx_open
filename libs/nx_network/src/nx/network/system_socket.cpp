@@ -680,7 +680,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
         {
             if (SystemError::getLastOSErrorCode() == WSA_IO_INCOMPLETE)
             {
-                ::CancelIo((HANDLE)m_fd);
+                ::CancelIoEx((HANDLE)m_fd, &overlapped);
                 // Wait for:
                 // 1. CancelIo has been finished.
                 // 2. WSARecv or WSASend has been finished.

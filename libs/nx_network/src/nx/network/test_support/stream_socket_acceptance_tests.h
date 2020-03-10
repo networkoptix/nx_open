@@ -535,6 +535,15 @@ protected:
             << SystemError::getLastOSErrorText().toStdString();
     }
 
+    void whenResendRandomDataToServer()
+    {
+        ASSERT_EQ(
+            m_randomDataBuffer.size(),
+            m_connection->send(m_randomDataBuffer.constData(), m_randomDataBuffer.size()))
+            << SystemError::getLastOSErrorText().toStdString();
+        m_sentData = m_randomDataBuffer;
+    }
+
     void whenSendAsyncRandomDataToServer()
     {
         ASSERT_TRUE(m_connection->setNonBlockingMode(true));
@@ -1554,7 +1563,7 @@ TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_send_timeout)
     this->assertAcceptedConnectionReceivedAllSentData();
 
     // Verifying that socket can be used after timedOut.
-    this->whenSendRandomDataToServer();
+    this->whenResendRandomDataToServer();
     this->assertAcceptedConnectionReceivedAllSentData();
 }
 
