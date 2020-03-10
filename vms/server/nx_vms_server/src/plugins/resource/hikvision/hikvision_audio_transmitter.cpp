@@ -112,6 +112,8 @@ bool HikvisionAudioTransmitter::openChannelIfNeeded()
         messageBody.append(httpHelper->fetchMessageBodyBuffer());
 
     auto channelStatus = hikvision::parseChannelStatusResponse(messageBody);
+    if (!channelStatus)
+        return false;
     auto format = hikvision::toAudioFormat(
         channelStatus->audioCompression,
         channelStatus->sampleRateHz);

@@ -260,8 +260,11 @@ public:
 
     bool start()
     {
-        if (!m_socket->setRecvTimeout(std::chrono::milliseconds(1)))
+        if (!m_socket->setNonBlockingMode(false) ||
+            !m_socket->setRecvTimeout(std::chrono::milliseconds(1)))
+        {
             return false;
+        }
 
         m_readThread = std::thread(
             std::bind(&ConcurrentSocketPipe::readThreadMain, this));
@@ -288,13 +291,9 @@ private:
             int bytesRead = m_socket->recv(readBuf.data(), readBuf.capacity(), 0);
             if (bytesRead < 0)
             {
-                if (SystemError::getLastOSErrorCode() == SystemError::timedOut ||
-                    SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
-                {
-                    continue;
-                }
-
-                break;
+                if (socketCannotRecoverFromError(SystemError::getLastOSErrorCode()))
+                    break;
+                continue;
             }
 
             if (bytesRead == 0)
@@ -313,8 +312,21 @@ private:
             if (!dataToSend)
                 continue;
 
-            if (m_socket->send(dataToSend->data(), dataToSend->size()) < 0)
-                break;
+            const auto size = dataToSend->size();
+            auto remain = size;
+            while (remain > 0)
+            {
+                const auto sent = m_socket->send(dataToSend->data() + (size - remain), remain);
+                if (sent < 0)
+                {
+                    if (socketCannotRecoverFromError(SystemError::getLastOSErrorCode()))
+                        return;
+                    continue;
+                }
+                if (sent == 0)
+                    return;
+                remain -= sent;
+            }
         }
     }
 };
@@ -465,6 +477,16 @@ protected:
         whenConnectUsingHostName();
     }
 
+    void givenClientConnectionTimedOutOnSend()
+    {
+        givenAcceptingServerSocket();
+        givenConnectedSocket();
+        setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+        whenClientSendsRandomDataSynchronouslyUntilFailure();
+        thenClientSendTimesOutEventually();
+    }
+
     template<typename AuxiliaryConnectCompletionHandler>
     void whenConnectToServer(AuxiliaryConnectCompletionHandler&& handler)
     {
@@ -513,6 +535,15 @@ protected:
             << SystemError::getLastOSErrorText().toStdString();
     }
 
+    void whenResendRandomDataToServer()
+    {
+        ASSERT_EQ(
+            m_randomDataBuffer.size(),
+            m_connection->send(m_randomDataBuffer.constData(), m_randomDataBuffer.size()))
+            << SystemError::getLastOSErrorText().toStdString();
+        m_sentData = m_randomDataBuffer;
+    }
+
     void whenSendAsyncRandomDataToServer()
     {
         ASSERT_TRUE(m_connection->setNonBlockingMode(true));
@@ -537,14 +568,17 @@ protected:
     {
         std::basic_string<uint8_t> readBuf(bytesExpected, 'x');
 
-        ASSERT_EQ(
-            bytesExpected,
-            std::get<1>(m_prevAcceptResult)->recv(
+        int totalBytesReceived = 0;
+        while (totalBytesReceived < bytesExpected)
+        {
+            auto bytesReceived = std::get<1>(m_prevAcceptResult)->recv(
                 readBuf.data(),
-                (unsigned int) readBuf.size(), recvFlags)
-        ) << SystemError::getLastOSErrorText().toStdString();
-
-        m_synchronousServerReceivedData.write(readBuf.data(), bytesExpected);
+                (unsigned int) (bytesExpected - totalBytesReceived),
+                recvFlags);
+            ASSERT_GT(bytesReceived, 0) << SystemError::getLastOSErrorText().toStdString();
+            totalBytesReceived += bytesReceived;
+            m_synchronousServerReceivedData.write(readBuf.data(), bytesReceived);
+        }
     }
 
     void whenClientConnectionIsClosed()
@@ -649,8 +683,10 @@ protected:
         if (m_randomDataBuffer.isEmpty())
             m_randomDataBuffer = nx::utils::generateRandomName(64 * 1024);
 
-        while (m_connection->send(m_randomDataBuffer.data(), m_randomDataBuffer.size()) > 0)
+        for (int bytesSent = 0;
+            (bytesSent = m_connection->send(m_randomDataBuffer.data(), m_randomDataBuffer.size())) > 0;)
         {
+            m_sentData += m_randomDataBuffer.mid(0, bytesSent);
         }
 
         m_sendResultQueue.push(SystemError::getLastOSErrorCode());
@@ -877,8 +913,13 @@ protected:
 
         ASSERT_TRUE(lastAcceptedSocket()->setNonBlockingMode(false));
 
-        assertAcceptedConnectionReceived(m_sentData);
+        assertAcceptedConnectionReceivedAllSentData();
         assertAcceptedConnectionReceivedEof();
+    }
+
+    void assertAcceptedConnectionReceivedAllSentData()
+    {
+        assertAcceptedConnectionReceived(m_sentData);
     }
 
     void assertAcceptedConnectionReceived(const nx::Buffer& expected)
@@ -886,6 +927,7 @@ protected:
         whenServerReadsBytesWithFlags(expected.size(), 0);
 
         ASSERT_EQ(expected, m_synchronousServerReceivedData.internalBuffer());
+        m_synchronousServerReceivedData = nx::utils::bstream::test::NotifyingOutput();
     }
 
     void assertAcceptedConnectionReceivedEof()
@@ -1171,7 +1213,7 @@ protected:
 
     void whenSendDataConcurrentlyThroughConnectedSockets()
     {
-        m_sentData = nx::utils::generateRandomName(16 * 1024);
+        m_sentData = nx::utils::generateRandomName(1024 * 1024);
 
         givenListeningServerSocket();
         startAcceptingConnections();
@@ -1510,6 +1552,19 @@ TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
 
     this->whenClientSentPingAsync();
     this->thenServerMessageIsReceived();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, DISABLED_socket_is_reusable_after_send_timeout)
+{
+    this->givenClientConnectionTimedOutOnSend();
+
+    // Receiving data sent before timedOut.
+    this->thenConnectionHasBeenAccepted();
+    this->assertAcceptedConnectionReceivedAllSentData();
+
+    // Verifying that socket can be used after timedOut.
+    this->whenResendRandomDataToServer();
+    this->assertAcceptedConnectionReceivedAllSentData();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, sync_send_reports_timedOut)
@@ -1879,6 +1934,11 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     msg_dont_wait_flag_makes_recv_call_nonblocking,
     concurrent_recv_send_in_blocking_mode,
     socket_is_reusable_after_recv_timeout,
+
+    // This test doesn't work for SSL connections because SSL_write doesn't allow to send different
+    // data after SSL_ERROR_WANT_WRITE.
+    DISABLED_socket_is_reusable_after_send_timeout,
+
     sync_send_reports_timedOut,
     async_send_reports_timedOut,
     all_data_sent_is_received_after_remote_end_closed_connection,

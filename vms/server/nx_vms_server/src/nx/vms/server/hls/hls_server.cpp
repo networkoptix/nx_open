@@ -78,9 +78,9 @@ nx::network::http::StatusCode::Value cameraResultToHttp(
 }
 
 HttpLiveStreamingProcessor::HttpLiveStreamingProcessor(
-    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnTcpListener* owner)
+    QnTcpListener* owner,
+    QnMediaServerModule* serverModule)
     :
     QnTCPConnectionProcessor(std::move(socket), owner),
     nx::vms::server::ServerModuleAware(serverModule),

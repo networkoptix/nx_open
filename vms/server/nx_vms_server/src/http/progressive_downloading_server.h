@@ -20,9 +20,9 @@ public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
     ProgressiveDownloadingServer(
-        QnMediaServerModule* serverModule,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        QnTcpListener* owner);
+        QnTcpListener* owner,
+        QnMediaServerModule* serverModule);
     virtual ~ProgressiveDownloadingServer();
 
     QnFfmpegTranscoder* getTranscoder();

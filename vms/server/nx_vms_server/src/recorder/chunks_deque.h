@@ -58,6 +58,7 @@ public:
     void update(ConstIterator itr, const Chunk& value);
     void remove_if(std::function<bool (const Chunk&)> condition);
     void set_union(ConstIterator begin, ConstIterator end);
+    void sort();
 private:
     std::unordered_map<int, Presence> m_archivePresence;
     std::deque<Chunk> m_deque;

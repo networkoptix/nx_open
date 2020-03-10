@@ -36,9 +36,9 @@ class JsonConnectionProcessor:
 {
 public:
     JsonConnectionProcessor(
-        ProcessorHandler handler,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        QnHttpConnectionListener* owner);
+        QnHttpConnectionListener* owner,
+        ProcessorHandler handler);
 
     virtual void run() override;
 

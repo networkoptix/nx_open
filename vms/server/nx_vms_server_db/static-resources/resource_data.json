@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.1.212",
+    "version": "4.1.1.219",
     "data": [
         {
             "keys": [
@@ -989,7 +989,20 @@
                 "un1a-32x16|network video recorder",
                 "ds-7204huhi-k1/p|leroy dvr",
                 "xnss|ipm32r16p",
-                "xnss|ipm32r32p"
+                "xnss|ipm32r32p",
+                "rvi-r16la*|rvi",
+                "*-1hdr16k|rvi",
+                "ds-8116*|embedded net dvr",
+                "dahua|x51a2*",
+                "nv4108-hs|ac",
+                "uniview|nvr301*",
+                "ds-7204*|casa",
+                "ltd8316k*|embedded net dvr",
+                "dh-nvr616*|private",
+                "st-hdvr-161|embedded_net_dvr",
+                "bx100|indigovision bx100",
+                "panasonic|wj-gxe100",
+                "st-hdvr162pro-d-v2|general"
             ],
             "analogEncoder": true
         },
@@ -1139,7 +1152,8 @@
                 "ACTI|I96","ACTI|I98",
                 "UNIVIEW|IPC6242SR-X22",
                 "Milesight*|MS-C2961-EB",
-                "Dahua|DH-SD22404T-GN"
+                "Dahua|DH-SD22404T-GN",
+                "dahua|XVR5116HS*"
             ],
             "ptzOverride": {
                 "operational": {"traits": "EightWayPtz"}
@@ -3354,7 +3368,7 @@
 			"MA9321-EHTV|VIVOTEK MA9321-EHTV",
             "avigilon|32c-h4a-4mh-360",
             "dahua|psd81602-a360",
-            "dahua|IPC-HDBW4231F-E2-M",
+            "dahua|IPC-HDBW4231F*",
             "avigilon|32c-h4a-4mh-360",
             "dahua|psd81602-a360",
             "dahua|ipc-hdbw4233x*",
@@ -3385,7 +3399,10 @@
             "avigilon|9c-h4a-3mh-180",
             "panomera s7 76/22 c|panomera s7",
             "vivotek|ms9321-ehv",
-            "Arecont Vision|*"
+            "Arecont Vision|*",
+            "flir systems|pt-644*",
+            "axis|p3719*",
+            "digital watchdog|nvm2-a21"
             ],
             "canShareLicenseGroup": true
         },
@@ -3806,7 +3823,7 @@
         {
             "_comment1": "Mapping for firmware: IPC_HCMN2108-B0009P30D1809",
             "keys": [
-                "hikvision|DS-2DE4225W-DE"
+                "hikvision|DS-2DE4225*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {

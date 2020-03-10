@@ -284,8 +284,9 @@ public:
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(
-    QnMediaServerModule* serverModule,
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket, 
+    QnTcpListener* owner,
+    QnMediaServerModule* serverModule)
     :
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, std::move(socket), owner)
 {

@@ -167,7 +167,7 @@ public:
         "It allows to save CPU for slow ARM devices."
     };
 
-    Option<int> mediaStatisticsWindowSize{ this, "mediaStatisticsWindowSize", 2,
+    Option<int> mediaStatisticsWindowSize{ this, "mediaStatisticsWindowSize", 10,
         "Time period in seconds for media stream statistics."
     };
     Option<int> mediaStatisticsMaxDurationInFrames{ this, "mediaStatisticsMaxDurationInFrames", 0,
@@ -267,6 +267,9 @@ public:
     };
     Option<QString> mediatorAddressUpdate{this, "mediatorAddressUpdate", "", ""};
     Option<bool> disableTranscoding{this, "disableTranscoding", false, ""};
+    Option<bool> allowThirdPartyProxy{this, "allowThirdPartyProxy", false, 
+        "Allow proxy requests for any sites if value is true. "
+        "Allow proxy requests for known servers and cameras only if it is false."};
     Option<bool> noResourceDiscovery{this, "noResourceDiscovery", false, ""};
     Option<bool> removeDbOnStartup{this, "removeDbOnStartup", false,
         "Cleanup ecs.sqlite when server is running if parameter is '1'. So, server will started "

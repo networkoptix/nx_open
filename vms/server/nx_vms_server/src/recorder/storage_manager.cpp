@@ -1133,45 +1133,47 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     int filesizeFieldIdx = queryInfo.indexOf("filesize");
 
     DeviceFileCatalogPtr fileCatalog;
-    nx::vms::server::ChunksDeque chunks;
-    QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ from all existing catalogs
-    QByteArray prevId;
-
-    while (query.next())
     {
-        QByteArray id = query.value(idFieldIdx).toByteArray();
-        QnServer::ChunksCatalog catalog = (QnServer::ChunksCatalog) query.value(roleFieldIdx).toInt();
-        if (id != prevId || catalog != prevCatalog)
+        nx::vms::server::ChunksDeque chunks;
+        QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ from all existing catalogs
+        QByteArray prevId;
+
+        while (query.next())
         {
-            if (fileCatalog)
+            QByteArray id = query.value(idFieldIdx).toByteArray();
+            QnServer::ChunksCatalog catalog = (QnServer::ChunksCatalog) query.value(roleFieldIdx).toInt();
+            if (id != prevId || catalog != prevCatalog)
             {
-                fileCatalog->addChunks(chunks);
-                oldCatalogs << fileCatalog;
-                chunks.clear();
-            }
+                if (fileCatalog)
+                {
+                    fileCatalog->addChunks(std::move(chunks));
+                    oldCatalogs << fileCatalog;
+                    chunks.clear();
+                }
 
-            prevCatalog = catalog;
-            prevId = id;
-            fileCatalog = DeviceFileCatalogPtr(
-                new DeviceFileCatalog(
-                    serverModule(),
-                    QString::fromUtf8(id),
-                    catalog,
-                    QnServer::StoragePool::None));
+                prevCatalog = catalog;
+                prevId = id;
+                fileCatalog = DeviceFileCatalogPtr(
+                    new DeviceFileCatalog(
+                        serverModule(),
+                        QString::fromUtf8(id),
+                        catalog,
+                        QnServer::StoragePool::None));
+            }
+            qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
+            qint64 filesize = query.value(filesizeFieldIdx).toLongLong();
+            int timezone = query.value(timezoneFieldIdx).toInt();
+            int fileNum = query.value(fileNumFieldIdx).toInt();
+            int durationMs = query.value(durationFieldIdx).toInt();
+            chunks.push_back(nx::vms::server::Chunk(
+                startTime, storageIndex, fileNum, durationMs, (qint16)timezone,
+                (quint16)(filesize >> 32), (quint32)filesize));
         }
-        qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
-        qint64 filesize = query.value(filesizeFieldIdx).toLongLong();
-        int timezone = query.value(timezoneFieldIdx).toInt();
-        int fileNum = query.value(fileNumFieldIdx).toInt();
-        int durationMs = query.value(durationFieldIdx).toInt();
-        chunks.push_back(nx::vms::server::Chunk(
-            startTime, storageIndex, fileNum, durationMs, (qint16)timezone,
-            (quint16)(filesize >> 32), (quint32)filesize));
-    }
-    if (fileCatalog)
-    {
-        fileCatalog->addChunks(chunks);
-        oldCatalogs << fileCatalog;
+        if (fileCatalog)
+        {
+            fileCatalog->addChunks(std::move(chunks));
+            oldCatalogs << fileCatalog;
+        }
     }
 
     auto connectionName = sqlDb.connectionName();
@@ -1221,7 +1223,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
                     QnServer::StoragePool::None));
 
             const auto diffChunks = c->setDifference(*newCatalog);
-            catalogToWrite->addChunks(diffChunks);
+            catalogToWrite->addChunks(std::move(diffChunks));
             catalogsToWrite.push_back(catalogToWrite);
         }
     }
@@ -2681,7 +2683,7 @@ void QnStorageManager::replaceChunks(
                     });
             }),
         chunksAfter.end());
-    newCatalog->addChunks(chunksAfter);
+    newCatalog->addChunks(std::move(chunksAfter));
 
     const auto newChunks = newCatalog->takeChunks();
     ownCatalog->replaceChunks(storageIndex, newChunks);

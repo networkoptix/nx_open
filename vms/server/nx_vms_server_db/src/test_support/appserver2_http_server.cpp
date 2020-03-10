@@ -16,9 +16,9 @@
 namespace ec2 {
 
 JsonConnectionProcessor::JsonConnectionProcessor(
-    ProcessorHandler handler,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnHttpConnectionListener* owner)
+    QnHttpConnectionListener* owner,
+    ProcessorHandler handler)
     :
     QnTCPConnectionProcessor(std::move(socket), owner),
     m_handler(handler)

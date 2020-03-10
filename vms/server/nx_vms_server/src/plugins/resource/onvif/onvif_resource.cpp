@@ -4843,6 +4843,9 @@ void QnPlOnvifResource::updateFirmware()
     DeviceSoapWrapper soapWrapper(onvifTimeouts(),
         getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
+    nx::utils::ElapsedTimer t;
+    t.restart();
+
     DeviceInfoReq request;
     DeviceInfoResp response;
     int soapRes = soapWrapper.getDeviceInformation(request, response);
@@ -4850,12 +4853,12 @@ void QnPlOnvifResource::updateFirmware()
     if (soapRes != SOAP_OK)
     {
         NX_DEBUG(this, makeSoapFailMessage(
-            soapWrapper, __func__, "GetDeviceInformation", soapRes));
+            soapWrapper, __func__, "GetDeviceInformation", soapRes, "", t.elapsed()));
     }
     else
     {
-        NX_VERBOSE(this, makeSoapSuccessMessage(
-            soapWrapper, __func__, "GetDeviceInformation"));
+        NX_DEBUG(this, makeSoapSuccessMessage(
+            soapWrapper, __func__, "GetDeviceInformation", "", t.elapsed()));
 
         QString firmware = QString::fromStdString(response.FirmwareVersion);
         if (!firmware.isEmpty())
@@ -4887,29 +4890,42 @@ void QnPlOnvifResource::updateOnvifUrls(const QnPlOnvifResourcePtr& other)
     setPtzUrl(other->getPtzUrl());
 }
 
+QString QnPlOnvifResource::addTimeoutToMessage(
+    const QString& message,
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    if (!timeout)
+        return message;
+    return lm("%1 (timeout=%2)").args(message, *timeout);
+}
+
 QString QnPlOnvifResource::makeSoapFailMessage(BaseSoapWrapper& soapWrapper,
     const QString& caller, const QString& requestCommand,
-    int soapError, const QString& text /*= QString()*/) const
+    int soapError, const QString& text,
+    std::optional<std::chrono::milliseconds> timeout) const
 {
     static const QString kSoapErrorMessagePattern =
         "SOAP request failed. %1 Caller = %2(), Device = %3, id = %4, url = %5"
         ", request command = %6, error = %7 (\"%8\")";
 
-    return kSoapErrorMessagePattern.arg(text, caller, getName(), getId().toString(),
+    QString result = kSoapErrorMessagePattern.arg(text, caller, getName(), getId().toString(),
         soapWrapper.endpoint(), requestCommand, QString::number(soapError),
         soapWrapper.getLastErrorDescription());
+    return addTimeoutToMessage(result, timeout);
 }
 
 QString QnPlOnvifResource::makeSoapSuccessMessage(BaseSoapWrapper& soapWrapper,
     const QString& caller, const QString& requestCommand,
-    const QString& text /*= QString()*/) const
+    const QString& text,
+    std::optional<std::chrono::milliseconds> timeout) const
 {
     static const QString kSoapErrorMessagePattern =
         "SOAP request succeeded. %1 Caller = %2(), Device = %3, id = %4, url = %5"
         ", request command = %6";
 
-    return kSoapErrorMessagePattern.arg(text, caller, getName(), getId().toString(),
+    QString result = kSoapErrorMessagePattern.arg(text, caller, getName(), getId().toString(),
         soapWrapper.endpoint(), requestCommand);
+    return addTimeoutToMessage(result, timeout);
 }
 
 QString QnPlOnvifResource::makeSoapNoParameterMessage(BaseSoapWrapper& soapWrapper,
@@ -4951,14 +4967,16 @@ QString QnPlOnvifResource::makeSoapSmallRangeMessage(BaseSoapWrapper& soapWrappe
 }
 
 QString QnPlOnvifResource::makeStaticSoapFailMessage(BaseSoapWrapper& soapWrapper,
-    const QString& requestCommand, int soapError, const QString& text /*= QString()*/)
+    const QString& requestCommand, int soapError, const QString& text,
+    std::optional<std::chrono::milliseconds> timeout)
 {
     static const QString kSoapErrorMessagePattern =
         "SOAP request failed. %1 url = %3, request command = %4"
         ", error = %5 (\"%6\")";
 
-    return kSoapErrorMessagePattern.arg(text, soapWrapper.endpoint(), requestCommand,
+    auto result = kSoapErrorMessagePattern.arg(text, soapWrapper.endpoint(), requestCommand,
         QString::number(soapError), soapWrapper.getLastErrorDescription());
+    return addTimeoutToMessage(result, timeout);
 }
 
 QString QnPlOnvifResource::makeStaticSoapNoParameterMessage(BaseSoapWrapper& soapWrapper,

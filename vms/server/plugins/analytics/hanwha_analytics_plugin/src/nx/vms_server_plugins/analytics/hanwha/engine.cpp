@@ -50,6 +50,33 @@ QString specialEventName(const QString& eventName)
     return itr->second;
 }
 
+template <typename Pred>
+QJsonValue filterJsonObjects(QJsonValue value, Pred pred)
+{
+    if (value.isObject())
+    {
+        auto object = value.toObject();
+        if (pred(object))
+            return QJsonValue::Undefined;
+        for (auto elementValueRef: object)
+            elementValueRef = filterJsonObjects(elementValueRef, pred);
+        return object;
+    }
+    if (value.isArray())
+    {
+        auto array = value.toArray();
+        for (auto it = array.begin(); it != array.end(); )
+        {
+            if (auto elementValue = filterJsonObjects(*it, pred); elementValue.isUndefined())
+                it = array.erase(it);
+            else
+                ++it;
+        }
+        return array;
+    }
+    return value;
+}
+
 } // namespace
 
 using namespace nx::sdk;
@@ -126,25 +153,13 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
                 m_sharedResources.remove(QString::fromUtf8(deviceInfo->sharedId()));
         });
 
-    auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
-    if (!supportedEventTypeIds)
-    {
-        NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
-            deviceInfo->name(), deviceInfo->id());
+    auto deviceAgentManifest = buildDeviceAgentManifest(sharedRes, deviceInfo);
+    if (!deviceAgentManifest)
         return;
-    }
-
-    Hanwha::DeviceAgentManifest deviceAgentManifest;
-    deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
-
-    // DeviceAgent should understand all engine's object types.
-    deviceAgentManifest.supportedObjectTypeIds.reserve(m_manifest.objectTypes.size());
-    for (const nx::vms::api::analytics::ObjectType& objectType: m_manifest.objectTypes)
-        deviceAgentManifest.supportedObjectTypeIds.push_back(objectType.id);
 
     const auto deviceAgent = new DeviceAgent(this, deviceInfo);
+    deviceAgent->setManifest(std::move(*deviceAgentManifest));
     deviceAgent->readCameraSettings();
-    deviceAgent->setManifest(std::move(deviceAgentManifest));
 
     ++sharedRes->deviceAgentCount;
 
@@ -174,13 +189,84 @@ void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IActi
 {
 }
 
-boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
-    const IDeviceInfo* deviceInfo)
+boost::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
+    const std::shared_ptr<SharedResources>& sharedRes,
+    const IDeviceInfo* deviceInfo) const
 {
-    using namespace nx::vms::server::plugins;
+    Hanwha::DeviceAgentManifest deviceAgentManifest;
 
-    auto sharedRes = sharedResources(deviceInfo);
+    const auto supportsObjectDetection = fetchSupportsObjectDetection(sharedRes, deviceInfo->channelNumber());
+    if (supportsObjectDetection)
+    {
+        // DeviceAgent should understand all engine's object types.
+        deviceAgentManifest.supportedObjectTypeIds.reserve(m_manifest.objectTypes.size());
+        for (const nx::vms::api::analytics::ObjectType& objectType: m_manifest.objectTypes)
+            deviceAgentManifest.supportedObjectTypeIds.push_back(objectType.id);
+    }
+    else
+    {
+        NX_DEBUG(this, "Device %1 (%2): doesn't support object detection/tracking.",
+            deviceInfo->name(), deviceInfo->id());
+    }
 
+    auto supportedEventTypeIds = fetchSupportedEventTypeIds(sharedRes, deviceInfo->channelNumber());
+    if (!supportedEventTypeIds)
+    {
+        NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
+        return boost::none;
+    }
+    deviceAgentManifest.supportedEventTypeIds = QList<QString>::fromSet(*supportedEventTypeIds);
+
+    deviceAgentManifest.deviceAgentSettingsModel = filterJsonObjects(
+        m_manifest.deviceAgentSettingsModel,
+        [&](const QJsonObject& node) {
+            bool keep = true;
+
+            if (const auto required = node["requiredForObjectDetection"]; !required.isUndefined() && !keep)
+            {
+                if (required.toBool() && supportsObjectDetection)
+                    keep = true;
+            }
+
+            if (const auto eventTypeIds = node["requiredForEventTypeIds"]; !eventTypeIds.isUndefined() && !keep)
+            {
+                for (const auto eventTypeId: eventTypeIds.toArray())
+                {
+                    if (supportedEventTypeIds->contains(eventTypeId.toString()))
+                    {
+                        keep = true;
+                        break;
+                    }
+                }
+            }
+
+            return keep;
+        });
+
+    return deviceAgentManifest;
+}
+
+bool Engine::fetchSupportsObjectDetection(
+    const std::shared_ptr<SharedResources>& sharedRes,
+    int channel)
+{
+    const auto& information = sharedRes->sharedContext->information();
+    if (!information)
+        return false;
+
+    const auto& attributes = information->attributes;
+    if (!attributes.isValid())
+        return false;
+
+    // What Hanwha calls "object detection" we at NX usually call "object tracking".
+    return attributes.attribute<bool>("Eventsource", "ObjectDetection", channel).value_or(false);
+}
+
+boost::optional<QSet<QString>> Engine::fetchSupportedEventTypeIds(
+    const std::shared_ptr<SharedResources>& sharedRes,
+    int channel) const
+{
     const auto& information = sharedRes->sharedContext->information();
     if (!information)
         return boost::none;
@@ -194,10 +280,10 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
 
     return eventTypeIdsFromParameters(
         sharedRes->sharedContext->url(),
-        cgiParameters, eventStatuses.value, deviceInfo->channelNumber());
+        cgiParameters, eventStatuses.value, channel);
 }
 
-boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
+boost::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
     const nx::utils::Url& url,
     const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
     const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
@@ -248,7 +334,7 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
         }
     }
 
-    return QList<QString>::fromSet(result);
+    return result;
 }
 
 const Hanwha::EngineManifest& Engine::manifest() const

@@ -404,30 +404,38 @@ void QnRtspDataConsumer::sendBufferViaTcp(std::optional<int64_t> timestampForLog
 {
     using namespace std::chrono;
 
-    const auto beforeSendBuffer = steady_clock::now();
+    const auto beforeSendBufferTime = steady_clock::now();
     const bool sendBufferResult = m_owner->sendBuffer(m_sendBuffer, timestampForLogging);
-    const auto afterSendBuffer = steady_clock::now();
+    const auto afterSendBufferTime = steady_clock::now();
 
-    // NOTE: On sending error, there seems to be no better option rather than ignore the error -
-    // the peer will have a broken stream but streaming will not stop, which is preferred.
+    const int64_t sendBufferDurationUs =
+        duration_cast<microseconds>(afterSendBufferTime - beforeSendBufferTime).count();
 
-    NX_VERBOSE(this, "Called sendBuffer(@%1, %2 bytes): "
+    const auto logLevel =
+        (sendBufferDurationUs >= nx::network::SocketGlobals::ini().minSocketSendDurationUs)
+            ? nx::utils::log::Level::warning
+            : nx::utils::log::Level::verbose;
+
+    NX_UTILS_LOG(logLevel, this, "Called sendBuffer(@%1, %2 bytes): "
         "%3, timestamp %4, duration %5 us, since last send %6, frame queue size %7",
         nx::kit::utils::toString((const void*) m_sendBuffer.constData()),
         m_sendBuffer.size(),
         sendBufferResult ? "success" : "FAILURE",
         timestampForLogging ? lm("%1 us").args(*timestampForLogging) : "n/a",
-        duration_cast<microseconds>(afterSendBuffer - beforeSendBuffer).count(),
+        sendBufferDurationUs,
         m_lastSendBufferViaTcpTime
             ? lm("%1 us").args(duration_cast<microseconds>(
-                beforeSendBuffer - *m_lastSendBufferViaTcpTime).count())
+                beforeSendBufferTime - *m_lastSendBufferViaTcpTime).count())
             : "n/a",
         m_dataQueue.lock().size()
     );
 
+    // NOTE: On sending error, there seems to be no better option rather than ignore the error -
+    // the peer will have a broken stream but streaming will not stop, which is preferred.
+
     m_sendBuffer.clear();
 
-    m_lastSendBufferViaTcpTime = beforeSendBuffer;
+    m_lastSendBufferViaTcpTime = beforeSendBufferTime;
 }
 
 void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)

@@ -18,7 +18,7 @@ class HttpLiveStreamingProcessorHttpResponse:
 public:
     HttpLiveStreamingProcessorHttpResponse(nx::network::http::MimeProtoVersion httpVersion):
         m_tcpListener(m_serverModule.commonModule()),
-        m_hlsRequestProcessor(&m_serverModule, std::unique_ptr<nx::network::AbstractStreamSocket>(), &m_tcpListener)
+        m_hlsRequestProcessor(std::unique_ptr<nx::network::AbstractStreamSocket>(), &m_tcpListener, &m_serverModule)
     {
         m_request.requestLine.version = httpVersion;
     }
@@ -170,7 +170,7 @@ TEST(HLSMimeTypes, main)
         {
             return nx::vms::server::hls::HttpLiveStreamingProcessor::mimeTypeByExtension(extension);
         }
-    } hlsServerTest(&mediaServerModule, std::unique_ptr<nx::network::AbstractStreamSocket>(), &tcpListener);
+    } hlsServerTest(std::unique_ptr<nx::network::AbstractStreamSocket>(), &tcpListener, &mediaServerModule);
 
     ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("m3u8")), lit("application/vnd.apple.mpegurl"));
     ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("M3U8")), lit("application/vnd.apple.mpegurl"));
