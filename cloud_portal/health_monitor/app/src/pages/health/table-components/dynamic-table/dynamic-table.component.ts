@@ -186,12 +186,10 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
     }
 
     private setPagerSize() {
-        if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.md)) {
+        if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.md) ||
+            (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.xl) && this.selectedEntity)) {
             this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSizeMedium;
             this.pagerEllipses = false;
-        } else if (this.selectedEntity && this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.xl)) {
-            this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSizeSmall;
-            this.pagerEllipses = true;
         } else {
             this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSize;
             this.pagerEllipses = true;
