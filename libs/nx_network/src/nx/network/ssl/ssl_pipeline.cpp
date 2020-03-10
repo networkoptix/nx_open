@@ -35,12 +35,8 @@ int Pipeline::write(const void* data, size_t size)
     }
 
     const auto resultCode = performSslIoOperation(&SSL_write, data, size);
-    if (m_state >= State::handshakeDone
-        && resultCode < 0
-        && resultCode != utils::bstream::StreamIoError::wouldBlock)
-    {
+    if (m_state >= State::handshakeDone && resultCode < 0)
         m_failed = true;
-    }
 
     return resultCode;
 }

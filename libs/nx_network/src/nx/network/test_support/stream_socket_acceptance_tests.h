@@ -1554,7 +1554,7 @@ TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
     this->thenServerMessageIsReceived();
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_send_timeout)
+TYPED_TEST_P(StreamSocketAcceptance, DISABLED_socket_is_reusable_after_send_timeout)
 {
     this->givenClientConnectionTimedOutOnSend();
 
@@ -1934,7 +1934,11 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     msg_dont_wait_flag_makes_recv_call_nonblocking,
     concurrent_recv_send_in_blocking_mode,
     socket_is_reusable_after_recv_timeout,
-    socket_is_reusable_after_send_timeout,
+
+    // This test doesn't work for SSL connections because SSL_write doesn't allow to send different
+    // data after SSL_ERROR_WANT_WRITE.
+    DISABLED_socket_is_reusable_after_send_timeout,
+
     sync_send_reports_timedOut,
     async_send_reports_timedOut,
     all_data_sent_is_received_after_remote_end_closed_connection,
