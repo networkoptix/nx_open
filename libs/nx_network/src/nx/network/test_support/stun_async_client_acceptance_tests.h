@@ -455,6 +455,8 @@ private:
         ASSERT_TRUE(m_server->bind(m_serverEndpoint));
         m_serverEndpoint = nx::network::url::getEndpoint(m_server->url());
 
+        NX_VERBOSE(this, "Server started on %1", m_serverEndpoint);
+
         if (m_proxy)
             m_proxy->setProxyDestination(m_serverEndpoint);
 
