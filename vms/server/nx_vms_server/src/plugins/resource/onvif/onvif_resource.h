@@ -701,15 +701,22 @@ private:
 
 protected:
     // Logging functions
+
+    static QString addTimeoutToMessage(
+        const QString& message,
+        std::optional<std::chrono::milliseconds> timeout);
+
     //** SOAP request failed. */
     QString makeSoapFailMessage(BaseSoapWrapper& soapWrapper,
         const QString& caller, const QString& requestCommand,
-        int soapError, const QString& text = QString()) const;
+        int soapError, const QString& text = QString(),
+        std::optional<std::chrono::milliseconds> timeout = std::optional<std::chrono::milliseconds>()) const;
 
     //** SOAP request succeeded. */
     QString makeSoapSuccessMessage(BaseSoapWrapper& soapWrapper,
         const QString& caller, const QString& requestCommand,
-        const QString& text = QString()) const;
+        const QString& text = QString(),
+        std::optional<std::chrono::milliseconds> timeout = std::optional<std::chrono::milliseconds>()) const;
 
     //** SOAP response has no desired parameter. */
     QString makeSoapNoParameterMessage(BaseSoapWrapper& soapWrapper,
@@ -729,7 +736,9 @@ protected:
 
     //* SOAP request failed - static analogue for makeSoapFailMessage. */
     static QString makeStaticSoapFailMessage(BaseSoapWrapper& soapWrapper,
-        const QString& requestCommand, int soapError, const QString& text = QString());
+        const QString& requestCommand, int soapError, 
+        const QString& text = QString(), 
+        std::optional<std::chrono::milliseconds> timeout = std::optional<std::chrono::milliseconds>());
 
     //** SOAP response is incomplete - static analogue for makeSoapNoParameterMessage. */
     static QString makeStaticSoapNoParameterMessage(BaseSoapWrapper& soapWrapper,
