@@ -59,7 +59,8 @@ QnServerArchiveDelegate::~QnServerArchiveDelegate()
 qint64 QnServerArchiveDelegate::startTime() const
 {
     QnMutexLocker lk( &m_mutex );
-    setCatalogs();
+    if (m_catalogHi.empty() || m_catalogLow.empty())
+        return AV_NOPTS_VALUE;
     qint64 ret = INT64_MAX;
 
     for (QnServer::StoragePool i : QnStorageManager::getPools()) // normal and backup
@@ -82,7 +83,9 @@ qint64 QnServerArchiveDelegate::startTime() const
 qint64 QnServerArchiveDelegate::endTime() const
 {
     QnMutexLocker lk( &m_mutex );
-    setCatalogs();
+    if (m_catalogHi.empty() || m_catalogLow.empty())
+        return AV_NOPTS_VALUE;
+
     qint64 ret = 0;
 
     for (QnServer::StoragePool i : QnStorageManager::getPools()) // normal and backup
