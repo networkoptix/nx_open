@@ -356,15 +356,13 @@ def _get_storages(api, ini) -> List[Storage]:
         if reply is None:
             raise exceptions.ServerApiError(
                 "Unable to get Server Storages via REST HTTP: invalid reply.")
-        if reply:
-            storages = [Storage(item) for item in reply if Storage(item).initialized]
-            if storages:
-                return storages
-
-            raise exceptions.ServerApiError("There are no initialized Storages on the box.")
+        storages = [Storage(item) for item in reply if Storage(item).initialized]
+        if storages:
+            return storages
         time.sleep(ini["getStoragesAttemptIntervalSeconds"])
+
     raise exceptions.ServerApiError(
-        "Unable to get Server Storages via REST HTTP: not all Storages are initialized.")
+        "Unable to get Server Storages via REST HTTP: no Storages are initialized.")
 
 
 _rtsp_perf_frame_regex = re.compile(
