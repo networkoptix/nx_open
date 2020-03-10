@@ -107,8 +107,8 @@ struct MediaFileOperation: RecordBase
             part2 |= (0x2ULL & 0x3) << 0x15;
     }
 
-    static const quint64 kFileSizeMaskLength = 0x27ULL;
-    static const quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
+    static constexpr quint64 kFileSizeMaskLength = 0x27ULL;
+    static constexpr quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
 
     qint64 getFileSize() const
     {
