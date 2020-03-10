@@ -386,19 +386,16 @@ void QnOnvifStreamReader::fixDahuaStreamUrl(
     // The two lower digits - is subtype number (subtype number corresponds to videoEncoder token.
     // The higher digits is a channel number minus 1 .
 
-    const QString token = QString::fromStdString(profileToken);
+    constexpr int kShortFormatDigitCount = 3;
+    constexpr int kLongFormatDigitCount = 5;
 
-    constexpr int kLongFormatDigits = 5;
-    constexpr int kShortFormatDigits = 3;
+    const auto digitsIterator = std::find_if_not(profileToken.crbegin(), profileToken.crend(),
+        isdigit).base();
+    const int digitsCount = profileToken.end() - digitsIterator;
+    if ((digitsCount < kShortFormatDigitCount) || (digitsCount > kLongFormatDigitCount))
+        return;
 
-    bool isNumber = false;
-    int code = token.right(kLongFormatDigits).toInt(&isNumber);
-    if (!isNumber)
-    {
-        int code = token.right(kShortFormatDigits).toInt(&isNumber);
-        if (!isNumber)
-            return; //< Failed to detect index => can not fix url.
-    }
+    const int code = atoi(&*digitsIterator);
     const int neededSubtypeNumber = code % 100;
     const int neededChannelNumber = code / 100 + 1;
 
@@ -417,6 +414,7 @@ void QnOnvifStreamReader::fixDahuaStreamUrl(
     if (path != kPath)
         return; //< Unknown url format => url should not be fixed.
 
+    bool isNumber = false;
     const int currentChannelNumber = query.queryItemValue(kChannel).toInt(&isNumber);
     if (!isNumber)
         return; //< Unknown url format => url should not be fixed.
