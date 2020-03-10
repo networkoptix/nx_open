@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NxRibbonService } from './ribbon.service';
-import { distinctUntilChanged, filter } from 'rxjs/operators';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
+import { Utils } from '../../utils/helpers';
 
 @AutoUnsubscribe()
 @Component({
@@ -34,7 +35,7 @@ export class NxRibbonComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.ribbonSubscription = this.ribbonService.contextSubject.pipe(
-            distinctUntilChanged((contextA, contextB) => JSON.stringify(contextA) === JSON.stringify(contextB))
+            distinctUntilChanged((contextA, contextB) => Utils.isEqual(contextA, contextB))
         ).subscribe(context => {
             this.showRibbon = context.visibility || false;
             this.message = context.message || '';

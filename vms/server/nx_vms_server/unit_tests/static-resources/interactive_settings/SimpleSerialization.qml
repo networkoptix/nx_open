@@ -47,6 +47,7 @@ Settings
                         "type": "ComboBox",
                         "name": "combobox",
                         "defaultValue": "value2",
+                        "itemCaptions": {},
                         "range": ["value1", "value2", "value3"]
                     },
                     {

@@ -64,5 +64,5 @@ void QnBlinkingImageButtonWidget::updateToolTip()
 void QnBlinkingImageButtonWidget::tick(int deltaMSecs)
 {
     m_time += deltaMSecs;
-    m_particle->setOpacity(0.6 + 0.4 * std::sin(m_time / 1000.0 * 2 * M_PI));
+    m_particle->setPaintOpacity(0.6 + 0.4 * std::sin(m_time / 1000.0 * 2 * M_PI));
 }

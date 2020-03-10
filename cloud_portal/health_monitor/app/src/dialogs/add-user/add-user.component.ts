@@ -7,6 +7,7 @@ import { NxLanguageProviderService }             from '../../services/nx-languag
 import { NxModalGenericComponent }               from '../generic/generic.component';
 import { NxToastService }                        from '../toast.service';
 import { NxProcessService }                      from '../../services/process.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector   : 'nx-modal-add-user-content',
@@ -29,9 +30,7 @@ export class AddUserModalContent {
     options: any;
     isNewShare: boolean;
     buttonText: string;
-    selectedPermission: {
-        name: ''
-    };
+    selectedPermissionSubject = new BehaviorSubject<any>({name: ''});
     accessDescription: string;
 
     constructor(public activeModal: NgbActiveModal,
@@ -48,15 +47,24 @@ export class AddUserModalContent {
         this.LANG = this.language.getTranslations();
     }
 
+    get selectedPermission() {
+        return this.selectedPermissionSubject.getValue();
+    }
+
+    set selectedPermission(role) {
+        this.user.role = role;
+        this.selectedPermissionSubject.next(role);
+    }
+
     private getRoleDescription() {
-        if (this.user.role.description) {
-            return this.user.role.description;
+        if (this.selectedPermission.description) {
+            return this.selectedPermission.description;
         }
-        if (this.user.role.userRoleId) {
+        if (this.selectedPermission.userRoleId) {
             return this.LANG.accessRoles.customRole.description;
         }
-        if (this.LANG.accessRoles[ this.user.role.name ]) {
-            return this.LANG.accessRoles[ this.user.role.name ].description;
+        if (this.LANG.accessRoles[ this.selectedPermission.name ]) {
+            return this.LANG.accessRoles[ this.selectedPermission.name ].description;
         }
         return this.LANG.accessRoles.customRole.description;
     }
@@ -77,8 +85,6 @@ export class AddUserModalContent {
     }
 
     doShare() {
-        this.user.role = this.selectedPermission;
-
         return this.system.saveUser(this.user, this.user.role).then((user) => {
             return this.system.getUsers(true).then(() => {
                 return new Promise(resolve => setTimeout(() => resolve(user)));
@@ -93,9 +99,6 @@ export class AddUserModalContent {
 
         if (!this.user) {
             this.isNewShare = true;
-            const predefinedRole = this.CONFIG.accessRoles.predefinedRoles.filter(role => {
-                return role.name === this.CONFIG.accessRoles.default;
-            })[0];
             this.user = {
                 email    : '',
                 isEnabled: true,

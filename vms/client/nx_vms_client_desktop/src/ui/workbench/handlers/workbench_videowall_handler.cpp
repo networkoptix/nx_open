@@ -1141,13 +1141,6 @@ void QnWorkbenchVideoWallHandler::restoreMessages(const QnUuid& controllerUuid, 
 
 bool QnWorkbenchVideoWallHandler::canStartControlMode(const QnUuid& layoutId) const
 {
-    if (!m_licensesHelper->isValid(Qn::LC_VideoWall))
-    {
-        showLicensesErrorDialog(
-            tr("To enable this feature, please activate a Video Wall license."));
-        return false;
-    }
-
     const auto localInstanceId = runtimeInfoManager()->localInfo().uuid;
 
     if (!m_licensesHelper->canStartControlSession(localInstanceId))
@@ -1705,12 +1698,6 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered()
     auto videoWall = menu()->currentParameters(sender()).resource().dynamicCast<QnVideoWallResource>();
     if (videoWall.isNull())
         return;
-
-    if (!m_licensesHelper->isValid())
-    {
-        showLicensesErrorDialog(tr("Activate one more license to start Video Wall."));
-        return;
-    }
 
     switchToVideoWallMode(videoWall);
 }

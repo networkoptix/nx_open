@@ -163,6 +163,10 @@
         height   : rem(300px);
         overflow : hidden;
 
+        .card--header {
+            min-height: 81px;
+        }
+
         .card--body {
             overflow: hidden;
         }

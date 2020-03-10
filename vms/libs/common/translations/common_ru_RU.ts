@@ -1925,15 +1925,15 @@
     </message>
     <message>
       <source>Archive Backup Finished</source>
-      <translation type="unfinished">Archive Backup Finished</translation>
+      <translation>Резервное копирование архива завершено</translation>
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation type="unfinished">PoE over Budget</translation>
+      <translation>Превышение порога мощности PoE</translation>
     </message>
     <message>
       <source>Fan Error</source>
-      <translation type="unfinished">Fan Error</translation>
+      <translation>Ошибка вентилятора</translation>
     </message>
     <message>
       <source>PoE over budget at %1</source>

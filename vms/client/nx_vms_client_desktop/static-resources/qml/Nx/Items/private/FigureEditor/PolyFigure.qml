@@ -257,6 +257,15 @@ Figure
         onDraggingChanged: gripDragging = dragging
     }
 
+    PointMarker
+    {
+        color: figure.color
+        x: pointMakerInstrument.hoveredPoint ? pointMakerInstrument.hoveredPoint.x : 0
+        y: pointMakerInstrument.hoveredPoint ? pointMakerInstrument.hoveredPoint.y : 0
+        hovered: true
+        visible: !!pointMakerInstrument.hoveredPoint
+    }
+
     Menu
     {
         id: pointMenu

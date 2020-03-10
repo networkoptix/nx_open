@@ -230,10 +230,9 @@ export class NxSystemMetricsComponent implements OnInit, AfterViewInit {
                 this.healthLayoutService.activeEntity = entity;
                 queryParams.id = entity.id;
                 this.uri.updateURI(undefined, queryParams);
-
-                if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.lg)) {
-                    this.healthLayoutService.mobileDetailMode = true;
-                }
+            }
+            if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.lg)) {
+                this.healthLayoutService.mobileDetailMode = true;
             }
         } else {
             this.resetActiveEntity();
