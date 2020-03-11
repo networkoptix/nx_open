@@ -63,6 +63,8 @@ void PeerRegistrator::bind(
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp ||
         !serverConnection)
     {
+        NX_VERBOSE(this, "Only TCP is allowed for bind request");
+
         return sendErrorResponse(
             connection,
             requestMessage.header,
@@ -365,7 +367,7 @@ void PeerRegistrator::reportClientBind(
 std::vector<network::stun::Message> PeerRegistrator::prepareClientBindIndications()
 {
     QnMutexLocker lk(&m_mutex);
- 
+
     std::vector<network::stun::Message> clientBindIndications;
     for (const auto& client: m_boundClients)
         clientBindIndications.push_back(makeIndication(client.first, client.second));

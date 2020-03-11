@@ -59,6 +59,8 @@ void MediaserverEndpointTesterBase::ping(
         message.getAttribute<network::stun::extension::attrs::PublicEndpointList>();
     if (!endpointsAttr)
     {
+        NX_VERBOSE(this, "Required attribute PublicEndpointList is missing from request");
+
         sendErrorResponse(
             connection,
             message.header,
