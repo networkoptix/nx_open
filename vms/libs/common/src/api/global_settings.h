@@ -311,6 +311,9 @@ public:
     QString cloudHost() const;
     void setCloudHost(const QString& value);
 
+    bool crossdomainEnabled() const;
+    void setCrossdomainEnabled(bool value);
+
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
 
@@ -519,6 +522,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_sequentialFlirOnvifSearcherEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_crossdomainEnabledAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets = nullptr;
