@@ -117,7 +117,7 @@ Instrument
             while (index < 0)
                 index += count
 
-            while (index >= count)
+            while (index > count)
                 index -= count
 
             return index
