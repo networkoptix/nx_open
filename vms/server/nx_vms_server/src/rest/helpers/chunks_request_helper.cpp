@@ -5,7 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <analytics/db/abstract_storage.h>
+#include <nx/analytics/db/abstract_storage.h>
 #include <api/helpers/chunks_request_data.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
@@ -13,7 +13,7 @@
 #include "motion/motion_helper.h"
 #include "recorder/storage_manager.h"
 #include "media_server/media_server_module.h"
-#include <nx/vms/server/metadata/analytics_helper.h>
+#include <nx/analytics/db/analytics_archive_helper.h>
 #include <nx/utils/log/log_main.h>
 
 static const auto kAllArchive = QList<QnServer::ChunksCatalog>()

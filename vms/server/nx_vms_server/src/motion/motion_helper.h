@@ -9,11 +9,12 @@
 #include "core/resource/resource_fwd.h"
 #include <nx/vms/server/server_module_aware.h>
 #include <api/helpers/chunks_request_data.h>
-#include <nx/vms/server/metadata/metadata_helper.h>
+#include <nx/vms/metadata/metadata_helper.h>
 
 class QnTimePeriodList;
 
-class QnMotionHelper: public nx::vms::server::metadata::MetadataHelper
+class QnMotionHelper:
+    public nx::vms::metadata::MetadataHelper
 {
     Q_OBJECT
 public:

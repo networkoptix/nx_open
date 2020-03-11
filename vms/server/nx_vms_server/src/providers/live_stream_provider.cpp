@@ -27,7 +27,7 @@
 #include <utils/media/hevc_sps.h>
 #include <camera/video_camera.h>
 #include <nx_vms_server_ini.h>
-#include <nx/vms/server/analytics/db/analytics_events_receptor.h>
+#include <nx/analytics/db/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/fusion/model_functions.h>
@@ -601,7 +601,7 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
 
 QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()
 {
-    QnMetaDataV1Ptr result(new QnMetaDataV1(1));
+    QnMetaDataV1Ptr result(new QnMetaDataV1(qnSyncTime->currentTimePoint(), 1));
     result->m_duration = 1000 * 1000 * 1000; // 1000 sec
     return result;
 }

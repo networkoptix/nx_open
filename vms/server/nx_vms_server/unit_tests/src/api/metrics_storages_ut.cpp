@@ -7,7 +7,7 @@
 #include <server_for_tests.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <analytics/db/abstract_storage.h>
+#include <nx/analytics/db/abstract_storage.h>
 #include <nx/vms/server/event/event_connector.h>
 
 #include "test_api_requests.h"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <memory>
 
 #include <QtCore/QVector>
@@ -255,8 +256,8 @@ struct QnMetaDataV1: public QnAbstractCompressedMetadata
 public:
     static const int kMotionDataBufferSize = Qn::kMotionGridWidth*Qn::kMotionGridHeight / 8;
 
-    QnMetaDataV1(int initialValue = 0, int extraBufferSize = 0);
-    QnMetaDataV1(QnAbstractAllocator* allocator, int initialValue = 0);
+    QnMetaDataV1(std::chrono::microseconds timestamp, int initialValue = 0, int extraBufferSize = 0);
+    QnMetaDataV1(std::chrono::microseconds timestamp, QnAbstractAllocator* allocator, int initialValue = 0);
 
     static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData);
 

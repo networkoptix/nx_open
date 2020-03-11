@@ -7,7 +7,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 #include <api/model/analytics_actions.h>
-#include <analytics/db/abstract_storage.h>
+#include <nx/analytics/db/abstract_storage.h>
 #include <transcoding/filters/abstract_image_filter.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 

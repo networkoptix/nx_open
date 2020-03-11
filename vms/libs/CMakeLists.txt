@@ -10,6 +10,7 @@ if(withMediaServer
     add_subdirectory(nx_vms_api)
     add_subdirectory(nx_sdk)
     add_subdirectory(nx_update)
+    add_subdirectory(nx_analytics_db)
 endif()
 
 if(withMediaServer OR withRootTool OR withClouds)
