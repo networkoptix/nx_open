@@ -596,9 +596,14 @@ CameraDiagnostics::Result QnRtspClient::sendOptions()
     request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     QByteArray response;
-    auto result = sendRequestAndReceiveResponse(std::move(request), response);
+    const auto result = sendRequestAndReceiveResponse(std::move(request), response);
     if (!result)
         NX_ERROR(this, "OPTIONS request failed");
+
+    QString allowedMethods = extractRTSPParam(QLatin1String(response), QLatin1String("Public:"));
+    if (!allowedMethods.contains("GET_PARAMETER"))
+        m_config.disableKeepAlive = true;
+
     return result;
 }
 
