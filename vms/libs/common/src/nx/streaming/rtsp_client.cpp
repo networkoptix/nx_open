@@ -625,6 +625,11 @@ bool QnRtspClient::sendOptions()
         NX_ERROR(this, "OPTIONS request failed");
         return false;
     }
+
+    QString allowedMethods = extractRTSPParam(QLatin1String(response), QLatin1String("Public:"));
+    if (!allowedMethods.contains("GET_PARAMETER"))
+        m_config.disableKeepAlive = true;
+
     return true;
 }
 
