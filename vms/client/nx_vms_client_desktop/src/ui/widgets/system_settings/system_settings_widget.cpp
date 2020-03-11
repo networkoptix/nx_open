@@ -7,6 +7,8 @@
 
 #include <core/resource/device_dependent_strings.h>
 
+#include <client/client_globals.h>
+
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
