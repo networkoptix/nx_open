@@ -263,9 +263,13 @@ class _BoxCpuTimes:
         self.busy_time_s = self.uptime_s - idle_time_s / cpu_cores
 
     def cpu_usage(self, prev: '_BoxCpuTimes'):
+        if self.uptime_s - prev.uptime_s == 0:
+            return None
+
         value = (self.busy_time_s - prev.busy_time_s) / (self.uptime_s - prev.uptime_s)
         if value > 1:
             return 1
+
         return value
 
 
@@ -741,7 +745,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             last_tx_rx_errors = first_tx_rx_errors
 
                             first_cycle = False
-                            continue
 
                         if cpu_times is not None:
                             cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
@@ -944,9 +947,10 @@ def _obtain_box_platform(box, linux_distribution):
         "    File systems:\n"
         + '\n'.join(
             f"        {storage['fs']} "
-            f"on {storage['point']}: "
-            f"free {int(storage['space_free']) / 1024 / 1024 / 1024:.1f} GB "
-            f"of {int(storage['space_total']) / 1024 / 1024 / 1024:.1f} GB"
+            f"on {storage['point']}: " + (
+                f"free {int(storage['space_free']) / 1024 / 1024 / 1024:.1f} GB "
+                f"of {int(storage['space_total']) / 1024 / 1024 / 1024:.1f} GB"
+            ) if 'space_free' in storage and 'space_total' in storage else ''
             for (point, storage) in box_platform.storages_list.items())
     )
 
