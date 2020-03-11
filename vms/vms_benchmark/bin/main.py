@@ -940,7 +940,7 @@ def _obtain_box_platform(box, linux_distribution):
         return res
 
     file_systems_info = '\n'.join(
-        otile_system_info_row(storage) for _point, storage in box_platform.storages_list.items()
+        file_system_info_row(storage) for _point, storage in box_platform.storages_list.items()
     )
 
     report(
