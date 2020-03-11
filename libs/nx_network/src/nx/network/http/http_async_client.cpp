@@ -694,6 +694,13 @@ void AsyncClient::onSomeBytesReadAsync(
 
         NX_DEBUG(this, lm("Error reading (state %1) http response from %2. %3")
             .arg(toString(stateBak)).arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)));
+        if (stateBak == State::sReadingMessageBody)
+        {
+            const auto contentLength = m_httpStreamReader.contentLength();
+            NX_DEBUG(this, "%1 out of %2 bytes of incomplete message body have been read",
+                m_httpStreamReader.messageBodyBytesRead(), contentLength ? std::to_string(*contentLength) : "?");
+        }
+
         m_lastSysErrorCode = errorCode;
         const auto requestSequenceBak = m_requestSequence;
         if (emitDone() == Result::thisDestroyed)
