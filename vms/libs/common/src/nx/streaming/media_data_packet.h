@@ -296,7 +296,7 @@ public:
 
     bool mapMotion(const QRect& imageRect, const QRect& mRect);
 
-    bool containTime(const qint64 timeUsec) const;
+    bool containTime(const qint64 timeUsec) const override;
 
     // Returns true if no motion detected.
     bool isEmpty() const;
