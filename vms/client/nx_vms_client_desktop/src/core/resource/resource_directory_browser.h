@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include <QtCore/QPointer>
 #include <core/resource/client_resource_fwd.h>
 #include "local_resources_directory_model.h"

@@ -23,13 +23,13 @@ void Group::setFilledCheckItems(const QVariantList& items)
     emit filledCheckItemsChanged();
 }
 
-QJsonObject Group::serialize() const
+QJsonObject Group::serializeModel() const
 {
-    auto result = base_type::serialize();
+    auto result = base_type::serializeModel();
 
     QJsonArray items;
     for (const auto item: m_items)
-        items.append(item->serialize());
+        items.append(item->serializeModel());
     result[QStringLiteral("items")] = items;
 
     result[QStringLiteral("filledCheckItems")] = QJsonArray::fromVariantList(m_filledCheckItems);

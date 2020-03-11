@@ -711,7 +711,7 @@ void PlayerPrivate::applyVideoQuality()
         ? dataConsumer->currentVideoDecoders()
         : std::vector<AbstractVideoDecoder*>();
 
-    media_player_quality_chooser::Input input;
+    media_player_quality_chooser::Params input;
     input.transcodingCodec = archiveReader->getTranscodingCodec();
     input.liveMode = liveMode;
     input.positionMs = positionMs;
@@ -1248,7 +1248,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
         ? d->dataConsumer->currentVideoDecoders()
         : std::vector<AbstractVideoDecoder*>();
     const auto getQuality =
-        [input = media_player_quality_chooser::Input{
+        [input = media_player_quality_chooser::Params{
             transcodingCoded,
             d->liveMode,
             d->positionMs,

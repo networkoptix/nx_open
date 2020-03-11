@@ -719,7 +719,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
                 (j + 10) * j + 10, 0, nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION,
                 1, 0, 1, 1));
         }
-        catalog->addChunks(chunks);
+        catalog->addChunks(std::move(chunks));
 
         referenceCatalogs.push_back(catalog);
     }
@@ -946,6 +946,39 @@ TEST_F(MediaDbTest, ReplaceRecord)
 
     ASSERT_EQ(1, dbChunkCatalogs.size());
     ASSERT_EQ(1, dbChunkCatalogs[0]->size());
+}
+
+TEST_F(MediaDbTest, invalidFileSize)
+{
+    using namespace nx::media_db;
+
+    auto sdb = serverModule().storageDbPool()->getSDB(storage);
+    auto result = sdb->open(*workDirResource->getDirName() + lit("/test.nxdb"));
+    ASSERT_TRUE(result);
+
+    sdb->loadFullFileCatalog();
+
+    const QString id1("1");
+
+    nx::vms::server::Chunk chunk;
+    chunk.startTimeMs = 10;
+    chunk.durationMs = 5;
+    chunk.fileIndex = nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION;
+    chunk.storageIndex = serverModule().storageDbPool()->getStorageIndex(storage);
+
+    chunk.setFileSize(-1);
+    ASSERT_EQ(0, chunk.getFileSize());
+    sdb->addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+
+    chunk.setFileSize(0x700000000000LL);
+    sdb->addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+
+    auto dbChunkCatalogs = sdb->loadFullFileCatalog();
+
+    ASSERT_EQ(1, dbChunkCatalogs.size());
+    ASSERT_EQ(2, dbChunkCatalogs[0]->size());
+    ASSERT_EQ(0, dbChunkCatalogs[0]->chunkAt(0).getFileSize());
+    ASSERT_EQ(MediaFileOperation::kMaxFileSizeValue, dbChunkCatalogs[0]->chunkAt(1).getFileSize());
 }
 
 } // namespace nx::media_db::test

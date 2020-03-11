@@ -119,9 +119,9 @@ static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
 ProgressiveDownloadingServer::ProgressiveDownloadingServer(
-    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnTcpListener* owner)
+    QnTcpListener* owner,
+    QnMediaServerModule* serverModule)
     :
     QnTCPConnectionProcessor(new ProgressiveDownloadingServerPrivate, std::move(socket), owner)
 {
@@ -618,7 +618,7 @@ void ProgressiveDownloadingServer::run()
 
     QnByteArray emptyChunk((unsigned)0,0);
     sendChunk(emptyChunk);
-    sendData(QByteArray("\r\n"));
+    sendBuffer(QByteArray("\r\n"));
 
     dataProvider->removeDataProcessor(&dataConsumer);
     if (camera)

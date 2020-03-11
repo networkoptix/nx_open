@@ -39,6 +39,22 @@ using namespace nx::debugging;
 using nx::vms::server::resource::AnalyticsEngineResource;
 using namespace nx::vms::server::metrics;
 
+static bool isEngineCompatibleWithDevice(
+    const wrappers::EnginePtr& engine,
+    const QnVirtualCameraResourcePtr& device)
+{
+    if (!NX_ASSERT(engine))
+        return false;
+
+    if (!NX_ASSERT(device))
+        return false;
+
+    if (device->hasCameraCapabilities(Qn::CameraCapability::noAnalytics))
+        return false;
+
+    return engine->isCompatible(device);
+}
+
 Manager::Manager(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     m_thread(new QThread(this))
@@ -518,7 +534,7 @@ QSet<QnUuid> Manager::compatibleEngineIds(const QnVirtualCameraResourcePtr& devi
         if (!NX_ASSERT(sdkEngine))
             continue;
 
-        if (sdkEngine->isCompatible(device))
+        if (isEngineCompatibleWithDevice(sdkEngine, device))
             result.insert(engine->getId());
     }
 
@@ -549,7 +565,7 @@ void Manager::updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& e
     for (auto& device: devices)
     {
         auto compatibleEngineIds = device->compatibleAnalyticsEngines();
-        if (sdkEngine->isCompatible(device))
+        if (isEngineCompatibleWithDevice(sdkEngine, device))
             compatibleEngineIds.insert(engineId);
         else
             compatibleEngineIds.remove(engineId);

@@ -100,6 +100,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     nx::vms_server_plugins::analytics::hanwha::Hanwha::EngineManifest,
     (json), HanwhaEngineManifest_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    nx::vms_server_plugins::analytics::hanwha::Hanwha::DeviceAgentManifest,
+    (json), HanwhaDeviceAgentManifest_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    nx::vms_server_plugins::analytics::hanwha::Hanwha::ObjectMetadataAttributeFilters,
+    (json), HanwhaObjectMetadataAttributeFilters_Fields)
 
 } // namespace hanwha
 } // namespace analytics

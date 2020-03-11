@@ -72,8 +72,8 @@ protected:
     static AbstractAsyncClient::Settings defaultSettings()
     {
         AbstractAsyncClient::Settings settings;
-        settings.sendTimeout = std::chrono::seconds::zero();
-        settings.recvTimeout = std::chrono::seconds::zero();
+        settings.sendTimeout = kNoTimeout;
+        settings.recvTimeout = kNoTimeout;
 
         settings.reconnectPolicy.delayMultiplier = 2;
         settings.reconnectPolicy.initialDelay = std::chrono::milliseconds(500);
@@ -203,6 +203,7 @@ TEST_F(StunClientServerTest, RequestResponse)
 
     const auto address = startServer();
     client->connect(nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
+
     {
         Message request(Header(MessageClass::request, MethodType::bindingMethod));
 
@@ -227,6 +228,7 @@ TEST_F(StunClientServerTest, RequestResponse)
         const auto ipv4 = ntohl(HostAddress::localhost.ipV4()->s_addr);
         ASSERT_EQ(ipv4, addr->address.ipv4);
     }
+
     {
         Message request(Header(MessageClass::request, 0xFFF /* unknown */));
 

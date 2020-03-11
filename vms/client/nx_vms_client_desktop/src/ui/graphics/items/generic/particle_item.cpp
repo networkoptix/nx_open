@@ -40,10 +40,16 @@ void QnParticleItem::setRect(const QRectF &rect) {
     m_rect = rect;
 }
 
+void QnParticleItem::setPaintOpacity(qreal opacity)
+{
+    m_paintOpacity = opacity;
+}
+
 void QnParticleItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
+    painter->setOpacity(m_paintOpacity);
     QnScopedPainterBrushRollback brushRollback(painter, m_brush);
     QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
     painter->drawRect(rect());

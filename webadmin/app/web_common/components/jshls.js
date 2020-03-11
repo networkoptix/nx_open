@@ -16,7 +16,9 @@ import * as Hls from 'hls.js';
             lastDuration,
             lastAudioTrackSwitchingIdx,
             recoverDecodingErrorDate,
-            recoverSwapAudioCodecDate;
+            recoverSwapAudioCodecDate,
+            stalledCount;
+        var self = this;
         
         this.initHlsEvents = function (hls) {
             var jshlsApi = this;
@@ -305,9 +307,10 @@ import * as Hls from 'hls.js';
                     case Hls.ErrorDetails.BUFFER_APPENDING_ERROR:
                         console.log('Buffer Appending Error');
                         break;
-                    // case Hls.ErrorDetails.BUFFER_STALLED_ERROR:
-                    //     jshlsApi.load(jshlsApi.video.src);
-                    //     break;
+                    case Hls.ErrorDetails.BUFFER_STALLED_ERROR:
+                        console.warn('BufferStalled');
+                        // jshlsApi.load(jshlsApi.video.src);
+                        break;
                     default:
                         break;
                 }
@@ -370,6 +373,7 @@ import * as Hls from 'hls.js';
         
         this.init = function (element, loadingTimeOut, jshlsDebugMode, readyHandler, errorHandler) {
             this.video = element[0];
+            stalledCount = 0;
             
             debugMode = jshlsDebugMode;
             if (Hls.isSupported()) {
@@ -421,10 +425,19 @@ import * as Hls from 'hls.js';
                 case 'play':
                 case 'playing':
                     lastStartPosition = evt.target.currentTime;
-                case 'pause':
-                case 'waiting':
+                    stalledCount = 0;
                 case 'stalled':
+                case 'waiting':
+                    if (evt.type === 'stalled' || evt.type === 'waiting') {
+                        stalledCount += 1;
+                    }
+                case 'pause':
                 case 'error':
+                    if (stalledCount > 2) {
+                        stalledCount = 0;
+                        self.handleMediaError();
+                        return;
+                    }
                     data = Math.round(evt.target.currentTime * 1000);
                     if (evt.type === 'error') {
                         var errorTxt, mediaError = evt.currentTarget.error;
@@ -434,7 +447,7 @@ import * as Hls from 'hls.js';
                                 break;
                             case mediaError.MEDIA_ERR_DECODE:
                                 errorTxt = 'The video playback was aborted due to a corruption problem or because the video used features your browser did not support';
-                                this.handleMediaError();
+                                self.handleMediaError();
                                 break;
                             case mediaError.MEDIA_ERR_NETWORK:
                                 errorTxt = 'A network error caused the video download to fail part-way';
@@ -526,6 +539,7 @@ import * as Hls from 'hls.js';
         this.addEventListener('loadedmetadata', this.handleVideoEvent);
         this.addEventListener('loadeddata', this.handleVideoEvent);
         this.addEventListener('durationchange', this.handleVideoEvent);
+        this.addEventListener('stalled', this.handleVideoEvent);
     };
     
     window.JsHlsAPI.prototype.addEventListener = function (event, handler) {

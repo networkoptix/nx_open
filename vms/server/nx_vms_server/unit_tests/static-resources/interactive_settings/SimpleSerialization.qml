@@ -47,6 +47,7 @@ Settings
                         "type": "ComboBox",
                         "name": "combobox",
                         "defaultValue": "value2",
+                        "itemCaptions": {},
                         "range": ["value1", "value2", "value3"]
                     },
                     {
@@ -76,6 +77,26 @@ Settings
         "textArea": "a text",
         "number": 42,
         "double": 3.1415,
+        "combobox": "value2",
+        "checkbox": true
+    }
+
+    readonly property var _stringValues:
+    {
+        "text": "a text",
+        "textArea": "a text",
+        "number": "15",
+        "double": "2.71828",
+        "combobox": "value2",
+        "checkbox": "true"
+    }
+
+    readonly property var _resultValues:
+    {
+        "text": "a text",
+        "textArea": "a text",
+        "number": 15,
+        "double": 2.71828,
         "combobox": "value2",
         "checkbox": true
     }

@@ -93,15 +93,17 @@ bool isProtocol(const QString& protocol)
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 ProxyConnectionProcessor::ProxyConnectionProcessor(
-    ::nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
     std::unique_ptr<::nx::network::AbstractStreamSocket> socket,
-    QnHttpConnectionListener* owner)
+    QnHttpConnectionListener* owner,
+    ::nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
+    bool allowThirdPartyProxy)
 :
     QnTCPConnectionProcessor(new ProxyConnectionProcessorPrivate, std::move(socket), owner)
 {
     Q_D(ProxyConnectionProcessor);
     d->connectTimeout = commonModule()->globalSettings()->proxyConnectTimeout();
     d->reverseConnectionManager = reverseConnectionManager;
+    d->allowThirdPartyProxy = allowThirdPartyProxy;
 }
 
 ProxyConnectionProcessor::~ProxyConnectionProcessor()
@@ -347,7 +349,7 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
     nx::network::http::insertOrReplaceHeader(
         &d->request.headers,
         nx::network::http::HttpHeader(Qn::PROXY_TTL_HEADER_NAME, QByteArray::number(ttl)));
-
+    bool isGeneralProxyRequest = false;
     if (isStandardProxyNeeded(commonModule(), d->request))
     {
         dstUrl = d->request.requestLine.url;
@@ -390,6 +392,7 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
             int port = hostAndPort.size() > 1 ? hostAndPort[1].toInt() : getDefaultPortByProtocol(protocol);
 
             dstUrl = nx::utils::Url(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
+            isGeneralProxyRequest = true;
         }
         else {
             QString scheme = url.scheme();
@@ -442,8 +445,10 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
                 replaceCameraRefererHeader(camera);
             }
         }
-        else if (isStandardProxyNeeded(commonModule(), d->request))
+        else if (isStandardProxyNeeded(commonModule(), d->request) || isGeneralProxyRequest)
         {
+            if (isGeneralProxyRequest && !d->allowThirdPartyProxy)
+                return false;
             nx::utils::Url url = d->request.requestLine.url;
             int defaultPort = getDefaultPortByProtocol(dstUrl.scheme());
             dstRoute.addr = nx::network::SocketAddress(dstUrl.host(), dstUrl.port(defaultPort));

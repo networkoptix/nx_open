@@ -47,9 +47,9 @@ public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
     HttpLiveStreamingProcessor(
-        QnMediaServerModule* serverModule,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        QnTcpListener* owner);
+        QnTcpListener* owner,
+        QnMediaServerModule* serverModule);
 
     virtual ~HttpLiveStreamingProcessor();
 

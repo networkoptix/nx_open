@@ -12,9 +12,9 @@ class ReverseConnectionListener: public QnTCPConnectionProcessor
 {
 public:
     ReverseConnectionListener(
-        ReverseConnectionManager* reverseConnectionManager,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        QnHttpConnectionListener* owner);
+        QnHttpConnectionListener* owner,
+        ReverseConnectionManager* reverseConnectionManager);
 protected:
     virtual void run();
 private:

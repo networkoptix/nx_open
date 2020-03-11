@@ -107,32 +107,35 @@ struct MediaFileOperation: RecordBase
             part2 |= (0x2ULL & 0x3) << 0x15;
     }
 
+    static constexpr quint64 kFileSizeMaskLength = 0x27ULL;
+    static constexpr quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
+
     qint64 getFileSize() const
     {
-        return (part2 >> 0x17) & getBitMask(0x27LL);
+        return (part2 >> 0x17) & kMaxFileSizeValue;
     }
 
-    const quint64 kFileSizeMaskLength = 0x27ULL;
-    const quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
-
-    void setFileSize(quint64 fileSize)
+    void setFileSize(qint64 fileSize)
     {
-        const quint64 kFileSizeMaskLength = 0x27ULL;
         const quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
 
         part2 &= ~(getBitMask(kFileSizeMaskLength) << 0x17);
-        if (fileSize > kMaxFileSizeValue)
+        if (fileSize < 0)
+        {
+            NX_WARNING(this, lm("File size is not known. Defaulting it to 0."));
+            fileSize = 0;
+        }
+        else if (fileSize > kMaxFileSizeValue)
         {
             NX_WARNING(
                 this,
                 lm("File size value %1 would overflow. Setting to max available value %2 instead.")
                 .arg(fileSize)
                 .arg(kMaxFileSizeValue));
-            part2 |= (getBitMask(kFileSizeMaskLength)) << 0x17;
-            return;
+            fileSize = kMaxFileSizeValue;
         }
 
-        part2 |= ((quint64)fileSize & getBitMask(kFileSizeMaskLength)) << 0x17;
+        part2 |= ((quint64)fileSize & kMaxFileSizeValue) << 0x17;
     }
 
     int getFileTypeIndex() const

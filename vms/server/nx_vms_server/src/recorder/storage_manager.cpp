@@ -517,7 +517,9 @@ private:
 
         lock->unlock();
         m_owner->scanMediaCatalog(
-            scanTask.storage, scanTask.catalog, DeviceFileCatalog::ScanFilter(),
+            scanTask.storage,
+            scanTask.catalog,
+            DeviceFileCatalog::ScanFilter(QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch())),
             &archiveCameras);
         lock->relock();
 
@@ -1131,45 +1133,47 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     int filesizeFieldIdx = queryInfo.indexOf("filesize");
 
     DeviceFileCatalogPtr fileCatalog;
-    nx::vms::server::ChunksDeque chunks;
-    QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ from all existing catalogs
-    QByteArray prevId;
-
-    while (query.next())
     {
-        QByteArray id = query.value(idFieldIdx).toByteArray();
-        QnServer::ChunksCatalog catalog = (QnServer::ChunksCatalog) query.value(roleFieldIdx).toInt();
-        if (id != prevId || catalog != prevCatalog)
+        nx::vms::server::ChunksDeque chunks;
+        QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ from all existing catalogs
+        QByteArray prevId;
+
+        while (query.next())
         {
-            if (fileCatalog)
+            QByteArray id = query.value(idFieldIdx).toByteArray();
+            QnServer::ChunksCatalog catalog = (QnServer::ChunksCatalog) query.value(roleFieldIdx).toInt();
+            if (id != prevId || catalog != prevCatalog)
             {
-                fileCatalog->addChunks(chunks);
-                oldCatalogs << fileCatalog;
-                chunks.clear();
-            }
+                if (fileCatalog)
+                {
+                    fileCatalog->addChunks(std::move(chunks));
+                    oldCatalogs << fileCatalog;
+                    chunks.clear();
+                }
 
-            prevCatalog = catalog;
-            prevId = id;
-            fileCatalog = DeviceFileCatalogPtr(
-                new DeviceFileCatalog(
-                    serverModule(),
-                    QString::fromUtf8(id),
-                    catalog,
-                    QnServer::StoragePool::None));
+                prevCatalog = catalog;
+                prevId = id;
+                fileCatalog = DeviceFileCatalogPtr(
+                    new DeviceFileCatalog(
+                        serverModule(),
+                        QString::fromUtf8(id),
+                        catalog,
+                        QnServer::StoragePool::None));
+            }
+            qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
+            qint64 filesize = query.value(filesizeFieldIdx).toLongLong();
+            int timezone = query.value(timezoneFieldIdx).toInt();
+            int fileNum = query.value(fileNumFieldIdx).toInt();
+            int durationMs = query.value(durationFieldIdx).toInt();
+            chunks.push_back(nx::vms::server::Chunk(
+                startTime, storageIndex, fileNum, durationMs, (qint16)timezone,
+                (quint16)(filesize >> 32), (quint32)filesize));
         }
-        qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
-        qint64 filesize = query.value(filesizeFieldIdx).toLongLong();
-        int timezone = query.value(timezoneFieldIdx).toInt();
-        int fileNum = query.value(fileNumFieldIdx).toInt();
-        int durationMs = query.value(durationFieldIdx).toInt();
-        chunks.push_back(nx::vms::server::Chunk(
-            startTime, storageIndex, fileNum, durationMs, (qint16)timezone,
-            (quint16)(filesize >> 32), (quint32)filesize));
-    }
-    if (fileCatalog)
-    {
-        fileCatalog->addChunks(chunks);
-        oldCatalogs << fileCatalog;
+        if (fileCatalog)
+        {
+            fileCatalog->addChunks(std::move(chunks));
+            oldCatalogs << fileCatalog;
+        }
     }
 
     auto connectionName = sqlDb.connectionName();
@@ -1219,7 +1223,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
                     QnServer::StoragePool::None));
 
             const auto diffChunks = c->setDifference(*newCatalog);
-            catalogToWrite->addChunks(diffChunks);
+            catalogToWrite->addChunks(std::move(diffChunks));
             catalogsToWrite.push_back(catalogToWrite);
         }
     }
@@ -2645,22 +2649,42 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqu
 }
 
 void QnStorageManager::replaceChunks(
-    const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage,
-    DeviceFileCatalogPtr&& newCatalog, const QString& cameraUniqueId,
+    const QnTimePeriod& rebuildPeriod,
+    const QnStorageResourcePtr &storage,
+    DeviceFileCatalogPtr&& newCatalog,
+    const QString& cameraUniqueId,
     QnServer::ChunksCatalog catalog)
 {
     QnMutexLocker lock( &m_mutexCatalog );
     int storageIndex = storageDbPool()->getStorageIndex(storage);
-
     DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
     qint64 newArchiveFirstChunkStartTimeMs = newCatalog->minTime() == AV_NOPTS_VALUE
         ? std::numeric_limits<qint64>::max()
         : newCatalog->minTime();
+    const qint64 leftNewArchiveBorder = qMin(rebuildPeriod.startTimeMs, newArchiveFirstChunkStartTimeMs);
+    newCatalog->addChunks(ownCatalog->chunksBefore(leftNewArchiveBorder, storageIndex));
 
-    qint64 newArchiveBorder = qMin(rebuildPeriod.startTimeMs, newArchiveFirstChunkStartTimeMs);
-    newCatalog->addChunks(ownCatalog->chunksBefore(newArchiveBorder, storageIndex));
-    newCatalog->addChunks(ownCatalog->chunksAfter(
-        ownCatalog->lastChunkStartTime(storageIndex), storageIndex));
+    NX_ASSERT(rebuildPeriod.endTimeMs() > 0);
+    const qint64 rightNewArchiveBorder = qMax(
+        rebuildPeriod.endTimeMs() - serverModule()->settings().mediaFileDuration() * 1000 * 1.5,
+        newCatalog->lastChunkStartTime(storageIndex));
+    auto chunksAfter = ownCatalog->chunksAfter(rightNewArchiveBorder, storageIndex);
+    chunksAfter.erase(std::remove_if(
+            chunksAfter.begin(), chunksAfter.end(),
+            [ownCatalog, storage](const auto& c)
+            {
+                const auto dirContents = storage->getFileList(ownCatalog->fileDir(c));
+                return std::none_of(
+                    dirContents.cbegin(), dirContents.cend(),
+                    [c](const auto& fileInfo)
+                    {
+                        return !fileInfo.isDir()
+                            && fileInfo.absoluteFilePath().contains(QString::number(c.startTimeMs));
+                    });
+            }),
+        chunksAfter.end());
+    newCatalog->addChunks(std::move(chunksAfter));
+
     const auto newChunks = newCatalog->takeChunks();
     ownCatalog->replaceChunks(storageIndex, newChunks);
     QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);

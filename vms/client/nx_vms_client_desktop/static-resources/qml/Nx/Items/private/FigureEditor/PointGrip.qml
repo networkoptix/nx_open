@@ -5,9 +5,9 @@ Item
     id: grip
 
     property bool ghost: false
-    property color color: "black"
-    property color ghostColor: "white"
-    property color borderColor: "white"
+    property alias color: marker.color
+    property alias ghostColor: marker.ghostColor
+    property alias borderColor: marker.borderColor
     property int axis: Drag.XAndYAxis
     property bool hoverEnabled: true
 
@@ -25,27 +25,19 @@ Item
     property real maxX: parent ? parent.width : 0
     property real maxY: parent ? parent.height : 0
 
-    Rectangle
+    PointMarker
     {
-        id: rect
+        id: marker
 
-        width: enabled && (mouseArea.containsMouse || mouseArea.pressed) ? 12 : 8
-        height: width
-        x: -width / 2
-        y: -height / 2
-
-        color: ghost ? ghostColor : grip.color
-        border.color: ghost ? "transparent" : grip.borderColor
-        border.width: 1
-
-        opacity: ghost ? 0.7 : 1.0
+        hovered: enabled && (mouseArea.containsMouse || mouseArea.pressed)
+        ghost: grip.ghost
     }
 
     MouseArea
     {
         id: mouseArea
 
-        anchors.centerIn: rect
+        anchors.centerIn: marker
         width: 12
         height: 12
 

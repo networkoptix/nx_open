@@ -2,6 +2,7 @@ import { Injectable }      from '@angular/core';
 import { HttpClient }      from '@angular/common/http';
 import { Observable }      from 'rxjs';
 import { NxConfigService } from './nx-config';
+import {toPromise} from "rxjs-compat/operator/toPromise";
 
 @Injectable({
     providedIn: 'root'
@@ -220,4 +221,9 @@ export class NxCloudApiService {
         }).toPromise();
     }
 
+    acceptAgreement(reviewId) {
+        return this.http.post(this.CONFIG.apiBase + '/accept_agreement', {
+            review_id: reviewId
+        }).toPromise();
+    }
 }

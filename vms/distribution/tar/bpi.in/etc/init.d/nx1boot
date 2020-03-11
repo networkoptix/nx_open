@@ -414,6 +414,16 @@ upgrade_sd() {
     installDebs fonts-arphic-ukai
 }
 
+move_crashdump() {
+    CRASHDUMPDIR="$MNTDATAHDDPART/crashdumps"
+    if [ ! -d "$CRASHDUMPDIR" ]; then 
+        mkdir -p "$CRASHDUMPDIR"
+    else
+        rm -Rf $CRASHDUMPDIR/*
+    fi    
+    find "/opt/$CUSTOMIZATION/mediaserver/bin" -name "core*" -exec mv {} "$CRASHDUMPDIR" \;
+}
+
 default_sequence () {
     get_reset_button_presense
     # Upgrading sdcard on first boot.
@@ -445,6 +455,7 @@ default_sequence () {
         mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
         /etc/init.d/nx1led boot_hdd
     fi
+    move_crashdump
     start_server
     start_lite_client
 }

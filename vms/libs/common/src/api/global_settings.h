@@ -316,6 +316,9 @@ public:
     QString cloudHost() const;
     void setCloudHost(const QString& value);
 
+    bool crossdomainEnabled() const;
+    void setCrossdomainEnabled(bool value);
+
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
 
@@ -401,7 +404,9 @@ public:
     void setLicenseServerUrl(const QString& value);
 
     nx::utils::Url resourceFileUri() const;
+
     QString pushNotificationsLanguage() const;
+    void setPushNotificationsLanguage(const QString& value);
 
     QString additionalLocalFsTypes() const;
 
@@ -536,6 +541,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_sequentialFlirOnvifSearcherEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_crossdomainEnabledAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_maxP2pQueueSizeBytes = nullptr;
     QnResourcePropertyAdaptor<qint64>* m_maxP2pQueueSizeForAllClientsBytes = nullptr;

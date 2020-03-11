@@ -43,8 +43,8 @@ struct QnIOStateData
     QnIOStateData(const QString& id, bool isActive, qint64 timestamp): id(id), isActive(isActive), timestamp(timestamp) {}
 
     QString id;
-    bool isActive;
-    qint64 timestamp;
+    bool isActive = false;
+    qint64 timestamp = -1;
 };
 
 inline bool operator<(const QnIOStateData& lhs, const QnIOStateData& rhs)

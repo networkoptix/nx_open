@@ -13,8 +13,9 @@ using namespace nx::common::metadata;
 class ConsumingAnalyticsMetadataProvider::Private
 {
 public:
-    QSharedPointer<media::CachingMetadataConsumer> metadataConsumer{
-        new media::CachingMetadataConsumer(MetadataType::ObjectDetection)};
+    QSharedPointer<media::CachingMetadataConsumer<ObjectMetadataPacketPtr>> metadataConsumer{
+        new media::CachingMetadataConsumer<ObjectMetadataPacketPtr>(
+            MetadataType::ObjectDetection)};
 };
 
 ConsumingAnalyticsMetadataProvider::ConsumingAnalyticsMetadataProvider():
@@ -29,10 +30,7 @@ ConsumingAnalyticsMetadataProvider::~ConsumingAnalyticsMetadataProvider()
 ObjectMetadataPacketPtr ConsumingAnalyticsMetadataProvider::metadata(
     microseconds timestamp, int channel) const
 {
-    const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(
-        d->metadataConsumer->metadata(timestamp, channel));
-
-    return fromCompressedMetadataPacket(compressedMetadata);
+    return d->metadataConsumer->metadata(timestamp, channel);
 }
 
 QList<ObjectMetadataPacketPtr> ConsumingAnalyticsMetadataProvider::metadataRange(
@@ -41,18 +39,12 @@ QList<ObjectMetadataPacketPtr> ConsumingAnalyticsMetadataProvider::metadataRange
     int channel,
     int maximumCount) const
 {
-    const auto& metadataList = d->metadataConsumer->metadataRange(
-        startTimestamp, endTimestamp, channel,
-        nx::media::CachingMetadataConsumer::PickingPolicy::TakeFirst, maximumCount);
-
-    QList<ObjectMetadataPacketPtr> result;
-    for (const auto& metadata: metadataList)
-    {
-        const auto compressedMetadata =
-            std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
-        result.append(fromCompressedMetadataPacket(compressedMetadata));
-    }
-    return result;
+    return d->metadataConsumer->metadataRange(
+        startTimestamp,
+        endTimestamp,
+        channel,
+        media::CachingMetadataConsumer<ObjectMetadataPacketPtr>::PickingPolicy::TakeFirst,
+        maximumCount);
 }
 
 QSharedPointer<media::AbstractMetadataConsumer>

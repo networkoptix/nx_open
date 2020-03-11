@@ -18,7 +18,6 @@ namespace test {
 
 static const size_t kTestConnections = 10;
 static const auto kConnectionId = QnUuid().createUuid().toSimpleString();
-static const std::chrono::milliseconds kSocketTimeout(3000);
 static const auto kDefaultKeepAliveInterval = std::chrono::milliseconds(3000);
 
 class UdpIncomingTunnelConnectionTest:
@@ -27,7 +26,7 @@ class UdpIncomingTunnelConnectionTest:
 protected:
     void SetUp() override
     {
-        m_connectionParameters.udpTunnelKeepAliveInterval = kDefaultKeepAliveInterval;
+        m_connectionParameters.udpTunnelKeepAliveInterval = kNoTimeout;
         m_connectionParameters.udpTunnelKeepAliveRetries = 1;
     }
 
@@ -48,8 +47,6 @@ protected:
 
     void givenStartedIncomingConnection()
     {
-        utils::TestSyncQueue<SystemError::ErrorCode> results;
-
         auto tmpSocket = makeSocket(true);
         auto tmpSocketGuard = nx::utils::makeScopeGuard([&tmpSocket]() { tmpSocket->pleaseStopSync(); });
 
@@ -57,12 +54,14 @@ protected:
         ASSERT_TRUE(tmpSocket->setRecvTimeout(0));
         m_connectionAddress = tmpSocket->getLocalAddress();
 
+        utils::TestSyncQueue<SystemError::ErrorCode> results;
+
         m_freeSocket = makeSocket(true);
         tmpSocket->connectAsync(m_freeSocket->getLocalAddress(), results.pusher());
         m_freeSocket->connectAsync(tmpSocket->getLocalAddress(), results.pusher());
 
-        ASSERT_EQ(results.pop(), SystemError::noError);
-        ASSERT_EQ(results.pop(), SystemError::noError);
+        ASSERT_EQ(SystemError::noError, results.pop());
+        ASSERT_EQ(SystemError::noError, results.pop());
 
         utils::promise<void> startedPromise;
         tmpSocket->dispatch(
@@ -85,12 +84,20 @@ protected:
         startedPromise.get_future().wait();
     }
 
+    void setSocketTimeout(std::optional<std::chrono::milliseconds> timeout)
+    {
+        m_socketTimeout = timeout;
+    }
+
     std::unique_ptr<UdtStreamSocket> makeSocket(bool randevous = false)
     {
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         NX_CRITICAL(socket->setRendezvous(randevous));
-        NX_CRITICAL(socket->setSendTimeout(kSocketTimeout.count()));
-        NX_CRITICAL(socket->setRecvTimeout(kSocketTimeout.count()));
+        if (m_socketTimeout)
+        {
+            NX_CRITICAL(socket->setSendTimeout(m_socketTimeout->count()));
+            NX_CRITICAL(socket->setRecvTimeout(m_socketTimeout->count()));
+        }
         NX_CRITICAL(socket->setNonBlockingMode(true));
         NX_CRITICAL(socket->bind(nx::network::SocketAddress(nx::network::HostAddress::localhost, 0)));
         return std::move(socket);
@@ -138,6 +145,18 @@ protected:
         m_connectedSockets.push_back(std::move(socket));
     }
 
+    void thenConnectionsEstablished(size_t count)
+    {
+        for (size_t i = 0; i < count; ++i)
+            ASSERT_EQ(SystemError::noError, m_connectResults.pop()) << "i = " << i;
+    }
+
+    void thenConnectionsAccepted(size_t count)
+    {
+        for (size_t i = 0; i < count; ++i)
+            ASSERT_EQ(SystemError::noError, m_acceptResults.pop()) << "i = " << i;
+    }
+
     std::unique_ptr<udp::IncomingTunnelConnection> takeConnection()
     {
         QnMutexLocker lock(&m_mutex);
@@ -151,10 +170,11 @@ protected:
     nx::network::SocketAddress m_connectionAddress;
     std::unique_ptr<udp::IncomingTunnelConnection> m_connection;
     std::unique_ptr<UdtStreamSocket> m_freeSocket;
-    utils::TestSyncQueue<SystemError::ErrorCode> m_acceptResults;
-    utils::TestSyncQueue<SystemError::ErrorCode> m_connectResults;
+    utils::SyncQueue<SystemError::ErrorCode> m_acceptResults;
+    utils::SyncQueue<SystemError::ErrorCode> m_connectResults;
     std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedSockets;
     std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_connectedSockets;
+    std::optional<std::chrono::milliseconds> m_socketTimeout;
 };
 
 TEST_F(UdpIncomingTunnelConnectionTest, Timeout)
@@ -163,21 +183,17 @@ TEST_F(UdpIncomingTunnelConnectionTest, Timeout)
 
     givenStartedIncomingConnection();
 
-    ASSERT_EQ(m_acceptResults.pop(), SystemError::timedOut);
+    ASSERT_EQ(SystemError::timedOut, m_acceptResults.pop());
 }
 
 TEST_F(UdpIncomingTunnelConnectionTest, Connections)
 {
-    setControlConnectionKeepAliveTimeout(std::chrono::hours(1));
-
     givenStartedIncomingConnection();
 
     runConnectingSockets(kTestConnections);
-    for (size_t i = 0; i < kTestConnections; ++i)
-    {
-        ASSERT_EQ(m_connectResults.pop(), SystemError::noError) << "i = " << i;
-        ASSERT_EQ(m_acceptResults.pop(), SystemError::noError) << "i = " << i;
-    }
+
+    thenConnectionsEstablished(kTestConnections);
+    thenConnectionsAccepted(kTestConnections);
 }
 
 TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
@@ -186,8 +202,8 @@ TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
 
     // we can connect right after start
     runConnectingSockets();
-    ASSERT_EQ(m_connectResults.pop(), SystemError::noError);
-    ASSERT_EQ(m_acceptResults.pop(), SystemError::noError);
+    ASSERT_EQ(SystemError::noError, m_connectResults.pop());
+    ASSERT_EQ(SystemError::noError, m_acceptResults.pop());
 
     {
         hpm::api::UdpHolePunchingSynRequest syn;
@@ -206,7 +222,7 @@ TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
             buffer,
             [this, &buffer, &promise](SystemError::ErrorCode code, size_t size)
             {
-                ASSERT_EQ(code, SystemError::noError);
+                ASSERT_EQ(SystemError::noError, code);
                 ASSERT_EQ(size, (size_t)buffer.size());
 
                 buffer.resize(0);
@@ -214,7 +230,7 @@ TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
                     &buffer,
                     [&buffer, &promise](SystemError::ErrorCode code, size_t)
                     {
-                        ASSERT_EQ(code, SystemError::noError);
+                        ASSERT_EQ(SystemError::noError, code);
 
                         stun::Message response;
                         stun::MessageParser parser;
@@ -241,8 +257,8 @@ TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
 
     // we still can connect
     runConnectingSockets();
-    ASSERT_EQ(m_connectResults.pop(), SystemError::noError);
-    ASSERT_EQ(m_acceptResults.pop(), SystemError::noError);
+    ASSERT_EQ(SystemError::noError, m_connectResults.pop());
+    ASSERT_EQ(SystemError::noError, m_acceptResults.pop());
 
     {
         Buffer buffer("someTrash");
@@ -269,9 +285,11 @@ TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
     }
 
     // connection was broken by wrong packet
+    setSocketTimeout(std::chrono::milliseconds(1));
+
     runConnectingSockets();
-    ASSERT_NE(m_connectResults.pop(), SystemError::noError);
-    ASSERT_EQ(m_acceptResults.pop(), SystemError::invalidData);
+    ASSERT_NE(SystemError::noError, m_connectResults.pop());
+    ASSERT_EQ(SystemError::invalidData, m_acceptResults.pop());
 }
 
 TEST_F(UdpIncomingTunnelConnectionTest, PleaseStop)
@@ -293,7 +311,6 @@ TEST_F(UdpIncomingTunnelConnectionTest, PleaseStopOnRun)
                 for (;;)
                 {
                     auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
-                    ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
                     if (!socket->connect(m_connectionAddress, nx::network::deprecated::kDefaultConnectTimeout))
                         return;
                 }

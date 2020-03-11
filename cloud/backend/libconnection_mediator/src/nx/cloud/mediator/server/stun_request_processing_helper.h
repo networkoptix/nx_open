@@ -5,6 +5,7 @@
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/stun/server_connection.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/type_utils.h>
 
 namespace nx {
@@ -132,6 +133,9 @@ void processRequest(
     InputData input;
     if (!input.parse(request))
     {
+        NX_VERBOSE(utils::log::Tag(std::string("STUN request helper")),
+            "Failed to parse STUN request %1", request.header.method);
+
         return sendErrorResponse(
             connection,
             std::move(request.header),

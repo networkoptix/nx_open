@@ -21,11 +21,16 @@ Instrument
 
     signal pointFinished()
 
+    readonly property var hoveredPoint:
+        enabled && d.hoveredPointIndex >= 0 ? getPoint(d.hoveredPointIndex) : undefined
+
     enabled: false
 
     property var d: Object
     {
         id: d
+
+        property int hoveredPointIndex: -1
 
         ListModel
         {
@@ -60,7 +65,7 @@ Instrument
             }
         }
 
-        function snappedToFirstOrLastPoint(p)
+        function snappedToEnd(p)
         {
             if (count === 0)
                 return p
@@ -68,36 +73,50 @@ Instrument
             const fp = getPoint(0)
             const lp = count > 1 ? getPoint(count - 2) : fp
 
-            if (F.distance(p.x, p.y, lp.x, lp.y) < F.distance(p.x, p.y, fp.x, fp.y))
+            if (!closed || F.distance(p.x, p.y, lp.x, lp.y) < F.distance(p.x, p.y, fp.x, fp.y))
                 return F.snapped(p.x, p.y, lp.x, lp.y, snapDistance)
             else
                 return F.snapped(p.x, p.y, fp.x, fp.y, snapDistance)
         }
 
-        function lastTwoPointsCollapsed()
+        function isLastPointSnappedTo(index)
         {
-            if (count < 2)
+            if (count < 2 || index >= count - 1)
                 return false
 
             const p1 = getPoint(count - 1)
-            const p2 = getPoint(count - 2)
+            const p2 = getPoint(index)
             return p1.x === p2.x && p1.y === p2.y
+        }
+
+        function lastTwoPointsCollapsed()
+        {
+            return isLastPointSnappedTo(count - 2)
         }
 
         function processMove(event)
         {
             event.accepted = true
+            var hoveredIndex = -1
             if (count > 0)
             {
                 setPoint(count - 1,
-                    count > minPoints
-                         ? snappedToFirstOrLastPoint(event.position)
-                         : event.position)
+                    count > minPoints ? snappedToEnd(event.position) : event.position)
+
+                if (closed && isLastPointSnappedTo(0))
+                    hoveredIndex = 0
+                else if (isLastPointSnappedTo(count - 2))
+                    hoveredIndex = count - 2
             }
+
+            d.hoveredPointIndex = hoveredIndex
         }
 
         function normalizedIndex(index)
         {
+            if (count === 0)
+                return index
+
             while (index < 0)
                 index += count
 
@@ -120,8 +139,13 @@ Instrument
         }
         d.processMove(mouse)
     }
-    onMouseMove: d.processMove(mouse)
-    onHoverMove: d.processMove(hover)
+
+    onMouseMove:
+        d.processMove(mouse)
+
+    onHoverMove:
+        d.processMove(hover)
+
     onMouseRelease:
     {
         mouse.accepted = true
@@ -139,7 +163,7 @@ Instrument
 
         if (count > minPoints && pointsModel.shouldFinish())
         {
-            pointsModel.remove(count - 1)
+            removePoint(count - 1)
             finish()
             return
         }
@@ -221,6 +245,9 @@ Instrument
     function removePoint(index)
     {
         pointsModel.remove(index)
+
+        if (d.hoveredPointIndex === index)
+            d.hoveredPointIndex = -1
     }
 
     function setRelativePoint(index, p)
@@ -283,5 +310,6 @@ Instrument
     function clear()
     {
         pointsModel.clear()
+        d.hoveredPointIndex = -1
     }
 }

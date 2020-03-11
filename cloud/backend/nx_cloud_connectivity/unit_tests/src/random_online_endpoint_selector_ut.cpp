@@ -47,12 +47,14 @@ protected:
         m_onlineHostEndpoint = onlineHostEndpoint;
     }
 
-    void whenSelectorIsInvoked()
+    void whenSelectorIsInvoked(std::optional<std::chrono::milliseconds> timeout)
     {
         nx::utils::promise<std::pair<nx::network::http::StatusCode::Value, nx::network::SocketAddress>> promiseToSelect;
         nx::network::cloud::RandomOnlineEndpointSelector selector;
 
         auto selected = promiseToSelect.get_future();
+
+        selector.setTimeout(timeout);
 
         selector.selectBestEndpont(
             QString(),
@@ -92,14 +94,14 @@ private:
 TEST_F(RandomOnlineEndpointSelector, online_endpoint_is_selected)
 {
     givenOnlineHost();
-    whenSelectorIsInvoked();
+    whenSelectorIsInvoked(kNoTimeout);
     thenAnyOnlineHostHasBeenSelected();
 }
 
 TEST_F(RandomOnlineEndpointSelector, no_online_endpoint_to_select)
 {
     givenOnlyOfflineHosts();
-    whenSelectorIsInvoked();
+    whenSelectorIsInvoked(std::chrono::milliseconds(1));
     thenNoHostHasBeenSelected();
 }
 

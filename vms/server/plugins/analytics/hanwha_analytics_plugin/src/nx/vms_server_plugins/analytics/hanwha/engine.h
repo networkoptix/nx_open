@@ -44,7 +44,8 @@ public:
 
     virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
 
-    const Hanwha::EngineManifest& engineManifest() const;
+    const Hanwha::EngineManifest& manifest() const;
+    const Hanwha::ObjectMetadataAttributeFilters& objectMetadataAttributeFilters() const;
 
     MetadataMonitor* monitor(
         const QString& sharedId,
@@ -77,10 +78,19 @@ protected:
         const nx::sdk::analytics::IAction* action) override;
 
 private:
-    boost::optional<QList<QString>> fetchSupportedEventTypeIds(
-        const nx::sdk::IDeviceInfo* deviceInfo);
+    boost::optional<Hanwha::DeviceAgentManifest> buildDeviceAgentManifest(
+        const std::shared_ptr<SharedResources>& sharedRes,
+        const nx::sdk::IDeviceInfo* deviceInfo) const;
 
-    boost::optional<QList<QString>> eventTypeIdsFromParameters(
+    static bool fetchSupportsObjectDetection(
+        const std::shared_ptr<SharedResources>& sharedRes,
+        int channel);
+
+    boost::optional<QSet<QString>> fetchSupportedEventTypeIds(
+        const std::shared_ptr<SharedResources>& sharedRes,
+        int channel) const;
+
+    boost::optional<QSet<QString>> eventTypeIdsFromParameters(
         const nx::utils::Url& url,
         const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
         const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
@@ -93,8 +103,8 @@ private:
     nx::sdk::analytics::Plugin* const m_plugin;
 
     mutable QnMutex m_mutex;
-    QByteArray m_manifest;
-    Hanwha::EngineManifest m_engineManifest;
+    Hanwha::EngineManifest m_manifest;
+    Hanwha::ObjectMetadataAttributeFilters m_objectMetadataAttributeFilters;
     QMap<QString, std::shared_ptr<SharedResources>> m_sharedResources;
 };
 

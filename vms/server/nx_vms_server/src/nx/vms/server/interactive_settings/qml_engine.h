@@ -12,8 +12,8 @@ public:
     QmlEngine();
     virtual ~QmlEngine() override;
 
-    virtual Error loadModelFromData(const QByteArray& data) override;
-    virtual Error loadModelFromFile(const QString& fileName) override;
+    virtual bool loadModelFromData(const QByteArray& data) override;
+    virtual bool loadModelFromFile(const QString& fileName) override;
 
 private:
     class Private;

@@ -68,10 +68,14 @@ PolyFigure
     {
         if (pointMakerInstrument.enabled)
         {
-            if (pointMakerInstrument.count === 0)
-                return qsTr("Click on video to start line.")
-            if (minPoints > geometricMinPoints && pointMakerInstrument.count < minPoints + 1)
-                return qsTr("This line requires at least %n points.", "", minPoints)
+            if (pointMakerInstrument.count > 0)
+            {
+                var minPoints_ = Math.max(minPoints, geometricMinPoints)
+                if (pointMakerInstrument.count < minPoints_ + 1)
+                    return qsTr("This line requires at least %n points.", "", minPoints_)
+                else
+                    return qsTr("Click on the last point to finish drawing the line.")
+            }
         }
         else
         {
@@ -82,10 +86,10 @@ PolyFigure
                 return qsTr("This line requires at least %n points.", "", minPoints)
 
             if (pointMakerInstrument.count === maxPoints && hoverInstrument.edgeHovered)
-                return qsTr("Maximum points count is reached (%n points).", "", maxPoints)
+                return qsTr("The maximum number of points has been reached (%n points).", "", maxPoints)
 
             if (allowedDirections !== "none")
-                return qsTr("Click arrows to toggle the desired directions.")
+                return qsTr("Click on each arrow to toggle the desired direction.")
         }
 
         return ""

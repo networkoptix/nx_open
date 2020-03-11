@@ -14,21 +14,14 @@
 
 class QnHttpConnectionListener;
 
-template<class T>
-QnTCPConnectionProcessor* handlerInstance(
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnHttpConnectionListener* owner)
-{
-    return new T(std::move(socket), owner);
-};
 
-template <class T, class ExtraParam>
+template <class T, typename... ExtraParams>
 QnTCPConnectionProcessor* handlerInstance(
-    ExtraParam extraParam,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnHttpConnectionListener* owner)
+    QnHttpConnectionListener* owner,
+    ExtraParams... extraParams)
 {
-    return new T(extraParam, std::move(socket), owner);
+    return new T(std::move(socket), owner, extraParams...);
 }
 
 class QnHttpConnectionListener: public QnTcpListener
@@ -55,19 +48,12 @@ public:
 
     virtual ~QnHttpConnectionListener();
 
-    template<class T, class ExtraParam>
-    void addHandler(const QByteArray& protocol, const QString& path, ExtraParam extraParam)
+    template<class T, class... ExtraParams>
+    void addHandler(const QByteArray& protocol, const QString& path, ExtraParams... extraParams)
     {
         using namespace std::placeholders;
         doAddHandler(protocol, path,
-            std::bind(&handlerInstance<T, ExtraParam>, extraParam, _1, _2));
-    }
-
-    template<class T>
-    void addHandler(const QByteArray& protocol, const QString& path)
-    {
-        // NOTE: Cast to InstanceFunc is a workaround for MSVC deficiency.
-        doAddHandler(protocol, path, (InstanceFunc) handlerInstance<T>);
+            std::bind(&handlerInstance<T, ExtraParams...>, _1, _2, extraParams...));
     }
 
     typedef std::function<bool(QnCommonModule* commonModule, const nx::network::http::Request&)> ProxyCond;
@@ -86,11 +72,11 @@ public:
         m_proxyInfo.proxyCond = cond;
     }
 
-    template <class T, class ExtraParam>
-    void setProxyHandler(const ProxyCond& cond, ExtraParam extraParam)
+    template <class T, typename... ExtraParams>
+    void setProxyHandler(const ProxyCond& cond, ExtraParams... extraParams)
     {
         using namespace std::placeholders;
-        m_proxyInfo.proxyHandler = std::bind(&handlerInstance<T, ExtraParam>, extraParam, _1, _2);
+        m_proxyInfo.proxyHandler = std::bind(&handlerInstance<T, ExtraParams...>, _1, _2, extraParams...);
         m_proxyInfo.proxyCond = cond;
     }
 

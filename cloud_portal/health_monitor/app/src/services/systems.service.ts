@@ -7,6 +7,7 @@ import { NxLanguageProviderService } from './nx-language-provider';
 import { NxCloudApiService } from './nx-cloud-api';
 import { NxPollService } from './poll.service';
 import { NxToastService } from '../dialogs/toast.service';
+import { Utils } from '../utils/helpers';
 
 @Injectable({
     providedIn: 'root'
@@ -112,12 +113,12 @@ export class NxSystemsService implements OnDestroy {
         if (this.activeSubscription) {
             this.activeSubscription.unsubscribe();
         }
-        this.activeSubscription = this.systemsPoll.pipe(
-            tap(systems => this.processSystems(systems)),
-            distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
-        ).subscribe(() => {
-            this.systemsSubject.next(this.systems);
-        });
+        this.activeSubscription = this.systemsPoll
+            .pipe(
+                tap(systems => this.processSystems(systems)),
+                distinctUntilChanged((a, b) => Utils.isEqual(a, b))
+            )
+            .subscribe(() => this.systemsSubject.next(this.systems));
     }
 
     stopPoll() {

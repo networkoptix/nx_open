@@ -144,8 +144,8 @@ public:
         const std::deque<nx::vms::server::Chunk>& chunks2);
 
     bool addChunk(const nx::vms::server::Chunk& chunk);
-    void addChunks(const nx::vms::server::ChunksDeque& chunks);
-    void addChunks(const std::deque<Chunk>& chunk);
+    void addChunks(nx::vms::server::ChunksDeque chunks);
+    void addChunks(std::deque<Chunk> chunk);
 
     /**
      * Return a deque of chunks such that they exist in *this, but don't exist in the other.

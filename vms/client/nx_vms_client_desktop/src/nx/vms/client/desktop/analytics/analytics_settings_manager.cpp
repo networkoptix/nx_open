@@ -48,6 +48,10 @@ public:
     bool hasSubscription(const DeviceAgentId& id) const;
 
     void updateStatus(const DeviceAgentId& id, DeviceAgentData::Status status);
+    void updateStatusAndSettings(
+        const DeviceAgentId& id,
+        DeviceAgentData::Status status,
+        const QJsonObject& settings);
 
     void loadResponseData(
         const DeviceAgentId& id,
@@ -202,6 +206,24 @@ void AnalyticsSettingsManager::Private::updateStatus(
         emit listener->dataChanged(data);
 }
 
+void AnalyticsSettingsManager::Private::updateStatusAndSettings(
+    const DeviceAgentId& id,
+    DeviceAgentData::Status status,
+    const QJsonObject& settings)
+{
+    if (!hasSubscription(id))
+        return;
+
+    auto& data = dataByAgentIdRef(id);
+    if (data.status == status && data.values == settings)
+        return;
+
+    data.status = status;
+    data.values = settings;
+    if (auto listener = data.listener.lock())
+        emit listener->dataChanged(data);
+}
+
 void AnalyticsSettingsManager::Private::loadResponseData(
     const DeviceAgentId& id,
     bool success,
@@ -328,7 +350,10 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
         if (handle > 0)
         {
             d->pendingApplyRequests.append(handle);
-            d->updateStatus(agentId, DeviceAgentData::Status::applying);
+            d->updateStatusAndSettings(
+                agentId,
+                DeviceAgentData::Status::applying,
+                settings);
         }
     }
 

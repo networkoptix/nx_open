@@ -3,16 +3,16 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
 
-#include "analytics_settings_manager_test.h"
+#include "analytics_settings_test_fixture.h"
 
 namespace nx::vms::client::desktop {
 namespace test {
 
 using namespace nx::vms::common;
 
-class AnalyticsSettingsMultiListenerTest: public AnalyticsSettingsManagerTest
+class AnalyticsSettingsMultiListenerTest: public AnalyticsSettingsTestFixture
 {
-    using base_type = AnalyticsSettingsManagerTest;
+    using base_type = AnalyticsSettingsTestFixture;
 
 protected:
     using ListenPolicy = AnalyticsSettingsMultiListener::ListenPolicy;

@@ -79,9 +79,7 @@ export class NxPermissionsDropdown implements OnInit {
         if (changes.roles && changes.roles.currentValue) {
             this.processAccessRoles();
             const role = this.accessRoles.filter(x => x.name === this.selected.name)[ 0 ];
-            this.selection = '';
-
-            if (role) {
+            if (!role || role.optionLabel !== this.selection) {
                 this.selection = role.optionLabel || this.message;
                 this.changePermission(role);
             }

@@ -208,14 +208,16 @@ void CameraWebPageWidget::Private::createNewPage()
     // Special actions list for context menu for links.
     webView->insertActions(nullptr, {
         webView->pageAction(QWebEnginePage::OpenLinkInThisWindow),
-        webView->pageAction(QWebEnginePage::Copy),
-        webView->pageAction(QWebEnginePage::CopyLinkToClipboard)});
+        webView->pageAction(QWebEnginePage::Copy)});
 
     webView->setHiddenActions({
         QWebEnginePage::DownloadImageToDisk,
         QWebEnginePage::DownloadLinkToDisk,
         QWebEnginePage::DownloadMediaToDisk,
-        QWebEnginePage::SavePage});
+        QWebEnginePage::SavePage,
+        QWebEnginePage::CopyLinkToClipboard,
+        QWebEnginePage::CopyImageUrlToClipboard,
+        QWebEnginePage::CopyMediaUrlToClipboard});
 
     authDialodCounter.setLimit(kHttpAuthDialogAttemptsLimit);
 

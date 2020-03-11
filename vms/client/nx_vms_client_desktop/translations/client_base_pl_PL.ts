@@ -1512,7 +1512,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional support</source>
-      <translation type="unfinished">Regional support</translation>
+      <translation>Wsparcie regionalne</translation>
     </message>
   </context>
   <context>
@@ -2123,32 +2123,32 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Serwer źródłowy</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Kamera źródłowa</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Źródłowa i jeszcze %n inna kamera</numerusform>
+        <numerusform>Źródłowa i jeszcze %n inne kamery</numerusform>
+        <numerusform>Źródłowa i jeszcze %n innych kamer</numerusform>
+        <numerusform>Źródłowa i jeszcze %n innych kamer</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Wybierz co najmniej jedno urządzenie</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Wybierz co najmniej jedną kamerę</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Wybierz serwer</translation>
     </message>
   </context>
   <context>
@@ -2704,7 +2704,7 @@ to %1</source>
     <name>QnCloudUsersValidationPolicy</name>
     <message>
       <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
-      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+      <translation>%1 z %2 wybranych użytkowników nie są użytkownikami chmury i nie otrzymają powiadomień mobilnych.</translation>
     </message>
   </context>
   <context>
@@ -3698,27 +3698,27 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Ogólne</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Funkcje</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Dozwolone ekrany</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Sesje kontrolne dozwolone</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Archiwizowane strumienie dozwolone</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Pozostałe dezaktywacje</translation>
     </message>
   </context>
   <context>
@@ -4024,11 +4024,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>Pozostała %n dezaktywacja.</numerusform>
+        <numerusform>Pozostały %n dezaktywacje.</numerusform>
+        <numerusform>Pozostało %n dezaktywacji.</numerusform>
+        <numerusform>Pozostało %n dezaktywacji.</numerusform>
       </translation>
     </message>
   </context>
@@ -5954,7 +5954,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>smb</source>
-      <translation type="unfinished">smb</translation>
+      <translation>smb</translation>
     </message>
   </context>
   <context>
@@ -7023,7 +7023,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktywuj licencję...</translation>
     </message>
   </context>
   <context>
@@ -7710,11 +7710,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n wartość</numerusform>
+        <numerusform>+%n wartości</numerusform>
+        <numerusform>+%n wartości</numerusform>
+        <numerusform>+%n wartości</numerusform>
       </translation>
     </message>
   </context>
@@ -9348,7 +9348,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
       <source>Cloud users</source>
-      <translation type="unfinished">Cloud users</translation>
+      <translation>Użytkownicy chmury</translation>
     </message>
   </context>
   <context>
@@ -10139,15 +10139,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Aby dezaktywować licencję, wykonaj następujące czynności</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Każdy klucz licencyjny można dezaktywować maksymalnie %n raz.</numerusform>
+        <numerusform>Każdy klucz licencyjny można dezaktywować maksymalnie %n razy.</numerusform>
+        <numerusform>Każdy klucz licencyjny można dezaktywować maksymalnie %n razy.</numerusform>
+        <numerusform>Każdy klucz licencyjny można dezaktywować maksymalnie %n razy.</numerusform>
       </translation>
     </message>
   </context>

@@ -479,7 +479,7 @@ void PlayerSetQualityTest::test(const TestCase& testCase)
     m_camera->setChannelCount(testCase.channelCount);
 
     const std::vector<AbstractVideoDecoder*> currentDecoders{};
-    media_player_quality_chooser::Input input;
+    media_player_quality_chooser::Params input;
     input.transcodingCodec = MockVideoDecoder::s_transcodingCodec;
     input.liveMode = true;
     input.positionMs = -1;

@@ -257,7 +257,10 @@ bool HanwhaPtzController::getPosition(
     if (space != Qn::DevicePtzCoordinateSpace)
         return false;
 
-    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
+    HanwhaRequestHelper helper(
+        m_hanwhaResource->sharedContext(),
+        m_hanwhaResource->bypassChannel());
+
     const auto response = helper.view(
         lit("ptzcontrol/query"),
         {

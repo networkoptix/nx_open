@@ -78,9 +78,9 @@ nx::network::http::StatusCode::Value cameraResultToHttp(
 }
 
 HttpLiveStreamingProcessor::HttpLiveStreamingProcessor(
-    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnTcpListener* owner)
+    QnTcpListener* owner,
+    QnMediaServerModule* serverModule)
     :
     QnTCPConnectionProcessor(std::move(socket), owner),
     nx::vms::server::ServerModuleAware(serverModule),
@@ -222,7 +222,7 @@ void HttpLiveStreamingProcessor::run()
                 if (m_useChunkedTransfer)
                     bytesSent = sendChunk(m_writeBuffer) ? m_writeBuffer.size() : -1;
                 else
-                    bytesSent = sendData(m_writeBuffer) ? m_writeBuffer.size() : -1;
+                    bytesSent = sendBuffer(m_writeBuffer) ? m_writeBuffer.size() : -1;
                 if (bytesSent < 0)
                 {
                     NX_WARNING(this, lm("Error sending data to %1 (%2). Sent %3 bytes total. "

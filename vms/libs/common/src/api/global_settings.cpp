@@ -595,6 +595,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         QString(),
         this);
 
+    m_crossdomainEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kNameCrossdomainEnabled,
+        false,
+        this);
+
     m_arecontRtspEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kArecontRtspEnabled,
         kArecontRtspEnabledDefault,
@@ -743,7 +748,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 
     m_pushNotificationsLanguageAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "pushNotificationsLanguage",
-        QnAppInfo::defaultLanguage(),
+        "",
         this);
 
     m_additionalLocalFsTypesAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
@@ -951,6 +956,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_backupNewCamerasByDefaultAdaptor
         << m_upnpPortMappingEnabledAdaptor
         << m_cloudHostAdaptor
+        << m_crossdomainEnabledAdaptor
         << m_arecontRtspEnabledAdaptor
         << m_sequentialFlirOnvifSearcherEnabledAdaptor
         << m_maxP2pQueueSizeBytes
@@ -1616,6 +1622,16 @@ void QnGlobalSettings::setCloudHost(const QString& value)
     m_cloudHostAdaptor->setValue(value);
 }
 
+bool QnGlobalSettings::crossdomainEnabled() const
+{
+    return m_crossdomainEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setCrossdomainEnabled(bool value)
+{
+    m_crossdomainEnabledAdaptor->setValue(value);
+}
+
 bool QnGlobalSettings::arecontRtspEnabled() const
 {
     return m_arecontRtspEnabledAdaptor->value();
@@ -1844,6 +1860,11 @@ nx::utils::Url QnGlobalSettings::resourceFileUri() const
 QString QnGlobalSettings::pushNotificationsLanguage() const
 {
     return m_pushNotificationsLanguageAdaptor->value();
+}
+
+void QnGlobalSettings::setPushNotificationsLanguage(const QString& value)
+{
+    m_pushNotificationsLanguageAdaptor->setValue(value);
 }
 
 QString QnGlobalSettings::additionalLocalFsTypes() const

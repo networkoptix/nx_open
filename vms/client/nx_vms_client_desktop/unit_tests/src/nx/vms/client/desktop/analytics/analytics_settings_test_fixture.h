@@ -67,11 +67,11 @@ public:
     int counter = 0;
 };
 
-class AnalyticsSettingsManagerTest: public ::testing::Test
+class AnalyticsSettingsTestFixture: public ::testing::Test
 {
 public:
-    AnalyticsSettingsManagerTest();
-    virtual ~AnalyticsSettingsManagerTest() override;
+    AnalyticsSettingsTestFixture();
+    virtual ~AnalyticsSettingsTestFixture() override;
 
 protected:
     // virtual void SetUp() will be called before each test is run.
@@ -83,8 +83,6 @@ protected:
     nx::CameraResourceStubPtr addCamera();
 
     nx::vms::common::AnalyticsEngineResourcePtr addEngine();
-
-    DeviceAgentId makeDeviceAgent();
 
     AnalyticsSettingsManager* manager() const;
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "enumeration_item.h"
+#include "enumeration_value_item.h"
 
 namespace nx::vms::server::interactive_settings::components {
 
-class ComboBox: public EnumerationItem
+class ComboBox: public EnumerationValueItem
 {
 public:
     ComboBox(QObject* parent = nullptr);

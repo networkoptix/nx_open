@@ -16,7 +16,15 @@
 #include <nx/vms/server/resource/camera.h>
 #include <plugins/resource/digitalwatchdog/helpers.h>
 
-bool modelHasZoom(const QString& cameraModel) {
+namespace {
+
+static const QString kCproPrimaryVideoCodec("cproPrimaryVideoCodec");
+static const QString kCproSecondaryVideoCodec("cproSecondaryVideoCodec");
+static const QString kDwPravisChipset("dw-pravis-chipset");
+static const QStringList kCproParameters{ kCproPrimaryVideoCodec, kCproSecondaryVideoCodec };
+
+bool modelHasZoom(const QString& cameraModel) 
+{
     QString tmp = cameraModel.toLower();
     tmp = tmp.replace(QLatin1String(" "), QLatin1String(""));
     if (tmp.contains(QLatin1String("fd20")) || tmp.contains(QLatin1String("mpa20m")) || tmp.contains(QLatin1String("mc421"))) {
@@ -24,6 +32,8 @@ bool modelHasZoom(const QString& cameraModel) {
     }
     return true;
 }
+
+} // namespace
 
 QnDigitalWatchdogResource::QnDigitalWatchdogResource(QnMediaServerModule* serverModule):
     QnPlOnvifResource(serverModule),
@@ -169,7 +179,7 @@ bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(
         if (!base_type::loadAdvancedParametersTemplate(params))
             return false;
     }
-    else if (resourceData().value<bool>(lit("dw-pravis-chipset")))
+    else if (resourceData().value<bool>(kDwPravisChipset))
     {
         if (!loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw-pravis.xml")))
             return false;
@@ -182,11 +192,6 @@ bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(
 
     return true;
 }
-
-static const QString kCproPrimaryVideoCodec("cproPrimaryVideoCodec");
-static const QString kCproSecondaryVideoCodec("cproSecondaryVideoCodec");
-static const QString kDwPravisChipset("dw-pravis-chipset");
-static const QStringList kCproParameters{kCproPrimaryVideoCodec, kCproSecondaryVideoCodec};
 
 void QnDigitalWatchdogResource::initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params)
 {

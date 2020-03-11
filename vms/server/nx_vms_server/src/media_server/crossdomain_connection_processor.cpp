@@ -54,6 +54,9 @@ void QnCrossdomainConnectionProcessor::run()
     parseRequest();
     d->response.messageBody.clear();
 
+    if (!commonModule()->globalSettings()->crossdomainEnabled())
+        return sendResponse(nx::network::http::StatusCode::notFound, kContentType, QByteArray());
+
     QnUuid selfId = commonModule()->moduleGUID();
     QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(selfId);
     QFile file(":/static/crossdomain.xml");

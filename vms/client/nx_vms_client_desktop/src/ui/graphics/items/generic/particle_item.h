@@ -31,12 +31,15 @@ public:
 
     void setRect(const QRectF &rect);
 
+    void setPaintOpacity(qreal opacity);
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
     QRectF m_rect;
     QColor m_color;
     QBrush m_brush;
+    qreal m_paintOpacity = 0.0;
 };
 
 

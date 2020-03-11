@@ -12,9 +12,9 @@ struct PowerConsumptionLimits
     double upperLimitWatts = 0.0;
 };
 
-static const QString kWrn410("WRN-410");
-static const QString kWrn810("WRN-810");
-static const QString kWrn1610("WRN-1610");
+static const QString kWrn410("WRN-410S");
+static const QString kWrn810("WRN-810S");
+static const QString kWrn1610("WRN-1610S");
 
 PowerConsumptionLimits getPowerConsumptionLimit(const DeviceInfo& deviceInfo);
 

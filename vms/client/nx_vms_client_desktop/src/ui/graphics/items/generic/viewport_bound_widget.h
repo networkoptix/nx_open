@@ -35,6 +35,7 @@ public:
     virtual void setGeometry(const QRectF& geometry) override;
 
     void updateScale();
+    virtual void updateGeometry() override;
 
     qreal scale() const; //< Absolute scale
     qreal sceneScale() const;
@@ -50,4 +51,5 @@ private:
     QSizeF m_fixedSize;
     QGraphicsScale* m_scale;
     QnViewportScaleWatcher* m_scaleWatcher;
+    bool m_inUpdateScale = false;
 };

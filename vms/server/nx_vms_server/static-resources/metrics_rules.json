@@ -122,10 +122,10 @@
                         "format": "shortText",
                         "display": "table|panel",
                         "alarms": [
-                            {
+                            { 
                                 "level": "error",
                                 "condition": "notEqual %status Online",
-                                "text": "is %status"
+                                "text": "is offline"
                             }
                         ]
                     },
@@ -139,7 +139,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %offlineEvents 1",
-                                "text": "went Offline %offlineEvents times in the last 24 hours"
+                                "text": "went offline %offlineEvents times in the last 24 hours"
                             }
                         ]
                     },
@@ -159,13 +159,8 @@
                         "alarms": [
                             {
                                 "level": "warning",
-                                "condition": "equal %logLevel Debug",
-                                "text": "current logging level is %logLevel. Recommended logging level is Info."
-                            },
-                            {
-                                "level": "warning",
-                                "condition": "equal %logLevel Verbose",
-                                "text": "current logging level is %logLevel. Recommended logging level is Info."
+                                "condition": "notEqual %logLevel Info",
+                                "text": "current Logging level is %logLevel. Recommended Logging level is Info."
                             }
                         ]
                     },
@@ -379,17 +374,17 @@
                             {
                                 "level": "error",
                                 "condition": "equal %status Unauthorized",
-                                "text": "is Unauthorized"
+                                "text": "is unauthorized"
                             },
                             {
                                 "level": "error",
                                 "condition": "equal %status Offline",
-                                "text": "is Offline"
+                                "text": "is offline"
                             },
                             {
                                 "level": "error",
                                 "condition": "equal %status Server_Offline",
-                                "text": "is Unavailable: parent Server is Offline"
+                                "text": "is unavailable: parent server is offline"
                             }
                         ]
                     },
@@ -403,12 +398,12 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %offlineEvents 0",
-                                "text": "went Offline %offlineEvents times in the last hour"
+                                "text": "went offline %offlineEvents times in the last hour"
                             },
                             {
                                 "level": "error",
                                 "condition": "greaterThan %offlineEvents 5",
-                                "text": "went Offline %offlineEvents times in the last hour"
+                                "text": "went offline %offlineEvents times in the last hour"
                             }
                         ]
                     },
@@ -616,12 +611,12 @@
                             {
                                 "level": "error",
                                 "condition": "equal %status Inaccessible",
-                                "text": "is Inaccessible"
+                                "text": "is inaccessible"
                             },
                             {
                                 "level": "error",
                                 "condition": "equal %status Server_Offline",
-                                "text": "is Inaccessible: parent Server is Offline"
+                                "text": "is inaccessible: parent server is offline"
                             }
                         ]
                     },

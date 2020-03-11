@@ -15,6 +15,7 @@ import { NxScrollMechanicsService }          from '../../../services/scroll-mech
 import { NxUtilsService }                    from '../../../services/utils.service';
 import { delay, throttleTime }               from 'rxjs/operators';
 import { NxHealthLayoutService }             from '../health-layout.service';
+import { Utils } from '../../../utils/helpers';
 
 interface Params {
     [key: string]: any;
@@ -196,7 +197,7 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     modelChanged(model) {
-        if (JSON.stringify(this.filterModel) !== JSON.stringify(model)) { // avoid unnecessary trips
+        if (!Utils.isEqual(this.filterModel, model)) { // avoid unnecessary trips
             this.filterModel = NxUtilsService.deepCopy(model);
             this.alerts = this.healthService.alertsSearch(this.healthService.alertsValues, model);
             this.countAlerts();
@@ -407,10 +408,6 @@ export class NxSystemAlertsComponent implements OnInit, AfterViewInit, OnDestroy
             this.uriService.updateURI(undefined, queryParams);
         }
         this.healthLayoutService.resetActiveEntity();
-    }
-
-    canSeeTable() {
-        return this.tableHeaders && this.healthService.alertsValues && !this.healthLayoutService.mobileDetailMode;
     }
 
     private setLayout() {

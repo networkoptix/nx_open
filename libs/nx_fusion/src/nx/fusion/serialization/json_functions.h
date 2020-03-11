@@ -14,6 +14,7 @@
 #endif
 #include <boost/optional.hpp>
 
+#include <QtCore/QPair>
 #include <QtCore/QSize>
 #include <QtCore/QSizeF>
 #include <QtCore/QRect>
@@ -400,6 +401,34 @@ QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS(long long)
 QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS(unsigned long long)
 #undef QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS
 
+template<typename A, typename B>
+inline void serialize(
+    QnJsonContext* ctx,
+    const QPair<A, B>& value,
+    QJsonValue* target)
+{
+    *target = QJsonArray{{}, {}};
+    QJson::serialize<A>(ctx, value.first, &target[0]);
+    QJson::serialize<B>(ctx, value.second, &target[1]);
+}
+
+template<typename A, typename B>
+inline bool deserialize(
+    QnJsonContext* ctx,
+    const QJsonValue& value,
+    QPair<A, B>* target)
+{
+    if (!value.isArray())
+        return false;
+    
+    const auto array = value.toArray();
+    if (array.size() != 2)
+        return false;
+
+    *target = QPair<A, B>();
+    return QJson::deserialize<A>(ctx, array[0], &target->first)
+        && QJson::deserialize<B>(ctx, array[1], &target->second);
+}
 
 #define QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG, IMPL) \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF)>                                          \

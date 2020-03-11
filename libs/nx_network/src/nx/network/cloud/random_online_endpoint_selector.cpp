@@ -4,7 +4,7 @@
 
 namespace {
 
-static const unsigned int CONNECT_TIMEOUT_MS = 14384;
+static constexpr auto kDefaultConnectTimeout = std::chrono::milliseconds(14384);
 
 } // namespace
 
@@ -46,7 +46,7 @@ void RandomOnlineEndpointSelector::selectBestEndpont(
         auto sock = SocketFactory::createStreamSocket(
             false, NatTraversalSupport::disabled);
         if (!sock->setNonBlockingMode(true) ||
-            !sock->setSendTimeout(CONNECT_TIMEOUT_MS))
+            !sock->setSendTimeout(m_timeout ? *m_timeout : kDefaultConnectTimeout))
         {
             continue;
         }
@@ -64,6 +64,12 @@ void RandomOnlineEndpointSelector::selectBestEndpont(
     auto localHandler = std::move(m_handler);
     lk.unlock();
     localHandler(nx::network::http::StatusCode::serviceUnavailable, SocketAddress());
+}
+
+void RandomOnlineEndpointSelector::setTimeout(
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    m_timeout = timeout;
 }
 
 void RandomOnlineEndpointSelector::done(

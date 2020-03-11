@@ -74,8 +74,9 @@ public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
     QnRtspConnectionProcessor(
-        QnMediaServerModule* serverModule,
-        std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket, 
+        QnTcpListener* owner,
+        QnMediaServerModule* serverModule);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);

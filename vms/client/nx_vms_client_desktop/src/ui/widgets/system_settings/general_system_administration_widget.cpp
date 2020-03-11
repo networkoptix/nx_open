@@ -63,6 +63,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
     connect(ui->systemNameLabel, &EditableLabel::editingFinished,
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
+    connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged,
+        this, &QnGeneralSystemAdministrationWidget::loadSystemName);
 
     auto buttonLayout = new QHBoxLayout(ui->buttonWidget);
     buttonLayout->setSpacing(0);
@@ -166,7 +168,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
 {
-    ui->systemNameLabel->setText(qnGlobalSettings->systemName());
+    loadSystemName();
     ui->systemSettingsWidget->loadDataToUi();
     ui->securitySettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
@@ -239,6 +241,11 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
 void QnGeneralSystemAdministrationWidget::resetWarnings()
 {
     ui->forceVideoEncryptionWarning->hide();
+}
+
+void QnGeneralSystemAdministrationWidget::loadSystemName()
+{
+    ui->systemNameLabel->setText(qnGlobalSettings->systemName());
 }
 
 bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const

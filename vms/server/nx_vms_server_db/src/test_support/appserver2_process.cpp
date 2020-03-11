@@ -486,7 +486,8 @@ void Appserver2Process::registerHttpHandlers(
 
     m_tcpListener->setProxyHandler<nx::vms::network::ProxyConnectionProcessor>(
         &nx::vms::network::ProxyConnectionProcessor::isProxyNeeded,
-        ec2ConnectionFactory->serverConnector());
+        ec2ConnectionFactory->serverConnector(),
+        /*allowThirdPartyProxy*/ false);
 }
 
 void Appserver2Process::resetInstanceCounter()

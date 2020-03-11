@@ -39,6 +39,7 @@ export class NxUriService {
         if (!navigateTo) {
             navigateTo = this.getURL();
         }
+
         replace = replace ? replace : false;
         // changes the route without moving from the current view
         return new Promise((resolve, reject) => {

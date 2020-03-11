@@ -884,6 +884,12 @@ void QnServerStreamRecorder::fileFinished(
     qint64 fileSize,
     qint64 startTimeMs)
 {
+    if (fileSize < 0)
+    {
+        NX_WARNING(this, 
+            "The size for file '%1' is not known. It will be defaulting to 0", fileName);
+    }
+
     if (m_truncateInterval != 0)
     {
         m_serverModule->normalStorageManager()->fileFinished(

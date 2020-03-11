@@ -1,4 +1,4 @@
-#include "analytics_settings_manager_test.h"
+#include "analytics_settings_test_fixture.h"
 
 #include <common/static_common_module.h>
 #include <common/common_module.h>
@@ -85,7 +85,7 @@ ListenerNotifier::ListenerNotifier(const AnalyticsSettingsListenerPtr& listener)
 
 // virtual void SetUp() will be called before each test is run.
 
-struct AnalyticsSettingsManagerTest::Environment
+struct AnalyticsSettingsTestFixture::Environment
 {
     Environment():
         staticCommonModule(),
@@ -99,15 +99,15 @@ struct AnalyticsSettingsManagerTest::Environment
     QnCommonModule commonModule;
 };
 
-AnalyticsSettingsManagerTest::AnalyticsSettingsManagerTest()
+AnalyticsSettingsTestFixture::AnalyticsSettingsTestFixture()
 {
 }
 
-AnalyticsSettingsManagerTest::~AnalyticsSettingsManagerTest()
+AnalyticsSettingsTestFixture::~AnalyticsSettingsTestFixture()
 {
 }
 
-void AnalyticsSettingsManagerTest::SetUp()
+void AnalyticsSettingsTestFixture::SetUp()
 {
     m_environment.reset(new Environment());
     m_serverInterfaceMock = std::make_shared<AnalyticsSettingsMockApiInterface>();
@@ -118,21 +118,21 @@ void AnalyticsSettingsManagerTest::SetUp()
 
 // virtual void TearDown() will be called after each test is run.
 
-void AnalyticsSettingsManagerTest::TearDown()
+void AnalyticsSettingsTestFixture::TearDown()
 {
     m_manager.reset();
     m_serverInterfaceMock.reset();
     m_environment.reset();
 }
 
-nx::CameraResourceStubPtr AnalyticsSettingsManagerTest::addCamera()
+nx::CameraResourceStubPtr AnalyticsSettingsTestFixture::addCamera()
 {
     nx::CameraResourceStubPtr camera(new nx::CameraResourceStub());
     resourcePool()->addResource(camera);
     return camera;
 }
 
-AnalyticsEngineResourcePtr AnalyticsSettingsManagerTest::addEngine()
+AnalyticsEngineResourcePtr AnalyticsSettingsTestFixture::addEngine()
 {
     AnalyticsEngineResourcePtr engine(new AnalyticsEngineResource());
     engine->setIdUnsafe(QnUuid::createUuid());
@@ -140,19 +140,12 @@ AnalyticsEngineResourcePtr AnalyticsSettingsManagerTest::addEngine()
     return engine;
 }
 
-DeviceAgentId AnalyticsSettingsManagerTest::makeDeviceAgent()
-{
-    auto camera = addCamera();
-    auto engine = addEngine();
-    return DeviceAgentId{ camera->getId(), engine->getId() };
-}
-
-AnalyticsSettingsManager* AnalyticsSettingsManagerTest::manager() const
+AnalyticsSettingsManager* AnalyticsSettingsTestFixture::manager() const
 {
     return m_manager.data();
 }
 
-QnResourcePool* AnalyticsSettingsManagerTest::resourcePool() const
+QnResourcePool* AnalyticsSettingsTestFixture::resourcePool() const
 {
     return m_environment->commonModule.resourcePool();
 }

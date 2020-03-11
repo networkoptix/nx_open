@@ -369,7 +369,7 @@ TEST_F(DeviceFileCatalogTest, chunksAfter)
         chunks.cbegin(), chunks.cend(), std::back_inserter(referenceDeque),
         [cutoffTimepoint](const auto& c)
         {
-            return c.startTimeMs >= cutoffTimepoint && c.storageIndex == 0;
+            return c.startTimeMs > cutoffTimepoint && c.storageIndex == 0;
         });
 
     const auto after = catalog->chunksAfter(cutoffTimepoint, 0);
@@ -391,7 +391,7 @@ TEST_F(DeviceFileCatalogTest, chunksBefore_wholeCatalog)
     std::deque<Chunk> referenceDeque;
     std::copy_if(
         chunks.cbegin(), chunks.cend(), std::back_inserter(referenceDeque),
-        [cutoffTimepoint](const auto& c) { return c.storageIndex == 0; });
+        [](const auto& c) { return c.storageIndex == 0; });
 
     ASSERT_EQ(referenceDeque, catalog->chunksBefore(cutoffTimepoint, 0));
 }

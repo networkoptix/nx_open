@@ -16,6 +16,7 @@ import { SubscriptionLike }         from 'rxjs';
 import { AutoUnsubscribe }          from 'ngx-auto-unsubscribe';
 import { NxHealthLayoutService } from '../../health-layout.service';
 import { delay } from 'rxjs/operators';
+import { Utils } from '../../../../utils/helpers';
 
 interface Params {
     [key: string]: any;
@@ -27,7 +28,7 @@ const ALARM_ORDER = {
     '': 0
 };
 
-const TEXT_FORMATS = ['longText', 'shortText', 'text'];
+const TEXT_FORMATS = ['longText', 'long-text', 'shortText', 'short-text', 'text', 'no-max-width'];
 const GROUP_ID = 0;
 const PARAM_ID = 1;
 const SORT_DIR = 2;
@@ -149,8 +150,11 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         if (this.healthLayoutService.activeEntity) {
             this.setPagerSize();
             this.startIndex = this._elements.findIndex(elem => {
-                return this.healthLayoutService.activeEntity === elem;
+                return this.healthLayoutService.activeEntity === elem || this.healthLayoutService.activeEntity.id === elem.entity;
             });
+            if (this.startIndex !== -1) {
+                this.selectedEntity = this._elements[this.startIndex];
+            }
         }
         if ([undefined, -1].includes(this.startIndex)) {
             this.startIndex = parseInt(this.params.index) || 0;
@@ -182,8 +186,9 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
     }
 
     private setPagerSize() {
-        if (this.healthLayoutService.activeEntity && this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.xl)) {
-            this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSizeSmall;
+        if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.md) ||
+            (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.xl) && this.selectedEntity)) {
+            this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSizeMedium;
             this.pagerEllipses = false;
         } else {
             this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSize;
@@ -192,7 +197,15 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
     }
 
     private setActiveEntity(activeEntity) {
-        this.selectedEntity = activeEntity;
+        if (activeEntity) {
+            this.selectedEntity = this._elements.find(elem => {
+                return this.healthLayoutService.activeEntity === elem || this.healthLayoutService.activeEntity.id === elem.entity;
+            });
+        } else {
+            this.selectedEntity = activeEntity;
+        }
+
+
         if (this.scrollMechanicsService.mediaQueryMax(NxScrollMechanicsService.MEDIA.lg)) {
             this.mobileDetailMode = !!this.selectedEntity;
         }
@@ -218,7 +231,7 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
             this.selectedHeader = undefined;
 
             if (changes.headers.previousValue !== undefined &&
-                JSON.stringify(changes.headers.previousValue) !== JSON.stringify(changes.headers.currentValue)) {
+                !Utils.isEqual(changes.headers.previousValue, changes.headers.currentValue)) {
                 resetURI = true;
             }
         }
@@ -290,7 +303,7 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         this.selectedGroup = sortBy[GROUP_ID];
         this.selectedHeader = sortBy[PARAM_ID];
 
-        this.toggleSort(sortBy[GROUP_ID], sortBy[PARAM_ID], false);
+        this.toggleSort(sortBy[GROUP_ID], sortBy[PARAM_ID], false , undefined, true);
     }
 
     setClickedRow(element) {
@@ -361,7 +374,7 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
         return !(typeof x === 'string' || typeof x === 'number');
     }
 
-    toggleSort(groupId, paramId, updateURI?, format?) {
+    toggleSort(groupId, paramId, updateURI?, format?, byParam = false) {
         if (this.selectedGroup !== groupId || this.selectedHeader !== paramId) {
             this.sortOrderASC = TEXT_FORMATS.includes(format);
         }
@@ -404,7 +417,7 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
 
                         const format = elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].formatClass || undefined;
 
-                        if (['longText', 'long-text', 'shortText', 'short-text', 'text', 'no-max-width'].includes(format)) {
+                        if (TEXT_FORMATS.includes(format)) {
                             return elm[groupId] && elm[groupId][paramId] && elm[groupId][paramId].text || '';
                         }
 
@@ -413,8 +426,8 @@ export class NxDynamicTableComponent implements OnChanges, OnInit, AfterViewInit
             }
         }
 
+        this.sortOrderASC = (byParam) ? this.sortOrderASC : !this.sortOrderASC;
         this._elements.sort(NxUtilsService.byParam(sortFunc(), this.sortOrderASC));
-        this.sortOrderASC = !this.sortOrderASC;
 
         if (updateURI || updateURI === undefined) {
             const queryParams: Params = {};

@@ -41,25 +41,6 @@ constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultSendTim
 constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultResponseReadTimeout;
 constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultMessageBodyReadTimeout;
 
-AsyncClient::Timeouts::Timeouts(
-    std::chrono::milliseconds send,
-    std::chrono::milliseconds recv,
-    std::chrono::milliseconds msgBody)
-:
-    sendTimeout(send),
-    responseReadTimeout(recv),
-    messageBodyReadTimeout(msgBody)
-{
-}
-
-
-bool AsyncClient::Timeouts::operator==(const Timeouts& rhs) const
-{
-    return sendTimeout == rhs.sendTimeout
-        && responseReadTimeout == rhs.responseReadTimeout
-        && messageBodyReadTimeout == rhs.messageBodyReadTimeout;
-}
-
 AsyncClient::AsyncClient():
     m_state(State::sInit),
     m_connectionClosed(false),
@@ -544,6 +525,13 @@ void AsyncClient::setMessageBodyReadTimeout(
     m_msgBodyReadTimeout = messageBodyReadTimeout;
 }
 
+void AsyncClient::setTimeouts(Timeouts timeouts)
+{
+    setSendTimeout(timeouts.sendTimeout);
+    setResponseReadTimeout(timeouts.responseReadTimeout);
+    setMessageBodyReadTimeout(timeouts.messageBodyReadTimeout);
+}
+
 void AsyncClient::stopWhileInAioThread()
 {
     m_socket.reset();
@@ -706,6 +694,13 @@ void AsyncClient::onSomeBytesReadAsync(
 
         NX_DEBUG(this, lm("Error reading (state %1) http response from %2. %3")
             .arg(toString(stateBak)).arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)));
+        if (stateBak == State::sReadingMessageBody)
+        {
+            const auto contentLength = m_httpStreamReader.contentLength();
+            NX_DEBUG(this, "%1 out of %2 bytes of incomplete message body have been read",
+                m_httpStreamReader.messageBodyBytesRead(), contentLength ? std::to_string(*contentLength) : "?");
+        }
+
         m_lastSysErrorCode = errorCode;
         const auto requestSequenceBak = m_requestSequence;
         if (emitDone() == Result::thisDestroyed)

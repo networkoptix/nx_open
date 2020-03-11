@@ -60,7 +60,7 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
     const AVCodecID codec,
     const QSize& resolution,
     bool allowOverlay,
-    const std::vector<AbstractVideoDecoder*>* currentDecoders)
+    const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
     auto codecString =
         [codec, &resolution]()
@@ -78,7 +78,7 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
     // fail if we don't take into account that the player can reuse its decoders.
 
     std::unordered_map<std::type_index, int> decoderCountByTypeIndex;
-    for (const auto& decoder: *currentDecoders)
+    for (const auto& decoder: currentDecoders)
         ++decoderCountByTypeIndex[std::type_index(typeid(*decoder))];
 
     QMutexLocker lock(&mutex);

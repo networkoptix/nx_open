@@ -193,13 +193,25 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
     {
         if (const auto camera = videoCameraPool->getVideoCamera(toSharedPointer(m_camera)))
         {
-            const auto stream =
-                (m_streamIndex == StreamIndex::primary)
-                ? camera->getPrimaryReader()
-                : camera->getSecondaryReader();
+            auto reopenStream = 
+                [](const QnLiveStreamProviderPtr& stream)
+                {
+                    if (stream && stream->isRunning())
+                        stream->pleaseReopenStream();
+                };
 
-            if (stream && stream->isRunning())
-                stream->pleaseReopenStream();
+            if (m_camera->resourceData().value<bool>("reopenBothStreams"))
+            {
+                reopenStream(camera->getPrimaryReader());
+                reopenStream(camera->getSecondaryReader());
+            }
+            else
+            {
+                reopenStream(
+                    (m_streamIndex == StreamIndex::primary)
+                    ? camera->getPrimaryReader()
+                    : camera->getSecondaryReader());
+            }
         }
     }
 

@@ -54,14 +54,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 static const QString utf8Icon(const vms::event::Level level)
 {
-    static const auto defaultIcon = ini().pushNotifyCommonUtfIcon
-        ? QString(QChar(0x2615)) //< UTF for ":)".
-        : QString();
+    static const auto commonIcon = ini().pushNotifyCommonUtfIcon;
     return nx::utils::switch_(level,
-        vms::event::Level::critical, [] { return QString(QChar(0x203C)); }, //< UTF for "!!".
+        vms::event::Level::critical, [] { return QString(QChar(0x274C)); }, //< UTF for "X".
         vms::event::Level::important, [] { return QString(QChar(0x26A0)); }, //< UTF for "(!)".
         vms::event::Level::success, [] { return QString(QChar(0x2705)); }, //< UTF for "[v]".
-        nx::utils::default_, [] { return defaultIcon; }
+        nx::utils::default_, [] { return commonIcon ? QString(QChar(commonIcon)) : QString(); }
     );
 }
 
@@ -83,7 +81,7 @@ bool PushManager::send(const vms::event::AbstractActionPtr& action)
         return true;
     }
 
-    request.targets = cloudUsers(action->getParams().additionalResources);
+    request.targets = cloudUsers(action->getParams());
     if (request.targets.empty())
     {
         NX_DEBUG(this, "Not sending notification, no targets found");
@@ -179,17 +177,17 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
     };
 }
 
-std::set<QString> PushManager::cloudUsers(std::vector<QnUuid> filter) const
+std::set<QString> PushManager::cloudUsers(const vms::event::ActionParameters& params) const
 {
     QnUserResourceList userList;
-    if (filter.empty())
+    if (params.allUsers)
     {
         userList = serverModule()->resourcePool()->getResources<QnUserResource>();
     }
     else
     {
         QList<QnUuid> userRoles;
-        userRolesManager()->usersAndRoles(filter, userList, userRoles);
+        userRolesManager()->usersAndRoles(params.additionalResources, userList, userRoles);
         for (const auto& role: userRoles)
         {
             for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(role))

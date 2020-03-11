@@ -170,9 +170,6 @@ protected:
 
     std::unique_ptr<aio::AsyncSocketImplHelper<self_type>> m_aioHelper;
     bool m_connected;
-#ifdef WIN32
-    WSAEVENT m_eventObject;
-#endif
 };
 
 /**

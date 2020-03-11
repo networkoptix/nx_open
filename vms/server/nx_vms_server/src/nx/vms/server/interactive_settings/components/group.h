@@ -6,6 +6,7 @@
 
 namespace nx::vms::server::interactive_settings::components {
 
+/** Base class for all grouping items: items which contain other items. */
 class Group: public Item
 {
     Q_OBJECT
@@ -28,7 +29,7 @@ public:
     QVariantList filledCheckItems() const { return m_filledCheckItems; }
     void setFilledCheckItems(const QVariantList& items);
 
-    virtual QJsonObject serialize() const override;
+    virtual QJsonObject serializeModel() const override;
 
 signals:
     void filledCheckItemsChanged();

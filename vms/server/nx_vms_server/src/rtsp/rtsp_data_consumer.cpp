@@ -2,6 +2,7 @@
 
 #include "rtsp_data_consumer.h"
 
+#include <nx/kit/utils.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/config.h>
 #include <rtsp/rtsp_connection.h>
@@ -60,7 +61,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_liveMode(false),
     m_pauseNetwork(false),
     m_singleShotMode(false),
-    m_packetSended(false),
+    m_packetSent(false),
     m_liveQuality(MEDIA_Quality_High),
     m_newLiveQuality(MEDIA_Quality_None),
     m_streamingSpeed(MAX_STREAMING_SPEED),
@@ -102,7 +103,7 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
             /*engineId*/ QnUuid(),
             StreamIndex::secondary);
 
-        m_primarypPutDataLogger = std::make_unique<nx::analytics::MetadataLogger>(
+        m_primaryPutDataLogger = std::make_unique<nx::analytics::MetadataLogger>(
             "rtsp_consumer_put_data_",
             camera->getId(),
             /*engineId*/ QnUuid(),
@@ -276,7 +277,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 
         const auto& logger = isSecondaryProvider
             ? m_secondaryPutDataLogger
-            : m_primarypPutDataLogger;
+            : m_primaryPutDataLogger;
 
         if (logger)
             logger->pushData(mediaData, lm("Queue size %1").args(m_dataQueue.size()));
@@ -399,6 +400,44 @@ void QnRtspDataConsumer::doRealtimeDelay(QnConstAbstractMediaDataPtr media)
     m_lastRtTime = media->timestamp;
 }
 
+void QnRtspDataConsumer::sendBufferViaTcp(std::optional<int64_t> timestampForLogging)
+{
+    using namespace std::chrono;
+
+    const auto beforeSendBufferTime = steady_clock::now();
+    const bool sendBufferResult = m_owner->sendBuffer(m_sendBuffer, timestampForLogging);
+    const auto afterSendBufferTime = steady_clock::now();
+
+    const int64_t sendBufferDurationUs =
+        duration_cast<microseconds>(afterSendBufferTime - beforeSendBufferTime).count();
+
+    const auto logLevel =
+        (sendBufferDurationUs >= nx::network::SocketGlobals::ini().minSocketSendDurationUs)
+            ? nx::utils::log::Level::warning
+            : nx::utils::log::Level::verbose;
+
+    NX_UTILS_LOG(logLevel, this, "Called sendBuffer(@%1, %2 bytes): "
+        "%3, timestamp %4, duration %5 us, since last send %6, frame queue size %7",
+        nx::kit::utils::toString((const void*) m_sendBuffer.constData()),
+        m_sendBuffer.size(),
+        sendBufferResult ? "success" : "FAILURE",
+        timestampForLogging ? lm("%1 us").args(*timestampForLogging) : "n/a",
+        sendBufferDurationUs,
+        m_lastSendBufferViaTcpTime
+            ? lm("%1 us").args(duration_cast<microseconds>(
+                beforeSendBufferTime - *m_lastSendBufferViaTcpTime).count())
+            : "n/a",
+        m_dataQueue.lock().size()
+    );
+
+    // NOTE: On sending error, there seems to be no better option rather than ignore the error -
+    // the peer will have a broken stream but streaming will not stop, which is preferred.
+
+    m_sendBuffer.clear();
+
+    m_lastSendBufferViaTcpTime = beforeSendBufferTime;
+}
+
 void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
 {
     RtspServerTrackInfo* metadataTrack = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
@@ -420,10 +459,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
             *lenPtr = htons(m_sendBuffer.size() - kRtpTcpHeaderSize - dataStartIndex);
 
             if (m_sendBuffer.size() >= kTcpSendBlockSize)
-            {
-                m_owner->sendBuffer(m_sendBuffer);
-                m_sendBuffer.clear();
-            }
+                sendBufferViaTcp();
         }
         else  if (metadataTrack->mediaSocket)
         {
@@ -636,13 +672,10 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
 {
     const auto flushBuffer = nx::utils::makeScopeGuard(
-        [this]()
+        [this, &media]()
         {
             if (!m_needStop && m_dataQueue.isEmpty() && m_sendBuffer.size() > 0)
-            {
-                m_owner->sendBuffer(m_sendBuffer);
-                m_sendBuffer.clear();
-            }
+                sendBufferViaTcp(media->timestamp);
         });
 
     if ((m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1))
@@ -738,11 +771,7 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
             quint16* lenPtr = (quint16*)(m_sendBuffer.data() + dataStartIndex + 2);
             *lenPtr = htons(m_sendBuffer.size() - kRtpTcpHeaderSize - dataStartIndex);
             if (m_sendBuffer.size() >= kTcpSendBlockSize)
-            {
-                [[maybe_unused]] const bool sendResult =
-                    m_owner->sendBuffer(m_sendBuffer); //< Error is already logged.
-                m_sendBuffer.clear();
-            }
+                sendBufferViaTcp(media->timestamp);
         }
         else
         {
@@ -761,7 +790,7 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
     if (!m_needStop)
         sendRangeHeaderIfChanged();
 
-    if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
+    if (m_packetSent++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
 }
 
@@ -804,7 +833,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(
 {
     // Fast channel zapping
     int copySize = 0;
-    if (camera /* && !res->hasFlags(Qn::no_last_gop) */) //< TODO: Add comment.
+    if (camera) //< TODO: Add comment.
         copySize = camera->copyLastGop(streamIndex, skipTime, m_dataQueue, iFramesOnly);
 
     NX_DEBUG(this, "%1 frames copied from saved gop", copySize);
@@ -816,7 +845,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(
 void QnRtspDataConsumer::setSingleShotMode(bool value)
 {
     m_singleShotMode = value;
-    m_packetSended = 0;
+    m_packetSent = 0;
 }
 
 qint64 QnRtspDataConsumer::lastQueuedTime()

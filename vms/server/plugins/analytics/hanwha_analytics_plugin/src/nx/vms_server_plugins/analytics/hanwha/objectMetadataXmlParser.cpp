@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/match/wildcard.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 
 namespace nx::vms_server_plugins::analytics::hanwha {
@@ -118,8 +119,11 @@ void forEachChildElement(const QDomElement& element, const QString& tagName, F f
 
 //-------------------------------------------------------------------------------------------------
 
-ObjectMetadataXmlParser::ObjectMetadataXmlParser(const Hanwha::EngineManifest& engineManifest):
-    m_engineManifest(engineManifest)
+ObjectMetadataXmlParser::ObjectMetadataXmlParser(
+        const Hanwha::EngineManifest& engineManifest,
+        const Hanwha::ObjectMetadataAttributeFilters& objectAttributeFilters):
+    m_engineManifest(engineManifest),
+    m_objectAttributeFilters(objectAttributeFilters)
 {
 }
 
@@ -203,6 +207,23 @@ bool ObjectMetadataXmlParser::extractFrameScale(const QDomElement& transformatio
     };
 }
 
+std::optional<QString> ObjectMetadataXmlParser::filterAttribute(const QString& name) const
+{
+    for (const auto& pattern: m_objectAttributeFilters.discard)
+    {
+        if (wildcardMatch(pattern, name))
+            return std::nullopt;
+    }
+    for (const auto& pair: m_objectAttributeFilters.rename)
+    {
+        const auto& pattern = pair.first;
+        const auto& replacement = pair.second;
+        if (wildcardMatch(pattern, name))
+            return replacement;
+    }
+    return name;
+}
+
 std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
     ObjectId objectId, const QDomElement& appearance)
 {
@@ -211,19 +232,12 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
     const auto walk =
         [&](auto walk, QString key, const QDomElement& element)
         {
-            static auto const appendDot =
-                [](const QString& string) {
-                    if (string.isEmpty())
-                        return string;
-                    return string + ".";
-                };
-
             const auto domAttrs = element.attributes();
             for (int i = 0; i < domAttrs.length(); ++i) {
                 const auto domAttr = domAttrs.item(i);
                 const auto name = domAttr.nodeName();
                 const auto value = domAttr.nodeValue();
-                attributes[(appendDot(key) + "@" + name).toStdString()] = value.toStdString();
+                attributes[(key + ".@" + name).toStdString()] = value.toStdString();
             }
 
             std::unordered_map<std::string, int> counts;
@@ -249,24 +263,18 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
                     if (counts[name] > 1)
                         suffix = QString("[%1]").arg(++indices[name]);
 
-                    walk(walk, appendDot(key) + child.tagName() + suffix, child);
+                    walk(walk, key + "." + child.tagName() + suffix, child);
                 });
         };
 
-    // This set might be incomplete.
-    static const std::vector<QString> rootTags = {
-        "HumanBody",
-        "HumanFace",
-        "VehicleInfo",
-    };
-    for (const auto& rootTag: rootTags)
+    for (const auto& rootTag: m_objectAttributeFilters.roots)
         forEachChildElement(appearance, rootTag,
             [&](const auto& element) {
                 // Since it appears that single object cannot have multiple
                 // root tags, we can just clear all the attributes.
                 attributes.clear();
 
-                walk(walk, "", element);
+                walk(walk, rootTag, element);
             });
 
     attributes.timeStamp = std::chrono::steady_clock::now();
@@ -275,8 +283,11 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
     result.reserve(attributes.size());
     for (const auto& [name, value]: attributes)
     {
-        auto attribute = makePtr<Attribute>(Attribute::Type::string, name, value);
-        result.push_back(std::move(attribute));
+        auto newName = filterAttribute(QString::fromStdString(name));
+        if (newName) {
+            auto attribute = makePtr<Attribute>(Attribute::Type::string, newName->toStdString(), value);
+            result.push_back(std::move(attribute));
+        }
     }
     std::sort(result.begin(), result.end(),
         [](const auto& a, const auto& b)

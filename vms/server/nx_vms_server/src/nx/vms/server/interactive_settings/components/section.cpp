@@ -14,15 +14,15 @@ const QList<Section*> SectionContainer::sectionList() const
     return m_sections;
 }
 
-QJsonObject SectionContainer::serialize() const
+QJsonObject SectionContainer::serializeModel() const
 {
-    auto result = base_type::serialize();
+    auto result = base_type::serializeModel();
     if (m_sections.empty())
         return result;
 
     QJsonArray sections;
     for (const auto section: m_sections)
-        sections.append(section->serialize());
+        sections.append(section->serializeModel());
 
     result[QStringLiteral("sections")] = sections;
     return result;

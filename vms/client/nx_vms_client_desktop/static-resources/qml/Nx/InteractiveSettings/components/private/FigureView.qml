@@ -104,7 +104,7 @@ Item
                     backgroundImage.updateThumbnail()
             }
 
-            function updateThumbnail()
+            function updateThumbnail(forceReload)
             {
                 backgroundImage.source = ""
                 updateTimer.stop()
@@ -115,7 +115,11 @@ Item
                     return
                 }
 
-                resourceThumbnailProvider.load(resourceId, engineId)
+                if (forceReload)
+                    resourceThumbnailProvider.refresh(resourceId, engineId)
+                else
+                    resourceThumbnailProvider.load(resourceId, engineId)
+
                 updateTimer.start()
             }
 
@@ -220,6 +224,10 @@ Item
 
     onResourceIdChanged:
         backgroundImage.updateThumbnail()
+
+    onFigureChanged:
+        if (!!backgroundImage.source)
+            backgroundImage.updateThumbnail(/*forceReload*/ true)
 
     Keys.enabled: editable
 

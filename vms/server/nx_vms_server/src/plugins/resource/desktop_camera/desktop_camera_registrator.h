@@ -13,9 +13,9 @@ class QnDesktopCameraRegistrator:
 {
 public:
     QnDesktopCameraRegistrator(
-        QnMediaServerModule* serverModule,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        QnTcpListener* owner);
+        QnTcpListener* owner,
+        QnMediaServerModule* serverModule);
 
 protected:
     virtual void run() override;

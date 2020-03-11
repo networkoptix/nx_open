@@ -180,7 +180,7 @@ std::deque<Chunk> DeviceFileCatalog::chunksAfter(int64_t timepointMs, int storag
             if (rit->storageIndex != storageIndex)
                 continue;
 
-            if (rit->startTimeMs < timepointMs)
+            if (rit->startTimeMs <= timepointMs)
                 break;
 
             result.push_back(*rit);
@@ -235,16 +235,18 @@ milliseconds DeviceFileCatalog::calendarDuration() const
     return milliseconds(endTimeMs - m_chunks.begin()->startTimeMs);
 }
 
-void DeviceFileCatalog::addChunks(const nx::vms::server::ChunksDeque& chunks)
+void DeviceFileCatalog::addChunks(nx::vms::server::ChunksDeque chunks)
 {
     NX_ASSERT(std::is_sorted(chunks.begin(), chunks.end()));
+    chunks.sort();
     QnMutexLocker lk(&m_mutex);
     m_chunks.set_union(chunks.begin(), chunks.end());
 }
 
-void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
+void DeviceFileCatalog::addChunks(std::deque<Chunk> chunks)
 {
     NX_ASSERT(std::is_sorted(chunks.begin(), chunks.end()));
+    std::sort(chunks.begin(), chunks.end());
     QnMutexLocker lk(&m_mutex);
     m_chunks.set_union(chunks.begin(), chunks.end());
 }

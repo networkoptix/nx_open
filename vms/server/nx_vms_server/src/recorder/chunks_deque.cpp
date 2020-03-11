@@ -139,6 +139,11 @@ void ChunksDeque::set_union(ConstIterator begin, ConstIterator end)
     allAdded();
 }
 
+void ChunksDeque::sort()
+{
+    std::sort(m_deque.begin(), m_deque.end());
+}
+
 bool operator==(const ChunksDeque& d1, const ChunksDeque& d2)
 {
     return d1.m_deque == d2.m_deque && d1.m_archivePresence == d2.m_archivePresence;

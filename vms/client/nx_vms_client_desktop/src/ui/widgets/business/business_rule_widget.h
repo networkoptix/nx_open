@@ -93,4 +93,6 @@ private:
 
     nx::vms::client::desktop::Aligner* const m_eventAligner;
     nx::vms::client::desktop::Aligner* const m_actionAligner;
+
+    std::optional<QMetaObject::Connection> m_intervalOfActionUpdater;
 };

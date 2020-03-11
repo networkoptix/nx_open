@@ -21,7 +21,18 @@ struct Chunk
     int64_t endTimeMs() const;
     bool containsTime(int64_t timeMs) const;
     int64_t getFileSize() const { return ((int64_t) fileSizeHi << 32) + fileSizeLo; }
-    void setFileSize(int64_t value) { fileSizeHi = uint16_t(value >> 32); fileSizeLo = quint32(value); }
+
+    /**
+     * @param value Can be negative, in which case it is treated as zero.
+     */
+    void setFileSize(int64_t value)
+    { 
+        if (value < 0)
+            value = 0;
+        fileSizeHi = (uint16_t) (value >> 32); 
+        fileSizeLo = (uint32_t) value; 
+    }
+
     bool isInfinite() const { return durationMs == -1; }
 
     QString fileName() const;

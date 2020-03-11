@@ -137,6 +137,15 @@ nx::utils::Url MediatorFunctionalTest::httpUrl() const
         .setPath(hpm::api::kMediatorApiPrefix).toUrl();
 }
 
+nx::utils::Url MediatorFunctionalTest::httpTunnelUrl() const
+{
+    return nx::network::url::Builder()
+        .setScheme(network::http::kUrlSchemeName)
+        .setEndpoint(m_httpEndpoint)
+        .setPath(hpm::api::kMediatorApiPrefix)
+        .appendPath(hpm::api::kStunOverHttpTunnelPath).toUrl();
+}
+
 std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
     MediatorFunctionalTest::clientConnection()
 {

@@ -1,11 +1,13 @@
 #include "tcp_connection_processor.h"
 
+#include <chrono>
+#include <optional>
+
 #include <QtCore/QTime>
 
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 
@@ -177,65 +179,52 @@ void QnTCPConnectionProcessor::parseRequest()
         d->owner->applyModToRequest(&d->request);
 }
 
-/*
-void QnTCPConnectionProcessor::bufferData(const char* data, int size)
+bool QnTCPConnectionProcessor::sendBuffer(
+    const QnByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
 {
-    Q_D(QnTCPConnectionProcessor);
-    d->sendBuffer.write(data, size);
+    return sendBufferThreadSafe(
+        sendBuffer.constData(), (int) sendBuffer.size(), timestampForLogging);
 }
 
-QnByteArray& QnTCPConnectionProcessor::getSendBuffer()
+bool QnTCPConnectionProcessor::sendBuffer(
+    const QByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
 {
-    Q_D(QnTCPConnectionProcessor);
-    return d->sendBuffer;
+    return sendBufferThreadSafe(
+        sendBuffer.constData(), sendBuffer.size(), timestampForLogging);
 }
 
-void QnTCPConnectionProcessor::sendBuffer()
+bool QnTCPConnectionProcessor::sendBuffer(
+    const char* data, int size, std::optional<int64_t> timestampForLogging)
 {
-    Q_D(QnTCPConnectionProcessor);
-    sendData(d->sendBuffer.data(), d->sendBuffer.size());
+    return sendBufferThreadSafe(data, size, timestampForLogging);
 }
 
-void QnTCPConnectionProcessor::clearBuffer()
-{
-    Q_D(QnTCPConnectionProcessor);
-    d->sendBuffer.clear();
-}
-*/
-bool QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
+bool QnTCPConnectionProcessor::sendBufferThreadSafe(
+    const char* data,
+    int size,
+    std::optional<int64_t> timestampForLogging)
 {
     Q_D(QnTCPConnectionProcessor);
 
-    QnMutexLocker lock( &d->sockMutex );
-    return sendData(sendBuffer.data(), sendBuffer.size());
-}
+    QnMutexLocker lock(&d->sendDataMutex);
 
-bool QnTCPConnectionProcessor::sendBuffer(const QByteArray& sendBuffer)
-{
-    Q_D(QnTCPConnectionProcessor);
-
-    QnMutexLocker lock( &d->sockMutex );
-    return sendData(sendBuffer.data(), sendBuffer.size());
-}
-
-bool QnTCPConnectionProcessor::sendData(const char* data, int size)
-{
-    Q_D(QnTCPConnectionProcessor);
     while (!needToStop() && size > 0 && d->socket->isConnected())
     {
-        const int sendResult = d->socket->send(data, size);
+        const auto sendDataResult = d->sendData(data, size, timestampForLogging);
 
-        if (sendResult == 0)
+        if (sendDataResult.sendResult == 0)
         {
             NX_DEBUG(this, "Socket was closed by the other peer (send() -> 0).");
             return false;
         }
 
-        if (sendResult < 0)
+        if (sendDataResult.sendResult < 0)
         {
-            const auto errorCode = SystemError::getLastOSErrorCode();
+            if (sendDataResult.errorCode == SystemError::interrupted)
+                continue; //< Retrying interrupted call.
 
-            if (errorCode == SystemError::wouldBlock || errorCode == SystemError::again)
+            if (sendDataResult.errorCode == SystemError::wouldBlock
+                || sendDataResult.errorCode == SystemError::again)
             {
                 unsigned int sendTimeout = 0;
                 if (!d->socket->getSendTimeout(&sendTimeout))
@@ -258,17 +247,14 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
                 }
                 continue; //< socket in async mode
             }
-            else if (SystemError::getLastOSErrorCode() == SystemError::interrupted)
-            {
-                continue; //< Retrying interrupted call.
-            }
 
-            NX_DEBUG(this, "Unable to send data to socket: %1(%2)", errorCode, SystemError::toString(errorCode));
+            NX_DEBUG(this, "Unable to send data to socket: %1 (OS code %2).",
+                SystemError::toString(sendDataResult.errorCode), sendDataResult.errorCode);
             return false;
         }
 
-        data += sendResult;
-        size -= sendResult;
+        data += sendDataResult.sendResult;
+        size -= sendDataResult.sendResult;
     }
 
     if (!d->socket->isConnected())
@@ -391,8 +377,7 @@ void QnTCPConnectionProcessor::sendResponse(
     auto response = createResponse(httpStatusCode, contentType, contentEncoding, multipartBoundary,
         displayDebug, isUndefinedContentLength);
 
-    QnMutexLocker lock(&d->sockMutex);
-    sendData(response.data(), response.size());
+    sendBuffer(response);
 }
 
 bool QnTCPConnectionProcessor::sendChunk( const QnByteArray& chunk )
@@ -412,7 +397,7 @@ bool QnTCPConnectionProcessor::sendChunk( const char* data, int size )
     result.append(data, size);  //TODO/IMPL avoid copying by implementing writev in socket
     result.append("\r\n");
 
-    return sendData( result.constData(), result.size() );
+    return sendBuffer(result);
 }
 
 void QnTCPConnectionProcessor::pleaseStop()
@@ -430,7 +415,7 @@ nx::network::SocketAddress QnTCPConnectionProcessor::getForeignAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
     QnMutexLocker lock(&d->socketMutex);
-    return d->socket->getForeignAddress();
+    return d->socket ? d->socket->getForeignAddress() : nx::network::SocketAddress();
 }
 
 int QnTCPConnectionProcessor::readSocket( quint8* buffer, int bufSize )

@@ -79,8 +79,19 @@ bool PartitionsInformationProvider::isFolder(const QByteArray& fsPath) const
 
 QStringList PartitionsInformationProvider::additionalLocalFsTypes() const
 {
-    return m_globalSettings->additionalLocalFsTypes().split(
-        ",", QString::SkipEmptyParts);
+    const QString settingsValue = m_globalSettings->additionalLocalFsTypes();
+    NX_MUTEX_LOCKER lock(&m_fsTypesMutex);
+    if (settingsValue != m_additionalFsTypesString)
+    {
+        m_additionalFsTypesString = settingsValue;
+        m_additionalFsTypes.clear();
+        const auto splits = settingsValue.split(",", QString::SkipEmptyParts);
+        std::transform(
+            splits.cbegin(), splits.cend(), std::back_inserter(m_additionalFsTypes),
+            [](const auto& s) { return s.trimmed(); });
+
+    }
+    return m_additionalFsTypes;
 }
 
 } // namesapce nx::vms::server::fs

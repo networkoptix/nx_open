@@ -34,6 +34,7 @@
 #include <ui/widgets/business/business_action_widget_factory.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <api/global_settings.h>
 #include <client/client_settings.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 
@@ -255,7 +256,30 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         }
         ui->actionAtLabel->setText(actionAtLabelText);
 
-        ui->aggregationWidget->setVisible(vms::event::allowsAggregation(m_model->actionType()));
+        const bool aggregationIsVisible = m_model->actionType() == ActionType::pushNotificationAction
+            ? !qnGlobalSettings->cloudSystemId().isNull()
+            : vms::event::allowsAggregation(m_model->actionType());
+        ui->aggregationWidget->setVisible(aggregationIsVisible);
+
+        // Push notification action widget has non-standard placeholder that is shown when system
+        // is not connected to Cloud. When this placeholder is shown, interval of action checkbox
+        // should be hidden for better user experience.
+        // User may connect to Cloud when the widget is shown, so we need to update visibility.
+        if (m_intervalOfActionUpdater)
+        {
+            disconnect(m_intervalOfActionUpdater.value());
+            m_intervalOfActionUpdater.reset();
+        }
+        if (m_model->actionType() == ActionType::pushNotificationAction
+            && qnGlobalSettings->cloudSystemId().isNull())
+        {
+            m_intervalOfActionUpdater.emplace(
+                connect(qnGlobalSettings, &QnGlobalSettings::cloudCredentialsChanged, this,
+                    [this]()
+                    {
+                        ui->aggregationWidget->setVisible(!qnGlobalSettings->cloudSystemId().isNull());
+                    }));
+        }
 
         ui->useEventSourceServerCheckBox->setVisible(
             vms::event::requiresServerResource(m_model->actionType()));
@@ -368,7 +392,10 @@ void QnBusinessRuleWidget::initActionParameters()
 
     const auto getTabBeforeTarget = [this]() -> QWidget *
     {
-        if (const bool aggregationIsVisible = vms::event::allowsAggregation(m_model->actionType()))
+        const bool aggregationIsVisible = m_model->actionType() == ActionType::pushNotificationAction
+            ? !qnGlobalSettings->cloudSystemId().isNull()
+            : vms::event::allowsAggregation(m_model->actionType());
+        if (aggregationIsVisible)
             return ui->aggregationWidget->lastTabItem();
 
         const auto actionType = m_model->actionType();

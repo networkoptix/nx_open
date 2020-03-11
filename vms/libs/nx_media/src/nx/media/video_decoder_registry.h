@@ -39,7 +39,7 @@ public:
         const AVCodecID codec,
         const QSize& resolution,
         bool allowOverlay,
-        const std::vector<AbstractVideoDecoder*>* currentDecoders);
+        const std::vector<AbstractVideoDecoder*>& currentDecoders);
 
     /**
      * @return Some sort of a maximum for all resolutions returned for the codec by
