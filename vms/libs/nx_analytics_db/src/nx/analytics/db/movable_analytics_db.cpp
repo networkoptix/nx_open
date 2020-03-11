@@ -15,7 +15,7 @@ bool MovableAnalyticsDb::initialize(const Settings& settings)
     bool result = otherDb->initialize(settings);
     if (!result)
     {
-        NX_INFO(this, "Failed to initialize analytics DB at %1", settings.path);
+        NX_INFO(this, "Failed to initialize Analytics DB at %1", settings.path);
         otherDb.reset();
     }
 
@@ -47,7 +47,7 @@ void MovableAnalyticsDb::save(common::metadata::ConstObjectMetadataPacketPtr pac
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to write to non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to write to a non-initialized Analytics DB");
         return;
     }
 
@@ -59,7 +59,7 @@ std::vector<ObjectPosition> MovableAnalyticsDb::lookupTrackDetailsSync(const Obj
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to lookup to non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to lookup to a non-initialized Analytics DB");
         return std::vector<ObjectPosition>();
     }
 
@@ -73,7 +73,7 @@ void MovableAnalyticsDb::lookup(
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to look up tracks in non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to look up tracks in a non-initialized Analytics DB");
         return completionHandler(ResultCode::ok, LookupResult());
     }
 
@@ -90,7 +90,7 @@ void MovableAnalyticsDb::lookupTimePeriods(
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to look up time periods in non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to look up time periods in a non-initialized Analytics DB");
         return completionHandler(ResultCode::error, QnTimePeriodList());
     }
 
@@ -107,7 +107,7 @@ void MovableAnalyticsDb::markDataAsDeprecated(
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to remove from non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to remove from a non-initialized Analytics DB");
         return;
     }
 
@@ -121,7 +121,7 @@ void MovableAnalyticsDb::flush(StoreCompletionHandler completionHandler)
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to flush non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to flush a non-initialized Analytics DB");
         return completionHandler(ResultCode::error);
     }
 
@@ -140,7 +140,7 @@ bool MovableAnalyticsDb::readMinimumEventTimestamp(std::chrono::milliseconds* ou
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to read min timestamp from non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to read min timestamp from a non-initialized Analytics DB");
         return false;
     }
 
