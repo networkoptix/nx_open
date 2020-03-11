@@ -14,6 +14,7 @@ Item
     property alias scrollView: scrollView
     property alias background: scrollView.background
     property Item contentItem
+    readonly property int pixelPerLine: 20 // Default value in Qt, originally comes from QTextEdit.
 
     onContentItemChanged:
     {
@@ -31,12 +32,10 @@ Item
         id: scrollView
 
         property ScrollBar verticalScrollBar: null
-        readonly property real kThreeRowsScrollStep: 120 / flickable.contentHeight
 
         anchors.fill: parent
         onVerticalScrollBarChanged: updateScrollBar()
         Component.onCompleted: updateScrollBar()
-        ScrollBar.vertical.stepSize: kThreeRowsScrollStep
 
         function updateScrollBar()
         {
@@ -44,7 +43,6 @@ Item
                 return
 
             ScrollBar.vertical = verticalScrollBar
-            verticalScrollBar.stepSize = Qt.binding(function() { return scrollView.kThreeRowsScrollStep })
         }
 
         Flickable
@@ -52,6 +50,21 @@ Item
             id: flickable
             boundsBehavior: Flickable.StopAtBounds
             clip: true
+
+            function scrollContentY(pixelDelta)
+            {
+                if (!pixelDelta)
+                    return
+
+                var minY = flickable.originY + flickable.topMargin
+                var maxY = (flickable.originY + flickable.bottomMargin
+                    + flickable.contentHeight) - flickable.height
+
+                if (flickable.headerItem && flickable.headerItem.height)
+                    minY += flickable.headerItem.height
+
+                flickable.contentY = Math.max(minY, Math.min(maxY, flickable.contentY - pixelDelta))
+            }
         }
     }
 
@@ -62,14 +75,20 @@ Item
         acceptedButtons: Qt.NoButton
         onWheel:
         {
-            if (!wheel.angleDelta.y)
-                return
+            if (flickable.contentHeight < flickable.height)
+                return;
 
-            if (wheel.angleDelta.y > 0)
-                scrollView.ScrollBar.vertical.decrease()
-            else
-                scrollView.ScrollBar.vertical.increase()
+            flickable.scrollContentY(getPixelDelta(wheel))
+        }
+
+        function getPixelDelta(wheel)
+        {
+            var degrees = wheel.angleDelta.y / 8
+
+            if (degrees)
+                return Qt.styleHints.wheelScrollLines * pixelPerLine * (degrees / 15.0)
+
+            return wheel.pixelDelta.y
         }
     }
 }
-

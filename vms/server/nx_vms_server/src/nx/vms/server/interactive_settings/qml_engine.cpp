@@ -2,6 +2,7 @@
 
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlComponent>
+#include <QtQml/QQmlContext>
 
 #include "components/section.h"
 #include "components/factory.h"
@@ -10,16 +11,19 @@ namespace nx::vms::server::interactive_settings {
 
 class QmlEngine::Private: public QObject
 {
+    QmlEngine* q = nullptr;
 public:
-    Private();
+    Private(QmlEngine *q);
+
+    void handleQmlComponentStatusChanged(QQmlComponent::Status status);
 
 public:
     std::unique_ptr<QQmlEngine> engine{new QQmlEngine()};
     std::unique_ptr<QQmlComponent> component{new QQmlComponent(engine.get())};
-    Error lastError = ErrorCode::ok;
 };
 
-QmlEngine::Private::Private()
+QmlEngine::Private::Private(QmlEngine* q):
+    q(q)
 {
     components::Factory::registerTypes();
 
@@ -27,52 +31,68 @@ QmlEngine::Private::Private()
     engine->setPluginPathList({});
 }
 
-QmlEngine::QmlEngine():
-    d(new Private())
+void QmlEngine::Private::handleQmlComponentStatusChanged(QQmlComponent::Status status)
 {
-    QObject::connect(d->component.get(), &QQmlComponent::statusChanged, d.get(),
-        [this](QQmlComponent::Status status)
+    if (status != QQmlComponent::Ready)
+    {
+        if (status == QQmlComponent::Error)
         {
-            if (status != QQmlComponent::Ready)
+            QString message = "QML engine reported errors:";
+            for (const auto& error: component->errors())
             {
-                if (status == QQmlComponent::Error)
-                {
-                    d->lastError = Error(ErrorCode::parseError, "QML engine reported errors:");
-
-                    for (const auto& error: d->component->errors())
-                    {
-                        d->lastError.message.append(L'\n');
-                        d->lastError.message.append(error.toString());
-                    }
-                }
-                return;
+                message.append(L'\n');
+                message.append(error.toString());
             }
 
-            const auto settingsItem = qobject_cast<components::Settings*>(d->component->create());
-            if (!settingsItem)
-            {
-                d->lastError = Error(ErrorCode::parseError, "Root item must have Settings type.");
-                return;
-            }
+            q->addIssue(Issue(Issue::Type::error, Issue::Code::parseError, message));
 
-            d->lastError = setSettingsItem(settingsItem);
-        });
+            q->stopUpdatingValues();
+        }
+        return;
+    }
+
+    std::unique_ptr<components::Item> rootItem(
+        qobject_cast<components::Item*>(component->create()));
+
+    q->stopUpdatingValues();
+
+    if (!rootItem)
+    {
+        q->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
+            "Root item is not recognized."));
+        return;
+    }
+
+    if (q->setSettingsItem(std::move(rootItem)))
+        q->initValues();
+}
+
+QmlEngine::QmlEngine():
+    d(new Private(this))
+{
+    d->engine->rootContext()->setContextProperty(
+        components::Item::kInterativeSettingsEngineProperty, this);
+
+    QObject::connect(d->component.get(), &QQmlComponent::statusChanged, d.get(),
+        &Private::handleQmlComponentStatusChanged);
 }
 
 QmlEngine::~QmlEngine()
 {
 }
 
-AbstractEngine::Error QmlEngine::loadModelFromData(const QByteArray& data)
+bool QmlEngine::loadModelFromData(const QByteArray& data)
 {
+    startUpdatingValues();
     d->component->setData(data, QUrl());
-    return d->lastError;
+    return settingsItem() != nullptr && !hasErrors();
 }
 
-AbstractEngine::Error QmlEngine::loadModelFromFile(const QString& fileName)
+bool QmlEngine::loadModelFromFile(const QString& fileName)
 {
+    startUpdatingValues();
     d->component->loadUrl(fileName);
-    return d->lastError;
+    return settingsItem() != nullptr && !hasErrors();
 }
 
 } // namespace nx::vms::server::interactive_settings

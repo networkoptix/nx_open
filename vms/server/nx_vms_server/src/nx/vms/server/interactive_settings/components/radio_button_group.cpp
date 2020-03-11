@@ -3,7 +3,7 @@
 namespace nx::vms::server::interactive_settings::components {
 
 RadioButtonGroup::RadioButtonGroup(QObject* parent):
-    EnumerationItem(QStringLiteral("RadioButtonGroup"), parent)
+    EnumerationValueItem(QStringLiteral("RadioButtonGroup"), parent)
 {
 }
 

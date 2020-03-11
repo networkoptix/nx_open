@@ -3,7 +3,7 @@
 namespace nx::vms::server::interactive_settings::components {
 
 CheckBox::CheckBox(QObject* parent):
-    ValueItem(QStringLiteral("CheckBox"), parent)
+    BooleanValueItem(QStringLiteral("CheckBox"), parent)
 {
 }
 

@@ -1,7 +1,0 @@
-import nx.mediaserver.interactive_settings 1.0
-
-Settings
-{
-    TextField { name: "text" }
-    TextField { name: "text" }
-}

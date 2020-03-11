@@ -1,10 +1,10 @@
 #pragma once
 
-#include "value_item.h"
+#include "string_value_item.h"
 
 namespace nx::vms::server::interactive_settings::components {
 
-class TextField: public ValueItem
+class TextField: public StringValueItem
 {
     Q_OBJECT
     Q_PROPERTY(QString validationRegex READ validationRegex WRITE setValidationRegex
@@ -13,8 +13,6 @@ class TextField: public ValueItem
         NOTIFY validationRegexFlagsChanged)
     Q_PROPERTY(QString validationErrorMessage READ validationErrorMessage
         WRITE setValidationErrorMessage NOTIFY validationErrorMessageChanged)
-
-    using base_type = ValueItem;
 
 public:
     TextField(QObject* parent = nullptr);
@@ -25,6 +23,7 @@ public:
      * notify a user about wrong input.
      */
     QString validationRegex() const;
+
     void setValidationRegex(const QString& regex);
 
     /**
@@ -32,12 +31,18 @@ public:
      * See RegExp documentation for details.
      */
     QString validationRegexFlags() const;
+
     void setValidationRegexFlags(const QString& flags);
 
+    /**
+     * When the item value does not satisfy the validation regex, this message should be displayed
+     * under the input box.
+     */
     QString validationErrorMessage() const;
+
     void setValidationErrorMessage(const QString& message);
 
-    virtual QJsonObject serialize() const override;
+    virtual QJsonObject serializeModel() const override;
 
 signals:
     void validationRegexChanged();

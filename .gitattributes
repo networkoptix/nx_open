@@ -14,6 +14,7 @@
 # And those are definitely binary ones
 *.jpg binary
 *.bmp binary
+*.gif binary
 *.dll binary
 *.lib binary
 *.exe binary
@@ -21,3 +22,9 @@
 *.ico binary
 *.png binary
 *.mkv binary
+*.ttf binary
+*.woff binary
+*.eot binary
+*.mp3 binary
+*.swf binary
+

@@ -4,6 +4,7 @@
 
 namespace nx::vms::server::interactive_settings::components {
 
+/** A grouping item which arranges items in a row (horizontally). */
 class Row: public Group
 {
 public:

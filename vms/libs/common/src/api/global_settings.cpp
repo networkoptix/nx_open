@@ -748,7 +748,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 
     m_pushNotificationsLanguageAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "pushNotificationsLanguage",
-        QnAppInfo::defaultLanguage(),
+        "",
         this);
 
     m_additionalLocalFsTypesAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
@@ -1860,6 +1860,11 @@ nx::utils::Url QnGlobalSettings::resourceFileUri() const
 QString QnGlobalSettings::pushNotificationsLanguage() const
 {
     return m_pushNotificationsLanguageAdaptor->value();
+}
+
+void QnGlobalSettings::setPushNotificationsLanguage(const QString& value)
+{
+    m_pushNotificationsLanguageAdaptor->setValue(value);
 }
 
 QString QnGlobalSettings::additionalLocalFsTypes() const

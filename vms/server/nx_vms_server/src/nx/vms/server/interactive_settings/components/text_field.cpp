@@ -3,7 +3,7 @@
 namespace nx::vms::server::interactive_settings::components {
 
 TextField::TextField(QObject* parent):
-    ValueItem(QStringLiteral("TextField"), parent)
+    StringValueItem(QStringLiteral("TextField"), parent)
 {
 }
 
@@ -49,9 +49,9 @@ void TextField::setValidationErrorMessage(const QString& message)
     emit validationErrorMessageChanged();
 }
 
-QJsonObject TextField::serialize() const
+QJsonObject TextField::serializeModel() const
 {
-    auto result = base_type::serialize();
+    auto result = StringValueItem::serializeModel();
     result[QStringLiteral("validationRegex")] = validationRegex();
     result[QStringLiteral("validationRegexFlags")] = validationRegexFlags();
     result[QStringLiteral("validationErrorMessage")] = validationErrorMessage();

@@ -114,6 +114,9 @@ Instrument
 
         function normalizedIndex(index)
         {
+            if (count === 0)
+                return index
+
             while (index < 0)
                 index += count
 
@@ -136,8 +139,13 @@ Instrument
         }
         d.processMove(mouse)
     }
-    onMouseMove: d.processMove(mouse)
-    onHoverMove: d.processMove(hover)
+
+    onMouseMove:
+        d.processMove(mouse)
+
+    onHoverMove:
+        d.processMove(hover)
+
     onMouseRelease:
     {
         mouse.accepted = true
@@ -155,7 +163,7 @@ Instrument
 
         if (count > minPoints && pointsModel.shouldFinish())
         {
-            pointsModel.remove(count - 1)
+            removePoint(count - 1)
             finish()
             return
         }
@@ -237,6 +245,9 @@ Instrument
     function removePoint(index)
     {
         pointsModel.remove(index)
+
+        if (d.hoveredPointIndex === index)
+            d.hoveredPointIndex = -1
     }
 
     function setRelativePoint(index, p)
@@ -299,5 +310,6 @@ Instrument
     function clear()
     {
         pointsModel.clear()
+        d.hoveredPointIndex = -1
     }
 }
