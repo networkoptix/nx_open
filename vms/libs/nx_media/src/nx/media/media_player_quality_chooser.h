@@ -36,14 +36,14 @@ Player::TranscodingSupportStatus transcodingSupportStatus(
     bool liveMode,
     TranscodingRequestType requestType = TranscodingRequestType::detailed);
 
-struct Input
+struct Params
 {
     AVCodecID transcodingCodec = AV_CODEC_ID_NONE;
 
     /** Used to find a server to query transcoding capability. */
     bool liveMode = false;
 
-    /** Used when not liveMode, to find a server to query transcoding capability. */
+    /** Used when not liveMode, to find a Server to query transcoding capability. */
     qint64 positionMs = -1;
 
     QnVirtualCameraResourcePtr camera;
@@ -78,7 +78,7 @@ struct Result: public boost::equality_comparable1<Result>
  *     camera aspect ratio, thus, the returned custom size width should be treated as specified
  *     in logical pixels.
  */
-Result chooseVideoQuality(int videoQuality, const Input& input);
+Result chooseVideoQuality(int videoQuality, const Params& input);
 
 } // namespace media_player_quality_chooser
 
