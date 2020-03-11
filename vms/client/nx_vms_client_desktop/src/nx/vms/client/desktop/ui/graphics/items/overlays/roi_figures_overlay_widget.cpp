@@ -197,7 +197,8 @@ RoiFiguresOverlayWidget::Private::Private(RoiFiguresOverlayWidget* q):
 
 QPointF RoiFiguresOverlayWidget::Private::absolutePos(const QPointF& relativePos) const
 {
-    return Geometry::subPoint(QRectF({}, q->size()), relativePos);
+    const QRectF widgetRect({}, q->size());
+    return Geometry::bounded(Geometry::subPoint(widgetRect, relativePos), widgetRect);
 }
 
 QVector<QPointF> RoiFiguresOverlayWidget::Private::mapPoints(const QVector<QPointF>& points) const
