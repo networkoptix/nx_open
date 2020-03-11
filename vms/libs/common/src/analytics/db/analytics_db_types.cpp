@@ -165,7 +165,7 @@ bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
         rectsIntersectToSearchPrecision(*(this->boundingBox), boundingBox);
 }
 
-bool Filter::acceptsAttributes(const std::vector<Attribute>& attributes) const
+bool Filter::acceptsAttributes(const Attributes& attributes) const
 {
     const auto filterWords = freeText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
     if (attributes.empty())
