@@ -69,7 +69,7 @@ bool EventsStorage::makePath(const QString& path)
         return false;
     }
 
-    NX_DEBUG(this, "Directory %1 exists or has been created successfully", path);
+    NX_DEBUG(this, "Directory %1 exists or has been created successfully.", path);
     return true;
 }
 
@@ -127,7 +127,7 @@ bool EventsStorage::initialize(const Settings& settings)
 {
     if (m_dbController)
     {
-        NX_ASSERT(false, "Reinitializing is not supported by this class");
+        NX_ASSERT(false, "Reinitializing is not supported by this class.");
         return false;
     }
 
@@ -138,7 +138,7 @@ bool EventsStorage::initialize(const Settings& settings)
 
     auto dbConnectionOptions = settings.dbConnectionOptions;
     dbConnectionOptions.dbName = closeDirPath(settings.path) + dbConnectionOptions.dbName;
-    NX_DEBUG(this, "Opening analytics event storage from [%1]", dbConnectionOptions.dbName);
+    NX_DEBUG(this, "Opening analytics event storage from [%1].", dbConnectionOptions.dbName);
 
     m_dbController = std::make_unique<DbController>(dbConnectionOptions);
     const auto archivePath = closeDirPath(settings.path) + "archive/";
@@ -150,7 +150,7 @@ bool EventsStorage::initialize(const Settings& settings)
         || !changeOwner(enumerateSqlFiles(dbConnectionOptions.dbName)))
     {
         m_dbController.reset();
-        NX_WARNING(this, "Failed to initialize analytics DB directories at %1", settings.path);
+        NX_WARNING(this, "Failed to initialize Analytics DB directories at %1", settings.path);
         return false;
     }
 
@@ -161,7 +161,7 @@ bool EventsStorage::initialize(const Settings& settings)
         || !loadDictionaries())
     {
         m_dbController.reset();
-        NX_WARNING(this, "Failed to open analytics DB at %1", settings.path);
+        NX_WARNING(this, "Failed to open Analytics DB at %1", settings.path);
         return false;
     }
 
@@ -171,7 +171,7 @@ bool EventsStorage::initialize(const Settings& settings)
         m_mediaServerModule,
         archivePath);
 
-    NX_DEBUG(this, "Analytics DB initialized");
+    NX_DEBUG(this, "Analytics DB initialized.");
 
     return true;
 }
@@ -192,7 +192,7 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
 
     QnMutexLocker lock(&m_mutex);
 
-    NX_VERBOSE(this, "Saving packet (1). %1ms", t.elapsed());
+    NX_VERBOSE(this, "Saving packet (1). %1 ms", t.elapsed());
 
     m_maxRecordedTimestamp = std::max<milliseconds>(
         m_maxRecordedTimestamp,
@@ -204,11 +204,11 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
 
     if (detectionDataSaver.empty())
     {
-        NX_VERBOSE(this, "Saving packet (2) took %1ms", t.elapsed());
+        NX_VERBOSE(this, "Saving packet (2) took %1 ms", t.elapsed());
         return;
     }
 
-    NX_VERBOSE(this, "Saving packet (3). %1ms", t.elapsed());
+    NX_VERBOSE(this, "Saving packet (3). %1 ms", t.elapsed());
 
     m_dbController->queryExecutor().executeUpdate(
         [packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
@@ -220,7 +220,7 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
         [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
         kSaveEventQueryAggregationKey);
 
-    NX_VERBOSE(this, "Saving packet (4) took %1ms", t.elapsed());
+    NX_VERBOSE(this, "Saving packet (4) took %1 ms", t.elapsed());
 }
 
 std::optional<nx::sql::QueryStatistics> EventsStorage::statistics() const
@@ -235,23 +235,23 @@ std::vector<ObjectPosition> EventsStorage::lookupTrackDetailsSync(const ObjectTr
     nx::utils::ElapsedTimer timer;
     timer.restart();
 
-    if (auto details = m_objectTrackCache->getTrackById(track.id))
+    if (const auto& details = m_objectTrackCache->getTrackById(track.id))
     {
-        NX_VERBOSE(this, "Return trackId %1 from the cache", track.id);
+        NX_VERBOSE(this, "Return trackId %1 from the cache.", track.id);
         return details->objectPositionSequence;
     }
 
     std::vector<ObjectPosition> result;
-    auto resource = m_mediaServerModule->resourcePool()->getResourceById(track.deviceId);
+    const auto& resource = m_mediaServerModule->resourcePool()->getResourceById(track.deviceId);
     if (!resource)
     {
-        NX_DEBUG(this, "Failed to to lookup detail track info for deviceId: %1", track.deviceId);
+        NX_DEBUG(this, "Failed to to lookup detail track info for deviceId %1", track.deviceId);
         return result;
     }
     QnServerArchiveDelegate archive(m_mediaServerModule, MediaQuality::MEDIA_Quality_High);
     if (!archive.open(resource, m_mediaServerModule->archiveIntegrityWatcher()))
     {
-        NX_DEBUG(this, "Failed to to lookup detail track info for objectTraclId: %1", track.id);
+        NX_DEBUG(this, "Failed to to lookup detail track info for objectTraclId %1", track.id);
         return result;
     }
     archive.seek(track.firstAppearanceTimeUs, true);
@@ -261,15 +261,15 @@ std::vector<ObjectPosition> EventsStorage::lookupTrackDetailsSync(const ObjectTr
         if (data->timestamp > lastTime || data->dataType == QnAbstractMediaData::EMPTY_DATA)
             break;
 
-        auto metadata = std::dynamic_pointer_cast<QnCompressedMetadata>(data);
+        const auto& metadata = std::dynamic_pointer_cast<QnCompressedMetadata>(data);
         if (!metadata)
             continue;
 
-        auto packet = nx::common::metadata::fromCompressedMetadataPacket(metadata);
+        const auto& packet = nx::common::metadata::fromCompressedMetadataPacket(metadata);
         if (!packet)
             break;
 
-        for (const auto& detailData : packet->objectMetadataList)
+        for (const auto& detailData: packet->objectMetadataList)
         {
             if (detailData.trackId == track.id)
             {
@@ -283,7 +283,7 @@ std::vector<ObjectPosition> EventsStorage::lookupTrackDetailsSync(const ObjectTr
             }
         }
     }
-    NX_VERBOSE(this, "track details data has read from media archive. Request duration %1",
+    NX_VERBOSE(this, "Track details data has been read from media archive. Request duration %1",
         timer.elapsed());
     return result;
 }
@@ -372,7 +372,7 @@ void EventsStorage::flush(StoreCompletionHandler completionHandler)
     m_dbController->queryExecutor().executeUpdate(
         [this](nx::sql::QueryContext* queryContext)
         {
-            NX_DEBUG(this, "Flushing unsaved data");
+            NX_DEBUG(this, "Flushing unsaved data.");
 
             QnMutexLocker lock(&m_mutex);
             ObjectTrackDataSaver detectionDataSaver = takeDataToSave(lock, /*flush*/ true);
@@ -394,7 +394,7 @@ void EventsStorage::flush(StoreCompletionHandler completionHandler)
 
 bool EventsStorage::readMaximumEventTimestamp()
 {
-    NX_DEBUG(this, "Loading max event timestamp");
+    NX_DEBUG(this, "Loading max event timestamp.");
 
     try
     {
@@ -411,7 +411,7 @@ bool EventsStorage::readMaximumEventTimestamp()
     }
     catch (const std::exception& e)
     {
-        NX_WARNING(this, "Failed to read maximum event timestamp from the DB. %1", e.what());
+        NX_WARNING(this, "Failed to read maximum event timestamp from Analytics DB: %1", e.what());
         return false;
     }
 
@@ -440,7 +440,7 @@ bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResu
     }
     catch (const std::exception& e)
     {
-        NX_WARNING(this, "Failed to read minimum event timestamp from the DB. %1", e.what());
+        NX_WARNING(this, "Failed to read minimum event timestamp from Analytics DB: %1", e.what());
         return false;
     }
 
@@ -464,7 +464,7 @@ bool EventsStorage::loadDictionaries()
     }
     catch (const std::exception& e)
     {
-        NX_WARNING(this, "Failed to read maximum event timestamp from the DB. %1", e.what());
+        NX_WARNING(this, "Failed to read maximum event timestamp from Analytics DB: %1", e.what());
         return false;
     }
 
@@ -536,7 +536,7 @@ void EventsStorage::scheduleDataCleanup(
 
             if (cleaner.clean(queryContext) == Cleaner::Result::incomplete)
             {
-                NX_VERBOSE(this, "Could not clean all data in one run. Scheduling another one");
+                NX_VERBOSE(this, "Could not clean all data in one run. Scheduling another one.");
 
                 QnMutexLocker lock(&m_mutex);
                 if (!m_stopped)
@@ -572,11 +572,11 @@ void EventsStorage::logDataSaveResult(sql::DBResult resultCode)
 {
     if (resultCode != sql::DBResult::ok)
     {
-        NX_DEBUG(this, "Error saving detection metadata packet. %1", resultCode);
+        NX_DEBUG(this, "Error saving detection metadata packet: %1", resultCode);
     }
     else
     {
-        NX_VERBOSE(this, "Detection metadata packet has been saved successfully");
+        NX_VERBOSE(this, "Detection metadata packet has been saved successfully.");
     }
 }
 
@@ -597,7 +597,7 @@ bool MovableAnalyticsDb::initialize(const Settings& settings)
     bool result = otherDb->initialize(settings);
     if (!result)
     {
-        NX_INFO(this, "Failed to initialize analytics DB at %1", settings.path);
+        NX_INFO(this, "Failed to initialize the Analytics DB at %1", settings.path);
         otherDb.reset();
     }
 
@@ -629,7 +629,7 @@ void MovableAnalyticsDb::save(common::metadata::ConstObjectMetadataPacketPtr pac
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to write to non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to write to a non-initialized Analytics DB.");
         return;
     }
 
@@ -641,7 +641,7 @@ std::vector<ObjectPosition> MovableAnalyticsDb::lookupTrackDetailsSync(const Obj
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to lookup to non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to look up in a non-initialized Analytics DB.");
         return std::vector<ObjectPosition>();
     }
 
@@ -655,7 +655,7 @@ void MovableAnalyticsDb::lookup(
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to look up tracks in non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to look up tracks in a non-initialized Analytics DB.");
         return completionHandler(ResultCode::ok, LookupResult());
     }
 
@@ -672,7 +672,7 @@ void MovableAnalyticsDb::lookupTimePeriods(
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to look up time periods in non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to look up time periods in a non-initialized Analytics DB.");
         return completionHandler(ResultCode::error, QnTimePeriodList());
     }
 
@@ -689,7 +689,7 @@ void MovableAnalyticsDb::markDataAsDeprecated(
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to remove from non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to remove from a non-initialized Analytics DB.");
         return;
     }
 
@@ -703,7 +703,7 @@ void MovableAnalyticsDb::flush(StoreCompletionHandler completionHandler)
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to flush non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to flush a non-initialized Analytics DB.");
         return completionHandler(ResultCode::error);
     }
 
@@ -722,7 +722,7 @@ bool MovableAnalyticsDb::readMinimumEventTimestamp(std::chrono::milliseconds* ou
     auto db = getDb();
     if (!db)
     {
-        NX_DEBUG(this, "Attempt to read min timestamp from non-initialized analytics DB");
+        NX_DEBUG(this, "Attempt to read min timestamp from a non-initialized Analytics DB.");
         return false;
     }
 

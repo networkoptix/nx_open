@@ -51,8 +51,7 @@ Ptr<IObjectTrackInfo> makeObjectTrackInfo(
 
     if (actionData.objectTrack)
     {
-        const auto track = createObjectTrack(*actionData.objectTrack);
-        if (track)
+        if (const auto track = createObjectTrack(*actionData.objectTrack))
             objectTrackInfo->setTrack(track.get());
 
         if (actionData.bestShotObjectPosition)
