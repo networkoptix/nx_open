@@ -114,7 +114,7 @@ ini_definition = {
     "cpuUsageThreshold": {"type": "float", "range": [0.0, 1.0], "default": 0.5},
     "archiveBitratePerCameraMbps": {"type": "int", "range": [1, 999], "default": 10},
     "minimumArchiveFreeSpacePerCameraSeconds": {"type": "int", "range": [1, None], "default": 240},
-    "timeDiffThresholdSeconds": {"type": "float", "range": [0.0, None], "default": 180},
+    "timeDiffThresholdSeconds": {"type": "float", "range": [0.0, None], "default": 3},
     "swapThresholdKilobytes": {"type": "int", "range": [0, None], "default": 0},
     "enableSwapThreshold": {"type": "bool", "default": False},
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
