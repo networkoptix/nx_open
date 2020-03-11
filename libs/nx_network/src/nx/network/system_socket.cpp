@@ -612,11 +612,11 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
     m_aioHelper->bindToAioThread(aioThread);
 }
 
-#if defined(Q_OS_WIN)
-    template<typename SocketInterfaceToImplement>
-    int CommunicatingSocket<SocketInterfaceToImplement>::performOperation(
-        Operation op, char* buffer, ULONG bufferLen, DWORD flags)
-    {
+template<typename SocketInterfaceToImplement>
+int CommunicatingSocket<SocketInterfaceToImplement>::recv(
+    void* buffer, unsigned int bufferLen, int flags)
+{
+    #if defined(Q_OS_WIN)
         bool isNonBlockingMode;
         if (!getNonBlockingMode(&isNonBlockingMode))
             return -1;
@@ -628,9 +628,9 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
             if (!setNonBlockingMode(true))
                 return -1;
         }
-        const int bytes = (op == Operation::read)
-            ? ::recv(m_fd, buffer, bufferLen, flags & ~MSG_DONTWAIT)
-            : ::send(m_fd, buffer, bufferLen, flags & ~MSG_DONTWAIT);
+
+        const int bytesRead = ::recv(m_fd, (raw_type *)buffer, bufferLen, flags & ~MSG_DONTWAIT);
+
         if (needNonBlockingMode)
         {
             // Save error code as changing mode will drop it.
@@ -644,22 +644,12 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
                 sysErrorCodeBak = SystemError::timedOut;
             SystemError::setLastErrorCode(sysErrorCodeBak);
         }
-        return bytes;
-    }
-#endif
-
-template<typename SocketInterfaceToImplement>
-int CommunicatingSocket<SocketInterfaceToImplement>::recv(
-    void* buffer, unsigned int bufferLen, int flags)
-{
-    #if defined(Q_OS_WIN)
-        int bytesRead = performOperation(Operation::read, (char*)buffer, bufferLen, flags);
     #else
         unsigned int recvTimeout = 0;
         if (!this->getRecvTimeout(&recvTimeout))
             return -1;
 
-        int bytesRead = doInterruptableSystemCallWithTimeout<>(
+        const int bytesRead = doInterruptableSystemCallWithTimeout<>(
             this,
             std::bind(&::recv, this->m_fd, (void*)buffer, (size_t)bufferLen, flags),
             recvTimeout,
@@ -683,13 +673,13 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     const void* buffer, unsigned int bufferLen)
 {
     #if defined(Q_OS_WIN)
-        int sent = performOperation(Operation::write, (char*)buffer, bufferLen, 0);
+        const int sent = ::send(m_fd, (raw_type*)buffer, bufferLen, 0);
     #else
         unsigned int sendTimeout = 0;
         if (!this->getSendTimeout(&sendTimeout))
             return -1;
 
-        int sent = doInterruptableSystemCallWithTimeout<>(
+        const int sent = doInterruptableSystemCallWithTimeout<>(
             this,
             std::bind(
                 &::send,
@@ -716,9 +706,12 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     {
         m_connected = false;
     }
-#if !defined(__arm__)
-    m_totalSocketBytesSent += sent;
-#endif
+    else
+    {
+        #if !defined(__arm__)
+            m_totalSocketBytesSent += sent;
+        #endif
+    }
     return sent;
 }
 

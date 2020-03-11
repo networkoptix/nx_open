@@ -162,12 +162,6 @@ public:
     virtual bool shutdown() override;
 
 protected:
-    #if defined(Q_OS_WIN)
-        enum class Operation: bool { read, write };
-
-        int performOperation(Operation op, char* buffer, ULONG bufferLen, DWORD flags);
-    #endif
-
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
     bool connectToIp(
