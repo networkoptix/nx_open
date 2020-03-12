@@ -212,6 +212,8 @@ void MediatorStunClient::failPendingRequests(
 
 void MediatorStunClient::sendPendingRequests()
 {
+    NX_VERBOSE(this, "Executing %1 postponed requests", m_postponedRequests.size());
+
     auto postponedRequests = std::exchange(m_postponedRequests, {});
     for (auto& requestContext: postponedRequests)
     {

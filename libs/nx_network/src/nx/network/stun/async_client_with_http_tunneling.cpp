@@ -298,6 +298,8 @@ void AsyncClientWithHttpTunneling::sendPendingRequests()
 {
     using namespace std::placeholders;
 
+    NX_VERBOSE(this, "Sending %1 pending requests", m_activeRequests.size());
+
     for (const auto& requestContext: m_activeRequests)
     {
         m_stunClient->sendRequest(
@@ -408,7 +410,7 @@ void AsyncClientWithHttpTunneling::onRequestCompleted(
     requestContext.handler(sysErrorCode, std::move(response));
 }
 
-template<typename Dictionary> 
+template<typename Dictionary>
 void AsyncClientWithHttpTunneling::cancelUserHandlers(
     Dictionary& dictionary,
     void* client)
