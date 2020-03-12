@@ -1070,7 +1070,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
                 return result.join("\n");
             };
 
-        NX_DEBUG(this, "System servers:\n%1", debugServersInfo());
+        NX_DEBUG(this, "Connection options:\n%1", debugServersInfo());
 
         const auto iter = std::find_if(servers.cbegin(), servers.cend(),
             [system](const nx::vms::api::ModuleInformation& server)
