@@ -17,12 +17,14 @@ class QnColorGLShaderProgram;
 class QnColorPerVertexGLShaderProgram;
 class QnTextureGLShaderProgram;
 class QnTextureTransitionShaderProgram;
+class QnColorLineGLShaderProgram;
 
 class QnOpenGLRenderer: public QOpenGLFunctions
 {
 
 public:
     QnOpenGLRenderer(QObject *parent = NULL);
+    virtual ~QnOpenGLRenderer();
 
     void                setColor(const QVector4D& c);
     void                setColor(const QColor& c);
@@ -46,6 +48,7 @@ public:
     QnTextureGLShaderProgram* getTextureShader() const;
     QnColorGLShaderProgram* getColorShader() const;
     QnTextureTransitionShaderProgram* getTextureTransitionShader() const;
+    QnColorLineGLShaderProgram* getColorLineShader() const;
 
 private:
     Q_DISABLE_COPY(QnOpenGLRenderer);
@@ -57,11 +60,13 @@ private:
     QVector4D  m_color;
 
     unsigned short m_indices_for_render_quads[6];
+    GLuint m_elementBuffer;
 
     QScopedPointer<QnColorGLShaderProgram>          m_colorProgram;
     QScopedPointer<QnTextureGLShaderProgram>  m_textureColorProgram;
     QScopedPointer<QnColorPerVertexGLShaderProgram> m_colorPerVertexShader;
     QScopedPointer<QnTextureTransitionShaderProgram> m_textureTransitionShader;
+    QScopedPointer<QnColorLineGLShaderProgram> m_colorLineShader;
 };
 
 class QnOpenGLRendererManager: public QObject

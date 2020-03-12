@@ -78,7 +78,9 @@ QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(QObject *parent):
         yuv.rgba = vec4(
             texture2D(yTexture, vTexCoord.st).r,
             texture2D(uvTexture, vTexCoord.st).r,
-            texture2D(uvTexture, vTexCoord.st).a,
+            // Use q for second component to automate .q -> .g replacement when
+            // GL_LUMINANCE_ALPHA is replaced with GL_RG.
+            texture2D(uvTexture, vTexCoord.st).q,
             1.0
             );
 

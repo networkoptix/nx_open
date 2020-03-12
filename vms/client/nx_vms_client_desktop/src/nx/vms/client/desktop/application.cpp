@@ -390,6 +390,22 @@ int runApplication(int argc, char** argv)
         QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
         QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     }
+
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        // This should go into QnClientModule::initSurfaceFormat(),
+        // but we must set OpenGL version before creation of GUI application.
+
+        QSurfaceFormat format;
+        // Mac computers OpenGL versions:
+        //   https://support.apple.com/en-us/HT202823
+        format.setProfile(QSurfaceFormat::CoreProfile);
+        // Chromium requires OpenGL 4.1 on macOS for WebGL and other HW accelerated staff.
+        format.setVersion(4, 1);
+
+        QSurfaceFormat::setDefaultFormat(format);
+    }
+
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
     // this is necessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created

@@ -53,9 +53,9 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(QObject *parent):
     void main()
     {
         // do color transformation yuv->RGB
-        gl_FragColor = vec4(texture2D(yTexture, vTexCoord).p,
-            texture2D(uTexture, vTexCoord).p,
-            texture2D(vTexture, vTexCoord).p,
+        gl_FragColor = vec4(texture2D(yTexture, vTexCoord).r,
+            texture2D(uTexture, vTexCoord).r,
+            texture2D(vTexture, vTexCoord).r,
             1.0) * colorTransform;
     }
     ));
@@ -104,10 +104,10 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(QObject *pa
         0.0,  0.0,    0.0,    opacity);
 
     void main() {
-        float y = texture2D(yTexture, vTexCoord).p;
+        float y = texture2D(yTexture, vTexCoord).r;
         gl_FragColor = vec4(clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0),
-            texture2D(uTexture, vTexCoord).p,
-            texture2D(vTexture, vTexCoord).p,
+            texture2D(uTexture, vTexCoord).r,
+            texture2D(vTexture, vTexCoord).r,
             1.0) * colorTransform;
     }
     ));
@@ -190,11 +190,11 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
-        float y = texture2D(yTexture, pos).p;
+        float y = texture2D(yTexture, pos).r;
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = vec4(%1,
-            texture2D(uTexture, pos).p,
-            texture2D(vTexture, pos).p,
+            texture2D(uTexture, pos).r,
+            texture2D(vTexture, pos).r,
             1.0) * colorTransform;
         else
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -282,11 +282,11 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
-        float y = texture2D(yTexture, pos).p;
+        float y = texture2D(yTexture, pos).r;
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = vec4(%1,
-            texture2D(uTexture, pos).p,
-            texture2D(vTexture, pos).p,
+            texture2D(uTexture, pos).r,
+            texture2D(vTexture, pos).r,
             1.0) * colorTransform;
         else
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -374,11 +374,11 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
-        float y = texture2D(yTexture, pos).p;
+        float y = texture2D(yTexture, pos).r;
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = vec4(%1,
-            texture2D(uTexture, pos).p,
-            texture2D(vTexture, pos).p,
+            texture2D(uTexture, pos).r,
+            texture2D(vTexture, pos).r,
             1.0) * colorTransform;
         else
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -678,10 +678,10 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(QObject *parent):
         0.0,  0.0,    0.0,    opacity);
 
     void main() {
-        gl_FragColor = vec4(texture2D(yTexture, vTexCoord).p,
-            texture2D(uTexture, vTexCoord).p-0.5,
-            texture2D(vTexture, vTexCoord).p-0.5,
-            texture2D(aTexture, vTexCoord).p) * colorTransform;
+        gl_FragColor = vec4(texture2D(yTexture, vTexCoord).r,
+            texture2D(uTexture, vTexCoord).r-0.5,
+            texture2D(vTexture, vTexCoord).r-0.5,
+            texture2D(aTexture, vTexCoord).r) * colorTransform;
     }
     ));
 

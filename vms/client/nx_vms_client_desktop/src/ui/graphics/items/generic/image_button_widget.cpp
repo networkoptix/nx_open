@@ -731,7 +731,7 @@ void QnImageButtonWidget::initializeVao(const QRectF &rect, QOpenGLWidget* glWid
         if (!shader->initialized())
         {
             shader->bindAttributeLocation("aPosition", VERTEX_POS_INDX);
-            shader->bindAttributeLocation("aTexcoord", VERTEX_TEXCOORD0_INDX);
+            shader->bindAttributeLocation("aTexCoord", VERTEX_TEXCOORD0_INDX);
             shader->markInitialized();
         };
 
@@ -763,7 +763,7 @@ void QnImageButtonWidget::initializeVao(const QRectF &rect, QOpenGLWidget* glWid
         if (!shader->initialized())
         {
             shader->bindAttributeLocation("aPosition", VERTEX_POS_INDX);
-            shader->bindAttributeLocation("aTexcoord", VERTEX_TEXCOORD0_INDX);
+            shader->bindAttributeLocation("aTexCoord", VERTEX_TEXCOORD0_INDX);
             shader->markInitialized();
         };
 
