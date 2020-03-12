@@ -757,7 +757,8 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::shutdown()
     m_connected = false;
     bool result = Socket<SocketInterfaceToImplement>::shutdown();
     #if defined(Q_OS_WIN)
-        ::CancelIoEx((HANDLE)m_fd, NULL);
+        if (m_fd != -1)
+            ::CancelIoEx((HANDLE)m_fd, NULL);
     #endif
     return result;
 }
