@@ -712,9 +712,9 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                 first_cycle = True
 
-                host_time_before_test = time.clock_gettime(time.CLOCK_REALTIME)
-                vms_time_before_test = api.get_time()
-                host_time_before_test_after_vms_time_acquisition = time.clock_gettime(time.CLOCK_REALTIME)
+                host_time_s_before_test = time.clock_gettime(time.CLOCK_REALTIME)
+                vms_time_ms_before_test = api.get_time()
+                host_time_s_before_test_after_vms_time_acquisition = time.clock_gettime(time.CLOCK_REALTIME)
 
                 try:
                     while True:
@@ -894,15 +894,15 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
     report('\n')
 
-    time.sleep(1)
+    time.sleep(5)
 
     try:
-        host_time_after_test = time.clock_gettime(time.CLOCK_REALTIME)
-        vms_time_after_test = api.get_time()
-        host_time_after_test_after_vms_time_acquisition = time.clock_gettime(time.CLOCK_REALTIME)
+        host_time_s_after_test = time.clock_gettime(time.CLOCK_REALTIME)
+        vms_time_ms_after_test = api.get_time()
+        host_time_s_after_test_after_vms_time_acquisition = time.clock_gettime(time.CLOCK_REALTIME)
 
-        get_time_request_duration_before = host_time_before_test_after_vms_time_acquisition - host_time_before_test
-        get_time_request_duration_after = host_time_after_test_after_vms_time_acquisition - host_time_after_test
+        get_time_request_duration_before = host_time_s_before_test_after_vms_time_acquisition - host_time_s_before_test
+        get_time_request_duration_after = host_time_s_after_test_after_vms_time_acquisition - host_time_s_after_test
 
         logging.info(
             f'/api/getTime request duration before the test: {get_time_request_duration_before} s.\n'
@@ -910,13 +910,11 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
         )
 
         report(
-            f'Streaming duration by box clock: {( vms_time_after_test - vms_time_before_test) / 1000.0} s.\n'
-            f'Streaming duration by host clock: {( host_time_after_test - host_time_before_test ):.3f} s.\n'
+            f'Streaming duration by box clock: {(vms_time_ms_after_test - vms_time_ms_before_test) / 1000.0} s.\n'
+            f'Streaming duration by host clock: {(host_time_s_after_test - host_time_s_before_test):.3f} s.\n'
         )
     except Exception as e:
-        logging.warning(
-            f"Can't obtain box time: {e}"
-        )
+        logging.warning(f"Can't obtain box time: {e}")
 
     report(
         f'Load tests finished successfully.\n'
@@ -937,9 +935,7 @@ def _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count):
 
 def _test_vms(api, box, box_platform, conf, ini, vms):
     ram_free_bytes = box_platform.obtain_ram_free_bytes()
-    report(
-        f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB"
-    )
+    report(f"Box RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
     _check_storages(api, ini, camera_count=max(ini['virtualCameraCount']))
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
