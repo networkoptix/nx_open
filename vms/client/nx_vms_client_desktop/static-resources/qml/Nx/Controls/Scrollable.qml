@@ -83,10 +83,14 @@ Item
 
         function getPixelDelta(wheel)
         {
-            var degrees = wheel.angleDelta.y / 8
+            // Standard mouse values.
+            var kUnitsPerDegree = 8
+            var kDegreesPerStep = 15.0
+
+            var degrees = wheel.angleDelta.y / kUnitsPerDegree
 
             if (degrees)
-                return Qt.styleHints.wheelScrollLines * pixelPerLine * (degrees / 15.0)
+                return Qt.styleHints.wheelScrollLines * pixelPerLine * (degrees / kDegreesPerStep)
 
             return wheel.pixelDelta.y
         }
