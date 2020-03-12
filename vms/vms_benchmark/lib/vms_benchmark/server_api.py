@@ -254,6 +254,24 @@ class ServerApi:
         return None
 
     @_catch_http_errors
+    def get_time(self):
+        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/getTime")
+        credentials = f"{self.user}:{self.password}"
+        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+        response = self.get_request(request)
+
+        result = self.Response(response.code)
+
+        if 200 <= response.code < 300:
+            result.payload = json.loads(response.body)
+            if int(result.payload['error']) != 0 or 'reply' not in result.payload:
+                return None
+            return int(result.payload['reply']['vmsTime'])
+
+        return None
+
+    @_catch_http_errors
     def add_cameras(self, hostname, count):
         from pprint import pformat
         cameras = []
