@@ -2498,6 +2498,8 @@ void MediaServerProcess::registerRestHandlers(
      *     %value true Merge will start anyway.
      *     %value false If the target server protocol version differs from the current server
      *         protocol version merge aborts.
+     * %param[opt]:boolean dryRun Only check for merge possibility, do not perform actual merge.
+     *     Known issues: dry run may produce false positive results in some rare cases.
      * %return:object JSON object with an error code and error string.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error token, or an empty string on success.

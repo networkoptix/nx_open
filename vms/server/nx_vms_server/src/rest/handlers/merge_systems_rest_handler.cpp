@@ -64,25 +64,25 @@ int QnMergeSystemsRestHandler::execute(
     if (QnPermissionsHelper::isSafeMode(serverModule()))
     {
         systemMergeProcessor.setMergeError(&result, MergeStatus::safeMode);
+        return nx::network::http::StatusCode::ok;
     }
-    else if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
+
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
     {
         systemMergeProcessor.setMergeError(&result, MergeStatus::forbidden);
         return nx::network::http::StatusCode::forbidden;
     }
-    else
-    {
-        systemMergeProcessor.enableDbBackup(serverModule()->settings().backupDir());
-        result = systemMergeProcessor.merge(
-            owner->accessRights(),
-            owner->authSession(),
-            data);
-    }
 
+    result = systemMergeProcessor.merge(owner->accessRights(), owner->authSession(), data);
+    if (data.dryRun)
+    {
+        NX_DEBUG(this, "Merge with %1 dry run result %2",
+            data.url, result.error ? QString("OK") : toString(result.error));
+        return nx::network::http::StatusCode::ok;
+    }
     if (result.error)
     {
-        NX_DEBUG(this, lm("Merge with %1 failed with result %2")
-            .args(data.url, toString(result.error)));
+        NX_DEBUG(this, "Merge with %1 failed with result %2", data.url, result.error);
         return nx::network::http::StatusCode::ok;
     }
 

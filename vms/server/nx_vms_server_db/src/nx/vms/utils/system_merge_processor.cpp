@@ -102,6 +102,12 @@ QnJsonRestResult SystemMergeProcessor::merge(
     if (result.error)
         return makeError("Systems cannot be merged");
 
+    if (data.dryRun)
+    {
+        NX_DEBUG(this, "Do not perform actual merge due to dry run request");
+        return result;
+    }
+
     QnUuid mergeId = QnUuid::createUuid();
     result = mergeSystems(accessRights, data, mergeId);
     if (result.error)

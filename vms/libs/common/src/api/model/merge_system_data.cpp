@@ -9,7 +9,8 @@ MergeSystemData::MergeSystemData(const QnRequestParams& params):
     postKey(params.value(lit("postKey"))),
     takeRemoteSettings(params.value(lit("takeRemoteSettings"), lit("false")) != lit("false")),
     mergeOneServer(params.value(lit("oneServer"), lit("false")) != lit("false")),
-    ignoreIncompatible(params.value(lit("ignoreIncompatible"), lit("false")) != lit("false"))
+    ignoreIncompatible(params.value(lit("ignoreIncompatible"), lit("false")) != lit("false")),
+    dryRun(params.value(lit("dryRun"), lit("false")) != lit("false"))
 {
 }
 

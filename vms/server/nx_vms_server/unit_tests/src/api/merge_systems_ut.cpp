@@ -31,13 +31,35 @@ protected:
         off
     };
 
+    QnJsonRestResult merge(
+        const LauncherPtr& target,
+        const QString& password,
+        const MergeSystemData& data)
+    {
+        QByteArray responseBody;
+        [&]
+        {
+            NX_TEST_API_POST(
+                target.get(), "api/mergeSystems", data,
+                [](const QByteArray& data) { return data; },
+                Equals(nx::network::http::StatusCode::ok),
+                "admin", password, &responseBody);
+        }();
+
+        bool success = false;
+        const auto result = QJson::deserialized<QnJsonRestResult>(responseBody, {}, &success);
+        EXPECT_TRUE(success);
+        return result;
+    }
+
     void assertMergeRequestReturn(
         const LauncherPtr& requestTarget,
         const LauncherPtr& serverToMerge,
         MergeStatus mergeStatus,
         nx::vms::api::SystemMergeHistoryRecord* outMergeResult = nullptr,
         const QString& requestTargetPassword = "admin",
-        const QString& serverToMergePassword = "admin")
+        const QString& serverToMergePassword = "admin",
+        bool testDryRun = true)
     {
         QnGetNonceReply nonceReply;
         issueGetRequest(requestTarget.get(), "api/getNonce", nonceReply);
@@ -51,20 +73,18 @@ protected:
         mergeSystemData.getKey = QString::fromLatin1(createHttpQueryAuthParam(
             "admin", serverToMergePassword, nonceReply.realm, "GET", nonceReply.nonce.toUtf8()));
 
-        QByteArray responseBody;
-        NX_TEST_API_POST(
-            requestTarget.get(), "api/mergeSystems", mergeSystemData,
-            [](const QByteArray& data) {return data;},
-            Equals(nx::network::http::StatusCode::ok),
-            "admin", requestTargetPassword,
-            &responseBody);
-        bool success = false;
-        auto result = QJson::deserialized<QnJsonRestResult>(responseBody, QnJsonRestResult(), &success);
-        ASSERT_TRUE(success);
-        ASSERT_EQ(toString(mergeStatus), result.errorString);
+        if (testDryRun)
+        {
+            mergeSystemData.dryRun = true;
+            const auto testResult = merge(requestTarget, requestTargetPassword, mergeSystemData);
+            EXPECT_EQ(toString(mergeStatus), testResult.errorString);
+        }
 
+        mergeSystemData.dryRun = false;
+        const auto actualResult = merge(requestTarget, requestTargetPassword, mergeSystemData);
+        ASSERT_EQ(toString(mergeStatus), actualResult.errorString);
         if (outMergeResult)
-            *outMergeResult = result.deserialized<nx::vms::api::SystemMergeHistoryRecord>();
+            *outMergeResult = actualResult.deserialized<nx::vms::api::SystemMergeHistoryRecord>();
     }
 
     LauncherPtr givenServer()
@@ -219,7 +239,11 @@ TEST_F(MergeSystems, SafeMode_To)
     assertMergeRequestReturn(
         /* requestTarget */ server1,
         /* serverToMerge */ server2,
-        /* expectedCode */ MergeStatus::safeMode);
+        /* expectedCode */ MergeStatus::safeMode,
+        /* outMergeResult */ nullptr,
+        /* requestTargetPassword */ "admin",
+        /* serverToMergePassword */ "admin",
+        /* testDryRun */ false); //< Dry run is not supported if target server is in the test mode.
 }
 
 void waitForMergeFinished(
