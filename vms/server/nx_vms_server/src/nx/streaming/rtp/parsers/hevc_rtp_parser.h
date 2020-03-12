@@ -126,7 +126,7 @@ private:
     bool extractPictureDimensionsFromSps(const uint8_t* buffer, int bufferLength);
 
     bool reset(bool softReset = false); //< Always returns false
-
+    void addChunk(int bufferOffset, int payloadLength, bool hasStartCode);
 private:
     HevcContext m_context;
 

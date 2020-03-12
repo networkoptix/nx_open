@@ -296,6 +296,14 @@ bool HevcParser::handlePayload(const uint8_t* payload, int payloadLength)
     }
 }
 
+void HevcParser::addChunk(int bufferOffset, int payloadLength, bool hasStartCode)
+{
+    m_chunks.emplace_back(bufferOffset, payloadLength, hasStartCode);
+    m_videoFrameSize += payloadLength;
+    if (hasStartCode)
+        ++m_numberOfNalUnits;
+}
+
 bool HevcParser::handleSingleNalUnitPacket(
     const hevc::NalUnitHeader* header,
     const uint8_t* payload,
@@ -328,9 +336,7 @@ bool HevcParser::handleSingleNalUnitPacket(
         m_context.height = sps.height;
     }
 
-    m_chunks.emplace_back(payload - m_rtpBufferBase, payloadLength, true);
-    m_videoFrameSize += payloadLength;
-    ++m_numberOfNalUnits;
+    addChunk(payload - m_rtpBufferBase, payloadLength, true);
     return true;
 }
 
@@ -358,9 +364,7 @@ bool HevcParser::handleAggregationPacket(
 
         updateNalFlags(nalHeader.unitType, payload, payloadLength);
 
-        m_chunks.emplace_back(payload - m_rtpBufferBase, nalSize, true);
-        m_videoFrameSize += nalSize;
-        ++m_numberOfNalUnits;
+        addChunk(payload - m_rtpBufferBase, nalSize, true);
 
         payload += nalSize;
         payloadLength -= nalSize;
@@ -395,11 +399,9 @@ bool HevcParser::handleFragmentationPacket(
             fuHeader.unitType,
             header->tid);
         updateNalFlags(fuHeader.unitType, payload, payloadLength);
-        ++m_numberOfNalUnits;
     }
 
-    m_chunks.emplace_back(payload - m_rtpBufferBase, payloadLength, fuHeader.startFlag);
-    m_videoFrameSize += payloadLength;
+    addChunk(payload - m_rtpBufferBase, payloadLength, fuHeader.startFlag);
 
     return true;
 }
