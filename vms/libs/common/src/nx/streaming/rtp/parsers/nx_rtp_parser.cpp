@@ -16,6 +16,7 @@
 
 #include <nx/analytics/analytics_logging_ini.h>
 
+#include <utils/common/synctime.h>
 #include <motion/motion_detection.h>
 #include <nx/utils/log/log_main.h>
 
@@ -146,7 +147,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
 
                 if (dataType == QnAbstractMediaData::META_V1)
                 {
-                    metadata = new QnMetaDataV1();
+                    metadata = new QnMetaDataV1(qnSyncTime->currentTimePoint());
                     metadata->metadataType = MetadataType::Motion;
                 }
                 else

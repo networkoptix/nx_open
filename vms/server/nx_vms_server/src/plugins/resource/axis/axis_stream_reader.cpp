@@ -270,7 +270,9 @@ bool QnAxisStreamReader::isStreamOpened() const
 
 QnMetaDataV1Ptr QnAxisStreamReader::getCameraMetadata()
 {
-    QnMetaDataV1Ptr rez = m_lastMetadata != 0 ? m_lastMetadata : QnMetaDataV1Ptr(new QnMetaDataV1());
+    QnMetaDataV1Ptr rez = m_lastMetadata != 0
+        ? m_lastMetadata
+        : QnMetaDataV1Ptr(new QnMetaDataV1(qnSyncTime->currentTimePoint()));
     m_lastMetadata.reset();
     if (rez)
         filterMotionByMask(rez);
@@ -281,7 +283,7 @@ void QnAxisStreamReader::fillMotionInfo(const QRect& rect)
 {
     if (m_lastMetadata == 0)
     {
-        m_lastMetadata = QnMetaDataV1Ptr(new QnMetaDataV1());
+        m_lastMetadata = QnMetaDataV1Ptr(new QnMetaDataV1(qnSyncTime->currentTimePoint()));
         m_lastMetadata->m_duration = 1000 * 1000 * 10; // 10 sec
     }
     for (int x = rect.left(); x <= rect.right(); ++x)

@@ -2,6 +2,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
+#include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "motion_helper.h"
 
@@ -16,13 +17,13 @@ static const quint16 kAggregationIntervalSeconds = 3; // at seconds
 
 // --------------- QnMotionArchiveConnection ---------------------
 
-using namespace nx::vms::server::metadata;
+using namespace nx::vms::metadata;
 
 QnMotionArchiveConnection::QnMotionArchiveConnection(QnMotionArchive* owner):
     m_owner(owner),
     m_minDate(AV_NOPTS_VALUE),
     m_maxDate(AV_NOPTS_VALUE),
-    m_lastResult(new QnMetaDataV1())
+    m_lastResult(new QnMetaDataV1(qnSyncTime->currentTimePoint()))
 {
     m_lastTimeMs = AV_NOPTS_VALUE;
     m_motionLoadedStart = m_motionLoadedEnd = -1;
@@ -90,7 +91,7 @@ QnAbstractCompressedMetadataPtr QnMotionArchiveConnection::getMotionData(qint64 
         return QnMetaDataV1Ptr();
 
 
-    m_lastResult = QnMetaDataV1Ptr(new QnMetaDataV1());
+    m_lastResult = QnMetaDataV1Ptr(new QnMetaDataV1(qnSyncTime->currentTimePoint()));
     m_lastResult->m_data.clear();
     int motionIndex = indexOffset - m_motionLoadedStart;
     m_lastResult->m_data.write((const char*) m_motionBuffer + motionIndex * m_owner->recordSize(), m_owner->recordSize());
@@ -119,7 +120,7 @@ QnMotionArchive::QnMotionArchive(
         dataDir,
         uniqueId,
         channel),
-    m_lastDetailedData(new QnMetaDataV1()),
+    m_lastDetailedData(new QnMetaDataV1(qnSyncTime->currentTimePoint())),
     m_lastTimestamp(AV_NOPTS_VALUE)
 {
 }

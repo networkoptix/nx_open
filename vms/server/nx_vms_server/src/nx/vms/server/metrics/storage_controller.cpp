@@ -6,7 +6,7 @@
 
 #include "helpers.h"
 #include <core/resource/media_server_resource.h>
-#include <nx/vms/server/analytics/db/analytics_db.h>
+#include <nx/analytics/db/analytics_db.h>
 
 namespace nx::vms::server::metrics {
 

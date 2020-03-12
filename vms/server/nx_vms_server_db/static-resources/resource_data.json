@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.1.219",
+    "version": "4.1.1.221",
     "data": [
         {
             "keys": [
@@ -3988,6 +3988,12 @@
                 "DW|DWC-BVI2IR"
             ],
             "dw-pravis-chipset": true
+        },
+        {
+            "keys": [
+                "Hikvision|DS-2CD2342WD*"
+            ],
+            "reopenBothStreams": true
         },
         {
             "_comment": "Calibration for camera fw ver. 2.2.45-PTZ_H_6314_Release",

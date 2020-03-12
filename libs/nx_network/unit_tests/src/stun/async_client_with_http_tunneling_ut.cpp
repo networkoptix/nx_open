@@ -10,6 +10,7 @@
 #include <nx/network/test_support/stun_async_client_acceptance_tests.h>
 #include <nx/network/test_support/stun_simple_server.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -57,6 +58,8 @@ protected:
 
         ASSERT_TRUE(m_stunServer.bind(SocketAddress::anyPrivateAddress));
         ASSERT_TRUE(m_stunServer.listen());
+
+        NX_VERBOSE(this, "STUN server started on %1", m_stunServer.address());
     }
 
     void givenScheduledStunRequest()

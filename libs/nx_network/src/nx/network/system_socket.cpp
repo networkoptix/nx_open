@@ -550,10 +550,6 @@ CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
         sockImpl),
     m_aioHelper(new aio::AsyncSocketImplHelper<self_type>(this, ipVersion)),
     m_connected(false)
-    #if defined(Q_OS_WIN)
-        , m_readEvent(::CreateEvent(0, false, false, nullptr))
-        , m_writeEvent(::CreateEvent(0, false, false, nullptr))
-    #endif
 {
 }
 
@@ -569,10 +565,6 @@ CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
         sockImpl),
     m_aioHelper(new aio::AsyncSocketImplHelper<self_type>(this, ipVersion)),
     m_connected(true)   // This constructor is used by server socket.
-    #if defined(Q_OS_WIN)
-        , m_readEvent(::CreateEvent(0, false, false, nullptr))
-        , m_writeEvent(::CreateEvent(0, false, false, nullptr))
-    #endif
 {
 }
 
@@ -581,10 +573,6 @@ CommunicatingSocket<SocketInterfaceToImplement>::~CommunicatingSocket()
 {
     if (m_aioHelper)
         m_aioHelper->terminate();
-    #if defined(Q_OS_WIN)
-        ::CloseHandle(m_readEvent);
-        ::CloseHandle(m_writeEvent);
-    #endif
 }
 
 template<typename SocketInterfaceToImplement>
@@ -624,103 +612,44 @@ void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
     m_aioHelper->bindToAioThread(aioThread);
 }
 
-#if defined(Q_OS_WIN)
-    template<typename SocketInterfaceToImplement>
-    int CommunicatingSocket<SocketInterfaceToImplement>::performOperation(
-        Operation op, char* buffer, ULONG bufferLen, DWORD flags)
-    {
-        bool isNonBlockingMode;
-        if (!getNonBlockingMode(&isNonBlockingMode))
-            return -1;
-
-        if (isNonBlockingMode || (flags & MSG_DONTWAIT) == MSG_DONTWAIT)
-        {
-            if (!isNonBlockingMode)
-            {
-                if (!setNonBlockingMode(true))
-                    return -1;
-            }
-            const int bytes = (op == Operation::read)
-                ? ::recv(m_fd, buffer, bufferLen, flags & ~MSG_DONTWAIT)
-                : ::send(m_fd, buffer, bufferLen, flags & ~MSG_DONTWAIT);
-            if (!isNonBlockingMode)
-            {
-                // Save error code as changing mode will drop it.
-                const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
-                if (!setNonBlockingMode(false))
-                    return -1;
-                SystemError::setLastErrorCode(sysErrorCodeBak);
-            }
-            return bytes;
-        }
-
-        return performInterruptableOperation(op, buffer, bufferLen, flags);
-    }
-
-    template<typename SocketInterfaceToImplement>
-    int CommunicatingSocket<SocketInterfaceToImplement>::performInterruptableOperation(
-        Operation op, char* buffer, ULONG bufferLen, DWORD flags)
-    {
-        WSAOVERLAPPED overlapped = {};
-        overlapped.hEvent = (op == Operation::read) ? m_readEvent : m_writeEvent;
-        WSABUF wsaBuffer;
-        wsaBuffer.len = bufferLen;
-        wsaBuffer.buf = buffer;
-        DWORD bytes = -1;
-        const int wsaResult = (op == Operation::read)
-            ? WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, &flags, &overlapped, nullptr)
-            : WSASend(m_fd, &wsaBuffer, /* buffer count*/ 1, &bytes, flags, &overlapped, nullptr);
-        if (wsaResult != SOCKET_ERROR)
-            return bytes;
-        if (SystemError::getLastOSErrorCode() != WSA_IO_PENDING)
-            return -1;
-        const auto timeout = (op == Operation::read) ? m_readTimeoutMS : m_writeTimeoutMS;
-        WaitForSingleObject(overlapped.hEvent, timeout ? timeout : INFINITE);
-        if (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &flags))
-        {
-            if (SystemError::getLastOSErrorCode() == WSA_IO_INCOMPLETE)
-            {
-                ::CancelIoEx((HANDLE)m_fd, &overlapped);
-                // Wait for:
-                // 1. CancelIo has been finished.
-                // 2. WSARecv or WSASend has been finished.
-                // 3. Shutdown called.
-                WaitForSingleObject(overlapped.hEvent, INFINITE);
-                // Check status again in case of race condition between CancelIo and other
-                // conditions
-                while (!WSAGetOverlappedResult(m_fd, &overlapped, &bytes, FALSE, &flags))
-                {
-                    const auto errCode = SystemError::getLastOSErrorCode();
-                    if (errCode == WSA_IO_INCOMPLETE)
-                    {
-                        ::Sleep(0);
-                        continue;
-                    }
-                    if (errCode == WSA_OPERATION_ABORTED)
-                    {
-                        SystemError::setLastErrorCode(
-                            SystemError::timedOut); //< emulate timeout code
-                    }
-                    return -1;
-                }
-            }
-        }
-        return bytes;
-    }
-#endif
-
 template<typename SocketInterfaceToImplement>
 int CommunicatingSocket<SocketInterfaceToImplement>::recv(
     void* buffer, unsigned int bufferLen, int flags)
 {
     #if defined(Q_OS_WIN)
-        int bytesRead = performOperation(Operation::read, (char*)buffer, bufferLen, flags);
+        bool isNonBlockingMode;
+        if (!getNonBlockingMode(&isNonBlockingMode))
+            return -1;
+
+        const bool needNonBlockingMode =
+            !isNonBlockingMode && (flags & MSG_DONTWAIT) == MSG_DONTWAIT;
+        if (needNonBlockingMode)
+        {
+            if (!setNonBlockingMode(true))
+                return -1;
+        }
+
+        const int bytesRead = ::recv(m_fd, (raw_type *)buffer, bufferLen, flags & ~MSG_DONTWAIT);
+
+        if (needNonBlockingMode)
+        {
+            // Save error code as changing mode will drop it.
+            auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
+            if (!setNonBlockingMode(false))
+                return -1;
+            // SystemError::interrupted is a result of the WSACancelBlockingCall() that is
+            // deprecated and seems to be used by the recv() implementation internally. So we
+            // replace it with more neutral timeout code.
+            if (sysErrorCodeBak == SystemError::interrupted)
+                sysErrorCodeBak = SystemError::timedOut;
+            SystemError::setLastErrorCode(sysErrorCodeBak);
+        }
     #else
         unsigned int recvTimeout = 0;
         if (!this->getRecvTimeout(&recvTimeout))
             return -1;
 
-        int bytesRead = doInterruptableSystemCallWithTimeout<>(
+        const int bytesRead = doInterruptableSystemCallWithTimeout<>(
             this,
             std::bind(&::recv, this->m_fd, (void*)buffer, (size_t)bufferLen, flags),
             recvTimeout,
@@ -744,13 +673,13 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     const void* buffer, unsigned int bufferLen)
 {
     #if defined(Q_OS_WIN)
-        int sent = performOperation(Operation::write, (char*)buffer, bufferLen, 0);
+        const int sent = ::send(m_fd, (raw_type*)buffer, bufferLen, 0);
     #else
         unsigned int sendTimeout = 0;
         if (!this->getSendTimeout(&sendTimeout))
             return -1;
 
-        int sent = doInterruptableSystemCallWithTimeout<>(
+        const int sent = doInterruptableSystemCallWithTimeout<>(
             this,
             std::bind(
                 &::send,
@@ -777,9 +706,12 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     {
         m_connected = false;
     }
-#if !defined(__arm__)
-    m_totalSocketBytesSent += sent;
-#endif
+    else
+    {
+        #if !defined(__arm__)
+            m_totalSocketBytesSent += sent;
+        #endif
+    }
     return sent;
 }
 
@@ -825,9 +757,7 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::shutdown()
     m_connected = false;
     bool result = Socket<SocketInterfaceToImplement>::shutdown();
     #if defined(Q_OS_WIN)
-        // Terminate current wait calls.
-        ::SetEvent(m_readEvent);
-        ::SetEvent(m_writeEvent);
+        ::CancelIoEx((HANDLE)m_fd, NULL);
     #endif
     return result;
 }

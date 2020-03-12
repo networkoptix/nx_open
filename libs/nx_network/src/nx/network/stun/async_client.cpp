@@ -290,6 +290,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
                 return;
             }
 
+            NX_VERBOSE(this, "Connecting to %1", *m_endpoint);
             m_connectingSocket->connectAsync(*m_endpoint, std::move(onComplete));
 
             m_state = State::connecting;

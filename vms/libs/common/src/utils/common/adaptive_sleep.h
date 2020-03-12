@@ -5,10 +5,13 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QTime>
 #include "sleep.h"
+#include <nx/utils/elapsed_timer.h>
 
 #define MAX_VALID_SLEEP_TIME 5000000
 
-class QnAdaptiveSleep {
+
+class QnAdaptiveSleep 
+{
 public:
     /**
      * Constructor.
@@ -36,19 +39,21 @@ public:
 
     int sleep(qint64 usec, qint64 maxSleepTime = INT_MAX)
     {
+        using namespace std::chrono;
+
         if (m_firstTime)
         {
             m_firstTime = false;
-            m_prevEndTime.start();
+            m_prevEndTime.restart();
             m_totalTime = 0;
         }
 
         m_totalTime += usec;
 
-        qint64 now = (qint64)m_prevEndTime.elapsed() * 1000;
+        qint64 now = microseconds(m_prevEndTime.elapsed()).count();
         qint64 havetowait = m_totalTime - now;
 
-        if (havetowait<=0)
+        if (havetowait <= 0)
         {
             if (-havetowait > m_maxOverdraft && m_maxOverdraft > 0)
                 afterdelay();
@@ -64,16 +69,18 @@ public:
 
     int terminatedSleep(qint64 usec, qint64 maxSleepTime = INT_MAX)
     {
+        using namespace std::chrono;
+
         if (m_firstTime)
         {
             m_firstTime = false;
-            m_prevEndTime.start();
+            m_prevEndTime.restart();
             m_totalTime = 0;
         }
 
         m_totalTime += usec;
 
-        qint64 now = (qint64)m_prevEndTime.elapsed() * 1000;
+        qint64 now = microseconds(m_prevEndTime.elapsed()).count();
         qint64 havetowait = m_totalTime - now;
 
         if (havetowait<=0)
@@ -84,8 +91,9 @@ public:
         }
         if (havetowait < MAX_VALID_SLEEP_TIME) 
         {
-            QnMutexLocker lock( &m_mutex );
-            m_waitCond.wait(&m_mutex, qMin(havetowait / 1000, maxSleepTime / 1000));
+            QnMutex mutex;
+            QnMutexLocker lock(&mutex);
+            m_waitCond.wait(&mutex, qMin(havetowait / 1000, maxSleepTime / 1000));
         }
         else {
             afterdelay();
@@ -100,14 +108,15 @@ public:
 
     int addQuant(qint64 usec)
     {
+        using namespace std::chrono;
         if (m_firstTime)
         {
             m_firstTime = false;
-            m_prevEndTime.start();
+            m_prevEndTime.restart();
             m_totalTime = 0;
         }
         m_totalTime += usec;
-        qint64 now = (qint64) m_prevEndTime.elapsed() * 1000;
+        qint64 now = microseconds(m_prevEndTime.elapsed()).count();
         qint64 havetowait = m_totalTime - now;
         return havetowait;
     }
@@ -118,12 +127,10 @@ public:
     }
 
 private:
-    QTime m_prevEndTime;
+    nx::utils::ElapsedTimer m_prevEndTime;
     bool m_firstTime;
     qint64 m_maxOverdraft;
     qint64 m_totalTime;
-    
-    QnMutex m_mutex;
     QnWaitCondition m_waitCond;
 };
 

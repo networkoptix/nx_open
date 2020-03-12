@@ -24,7 +24,7 @@ public:
     QnNetworkResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnNetworkResource();
 
-    virtual QString getUniqueId() const;
+    virtual QString getUniqueId() const override;
     virtual void setUrl(const QString& url) override;
 
     virtual QString getHostAddress() const;

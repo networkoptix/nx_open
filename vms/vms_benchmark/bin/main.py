@@ -114,7 +114,7 @@ ini_definition = {
     "cpuUsageThreshold": {"type": "float", "range": [0.0, 1.0], "default": 0.5},
     "archiveBitratePerCameraMbps": {"type": "int", "range": [1, 999], "default": 10},
     "minimumArchiveFreeSpacePerCameraSeconds": {"type": "int", "range": [1, None], "default": 240},
-    "timeDiffThresholdSeconds": {"type": "float", "range": [0.0, None], "default": 180},
+    "timeDiffThresholdSeconds": {"type": "float", "range": [0.0, None], "default": 3},
     "swapThresholdKilobytes": {"type": "int", "range": [0, None], "default": 0},
     "enableSwapThreshold": {"type": "bool", "default": False},
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
@@ -263,9 +263,13 @@ class _BoxCpuTimes:
         self.busy_time_s = self.uptime_s - idle_time_s / cpu_cores
 
     def cpu_usage(self, prev: '_BoxCpuTimes'):
+        if self.uptime_s - prev.uptime_s == 0:
+            return None
+
         value = (self.busy_time_s - prev.busy_time_s) / (self.uptime_s - prev.uptime_s)
         if value > 1:
             return 1
+
         return value
 
 
@@ -531,7 +535,7 @@ class _BoxPoller:
         if isinstance(self._exception, exceptions.VmsBenchmarkIssue):
             return [self._exception]
         return [exceptions.TestCameraStreamingIssue(
-            'Unexpected error during acquiring VMS Server CPU usage, storage or network errors or swap occupation. '
+            'Unexpected error during acquiring VMS Server CPU usage, storage, network errors, or swap occupation. '
             'Can be caused by network issues or Server issues.',
             original_exception=self._exception)]
 
@@ -748,7 +752,6 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                             last_tx_rx_errors = first_tx_rx_errors
 
                             first_cycle = False
-                            continue
 
                         if cpu_times is not None:
                             cpu_usage_last_minute = cpu_times.cpu_usage(last_cpu_times)
@@ -940,6 +943,19 @@ def _remove_cameras(api):
 def _obtain_box_platform(box, linux_distribution):
     box_platform = BoxPlatform.create(box, linux_distribution)
 
+    def file_system_info_row(storage):
+        res = f"        {storage['fs']} on {storage['point']}"
+
+        if 'space_free' in storage and 'space_total' in storage:
+            m = 1024**3
+            res += f": free {int(storage['space_free']) / m:.1f} GB of {int(storage['space_total']) / m:.1f} GB"
+
+        return res
+
+    file_systems_info = '\n'.join(
+        file_system_info_row(storage) for _point, storage in box_platform.storages_list.items()
+    )
+
     report(
         "\nBox properties detected:\n"
         f"    IP address: {box.ip}\n"
@@ -954,13 +970,7 @@ def _obtain_box_platform(box, linux_distribution):
         f"    CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else 'None'}\n"
         f"    RAM: {to_megabytes(box_platform.ram_bytes)} MB "
         f"({to_megabytes(box_platform.obtain_ram_free_bytes())} MB free)\n"
-        "    File systems:\n"
-        + '\n'.join(
-            f"        {storage['fs']} "
-            f"on {storage['point']}: "
-            f"free {int(storage['space_free']) / 1024 / 1024 / 1024:.1f} GB "
-            f"of {int(storage['space_total']) / 1024 / 1024 / 1024:.1f} GB"
-            for (point, storage) in box_platform.storages_list.items())
+        f"    File systems: \n{file_systems_info}\n"
     )
 
     return box_platform

@@ -2,8 +2,8 @@
 
 #include <QtGui/QRegion>
 
-#include <utils/media/bitStream.h>
 #include <utils/common/synctime.h>
+#include <utils/media/bitStream.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/socket_common.h>
@@ -106,27 +106,27 @@ size_t QnEmptyMediaData::dataSize() const
 //--------------------------------------- QnMetaDataV1 -------------------------------------------
 
 //TODO #ak delegate constructor
-QnMetaDataV1::QnMetaDataV1(int initialValue, int extraBufferSize)
+QnMetaDataV1::QnMetaDataV1(std::chrono::microseconds timestamp_, int initialValue, int extraBufferSize)
     :
     QnAbstractCompressedMetadata(MetadataType::Motion, kMotionDataBufferSize + extraBufferSize)
 {
     flags = 0;
     m_duration = 0;
     m_firstTimestamp = AV_NOPTS_VALUE;
-    timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
+    timestamp = timestamp_.count();
     if (initialValue)
         m_data.writeFiller(0xff, m_data.capacity());
     else
         m_data.writeFiller(0, m_data.capacity());
 }
 
-QnMetaDataV1::QnMetaDataV1(QnAbstractAllocator* allocator, int initialValue):
+QnMetaDataV1::QnMetaDataV1(std::chrono::microseconds timestamp_, QnAbstractAllocator* allocator, int initialValue):
     QnAbstractCompressedMetadata(MetadataType::Motion, kMotionDataBufferSize, allocator)
 {
     flags = 0;
     m_duration = 0;
     m_firstTimestamp = AV_NOPTS_VALUE;
-    timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
+    timestamp = timestamp_.count();
     if (initialValue)
         m_data.writeFiller(0xff, m_data.capacity());
     else
@@ -135,7 +135,7 @@ QnMetaDataV1::QnMetaDataV1(QnAbstractAllocator* allocator, int initialValue):
 
 QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData)
 {
-    QnMetaDataV1Ptr result(new QnMetaDataV1());
+    QnMetaDataV1Ptr result(new QnMetaDataV1(qnSyncTime->currentTimePoint()));
     result->timestamp = lightData.startTimeMs*1000;
     result->m_duration = lightData.durationMs*1000;
     result->channelNumber = lightData.channel;
@@ -211,7 +211,7 @@ void QnMetaDataV1::assign(const QnMetaDataV1* other)
 
 QnMetaDataV1* QnMetaDataV1::clone( QnAbstractAllocator* allocator ) const
 {
-    QnMetaDataV1* rez = new QnMetaDataV1( allocator );
+    QnMetaDataV1* rez = new QnMetaDataV1(qnSyncTime->currentTimePoint(), allocator);
     rez->assign(this);
     return rez;
 }

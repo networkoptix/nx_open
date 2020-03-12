@@ -6,7 +6,7 @@
 #include "motion/abstract_motion_archive.h"
 
 #include <motion/motion_detection.h>
-#include <nx/vms/server/metadata/metadata_archive.h>
+#include <nx/vms/metadata/metadata_archive.h>
 
 class QnMotionArchive;
 
@@ -24,9 +24,9 @@ private:
     QnMotionArchive* m_owner;
     qint64 m_minDate;
     qint64 m_maxDate;
-    QVector<nx::vms::server::metadata::IndexRecord> m_index;
-    nx::vms::server::metadata::IndexHeader m_indexHeader;
-    QVector<nx::vms::server::metadata::IndexRecord>::iterator m_indexItr;
+    QVector<nx::vms::metadata::IndexRecord> m_index;
+    nx::vms::metadata::IndexHeader m_indexHeader;
+    QVector<nx::vms::metadata::IndexRecord>::iterator m_indexItr;
     QFile m_motionFile;
 
     int m_motionLoadedStart;
@@ -39,10 +39,10 @@ private:
 
 typedef std::shared_ptr<QnMotionArchiveConnection> QnMotionArchiveConnectionPtr;
 
-class QnMotionArchive: public nx::vms::server::metadata::MetadataArchive
+class QnMotionArchive: public nx::vms::metadata::MetadataArchive
 {
     Q_OBJECT
-    using base_type = nx::vms::server::metadata::MetadataArchive;
+    using base_type = nx::vms::metadata::MetadataArchive;
 public:
     QnMotionArchive(const QString& dataDir, const QString& uniqueId, int channel);
     virtual ~QnMotionArchive();

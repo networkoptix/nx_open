@@ -213,7 +213,7 @@ nx::sdk::Ptr<nx::sdk::IList<ITimestampedObjectMetadata>> createObjectTrack(
     auto timestampedTrack = nx::sdk::makePtr<nx::sdk::List<ITimestampedObjectMetadata>>();
     for (const auto& objectPosition: track.objectPositionSequence)
     {
-        if (auto objectMetadataPtr = createTimestampedObjectMetadata(track, objectPosition))
+        if (const auto& objectMetadataPtr = createTimestampedObjectMetadata(track, objectPosition))
             timestampedTrack->addItem(objectMetadataPtr.get());
     }
 

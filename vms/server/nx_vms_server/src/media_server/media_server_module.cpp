@@ -61,6 +61,7 @@
 #include <nx/vms/server/nvr/service_factory.h>
 #include <nx/vms/server/nvr/hanwha/service_provider.h>
 
+#include <nx/vms/server/analytics/analytics_db.h>
 #include <nx/vms/server/analytics/sdk_object_factory.h>
 
 #include <media_server/serverutil.h>
@@ -69,7 +70,7 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
-#include <nx/vms/server/analytics/db/analytics_db.h>
+#include <nx/analytics/db/analytics_db.h>
 
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
@@ -297,8 +298,18 @@ QnMediaServerModule::QnMediaServerModule(
         new nx::vms::server::analytics::IframeSearchHelper(
             commonModule()->resourcePool(), m_videoCameraPool));
 
+    nx::analytics::db::EventsStorageFactory::instance().setCustomFunc(
+        [this](
+            QnCommonModule* /*commonModule*/,
+            nx::analytics::db::AbstractIframeSearchHelper* iframeSearchHelper)
+        {
+            return std::make_unique<nx::vms::server::analytics::AnalyticsDb>(
+                this, iframeSearchHelper);
+        });
+
     m_analyticsEventsStorage = store(
-        nx::analytics::db::EventsStorageFactory::instance().create(this).release());
+        nx::analytics::db::EventsStorageFactory::instance().create(
+            commonModule(), m_analyticsIframeSearchHelper).release());
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
@@ -805,7 +816,7 @@ QString QnMediaServerModule::metadataDatabaseDir() const
 
 using namespace nx::vms::server::analytics;
 
-AbstractIframeSearchHelper* QnMediaServerModule::iFrameSearchHelper() const
+nx::analytics::db::AbstractIframeSearchHelper* QnMediaServerModule::iFrameSearchHelper() const
 {
     return m_analyticsIframeSearchHelper;
 }

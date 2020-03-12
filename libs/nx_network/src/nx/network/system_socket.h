@@ -162,14 +162,6 @@ public:
     virtual bool shutdown() override;
 
 protected:
-    #if defined(Q_OS_WIN)
-        enum class Operation: bool { read, write };
-
-        int performOperation(Operation op, char* buffer, ULONG bufferLen, DWORD flags);
-        int performInterruptableOperation(
-            Operation op, char* buffer, ULONG bufferLen, DWORD flags);
-    #endif
-
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
     bool connectToIp(
@@ -178,10 +170,6 @@ protected:
 
     std::unique_ptr<aio::AsyncSocketImplHelper<self_type>> m_aioHelper;
     bool m_connected;
-    #if defined(Q_OS_WIN)
-        WSAEVENT m_readEvent;
-        WSAEVENT m_writeEvent;
-    #endif
 };
 
 /**

@@ -466,7 +466,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 
 
     if (cam_info_file.size()==0)
-        return QnMetaDataV1Ptr(new QnMetaDataV1());
+        return QnMetaDataV1Ptr(new QnMetaDataV1(qnSyncTime->currentTimePoint()));
 
     QString file_s = QLatin1String(cam_info_file);
     QStringList lines = file_s.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
@@ -489,9 +489,9 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
     QnMetaDataV1Ptr motion;
 
     if (empty)
-        motion = QnMetaDataV1Ptr(new QnMetaDataV1());
+        motion = QnMetaDataV1Ptr(new QnMetaDataV1(qnSyncTime->currentTimePoint()));
     else
-        motion = QnMetaDataV1Ptr(new QnMetaDataV1(1));
+        motion = QnMetaDataV1Ptr(new QnMetaDataV1(qnSyncTime->currentTimePoint(), 1));
 
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;

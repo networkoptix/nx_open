@@ -77,8 +77,12 @@ ServerConnection::ServerConnection(
 ServerConnection::~ServerConnection()
 {
     directDisconnectAll();
-    for (const auto& handle : m_runningRequests.keys())
-        httpClientPool()->terminate(handle);
+    // It is not a proper fix, but should do better than a random crash on stop.
+    if (const auto clientPool = httpClientPool())
+    {
+        for (const auto& handle : m_runningRequests.keys())
+            clientPool->terminate(handle);
+    }
 }
 
 rest::Handle ServerConnection::cameraHistoryAsync(

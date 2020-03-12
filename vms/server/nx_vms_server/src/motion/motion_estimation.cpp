@@ -812,7 +812,7 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTimeUs)
     quint8* dstPtr = m_filteredFrame;
     const quint8* maskPtr = m_scaledMask;
 
-    for (int y = 0; y < Qn::kMotionGridHeight; ++y) 
+    for (int y = 0; y < Qn::kMotionGridHeight; ++y)
     {
         if (*curPtr > kGlobalLumaValueThreshold)
             globalLumaCounter++;
@@ -867,7 +867,7 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTimeUs)
         dstPtr++;
     }
 
-    for (int y = 0; y < Qn::kMotionGridHeight; ++y) 
+    for (int y = 0; y < Qn::kMotionGridHeight; ++y)
     {
         if (*curPtr > kGlobalLumaValueThreshold)
             globalLumaCounter++;
@@ -882,12 +882,12 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame, qint64 frameTimeUs)
         if (globalLumaCounter > totalSquareCount * kGlobalLumaSquareThreshold)
         {
             m_lastGlobalLumaChangeTimeUs = frameTimeUs;
-            NX_DEBUG(this, 
-                "Detect global luminance changing. Square = %1. Block motion for %2ms", 
+            NX_DEBUG(this,
+                "Detect global luminance changing. Square = %1. Block motion for %2ms",
                 globalLumaCounter / (qreal) totalSquareCount, kGlobalLumaDurationUs / 1000);
             return; //< Ignore motion by global luma change.
         }
-        else if (m_lastGlobalLumaChangeTimeUs != AV_NOPTS_VALUE 
+        else if (m_lastGlobalLumaChangeTimeUs != AV_NOPTS_VALUE
             && frameTimeUs < m_lastGlobalLumaChangeTimeUs + kGlobalLumaDurationUs)
         {
             return;  //< Motion is blocked for some period of time after global luma change.
@@ -1307,7 +1307,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 
 QnMetaDataV1Ptr QnMotionEstimation::makeMotion()
 {
-    QnMetaDataV1Ptr rez(new QnMetaDataV1());
+    QnMetaDataV1Ptr rez(new QnMetaDataV1(qnSyncTime->currentTimePoint()));
     rez->timestamp = (m_lastFrameTime == (qint64)AV_NOPTS_VALUE)
         ? qnSyncTime->currentMSecsSinceEpoch() * 1000
         : m_lastFrameTime;

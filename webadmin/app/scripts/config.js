@@ -108,9 +108,14 @@
 
             newSystem: {type: 'static'},
             proxyConnectTimeoutSec: {type: 'number'},
-            crossdomainEnabled: {type: 'checkbox'},
-            maxRtspConnectDurationSec: {label: 'Maximum duration for RTSP connection (seconds)', type: 'number'},
-
+            crossdomainEnabled: {
+                type: 'checkbox',
+                label: 'Enable /crossdomain.xml'
+            },
+            maxRtspConnectDurationSec: {
+                type: 'number',
+                label: 'Maximum duration for RTSP connection (seconds)'
+            },
             statisticsReportLastNumber: {type: 'static'},
             statisticsReportLastTime: {type: 'static'},
             statisticsReportServerApi: {type: 'text'},

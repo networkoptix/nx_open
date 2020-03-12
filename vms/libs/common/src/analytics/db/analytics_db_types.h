@@ -13,7 +13,6 @@
 #include <analytics/common/object_metadata.h>
 #include <recording/time_period.h>
 #include <utils/common/request_param.h>
-#include <motion/motion_detection.h>
 #include <utils/common/byte_array.h>
 
 class QnResourcePool;
@@ -22,11 +21,13 @@ namespace nx::analytics::db {
 
 struct ObjectPosition
 {
-    /** Device object has been detected on. */
+    /** Device the object has been detected on. */
     QnUuid deviceId;
+
     qint64 timestampUs = 0;
     qint64 durationUs = 0;
     QRectF boundingBox;
+
     /** Variable object attributes. E.g., car speed. */
     nx::common::metadata::Attributes attributes;
 };
@@ -104,40 +105,33 @@ QN_FUSION_DECLARE_FUNCTIONS(ObjectTrackEx, (json)(ubjson));
 
 struct Filter
 {
-    /**
-     * If empty than any device is matched.
-     */
+    /** If empty, any device is matched. */
     std::vector<QnUuid> deviceIds;
 
     // TODO: #mshevchenko Why 'Id' and not `Ids`? And why not `nx::analytics::ObjectTypeId`?
     std::vector<QString> objectTypeId;
+
     QnUuid objectTrackId;
     QnTimePeriod timePeriod;
-    /**
-     * Coordinates are in range [0;1].
-     */
+
+    /** Coordinates in range [0;1]. */
     std::optional<QRectF> boundingBox;
 
     /**
-     * Set of words separated by spaces, commas, etc...
-     * Search is done across all attributes values using wildcards.
+     * Set of words separated by spaces, commas, etc. The search is done across all attribute
+     * values, using wildcards.
      */
     QString freeText;
 
     // TODO: #ak Move result options to a separate struct.
 
-    /**
-     * Zero value is treated as no limit.
-     */
+    /** Zero value is treated as no limit. */
     int maxObjectTracksToSelect = 0;
 
-    /**
-     * Select track details(geometry data) if it true.
-     */
+    /** If true, track details (geometry data) will be selected. */
     bool needFullTrack = false;
-    /**
-     * Found tracks are sorted by minimal track time using this order.
-     */
+
+    /** Found tracks are sorted by the minimum track time using this order. */
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
     Filter();
@@ -192,8 +186,8 @@ using LookupResult = std::vector<ObjectTrackEx>;
 struct TimePeriodsLookupOptions
 {
     /**
-     * If distance between two time periods less than this value,
-     * then those periods SHOULD be merged ignoring gap.
+     * If distance between two time periods less than this value, then those periods must be merged
+     * ignoring the gap.
      */
     std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
 };

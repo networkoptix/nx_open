@@ -27,7 +27,7 @@
 #include <nx/analytics/action_type_descriptor_manager.h>
 
 #include <camera/get_image_helper.h>
-#include <analytics/db/abstract_storage.h>
+#include <nx/analytics/db/abstract_storage.h>
 
 #include <plugins/settings.h>
 
@@ -51,8 +51,7 @@ Ptr<IObjectTrackInfo> makeObjectTrackInfo(
 
     if (actionData.objectTrack)
     {
-        const auto track = createObjectTrack(*actionData.objectTrack);
-        if (track)
+        if (const auto track = createObjectTrack(*actionData.objectTrack))
             objectTrackInfo->setTrack(track.get());
 
         if (actionData.bestShotObjectPosition)
