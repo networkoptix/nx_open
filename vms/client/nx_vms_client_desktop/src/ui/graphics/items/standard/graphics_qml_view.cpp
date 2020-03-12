@@ -34,7 +34,7 @@ namespace {
 const auto kResizeTimeout = std::chrono::milliseconds(200);
 constexpr auto kQuadVertexCount = 4;
 constexpr auto kCoordPerVertex = 2; //< x, y
-constexpr auto kQuadArrayCount = kQuadVertexCount * kCoordPerVertex;
+constexpr auto kQuadArrayLength = kQuadVertexCount * kCoordPerVertex;
 
 QWidget* findWindowWidgetOf(QWidget* widget)
 {
@@ -103,14 +103,17 @@ void initializeQuadBuffer(
     QnTextureGLShaderProgram* shader,
     const char* attributeName,
     QOpenGLBuffer* buffer,
-    const QOpenGLBuffer::UsagePattern pattern,
-    const GLfloat* values)
+    const GLfloat* values = nullptr)
 {
     buffer->create();
-    buffer->setUsagePattern(pattern);
+    buffer->setUsagePattern(values ? QOpenGLBuffer::StaticDraw : QOpenGLBuffer::DynamicDraw);
 
     buffer->bind();
-    buffer->allocate(values, kQuadArrayCount * sizeof(GLfloat));
+    const auto bufferSize = kQuadArrayLength * sizeof(GLfloat);
+    if (values)
+        buffer->allocate(values, bufferSize);
+    else
+        buffer->allocate(bufferSize);
 
     const auto location = shader->attributeLocation(attributeName);
     NX_ASSERT(location != -1, attributeName);
@@ -460,7 +463,7 @@ void GraphicsQmlView::Private::ensureVao(QnTextureGLShaderProgram* shader)
     if (m_vaoInitialized)
         return;
 
-    static constexpr GLfloat coordArray[kQuadArrayCount] = {
+    static constexpr GLfloat kTexCoordArray[kQuadArrayLength] = {
         0.0, 0.0,
         1.0, 0.0,
         1.0, 1.0,
@@ -470,19 +473,8 @@ void GraphicsQmlView::Private::ensureVao(QnTextureGLShaderProgram* shader)
     m_vertices.create();
     m_vertices.bind();
 
-    initializeQuadBuffer(
-        shader,
-        "aPosition",
-        &m_positionBuffer,
-        QOpenGLBuffer::DynamicDraw,
-        coordArray);
-
-    initializeQuadBuffer(
-        shader,
-        "aTexCoord",
-        &m_texcoordBuffer,
-        QOpenGLBuffer::StaticDraw,
-        coordArray);
+    initializeQuadBuffer(shader, "aPosition", &m_positionBuffer);
+    initializeQuadBuffer(shader, "aTexCoord", &m_texcoordBuffer, kTexCoordArray);
 
     shader->markInitialized();
 
@@ -631,7 +623,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
     functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
-    const GLfloat posArray[kQuadArrayCount] = {
+    const GLfloat posArray[kQuadArrayLength] = {
         (float)channelRect.left(), (float)channelRect.bottom(),
         (float)channelRect.right(), (float)channelRect.bottom(),
         (float)channelRect.right(), (float)channelRect.top(),
@@ -644,7 +636,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     d->ensureVao(shader);
     d->m_positionBuffer.bind();
-    d->m_positionBuffer.write(0, posArray, kQuadArrayCount * sizeof(GLfloat));
+    d->m_positionBuffer.write(0, posArray, kQuadArrayLength * sizeof(GLfloat));
     d->m_positionBuffer.release();
 
     shader->bind();
