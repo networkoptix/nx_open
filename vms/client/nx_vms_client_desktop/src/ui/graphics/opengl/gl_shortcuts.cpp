@@ -1,5 +1,6 @@
 #include "gl_shortcuts.h"
 
+#include <QtCore/QString>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 
@@ -16,7 +17,7 @@
 namespace {
 
 #ifdef QN_GL_RENDERER_DEBUG
-const char* glErrorString(GLenum err)
+QString glErrorString(GLenum err)
 {
     switch (err)
     {
@@ -48,7 +49,7 @@ const char* glErrorString(GLenum err)
             return "GL_INVALID_FRAMEBUFFER_OPERATION";
 
         default:
-            return "UNKNOWN";
+            return QString("UNKNOWN 0x%1").arg(err, 0, 16);
     }
 }
 #endif // QN_GL_RENDERER_DEBUG
