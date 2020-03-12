@@ -1029,10 +1029,49 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     if (!system || !system->isConnectable())
         return;
 
-    auto serverToConnect = nx::vms::client::core::helpers::preferredCloudServer(id);
-    if (serverToConnect.isNull() || !system->isReachableServer(serverToConnect))
+    nx::utils::Url url;
+
+    if (!ini().ignoreSavedPreferredCloudServers)
+    {
+        const auto serverId = nx::vms::client::core::helpers::preferredCloudServer(id);
+        if (!serverId.isNull())
+        {
+            if (system->isReachableServer(serverId))
+            {
+                url = system->getServerHost(serverId);
+                if (NX_ASSERT(!url.isEmpty()))
+                {
+                    NX_DEBUG(this, "Choosing stored preferred cloud server %1 (%2)",
+                        serverId.toString(), url);
+                }
+            }
+            else
+            {
+                NX_DEBUG(this, "Stored preferred cloud server %1 is not reachable",
+                    serverId.toString());
+            }
+        }
+    }
+
+    if (url.isEmpty())
     {
         const auto servers = system->servers();
+
+        const auto debugServersInfo =
+            [&servers, system]() -> QString
+            {
+                QStringList result;
+                for (const auto& server: servers)
+                {
+                    result.push_back(QStringLiteral("   %1 (%2)").arg(
+                        server.id.toString(),
+                        system->getServerHost(server.id).toString()));
+                }
+                return result.join("\n");
+            };
+
+        NX_DEBUG(this, "System servers:\n%1", debugServersInfo());
+
         const auto iter = std::find_if(servers.cbegin(), servers.cend(),
             [system](const nx::vms::api::ModuleInformation& server)
             {
@@ -1040,13 +1079,25 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
             });
 
         if (iter != servers.cend())
-            serverToConnect = iter->id;
+        {
+            if (NX_ASSERT(!iter->id.isNull()))
+            {
+                url = system->getServerHost(iter->id);
+                if (NX_ASSERT(!url.isEmpty()))
+                {
+                    NX_DEBUG(this, "Choosing %1 connection to the server %2 (%3)",
+                        isConnectionToCloud(system->getServerHost(iter->id)) ? "cloud" : "local",
+                        iter->id.toString(), url);
+                }
+            }
+        }
     }
 
-    if (serverToConnect.isNull())
+    if (url.isEmpty())
+    {
+        NX_WARNING(this, "No connection to the system %1 is found", id);
         return;
-
-    nx::utils::Url url = system->getServerHost(serverToConnect);
+    }
 
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
