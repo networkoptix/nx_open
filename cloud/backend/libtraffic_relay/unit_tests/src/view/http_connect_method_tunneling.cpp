@@ -106,6 +106,7 @@ private:
 
         m_relayClient = std::make_unique<api::ClientOverHttpConnect>(
             relay().basicUrl(), nullptr);
+        m_relayClient->setTimeout(nx::network::kNoTimeout);
     }
 
     void saveEstablishServerTunnelResult()
