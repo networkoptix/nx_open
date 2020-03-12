@@ -384,7 +384,7 @@ _rtsp_perf_summary_regex = re.compile(
 )
 
 _rtsp_perf_warning_regex = re.compile(
-    r'.* WARNING: (?P<message>.*)'
+    r'.*WARNING: (?P<message>.*)'
 )
 
 
