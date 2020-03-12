@@ -1272,8 +1272,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     emptyPictureBuf->texturePack()->setPictureFormat( format );
 
     const auto profile = QSurfaceFormat::defaultFormat().profile();
-    const bool useDeprecated =
-        !(profile == QSurfaceFormat::CoreProfile && nx::utils::AppInfo::isMacOsX());
+    const bool useDeprecated = profile != QSurfaceFormat::CoreProfile;
 
     const auto singleComponent = useDeprecated ? GL_LUMINANCE : GL_RED;
     const auto doubleComponent = useDeprecated ? GL_LUMINANCE_ALPHA : GL_RG;

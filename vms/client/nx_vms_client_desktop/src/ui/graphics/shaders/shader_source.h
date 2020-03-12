@@ -19,7 +19,7 @@ inline QByteArray qnUnparenthesize(const char *parenthesized) {
 
     const auto profile = QSurfaceFormat::defaultFormat().profile();
 
-    if (profile == QSurfaceFormat::CoreProfile && nx::utils::AppInfo::isMacOsX())
+    if (profile == QSurfaceFormat::CoreProfile)
     {
         // Modernize shared source.
 
