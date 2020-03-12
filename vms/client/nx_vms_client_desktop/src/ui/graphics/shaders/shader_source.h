@@ -31,7 +31,7 @@ inline QByteArray qnUnparenthesize(const char *parenthesized) {
             result.replace("gl_FragColor", "FragColor");
 
             // GL_LUMINANCE_ALPHA -> GL_RG
-            result.replace(").a,", ").g,");
+            result.replace(").q,", ").g,");
 
             result.replace("texture2D", "texture");
         }
