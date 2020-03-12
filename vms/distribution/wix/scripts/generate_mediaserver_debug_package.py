@@ -10,6 +10,7 @@ from environment import zip_files
 def create_mediaserver_debug_file(binaries_dir, output_filename):
     pdb_filenames = [
         'mediaserver.pdb',
+        'nx_analytics.pdb',
         'plugins/generic_multicast_plugin.pdb',
         'plugins/generic_rtsp_plugin.pdb',
         'plugins/hanwha_analytics_plugin.pdb',

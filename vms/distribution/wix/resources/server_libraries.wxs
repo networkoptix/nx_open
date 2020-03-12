@@ -6,6 +6,7 @@
                 Source="$(var.SourceDir)"
                 Directory="InstallDirRoot">
             <Component><File Name="sigar.dll" KeyPath="yes"/></Component>
+            <Component><File Name="nx_analytics_db.dll" KeyPath="yes"/></Component>
         </ComponentGroup>
 
         <ComponentGroup Id="server_qt_libraries"
