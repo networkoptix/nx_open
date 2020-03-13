@@ -218,7 +218,8 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
         updatedItems.insert(item.uuid, item);
     }
 
-    layout->setItems(updatedItems);
+    if (!QThread::currentThread()->isInterruptionRequested())
+        layout->setItems(updatedItems);
 
     return layout;
 }
