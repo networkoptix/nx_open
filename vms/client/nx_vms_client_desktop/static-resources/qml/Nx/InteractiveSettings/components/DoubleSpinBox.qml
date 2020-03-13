@@ -16,6 +16,8 @@ LabeledItem
     property alias decimals: spinBox.decimals
     property alias step: spinBox.dStepSize
 
+    toolTipTarget: spinBox
+
     contentItem: Item
     {
         implicitWidth: spinBox.implicitWidth
