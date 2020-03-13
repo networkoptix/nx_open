@@ -196,9 +196,8 @@ PtzInstrument::PtzInstrument(QObject *parent):
 
                 if (wasInaccessible && isAccessible)
                 {
-                    const auto widgets = m_widgetByResource.values(camera);
-                    for (const auto& widget: widgets)
-                        updateTraits(widget);
+                    for (const auto& widget: display()->widgets(camera))
+                        updateTraits(dynamic_cast<QnMediaResourceWidget*>(widget));
                 }
             }
         });
@@ -499,10 +498,6 @@ void PtzInstrument::updateWidgetPtzController(QnMediaResourceWidget* widget)
                 updateTraits(widget);
         });
 
-    data.widget = widget;
-    data.resource = widget->resource();
-    m_widgetByResource.insert(widget->resource(), widget);
-
     updateCapabilities(widget);
     updateTraits(widget);
     updateOverlayWidgetInternal(widget);
@@ -575,7 +570,6 @@ void PtzInstrument::updateTraits(QnMediaResourceWidget* widget)
 
     QnPtzAuxiliaryTraitList traits;
     widget->ptzController()->getAuxiliaryTraits(&traits);
-
     if (data.traits == traits)
         return;
 
@@ -766,8 +760,6 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem* item)
 
     PtzData& data = m_dataByWidget[object];
     disconnect(data.capabilitiesConnection);
-
-    m_widgetByResource.remove(data.resource, data.widget);
 
     m_dataByWidget.remove(object);
 }

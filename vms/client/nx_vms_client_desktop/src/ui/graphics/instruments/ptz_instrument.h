@@ -140,8 +140,6 @@ private:
         nx::core::ptz::Vector requestedSpeed;
         PtzOverlayWidget* overlayWidget = nullptr;
         QMetaObject::Connection capabilitiesConnection;
-        QnMediaResourceWidget* widget;
-        QnMediaResourcePtr resource;
     };
 
     struct SplashItemAnimation
@@ -185,8 +183,6 @@ private:
     QPointer<QnMediaResourceWidget> m_target;
     QHash<QObject*, PtzData> m_dataByWidget;
     QBasicTimer m_movementTimer;
-
-    QMultiHash<const QnMediaResourcePtr, QnMediaResourceWidget*> m_widgetByResource;
 
     Movement m_movement;
     Qt::Orientations m_movementOrientations;
