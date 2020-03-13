@@ -1437,6 +1437,10 @@
             "positiveState": "is medium",
             "negativeState": "has decreased to low",
             "groupId": "nx.hanwha.Queue"
+        },
+        {
+            "id": "nx.hanwha.ObjectTracking.Start",
+            "name": "Object tracking - Start"
         }
     ],
     "groups":

@@ -211,7 +211,7 @@ namespace
  * the information about objects. Then it creates `objectMetadataPacket, attaches `objectMetadata`
  * (with object information) to it and sends to server using `m_handler`.
 */
-void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket)
+void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dataPacket)
 {
     const auto incomingPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
     QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
@@ -224,22 +224,26 @@ void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPac
 
     const auto ts = incomingPacket->timestampUs();
 
-    // `outcomingPackets` vector contains packets each of which contains exactly one object
-    // we'll pass each packet to `m_handler->handleMetadata` function.
-    // For now client does not support packets with multiple objects. When GUI team fix it
-    // we'll pass one packet with many objects instead of many packets with one object.
+    auto [outEventPacket, outObjectPacket] = m_objectMetadataXmlParser.parse(xmlData);
 
-    Ptr<ObjectMetadataPacket> outcomingPacket = m_objectMetadataXmlParser.parse(xmlData);
+    if (outEventPacket && outEventPacket->count())
+    {
+        outEventPacket->setTimestampUs(ts);
+        outEventPacket->setDurationUs(-1);
 
-    if (outcomingPacket && outcomingPacket->count())
+        if (NX_ASSERT(m_handler))
+            m_handler->handleMetadata(outEventPacket.get());
+    }
+
+    if (outObjectPacket && outObjectPacket->count())
     {
         //std::cout << outcomingPacket->count() << std::endl;
 
-        outcomingPacket->setTimestampUs(ts);
-        outcomingPacket->setDurationUs(1'000'000); // 1 second
+        outObjectPacket->setTimestampUs(ts);
+        outObjectPacket->setDurationUs(1'000'000); // 1 second
 
         if (NX_ASSERT(m_handler))
-            m_handler->handleMetadata(outcomingPacket.get());
+            m_handler->handleMetadata(outObjectPacket.get());
     }
 
 /*

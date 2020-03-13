@@ -11,16 +11,11 @@
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
+using namespace std::string_literals;
 using namespace std::chrono_literals;
 
-using nx::sdk::Ptr;
-using nx::sdk::makePtr;
-using nx::sdk::Uuid;
-using nx::sdk::Attribute;
-using nx::sdk::analytics::ObjectMetadata;
-using nx::sdk::analytics::IObjectMetadata;
-using nx::sdk::analytics::ObjectMetadataPacket;
-using nx::sdk::analytics::Rect;
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
 
 namespace {
 //-------------------------------------------------------------------------------------------------
@@ -127,9 +122,11 @@ ObjectMetadataXmlParser::ObjectMetadataXmlParser(
 {
 }
 
-Ptr<ObjectMetadataPacket> ObjectMetadataXmlParser::parse(const QByteArray& data)
+ObjectMetadataXmlParser::Result ObjectMetadataXmlParser::parse(const QByteArray& data)
 {
-    Ptr<ObjectMetadataPacket> result;
+    collectGarbage();
+
+    Result result;
 
     QDomDocument dom;
     dom.setContent(data, true);
@@ -153,13 +150,16 @@ Ptr<ObjectMetadataPacket> ObjectMetadataXmlParser::parse(const QByteArray& data)
     if (!extractFrameScale(transformation))
         return result;
 
-    result = makePtr<ObjectMetadataPacket>();
+    result.eventMetadataPacket = makePtr<EventMetadataPacket>();
+    result.objectMetadataPacket = makePtr<ObjectMetadataPacket>();
 
     for (auto object = frame.firstChildElement("Object");
          !object.isNull(); object = object.nextSiblingElement("Object"))
     {
-        if (Ptr<ObjectMetadata> objectMetadata = extractObject(object))
-            result->addItem(objectMetadata.releasePtr());
+        if (Ptr<EventMetadata> eventMetadata = extractEventMetadata(object))
+            result.eventMetadataPacket->addItem(eventMetadata.releasePtr());
+        if (Ptr<ObjectMetadata> objectMetadata = extractObjectMetadata(object))
+            result.objectMetadataPacket->addItem(objectMetadata.releasePtr());
     }
 
     return result;
@@ -298,7 +298,7 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
     return result;
 }
 
-Ptr<ObjectMetadata> ObjectMetadataXmlParser::extractObject(const QDomElement& object)
+Ptr<ObjectMetadata> ObjectMetadataXmlParser::extractObjectMetadata(const QDomElement& object)
 {
     Ptr<ObjectMetadata> result;
     const int objectId = object.attribute("ObjectId").toInt();
@@ -336,6 +336,23 @@ Ptr<ObjectMetadata> ObjectMetadataXmlParser::extractObject(const QDomElement& ob
     result->setBoundingBox(relativeRect);
 
     result->addAttributes(extractAttributes(objectId, appearance));
+
+    return result;
+}
+
+Ptr<EventMetadata> ObjectMetadataXmlParser::extractEventMetadata(const QDomElement& object)
+{
+    const int objectId = object.attribute("ObjectId").toInt();
+    if (m_objectAttributes.count(objectId))
+        return {};
+    m_objectAttributes[objectId] = {};
+
+    auto result = makePtr<EventMetadata>();
+
+    result->setTypeId("nx.hanwha.ObjectTracking.Start");
+    result->setCaption("");
+    result->setDescription("Started tracking object #"s  + std::to_string(objectId));
+    result->setConfidence(1.0);
 
     return result;
 }

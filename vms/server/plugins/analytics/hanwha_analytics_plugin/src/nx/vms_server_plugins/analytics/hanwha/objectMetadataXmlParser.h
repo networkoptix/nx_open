@@ -14,6 +14,8 @@
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
@@ -22,11 +24,18 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 class ObjectMetadataXmlParser
 {
 public:
+    struct Result
+    {
+        nx::sdk::Ptr<nx::sdk::analytics::EventMetadataPacket> eventMetadataPacket;
+        nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket;
+    };
+
+public:
     explicit ObjectMetadataXmlParser(
         const Hanwha::EngineManifest& engineManifest,
         const Hanwha::ObjectMetadataAttributeFilters& objectAttributeFilters);
 
-    nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> parse(const QByteArray& data);
+    Result parse(const QByteArray& data);
 
 private:
     using ObjectId = int;
@@ -54,7 +63,8 @@ private:
     std::vector<nx::sdk::Ptr<nx::sdk::Attribute>> extractAttributes(
         ObjectId objectId, const QDomElement& appearance);
 
-    nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> extractObject(const QDomElement& object);
+    nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> extractObjectMetadata(const QDomElement& object);
+    nx::sdk::Ptr<nx::sdk::analytics::EventMetadata> extractEventMetadata(const QDomElement& object);
 
     void collectGarbage();
 
