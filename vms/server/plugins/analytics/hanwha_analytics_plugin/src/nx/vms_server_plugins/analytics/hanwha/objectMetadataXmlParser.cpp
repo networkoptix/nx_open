@@ -1,5 +1,6 @@
 #include "objectMetadataXmlParser.h"
 
+#include <chrono>
 #include <cmath>
 #include <ctime>
 #include <optional>
@@ -342,15 +343,14 @@ Ptr<ObjectMetadata> ObjectMetadataXmlParser::extractObjectMetadata(const QDomEle
 
 Ptr<EventMetadata> ObjectMetadataXmlParser::extractEventMetadata(const QDomElement& object)
 {
-    const int objectId = object.attribute("ObjectId").toInt();
+    const ObjectId objectId = object.attribute("ObjectId").toInt();
     if (m_objectAttributes.count(objectId))
         return {};
-    m_objectAttributes[objectId] = {};
+    m_objectAttributes[objectId].timeStamp = std::chrono::steady_clock::now();
 
     auto result = makePtr<EventMetadata>();
 
     result->setTypeId("nx.hanwha.ObjectTracking.Start");
-    result->setCaption("");
     result->setDescription("Started tracking object #"s  + std::to_string(objectId));
     result->setConfidence(1.0);
 
@@ -361,7 +361,7 @@ void ObjectMetadataXmlParser::collectGarbage()
 {
     static const auto timeout = 5min;
 
-    auto now = std::chrono::steady_clock::now();
+    const auto now = std::chrono::steady_clock::now();
     for (auto it = m_objectAttributes.begin(); it != m_objectAttributes.end(); ) {
         auto [objectId, attributes] = *it;
         if (now - attributes.timeStamp > timeout)
