@@ -80,11 +80,18 @@ public:
 
     struct ObjectMetadataAttributeFilters
     {
-        QList<QString> roots;
-        QList<QString> discard;
-        QList<QPair<QString, QString>> rename;
+        QList<QString> roots; //< XML element tag names from which to extract attributes
+        QList<QString> discard; //< patterns of attribute names to discard
+
+        struct RenameEntry
+        {
+            QString ifMatches; //< pattern to match attribute name to
+            QString replaceWith; //< new attribute name
+        };
+        QList<RenameEntry> rename; //< attribute renaming map
     };
     #define HanwhaObjectMetadataAttributeFilters_Fields (roots)(discard)(rename)
+    #define HanwhaObjectMetadataAttributeFiltersRenameEntry_Fields (ifMatches)(replaceWith)
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventItemType)
 
@@ -93,7 +100,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Hanwha::ObjectType)
     (Hanwha::EngineManifest)
     (Hanwha::DeviceAgentManifest)
-    (Hanwha::ObjectMetadataAttributeFilters),
+    (Hanwha::ObjectMetadataAttributeFilters)
+    (Hanwha::ObjectMetadataAttributeFilters::RenameEntry),
     (json)
 )
 

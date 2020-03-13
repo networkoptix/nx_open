@@ -216,6 +216,7 @@ void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dat
     const auto incomingPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
     QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
 
+    //// For debugging.
     //if (incomingPacket->dataSize() > 2000) {
     //    static int i = 0;
     //    std::cout << "========================" << std::endl;

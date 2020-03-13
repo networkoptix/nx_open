@@ -50,7 +50,7 @@ private:
         public std::unordered_map<std::string, std::string>
     {
     public:
-        std::chrono::steady_clock::time_point timeStamp = {};
+        std::chrono::steady_clock::time_point timeStamp;
     };
 
 private:

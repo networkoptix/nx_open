@@ -8,21 +8,51 @@
         "HumanBody.Clothing.*.Color.ColorCluster.Color.@*"
     ],
     "rename": [
-        ["HumanFace.Accessory.Hat.Wear", "WearsHat"],
-        ["HumanFace.Accessory.Opticals.Wear", "WearsOpticals"],
+        {
+            "ifMatches": "HumanFace.Accessory.Hat.Wear",
+            "replaceWith": "WearsHat"
+        },
+        {
+            "ifMatches": "HumanFace.Accessory.Opticals.Wear",
+            "replaceWith": "WearsOpticals"
+        },
 
-        ["HumanFace.AgeType", "Age"],
+        {
+            "ifMatches": "HumanFace.AgeType",
+            "replaceWith": "Age"
+        },
 
-        ["*.Gender", "Gender"],
+        {
+            "ifMatches": "*.Gender",
+            "replaceWith": "Gender"
+        },
 
-        ["HumanBody.Clothing.Hat.Wear", "WearsHat"],
+        {
+            "ifMatches": "HumanBody.Clothing.Hat.Wear",
+            "replaceWith": "WearsHat"
+        },
 
-        ["HumanBody.Clothing.Bottoms.Color.ColorCluster.ColorString", "BottomsColor"],
-        ["HumanBody.Clothing.Bottoms.Length", "BottomsLength"],
+        {
+            "ifMatches": "HumanBody.Clothing.Bottoms.Color.ColorCluster.ColorString",
+            "replaceWith": "BottomsColor"
+        },
+        {
+            "ifMatches": "HumanBody.Clothing.Bottoms.Length",
+            "replaceWith": "BottomsLength"
+        },
 
-        ["HumanBody.Clothing.Tops.Color.ColorCluster.ColorString", "TopsColor"],
-        ["HumanBody.Clothing.Tops.Length", "TopsLength"],
+        {
+            "ifMatches": "HumanBody.Clothing.Tops.Color.ColorCluster.ColorString",
+            "replaceWith": "TopsColor"
+        },
+        {
+            "ifMatches": "HumanBody.Clothing.Tops.Length",
+            "replaceWith": "TopsLength"
+        },
 
-        ["HumanBody.Belonging.Bag.Category", "BagCategory"]
+        {
+            "ifMatches": "HumanBody.Belonging.Bag.Category",
+            "replaceWith": "BagCategory"
+        }
     ]
 }

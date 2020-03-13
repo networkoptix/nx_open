@@ -179,8 +179,7 @@ bool ObjectMetadataXmlParser::extractFrameScale(const QDomElement& transformatio
             xDenominator = e.attribute("x").toFloat();
             yDenominator = e.attribute("y").toFloat();
         }
-        else
-        if (e.tagName() == "Scale")
+        else if (e.tagName() == "Scale")
         {
             xNumerator = e.attribute("x").toFloat();
             yNumerator = e.attribute("y").toFloat();
@@ -215,12 +214,10 @@ std::optional<QString> ObjectMetadataXmlParser::filterAttribute(const QString& n
         if (wildcardMatch(pattern, name))
             return std::nullopt;
     }
-    for (const auto& pair: m_objectAttributeFilters.rename)
+    for (const auto& entry: m_objectAttributeFilters.rename)
     {
-        const auto& pattern = pair.first;
-        const auto& replacement = pair.second;
-        if (wildcardMatch(pattern, name))
-            return replacement;
+        if (wildcardMatch(entry.ifMatches, name))
+            return entry.replaceWith;
     }
     return name;
 }
@@ -231,10 +228,11 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
     auto& attributes = m_objectAttributes[objectId];
 
     const auto walk =
-        [&](auto walk, QString key, const QDomElement& element)
+        [&](auto walk, const QString& key, const QDomElement& element)
         {
             const auto domAttrs = element.attributes();
-            for (int i = 0; i < domAttrs.length(); ++i) {
+            for (int i = 0; i < domAttrs.length(); ++i)
+            {
                 const auto domAttr = domAttrs.item(i);
                 const auto name = domAttr.nodeName();
                 const auto value = domAttr.nodeValue();
@@ -249,7 +247,8 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
 
             if (counts.empty())
             {
-                if (const auto child = element.firstChild(); child.isText()) {
+                if (const auto child = element.firstChild(); child.isText())
+                {
                     const QString value = child.toText().data();
                     attributes[key.toStdString()] = value.toStdString();
                 }
