@@ -267,6 +267,14 @@ void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, api::PeerType p
 
 void QnClientMessageProcessor::onGotInitialNotification(const api::FullInfoData& fullData)
 {
+    if (m_status.state() != QnConnectionState::Connected &&
+        NX_ASSERT(m_status.state() != QnConnectionState::Ready))
+    {
+        // Skip belated initial resources notification received after disconnection.
+        // Pass double initial resources notification with an assertion failure.
+        return;
+    }
+
     NX_DEBUG(this, lit("resources received, state -> Ready"));
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_status.setState(QnConnectionState::Ready);
