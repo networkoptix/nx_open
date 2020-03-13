@@ -2,6 +2,8 @@ import QtQuick 2.11
 
 import Nx.Controls 1.0
 
+import nx.vms.client.desktop 1.0
+
 import "private"
 
 LabeledItem
@@ -10,8 +12,6 @@ LabeledItem
 
     isGroup: buttons.count > 1
 
-    // TODO: #dfisenko: rename to "defaultTooltip" for enabling tooltips
-    property var defaultTooltip_: ""
     property var value: defaultValue
     property var defaultValue
     property var itemCaptions
@@ -35,11 +35,8 @@ LabeledItem
             onClicked:
                 buttons.updateValue()
 
-            onHoveredChanged:
-            {
-                if (hovered)
-                    control.defaultTooltip_ = defaultValue.indexOf(identifier) !== -1
-            }
+            GlobalToolTip.text: control.defaultValueTooltipText(
+                defaultValue.indexOf(identifier) !== -1)
         }
 
         function updateValue()
