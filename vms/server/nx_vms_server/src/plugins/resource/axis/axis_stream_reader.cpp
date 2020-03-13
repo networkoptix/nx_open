@@ -60,8 +60,14 @@ int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
 
 CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
+    NX_VERBOSE(this, lit("try to get stream URL for camera %1 for role %1").arg(m_resource->getUrl()).arg(getRole()));
+
     if (isStreamOpened())
+    {
+        NX_VERBOSE(this, 
+            "Stream is already opened for camera %1 for role %2", m_resource->getUrl(), getRole());
         return CameraDiagnostics::NoErrorResult();
+    }
 
     //setRole(Qn::CR_SecondaryLiveVideo);
 
@@ -116,6 +122,10 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
 
             if (status != CL_HTTP_SUCCESS)
             {
+                NX_DEBUG(this, 
+                    "Can not get stream URL for camera %1 for role %2. Request failed with code %3", 
+                    m_resource->getUrl(), getRole(), status);
+
                 if (status == CL_HTTP_AUTH_REQUIRED)
                 {
                     return CameraDiagnostics::NotAuthorisedResult(m_axisRes->getUrl());
