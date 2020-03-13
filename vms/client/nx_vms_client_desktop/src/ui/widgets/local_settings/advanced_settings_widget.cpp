@@ -14,6 +14,7 @@
 
 #include <core/resource/resource_directory_browser.h>
 
+#include <nx/utils/app_info.h>
 #include <nx/vms/text/time_strings.h>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -33,6 +34,12 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     ui(new Ui::AdvancedSettingsWidget)
 {
     ui->setupUi(this);
+
+    if (!nx::utils::AppInfo::isMacOsX())
+    {
+        ui->autoFpsLimitCheckbox->setVisible(false);
+        ui->autoFpsLimitCheckboxHint->setVisible(false);
+    }
 
     ui->maximumLiveBufferLengthSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds));
 
