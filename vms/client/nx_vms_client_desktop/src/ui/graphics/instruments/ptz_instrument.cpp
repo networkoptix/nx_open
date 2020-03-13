@@ -15,6 +15,7 @@
 
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/api/data/dewarping_data.h>
 #include <core/ptz/media_dewarping_params.h>
@@ -180,6 +181,23 @@ PtzInstrument::PtzInstrument(QObject *parent):
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0),
     m_movement(NoMovement)
 {
+    connect(resourcePool(), &QnResourcePool::statusChanged, this,
+        [this](const QnResourcePtr& resource, Qn::StatusChangeReason /*reason*/)
+        {
+            if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+            {
+                const bool wasInaccessible =
+                    resource->getPreviousStatus() == Qn::Offline ||
+                    resource->getPreviousStatus() == Qn::Unauthorized;
+
+                const bool isAccessible =
+                        resource->getStatus() == Qn::Online ||
+                        resource->getStatus() == Qn::Recording;
+
+                if (wasInaccessible && isAccessible && m_widgetByResource.contains(camera))
+                    updateTraits(m_widgetByResource[camera]);
+            }
+        });
 }
 
 PtzInstrument::~PtzInstrument()
@@ -548,6 +566,7 @@ void PtzInstrument::updateTraits(QnMediaResourceWidget* widget)
 
     QnPtzAuxiliaryTraitList traits;
     widget->ptzController()->getAuxiliaryTraits(&traits);
+
     if (data.traits == traits)
         return;
 
@@ -716,6 +735,9 @@ bool PtzInstrument::registeredNotify(QGraphicsItem* item)
     if (!widget || !widget->resource())
         return false;
 
+    m_widgetByResource[widget->resource()] = widget;
+    m_resourceByItem[item] = widget->resource();
+
     connect(widget, &QnMediaResourceWidget::optionsChanged, this,
         &PtzInstrument::updateOverlayWidget);
     connect(widget, &QnMediaResourceWidget::fisheyeChanged, this,
@@ -731,6 +753,13 @@ bool PtzInstrument::registeredNotify(QGraphicsItem* item)
 void PtzInstrument::unregisteredNotify(QGraphicsItem* item)
 {
     base_type::unregisteredNotify(item);
+
+    auto iter = m_resourceByItem.find(item);
+    if (iter != m_resourceByItem.end())
+    {
+        m_widgetByResource.remove(*iter);
+        m_resourceByItem.erase(iter);
+    }
 
     /* We don't want to use RTTI at this point, so we don't cast to QnMediaResourceWidget. */
     QGraphicsObject* object = item->toGraphicsObject();

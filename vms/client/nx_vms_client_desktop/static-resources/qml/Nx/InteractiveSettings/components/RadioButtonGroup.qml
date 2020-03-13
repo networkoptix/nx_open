@@ -2,6 +2,8 @@ import QtQuick 2.11
 
 import Nx.Controls 1.0
 
+import nx.vms.client.desktop 1.0
+
 import "private"
 
 LabeledItem
@@ -32,6 +34,9 @@ LabeledItem
 
             onClicked:
                 control.value = identifier
+
+            GlobalToolTip.text: control.defaultValueTooltipText(
+                (itemCaptions && itemCaptions[defaultValue]) || defaultValue)
         }
     }
 }

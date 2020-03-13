@@ -2,26 +2,32 @@ import QtQuick 2.0
 
 import Nx.Controls 1.0
 
+import nx.vms.client.desktop 1.0
+
 import "private"
 
 LabeledItem
 {
     id: control
 
-    // TODO: #dfisenko: rename to "defaultTooltip" for enabling tooltips
-    property bool defaultTooltip_: defaultValue
     property alias caption: checkBox.text
     property alias value: checkBox.checked
     property bool defaultValue: false
 
     readonly property bool filled: checkBox.checked
 
-    contentItem: checkBox
-
-    CheckBox
+    contentItem: Item
     {
-        id: checkBox
-        checked: defaultValue
+        implicitWidth: checkBox.implicitWidth
+        implicitHeight: checkBox.implicitHeight
+        baselineOffset: checkBox.baselineOffset
+
+        CheckBox
+        {
+            id: checkBox
+            checked: defaultValue
+            GlobalToolTip.text: control.defaultValueTooltipText(defaultValue)
+        }
     }
 
     function setValue(value)

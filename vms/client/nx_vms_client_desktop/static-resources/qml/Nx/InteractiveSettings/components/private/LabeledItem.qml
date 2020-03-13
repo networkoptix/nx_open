@@ -10,12 +10,15 @@ BottomPaddedItem
     property string description: ""
 
     property Item contentItem: null
-    property Item toolTipTarget: contentItem
 
     property real spacing: 8
 
     property alias labelWidth: label.width
     property string caption
+
+    // This property only affects defaultValueTooltipText() function return value.
+    // Descendant components should define GlobalToolTip bindings where required.
+    property bool defaultValueTooltipEnabled: false
 
     width: parent.width
 
@@ -71,17 +74,10 @@ BottomPaddedItem
             })
     }
 
-    onToolTipTargetChanged:
+    function defaultValueTooltipText(value)
     {
-        if (!toolTipTarget)
-            return
-
-        toolTipTarget.GlobalToolTip.text = Qt.binding(
-            function()
-            {
-                return labeledItem.hasOwnProperty("defaultTooltip")
-                    ? "Default value: " + labeledItem.defaultTooltip
-                    : ""
-            })
+        return defaultValueTooltipEnabled
+            ? qsTr("Default value:") + " " + value
+            : ""
     }
 }

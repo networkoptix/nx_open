@@ -2,13 +2,14 @@ import QtQuick 2.6
 
 import Nx.Controls 1.0
 
+import nx.vms.client.desktop 1.0
+
 import "private"
 
 LabeledItem
 {
     id: control
 
-    property int defaultTooltip: defaultValue
     property int defaultValue: 0
     property alias minValue: spinBox.from
     property alias maxValue: spinBox.to
@@ -16,7 +17,7 @@ LabeledItem
 
     readonly property bool filled: spinBox.value !== 0
 
-    toolTipTarget: spinBox
+    defaultValueTooltipEnabled: true
 
     contentItem: Item
     {
@@ -30,6 +31,7 @@ LabeledItem
 
             editable: true
             value: defaultValue
+            GlobalToolTip.text: control.defaultValueTooltipText(defaultValue)
         }
     }
 }
