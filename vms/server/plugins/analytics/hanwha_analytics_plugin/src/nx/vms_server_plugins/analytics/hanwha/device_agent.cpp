@@ -245,25 +245,6 @@ void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dat
         if (NX_ASSERT(m_handler))
             m_handler->handleMetadata(outObjectPacket.get());
     }
-
-/*
-    // This chunk of code is for test purposes.
-    Ptr<ObjectMetadataPacket> outcomingPacket = makePtr<ObjectMetadataPacket>();
-    outcomingPacket->setTimestampUs(ts);
-    outcomingPacket->setDurationUs(1'000'000);
-
-    auto objectMetadata = makePtr<ObjectMetadata>();
-    int objectId = 100;
-    static const nx::sdk::Uuid trackId =
-        nx::vms_server_plugins::analytics::hanwha::deviceObjectNumberToUuid(objectId);
-    objectMetadata->setTrackId(trackId);
-    objectMetadata->setTypeId("nx.hanwha.ObjectDetection.Head");
-    objectMetadata->setBoundingBox(Rect(0.25, 0.25, 0.5, 0.5));
-    outcomingPacket->addItem(objectMetadata.get());
-
-    if (NX_ASSERT(m_handler))
-        m_handler->handleMetadata(outcomingPacket.get());
-//*/
 }
 
 /**
@@ -404,6 +385,9 @@ void DeviceAgent::doSetSettings(
 void DeviceAgent::getPluginSideSettings(
     Result<const ISettingsResponse*>* outResult) const
 {
+//    ObjectSizeConstraints osc{ 0.2, 0.3, 0.8, 0.9 };
+//    std::string s = osc.toServerString();
+
     const auto response = new nx::sdk::SettingsResponse();
 
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.ShockDetection"))
@@ -722,7 +706,7 @@ void DeviceAgent::readCameraSettings()
      || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Intrusion")
      || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Loitering"))
     {
-        if (sunapiReply.empty()) 
+        if (sunapiReply.empty())
             sunapiReply = loadEventSettings("videoanalysis2");
 
         readFromDeviceReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, m_channelNumber);

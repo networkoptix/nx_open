@@ -130,7 +130,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         if (file.open(QFile::ReadOnly))
         {
             NX_INFO(this,
-                lm("Switch to external object metatdata attribute filters file %1").arg(QFileInfo(file).absoluteFilePath()));
+                lm("Switch to external object metadata attribute filters file %1").arg(QFileInfo(file).absoluteFilePath()));
             attributeFiltersData = file.readAll();
         }
     }

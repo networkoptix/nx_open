@@ -168,16 +168,13 @@ struct Motion: public SettingGroup
 
 struct MotionDetectionObjectSize: public SettingGroup
 {
-    UnnamedBoxFigure minDimentions;
-    UnnamedBoxFigure maxDimentions;
+    ObjectSizeConstraints constraints;
 
     enum class KeyIndex {
-        minDimentions,
-        maxDimentions,
+        constraints,
     };
     static constexpr const char* kKeys[] = {
-        "MotionDetection.MinObjectSize.Points",
-        "MotionDetection.MaxObjectSize.Points",
+        "MotionDetection.ObjectSize.Constraints",
     };
     static constexpr const char* kJsonEventName = "VideoAnalysis";
     static constexpr const char* kSunapiEventName = "videoanalysis2";
@@ -201,16 +198,13 @@ private:
 
 struct IvaObjectSize: public SettingGroup
 {
-    UnnamedBoxFigure minDimentions;
-    UnnamedBoxFigure maxDimentions;
+    ObjectSizeConstraints constraints;
 
     enum class KeyIndex {
-        minDimentions,
-        maxDimentions,
+        constraints,
     };
     static constexpr const char* kKeys[] = {
-        "IVA.MinObjectSize.Points",
-        "IVA.MaxObjectSize.Points",
+        "IVA.ObjectSize.Constraints",
     };
     static constexpr const char* kJsonEventName = "VideoAnalysis";
     static constexpr const char* kSunapiEventName = "videoanalysis2";

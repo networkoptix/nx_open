@@ -40,6 +40,8 @@ std::string serialize(bool value)
 
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void deserializeOrThrow(const char* source, int* destination)
 {
     if (!source)
@@ -58,6 +60,8 @@ std::string serialize(int value)
     return std::to_string(value);
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void deserializeOrThrow(const char* source, std::string* destination)
 {
     if (!source)
@@ -70,6 +74,8 @@ std::string serialize(std::string value)
 {
     return value;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void deserializeOrThrow(const char* source, UnnamedBoxFigure* destination)
 {
@@ -92,6 +98,31 @@ std::string serialize(const UnnamedBoxFigure& value)
     return value.toServerString();
 }
 
+//-------------------------------------------------------------------------------------------------
+
+void deserializeOrThrow(const char* source, ObjectSizeConstraints* destination)
+{
+    if (!source)
+        throw ServerValueError();
+
+    std::optional<ObjectSizeConstraints> tmp = ObjectSizeConstraints::fromServerString(source);
+
+    if (tmp)
+    {
+        *destination = *tmp;
+        return;
+    }
+
+    throw ServerValueError();
+}
+
+std::string serialize(const ObjectSizeConstraints& value)
+{
+    return value.toServerString();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void deserializeOrThrow(const char* source, NamedPolygon* destination)
 {
     if (!source)
@@ -112,6 +143,8 @@ std::string serialize(const NamedPolygon& value)
 {
     return value.toServerString();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void deserializeOrThrow(const char* source, UnnamedPolygon* destination)
 {
@@ -134,6 +167,8 @@ std::string serialize(const UnnamedPolygon& value)
     return value.toServerString();
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void deserializeOrThrow(const char* source, NamedLineFigure* destination)
 {
     if (!source)
@@ -154,6 +189,8 @@ std::string serialize(const NamedLineFigure& value)
 {
     return value.toServerString();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void deserializeOrThrow(const char* source, Width* destination)
 {
@@ -177,6 +214,8 @@ std::string serialize(std::pair<Width, Height> pair)
     std::string result = pluginPointsToServerString(*points);
     return result;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void deserializeOrThrow(const char* source, std::vector<PluginPoint>* destination)
 {
