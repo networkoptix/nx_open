@@ -398,7 +398,7 @@ def _rtsp_perf_frames(stdout, output_file_path):
     while True:
         line = stdout.readline().decode('UTF-8').strip('\n\r')
 
-        if output_file** 2:
+        if output_file:
             timestamp_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             if line.startswith(timestamp_str):  # Some rtsp_perf lines already have timestamps.
                 prefix = ''
@@ -722,9 +722,9 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                 first_cycle = True
 
-                host_time_s_before_test = time.clock_gettime(time.CLOCK_REALTIME)
+                host_time_s_before_test = time.time()
                 vms_time_ms_before_test = api.get_time()
-                host_time_s_before_test_after_vms_time_acquisition = time.clock_gettime(time.CLOCK_REALTIME)
+                host_time_s_before_test_after_vms_time_acquisition = time.time()
 
                 try:
                     while True:
@@ -907,9 +907,9 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
     time.sleep(5)
 
     try:
-        host_time_s_after_test = time.clock_gettime(time.CLOCK_REALTIME)
+        host_time_s_after_test = time.time()
         vms_time_ms_after_test = api.get_time()
-        host_time_s_after_test_after_vms_time_acquisition = time.clock_gettime(time.CLOCK_REALTIME)
+        host_time_s_after_test_after_vms_time_acquisition = time.time()
 
         get_time_request_duration_before = host_time_s_before_test_after_vms_time_acquisition - host_time_s_before_test
         get_time_request_duration_after = host_time_s_after_test_after_vms_time_acquisition - host_time_s_after_test
