@@ -254,7 +254,7 @@ void AnalyticsSettingsWidget::Private::refreshSettingsValues(const QnUuid& engin
         return;
 
     const auto server = commonModule()->currentServer();
-    if (!NX_ASSERT(server))
+    if (!server) //< It may be null if the client just disconnected from the server.
         return;
 
     const auto engine = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId);

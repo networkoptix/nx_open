@@ -12,7 +12,6 @@ enum PoeSettingsColumn
     port = first,
     camera,
     consumption,
-    speed,
     status,
     power,
 

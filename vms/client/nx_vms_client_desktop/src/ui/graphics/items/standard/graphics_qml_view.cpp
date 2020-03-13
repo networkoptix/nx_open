@@ -16,18 +16,25 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLFramebufferObject>
 #include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLFunctions_1_5>
 #include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLVertexArrayObject>
+#include <QtGui/QOpenGLBuffer>
 
 #include <QtCore/QTimer>
 #include <QtCore/QtMath>
 
 #include <client_core/client_core_module.h>
+#include <memory>
 #include <ui/workaround/gl_native_painting.h>
+#include <opengl_renderer.h>
+#include <ui/graphics/shaders/texture_color_shader_program.h>
 
 namespace {
 
 const auto kResizeTimeout = std::chrono::milliseconds(200);
+constexpr auto kQuadVertexCount = 4;
+constexpr auto kCoordPerVertex = 2; //< x, y
+constexpr auto kQuadArrayLength = kQuadVertexCount * kCoordPerVertex;
 
 QWidget* findWindowWidgetOf(QWidget* widget)
 {
@@ -90,6 +97,30 @@ void remapInputMethodQueryEvent(QObject* object, QInputMethodQueryEvent* e)
         if (value.canConvert<QPointF>())
             e->setValue(Qt::ImCursorPosition, item->mapToScene(value.toPointF()));
     }
+}
+
+void initializeQuadBuffer(
+    QnTextureGLShaderProgram* shader,
+    const char* attributeName,
+    QOpenGLBuffer* buffer,
+    const GLfloat* values = nullptr)
+{
+    buffer->create();
+    buffer->setUsagePattern(values ? QOpenGLBuffer::StaticDraw : QOpenGLBuffer::DynamicDraw);
+
+    buffer->bind();
+    const auto bufferSize = kQuadArrayLength * sizeof(GLfloat);
+    if (values)
+        buffer->allocate(values, bufferSize);
+    else
+        buffer->allocate(bufferSize);
+
+    const auto location = shader->attributeLocation(attributeName);
+    NX_ASSERT(location != -1, attributeName);
+
+    shader->enableAttributeArray(location);
+    shader->setAttributeBuffer(location, GL_FLOAT, 0, kCoordPerVertex);
+    buffer->release();
 }
 
 } // namespace
@@ -188,7 +219,7 @@ QWindow* RenderControl::renderWindow(QPoint* offset)
 struct GraphicsQmlView::Private
 {
     GraphicsQmlView* m_view;
-    bool m_initialized = false;
+    bool m_offscreenInitialized = false;
     QScopedPointer<QQuickWindow> m_quickWindow;
     QScopedPointer<QQuickItem> m_rootItem;
     QScopedPointer<RenderControl> m_renderControl;
@@ -198,11 +229,17 @@ struct GraphicsQmlView::Private
     QQmlEngine* m_qmlEngine;
     QTimer* m_resizeTimer;
 
+    QOpenGLVertexArrayObject m_vertices;
+    QOpenGLBuffer m_positionBuffer;
+    QOpenGLBuffer m_texcoordBuffer;
+    bool m_vaoInitialized = false;
+
     Private(GraphicsQmlView* view): m_view(view) {}
 
-    void initialize(const QRectF& rect, QOpenGLWidget* glWidget);
+    void ensureOffscreen(const QRectF& rect, QOpenGLWidget* glWidget);
+    void ensureVao(QnTextureGLShaderProgram* shader);
     void updateSizes();
-    void ensureFbo();
+    void tryInitializeFbo();
     void scheduleUpdateSizes();
 };
 
@@ -227,13 +264,6 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
     d->m_quickWindow.reset(new QQuickWindow(d->m_renderControl.data()));
     d->m_quickWindow->setTitle(QString::fromLatin1("Offscreen"));
     d->m_quickWindow->setGeometry(0, 0, 640, 480); //< Will be resized later.
-
-    connect(d->m_quickWindow.data(), &QQuickWindow::sceneGraphInitialized, this,
-        [this]()
-        {
-            d->ensureFbo();
-        }
-    );
 
     d->m_resizeTimer = new QTimer(this);
     d->m_resizeTimer->setSingleShot(true);
@@ -320,21 +350,25 @@ QQmlEngine* GraphicsQmlView::engine() const
     return d->m_qmlEngine;
 }
 
-void GraphicsQmlView::Private::ensureFbo()
+void GraphicsQmlView::Private::tryInitializeFbo()
 {
     if (!m_quickWindow)
         return;
 
-    QSize fboSize = m_quickWindow->size() * qApp->devicePixelRatio();
+    const QSize requiredSize = m_quickWindow->size() * qApp->devicePixelRatio();
 
-    if (m_fbo && m_fbo->size() != fboSize)
-        m_fbo.reset();
+    if (m_fbo && m_fbo->size() == requiredSize)
+        return;
 
-    if (!m_fbo)
-    {
-        m_fbo.reset(new QOpenGLFramebufferObject(fboSize, QOpenGLFramebufferObject::CombinedDepthStencil));
-        m_quickWindow->setRenderTarget(m_fbo.data());
-    }
+    QScopedPointer<QOpenGLFramebufferObject> fbo(
+        new QOpenGLFramebufferObject(
+            requiredSize, QOpenGLFramebufferObject::CombinedDepthStencil));
+
+    if (!fbo->isValid())
+        return;
+
+    m_fbo.swap(fbo);
+    m_quickWindow->setRenderTarget(m_fbo.data());
 }
 
 bool GraphicsQmlView::event(QEvent* event)
@@ -400,8 +434,11 @@ void GraphicsQmlView::Private::updateSizes()
     m_quickWindow->setGeometry(pos.x(), pos.y(), qCeil(size.width()), qCeil(size.height()));
 }
 
-void GraphicsQmlView::Private::initialize(const QRectF&, QOpenGLWidget* glWidget)
+void GraphicsQmlView::Private::ensureOffscreen(const QRectF&, QOpenGLWidget* glWidget)
 {
+    if (m_offscreenInitialized)
+        return;
+
     auto context = glWidget->context();
 
     m_offscreenSurface.reset(new QOffscreenSurface());
@@ -418,7 +455,32 @@ void GraphicsQmlView::Private::initialize(const QRectF&, QOpenGLWidget* glWidget
     m_renderControl->initialize(context);
     context->doneCurrent();
 
-    m_initialized = true;
+    m_offscreenInitialized = true;
+}
+
+void GraphicsQmlView::Private::ensureVao(QnTextureGLShaderProgram* shader)
+{
+    if (m_vaoInitialized)
+        return;
+
+    static constexpr GLfloat kTexCoordArray[kQuadArrayLength] = {
+        0.0, 0.0,
+        1.0, 0.0,
+        1.0, 1.0,
+        0.0, 1.0
+    };
+
+    m_vertices.create();
+    m_vertices.bind();
+
+    initializeQuadBuffer(shader, "aPosition", &m_positionBuffer);
+    initializeQuadBuffer(shader, "aTexCoord", &m_texcoordBuffer, kTexCoordArray);
+
+    shader->markInitialized();
+
+    m_vertices.release();
+
+    m_vaoInitialized = true;
 }
 
 void GraphicsQmlView::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
@@ -523,20 +585,21 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     QnGlNativePainting::begin(glWidget, painter);
 
-    if (!d->m_initialized)
-        d->initialize(channelRect, glWidget);
-
-    d->ensureFbo();
+    d->ensureOffscreen(channelRect, glWidget);
 
     if (glWidget->context()->makeCurrent(d->m_offscreenSurface.data()))
     {
-        d->m_renderControl->polishItems();
-        d->m_renderControl->sync();
+        d->tryInitializeFbo();
 
-        d->m_renderControl->render();
-        d->m_quickWindow->resetOpenGLState();
-        glWidget->context()->functions()->glFlush();
-        glWidget->context()->doneCurrent();
+        if (d->m_fbo)
+        {
+            d->m_renderControl->polishItems();
+            d->m_renderControl->sync();
+
+            d->m_renderControl->render();
+            d->m_quickWindow->resetOpenGLState();
+            glWidget->context()->functions()->glFlush();
+        }
     }
 
     QnGlNativePainting::end(painter);
@@ -546,25 +609,41 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     QnGlNativePainting::begin(glWidget, painter);
 
-    const auto functions = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_1_5>();
+    auto renderer = QnOpenGLRendererManager::instance(glWidget);
+    glWidget->makeCurrent();
 
+    const auto functions = glWidget->context()->functions();
+    functions->glEnable(GL_BLEND);
+    functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    functions->glActiveTexture(GL_TEXTURE0);
     functions->glBindTexture(GL_TEXTURE_2D, d->m_fbo->texture());
 
-    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    const auto filter = d->m_resizeTimer->isActive() ? GL_LINEAR : GL_NEAREST;
+    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
-    functions->glEnable(GL_TEXTURE_2D);
-    functions->glBegin(GL_QUADS);
-    functions->glColor3f(1, 1, 1);
-    functions->glTexCoord2d(0, 0);
-    functions->glVertex2d(channelRect.left(), channelRect.bottom());
-    functions->glTexCoord2d(0, 1);
-    functions->glVertex2d(channelRect.left(), channelRect.top());
-    functions->glTexCoord2d(1, 1);
-    functions->glVertex2d(channelRect.right(), channelRect.top());
-    functions->glTexCoord2d(1, 0);
-    functions->glVertex2d(channelRect.right(), channelRect.bottom());
-    functions->glEnd();
+    const GLfloat posArray[kQuadArrayLength] = {
+        (float)channelRect.left(), (float)channelRect.bottom(),
+        (float)channelRect.right(), (float)channelRect.bottom(),
+        (float)channelRect.right(), (float)channelRect.top(),
+        (float)channelRect.left(), (float)channelRect.top()
+    };
+
+    const auto shaderColor = QVector4D(1.0, 1.0, 1.0, painter->opacity());
+
+    auto shader = renderer->getTextureShader();
+
+    d->ensureVao(shader);
+    d->m_positionBuffer.bind();
+    d->m_positionBuffer.write(0, posArray, kQuadArrayLength * sizeof(GLfloat));
+    d->m_positionBuffer.release();
+
+    shader->bind();
+    shader->setColor(shaderColor);
+    shader->setTexture(0);
+    renderer->drawBindedTextureOnQuadVao(&d->m_vertices, shader);
+    shader->release();
 
     QnGlNativePainting::end(painter);
 }

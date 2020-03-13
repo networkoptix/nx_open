@@ -197,6 +197,9 @@ struct Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(0, forceJsonConnection,
         "Force desktop client use json data encoding");
+
+    NX_INI_FLAG(0, ignoreSavedPreferredCloudServers,
+        "Ignore cloud server preference saved by \"Connect to this Server\" commands.");
 };
 
 inline Ini& ini()

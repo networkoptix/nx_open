@@ -19,6 +19,7 @@ extern "C"
 #include <utils/common/util.h> /* For random. */
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/utils/app_info.h>
 #include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
@@ -1270,6 +1271,12 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
     emptyPictureBuf->texturePack()->setPictureFormat( format );
 
+    const auto profile = QSurfaceFormat::defaultFormat().profile();
+    const bool useDeprecated = profile != QSurfaceFormat::CoreProfile;
+
+    const auto singleComponent = useDeprecated ? GL_LUMINANCE : GL_RED;
+    const auto doubleComponent = useDeprecated ? GL_LUMINANCE_ALPHA : GL_RG;
+
     if( (format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV444P || format == AV_PIX_FMT_YUVA420P) && usingShaderYuvToRgb() )
     {
         //using pixel shader for yuv->rgb conversion
@@ -1278,7 +1285,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             QnGlRendererTexture* texture = emptyPictureBuf->texture(i);
             texture->ensureInitialized(
                 r_w[i], h[i], lineSizes[i],
-                1, GL_LUMINANCE, 1, i == Y_PLANE_INDEX ? 0x10 : (i == A_PLANE_INDEX ? 0x00 : 0x80) );
+                1, singleComponent, 1, i == Y_PLANE_INDEX ? 0x10 : (i == A_PLANE_INDEX ? 0x00 : 0x80) );
 
             NX_VERBOSE(this,
                 lm("Uploading to gl texture. id = %1, i = %2, lineSizes[i] = %3, r_w[i] = %4, "
@@ -1296,10 +1303,18 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             const quint64 lineSizes_i = lineSizes[i];
             const quint64 r_w_i = r_w[i];
 //            d->glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes_i);
-            glCheckError("glPixelStorei");
+//            glCheckError("glPixelStorei");
             NX_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
 
-            loadImageData(d.get(), texture->textureSize().width(),texture->textureSize().height(),lineSizes_i,h[i],1,GL_LUMINANCE,planes[i]);
+            loadImageData(
+                d.get(),
+                texture->textureSize().width(),
+                texture->textureSize().height(),
+                lineSizes_i,
+                h[i],
+                1,
+                singleComponent,
+                planes[i]);
 
             bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[i],ROUND_COEFF)*h[i] );
         }
@@ -1314,9 +1329,9 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         {
             QnGlRendererTexture* texture = emptyPictureBuf->texture(i);
             if( i == Y_PLANE_INDEX )
-                texture->ensureInitialized( width, height, lineSizes[i], 1, GL_LUMINANCE, 1, -1 );
+                texture->ensureInitialized(width, height, lineSizes[i], 1, singleComponent, 1, -1);
             else
-                texture->ensureInitialized( width / 2, height / 2, lineSizes[i]/2, 2, GL_LUMINANCE_ALPHA, 2, -1 );
+                texture->ensureInitialized(width / 2, height / 2, lineSizes[i]/2, 2, doubleComponent, 2, -1);
 
             d->glBindTexture( GL_TEXTURE_2D, texture->id() );
             const uchar* pixels = planes[i];
@@ -1328,14 +1343,14 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                             i == 0 ? lineSizes[0] : (lineSizes[1]/2),
                             i == 0 ? height : height / 2,
                             i == 0 ? 1 : 2,
-                            i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
+                            i == 0 ? singleComponent : doubleComponent,
                             pixels);
             /*
             d->glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
                             i == 0 ? qPower2Ceil(width,ROUND_COEFF) : width / 2,
                             i == 0 ? height : height / 2,
-                            i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
+                            i == 0 ? singleComponent : doubleComponent,
                             GL_UNSIGNED_BYTE, pixels );*/
             glCheckError("glTexSubImage2D");
             d->glBindTexture( GL_TEXTURE_2D, 0 );

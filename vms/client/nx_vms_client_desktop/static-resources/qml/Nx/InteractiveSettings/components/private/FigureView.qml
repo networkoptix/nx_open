@@ -79,6 +79,8 @@ Item
         {
             id: backgroundImage
 
+            cache: false
+
             Connections
             {
                 target: resourceThumbnailProvider || null
@@ -110,7 +112,7 @@ Item
                 updateTimer.stop()
 
                 if (!resourceThumbnailProvider || !resourceId || resourceId.isNull()
-                    || !engineId || engineId.isNull())
+                    || !engineId || engineId.isNull() || !preview.hasFigure)
                 {
                     return
                 }

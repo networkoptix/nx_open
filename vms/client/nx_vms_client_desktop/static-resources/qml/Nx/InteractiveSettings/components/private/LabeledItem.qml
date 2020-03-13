@@ -10,6 +10,7 @@ BottomPaddedItem
     property string description: ""
 
     property Item contentItem: null
+    property Item toolTipTarget: contentItem
 
     property real spacing: 8
 
@@ -55,14 +56,6 @@ BottomPaddedItem
         contentItem.parent = focusScope
         contentItem.focus = true
 
-        contentItem.GlobalToolTip.text = Qt.binding(
-            function()
-            {
-                return labeledItem.hasOwnProperty("defaultTooltip")
-                    ? "Default value: " + labeledItem.defaultTooltip
-                    : ""
-            })
-
         contentItem.width = Qt.binding(
             function() { return labeledItem.width - contentItem.x })
 
@@ -75,6 +68,20 @@ BottomPaddedItem
                 return labeledItem.isBaselineAlignment
                     ? label.y + label.baselineOffset - contentItem.baselineOffset
                     : 0
+            })
+    }
+
+    onToolTipTargetChanged:
+    {
+        if (!toolTipTarget)
+            return
+
+        toolTipTarget.GlobalToolTip.text = Qt.binding(
+            function()
+            {
+                return labeledItem.hasOwnProperty("defaultTooltip")
+                    ? "Default value: " + labeledItem.defaultTooltip
+                    : ""
             })
     }
 }

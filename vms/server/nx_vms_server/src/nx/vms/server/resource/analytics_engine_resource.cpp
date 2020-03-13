@@ -57,7 +57,7 @@ QJsonObject AnalyticsEngineResource::settingsValues() const
     {
         const auto pluginSideSettings = m_sdkEngine->pluginSideSettings();
         if (pluginSideSettings)
-            jsonEngine.applyValues(pluginSideSettings->settingValues);
+            jsonEngine.applyStringValues(pluginSideSettings->settingValues);
     }
 
     return jsonEngine.values();

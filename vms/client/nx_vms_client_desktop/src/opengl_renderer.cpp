@@ -11,13 +11,15 @@
 #include <ui/graphics/shaders/texture_color_shader_program.h>
 #include <ui/graphics/shaders/per_vertex_colored_shader_program.h>
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
+#include <ui/graphics/shaders/color_line_shader_program.h>
 
 
 QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
     m_colorProgram(new QnColorGLShaderProgram(parent)),
     m_textureColorProgram(new QnTextureGLShaderProgram(parent)),
     m_colorPerVertexShader(new QnColorPerVertexGLShaderProgram(parent)),
-    m_textureTransitionShader(new QnTextureTransitionShaderProgram(parent))
+    m_textureTransitionShader(new QnTextureTransitionShaderProgram(parent)),
+    m_colorLineShader(new QnColorLineGLShaderProgram(parent))
 {
     QOpenGLFunctions::initializeOpenGLFunctions();
 
@@ -25,6 +27,7 @@ QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
     m_textureColorProgram->compile();
     m_colorPerVertexShader->compile();
     m_textureTransitionShader->compile();
+    m_colorLineShader->compile();
 
     m_indices_for_render_quads[0] = 0;
     m_indices_for_render_quads[1] = 1;
@@ -34,9 +37,22 @@ QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
     m_indices_for_render_quads[4] = 2;
     m_indices_for_render_quads[5] = 3;
 
+    glGenBuffers(1, &m_elementBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+        sizeof(m_indices_for_render_quads),
+        m_indices_for_render_quads,
+        GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
     m_color = QVector4D(1.0f,1.0f,1.0f,1.0f);
     m_modelViewMatrix.setToIdentity();
     m_projectionMatrix.setToIdentity();
+}
+
+QnOpenGLRenderer::~QnOpenGLRenderer()
+{
+    glDeleteBuffers(1, &m_elementBuffer);
 }
 
 void  QnOpenGLRenderer::setColor(const QVector4D& c)
@@ -139,7 +155,10 @@ void QnOpenGLRenderer::drawColoredQuad(const float* v_array, QnColorGLShaderProg
             shader->markInitialized();
         };
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT,m_indices_for_render_quads);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementBuffer);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
         glCheckError("render");
         shader->release();
         //glDisableVertexAttribArray(VERTEX_POS_INDX);
@@ -149,7 +168,11 @@ void QnOpenGLRenderer::drawColoredQuad(const float* v_array, QnColorGLShaderProg
 void QnOpenGLRenderer::drawBindedTextureOnQuadVao(QOpenGLVertexArrayObject* vao, QnGLShaderProgram* shader) {
     vao->bind();
     shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT,m_indices_for_render_quads);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementBuffer);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
     vao->release();
     glCheckError("render");
 }
@@ -168,6 +191,11 @@ QnColorGLShaderProgram* QnOpenGLRenderer::getColorShader() const {
 
 QnTextureTransitionShaderProgram* QnOpenGLRenderer::getTextureTransitionShader() const {
     return m_textureTransitionShader.data();
+}
+
+QnColorLineGLShaderProgram* QnOpenGLRenderer::getColorLineShader() const
+{
+    return m_colorLineShader.data();
 }
 
 QMatrix4x4 QnOpenGLRenderer::getModelViewMatrix() const {
