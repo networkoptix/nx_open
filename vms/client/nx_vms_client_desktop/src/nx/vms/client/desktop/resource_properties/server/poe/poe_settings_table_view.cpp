@@ -19,8 +19,6 @@ QString headerText(int column)
             return PoeSettingsTableView::tr("Camera");
         case PoeSettingsColumn::consumption:
             return PoeSettingsTableView::tr("Consumption");
-        case PoeSettingsColumn::speed:
-            return PoeSettingsTableView::tr("Speed");
         case PoeSettingsColumn::status:
             return PoeSettingsTableView::tr("Status");
         case PoeSettingsColumn::power:

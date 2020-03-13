@@ -30,13 +30,6 @@ using NetworkPortState = nx::vms::api::NetworkPortState;
 
 static const QVariant kTextAlign = static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
 
-QString getSpeed(const NetworkPortState& port)
-{
-    return port.linkSpeedMbps > 0
-        ? PoeSettingsTableView::tr("%1 Mbps").arg(port.linkSpeedMbps)
-        : "-";
-}
-
 QString getConsumptionText(const NetworkPortState& port)
 {
     return nx::vms::event::StringsHelper::poeConsumptionString(
@@ -152,7 +145,6 @@ ViewNodeData dataFromPort(
         .withText(PoeSettingsColumn::consumption, getConsumptionText(port))
         .withData(PoeSettingsColumn::consumption, Qt::TextAlignmentRole, kTextAlign)
 
-        .withText(PoeSettingsColumn::speed, getSpeed(port))
         .withNodeData(poweringStatusData(port))
 
         .withCheckedState(PoeSettingsColumn::power, getPowerStatusCheckedState(port))
