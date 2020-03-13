@@ -33,12 +33,16 @@ void EnumerationValueItem::setRange(const QJsonValue& range)
         applyConstraints();
 }
 
-void EnumerationValueItem::setItemCaptions(const QJsonObject& value)
+void EnumerationValueItem::setItemCaptions(const QJsonValue& value)
 {
-    if (m_itemCaptions == value)
+    if (value.type() != QJsonValue::Object && value.type() != QJsonValue::Null)
+        emitError(Issue::Code::cannotConvertValue, "itemCaptions must be an object.");
+
+    const auto object = value.toObject();
+    if (m_itemCaptions == object)
         return;
 
-    m_itemCaptions = value;
+    m_itemCaptions = object;
     emit itemCaptionsChanged();
 }
 
