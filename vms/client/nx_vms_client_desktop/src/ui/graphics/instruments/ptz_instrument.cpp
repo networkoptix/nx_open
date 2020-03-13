@@ -194,8 +194,12 @@ PtzInstrument::PtzInstrument(QObject *parent):
                         resource->getStatus() == Qn::Online ||
                         resource->getStatus() == Qn::Recording;
 
-                if (wasInaccessible && isAccessible && m_widgetByResource.contains(camera))
-                    updateTraits(m_widgetByResource[camera]);
+                if (wasInaccessible && isAccessible)
+                {
+                    const auto widgets = m_widgetByResource.values(camera);
+                    for (const auto& widget: widgets)
+                        updateTraits(widget);
+                }
             }
         });
 }
@@ -494,6 +498,11 @@ void PtzInstrument::updateWidgetPtzController(QnMediaResourceWidget* widget)
             if (fields.testFlag(Qn::AuxiliaryTraitsPtzField))
                 updateTraits(widget);
         });
+
+    data.widget = widget;
+    data.resource = widget->resource();
+    m_widgetByResource.insert(widget->resource(), widget);
+
     updateCapabilities(widget);
     updateTraits(widget);
     updateOverlayWidgetInternal(widget);
@@ -735,9 +744,6 @@ bool PtzInstrument::registeredNotify(QGraphicsItem* item)
     if (!widget || !widget->resource())
         return false;
 
-    m_widgetByResource[widget->resource()] = widget;
-    m_resourceByItem[item] = widget->resource();
-
     connect(widget, &QnMediaResourceWidget::optionsChanged, this,
         &PtzInstrument::updateOverlayWidget);
     connect(widget, &QnMediaResourceWidget::fisheyeChanged, this,
@@ -754,19 +760,14 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem* item)
 {
     base_type::unregisteredNotify(item);
 
-    auto iter = m_resourceByItem.find(item);
-    if (iter != m_resourceByItem.end())
-    {
-        m_widgetByResource.remove(*iter);
-        m_resourceByItem.erase(iter);
-    }
-
     /* We don't want to use RTTI at this point, so we don't cast to QnMediaResourceWidget. */
     QGraphicsObject* object = item->toGraphicsObject();
     object->disconnect(this);
 
     PtzData& data = m_dataByWidget[object];
     disconnect(data.capabilitiesConnection);
+
+    m_widgetByResource.remove(data.resource, data.widget);
 
     m_dataByWidget.remove(object);
 }

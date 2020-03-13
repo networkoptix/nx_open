@@ -134,12 +134,14 @@ private:
     {
         bool hasCapabilities(Ptz::Capabilities value) const;
 
-        Ptz::Capabilities capabilities = 0;
+        Ptz::Capabilities capabilities = Ptz::NoPtzCapabilities;
         QnPtzAuxiliaryTraitList traits;
         nx::core::ptz::Vector currentSpeed;
         nx::core::ptz::Vector requestedSpeed;
         PtzOverlayWidget* overlayWidget = nullptr;
         QMetaObject::Connection capabilitiesConnection;
+        QnMediaResourceWidget* widget;
+        QnMediaResourcePtr resource;
     };
 
     struct SplashItemAnimation
@@ -184,8 +186,7 @@ private:
     QHash<QObject*, PtzData> m_dataByWidget;
     QBasicTimer m_movementTimer;
 
-    QHash<const QnMediaResourcePtr, QnMediaResourceWidget*> m_widgetByResource;
-    QHash<QGraphicsItem*, QnMediaResourcePtr> m_resourceByItem;
+    QMultiHash<const QnMediaResourcePtr, QnMediaResourceWidget*> m_widgetByResource;
 
     Movement m_movement;
     Qt::Orientations m_movementOrientations;
