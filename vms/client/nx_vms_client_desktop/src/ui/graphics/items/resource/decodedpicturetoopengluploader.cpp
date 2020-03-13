@@ -29,9 +29,6 @@ extern "C"
 #include <nx/streaming/config.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 
-#include <nx/media/quick_sync/glx/va_glx.h>
-#include <nx/media/quick_sync/va_surface_info.h>
-
 namespace
 {
     const int ROUND_COEFF = 8;
@@ -547,8 +544,6 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
 
 DecodedPictureToOpenGLUploader::UploadedPicture::~UploadedPicture()
 {
-    if (m_vaglx_surface)
-        vaDestroySurfaceGLX(m_display, m_vaglx_surface);
     delete m_texturePack;
     m_texturePack = NULL;
 }
@@ -1204,22 +1199,29 @@ nx::vms::api::ImageCorrectionData DecodedPictureToOpenGLUploader::getImageCorrec
     return m_imageCorrection;
 }
 
-/*
-static QString toString( AVPixelFormat format )
+bool DecodedPictureToOpenGLUploader::renderVideoMemory(
+    DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
+    const QSharedPointer<CLVideoDecoderOutput>& frame)
 {
-    switch( format )
+    emptyPictureBuf->texturePack()->setPictureFormat((AVPixelFormat)frame->format);
+    emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
+    QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
+    QSize displaySize = emptyPictureBuf->displaySize();
+    if (!displaySize.isEmpty())
+        displaySize = displaySize.boundedTo(frame->size());
+    else
+        displaySize = QSize(frame->width, frame->height);
+
+    bool isNewTExture = texture->ensureInitialized(
+            displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
+    if (!frame->getVideoSurface()->renderToRgb(isNewTExture, texture->id()))
     {
-        case AV_PIX_FMT_YUV444P:
-            return lit("AV_PIX_FMT_YUV444P");
-        case AV_PIX_FMT_YUV422P:
-            return lit("AV_PIX_FMT_YUV422P");
-        case AV_PIX_FMT_YUV420P:
-            return lit("AV_PIX_FMT_YUV420P");
-        default:
-            return lit("unknown");
+        NX_ERROR(this, "Failed to render video memeory to OpenGL texture");
+        return false;
     }
+    d->glBindTexture(GL_TEXTURE_2D, texture->id());
+    return true;
 }
-*/
 
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
@@ -1232,56 +1234,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     }
 
     if (frame->memoryType() == MemoryType::VideoMemory)
-    {
-        auto surfaceInfo = frame->handle().value<VaSurfaceInfo>();
-        auto decoder = frame->decoder().lock();
-        if (!decoder)
-            return false;
-
-
-        emptyPictureBuf->texturePack()->setPictureFormat((AVPixelFormat)frame->format);
-        emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
-        QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
-        VAStatus status;
-        QSize displaySize = emptyPictureBuf->displaySize();
-        if (displaySize.isEmpty())
-            displaySize = QSize(frame->width, frame->height);
-        displaySize.setWidth(qPower2Ceil((unsigned)displaySize.width(), 32));
-        displaySize.setHeight(qPower2Ceil((unsigned)displaySize.height(), 32));
-
-        displaySize.setWidth(std::min(displaySize.width(), frame->width));
-        displaySize.setHeight(std::min(displaySize.height(), frame->height));
-        if (texture->ensureInitialized(displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1)
-            || emptyPictureBuf->m_display != surfaceInfo.display)
-        {
-            emptyPictureBuf->m_display = surfaceInfo.display;
-            if (emptyPictureBuf->m_vaglx_surface)
-                vaDestroySurfaceGLX(emptyPictureBuf->m_display, emptyPictureBuf->m_vaglx_surface);
-
-            status = vaCreateSurfaceGLX_nx(emptyPictureBuf->m_display, GL_TEXTURE_2D, texture->id(), frame->width, frame->height, &emptyPictureBuf->m_vaglx_surface);
-            if (status != VA_STATUS_SUCCESS)
-            {
-                NX_DEBUG(this, "vaCreateSurfaceGLX failed: %1", status);
-                return false;
-            }
-        }
-        status = vaCopySurfaceGLX_nx(emptyPictureBuf->m_display, emptyPictureBuf->m_vaglx_surface, surfaceInfo.id, VA_SRC_COLOR_MASK);
-        if (status != VA_STATUS_SUCCESS)
-        {
-            NX_DEBUG(this, "vaCopySurfaceGLX failed: %1", status);
-            return false;
-        }
-
-        status = vaSyncSurface(emptyPictureBuf->m_display, surfaceInfo.id);
-        if (status != VA_STATUS_SUCCESS)
-        {
-            NX_DEBUG(this, "vaSyncSurface failed: %1", status);
-            return false;
-        }
-
-        d->glBindTexture(GL_TEXTURE_2D, texture->id());
-        return true;
-    }
+        return renderVideoMemory(emptyPictureBuf, frame);
 
     const AVPixelFormat format = (AVPixelFormat)frame->format;
     const unsigned int width = frame->width;
@@ -1367,7 +1320,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
         emptyPictureBuf->setColorFormat( format == AV_PIX_FMT_YUVA420P ? AV_PIX_FMT_YUVA420P : AV_PIX_FMT_YUV420P );
     }
-   else if( format == AV_PIX_FMT_NV12 && usingShaderNV12ToRgb() )
+    else if( format == AV_PIX_FMT_NV12 && usingShaderNV12ToRgb() )
     {
         for( int i = 0; i < 2; ++i )
         {

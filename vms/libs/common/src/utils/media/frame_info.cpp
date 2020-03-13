@@ -79,29 +79,10 @@ static bool convertImageFormat(
     return false;
 }
 
-void CLVideoDecoderOutput::attachToVideoMemory(
-    const std::shared_ptr<QVideoFrame>& frame, std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> decoder)
+void CLVideoDecoderOutput::attachVideoSurface(std::unique_ptr<AbstractVideoSurface> surface)
 {
     m_memoryType = MemoryType::VideoMemory;
-    flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
-    pkt_dts = frame->startTime();
-    width = frame->size().width();
-    height = frame->size().height();
-    m_frame = frame;
-    m_decoder = std::move(decoder);
-}
-
-std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> CLVideoDecoderOutput::decoder()
-{
-    return m_decoder;
-}
-
-QVariant CLVideoDecoderOutput::handle()
-{
-    if (!m_frame)
-        return QVariant();
-
-    return m_frame->handle();
+    m_surface = std::move(surface);
 }
 
 void CLVideoDecoderOutput::setUseExternalData(bool value)

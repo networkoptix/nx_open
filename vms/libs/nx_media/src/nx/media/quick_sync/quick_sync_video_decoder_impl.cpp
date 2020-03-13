@@ -11,6 +11,7 @@
 #include "mfx_drm_qt_video_buffer.h"
 #include "mfx_status_string.h"
 #include "va_display.h"
+#include "glx/va_glx.h"
 
 
 #define MSDK_ALIGN16(value) (((value + 15) >> 4) << 4) // round up to a multiple of 16
@@ -31,6 +32,9 @@ QuickSyncVideoDecoderImpl::~QuickSyncVideoDecoderImpl()
     NX_DEBUG(this, "Close quick sync video decoder");
     if (m_allocator)
         m_allocator->FreeFrames(&m_response);
+
+    if (m_renderingSurface)
+        vaDestroySurfaceGLX(m_display, m_renderingSurface);
 
     m_mfxSession.Close();
 }

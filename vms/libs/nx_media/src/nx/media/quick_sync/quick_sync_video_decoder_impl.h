@@ -19,6 +19,8 @@ public:
     ~QuickSyncVideoDecoderImpl();
     int decode(const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result = nullptr);
 
+    void** getRenderingSurface() { return &m_renderingSurface; }
+
 private:
     bool init(mfxBitstream& bitstream, AVCodecID codedId);
     bool initSession();
@@ -47,8 +49,12 @@ private:
     CBuffering m_surfaces;
     std::shared_ptr<MFXFrameAllocator> m_allocator;
     mfxFrameAllocResponse m_response;
-    msdkFrameSurface* m_pCurrentFreeSurface = nullptr; // surface detached from free surfaces array
+    msdkFrameSurface* m_pCurrentFreeSurface = nullptr; // Surface detached from free surfaces array.
     VADisplay m_display = nullptr;
+
+    // Surface needed to render frame to opengl texture. Keep it here due to do not recreate it on
+    // every frame.
+    void* m_renderingSurface = nullptr;
 };
 
 } // namespace nx::media

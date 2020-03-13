@@ -110,8 +110,6 @@ public:
         ImageCorrectionResult m_imgCorrection;
         QRectF m_displayedRect;
         QnGlRendererTexturePack* m_texturePack;
-        void* m_vaglx_surface = nullptr;
-        void* m_display = nullptr;
         QSize m_onScreenSize;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
@@ -218,6 +216,8 @@ public:
         \return false, if failed to make \a glContext current. Otherwise, true
     */
     bool uploadDataToGl(
+        UploadedPicture* const dest, const QSharedPointer<CLVideoDecoderOutput>& frame);
+    bool renderVideoMemory(
         UploadedPicture* const dest, const QSharedPointer<CLVideoDecoderOutput>& frame);
 private:
     friend class QnGlRendererTexture;

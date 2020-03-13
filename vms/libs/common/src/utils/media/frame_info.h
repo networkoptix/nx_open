@@ -8,6 +8,7 @@
 #include <QtCore/QAtomicInt>
 #include <QtGui/QImage>
 #include <QtMultimedia/QVideoFrame>
+#include <QtGui/QOpenGLFunctions>
 
 extern "C" {
 
@@ -35,6 +36,13 @@ class QuickSyncVideoDecoderImpl;
 
 };
 
+class AbstractVideoSurface
+{
+public:
+    virtual ~AbstractVideoSurface() {}
+    virtual bool renderToRgb(bool isNewTexture, GLuint textureId) = 0;
+};
+
 /**
  * Decoded frame, ready to be rendered.
  *
@@ -52,9 +60,8 @@ public:
     ~CLVideoDecoderOutput();
 
     MemoryType memoryType() const { return m_memoryType; }
-    void attachToVideoMemory(const std::shared_ptr<QVideoFrame>& frame, std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> decoder);
-    QVariant handle();
-    std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> decoder();
+    void attachVideoSurface(std::unique_ptr<AbstractVideoSurface> surface);
+    AbstractVideoSurface* getVideoSurface() { return m_surface.get(); }
 
     QImage toImage() const;
 
@@ -106,17 +113,12 @@ public:
 
     /** Number of the video channel in video layout. */
     int channel = 0;
-    MemoryType m_memoryType = MemoryType::SystemMemory;
-
-    // Contain video surface in case of video memory usage
-    std::shared_ptr<QVideoFrame> m_frame;
-    // Contain reference to video decoder to ensure that it still alive
-    std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> m_decoder;
-
     FrameMetadata metadata; // addition data associated with video frame
 
 private:
     bool m_useExternalData = false; // pointers only copied to this frame
+    std::unique_ptr<AbstractVideoSurface> m_surface;
+    MemoryType m_memoryType = MemoryType::SystemMemory;
 
 private:
     bool invalidScaleParameters(const QSize& size) const;

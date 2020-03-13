@@ -1,5 +1,6 @@
 #include "quick_sync_video_decoder_old_player.h"
 #include "quick_sync_video_decoder_impl.h"
+#include "quick_sync_video_frame.h"
 #include "va_display.h"
 
 #include <utils/media/utils.h>
@@ -46,7 +47,12 @@ bool QuickSyncVideoDecoder::decode(
         return false;
 
     std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> decoderWeakPtr = m_impl;
-    outFrame->attachToVideoMemory(result, std::move(decoderWeakPtr));
+    outFrame->flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
+    outFrame->pkt_dts = result->startTime();
+    outFrame->width = result->size().width();
+    outFrame->height = result->size().height();
+    auto suraceFrame = std::make_unique<QuickSyncVideoFrame>(result, std::move(decoderWeakPtr));
+    outFrame->attachVideoSurface(std::move(suraceFrame));
     return true;
 }
 
