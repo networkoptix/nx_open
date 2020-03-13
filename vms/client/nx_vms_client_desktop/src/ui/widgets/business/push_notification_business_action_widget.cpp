@@ -13,6 +13,7 @@
 #include <core/resource/user_resource.h>
 
 #include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -20,8 +21,35 @@
 #include <ui/style/skin.h>
 
 #include <nx/network/app_info.h>
+#include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop::ui;
+
+namespace {
+
+class Filter: public QObject
+{
+public:
+    Filter(const std::function<void()>& action, QObject* parent = nullptr):
+        QObject(parent),
+        m_action(action)
+    {
+    }
+
+protected:
+    bool eventFilter(QObject* watched, QEvent* event) override
+    {
+        if (event->type() == QEvent::MouseButtonRelease)
+            m_action();
+
+        return false;
+    }
+
+private:
+    const std::function<void()> m_action;
+};
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -44,6 +72,13 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
 
     setHelpTopic(this, Qn::EventsActions_SendMobileNotification_Help);
 
+    ui->languageButton->setIcon(qnSkin->pixmap("events/lang.svg"));
+    connect(ui->languageButton, &QPushButton::clicked, this,
+        [this]
+        {
+            context()->menu()->trigger(ui::action::SystemAdministrationAction);
+        });
+
     connect(ui->customTextCheckBox, &QCheckBox::clicked, this,
         [this]()
         {
@@ -56,11 +91,23 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
 
             parametersChanged();
         });
+    ui->customTextEdit->installEventFilter(new Filter(
+        [this]
+        {
+            if (!ui->customTextCheckBox->isChecked())
+            {
+                ui->customTextCheckBox->setChecked(true);
+                ui->customTextEdit->setPlainText(m_lastCustomText);
+                ui->customTextEdit->setFocus(Qt::MouseFocusReason);
+                // TODO: set text cursor under the mouse cursor?
+            }
+        },
+        this));
+
+    connect(ui->customTextCheckBox, &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
+
     connect(ui->customTextEdit, &QPlainTextEdit::textChanged,
         this, &PushNotificationBusinessActionWidget::parametersChanged);
-
-    ui->customTextEdit->setEnabled(ui->customTextCheckBox->isChecked());
-    connect(ui->customTextCheckBox, &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
 
     setSubjectsButton(ui->selectUsersButton);
 

@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="usersLabel">
        <property name="text">
-        <string>for</string>
+        <string>to</string>
        </property>
       </widget>
      </item>
