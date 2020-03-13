@@ -19,7 +19,6 @@ const QHash<Value, QString> kErrorToStringHash{
     { incompatibleVersion, lit("INCOMPATIBLE") },
     { unauthorized, lit("UNAUTHORIZED") },
     { forbidden, lit("FORBIDDEN") },
-    { notLocalOwner, lit("NOT_LOCAL_OWNER") },
     { backupFailed, lit("BACKUP_ERROR") },
     { starterLicense, lit("STARTER_LICENSE_ERROR") },
     { safeMode, lit("SAFE_MODE") },
@@ -27,7 +26,6 @@ const QHash<Value, QString> kErrorToStringHash{
     { dependentSystemBoundToCloud, lit("DEPENDENT_SYSTEM_BOUND_TO_CLOUD") },
     { bothSystemBoundToCloud, lit("BOTH_SYSTEM_BOUND_TO_CLOUD") },
     { cloudSystemsHaveDifferentOwners, lit("CLOUD_SYSTEMS_HAVE_DIFFERENT_OWNERS") },
-    { differentCloudHost, lit("DIFFERENT_CLOUD_HOST") },
     { unconfiguredSystem, lit("UNCONFIGURED_SYSTEM") },
     { unknownError, lit("UNKNOWN_ERROR") },
     { duplicateMediaServerFound, lit("DUPLICATE_MEDIASERVER_FOUND") }};
@@ -67,11 +65,6 @@ public:
                 return tr("The password or user name is invalid.");
             case forbidden:
                 return tr("This user does not have permissions for the requested operation.");
-            case notLocalOwner:
-                return tr("Cannot connect to the other System "
-                    "because current System is already connected to %1.",
-                    "%1 is the cloud name (like Nx Cloud)")
-                        .arg(nx::network::AppInfo::cloudName());
             case backupFailed:
                 return tr("Cannot create database backup.");
             case starterLicense:

@@ -22,7 +22,13 @@ using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
 namespace nx {
 namespace test {
 
-class MergeSystems: public ::testing::Test
+enum class MergeAuthType
+{
+    rawPassword,
+    getPostKeys,
+};
+
+class MergeSystems: public ::testing::TestWithParam<MergeAuthType>
 {
 protected:
     enum class SafeMode
@@ -52,6 +58,36 @@ protected:
         return result;
     }
 
+    void addAuth(MergeSystemData* data, const LauncherPtr& target, const QString& password)
+    {
+        switch (GetParam())
+        {
+            case MergeAuthType::rawPassword:
+                {
+                    nx::utils::Url url(data->url);
+                    url.setUserName("admin");
+                    url.setPassword(password);
+                    data->url = url.toString();
+                }
+                break;
+
+            case MergeAuthType::getPostKeys:
+                {
+                    QnGetNonceReply nonceReply;
+                    issueGetRequest(target.get(), "api/getNonce", nonceReply);
+                    ASSERT_FALSE(nonceReply.nonce.isEmpty());
+                    ASSERT_FALSE(nonceReply.realm.isEmpty());
+                    data->postKey = QString::fromLatin1(createHttpQueryAuthParam(
+                        "admin", password, nonceReply.realm,
+                        "POST", nonceReply.nonce.toUtf8()));
+                    data->getKey = QString::fromLatin1(createHttpQueryAuthParam(
+                        "admin", password, nonceReply.realm,
+                        "GET", nonceReply.nonce.toUtf8()));
+                }
+                break;
+        };
+    }
+
     void assertMergeRequestReturn(
         const LauncherPtr& requestTarget,
         const LauncherPtr& serverToMerge,
@@ -61,28 +97,19 @@ protected:
         const QString& serverToMergePassword = "admin",
         bool testDryRun = true)
     {
-        QnGetNonceReply nonceReply;
-        issueGetRequest(requestTarget.get(), "api/getNonce", nonceReply);
-        ASSERT_FALSE(nonceReply.nonce.isEmpty());
-        ASSERT_FALSE(nonceReply.realm.isEmpty());
-
         MergeSystemData mergeSystemData;
         mergeSystemData.url = serverToMerge->apiUrl().toString();
-        mergeSystemData.postKey = QString::fromLatin1(createHttpQueryAuthParam(
-            "admin", serverToMergePassword, nonceReply.realm, "POST", nonceReply.nonce.toUtf8()));
-        mergeSystemData.getKey = QString::fromLatin1(createHttpQueryAuthParam(
-            "admin", serverToMergePassword, nonceReply.realm, "GET", nonceReply.nonce.toUtf8()));
-
         if (testDryRun)
         {
             mergeSystemData.dryRun = true;
             const auto testResult = merge(requestTarget, requestTargetPassword, mergeSystemData);
-            EXPECT_EQ(toString(mergeStatus), testResult.errorString);
+            EXPECT_EQ(toString(mergeStatus), testResult.errorString) << "on Dry Run";
         }
 
         mergeSystemData.dryRun = false;
+        addAuth(&mergeSystemData, requestTarget, serverToMergePassword);
         const auto actualResult = merge(requestTarget, requestTargetPassword, mergeSystemData);
-        ASSERT_EQ(toString(mergeStatus), actualResult.errorString);
+        ASSERT_EQ(toString(mergeStatus), actualResult.errorString) << "on Actual Merge";
         if (outMergeResult)
             *outMergeResult = actualResult.deserialized<nx::vms::api::SystemMergeHistoryRecord>();
     }
@@ -206,7 +233,7 @@ private:
     }
 };
 
-TEST_F(MergeSystems, SafeMode_From)
+TEST_P(MergeSystems, SafeMode_From)
 {
     auto server1 = givenServer();
     whenServerLaunched(server1, SafeMode::off);
@@ -224,7 +251,7 @@ TEST_F(MergeSystems, SafeMode_From)
         /* expectedCode */ MergeStatus::safeMode);
 }
 
-TEST_F(MergeSystems, SafeMode_To)
+TEST_P(MergeSystems, SafeMode_To)
 {
     auto server1 = givenServer();
     whenServerLaunched(server1, SafeMode::off);
@@ -264,7 +291,7 @@ void waitForMergeFinished(
     } while (true);
 }
 
-TEST_F(MergeSystems, DoubleMergeWithTakeLocalSettings)
+TEST_P(MergeSystems, DoubleMergeWithTakeLocalSettings)
 {
     std::vector<LauncherPtr> servers;
     nx::vms::api::SystemMergeHistoryRecord mergeResult;
@@ -293,7 +320,7 @@ TEST_F(MergeSystems, DoubleMergeWithTakeLocalSettings)
     waitForMergeFinished(servers[0]);
 }
 
-TEST_F(MergeSystems, MergeServersWithData)
+TEST_P(MergeSystems, MergeServersWithData)
 {
     const int kServerCount = 3;
     std::vector<LauncherPtr> servers;
@@ -319,7 +346,7 @@ TEST_F(MergeSystems, MergeServersWithData)
     thenFullInfoEqual(servers);
 }
 
-TEST_F(MergeSystems, MergeServersWithDifferentPasswords)
+TEST_P(MergeSystems, MergeServersWithDifferentPasswords)
 {
     const int kServerCount = 2;
     std::vector<LauncherPtr> servers;
@@ -348,6 +375,11 @@ TEST_F(MergeSystems, MergeServersWithDifferentPasswords)
     waitForMergeFinished(servers[0], "admin_0");
     thenFullInfoEqual(servers, "admin_0");
 }
+
+INSTANTIATE_TEST_CASE_P(Api, MergeSystems, ::testing::Values(
+    MergeAuthType::rawPassword,
+    MergeAuthType::getPostKeys
+));
 
 } // namespace test
 } // namespace nx

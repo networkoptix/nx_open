@@ -146,27 +146,26 @@ bool SystemMergeProcessor::validateInputData(
 {
     if (data.url.isEmpty())
     {
-        NX_DEBUG(this, lit("Request missing required parameter \"url\""));
+        NX_DEBUG(this, "Request missing required parameter 'url'");
         result->setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, lit("url")));
+            QnJsonRestResult::MissingParameter, "url"));
         return false;
     }
 
     const nx::utils::Url url(data.url);
     if (!url.isValid())
     {
-        NX_DEBUG(this, lit("Received invalid parameter url %1")
-            .arg(data.url));
+        NX_DEBUG(this, "Received invalid parameter url %1", data.url);
         result->setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::InvalidParameter, lit("url")));
+            QnJsonRestResult::InvalidParameter, "url"));
         return false;
     }
 
-    if (data.getKey.isEmpty())
+    if (!data.dryRun && url.password().isEmpty() && data.getKey.isEmpty())
     {
-        NX_DEBUG(this, lit("Request missing required parameter \"getKey\""));
+        NX_DEBUG(this, "No authorization data is provided");
         result->setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, lit("password")));
+            QnJsonRestResult::CantProcessRequest, "No authorization data is provided"));
         return false;
     }
 
@@ -195,17 +194,20 @@ QnJsonRestResult SystemMergeProcessor::checkWhetherMergeIsPossible(
         return result;
     }
 
-    MediaServerClient remoteMediaServerClient(remoteServerUrl);
-    remoteMediaServerClient.setRequestTimeout(kRequestTimeout);
-    remoteMediaServerClient.setAuthenticationKey(data.getKey);
+    if (!remoteServerUrl.password().isEmpty() || !data.getKey.isEmpty())
+    {
+        MediaServerClient remoteMediaServerClient(remoteServerUrl);
+        remoteMediaServerClient.setRequestTimeout(kRequestTimeout);
+        remoteMediaServerClient.setAuthenticationKey(data.getKey);
 
-    result = checkIfSystemsHaveServerWithSameId(&remoteMediaServerClient);
-    if (result.error)
-        return result;
+        result = checkIfSystemsHaveServerWithSameId(&remoteMediaServerClient);
+        if (result.error)
+            return result;
 
-    result = checkIfCloudSystemsMergeIsPossible(data, &remoteMediaServerClient);
-    if (result.error)
-        return result;
+        result = checkIfCloudSystemsMergeIsPossible(data, &remoteMediaServerClient);
+        if (result.error)
+            return result;
+    }
 
     const auto connectionResult = QnConnectionValidator::validateConnection(m_remoteModuleInformation);
     if (connectionResult == Qn::IncompatibleInternalConnectionResult
@@ -883,6 +885,9 @@ void SystemMergeProcessor::addAuthToRequest(
     nx::utils::Url& request,
     const QString& remoteAuthKey)
 {
+    if (remoteAuthKey.isEmpty())
+        return;
+
     QUrlQuery query(request.query());
     query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), remoteAuthKey);
     request.setQuery(query);
@@ -900,14 +905,19 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::fetchModuleInformatio
         client.setSendTimeout(kRequestTimeout);
         client.setMessageBodyReadTimeout(kRequestTimeout);
 
-        QUrlQuery query;
-        query.addQueryItem(lit("checkOwnerPermissions"), lit("true"));
-        query.addQueryItem(lit("showAddresses"), lit("true"));
+
 
         nx::utils::Url requestUrl(url);
-        requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
-        requestUrl.setQuery(query);
-        addAuthToRequest(requestUrl, authenticationKey);
+        if (!requestUrl.password().isEmpty() || !authenticationKey.isEmpty())
+        {
+            requestUrl.setPath("/api/moduleInformationAuthenticated");
+            requestUrl.setQuery("checkOwnerPermissions=true&showAddresses=true");
+            addAuthToRequest(requestUrl, authenticationKey);
+        }
+        else
+        {
+            requestUrl.setPath("/api/moduleInformation");
+        }
 
         if (!client.doGet(requestUrl) || !isResponseOK(client))
         {

@@ -23,7 +23,6 @@ enum Value
     bothSystemBoundToCloud,
     cloudSystemsHaveDifferentOwners,
     unconfiguredSystem,
-    notLocalOwner,
     differentCloudHost,
     duplicateMediaServerFound,
 };
