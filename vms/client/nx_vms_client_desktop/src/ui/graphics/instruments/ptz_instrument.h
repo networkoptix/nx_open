@@ -24,13 +24,13 @@ class QnMediaResourceWidget;
 
 class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware
 {
-    Q_OBJECT;
+    Q_OBJECT
 
     using base_type = DragProcessingInstrument;
 
 public:
     PtzInstrument(QObject* parent = nullptr);
-    virtual ~PtzInstrument();
+    virtual ~PtzInstrument() override;
 
 signals:
     void ptzProcessStarted(QnMediaResourceWidget* widget);
@@ -110,7 +110,7 @@ private:
     void handlePtzRedirect(QnMediaResourceWidget* widget);
     bool ensurePtzRedirectedCameraIsOnLayout(
         QnMediaResourceWidget* staticSensor,
-		const QnVirtualCameraResourcePtr& dynamicSensor);
+        const QnVirtualCameraResourcePtr& dynamicSensor);
 
     bool processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEvent* event);
 
@@ -183,6 +183,9 @@ private:
     QPointer<QnMediaResourceWidget> m_target;
     QHash<QObject*, PtzData> m_dataByWidget;
     QBasicTimer m_movementTimer;
+
+    QHash<const QnMediaResourcePtr, QnMediaResourceWidget*> m_widgetByResource;
+    QHash<QGraphicsItem*, QnMediaResourcePtr> m_resourceByItem;
 
     Movement m_movement;
     Qt::Orientations m_movementOrientations;
