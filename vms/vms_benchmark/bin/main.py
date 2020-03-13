@@ -471,14 +471,17 @@ class _StreamTypeStats:
         self._max_lag_us = max(self._max_lag_us, lag_us)
 
     def worst_lag_us(self):
-        # If min_lag is negative, it means that the latency of the first frame is not less than
-        # abs(min_lag), and thus we can consider the actual maximum lag to be less than max_lag
-        # by that value.
-        result = (
-            self._max_lag_us if self._min_lag_us >= 0 else self._max_lag_us + self._min_lag_us)
-        if result < 0:
-            return 0
-        return result
+        if self._max_lag_us < 0:
+            logging.warning(f"INTERNAL ERROR: _max_lag_us < 0: {self._max_lag_us}")
+            self._max_lag_us = 0
+        if self._min_lag_us > 0:
+            logging.warning(f"INTERNAL ERROR: _min_lag_us > 0: {self._min_lag_us}")
+            self._min_lag_us = 0
+  
+        # If _min_lag_us < 0, it means that the latency of the first frame is not less than
+        # abs(_min_lag_us), and thus we can consider the actual maximum lag to be greater than
+        # _max_lag_us by that value.
+        return self._max_lag_us - self._min_lag_us
 
 
 class _BoxPoller:
