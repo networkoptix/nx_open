@@ -102,7 +102,7 @@ void QnFileDeletor::processPostponedFiles()
                     auto splits = line.split(',');
                     m_postponedFiles.emplace(
                         QString::fromUtf8(splits[0].trimmed()),
-                        QnUuid::fromRfc4122(splits[1].trimmed()));
+                        QnUuid(splits[1].trimmed()));
                 }
                 line = m_deleteCatalog.readLine().trimmed();
             }
