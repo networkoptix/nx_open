@@ -134,7 +134,7 @@ private:
     {
         bool hasCapabilities(Ptz::Capabilities value) const;
 
-        Ptz::Capabilities capabilities = 0;
+        Ptz::Capabilities capabilities = Ptz::NoPtzCapabilities;
         QnPtzAuxiliaryTraitList traits;
         nx::core::ptz::Vector currentSpeed;
         nx::core::ptz::Vector requestedSpeed;
@@ -183,9 +183,6 @@ private:
     QPointer<QnMediaResourceWidget> m_target;
     QHash<QObject*, PtzData> m_dataByWidget;
     QBasicTimer m_movementTimer;
-
-    QHash<const QnMediaResourcePtr, QnMediaResourceWidget*> m_widgetByResource;
-    QHash<QGraphicsItem*, QnMediaResourcePtr> m_resourceByItem;
 
     Movement m_movement;
     Qt::Orientations m_movementOrientations;

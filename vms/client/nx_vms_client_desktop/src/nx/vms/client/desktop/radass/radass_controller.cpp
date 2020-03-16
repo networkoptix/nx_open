@@ -851,7 +851,8 @@ void RadassController::registerConsumer(QnCamDisplay* display)
                 (const QnResourcePtr& /*resource*/, const QString& propertyName)
                 {
                     if (propertyName == ResourcePropertyKey::kMediaCapabilities
-                        || propertyName == ResourcePropertyKey::kHasDualStreaming)
+                        || propertyName == ResourcePropertyKey::kHasDualStreaming
+                        || propertyName == ResourcePropertyKey::kStreamUrls)
                     {
                         updateHasDualStreaming();
                     }

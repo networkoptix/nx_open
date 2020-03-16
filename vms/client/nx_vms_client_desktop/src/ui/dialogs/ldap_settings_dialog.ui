@@ -220,14 +220,7 @@
        <widget class="QWidget" name="testResultPage">
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QLabel" name="testResultLabel">
-           <property name="text">
-            <string/>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
+          <widget class="QnWordWrappedLabel" name="testResultLabel" native="true"/>
          </item>
         </layout>
        </widget>

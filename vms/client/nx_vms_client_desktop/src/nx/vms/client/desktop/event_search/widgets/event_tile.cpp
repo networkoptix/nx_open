@@ -286,6 +286,7 @@ EventTile::EventTile(QWidget* parent):
     ui->debugPreviewTimeLabel->hide();
     ui->timestampLabel->hide();
     ui->actionHolder->hide();
+    ui->attributeTable->hide();
     ui->footerLabel->hide();
     ui->resourceListHolder->hide();
     ui->progressDescriptionLabel->hide();
@@ -337,9 +338,10 @@ EventTile::EventTile(QWidget* parent):
 
     font.setWeight(kFooterFontWeight);
     font.setPixelSize(kFooterFontPixelSize);
+    ui->attributeTable->setFont(font);
+    ui->attributeTable->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->footerLabel->setFont(font);
     ui->footerLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
-    ui->footerLabel->setOpenExternalLinks(false);
 
     ui->busyIndicator->setContentsMargins(
         style::Metrics::kStandardPadding,
@@ -363,6 +365,7 @@ EventTile::EventTile(QWidget* parent):
 
     ui->nameLabel->setText({});
     ui->descriptionLabel->setText({});
+    ui->attributeTable->setContent({});
     ui->footerLabel->setText({});
     ui->timestampLabel->setText({});
 
@@ -388,7 +391,6 @@ EventTile::EventTile(QWidget* parent):
 
     connect(ui->nameLabel, &QLabel::linkActivated, this, activateLink);
     connect(ui->descriptionLabel, &QLabel::linkActivated, this, activateLink);
-    connect(ui->footerLabel, &QLabel::linkActivated, this, activateLink);
 }
 
 EventTile::EventTile(
@@ -500,6 +502,17 @@ void EventTile::setFooterText(const QString& value)
 {
     ui->footerLabel->setText(value);
     ui->footerLabel->setHidden(!d->footerEnabled || value.isEmpty());
+}
+
+EventTile::AttributeList EventTile::attributeList() const
+{
+    return ui->attributeTable->content();
+}
+
+void EventTile::setAttributeList(const AttributeList& value)
+{
+    ui->attributeTable->setContent(value);
+    ui->attributeTable->setHidden(!d->footerEnabled || value.isEmpty());
 }
 
 QString EventTile::timestamp() const
@@ -804,6 +817,7 @@ bool EventTile::footerEnabled() const
 void EventTile::setFooterEnabled(bool value)
 {
     d->footerEnabled = value;
+    ui->attributeTable->setHidden(!d->footerEnabled || ui->attributeTable->content().isEmpty());
     ui->footerLabel->setHidden(!d->footerEnabled || ui->footerLabel->text().isEmpty());
 }
 
@@ -913,6 +927,7 @@ void EventTile::clear()
     setTitle({});
     setTitleColor({});
     setDescription({});
+    setAttributeList({});
     setFooterText({});
     setTimestamp({});
     setIcon({});

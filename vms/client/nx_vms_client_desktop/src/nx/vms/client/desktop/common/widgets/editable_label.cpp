@@ -1,9 +1,7 @@
 #include "editable_label.h"
 
 #include <QtCore/QSignalBlocker>
-
 #include <QtGui/QMouseEvent>
-
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QStackedWidget>
@@ -207,20 +205,29 @@ public:
     }
 
     // Event filter to handle global mouse clicks and intercept Esc and Enter keys.
-    virtual bool eventFilter(QObject* /*watched*/, QEvent* event) override
+    virtual bool eventFilter(QObject* watched, QEvent* event) override
     {
         switch (event->type())
         {
             // Left button click outside of line edit during editing forces commit.
             case QEvent::MouseButtonPress:
             {
+                // Handle only widgets (now windows), skip the edit itself and its context menu.
+                const auto watchedWidget = qobject_cast<const QWidget*>(watched);
+                if (!watchedWidget || watchedWidget == edit || watchedWidget->parent() == edit)
+                    return false;
+
                 auto mouseEvent = static_cast<QMouseEvent*>(event);
 
                 if (mouseEvent->button() != Qt::LeftButton || !editing())
                     return false;
 
-                if (edit->rect().contains(edit->mapFromGlobal(mouseEvent->globalPos())))
+                // This check is to prevent finishing edit right after start by clicking the label.
+                if (watchedWidget->window() == edit->window()
+                    && edit->rect().contains(edit->mapFromGlobal(mouseEvent->globalPos())))
+                {
                     return false;
+                }
 
                 commit();
                 return false; //< Allow further processing.

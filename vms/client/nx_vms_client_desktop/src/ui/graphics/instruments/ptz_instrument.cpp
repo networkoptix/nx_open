@@ -194,8 +194,11 @@ PtzInstrument::PtzInstrument(QObject *parent):
                         resource->getStatus() == Qn::Online ||
                         resource->getStatus() == Qn::Recording;
 
-                if (wasInaccessible && isAccessible && m_widgetByResource.contains(camera))
-                    updateTraits(m_widgetByResource[camera]);
+                if (wasInaccessible && isAccessible)
+                {
+                    for (const auto& widget: display()->widgets(camera))
+                        updateTraits(dynamic_cast<QnMediaResourceWidget*>(widget));
+                }
             }
         });
 }
@@ -494,6 +497,7 @@ void PtzInstrument::updateWidgetPtzController(QnMediaResourceWidget* widget)
             if (fields.testFlag(Qn::AuxiliaryTraitsPtzField))
                 updateTraits(widget);
         });
+
     updateCapabilities(widget);
     updateTraits(widget);
     updateOverlayWidgetInternal(widget);
@@ -531,6 +535,8 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         overlayWidget->zoomOutButton()->setVisible(hasZoom);
         overlayWidget->focusInButton()->setVisible(hasFocus);
         overlayWidget->focusOutButton()->setVisible(hasFocus);
+
+        const bool autoFocusWasVisible = overlayWidget->focusAutoButton()->isVisible();
         overlayWidget->focusAutoButton()->setVisible(hasAutoFocus);
 
         if (isFisheye)
@@ -542,6 +548,9 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         }
         overlayWidget->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
         overlayWidget->setMarkersMode(capabilitiesToMode(data.capabilities));
+
+        if (autoFocusWasVisible != hasAutoFocus)
+            overlayWidget->forceUpdateLayout();
     }
 }
 
@@ -566,7 +575,6 @@ void PtzInstrument::updateTraits(QnMediaResourceWidget* widget)
 
     QnPtzAuxiliaryTraitList traits;
     widget->ptzController()->getAuxiliaryTraits(&traits);
-
     if (data.traits == traits)
         return;
 
@@ -735,9 +743,6 @@ bool PtzInstrument::registeredNotify(QGraphicsItem* item)
     if (!widget || !widget->resource())
         return false;
 
-    m_widgetByResource[widget->resource()] = widget;
-    m_resourceByItem[item] = widget->resource();
-
     connect(widget, &QnMediaResourceWidget::optionsChanged, this,
         &PtzInstrument::updateOverlayWidget);
     connect(widget, &QnMediaResourceWidget::fisheyeChanged, this,
@@ -753,13 +758,6 @@ bool PtzInstrument::registeredNotify(QGraphicsItem* item)
 void PtzInstrument::unregisteredNotify(QGraphicsItem* item)
 {
     base_type::unregisteredNotify(item);
-
-    auto iter = m_resourceByItem.find(item);
-    if (iter != m_resourceByItem.end())
-    {
-        m_widgetByResource.remove(*iter);
-        m_resourceByItem.erase(iter);
-    }
 
     /* We don't want to use RTTI at this point, so we don't cast to QnMediaResourceWidget. */
     QGraphicsObject* object = item->toGraphicsObject();
