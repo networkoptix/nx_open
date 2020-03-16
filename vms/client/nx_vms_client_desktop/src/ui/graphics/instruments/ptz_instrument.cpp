@@ -535,6 +535,8 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         overlayWidget->zoomOutButton()->setVisible(hasZoom);
         overlayWidget->focusInButton()->setVisible(hasFocus);
         overlayWidget->focusOutButton()->setVisible(hasFocus);
+
+        const bool autoFocusWasVisible = overlayWidget->focusAutoButton()->isVisible();
         overlayWidget->focusAutoButton()->setVisible(hasAutoFocus);
 
         if (isFisheye)
@@ -546,6 +548,9 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         }
         overlayWidget->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
         overlayWidget->setMarkersMode(capabilitiesToMode(data.capabilities));
+
+        if (autoFocusWasVisible != hasAutoFocus)
+            overlayWidget->forceUpdateLayout();
     }
 }
 

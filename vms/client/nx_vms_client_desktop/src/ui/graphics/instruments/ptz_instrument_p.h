@@ -234,12 +234,15 @@ public:
         m_modeButton = new PtzImageButtonWidget(this);
         m_modeButton->setToolTip(tr("Change Dewarping Mode"));
 
-        connect(m_focusAutoButton, &QGraphicsObject::visibleChanged, this, &PtzOverlayWidget::updateLayout);
-
         updateLayout();
         showCursor();
 
         setPen(QPen(QColor(128, 196, 255, 192), 0.0));
+    }
+
+    void forceUpdateLayout()
+    {
+        updateLayout();
     }
 
     const QPen &pen() const { return m_pen; }
