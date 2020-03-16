@@ -233,6 +233,13 @@ private:
 
     friend class InitAsyncTask;
 
+    enum InitState
+    {
+        initNone,
+        initInProgress,
+        reinitRequested
+    };
+    bool switchState(InitState from, InitState to);
 protected:
     /** Mutex that is to be used when accessing a set of all consumers. */
     mutable QnMutex m_consumersMtx;
@@ -292,11 +299,13 @@ private:
     std::atomic<bool> m_initialized{false};
 
     CameraDiagnostics::Result m_prevInitializationResult = CameraDiagnostics::Result(
-        CameraDiagnostics::ErrorCode::cameraInitializationInProgress);
+        CameraDiagnostics::ErrorCode::initializationInProgress);
 
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
-    std::atomic<int> m_initState{0};
+
+    std::atomic<InitState> m_initState{initNone};
+
     QnCommonModule* m_commonModule;
     bool m_forceUseLocalProperties = false;
     std::atomic<int> cTestStatus{0};

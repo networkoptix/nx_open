@@ -235,7 +235,7 @@ public:
                     << tr("Media stream is opened but no media data was received.");
                 break;
             }
-            case cameraInitializationInProgress:
+            case initializationInProgress:
             {
                 QnCameraDeviceStringSet details(
                     tr("Device initialization process is in progress."),

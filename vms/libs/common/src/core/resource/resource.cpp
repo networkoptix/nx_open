@@ -21,13 +21,6 @@
 
 namespace {
 
-enum InitState
-{
-    initNone,
-    initInProgress,
-    reinitRequested
-};
-
 } // namespace
 
 // -------------------------------------------------------------------------- //
@@ -629,6 +622,11 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 
 // -----------------------------------------------------------------------------
 
+bool QnResource::switchState(InitState from, InitState to)
+{
+    return m_initState.compare_exchange_strong(from, to);
+}
+
 bool QnResource::init()
 {
     auto commonModule = this->commonModule();
@@ -638,8 +636,7 @@ bool QnResource::init()
     if (m_initialized)
         return true; /* Nothing to do. */
 
-    int isNoneValue = initNone;
-    if (!m_initState.compare_exchange_strong(isNoneValue, initInProgress))
+    if (!switchState(initNone, initInProgress))
         return false; //< Already initializing
 
     const auto parentId = getParentId();
@@ -660,12 +657,10 @@ bool QnResource::init()
                 && (initResult.errorCode == CameraDiagnostics::ErrorCode::noError);
         }
 
-        int isInitInProgress = initInProgress;
-        if (m_initState.compare_exchange_strong(isInitInProgress, initNone))
+        if (switchState(initInProgress, initNone))
             break;
         NX_VERBOSE(this, "Reinit is requested during previous initialization for resource %1. Init again.", getId());
-        int isReinitRequested = reinitRequested;
-        NX_ASSERT(m_initState.compare_exchange_strong(isReinitRequested, initInProgress));
+        NX_ASSERT(switchState(reinitRequested, initInProgress));
     }
 
     if (isInitialized)
@@ -697,8 +692,7 @@ void QnResource::reinitAsync()
         return;
 
     NX_DEBUG(this, "Reinitialization is requested for resource %1", getId());
-    int isInitInProgress = initInProgress;
-    if (m_initState.compare_exchange_strong(isInitInProgress, reinitRequested))
+    if (switchState(initInProgress, reinitRequested))
         return; //< Initialization will be requested again after current init is finished.
 
     setStatus(Qn::Offline);
