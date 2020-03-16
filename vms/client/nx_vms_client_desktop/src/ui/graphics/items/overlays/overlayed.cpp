@@ -177,7 +177,8 @@ void detail::OverlayedBase::updateOverlayWidgetsVisibility(bool animate)
     }
 }
 
-void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible /*= true*/, bool animate /*= true*/)
+void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible /*= true*/,
+    bool animate /*= true*/, bool controlVisibility /*= true*/)
 {
     if (!widget)
         return;
@@ -190,7 +191,7 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
             widget->setVisible(true);
 
         using namespace nx::vms::client::desktop::ui::workbench;
-        auto animator = opacityAnimator(widget, /*speed*/ 1.0, /*controlVisibility*/ true);
+        auto animator = opacityAnimator(widget, /*speed*/ 1.0, controlVisibility);
 
         const bool sameTarget = animator->isRunning()
             && qFuzzyEquals(animator->targetValue().toReal(), opacity);
@@ -212,7 +213,8 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
             opacityAnimator(widget)->stop();
 
         widget->setOpacity(opacity);
-        widget->setVisible(visible);
+        if (visible || controlVisibility)
+            widget->setVisible(visible);
     }
 
     NX_ASSERT(isOverlayWidgetVisible(widget) == visible, "Validate checking function");
