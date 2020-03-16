@@ -27,59 +27,48 @@
     "deviceAgentSettingsModel":
     {
         "type": "Settings",
-        "items":
+        "items": 
         [
             {
+                "type": "ComboBox",
+                "name": "MotionDetection.DetectionType",
+                "caption": "Detection type",
+                "range": [ "Off", "MotionDetection", "IntelligentVideo", "MDAndIV" ],
+                "defaultValue": "MotionDetection"
+            },
+            {
                 "type": "GroupBox",
-                "caption": "Common settings: Motion and IVA",
-                "items":
+                "caption": "Motion Detection",
+                "requiredForEventTypeIds": [ "nx.hanwha.MotionDetection" ],
+                "items": 
                 [
                     {
-                        "type": "ComboBox",
-                        "name": "MotionDetection.DetectionType",
-                        "caption": "Motion detection type",
-                        "range": ["Off", "MotionDetection", "IntelligentVideo", "MDAndIV"],
-                        "defaultValue": "MotionDetection"
-                    },
+                        "type": "ObjectSizeConstraints",
+                        "caption": "Object size",
+                        "name": "MotionDetection.ObjectSize.Constraints",
+                        "defaultValue": {
+                            "minimum": [ 0.1, 0.1 ],
+                            "maximum": [ 0.9, 0.9 ]
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "AI (Object Detection and IVA)",
+                "items": 
+                [
                     {
-                        "type": "GroupBox",
-                        "caption": "Object size restraints for Motion detection",
-                        "items":
-                        [
-                            {
-                                "type": "BoxFigure",
-                                "name": "MotionDetection.MinObjectSize.Points",
-                                "caption": "Motion - Minimum object size"
-                            },
-                            {
-                                "type": "BoxFigure",
-                                "name": "MotionDetection.MaxObjectSize.Points",
-                                "caption": "Motion - Maximum object size"
-                            }
-                        ],
-                        "requiredForEventTypeIds":
-                        [
-                            "nx.hanwha.MotionDetection"
-                        ]
-                    },
-                    {
-                        "type": "GroupBox",
-                        "caption": "Object size restraints for AI (Object detection and IVA)",
-                        "items":
-                        [
-                            {
-                                "type": "BoxFigure",
-                                "name": "IVA.MinObjectSize.Points",
-                                "caption": "AI - Minimum object size"
-                            },
-                            {
-                                "type": "BoxFigure",
-                                "name": "IVA.MaxObjectSize.Points",
-                                "caption": "AI - Maximum object size"
-                            }
-                        ],
+                        "type": "ObjectSizeConstraints",
+                        "caption": "Object size",
+                        "name": "IVA.ObjectSize.Constraints",
+                        "defaultValue": 
+                        {
+                            "minimum": [ 0.1, 0.1 ],
+                            "maximum": [ 0.9, 0.9 ]
+                        },
                         "requiredForObjectDetection": true,
-                        "requiredForEventTypeIds":
+                        "requiredForEventTypeIds": 
                         [
                             "nx.hanwha.VideoAnalytics.Passing",
                             "nx.hanwha.VideoAnalytics.Entering",
@@ -97,7 +86,8 @@
             {
                 "type": "Section",
                 "caption": "Shock detection",
-                "items":
+                "requiredForEventTypeIds": [ "nx.hanwha.ShockDetection" ],
+                "items": 
                 [
                     {
                         "type": "CheckBox",
@@ -121,224 +111,85 @@
                         "minValue": 1,
                         "maxValue": 100
                     }
-                ],
-                "requiredForEventTypeIds": [
-                    "nx.hanwha.ShockDetection"
                 ]
             },
             {
                 "type": "Section",
                 "caption": "Motion detection. Include areas",
-                "items":
+                "requiredForEventTypeIds": [ "nx.hanwha.MotionDetection" ],
+                "items": 
                 [
                     {
-                        "type": "GroupBox",
-                        "caption": "Include area 1",
-                        "items":
-                        [
-                            {
-                              "type": "PolygonFigure",
-                              "minPoints": 4,
-                              "maxPoints": 8,
-                              "name": "MotionDetection.IncludeArea1.Points",
-                              "caption": "Include area"
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea1.ThresholdLevel",
-                                "caption": "Level of detection",
-                                "defaultValue": 50,
-                                "minValue": 1,
-                                "maxValue": 100
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea1.SensitivityLevel",
-                                "caption": "Sensitivity",
-                                "defaultValue": 80,
-                                "minValue": 1,
-                                "maxValue": 100
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea1.MinimumDuration",
-                                "caption": "Minimum duration (s)",
-                                "defaultValue": 0,
-                                "minValue": 0,
-                                "maxValue": 5
-                            }
-                        ]
-                    },
-                    {
-                        "type": "GroupBox",
-                        "caption": "Include area 2",
-                        "items":
-                        [
-                            {
-                              "type": "PolygonFigure",
-                              "minPoints": 4,
-                              "maxPoints": 8,
-                              "name": "MotionDetection.IncludeArea2.Points",
-                              "caption": "Include area"
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea2.ThresholdLevel",
-                                "caption": "Level of detection",
-                                "defaultValue": 50,
-                                "minValue": 1,
-                                "maxValue": 100
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea2.SensitivityLevel",
-                                "caption": "Sensitivity",
-                                "defaultValue": 80,
-                                "minValue": 1,
-                                "maxValue": 100
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea2.MinimumDuration",
-                                "caption": "Minimum duration (s)",
-                                "defaultValue": 0,
-                                "minValue": 0,
-                                "maxValue": 5
-                            }
-                        ]
-                    },
-                    {
-                        "type": "GroupBox",
-                        "caption": "Include area 3",
-                        "items":
-                        [
-                            {
-                              "type": "PolygonFigure",
-                              "minPoints": 4,
-                              "maxPoints": 8,
-                              "name": "MotionDetection.IncludeArea3.Points",
-                              "caption": "Include area"
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea3.ThresholdLevel",
-                                "caption": "Level of detection",
-                                "defaultValue": 50,
-                                "minValue": 1,
-                                "maxValue": 100
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea3.SensitivityLevel",
-                                "caption": "Sensitivity",
-                                "defaultValue": 80,
-                                "minValue": 1,
-                                "maxValue": 100
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea3.MinimumDuration",
-                                "caption": "Minimum duration (s)",
-                                "defaultValue": 0,
-                                "minValue": 0,
-                                "maxValue": 5
-                            }
-                        ]
-                    },
-                    {
-                        "type": "GroupBox",
-                        "caption": "Include area 4",
-                        "items":
-                        [
-                            {
-                              "type": "PolygonFigure",
-                              "minPoints": 4,
-                              "maxPoints": 8,
-                              "name": "MotionDetection.IncludeArea4.Points",
-                              "caption": "Include area"
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea4.ThresholdLevel",
-                                "caption": "Level of detection",
-                                "defaultValue": 50,
-                                "minValue": 1,
-                                "maxValue": 100
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea4.SensitivityLevel",
-                                "caption": "Sensitivity",
-                                "defaultValue": 80,
-                                "minValue": 1,
-                                "maxValue": 100
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "MotionDetection.IncludeArea4.MinimumDuration",
-                                "caption": "Minimum duration (s)",
-                                "defaultValue": 0,
-                                "minValue": 0,
-                                "maxValue": 5
-                            }
-                        ]
+                        "type": "Repeater",
+                        "count": 4,
+                        "startIndex": 1,
+                        "template": {
+                            "type": "GroupBox",
+                            "caption": "Include area #",
+                            "items": 
+                            [
+                                {
+                                    "type": "PolygonFigure",
+                                    "name": "MotionDetection.IncludeArea#.Points",
+                                    "caption": "Include area",
+                                    "minPoints": 4,
+                                    "maxPoints": 8
+                                },
+                                {
+                                    "type": "SpinBox",
+                                    "name": "MotionDetection.IncludeArea#.ThresholdLevel",
+                                    "caption": "Level of detection",
+                                    "defaultValue": 50,
+                                    "minValue": 1,
+                                    "maxValue": 100
+                                },
+                                {
+                                    "type": "SpinBox",
+                                    "name": "MotionDetection.IncludeArea#.SensitivityLevel",
+                                    "caption": "Sensitivity",
+                                    "defaultValue": 80,
+                                    "minValue": 1,
+                                    "maxValue": 100
+                                },
+                                {
+                                    "type": "SpinBox",
+                                    "name": "MotionDetection.IncludeArea#.MinimumDuration",
+                                    "caption": "Minimum duration (s)",
+                                    "defaultValue": 0,
+                                    "minValue": 0,
+                                    "maxValue": 5
+                                }
+                            ]
+                        }
                     }
-                ],
-                "requiredForEventTypeIds":
-                [
-                    "nx.hanwha.MotionDetection"
+
                 ]
             },
             {
                 "type": "Section",
                 "caption": "Motion detection. Exclude areas",
-                "items":
+                "requiredForEventTypeIds": [ "nx.hanwha.MotionDetection" ],
+                "items": 
                 [
                     {
-                        "type": "GroupBox",
-                        "caption": "Exclude areas",
-                        "items":
-                        [
-                            {
-                              "type": "PolygonFigure",
-                              "minPoints": 4,
-                              "maxPoints": 8,
-                              "name": "MotionDetection.ExcludeArea1.Points",
-                              "caption": "Exclude area 1"
-                            },
-                            {
-                              "type": "PolygonFigure",
-                              "minPoints": 4,
-                              "maxPoints": 8,
-                              "name": "MotionDetection.ExcludeArea2.Points",
-                              "caption": "Exclude area 2"
-                            },
-                            {
-                              "type": "PolygonFigure",
-                              "minPoints": 4,
-                              "maxPoints": 8,
-                              "name": "MotionDetection.ExcludeArea3.Points",
-                              "caption": "Exclude area 3"
-                            },
-                            {
-                              "type": "PolygonFigure",
-                              "minPoints": 4,
-                              "maxPoints": 8,
-                              "name": "MotionDetection.ExcludeArea4.Points",
-                              "caption": "Exclude area 4"
-                            }
-                        ]
+                        "type": "Repeater",
+                        "count": 4,
+                        "startIndex": 1,
+                        "template": {
+                            "type": "PolygonFigure",
+                            "name": "MotionDetection.ExcludeArea#.Points",
+                            "caption": "Exclude area #",
+                            "minPoints": 4,
+                            "maxPoints": 8
+                        }
                     }
-                ],
-                "requiredForEventTypeIds":
-                [
-                    "nx.hanwha.MotionDetection"
                 ]
             },
             {
                 "type": "Section",
                 "caption": "Tampering detection",
-                "items":
+                "requiredForEventTypeIds": [ "nx.hanwha.Tampering" ],
+                "items": 
                 [
                     {
                         "type": "CheckBox",
@@ -377,16 +228,13 @@
                         "defaultValue": false,
                         "value": false
                     }
-                ],
-                "requiredForEventTypeIds":
-                [
-                    "nx.hanwha.Tampering"
                 ]
             },
             {
                 "type": "Section",
                 "caption": "Defocus detection",
-                "items":
+                "requiredForEventTypeIds": [ "nx.hanwha.DefocusDetection" ],
+                "items": 
                 [
                     {
                         "type": "CheckBox",
@@ -418,16 +266,13 @@
                         "minValue": 1,
                         "maxValue": 5
                     }
-                ],
-                "requiredForEventTypeIds":
-                [
-                    "nx.hanwha.DefocusDetection"
                 ]
             },
             {
                 "type": "Section",
                 "caption": "Fog detection",
-                "items":
+                "requiredForEventTypeIds": [ "nx.hanwha.FogDetection" ],
+                "items": 
                 [
                     {
                         "type": "CheckBox",
@@ -459,16 +304,13 @@
                         "minValue": 1,
                         "maxValue": 5
                     }
-                ],
-                "requiredForEventTypeIds":
-                [
-                    "nx.hanwha.FogDetection"
                 ]
             },
             {
                 "type": "Section",
                 "caption": "Face detection. General",
-                "items":
+                "requiredForEventTypeIds": [ "nx.hanwha.FaceDetection" ],
+                "items": 
                 [
                     {
                         "type": "CheckBox",
@@ -484,10 +326,6 @@
                         "minValue": 1,
                         "maxValue": 100
                     }
-                ],
-                "requiredForEventTypeIds":
-                [
-                    "nx.hanwha.FaceDetection"
                 ]
             },
             {
@@ -1437,6 +1275,10 @@
             "positiveState": "is medium",
             "negativeState": "has decreased to low",
             "groupId": "nx.hanwha.Queue"
+        },
+        {
+            "id": "nx.hanwha.ObjectTracking.Start",
+            "name": "Object tracking - Start"
         }
     ],
     "groups":

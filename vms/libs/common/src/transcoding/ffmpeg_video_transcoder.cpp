@@ -18,7 +18,7 @@
 #include <transcoding/transcoding_utils.h>
 
 namespace {
-const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
+const static int kMaxEncodedFrameSize = 1024 * 1024 * 5;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
 const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
 static const int kMaxDroppedFrames = 5;
@@ -84,7 +84,7 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
         m_lastSrcHeight[i] = -1;
     }
     m_videoDecoders.resize(CL_MAX_CHANNELS);
-    m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
+    m_videoEncodingBuffer = (quint8*) qMallocAligned(kMaxEncodedFrameSize, 32);
     m_decodedVideoFrame->setUseExternalData(true);
     if (m_metrics)
         m_metrics->transcoders()++;
@@ -291,11 +291,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         }
     }
 
-    // TODO: ffmpeg-test
-    //int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
-
     m_outPacket->data = m_videoEncodingBuffer;
-    m_outPacket->size = MAX_VIDEO_FRAME;
+    m_outPacket->size = kMaxEncodedFrameSize;
     int got_packet = 0;
     int encodeResult = avcodec_encode_video2(m_encoderCtx, m_outPacket, decodedFrame.data(), &got_packet);
     if (encodeResult < 0)

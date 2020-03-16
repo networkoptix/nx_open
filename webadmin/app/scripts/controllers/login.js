@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('LoginCtrl', ['$scope', 'mediaserver', '$sessionStorage', 'dialogs', 'nativeClient',
-    function ($scope, mediaserver, $sessionStorage, dialogs, nativeClient) {
+    .controller('LoginCtrl', ['$scope', 'mediaserver', '$sessionStorage', 'dialogs', 'nativeClient', '$timeout',
+    function ($scope, mediaserver, $sessionStorage, dialogs, nativeClient, $timeout) {
 
         // A hack that allows the user to change the url and remove the login dialog.
         $scope.$on('$locationChangeSuccess', function() {
@@ -25,9 +25,9 @@ angular.module('webadminApp')
             $scope.authorized = true;
             $scope.authorizing = false;
             $scope.session.serverInfoAlertHidden = false;
-            setTimeout(function(){
+            $timeout(function(){
                 window.location.reload();
-            },20);
+            }, 20);
             return false;
         }
     
@@ -41,37 +41,39 @@ angular.module('webadminApp')
         }
 
         $scope.login = function (form) {
-            if ($scope.loginForm.$valid && !$scope.authorized) {
-                $scope.authorizing = true;
-                touchForm(form);
-                var login = $scope.user.username.toLowerCase();
-                var password = $scope.user.password;
-                
-                mediaserver
-                    .login(login, password)
-                    .then(reload, function(error) {
-                        if (error.authResult !== '') {
-                            switch (error.authResult) {
-                                case 'Auth_WrongLogin':
-                                case 'Auth_WrongPassword':
-                                    dialogs.alert(L.login.incorrectPassword);
-                                    break;
-                                case 'Auth_LockedOut':
-                                default:
-                                    dialogs.alert(L.login.authLockout);
-                            }
-                        } else {
-                            if(error.errorString.toLowerCase().indexOf('wrong') > -1) {
-                                dialogs.alert(L.login.incorrectPassword);
+            $timeout(function() {
+                if ($scope.loginForm.$valid && !$scope.authorized) {
+                    $scope.authorizing = true;
+                    touchForm(form);
+                    var login = $scope.user.username.toLowerCase();
+                    var password = $scope.user.password;
+
+                    mediaserver
+                        .login(login, password)
+                        .then(reload, function (error) {
+                            if (error.authResult !== '') {
+                                switch (error.authResult) {
+                                    case 'Auth_WrongLogin':
+                                    case 'Auth_WrongPassword':
+                                        dialogs.alert(L.login.incorrectPassword);
+                                        break;
+                                    case 'Auth_LockedOut':
+                                    default:
+                                        dialogs.alert(L.login.authLockout);
+                                }
                             } else {
-                                dialogs.alert(L.login.authLockout);
+                                if (error.errorString.toLowerCase().indexOf('wrong') > -1) {
+                                    dialogs.alert(L.login.incorrectPassword);
+                                } else {
+                                    dialogs.alert(L.login.authLockout);
+                                }
                             }
-                        }
-                    }).then(function(){
+                        }).then(function () {
                         nativeClient.updateCredentials(login, password, false, false);
-                    }).finally(function() {
+                    }).finally(function () {
                         $scope.authorizing = false;
                     });
-            }
+                }
+            }, 50);
         };
     }]);

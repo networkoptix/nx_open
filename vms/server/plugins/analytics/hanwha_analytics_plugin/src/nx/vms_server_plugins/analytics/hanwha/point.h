@@ -150,6 +150,16 @@ struct UnnamedBoxFigure
     std::string toServerString() const;
 };
 
+struct ObjectSizeConstraints
+{
+    Width minWidth;
+    Height minHeight;
+    Width maxWidth;
+    Height maxHeight;
+    static std::optional<ObjectSizeConstraints> fromServerString(const char* source);
+    std::string toServerString() const;
+};
+
 struct UnnamedPolygon
 {
     std::vector<PluginPoint> points;

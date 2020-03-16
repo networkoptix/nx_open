@@ -19,9 +19,10 @@ struct MergeSystemData: public CurrentPasswordData
     bool takeRemoteSettings = false;
     bool mergeOneServer = false;
     bool ignoreIncompatible = false;
+    bool dryRun = false;
 };
 
 #define MergeSystemData_Fields CurrentPasswordData_Fields \
-    (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible)
+    (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible)(dryRun)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((MergeSystemData), (json))

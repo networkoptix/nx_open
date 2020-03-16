@@ -106,6 +106,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     nx::vms_server_plugins::analytics::hanwha::Hanwha::ObjectMetadataAttributeFilters,
     (json), HanwhaObjectMetadataAttributeFilters_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    nx::vms_server_plugins::analytics::hanwha::Hanwha::ObjectMetadataAttributeFilters::RenameEntry,
+    (json), HanwhaObjectMetadataAttributeFiltersRenameEntry_Fields)
 
 } // namespace hanwha
 } // namespace analytics

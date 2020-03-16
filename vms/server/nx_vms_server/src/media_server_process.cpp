@@ -2475,7 +2475,8 @@ void MediaServerProcess::registerRestHandlers(
      * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
      * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
      * %permissions Owner.
-     * %param:string url URL of one Server in the System to join.
+     * %param:string url URL of one Server in the System to join. URL may contain credentials, in
+     *     that case getKey and postKey are not required.
      * %param:string getKey Authentication hash of the target Server for GET requests.
      * %param:string postKey Authentication hash of the target Server for POST requests.
      * %param:string currentPassword Current user password.
@@ -2498,6 +2499,8 @@ void MediaServerProcess::registerRestHandlers(
      *     %value true Merge will start anyway.
      *     %value false If the target server protocol version differs from the current server
      *         protocol version merge aborts.
+     * %param[opt]:boolean dryRun Only check for merge possibility, do not perform actual merge.
+     *     Known issues: dry run may produce false positive results in some rare cases.
      * %return:object JSON object with an error code and error string.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error token, or an empty string on success.
@@ -2505,7 +2508,17 @@ void MediaServerProcess::registerRestHandlers(
      *         %value "UNAUTHORIZED" The authentication credentials are invalid.
      *         %value "INCOMPATIBLE" The found system has an incompatible version or a different
      *             customization.
+     *         %value "FORBIDDEN" The user does not have permission for merge.
      *         %value "BACKUP_ERROR" The database backup could not be created.
+     *         %value "STARTER_LICENSE_ERROR" You are about to merge Systems with Starter licenses.
+     *         %value "CONFIGURATION_ERROR" Could not configure the remote System.
+     *         %value "DEPENDENT_SYSTEM_BOUND_TO_CLOUD" System can only be merged with non-cloud.
+     *         %value "CLOUD_SYSTEMS_HAVE_DIFFERENT_OWNERS" Cannot merge two cloud systems with
+     *             different owners.
+     *         %value "UNCONFIGURED_SYSTEM" Cannot merge to the unconfigured system.
+     *         %value "UNKNOWN_ERROR" something unexpected has happend.
+     *         %value "DUPLICATE_MEDIASERVER_FOUND" Cannot merge Systems because they have at least
+     *             one server with the same ID.
      */
     reg("api/mergeSystems", new QnMergeSystemsRestHandler(serverModule()), kAdmin);
 

@@ -721,15 +721,15 @@ void QnResource::initAsync(bool optional)
     if (resourcePool() == nullptr)
         return;
 
-    NX_VERBOSE(this, "Async init requested (optional: %1)", optional);
+    NX_VERBOSE(this, "Async init requested for resource %1 (optional: %2)", getId(), optional);
 
     qint64 t = getUsecTimer();
 
     QnMutexLocker lock(&m_initAsyncMutex);
 
-    if (t - m_lastInitTime < MIN_INIT_INTERVAL)
+    if (t - m_lastInitTime < MIN_INIT_INTERVAL && optional)
     {
-        NX_VERBOSE(this, "Not running init task: init was recently (%1us < %2us)",
+        NX_VERBOSE(this, "Not running optional init task: init was recently (%1us < %2us)",
             t - m_lastInitTime, MIN_INIT_INTERVAL);
         return;
     }
@@ -756,12 +756,9 @@ void QnResource::initAsync(bool optional)
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     if (!optional)
     {
-        m_lastInitTime = t;
         resourcePool->threadPool()->start(task);
-        return;
     }
-
-    if (!resourcePool->threadPool()->tryStart(task))
+    else if (!resourcePool->threadPool()->tryStart(task))
     {
         delete task;
         NX_DEBUG(this, "Not running init task: thread pool is fully loaded");

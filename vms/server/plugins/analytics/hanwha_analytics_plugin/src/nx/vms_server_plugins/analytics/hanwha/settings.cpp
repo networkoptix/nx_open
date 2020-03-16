@@ -394,6 +394,17 @@ void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize fra
     }
 }
 
+void sunapiReadOrThrow(const nx::kit::Json& json, FrameSize frameSize, ObjectSizeConstraints* result)
+{
+    PluginPoint minSize, maxSize;
+    sunapiReadOrThrow(json, "MinimumObjectSizeInPixels", frameSize, &minSize);
+    sunapiReadOrThrow(json, "MaximumObjectSizeInPixels", frameSize, &maxSize);
+    result->minWidth = minSize.x;
+    result->minHeight = minSize.y;
+    result->maxWidth = maxSize.x;
+    result->maxHeight = maxSize.y;
+}
+
 void sunapiReadOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, UnnamedBoxFigure* result)
 {
     PluginPoint point;
@@ -591,18 +602,17 @@ std::string Motion::buildCameraWritingQuery(FrameSize /*frameSize*/, int channel
 bool MotionDetectionObjectSize::operator==(const MotionDetectionObjectSize& rhs) const
 {
     return initialized == rhs.initialized
-        && minDimentions.width == rhs.minDimentions.width
-        && minDimentions.height == rhs.minDimentions.height
-        && maxDimentions.width == rhs.maxDimentions.width
-        && maxDimentions.height == rhs.maxDimentions.height
+        && constraints.minWidth == rhs.constraints.minWidth
+        && constraints.minHeight == rhs.constraints.minHeight
+        && constraints.maxWidth == rhs.constraints.maxWidth
+        && constraints.maxHeight == rhs.constraints.maxHeight
         ;
 }
 
 void MotionDetectionObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace basicServerSettingsIo;
-    deserializeOrThrow(value(sourceMap, KeyIndex::minDimentions), &minDimentions);
-    deserializeOrThrow(value(sourceMap, KeyIndex::maxDimentions), &maxDimentions);
+    deserializeOrThrow(value(sourceMap, KeyIndex::constraints), &constraints);
     initialized = true;
 }
 
@@ -610,15 +620,13 @@ void MotionDetectionObjectSize::writeToServer(
     nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
     using namespace basicServerSettingsIo;
-    result->setValue(key(KeyIndex::minDimentions), serialize(minDimentions));
-    result->setValue(key(KeyIndex::maxDimentions), serialize(maxDimentions));
+    result->setValue(key(KeyIndex::constraints), serialize(constraints));
 }
 
 void MotionDetectionObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
     nx::kit::Json objectSizeInfo = getObjectSizeInfo(channelInfo, "MotionDetection");
-    sunapiReadOrThrow(objectSizeInfo, "MinimumObjectSizeInPixels", frameSize, &minDimentions);
-    sunapiReadOrThrow(objectSizeInfo, "MaximumObjectSizeInPixels", frameSize, &maxDimentions);
+    sunapiReadOrThrow(objectSizeInfo, frameSize, &constraints);
     initialized = true;
 }
 
@@ -626,9 +634,9 @@ std::string MotionDetectionObjectSize::buildMinObjectSize(FrameSize frameSize) c
 {
     std::stringstream stream;
     stream
-        << frameSize.xRelativeToAbsolute(minDimentions.width)
+        << frameSize.xRelativeToAbsolute(constraints.minWidth)
         << ','
-        << frameSize.yRelativeToAbsolute(minDimentions.height);
+        << frameSize.yRelativeToAbsolute(constraints.minHeight);
     return stream.str();
 }
 
@@ -636,9 +644,9 @@ std::string MotionDetectionObjectSize::buildMaxObjectSize(FrameSize frameSize) c
 {
     std::stringstream stream;
     stream
-        << frameSize.xRelativeToAbsolute(maxDimentions.width)
+        << frameSize.xRelativeToAbsolute(constraints.maxWidth)
         << ','
-        << frameSize.yRelativeToAbsolute(maxDimentions.height);
+        << frameSize.yRelativeToAbsolute(constraints.maxHeight);
     return stream.str();
 }
 
@@ -665,33 +673,30 @@ std::string MotionDetectionObjectSize::buildCameraWritingQuery(FrameSize frameSi
 bool IvaObjectSize::operator==(const IvaObjectSize& rhs) const
 {
     return initialized == rhs.initialized
-        && minDimentions.width == rhs.minDimentions.width
-        && minDimentions.height == rhs.minDimentions.height
-        && maxDimentions.width == rhs.maxDimentions.width
-        && maxDimentions.height == rhs.maxDimentions.height
+        && constraints.minWidth == rhs.constraints.minWidth
+        && constraints.minHeight == rhs.constraints.minHeight
+        && constraints.maxWidth == rhs.constraints.maxWidth
+        && constraints.maxHeight == rhs.constraints.maxHeight
         ;
 }
 
 void IvaObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace basicServerSettingsIo;
-    deserializeOrThrow(value(sourceMap, KeyIndex::minDimentions), &minDimentions);
-    deserializeOrThrow(value(sourceMap, KeyIndex::maxDimentions), &maxDimentions);
+    deserializeOrThrow(value(sourceMap, KeyIndex::constraints), &constraints);
     initialized = true;
 }
 
 void IvaObjectSize::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
     using namespace basicServerSettingsIo;
-    result->setValue(key(KeyIndex::minDimentions), serialize(minDimentions));
-    result->setValue(key(KeyIndex::maxDimentions), serialize(maxDimentions));
+    result->setValue(key(KeyIndex::constraints), serialize(constraints));
 }
 
 void IvaObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
-    nx::kit::Json objectSizeInfo = getObjectSizeInfo(channelInfo, "IntelligentVideo");
-    sunapiReadOrThrow(objectSizeInfo, "MinimumObjectSizeInPixels", frameSize, &minDimentions);
-    sunapiReadOrThrow(objectSizeInfo, "MaximumObjectSizeInPixels", frameSize, &maxDimentions);
+    nx::kit::Json objectSizeInfo = getObjectSizeInfo(channelInfo, "MotionDetection");
+    sunapiReadOrThrow(objectSizeInfo, frameSize, &constraints);
     initialized = true;
 }
 
@@ -699,9 +704,9 @@ std::string IvaObjectSize::buildMinObjectSize(FrameSize frameSize) const
 {
     std::stringstream stream;
     stream
-        << frameSize.xRelativeToAbsolute(minDimentions.width)
+        << frameSize.xRelativeToAbsolute(constraints.minWidth)
         << ','
-        << frameSize.yRelativeToAbsolute(minDimentions.height);
+        << frameSize.yRelativeToAbsolute(constraints.minHeight);
     return stream.str();
 }
 
@@ -709,9 +714,9 @@ std::string IvaObjectSize::buildMaxObjectSize(FrameSize frameSize) const
 {
     std::stringstream stream;
     stream
-        << frameSize.xRelativeToAbsolute(maxDimentions.width)
+        << frameSize.xRelativeToAbsolute(constraints.maxWidth)
         << ','
-        << frameSize.yRelativeToAbsolute(maxDimentions.height);
+        << frameSize.yRelativeToAbsolute(constraints.maxHeight);
     return stream.str();
 }
 

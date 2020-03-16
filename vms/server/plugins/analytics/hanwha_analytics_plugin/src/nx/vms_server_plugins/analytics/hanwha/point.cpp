@@ -291,6 +291,70 @@ std::string UnnamedBoxFigure::toServerString() const
 
 //-------------------------------------------------------------------------------------------------
 
+/*static*/ std::optional<ObjectSizeConstraints> ObjectSizeConstraints::fromServerString(
+    const char* source)
+{
+    ObjectSizeConstraints result;
+
+    std::string err;
+    nx::kit::Json json = nx::kit::Json::parse(source, err);
+    if (!json.is_object())
+        return std::nullopt;
+
+    const nx::kit::Json& jsonMinimum = json["minimum"];
+    if (!jsonMinimum.is_array())
+        return std::nullopt;
+    std::vector<nx::kit::Json> jsonMinimumAsArray = jsonMinimum.array_items();
+    if (jsonMinimumAsArray.size() != 2)
+        return std::nullopt;
+    result.minWidth = jsonMinimumAsArray[0].number_value();
+    result.minHeight = jsonMinimumAsArray[1].number_value();
+
+    const nx::kit::Json& jsonMaximum = json["maximum"];
+    if (!jsonMaximum.is_array())
+        return std::nullopt;
+    std::vector<nx::kit::Json> jsonMaximumAsArray = jsonMaximum.array_items();
+    if (jsonMaximumAsArray.size() != 2)
+        return std::nullopt;
+    result.maxWidth = jsonMaximumAsArray[0].number_value();
+    result.maxHeight = jsonMaximumAsArray[1].number_value();
+    return result;
+}
+
+std::string ObjectSizeConstraints::toServerString() const
+{
+    // The example of the desired result:
+    // {
+    //    "minimum": [0.2, 0.3],
+    //    "maximum": [0.8, 0.9],
+    //    "positions":
+    //    [
+    //        [0.4, 0.35],
+    //        [0.1, 0.05]
+    //    ]
+    // }
+
+    auto offset = [](double size) { return (1.0 - size) / 2; };
+
+    nx::kit::Json::array minSizeArray{ double(minWidth), double(minHeight) };
+    nx::kit::Json::array maxSizeArray{ double(maxWidth), double(maxHeight) };
+
+    nx::kit::Json::object jsonResult;
+    jsonResult.insert(std::pair("minimum", minSizeArray));
+    jsonResult.insert(std::pair("maximum", maxSizeArray));
+
+    nx::kit::Json::array minOffsetArray{ 0, 0 };// offset(minWidth), offset(minHeight) };
+    nx::kit::Json::array maxOffsetArray{ 0, 0 };// offset(maxWidth), offset(maxHeight) };
+
+    nx::kit::Json::array offsetArray{ minOffsetArray, maxOffsetArray };
+//    jsonResult.insert(std::pair("positions", offsetArray));
+
+    std::string result = nx::kit::Json(jsonResult).dump();
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 /*static*/ std::optional<UnnamedPolygon> UnnamedPolygon::fromServerString(const char* source)
 {
     std::optional<std::vector<PluginPoint>> points = ServerStringToPluginPoints(source);

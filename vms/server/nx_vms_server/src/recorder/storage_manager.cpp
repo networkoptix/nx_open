@@ -2206,13 +2206,13 @@ void QnStorageManager::clearMaxDaysData()
 
 void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
 {
-    QList<DeviceFileCatalogPtr> cameraList;
+    QList<DeviceFileCatalogPtr> catalogList;
     {
         QnMutexLocker lock(&m_mutexCatalog);
-        cameraList = m_devFileCatalog[catalogIdx].values();
+        catalogList = m_devFileCatalog[catalogIdx].values();
     }
 
-    for(const DeviceFileCatalogPtr& catalog: cameraList) 
+    for(const DeviceFileCatalogPtr& catalog: catalogList)
     {
         QnSecurityCamResourcePtr camera = serverModule()->resourcePool()
             ->getResourceByUniqueId<QnSecurityCamResource>(catalog->cameraUniqueId());

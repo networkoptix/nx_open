@@ -56,7 +56,7 @@ QJsonValue filterJsonObjects(QJsonValue value, Pred pred)
     if (value.isObject())
     {
         auto object = value.toObject();
-        if (pred(object))
+        if (!pred(object))
             return QJsonValue::Undefined;
         for (auto elementValueRef: object)
             elementValueRef = filterJsonObjects(elementValueRef, pred);
@@ -130,7 +130,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         if (file.open(QFile::ReadOnly))
         {
             NX_INFO(this,
-                lm("Switch to external object metatdata attribute filters file %1").arg(QFileInfo(file).absoluteFilePath()));
+                lm("Switch to external object metadata attribute filters file %1").arg(QFileInfo(file).absoluteFilePath()));
             attributeFiltersData = file.readAll();
         }
     }
@@ -216,32 +216,39 @@ boost::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
             deviceInfo->name(), deviceInfo->id());
         return boost::none;
     }
+    if (supportsObjectDetection) {
+        supportedEventTypeIds->insert("nx.hanwha.ObjectTracking.Start");
+    }
+
     deviceAgentManifest.supportedEventTypeIds = QList<QString>::fromSet(*supportedEventTypeIds);
 
     deviceAgentManifest.deviceAgentSettingsModel = filterJsonObjects(
         m_manifest.deviceAgentSettingsModel,
         [&](const QJsonObject& node) {
-            bool keep = true;
+            bool keepByDefault = true;
 
-            if (const auto required = node["requiredForObjectDetection"]; !required.isUndefined() && !keep)
+            bool keepForObjectDetection = false;
+            if (const auto required = node["requiredForObjectDetection"]; required.toBool())
             {
-                if (required.toBool() && supportsObjectDetection)
-                    keep = true;
+                keepByDefault = false;
+                keepForObjectDetection = supportsObjectDetection;
             }
 
-            if (const auto eventTypeIds = node["requiredForEventTypeIds"]; !eventTypeIds.isUndefined() && !keep)
+            bool keepForEvents = false;
+            if (const auto eventTypeIds = node["requiredForEventTypeIds"].toArray(); !eventTypeIds.empty())
             {
-                for (const auto eventTypeId: eventTypeIds.toArray())
+                keepByDefault = false;
+                for (const auto eventTypeId: eventTypeIds)
                 {
                     if (supportedEventTypeIds->contains(eventTypeId.toString()))
                     {
-                        keep = true;
+                        keepForEvents = true;
                         break;
                     }
                 }
             }
 
-            return keep;
+            return keepByDefault || keepForObjectDetection || keepForEvents;
         });
 
     return deviceAgentManifest;

@@ -1,5 +1,6 @@
 #include "objectMetadataXmlParser.h"
 
+#include <chrono>
 #include <cmath>
 #include <ctime>
 #include <optional>
@@ -11,16 +12,11 @@
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
+using namespace std::string_literals;
 using namespace std::chrono_literals;
 
-using nx::sdk::Ptr;
-using nx::sdk::makePtr;
-using nx::sdk::Uuid;
-using nx::sdk::Attribute;
-using nx::sdk::analytics::ObjectMetadata;
-using nx::sdk::analytics::IObjectMetadata;
-using nx::sdk::analytics::ObjectMetadataPacket;
-using nx::sdk::analytics::Rect;
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
 
 namespace {
 //-------------------------------------------------------------------------------------------------
@@ -127,9 +123,11 @@ ObjectMetadataXmlParser::ObjectMetadataXmlParser(
 {
 }
 
-Ptr<ObjectMetadataPacket> ObjectMetadataXmlParser::parse(const QByteArray& data)
+ObjectMetadataXmlParser::Result ObjectMetadataXmlParser::parse(const QByteArray& data)
 {
-    Ptr<ObjectMetadataPacket> result;
+    collectGarbage();
+
+    Result result;
 
     QDomDocument dom;
     dom.setContent(data, true);
@@ -153,13 +151,16 @@ Ptr<ObjectMetadataPacket> ObjectMetadataXmlParser::parse(const QByteArray& data)
     if (!extractFrameScale(transformation))
         return result;
 
-    result = makePtr<ObjectMetadataPacket>();
+    result.eventMetadataPacket = makePtr<EventMetadataPacket>();
+    result.objectMetadataPacket = makePtr<ObjectMetadataPacket>();
 
     for (auto object = frame.firstChildElement("Object");
          !object.isNull(); object = object.nextSiblingElement("Object"))
     {
-        if (Ptr<ObjectMetadata> objectMetadata = extractObject(object))
-            result->addItem(objectMetadata.releasePtr());
+        if (Ptr<EventMetadata> eventMetadata = extractEventMetadata(object))
+            result.eventMetadataPacket->addItem(eventMetadata.releasePtr());
+        if (Ptr<ObjectMetadata> objectMetadata = extractObjectMetadata(object))
+            result.objectMetadataPacket->addItem(objectMetadata.releasePtr());
     }
 
     return result;
@@ -178,8 +179,7 @@ bool ObjectMetadataXmlParser::extractFrameScale(const QDomElement& transformatio
             xDenominator = e.attribute("x").toFloat();
             yDenominator = e.attribute("y").toFloat();
         }
-        else
-        if (e.tagName() == "Scale")
+        else if (e.tagName() == "Scale")
         {
             xNumerator = e.attribute("x").toFloat();
             yNumerator = e.attribute("y").toFloat();
@@ -214,12 +214,10 @@ std::optional<QString> ObjectMetadataXmlParser::filterAttribute(const QString& n
         if (wildcardMatch(pattern, name))
             return std::nullopt;
     }
-    for (const auto& pair: m_objectAttributeFilters.rename)
+    for (const auto& entry: m_objectAttributeFilters.rename)
     {
-        const auto& pattern = pair.first;
-        const auto& replacement = pair.second;
-        if (wildcardMatch(pattern, name))
-            return replacement;
+        if (wildcardMatch(entry.ifMatches, name))
+            return entry.replaceWith;
     }
     return name;
 }
@@ -230,10 +228,11 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
     auto& attributes = m_objectAttributes[objectId];
 
     const auto walk =
-        [&](auto walk, QString key, const QDomElement& element)
+        [&](auto walk, const QString& key, const QDomElement& element)
         {
             const auto domAttrs = element.attributes();
-            for (int i = 0; i < domAttrs.length(); ++i) {
+            for (int i = 0; i < domAttrs.length(); ++i)
+            {
                 const auto domAttr = domAttrs.item(i);
                 const auto name = domAttr.nodeName();
                 const auto value = domAttr.nodeValue();
@@ -248,7 +247,8 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
 
             if (counts.empty())
             {
-                if (const auto child = element.firstChild(); child.isText()) {
+                if (const auto child = element.firstChild(); child.isText())
+                {
                     const QString value = child.toText().data();
                     attributes[key.toStdString()] = value.toStdString();
                 }
@@ -298,7 +298,7 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
     return result;
 }
 
-Ptr<ObjectMetadata> ObjectMetadataXmlParser::extractObject(const QDomElement& object)
+Ptr<ObjectMetadata> ObjectMetadataXmlParser::extractObjectMetadata(const QDomElement& object)
 {
     Ptr<ObjectMetadata> result;
     const int objectId = object.attribute("ObjectId").toInt();
@@ -340,11 +340,27 @@ Ptr<ObjectMetadata> ObjectMetadataXmlParser::extractObject(const QDomElement& ob
     return result;
 }
 
+Ptr<EventMetadata> ObjectMetadataXmlParser::extractEventMetadata(const QDomElement& object)
+{
+    const ObjectId objectId = object.attribute("ObjectId").toInt();
+    if (m_objectAttributes.count(objectId))
+        return {};
+    m_objectAttributes[objectId].timeStamp = std::chrono::steady_clock::now();
+
+    auto result = makePtr<EventMetadata>();
+
+    result->setTypeId("nx.hanwha.ObjectTracking.Start");
+    result->setDescription("Started tracking object #"s  + std::to_string(objectId));
+    result->setConfidence(1.0);
+
+    return result;
+}
+
 void ObjectMetadataXmlParser::collectGarbage()
 {
     static const auto timeout = 5min;
 
-    auto now = std::chrono::steady_clock::now();
+    const auto now = std::chrono::steady_clock::now();
     for (auto it = m_objectAttributes.begin(); it != m_objectAttributes.end(); ) {
         auto [objectId, attributes] = *it;
         if (now - attributes.timeStamp > timeout)

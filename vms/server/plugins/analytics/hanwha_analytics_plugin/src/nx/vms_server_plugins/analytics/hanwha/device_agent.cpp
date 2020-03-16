@@ -211,11 +211,12 @@ namespace
  * the information about objects. Then it creates `objectMetadataPacket, attaches `objectMetadata`
  * (with object information) to it and sends to server using `m_handler`.
 */
-void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket)
+void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dataPacket)
 {
     const auto incomingPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
     QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
 
+    //// For debugging.
     //if (incomingPacket->dataSize() > 2000) {
     //    static int i = 0;
     //    std::cout << "========================" << std::endl;
@@ -224,42 +225,27 @@ void DeviceAgent::doPushDataPacket(Result<void>* outResult, IDataPacket* dataPac
 
     const auto ts = incomingPacket->timestampUs();
 
-    // `outcomingPackets` vector contains packets each of which contains exactly one object
-    // we'll pass each packet to `m_handler->handleMetadata` function.
-    // For now client does not support packets with multiple objects. When GUI team fix it
-    // we'll pass one packet with many objects instead of many packets with one object.
+    auto [outEventPacket, outObjectPacket] = m_objectMetadataXmlParser.parse(xmlData);
 
-    Ptr<ObjectMetadataPacket> outcomingPacket = m_objectMetadataXmlParser.parse(xmlData);
+    if (outEventPacket && outEventPacket->count())
+    {
+        outEventPacket->setTimestampUs(ts);
+        outEventPacket->setDurationUs(-1);
 
-    if (outcomingPacket && outcomingPacket->count())
+        if (NX_ASSERT(m_handler))
+            m_handler->handleMetadata(outEventPacket.get());
+    }
+
+    if (outObjectPacket && outObjectPacket->count())
     {
         //std::cout << outcomingPacket->count() << std::endl;
 
-        outcomingPacket->setTimestampUs(ts);
-        outcomingPacket->setDurationUs(1'000'000); // 1 second
+        outObjectPacket->setTimestampUs(ts);
+        outObjectPacket->setDurationUs(1'000'000); // 1 second
 
         if (NX_ASSERT(m_handler))
-            m_handler->handleMetadata(outcomingPacket.get());
+            m_handler->handleMetadata(outObjectPacket.get());
     }
-
-/*
-    // This chunk of code is for test purposes.
-    Ptr<ObjectMetadataPacket> outcomingPacket = makePtr<ObjectMetadataPacket>();
-    outcomingPacket->setTimestampUs(ts);
-    outcomingPacket->setDurationUs(1'000'000);
-
-    auto objectMetadata = makePtr<ObjectMetadata>();
-    int objectId = 100;
-    static const nx::sdk::Uuid trackId =
-        nx::vms_server_plugins::analytics::hanwha::deviceObjectNumberToUuid(objectId);
-    objectMetadata->setTrackId(trackId);
-    objectMetadata->setTypeId("nx.hanwha.ObjectDetection.Head");
-    objectMetadata->setBoundingBox(Rect(0.25, 0.25, 0.5, 0.5));
-    outcomingPacket->addItem(objectMetadata.get());
-
-    if (NX_ASSERT(m_handler))
-        m_handler->handleMetadata(outcomingPacket.get());
-//*/
 }
 
 /**
@@ -400,6 +386,9 @@ void DeviceAgent::doSetSettings(
 void DeviceAgent::getPluginSideSettings(
     Result<const ISettingsResponse*>* outResult) const
 {
+//    ObjectSizeConstraints osc{ 0.2, 0.3, 0.8, 0.9 };
+//    std::string s = osc.toServerString();
+
     const auto response = new nx::sdk::SettingsResponse();
 
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.ShockDetection"))
@@ -718,7 +707,7 @@ void DeviceAgent::readCameraSettings()
      || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Intrusion")
      || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Loitering"))
     {
-        if (sunapiReply.empty()) 
+        if (sunapiReply.empty())
             sunapiReply = loadEventSettings("videoanalysis2");
 
         readFromDeviceReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, m_channelNumber);
