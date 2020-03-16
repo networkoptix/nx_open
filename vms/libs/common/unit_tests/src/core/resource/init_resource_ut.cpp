@@ -6,7 +6,7 @@
 #include <common/common_module.h>
 #include <nx/core/access/access_types.h>
 
-namespace nx::core::resource::tesdt {
+namespace nx::core::resource::test {
 
 class ResourceMock : public DeviceMock
 {
@@ -89,4 +89,4 @@ TEST(InitResource, main)
     ASSERT_EQ(4, resource->initAttempts());
 }
 
-} // namespace nx::core::resource::tesdt
+} // namespace nx::core::resource::test
