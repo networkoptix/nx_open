@@ -97,7 +97,7 @@ At least one <cameraSet> is required; it is a concatenation of semicolon-separat
      Log each video frame being sent to the specified file.
 
 Example:
- )help" + baseExeName + R"help( files=c:/test.264;count=20
+ )help" + baseExeName + R"help( files="c:/test.264;count=20"
 )help";
 }
 
