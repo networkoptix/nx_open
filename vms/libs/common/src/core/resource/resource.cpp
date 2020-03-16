@@ -443,7 +443,7 @@ QString QnResource::getProperty(const QString &key) const
             if (itr != m_locallySavedProperties.end())
                 value = itr->second.value;
         }
-        else if (auto module = commonModule())
+        else if (auto module = commonModule(); module && module->resourcePropertyDictionary())
         {
             value = module->resourcePropertyDictionary()->value(m_id, key);
         }
