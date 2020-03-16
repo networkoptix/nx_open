@@ -212,6 +212,7 @@ public:
             // Left button click outside of line edit during editing forces commit.
             case QEvent::MouseButtonPress:
             {
+                // Handle only widgets (now windows), skip the edit itself and its context menu.
                 const auto watchedWidget = qobject_cast<const QWidget*>(watched);
                 if (!watchedWidget || watchedWidget == edit || watchedWidget->parent() == edit)
                     return false;
@@ -221,6 +222,7 @@ public:
                 if (mouseEvent->button() != Qt::LeftButton || !editing())
                     return false;
 
+                // This check is to prevent finishing edit right after start by clicking the label.
                 if (watchedWidget->window() == edit->window()
                     && edit->rect().contains(edit->mapFromGlobal(mouseEvent->globalPos())))
                 {
