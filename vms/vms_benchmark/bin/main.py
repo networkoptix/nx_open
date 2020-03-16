@@ -191,7 +191,7 @@ def load_configs(conf_file, ini_file_if_passed, ini_file_default):
 
 
 def to_megabytes(bytes_count):
-    return bytes_count // (1024 * 1024)
+    return bytes_count // (1024 ** 2)
 
 
 def to_percentage(share_0_1):
@@ -220,7 +220,7 @@ def _check_storages(api, ini, camera_count):
     space_for_recordings_bytes = (
         camera_count
         * ini['minimumArchiveFreeSpacePerCameraSeconds']
-        * ini['archiveBitratePerCameraMbps'] * 1000 * 1000 // 8
+        * ini['archiveBitratePerCameraMbps'] * 1000 ** 2 // 8
     )
     for storage in _get_storages(api, ini):
         if (
@@ -231,7 +231,7 @@ def _check_storages(api, ini, camera_count):
     else:
         raise exceptions.BoxStateError(
             f"Server has no video archive Storage "
-            f"with at least {space_for_recordings_bytes // 1024 ** 2} MB "
+            f"with at least {to_megabytes(space_for_recordings_bytes)} MB "
             f"of non-reserved free space.")
 
 
@@ -722,9 +722,9 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                 first_cycle = True
 
-                host_time_s_before_test = time.clock_gettime(time.CLOCK_REALTIME)
+                host_time_s_before_test = time.time()
                 vms_time_ms_before_test = api.get_time()
-                host_time_s_before_test_after_vms_time_acquisition = time.clock_gettime(time.CLOCK_REALTIME)
+                host_time_s_before_test_after_vms_time_acquisition = time.time()
 
                 try:
                     while True:
@@ -907,9 +907,9 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
     time.sleep(5)
 
     try:
-        host_time_s_after_test = time.clock_gettime(time.CLOCK_REALTIME)
+        host_time_s_after_test = time.time()
         vms_time_ms_after_test = api.get_time()
-        host_time_s_after_test_after_vms_time_acquisition = time.clock_gettime(time.CLOCK_REALTIME)
+        host_time_s_after_test_after_vms_time_acquisition = time.time()
 
         get_time_request_duration_before = host_time_s_before_test_after_vms_time_acquisition - host_time_s_before_test
         get_time_request_duration_after = host_time_s_after_test_after_vms_time_acquisition - host_time_s_after_test
@@ -934,7 +934,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
 def _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count):
     ram_free_bytes = box_platform.obtain_ram_free_bytes()
-    ram_required_bytes = test_camera_count * ini['ramPerCameraMegabytes'] * 1024 * 1024
+    ram_required_bytes = test_camera_count * ini['ramPerCameraMegabytes'] * 1024 ** 2
 
     if ram_free_bytes < ram_required_bytes:
         raise exceptions.InsufficientResourcesError(
@@ -979,7 +979,7 @@ def _obtain_box_platform(box, linux_distribution):
         res = f"        {storage['fs']} on {storage['point']}"
 
         if 'space_free' in storage and 'space_total' in storage:
-            m = 1024**3
+            m = 1024 ** 3
             res += f": free {int(storage['space_free']) / m:.1f} GB of {int(storage['space_total']) / m:.1f} GB"
 
         return res
