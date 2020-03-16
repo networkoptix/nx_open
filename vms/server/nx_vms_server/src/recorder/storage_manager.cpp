@@ -3211,8 +3211,9 @@ void QnStorageManager::getCamerasWithArchiveInternal(std::set<QString>& result, 
 {
     for(auto itr = catalogMap.begin(); itr != catalogMap.end(); ++itr)
     {
+        const QString& name = itr.key();
         const DeviceFileCatalogPtr& catalog = itr.value();
-        if (!catalog->isEmpty())
+        if (NX_ASSERT(catalog, name) && !catalog->isEmpty())
             result.insert(catalog->cameraUniqueId());
     }
 }
