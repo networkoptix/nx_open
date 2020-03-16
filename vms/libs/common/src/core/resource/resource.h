@@ -18,6 +18,7 @@
 #include "shared_resource_pointer.h"
 #include "resource_fwd.h"
 #include "resource_type.h"
+#include <nx/utils/elapsed_timer.h>
 
 class QnResourceConsumer;
 class QnResourcePool;
@@ -74,22 +75,18 @@ public:
     virtual bool init();
 
     /**
-     * Initialize camera sync. This function can omit initialization if recently call was failed.
-     * It init camera not often then some time period.
-     * @param optional - if false and no thread in ThreadPool left then return immediately.
-     * if true and no thread in ThreadPool left then add new thread to ThreadPool queue.
+     * Initialize camera asynchronously. If a camera has been already initialized or it is
+     * initializing now this call does nothing.
      */
-    void initAsync(bool optional);
+    void initAsync();
 
     /**
-     * Same as initAsync but run initialization always.
-     * This call don't check if initAsync was called recently but always add a new task.
+     * Reinitialize camera asynchronously. If a camera has been already initialized or it is
+     * initializing now the new initialization will be scheduled anyway.
      */
     void reinitAsync();
 
     CameraDiagnostics::Result prevInitializationResult() const;
-    //!Returns counter of resource initialization attempts (every attempt: successful or not)
-    int initializationAttemptCount() const;
 
     // flags like network media and so on
     virtual Qn::ResourceFlags flags() const;
@@ -245,7 +242,6 @@ protected:
 
     /** Mutex that is to be used when accessing resource fields. */
     mutable QnMutex m_mutex;
-    mutable QnMutex m_initMutex;
 
     /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
     QnUuid m_parentId;
@@ -294,17 +290,13 @@ private:
     Qn::ResourceFlags m_flags = 0;
 
     std::atomic<bool> m_initialized{false};
-    static QnMutex m_initAsyncMutex;
 
-    qint64 m_lastInitTime = 0;
     CameraDiagnostics::Result m_prevInitializationResult = CameraDiagnostics::Result(
-        CameraDiagnostics::ErrorCode::unknown);
+        CameraDiagnostics::ErrorCode::cameraInitializationInProgress);
 
-    QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
-    std::atomic<bool> m_initInProgress{false};
-    std::atomic<bool> m_interruptInitialization{false};
+    std::atomic<int> m_initState{0};
     QnCommonModule* m_commonModule;
     bool m_forceUseLocalProperties = false;
     std::atomic<int> cTestStatus{0};

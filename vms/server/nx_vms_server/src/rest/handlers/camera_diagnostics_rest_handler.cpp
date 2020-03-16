@@ -120,12 +120,6 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailabilit
     if (!cameraRes->ping())
         return CameraDiagnostics::CannotEstablishConnectionResult(cameraRes->httpPort());
 
-    if (cameraRes->initializationAttemptCount() == 0)
-    {
-        // There was no attempt yet to initialize the camera.
-        cameraRes->blockingInit(); // Initialize the camera to receive valid initialization result.
-    }
-
     return cameraRes->prevInitializationResult();
 }
 

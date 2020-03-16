@@ -1009,7 +1009,7 @@ void QnRtspConnectionProcessor::createDataProvider()
         {
             NX_DEBUG(this,
                 "Trying to initialize resource if it was not initialized for some unknown reason");
-            cameraRes->initAsync(true);
+            cameraRes->initAsync();
 
             // Wait for camera initializing.
             if (!d->useProprietaryFormat)

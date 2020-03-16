@@ -193,7 +193,7 @@ private:
     const qint64 m_hiStreamHlsInactivityPeriodMS;
 
     QElapsedTimer m_lastActivityTimer;
-
+    nx::utils::ElapsedTimer m_tryToInitTimer;
 private:
     enum class ForceLiveCacheForPrimaryStream { no, yes, auto_ };
 

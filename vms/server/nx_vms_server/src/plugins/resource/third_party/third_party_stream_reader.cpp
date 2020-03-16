@@ -87,9 +87,8 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
                         return;
 
                     NX_VERBOSE(this, "Reinitializing camera driver. 'hasDualStreaming' may be changed.");
-                    m_resource->setStatus(Qn::Offline);
                     m_isMediaUrlValid.clear();
-                    m_resource->initAsync(true);
+                    m_resource->reinitAsync();
                 }
             });
     }

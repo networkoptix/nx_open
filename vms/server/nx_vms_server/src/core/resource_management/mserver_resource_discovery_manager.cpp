@@ -576,7 +576,7 @@ void QnMServerResourceDiscoveryManager::updateResourceStatus(const QnNetworkReso
     if (!rpNetRes->isInitialized() && !rpNetRes->hasFlags(Qn::foreigner))
     {
         NX_VERBOSE(this, "Trying to init not initialized resource [%1]", rpNetRes);
-        rpNetRes->initAsync(false); //< wait for initialization
+        rpNetRes->initAsync();
     }
 }
 

@@ -422,7 +422,7 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& /*resour
     {
         NX_VERBOSE(this, "Trying to init resource [%1] after status change to [%2]",
             camera, camera->getStatus());
-        camera->initAsync(false);
+        camera->initAsync();
     }
 
     updateCamera(camera);
@@ -470,7 +470,7 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         connect(camera.data(), &QnVirtualCameraResource::recordingActionChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         updateCamera(camera);
         if (!camera->hasFlags(Qn::foreigner))
-            resource->initAsync(/*optional*/ true);
+            resource->initAsync();
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);

@@ -59,11 +59,6 @@ public:
     Camera(QnMediaServerModule* serverModule);
     virtual ~Camera() override;
 
-    /*!
-        Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
-    */
-    void blockingInit();
-
     /**
      * The difference between desired and real is that camera can have multiple clients we do not
      * know about or big exposure time.
@@ -311,6 +306,8 @@ private:
     std::atomic<size_t> m_inputPortListenerCount = 0;
     bool m_inputPortListeningInProgress = false;
     QnMutex m_ioPortStatesMutex;
+    QnMutex m_ioMonitorMutex;
+    mutable QnReadWriteLock m_cameraAdvancedProviderLock;
     std::map<QString, QnIOStateData> m_ioPortStatesCache;
     Role m_role = Role::regular;
     std::shared_ptr<Metrics> m_metrics;
