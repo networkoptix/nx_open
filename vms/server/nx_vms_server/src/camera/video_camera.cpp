@@ -679,7 +679,6 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     }
 
     reader->setOwner(toSharedPointer());
-    // TODO: Make at_camera_resourceChanged async (queued connection, etc.).
     if (role == Qn::CR_LiveVideo)
     {
         connect(
@@ -687,7 +686,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
             SIGNAL(resourceChanged(const QnResourcePtr&)),
             this,
             SLOT(at_camera_resourceChanged()),
-            Qt::DirectConnection);
+            Qt::QueuedConnection);
     }
 
     auto gopKeeper = std::make_unique<QnVideoCameraGopKeeper>(this, m_resource, catalog);
