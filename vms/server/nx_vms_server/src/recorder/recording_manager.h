@@ -132,6 +132,7 @@ private slots:
     void onTimer();
     void at_camera_initializationChanged(const QnResourcePtr &resource);
     void at_camera_resourceChanged(const QnResourcePtr &resource);
+    void at_parentId_Changed(const QnResourcePtr& resource);
     void at_checkLicenses();
     void at_serverPropertyChanged(const QnResourcePtr &, const QString &key);
 private:

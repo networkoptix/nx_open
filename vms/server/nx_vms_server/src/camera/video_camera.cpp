@@ -545,6 +545,12 @@ QnVideoCamera::QnVideoCamera(
     m_liveCache.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_lastActivityTimer.invalidate();
+
+    connect(resource.data(), &QnResource::resourceChanged, this, 
+        [this]()
+        {
+            m_tryToInitTimer.invalidate(); //< Try to init again without delay.
+        });
 }
 
 QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(StreamIndex streamIndex) const
@@ -1073,6 +1079,8 @@ bool QnVideoCamera::ensureLiveCacheStarted(MediaQuality streamQuality, qint64 ta
 QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(
     QnServer::ChunksCatalog catalog, bool ensureInitialized)
 {
+    std::chrono::seconds kCameraTryToInitInterval(30);
+
     if (m_resource->hasFlags(Qn::foreigner))
         return nullptr;
 
@@ -1084,10 +1092,11 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(
             createReader(catalog);
         }
     }
-    else if (ensureInitialized)
+    else if (ensureInitialized && m_tryToInitTimer.hasExpired(kCameraTryToInitInterval))
     {
+        m_tryToInitTimer.restart();
         NX_VERBOSE(this, "Trying to init not initialized camera [%1]", m_resource);
-        m_resource->initAsync(true);
+        m_resource->initAsync();
     }
 
     const QnSecurityCamResource* cameraResource =

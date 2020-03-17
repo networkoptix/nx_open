@@ -66,7 +66,7 @@ enum Value
     cameraInvalidParams,
     badMediaStream,
     noMediaStream,
-    cameraInitializationInProgress,
+    initializationInProgress,
     pluginError,
     liveVideoIsNotSupportedError,
     tooManyOpenedConnections,
@@ -330,7 +330,7 @@ class InitializationInProgress: public Result
 {
 public:
     InitializationInProgress():
-        Result(ErrorCode::cameraInitializationInProgress)
+        Result(ErrorCode::initializationInProgress)
     {
     }
 };

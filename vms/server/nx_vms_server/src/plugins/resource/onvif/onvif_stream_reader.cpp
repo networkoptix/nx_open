@@ -72,7 +72,7 @@ QnOnvifStreamReader::~QnOnvifStreamReader()
 CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
-    NX_VERBOSE(this, "try to get stream URL for camera %1 for role %1", m_resource->getUrl(), getRole());
+    NX_VERBOSE(this, "try to get stream URL for camera %1 for role %2", m_resource->getUrl(), getRole());
     if (isStreamOpened())
     {
         NX_VERBOSE(this, "Stream is already opened for camera %1 for role %2", m_resource->getUrl(), getRole());
@@ -117,7 +117,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
         &streamUrl, isCameraControlRequired, params);
     if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
     {
-        NX_DEBUG(this, 
+        NX_DEBUG(this,
             "Can not get stream URL for camera %1 for role %2. Request failed with code %3",
             m_resource->getUrl(), getRole(), result.toString(resourcePool()));
         return result;

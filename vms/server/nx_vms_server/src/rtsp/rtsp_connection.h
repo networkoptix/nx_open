@@ -124,6 +124,10 @@ private:
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
     AbstractRtspEncoderPtr createRtpEncoder(QnAbstractMediaData::DataType dataType);
+    QnConstAbstractMediaDataPtr getKeyFrame(
+        QnAbstractMediaData::DataType dataType, MediaQuality quality);
+    QnConstAbstractMediaDataPtr waitForKeyFrame(
+        QnAbstractMediaData::DataType dataType, MediaQuality quality);
     QnConstAbstractMediaDataPtr getCameraData(
         QnAbstractMediaData::DataType dataType, MediaQuality quality);
     static int isFullBinaryMessage(const QByteArray& data);
@@ -138,6 +142,7 @@ private:
         nx::vms::api::StreamDataFilters oldFilters) const;
     bool applyUrlParams();
     void waitForResourceInitializing(const QnNetworkResourcePtr& resource);
+
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

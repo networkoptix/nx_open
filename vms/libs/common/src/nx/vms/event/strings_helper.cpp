@@ -220,17 +220,13 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 .arg(resourceName);
 
         case EventType::analyticsSdkEvent:
-            if (!params.caption.isEmpty())
-            {
-                const auto eventName = getAnalyticsSdkEventName(params);
-                NX_ASSERT(!eventName.isEmpty());
-                return lit("%1 - %2").arg(eventName).arg(params.caption);
-            }
-
+        {
+            const auto eventName = getAnalyticsSdkEventName(params);
+            NX_ASSERT(!eventName.isEmpty());
             return tr("%1 at %2", "Analytics Event at some camera")
-                .arg(getAnalyticsSdkEventName(params))
+                .arg(params.caption.isEmpty() ? eventName : params.caption)
                 .arg(resourceName);
-
+        }
         case EventType::pluginDiagnosticEvent:
         {
             const QString caption = params.caption.isEmpty()

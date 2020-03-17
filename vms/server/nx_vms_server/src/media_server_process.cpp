@@ -2027,7 +2027,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc GET /api/pingSystem
      * Ping the system.
      * %param:string url System URL to ping.
-     * %param:string getKey Authorization key ("auth" param) for the system to ping.
+     * %param:string getKey Authorization key ("auth" param) for the System to ping.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error token, or an empty string on success.
@@ -2475,11 +2475,14 @@ void MediaServerProcess::registerRestHandlers(
      * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
      * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
      * %permissions Owner.
-     * %param:string url URL of one Server in the System to join. URL may contain credentials, in
-     *     that case getKey and postKey are not required.
-     * %param:string getKey Authentication hash of the target Server for GET requests.
-     * %param:string postKey Authentication hash of the target Server for POST requests.
      * %param:string currentPassword Current user password.
+     * %param:string url URL of one Server in the target System to join. URL may contain credentials
+     *     for target System, in that case getKey and postKey are not required. The target System
+     *     user should have Owner permissions as well.
+     * %param[opt]:string getKey Authorization key ("auth" param) for GET requests to the target
+     *     System. Required if URL does not contain credentials.
+     * %param[opt]:string postKey Authorization key ("auth" param) for POST requests to the target
+     *     System. Required if URL does not contain credentials.
      * %param[opt]:boolean takeRemoteSettings Direction of the merge. Default value is false. If
      *     <b>mergeOneServer</b> is true, <b>takeRemoteSettings</b> parameter is ignored and
      *     treated as false.

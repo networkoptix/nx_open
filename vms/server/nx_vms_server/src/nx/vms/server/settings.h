@@ -148,7 +148,7 @@ public:
         "If no one uses HLS for thid time period (in seconds), than live media cache is stopped "
         "and cleaned. It will be restarted with next HLS request."
     };
-    Option<int> resourceInitThreadsCount{this, "resourceInitThreadsCount", 32, ""};
+    Option<int> resourceInitThreadsCount{this, "resourceInitThreadsCount", 64, ""};
     Option<QString> allowedSslVersions{this, "allowedSslVersions", "",
         "Supported values: SSLv1, SSLv2, TLSv1, TLSv1.1, TLSv1.2"
     };

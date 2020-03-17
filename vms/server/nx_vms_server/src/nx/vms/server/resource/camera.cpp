@@ -74,15 +74,6 @@ Camera::~Camera()
     // Needed because of the forward declaration.
 }
 
-void Camera::blockingInit()
-{
-    if (!init())
-    {
-        //init is running in another thread, waiting for it to complete...
-        QnMutexLocker lk(&m_initMutex);
-    }
-}
-
 int Camera::getChannel() const
 {
     QnMutexLocker lock( &m_mutex );
@@ -149,7 +140,8 @@ void Camera::setUrl(const QString &urlStr)
 
 QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>& ids)
 {
-    QnMutexLocker lock(&m_initMutex);
+    QnReadLocker lock(&m_cameraAdvancedProviderLock);
+
     if (!isInitialized())
         return {};
 
@@ -217,7 +209,8 @@ boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
 
 QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap& values)
 {
-    QnMutexLocker lock(&m_initMutex);
+    QnReadLocker lock(&m_cameraAdvancedProviderLock);
+
     if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
     {
@@ -274,10 +267,10 @@ QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
     const auto getStreamParameters =
         [&](nx::vms::api::StreamIndex streamIndex)
         {
-            QnMutexLocker lock(&m_initMutex);
             if (!isInitialized())
                 return QnLiveStreamParams();
 
+            QnReadLocker lock(&m_cameraAdvancedProviderLock);
             const auto it = m_streamCapabilityAdvancedProviders.find(streamIndex);
             if (it == m_streamCapabilityAdvancedProviders.end())
                 return QnLiveStreamParams();
@@ -462,7 +455,7 @@ void Camera::initializationDone()
 
 void Camera::fixInputPortMonitoringSafe()
 {
-    QnMutexLocker lk(&m_initMutex);
+    QnMutexLocker lk(&m_ioMonitorMutex);
     fixInputPortMonitoring();
 }
 
@@ -512,6 +505,8 @@ void Camera::reopenStream(nx::vms::api::StreamIndex streamIndex)
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
 {
+    QnWriteLocker lock(&m_cameraAdvancedProviderLock);
+
     m_streamCapabilityAdvancedProviders.clear();
     m_defaultAdvancedParametersProvider = nullptr;
     m_advancedParametersProvidersByParameterId.clear();
@@ -735,14 +730,14 @@ int Camera::getMaxChannels() const
 }
 void Camera::inputPortListenerAttached()
 {
-    QnMutexLocker lk(&m_initMutex);
+    QnMutexLocker lk(&m_ioMonitorMutex);
     ++m_inputPortListenerCount;
     fixInputPortMonitoring();
 }
 
 void Camera::inputPortListenerDetached()
 {
-    QnMutexLocker lk(&m_initMutex);
+    QnMutexLocker lk(&m_ioMonitorMutex);
     if (m_inputPortListenerCount == 0)
     {
         NX_ASSERT(false, "Detached input port listener without attach");

@@ -19,16 +19,15 @@
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/metrics/metrics_storage.h>
 
-QnMutex QnResource::m_initAsyncMutex;
+namespace {
 
-static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnResource
 // -------------------------------------------------------------------------- //
 QnResource::QnResource(QnCommonModule* commonModule):
     m_mutex(QnMutex::Recursive),
-    m_initMutex(QnMutex::Recursive),
     m_commonModule(commonModule)
 {
 }
@@ -41,12 +40,9 @@ QnResource::QnResource(const QnResource& right):
     m_id(right.m_id),
     m_typeId(right.m_typeId),
     m_flags(right.m_flags),
-    m_initialized(right.m_initialized.load()),
-    m_lastInitTime(right.m_lastInitTime),
     m_prevInitializationResult(right.m_prevInitializationResult),
-    m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
-    m_initInProgress(right.m_initInProgress.load()),
+    m_initState(right.m_initState.load()),
     m_commonModule(right.m_commonModule)
 {
 }
@@ -121,11 +117,6 @@ void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& no
     {
         m_parentId = other->m_parentId;
         notifiers << [r = toSharedPointer(this)]{ emit r->parentIdChanged(r);};
-        if (m_initialized)
-        {
-            m_initialized = false;
-            notifiers << [r = toSharedPointer(this)]{ emit r->initializedChanged(r); };
-        }
     }
 
     m_locallySavedProperties = other->m_locallySavedProperties;
@@ -160,24 +151,14 @@ QnUuid QnResource::getParentId() const
 
 void QnResource::setParentId(const QnUuid& parent)
 {
-    bool initializedChanged = false;
     {
         QnMutexLocker locker(&m_mutex);
         if (m_parentId == parent)
             return;
-
         m_parentId = parent;
-        if (m_initialized)
-        {
-            m_initialized = false;
-            initializedChanged = true;
-        }
     }
 
     emit parentIdChanged(toSharedPointer(this));
-
-    if (initializedChanged)
-        emit this->initializedChanged(toSharedPointer(this));
 }
 
 QString QnResource::getName() const
@@ -326,11 +307,14 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
         commonModule()->metrics()->offlineStatus()++;
 
-    if (m_initialized && (newStatus == Qn::Offline || newStatus == Qn::Unauthorized))
+    if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized)
     {
-        NX_VERBOSE(this, "Signal initialized for status %1", newStatus);
-        m_initialized = false;
-        emit initializedChanged(toSharedPointer(this));
+        if (switchState(initDone, initNone))
+        {
+            NX_VERBOSE(this, 
+                "Mark resource %1 as uninitialized because its status %2", getId(), newStatus);
+            emit initializedChanged(toSharedPointer(this));
+        }
     }
 
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
@@ -625,54 +609,48 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 
 // -----------------------------------------------------------------------------
 
+bool QnResource::switchState(InitState from, InitState to)
+{
+    return m_initState.compare_exchange_strong(from, to);
+}
+
 bool QnResource::init()
 {
     auto commonModule = this->commonModule();
-    auto parentId = getParentId();
-    {
-        QnMutexLocker lock(&m_initMutex);
-        if (!commonModule || commonModule->isNeedToStop())
-            return false;
+    if (!commonModule || commonModule->isNeedToStop())
+        return false;
 
-        if (m_initialized)
-            return true; /* Nothing to do. */
-        if (m_initInProgress)
-            return false; /* Skip request if init is already running. */
-        m_initInProgress = true;
-        m_interruptInitialization = false;
-    }
+    if (!switchState(initNone, initInProgress))
+        return false; //< Already initializing
 
-    NX_DEBUG(this, "Initiatialize...");
-    CameraDiagnostics::Result initResult = initInternal();
-    NX_DEBUG(this, "Initialization result: %1",
-        initResult.toString(commonModule->resourcePool()));
-
+    const auto parentId = getParentId();
+    CameraDiagnostics::Result initResult;
     bool isInitialized = false;
+    while(1)
     {
-        QnMutexLocker lock(&m_initMutex);
-        m_initInProgress = false;
-        if (m_interruptInitialization)
-        {
-            NX_VERBOSE(this, "Initialization is interrupted");
-            return init();
-        }
+        NX_DEBUG(this, "Start initializing for resource %1", getId());
+        if (parentId == getParentId())
+            initResult = initInternal();
+        NX_DEBUG(this, "Initialization finished for resource %1 with result: %2",
+            getId(), initResult.toString(commonModule->resourcePool()));
 
         {
             QnMutexLocker lk(&m_mutex);
             m_prevInitializationResult = initResult;
-
-            if (parentId != m_parentId)
-                return false; //< Initialization has been interrupted by changing parentId.
-            isInitialized = m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+            isInitialized = (parentId == m_parentId)
+                && (initResult.errorCode == CameraDiagnostics::ErrorCode::noError);
         }
 
-        m_initializationAttemptCount.fetchAndAddOrdered(1);
-
-        if (isInitialized)
-            initializationDone();
-        else if (isOnline())
-            setStatus(Qn::Offline);
+        if (switchState(initInProgress, isInitialized ? initDone : initNone))
+            break;
+        NX_VERBOSE(this, "Reinit is requested during previous initialization for resource %1. Init again.", getId());
+        NX_ASSERT(switchState(reinitRequested, initInProgress));
     }
+
+    if (isInitialized)
+        initializationDone();
+    else if (isOnline())
+        setStatus(Qn::Offline);
 
     if (isInitialized)
         emit initializedChanged(toSharedPointer(this));
@@ -694,78 +672,40 @@ private:
 
 void QnResource::reinitAsync()
 {
-    if (commonModule()->isNeedToStop() || hasFlags(Qn::foreigner))
-        return;
-    if (resourcePool() == nullptr)
+    if (resourcePool() == nullptr || commonModule()->isNeedToStop() || hasFlags(Qn::foreigner))
         return;
 
-    NX_DEBUG(this, "Reinitialization is requested");
-    {
-        QnMutexLocker lock(&m_initAsyncMutex);
-        if (m_initInProgress)
-        {
-            m_interruptInitialization = true;
-            return;
-        }
-
-        m_lastInitTime = getUsecTimer();
-    }
+    NX_DEBUG(this, "Reinitialization is requested for resource %1", getId());
+    if (switchState(initInProgress, reinitRequested))
+        return; //< Initialization will be requested again after current init is finished.
 
     setStatus(Qn::Offline);
-    if (const auto pool = resourcePool())
-        pool->threadPool()->start(new InitAsyncTask(toSharedPointer(this)));
+    initAsync(); //< Schedule init request
 }
 
-void QnResource::initAsync(bool optional)
+void QnResource::initAsync()
 {
-    if (resourcePool() == nullptr)
-        return;
-
-    NX_VERBOSE(this, "Async init requested for resource %1 (optional: %2)", getId(), optional);
-
-    qint64 t = getUsecTimer();
-
-    QnMutexLocker lock(&m_initAsyncMutex);
-
-    if (t - m_lastInitTime < MIN_INIT_INTERVAL && optional)
-    {
-        NX_VERBOSE(this, "Not running optional init task: init was recently (%1us < %2us)",
-            t - m_lastInitTime, MIN_INIT_INTERVAL);
-        return;
-    }
-
-    if (commonModule()->isNeedToStop())
-    {
-        NX_VERBOSE(this, "Not running init task: server is stopping");
-        return;
-    }
-
-    if (hasFlags(Qn::foreigner))
-    {
-        NX_VERBOSE(this, "Not running init task: removed to other server");
-        return;
-    }
-
-    auto resourcePool = this->resourcePool();
+    const auto resourcePool = this->resourcePool();
     if (!resourcePool)
     {
-        NX_DEBUG(this, "Not running init task: resource pool is unavailable");
+        NX_DEBUG(this, 
+            "Not running init task for resource %1: resource pool is unavailable", getId());
+        return;
+    }
+    else if (commonModule()->isNeedToStop())
+    {
+        NX_VERBOSE(this, "Not running init task for resource %1: server is stopping", getId());
+        return;
+    }
+    else if (hasFlags(Qn::foreigner))
+    {
+        NX_VERBOSE(this, "Not running init task for resource %1: removed to other server", getId());
         return;
     }
 
-    InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
-    if (!optional)
-    {
-        resourcePool->threadPool()->start(task);
-    }
-    else if (!resourcePool->threadPool()->tryStart(task))
-    {
-        delete task;
-        NX_DEBUG(this, "Not running init task: thread pool is fully loaded");
-        return;
-    }
-
-    m_lastInitTime = t;
+    NX_VERBOSE(this, "Async init requested for resource %1)", getId());
+    InitAsyncTask* task = new InitAsyncTask(toSharedPointer(this));
+    resourcePool->threadPool()->start(task);
 }
 
 CameraDiagnostics::Result QnResource::prevInitializationResult() const
@@ -774,19 +714,15 @@ CameraDiagnostics::Result QnResource::prevInitializationResult() const
     return m_prevInitializationResult;
 }
 
-int QnResource::initializationAttemptCount() const
-{
-    return m_initializationAttemptCount.load();
-}
-
 bool QnResource::isInitialized() const
 {
-    return m_initialized;
+    return m_initState == initDone;
 }
 
 bool QnResource::isInitializationInProgress() const
 {
-    return m_initInProgress;
+    const auto state = m_initState.load();
+    return state == initInProgress || state == reinitRequested;
 }
 
 void QnResource::setUniqId(const QString& /*value*/)

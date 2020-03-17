@@ -410,42 +410,25 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
     startOrStopRecording(cameraRes, camera, recorders);
 }
 
-void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& /*resource*/)
+void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& resource)
 {
-    QnVirtualCameraResource* cameraPtr = dynamic_cast<QnVirtualCameraResource*>(sender());
-    if( !cameraPtr )
-        return;
-
-    const QnVirtualCameraResourcePtr& camera = cameraPtr->toSharedPointer().staticCast<QnVirtualCameraResource>();
-    const bool ownResource = !camera->hasFlags(Qn::foreigner);
-    if (ownResource && !camera->isInitialized())
-    {
-        NX_VERBOSE(this, "Trying to init resource [%1] after status change to [%2]",
-            camera, camera->getStatus());
-        camera->initAsync(false);
-    }
-
-    updateCamera(camera);
-
-    // no need mutex here because of readOnly access from other threads and m_recordMap modified only from current thread
-    //QnMutexLocker lock( &m_mutex );
-
-    auto itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
-    if (itr != m_recordMap.end() && ownResource)
-    {
-        const auto& value = itr->second;
-        if (value.recorderHiRes && value.recorderHiRes->recorder->isAudioPresent() != camera->isAudioEnabled())
-            value.recorderHiRes->recorder->setNeedReopen();
-        if (value.recorderLowRes && value.recorderLowRes->recorder->isAudioPresent() != camera->isAudioEnabled())
-            value.recorderLowRes->recorder->setNeedReopen();
-    }
+    QnVirtualCameraResourcePtr camera =  resource.dynamicCast<QnVirtualCameraResource>();
+    if (camera && !camera->hasFlags(Qn::foreigner))
+        updateCamera(camera);
 }
 
 void QnRecordingManager::at_camera_initializationChanged(const QnResourcePtr &resource)
 {
-    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
-    if (camera && camera->isInitialized())
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (camera && !camera->hasFlags(Qn::foreigner) && camera->isInitialized())
         updateCamera(camera);
+}
+
+void QnRecordingManager::at_parentId_Changed(const QnResourcePtr& resource)
+{
+    const QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (camera && !camera->hasFlags(Qn::foreigner))
+        camera->reinitAsync();
 }
 
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
@@ -466,11 +449,11 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         // TODO: resource::update() has not trigger signal resourceChanged. So, connect to the 'parentIdChanged' additionally.
-        connect(camera.data(), &QnResource::parentIdChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
+        connect(camera.data(), &QnResource::parentIdChanged,    this, &QnRecordingManager::at_parentId_Changed);
         connect(camera.data(), &QnVirtualCameraResource::recordingActionChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         updateCamera(camera);
         if (!camera->hasFlags(Qn::foreigner))
-            resource->initAsync(/*optional*/ true);
+            resource->initAsync();
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);

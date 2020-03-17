@@ -551,12 +551,19 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
 {
     Q_D(QnRtspConnectionProcessor);
 
+    nx::utils::Url url(d->request.requestLine.url);
+    const QUrlQuery urlQuery(url.query());
+    bool useMultiplePayloadTypes = urlQuery.hasQueryItem("multiple_payload_types");
+
     QnConstAbstractMediaDataPtr mediaHigh = getCameraData(dataType, MEDIA_Quality_High);
     QnConstAbstractMediaDataPtr mediaLow;
 
     QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(d->mediaRes->toResource());
-    if (camRes && camRes->hasDualStreaming())
+    if (camRes && camRes->hasDualStreaming() &&
+        (useMultiplePayloadTypes || d->quality == MEDIA_Quality_Low))
+    {
         mediaLow = getCameraData(dataType, MEDIA_Quality_Low);
+    }
 
     QnConstAbstractMediaDataPtr media =
         d->quality == MEDIA_Quality_High || d->quality == MEDIA_Quality_ForceHigh
@@ -582,8 +589,6 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
         return nullptr;
     }
     QnResourcePtr res = getResource()->toResourcePtr();
-    nx::utils::Url url(d->request.requestLine.url);
-    const QUrlQuery urlQuery( url.query() );
     int rotation;
     if (urlQuery.hasQueryItem("rotation"))
         rotation = urlQuery.queryItemValue("rotation").toInt();
@@ -595,8 +600,7 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
     config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
     config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
     config.addOnvifHeaderExtension = d->params.onvifReplay();
-    if (urlQuery.hasQueryItem("multiple_payload_types"))
-        config.useMultipleSdpPayloadTypes = true;
+    config.useMultipleSdpPayloadTypes = useMultiplePayloadTypes;
 
     QnLegacyTranscodingSettings extraTranscodeParams;
     extraTranscodeParams.resource = getResource();
@@ -613,6 +617,60 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
     return universalEncoder;
 }
 
+QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getKeyFrame(
+    QnAbstractMediaData::DataType dataType, MediaQuality quality)
+{
+    Q_D(QnRtspConnectionProcessor);
+    QnSharedResourcePointer<QnVideoCamera> videoCamera;
+    auto resource = getResource();
+    if (!resource)
+    {
+        NX_WARNING(this, "Resource not initialized, failed to get last key frame");
+        return nullptr;
+    }
+    auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource->toResourcePtr());
+    videoCamera = camera.dynamicCast<QnVideoCamera>();
+    if (!videoCamera)
+    {
+        NX_WARNING(this, "Camera not found, failed to get last key frame");
+        return nullptr;
+    }
+    const nx::vms::api::StreamIndex streamIndex =
+        (quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh)
+        ? nx::vms::api::StreamIndex::primary
+        : nx::vms::api::StreamIndex::secondary;
+
+    if (dataType == QnAbstractMediaData::VIDEO)
+        return videoCamera->getLastVideoFrameRtsp(streamIndex, /*channel*/ 0);
+    else
+        return videoCamera->getLastAudioFrameRtsp(streamIndex);
+}
+
+QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::waitForKeyFrame(
+    QnAbstractMediaData::DataType dataType, MediaQuality quality)
+{
+    constexpr std::chrono::milliseconds kSleepInterval(100);
+    constexpr std::chrono::seconds kWaitTimeout(10);
+    std::chrono::milliseconds overallWait(0);
+
+    while(!m_needStop)
+    {
+        auto result = getKeyFrame(dataType, quality);
+        if (result)
+            return result;
+
+        std::this_thread::sleep_for(kSleepInterval);
+        overallWait += kSleepInterval;
+        if (overallWait > kWaitTimeout)
+        {
+            NX_WARNING(this, "Stream initializing timeout expired: %1, dataType %2, quality %3",
+                kWaitTimeout, dataType, quality);
+            return nullptr;
+        }
+    }
+    return nullptr;
+}
+
 QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
     QnAbstractMediaData::DataType dataType, MediaQuality quality)
 {
@@ -623,33 +681,12 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
     bool canCheckLive = (dataType == QnAbstractMediaData::VIDEO) || (d->startTime == DATETIME_NOW);
     if (canCheckLive)
     {
-        QnSharedResourcePointer<QnVideoCamera> videoCamera;
-        const nx::vms::api::StreamIndex streamIndex =
-            (quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh)
-            ? nx::vms::api::StreamIndex::primary
-            : nx::vms::api::StreamIndex::secondary;
-        if (getResource())
-        {
-            auto camera =
-                d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
-            videoCamera = camera.dynamicCast<QnVideoCamera>();
-        }
+        QnConstAbstractMediaDataPtr result = waitForKeyFrame(dataType, quality);
+        if (result)
+            return result;
 
-        if (videoCamera)
-        {
-            QnConstAbstractMediaDataPtr result;
-            if (dataType == QnAbstractMediaData::VIDEO)
-                result = videoCamera->getLastVideoFrameRtsp(streamIndex, /*channel*/ 0);
-            else
-                result = videoCamera->getLastAudioFrameRtsp(streamIndex);
-
-            if (result)
-                return result;
-        }
-        else
-        {
-            NX_DEBUG(this, "Camera not found, archive will be checked");
-        }
+        NX_DEBUG(this, "Failed to get last key frame from live stream, try archive, quality %1",
+            quality);
     }
 
     // 2. Find a packet inside the archive.
@@ -953,10 +990,17 @@ void QnRtspConnectionProcessor::waitForResourceInitializing(const QnNetworkResou
     constexpr std::chrono::milliseconds kSleepInterval(100);
     constexpr std::chrono::seconds kWaitTimeout(4);
     std::chrono::milliseconds overallWait(0);
-    while(!m_needStop && !resource->isInitialized() && overallWait < kWaitTimeout)
+
+    while(!m_needStop && !resource->isInitialized())
     {
         std::this_thread::sleep_for(kSleepInterval);
         overallWait += kSleepInterval;
+
+        if (overallWait > kWaitTimeout)
+        {
+            NX_WARNING(this, "Resource initializing timeout expired: %1", kWaitTimeout);
+            break;
+        }
     }
 }
 
@@ -1009,7 +1053,7 @@ void QnRtspConnectionProcessor::createDataProvider()
         {
             NX_DEBUG(this,
                 "Trying to initialize resource if it was not initialized for some unknown reason");
-            cameraRes->initAsync(true);
+            cameraRes->initAsync();
 
             // Wait for camera initializing.
             if (!d->useProprietaryFormat)

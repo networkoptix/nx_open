@@ -42,7 +42,7 @@ angular.module('webadminApp')
 
         $scope.login = function (form) {
             $timeout(function() {
-                if ($scope.loginForm.$valid && !$scope.authorized) {
+                if ($scope.loginForm.$valid && !$scope.authorized && !$scope.authorizing) {
                     $scope.authorizing = true;
                     touchForm(form);
                     var login = $scope.user.username.toLowerCase();
@@ -51,28 +51,20 @@ angular.module('webadminApp')
                     mediaserver
                         .login(login, password)
                         .then(reload, function (error) {
-                            if (error.authResult !== '') {
-                                switch (error.authResult) {
-                                    case 'Auth_WrongLogin':
-                                    case 'Auth_WrongPassword':
-                                        dialogs.alert(L.login.incorrectPassword);
-                                        break;
-                                    case 'Auth_LockedOut':
-                                    default:
-                                        dialogs.alert(L.login.authLockout);
-                                }
-                            } else {
-                                if (error.errorString.toLowerCase().indexOf('wrong') > -1) {
-                                    dialogs.alert(L.login.incorrectPassword);
-                                } else {
-                                    dialogs.alert(L.login.authLockout);
-                                }
+                            var alertMessage = L.login.authLockout;
+                            var authResult = error.authResult !== '' &&
+                                ['Auth_WrongLogin', 'Auth_WrongPassword'].some(function(code){
+                                    return code === error.authResult;
+                                });
+                            if ( authResult || error.errorString.toLowerCase().indexOf('wrong') > -1) {
+                                alertMessage = L.login.incorrectPassword;
                             }
+                            return dialogs.alert(alertMessage);
                         }).then(function () {
-                        nativeClient.updateCredentials(login, password, false, false);
-                    }).finally(function () {
-                        $scope.authorizing = false;
-                    });
+                            nativeClient.updateCredentials(login, password, false, false);
+                        }).finally(function () {
+                            $scope.authorizing = false;
+                        });
                 }
             }, 50);
         };
