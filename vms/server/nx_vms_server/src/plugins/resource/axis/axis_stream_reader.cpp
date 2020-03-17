@@ -60,7 +60,7 @@ int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
 
 CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
-    NX_VERBOSE(this, lit("try to get stream URL for camera %1 for role %1").arg(m_resource->getUrl()).arg(getRole()));
+    NX_VERBOSE(this, lit("try to get stream URL for camera %1 for role %2").arg(m_resource->getUrl()).arg(getRole()));
 
     if (isStreamOpened())
     {
