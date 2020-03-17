@@ -549,12 +549,6 @@ void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
 
     fields |= updateEventClassRelatedParams();
 
-    if (actionIsUsingSourceServer() && !actionCanUseSourceServer())
-    {
-        m_actionParams.useSource = false;
-        fields |= Field::actionParams;
-    }
-
     emit dataChanged(fields);
     // TODO: #GDM #Business check others, params and resources should be merged
 }
@@ -650,7 +644,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
 
         case vms::event::ActionType::buzzerAction:
         {
-            if (actionIsUsingSourceServer())
+            if (actionCanUseSourceServer() && actionIsUsingSourceServer())
                 return getIcon(Column::source);
         }
 
@@ -1426,14 +1420,16 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
         const QnMediaServerResourceList targetServers =
             resourcePool()->getResourcesByIds<QnMediaServerResource>(m_actionResources);
 
+        bool actuallyUsesSourceServer = actionCanUseSourceServer() && actionIsUsingSourceServer();
+
         if (targetServers.isEmpty())
-            return actionIsUsingSourceServer() ? tr("Source Server") : tr("Select Server");
+            return actuallyUsesSourceServer ? tr("Source Server") : tr("Select Server");
 
         const auto targetServersString = (targetServers.count() > 1)
             ? tr("%n Servers", "", targetServers.count())
             : targetServers.first()->getName();
 
-        return actionIsUsingSourceServer()
+        return actuallyUsesSourceServer
             ? tr("Source Server and %1").arg(targetServersString)
             : targetServersString;
     }
