@@ -189,6 +189,7 @@ bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(bool,          readBool,       writeBool)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(quint8,        readUInt8,      writeUInt8)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint8,         readInt8,       writeInt8)
+QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(char,          readChar,       writeChar)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(quint16,       readUInt16,     writeUInt16)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint16,        readInt16,      writeInt16)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint32,        readInt32,      writeInt32)

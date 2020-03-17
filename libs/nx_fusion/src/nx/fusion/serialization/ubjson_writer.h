@@ -12,7 +12,8 @@
 #include "ubjson_detail.h"
 
 template<class Output>
-class QnUbjsonWriter: private QnUbjsonDetail::ReaderWriterBase {
+class QnUbjsonWriter: private QnUbjsonDetail::ReaderWriterBase 
+{
 public:
     QnUbjsonWriter(Output *data):
         m_stream(data)
@@ -20,73 +21,95 @@ public:
         m_stateStack.push_back(State(AtArrayElement));
     }
 
-    void writeNull() {
+    void writeNull() 
+    {
         writeMarkerInternal(QnUbjson::NullMarker);
     }
 
-    void writeBool(bool value) {
+    void writeBool(bool value) 
+    {
         writeMarkerInternal(value ? QnUbjson::TrueMarker : QnUbjson::FalseMarker);
     }
 
-    void writeUInt8(quint8 value) {
+    void writeUInt8(quint8 value) 
+    {
         return writeNumberInternal(QnUbjson::UInt8Marker, value);
     }
 
-    void writeInt8(qint8 value) {
+    void writeInt8(qint8 value) 
+    {
         return writeNumberInternal(QnUbjson::Int8Marker, value);
     }
 
-    void writeUInt16(quint16 value) {
+    void writeChar(char value) 
+    {
+        return writeNumberInternal(QnUbjson::Int8Marker, value);
+    }
+
+    void writeUInt16(quint16 value) 
+    {
         return writeNumberInternal(QnUbjson::Int16Marker, (qint16)value);
     }
 
-    void writeInt16(qint16 value) {
+    void writeInt16(qint16 value) 
+    {
         return writeNumberInternal(QnUbjson::Int16Marker, value);
     }
 
-    void writeInt32(qint32 value) {
+    void writeInt32(qint32 value) 
+    {
         return writeNumberInternal(QnUbjson::Int32Marker, value);
     }
 
-    void writeInt64(qint64 value) {
+    void writeInt64(qint64 value) 
+    {
         return writeNumberInternal(QnUbjson::Int64Marker, value);
     }
 
-    void writeUInt64(quint64 value) {
+    void writeUInt64(quint64 value) 
+    {
         return writeNumberInternal(QnUbjson::Int64Marker, (qint64)value);
     }
 
-    void writeFloat(float value) {
+    void writeFloat(float value) 
+    {
         // TODO: #Elric support NaN (like in JSON spec)
         return writeNumberInternal(QnUbjson::FloatMarker, value);
     }
 
-    void writeDouble(double value) {
+    void writeDouble(double value) 
+    {
         // TODO: #Elric support NaN (like in JSON spec)
         return writeNumberInternal(QnUbjson::DoubleMarker, value);
     }
 
-    void writeBigNumber(const QByteArray &value) {
+    void writeBigNumber(const QByteArray &value) 
+    {
         return writeUtf8StringInternal(QnUbjson::BigNumberMarker, value);
     }
 
-    void writeLatin1Char(char value) {
+    void writeLatin1Char(char value) 
+    {
         return writeNumberInternal(QnUbjson::Latin1CharMarker, value);
     }
 
-    void writeUtf8String(const QByteArray &value) {
+    void writeUtf8String(const QByteArray &value) 
+    {
         return writeUtf8StringInternal(QnUbjson::Utf8StringMarker, value);
     }
 
-    void writeUtf8String(const QString &value) {
+    void writeUtf8String(const QString &value) 
+    {
         writeUtf8String(value.toUtf8());
     }
 
-    void writeUtf8String(const std::string& value) {
+    void writeUtf8String(const std::string& value) 
+    {
         writeUtf8String(QByteArray::fromRawData(value.c_str(), (int) value.size()));
     }
 
-    void writeBinaryData(const QByteArray &value) {
+    void writeBinaryData(const QByteArray &value) 
+    {
         writeArrayStart(value.size(), QnUbjson::UInt8Marker);
 
         m_stream.writeBytes(value);
@@ -98,43 +121,51 @@ public:
         writeArrayEnd();
     }
 
-    void writeArrayStart(int size = -1, QnUbjson::Marker type = QnUbjson::InvalidMarker) {
+    void writeArrayStart(int size = -1, QnUbjson::Marker type = QnUbjson::InvalidMarker) 
+    {
         writeContainerStartInternal<AtArrayStart, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd>(QnUbjson::ArrayStartMarker, size, type);
     }
 
-    void writeArrayEnd() {
+    void writeArrayEnd() 
+    {
         writeContainerEndInternal(QnUbjson::ArrayEndMarker);
     }
 
-    void writeObjectStart(int size = -1, QnUbjson::Marker type = QnUbjson::InvalidMarker) {
+    void writeObjectStart(int size = -1, QnUbjson::Marker type = QnUbjson::InvalidMarker) 
+    {
         writeContainerStartInternal<AtObjectStart, AtObjectKey, AtSizedObjectKey, AtTypedSizedObjectKey, AtObjectEnd>(QnUbjson::ObjectStartMarker, size, type);
     }
 
-    void writeObjectEnd() {
+    void writeObjectEnd() 
+    {
         writeContainerEndInternal(QnUbjson::ObjectEndMarker);
     }
 
 private:
     template<class T>
-    void writeNumberInternal(QnUbjson::Marker marker, T value) {
+    void writeNumberInternal(QnUbjson::Marker marker, T value) 
+    {
         writeMarkerInternal(marker);
         m_stream.writeNumber(value);
     }
 
-    void writeUtf8StringInternal(QnUbjson::Marker marker, const QByteArray &value) {
+    void writeUtf8StringInternal(QnUbjson::Marker marker, const QByteArray &value) 
+    {
         writeMarkerInternal(marker);
         writeSizeToStream(value.size());
         m_stream.writeBytes(value);
     }
 
     template<Status startStatus, Status normalStatus, Status sizedStatus, Status typedSizedStatus, Status endStatus>
-    void writeContainerStartInternal(QnUbjson::Marker marker, int size, QnUbjson::Marker type) {
+    void writeContainerStartInternal(QnUbjson::Marker marker, int size, QnUbjson::Marker type) 
+    {
         writeMarkerInternal(marker);
 
         m_stateStack.push_back(State(startStatus));
         State &state = m_stateStack.back();
 
-        if(type != QnUbjson::InvalidMarker) {
+        if(type != QnUbjson::InvalidMarker) 
+        {
             NX_ASSERT(QnUbjson::isValidContainerType(type) && size >= 0);
 
             m_stream.writeMarker(QnUbjson::ContainerTypeMarker);
@@ -145,18 +176,23 @@ private:
             state.type = type;
             state.count = size;
             state.status = state.count == 0 ? endStatus : typedSizedStatus;
-        } else if(size >= 0) {
+        } 
+        else if(size >= 0) 
+        {
             m_stream.writeMarker(QnUbjson::ContainerSizeMarker);
             writeSizeToStream(size);
 
             state.count = size;
             state.status = state.count == 0 ? endStatus : sizedStatus;
-        } else {
+        } 
+        else 
+        {
             state.status = normalStatus;
         }
     }
 
-    void writeContainerEndInternal(QnUbjson::Marker marker) {
+    void writeContainerEndInternal(QnUbjson::Marker marker) 
+    {
         NX_ASSERT(m_stateStack.size() > 1);
         NX_ASSERT(m_stateStack.back().count <= 0);
 
@@ -165,9 +201,11 @@ private:
         m_stateStack.pop_back();
     }
 
-    void writeMarkerInternal(QnUbjson::Marker marker) {
+    void writeMarkerInternal(QnUbjson::Marker marker) 
+    {
         State &state = m_stateStack.back();
-        switch (state.status) {
+        switch (state.status) 
+        {
         case AtArrayStart:
             m_stream.writeMarker(marker);
             break;
@@ -215,11 +253,10 @@ private:
 
         case AtSizedObjectValue:
             state.count--;
-            if(state.count == 0) {
+            if(state.count == 0) 
                 state.status = AtObjectEnd;
-            } else {
+            else
                 state.status = AtSizedObjectKey;
-            }
             m_stream.writeMarker(marker);
             break;
 
@@ -231,11 +268,10 @@ private:
         case AtTypedSizedObjectValue:
             NX_ASSERT(marker == state.type);
             state.count--;
-            if(state.count == 0) {
+            if(state.count == 0) 
                 state.status = AtObjectEnd;
-            } else {
+            else
                 state.status = AtSizedObjectKey;
-            }
             break;
 
         case AtObjectEnd:
@@ -247,14 +283,20 @@ private:
         }
     }
 
-    void writeSizeToStream(int value) {
-        if(value <= 255) {
+    void writeSizeToStream(int value) 
+    {
+        if(value <= 255) 
+        {
             m_stream.writeMarker(QnUbjson::UInt8Marker);
             m_stream.writeNumber(static_cast<quint8>(value));
-        } else if (value <= 32767) {
+        } 
+        else if (value <= 32767) 
+        {
             m_stream.writeMarker(QnUbjson::Int16Marker);
             m_stream.writeNumber(static_cast<qint16>(value));
-        } else {
+        } 
+        else 
+        {
             m_stream.writeMarker(QnUbjson::Int32Marker);
             m_stream.writeNumber(static_cast<qint32>(value));
         }
@@ -270,7 +312,8 @@ private:
  * anyway. Also when wrapping is enabled, ADL fails to find template overloads. */
 
 template<class Output>
-QnUbjsonWriter<Output> *disable_user_conversions(QnUbjsonWriter<Output> *value) {
+QnUbjsonWriter<Output> *disable_user_conversions(QnUbjsonWriter<Output> *value) 
+{
     return value;
 }
 

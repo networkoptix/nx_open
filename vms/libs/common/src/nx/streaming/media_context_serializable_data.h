@@ -43,8 +43,8 @@ struct QnMediaContextSerializableData
 
     AVCodecID codecId;
     AVMediaType codecType;
-    QByteArray rcEq; ///< Empty (represents char* null) or nul-terminated.
-    QByteArray extradata;
+    std::vector<char> rcEq; ///< Empty (represents char* null) or nul-terminated.
+    std::vector<quint8> extradata;
 
     /// Length is 0 or QnAvCodecHelper::kMatrixLength.
     std::vector<quint16> intraMatrix;
