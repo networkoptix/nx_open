@@ -99,8 +99,6 @@ class QnRecordingManager:
 {
     Q_OBJECT
 public:
-    int recordingChunkDurationSec() const;
-
     QnRecordingManager(
         QnMediaServerModule* serverModule,
         ec2::QnDistributedMutexManager* mutexManager);

@@ -94,6 +94,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(
 {
     NX_VERBOSE(this, "New");
 
+    setTruncateInterval(m_serverModule->settings().mediaFileDuration());
+
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     //m_needUpdateStreamParams = true;
@@ -889,7 +891,7 @@ void QnServerStreamRecorder::fileFinished(
 {
     if (fileSize < 0)
     {
-        NX_WARNING(this, 
+        NX_WARNING(this,
             "The size for file '%1' is not known. It will be defaulting to 0", fileName);
     }
 
