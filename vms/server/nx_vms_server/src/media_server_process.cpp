@@ -1175,7 +1175,7 @@ void MediaServerProcess::updateAddressesList()
     const nx::utils::Url defaultUrl(m_mediaServer->getApiUrl());
     const nx::network::SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
     if (std::find(serverAddresses.begin(), serverAddresses.end(),
-                  defaultAddress) == serverAddresses.end())
+        defaultAddress) == serverAddresses.end())
     {
         nx::network::SocketAddress newAddress;
         if (!serverAddresses.isEmpty())
