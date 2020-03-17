@@ -2182,6 +2182,115 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
+    /**%apidoc DELETE /api/downloads/{fileName}
+     * Deletes the record about the specified file previously registered in the Server's Downloader
+     * via POST /api/downloads/{fileName}.
+     * %param[opt]:boolean deleteData If set to false, the actual file will not be deleted from
+     *     the Server's filesystem. Default: true.
+     *
+     **%apidoc GET /api/downloads/{fileName}/chunks/{chunkIndex}
+     * Retrieves the binary content of the specified chunk ({chunkIndex} is zero-based) of the file
+     * previously registered in the Server's Downloader via POST /api/downloads/{fileName}.
+     * %param[proprietary]:boolean fromInternet Whether the chunk should be downloaded from the
+     *     internet and stored in the Server's Downloader. Default: false.
+     * %param[proprietary]:string url Must be specified if and only if fromInternet is true.
+     * %param[proprietary]:integer chunkSize Size of the chunk, in bytes, from 1 to 10485760 (10
+     *     MB). Must be specified if and only if fromInternet is true.
+     * %return:binary Content of the specified file chunk, as raw bytes.
+     *
+     **%apidoc GET /api/downloads/{fileName}/checksums
+     * Retrieves chunk checksums for the specified file previously registered in the Server's
+     * Downloader via POST /api/downloads/{fileName}.
+     * %param[proprietary]:option extraFormatting If present and the requested result format is
+     *     non-binary, indentation and spacing will be used to improve readability.
+     * %return:stringArray List of base64-encoded checksums for all chunks.
+     *
+     **%apidoc GET /api/downloads/status
+     * Retrieves the detailed status information for all files previously registered in the
+     * Server's Downloader via POST /api/downloads/{fileName}.
+     * %return:object JSON object with an error code, error message, and the reply data on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param[opt]:array reply On success, contains the list of file information objects for
+     *         each file registered in the Server's Downloader.
+     *         %struct FileInformation
+     *
+     **%apidoc GET /api/downloads/{fileName}/status
+     * Retrieves the detailed status information for the specified file previously registered in
+     * the Server's Downloader via POST /api/downloads/{fileName}.
+     * %return:object JSON object with an error code, error message, and the reply data on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param[opt]:object reply On success, contains the file information object.
+     *         %struct FileInformation
+     *
+     **%apidoc[proprietary] PUT /api/downloads/{fileName}
+     * Equivalent of POST /api/downloads/{fileName}.
+     *
+     **%apidoc POST /api/downloads/{fileName}
+     * Registers the file in the Server's Downloader. Here {fileName} is an arbitrary identifier
+     * for the file; it must be unique throughout the entire VMS System, and is intended to be used
+     * in further calls related to this file record.
+     * <br/>
+     * After registering, starts the download session for the file - the content for the file will
+     * be downloaded by the Server from the internet and/or other Servers in the System which have
+     * already downloaded certain chunks of the file.
+     * <br/>
+     * The file, when its content is obtained by the Server, can then be used for various purposes,
+     * e.g. to create a Virtual Camera having the file content as its video archive.
+     * %// ATTENTION: This API function has an option-typed param `upload`, which, if present,
+     *     changes the set of other params and the semantics of this function, thus, such case is
+     *     documented as a separate API function with `?upload` appended to the function name.
+     * %param[opt]:integer size File size, in bytes. Can be omitted if unknown.
+     * %param[opt]:string md5 MD5 checksum of the whole file content. Can be omitted if unknown.
+     * %param:string url Internet URL from which the Server will download the file content.
+     * %param[proprietary]:string peerPolicy Default: none. Defines whether the Server will attempt
+     *     to download the file from other Servers in the System, and which Servers.
+     *     %value none Do not attempt to download the file from other Servers of the System.
+     *     %value all Attempt to download the file from other Servers of the System.
+     *     %value byPlatform Attempt to download the file from other Servers of the System, but
+     *         only those Servers which have the same hardware platform.
+     * %return:object JSON object with an error code and error message.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *
+     **%apidoc POST /api/downloads/{fileName}?upload
+     * Registers the file in the Server's Downloader. Here {fileName} is an arbitrary identifier
+     * for the file; it must be unique throughout the entire VMS System, and is intended to be used
+     * in further calls related to this file record.
+     * <br/>
+     * After registering, starts the upload session for the file - the content for the file should
+     * then be uploaded chunk-by-chunk via PUT /api/downloads/{fileName}/chunks/{chunkIndex}.
+     * <br/>
+     * The file, when its content is obtained by the Server, can then be used for various purposes,
+     * e.g. to create a Virtual Camera having the file content as its video archive.
+     * %// ATTENTION: This function has `?upload` appended to its name. The corresponding API call
+     *     without `upload` param is documented as a separate function.
+     * %param:integer size File size, in bytes.
+     * %param:string md5 MD5 checksum of the entire file.
+     * %param:integer chunkSize Size of the chunk, in bytes, from 1 to 10485760 (10 MB).
+     * %param[opt]:integer ttl If specified, defines the time-to-live for the file, in
+     *     milliseconds: if the file was not written to during the specified amount of time, its
+     *     record and content will be deleted from the Server.
+     * %param[opt]:boolean recreate Allows to create the new file record if a record for the same
+     *     {fileName} already exists. Default: false.
+     * %return:object JSON object with an error code and error message.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *
+     **%apidoc PUT /api/downloads/{fileName}/chunks/{chunkIndex}
+     * Sends to the Server the binary content of the specified chunk of the file previously
+     * registered in the Server's Downloader via POST /api/downloads/{fileName}. Here {chunkIndex}
+     * is zero-based, and the request body must contain the chunk bytes and must have
+     * "Content-Type: application/octet-stream". To validate the upload, call
+     * GET /api/downloads/{fileName}/status.
+     * %return:object JSON object with an error code and error message.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *
+     **%apidoc[proprietary] POST /api/downloads/
+     * Equivalent of PUT /api/downloads/.
+     */
     reg("api/downloads/", new nx::vms::server::rest::handlers::Downloads(serverModule()));
 
     /**%apidoc[proprietary] GET /api/settime
