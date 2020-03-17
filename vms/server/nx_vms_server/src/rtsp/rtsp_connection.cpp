@@ -1304,6 +1304,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
             d->archiveDP->stop();
         if (d->thumbnailsDP)
             d->thumbnailsDP->stop();
+        d->archiveDpOpened = false;
     }
     else
     {
