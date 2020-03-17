@@ -377,12 +377,6 @@ bool UpdateManager::canDownloadFile(const update::Package& package, update::Stat
         switch (fileInformation.status)
         {
             case FileInformation::Status::downloading:
-                *outUpdateStatus = update::Status(
-                    peerId,
-                    update::Status::Code::downloading,
-                    update::Status::ErrorCode::noError,
-                    fileInformation.calculateDownloadProgress());
-                return false;
             case FileInformation::Status::uploading:
                 *outUpdateStatus = update::Status(
                     peerId,
