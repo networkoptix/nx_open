@@ -168,7 +168,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             QScopedValueRollback<bool> guard(d->isMenuOpened, true);
 
             static const QPoint kVerticalOffset(0, 2);
-            d->mainMenuHolder.reset(menu()->newMenu(action::MainScope, nullptr));
+            d->mainMenuHolder.reset(menu()->newMenu(action::MainScope, mainWindowWidget()));
             d->mainMenuButton->setDown(true);
             executeButtonMenu(d->mainMenuButton, d->mainMenuHolder.data(), kVerticalOffset);
         });
@@ -218,7 +218,8 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
 
             QScopedPointer<QMenu> layoutsMenu(menu()->newMenu(
                 action::OpenCurrentUserLayoutMenu,
-                action::TitleBarScope));
+                action::TitleBarScope,
+                mainWindowWidget()));
 
             executeButtonMenu(d->currentLayoutsButton, layoutsMenu.data());
         });

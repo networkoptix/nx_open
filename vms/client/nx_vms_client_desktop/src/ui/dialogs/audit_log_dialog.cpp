@@ -928,7 +928,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
             action::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
 
-            menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
+            menu.reset(manager->newMenu(action::TreeScope, this, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }
@@ -936,7 +936,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
     if (menu)
         menu->addSeparator();
     else
-        menu.reset(new QMenu());
+        menu.reset(new QMenu(this));
 
     m_clipboardAction->setEnabled(gridMaster->selectionModel()->hasSelection());
     m_exportAction->setEnabled(gridMaster->selectionModel()->hasSelection());

@@ -399,7 +399,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     // Initialize system-wide menu
     if (nx::utils::AppInfo::isMacOsX())
-        menu()->newMenu(action::MainScope);
+        menu()->newMenu(action::MainScope, this);
 
     if (ini().limitFrameRate && ini().enableVSyncWorkaround)
     {

@@ -2275,7 +2275,8 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     if (!bookmarks.isEmpty())
         parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
 
-    QScopedPointer<QMenu> menu(manager->newMenu(action::TimelineScope, nullptr, parameters));
+    QScopedPointer<QMenu> menu(manager->newMenu(
+        action::TimelineScope, mainWindowWidget(), parameters));
     if (menu->isEmpty())
         return;
 

@@ -728,7 +728,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
             action::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
 
-            menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
+            menu.reset(manager->newMenu(action::TreeScope, this, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }
@@ -736,7 +736,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     if (menu)
         menu->addSeparator();
     else
-        menu.reset(new QMenu());
+        menu.reset(new QMenu(this));
 
     m_filterAction->setEnabled(idx.isValid());
     m_clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());

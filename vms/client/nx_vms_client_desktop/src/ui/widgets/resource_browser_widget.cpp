@@ -847,9 +847,10 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
 
     auto manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(action::TreeScope, nullptr, ignoreSelection
-        ? action::Parameters{Qn::NodeTypeRole, NodeType::root}
-        : currentParameters(action::TreeScope)));
+    QScopedPointer<QMenu> menu(manager->newMenu(action::TreeScope, mainWindowWidget(),
+        ignoreSelection
+            ? action::Parameters{Qn::NodeTypeRole, NodeType::root}
+            : currentParameters(action::TreeScope)));
 
     for (action::IDType key : m_renameActions.keys())
         manager->redirectAction(menu.data(), key, m_renameActions[key]);
