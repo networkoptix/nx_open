@@ -24,7 +24,8 @@ struct Ini: nx::kit::IniConfig
         "URL of Entropix image enhancement API.");
     NX_INI_FLAG(0, enableUnlimitedZoom,
         "Allows to zoom in to a very big scale by disabling the default zoom limitation.");
-    NX_INI_FLAG(0, showVideoQualityOverlay, "");
+    NX_INI_FLAG(0, showVideoQualityOverlay,
+        "Display green overlay over video if HQ or red overlay if LQ.");
 
     NX_INI_FLAG(0, externalMetadata, "Whether to use external metadata for local files.");
     NX_INI_FLAG(0, allowCustomArZoomWindows,

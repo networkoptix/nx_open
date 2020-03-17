@@ -202,8 +202,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
 
         if (m_model->actionIsUsingSourceServer())
             setActionResourcesHolderDisplayFromModel(ui->actionResourcesHolder, m_model.get());
-
-        ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
     }
 
     if (fields & Field::eventState)
@@ -281,24 +279,20 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
                     }));
         }
 
-        ui->useEventSourceServerCheckBox->setVisible(
-            vms::event::requiresServerResource(m_model->actionType()));
-        ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
-        ui->useEventSourceServerCheckBox->setChecked(m_model->actionIsUsingSourceServer());
-
         initActionParameters();
-    }
-
-    if (fields & Field::actionParams)
-    {
-        ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
-        ui->useEventSourceServerCheckBox->setChecked(m_model->actionIsUsingSourceServer());
-        if (!ui->useEventSourceServerCheckBox->isEnabled())
-            ui->useEventSourceServerCheckBox->setChecked(false);
     }
 
     if (fields & (Field::eventType | Field::actionType | Field::actionParams))
     {
+        ui->useEventSourceServerCheckBox->setVisible(
+            vms::event::requiresServerResource(m_model->actionType()));
+
+        ui->useEventSourceServerCheckBox->setEnabled(
+            m_model->actionCanUseSourceServer());
+
+        ui->useEventSourceServerCheckBox->setChecked(
+            ui->useEventSourceServerCheckBox->isEnabled() && m_model->actionIsUsingSourceServer());
+
         if (m_model->eventType() == EventType::softwareTriggerEvent)
         {
             /* SoftwareTriggerEvent is prolonged if its action is prolonged. */

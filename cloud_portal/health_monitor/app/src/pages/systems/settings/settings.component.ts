@@ -42,7 +42,6 @@ export class NxSystemSettingsComponent implements OnInit, OnDestroy {
     deletingSystem: any;
 
     menuVisible: boolean;
-    footerVisible: boolean;
     systemId: any;
     systemNoAccess: boolean;
     canMerge: boolean;
@@ -59,7 +58,6 @@ export class NxSystemSettingsComponent implements OnInit, OnDestroy {
     headerHeight: number;
 
     private connectionSubscription: Subscription;
-    private footerSubscription: Subscription;
     private menuSectionSubscription: Subscription;
     private menuSubSectionSubscription: Subscription;
     private menuSelectedDetailsSubscription: Subscription;
@@ -127,12 +125,6 @@ export class NxSystemSettingsComponent implements OnInit, OnDestroy {
                 this.getSystemInfo();
             }
         });
-
-        this.footerSubscription = this.settingsService
-            .footerSubject
-            .subscribe((value) => {
-                this.footerVisible = value;
-            });
 
         this.content = {
             selectedSection: '',         // updated by selectedSectionSubject

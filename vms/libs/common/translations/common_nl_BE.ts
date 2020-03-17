@@ -51,49 +51,49 @@
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
+      <translation>
+        <numerusform>Byte (s)</numerusform>
+        <numerusform>Byte (s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
+      <translation>
+        <numerusform>Kilobyte (s)</numerusform>
+        <numerusform>Kilobyte (s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
+      <translation>
+        <numerusform>Megabyte (s)</numerusform>
+        <numerusform>Megabyte (s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
+      <translation>
+        <numerusform>Gigabyte (s)</numerusform>
+        <numerusform>Gigabyte (s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
+      <translation>
+        <numerusform>Terabyte (s)</numerusform>
+        <numerusform>Terabyte (s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
+      <translation>
+        <numerusform>Petabyte (s)</numerusform>
+        <numerusform>Petabyte (s)</numerusform>
       </translation>
     </message>
   </context>
@@ -1830,27 +1830,27 @@
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation type="unfinished">Show desktop notification</translation>
+      <translation>Bureaubladmeldingen inschakelen</translation>
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation type="unfinished">Send mobile notification</translation>
+      <translation>Mobiele melding verzenden</translation>
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Verbruik</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Apparaat is losgekoppeld</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Camera is losgekoppeld</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>I / O-module is losgekoppeld</translation>
     </message>
   </context>
   <context>
