@@ -573,8 +573,8 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos)
     WeakGraphicsItemPointerList items(display()->scene()->selectedItems());
     executeDelayedParented([this, pos, items]()
         {
-            QScopedPointer<QMenu> menu(this->menu()->newMenu(action::SceneScope, nullptr,
-                items.materialized()));
+            QScopedPointer<QMenu> menu(this->menu()->newMenu(
+                action::SceneScope, mainWindowWidget(), items.materialized()));
             if (menu->isEmpty())
                 return;
 

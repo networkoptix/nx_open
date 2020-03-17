@@ -23,28 +23,6 @@ namespace {
 class RenderControl: public QQuickRenderControl
 {
 public:
-    const auto bindContext() const
-    {
-        const QPointer<QOpenGLContext> previousContext = QOpenGLContext::currentContext();
-        const auto previousSurface = previousContext ? previousContext->surface() : nullptr;
-
-        staticContext().context->makeCurrent(staticContext().surface.get());
-        return nx::utils::makeScopeGuard(
-            [this, previousContext, previousSurface]()
-            {
-                if (previousContext)
-                    previousContext->makeCurrent(previousSurface);
-                else
-                    staticContext().context->doneCurrent();
-            });
-    }
-
-    RenderControl(QWidget* widget):
-        QQuickRenderControl(),
-        m_widget(widget)
-    {
-    }
-
     virtual QWindow* renderWindow(QPoint* offset) override
     {
         const auto window = m_widget ? m_widget->window()->windowHandle() : nullptr;
@@ -54,37 +32,75 @@ public:
         return window;
     }
 
-private:
-    struct StaticContext
+    void setWidget(QWidget* value)
     {
-        const QScopedPointer<QOffscreenSurface> surface;
-        const QScopedPointer<QOpenGLContext> context;
-
-        StaticContext():
-            surface(new QOffscreenSurface()),
-            context(new QOpenGLContext())
-        {
-            QSurfaceFormat format;
-            format.setDepthBufferSize(16);
-            format.setStencilBufferSize(8);
-
-            context->setFormat(format);
-            context->setShareContext(QOpenGLContext::globalShareContext());
-            context->setObjectName("NameValueTableContext");
-            NX_ASSERT(context->create());
-            surface->setFormat(context->format());
-            surface->create();
-        }
-    };
-
-    static const StaticContext& staticContext()
-    {
-        static const StaticContext staticContext;
-        return staticContext;
+        m_widget = value;
     }
 
 private:
     QPointer<QWidget> m_widget;
+};
+
+struct SharedRenderer
+{
+    const QScopedPointer<QOffscreenSurface> surface;
+    const QScopedPointer<QOpenGLContext> context;
+    const QScopedPointer<RenderControl> renderControl;
+    const QScopedPointer<QQuickWindow> quickWindow;
+    const QScopedPointer<QQmlComponent> rootComponent;
+    const QScopedPointer<QQuickItem> rootItem;
+
+    const auto bindContext()
+    {
+        const QPointer<QOpenGLContext> previousContext = QOpenGLContext::currentContext();
+        const auto previousSurface = previousContext ? previousContext->surface() : nullptr;
+
+        context->makeCurrent(surface.get());
+        return nx::utils::makeScopeGuard(
+            [this, previousContext, previousSurface]()
+            {
+                if (previousContext)
+                    previousContext->makeCurrent(previousSurface);
+                else
+                    context->doneCurrent();
+            });
+    }
+
+    SharedRenderer():
+        surface(new QOffscreenSurface()),
+        context(new QOpenGLContext()),
+        renderControl(new RenderControl()),
+        quickWindow(new QQuickWindow(renderControl.get())),
+        rootComponent(new QQmlComponent(qnClientCoreModule->mainQmlEngine(),
+            QUrl("Internal/NameValueTable.qml"),
+            QQmlComponent::CompilationMode::PreferSynchronous)),
+        rootItem(qobject_cast<QQuickItem*>(rootComponent->create()))
+    {
+        QSurfaceFormat format;
+        format.setDepthBufferSize(24);
+        format.setStencilBufferSize(8);
+
+        context->setFormat(format);
+        context->setShareContext(QOpenGLContext::globalShareContext());
+        context->setObjectName("NameValueTableContext");
+        NX_ASSERT(context->create());
+        surface->setFormat(context->format());
+        surface->create();
+
+        NX_CRITICAL(rootItem);
+        rootItem->setParentItem(quickWindow->contentItem());
+        quickWindow->setColor(Qt::transparent);
+        quickWindow->setGeometry({0, 0, 1, 1});
+
+        const auto contextGuard = bindContext();
+        renderControl->initialize(QOpenGLContext::currentContext());
+    }
+
+    static SharedRenderer& instance()
+    {
+        static SharedRenderer renderer;
+        return renderer;
+    }
 };
 
 } // namespace
@@ -93,41 +109,20 @@ struct NameValueTable::Private
 {
     NameValueTable* const q;
     NameValueList content;
-
-    const QScopedPointer<RenderControl> renderControl;
+    QSize size;
 
     QScopedPointer<QOpenGLFramebufferObject> fbo;
-    const QScopedPointer<QQuickWindow> quickWindow;
-
-    const QScopedPointer<QQmlComponent> rootComponent;
-    const QScopedPointer<QQuickItem> rootItem;
 
     QPixmap pixmap;
 
     Private(NameValueTable* q):
-        q(q),
-        renderControl(new RenderControl(q)),
-        quickWindow(new QQuickWindow(renderControl.get())),
-        rootComponent(new QQmlComponent(qnClientCoreModule->mainQmlEngine(),
-            QUrl("Internal/NameValueTable.qml"),
-            QQmlComponent::CompilationMode::PreferSynchronous)),
-        rootItem(qobject_cast<QQuickItem*>(rootComponent->create()))
+        q(q)
     {
-        NX_CRITICAL(rootItem);
-        rootItem->setParentItem(quickWindow->contentItem());
-        quickWindow->setColor(Qt::transparent);
-        quickWindow->setGeometry({0, 0, 1, 1});
-
-        connect(quickWindow.get(), &QWindow::widthChanged, q, &QWidget::updateGeometry);
-        connect(quickWindow.get(), &QWindow::heightChanged, q, &QWidget::updateGeometry);
-
-        const auto contextGuard = renderControl->bindContext();
-        renderControl->initialize(QOpenGLContext::currentContext());
     }
 
     virtual ~Private()
     {
-        const auto contextGuard = renderControl->bindContext();
+        const auto contextGuard = SharedRenderer::instance().bindContext();
         fbo.reset();
     }
 
@@ -137,35 +132,44 @@ struct NameValueTable::Private
             return;
 
         content = value;
-        QStringList items;
-
-        for (const auto& [name, value]: content)
-            items << name << value;
-
-        rootItem->setProperty("items", items);
         updateImage();
+    }
+
+    void setSize(const QSize& value)
+    {
+        if (size == value)
+            return;
+
+        size = value;
+        q->updateGeometry();
     }
 
     void updateImage()
     {
-        rootItem->setWidth(q->width());
-        rootItem->setProperty("font", q->font());
-        rootItem->setProperty("nameColor", q->palette().color(QPalette::WindowText));
-        rootItem->setProperty("valueColor", q->palette().color(QPalette::Light));
+        auto& r = SharedRenderer::instance();
 
-        const QSize size(rootItem->width(), rootItem->height());
+        QStringList items;
+        for (const auto& [name, value]: content)
+            items << name << value;
+
+        r.rootItem->setWidth(q->width());
+        r.rootItem->setProperty("items", items);
+        r.rootItem->setProperty("font", q->font());
+        r.rootItem->setProperty("nameColor", q->palette().color(QPalette::WindowText));
+        r.rootItem->setProperty("valueColor", q->palette().color(QPalette::Light));
+
+        setSize(QSize(r.rootItem->width(), r.rootItem->height()));
         if (size.isEmpty())
         {
-            quickWindow->setGeometry({0, 0, 1, 1});
-            quickWindow->setRenderTarget(nullptr);
             pixmap = QPixmap();
             return;
         }
 
-        const auto contextGuard = renderControl->bindContext();
-        quickWindow->setGeometry(QRect({}, size));
+        const auto contextGuard = r.bindContext();
+        r.quickWindow->setGeometry(QRect({}, size));
+        r.renderControl->setWidget(q); //< For screen & devicePixelRatio detection.
 
-        const QSize deviceSize = size * quickWindow->effectiveDevicePixelRatio();
+        const QSize deviceSize = size * r.quickWindow->effectiveDevicePixelRatio();
         if (!fbo || fbo->size() != deviceSize)
         {
             QOpenGLFramebufferObject::bindDefault();
@@ -173,9 +177,9 @@ struct NameValueTable::Private
                 QOpenGLFramebufferObject::Attachment::CombinedDepthStencil));
         }
 
-        quickWindow->setRenderTarget(fbo.get());
-        pixmap = QPixmap::fromImage(renderControl->grab());
-        quickWindow->setRenderTarget(nullptr);
+        r.quickWindow->setRenderTarget(fbo.get());
+        pixmap = QPixmap::fromImage(r.renderControl->grab());
+        r.quickWindow->setRenderTarget(nullptr);
         QOpenGLFramebufferObject::bindDefault();
     }
 };
@@ -208,7 +212,7 @@ QSize NameValueTable::sizeHint() const
 
 QSize NameValueTable::minimumSizeHint() const
 {
-    return d->quickWindow->size();
+    return d->size;
 }
 
 void NameValueTable::paintEvent(QPaintEvent* /*event*/)

@@ -8,6 +8,7 @@
 #include "repeater.h"
 #include "group_box.h"
 #include "row.h"
+#include "column.h"
 
 #include "text_field.h"
 #include "text_area.h"
@@ -64,6 +65,7 @@ void Factory::registerTypes()
     registerType<Section>("Section");
     registerType<Repeater>("Repeater");
     registerType<Row>("Row");
+    registerType<Column>("Column");
     registerType<TextField>("TextField");
     registerType<TextArea>("TextArea");
     registerType<ComboBox>("ComboBox");

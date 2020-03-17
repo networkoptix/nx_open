@@ -383,7 +383,7 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
         return;
 
     /* Create menu object: */
-    auto newMenu = new QMenu();
+    auto newMenu = new QMenu(m_owner);
 
     /* Add suitable actions: */
     const auto addActionToMenu =

@@ -396,7 +396,7 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
 {
     auto table = currentTable();
 
-    QScopedPointer<QMenu> menu(new QMenu());
+    QScopedPointer<QMenu> menu(new QMenu(this));
 
     QModelIndexList selectedIndexes = table->selectionModel()->selectedRows(); //< Only 1 index for row.
     QnResourceList selectedResources;
@@ -414,7 +414,7 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
         action::Parameters parameters(selectedResources);
         parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
         auto manager = context()->menu();
-        menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters, 0,
+        menu.reset(manager->newMenu(action::TreeScope, this, parameters, 0,
             {action::IDType::CameraSettingsAction}));
 
         for (auto action: menu->actions())

@@ -592,9 +592,14 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
     if (!mediaResources.empty())
     {
         if (!menu || !NX_ASSERT(!menu->isEmpty()))
-            menu.reset(new QMenu());
+        {
+            menu.reset(new QMenu(q));
+        }
         else
+        {
             menu->insertSeparator(menu->actions()[0]);
+            menu->setParent(q);
+        }
 
         // TODO: #vkutin #gdm
         // Add new translatable strings in 4.2 and remove workbench context awareness.
