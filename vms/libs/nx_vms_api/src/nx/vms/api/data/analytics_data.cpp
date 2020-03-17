@@ -13,7 +13,8 @@ const QnUuid AnalyticsEngineData::kResourceTypeId =
     ResourceData::getFixedTypeId(AnalyticsEngineData::kResourceTypeName);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AnalyticsPluginData)(AnalyticsEngineData)(PluginInfo),
+    (AnalyticsPluginData)(AnalyticsEngineData)(PluginInfo)
+    (PluginResourceBindingInfo)(ExtendedPluginInfo),
     (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
     _Fields)
 

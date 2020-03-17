@@ -1866,31 +1866,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regFunctor<std::nullptr_t, ResourceParamDataList>(p, ApiCommand::getSettings,
         std::bind(&LocalConnectionFactory::getSettings, this, _1, _2, _3));
 
-    /**%apidoc[proprietary] GET /ec2/getStatisticsReport
-     * %// TODO: Write apidoc comment.
-     * %// Ec2StaticticsReporter
-     */
-    regFunctor<std::nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
-        [this](std::nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
-        {
-            if (!m_directConnection)
-                return ErrorCode::failure;
-            return m_directConnection->getStaticticsReporter()->collectReportData(nullptr, out);
-        });
-    
-    /**%apidoc[proprietary] GET /ec2/triggerStatisticsReport
-     * %// TODO: Write apidoc comment.
-     */
-    regFunctor<ApiStatisticsServerArguments, ApiStatisticsServerInfo>(
-        p, ApiCommand::triggerStatisticsReport,
-        [this](const ApiStatisticsServerArguments& in,
-            ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
-        {
-            if (!m_directConnection)
-                return ErrorCode::failure;
-            return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(in, out);
-        });
-
     p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.

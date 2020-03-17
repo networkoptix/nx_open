@@ -12,7 +12,7 @@
 #include <nx/sdk/ptr.h>
 #include <plugins/plugin_api.h>
 #include <nx/vms/server/plugins/utility_provider.h>
-#include <nx/vms/server/metrics/i_plugin_metrics_provider.h>
+#include <nx/vms/server/metrics/plugin_resource_binding_info_provider.h>
 #include <plugins/settings.h>
 
 #include <nx/vms/api/data/analytics_data.h>
@@ -31,8 +31,7 @@ class QFileInfo;
  */
 class PluginManager:
     public QObject,
-    public nx::vms::server::ServerModuleAware,
-    public nx::vms::server::metrics::IPluginMetricsProvider
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
@@ -97,9 +96,7 @@ public:
 
     void unloadPlugins();
 
-    nx::vms::api::PluginInfoList pluginInfoList() const;
-
-    virtual std::vector<nx::vms::server::metrics::PluginMetrics> metrics() const override;
+    nx::vms::api::ExtendedPluginInfoList extendedPluginInfoList() const;
 
     /** @return Never null; if not found, fails an assertion and returns a stub structure. */
     std::shared_ptr<const nx::vms::api::PluginInfo> pluginInfo(
@@ -158,6 +155,9 @@ private:
     void loadNonOptionalPluginsIfNeeded(
         const QString& binPath, const SettingsHolder& settingsHolder);
 
+    std::unique_ptr<nx::vms::server::metrics::PluginResourceBindingInfoHolder>
+        proxyBindingInfoHolder() const;
+
 private:
     struct PluginContext
     {
@@ -169,7 +169,6 @@ private:
     };
 
     std::vector<PluginContext> m_pluginContexts;
-    mutable std::vector<PluginInfo> m_cachedPluginInfo;
 
     mutable QnMutex m_mutex;
 };

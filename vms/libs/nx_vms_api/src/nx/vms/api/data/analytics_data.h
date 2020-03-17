@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
@@ -185,12 +187,74 @@ NX_VMS_API QString toString(PluginInfo::Status value);
 NX_VMS_API QString toString(PluginInfo::Error value);
 NX_VMS_API QString toString(PluginInfo::MainInterface value);
 
+/**%apidoc Information about bound resources.
+ * For analytics Plugins contains information about the resources bound to its Engine.
+ * For Device Plugins the information is related to the resources bound to the Plugin itself.
+ */
+struct NX_VMS_API PluginResourceBindingInfo
+{
+    /**apidoc
+     * Id of the Engine in the case of analytics Plugins, an empty string for Device Plugins.
+     */
+    QString id;
+
+    /**%apidoc
+     * Name of the Engine (for analytics Plugins) or the Plugin (for Device Plugins).
+     */
+    QString name;
+
+    /**%apidoc
+     * For analytics Plugins - number of resources on which the Engine is enabled automatically
+     * or by the User. In the case of Device Plugins - number of resources that are produced
+     * by the Plugin.
+     */
+    int boundResourceCount = 0;
+
+    /**%apidoc
+     * For Device Plugins - number of resources on which the Engine is enabled automatically
+     * or by the User and that are currently online (hence a Device Agent is created for them).
+     * In the case of Device Plugins - number of resources that are produced by the Plugin and
+     * are online.
+     */
+    int onlineBoundResourceCount = 0;
+};
+
+#define PluginResourceBindingInfo_Fields \
+    (id) \
+    (name) \
+    (boundResourceCount) \
+    (onlineBoundResourceCount)
+
+/**%apidoc Extended information about a Server plugin library.*/
+struct NX_VMS_API ExtendedPluginInfo: public PluginInfo
+{
+    ExtendedPluginInfo() = default;
+    ExtendedPluginInfo(PluginInfo pluginInfo)
+    {
+        static_cast<PluginInfo&>(*this) = std::move(pluginInfo);
+    }
+
+    /**%apidoc
+     * Array with information about bound resources.
+     * For Device Plugins contains zero (if the Plugin is not loaded) or one item.
+     * For analytics Plugins number of items is equal to the number of Plugin Engines.
+     */
+    std::vector<PluginResourceBindingInfo> resourceBindingInfo;
+};
+
+#define ExtendedPluginInfo_Fields PluginInfo_Fields (resourceBindingInfo)
+
+using ExtendedPluginInfoByServer = std::map<QnUuid, ExtendedPluginInfoList>;
+
 } // namespace nx::vms::api
 
 Q_DECLARE_METATYPE(nx::vms::api::AnalyticsPluginData)
 Q_DECLARE_METATYPE(nx::vms::api::AnalyticsEngineData)
 Q_DECLARE_METATYPE(nx::vms::api::PluginInfo)
 Q_DECLARE_METATYPE(nx::vms::api::PluginInfoList)
+Q_DECLARE_METATYPE(nx::vms::api::PluginResourceBindingInfo)
+Q_DECLARE_METATYPE(nx::vms::api::ExtendedPluginInfo)
+
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::Optionality, (lexical), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::Status, (lexical), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::Error, (lexical), NX_VMS_API)

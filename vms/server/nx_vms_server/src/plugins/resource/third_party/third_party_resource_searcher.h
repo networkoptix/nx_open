@@ -11,7 +11,7 @@
 
 #include <camera/camera_plugin.h>
 
-#include <nx/vms/server/metrics/i_plugin_metrics_provider.h>
+#include <nx/vms/server/metrics/plugin_resource_binding_info_provider.h>
 
 #include <plugins/resource/third_party/third_party_resource.h>
 #include <plugins/resource/mdns/mdns_resource_searcher.h>
@@ -24,7 +24,7 @@
 class ThirdPartyResourceSearcher:
     public QnMdnsResourceSearcher,
     public QnUpnpResourceSearcherAsync,
-    public nx::vms::server::metrics::IPluginMetricsProvider
+    public nx::vms::server::metrics::PluginResourceBindingInfoProvider
 {
 public:
     /*!
@@ -49,7 +49,9 @@ public:
     static void initStaticInstance(ThirdPartyResourceSearcher* _instance);
     static ThirdPartyResourceSearcher* instance();
 
-    virtual std::vector<nx::vms::server::metrics::PluginMetrics> metrics() const override;
+    virtual std::unique_ptr<nx::vms::server::metrics::PluginResourceBindingInfoHolder>
+        bindingInfoHolder() const override;
+
     virtual bool canFindLocalResources() const override;
 protected:
     /** Implementation of QnUpnpResourceSearcherAsync::processPacket */
@@ -82,10 +84,13 @@ private:
 private:
     QnMediaServerModule* m_serverModule = nullptr;
 
-    using DiscoveryManagerByPluginName =
-        std::map<QString, std::shared_ptr<nxcip_qt::CameraDiscoveryManager>>;
+    struct PluginContext
+    {
+        nx::sdk::Ptr<nx::sdk::IRefCountable> pluginRefCountable;
+        std::shared_ptr<nxcip_qt::CameraDiscoveryManager> discoveryManager;
+    };
 
-    DiscoveryManagerByPluginName m_discoveryManagerByPluginName;
+    std::map</*Plugin name*/ QString, PluginContext> m_contextByPluginName;
 };
 
 #endif // ENABLE_THIRD_PARTY

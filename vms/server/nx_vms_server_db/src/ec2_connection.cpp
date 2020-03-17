@@ -23,13 +23,6 @@ Ec2DirectConnection::Ec2DirectConnection(
     // todo: #singletone. Only one connection for each connection factory allowed now
     m_isInitialized = queryProcessor->getDb()->init(dbUrl);
 
-    // NOTE: Ec2StaticticsReporter can only be created after connection is established
-    if (m_isInitialized)
-    {
-        m_staticticsReporter = std::make_unique<Ec2StaticticsReporter>(
-            commonModule()->timerManager(), this);
-    }
-
     m_orphanCameraWatcher = std::make_unique<nx::appserver::OrphanCameraWatcher>(commonModule());
 }
 
@@ -55,11 +48,6 @@ void Ec2DirectConnection::updateConnectionUrl(const nx::utils::Url & /*url*/)
 bool Ec2DirectConnection::initialized() const
 {
     return m_isInitialized;
-}
-
-Ec2StaticticsReporter* Ec2DirectConnection::getStaticticsReporter()
-{
-    return m_staticticsReporter.get();
 }
 
 nx::appserver::OrphanCameraWatcher* Ec2DirectConnection::orphanCameraWatcher()

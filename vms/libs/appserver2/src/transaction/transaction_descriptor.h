@@ -22,7 +22,6 @@
 #include "abstract_persistent_storage.h"
 #include "nx_ec/access_helpers.h"
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_statistics.h"
 
 #include <nx/utils/type_utils.h>
 #include <nx/vms/api/data/camera_data.h>

@@ -29,6 +29,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/serialization.h>
 #include <nx/vms/api/data_fwd.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/rule.h>
@@ -1092,6 +1093,28 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
 Handle ServerConnection::getPluginInformation(GetCallback callback, QThread* targetThread)
 {
     return executeGet("/api/pluginInfo", {}, callback, targetThread);
+}
+
+Handle ServerConnection::getExtendedPluginInformation(
+    Result<nx::vms::api::ExtendedPluginInfoByServer>::type&& callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        "/ec2/pluginInfo",
+        {},
+        Result<QnJsonRestResult>::type(
+            [callback = std::move(callback)](
+                bool success,
+                Handle requestId,
+                const QnJsonRestResult& result)
+            {
+                callback(
+                    success,
+                    requestId,
+                    nx::utils::mapFromJsonObject<nx::vms::api::ExtendedPluginInfoByServer>(
+                        result.reply.toObject()));
+            }),
+        targetThread);
 }
 
 Handle ServerConnection::debug(

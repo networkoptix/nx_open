@@ -24,7 +24,7 @@ JsonRestResponse PluginInfoHandler::executeGet(const JsonRestRequest& /*request*
             QnRestResult::Error::InternalServerError);
     }
 
-    return JsonRestResponse(pluginManager->pluginInfoList());
+    return JsonRestResponse(pluginManager->extendedPluginInfoList());
 }
 
 } // namespace nx::vms::server::rest
