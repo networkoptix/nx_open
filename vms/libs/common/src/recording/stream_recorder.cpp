@@ -351,7 +351,7 @@ void QnStreamRecorder::updateProgress(qint64 timestampUs)
 
         if (progress != m_lastProgress && progress >= 0)
         {
-            NX_VERBOSE(this, "Recording progress", progress);
+            NX_VERBOSE(this, "Recording progress %1", progress);
             m_lastProgress = progress;
             lock.unlock();
             emit recordingProgress(progress);

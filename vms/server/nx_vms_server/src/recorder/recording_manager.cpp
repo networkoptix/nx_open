@@ -152,7 +152,6 @@ std::unique_ptr<RecorderData> QnRecordingManager::createRecorder(
     auto recorder = std::make_unique<QnServerStreamRecorder>(
         serverModule(), res, catalog, reader.data());
     recorder->setDualStreamingHelper(dualStreamingHelper);
-    recorder->setTruncateInterval(recordingChunkDurationSec());
 
     if (auto camRes = res.dynamicCast<QnSecurityCamResource>())
         recorder->updateCamera(camRes);
@@ -676,11 +675,6 @@ void QnRecordingManager::disableLicensesIfNeed()
         // TODO: #gdm move (de)serializing of encoded reason params to common place
         emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::api::EventReason::licenseRemoved, disabledCameras.join(L';'));
     }
-}
-
-int QnRecordingManager::recordingChunkDurationSec() const
-{
-    return serverModule()->settings().mediaFileDuration();
 }
 
 void QnRecordingManager::at_licenseMutexTimeout()
