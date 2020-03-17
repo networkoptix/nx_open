@@ -58,5 +58,47 @@ int64_t ElapsedTimer::elapsedMs() const
     return duration_cast<milliseconds>(elapsed()).count();
 }
 
+// ----------------------------------------------- SafeElapsedTimer -------------------------------------------------------------
+
+SafeElapsedTimer::SafeElapsedTimer(bool started): base_type(started)
+{
+}
+
+bool SafeElapsedTimer::hasExpired(std::chrono::milliseconds value) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return base_type::hasExpired(value);
+}
+
+std::chrono::milliseconds SafeElapsedTimer::restart()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return base_type::restart();
+}
+
+void SafeElapsedTimer::invalidate()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    base_type::invalidate();
+}
+
+bool SafeElapsedTimer::isValid() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return base_type::isValid();
+}
+
+std::chrono::milliseconds SafeElapsedTimer::elapsed() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return base_type::elapsed();
+}
+
+int64_t SafeElapsedTimer::elapsedMs() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return base_type::elapsedMs();
+}
+
 } // namespace utils
 } // namespace nx
