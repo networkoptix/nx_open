@@ -2080,13 +2080,13 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/getEvents", new QnMultiserverEventsRestHandler(serverModule(), "ec2/getEvents"), kViewLogs);
 
     /**%apidoc GET /api/showLog
-     * Return tail of the server log file
-     * %param[opt]:integer lines Display last N log lines.
-     * %param[opt]:integer id Id of log file. By default main log is returned
-     *     %value 0 Main server log
-     *     %value 2 Http log
-     *     %value 3 Transaction log
-     * %return:text Tail of the server log file in text format
+     * Return the tail of the Server log file.
+     * %param[opt]:integer lines Display the last N log lines.
+     * %param[opt]:integer id Id of the log file. By default, the main log is returned.
+     *     %value 0 Main server log.
+     *     %value 2 Http log.
+     *     %value 3 Transaction log.
+     * %return:text Tail of the Server log file in the text format.
      */
     reg("api/showLog", new QnLogRestHandler());
 
@@ -2964,7 +2964,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:object reply.values Name-value map with setting values, using JSON types
      *             corresponding to each setting type.
      *
-     * %apidoc POST /ec2/analyticsEngineSettings
+     **%apidoc POST /ec2/analyticsEngineSettings
      * Applies passed settings values to correspondent Analytics Engine.
      * %param:string engineId Id of an Analytics Engine.
      * %param:object settings Name-value map with setting values, using JSON types corresponding to
@@ -2993,7 +2993,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:object reply.values Name-value map with setting values, using JSON types
      *             corresponding to each setting type.
      *
-     * %apidoc POST /ec2/deviceAnalyticsSettings
+     **%apidoc POST /ec2/deviceAnalyticsSettings
      * Applies passed settings values to the corresponding DeviceAgent (which is a device-engine
      * pair).
      * %param:string engineId Id of an Analytics Engine.
