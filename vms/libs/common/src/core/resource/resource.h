@@ -237,7 +237,8 @@ private:
     {
         initNone,
         initInProgress,
-        reinitRequested
+        reinitRequested,
+        initDone
     };
     bool switchState(InitState from, InitState to);
 protected:
@@ -295,8 +296,6 @@ private:
 
     /** Flags of this resource that determine its type. */
     Qn::ResourceFlags m_flags = 0;
-
-    std::atomic<bool> m_initialized{false};
 
     CameraDiagnostics::Result m_prevInitializationResult = CameraDiagnostics::Result(
         CameraDiagnostics::ErrorCode::initializationInProgress);

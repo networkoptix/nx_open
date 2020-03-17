@@ -68,9 +68,15 @@ TEST(InitResource, main)
     resource->setCommonModule(&commonModule);
 
     resource->initAsync();
-    while (!resource->isInitialized())
+    while (resource->getStatus() != Qn::ResourceStatus::Online)
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     ASSERT_EQ(1, resource->initAttempts());
+
+    resource->blockInit();
+    resource->reinitAsync(); //< start reinit without initialization
+    resource->waitForInitStarted();
+    resource->unblockInit();
+    ASSERT_EQ(2, resource->initAttempts());
 
     resource->setStatus(Qn::Offline); //< reset initialization.
     resource->blockInit();
@@ -78,13 +84,6 @@ TEST(InitResource, main)
     resource->waitForInitStarted();
     for (int i = 0; i < 5; ++i)
         resource->reinitAsync(); //< start reinit during initialization.
-    resource->unblockInit();
-
-    ASSERT_EQ(3, resource->initAttempts());
-
-    resource->blockInit();
-    resource->reinitAsync(); //< start reinit without initialization
-    resource->waitForInitStarted();
     resource->unblockInit();
     ASSERT_EQ(4, resource->initAttempts());
 }

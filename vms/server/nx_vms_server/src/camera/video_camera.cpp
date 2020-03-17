@@ -545,6 +545,12 @@ QnVideoCamera::QnVideoCamera(
     m_liveCache.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_lastActivityTimer.invalidate();
+
+    connect(resource.data(), &QnResource::resourceChanged, this, 
+        [this]()
+        {
+            m_tryToInitTimer.invalidate(); //< Try to init again without delay.
+        });
 }
 
 QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(StreamIndex streamIndex) const

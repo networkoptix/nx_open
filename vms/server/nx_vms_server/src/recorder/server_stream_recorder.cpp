@@ -813,6 +813,9 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
         liveProvider->updateSoftwareMotion();
     }
+
+    if (isRunning() && isAudioPresent() != cameraRes->isAudioEnabled())
+        setNeedReopen();
 }
 
 bool QnServerStreamRecorder::isRedundantSyncOn() const

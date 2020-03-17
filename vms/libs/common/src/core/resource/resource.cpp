@@ -40,7 +40,6 @@ QnResource::QnResource(const QnResource& right):
     m_id(right.m_id),
     m_typeId(right.m_typeId),
     m_flags(right.m_flags),
-    m_initialized(right.m_initialized.load()),
     m_prevInitializationResult(right.m_prevInitializationResult),
     m_locallySavedProperties(right.m_locallySavedProperties),
     m_initState(right.m_initState.load()),
@@ -118,11 +117,6 @@ void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& no
     {
         m_parentId = other->m_parentId;
         notifiers << [r = toSharedPointer(this)]{ emit r->parentIdChanged(r);};
-        if (m_initialized)
-        {
-            m_initialized = false;
-            notifiers << [r = toSharedPointer(this)]{ emit r->initializedChanged(r); };
-        }
     }
 
     m_locallySavedProperties = other->m_locallySavedProperties;
@@ -157,24 +151,14 @@ QnUuid QnResource::getParentId() const
 
 void QnResource::setParentId(const QnUuid& parent)
 {
-    bool initializedChanged = false;
     {
         QnMutexLocker locker(&m_mutex);
         if (m_parentId == parent)
             return;
-
         m_parentId = parent;
-        if (m_initialized)
-        {
-            m_initialized = false;
-            initializedChanged = true;
-        }
     }
 
     emit parentIdChanged(toSharedPointer(this));
-
-    if (initializedChanged)
-        emit this->initializedChanged(toSharedPointer(this));
 }
 
 QString QnResource::getName() const
@@ -323,11 +307,14 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
         commonModule()->metrics()->offlineStatus()++;
 
-    if (m_initialized && (newStatus == Qn::Offline || newStatus == Qn::Unauthorized))
+    if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized)
     {
-        NX_VERBOSE(this, "Signal initialized for status %1", newStatus);
-        m_initialized = false;
-        emit initializedChanged(toSharedPointer(this));
+        if (switchState(initDone, initNone))
+        {
+            NX_VERBOSE(this, 
+                "Mark resource %1 as uninitialized because its status %2", getId(), newStatus);
+            emit initializedChanged(toSharedPointer(this));
+        }
     }
 
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
@@ -633,9 +620,6 @@ bool QnResource::init()
     if (!commonModule || commonModule->isNeedToStop())
         return false;
 
-    if (m_initialized)
-        return true; /* Nothing to do. */
-
     if (!switchState(initNone, initInProgress))
         return false; //< Already initializing
 
@@ -653,11 +637,11 @@ bool QnResource::init()
         {
             QnMutexLocker lk(&m_mutex);
             m_prevInitializationResult = initResult;
-            isInitialized = m_initialized = (parentId == m_parentId)
+            isInitialized = (parentId == m_parentId)
                 && (initResult.errorCode == CameraDiagnostics::ErrorCode::noError);
         }
 
-        if (switchState(initInProgress, initNone))
+        if (switchState(initInProgress, isInitialized ? initDone : initNone))
             break;
         NX_VERBOSE(this, "Reinit is requested during previous initialization for resource %1. Init again.", getId());
         NX_ASSERT(switchState(reinitRequested, initInProgress));
@@ -701,7 +685,7 @@ void QnResource::reinitAsync()
 
 void QnResource::initAsync()
 {
-    auto resourcePool = this->resourcePool();
+    const auto resourcePool = this->resourcePool();
     if (!resourcePool)
     {
         NX_DEBUG(this, 
@@ -732,12 +716,13 @@ CameraDiagnostics::Result QnResource::prevInitializationResult() const
 
 bool QnResource::isInitialized() const
 {
-    return m_initialized;
+    return m_initState == initDone;
 }
 
 bool QnResource::isInitializationInProgress() const
 {
-    return m_initState > 0;
+    const auto state = m_initState.load();
+    return state == initInProgress || state == reinitRequested;
 }
 
 void QnResource::setUniqId(const QString& /*value*/)
