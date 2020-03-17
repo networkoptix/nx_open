@@ -3,7 +3,7 @@
 namespace nx::vms::server::interactive_settings::components {
 
 Column::Column(QObject* parent):
-    Group(QStringLIteral("Column"), parent)
+    Group(QStringLiteral("Column"), parent)
 {
 }
 
