@@ -31,6 +31,7 @@ ClientPool::~ClientPool()
     {
         QnMutexLocker lock(&m_mutex);
         std::swap(dataCopy, m_connectionPool);
+        m_awaitingRequests.clear(); //< We must not create new connections.
     }
     for (auto itr = dataCopy.begin(); itr != dataCopy.end(); ++itr)
         itr->second->client->pleaseStopSync();

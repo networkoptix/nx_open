@@ -45,6 +45,7 @@ QnServerMessageProcessor::QnServerMessageProcessor(QnMediaServerModule* serverMo
 void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource,
     ec2::NotificationSource source)
 {
+    NX_DEBUG(this, "Updating resource %1 from %2", resource, source);
     QnCommonMessageProcessor::updateResource(resource, source);
     QnMediaServerResourcePtr ownMediaServer =
         resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
@@ -72,6 +73,8 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource,
                     ownData,
                     ec2::DummyHandler::instance(),
                     &ec2::DummyHandler::onRequestDone);
+
+                NX_DEBUG(this, "Skip own server %1 update from remote source", resource);
                 return;
             }
         }

@@ -413,7 +413,11 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& resource
 {
     QnVirtualCameraResourcePtr camera =  resource.dynamicCast<QnVirtualCameraResource>();
     if (camera && !camera->hasFlags(Qn::foreigner))
+    {
+        if (!camera->isInitialized())
+            camera->initAsync();
         updateCamera(camera);
+    }
 }
 
 void QnRecordingManager::at_camera_initializationChanged(const QnResourcePtr &resource)

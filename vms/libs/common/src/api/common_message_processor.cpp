@@ -1115,10 +1115,9 @@ void QnCommonMessageProcessor::updateResource(
     QnStorageResourcePtr qnStorage = getResourceFactory()->createResource(
         StorageData::kResourceTypeId, QnResourceParams(storage.id, storage.url, QString()))
             .dynamicCast<QnStorageResource>();
-    qnStorage->setCommonModule(commonModule());
-    NX_ASSERT(qnStorage, "Invalid resource type pool state");
-    if (qnStorage)
+    if (NX_ASSERT(qnStorage, "Unable to create storage %1", QJson::serialized(storage)))
     {
+        qnStorage->setCommonModule(commonModule());
         ec2::fromApiToResource(storage, qnStorage);
         updateResource(qnStorage, source);
     }

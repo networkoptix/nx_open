@@ -173,6 +173,7 @@ int Helper::handleAddDownload(const QString& fileName)
 {
     NX_VERBOSE(handler, "Creating download: %1", fileName);
     FileInformation fileInfo(fileName);
+    // NOTE: FileInformation::status is intentionally left at its default - notFound.
 
     const auto sizeString = params.value("size");
     if (!sizeString.isEmpty())
@@ -256,7 +257,7 @@ int Helper::handleAddUpload(const QString& fileName)
     {
         bool ok;
         fileInfo.chunkSize = chunkSizeString.toLongLong(&ok);
-        if(!ok || fileInfo.chunkSize > kMaxChunkSize)
+        if (!ok || fileInfo.chunkSize > kMaxChunkSize)
             return makeInvalidParameterError("chunkSize");
     }
     else

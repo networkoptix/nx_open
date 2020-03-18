@@ -82,6 +82,9 @@ public:
         QnServer::StoragePool kind,
         const char* threadName = nullptr);
     virtual ~QnStorageManager();
+
+    QString idForToStringFromPtr() const;
+
     void removeStorage(const QnStorageResourcePtr &storage);
     bool hasStorageUnsafe(const QnStorageResourcePtr &storage) const;
     bool hasStorage(const QnStorageResourcePtr &storage) const;
