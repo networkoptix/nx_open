@@ -2406,9 +2406,9 @@ void MediaServerProcess::registerRestHandlers(
      * the joinable System is called the target System. The <b>URL</b> parameter sets the
      * target Server which should be joined with the current System. Other servers, that are
      * merged with the target Server will be joined if parameter <b>mergeOneServer</b> is set
-     * to false. <br/> The method uses digest authentication. Two hashes should be previouly
+     * to false. <br/> The method uses digest authentication. Two hashes should be previously
      * calculated: <b>getKey</b> and <b>postKey</b>. Both are mandatory. The calculation
-     * algorithm is described in <b>Calculating authentication hash</b> section (in the bootom
+     * algorithm is described in <b>Calculating authentication hash</b> section (in the bottom
      * of the page). While calculating hashes, username and password of the target Server are
      * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
      * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
