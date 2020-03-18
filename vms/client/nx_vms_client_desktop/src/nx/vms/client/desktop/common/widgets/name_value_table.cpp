@@ -146,6 +146,13 @@ struct NameValueTable::Private
 
     void updateImage()
     {
+        if (content.isEmpty())
+        {
+            size = QSize();
+            pixmap = QPixmap();
+            return;
+        }
+
         auto& r = SharedRenderer::instance();
 
         QStringList items;
