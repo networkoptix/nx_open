@@ -720,13 +720,13 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
                 box_poller = _BoxPoller(api, box, box_platform.cpu_count, ini['reportingPeriodSeconds'])
 
-                first_cycle = True
-
-                host_time_s_before_test = time.time()
-                vms_time_ms_before_test = api.get_time()
-                host_time_s_before_test_after_vms_time_acquisition = time.time()
-
                 try:
+                    first_cycle = True
+
+                    host_time_s_before_test = time.time()
+                    vms_time_ms_before_test = api.get_time()
+                    host_time_s_before_test_after_vms_time_acquisition = time.time()
+
                     while True:
                         if stream_reader_process.poll() is not None:
                             raise exceptions.RtspPerfError("Streaming unexpectedly ended.")
