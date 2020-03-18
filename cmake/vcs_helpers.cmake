@@ -74,9 +74,7 @@ endfunction()
 
 function(_git_branch dir var)
     execute_process(
-        COMMAND git -C "${dir}" show -s --format=%B
-        COMMAND sed -n "s/^Branch: \\(.*\\)$/\\1/p"
-        COMMAND tail -n1
+        COMMAND git -C "${dir}" symbolic-ref --short HEAD
         OUTPUT_VARIABLE branch
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )

@@ -31,8 +31,6 @@ endif()
 
 if(customWebAdminPackageDirectory)
     list(INSERT rdepOverrides 0 "server-external=${customWebAdminPackageDirectory}")
-else()
-    list(INSERT rdepOverrides 0 "server-external=${branch}")
 endif()
 
 if(rdepOverrides)

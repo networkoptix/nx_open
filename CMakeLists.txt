@@ -63,9 +63,6 @@ if(NOT changeSet AND NOT developerBuild)
 endif()
 
 nx_vcs_branch(${CMAKE_CURRENT_LIST_DIR} branch)
-if(NOT branch AND NOT developerBuild)
-    message(FATAL_ERROR "VCS branch cannot be calculated.")
-endif()
 
 include(cmake/dependencies.cmake)
 # Load generated dependencies.cmake, containing packages path variables.
