@@ -255,11 +255,7 @@ void AbstractEngine::clearIssues()
 void AbstractEngine::addIssue(const Issue& issue)
 {
     m_issues.append(issue);
-
-    const auto logLevel = (issue.type == Issue::Type::error)
-        ? nx::utils::log::Level::error
-        : nx::utils::log::Level::warning;
-    NX_UTILS_LOG(logLevel, this, "%1: %2", issue.code, issue.message);
+    NX_DEBUG(this, "%1: %2", issue.code, issue.message);
 }
 
 QList<Issue> AbstractEngine::issues() const
