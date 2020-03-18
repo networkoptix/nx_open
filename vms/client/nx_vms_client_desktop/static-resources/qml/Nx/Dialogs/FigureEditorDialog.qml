@@ -16,6 +16,7 @@ Window
     id: dialog
 
     modality: Qt.ApplicationModal
+    flags: Qt.Dialog
 
     width: 600
     height: 400
