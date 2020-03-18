@@ -608,6 +608,13 @@ def _obtain_cameras(test_camera_count, api, box, test_camera_context, ini, conf)
     return cameras
 
 
+def _get_box_time_ms(api):
+    host_time_before_s = time.time()
+    vms_time_ms = api.get_time()
+    request_duration_s = time.time() - host_time_before_s
+    return vms_time_ms, request_duration_s
+
+
 def _run_load_tests(api, box, box_platform, conf, ini, vms):
     report('')
     report('Starting load tests...')
@@ -723,9 +730,10 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                 try:
                     first_cycle = True
 
-                    host_time_s_before_test = time.time()
-                    vms_time_ms_before_test = api.get_time()
-                    host_time_s_before_test_after_vms_time_acquisition = time.time()
+                    (
+                        vms_time_before_test_ms, get_time_request_duration_before_ms
+                    ) = _get_box_time_ms(api)
+                    host_time_before_test_s = time.time()
 
                     while True:
                         if stream_reader_process.poll() is not None:
@@ -907,21 +915,21 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
     time.sleep(5)
 
     try:
-        host_time_s_after_test = time.time()
-        vms_time_ms_after_test = api.get_time()
-        host_time_s_after_test_after_vms_time_acquisition = time.time()
-
-        get_time_request_duration_before = host_time_s_before_test_after_vms_time_acquisition - host_time_s_before_test
-        get_time_request_duration_after = host_time_s_after_test_after_vms_time_acquisition - host_time_s_after_test
+        host_time_after_test_s = time.time()
+        vms_time_after_test_ms, get_time_request_duration_after_ms = _get_box_time_ms(api)
 
         logging.info(
-            f'/api/getTime request duration before the test: {get_time_request_duration_before} s.\n'
-            f'/api/getTime request duration after the test: {get_time_request_duration_after} s.\n'
+            '/api/getTime request duration before the test: '
+            f'{get_time_request_duration_before_ms} s.\n'
+            '/api/getTime request duration after the test: '
+            f'{get_time_request_duration_after_ms} s.\n'
         )
 
         report(
-            f'Streaming duration by box clock: {(vms_time_ms_after_test - vms_time_ms_before_test) / 1000.0} s.\n'
-            f'Streaming duration by host clock: {(host_time_s_after_test - host_time_s_before_test):.3f} s.\n'
+            'Streaming duration by box clock: '
+            f'{(vms_time_after_test_ms - vms_time_before_test_ms) / 1000.0 :.3f} s.\n'
+            'Streaming duration by host clock: '
+            f'{(host_time_after_test_s - host_time_before_test_s) :.3f} s.\n'
         )
     except Exception as e:
         logging.warning(f"Can't obtain box time: {e}")
