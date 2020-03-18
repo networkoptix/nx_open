@@ -1,5 +1,5 @@
 #include "per_vertex_colored_shader_program.h"
-#include "ui/graphics/shaders/shader_source.h"
+#include <nx/vms/client/core/graphics/shader_source.h>
 
 QnColorPerVertexGLShaderProgram::QnColorPerVertexGLShaderProgram(QObject *parent)
     : QnColorGLShaderProgram(parent)

@@ -1,6 +1,6 @@
 #include "blur_shader_program.h"
 
-#include "shader_source.h"
+#include <nx/vms/client/core/graphics/shader_source.h>
 
 QnBlurShaderProgram::QnBlurShaderProgram(QObject *parent) :
     base_type(parent)

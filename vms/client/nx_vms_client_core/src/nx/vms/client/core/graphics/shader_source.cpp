@@ -1,17 +1,15 @@
-#ifndef QN_SHADER_SOURCE_H
-#define QN_SHADER_SOURCE_H
-
-#ifndef Q_MOC_RUN
-#include <boost/preprocessor/stringize.hpp>
-#endif
+#include "shader_source.h"
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/assert.h>
 
 #include <QtCore/QByteArray>
 #include <QtGui/QSurfaceFormat>
+#include <QtGui/QOpenGLContext>
 
-inline QByteArray qnProcessShaderSource(const char* parenthesized)
+namespace nx::vms::client::core::graphics {
+
+QByteArray processShaderSource(const char* parenthesized)
 {
     QByteArray result;
 
@@ -23,10 +21,22 @@ inline QByteArray qnProcessShaderSource(const char* parenthesized)
     if (NX_ASSERT(result.back() == ')'))
         result.chop(1);
 
+    return modernizeShaderSource(result);
+}
+
+QByteArray modernizeShaderSource(const QByteArray& source)
+{
+    QByteArray result(source);
+
     const auto profile = QSurfaceFormat::defaultFormat().profile();
 
     if (profile != QSurfaceFormat::CoreProfile)
+    {
+        result.prepend(QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGLES
+                ? "#version 100\n"
+                : "#version 120\n");
         return result;
+    }
 
     // Modernize shared source.
 
@@ -51,6 +61,4 @@ inline QByteArray qnProcessShaderSource(const char* parenthesized)
     return result;
 }
 
-#define QN_SHADER_SOURCE(...) qnProcessShaderSource(BOOST_PP_STRINGIZE((__VA_ARGS__)))
-
-#endif // QN_SHADER_SOURCE_H
+} // namespace nx::vms::client::core::graphics
