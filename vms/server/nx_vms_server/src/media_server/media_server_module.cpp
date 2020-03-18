@@ -103,6 +103,7 @@
 #include <nx_vms_server_ini.h>
 #include <nx/metrics/metrics_storage.h>
 #include <nx/vms/server/analytics/iframe_search_helper.h>
+#include <nx/vms/server/statistics/reporter.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -390,6 +391,9 @@ QnMediaServerModule::QnMediaServerModule(
         commonModule()->timerManager()));
     m_multicastAddressRegistry = store(new nx::vms::server::network::MulticastAddressRegistry());
 
+    m_statisticsReporter =
+        std::make_unique<nx::vms::server::statistics::Reporter>(commonModule());
+
     // Initialize TranslationManager.
     QPointer<QnTranslationManager> translationManager = instance<QnTranslationManager>();
 
@@ -471,6 +475,7 @@ void QnMediaServerModule::stop()
 
     m_streamingChunkTranscoder->stop();
     m_eventConnector->stop();
+    m_statisticsReporter.reset();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -819,4 +824,9 @@ using namespace nx::vms::server::analytics;
 nx::analytics::db::AbstractIframeSearchHelper* QnMediaServerModule::iFrameSearchHelper() const
 {
     return m_analyticsIframeSearchHelper;
+}
+
+nx::vms::server::statistics::Reporter* QnMediaServerModule::statisticsReporter() const
+{
+    return m_statisticsReporter.get();
 }

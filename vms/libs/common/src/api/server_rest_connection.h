@@ -30,6 +30,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/analytics_data.h>
 
 namespace rest {
 
@@ -527,6 +528,10 @@ public:
         QThread* targetThread = nullptr);
 
     Handle getPluginInformation(GetCallback callback, QThread* targetThread = nullptr);
+
+    Handle getExtendedPluginInformation(
+        Result<nx::vms::api::ExtendedPluginInfoByServer>::type&& callback,
+        QThread* targetThread = nullptr);
 
     Handle debug(
         const QString& action,

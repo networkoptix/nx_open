@@ -16,7 +16,7 @@
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/settings.h>
 #include <nx/vms/server/analytics/rule_holder.h>
-#include <nx/vms/server/metrics/i_plugin_metrics_provider.h>
+#include <nx/vms/server/metrics/plugin_resource_binding_info_provider.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/fusion/serialization/json.h>
@@ -33,7 +33,7 @@ class StreamDataReceptor;
 class Manager final:
     public Connective<QObject>,
     public /*mixin*/ nx::vms::server::ServerModuleAware,
-    public nx::vms::server::metrics::IPluginMetricsProvider
+    public nx::vms::server::metrics::PluginResourceBindingInfoProvider
 {
     Q_OBJECT
 
@@ -49,7 +49,8 @@ public:
     void at_resourceParentIdChanged(const QnResourcePtr& resource);
     void at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
 
-    virtual std::vector<nx::vms::server::metrics::PluginMetrics> metrics() const override;
+    virtual std::unique_ptr<metrics::PluginResourceBindingInfoHolder>
+        bindingInfoHolder() const override;
 
     void registerMetadataSink(
         const QnResourcePtr& deviceResource,

@@ -1,11 +1,11 @@
 #ifndef CRASH_REPORTER_H
 #define CRASH_REPORTER_H
 
-#include "ec2_statictics_reporter.h"
-
 #include <nx/utils/concurrent.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
+
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include <QDir>
 #include <QSettings>

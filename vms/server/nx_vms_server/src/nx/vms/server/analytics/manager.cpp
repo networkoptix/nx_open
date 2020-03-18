@@ -16,6 +16,7 @@
 #include <nx/vms/server/analytics/wrappers/engine.h>
 #include <nx/vms/server/analytics/device_analytics_context.h>
 #include <nx/vms/server/analytics/proxy_stream_data_receptor.h>
+#include <nx/vms/server/metrics/common_plugin_resource_binding_info_holder.h>
 
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/resource/camera.h>
@@ -351,38 +352,61 @@ void Manager::at_engineInitializationStateChanged(const AnalyticsEngineResourceP
     updateCompatibilityWithDevices(engine);
 }
 
-std::vector<PluginMetrics> Manager::metrics() const
+std::unique_ptr<metrics::PluginResourceBindingInfoHolder> Manager::bindingInfoHolder() const
 {
-    std::map</*Engine id*/ QnUuid, PluginMetrics> engineMetrics;
+    NX_DEBUG(this, "Collecting Engine binding info");
+    metrics::CommonPluginResourceBindingInfoHolder::EngineBindingInfoMap engineBindingInfoMap;
+
+    for (const resource::AnalyticsEngineResourcePtr& engine: localEngines())
+    {
+        engineBindingInfoMap[engine].id = engine->getId().toString();
+        engineBindingInfoMap[engine].name = engine->getName();
+    }
+
     for (const auto& [deviceId, context]: m_deviceAnalyticsContexts)
     {
         const auto device = resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
         if (!device || !isLocalDevice(device))
-            continue;
-
-        const auto bindingStatuses = context->bindingStatuses();
-        for (const auto& [engineId, hasAliveDeviceAgent]: bindingStatuses)
         {
-            ++engineMetrics[engineId].numberOfBoundResources;
-            if (hasAliveDeviceAgent)
-                ++engineMetrics[engineId].numberOfAliveBoundResources;
+            NX_DEBUG(this,
+                "Unable to find the Device with id %1 (but its analytics context exists)",
+                deviceId);
+            continue;
+        }
 
-            if (engineMetrics[engineId].name.isEmpty())
-            {
-                if (const auto engineResource = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId))
-                {
-                    engineMetrics[engineId].name = engineResource->getName();
-                    engineMetrics[engineId].version = engineResource->plugin()->manifest().version;
-                }
-            }
+        if (!isLocalDevice(device))
+        {
+            NX_DEBUG(this,
+                "Skipping Device %1 (%2) because it is bound to another Server "
+                "(but its analytics context exists on the current one)",
+                device->getUserDefinedName(), device->getId());
+        }
+
+        NX_VERBOSE(this, "Collecting Engine binding info for Device %1 (%2)",
+            device->getUserDefinedName(), device->getId());
+
+        for (const auto& [engineId, hasAliveDeviceAgent]: context->bindingStatuses())
+        {
+            const auto engineResource =
+                resourcePool()->getResourceById<AnalyticsEngineResource>(engineId);
+
+            if (!NX_ASSERT(engineResource))
+                continue;
+
+            NX_VERBOSE(this,
+                "Device %1 (%2) is bound to the Engine %3 (%4), active Device Agent exists: %5",
+                device->getUserDefinedName(), device->getId(),
+                engineResource->getName(), engineResource->getId(),
+                hasAliveDeviceAgent);
+
+            ++engineBindingInfoMap[engineResource].boundResourceCount;
+            if (hasAliveDeviceAgent)
+                ++engineBindingInfoMap[engineResource].onlineBoundResourceCount;
         }
     }
 
-    std::vector<PluginMetrics> result;
-    for (auto& [engineId, metrics]: engineMetrics)
-        result.push_back(std::move(metrics));
-
-    return result;
+    return std::make_unique<metrics::CommonPluginResourceBindingInfoHolder>(
+        std::move(engineBindingInfoMap));
 }
 
 void Manager::registerMetadataSink(

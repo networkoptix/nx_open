@@ -79,6 +79,7 @@ namespace nx::vms::server {
 } // namespace nx::vms::server
 
 namespace nx::vms::server::nvr { class IService; }
+namespace nx::vms::server::statistics { class Reporter; }
 
 namespace nx::vms::server::resource { class SharedContextPool; }
 namespace nx::vms::server::camera { class ErrorProcessor; }
@@ -177,6 +178,7 @@ public:
     void initOutgoingSocketCounter();
 
     nx::analytics::db::AbstractIframeSearchHelper* iFrameSearchHelper() const;
+    nx::vms::server::statistics::Reporter* statisticsReporter() const;
 private:
     void registerResourceDataProviders();
     /**
@@ -240,6 +242,7 @@ private:
     StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
     nx::analytics::db::AbstractIframeSearchHelper* m_analyticsIframeSearchHelper = nullptr;
     std::unique_ptr<nx::vms::server::event::ServerRuntimeEventManager> m_serverRuntimeEventManager;
+    std::unique_ptr<nx::vms::server::statistics::Reporter> m_statisticsReporter;
 
     // When server stops, QnResourcePropertyDictionary is destroyed before QnResource objects
     // (at least some of them) because of unknown reasons. So QnResource can not make soap requests

@@ -225,17 +225,4 @@ void toUrlParams(const std::nullptr_t&, QUrlQuery*)
 {
 }
 
-bool parseHttpRequestParams(
-    QnCommonModule* /*commonModule*/,
-    const QString& /*command*/, const QnRequestParamList& params,
-    ApiStatisticsServerArguments* arguments)
-{
-    return deserialize(params, lit("randomSystemId"), &arguments->randomSystemId);
-}
-
-void toUrlParams(const ApiStatisticsServerArguments& arguments, QUrlQuery* query)
-{
-    serialize(arguments.randomSystemId, lit("randomSystemId"), query);
-}
-
 } // namespace ec2

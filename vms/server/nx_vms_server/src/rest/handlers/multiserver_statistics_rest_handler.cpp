@@ -16,8 +16,10 @@
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <ec2_statictics_reporter.h>
+#include <nx/vms/server/statistics/reporter.h>
 #include <api/global_settings.h>
+
+#include <nx/statistics/settings.h>
 
 #include <statistics/statistics_settings.h>
 
@@ -233,7 +235,7 @@ nx::network::http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(
     const auto settingsUrl = [commonModule]()
     {
         static const auto kSettingsUrl =
-            ec2::Ec2StaticticsReporter::DEFAULT_SERVER_API + lit("/config/client_stats_v2.json");
+            nx::statistics::kDefaultStatisticsServer + lit("/config/client_stats_v2.json");
 
         const auto localSettingsUrl = commonModule->globalSettings()->clientStatisticsSettingsUrl();
         return nx::utils::Url::fromUserInput(localSettingsUrl.trimmed().isEmpty()

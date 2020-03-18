@@ -9,7 +9,6 @@
 
 #include <nx/utils/url.h>
 #include "base_ec2_connection.h"
-#include "ec2_statictics_reporter.h"
 #include "nx/appserver/orphan_camera_watcher.h"
 
 #include "server_query_processor.h"
@@ -39,7 +38,6 @@ public:
 
     bool initialized() const;
 
-    Ec2StaticticsReporter* getStaticticsReporter();
     nx::appserver::OrphanCameraWatcher* orphanCameraWatcher();
 
     virtual nx::vms::api::Timestamp getTransactionLogTime() const override;
@@ -51,7 +49,6 @@ public:
 private:
     const QnConnectionInfo m_connectionInfo;
     bool m_isInitialized;
-    std::unique_ptr<Ec2StaticticsReporter> m_staticticsReporter;
     std::unique_ptr<nx::appserver::OrphanCameraWatcher> m_orphanCameraWatcher;
 };
 typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;

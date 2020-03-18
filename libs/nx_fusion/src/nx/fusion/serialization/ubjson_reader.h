@@ -18,7 +18,8 @@
 
 
 template<class Input>
-class QnUbjsonReader: private QnUbjsonDetail::ReaderWriterBase {
+class QnUbjsonReader: private QnUbjsonDetail::ReaderWriterBase 
+{
 public:
     QnUbjsonReader(const Input *data):
         m_stream(data),
@@ -28,7 +29,8 @@ public:
         m_stateStack.push_back(State(AtArrayElement));
     }
 
-    QnUbjson::Marker peekMarker() {
+    QnUbjson::Marker peekMarker() 
+    {
         if(m_peeked)
             return m_peekedMarker;
 
@@ -38,7 +40,8 @@ public:
         return m_peekedMarker;
     }
 
-    bool readNull() {
+    bool readNull() 
+    {
         peekMarker();
         if(m_peekedMarker != QnUbjson::NullMarker)
             return false;
@@ -47,74 +50,98 @@ public:
         return true;
     }
 
-    bool readBool(bool *target) {
+    bool readBool(bool *target) 
+    {
         NX_ASSERT(target);
 
         peekMarker();
-        if(m_peekedMarker == QnUbjson::TrueMarker) {
+        if(m_peekedMarker == QnUbjson::TrueMarker) 
+        {
             m_peeked = false;
             *target = true;
             return true;
-        } else if(m_peekedMarker == QnUbjson::FalseMarker) {
+        } 
+        else if(m_peekedMarker == QnUbjson::FalseMarker) 
+        {
             m_peeked = false;
             *target = false;
             return true;
-        } else {
+        } 
+        else 
+        {
             return false;
         }
     }
 
-    bool readUInt8(quint8 *target) {
+    bool readUInt8(quint8 *target) 
+    {
         return readNumberInternal(QnUbjson::UInt8Marker, target);
     }
 
-    bool readInt8(qint8 *target) {
+    bool readInt8(qint8 *target) 
+    {
         return readNumberInternal(QnUbjson::Int8Marker, target);
     }
 
-    bool readUInt16(quint16 *target) {
+    bool readChar(char* target) 
+    {
+        return readNumberInternal(QnUbjson::Int8Marker, target);
+    }
+
+    bool readUInt16(quint16 *target) 
+    {
         return readNumberInternal(QnUbjson::Int16Marker, (qint16*)target);
     }
 
-    bool readInt16(qint16 *target) {
+    bool readInt16(qint16 *target) 
+    {
         return readNumberInternal(QnUbjson::Int16Marker, target);
     }
 
-    bool readInt32(qint32 *target) {
+    bool readInt32(qint32 *target) 
+    {
         return readNumberInternal(QnUbjson::Int32Marker, target);
     }
 
-    bool readInt64(qint64 *target) {
+    bool readInt64(qint64 *target) 
+    {
         return readNumberInternal(QnUbjson::Int64Marker, target);
     }
 
-    bool readUInt64(quint64 *target) {
+    bool readUInt64(quint64 *target) 
+    {
         return readNumberInternal(QnUbjson::Int64Marker, (qint64*)target);
     }
 
-    bool readFloat(float *target) {
+    bool readFloat(float *target) 
+    {
         // TODO: #Elric support NaN (like in JSON spec)
         return readNumberInternal(QnUbjson::FloatMarker, target);
     }
 
-    bool readDouble(double *target) {
+    bool readDouble(double *target) 
+    {
         // TODO: #Elric support NaN (like in JSON spec)
         return readNumberInternal(QnUbjson::DoubleMarker, target);
     }
 
-    bool readBigNumber(QByteArray *target) {
+    bool readBigNumber(QByteArray *target) 
+    {
         return readUtf8StringInternal(QnUbjson::BigNumberMarker, target);
     }
 
-    bool readLatin1Char(char *target) {
+    bool readLatin1Char(char *target) 
+    {
         return readNumberInternal(QnUbjson::Latin1CharMarker, target);
     }
 
-    bool readUtf8String(QByteArray *target) {
+    bool readUtf8String(QByteArray *target) 
+    {
         return readUtf8StringInternal(QnUbjson::Utf8StringMarker, target);
     }
 
-    bool readUtf8String(QString *target) {
+    bool readUtf8String(QString *target) 
+    {
         NX_ASSERT(target);
 
         QByteArray tmp;
@@ -137,7 +164,8 @@ public:
         return true;
     }
 
-    bool readBinaryData(QByteArray *target) {
+    bool readBinaryData(QByteArray *target) 
+    {
         NX_ASSERT(target);
 
         if(!readArrayStart())
@@ -159,7 +187,8 @@ public:
     }
 
     template <class T, std::size_t N>
-    bool readBinaryData(std::array<T, N> *target) {
+    bool readBinaryData(std::array<T, N> *target) 
+    {
         NX_ASSERT(target);
 
         if(!readArrayStart())
@@ -180,29 +209,35 @@ public:
         return true;
     }
 
-    bool readArrayStart(int *size = NULL, QnUbjson::Marker *type = NULL) {
+    bool readArrayStart(int *size = NULL, QnUbjson::Marker *type = NULL) 
+    {
         return readContainerStartInternal<AtArrayStart, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd>(QnUbjson::ArrayStartMarker, size, type);
     }
 
-    bool readArrayEnd() {
+    bool readArrayEnd() 
+    {
         return readContainerEndInternal(QnUbjson::ArrayEndMarker);
     }
 
-    bool readObjectStart(int *size = NULL, QnUbjson::Marker *type = NULL) {
+    bool readObjectStart(int *size = NULL, QnUbjson::Marker *type = NULL) 
+    {
         return readContainerStartInternal<AtObjectStart, AtObjectKey, AtSizedObjectKey, AtTypedSizedObjectKey, AtObjectEnd>(QnUbjson::ObjectStartMarker, size, type);
     }
 
-    bool readObjectEnd() {
+    bool readObjectEnd() 
+    {
         return readContainerEndInternal(QnUbjson::ObjectEndMarker);
     }
 
-    bool skipValue() {
+    bool skipValue() 
+    {
         QnUbjson::Marker marker = peekMarker();
 
         if (marker != QnUbjson::ArrayStartMarker && marker != QnUbjson::ObjectStartMarker)
             m_peeked = false;
 
-        switch (marker) {
+        switch (marker) 
+        {
         case QnUbjson::NullMarker:
         case QnUbjson::TrueMarker:
         case QnUbjson::FalseMarker:
@@ -224,17 +259,20 @@ public:
         case QnUbjson::Latin1CharMarker:
             return m_stream.skipBytes(sizeof(char));
         case QnUbjson::BigNumberMarker:
-        case QnUbjson::Utf8StringMarker: {
+        case QnUbjson::Utf8StringMarker: 
+        {
             int size;
             if(!readSizeFromStream(&size))
                 return false;
             return m_stream.skipBytes(size);
         }
-        case QnUbjson::ArrayStartMarker: {
+        case QnUbjson::ArrayStartMarker: 
+        {
             if(!readArrayStart())
                 return false;
 
-            while(true) {
+            while(true) 
+            {
                 marker = peekMarker();
                 if(marker == QnUbjson::ArrayEndMarker)
                     break;
@@ -247,11 +285,13 @@ public:
 
             return true;
         }
-        case QnUbjson::ObjectStartMarker: {
+        case QnUbjson::ObjectStartMarker: 
+        {
             if(!readObjectStart())
                 return false;
 
-            while(true) {
+            while(true) 
+            {
                 marker = peekMarker();
                 if(marker == QnUbjson::ObjectEndMarker)
                     break;
@@ -272,7 +312,8 @@ public:
     int pos() const { return m_stream.pos(); }
 private:
     template<class T>
-    bool readNumberInternal(QnUbjson::Marker expectedMarker, T *target) {
+    bool readNumberInternal(QnUbjson::Marker expectedMarker, T *target) 
+    {
         NX_ASSERT(target);
 
         peekMarker();
@@ -286,7 +327,8 @@ private:
         return true;
     }
 
-    bool readUtf8StringInternal(QnUbjson::Marker expectedMarker, QByteArray *target) {
+    bool readUtf8StringInternal(QnUbjson::Marker expectedMarker, QByteArray *target) 
+    {
         NX_ASSERT(target);
 
         peekMarker();
@@ -302,7 +344,8 @@ private:
     }
 
     template<Status startStatus, Status normalStatus, Status sizedStatus, Status typedSizedStatus, Status endStatus>
-    bool readContainerStartInternal(QnUbjson::Marker expectedMarker, int *size, QnUbjson::Marker *type) {
+    bool readContainerStartInternal(QnUbjson::Marker expectedMarker, int *size, QnUbjson::Marker *type) 
+    {
         peekMarker();
         if(m_peekedMarker != expectedMarker)
             return false;
@@ -312,7 +355,8 @@ private:
         State &state = m_stateStack.back();
 
         peekMarker();
-        if(m_peekedMarker == QnUbjson::ContainerTypeMarker) {
+        if(m_peekedMarker == QnUbjson::ContainerTypeMarker) 
+        {
             m_peeked = false;
 
             state.type = m_stream.readMarker();
@@ -326,7 +370,8 @@ private:
                 return false;
 
             state.status = state.count == 0 ? endStatus : typedSizedStatus;
-        } else if(m_peekedMarker == QnUbjson::ContainerSizeMarker) {
+        } else if(m_peekedMarker == QnUbjson::ContainerSizeMarker) 
+        {
             m_peeked = false;
 
             state.status = sizedStatus;
@@ -335,7 +380,8 @@ private:
                 return false;
 
             state.status = state.count == 0 ? endStatus : sizedStatus;
-        } else {
+        } else 
+        {
             state.status = normalStatus;
         }
 
@@ -347,14 +393,16 @@ private:
         return true;
     }
 
-    bool readContainerEndInternal(QnUbjson::Marker expectedMarker) {
+    bool readContainerEndInternal(QnUbjson::Marker expectedMarker) 
+    {
         peekMarker();
         if(m_peekedMarker != expectedMarker)
             return false;
         m_peeked = false;
 
         m_stateStack.pop_back();
-        if(m_stateStack.isEmpty()) {
+        if(m_stateStack.isEmpty()) 
+        {
             /* Upper level array should not be closed. */
             m_stateStack.push_back(State(AtArrayElement));
             return false;
@@ -363,11 +411,13 @@ private:
         return true;
     }
 
-    QnUbjson::Marker readMarkerInternal() {
+    QnUbjson::Marker readMarkerInternal() 
+    {
         NX_ASSERT(!m_peeked);
 
         State &state = m_stateStack.back();
-        switch (state.status) {
+        switch (state.status) 
+        {
         case AtArrayStart:
             return m_stream.readNonNoopMarker();
 
@@ -406,11 +456,10 @@ private:
 
         case AtSizedObjectValue:
             state.count--;
-            if(state.count == 0) {
+            if(state.count == 0) 
                 state.status = AtObjectEnd;
-            } else {
+            else 
                 state.status = AtSizedObjectKey;
-            }
             return m_stream.readNonNoopMarker();
 
         case AtTypedSizedObjectKey:
@@ -419,11 +468,10 @@ private:
 
         case AtTypedSizedObjectValue:
             state.count--;
-            if(state.count == 0) {
+            if(state.count == 0) 
                 state.status = AtObjectEnd;
-            } else {
+            else
                 state.status = AtSizedObjectKey;
-            }
             return state.type;
 
         case AtObjectEnd:
@@ -434,10 +482,12 @@ private:
         }
     }
 
-    bool readSizeFromStream(int *target) {
+    bool readSizeFromStream(int *target) 
+    {
         // TODO: #Elric #ubjson support Int64 here
 
-        switch (m_stream.readMarker()) {
+        switch (m_stream.readMarker()) 
+        {
         case QnUbjson::UInt8Marker: return readTypedSizeFromStream<quint8>(target);
         case QnUbjson::Int8Marker: return readTypedSizeFromStream<qint8>(target);
         case QnUbjson::Int16Marker: return readTypedSizeFromStream<qint16>(target);
@@ -447,7 +497,8 @@ private:
     }
 
     template<class T>
-    bool readTypedSizeFromStream(int *target) {
+    bool readTypedSizeFromStream(int *target) 
+    {
         T tmp;
         if(!m_stream.readNumber(&tmp))
             return false;
@@ -471,7 +522,8 @@ private:
  * anyway. Also when wrapping is enabled, ADL fails to find template overloads. */
 
 template<class Output>
-QnUbjsonReader<Output> *disable_user_conversions(QnUbjsonReader<Output> *value) {
+QnUbjsonReader<Output> *disable_user_conversions(QnUbjsonReader<Output> *value) 
+{
     return value;
 }
 

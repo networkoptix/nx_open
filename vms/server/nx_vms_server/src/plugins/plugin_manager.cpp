@@ -14,6 +14,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/kit/utils.h>
 #include <plugins/plugin_api.h>
+#include <plugins/proxy_plugin_binding_info_holder.h>
 #include <nx/sdk/helpers/lib_context.h>
 #include <nx/vms/server/sdk_support/ref_countable_registry.h>
 #include <nx/sdk/ptr.h>
@@ -36,6 +37,7 @@
 using namespace nx::sdk;
 using nx::vms::server::sdk_support::RefCountableRegistry;
 using nx::vms::api::PluginInfo;
+using nx::vms::api::PluginResourceBindingInfo;
 using namespace nx::vms::server::analytics;
 using namespace nx::vms::server::metrics;
 
@@ -65,40 +67,22 @@ void PluginManager::unloadPlugins()
     m_pluginContexts.clear();
 }
 
-nx::vms::api::PluginInfoList PluginManager::pluginInfoList() const
+nx::vms::api::ExtendedPluginInfoList PluginManager::extendedPluginInfoList() const
 {
+    nx::vms::api::ExtendedPluginInfoList result;
+    const std::unique_ptr<PluginResourceBindingInfoHolder> bindingInfoHolder =
+        proxyBindingInfoHolder();
+
     QnMutexLocker lock(&m_mutex);
-    if (m_cachedPluginInfo.empty())
+    for (const auto& pluginContext: m_pluginContexts)
     {
-        for (const auto& pluginContext: m_pluginContexts)
-            m_cachedPluginInfo.push_back(*pluginContext.pluginInfo);
+        nx::vms::api::ExtendedPluginInfo extendedPluginInfo(*pluginContext.pluginInfo);
+        extendedPluginInfo.resourceBindingInfo =
+            bindingInfoHolder->bindingInfoForPlugin(pluginContext.plugin);
+
+        result.push_back(extendedPluginInfo);
+
     }
-
-    return m_cachedPluginInfo;
-}
-
-std::vector<PluginMetrics> PluginManager::metrics() const
-{
-    const auto analyticsManager = serverModule()->analyticsManager();
-    if (!NX_ASSERT(analyticsManager))
-        return {};
-
-    std::vector<PluginMetrics> result = analyticsManager->metrics();
-
-    const auto resourceDiscoveryManager = serverModule()->resourceDiscoveryManager();
-    if (!NX_ASSERT(resourceDiscoveryManager))
-        return result;
-
-    const auto thirdPartyResourceSearcher =
-        dynamic_cast<nx::vms::server::metrics::IPluginMetricsProvider*>(
-            resourceDiscoveryManager->searcherByManufacturer(
-                nx::vms::server::discovery::kThirdPartyManufacturerName));
-
-    if (!thirdPartyResourceSearcher)
-        return result;
-
-    const auto devicePluginsResult = thirdPartyResourceSearcher->metrics();
-    result.insert(result.end(), devicePluginsResult.cbegin(), devicePluginsResult.cend());
 
     return result;
 }
@@ -111,10 +95,13 @@ std::shared_ptr<const PluginInfo> PluginManager::pluginInfo(
 
     {
         QnMutexLocker lock(&m_mutex);
-        for (const auto& pluginContext : m_pluginContexts)
+        for (const auto& pluginContext: m_pluginContexts)
         {
             if (pluginContext.plugin.get() == plugin)
+            {
+                nx::vms::api::ExtendedPluginInfo extendedPluginInfo(*pluginContext.pluginInfo);
                 return pluginContext.pluginInfo;
+            }
         }
     }
 
@@ -143,8 +130,7 @@ void PluginManager::setIsActive(const IRefCountable* plugin, bool isActive)
         if (pluginContext.pluginInfo->isActive == isActive)
             return;
 
-        pluginContext.pluginInfo->isActive = isActive;
-        m_cachedPluginInfo.clear();
+        pluginContext.pluginInfo->isActive = isActive;        
         return;
     }
 }
@@ -583,4 +569,31 @@ void PluginManager::loadPlugins(const QSettings* settings)
 
     loadNonOptionalPluginsIfNeeded(binPath, settingsHolder);
     loadOptionalPluginsIfNeeded(binPath, settingsHolder);
+}
+
+std::unique_ptr<nx::vms::server::metrics::PluginResourceBindingInfoHolder>
+    PluginManager::proxyBindingInfoHolder() const
+{
+    ProxyPluginBindingInfoHolder::BindingInfoHolderList proxiedBindingInfoHolders;
+    const auto analyticsManager = serverModule()->analyticsManager();
+    if (!NX_ASSERT(analyticsManager))
+        return nullptr;
+
+    proxiedBindingInfoHolders.push_back(analyticsManager->bindingInfoHolder());
+
+    const auto resourceDiscoveryManager = serverModule()->resourceDiscoveryManager();
+    if (!NX_ASSERT(resourceDiscoveryManager))
+        return nullptr;
+
+    const auto thirdPartyResourceSearcher =
+        dynamic_cast<nx::vms::server::metrics::PluginResourceBindingInfoProvider*>(
+            resourceDiscoveryManager->searcherByManufacturer(
+                nx::vms::server::discovery::kThirdPartyManufacturerName));
+
+    if (!thirdPartyResourceSearcher)
+        return nullptr;
+
+    proxiedBindingInfoHolders.push_back(thirdPartyResourceSearcher->bindingInfoHolder());
+
+    return std::make_unique<ProxyPluginBindingInfoHolder>(std::move(proxiedBindingInfoHolders));
 }

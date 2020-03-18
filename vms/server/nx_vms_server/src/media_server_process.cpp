@@ -191,7 +191,10 @@
 #include <nx/vms/server/rest/get_time_handler.h>
 #include <nx/vms/server/rest/server_time_handler.h>
 #include <nx/vms/server/rest/plugin_info_handler.h>
+#include <nx/vms/server/rest/multiserver_plugin_info_handler.h>
 #include <nx/vms/server/rest/nvr_network_block_handler.h>
+#include <nx/vms/server/rest/get_statistics_report_handler.h>
+#include <nx/vms/server/rest/trigger_statistics_report_handler.h>
 #include <nx/vms/server/nvr/i_service.h>
 
 #include <rtsp/rtsp_connection.h>
@@ -240,7 +243,6 @@
 #include "rest/handlers/old_client_connect_rest_handler.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/dummy_handler.h"
-#include "ec2_statictics_reporter.h"
 
 #include "core/resource_management/resource_properties.h"
 #include "core/resource/network_resource.h"
@@ -2872,6 +2874,23 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
+    /**%apidoc[proprietary] GET /ec2/getStatisticsReport
+     * Get anonymous statistic about the System.
+     * %return:object System statistics:
+     *     %struct SystemStatistics
+     */
+    reg("ec2/getStatisticsReport",
+        new nx::vms::server::rest::GetStatisticsReportHandler(serverModule()));
+
+    /**%apidoc[proprietary] POST /ec2/triggerStatisticsReport
+     * Initiate delivery of the System statistics to the statistics server.
+     * %return:object Status of the triggered delivery operation:
+     *     %struct StatisticsServerInfo
+     */
+    reg("ec2/triggerStatisticsReport",
+        new nx::vms::server::rest::TriggerStatisticsReportHandler(serverModule()));
+
+
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
      * %param[opt]:string deviceId device id (can be obtained from "id" field via
@@ -2977,15 +2996,31 @@ void MediaServerProcess::registerRestHandlers(
         new nx::vms::server::rest::QnExecuteEventActionRestHandler(serverModule()));
 
     /**%apidoc GET /api/pluginInfo
+     * Deprecated in favor of /ec2/pluginInfo.
      * %return:object JSON object with an error code, error string, and a list with information
      *     about Server plugins on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:array reply List of JSON objects with the following structure:
-     *         %struct PluginInfo
+     *         %struct ExtendedPluginInfo
      */
     reg("api/pluginInfo",
         new nx::vms::server::rest::PluginInfoHandler(serverModule()));
+
+    /**%apidoc GET /ec2/pluginInfo
+     * %param:boolean isLocal If true, data is collected only from the Server that received the
+     *     request. Otherwise data is collected from all online Servers in the system.
+     * %return:object JSON object with an error code, error string, and a list with information
+     *     about Server plugins on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Map containing per Server information about Plugins.
+     *         %param:string key Unique id of a Server
+     *         %param:object value
+     *             %struct ExtendedPluginInfo
+     */
+    reg(nx::vms::server::rest::MultiserverPluginInfoHandler::kPath,
+        new nx::vms::server::rest::MultiserverPluginInfoHandler(serverModule()));
 
     // TODO: #dmishin register this handler conditionally?
     /**%apidoc GET /api/nvrNetworkBlock

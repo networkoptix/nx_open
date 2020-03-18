@@ -12,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/guarded_callback.h>
 #include <ui/workbench/handlers/workbench_connect_handler.h>
+#include <api/model/connection_info.h>
 
 #include "update_verification.h"
 

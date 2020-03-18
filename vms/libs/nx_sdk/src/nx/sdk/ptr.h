@@ -167,6 +167,24 @@ bool operator!=(const Ptr<RefCountable>& ptr, std::nullptr_t) { return (bool) pt
 template<class RefCountable>
 bool operator!=(std::nullptr_t, const Ptr<RefCountable>& ptr) { return (bool) ptr; }
 
+template<typename RefCountable>
+bool operator<(const Ptr<const RefCountable>& first, const Ptr<const RefCountable>& second)
+{
+    return first.get() < second.get();
+}
+
+template<typename RefCountable>
+bool operator<(const Ptr<const RefCountable>& refCountable, std::nullptr_t)
+{
+    return refCountable.get() < nullptr;
+}
+
+template<typename RefCountable>
+bool operator<(std::nullptr_t, const Ptr<RefCountable>& refCountable)
+{
+    return nullptr < refCountable.get();
+}
+
 /**
  * Wrapper for Ptr constructor - needed to use the template argument deduction.
  *

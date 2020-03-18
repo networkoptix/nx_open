@@ -1201,28 +1201,8 @@ APPLY(2010, markVideoWallLicenseOverflow, nx::vms::api::VideoWallLicenseOverflow
                        LocalTransactionType()) /* local transaction type */ \
 /* Transaction 4001 (getClientInfoList) removed, code is forbidden. */ \
 /* Transaction 4002 (saveClientInfo) removed, code is forbidden. */ \
-APPLY(5001, getStatisticsReport, ApiSystemStatistics, \
-                       false, \
-                       false, \
-                       InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(5002, triggerStatisticsReport, ApiStatisticsServerInfo, \
-                       false, \
-                       false, \
-                       InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
+/* Transaction 5001 (getStatisticsReport) removed, code is forbidden */ \
+/* Transaction 5002 (triggerStatisticsReport) removed, code is forbidden */ \
 APPLY(9004, runtimeInfoChanged, nx::vms::api::RuntimeData, \
                        false, \
                        true, \

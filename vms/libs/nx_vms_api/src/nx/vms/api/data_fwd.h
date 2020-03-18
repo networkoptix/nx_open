@@ -146,6 +146,21 @@ DECLARE_STRUCT_EX(ModuleInformationWithAddresses, (eq)(ubjson)(json)(xml)(csv_re
 DECLARE_STRUCT_AND_LIST(AnalyticsPluginData)
 DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
 DECLARE_STRUCT_AND_LIST(PluginInfo)
+DECLARE_STRUCT_AND_LIST(PluginResourceBindingInfo)
+DECLARE_STRUCT_AND_LIST(ExtendedPluginInfo)
+
+DECLARE_STRUCT(DeviceAnalyticsTypeInfo)
+DECLARE_STRUCT(DeviceAnalyticsStatistics)
+DECLARE_STRUCT(StatisticsCameraData)
+DECLARE_STRUCT(StatisticsStorageData)
+DECLARE_STRUCT(StatisticsMediaServerData)
+DECLARE_STRUCT(StatisticsLicenseData)
+DECLARE_STRUCT(StatisticsEventRuleData)
+DECLARE_STRUCT(StatisticsUserData)
+DECLARE_STRUCT(StatisticsReportInfo)
+DECLARE_STRUCT(SystemStatistics)
+DECLARE_STRUCT(StatisticsServerArguments)
+DECLARE_STRUCT(StatisticsServerInfo)
 
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_EX

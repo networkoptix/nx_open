@@ -340,27 +340,6 @@ static QString getEngineLogLabel(QnMediaServerModule* serverModule, QnUuid engin
         engineResource->getId(), parentPlugin->getName());
 }
 
-static std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
-    pixelFormatForEngine(
-        QnMediaServerModule* serverModule,
-        QnUuid engineId,
-        const std::shared_ptr<nx::vms::server::analytics::DeviceAnalyticsBinding>& binding,
-        bool* outSuccess)
-{
-    *outSuccess = false;
-    const QString engineLogLabel = getEngineLogLabel(serverModule, engineId);
-
-    if (!NX_ASSERT(binding, engineLogLabel))
-        return std::nullopt;
-
-    const auto engineManifest = binding->engineManifest();
-    if (!NX_ASSERT(engineManifest, engineLogLabel))
-        return std::nullopt;
-
-    *outSuccess = true;
-    return sdk_support::pixelFormatFromEngineManifest(*engineManifest, engineLogLabel);
-}
-
 void DeviceAnalyticsContext::putData(const QnAbstractDataPacketPtr& data)
 {
     NX_VERBOSE(this, "Processing data, timestamp %1 us", data->timestamp);

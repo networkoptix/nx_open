@@ -266,12 +266,15 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
             [this](const auto&)
             {
                 QStringList result;
-                for (const auto& value: serverModule()->pluginManager()->metrics())
+                for (const auto& value: serverModule()->pluginManager()->extendedPluginInfoList())
                 {
-                    if (value.numberOfAliveBoundResources > 0)
+                    for (const auto& resourceBindingInfo: value.resourceBindingInfo)
                     {
-                        result.push_back(lm("%1. %2 %3").args(
-                            result.size() + 1, value.name, value.version));
+                        if (resourceBindingInfo.onlineBoundResourceCount > 0)
+                        {
+                            result.push_back(lm("%1. %2 %3").args(
+                                result.size() + 1, resourceBindingInfo.name, value.version));
+                        }
                     }
                 }
                 return result.isEmpty() ? Value() : Value(result.join(L'\n'));
