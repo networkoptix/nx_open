@@ -74,15 +74,9 @@ endfunction()
 
 function(_git_branch dir var)
     execute_process(
-        COMMAND git -C "${dir}" show -s --format=%B
-        OUTPUT_VARIABLE branch_output
+        COMMAND git -C "${dir}" symbolic-ref --short HEAD
+        OUTPUT_VARIABLE branch
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    string(REGEX REPLACE "\r?\n" ";" lines "${branch_output}")
-    foreach(line ${lines})
-        if ("${line}" MATCHES "^Branch: ")
-            string(REGEX REPLACE "^Branch: " "" branch "${line}")
-        endif()
-    endforeach()
     set(${var} "${branch}" PARENT_SCOPE)
 endfunction()
