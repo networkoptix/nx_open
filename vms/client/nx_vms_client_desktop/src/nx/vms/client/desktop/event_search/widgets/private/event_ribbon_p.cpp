@@ -639,9 +639,8 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
 
     const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, posRelativeToTile);
 
-    menu->setParent(q);
-    // QWidget::setParent() clears window type flags, so we have to restore Qt::Popup.
-    menu->setWindowFlags(menu->windowFlags() | Qt::Popup | Qt::BypassGraphicsProxyWidget);
+    // QWidget::setParent() clears window type, so we have to restore it taking the original flags.
+    menu->setParent(q, menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
     menu->exec(globalPos);
     menu->setParent(nullptr);
 }
