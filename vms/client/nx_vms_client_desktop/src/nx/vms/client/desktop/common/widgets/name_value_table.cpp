@@ -8,6 +8,7 @@
 #include <QtGui/QOpenGLFramebufferObject>
 #include <QtGui/QPainter>
 #include <QtQml/QQmlComponent>
+#include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickRenderControl>
 #include <QtQuick/QQuickWindow>
@@ -76,6 +77,12 @@ struct SharedRenderer
             QQmlComponent::CompilationMode::PreferSynchronous)),
         rootItem(qobject_cast<QQuickItem*>(rootComponent->create()))
     {
+        NX_CRITICAL(rootItem);
+        QQmlEngine::setObjectOwnership(rootItem.get(), QQmlEngine::CppOwnership);
+        rootItem->setParentItem(quickWindow->contentItem());
+        quickWindow->setColor(Qt::transparent);
+        quickWindow->setGeometry({0, 0, 1, 1});
+
         QSurfaceFormat format;
         format.setDepthBufferSize(24);
         format.setStencilBufferSize(8);
@@ -86,11 +93,6 @@ struct SharedRenderer
         NX_ASSERT(context->create());
         surface->setFormat(context->format());
         surface->create();
-
-        NX_CRITICAL(rootItem);
-        rootItem->setParentItem(quickWindow->contentItem());
-        quickWindow->setColor(Qt::transparent);
-        quickWindow->setGeometry({0, 0, 1, 1});
 
         const auto contextGuard = bindContext();
         renderControl->initialize(QOpenGLContext::currentContext());
