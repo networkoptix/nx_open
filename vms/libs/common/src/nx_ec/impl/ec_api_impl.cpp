@@ -47,4 +47,17 @@ QString toString(ErrorCode errorCode)
     }
 }
 
+QString toString(NotificationSource source)
+{
+    switch (source)
+    {
+        case NotificationSource::Local: return "local";
+        case NotificationSource::Remote: return "remote";
+    }
+
+    const QString error = nx::utils::log::makeMessage("unexpected(%1)", static_cast<int>(source));
+    NX_ASSERT(false, error);
+    return error;
 }
+
+} // namespace ec2

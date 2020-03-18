@@ -1371,6 +1371,9 @@ bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) con
     if ((m_role == QnServer::StoragePool::Backup && !storage->isBackup()) ||
         (m_role == QnServer::StoragePool::Normal && storage->isBackup()))
     {
+        NX_VERBOSE(this, "Storage %1. Ignore isBackup=%2",
+            nx::utils::url::hidePassword(storage->getUrl()), storage->isBackup());
+
         return false;
     }
     return true;
@@ -1502,6 +1505,11 @@ QnStorageManager::~QnStorageManager()
     }
 
     stopAsyncTasks();
+}
+
+QString QnStorageManager::idForToStringFromPtr() const
+{
+    return toString(m_role);
 }
 
 QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator)

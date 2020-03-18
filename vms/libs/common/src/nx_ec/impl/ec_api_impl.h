@@ -128,6 +128,8 @@ enum class NotificationSource
     Remote
 };
 
+QString toString(NotificationSource source);
+
 namespace impl {
 
 template<typename... Params>
