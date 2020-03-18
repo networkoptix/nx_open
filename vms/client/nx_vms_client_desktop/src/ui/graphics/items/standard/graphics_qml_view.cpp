@@ -224,6 +224,7 @@ struct GraphicsQmlView::Private
     QScopedPointer<QQuickItem> m_rootItem;
     QScopedPointer<RenderControl> m_renderControl;
     QScopedPointer<QOffscreenSurface> m_offscreenSurface;
+    QScopedPointer<QOpenGLContext> m_openglContext;
     QScopedPointer<QOpenGLFramebufferObject> m_fbo;
     QScopedPointer<QQmlComponent> m_qmlComponent;
     QQmlEngine* m_qmlEngine;
@@ -439,21 +440,25 @@ void GraphicsQmlView::Private::ensureOffscreen(const QRectF&, QOpenGLWidget* glW
     if (m_offscreenInitialized)
         return;
 
-    auto context = glWidget->context();
+    m_openglContext.reset(new QOpenGLContext());
+    m_openglContext->setShareContext(glWidget->context());
+    m_openglContext->create();
+    NX_ASSERT(m_openglContext->isValid());
 
     m_offscreenSurface.reset(new QOffscreenSurface());
-    QSurfaceFormat format = context->format();
+    QSurfaceFormat format = m_openglContext->format();
     // Qt Quick may need a depth and stencil buffer. Always make sure these are available.
-    format.setDepthBufferSize(16);
+    format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
 
     m_offscreenSurface->setFormat(format);
-    m_offscreenSurface->setScreen(context->screen());
+    m_offscreenSurface->setScreen(m_openglContext->screen());
     m_offscreenSurface->create();
+    NX_ASSERT(m_offscreenSurface->isValid());
 
-    context->makeCurrent(m_offscreenSurface.data());
-    m_renderControl->initialize(context);
-    context->doneCurrent();
+    m_openglContext->makeCurrent(m_offscreenSurface.data());
+    m_renderControl->initialize(m_openglContext.data());
+    m_openglContext->doneCurrent();
 
     m_offscreenInitialized = true;
 }
@@ -587,7 +592,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     d->ensureOffscreen(channelRect, glWidget);
 
-    if (glWidget->context()->makeCurrent(d->m_offscreenSurface.data()))
+    if (d->m_openglContext->makeCurrent(d->m_offscreenSurface.data()))
     {
         d->tryInitializeFbo();
 
@@ -598,7 +603,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
             d->m_renderControl->render();
             d->m_quickWindow->resetOpenGLState();
-            glWidget->context()->functions()->glFlush();
+            d->m_openglContext->functions()->glFlush();
         }
     }
 
