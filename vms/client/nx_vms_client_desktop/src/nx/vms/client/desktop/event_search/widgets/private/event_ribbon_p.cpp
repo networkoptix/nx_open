@@ -592,14 +592,9 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
     if (!mediaResources.empty())
     {
         if (!menu || !NX_ASSERT(!menu->isEmpty()))
-        {
-            menu.reset(new QMenu(q));
-        }
+            menu.reset(new QMenu());
         else
-        {
             menu->insertSeparator(menu->actions()[0]);
-            menu->setParent(q);
-        }
 
         // TODO: #vkutin #gdm
         // Add new translatable strings in 4.2 and remove workbench context awareness.
@@ -642,10 +637,13 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
                 menu->close();
         });
 
-    menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-
     const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, posRelativeToTile);
+
+    menu->setParent(q);
+    // QWidget::setParent() clears window type flags, so we have to restore Qt::Popup.
+    menu->setWindowFlags(menu->windowFlags() | Qt::Popup | Qt::BypassGraphicsProxyWidget);
     menu->exec(globalPos);
+    menu->setParent(nullptr);
 }
 
 void EventRibbon::Private::closeExpiredTiles()
