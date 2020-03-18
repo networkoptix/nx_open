@@ -18,6 +18,7 @@
 #include "radio_button_group.h"
 #include "combo_box.h"
 #include "roi_items.h"
+#include "switch_button.h"
 
 #include "button.h"
 
@@ -73,6 +74,7 @@ void Factory::registerTypes()
     registerType<DoubleSpinBox>("DoubleSpinBox");
     registerType<CheckBox>("CheckBox");
     registerType<Button>("Button");
+    registerType<SwitchButton>("SwitchButton");
     registerType<Separator>("Separator");
     registerType<RadioButtonGroup>("RadioButtonGroup");
     registerType<CheckBoxGroup>("CheckBoxGroup");
