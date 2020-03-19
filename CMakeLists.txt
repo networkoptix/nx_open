@@ -66,6 +66,7 @@ if(NOT changeSet AND NOT developerBuild)
 endif()
 
 nx_vcs_branch(${CMAKE_CURRENT_LIST_DIR} branch)
+nx_vcs_current_refs(${CMAKE_CURRENT_LIST_DIR} currentRefs)
 
 include(cmake/dependencies.cmake)
 # Load generated dependencies.cmake, containing packages path variables.
