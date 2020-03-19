@@ -469,6 +469,14 @@ protected:
         m_server->setRequest(m_clientMessage);
     }
 
+    void givenSpamServer()
+    {
+        m_synchronousServer = std::make_unique<SynchronousSpamServer>(
+            std::make_unique<typename SocketTypeSet::ServerSocket>());
+        ASSERT_TRUE(m_synchronousServer->bindAndListen(SocketAddress::anyPrivateAddress));
+        m_synchronousServer->start();
+    }
+
     void givenSocketInConnectStage()
     {
         givenListeningServerSocket();
@@ -1650,6 +1658,20 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
     this->thenClientSocketReportedTimedout();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, socket_removed_while_receiving_data)
+{
+    this->givenSpamServer();
+    this->givenConnectedSocket();
+
+    this->whenClientSentPing();
+    // The server starts sending random data.
+    this->whenReadSocketInBlockingWay();
+
+    this->whenClientConnectionIsClosed();
+
+    // then server has received an error and can be freed.
+}
+
 // TODO: #ak Modify and uncomment this test.
 // But, the use case is not valid in case of encryption
 // auto-detection is enabled on server side.
@@ -1938,6 +1960,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     // I/O cancellation tests.
     randomly_stopping_multiple_simultaneous_connections,
     receive_timeout_change_is_not_ignored,
+    socket_removed_while_receiving_data,
     cancel_io,
     socket_is_ready_for_io_after_read_cancellation,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_connect_completion,

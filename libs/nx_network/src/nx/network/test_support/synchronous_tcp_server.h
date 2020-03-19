@@ -67,6 +67,9 @@ protected:
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * Reads socket and pushes all received data to utils::bstream::AbstractOutput.
+ */
 class NX_NETWORK_API SynchronousReceivingServer:
     public BasicSynchronousReceivingServer
 {
@@ -89,6 +92,9 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * Waits for a ping message on connection and responds with a pong message.
+ */
 class NX_NETWORK_API SynchronousPingPongServer:
     public BasicSynchronousReceivingServer
 {
@@ -109,6 +115,27 @@ protected:
 private:
     const std::string m_ping;
     const std::string m_pong;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Starts sending an infinite stream of random data after receiving any data on the connection.
+ */
+class NX_NETWORK_API SynchronousSpamServer:
+    public BasicSynchronousReceivingServer
+{
+    using base_type = BasicSynchronousReceivingServer;
+
+public:
+    SynchronousSpamServer(
+        std::unique_ptr<AbstractStreamServerSocket> serverSocket);
+
+protected:
+    virtual void processDataReceived(
+        AbstractStreamSocket* connection,
+        const char* data,
+        int dataSize) override;
 };
 
 } // namespace test
