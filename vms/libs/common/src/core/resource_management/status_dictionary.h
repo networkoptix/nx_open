@@ -15,6 +15,7 @@ public:
     void setValue(const QnUuid& resourceId, Qn::ResourceStatus status);
     void clear();
     void clear(const QVector<QnUuid>& idList);
+    void remove(const QnUuid& id);
     QMap<QnUuid, Qn::ResourceStatus> values() const;
 private:
     QMap<QnUuid, Qn::ResourceStatus> m_items;
