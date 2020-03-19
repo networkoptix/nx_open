@@ -388,6 +388,25 @@ TEST_F(CameraSettingsDialogStateReducerTest, disableMotionIfSecondaryStreamDisab
     ASSERT_TRUE(forcedMdOnPrimaryStream.isMotionDetectionEnabled());
 }
 
+// Validate VMS-17723 scenario: each camera schedule is OK, but reducer suggests to disable motion.
+TEST_F(CameraSettingsDialogStateReducerTest, DISABLED_skipMotionAlertIfScheduleIsNotToBeModified)
+{
+    // Given camera without motion support and with valid schedule.
+    CameraResourceStubPtr cameraWithNoMotion(new CameraResourceStub());
+    cameraWithNoMotion->setDisableDualStreaming(true);
+    cameraWithNoMotion->setScheduleTasks(makeSchedule(Qn::RecordingType::always));
+    EXPECT_EQ(Reducer::loadCameras({}, {cameraWithNoMotion}).scheduleAlert, std::nullopt);
+
+    // Given camera with motion support and with valid motion-only schedule.
+    CameraResourceStubPtr cameraWithMotion(new CameraResourceStub());
+    cameraWithMotion->setScheduleTasks(makeSchedule(Qn::RecordingType::motionOnly));
+    EXPECT_EQ(Reducer::loadCameras({}, {cameraWithMotion}).scheduleAlert, std::nullopt);
+
+    // Selecting both cameras must not emit any schedule alerts.
+    const auto initial = Reducer::loadCameras({}, {cameraWithNoMotion, cameraWithMotion});
+    ASSERT_EQ(initial.scheduleAlert, std::nullopt);
+}
+
 // "wearableClientTimeZone" property test
 TEST_F(CameraSettingsDialogStateReducerTest, wearableClientTimeZone)
 {
