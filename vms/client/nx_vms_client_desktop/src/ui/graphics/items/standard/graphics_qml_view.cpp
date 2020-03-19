@@ -566,7 +566,7 @@ void GraphicsQmlView::focusInEvent(QFocusEvent* event)
 void GraphicsQmlView::focusOutEvent(QFocusEvent* event)
 {
     // This event may fire during QGraphicsWidget destruction.
-    if (!d)
+    if (!d->quickWindow)
         return;
 
     QCoreApplication::sendEvent(d->quickWindow.data(), event);
