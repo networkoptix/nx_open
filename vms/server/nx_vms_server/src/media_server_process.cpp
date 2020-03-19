@@ -2588,13 +2588,13 @@ void MediaServerProcess::registerRestHandlers(
      * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
      * %permissions Owner.
      * %param:string currentPassword Current user password.
-     * %param:string url URL of one Server in the target System to join. URL may contain credentials
-     *     for target System, in that case getKey and postKey are not required. The target System
-     *     user should have Owner permissions as well.
+     * %param:string url URL of one Server in the target System to join. The URL may contain
+     *     credentials for the target System, in that case getKey and postKey are not required.
+     *     The target System user should have Owner permissions as well.
      * %param[opt]:string getKey Authorization key ("auth" param) for GET requests to the target
-     *     System. Required if URL does not contain credentials.
+     *     System. Required if the URL does not contain credentials.
      * %param[opt]:string postKey Authorization key ("auth" param) for POST requests to the target
-     *     System. Required if URL does not contain credentials.
+     *     System. Required if the URL does not contain credentials.
      * %param[opt]:boolean takeRemoteSettings Direction of the merge. Default value is false. If
      *     <b>mergeOneServer</b> is true, <b>takeRemoteSettings</b> parameter is ignored and
      *     treated as false.
@@ -2633,7 +2633,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %value "UNCONFIGURED_SYSTEM" Cannot merge to the unconfigured system.
      *         %value "UNKNOWN_ERROR" something unexpected has happend.
      *         %value "DUPLICATE_MEDIASERVER_FOUND" Cannot merge Systems because they have at least
-     *             one server with the same ID.
+     *             one Server with the same id.
      */
     reg("api/mergeSystems", new QnMergeSystemsRestHandler(serverModule()), kAdmin);
 
