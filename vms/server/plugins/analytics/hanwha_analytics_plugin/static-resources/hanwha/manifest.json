@@ -85,42 +85,50 @@
         [
             {
                 "type": "Section",
-                "caption": "Shock detection",
+                "caption": "Shock Detection",
                 "requiredForEventTypeIds": [ "nx.hanwha.ShockDetection" ],
                 "items": 
                 [
                     {
-                        "type": "CheckBox",
+                        "type": "SwitchButton",
                         "name": "ShockDetection.Enable",
                         "caption": "Enable",
                         "defaultValue": false
                     },
                     {
-                        "type": "SpinBox",
-                        "name": "ShockDetection.ThresholdLevel",
-                        "caption": "Level of detection",
-                        "defaultValue": 50,
-                        "minValue": 1,
-                        "maxValue": 100
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": "ShockDetection.SensitivityLevel",
-                        "caption": "Sensitivity",
-                        "defaultValue": 80,
-                        "minValue": 1,
-                        "maxValue": 100
+                        "type": "GroupBox",
+                        "caption": "Shock Detection",
+                        "items": 
+                        [
+                            {
+                                "type": "SpinBox",
+                                "name": "ShockDetection.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 50,
+                                "minValue": 1,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "ShockDetection.SensitivityLevel",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 1,
+                                "maxValue": 100
+                            }
+                        ]
                     }
                 ]
             },
             {
                 "type": "Section",
-                "caption": "Motion detection",
+                "caption": "Motion Detection",
                 "requiredForEventTypeIds": [ "nx.hanwha.MotionDetection" ],
                 "items": 
                 [
                     {
-                        "type": "Separator"
+                        "type": "GroupBox",
+                        "caption": "Motion Detection"
                     }
                 ],
                 "sections":
@@ -128,53 +136,60 @@
                     {
                         "type": "Section",
                         "caption": "Include Areas",
-                        "items": 
+                        "items":
                         [
                             {
-                                "type": "Repeater",
-                                "count": 4,
-                                "startIndex": 1,
-                                "template": 
-                                {
-                                    "type": "GroupBox",
-                                    "caption": "Include area #",
-                                    "items": 
-                                    [
+                                "type": "GroupBox",
+                                "caption": "Motion Detection Include Areas",
+                                "items": 
+                                [
+                                    {
+                                        "type": "Repeater",
+                                        "count": 4,
+                                        "startIndex": 1,
+                                        "template": 
                                         {
-                                            "type": "PolygonFigure",
-                                            "name": "MotionDetection.IncludeArea#.Points",
-                                            "caption": "Include area",
-                                            "minPoints": 4,
-                                            "maxPoints": 8
-                                        },
-                                        {
-                                            "type": "SpinBox",
-                                            "name": "MotionDetection.IncludeArea#.ThresholdLevel",
-                                            "caption": "Level of detection",
-                                            "defaultValue": 50,
-                                            "minValue": 1,
-                                            "maxValue": 100
-                                        },
-                                        {
-                                            "type": "SpinBox",
-                                            "name": "MotionDetection.IncludeArea#.SensitivityLevel",
-                                            "caption": "Sensitivity",
-                                            "defaultValue": 80,
-                                            "minValue": 1,
-                                            "maxValue": 100
-                                        },
-                                        {
-                                            "type": "SpinBox",
-                                            "name": "MotionDetection.IncludeArea#.MinimumDuration",
-                                            "caption": "Minimum duration (s)",
-                                            "defaultValue": 0,
-                                            "minValue": 0,
-                                            "maxValue": 5
+                                            "type": "GroupBox",
+                                            "caption": "Include area #",
+                                            "items": 
+                                            [
+                                                {
+                                                    "type": "PolygonFigure",
+                                                    "name": "MotionDetection.IncludeArea#.Points",
+                                                    "caption": "Include area",
+                                                    "minPoints": 4,
+                                                    "maxPoints": 8
+                                                },
+                                                {
+                                                    "type": "SpinBox",
+                                                    "name": "MotionDetection.IncludeArea#.ThresholdLevel",
+                                                    "caption": "Level of detection",
+                                                    "defaultValue": 50,
+                                                    "minValue": 1,
+                                                    "maxValue": 100
+                                                },
+                                                {
+                                                    "type": "SpinBox",
+                                                    "name": "MotionDetection.IncludeArea#.SensitivityLevel",
+                                                    "caption": "Sensitivity",
+                                                    "defaultValue": 80,
+                                                    "minValue": 1,
+                                                    "maxValue": 100
+                                                },
+                                                {
+                                                    "type": "SpinBox",
+                                                    "name": "MotionDetection.IncludeArea#.MinimumDuration",
+                                                    "caption": "Minimum duration (s)",
+                                                    "defaultValue": 0,
+                                                    "minValue": 0,
+                                                    "maxValue": 5
+                                                }
+                                            ]
                                         }
-                                    ]
-                                }
-                            }
+                                    }
 
+                                ]
+                            }
                         ]
                     },
                     {
@@ -183,17 +198,24 @@
                         "items": 
                         [
                             {
-                                "type": "Repeater",
-                                "count": 4,
-                                "startIndex": 1,
-                                "template": 
-                                {
-                                    "type": "PolygonFigure",
-                                    "name": "MotionDetection.ExcludeArea#.Points",
-                                    "caption": "Exclude area #",
-                                    "minPoints": 4,
-                                    "maxPoints": 8
-                                }
+                                "type": "GroupBox",
+                                "caption": "Motion Detection Exclude Areas",
+                                "items": 
+                                [
+                                    {
+                                        "type": "Repeater",
+                                        "count": 4,
+                                        "startIndex": 1,
+                                        "template": 
+                                        {
+                                            "type": "PolygonFigure",
+                                            "name": "MotionDetection.ExcludeArea#.Points",
+                                            "caption": "Exclude area #",
+                                            "minPoints": 4,
+                                            "maxPoints": 8
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -202,84 +224,98 @@
             },
             {
                 "type": "Section",
-                "caption": "Tampering detection",
+                "caption": "Tampering Detection",
                 "requiredForEventTypeIds": [ "nx.hanwha.Tampering" ],
                 "items": 
                 [
                     {
-                        "type": "CheckBox",
+                        "type": "SwitchButton",
                         "name": "TamperingDetection.Enable",
                         "caption": "Enable",
                         "defaultValue": false
                     },
                     {
-                        "type": "SpinBox",
-                        "name": "TamperingDetection.ThresholdLevel",
-                        "caption": "Level of detection",
-                        "defaultValue": 50,
-                        "minValue": 1,
-                        "maxValue": 100
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": "TamperingDetection.SensitivityLevel",
-                        "caption": "Sensitivity",
-                        "defaultValue": 80,
-                        "minValue": 1,
-                        "maxValue": 100
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": "TamperingDetection.MinimumDuration",
-                        "caption": "Minimum duration (s)",
-                        "defaultValue": 1,
-                        "minValue": 1,
-                        "maxValue": 5
-                    },
-                    {
-                        "type": "CheckBox",
-                        "name": "TamperingDetection.ExceptDarkImages",
-                        "caption": "Except dark images",
-                        "defaultValue": false,
-                        "value": false
+                        "type": "GroupBox",
+                        "caption": "Tampering Detection",
+                        "items": 
+                        [
+                            {
+                                "type": "SpinBox",
+                                "name": "TamperingDetection.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 50,
+                                "minValue": 1,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "TamperingDetection.SensitivityLevel",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 1,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "TamperingDetection.MinimumDuration",
+                                "caption": "Minimum Duration (s)",
+                                "defaultValue": 1,
+                                "minValue": 1,
+                                "maxValue": 5
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "TamperingDetection.ExceptDarkImages",
+                                "caption": "Except dark images",
+                                "defaultValue": false,
+                                "value": false
+                            }
+                        ]
                     }
                 ]
             },
             {
                 "type": "Section",
-                "caption": "Defocus detection",
+                "caption": "Defocus Detection",
                 "requiredForEventTypeIds": [ "nx.hanwha.DefocusDetection" ],
                 "items": 
                 [
                     {
-                        "type": "CheckBox",
+                        "type": "SwitchButton",
                         "name": "DefocusDetection.Enable",
                         "caption": "Enable",
                         "defaultValue": false
                     },
                     {
-                        "type": "SpinBox",
-                        "name": "DefocusDetection.ThresholdLevel",
-                        "caption": "Level of detection",
-                        "defaultValue": 20,
-                        "minValue": 1,
-                        "maxValue": 100
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": "DefocusDetection.SensitivityLevel",
-                        "caption": "Sensitivity",
-                        "defaultValue": 80,
-                        "minValue": 1,
-                        "maxValue": 100
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": "DefocusDetection.MinimumDuration",
-                        "caption": "Minimum Duration (s)",
-                        "defaultValue": 0,
-                        "minValue": 1,
-                        "maxValue": 5
+                        "type": "GroupBox",
+                        "caption": "Defocus Detection",
+                        "items": 
+                        [
+                            {
+                                "type": "SpinBox",
+                                "name": "DefocusDetection.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 20,
+                                "minValue": 1,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "DefocusDetection.SensitivityLevel",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 1,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "DefocusDetection.MinimumDuration",
+                                "caption": "Minimum Duration (s)",
+                                "defaultValue": 0,
+                                "minValue": 1,
+                                "maxValue": 5
+                            }
+                        ]
                     }
                 ]
             },
@@ -290,34 +326,41 @@
                 "items": 
                 [
                     {
-                        "type": "CheckBox",
+                        "type": "SwitchButton",
                         "name": "FogDetection.Enable",
                         "caption": "Enable",
                         "defaultValue": false
                     },
                     {
-                        "type": "SpinBox",
-                        "name": "FogDetection.ThresholdLevel",
-                        "caption": "Level of detection",
-                        "defaultValue": 20,
-                        "minValue": 1,
-                        "maxValue": 100
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": "FogDetection.SensitivityLevel",
-                        "caption": "Sensitivity",
-                        "defaultValue": 80,
-                        "minValue": 1,
-                        "maxValue": 100
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": "FogDetection.MinimumDuration",
-                        "caption": "Minimum Duration (s)",
-                        "defaultValue": 30,
-                        "minValue": 1,
-                        "maxValue": 5
+                        "type": "GroupBox",
+                        "caption": "Fog Detection",
+                        "items": 
+                        [
+                            {
+                                "type": "SpinBox",
+                                "name": "FogDetection.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 20,
+                                "minValue": 1,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "FogDetection.SensitivityLevel",
+                                "caption": "Sensitivity",
+                                "defaultValue": 80,
+                                "minValue": 1,
+                                "maxValue": 100
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": "FogDetection.MinimumDuration",
+                                "caption": "Minimum Duration (s)",
+                                "defaultValue": 30,
+                                "minValue": 1,
+                                "maxValue": 5
+                            }
+                        ]
                     }
                 ]
             },
@@ -328,43 +371,50 @@
                 "items": 
                 [
                     {
-                        "type": "CheckBox",
+                        "type": "SwitchButton",
                         "name": "ObjectDetection.Enable",
                         "caption": "Enable",
                         "defaultValue": false
                     },
                     {
                         "type": "GroupBox",
-                        "caption": "Objects",
+                        "caption": "[AI] Objects",
                         "items": 
                         [
                             {
-                                "type": "CheckBox",
-                                "name": "ObjectDetection.Person",
-                                "caption": "Person",
-                                "defaultValue": false,
-                                "value": false
-                            },
-                            {
-                                "type": "CheckBox",
-                                "name": "ObjectDetection.Vehicle",
-                                "caption": "Vehicle",
-                                "defaultValue": false,
-                                "value": false
-                            },
-                            {
-                                "type": "CheckBox",
-                                "name": "ObjectDetection.Face",
-                                "caption": "Face",
-                                "defaultValue": false,
-                                "value": false
-                            },
-                            {
-                                "type": "CheckBox",
-                                "name": "ObjectDetection.LicensePlate",
-                                "caption": "License plate",
-                                "defaultValue": false,
-                                "value": false
+                                "type": "GroupBox",
+                                "caption": "Type",
+                                "items": 
+                                [
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "ObjectDetection.Person",
+                                        "caption": "Person",
+                                        "defaultValue": false,
+                                        "value": false
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "ObjectDetection.Vehicle",
+                                        "caption": "Vehicle",
+                                        "defaultValue": false,
+                                        "value": false
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "ObjectDetection.Face",
+                                        "caption": "Face",
+                                        "defaultValue": false,
+                                        "value": false
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "ObjectDetection.LicensePlate",
+                                        "caption": "License plate",
+                                        "defaultValue": false,
+                                        "value": false
+                                    }
+                                ]
                             },
                             {
                                 "type": "SpinBox",
@@ -381,57 +431,77 @@
                 [
                     {
                         "type": "Section",
-                        "caption": "Best short",
+                        "caption": "Best Short",
                         "items": 
                         [
                             {
-                                "type": "CheckBox",
-                                "name": "ObjectDetection.BestShot.Person",
-                                "caption": "Person",
-                                "defaultValue": false,
-                                "value": false
-                            },
-                            {
-                                "type": "CheckBox",
-                                "name": "ObjectDetection.BestShot.Vehicle",
-                                "caption": "Vehicle",
-                                "defaultValue": false,
-                                "value": false
-                            },
-                            {
-                                "type": "CheckBox",
-                                "name": "ObjectDetection.BestShot.Face",
-                                "caption": "Face",
-                                "defaultValue": false,
-                                "value": false
-                            },
-                            {
-                                "type": "CheckBox",
-                                "name": "ObjectDetection.BestShot.LicensePlate",
-                                "caption": "LicensePlate",
-                                "defaultValue": false,
-                                "value": false
+                                "type": "GroupBox",
+                                "caption": "Objects Best Short",
+                                "items": 
+                                [
+                                    {
+                                        "type": "GroupBox",
+                                        "caption": "Type",
+                                        "items": 
+                                        [
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.BestShot.Person",
+                                                "caption": "Person",
+                                                "defaultValue": false,
+                                                "value": false
+                                            },
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.BestShot.Vehicle",
+                                                "caption": "Vehicle",
+                                                "defaultValue": false,
+                                                "value": false
+                                            },
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.BestShot.Face",
+                                                "caption": "Face",
+                                                "defaultValue": false,
+                                                "value": false
+                                            },
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.BestShot.LicensePlate",
+                                                "caption": "LicensePlate",
+                                                "defaultValue": false,
+                                                "value": false
+                                            }
+                                        ]
+                                    }
+                                ]
                             }
-
                         ]
                     },
                     {
                         "type": "Section",
-                        "caption": "Exclude Area",
+                        "caption": "Exclude Areas",
                         "items": 
                         [
                             {
-                                "type": "Repeater",
-                                "count": 4,
-                                "startIndex": 1,
-                                "template": 
-                                {
-                                    "type": "PolygonFigure",
-                                    "name": "ObjectDetection.ExcludeArea#.Points",
-                                    "caption": "Object Exclude Area #",
-                                    "minPoints": 4,
-                                    "maxPoints": 8
-                                }
+                                "type": "GroupBox",
+                                "caption": "Objects Exclude Areas",
+                                "items": 
+                                [
+                                    {
+                                        "type": "Repeater",
+                                        "count": 4,
+                                        "startIndex": 1,
+                                        "template": 
+                                        {
+                                            "type": "PolygonFigure",
+                                            "name": "ObjectDetection.ExcludeArea#.Points",
+                                            "caption": "Object Exclude Area #",
+                                            "minPoints": 4,
+                                            "maxPoints": 8
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -451,6 +521,13 @@
                     "nx.hanwha.VideoAnalytics.Intrusion",
                     "nx.hanwha.VideoAnalytics.Loitering"
                 ],
+                "items": 
+                [
+                    {
+                        "type": "GroupBox",
+                        "caption": "[AI] IVA"
+                    }
+                ],
                 "sections": 
                 [
                     {
@@ -459,148 +536,194 @@
                         "items": 
                         [
                             {
-                                "type": "Repeater",
-                                "count": 4,
-                                "startIndex": 1,
-                                "template": 
-                                {
-                                    "type": "GroupBox",
-                                    "caption": "IVA Line #",
-                                    "items": 
-                                    [
+                                "type": "GroupBox",
+                                "caption": "[AI] IVA Lines",
+                                "items": 
+                                [
+                                    {
+                                        "type": "Repeater",
+                                        "count": 4,
+                                        "startIndex": 1,
+                                        "template": 
                                         {
-                                            "type": "LineFigure",
-                                            "name": "IVA.Line#.Points",
-                                            "caption": "Line #"
-                                        },
-                                        {
-                                            "type": "CheckBox",
-                                            "name": "IVA.Line#.Person",
-                                            "caption": "Person",
-                                            "defaultValue": false
-                                        },
-                                        {
-                                            "type": "CheckBox",
-                                            "name": "IVA.Line#.Vehicle",
-                                            "caption": "Vehicle",
-                                            "defaultValue": false
-                                        },
-                                        {
-                                            "type": "CheckBox",
-                                            "name": "IVA.Line#.Crossing",
-                                            "caption": "Crossing",
-                                            "defaultValue": false
+                                            "type": "GroupBox",
+                                            "caption": "IVA Line #",
+                                            "items": 
+                                            [
+                                                {
+                                                    "type": "LineFigure",
+                                                    "name": "IVA.Line#.Points",
+                                                    "caption": "Line #"
+                                                },
+                                                {
+                                                    "type": "GroupBox",
+                                                    "caption": "Type",
+                                                    "items": 
+                                                    [
+                                                        {
+                                                            "type": "CheckBox",
+                                                            "name": "IVA.Line#.Person",
+                                                            "caption": "Person",
+                                                            "defaultValue": false
+                                                        },
+                                                        {
+                                                            "type": "CheckBox",
+                                                            "name": "IVA.Line#.Vehicle",
+                                                            "caption": "Vehicle",
+                                                            "defaultValue": false
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "CheckBox",
+                                                    "name": "IVA.Line#.Crossing",
+                                                    "caption": "Crossing",
+                                                    "defaultValue": false
+                                                }
+                                            ]
                                         }
-                                    ]
-                                }
+                                    }
+                                ]
                             }
                         ]
                     },
                     {
                         "type": "Section",
-                        "caption": "Include areas",
-                        "items": [
+                        "caption": "Include Areas",
+                        "items": 
+                        [
                             {
-                                "type": "Repeater",
-                                "count": 4,
-                                "startIndex": 1,
-                                "template": {
-                                    "type": "GroupBox",
-                                    "caption": "IVA Include area 1",
-                                    "items": [
+                                "type": "GroupBox",
+                                "caption": "[AI] IVA Include Areas",
+                                "items": 
+                                [
+                                    {
+                                        "type": "Repeater",
+                                        "count": 4,
+                                        "startIndex": 1,
+                                        "template": 
+                                        {
+                                            "type": "GroupBox",
+                                            "caption": "IVA Include area #",
+                                            "items": 
+                                            [
+                                                {
+                                                    "type": "PolygonFigure",
+                                                    "name": "IVA.IncludeArea#.Points",
+                                                    "caption": "Area #",
+                                                    "minPoints": 4,
+                                                    "maxPoints": 8
+                                                },
+                                                {
+                                                    "type": "GroupBox",
+                                                    "caption": "Type",
+                                                    "items": 
+                                                    [
+                                                        {
+                                                            "type": "CheckBox",
+                                                            "name": "IVA.IncludeArea#.Person",
+                                                            "caption": "Person",
+                                                            "defaultValue": false
+                                                        },
+                                                        {
+                                                            "type": "CheckBox",
+                                                            "name": "IVA.IncludeArea#.Vehicle",
+                                                            "caption": "Vehicle",
+                                                            "defaultValue": false
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "GroupBox",
+                                                    "caption": "Category",
+                                                    "items": [
+                                                        {
+                                                            "type": "CheckBox",
+                                                            "name": "IVA.IncludeArea#.Intrusion",
+                                                            "caption": "Intrusion",
+                                                            "defaultValue": false
+                                                        },
+                                                        {
+                                                            "type": "CheckBox",
+                                                            "name": "IVA.IncludeArea#.Enter",
+                                                            "caption": "Enter",
+                                                            "defaultValue": false
+                                                        },
+                                                        {
+                                                            "type": "CheckBox",
+                                                            "name": "IVA.IncludeArea#.Exit",
+                                                            "caption": "Exit",
+                                                            "defaultValue": false
+                                                        },
+                                                        {
+                                                            "type": "CheckBox",
+                                                            "name": "IVA.IncludeArea#.Appear",
+                                                            "caption": "Appear",
+                                                            "defaultValue": false
+                                                        },
+                                                        {
+                                                            "type": "CheckBox",
+                                                            "name": "IVA.IncludeArea#.Loitering",
+                                                            "caption": "Loitering",
+                                                            "defaultValue": false
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "SpinBox",
+                                                    "name": "IVA.IncludeArea#.IntrusionDuration",
+                                                    "caption": "Intrusion duration",
+                                                    "defaultValue": 0,
+                                                    "minValue": 0,
+                                                    "maxValue": 5
+                                                },
+                                                {
+                                                    "type": "SpinBox",
+                                                    "name": "IVA.IncludeArea#.AppearDuration",
+                                                    "caption": "Appear duration",
+                                                    "defaultValue": 10,
+                                                    "minValue": 1,
+                                                    "maxValue": 60
+                                                },
+                                                {
+                                                    "type": "SpinBox",
+                                                    "name": "IVA.IncludeArea#.LoiteringDuration",
+                                                    "caption": "Loitering duration",
+                                                    "defaultValue": 10,
+                                                    "minValue": 1,
+                                                    "maxValue": 60
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "Section",
+                        "caption": "Exclude Areas",
+                        "items": 
+                        [
+                            {
+                                "type": "GroupBox",
+                                "caption": "[AI] IVA Exclude Areas",
+                                "items": 
+                                [
+                                    {
+                                        "type": "Repeater",
+                                        "count": 4,
+                                        "startIndex": 1,
+                                        "template": 
                                         {
                                             "type": "PolygonFigure",
-                                            "name": "IVA.IncludeArea#.Points",
-                                            "caption": "Area #",
                                             "minPoints": 4,
-                                            "maxPoints": 8
-                                        },
-                                        {
-                                            "type": "CheckBox",
-                                            "name": "IVA.IncludeArea#.Person",
-                                            "caption": "Person",
-                                            "defaultValue": false
-                                        },
-                                        {
-                                            "type": "CheckBox",
-                                            "name": "IVA.IncludeArea#.Vehicle",
-                                            "caption": "Vehicle",
-                                            "defaultValue": false
-                                        },
-                                        {
-                                            "type": "CheckBox",
-                                            "name": "IVA.IncludeArea#.Intrusion",
-                                            "caption": "Intrusion",
-                                            "defaultValue": false
-                                        },
-                                        {
-                                            "type": "CheckBox",
-                                            "name": "IVA.IncludeArea#.Enter",
-                                            "caption": "Enter",
-                                            "defaultValue": false
-                                        },
-                                        {
-                                            "type": "CheckBox",
-                                            "name": "IVA.IncludeArea#.Exit",
-                                            "caption": "Exit",
-                                            "defaultValue": false
-                                        },
-                                        {
-                                            "type": "CheckBox",
-                                            "name": "IVA.IncludeArea#.Appear",
-                                            "caption": "Appear",
-                                            "defaultValue": false
-                                        },
-                                        {
-                                            "type": "CheckBox",
-                                            "name": "IVA.IncludeArea#.Loitering",
-                                            "caption": "Loitering",
-                                            "defaultValue": false
-                                        },
-                                        {
-                                            "type": "SpinBox",
-                                            "name": "IVA.IncludeArea#.IntrusionDuration",
-                                            "caption": "Intrusion duration",
-                                            "defaultValue": 0,
-                                            "minValue": 0,
-                                            "maxValue": 5
-                                        },
-                                        {
-                                            "type": "SpinBox",
-                                            "name": "IVA.IncludeArea#.AppearDuration",
-                                            "caption": "Appear duration",
-                                            "defaultValue": 10,
-                                            "minValue": 1,
-                                            "maxValue": 60
-                                        },
-                                        {
-                                            "type": "SpinBox",
-                                            "name": "IVA.IncludeArea#.LoiteringDuration",
-                                            "caption": "Loitering duration",
-                                            "defaultValue": 10,
-                                            "minValue": 1,
-                                            "maxValue": 60
+                                            "maxPoints": 8,
+                                            "name": "IVA.ExcludeArea#.Points",
+                                            "caption": "Area #"
                                         }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "type": "Section",
-                        "caption": "Exclude areas",
-                        "items": [
-                            {
-                                "type": "Repeater",
-                                "count": 4,
-                                "startIndex": 1,
-                                "template": {
-                                    "type": "PolygonFigure",
-                                    "minPoints": 4,
-                                    "maxPoints": 8,
-                                    "name": "IVA.ExcludeArea#.Points",
-                                    "caption": "Area #"
-                                }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -608,29 +731,36 @@
             },
             {
                 "type": "Section",
-                "caption": "Audio detection",
+                "caption": "Audio Detection",
                 "requiredForEventTypeIds": [ "nx.hanwha.AudioDetection" ],
                 "items": 
                 [
                     {
-                        "type": "CheckBox",
+                        "type": "SwitchButton",
                         "name": "AudioDetection.Enable",
                         "caption": "Enable",
                         "defaultValue": false
                     },
                     {
-                        "type": "SpinBox",
-                        "name": "AudioDetection.ThresholdLevel",
-                        "caption": "Level of detection",
-                        "defaultValue": 50,
-                        "minValue": 1,
-                        "maxValue": 100
+                        "type": "GroupBox",
+                        "caption": "Audio Detection",
+                        "items": 
+                        [
+                            {
+                                "type": "SpinBox",
+                                "name": "AudioDetection.ThresholdLevel",
+                                "caption": "Level of detection",
+                                "defaultValue": 50,
+                                "minValue": 1,
+                                "maxValue": 100
+                            }
+                        ]
                     }
                 ]
             },
             {
                 "type": "Section",
-                "caption": "Sound classification",
+                "caption": "Sound Classification",
                 "requiredForEventTypeIds": 
                 [
                     "nx.hanwha.AudioAnalytics.Scream",
@@ -641,57 +771,64 @@
                 "items": 
                 [
                     {
-                        "type": "CheckBox",
+                        "type": "SwitchButton",
                         "name": "SoundClassification.Enable",
                         "caption": "Enable",
                         "defaultValue": false
                     },
                     {
-                        "type": "CheckBox",
-                        "name": "SoundClassification.NoiseReduction",
-                        "caption": "Noise filter",
-                        "defaultValue": false
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": "SoundClassification.ThresholdLevel",
-                        "caption": "Level of classification",
-                        "defaultValue": 50,
-                        "minValue": 1,
-                        "maxValue": 100
-                    },
-                    {
                         "type": "GroupBox",
-                        "caption": "Categories",
+                        "caption": "Sound Classification",
                         "items": 
                         [
                             {
                                 "type": "CheckBox",
-                                "name": "SoundClassification.Scream",
-                                "caption": "Scream",
-                                "defaultValue": false,
-                                "value": false
+                                "name": "SoundClassification.NoiseReduction",
+                                "caption": "Noise filter",
+                                "defaultValue": false
                             },
                             {
-                                "type": "CheckBox",
-                                "name": "SoundClassification.Gunshot",
-                                "caption": "Gunshot",
-                                "defaultValue": false,
-                                "value": false
+                                "type": "SpinBox",
+                                "name": "SoundClassification.ThresholdLevel",
+                                "caption": "Level of classification",
+                                "defaultValue": 50,
+                                "minValue": 1,
+                                "maxValue": 100
                             },
                             {
-                                "type": "CheckBox",
-                                "name": "SoundClassification.Explosion",
-                                "caption": "Explosion",
-                                "defaultValue": false,
-                                "value": false
-                            },
-                            {
-                                "type": "CheckBox",
-                                "name": "SoundClassification.CrashingGlass",
-                                "caption": "Crashing glass",
-                                "defaultValue": false,
-                                "value": false
+                                "type": "GroupBox",
+                                "caption": "Categories",
+                                "items": 
+                                [
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "SoundClassification.Scream",
+                                        "caption": "Scream",
+                                        "defaultValue": false,
+                                        "value": false
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "SoundClassification.Gunshot",
+                                        "caption": "Gunshot",
+                                        "defaultValue": false,
+                                        "value": false
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "SoundClassification.Explosion",
+                                        "caption": "Explosion",
+                                        "defaultValue": false,
+                                        "value": false
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "name": "SoundClassification.CrashingGlass",
+                                        "caption": "Crashing glass",
+                                        "defaultValue": false,
+                                        "value": false
+                                    }
+                                ]
                             }
                         ]
                     }
