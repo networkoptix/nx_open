@@ -45,6 +45,15 @@ function(nx_vcs_branch dir var)
     set(${var} ${${var}} PARENT_SCOPE)
 endfunction()
 
+function(nx_vcs_current_refs dir var)
+    if(EXISTS ${dir}/.git)
+        _git_current_refs(${dir} ${var})
+    else()
+        message(WARNING "Can't get current refs: not found any VCS: ${dir}")
+    endif()
+    set(${var} ${${var}} PARENT_SCOPE)
+endfunction()
+
 function(_hg_changeset dir var)
     execute_process(
         COMMAND hg --repository "${dir}" log --rev . --template "{node|short}"
@@ -78,5 +87,18 @@ function(_git_branch dir var)
         OUTPUT_VARIABLE branch
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+    if(NOT branch)
+        set(branch "DETACHED_HEAD")
+    endif()
     set(${var} "${branch}" PARENT_SCOPE)
+endfunction()
+
+function(_git_current_refs dir var)
+    execute_process(
+        COMMAND git -C "${dir}" log --decorate -n1 --format=format:"%D"
+        OUTPUT_VARIABLE current_refs_output
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    string(REGEX REPLACE "HEAD, |HEAD -> " "" current_refs "${current_refs_output}")
+    set(${var} "${current_refs}" PARENT_SCOPE)
 endfunction()
