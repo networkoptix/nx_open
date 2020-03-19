@@ -2254,6 +2254,9 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *
+     **%apidoc[proprietary] PUT /api/downloads/{fileName}?upload
+     * Equivalent of POST /api/downloads/{fileName}?upload.
+     *
      **%apidoc POST /api/downloads/{fileName}?upload
      * Registers the file in the Server's Downloader. Here {fileName} is an arbitrary identifier
      * for the file; it must be unique throughout the entire VMS System, and is intended to be used
@@ -2278,6 +2281,9 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *
+     **%apidoc[proprietary] POST /api/downloads/{fileName}/chunks/{chunkIndex}
+     * Equivalent of PUT /api/downloads/{fileName}/chunks/{chunkIndex}.
+     *
      **%apidoc PUT /api/downloads/{fileName}/chunks/{chunkIndex}
      * Sends to the Server the binary content of the specified chunk of the file previously
      * registered in the Server's Downloader via POST /api/downloads/{fileName}. Here {chunkIndex}
@@ -2287,9 +2293,6 @@ void MediaServerProcess::registerRestHandlers(
      * %return:object JSON object with an error code and error message.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
-     *
-     **%apidoc[proprietary] POST /api/downloads/
-     * Equivalent of PUT /api/downloads/.
      */
     reg("api/downloads/", new nx::vms::server::rest::handlers::Downloads(serverModule()));
 
