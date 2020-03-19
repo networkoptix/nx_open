@@ -44,7 +44,7 @@ Item
             height: width
             radius: height / 2
             x: parent.width - parent.height / 2 - width / 2
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenter: uncheckedLayer.verticalCenter
             color: _hoverColor(uncheckedIndicatorColor)
 
             Rectangle
@@ -74,7 +74,7 @@ Item
                 width: 2
                 height: parent.height / 2
                 x: parent.height / 2
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenter: checkedLayer.verticalCenter
                 color: _hoverColor(checkedIndicatorColor)
                 visible: checkState !== Qt.PartiallyChecked
             }
@@ -106,7 +106,7 @@ Item
             height: width
             radius: height / 2
             color: _transparentHandle ? "white" : _hoverColor(handleColor)
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenter: opacityMaskSource.verticalCenter
 
             x:
             {

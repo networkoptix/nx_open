@@ -536,6 +536,13 @@ std::string Engine::manifestString() const
                                 "caption": "Nested Section Example",
                                 "items": [
                                     {
+                                        "type": "SwitchButton",
+                                        "caption": "Switch Button",
+                                        "name": "testSwitch",
+                                        "description": "Tooltip for the switch button",
+                                        "defaultValue": false
+                                    },
+                                    {
                                         "type": "SpinBox",
                                         "caption": "SpinBox Parameter",
                                         "name": "testSpinBox3",

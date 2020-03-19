@@ -1,6 +1,6 @@
 #include "texture_transition_shader_program.h"
 
-#include "shader_source.h"
+#include <nx/vms/client/core/graphics/shader_source.h>
 
 QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(QObject *parent)
     : QnTextureGLShaderProgram(parent)

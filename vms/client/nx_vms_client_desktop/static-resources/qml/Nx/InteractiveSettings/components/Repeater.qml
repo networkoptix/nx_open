@@ -11,7 +11,7 @@ Item
 
     readonly property Item childrenItem: column
 
-    readonly property real buttonSpacing: 8
+    readonly property real buttonSpacing: 24
 
     implicitWidth: parent.width
     implicitHeight: column.implicitHeight + addButton.implicitHeight + buttonSpacing

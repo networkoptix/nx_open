@@ -11,6 +11,7 @@
 #include <QtQuick/QSGTexture>
 
 #include <nx/client/core/motion/helpers/camera_motion_helper.h>
+#include <nx/vms/client/core/graphics/shader_source.h>
 
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/thread/custom_runnable.h>
@@ -480,10 +481,7 @@ bool MotionRegionsItem::Private::State::operator!=(const State& other) const
 
 const char* MotionRegionsItem::Private::Shader::vertexShader() const
 {
-    return R"GLSL(
-
-        #version 120
-
+    static const QByteArray shader(core::graphics::modernizeShaderSource(R"GLSL(
         attribute vec4 vertex;
         attribute vec2 texCoord;
 
@@ -496,16 +494,13 @@ const char* MotionRegionsItem::Private::Shader::vertexShader() const
             gl_Position = qt_Matrix * vertex;
             uv = texCoord;
         }
-
-    )GLSL";
+    )GLSL"));
+    return shader.constData();
 }
 
 const char* MotionRegionsItem::Private::Shader::fragmentShader() const
 {
-    return R"GLSL(
-
-        #version 120
-
+    static const QByteArray shader(core::graphics::modernizeShaderSource(R"GLSL(
         uniform float qt_Opacity;
         uniform float fillOpacity;
         uniform sampler2D sourceTexture;
@@ -532,7 +527,8 @@ const char* MotionRegionsItem::Private::Shader::fragmentShader() const
                 * qt_Opacity;
         }
 
-    )GLSL";
+    )GLSL"));
+    return shader.constData();
 }
 
 QList<QByteArray> MotionRegionsItem::Private::Shader::attributes() const

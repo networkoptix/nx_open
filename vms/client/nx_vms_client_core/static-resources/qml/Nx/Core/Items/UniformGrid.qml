@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import nx.client.core.graphics 1.0
 
 ShaderEffect
 {
@@ -19,15 +20,11 @@ ShaderEffect
         lineSize / cellSize.x,
         lineSize / cellSize.y)
 
-    readonly property string shaderVersion:
-        OpenGLInfo.renderableType == OpenGLInfo.OpenGLES ? 100 : 120
-
     readonly property string precisionString:
         OpenGLInfo.renderableType == OpenGLInfo.OpenGLES ? "precision highp float;" : ""
 
-    vertexShader: "
-        #version " + shaderVersion + "
-        " + precisionString + "
+    vertexShader: ShaderHelper.processSource(
+        precisionString + "
 
         uniform vec2 cellSize;
         uniform mat4 qt_Matrix;
@@ -40,11 +37,10 @@ ShaderEffect
         {
             gl_Position = qt_Matrix * qt_Vertex;
             cellCoords = qt_Vertex.xy / cellSize;
-        }"
+        }")
 
-    fragmentShader: "
-        #version " + shaderVersion + "
-        " + precisionString + "
+    fragmentShader: ShaderHelper.processSource(
+        precisionString + "
 
         uniform vec4 color;
         uniform vec2 lineSizeInCellCoords;
@@ -61,5 +57,5 @@ ShaderEffect
                 discard;
 
             gl_FragColor = color * qt_Opacity;
-        }"
+        }")
 }

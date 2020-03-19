@@ -19,16 +19,9 @@ Item::Item(const QString& type, QObject* parent):
 void Item::emitIssue(const Issue& issue) const
 {
     if (engine())
-    {
         engine()->addIssue(issue);
-    }
     else
-    {
-        const auto logLevel = (issue.type == Issue::Type::error)
-            ? nx::utils::log::Level::error
-            : nx::utils::log::Level::warning;
-        NX_UTILS_LOG(logLevel, this, "%1: %2", issue.code, issue.message);
-    }
+        NX_DEBUG(this, "%1: %2", issue.code, issue.message);
 }
 
 void Item::emitIssue(Issue::Type type, Issue::Code code, const QString& message) const

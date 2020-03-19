@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import nx.client.core.graphics 1.0
 
 UniformGrid
 {
@@ -11,9 +12,8 @@ UniformGrid
     readonly property bool maskTextureValid: maskTextureProvider
     readonly property vector2d cellCounts: Qt.vector2d(cellCountX, cellCountY)
 
-    fragmentShader: "
-        #version " + shaderVersion + "
-        " + precisionString + "
+    fragmentShader: ShaderHelper.processSource(
+        precisionString + "
 
         uniform vec4 color;
         uniform vec2 cellCounts;
@@ -46,5 +46,5 @@ UniformGrid
                 discard;
 
             gl_FragColor = color * qt_Opacity;
-        }"
+        }")
 }

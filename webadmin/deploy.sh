@@ -4,17 +4,10 @@ set -e
 
 SOURCE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT_DIR="$SOURCE_DIR/.."
-BRANCH_FILE="$ROOT_DIR"/.hg/branch
 RDEP="$ROOT_DIR"/build_utils/python/rdep.py
 WEBADMIN_FILE="$PWD"/server-external/bin/external.dat
-PACKAGES_DIR="$environment"/packages
+PACKAGES_DIR="$RDEP_PACKAGES_DIR"
 PACKAGE_BASE_NAME=server-external
-DEPLOY_RELEASE_VERSION=0
-
-if [ "$1" = "--deploy-release-version" ]
-then
-    DEPLOY_RELEASE_VERSION=1
-fi
 
 function deploy_package()
 {
@@ -52,26 +45,7 @@ check_file "$WEBADMIN_FILE" \
 check_file "$PACKAGES_DIR"/.rdep \
     "RDep repository is not found in $PACKAGES_DIR."
 
-if [ -d "$ROOT_DIR/.hg" ]; then
-    check_file "$BRANCH_FILE"
-    BRANCH=$(cat $BRANCH_FILE)
-elif [ -d "$ROOT_DIR/.git" ]; then
-    BRANCH=$(git -C "$ROOT_DIR" show -s --format=%B | grep '^Branch:' | tail -n1 | awk '{print $2}')
-else
-    echo "Error: Used VCS is not detected. Deploying without repository is not supported." >&2
-    exit 1
-fi
+VMS_VERSION=$(grep 'set(releaseVersion .*)' "$ROOT_DIR/CMakeLists.txt" \
+    | sed -E 's/.*releaseVersion ([0-9.]+)+\)/\1/')
 
-if [ -z "$BRANCH" ]; then
-    echo "Error: Failed to get the branch from VCS."
-    exit 1
-fi
-
-deploy_package "$PACKAGES_DIR/any/$PACKAGE_BASE_NAME-$BRANCH"
-if [ $DEPLOY_RELEASE_VERSION = 1 ]
-then
-    VMS_VERSION=$(grep 'set(releaseVersion .*)' "$ROOT_DIR/CMakeLists.txt" \
-        | sed -E 's/.*releaseVersion ([0-9.]+)+\)/\1/')
-
-    deploy_package "$PACKAGES_DIR/any/$PACKAGE_BASE_NAME-$VMS_VERSION"
-fi
+deploy_package "$PACKAGES_DIR/any/$PACKAGE_BASE_NAME-$VMS_VERSION"

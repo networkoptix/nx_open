@@ -16,6 +16,12 @@ ToolTip
 
     delay: 500
 
+    property real maxWidth: 500
+
+    implicitWidth: contentItem
+        ? Math.min(contentItem.implicitWidth, maxWidth) + leftPadding + rightPadding
+        : 0
+
     background: Item
     {
         Rectangle
@@ -45,6 +51,7 @@ ToolTip
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignLeft
         textFormat: Text.RichText //< For some reason Text.AutoText works very unreliable.
+        wrapMode: Text.WordWrap
     }
 
     enter: Transition

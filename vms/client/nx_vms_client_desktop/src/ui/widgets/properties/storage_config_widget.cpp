@@ -390,8 +390,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
             if (m_updating)
                 return;
 
-            updateBackupInfo();
-            updateRebuildInfo();
+            updateRebuildAndBackupInfo();
         });
 
     m_updateLabelsTimer->setInterval(1000);
@@ -533,20 +532,23 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
     emit hasChangesChanged();
 }
 
+void QnStorageConfigWidget::updateRebuildAndBackupInfo()
+{
+    updateRebuildInfo();
+    updateBackupInfo();
+}
+
 void QnStorageConfigWidget::loadDataToUi()
 {
     if (!m_server)
         return;
 
-    QScopedValueRollback<bool> guard(m_updating, true);
     loadStoragesFromResources();
     m_backupSchedule = m_server->getBackupSchedule();
     m_camerasToBackup = getCurrentSelectedCameras(resourcePool());
 
     updateWarnings();
-
-    updateRebuildInfo();
-    updateBackupInfo();
+    updateRebuildAndBackupInfo();
 }
 
 void QnStorageConfigWidget::loadStoragesFromResources()
@@ -653,6 +655,9 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
                 // Now metadata storage is changed instantly, so we don't fire hasChangedChanged().
                 }
         });
+
+        connect(m_server, &QnResource::statusChanged, this,
+            &QnStorageConfigWidget::updateRebuildAndBackupInfo);
     }
 }
 
@@ -720,6 +725,11 @@ bool QnStorageConfigWidget::hasStoragesChanges(const QnStorageModelInfoList& sto
     /* Storage was removed. */
     auto existingStorages = m_server->getStorages();
     return storages.size() != existingStorages.size();
+}
+
+bool QnStorageConfigWidget::isServerOnline() const
+{
+    return m_server && m_server->getStatus() == Qn::Online;
 }
 
 void QnStorageConfigWidget::applyChanges()
@@ -833,6 +843,9 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
                 *info = error;
             return false;
         };
+
+    if (!isServerOnline())
+        return error(tr("Server is unavailable."));
 
     if (data.state != Qn::BackupState_None)
         return error(tr("Backup is already in progress."));
@@ -961,6 +974,8 @@ void QnStorageConfigWidget::updateRealtimeBackupMovieStatus(int index)
 
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int overallSelectedCameras)
 {
+    QScopedValueRollback<bool> updatingGuard(m_updating, true);
+
     m_lastPerformedBackupTimeMs = m_nextScheduledBackupTimeMs = 0;
 
     bool backupInProgress = reply.state == Qn::BackupState_InProgress;
@@ -1099,6 +1114,8 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
 
 void QnStorageConfigWidget::updateWarnings()
 {
+    QScopedValueRollback<bool> updatingGuard(m_updating, true);
+
     bool analyticsIsOnSystemDrive = false;
     bool analyticsIsOnDisabledStorage = false;
     bool hasDisabledStorage = false;
@@ -1214,6 +1231,8 @@ void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceLi
 
 void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply)
 {
+    QScopedValueRollback<bool> updatingGuard(m_updating, true);
+
     m_model->updateRebuildInfo(pool, reply);
 
     bool isMainPool = pool == QnServerStoragesPool::Main;
@@ -1223,10 +1242,10 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
         && m_server->getBackupSchedule().backupType != vms::api::BackupType::realtime
         && qnServerStorageManager->backupStatus(m_server).state != Qn::BackupState_None;
 
-    ui->addExtStorageToMainBtn->setEnabled(!backupIsInProgress);
+    ui->addExtStorageToMainBtn->setEnabled(isServerOnline() && !backupIsInProgress);
 
     bool canStartRebuild =
-            m_server
+        isServerOnline()
         &&  reply.state == Qn::RebuildState_None
         &&  !hasStoragesChanges(m_model->storages())
         &&  any_of(m_model->storages(), [this, isMainPool](const QnStorageModelInfo& info) {

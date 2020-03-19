@@ -287,6 +287,12 @@ void QSGVideoMaterial_YUV::bind()
             functions->glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
             functions->glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+            const auto profile = QSurfaceFormat::defaultFormat().profile();
+            const bool useDeprecated = profile != QSurfaceFormat::CoreProfile;
+
+            const auto singleComponent = useDeprecated ? GL_LUMINANCE : GL_RED;
+            const auto doubleComponent = useDeprecated ? GL_LUMINANCE_ALPHA : GL_RG;
+
             if (m_format.pixelFormat() == QVideoFrame::Format_NV12
                     || m_format.pixelFormat() == QVideoFrame::Format_NV21) {
                 const int y = 0;
@@ -295,9 +301,9 @@ void QSGVideoMaterial_YUV::bind()
                 m_planeWidth[0] = m_planeWidth[1] = qreal(fw) / m_frame.bytesPerLine(y);
 
                 functions->glActiveTexture(GL_TEXTURE1);
-                bindTexture(m_textureIds[1], m_frame.bytesPerLine(uv) / 2, fh / 2, m_frame.bits(uv), GL_LUMINANCE_ALPHA);
+                bindTexture(m_textureIds[1], m_frame.bytesPerLine(uv) / 2, fh / 2, m_frame.bits(uv), doubleComponent);
                 functions->glActiveTexture(GL_TEXTURE0); // Finish with 0 as default texture unit
-                bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), GL_LUMINANCE);
+                bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), singleComponent);
 
             } else { // YUV420P || YV12
                 const int y = 0;
@@ -308,11 +314,11 @@ void QSGVideoMaterial_YUV::bind()
                 m_planeWidth[1] = m_planeWidth[2] = qreal(fw) / (2 * m_frame.bytesPerLine(u));
 
                 functions->glActiveTexture(GL_TEXTURE1);
-                bindTexture(m_textureIds[1], m_frame.bytesPerLine(u), fh / 2, m_frame.bits(u), GL_LUMINANCE);
+                bindTexture(m_textureIds[1], m_frame.bytesPerLine(u), fh / 2, m_frame.bits(u), singleComponent);
                 functions->glActiveTexture(GL_TEXTURE2);
-                bindTexture(m_textureIds[2], m_frame.bytesPerLine(v), fh / 2, m_frame.bits(v), GL_LUMINANCE);
+                bindTexture(m_textureIds[2], m_frame.bytesPerLine(v), fh / 2, m_frame.bits(v), singleComponent);
                 functions->glActiveTexture(GL_TEXTURE0); // Finish with 0 as default texture unit
-                bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), GL_LUMINANCE);
+                bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), singleComponent);
             }
 
             functions->glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
