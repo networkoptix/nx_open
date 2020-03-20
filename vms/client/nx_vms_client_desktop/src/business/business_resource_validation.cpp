@@ -873,44 +873,49 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
     bool allUsers,
     const QSet<QnUuid>& subjects) const
 {
-    QnUserResourceList users;
-    if (allUsers)
-    {
-        users = resourcePool()->getResources<QnUserResource>();
-    }
-    else
-    {
-        QnUuidList roles;
-        commonModule()->userRolesManager()->usersAndRoles(subjects, users, roles);
-        for (const auto& roleId: roles)
+    const auto buildUserList =
+        [this](const QSet<QnUuid>& subjects) -> QnUserResourceList
         {
-            const auto& inRole = commonModule()->resourceAccessSubjectsCache()->usersInRole(roleId);
-            for (const auto& subject: inRole)
-            {
-                if (!subject.isUser())
-                    continue;
+            QnUserResourceList users;
+            QnUuidList roles;
+            commonModule()->userRolesManager()->usersAndRoles(subjects, users, roles);
 
-                if (std::find_if(users.begin(), users.end(),
-                    [subject](const QnUserResourcePtr& existing)
-                    {
-                        return subject.user()->getId() == existing->getId();
-                    }) == users.end())
+            for (const auto& roleId: roles)
+            {
+                const auto& inRole = commonModule()->resourceAccessSubjectsCache()->usersInRole(roleId);
+                for (const auto& subject: inRole)
                 {
-                    users << subject.user();
+                    if (!subject.isUser())
+                        continue;
+
+                    if (std::find_if(users.begin(), users.end(),
+                        [subject](const QnUserResourcePtr& existing)
+                        {
+                            return subject.user()->getId() == existing->getId();
+                        }) == users.end())
+                    {
+                        users << subject.user();
+                    }
                 }
             }
-        }
-    }
+
+            return users;
+        };
+
+    const QnUserResourceList users = allUsers
+        ? resourcePool()->getResources<QnUserResource>()
+        : buildUserList(subjects);
 
     int nonCloudCount = 0, totalCount = 0;
     for (const auto& user: users)
     {
-        if (user->isEnabled())
-        {
-            if (!user->isCloud())
-                ++nonCloudCount;
-            ++totalCount;
-        }
+        if (!user->isEnabled())
+            continue;
+
+        if (!user->isCloud())
+            ++nonCloudCount;
+
+        ++totalCount;
     }
 
     if (totalCount == 0)
