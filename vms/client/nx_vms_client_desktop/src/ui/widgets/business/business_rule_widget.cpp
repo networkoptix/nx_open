@@ -287,11 +287,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->useEventSourceServerCheckBox->setVisible(
             vms::event::requiresServerResource(m_model->actionType()));
 
-        ui->useEventSourceServerCheckBox->setEnabled(
-            m_model->actionCanUseSourceServer());
-
-        ui->useEventSourceServerCheckBox->setChecked(
-            ui->useEventSourceServerCheckBox->isEnabled() && m_model->actionIsUsingSourceServer());
+        ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
+        ui->useEventSourceServerCheckBox->setChecked(m_model->actionIsUsingSourceServer());
 
         if (m_model->eventType() == EventType::softwareTriggerEvent)
         {
