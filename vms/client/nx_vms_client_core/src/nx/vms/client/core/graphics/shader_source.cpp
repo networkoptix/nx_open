@@ -15,7 +15,7 @@ QByteArray processShaderSource(const char* parenthesized)
 
     // Remove leading '('.
     if (NX_ASSERT(parenthesized[0] == '('))
-        result.append(parenthesized + 1); 
+        result.append(parenthesized + 1);
 
     // Remove trailing ')'.
     if (NX_ASSERT(result.back() == ')'))
@@ -38,7 +38,7 @@ QByteArray modernizeShaderSource(const QByteArray& source)
         return result;
     }
 
-    // Modernize shared source.
+    // Modernize shader source.
 
     const bool isFragment = result.contains("gl_FragColor");
 
