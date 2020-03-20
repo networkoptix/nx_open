@@ -95,6 +95,7 @@ inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, float *targ
 
 
 namespace QJsonDetail {
+
     template<class Element, class Tag>
     void serialize_collection_element(QnJsonContext *ctx, const Element &element, QJsonValue *target, const Tag &) {
         QJson::serialize(ctx, element, target);
