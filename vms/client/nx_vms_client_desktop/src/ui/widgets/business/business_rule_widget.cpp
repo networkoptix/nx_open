@@ -254,7 +254,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         }
         ui->actionAtLabel->setText(actionAtLabelText);
 
-        const bool aggregationIsVisible = m_model->actionType() == ActionType::pushNotificationAction
+        const bool aggregationIsVisible = (m_model->actionType() == ActionType::pushNotificationAction)
             ? !qnGlobalSettings->cloudSystemId().isNull()
             : vms::event::allowsAggregation(m_model->actionType());
         ui->aggregationWidget->setVisible(aggregationIsVisible);
@@ -383,7 +383,7 @@ void QnBusinessRuleWidget::initActionParameters()
 
     const auto getTabBeforeTarget = [this]() -> QWidget *
     {
-        const bool aggregationIsVisible = m_model->actionType() == ActionType::pushNotificationAction
+        const bool aggregationIsVisible = (m_model->actionType() == ActionType::pushNotificationAction)
             ? !qnGlobalSettings->cloudSystemId().isNull()
             : vms::event::allowsAggregation(m_model->actionType());
         if (aggregationIsVisible)
