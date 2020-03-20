@@ -12,6 +12,9 @@ QByteArray str(const QString& source)
     return "\"" + source.toUtf8() + "\"";
 }
 
+static const QnUuid kFirstUuid("0adc055b-3507-4c00-b1c7-d2a789b08d64");
+static const QnUuid kSecondUuid("251c6b73-674c-4773-a8fc-2577d7a0ecf6");
+
 static const QnUuid kTestId("b4a5d7ec-1952-4225-96ed-a08eaf34d97a");
 static const QString kHelloWorld("hello world");
 
@@ -88,11 +91,83 @@ struct BriefMockDataWithQList
 };
 #define BriefMockDataWithQList_Fields (items)
 
+struct MapKey
+{
+    QnUuid uuidField;
+    int integerField = 0;
+    QString stringField;
+};
+#define MapKey_Fields (uuidField)(integerField)(stringField)
+
+static bool operator<(const MapKey& first, const MapKey& second)
+{
+    if (first.uuidField != second.uuidField)
+        return first.uuidField < second.uuidField;
+
+    if (second.integerField != second.integerField)
+        return second.integerField < second.integerField;
+
+    if (second.stringField != second.stringField)
+        return second.stringField < second.stringField;
+
+    return false;
+}
+
+static bool operator==(const MapKey& first, const MapKey& second)
+{
+    return first.uuidField == second.uuidField
+        && first.integerField == second.integerField
+        && first.stringField == second.stringField;
+}
+
+static const std::map<MapKey, IntMockData> kMapWithCustomStructAsKey = {
+    {{kFirstUuid, 1, "someString"}, {1, 2, 3}},
+    {{kSecondUuid, 2, "somethingElse"}, {4, 5, 6}}
+};
+
+const QByteArray kSerializedMapWithCustomStructAsKey = lm(
+    "{"
+        "\"{"
+            "\\\"integerField\\\":1,"
+            "\\\"stringField\\\":\\\"someString\\\","
+            "\\\"uuidField\\\":\\\"%1\\\""
+        "}\":{\"a\":1,\"b\":2,\"c\":3},"
+        "\"{"
+            "\\\"integerField\\\":2,"
+            "\\\"stringField\\\":\\\"somethingElse\\\","
+            "\\\"uuidField\\\":\\\"%2\\\""
+        "}\":{\"a\":4,\"b\":5,\"c\":6}"
+    "}")
+        .args(kFirstUuid, kSecondUuid)
+        .toQString()
+        .toUtf8();
+
+const QByteArray kMapWithCustomStructAsKeySerializedToArray =
+        "["
+            "{"
+                "\"key\":{"
+                    "\"integerField\":1,"
+                    "\"stringField\":\"someString\","
+                    "\"uuidField\":\"{0adc055b-3507-4c00-b1c7-d2a789b08d64}\""
+                "},"
+                "\"value\":{\"a\":1,\"b\":2,\"c\":3}"
+            "},"
+            "{"
+                "\"key\":{"
+                    "\"integerField\":2,"
+                    "\"stringField\":\"somethingElse\","
+                    "\"uuidField\":\"{251c6b73-674c-4773-a8fc-2577d7a0ecf6}\""
+                "},"
+                "\"value\":{\"a\":4,\"b\":5,\"c\":6}"
+            "}"
+        "]";
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((IntMockData), (json), _Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (BriefMockData)
     (BriefMockDataWithVector)
-    (BriefMockDataWithQList),
+    (BriefMockDataWithQList)
+    (MapKey),
     (json), _Fields, (brief, true))
 
 } // namespace
@@ -364,6 +439,51 @@ TEST_F(QnJsonTextFixture, serializeEmptyQListBrief)
     const QByteArray jsonStr = QString(R"json({})json").toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
     ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithQList>(jsonStr));
+}
+
+TEST_F(QnJsonTextFixture, serializeMapToObjects)
+{
+    static const std::map<QnUuid, int> data = {
+        {kFirstUuid, 1},
+        {kSecondUuid, 2}
+    };
+
+    const QByteArray expectedJson = lm("{\"%1\":1,\"%2\":2}")
+        .args(kFirstUuid, kSecondUuid).toQString().toUtf8();
+
+    QnJsonContext context;
+    context.setSerializeMapToObject(true);
+
+    QByteArray actualJson;
+    QJson::serialize(&context, data, &actualJson);
+
+    ASSERT_EQ(expectedJson, actualJson);
+}
+
+TEST_F(QnJsonTextFixture, serializeMapToObjectUsingCustomStructAsKey)
+{
+    QnJsonContext context;
+    context.setSerializeMapToObject(true);
+
+    QByteArray actualJson;
+    QJson::serialize(&context, kMapWithCustomStructAsKey, &actualJson);
+
+    ASSERT_EQ(kSerializedMapWithCustomStructAsKey, actualJson);
+}
+
+TEST_F(QnJsonTextFixture, deserializeMapWithCustomStructAsKey)
+{
+    std::map<MapKey, IntMockData> deserialized;
+
+    ASSERT_TRUE(QJson::deserialize(kSerializedMapWithCustomStructAsKey, &deserialized));
+    ASSERT_EQ(kMapWithCustomStructAsKey, deserialized);
+}
+
+TEST_F(QnJsonTextFixture, deserializeMapFromArray)
+{
+    std::map<MapKey, IntMockData> deserialized;
+    ASSERT_TRUE(QJson::deserialize(kMapWithCustomStructAsKeySerializedToArray, &deserialized));
+    ASSERT_EQ(kMapWithCustomStructAsKey, deserialized);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -13,7 +13,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
-#include <nx/utils/serialization.h>
 #include <nx/utils/scope_guard.h>
 
 #include <nx/vms/api/data/analytics_data.h>
@@ -71,14 +70,14 @@ JsonRestResponse MultiserverPluginInfoHandler::executeGet(const JsonRestRequest&
     QnMediaServerResourceList serversToCollectDataFrom =
         resourcePool->getAllServers(Qn::ResourceStatus::Online);
 
-    if (nx::utils::boolFromString(request.params[kIsLocalParameterName]))
+    if (QnLexical::deserialized<bool>(request.params[kIsLocalParameterName]))
         serversToCollectDataFrom = {request.owner->commonModule()->currentServer()};
 
-    ExtendedPluginInfoByServer result;
+    ExtendedPluginInfoByServer pluginInfoByServer;
     for (const QnMediaServerResourcePtr& server: serversToCollectDataFrom)
     {
         const QnUuid serverId = server->getId();
-        ExtendedPluginInfoList* serverExtendedPluginInfoList = &result[serverId];
+        ExtendedPluginInfoList* serverExtendedPluginInfoList = &pluginInfoByServer[serverId];
         if (serverId == moduleGUID())
             loadLocalData(serverExtendedPluginInfoList);
         else
@@ -87,7 +86,13 @@ JsonRestResponse MultiserverPluginInfoHandler::executeGet(const JsonRestRequest&
 
     requestContext.waitForDone();
 
-    return nx::utils::mapToJsonObject(result);
+    QnJsonContext context;
+    context.setSerializeMapToObject(true);
+
+    QJsonValue jsonResult;
+    QJson::serialize(&context, pluginInfoByServer, &jsonResult);
+
+    return jsonResult.toObject();
 }
 
 void MultiserverPluginInfoHandler::loadLocalData(
@@ -184,8 +189,15 @@ void MultiserverPluginInfoHandler::onRemoteRequestCompletion(
         return;
     }
 
-    ExtendedPluginInfoByServer remoteData =
-        nx::utils::mapFromJsonObject<ExtendedPluginInfoByServer>(jsonResult->reply.toObject());
+    ExtendedPluginInfoByServer remoteData;
+    if (!QJson::deserialize(jsonResult->reply, &remoteData))
+    {
+        NX_DEBUG(this, "Unable to deserialize the response from the Server %1 (%2, %3), %4",
+            server->getName(), server->getId(), server->getUrl(),
+            QJson::serialize(jsonResult->reply));
+
+        return;
+    }
 
     inOutRequestContext->executeGuarded(
         [inOutRequestContext, &remoteData, &server, outExtendedPluginInfoList]()

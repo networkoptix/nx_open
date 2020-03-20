@@ -299,4 +299,5 @@ struct NX_VMS_API StatisticsServerInfo
     (StatisticsServerInfo) \
     (DeviceAnalyticsTypeInfo) \
     (DeviceAnalyticsStatistics)
+
 } // namespace nx::vms::api

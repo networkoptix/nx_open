@@ -41,8 +41,13 @@ class QnJsonContext: public QnSerializationContext<QnJsonSerializer>
 public:
     bool areSomeFieldsNotFound() const { return m_someFieldsNotFound; }
     void setSomeFieldsNotFound(bool value) { m_someFieldsNotFound = value; }
+
+    bool serializeMapToObject() const { return m_serializeMapToObject;}
+    void setSerializeMapToObject(bool value) { m_serializeMapToObject = value; }
+
 private:
     bool m_someFieldsNotFound{false};
+    bool m_serializeMapToObject{false};
 };
 
 class QnJsonSerializer:
