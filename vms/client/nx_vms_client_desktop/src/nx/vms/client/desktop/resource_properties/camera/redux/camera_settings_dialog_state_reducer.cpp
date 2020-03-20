@@ -99,7 +99,7 @@ QString calculateWebPage(const Camera& camera)
             port = url.port(80);
 
         if (port != 80 && port > 0)
-            webPageAddress += L':' + QString::number(url.port());
+            webPageAddress += L':' + QString::number(port);
     }
 
     return lit("<a href=\"%1\">%1</a>").arg(webPageAddress);
