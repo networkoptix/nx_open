@@ -39,8 +39,6 @@ const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
 namespace {
 
 const static std::chrono::milliseconds kReconnectTimeout(1000);
-const static std::chrono::seconds kSendTimeout{5};
-const static std::chrono::seconds kReceiveTimeout{5};
 
 const float MAX_AR_EPS = 0.04f;
 const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
@@ -225,6 +223,33 @@ void QnPlAxisResource::startInputPortMonitoring()
     readCurrentIOStateAsync();
 }
 
+int QnPlAxisResource::doHttpRequest(const QString& query, QByteArray* data) const
+{
+    auto http = makeHttpClient();
+    return doHttpRequest(http.get(), query, data);
+}
+
+int QnPlAxisResource::doHttpRequest(
+    nx::network::http::HttpClient* http, const QString& query, QByteArray* data) const
+{
+    nx::utils::Url url;
+    url.setScheme("http");
+    url.setHost(getHostAddress());
+    url.setPort(QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT));
+    url.setPath("/axis-cgi/param.cgi");
+    url.setQuery(query);
+    NX_DEBUG(this, "Http request %1", url);
+    if (!http->doGet(url) || !http->response())
+    {
+        NX_WARNING(this, "Failed to send http request %1", url);
+        return nx::network::http::StatusCode::undefined;
+    }
+    auto messageBody = http->fetchEntireMessageBody();
+    if (data && messageBody)
+        *data = *messageBody;
+    return http->response()->statusLine.statusCode;
+}
+
 bool QnPlAxisResource::startIOMonitorInternal(IOMonitor& ioMonitor)
 {
     if( hasFlags(Qn::foreigner) ||      //we do not own camera
@@ -377,18 +402,16 @@ bool QnPlAxisResource::readMotionInfo()
     }
 
     // read motion windows coordinates
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
-    CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Motion"));
-    if (status != CL_HTTP_SUCCESS) {
-        if (status == CL_HTTP_AUTH_REQUIRED)
+    QByteArray body;
+    const int status = doHttpRequest("action=list&group=Motion", &body);
+    if (status != nx::network::http::StatusCode::ok)
+    {
+        if (status == nx::network::http::StatusCode::unauthorized)
             setStatus(Qn::Unauthorized);
         return false;
     }
-    QByteArray body;
-    http.readAll(body);
     QList<QByteArray> lines = body.split('\n');
     QMap<int,WindowInfo> windows;
-
     for (int i = 0; i < lines.size(); ++i)
     {
         QList<QByteArray> params = lines[i].split('.');
@@ -465,11 +488,10 @@ CameraDiagnostics::Result QnPlAxisResource::getParameterValue(
     const QString& path,
     QByteArray* outResult)
 {
-    CLSimpleHTTPClient httpClient(getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
-
+    auto httpClient = makeHttpClient();
     QList<QPair<QByteArray, QByteArray>> result;
-    auto status = readAxisParameters(path, &httpClient, result);
-    if (status != CL_HTTP_SUCCESS)
+    auto status = readAxisParameters(path, httpClient.get(), result);
+    if (status != nx::network::http::StatusCode::ok)
         return CameraDiagnostics::RequestFailedResult(path, QString());
     if (result.isEmpty())
         return CameraDiagnostics::RequestFailedResult(path, QString("There is no such parameter on camera"));
@@ -516,13 +538,12 @@ QSet<AVCodecID> QnPlAxisResource::filterSupportedCodecs(const QList<QByteArray>&
 
 std::unique_ptr<nx::network::http::HttpClient> QnPlAxisResource::makeHttpClient() const
 {
-    using namespace std::chrono;
-
+    const auto timeout = std::chrono::milliseconds(getNetworkTimeout());
     const auto auth = getAuth();
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
-    httpClient->setSendTimeout(kSendTimeout);
-    httpClient->setMessageBodyReadTimeout(kReceiveTimeout);
-    httpClient->setResponseReadTimeout(kReceiveTimeout);
+    httpClient->setSendTimeout(timeout);
+    httpClient->setMessageBodyReadTimeout(timeout);
+    httpClient->setResponseReadTimeout(timeout);
     httpClient->setUserName(auth.user());
     httpClient->setUserPassword(auth.password());
     return httpClient;
@@ -547,19 +568,15 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
 
     //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
-        CLSimpleHTTPClient http(
-            getHostAddress(),
-            QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT),
-            getNetworkTimeout(),
-            auth);
+        auto httpClient = makeHttpClient();
 
         QString firmware;
-        auto status = readAxisParameter(&http, AXIS_FIRMWARE_VERSION_PARAM_NAME, &firmware);
-        if (status == CL_HTTP_SUCCESS)
+        auto status = readAxisParameter(httpClient.get(), AXIS_FIRMWARE_VERSION_PARAM_NAME, &firmware);
+        if (status == nx::network::http::StatusCode::ok)
             setFirmware(firmware);
 
-        if (status == CL_HTTP_AUTH_REQUIRED)
-            return CameraDiagnostics::NotAuthorisedResult(http.lastRequestUrl());
+        if (status == nx::network::http::StatusCode::unauthorized)
+            return CameraDiagnostics::NotAuthorisedResult(getUrl());
     }
 
     if (commonModule()->isNeedToStop())
@@ -568,15 +585,15 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     if (hasVideo(0))
     {
         // enable send motion into H.264 stream
-        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
-        //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes"));
-        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=yes"));
-        //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
+        QByteArray body;
+        int status = doHttpRequest(
+            "action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=yes", nullptr);
+        //"/axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes"
+        //"/axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"
+        if (status == nx::network::http::StatusCode::unauthorized)
+            return CameraDiagnostics::NotAuthorisedResult(getUrl());
 
-        if (status == CL_HTTP_AUTH_REQUIRED)
-            return CameraDiagnostics::NotAuthorisedResult(http.lastRequestUrl());
-
-        if (status != CL_HTTP_SUCCESS)
+        if (status != nx::network::http::StatusCode::ok)
             return CameraDiagnostics::UnknownErrorResult();
     }
     else
@@ -670,14 +687,14 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    CLSimpleHTTPClient httpClient(getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
-    if (!initializeIOPorts( &httpClient))
+    auto httpClient = makeHttpClient();
+    if (!initializeIOPorts(httpClient.get()))
         return CameraDiagnostics::CameraInvalidParams(tr("Can't initialize IO port settings"));
 
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    if(!initializeAudio(&httpClient))
+    if(!initializeAudio(httpClient.get()))
         return CameraDiagnostics::UnknownErrorResult();
 
     if (commonModule()->isNeedToStop())
@@ -723,37 +740,36 @@ QMap<int, QRect> QnPlAxisResource::getMotionWindows() const
 
 bool QnPlAxisResource::removeMotionWindow(int wndNum)
 {
-    //QnMutexLocker lock( &m_mutex );
-
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
-    CLHttpStatus status = http.doGET(QString(QLatin1String("axis-cgi/param.cgi?action=remove&group=Motion.M%1")).arg(wndNum));
-    return status == CL_HTTP_SUCCESS;
+    const int status = doHttpRequest(
+        QString("action=remove&group=Motion.M%1").arg(wndNum), nullptr);
+    return status == nx::network::http::StatusCode::ok;
 }
 
 int QnPlAxisResource::addMotionWindow()
 {
-    //QnMutexLocker lock( &m_mutex );
-
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
-    CLHttpStatus status = http.doGET(QLatin1String("axis-cgi/param.cgi?action=add&group=Motion&template=motion&Motion.M.WindowType=include&Motion.M.ImageSource=0"));
-    if (status != CL_HTTP_SUCCESS)
-        return -1;
     QByteArray data;
-    http.readAll(data);
+    const int status = doHttpRequest(
+        "action=add&group=Motion&template=motion&Motion.M.WindowType=include&Motion.M.ImageSource=0",
+        &data);
+    if (status != nx::network::http::StatusCode::ok)
+        return -1;
     data = data.split(' ')[0].mid(1);
     return data.toInt();
 }
 
 bool QnPlAxisResource::updateMotionWindow(int wndNum, int sensitivity, const QRect& rect)
 {
-    //QnMutexLocker lock( &m_mutex );
-
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
-    CLHttpStatus status = http.doGET(QString(QLatin1String("axis-cgi/param.cgi?action=update&group=Motion&\
-Motion.M%1.Name=HDWitnessWindow%1&Motion.M%1.ImageSource=0&Motion.M%1.WindowType=include&\
-Motion.M%1.Left=%2&Motion.M%1.Right=%3&Motion.M%1.Top=%4&Motion.M%1.Bottom=%5&Motion.M%1.Sensitivity=%6"))
-.arg(wndNum).arg(rect.left()).arg(rect.right()).arg(rect.top()).arg(rect.bottom()).arg(sensitivity));
-return status == CL_HTTP_SUCCESS;
+    QString query("action=update&group=Motion");
+    query += QString("&Motion.M%1.Name=HDWitnessWindow%1").arg(wndNum);
+    query += QString("&Motion.M%1.ImageSource=0").arg(wndNum);
+    query += QString("&Motion.M%1.WindowType=include").arg(wndNum);
+    query += QString("&Motion.M%1.Left=%2").arg(wndNum).arg(rect.left());
+    query += QString("&Motion.M%1.Right=%2").arg(wndNum).arg(rect.right());
+    query += QString("&Motion.M%1.Top=%2").arg(wndNum).arg(rect.top());
+    query += QString("&Motion.M%1.Bottom=%2").arg(wndNum).arg(rect.bottom());
+    query += QString("&Motion.M%1.Sensitivity=%2").arg(wndNum).arg(sensitivity);
+    const int status = doHttpRequest(query, nullptr);
+    return status == nx::network::http::StatusCode::ok;
 }
 
 int QnPlAxisResource::toAxisMotionSensitivity(int sensitivity)
@@ -927,28 +943,23 @@ bool QnPlAxisResource::setOutputPortState(
 
 bool QnPlAxisResource::enableDuplexMode() const
 {
-    CLSimpleHTTPClient http (
-        getHostAddress(),
-        QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT),
-        getNetworkTimeout(),
-        getAuth());
+    const int status = doHttpRequest(
+        "action=update&root.Audio.DuplexMode=full", nullptr);
 
-    auto status = http.doGET(lit("/axis-cgi/param.cgi?action=update&root.Audio.DuplexMode=full"));
-
-    return status == CL_HTTP_SUCCESS;
+    return status == nx::network::http::StatusCode::ok;
 }
 
-CLHttpStatus QnPlAxisResource::readAxisParameters(
+int QnPlAxisResource::readAxisParameters(
     const QString& rootPath,
-    CLSimpleHTTPClient* const httpClient,
+    nx::network::http::HttpClient* const httpClient,
     QList<QPair<QByteArray,QByteArray>>& params)
 {
     params.clear();
-    CLHttpStatus status = httpClient->doGET( lit("axis-cgi/param.cgi?action=list&group=%1").arg(rootPath).toLatin1() );
-    if (status == CL_HTTP_SUCCESS)
+    QByteArray body;
+    const int status = doHttpRequest(httpClient,
+        QString("action=list&group=%1").arg(rootPath), &body);
+    if (status == nx::network::http::StatusCode::ok)
     {
-        QByteArray body;
-        httpClient->readAll( body );
         for (const QByteArray& line: body.split('\n'))
         {
             const auto& paramItems = line.split('=');
@@ -960,85 +971,59 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
     {
         NX_WARNING(this, lit("Failed to read params from path %1 of camera %2. Result: %3").
             arg(rootPath).arg(getHostAddress()).arg(::toString(status)));
-        if (status == CL_HTTP_AUTH_REQUIRED)
+        if (status == nx::network::http::StatusCode::unauthorized)
             setStatus(Qn::Unauthorized);
     }
     return status;
 }
 
-CLHttpStatus QnPlAxisResource::readAxisParameters(
-    const QString& rootPath,
-    CLSimpleHTTPClient* const httpClient,
-    QMap<QString, QString>& params)
-{
-    params.clear();
-    CLHttpStatus status = httpClient->doGET( lit("axis-cgi/param.cgi?action=list&group=%1").arg(rootPath).toLatin1() );
-    if (status == CL_HTTP_SUCCESS)
-    {
-        QByteArray body;
-        httpClient->readAll( body );
-        for (const QByteArray& line: body.split('\n'))
-        {
-            const auto& paramItems = line.split('=');
-            if( paramItems.size() == 2)
-                params[paramItems[0]] = paramItems[1];
-        }
-    }
-    else
-    {
-        NX_WARNING(this, lit("Failed to read params from path %1 of camera %2. Result: %3").
-            arg(rootPath).arg(getHostAddress()).arg(::toString(status)));
-    }
-    return status;
-}
-
-CLHttpStatus QnPlAxisResource::readAxisParameter(
-    CLSimpleHTTPClient* const httpClient,
+int QnPlAxisResource::readAxisParameter(
+    nx::network::http::HttpClient* const httpClient,
     const QString& paramName,
     QVariant* paramValue )
 {
     QList<QPair<QByteArray,QByteArray>> params;
     auto result = readAxisParameters(paramName, httpClient, params);
-    if (result != CL_HTTP_SUCCESS)
+    if (result != nx::network::http::StatusCode::ok)
         return result;
     for (auto itr = params.constBegin(); itr != params.constEnd(); ++itr)
     {
         if (itr->first == paramName)
         {
             *paramValue = itr->second;
-            return CL_HTTP_SUCCESS;
+            return nx::network::http::StatusCode::ok;
         }
     }
     return CL_HTTP_BAD_REQUEST;
 }
 
-CLHttpStatus QnPlAxisResource::readAxisParameter(
-    CLSimpleHTTPClient* const httpClient,
+int QnPlAxisResource::readAxisParameter(
+    nx::network::http::HttpClient* const httpClient,
     const QString& paramName,
     QString* paramValue )
 {
     QVariant val;
-    CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
+    int status = readAxisParameter( httpClient, paramName, &val );
     *paramValue = val.toString().trimmed();
     return status;
 }
 
-CLHttpStatus QnPlAxisResource::readAxisParameter(
-    CLSimpleHTTPClient* const httpClient,
+int QnPlAxisResource::readAxisParameter(
+    nx::network::http::HttpClient* const httpClient,
     const QString& paramName,
     unsigned int* paramValue )
 {
     QVariant val;
-    CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
+    int status = readAxisParameter( httpClient, paramName, &val );
     *paramValue = val.toUInt();
     return status;
 }
 
-bool QnPlAxisResource::initializeAudio(CLSimpleHTTPClient * const http)
+bool QnPlAxisResource::initializeAudio(nx::network::http::HttpClient* const httpClient)
 {
     QString duplexModeList;
-    auto status = readAxisParameter(http, AXIS_TWO_WAY_AUDIO_MODES, &duplexModeList);
-    if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+    auto status = readAxisParameter(httpClient, AXIS_TWO_WAY_AUDIO_MODES, &duplexModeList);
+    if (status != nx::network::http::StatusCode::ok)
     {
         setProperty(ResourcePropertyKey::kIsAudioSupported, QString("0"));
         return true;
@@ -1057,8 +1042,8 @@ bool QnPlAxisResource::initializeAudio(CLSimpleHTTPClient * const http)
         return true;
 
     QString outputFormats;
-    status = readAxisParameter(http, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &outputFormats);
-    if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+    status = readAxisParameter(httpClient, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &outputFormats);
+    if (status != nx::network::http::StatusCode::ok)
         return true;
 
     for (const auto& formatStr: outputFormats.split(','))
@@ -1074,7 +1059,7 @@ bool QnPlAxisResource::initializeAudio(CLSimpleHTTPClient * const http)
     return true;
 }
 
-void QnPlAxisResource::onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient )
+void QnPlAxisResource::onMonitorResponseReceived(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     NX_ASSERT( httpClient );
 
@@ -1180,11 +1165,12 @@ void QnPlAxisResource::restartIOMonitorWithDelay()
     );
 }
 
-bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPortList)
+bool QnPlAxisResource::readPortSettings(
+    nx::network::http::HttpClient* const httpClient, QnIOPortDataList& ioPortList)
 {
     QList<QPair<QByteArray,QByteArray>> params;
-    CLHttpStatus status = readAxisParameters( QLatin1String("root.IOPort"), http, params );
-    if( status != CL_HTTP_SUCCESS )
+    int status = readAxisParameters( QLatin1String("root.IOPort"), httpClient, params );
+    if( status != nx::network::http::StatusCode::ok )
     {
         NX_WARNING(this, lit("Failed to read number of input ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)));
@@ -1259,8 +1245,6 @@ bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPor
 
 bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts, const QnIOPortDataList& oldPorts)
 {
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
-
     QMap<QString,QString> changedParams;
 
     for(auto& currentValue: oldPorts)
@@ -1290,17 +1274,19 @@ bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts, const 
     }
 
     QUrlQuery urlQuery;
-    static const int MAX_PATH_SIZE = 128;
+    static const int MAX_PATH_SIZE = 128 - sizeof("/axis-cgi/param.cgi?");
     for (auto itr = changedParams.begin(); itr != changedParams.end();)
     {
         urlQuery.addQueryItem(itr.key(), itr.value());
         ++itr;
-        QString path = lit("axis-cgi/param.cgi?action=update&").append(urlQuery.toString(QUrl::FullyEncoded));
-        if (path.size() >= MAX_PATH_SIZE || itr == changedParams.end())
+        QString query = "action=update&" + urlQuery.toString(QUrl::FullyEncoded);
+        if (query.size() >= MAX_PATH_SIZE || itr == changedParams.end())
         {
-            CLHttpStatus status = http.doGET(path);
-            if (status != CL_HTTP_SUCCESS) {
-                qWarning() << "Failed to update IO params for camera " << getHostAddress() << "rejected value:" << path;
+            int status = doHttpRequest(query, nullptr);
+            if (status != nx::network::http::StatusCode::ok)
+            {
+                NX_WARNING(this, "Failed to update IO params for camera %1 rejected value: %2",
+                    getHostAddress(), query);
                 return false;
             }
             urlQuery.clear();
@@ -1338,7 +1324,7 @@ void QnPlAxisResource::readPortIdLIst()
         m_ioPortIdList << portId;
 }
 
-bool QnPlAxisResource::initializeIOPorts(CLSimpleHTTPClient* const http)
+bool QnPlAxisResource::initializeIOPorts(nx::network::http::HttpClient* const httpClient)
 {
     readPortIdLIst();
 
@@ -1346,7 +1332,7 @@ bool QnPlAxisResource::initializeIOPorts(CLSimpleHTTPClient* const http)
         return false;
 
     QnIOPortDataList cameraPorts;
-    if (!readPortSettings(http, cameraPorts))
+    if (!readPortSettings(httpClient, cameraPorts))
         return ioPortErrorOccured();
 
     if (setIoPortDescriptions(cameraPorts, /*needMerge*/ true))

@@ -27,7 +27,6 @@ private:
     QnAbstractMediaDataPtr getNextDataMJPEG();
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
-    nx::network::http::Response doHttpRequest(const QString& path);
     QStringList getRTPurls() const;
     int toAxisQuality(Qn::StreamQuality quality);
     void parseMotionInfo(QnCompressedVideoData* videoData);
@@ -35,6 +34,7 @@ private:
 
     void fillMotionInfo(const QRect& rect);
     bool isGotFrame(QnCompressedVideoDataPtr videoData);
+
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_rtpStreamParser;

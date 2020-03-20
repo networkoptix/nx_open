@@ -71,6 +71,8 @@ public:
     static QString toAxisCodecString(AVCodecID codecId);
     int rtspPort() const;
     virtual int getMaxChannelsFromDriver() const override;
+    int doHttpRequest(const QString& query, QByteArray* data) const;
+
 public slots:
     void onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient );
@@ -90,7 +92,13 @@ protected:
     virtual void setCroppingPhysical(QRect cropping);
     virtual void startInputPortStatesMonitoring() override;
     virtual void stopInputPortStatesMonitoring() override;
+
 private:
+    std::unique_ptr<nx::network::http::HttpClient> makeHttpClient() const;
+    int doHttpRequest(
+        nx::network::http::HttpClient* client,
+        const QString& query,
+        QByteArray* data) const;
     int getChannelNumAxis() const; // depracated
     void clear();
     static QRect axisRectToGridRect(const QRect& axisRect);
@@ -110,7 +118,6 @@ private:
     void setSupportedCodecs(const QSet<AVCodecID>& value);
     QSet<AVCodecID> filterSupportedCodecs(const QList<QByteArray>& values) const;
 
-    std::unique_ptr<nx::network::http::HttpClient> makeHttpClient() const;
 private:
     QList<AxisResolution> m_resolutionList;
     QSet<AVCodecID> m_supportedCodecs;
@@ -148,27 +155,25 @@ private:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlAxisResource> m_advancedParametersProvider;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
-    CLHttpStatus readAxisParameter(
-        CLSimpleHTTPClient* const httpClient,
+    int readAxisParameter(
+        nx::network::http::HttpClient* const httpClient,
         const QString& paramName,
-        QVariant* paramValue );
-    CLHttpStatus readAxisParameter(
-        CLSimpleHTTPClient* const httpClient,
+        QVariant* paramValue);
+    int readAxisParameter(
+        nx::network::http::HttpClient* const httpClient,
         const QString& paramName,
-        QString* paramValue );
-    CLHttpStatus readAxisParameter(
-        CLSimpleHTTPClient* const httpClient,
+        QString* paramValue);
+    int readAxisParameter(
+        nx::network::http::HttpClient* const httpClient,
         const QString& paramName,
-        unsigned int* paramValue );
-    CLHttpStatus readAxisParameters(const QString& rootPath, CLSimpleHTTPClient* const httpClient, QList<QPair<QByteArray,QByteArray>>& params);
-    CLHttpStatus readAxisParameters(const QString& rootPath, CLSimpleHTTPClient* const httpClient, QMap<QString, QString>& params);
-
+        unsigned int* paramValue);
+    int readAxisParameters(const QString& rootPath, nx::network::http::HttpClient* const httpClient, QList<QPair<QByteArray,QByteArray>>& params);
     bool enableDuplexMode() const;
 
-    bool initializeAudio(CLSimpleHTTPClient* const http);
-    bool initializeIOPorts( CLSimpleHTTPClient* const http );
+    bool initializeAudio(nx::network::http::HttpClient* const httpClient);
+    bool initializeIOPorts(nx::network::http::HttpClient* const httpClient);
     void notificationReceived( const nx::network::http::ConstBufferRefType& notification );
-    bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPorts);
+    bool readPortSettings(nx::network::http::HttpClient* const httpClient, QnIOPortDataList& ioPorts);
     bool savePortSettings(const QnIOPortDataList& newPorts, const QnIOPortDataList& oldPorts);
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
     bool ioPortErrorOccured();

@@ -58,26 +58,6 @@ int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
     }
 }
 
-nx::network::http::Response QnAxisStreamReader::doHttpRequest(const QString& path)
-{
-    nx::network::http::HttpClient http;
-    http.setResponseReadTimeout(std::chrono::milliseconds(m_axisRes->getNetworkTimeout()));
-    nx::utils::Url url;
-    url.setScheme("http");
-    url.setHost(m_axisRes->getHostAddress());
-    url.setPort(80);
-    QAuthenticator auth = m_axisRes->getAuth();
-    url.setUserName(auth.user());
-    url.setPassword(auth.password());
-    url.setPath(path);
-    if (!http.doGet(url) || !http.response())
-    {
-        NX_WARNING(this, "Failed to send http request %1", url);
-        return nx::network::http::Response();
-    }
-    return *http.response();
-}
-
 CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     NX_VERBOSE(this, lit("try to get stream URL for camera %1 for role %2").arg(m_resource->getUrl()).arg(getRole()));
@@ -132,77 +112,79 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         // ================ profile setup ========================
 
         // -------------- check if profile already exists
-
-        std::set<QByteArray> profilesToRemove;
+        QByteArray message;
         for (int i = 0; i < 3; ++i)
         {
-            QString requestPath = "/axis-cgi/param.cgi?action=list&group=StreamProfile";
-            auto response = doHttpRequest(requestPath);
-            if (response.statusLine.statusCode != nx::network::http::StatusCode::ok)
+            QString requestQuery = "action=list&group=StreamProfile";
+            const int statusCode = m_axisRes->doHttpRequest(requestQuery, &message);
+            if (statusCode != nx::network::http::StatusCode::ok)
             {
                 NX_DEBUG(this,
                     "Can not get stream URL for camera %1 for role %2. Request failed with code %3", 
-                    m_resource->getUrl(), getRole(), response.statusLine.statusCode);
+                    m_resource->getUrl(), getRole(), statusCode);
 
-                if (response.statusLine.statusCode == nx::network::http::StatusCode::unauthorized)
+                if (statusCode == nx::network::http::StatusCode::unauthorized)
                 {
                     return CameraDiagnostics::NotAuthorisedResult(m_axisRes->getUrl());
                 }
-                else if (response.statusLine.statusCode == nx::network::http::StatusCode::notFound && !m_oldFirmwareWarned)
+                else if (statusCode == nx::network::http::StatusCode::notFound && !m_oldFirmwareWarned)
                 {
                     NX_ERROR(this, lit("Axis camera must be have old firmware!!!!  ip = %1").arg(m_axisRes->getHostAddress()));
                     m_oldFirmwareWarned = true;
-                    return CameraDiagnostics::RequestFailedResult(requestPath, "old firmware");
+                    return CameraDiagnostics::RequestFailedResult(requestQuery, "old firmware");
                 }
 
-                return CameraDiagnostics::RequestFailedResult(requestPath, nx::network::http::StatusCode::toString(response.statusLine.statusCode));
+                return CameraDiagnostics::RequestFailedResult(requestQuery, nx::network::http::StatusCode::toString(statusCode));
             }
 
-            if (response.messageBody.isEmpty())
-            {
-                msleep(nx::utils::random::number(0, 50));
-                continue; // sometime axis returns empty profiles list
-            }
+            if (!message.isEmpty())
+                break;
 
-            QList<QByteArray> lines = response.messageBody.split('\n');
-            bool profileFound = false;
-            for (int i = 0; i < lines.size(); ++i)
+            // sometimes axis returns empty profiles list
+            NX_DEBUG(this, "Axis camera %1 return empty reponse, retry...", m_axisRes->getUrl());
+            msleep(nx::utils::random::number(0, 50));
+        }
+
+        std::set<QByteArray> profilesToRemove;
+        QList<QByteArray> lines = message.split('\n');
+        bool profileFound = false;
+        for (const auto& line: lines)
+        {
+            if (line.endsWith(QByteArray("Name=") + profileName))
             {
-                if (lines[i].endsWith(QByteArray("Name=") + profileName))
+                QList<QByteArray> params = line.split('.');
+                if (params.size() >= 2)
                 {
-                    action = "update"; // profile already exists, so update instead of add
-                    QList<QByteArray> params = lines[i].split('.');
-                    if (params.size() >= 2)
+                    QByteArray token = params[params.size()-2];
+                    if (!profileFound)
                     {
-                        QByteArray token = params[params.size()-2];
-                        if (!profileFound)
-                        {
-                            action = "update"; // profile already exists, so update instead of add
-                            profileNumber = token;
-                        }
-                        else
-                        {
-                            profilesToRemove.insert( token );
-                        }
-                        profileFound = true;
+                        action = "update"; // profile already exists, so update instead of add
+                        profileNumber = token;
                     }
+                    else
+                    {
+                        profilesToRemove.insert( token );
+                    }
+                    profileFound = true;
+                }
 
-                }
-                else if (lines[i].endsWith(QByteArray("Name=") + oldProfileName))
-                {
-                    //removing this profile
-                    auto tokens = lines[i].split('.');
-                    if (tokens.size() > 3)
-                        profilesToRemove.insert(tokens[2]);
-                }
+            }
+            else if (line.endsWith(QByteArray("Name=") + oldProfileName))
+            {
+                //removing this profile
+                auto tokens = line.split('.');
+                if (tokens.size() > 3)
+                    profilesToRemove.insert(tokens[2]);
             }
         }
 
         //removing old profiles
-        for (const auto& profileToRemove : profilesToRemove)
+        for (const auto& profileToRemove: profilesToRemove)
         {
-            auto response = doHttpRequest("/axis-cgi/param.cgi?action=remove&group=root.StreamProfile." + profileToRemove);
-            if (response.statusLine.statusCode != nx::network::http::StatusCode::ok)
+            const int statusCode = m_axisRes->doHttpRequest(
+                "action=remove&group=root.StreamProfile." + profileToRemove,
+                nullptr);
+            if (statusCode != nx::network::http::StatusCode::ok)
             {
                 NX_DEBUG(this, "Failed to remove old Axis profile %1 on camera %2",
                     profileToRemove, m_axisRes->getHostAddress());
@@ -231,10 +213,10 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
 
         if (action == QByteArray("add") || isCameraControlRequired)
         {
-            QString streamProfile;
-            QTextStream str(&streamProfile);
+            QString streamProfileQuery;
+            QTextStream str(&streamProfileQuery);
 
-            str << "/axis-cgi/param.cgi?action=" << action;
+            str << "action=" << action;
             str << "&template=streamprofile";
             if (action != "update")
                 str << "&group=StreamProfile";
@@ -243,15 +225,15 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(QLatin1String(paramsStr));
             str.flush();
 
-            auto response = doHttpRequest(streamProfile);
-            if (response.statusLine.statusCode == nx::network::http::StatusCode::unauthorized)
+            const int statusCode = m_axisRes->doHttpRequest(streamProfileQuery, nullptr);
+            if (statusCode == nx::network::http::StatusCode::unauthorized)
             {
                 return CameraDiagnostics::NotAuthorisedResult(m_axisRes->getUrl());
             }
-            else if (response.statusLine.statusCode != nx::network::http::StatusCode::ok)
+            else if (statusCode != nx::network::http::StatusCode::ok)
             {
-                return CameraDiagnostics::RequestFailedResult(streamProfile,
-                    nx::network::http::StatusCode::toString(response.statusLine.statusCode));
+                return CameraDiagnostics::RequestFailedResult(streamProfileQuery,
+                    nx::network::http::StatusCode::toString(statusCode));
             }
 
             if (role != Qn::CR_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MotionType::MT_SoftwareGrid)
