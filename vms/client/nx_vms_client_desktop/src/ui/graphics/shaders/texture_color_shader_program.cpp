@@ -1,5 +1,5 @@
 #include "texture_color_shader_program.h"
-#include <nx/vms/client/core/graphics/shader_source.h>
+#include <nx/vms/client/core/graphics/shader_helper.h>
 
 QnTextureGLShaderProgram::QnTextureGLShaderProgram(QObject *parent)
     : QnColorGLShaderProgram(parent)

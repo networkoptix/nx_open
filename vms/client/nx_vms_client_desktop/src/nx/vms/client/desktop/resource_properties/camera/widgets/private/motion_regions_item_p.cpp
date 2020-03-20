@@ -11,7 +11,7 @@
 #include <QtQuick/QSGTexture>
 
 #include <nx/client/core/motion/helpers/camera_motion_helper.h>
-#include <nx/vms/client/core/graphics/shader_source.h>
+#include <nx/vms/client/core/graphics/shader_helper.h>
 
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/thread/custom_runnable.h>
@@ -481,7 +481,7 @@ bool MotionRegionsItem::Private::State::operator!=(const State& other) const
 
 const char* MotionRegionsItem::Private::Shader::vertexShader() const
 {
-    static const QByteArray shader(core::graphics::modernizeShaderSource(R"GLSL(
+    static const QByteArray shader(core::graphics::ShaderHelper::modernizeShaderSource(R"GLSL(
         attribute vec4 vertex;
         attribute vec2 texCoord;
 
@@ -500,7 +500,7 @@ const char* MotionRegionsItem::Private::Shader::vertexShader() const
 
 const char* MotionRegionsItem::Private::Shader::fragmentShader() const
 {
-    static const QByteArray shader(core::graphics::modernizeShaderSource(R"GLSL(
+    static const QByteArray shader(core::graphics::ShaderHelper::modernizeShaderSource(R"GLSL(
         uniform float qt_Opacity;
         uniform float fillOpacity;
         uniform sampler2D sourceTexture;
