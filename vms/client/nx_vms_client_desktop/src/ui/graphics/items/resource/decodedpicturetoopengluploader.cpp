@@ -27,6 +27,7 @@ extern "C"
 #include "opengl_renderer.h"
 
 #include <nx/streaming/config.h>
+#include <nx/vms/client/core/graphics/shader_helper.h>
 
 namespace
 {
@@ -1271,11 +1272,8 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
     emptyPictureBuf->texturePack()->setPictureFormat( format );
 
-    const auto profile = QSurfaceFormat::defaultFormat().profile();
-    const bool useDeprecated = profile != QSurfaceFormat::CoreProfile;
-
-    const auto singleComponent = useDeprecated ? GL_LUMINANCE : GL_RED;
-    const auto doubleComponent = useDeprecated ? GL_LUMINANCE_ALPHA : GL_RG;
+    const auto [singleComponent, doubleComponent] =
+        nx::vms::client::core::graphics::ShaderHelper::getTexImageFormats();
 
     if( (format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV444P || format == AV_PIX_FMT_YUVA420P) && usingShaderYuvToRgb() )
     {
