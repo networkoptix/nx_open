@@ -339,7 +339,7 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
         remove_(n);
     }
 
-    insert_(std::chrono::microseconds(1), u, n);
+    insert_(std::chrono::microseconds(1), n);
 }
 
 int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
@@ -373,7 +373,7 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
 
     // insert a new entry, ts is the next processing time
     if (ts > std::chrono::microseconds::zero())
-        insert_(ts, u, n);
+        insert_(ts, n);
 
     return 1;
 }
@@ -404,7 +404,6 @@ std::chrono::microseconds CSndUList::getNextProcTime() const
 
 void CSndUList::insert_(
     std::chrono::microseconds ts,
-    std::shared_ptr<CUDT> u,
     CSNode* n)
 {
     // do not insert repeated node

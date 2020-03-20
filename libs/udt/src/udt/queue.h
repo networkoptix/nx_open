@@ -213,7 +213,6 @@ public:
 private:
     void insert_(
         std::chrono::microseconds ts,
-        std::shared_ptr<CUDT> u,
         CSNode* n);
 
     void remove_(CSNode* n);
