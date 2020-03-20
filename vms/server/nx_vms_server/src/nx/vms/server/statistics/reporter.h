@@ -15,15 +15,15 @@ namespace nx::vms::server::statistics {
 class Reporter: public QObject, public QnCommonModuleAware
 {
 public:
-    /** Collects and reports statistics in automatic mode (by internal timer) */
+    /** Collects and reports statistics in automatic mode (by internal timer). */
     Reporter(QnCommonModule* serverModule);
 
     ~Reporter();
 
-    /** Collects \class ApiSystemStatistics in the entire system */
+    /** Collects statistics from the entire system. */
     ec2::ErrorCode collectReportData(nx::vms::api::SystemStatistics* const outData);
 
-    /** Collects \class ApiSystemStatistics and sends it to the statistics server */
+    /** Collects ApiSystemStatistics and sends it to the statistics server. */
     ec2::ErrorCode triggerStatisticsReport(
         const nx::vms::api::StatisticsServerArguments& arguments,
         nx::vms::api::StatisticsServerInfo* const outData);
@@ -34,7 +34,7 @@ private:
     void timerEvent();
 
     QDateTime plannedReportTime(const QDateTime& now);
-    ec2::ErrorCode initiateReport(QString* reportApi = 0, QnUuid* systemId = 0);
+    ec2::ErrorCode initiateReport(QString* reportApi = nullptr, QnUuid* systemId = nullptr);
 
 private:
     void finishReport(nx::network::http::AsyncHttpClientPtr httpClient);
@@ -43,12 +43,12 @@ private:
 
 private:    
     nx::network::http::AsyncHttpClientPtr m_httpClient;
-    bool m_firstTime;
+    bool m_firstTime = true;
     boost::optional<QDateTime> m_plannedReportTime;
     uint m_timerCycle;
 
     QnMutex m_mutex;
-    bool m_timerDisabled;
+    bool m_timerDisabled = false;
     boost::optional<qint64> m_timerId;
     nx::utils::TimerManager* m_timerManager = nullptr;
 };

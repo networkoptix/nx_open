@@ -3119,7 +3119,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/pluginInfo
      * %param:boolean isLocal If true, data is collected only from the Server that received the
-     *     request. Otherwise data is collected from all online Servers in the system.
+     *     request. Otherwise data is collected from all online Servers in the System.
      * %return:object JSON object with an error code, error string, and a list with information
      *     about Server plugins on success.
      *     %param:string error Error code, "0" means no error.

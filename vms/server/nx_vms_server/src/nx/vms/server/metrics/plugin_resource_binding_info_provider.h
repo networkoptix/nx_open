@@ -12,7 +12,7 @@ namespace nx::vms::server::metrics {
 class PluginResourceBindingInfoHolder
 {
 public:
-    virtual ~PluginResourceBindingInfoHolder() {}
+    virtual ~PluginResourceBindingInfoHolder() = default;
 
     virtual std::vector<nx::vms::api::PluginResourceBindingInfo> bindingInfoForPlugin(
         const nx::sdk::Ptr<const nx::sdk::IRefCountable>& pluginRefCountable) const = 0;
@@ -21,7 +21,7 @@ public:
 class PluginResourceBindingInfoProvider
 {
 public:
-    virtual ~PluginResourceBindingInfoProvider() {}
+    virtual ~PluginResourceBindingInfoProvider() = default;
 
     virtual std::unique_ptr<PluginResourceBindingInfoHolder> bindingInfoHolder() const = 0;
 };

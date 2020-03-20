@@ -11,10 +11,10 @@ namespace nx::vms::server::statistics {
 
 using namespace nx::vms::api;
 
-StatisticsCameraData toStatisticsData(const CameraDataEx& data)
+StatisticsCameraData toStatisticsData(CameraDataEx&& data)
 {
     StatisticsCameraData statisticsCameraData;
-    (CameraDataEx&) statisticsCameraData = data;
+    (CameraDataEx&) statisticsCameraData = std::move(data);
 
     // find out if default password worked
     const auto& defCred = ResourcePropertyKey::kDefaultCredentials;
@@ -91,18 +91,18 @@ StatisticsCameraData toStatisticsData(const CameraDataEx& data)
     return statisticsCameraData;
 }
 
-StatisticsStorageData toStatisticsData(const StorageData& data)
+StatisticsStorageData toStatisticsData(StorageData&& data)
 {
     StatisticsStorageData statisticsStorageData;
-    (StorageData&) statisticsStorageData = data;
+    (StorageData&) statisticsStorageData = std::move(data);
 
     return statisticsStorageData;
 }
 
-StatisticsMediaServerData toStatisticsData(const MediaServerDataEx& data)
+StatisticsMediaServerData toStatisticsData(MediaServerDataEx&& data)
 {
     StatisticsMediaServerData statisticsMediaServerData;
-    (MediaServerDataEx&) statisticsMediaServerData = data;
+    (MediaServerDataEx&) statisticsMediaServerData = std::move(data);
 
     const static std::set<QString> kServerParamsToRemove =
     {
@@ -129,7 +129,6 @@ StatisticsMediaServerData toStatisticsData(const MediaServerDataEx& data)
 StatisticsLicenseData toStatisticsData(const LicenseData& data)
 {
     StatisticsLicenseData statisticsLicenseData;
-    (LicenseData&) statisticsLicenseData = data;
 
     QMap<QString, QString> parsed;
     for (const auto& value: data.licenseBlock.split('\n'))
@@ -139,37 +138,37 @@ StatisticsLicenseData toStatisticsData(const LicenseData& data)
             parsed.insert(QLatin1String(pair[0]), QLatin1String(pair[1]));
     }
 
-    statisticsLicenseData.name        = parsed[lit("NAME")];
-    statisticsLicenseData.key         = parsed[lit("SERIAL")];
+    statisticsLicenseData.name = parsed[lit("NAME")];
+    statisticsLicenseData.key = parsed[lit("SERIAL")];
     statisticsLicenseData.licenseType = parsed[lit("CLASS")];
     statisticsLicenseData.cameraCount = parsed[lit("COUNT")].toLongLong();
-    statisticsLicenseData.version     = parsed[lit("VERSION")];
-    statisticsLicenseData.brand       = parsed[lit("BRAND")];
-    statisticsLicenseData.expiration  = parsed[lit("EXPIRATION")];
+    statisticsLicenseData.version = parsed[lit("VERSION")];
+    statisticsLicenseData.brand = parsed[lit("BRAND")];
+    statisticsLicenseData.expiration = parsed[lit("EXPIRATION")];
 
     return statisticsLicenseData;
 }
 
-StatisticsEventRuleData toStatisticsData(const EventRuleData& data)
+StatisticsEventRuleData toStatisticsData(EventRuleData&& data)
 {
     StatisticsEventRuleData statisticsEventRuleData;
-    (EventRuleData&) statisticsEventRuleData = data;
+    (EventRuleData&) statisticsEventRuleData = std::move(data);
 
     return statisticsEventRuleData;
 }
 
-StatisticsUserData toStatisticsData(const UserData& data)
+StatisticsUserData toStatisticsData(UserData&& data)
 {
     StatisticsUserData statisticsUserData;
-    (UserData&) statisticsUserData = data;
+    (UserData&) statisticsUserData = std::move(data);
 
     return statisticsUserData;
 }
 
-StatisticsPluginInfo toStatisticsData(const PluginInfoEx& data)
+StatisticsPluginInfo toStatisticsData(PluginInfoEx&& data)
 {
     StatisticsPluginInfo statisticsPluginInfo;
-    (PluginInfoEx&) statisticsPluginInfo = data;
+    (PluginInfoEx&) statisticsPluginInfo = std::move(data);
 
     return statisticsPluginInfo;
 }

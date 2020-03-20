@@ -19,7 +19,7 @@
 #include <nx/vms/server/statistics/reporter.h>
 #include <api/global_settings.h>
 
-#include <nx/statistics/settings.h>
+#include <nx/vms/statistics/settings.h>
 
 #include <statistics/statistics_settings.h>
 
@@ -235,7 +235,7 @@ nx::network::http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(
     const auto settingsUrl = [commonModule]()
     {
         static const auto kSettingsUrl =
-            nx::statistics::kDefaultStatisticsServer + lit("/config/client_stats_v2.json");
+            nx::vms::statistics::kDefaultStatisticsServer + lit("/config/client_stats_v2.json");
 
         const auto localSettingsUrl = commonModule->globalSettings()->clientStatisticsSettingsUrl();
         return nx::utils::Url::fromUserInput(localSettingsUrl.trimmed().isEmpty()

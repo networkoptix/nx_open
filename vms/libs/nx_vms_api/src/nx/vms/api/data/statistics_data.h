@@ -15,59 +15,47 @@
 
 namespace nx::vms::api {
 
-/**
+/*
  * NOTE: Many of the structures below are created with a single purpose - to filter out the fields
  * containing sensitive information the User could be identified by and make the report completely
  * anonymous.
  */
 
 /**%apidoc
- * Information about an analytics object/event type.
+ * Information about an Analytics Object/Event type.
  */
 struct NX_VMS_API DeviceAnalyticsTypeInfo
 {
-    /**%apidoc
-     * Id of object/event type.
-     */
+    /**%apidoc Id of Object/Event type. */
     QString id;
 
-    /**%apidoc
-     *  Name of object/event type.
-     */
+    /**%apidoc Name of Object/Event type. */
     QString name;
 
     /**%apidoc
-     * Name of vendor that provides this object/event type. Empty string if unknown.
+     * Name of the vendor that provides this Object/Event type. Empty string if unknown.
      */
     QString provider;
 };
 #define DeviceAnalyticsTypeInfo_Fields (id)(name)(provider)
 
 /**%apidoc
- * Statistics information about analytics object/events supported by the System.
+ * Statistics information about Analytics Object/Events supported by the System.
  */
 struct NX_VMS_API DeviceAnalyticsStatistics
 {
-    /**%apidoc
-     * Analytics event types supported by the System.
-     */
+    /**%apidoc Analytics Event types supported by the System. */
     std::vector<DeviceAnalyticsTypeInfo> supportedEventTypes;
 
-    /**%apidoc
-     * Analytics object types supported by the System.
-     */
+    /**%apidoc Analytics Object types supported by the System. */
     std::vector<DeviceAnalyticsTypeInfo> supportedObjectTypes;
 };
 #define DeviceAnalyticsStatistics_Fields (supportedEventTypes)(supportedObjectTypes)
 
-/**%apidoc
- * Anonymous statistics data about Devices in the System.
- */
+/**%apidoc Anonymous statistics data about Devices in the System. */
 struct NX_VMS_API StatisticsCameraData: public nx::vms::api::CameraDataEx
 {
-    /**%apidoc
-     * Statistics information about the analytics subsystem.
-     */
+    /**%apidoc Statistics information about the analytics subsystem. */
     DeviceAnalyticsStatistics analyticsInfo;
 };
 #define StatisticsCameraData_Fields \
@@ -93,9 +81,7 @@ struct NX_VMS_API StatisticsCameraData: public nx::vms::api::CameraDataEx
     (backupType) \
     (analyticsInfo)
 
-/**%apidoc
- * Anonymous statistics data about Storages in the System.
- */
+/**%apidoc Anonymous statistics data about Storages in the System. */
 struct NX_VMS_API StatisticsStorageData: public nx::vms::api::StorageData
 {
 };
@@ -109,7 +95,7 @@ struct NX_VMS_API StatisticsStorageData: public nx::vms::api::StorageData
     (addParams)
 
 /**%apidoc
- * Anonymous statistics data about device, storage and analytics Plugins in the System.
+ * Anonymous statistics data about Device, Storage and Analytics Plugins in the System.
  */
 struct NX_VMS_API StatisticsPluginInfo: public nx::vms::api::PluginInfoEx
 {
@@ -124,19 +110,13 @@ struct NX_VMS_API StatisticsPluginInfo: public nx::vms::api::PluginInfoEx
     (mainInterface) \
     (resourceBindingInfo)
 
-/**%apidoc
- * Anonymous statistics data about Servers in the System.
- */
+/**%apidoc Anonymous statistics data about Servers in the System. */
 struct NX_VMS_API StatisticsMediaServerData: public nx::vms::api::MediaServerDataEx
 {
-    /**%apidoc
-     * Anonymous statistics data about Storages on the Server.
-     */
+    /**%apidoc Anonymous statistics data about Storages on the Server. */
     std::vector<StatisticsStorageData> storages; //< Overrides the base class field.
 
-    /**%apidoc
-     * Anonymous statistics data about Plugins on the Server.
-     */
+    /**%apidoc Anonymous statistics data about Plugins on the Server. */
     std::vector<StatisticsPluginInfo> pluginInfo;
 };
 #define StatisticsMediaServerData_Fields \
@@ -157,9 +137,7 @@ struct NX_VMS_API StatisticsMediaServerData: public nx::vms::api::MediaServerDat
     (backupBitrate) \
     (pluginInfo) \
 
-/**%apidoc
- * Anonymous statistics data about licenses in the System.
- */
+/**%apidoc Anonymous statistics data about licenses in the System. */
 struct NX_VMS_API StatisticsLicenseData
 {
     StatisticsLicenseData() = default;
@@ -184,9 +162,7 @@ struct NX_VMS_API StatisticsLicenseData
     (expiration) \
     (validation)
 
-/**%apidoc
- * Anonymous statistics data about event rules in the System.
- */
+/**%apidoc Anonymous statistics data about event rules in the System. */
 struct NX_VMS_API StatisticsEventRuleData: public nx::vms::api::EventRuleData
 {
 };
@@ -204,17 +180,13 @@ struct NX_VMS_API StatisticsEventRuleData: public nx::vms::api::EventRuleData
     (schedule) \
     (system)
 
-/**%apidoc
- * Anonymous statistics data about Users in the System.
- */
+/**%apidoc Anonymous statistics data about Users in the System. */
 struct NX_VMS_API StatisticsUserData: public nx::vms::api::UserData
 {
 };
 #define StatisticsUserData_Fields (id)(isAdmin)(permissions)(isLdap)(isEnabled)
 
-/**%apidoc
- * Information about the statistics report itself.
- */
+/**%apidoc Information about the statistics report itself. */
 struct NX_VMS_API StatisticsReportInfo
 {
     StatisticsReportInfo():
@@ -254,33 +226,23 @@ struct NX_VMS_API SystemStatistics
     (videowalls) \
     (reportInfo)
 
-/**%apidoc
- * Parameters for the statistics report generation procedure.
- */
+/**%apidoc Parameters for the statistics report generation procedure. */
 struct NX_VMS_API StatisticsServerArguments
 {
     bool randomSystemId = false;
 };
 #define StatisticsServerArguments_Fields (randomSystemId)
 
-/**%apidoc
- * Information about the current statistics delivery procedure.
- */
+/**%apidoc Information about the current statistics delivery procedure. */
 struct NX_VMS_API StatisticsServerInfo
 {
-    /**%apidoc
-     * Id of the System.
-     */
+    /**%apidoc Id of the System. */
     QnUuid systemId;
 
-    /**%apidoc
-     * Url of the statistics Server the report is going to be delivered to.
-     */
+    /**%apidoc Url of the statistics Server the report is going to be delivered to. */
     QString url;
 
-    /**%apidoc
-     * Current status of the statistics delivery procedure.
-     */
+    /**%apidoc Current status of the statistics delivery procedure. */
     QString status;
 };
 #define StatisticsServerInfo_Fields (systemId)(url)(status)

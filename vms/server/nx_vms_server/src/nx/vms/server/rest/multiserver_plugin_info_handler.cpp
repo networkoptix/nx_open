@@ -102,7 +102,7 @@ void MultiserverPluginInfoHandler::loadLocalData(
         return;
 
     const PluginManager* pluginManager = serverModule()->pluginManager();
-    if (!NX_ASSERT(pluginManager, "Unable to access plugin manager"))
+    if (!NX_ASSERT(pluginManager, "Unable to access PluginManager"))
         return;
 
     *outExtendedPluginInfoList = pluginManager->extendedPluginInfoList();
