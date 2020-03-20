@@ -5,7 +5,6 @@
 #include <providers/spush_media_stream_provider.h>
 #include "network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
-#include <nx/network/http/http_types.h>
 
 class QnAxisStreamReader: public CLServerPushStreamReader
 {

@@ -71,7 +71,7 @@ public:
     static QString toAxisCodecString(AVCodecID codecId);
     int rtspPort() const;
     virtual int getMaxChannelsFromDriver() const override;
-    int doHttpRequest(const QString& query, QByteArray* data) const;
+    int doHttpRequest(const QString& query, QByteArray* outData) const;
 
 public slots:
     void onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
@@ -98,7 +98,7 @@ private:
     int doHttpRequest(
         nx::network::http::HttpClient* client,
         const QString& query,
-        QByteArray* data) const;
+        QByteArray* outData) const;
     int getChannelNumAxis() const; // depracated
     void clear();
     static QRect axisRectToGridRect(const QRect& axisRect);

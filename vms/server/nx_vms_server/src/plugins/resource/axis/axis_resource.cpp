@@ -223,14 +223,14 @@ void QnPlAxisResource::startInputPortMonitoring()
     readCurrentIOStateAsync();
 }
 
-int QnPlAxisResource::doHttpRequest(const QString& query, QByteArray* data) const
+int QnPlAxisResource::doHttpRequest(const QString& query, QByteArray* outData) const
 {
     auto http = makeHttpClient();
-    return doHttpRequest(http.get(), query, data);
+    return doHttpRequest(http.get(), query, outData);
 }
 
 int QnPlAxisResource::doHttpRequest(
-    nx::network::http::HttpClient* http, const QString& query, QByteArray* data) const
+    nx::network::http::HttpClient* http, const QString& query, QByteArray* outData) const
 {
     nx::utils::Url url;
     url.setScheme("http");
@@ -245,8 +245,8 @@ int QnPlAxisResource::doHttpRequest(
         return nx::network::http::StatusCode::undefined;
     }
     auto messageBody = http->fetchEntireMessageBody();
-    if (data && messageBody)
-        *data = *messageBody;
+    if (outData && messageBody)
+        *outData = *messageBody;
     return http->response()->statusLine.statusCode;
 }
 
