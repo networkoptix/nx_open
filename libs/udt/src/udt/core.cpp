@@ -146,7 +146,6 @@ CUDT::~CUDT()
     m_pRcvTimeWindow.reset();
     delete m_pCCFactory;
     delete m_pCC;
-    m_pSNode.reset();
 }
 
 CSndQueue& CUDT::sndQueue()
@@ -493,13 +492,6 @@ void CUDT::open()
     m_LastSampleTime = CTimer::getTime();
     m_llTraceSent = m_llTraceRecv = m_iTraceSndLoss = m_iTraceRcvLoss = m_iTraceRetrans = m_iSentACK = m_iRecvACK = m_iSentNAK = m_iRecvNAK = 0;
     m_llSndDuration = m_llSndDurationTotal = std::chrono::microseconds::zero();
-
-    // structures for queue
-    if (!m_pSNode)
-        m_pSNode = std::make_unique<CSNode>();
-    m_pSNode->socket = shared_from_this();
-    m_pSNode->timestamp = std::chrono::microseconds(1);
-    m_pSNode->locationOnHeap = -1;
 
     m_iRTT = 10 * m_iSYNInterval;
     m_iRTTVar = m_iRTT / 2;
