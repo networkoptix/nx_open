@@ -17,6 +17,6 @@ nx::vms::api::StatisticsEventRuleData toStatisticsData(const nx::vms::api::Event
 
 nx::vms::api::StatisticsUserData toStatisticsData(const nx::vms::api::UserData& data);
 
-nx::vms::api::StatisticsPluginInfo toStatisticsData(const nx::vms::api::ExtendedPluginInfo& data);
+nx::vms::api::StatisticsPluginInfo toStatisticsData(const nx::vms::api::PluginInfoEx& data);
 
 } // namespace nx::vms::server::statistics

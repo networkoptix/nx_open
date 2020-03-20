@@ -67,16 +67,16 @@ void PluginManager::unloadPlugins()
     m_pluginContexts.clear();
 }
 
-nx::vms::api::ExtendedPluginInfoList PluginManager::extendedPluginInfoList() const
+nx::vms::api::PluginInfoExList PluginManager::extendedPluginInfoList() const
 {
-    nx::vms::api::ExtendedPluginInfoList result;
+    nx::vms::api::PluginInfoExList result;
     const std::unique_ptr<PluginResourceBindingInfoHolder> bindingInfoHolder =
         proxyBindingInfoHolder();
 
     QnMutexLocker lock(&m_mutex);
     for (const auto& pluginContext: m_pluginContexts)
     {
-        nx::vms::api::ExtendedPluginInfo extendedPluginInfo(*pluginContext.pluginInfo);
+        nx::vms::api::PluginInfoEx extendedPluginInfo(*pluginContext.pluginInfo);
         extendedPluginInfo.resourceBindingInfo =
             bindingInfoHolder->bindingInfoForPlugin(pluginContext.plugin);
 
@@ -99,7 +99,7 @@ std::shared_ptr<const PluginInfo> PluginManager::pluginInfo(
         {
             if (pluginContext.plugin.get() == plugin)
             {
-                nx::vms::api::ExtendedPluginInfo extendedPluginInfo(*pluginContext.pluginInfo);
+                nx::vms::api::PluginInfoEx extendedPluginInfo(*pluginContext.pluginInfo);
                 return pluginContext.pluginInfo;
             }
         }

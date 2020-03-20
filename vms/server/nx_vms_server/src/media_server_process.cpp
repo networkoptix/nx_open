@@ -3112,7 +3112,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:array reply List of JSON objects with the following structure:
-     *         %struct ExtendedPluginInfo
+     *         %struct PluginInfoEx
      */
     reg("api/pluginInfo",
         new nx::vms::server::rest::PluginInfoHandler(serverModule()));
@@ -3127,7 +3127,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:object reply Map containing per Server information about Plugins.
      *         %param:string key Unique id of a Server
      *         %param:object value
-     *             %struct ExtendedPluginInfo
+     *             %struct PluginInfoEx
      */
     reg(nx::vms::server::rest::MultiserverPluginInfoHandler::kPath,
         new nx::vms::server::rest::MultiserverPluginInfoHandler(serverModule()));

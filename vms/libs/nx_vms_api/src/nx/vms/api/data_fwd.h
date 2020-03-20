@@ -147,7 +147,7 @@ DECLARE_STRUCT_AND_LIST(AnalyticsPluginData)
 DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
 DECLARE_STRUCT_AND_LIST(PluginInfo)
 DECLARE_STRUCT_AND_LIST(PluginResourceBindingInfo)
-DECLARE_STRUCT_AND_LIST(ExtendedPluginInfo)
+DECLARE_STRUCT_AND_LIST(PluginInfoEx)
 
 DECLARE_STRUCT(DeviceAnalyticsTypeInfo)
 DECLARE_STRUCT(DeviceAnalyticsStatistics)

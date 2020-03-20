@@ -166,10 +166,10 @@ StatisticsUserData toStatisticsData(const UserData& data)
     return statisticsUserData;
 }
 
-StatisticsPluginInfo toStatisticsData(const ExtendedPluginInfo& data)
+StatisticsPluginInfo toStatisticsData(const PluginInfoEx& data)
 {
     StatisticsPluginInfo statisticsPluginInfo;
-    (ExtendedPluginInfo&) statisticsPluginInfo = data;
+    (PluginInfoEx&) statisticsPluginInfo = data;
 
     return statisticsPluginInfo;
 }

@@ -5,6 +5,7 @@
 #include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data_fwd.h>
 #include <nx/vms/api/data/resource_data.h>
 
 namespace nx::vms::api {
@@ -226,13 +227,18 @@ struct NX_VMS_API PluginResourceBindingInfo
     (onlineBoundResourceCount)
 
 /**%apidoc Extended information about a Server plugin library.*/
-struct NX_VMS_API ExtendedPluginInfo: public PluginInfo
+struct NX_VMS_API PluginInfoEx: public PluginInfo
 {
-    ExtendedPluginInfo() = default;
-    ExtendedPluginInfo(PluginInfo pluginInfo)
+    PluginInfoEx() = default;
+    PluginInfoEx(PluginInfo pluginInfo)
     {
         static_cast<PluginInfo&>(*this) = std::move(pluginInfo);
     }
+
+    PluginInfoEx(const PluginInfoEx& other) = default;
+    PluginInfoEx(PluginInfoEx&& other) = default;
+    PluginInfoEx& operator=(const PluginInfoEx& other) = default;
+    PluginInfoEx& operator=(PluginInfoEx&& other) = default;
 
     /**%apidoc
      * Array with information about bound resources.
@@ -242,9 +248,9 @@ struct NX_VMS_API ExtendedPluginInfo: public PluginInfo
     std::vector<PluginResourceBindingInfo> resourceBindingInfo;
 };
 
-#define ExtendedPluginInfo_Fields PluginInfo_Fields (resourceBindingInfo)
+#define PluginInfoEx_Fields PluginInfo_Fields (resourceBindingInfo)
 
-using ExtendedPluginInfoByServer = std::map<QnUuid, ExtendedPluginInfoList>;
+using ExtendedPluginInfoByServer = std::map<QnUuid, PluginInfoExList>;
 
 } // namespace nx::vms::api
 
@@ -253,7 +259,7 @@ Q_DECLARE_METATYPE(nx::vms::api::AnalyticsEngineData)
 Q_DECLARE_METATYPE(nx::vms::api::PluginInfo)
 Q_DECLARE_METATYPE(nx::vms::api::PluginInfoList)
 Q_DECLARE_METATYPE(nx::vms::api::PluginResourceBindingInfo)
-Q_DECLARE_METATYPE(nx::vms::api::ExtendedPluginInfo)
+Q_DECLARE_METATYPE(nx::vms::api::PluginInfoEx)
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::Optionality, (lexical), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PluginInfo::Status, (lexical), NX_VMS_API)

@@ -114,7 +114,7 @@ ec2::ErrorCode Reporter::collectReportData(SystemStatistics* const outData)
         if (auto it = pluginInfoByServer.find(mediaServer.id);
             it != pluginInfoByServer.cend())
         {
-            for (const ExtendedPluginInfo& pluginInfo: it->second)
+            for (const PluginInfoEx& pluginInfo: it->second)
                 mediaServerStatistics.pluginInfo.push_back(toStatisticsData(pluginInfo));
         }
         outData->mediaservers.push_back(std::move(mediaServerStatistics));

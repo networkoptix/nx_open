@@ -111,7 +111,7 @@ struct NX_VMS_API StatisticsStorageData: public nx::vms::api::StorageData
 /**%apidoc
  * Anonymous statistics data about device, storage and analytics Plugins in the System.
  */
-struct NX_VMS_API StatisticsPluginInfo: public nx::vms::api::ExtendedPluginInfo
+struct NX_VMS_API StatisticsPluginInfo: public nx::vms::api::PluginInfoEx
 {
 };
 #define StatisticsPluginInfo_Fields \

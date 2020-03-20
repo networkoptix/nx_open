@@ -14,7 +14,7 @@ const QnUuid AnalyticsEngineData::kResourceTypeId =
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (AnalyticsPluginData)(AnalyticsEngineData)(PluginInfo)
-    (PluginResourceBindingInfo)(ExtendedPluginInfo),
+    (PluginResourceBindingInfo)(PluginInfoEx),
     (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
     _Fields)
 
