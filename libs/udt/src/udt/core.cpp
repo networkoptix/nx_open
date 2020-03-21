@@ -1670,7 +1670,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 // read loss list from the local receiver loss list
                 ctrlpkt.pack(pkttype, NULL, (m_iPayloadSize / 4) * sizeof(int32_t));
 
-                int losslen;
+                int losslen = 0;
                 m_pRcvLossList->getLossArray(
                     (int32_t*) ctrlpkt.payload().data(), losslen, m_iPayloadSize / 4);
 

@@ -323,7 +323,6 @@ void CSndBuffer::increase()
 ////////////////////////////////////////////////////////////////////////////////
 
 CRcvBuffer::CRcvBuffer(CUnitQueue* queue, int bufsize):
-    m_pUnit(NULL),
     m_iSize(bufsize),
     m_pUnitQueue(queue),
     m_iStartPos(0),
@@ -331,9 +330,7 @@ CRcvBuffer::CRcvBuffer(CUnitQueue* queue, int bufsize):
     m_iMaxPos(0),
     m_iNotch(0)
 {
-    m_pUnit = new CUnit*[m_iSize];
-    for (int i = 0; i < m_iSize; ++i)
-        m_pUnit[i] = NULL;
+    m_pUnit.resize(m_iSize);
 }
 
 CRcvBuffer::~CRcvBuffer()
@@ -346,8 +343,6 @@ CRcvBuffer::~CRcvBuffer()
             m_pUnitQueue->decCount();
         }
     }
-
-    delete[] m_pUnit;
 }
 
 bool CRcvBuffer::addData(CUnit* unit, int offset)

@@ -260,7 +260,7 @@ private:
 private:
     mutable std::mutex m_mutex;           // used to synchronize buffer operation
 
-    CUnit** m_pUnit;                     // pointer to the protocol buffer
+    std::vector<CUnit*> m_pUnit;                     // pointer to the protocol buffer
     int m_iSize;                         // size of the protocol buffer
     CUnitQueue* m_pUnitQueue;        // the shared unit queue
 
