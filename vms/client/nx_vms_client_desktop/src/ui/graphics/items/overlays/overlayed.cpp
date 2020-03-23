@@ -13,6 +13,12 @@
 
 using nx::vms::client::desktop::Rotation;
 
+namespace {
+
+static constexpr auto kOverlayVisibleProperty = "overlayVisible";
+
+} // namespace
+
 detail::OverlayedBase::OverlayWidget::OverlayWidget()
     : visibility(OverlayVisibility::Invisible)
     , widget(nullptr)
@@ -183,11 +189,14 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
     if (!widget)
         return;
 
+    if (controlVisibility)
+        widget->setProperty(kOverlayVisibleProperty, visible);
+
     const qreal opacity = visible ? 1.0 : 0.0;
     if (animate)
     {
         // Allow widget to resize while it is fully transparent.
-        if (visible && qFuzzyIsNull(widget->opacity()))
+        if (controlVisibility && visible && qFuzzyIsNull(widget->opacity()))
             widget->setVisible(true);
 
         using namespace nx::vms::client::desktop::ui::workbench;
@@ -213,11 +222,9 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
             opacityAnimator(widget)->stop();
 
         widget->setOpacity(opacity);
-        if (visible || controlVisibility)
+        if (controlVisibility)
             widget->setVisible(visible);
     }
-
-    NX_ASSERT(isOverlayWidgetVisible(widget) == visible, "Validate checking function");
 }
 
 bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
@@ -225,13 +232,7 @@ bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
     if (!widget)
         return false;
 
-    if (hasOpacityAnimator(widget))
-    {
-        auto animator = opacityAnimator(widget);
-        if (animator->isRunning())
-            return !qFuzzyIsNull(animator->targetValue().toDouble());
-    }
-    return !qFuzzyIsNull(widget->opacity());
+    return widget->property(kOverlayVisibleProperty).toBool();
 }
 
 detail::OverlayParams::OverlayParams(OverlayedBase::OverlayVisibility visibility,
