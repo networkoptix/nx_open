@@ -78,6 +78,12 @@ public:
         totalNetworkLoad = base->totalNetworkLoad();
     }
 
+    void stopTimersLocked()
+    {
+        updateTimer.stop();
+        stopTimer.stop();
+    }
+
 private:
     mutable QnMutex mutex;
 
@@ -141,8 +147,11 @@ QnGlobalMonitor::QnGlobalMonitor(
     }
 }
 
-QnGlobalMonitor::~QnGlobalMonitor() {
-    return;
+QnGlobalMonitor::~QnGlobalMonitor()
+{
+    Q_D(QnGlobalMonitor);
+    QnMutexLocker locker(&d->mutex);
+    d->stopTimersLocked();
 }
 
 qint64 QnGlobalMonitor::updatePeriodMs() const
