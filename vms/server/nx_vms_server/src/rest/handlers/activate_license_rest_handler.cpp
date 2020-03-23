@@ -44,7 +44,7 @@ const QString kMode = "mode";
 const QString kInfo = "info";
 const QString kKey = "key";
 
-// TODO: Some strings can be reused when when the server supports translations.
+// TODO: Some strings can be reused when the Server supports translations.
 QString activationMessage(const QJsonObject& errorMessage)
 {
     QString messageId = errorMessage.value("messageId").toString();
@@ -104,7 +104,7 @@ int QnActivateLicenseRestHandler::executePost(const QString& /*path*/,
     LicenseKey licenseKeyStruct;
     if (!QJson::deserialize<LicenseKey>(body, &licenseKeyStruct))
     {
-        result.setError(QnJsonRestResult::InvalidParameter, "Invalid content");
+        result.setError(QnJsonRestResult::InvalidParameter, "Invalid 'licenseKey' parameter");
         return nx::network::http::StatusCode::ok;
     }
 
@@ -118,7 +118,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString& /*path*/, const QnRe
     const QString licenseKey = params.value(kKey);
     if (licenseKey.isEmpty())
     {
-        result.setError(QnJsonRestResult::MissingParameter, "Parameter 'key' is missed");
+        result.setError(QnJsonRestResult::MissingParameter, "Parameter 'key' is missing");
         return nx::network::http::StatusCode::ok;
     }
 

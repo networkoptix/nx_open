@@ -218,9 +218,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc[proprietary] POST /ec2/setResourceStatus
      * Change a resource status.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getStatusList</code>.
      * </p>
      * %permissions Administrator, or a custom user with "Edit camera settings" permission,
      *     or a user who owns the resource in case the resource is a layout.
@@ -246,9 +246,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * Set resource (camera, user or server) additional parameters (camera firmware version, etc).
      * The list of parameters depends on the resource type.
      * <p>
-     * Parameters should be passed as a JSON array of objects in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON array of objects in POST message body with
+     * content type "application/json". An example of such array can be seen in the result of
+     * <code>GET /ec2/getResourceParams</code>.
      * </p>
      * %param resourceId Resource unique id.
      * %param value Parameter value.
@@ -260,9 +260,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc POST /ec2/removeResource
      * Delete the resource.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * </p>
      * %permissions Administrator, or a custom user with "Edit camera settings" permission,
      *     or a user who owns the resource in case the resource is a layout.
@@ -272,9 +271,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<IdData>(p, ApiCommand::removeResource);
 
     /**%apidoc GET /ec2/getStatusList
-     * Read current status of the resources: cameras, servers and storages.
+     * Read the current status of the Resources: cameras, Servers and Storages.
      * %param[default] format
-     * %param[opt] id Resource unique id. If omitted, return data for all resources.
+     * %param[opt] id Resource unique id. If omitted, return data for all Resources.
      * %return List of status objects in the requested format.
      *     %// TODO: Describe ResourceStatus fields.
      */
@@ -289,9 +288,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc POST /ec2/saveMediaServerUserAttributes
      * Save additional attributes of a server.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getMediaServerUserAttributesList</code>.
      * </p>
      * %permissions Administrator.
      * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
@@ -325,9 +324,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc:arrayParams POST /ec2/saveMediaServerUserAttributesList
      * Save additional attributes of a number of servers.
      * <p>
-     * Parameters should be passed as a JSON array of objects in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON array of objects in POST message body with
+     * content type "application/json". An example of such array can be seen in the result of
+     * <code>GET /ec2/getMediaServerUserAttributesList</code>.
      * </p>
      * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
      * %param serverName Server name.
@@ -395,7 +394,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<IdData>(p, ApiCommand::removeMediaServer);
 
     /**%apidoc GET /ec2/getMediaServersEx
-     * Return server list.
+     * Retrieve the list of Servers in the System.
      * %param[default] format
      * %return Server object in the requested format.
      * %// AbstractMediaServerManager::getServersEx
@@ -407,9 +406,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc[proprietary] POST /ec2/saveStorage
      * Save the storage.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getStorages</code>.
      * </p>
      * %permissions Administrator.
      * %param[opt] id Storage unique id. Can be omitted when creating a new object.
@@ -452,9 +451,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc:arrayParams POST /ec2/saveCameraUserAttributesList
      * Save additional camera attributes for a number of cameras.
      * <p>
-     * Parameters should be passed as a JSON array of objects in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON array of objects in POST message body with
+     * content type "application/json". An example of such array can be seen in the result of
+     * <code>GET /ec2/getCameraUserAttributesList</code>.
      * </p>
      * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
      * %param cameraName Camera name.
@@ -549,9 +548,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc POST /ec2/saveCameraUserAttributes
      * Save additional camera attributes for a single camera.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getCameraUserAttributesList</code>.
      * </p>
      * %permissions Administrator, or a custom user with "Edit camera settings" permission.
      * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
@@ -758,7 +757,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<std::nullptr_t, ServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
 
     /**%apidoc GET /ec2/getCamerasEx
-     * Read camera list.
+     * Retrieve the list of Cameras in the System.
      * %param[default] format
      * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
      *     field via /ec2/getCamerasEx) or MAC address (not
@@ -893,7 +892,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<QnCameraDataExQuery, CameraDataExList>(p, ApiCommand::getCamerasEx);
 
     /**%apidoc GET /ec2/getStorages
-     * Read the list of current storages.
+     * Retrieve the current list of Storages in the System.
      * %param[default] format
      * %param[opt]:uuid id Parent server unique id. If omitted, return storages for all servers.
      * %return List of storages.
@@ -1079,27 +1078,28 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
     /**%apidoc POST /ec2/saveEventRule
-     * Create or update event rule in event/actions rule list.
+     * Create or update an Event Rule in the Event/Actions Rule list.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getEventRules</code>.
      * </p>
-     * %param eventType Event type to match the rule. Example of possible values can be seen in
-     *     the result of the corresponding GET function.
+     * %param eventType Event type to match the rule. An example of possible values can be seen in
+     *     the result of <code>GET /ec2/getEventRules</code>.
      * %param[opt] eventResourceIds List of resources to match. Any resource if the list is empty.
      * %param[opt] eventCondition Additional text filter for event rule. Used for some event types.
      * %param[opt] EventState Event state to match the rule.
      *     %value inactive Prolonged event has finished.
      *     %value active Prolonged event has started.
      *     %value undefined Any state.
-     * %param actionType Action to execute if the rule matches. Example of possible values can be
-     *     seen in the result of the corresponding GET function.
-     * %param[opt] actionResourceIds Resource list associated with the action. The action is executed
-     *     for each resource in the list.
-     * %param[opt] actionParams Additional parameters used in the action. It depends on the action type.
-     * %param[opt] aggregationPeriod Aggregation period in seconds. The action is not going to trigger
-     *     more often than the aggregation period.
+     * %param actionType Action to execute if the Rule matches. An example of possible values can
+     *     be seen in the result of <code>GET /ec2/getEventRules</code>.
+     * %param[opt] actionResourceIds Resource list associated with the action. The action is
+     *     executed for each resource in the list.
+     * %param[opt] actionParams Additional parameters used in the action. It depends on the action
+     *     type.
+     * %param[opt] aggregationPeriod Aggregation period in seconds. The action is not going to
+     *     trigger more often than the aggregation period.
      * %param disabled Enable or disable the rule.
      * %param[opt] comment Human-readable text. Not used on the server side.
      * %param[opt] schedule Hex representation of the binary data. Each bit defines whether
@@ -1142,7 +1142,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<QnUuid, UserRoleDataList>(p, ApiCommand::getUserRoles);
 
     /**%apidoc GET /ec2/getAccessRights
-     * Return list of ids of accessible resources for each user in the System.
+     * Retrieve the list of ids of accessible Resources for each user in the System.
      * %param[default] format
      * %return List of access rights data objects in the requested format.
      * %// AbstractUserManager::getAccessRights
@@ -1151,9 +1151,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 
     /**%apidoc POST /ec2/setAccessRights
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getAccessRights</code>.
      * </p>
      * %permissions Administrator.
      * %param userId User unique id.
@@ -1164,9 +1164,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 
     /**%apidoc POST /ec2/saveUser
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getUsers</code>.
      * </p>
      * %permissions Administrator.
      * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
@@ -1222,11 +1222,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<UserDataEx, UserData>(p, ApiCommand::saveUser);
 
     /**%apidoc:arrayParams POST /ec2/saveUsers
-    * Saves the list of users. Only local and LDAP users are supported. Cloud users won't be saved.
+    * Saves the list of Users. Only local and LDAP users are supported. Cloud users won't be saved.
     * <p>
-    * Parameters should be passed as a JSON array of objects in POST message body with
-    * content type "application/json". Example of such object can be seen in
-    * the result of the corresponding GET function.
+    * The parameters should be passed as a JSON array of objects in POST message body with
+    * content type "application/json". An example of such array can be seen in the result of
+    * <code>GET /ec2/getUsers</code>.
     * </p>
     * %permissions Administrator.
     * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
@@ -1283,9 +1283,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc POST /ec2/removeUser
      * Delete the specified user.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * </p>
      * %permissions Administrator.
      * %param id User unique id.
@@ -1296,9 +1295,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc POST /ec2/removeResourceParam
      * Delete the specified property.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getResourceParams</code>.
      * </p>
      * %param resourceId resource id.
      * %param name property name to remove.
@@ -1307,9 +1306,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 
     /**%apidoc POST /ec2/saveUserRole
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getUserRoles</code>.
      * </p>
      * %permissions Administrator.
      * %param[opt] id User role unique id. Can be omitted when creating a new object. If such
@@ -1332,9 +1331,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc POST /ec2/removeUserRole
      * Delete the specified user role.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * </p>
      * %permissions Administrator.
      * %param id User role unique id.
@@ -1343,14 +1341,14 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<IdData>(p, ApiCommand::removeUserRole);
 
     /**%apidoc GET /ec2/getPredefinedRoles
-    * Return list of predefined user roles.
+    * Retrieve the list of predefined User Roles.
     * %param[default] format
-    * %return List of predefined user role objects in the requested format.
+    * %return List of predefined User Role objects in the requested format.
     */
     regGet<std::nullptr_t, PredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
 
     /**%apidoc GET /ec2/getVideowalls
-     * Return list of video walls
+     * Retrieve the list of Video Walls in the System.
      * %param[default] format
      * %return List of video wall objects in the requested format.
      * %// AbstractVideowallManager::getVideowalls
@@ -1364,7 +1362,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<RuntimeData>(p, ApiCommand::runtimeInfoChanged);
 
     /**%apidoc GET /ec2/getWebPages
-     * Return list of web pages
+     * Retrieve the list of web pages in the System.
      * %param[default] format
      * %return List of web page objects in the requested format.
      * %// AbstractWebPageManager::getWebPages
@@ -1373,9 +1371,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 
     /**%apidoc POST /ec2/saveWebPage
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getWebPages</code>.
      * </p>
      * %permissions Administrator.
      * %param[opt] id Web page unique id. Can be omitted when creating a new object. If such object
@@ -1392,9 +1390,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc POST /ec2/removeWebPage
      * Delete the specified web page.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * </p>
      * %permissions Administrator.
      * %param id Web page unique id.
@@ -1420,11 +1417,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<QnUuid, AnalyticsEngineDataList>(p, ApiCommand::getAnalyticsEngines);
 
     /**%apidoc GET /ec2/getLayouts
-     * Return list of user layout
+     * Retrieve the list of User Layouts in the System.
      * %param[default] format
      * %param[opt]:string id Layout unique id or logical id. If omitted, return data for all
-     *     layouts.
-     * %return List of layout objects in the requested format.
+     *     Layouts.
+     * %return List of Layout objects in the requested format.
      * %// AbstractLayoutManager::getLayouts
      */
     regGet<QnLayoutUuid, LayoutDataList>(p, ApiCommand::getLayouts);
@@ -1432,9 +1429,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc POST /ec2/saveLayout
      * Save layout.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getLayouts</code>.
      * </p>
      * %permissions Administrator, or a user who owns the layout.
      * %param[opt] id Layout unique id. Can be omitted when creating a new object. If such object
@@ -1513,9 +1510,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc:arrayParams POST /ec2/saveLayouts
      * Save the list of layouts.
      * <p>
-     * Parameters should be passed as a JSON array of objects in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON array of objects in POST message body with
+     * content type "application/json". An example of such array can be seen in the result of
+     * <code>GET /ec2/getLayouts</code>.
      * </p>
      * %param id Layout unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
@@ -1594,9 +1591,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc POST /ec2/removeLayout
      * Delete the specified layout.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
-     * content type "application/json". Example of such object can be seen in
-     * the result of the corresponding GET function.
+     * The parameters should be passed as a JSON object in POST message body with content type
+     * "application/json".
      * </p>
      * %permissions Administrator, or a user who owns the layout.
      * %param id Unique id of the layout to be deleted.
@@ -1605,7 +1601,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<IdData>(p, ApiCommand::removeLayout);
 
     /**%apidoc GET /ec2/getLayoutTours
-    * Return list of layout tours
+    * Retrieve the list of Layout Tours in the System.
     * %param[default] format
     * %param[opt] id Layout tour unique id. If omitted, return data for all tours.
     * %return List of layout tour objects in the requested format.
@@ -1614,19 +1610,19 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<QnUuid, LayoutTourDataList>(p, ApiCommand::getLayoutTours);
 
     /**%apidoc POST /ec2/saveLayoutTour
-    * Save layout tour.
+    * Save the Layout Tour.
     * <p>
-    * Parameters should be passed as a JSON object in POST message body with
-    * content type "application/json". Example of such object can be seen in
-    * the result of the corresponding GET function.
+    * The parameters should be passed as a JSON object in POST message body with content type
+    * "application/json". An example of such object can be seen in an item of the array returned
+    * by <code>GET /ec2/getLayoutTours</code>.
     * </p>
     * %permissions Administrator
-    * %param[opt] id Layout tour unique id. Can be omitted when creating a new object. If such
+    * %param[opt] id Layout Tour unique id. Can be omitted when creating a new object. If such
     *     object exists, omitted fields will not be changed.
     * %param parentId
     * %param name Tour name.
-    * %param items List of the layout tour items.
-    * %param items[].resourceId Resource unique id. Can be a layout or a camera or something else.
+    * %param items List of the Layout tour items.
+    * %param items[].resourceId Resource unique id. Can be a Layout or a Camera or something else.
     * %param items[].delayMs Delay between layouts switching in milliseconds.
     * %param[opt] settings
     * %param[opt] settings.manual
@@ -1635,22 +1631,21 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<LayoutTourData>(p, ApiCommand::saveLayoutTour);
 
     /**%apidoc POST /ec2/removeLayoutTour
-    * Delete the specified layout tour.
+    * Delete the specified Layout Tour from the System.
     * <p>
-    * Parameters should be passed as a JSON object in POST message body with
-    * content type "application/json". Example of such object can be seen in
-    * the result of the corresponding GET function.
+    * The parameters should be passed as a JSON object in POST message body with content type
+    * "application/json". An example of such object can be seen in an item of the array returned
+    * by <code>GET /ec2/getLayoutTours</code>.
     * </p>
     * %permissions Administrator
-    * %param id Unique id of the layout tour to be deleted.
+    * %param id Unique id of the Layout Tour to be deleted.
     * %// AbstractLayoutTourManager::remove
     */
     regUpdate<IdData>(p, ApiCommand::removeLayoutTour);
 
     /**%apidoc GET /ec2/listDirectory
-     * Return list of folders and files in a virtual FS stored inside
-     * database. This function is used to add files (such audio for notifications)
-     * to database.
+     * Retrieve the list of folders and files in a virtual FS stored inside the database. This
+     * function is used to add files (such as audio for notifications) to the database.
      * %param[default] format
      * %param[unused] path
      *     %// NOTE: ApiStoredFilePath.path is serialized as "folder".
