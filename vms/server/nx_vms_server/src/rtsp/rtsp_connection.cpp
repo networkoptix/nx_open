@@ -1585,18 +1585,6 @@ bool QnRtspConnectionProcessor::processRequest()
         return false;
     }
 
-    bool hasPermission = resourceAccessManager()->hasPermission(
-        d->accessRights,
-        d->mediaRes.dynamicCast<QnResource>(),
-        requiredPermission(getStreamingMode()));
-
-    if (!hasPermission)
-    {
-        NX_DEBUG(this, "RTSP request forbidden: [%1]", d->clientRequest);
-        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
-        return false;
-    }
-
     if (auto cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>())
         d->m_cameraParameters = cameraParameters(cameraRes);
 
@@ -1616,6 +1604,22 @@ bool QnRtspConnectionProcessor::processRequest()
     d->quality = d->params.quality();
     d->startTime = d->params.position();
     d->endTime = d->params.endPosition();
+
+    bool hasPermission = resourceAccessManager()->hasPermission(
+        d->accessRights,
+        d->mediaRes.dynamicCast<QnResource>(),
+        requiredPermission(getStreamingMode()));
+
+    auto camera = d->mediaRes.dynamicCast<QnSecurityCamResource>();
+    if (camera && camera->isDtsBased() && !camera->isLicenseUsed() && getStreamingMode() != PlaybackMode::Live)
+        hasPermission = false;
+
+    if (!hasPermission)
+    {
+        NX_DEBUG(this, "RTSP request forbidden: [%1]", d->clientRequest);
+        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
+        return false;
+    }
 
     if (method != "OPTIONS" && d->sessionId.isEmpty())
         generateSessionId();
