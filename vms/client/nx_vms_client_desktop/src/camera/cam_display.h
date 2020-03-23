@@ -207,7 +207,7 @@ private:
         QnAbstractMediaData::MediaFlags flags);
     bool useRealTimeHurryUp() const;
     void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
-
+    void sendEofSignal(bool value);
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];

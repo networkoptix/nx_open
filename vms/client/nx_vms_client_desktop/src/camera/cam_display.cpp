@@ -35,7 +35,7 @@ Q_GLOBAL_STATIC(QnMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int REDASS_DELAY_INTERVAL = 2 * 1000 * 1000ll; // if archive frame delayed for interval, mark stream as slow
 static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer
-static const std::chrono::milliseconds kMediaMessageDelay(1500);
+static const std::chrono::milliseconds kMediaMessageDelay(2500);
 
 static void updateActivity()
 {
@@ -841,10 +841,7 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
 
     m_emptyPacketCounter = 0;
     if (m_extTimeSrc && m_eofSignalSended)
-    {
-        m_extTimeSrc->onEofReached(this, false);
-        m_eofSignalSended = false;
-    }
+        sendEofSignal(false);
 }
 
 void QnCamDisplay::blockTimeValue(qint64 time)
@@ -883,6 +880,7 @@ void QnCamDisplay::waitForFramesDisplayed()
 
 void QnCamDisplay::onBeforeJump(qint64 time)
 {
+    m_lastMediaEventTimeout.invalidate();
     if (m_extTimeSrc)
         m_extTimeSrc->onBufferingStarted(this, m_doNotChangeDisplayTime ? getDisplayedTime() : time);
 
@@ -1066,6 +1064,13 @@ void QnCamDisplay::unblockTimeValue()
     m_audioDisplay->unblockTimeValue();
 }
 
+void QnCamDisplay::sendEofSignal(bool value)
+{
+    if (m_extTimeSrc)
+        m_extTimeSrc->onEofReached(this, value);
+    m_eofSignalSended = value;
+}
+
 void QnCamDisplay::processNewSpeed(float speed)
 {
     if (qAbs(speed - 1.0) > FPS_EPS && qAbs(speed) > FPS_EPS)
@@ -1089,10 +1094,7 @@ void QnCamDisplay::processNewSpeed(float speed)
         m_buffering = getBufferingMask(); // decode first gop is required some time
 
     if (m_prevSpeed == 0 && m_extTimeSrc && m_eofSignalSended)
-    {
-        m_extTimeSrc->onEofReached(this, false);
-        m_eofSignalSended = false;
-    }
+        sendEofSignal(false);
 
     // Speed sign was previously changed. Need unblock blocked resources
     if (m_executingChangeSpeed)
@@ -1226,6 +1228,14 @@ void QnCamDisplay::processFillerPacket(
     // empty data signal about EOF, or read/network error. So, check counter before EOF signaling
     //bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
     bool isFillerPacket = timestampUs > 0 && timestampUs < DATETIME_NOW;
+    
+    if (m_lastMediaEventTimeout.isValid() && 
+        m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay) && !m_eofSignalSended)
+    {
+        sendEofSignal(true);
+        return;
+    }
+
     if (m_emptyPacketCounter >= 3 || isFillerPacket)
     {
         bool isLive = flags & QnAbstractMediaData::MediaFlags_LIVE;
@@ -1233,12 +1243,9 @@ void QnCamDisplay::processFillerPacket(
             !isLive &&
             isVideoCamera &&
             !m_eofSignalSended &&
-            !isFillerPacket &&
-            (!m_lastMediaEventTimeout.isValid() ||
-                m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay)))
+            !isFillerPacket)
         {
-            m_extTimeSrc->onEofReached(this, true); // jump to live if needed
-            m_eofSignalSended = true;
+            sendEofSignal(true);
         }
 
         moveTimestampTo(timestampUs);
@@ -1477,10 +1484,8 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     }
     else
     {
-        if (m_extTimeSrc && m_eofSignalSended) {
-            m_extTimeSrc->onEofReached(this, false);
-            m_eofSignalSended = false;
-        }
+        if (m_extTimeSrc && m_eofSignalSended) 
+            sendEofSignal(false);
         m_emptyPacketCounter = 0;
     }
 
