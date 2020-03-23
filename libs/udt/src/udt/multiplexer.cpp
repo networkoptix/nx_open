@@ -42,10 +42,6 @@ void Multiplexer::shutdown()
         m_udpChannel->shutdown();
     if (m_recvQueue)
         m_recvQueue->stop();
-    m_sendQueue.reset();
-    m_recvQueue.reset();
-    m_timer.reset();
-    m_udpChannel.reset();
 }
 
 AbstractUdpChannel& Multiplexer::channel()
