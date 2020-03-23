@@ -291,6 +291,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     m_outPacket->size = kMaxEncodedFrameSize;
     int got_packet = 0;
     int encodeResult = avcodec_encode_video2(m_encoderCtx, m_outPacket, decodedFrame.data(), &got_packet);
+    av_packet_free_side_data(m_outPacket);
     if (encodeResult < 0)
         return -3;
     if (!got_packet)
