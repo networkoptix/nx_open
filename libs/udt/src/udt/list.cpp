@@ -43,24 +43,13 @@ Yunhong Gu, last updated 01/22/2011
 CSndLossList::CSndLossList(int size):
     m_iSize(size)
 {
-    m_piData1 = new int32_t[m_iSize];
-    m_piData2 = new int32_t[m_iSize];
-    m_piNext = new int[m_iSize];
-
     // -1 means there is no data in the node
-    for (int i = 0; i < size; ++i)
-    {
-        m_piData1[i] = -1;
-        m_piData2[i] = -1;
-    }
+    m_piData1.resize(m_iSize, -1);
+    m_piData2.resize(m_iSize, -1);
+    m_piNext.resize(m_iSize);
 }
 
-CSndLossList::~CSndLossList()
-{
-    delete[] m_piData1;
-    delete[] m_piData2;
-    delete[] m_piNext;
-}
+CSndLossList::~CSndLossList() = default;
 
 int CSndLossList::insert(int32_t seqno1, int32_t seqno2)
 {
@@ -399,26 +388,14 @@ int32_t CSndLossList::getLostSeq()
 CRcvLossList::CRcvLossList(int size):
     m_iSize(size)
 {
-    m_piData1 = new int32_t[m_iSize];
-    m_piData2 = new int32_t[m_iSize];
-    m_piNext = new int[m_iSize];
-    m_piPrior = new int[m_iSize];
-
     // -1 means there is no data in the node
-    for (int i = 0; i < size; ++i)
-    {
-        m_piData1[i] = -1;
-        m_piData2[i] = -1;
-    }
+    m_piData1.resize(m_iSize, -1);
+    m_piData2.resize(m_iSize, -1);
+    m_piNext.resize(m_iSize);
+    m_piPrior.resize(m_iSize);
 }
 
-CRcvLossList::~CRcvLossList()
-{
-    delete[] m_piData1;
-    delete[] m_piData2;
-    delete[] m_piNext;
-    delete[] m_piPrior;
-}
+CRcvLossList::~CRcvLossList() = default;
 
 void CRcvLossList::insert(int32_t seqno1, int32_t seqno2)
 {
