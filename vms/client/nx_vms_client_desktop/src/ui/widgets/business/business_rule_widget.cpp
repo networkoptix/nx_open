@@ -254,7 +254,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         }
         ui->actionAtLabel->setText(actionAtLabelText);
 
-        const bool aggregationIsVisible = m_model->actionType() == ActionType::pushNotificationAction
+        const bool aggregationIsVisible = (m_model->actionType() == ActionType::pushNotificationAction)
             ? !qnGlobalSettings->cloudSystemId().isNull()
             : vms::event::allowsAggregation(m_model->actionType());
         ui->aggregationWidget->setVisible(aggregationIsVisible);
@@ -287,11 +287,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->useEventSourceServerCheckBox->setVisible(
             vms::event::requiresServerResource(m_model->actionType()));
 
-        ui->useEventSourceServerCheckBox->setEnabled(
-            m_model->actionCanUseSourceServer());
-
-        ui->useEventSourceServerCheckBox->setChecked(
-            ui->useEventSourceServerCheckBox->isEnabled() && m_model->actionIsUsingSourceServer());
+        ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
+        ui->useEventSourceServerCheckBox->setChecked(m_model->actionIsUsingSourceServer());
 
         if (m_model->eventType() == EventType::softwareTriggerEvent)
         {
@@ -386,7 +383,7 @@ void QnBusinessRuleWidget::initActionParameters()
 
     const auto getTabBeforeTarget = [this]() -> QWidget *
     {
-        const bool aggregationIsVisible = m_model->actionType() == ActionType::pushNotificationAction
+        const bool aggregationIsVisible = (m_model->actionType() == ActionType::pushNotificationAction)
             ? !qnGlobalSettings->cloudSystemId().isNull()
             : vms::event::allowsAggregation(m_model->actionType());
         if (aggregationIsVisible)

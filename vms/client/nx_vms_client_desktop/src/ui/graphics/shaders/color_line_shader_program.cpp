@@ -2,7 +2,7 @@
 
 #include <ui/graphics/opengl/gl_context_data.h>
 
-#include <nx/vms/client/core/graphics/shader_source.h>
+#include <nx/vms/client/core/graphics/shader_helper.h>
 
 
 QnColorLineGLShaderProgram::QnColorLineGLShaderProgram(QObject *parent)

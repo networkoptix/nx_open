@@ -38,6 +38,8 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLShaderProgram>
 
+#include <nx/vms/client/core/graphics/shader_helper.h>
+
 QT_BEGIN_NAMESPACE
 
 QList<QVideoFrame::PixelFormat> QSGVideoNodeFactory_YUV::supportedPixelFormats(
@@ -287,11 +289,8 @@ void QSGVideoMaterial_YUV::bind()
             functions->glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
             functions->glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-            const auto profile = QSurfaceFormat::defaultFormat().profile();
-            const bool useDeprecated = profile != QSurfaceFormat::CoreProfile;
-
-            const auto singleComponent = useDeprecated ? GL_LUMINANCE : GL_RED;
-            const auto doubleComponent = useDeprecated ? GL_LUMINANCE_ALPHA : GL_RG;
+            const auto [singleComponent, doubleComponent] =
+                nx::vms::client::core::graphics::ShaderHelper::getTexImageFormats();
 
             if (m_format.pixelFormat() == QVideoFrame::Format_NV12
                     || m_format.pixelFormat() == QVideoFrame::Format_NV21) {

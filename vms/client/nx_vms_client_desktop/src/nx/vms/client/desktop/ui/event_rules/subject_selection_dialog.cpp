@@ -238,7 +238,7 @@ void SubjectSelectionDialog::showAllUsersChanged(bool value)
 void SubjectSelectionDialog::setOptions(const CustomizableOptions& options)
 {
     auto filter = options.userFilter;
-    auto f =
+    auto customFilterPredicate =
         [this, filter](int row, const QModelIndex& index) -> bool
         {
             auto user = m_users->sourceModel()->index(row, UserListModel::NameColumn, index)
@@ -248,7 +248,7 @@ void SubjectSelectionDialog::setOptions(const CustomizableOptions& options)
         };
 
     m_users->setCustomUsersOnly(false);
-    m_users->setCustomFilterAcceptsRow(f);
+    m_users->setCustomFilterAcceptsRow(customFilterPredicate);
 
     ui->showAllUsers->setVisible(options.showAllUsersSwitcher);
     ui->usersGroupBox->setVisible(true);

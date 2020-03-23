@@ -2,7 +2,7 @@
 
 #include <core/ptz/media_dewarping_params.h>
 
-#include <nx/vms/client/core/graphics/shader_source.h>
+#include <nx/vms/client/core/graphics/shader_helper.h>
 #include "base_shader_program.h"
 
 #include <nx/vms/api/data/dewarping_data.h>

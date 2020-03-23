@@ -2,7 +2,7 @@
 
 #include <utils/common/warnings.h>
 
-#include <nx/vms/client/core/graphics/shader_source.h>
+#include <nx/vms/client/core/graphics/shader_helper.h>
 
 namespace {
     /** 

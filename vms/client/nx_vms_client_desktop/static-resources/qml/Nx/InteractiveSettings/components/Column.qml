@@ -9,8 +9,7 @@ Group
     property string name: ""
     childrenItem: column
 
-    implicitWidth: column.implicitWidth
-    implicitHeight: column.implicitHeight
+    width: parent.width
 
     contentItem: AlignedColumn
     {

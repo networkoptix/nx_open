@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QtWidgets/QWidget>
 
 #include <nx/vms/event/event_fwd.h>

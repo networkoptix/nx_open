@@ -644,7 +644,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
 
         case vms::event::ActionType::buzzerAction:
         {
-            if (actionCanUseSourceServer() && actionIsUsingSourceServer())
+            if (actionIsUsingSourceServer())
                 return getIcon(Column::source);
         }
 
@@ -921,7 +921,9 @@ bool QnBusinessRuleViewModel::actionCanUseSourceServer() const
 
 bool QnBusinessRuleViewModel::actionIsUsingSourceServer() const
 {
-    return m_actionParams.useSource && vms::event::requiresServerResource(m_actionType);
+    return m_actionParams.useSource
+        && vms::event::requiresServerResource(m_actionType)
+        && vms::event::requiresServerResource(m_eventType);
 }
 
 void QnBusinessRuleViewModel::toggleActionUseSourceServer()
@@ -1420,16 +1422,14 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
         const QnMediaServerResourceList targetServers =
             resourcePool()->getResourcesByIds<QnMediaServerResource>(m_actionResources);
 
-        bool actuallyUsesSourceServer = actionCanUseSourceServer() && actionIsUsingSourceServer();
-
         if (targetServers.isEmpty())
-            return actuallyUsesSourceServer ? tr("Source Server") : tr("Select Server");
+            return actionIsUsingSourceServer() ? tr("Source Server") : tr("Select Server");
 
         const auto targetServersString = (targetServers.count() > 1)
             ? tr("%n Servers", "", targetServers.count())
             : targetServers.first()->getName();
 
-        return actuallyUsesSourceServer
+        return actionIsUsingSourceServer()
             ? tr("Source Server and %1").arg(targetServersString)
             : targetServersString;
     }
