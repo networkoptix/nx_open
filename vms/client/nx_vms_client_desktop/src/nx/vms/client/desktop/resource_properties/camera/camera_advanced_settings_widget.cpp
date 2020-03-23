@@ -46,6 +46,13 @@ void CameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     {
         connect(m_camera, &QnResource::statusChanged, this,
             &CameraAdvancedSettingsWidget::visibilityUpdateRequested);
+
+        connect(m_camera, &QnResource::propertyChanged, this,
+            [this](const QnResourcePtr& resource, const QString& key)
+            {
+                if (key == ResourcePropertyKey::kCameraAdvancedParams)
+                    emit visibilityUpdateRequested();
+            });
     }
 
     ui->cameraAdvancedParamsWidget->setCamera(m_camera);
@@ -73,7 +80,7 @@ bool CameraAdvancedSettingsWidget::shouldBeVisible() const
     if (!m_camera)
         return false;
 
-    const auto& params = QnCameraAdvancedParamsReader::paramsFromResource(m_camera);
+    const QnCameraAdvancedParams params = QnCameraAdvancedParamsReader::paramsFromResource(m_camera);
     if (params.groups.empty())
         return false;
 

@@ -106,10 +106,11 @@ struct CameraSettingsDialog::Private: public QObject
 
     void handleCamerasChanged()
     {
-        const bool advancedSettingsAreVisible = cameras.size() == 1;
-        if (advancedSettingsAreVisible)
+        const bool advancedSettingsArePotentiallyAllowed = cameras.size() == 1;
+        if (advancedSettingsArePotentiallyAllowed)
         {
             advancedSettingsWidget->setCamera(cameras.first());
+            updateAdvancedSettingsVisibility();
             tryReloadAdvancedSettings();
         }
     }
@@ -635,8 +636,6 @@ void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
     // Always displaying for single camera as it contains Logical Id setup.
     setPageVisible(int(CameraSettingsTab::expert),
         state.supportsVideoStreamControl() || state.isSingleCamera());
-
-    d->updateAdvancedSettingsVisibility();
 }
 
 } // namespace nx::vms::client::desktop
