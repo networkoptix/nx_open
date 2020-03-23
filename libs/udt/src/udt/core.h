@@ -176,8 +176,6 @@ public: // internal API
     void setBroken(bool val);
     bool broken() const;
 
-    CSNode* sNode() { return m_pSNode.get(); }
-
     int payloadSize() const { return m_iPayloadSize; }
 
     std::chrono::microseconds lastReqTime() const { return m_llLastReqTime; }
@@ -570,7 +568,6 @@ private: // for UDP multiplexer
     std::shared_ptr<Multiplexer> m_multiplexer;
     detail::SocketAddress m_pPeerAddr;    // peer address
     uint32_t m_piSelfIP[4];             // local UDP IP address
-    std::unique_ptr<CSNode> m_pSNode;         // node information for UDT list used in snd queue
     std::shared_ptr<ServerSideConnectionAcceptor> m_synPacketHandler;
 
 private: // for epoll

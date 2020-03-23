@@ -211,12 +211,16 @@ public:
     int lastEntry() const { return m_iLastEntry; }
 
 private:
-    void insert_(std::chrono::microseconds ts, std::shared_ptr<CUDT> u);
+    void insert_(
+        std::chrono::microseconds ts,
+        CSNode* n);
+
     void remove_(CSNode* n);
 
 private:
-    // The heap array
+    // The heap array. CSNode objects are owned by m_socketToNode.
     std::vector<CSNode*> m_nodeHeap;
+    std::map<CUDT*, std::unique_ptr<CSNode>> m_socketToNode;
     // physical length of the array
     int m_iArrayLength = 0;
     // position of last entry on the heap array

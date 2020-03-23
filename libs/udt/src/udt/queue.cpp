@@ -312,9 +312,17 @@ CSndUList::~CSndUList()
 
 void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
 {
-    std::lock_guard<std::mutex> listguard(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
-    CSNode* n = u->sNode();
+    auto [it, inserted] = m_socketToNode.emplace(u.get(), nullptr);
+    if (inserted)
+    {
+        it->second = std::make_unique<CSNode>();
+        it->second->socket = u;
+        it->second->timestamp = std::chrono::microseconds(1);
+    }
+
+    auto n = it->second.get();
 
     if (n->locationOnHeap >= 0)
     {
@@ -331,7 +339,7 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
         remove_(n);
     }
 
-    insert_(std::chrono::microseconds(1), u);
+    insert_(std::chrono::microseconds(1), n);
 }
 
 int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
@@ -339,18 +347,20 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
     // When this method destroyes CUDT, it must do it with no mutex lock.
     std::shared_ptr<CUDT> u;
 
-    std::lock_guard<std::mutex> listguard(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     if (-1 == m_iLastEntry)
         return -1;
 
+    auto n = m_nodeHeap[0];
+
     // no pop until the next schedulled time
     auto ts = CTimer::getTime();
-    if (ts < m_nodeHeap[0]->timestamp)
+    if (ts < n->timestamp)
         return -1;
 
-    u = m_nodeHeap[0]->socket.lock();
-    remove_(m_nodeHeap[0]);
+    u = n->socket.lock();
+    remove_(n);
 
     if (!u || !u->connected() || u->broken())
         return -1;
@@ -363,21 +373,28 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
 
     // insert a new entry, ts is the next processing time
     if (ts > std::chrono::microseconds::zero())
-        insert_(ts, u);
+        insert_(ts, n);
 
     return 1;
 }
 
 void CSndUList::remove(CUDT* u)
 {
-    std::lock_guard<std::mutex> listguard(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
-    remove_(u->sNode());
+    auto it = m_socketToNode.find(u);
+    if (it == m_socketToNode.end())
+        return;
+
+    auto n = std::exchange(it->second, nullptr);
+    m_socketToNode.erase(it);
+
+    remove_(n.get());
 }
 
 std::chrono::microseconds CSndUList::getNextProcTime() const
 {
-    std::lock_guard<std::mutex> listguard(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     if (-1 == m_iLastEntry)
         return std::chrono::microseconds::zero();
@@ -385,10 +402,10 @@ std::chrono::microseconds CSndUList::getNextProcTime() const
     return m_nodeHeap[0]->timestamp;
 }
 
-void CSndUList::insert_(std::chrono::microseconds ts, std::shared_ptr<CUDT> u)
+void CSndUList::insert_(
+    std::chrono::microseconds ts,
+    CSNode* n)
 {
-    CSNode* n = u->sNode();
-
     // do not insert repeated node
     if (n->locationOnHeap >= 0)
         return;
@@ -446,7 +463,7 @@ void CSndUList::remove_(CSNode* n)
 
             if (m_nodeHeap[q]->timestamp > m_nodeHeap[p]->timestamp)
             {
-                CSNode* t = m_nodeHeap[p];
+                auto t = m_nodeHeap[p];
                 m_nodeHeap[p] = m_nodeHeap[q];
                 m_nodeHeap[p]->locationOnHeap = p;
                 m_nodeHeap[q] = t;
