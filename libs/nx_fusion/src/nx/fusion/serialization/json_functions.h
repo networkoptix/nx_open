@@ -140,7 +140,7 @@ namespace QJsonDetail {
 
         QJsonObject result;
 
-        for(const auto& [key, value]: map)
+        for (const auto& [key, value]: map)
         {
             QJsonValue serializedValue;
             QJson::serialize(ctx, value, &serializedValue);
@@ -222,13 +222,13 @@ namespace QJsonDetail {
         QnCollection::clear(*target);
         QnCollection::reserve(*target, value.size());
 
-        for(auto it = value.begin(); it != value.end(); ++it)
+        for (auto it = value.begin(); it != value.end(); ++it)
         {
             typename Map::key_type deserializedKey;
             if (!QJson::deserialize(ctx, it.key().toUtf8(), &deserializedKey))
                 return false;
 
-            if(!QJson::deserialize(ctx, it.value(), &(*target)[deserializedKey]))
+            if (!QJson::deserialize(ctx, it.value(), &(*target)[deserializedKey]))
                 return false;
         }
 
