@@ -15,6 +15,11 @@
 
 class QnJsonSerializer;
 
+template<typename Type>
+struct HasDirectObjectKeySerializer: public std::false_type
+{
+};
+
 namespace QJsonDetail {
 
 void serialize_json(const QJsonValue& value, QByteArray* outTarget,
@@ -42,12 +47,16 @@ public:
     bool areSomeFieldsNotFound() const { return m_someFieldsNotFound; }
     void setSomeFieldsNotFound(bool value) { m_someFieldsNotFound = value; }
 
-    bool serializeMapToObject() const { return m_serializeMapToObject;}
+    bool serializeMapToObject() const { return m_serializeMapToObject; }
     void setSerializeMapToObject(bool value) { m_serializeMapToObject = value; }
+
+    bool isMapKeyDeserializationMode() const { return m_isMapKeyDeserializationMode; }
+    void setIsMapKeyDeserializationMode(bool value) { m_isMapKeyDeserializationMode = value; }
 
 private:
     bool m_someFieldsNotFound{false};
     bool m_serializeMapToObject{false};
+    bool m_isMapKeyDeserializationMode{false};
 };
 
 class QnJsonSerializer:
@@ -242,7 +251,10 @@ bool deserialize(QnJsonContext* ctx, const QByteArray& value, T* outTarget)
     NX_ASSERT(outTarget);
 
     QJsonValue jsonValue;
-    if (!QJsonDetail::deserialize_json(value, &jsonValue))
+
+    if (HasDirectObjectKeySerializer<T>::value && ctx->isMapKeyDeserializationMode())
+        jsonValue = QString::fromUtf8(value);
+    else if (!QJsonDetail::deserialize_json(value, &jsonValue))
         return false;
 
     return QJson::deserialize(ctx, jsonValue, outTarget);

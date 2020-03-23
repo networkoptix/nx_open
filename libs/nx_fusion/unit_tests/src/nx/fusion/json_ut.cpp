@@ -486,6 +486,35 @@ TEST_F(QnJsonTextFixture, deserializeMapFromArray)
     ASSERT_EQ(kMapWithCustomStructAsKey, deserialized);
 }
 
+TEST_F(QnJsonTextFixture, deserializeMapWithUuidAsKey)
+{
+    static const std::map<QnUuid, int> kExpectedMap = {{kFirstUuid, 1}, {kSecondUuid, 2}};
+    static const QByteArray kSerializedMap =
+        lm(R"json({"%1":1,"%2":2})json").args(kFirstUuid, kSecondUuid).toUtf8();
+
+    std::map<QnUuid, int> actualMap;
+    ASSERT_TRUE(QJson::deserialize(kSerializedMap, &actualMap));
+    ASSERT_EQ(actualMap, kExpectedMap);
+}
+
+TEST_F(QnJsonTextFixture, deserializeMapWithIntegerAsKey)
+{
+    static const std::map<int, int> kExpectedMap = {{1, 1}, {2, 2}};
+    static const QByteArray kSerializedMap(R"json({"1":1,"2":2})json");
+
+    std::map<int, int> actualMap;
+    ASSERT_TRUE(QJson::deserialize(kSerializedMap, &actualMap));
+    ASSERT_EQ(actualMap, kExpectedMap);
+}
+
+TEST_F(QnJsonTextFixture, deserializeMapWithIncorrectJsonAsKeyFails)
+{
+    static const QByteArray kSerializedMap(R"json({"{a}":1,"{2}":2})json");
+
+    std::map<MapKey, int> result;
+    ASSERT_FALSE(QJson::deserialize(kSerializedMap, &result));
+}
+
 //-------------------------------------------------------------------------------------------------
 
 namespace {
