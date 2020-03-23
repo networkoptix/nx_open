@@ -1807,10 +1807,16 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCurrentUser", new QnCurrentUserRestHandler());
 
     /**%apidoc POST /api/activateLicense
-     * Activate new license and return license JSON data on success. It requires internet to
-     * connect to the license server.
+     * Activate the new License and return the signed License Block on success. The activation is
+     * performed by sending the License serial number and the current Server Hardware Id to the
+     * License Server over the internet (thus, an internet connection is required), and getting
+     * back the LicenseBlock signed by the License Server. After activation, the License is
+     * registered in the System the same way as POST /ec2/addLicenses does.
      * %param:string licenseKey License serial number.
-     * %return:object License JSON data.
+     * %return:object JSON object containing the structured representation of the License Block.
+     *     See the description of License Block properties in the documentation for the result of
+     *     <code>GET /ec2/getLicenses</code>.
+     *     %struct DetailedLicenseData
      */
     reg("api/activateLicense", new QnActivateLicenseRestHandler());
 

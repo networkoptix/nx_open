@@ -916,9 +916,39 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<StorageParentId, StorageDataList>(p, ApiCommand::getStorages);
 
-    // AbstractLicenseManager::addLicenses
+    /**%apidoc GET /ec2/getLicenses
+     * Retrieve all Licenses registered in the System.
+     * %param[default] format
+     * %return List of License information objects in the requested format.
+     */
+    regGet<std::nullptr_t, LicenseDataList>(p, ApiCommand::getLicenses);
+
+    /**%apidoc:arrayParams POST /ec2/addLicenses
+     * Register the specified Licenses in the System. Each License should be bound via Hardware Id
+     * to some Server in the System.
+     * <br/>
+     * The License Block can be obtained via the procedure offered in the VMS Client application,
+     * menu System Administration -> Licenses -> Manual Activation.
+     * <p>
+     * The parameters should be passed as a JSON array of objects in POST message body with
+     * content type "application/json". An example of such array can be seen in the result of
+     * <code>GET /ec2/getLicenses</code>.
+     * </p>
+     * %struct LicenseData
+     * %// AbstractLicenseManager::addLicenses
+     */
     regUpdate<LicenseDataList>(p, ApiCommand::addLicenses);
-    // AbstractLicenseManager::removeLicense
+
+    /**%apidoc POST /ec2/removeLicense
+     * Remove the specified License from the System.
+     * <p>
+     * The parameter should be passed as a JSON object in POST message body with content type
+     * "application/json". An example of such object can be seen in an item of the array returned
+     * by <code>GET /ec2/getLicenses</code>.
+     * </p>
+     * %struct LicenseData
+     * %// AbstractLicenseManager::removeLicense
+     */
     regUpdate<LicenseData>(p, ApiCommand::removeLicense);
 
     /**%apidoc GET /ec2/getEventRules
@@ -1699,13 +1729,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return Object in the requested format.
      */
     regGet<std::nullptr_t, FullInfoData>(p, ApiCommand::getFullInfo);
-
-    /**%apidoc GET /ec2/getLicenses
-     * Read license list
-     * %param[default] format
-     * %return List of license objects in the requested format.
-     */
-    regGet<std::nullptr_t, LicenseDataList>(p, ApiCommand::getLicenses);
 
     regGet<std::nullptr_t, DatabaseDumpData>(p, ApiCommand::dumpDatabase);
     regGet<StoredFilePath, DatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
