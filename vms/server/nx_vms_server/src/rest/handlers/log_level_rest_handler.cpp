@@ -40,7 +40,8 @@ JsonRestResponse QnLogLevelRestHandler::executeGet(const JsonRestRequest& reques
     if (request.params.contains(kIdParam))
         return manageLogLevelById(request);
 
-    if (request.params.empty())
+    const auto name = request.params.value(kNameParam);
+    if (name.isEmpty())
     {
         std::map<QString, QString> levelsByName;
         for (const auto& name: QnLogs::getLoggerNames())
@@ -48,7 +49,6 @@ JsonRestResponse QnLogLevelRestHandler::executeGet(const JsonRestRequest& reques
         return {levelsByName};
     }
 
-    const auto name = request.params.value(kNameParam);
     const auto logger = QnLogs::getLogger(name);
     if (!logger)
         return invalidParameter(kNameParam, name);
