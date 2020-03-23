@@ -614,9 +614,8 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
     if (canRemoveResource(resourceId))
     {
         if (QnResourcePtr ownResource = resourcePool()->getResourceById(resourceId))
-        {
             resourcePool()->removeResource(ownResource);
-        }
+        statusDictionary()->remove(resourceId);
     }
     else
         removeResourceIgnored(resourceId);

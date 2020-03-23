@@ -33,6 +33,7 @@ private:
 
     void fillMotionInfo(const QRect& rect);
     bool isGotFrame(QnCompressedVideoDataPtr videoData);
+
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_rtpStreamParser;

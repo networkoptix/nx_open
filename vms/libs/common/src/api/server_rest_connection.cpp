@@ -29,7 +29,6 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/serialization.h>
 #include <nx/vms/api/data_fwd.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/rule.h>
@@ -1103,16 +1102,24 @@ Handle ServerConnection::getExtendedPluginInformation(
         "/ec2/pluginInfo",
         {},
         Result<QnJsonRestResult>::type(
-            [callback = std::move(callback)](
+            [callback = std::move(callback), this](
                 bool success,
                 Handle requestId,
                 const QnJsonRestResult& result)
             {
+                nx::vms::api::ExtendedPluginInfoByServer pluginInfo;
+                if (!QJson::deserialize(result.reply, &pluginInfo))
+                {
+                    NX_DEBUG(m_logTag,
+                        "getExtendedPluginInformation: "
+                        "Unable to deserialize the response from the Server %1, %2",
+                        m_serverId, QJson::serialize(result.reply));
+                }
+
                 callback(
                     success,
                     requestId,
-                    nx::utils::mapFromJsonObject<nx::vms::api::ExtendedPluginInfoByServer>(
-                        result.reply.toObject()));
+                    std::move(pluginInfo));
             }),
         targetThread);
 }

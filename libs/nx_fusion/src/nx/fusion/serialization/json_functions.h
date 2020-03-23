@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <type_traits>
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
@@ -121,6 +122,48 @@ namespace QJsonDetail {
         *target = result;
     }
 
+    inline QString convertQJsonValueToString(const QJsonValue& jsonValue)
+    {
+        if (jsonValue.type() == QJsonValue::String)
+            return jsonValue.toString();
+
+        return QString::fromUtf8(QJson::serialized(jsonValue));
+    }
+
+    template<typename Map>
+    void serialize_generic_map_to_object(QnJsonContext* ctx, const Map& map, QJsonValue* target)
+    {
+        static_assert(
+            std::is_same_v<
+                typename QnCollection::collection_category<Map>::type,
+                typename QnCollection::map_tag>);
+
+        QJsonObject result;
+
+        for(const auto& [key, value]: map)
+        {
+            QJsonValue serializedValue;
+            QJson::serialize(ctx, value, &serializedValue);
+
+            QJsonValue serializedKey;
+            QJson::serialize(ctx, key, &serializedKey);
+
+            result.insert(convertQJsonValueToString(serializedKey), serializedValue);
+        }
+
+        *target = result;
+    }
+
+    template<typename Map>
+    void serialize_generic_map(QnJsonContext *ctx, const Map &value, QJsonValue *target)
+    {
+        if (ctx->serializeMapToObject())
+            serialize_generic_map_to_object(ctx, value, target);
+        else
+            serialize_collection(ctx, value, target);
+
+    }
+
     template<class Collection, class Element>
     bool deserialize_collection_element(QnJsonContext *ctx, const QJsonValue &value, Collection *target, const Element *, const QnCollection::list_tag &) {
         return QJson::deserialize(ctx, value, &*QnCollection::insert(*target, boost::end(*target), Element()));
@@ -168,6 +211,47 @@ namespace QJsonDetail {
                 return false;
 
         return true;
+    }
+
+    template<typename Map>
+    bool deserialize_generic_map_from_object(
+        QnJsonContext* ctx,
+        const QJsonObject& value,
+        Map* target)
+    {
+        QnCollection::clear(*target);
+        QnCollection::reserve(*target, value.size());
+
+        for(auto it = value.begin(); it != value.end(); ++it)
+        {
+            typename Map::key_type deserializedKey;
+            if (!QJson::deserialize(ctx, it.key().toUtf8(), &deserializedKey))
+                return false;
+
+            if(!QJson::deserialize(ctx, it.value(), &(*target)[deserializedKey]))
+                return false;
+        }
+
+        return true;
+    }
+
+    template<typename Map>
+    bool deserialize_generic_map(QnJsonContext* ctx, const QJsonValue& value, Map* target)
+    {
+        static_assert(
+            std::is_same_v<
+                typename QnCollection::collection_category<Map>::type,
+                typename QnCollection::map_tag>);
+
+        switch (value.type())
+        {
+            case QJsonValue::Object:
+                return deserialize_generic_map_from_object(ctx, value.toObject(), target);
+            case QJsonValue::Array:
+                return deserialize_collection(ctx, value, target);
+            default:
+                return false;
+        }
     }
 
     template<class Map>
@@ -451,7 +535,7 @@ QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::list, (class T, class Allocator), (T, Allocator), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator), collection);
-QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator), generic_map);
 
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QMap, (class T), (QString, T), string_map);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QHash, (class T), (QString, T), string_map);

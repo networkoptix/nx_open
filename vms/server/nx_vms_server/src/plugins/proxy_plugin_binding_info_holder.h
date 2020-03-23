@@ -17,5 +17,4 @@ public:
 
 private:
     BindingInfoHolderList m_proxiedBindingInfoHolders;
-
 };

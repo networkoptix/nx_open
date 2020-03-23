@@ -87,12 +87,12 @@ public:
         }
     };
 
-    static constexpr auto kNoTimeout = Timeouts{
+    static constexpr auto kNoTimeouts = Timeouts{
         nx::network::kNoTimeout,
         nx::network::kNoTimeout,
         nx::network::kNoTimeout};
 
-    static const int UNLIMITED_RECONNECT_TRIES = -1;
+    static constexpr int UNLIMITED_RECONNECT_TRIES = -1;
 
     AsyncClient();
 

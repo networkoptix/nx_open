@@ -478,6 +478,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
+    const quint8* bufferEnd = rtpBuffer + bytesRead;
 
     static quint8 jpeg_end[2] = {0xff, 0xd9};
 
@@ -487,6 +488,12 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     RtpHeader* rtpHeader = (RtpHeader*)rtpBuffer;
     const quint8* curPtr = rtpBuffer + RtpHeader::kSize;
     int bytesLeft = bytesRead - RtpHeader::kSize;
+
+    if (rtpHeader->padding)
+    {
+        int paddingSize = bufferEnd[-1];
+        bytesLeft -= paddingSize;
+    }
 
     if (rtpHeader->extension)
     {
@@ -499,9 +506,6 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
         processRtpExtensions(curPtr, std::min(extensionsSize, bytesLeft));
         curPtr += extensionsSize;
     }
-
-    if (rtpHeader->padding != 0)
-        bytesLeft -= qFromBigEndian(rtpHeader->padding);
 
     if (bytesLeft < 8)
         return false;

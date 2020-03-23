@@ -20,7 +20,7 @@
 
 #include <nx/vms/api/data/analytics_data.h>
 
-#include <nx/statistics/settings.h>
+#include <nx/vms/statistics/settings.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/cryptographic_hash.h>
@@ -55,11 +55,8 @@ using namespace nx::vms::api;
 namespace nx::vms::server::statistics {
 
 Reporter::Reporter(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),
-    m_firstTime(true),
-    m_timerCycle(kInitialTimerCycle),
-    m_timerDisabled(false),
-    m_timerId(boost::none),
+    QnCommonModuleAware(commonModule),    
+    m_timerCycle(kInitialTimerCycle),        
     m_timerManager(commonModule->timerManager())
 {
     NX_CRITICAL(kMaxdelayRation <= 100);
@@ -110,12 +107,15 @@ ec2::ErrorCode Reporter::collectReportData(SystemStatistics* const outData)
     nx::vms::api::ExtendedPluginInfoByServer pluginInfoByServer = future.get();
     for (auto& mediaServer: mediaServers)
     {
-        StatisticsMediaServerData mediaServerStatistics = toStatisticsData(mediaServer);
-        if (auto it = pluginInfoByServer.find(mediaServer.id);
+        StatisticsMediaServerData mediaServerStatistics = toStatisticsData(std::move(mediaServer));
+        if (auto it = pluginInfoByServer.find(mediaServerStatistics.id);
             it != pluginInfoByServer.cend())
         {
-            for (const ExtendedPluginInfo& pluginInfo: it->second)
-                mediaServerStatistics.pluginInfo.push_back(toStatisticsData(pluginInfo));
+            for (PluginInfoEx& pluginInfo: it->second)
+            {
+                mediaServerStatistics.pluginInfo.push_back(
+                    toStatisticsData(std::move(pluginInfo)));
+            }
         }
         outData->mediaservers.push_back(std::move(mediaServerStatistics));
     }
@@ -137,7 +137,7 @@ ec2::ErrorCode Reporter::collectReportData(SystemStatistics* const outData)
     {
         nx::vms::api::LicenseData apiLicense;
         ec2::fromResourceToApi(license, apiLicense);
-        StatisticsLicenseData statLicense = toStatisticsData(apiLicense);
+        StatisticsLicenseData statLicense = toStatisticsData(std::move(apiLicense));
         QnLicenseValidator validator(ec2Connection->commonModule());
         statLicense.validation = validator.validationInfo(license);
         outData->licenses.push_back(std::move(statLicense));
@@ -150,22 +150,15 @@ ec2::ErrorCode Reporter::collectReportData(SystemStatistics* const outData)
         return errCode;
 
     for (auto& rule: eventRules)
-        outData->businessRules.emplace_back(toStatisticsData(rule));
-
-    errCode = ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&outData->layouts);
-    if (errCode != ec2::ErrorCode::ok)
-        return errCode;
+        outData->businessRules.emplace_back(toStatisticsData(std::move(rule)));
 
     nx::vms::api::UserDataList users;
     errCode = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
     if (errCode != ec2::ErrorCode::ok)
         return errCode;
 
-    for (auto& u: users) outData->users.push_back(toStatisticsData(u));
-
-    errCode = ec2Connection->getVideowallManager(Qn::kSystemAccess)->getVideowallsSync(&outData->videowalls);
-    if (errCode != ec2::ErrorCode::ok)
-        return errCode;
+    for (auto& u: users)
+        outData->users.push_back(toStatisticsData(std::move(u)));
 
     if (outData->systemId.isNull())
         outData->systemId = helpers::currentSystemLocalId(ec2Connection->commonModule());
@@ -323,12 +316,12 @@ ec2::ErrorCode Reporter::initiateReport(QString* reportApi, QnUuid* systemId)
     connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
             this, &Reporter::finishReport, Qt::DirectConnection);
 
-    m_httpClient->setUserName(nx::statistics::kDefaultUser);
-    m_httpClient->setUserPassword(nx::statistics::kDefaultPassword);
+    m_httpClient->setUserName(nx::vms::statistics::kDefaultUser);
+    m_httpClient->setUserPassword(nx::vms::statistics::kDefaultPassword);
 
     const QString configApi = settings->statisticsReportServerApi();
     const QString serverApi = configApi.isEmpty()
-        ? nx::statistics::kDefaultStatisticsServer
+        ? nx::vms::statistics::kDefaultStatisticsServer
         : configApi;
 
     const nx::utils::Url url = lit("%1/%2").arg(serverApi).arg(kServerReportApi);
@@ -467,16 +460,18 @@ std::vector<DeviceAnalyticsTypeInfo> deviceAnalyticsTypeInfo(
 StatisticsCameraData Reporter::fullDeviceStatistics(CameraDataEx&& deviceInfo)
 {
     using namespace nx::vms::api::analytics;
+
+    StatisticsCameraData result = toStatisticsData(std::move(deviceInfo));
+
     const auto commonModule = this->commonModule();
     if (!NX_ASSERT(commonModule, "Unable to access common module"))
-        return toStatisticsData(deviceInfo);
+        return result;
 
     const auto resourcePool = commonModule->resourcePool();
     if (!NX_ASSERT(resourcePool, "Unable to access resource pool"))
-        return toStatisticsData(deviceInfo);
+        return result;
 
-    const auto device = resourcePool->getResourceById<QnVirtualCameraResource>(deviceInfo.id);
-    StatisticsCameraData result = toStatisticsData(deviceInfo);
+    auto device = resourcePool->getResourceById<QnVirtualCameraResource>(deviceInfo.id);
     if (!device)
         return result;
 

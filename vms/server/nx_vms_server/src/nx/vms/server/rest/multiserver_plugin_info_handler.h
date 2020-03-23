@@ -30,15 +30,15 @@ public:
 
 private:
     void loadLocalData(
-        nx::vms::api::ExtendedPluginInfoList* outExtendedPluginInfoList);
+        nx::vms::api::PluginInfoExList* outExtendedPluginInfoList);
 
     void loadRemoteDataAsync(
-        nx::vms::api::ExtendedPluginInfoList* outExtendedPluginInfoList,
+        nx::vms::api::PluginInfoExList* outExtendedPluginInfoList,
         JsonRequestContext* inOutRequestContext,
         const QnMediaServerResourcePtr& server);
 
     void onRemoteRequestCompletion(
-        nx::vms::api::ExtendedPluginInfoList* outExtendedPluginInfoList,
+        nx::vms::api::PluginInfoExList* outExtendedPluginInfoList,
         JsonRequestContext* inOutRequestContext,
         const QnMediaServerResourcePtr& server,
         const HttpRequestContext& httpRequestContext);

@@ -2549,24 +2549,28 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/restoreState", new QnRestoreStateRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/setupLocalSystem
-     * Configure server system name and password. This function can be called for server with
-     * default system name. Otherwise function returns error. This method requires owner
-     * permissions.
+     * Configure Server's VMS System name and password. Can be called only for a Server with the
+     *     default System name, otherwise, returns an error.
      * %permissions Owner.
-     * %param:string password New password for admin user
-     * %param:string systemName New system name
+     * %param:string password New password for "admin" user.
+     * %param:string systemName New System name.
+     * %param[opt]:object systemSettings JSON object containing a map of the VMS System settings
+     *     (can be obtained via GET /api/systemSettings) that will be applied to the created System
+     *     in addition to (on top of) the default ones.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/setupCloudSystem
-     * Configure server system name and attach it to cloud. This function can be called for server
-     * with default system name. Otherwise function returns error. This method requires owner
-     * permissions.
+     * Configure Server's VMS System name, and attach the System to the Cloud. Can be called only
+     *     for a Server with the default System name, otherwise, returns an error.
      * %permissions Owner.
-     * %param:string systemName New system name
-     * %param:string cloudAuthKey could authentication key
-     * %param:string cloudSystemID could system id
+     * %param:string systemName New System name.
+     * %param:string cloudAuthKey Could authentication key.
+     * %param:string cloudSystemID Could System id.
+     * %param[opt]:object systemSettings JSON object containing a map of the VMS System settings
+     *     (can be obtained via GET /api/systemSettings) that will be applied to the created System
+     *     in addition to (on top of) the default ones.
      * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(serverModule(), cloudManagerGroup), kAdmin);
@@ -2576,21 +2580,21 @@ void MediaServerProcess::registerRestHandlers(
      * the joinable System is called the target System. The <b>URL</b> parameter sets the
      * target Server which should be joined with the current System. Other servers, that are
      * merged with the target Server will be joined if parameter <b>mergeOneServer</b> is set
-     * to false. <br/> The method uses digest authentication. Two hashes should be previouly
+     * to false. <br/> The method uses digest authentication. Two hashes should be previously
      * calculated: <b>getKey</b> and <b>postKey</b>. Both are mandatory. The calculation
-     * algorithm is described in <b>Calculating authentication hash</b> section (in the bootom
+     * algorithm is described in <b>Calculating authentication hash</b> section (in the bottom
      * of the page). While calculating hashes, username and password of the target Server are
      * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
      * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
      * %permissions Owner.
      * %param:string currentPassword Current user password.
-     * %param:string url URL of one Server in the target System to join. URL may contain credentials
-     *     for target System, in that case getKey and postKey are not required. The target System
-     *     user should have Owner permissions as well.
+     * %param:string url URL of one Server in the target System to join. The URL may contain
+     *     credentials for the target System, in that case getKey and postKey are not required.
+     *     The target System user should have Owner permissions as well.
      * %param[opt]:string getKey Authorization key ("auth" param) for GET requests to the target
-     *     System. Required if URL does not contain credentials.
+     *     System. Required if the URL does not contain credentials.
      * %param[opt]:string postKey Authorization key ("auth" param) for POST requests to the target
-     *     System. Required if URL does not contain credentials.
+     *     System. Required if the URL does not contain credentials.
      * %param[opt]:boolean takeRemoteSettings Direction of the merge. Default value is false. If
      *     <b>mergeOneServer</b> is true, <b>takeRemoteSettings</b> parameter is ignored and
      *     treated as false.
@@ -2629,7 +2633,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %value "UNCONFIGURED_SYSTEM" Cannot merge to the unconfigured system.
      *         %value "UNKNOWN_ERROR" something unexpected has happend.
      *         %value "DUPLICATE_MEDIASERVER_FOUND" Cannot merge Systems because they have at least
-     *             one server with the same ID.
+     *             one Server with the same id.
      */
     reg("api/mergeSystems", new QnMergeSystemsRestHandler(serverModule()), kAdmin);
 
@@ -3108,14 +3112,14 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:array reply List of JSON objects with the following structure:
-     *         %struct ExtendedPluginInfo
+     *         %struct PluginInfoEx
      */
     reg("api/pluginInfo",
         new nx::vms::server::rest::PluginInfoHandler(serverModule()));
 
     /**%apidoc GET /ec2/pluginInfo
      * %param:boolean isLocal If true, data is collected only from the Server that received the
-     *     request. Otherwise data is collected from all online Servers in the system.
+     *     request. Otherwise data is collected from all online Servers in the System.
      * %return:object JSON object with an error code, error string, and a list with information
      *     about Server plugins on success.
      *     %param:string error Error code, "0" means no error.
@@ -3123,7 +3127,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:object reply Map containing per Server information about Plugins.
      *         %param:string key Unique id of a Server
      *         %param:object value
-     *             %struct ExtendedPluginInfo
+     *             %struct PluginInfoEx
      */
     reg(nx::vms::server::rest::MultiserverPluginInfoHandler::kPath,
         new nx::vms::server::rest::MultiserverPluginInfoHandler(serverModule()));

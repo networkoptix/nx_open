@@ -318,8 +318,11 @@ bool QnRtspClientArchiveDelegate::openInternal()
     if (m_rtspSession->isOpened())
         return true;
 
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_parsers.clear();
+    }
     m_frameCnt = 0;
-    m_parsers.clear();
     m_closing = false;
     m_lastMediaFlags = -1;
     m_sessionTimeout.invalidate();

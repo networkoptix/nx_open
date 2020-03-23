@@ -14,7 +14,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
 
-#include <nx/statistics/settings.h>
+#include <nx/vms/statistics/settings.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/scoped_thread_rollback.h>
@@ -136,7 +136,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
 
     const QString configApi = globalSettings->statisticsReportServerApi();
     const QString serverApi = configApi.isEmpty()
-        ? nx::statistics::kDefaultStatisticsServer
+        ? nx::vms::statistics::kDefaultStatisticsServer
         : configApi;
 
     const nx::utils::Url url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
@@ -217,8 +217,8 @@ bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash
     QObject::connect(httpClient.get(), &nx::network::http::AsyncHttpClient::done,
                     report, &ReportData::finishReport, Qt::DirectConnection);
 
-    httpClient->setUserName(nx::statistics::kDefaultUser);
-    httpClient->setUserPassword(nx::statistics::kDefaultPassword);
+    httpClient->setUserName(nx::vms::statistics::kDefaultUser);
+    httpClient->setUserPassword(nx::vms::statistics::kDefaultPassword);
     httpClient->setAdditionalHeaders(report->makeHttpHeaders());
 
     QnMutexLocker lock(&m_mutex);

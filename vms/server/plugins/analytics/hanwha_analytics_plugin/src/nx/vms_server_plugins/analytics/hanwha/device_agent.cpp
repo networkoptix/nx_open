@@ -241,7 +241,7 @@ void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dat
         //std::cout << outcomingPacket->count() << std::endl;
 
         outObjectPacket->setTimestampUs(ts);
-        outObjectPacket->setDurationUs(1'000'000); // 1 second
+        outObjectPacket->setDurationUs(1'000'000); //< 1 second
 
         if (NX_ASSERT(m_handler))
             m_handler->handleMetadata(outObjectPacket.get());
@@ -263,8 +263,6 @@ void DeviceAgent::doSetSettings(
     }
 
     int c = sourceMap->count();
-    //std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> m_engine->sharedContext(m_sharedId);
-
     auto errorMap = makePtr<nx::sdk::StringMap>();
 
     // Here we use temporary error map, because setting empty exclude area leads to false

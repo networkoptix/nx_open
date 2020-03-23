@@ -1,6 +1,7 @@
 #include "synchronous_tcp_server.h"
 
 #include <nx/network/system_socket.h>
+#include <nx/utils/random.h>
 
 namespace nx {
 namespace network {
@@ -152,6 +153,30 @@ void SynchronousPingPongServer::processDataReceived(
         return;
 
     connection->send(m_pong.data(), (unsigned int) m_pong.size());
+}
+
+//-------------------------------------------------------------------------------------------------
+
+SynchronousSpamServer::SynchronousSpamServer(
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket)
+    :
+    base_type(std::move(serverSocket))
+{
+}
+
+void SynchronousSpamServer::processDataReceived(
+    AbstractStreamSocket* connection,
+    const char* /*data*/,
+    int /*dataSize*/)
+{
+    auto buffer = nx::utils::random::generate(16 * 1024);
+
+    for (;;)
+    {
+        const auto bytesSent = connection->send(buffer.data(), (unsigned int) buffer.size());
+        if (bytesSent <= 0)
+            break;
+    }
 }
 
 } // namespace test

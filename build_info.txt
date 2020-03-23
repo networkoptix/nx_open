@@ -7,6 +7,7 @@ platform=@platform@
 platformModification=@modification@
 changeSet=@changeSet@
 branch=@branch@
+currentRefs=@currentRefs@
 beta=@beta_bool@
 brand=@customization.brand@
 protoVersion=@vmsProtocolVersion@

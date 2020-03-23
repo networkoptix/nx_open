@@ -96,7 +96,7 @@ public:
 
     void unloadPlugins();
 
-    nx::vms::api::ExtendedPluginInfoList extendedPluginInfoList() const;
+    nx::vms::api::PluginInfoExList extendedPluginInfoList() const;
 
     /** @return Never null; if not found, fails an assertion and returns a stub structure. */
     std::shared_ptr<const nx::vms::api::PluginInfo> pluginInfo(

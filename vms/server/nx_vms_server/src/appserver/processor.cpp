@@ -192,9 +192,8 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource) const
 {
     QString uniqueId = cameraResource->getUniqueId();
-    bool resourceExists = static_cast<bool>(
-        resourcePool()->getResourceByUniqueId(uniqueId)
-    );
+    QnResourcePtr rpRes = resourcePool()->getResourceByUniqueId(uniqueId);
+    bool resourceExists = static_cast<bool>(rpRes);
     if (cameraResource->hasFlags(Qn::search_upd_only) && !resourceExists)
         return;   //ignoring newly discovered camera
 
@@ -242,7 +241,6 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
             res->emitModificationSignals( modifiedFields );
     }
 
-    QnResourcePtr rpRes = resourcePool()->getResourceById(apiCameraData.id);
     if (rpRes)
     {
         NX_VERBOSE(this, "Reiniting resource [%1]", rpRes);

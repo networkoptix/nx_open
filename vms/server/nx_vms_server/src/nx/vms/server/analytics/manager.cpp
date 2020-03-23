@@ -369,7 +369,7 @@ std::unique_ptr<metrics::PluginResourceBindingInfoHolder> Manager::bindingInfoHo
         if (!device || !isLocalDevice(device))
         {
             NX_DEBUG(this,
-                "Unable to find the Device with id %1 (but its analytics context exists)",
+                "Unable to find the Device with id %1 (but its Analytics context exists)",
                 deviceId);
             continue;
         }

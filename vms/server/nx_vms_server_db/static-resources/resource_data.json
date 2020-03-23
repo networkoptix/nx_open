@@ -1246,8 +1246,7 @@
                 "H264|N51820L",
                 "onvif|v047-1",
                 "iPIXA|*",
-                "Rhodium|RBU-PZ-4461-EB",
-                "UNIVIEW|IPC6322SR-X22*"
+                "Rhodium|RBU-PZ-4461-EB"
             ],
             "onvifPtzPresetsEnabled": true
         },

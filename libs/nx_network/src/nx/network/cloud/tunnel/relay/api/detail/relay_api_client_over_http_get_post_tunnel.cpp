@@ -91,8 +91,8 @@ void ClientOverHttpGetPostTunnel::openDownChannel(
 
     (*tunnelCtxIter)->httpClient =
         std::make_unique<nx::network::http::AsyncClient>();
-    if (timeout())
-        (*tunnelCtxIter)->httpClient->setTimeouts({*timeout(), *timeout(), *timeout()});
+    if (auto timeoutVal = timeout())
+        (*tunnelCtxIter)->httpClient->setTimeouts({*timeoutVal, *timeoutVal, *timeoutVal});
 
     (*tunnelCtxIter)->httpClient->bindToAioThread(getAioThread());
     (*tunnelCtxIter)->httpClient->setOnResponseReceived(

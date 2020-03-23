@@ -103,6 +103,7 @@ copyLibs()
         'libnx_clusterdb*'
         'libnx_discovery_api_client*'
         'libtraffic_relay*'
+        'libnx_analytics_db.so'
     )
 
     for LIB in "$BUILD_DIR/lib"/*.so*
