@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.218",
+    "version": "1.0.1.251",
     "data": [
         {
             "keys": [
@@ -3990,6 +3990,33 @@
                         "device":  [-1, 0.9, -0.8, -0.7, -0.6,  -0.5, -0.4,  -0.3, -0.2,  -0.1, 0,  0.1, 0.2, 0.3, 0.4,  0.5, 0.6, 0.7, 0.8,  0.9, 1],
                         "logical": [1, 1.01, 1.111, 1.212, 1.313, 1.515, 1.717, 1.818, 2.02, 2.222, 2.474, 2.828, 3.282, 3.888, 4.595, 5.505, 6.717, 8.282, 10.353, 13.151, 21.212],
                         "logicalMultiplier": 36.5,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment": "Calibration for camera fw ver. 43.7.0.73-r7",
+            "keys": [
+                "Milesight*|MS-C5341*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [ 1,    -1],
+                        "logical": [180, -180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [ -1,   1],
+                        "logical": [  0, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0.04, 0.10, 0.13, 0.17, 0.26, 0.43, 0.70, 0.87, 1.00],
+                        "logical": [1.00, 1.72, 2.22, 3.17, 4.44, 6.81, 10.00, 12.39, 14.44],
+                        "logicalMultiplier": 35,
                         "space": "35MmEquiv"
                     }
                 }
