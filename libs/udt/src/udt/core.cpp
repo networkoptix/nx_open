@@ -2206,7 +2206,7 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
     return payloadSize;
 }
 
-Result<> CUDT::processData(CUnit* unit)
+Result<> CUDT::processData(Unit* unit)
 {
     CPacket& packet = unit->packet();
 

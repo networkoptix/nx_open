@@ -145,161 +145,6 @@ static SendedPacketVerifier packetVerifier;
 
 //-------------------------------------------------------------------------------------------------
 
-CUnit::CUnit(CUnitQueue* unitQueue):
-    m_unitQueue(unitQueue)
-{
-}
-
-CPacket& CUnit::packet()
-{
-    return m_Packet;
-}
-
-void CUnit::setFlag(Flag val)
-{
-    if (m_iFlag == val)
-        return;
-
-    m_iFlag = val;
-
-    if (m_iFlag == Flag::free_)
-        m_unitQueue->decCount();
-    else if (m_iFlag == Flag::occupied)
-        m_unitQueue->incCount();
-}
-
-CUnit::Flag CUnit::flag() const
-{
-    return m_iFlag;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-CUnitQueue::CUnitQueue() = default;
-
-CUnitQueue::~CUnitQueue()
-{
-    CQEntry* p = m_pQEntry;
-
-    while (p != nullptr)
-    {
-        CQEntry* q = p;
-        if (p == m_pLastQueue)
-            p = nullptr;
-        else
-            p = p->next;
-        delete q;
-    }
-}
-
-int CUnitQueue::init(int size, int mss)
-{
-    m_iSize = size;
-    m_iMSS = mss;
-
-    auto tempq = makeEntry(size).release();
-
-    m_pQEntry = m_pCurrQueue = m_pLastQueue = tempq;
-    m_pQEntry->next = m_pQEntry;
-
-    m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-
-    return 0;
-}
-
-int CUnitQueue::increase()
-{
-    if (!m_pQEntry)
-        return -1;
-
-    // adjust/correct m_iCount
-    int real_count = 0;
-    CQEntry* p = m_pQEntry;
-    while (p != nullptr)
-    {
-        real_count += (int) std::count_if(
-            p->unitQueue.begin(), p->unitQueue.end(),
-            [](const auto& unit) { return unit.flag() != CUnit::Flag::free_; });
-
-        if (p == m_pLastQueue)
-            p = nullptr;
-        else
-            p = p->next;
-    }
-    m_iCount = real_count;
-    if (double(real_count) / m_iSize < 0.9)
-        return -1;
-
-    // all queues have the same size.
-    const auto size = m_pQEntry->unitQueue.size();
-
-    auto tempq = makeEntry(size).release();
-
-    m_pLastQueue->next = tempq;
-    m_pLastQueue = tempq;
-    m_pLastQueue->next = m_pQEntry;
-
-    m_iSize += size;
-
-    return 0;
-}
-
-int CUnitQueue::shrink()
-{
-    // currently queue cannot be shrunk.
-    return -1;
-}
-
-CUnit* CUnitQueue::getNextAvailUnit()
-{
-    if (m_iCount * 10 > m_iSize * 9)
-        increase();
-
-    if (m_iCount >= m_iSize)
-        return nullptr;
-
-    CQEntry* entrance = m_pCurrQueue;
-
-    do
-    {
-        for (CUnit* sentinel = &m_pCurrQueue->unitQueue.back();
-            m_pAvailUnit <= sentinel;
-            ++m_pAvailUnit)
-        {
-            if (m_pAvailUnit->flag() == CUnit::Flag::free_)
-                return m_pAvailUnit;
-        }
-
-        if (m_pCurrQueue->unitQueue.front().flag() == CUnit::Flag::free_)
-        {
-            m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-            return m_pAvailUnit;
-        }
-
-        m_pCurrQueue = m_pCurrQueue->next;
-        m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-    } while (m_pCurrQueue != entrance);
-
-    increase();
-
-    return nullptr;
-}
-
-std::unique_ptr<CUnitQueue::CQEntry> CUnitQueue::makeEntry(std::size_t size)
-{
-    std::vector<CUnit> unitQueue;
-    unitQueue.reserve(size);
-    for (std::size_t i = 0; i < size; ++i)
-    {
-        unitQueue.push_back(CUnit(this));
-        unitQueue.back().packet().payload().resize(m_iMSS);
-    }
-
-    return std::make_unique<CQEntry>(std::move(unitQueue));
-}
-
-//-------------------------------------------------------------------------------------------------
-
 CSndUList::CSndUList(
     CTimer* timer,
     std::mutex* windowLock,
@@ -842,7 +687,7 @@ void CRcvQueue::worker()
         }
 
         // find next available slot for incoming packet
-        CUnit* unit = m_UnitQueue.getNextAvailUnit();
+        Unit* unit = m_UnitQueue.getNextAvailUnit();
         if (!unit)
         {
             // TODO: #ak Actual read may happen much later, so buffer size should be checked
@@ -912,7 +757,7 @@ void CRcvQueue::timerCheck()
 }
 
 Result<> CRcvQueue::processUnit(
-    CUnit* unit,
+    Unit* unit,
     const detail::SocketAddress& addr)
 {
     int32_t id = unit->packet().m_iID;
