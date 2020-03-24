@@ -1,5 +1,7 @@
 #include "unit_queue.h"
 
+#include <algorithm>
+
 Unit::Unit(UnitQueue* unitQueue):
     m_unitQueue(unitQueue)
 {
