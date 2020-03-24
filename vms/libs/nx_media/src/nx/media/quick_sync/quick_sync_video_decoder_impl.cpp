@@ -1,3 +1,4 @@
+
 #include "quick_sync_video_decoder_impl.h"
 
 #include <deque>
@@ -5,6 +6,7 @@
 
 #include <QtMultimedia/QVideoFrame>
 
+#include <utils/media/nalUnits.h>
 #include "allocators/sysmem_allocator.h"
 #include "allocators/vaapi_allocator.h"
 #include "mfx_sys_qt_video_buffer.h"
@@ -13,14 +15,23 @@
 #include "va_display.h"
 #include "glx/va_glx.h"
 
-
 #define MSDK_ALIGN16(value) (((value + 15) >> 4) << 4) // round up to a multiple of 16
 
 namespace nx::media {
 
 constexpr int kLatencySurfaceCount = 1;
 constexpr int kSyncWaitMsec = 5000;
+constexpr int kMaxBitstreamSizeBytes = 1024 * 1024 * 10;
 
+bool QuickSyncVideoDecoderImpl::isCompatible(AVCodecID codec)
+{
+    if (VaDisplay::getDisplay() == nullptr)
+        return false;
+
+    if (codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265)
+        return true;
+    return false;
+}
 
 QuickSyncVideoDecoderImpl::QuickSyncVideoDecoderImpl()
 {
@@ -185,7 +196,7 @@ bool QuickSyncVideoDecoderImpl::allocFramesSample(mfxFrameAllocRequest& request)
     return true;
 }
 
-bool QuickSyncVideoDecoderImpl::init(mfxBitstream& bitstream, AVCodecID codedId)
+bool QuickSyncVideoDecoderImpl::init(mfxBitstream& bitstream, AVCodecID codec)
 {
     memset(&m_mfxDecParams, 0, sizeof(m_mfxDecParams));
     m_mfxDecParams.AsyncDepth = 4;
@@ -194,15 +205,23 @@ bool QuickSyncVideoDecoderImpl::init(mfxBitstream& bitstream, AVCodecID codedId)
     else
         m_mfxDecParams.IOPattern = MFX_IOPATTERN_OUT_SYSTEM_MEMORY;
 
-    if (codedId == AV_CODEC_ID_H264)
+    if (codec == AV_CODEC_ID_H264)
+    {
        m_mfxDecParams.mfx.CodecId = MFX_CODEC_AVC;
-    else if (codedId == AV_CODEC_ID_H265)
+    }
+    else if (codec == AV_CODEC_ID_H265)
+    {
        m_mfxDecParams.mfx.CodecId = MFX_CODEC_HEVC;
+    }
     else
+    {
+        NX_DEBUG(this, "Failed to init decoder, codec not supported: %1", codec);
         return false;
+    }
 
     if (!initSession())
         return false;
+
 
     mfxStatus status = MFXVideoDECODE_DecodeHeader(m_mfxSession, &bitstream, &m_mfxDecParams);
     if (status < MFX_ERR_NONE)
@@ -280,8 +299,14 @@ int QuickSyncVideoDecoderImpl::decode(
     memset(&bitstream, 0, sizeof(bitstream));
     if (frame) // TODO make flush
     {
+        if (m_bitstreamData.size() + frame->dataSize() > kMaxBitstreamSizeBytes)
+        {
+            NX_DEBUG(this, "Bitstream size too big: %1, clear ...", m_bitstreamData.size());
+            m_bitstreamData.clear();
+        }
         m_bitstreamData.insert(
             m_bitstreamData.end(), frame->data(), frame->data() + frame->dataSize());
+
         bitstream.Data = (mfxU8*)m_bitstreamData.data();
         bitstream.DataLength = m_bitstreamData.size();
         bitstream.MaxLength = m_bitstreamData.size();
@@ -297,6 +322,13 @@ int QuickSyncVideoDecoderImpl::decode(
             NX_ERROR(this, "Fatal: failed to initialize decoder, empty frame");
             return -1;
         }
+
+        if (!frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+        {
+            m_bitstreamData.clear();
+            return 0;
+        }
+
         if (!init(bitstream, frame->compressionType))
         {
             NX_ERROR(this, "Failed to init quick sync video decoder");

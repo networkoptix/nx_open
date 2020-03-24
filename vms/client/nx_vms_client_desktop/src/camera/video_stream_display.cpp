@@ -421,9 +421,9 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     QnCompressedVideoDataPtr data, bool mtDecoding) const
 {
     QnAbstractVideoDecoder* decoder;
-    if (!m_reverseMode && QuickSyncVideoDecoder::isSupported())
+    if (!m_reverseMode && QuickSyncVideoDecoderOldPlayer::isSupported(data->compressionType))
     {
-        decoder = new QuickSyncVideoDecoder();
+        decoder = new QuickSyncVideoDecoderOldPlayer();
     }
     else
     {

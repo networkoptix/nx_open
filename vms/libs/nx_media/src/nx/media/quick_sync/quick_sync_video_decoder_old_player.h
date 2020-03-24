@@ -7,7 +7,7 @@ namespace nx::media {
     class QuickSyncVideoDecoderImpl;
 }
 
-class QuickSyncVideoDecoder: public QnAbstractVideoDecoder
+class QuickSyncVideoDecoderOldPlayer: public QnAbstractVideoDecoder
 {
 public:
     virtual bool decode(const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutputPtr* const outFrame) override;
@@ -24,7 +24,7 @@ public:
     virtual void setLightCpuMode(DecodeMode val) override;
     virtual void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy) override;
 
-    static bool isSupported();
+    static bool isSupported(AVCodecID codec);
 
 private:
     std::shared_ptr<nx::media::QuickSyncVideoDecoderImpl> m_impl;

@@ -7,9 +7,7 @@ namespace nx::media {
 bool QuickSyncVideoDecoder::isCompatible(
     const AVCodecID codec, const QSize& /*resolution*/, bool /*allowOverlay*/)
 {
-    if (codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265)
-        return true;
-    return false;
+    return QuickSyncVideoDecoderImpl::isCompatible(codec);
 }
 
 QSize QuickSyncVideoDecoder::maxResolution(const AVCodecID /*codec*/)

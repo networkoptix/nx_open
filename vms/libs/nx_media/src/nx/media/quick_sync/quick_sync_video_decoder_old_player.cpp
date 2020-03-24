@@ -5,12 +5,12 @@
 
 #include <utils/media/utils.h>
 
-bool QuickSyncVideoDecoder::isSupported()
+bool QuickSyncVideoDecoderOldPlayer::isSupported(AVCodecID codec)
 {
-    return VaDisplay::getDisplay() != nullptr;
+    return nx::media::QuickSyncVideoDecoderImpl::isCompatible(codec);
 }
 
-bool QuickSyncVideoDecoder::decode(
+bool QuickSyncVideoDecoderOldPlayer::decode(
     const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutputPtr* const outFramePtr)
 {
     if (!outFramePtr || !outFramePtr->data())
@@ -56,47 +56,47 @@ bool QuickSyncVideoDecoder::decode(
     return true;
 }
 
-const AVFrame* QuickSyncVideoDecoder::lastFrame() const
+const AVFrame* QuickSyncVideoDecoderOldPlayer::lastFrame() const
 {
     // TODO
     return nullptr;
 }
 
-void QuickSyncVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& /*data*/)
+void QuickSyncVideoDecoderOldPlayer::resetDecoder(const QnConstCompressedVideoDataPtr& /*data*/)
 {
     NX_DEBUG(this, "Reset decoder");
     m_impl.reset();
 }
 
-int QuickSyncVideoDecoder::getWidth() const
+int QuickSyncVideoDecoderOldPlayer::getWidth() const
 {
     return m_resolution.width();
 }
-int QuickSyncVideoDecoder::getHeight() const
+int QuickSyncVideoDecoderOldPlayer::getHeight() const
 {
     return m_resolution.height();
 }
 
-AVPixelFormat QuickSyncVideoDecoder::GetPixelFormat() const
+AVPixelFormat QuickSyncVideoDecoderOldPlayer::GetPixelFormat() const
 {
     return AV_PIX_FMT_NV12;
 }
 
-MemoryType QuickSyncVideoDecoder::targetMemoryType() const
+MemoryType QuickSyncVideoDecoderOldPlayer::targetMemoryType() const
 {
     return MemoryType::VideoMemory;
 }
 
-double QuickSyncVideoDecoder::getSampleAspectRatio() const
+double QuickSyncVideoDecoderOldPlayer::getSampleAspectRatio() const
 {
     // TODO
     return 1.0;
 }
 
-void QuickSyncVideoDecoder::setLightCpuMode(DecodeMode /*val*/)
+void QuickSyncVideoDecoderOldPlayer::setLightCpuMode(DecodeMode /*val*/)
 {
     // TODO
 }
 
-void QuickSyncVideoDecoder::setMultiThreadDecodePolicy(MultiThreadDecodePolicy /*mtDecodingPolicy*/)
+void QuickSyncVideoDecoderOldPlayer::setMultiThreadDecodePolicy(MultiThreadDecodePolicy /*mtDecodingPolicy*/)
 {}

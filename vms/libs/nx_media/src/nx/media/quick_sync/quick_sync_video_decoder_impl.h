@@ -21,8 +21,10 @@ public:
 
     void** getRenderingSurface() { return &m_renderingSurface; }
 
+    static bool isCompatible(AVCodecID codec);
+
 private:
-    bool init(mfxBitstream& bitstream, AVCodecID codedId);
+    bool init(mfxBitstream& bitstream, AVCodecID codec);
     bool initSession();
     bool allocFrames();
 
