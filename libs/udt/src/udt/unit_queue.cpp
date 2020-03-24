@@ -32,7 +32,17 @@ Unit::Flag Unit::flag() const
 
 //-------------------------------------------------------------------------------------------------
 
-UnitQueue::UnitQueue() = default;
+UnitQueue::UnitQueue(int initialQueueSize, int bufferSize):
+    m_iSize(initialQueueSize),
+    m_iMSS(bufferSize)
+{
+    auto tempq = makeEntry(m_iSize).release();
+
+    m_pQEntry = m_pCurrQueue = m_pLastQueue = tempq;
+    m_pQEntry->next = m_pQEntry;
+
+    m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
+}
 
 UnitQueue::~UnitQueue()
 {
@@ -49,19 +59,52 @@ UnitQueue::~UnitQueue()
     }
 }
 
-int UnitQueue::init(int size, int mss)
+std::shared_ptr<Unit> UnitQueue::takeNextAvailUnit()
 {
-    m_iSize = size;
-    m_iMSS = mss;
+    if (m_iCount * 10 > m_iSize * 9)
+        increase();
 
-    auto tempq = makeEntry(size).release();
+    if (m_iCount >= m_iSize)
+        return nullptr;
 
-    m_pQEntry = m_pCurrQueue = m_pLastQueue = tempq;
-    m_pQEntry->next = m_pQEntry;
+    CQEntry* entrance = m_pCurrQueue;
 
-    m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
+    do
+    {
+        for (Unit* sentinel = &m_pCurrQueue->unitQueue.back();
+            m_pAvailUnit <= sentinel;
+            ++m_pAvailUnit)
+        {
+            if (m_pAvailUnit->flag() == Unit::Flag::free_)
+                return wrapUnitPtr(m_pAvailUnit);
+        }
 
-    return 0;
+        if (m_pCurrQueue->unitQueue.front().flag() == Unit::Flag::free_)
+        {
+            m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
+            return wrapUnitPtr(m_pAvailUnit);
+        }
+
+        m_pCurrQueue = m_pCurrQueue->next;
+        m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
+    } while (m_pCurrQueue != entrance);
+
+    increase();
+
+    return nullptr;
+}
+
+std::unique_ptr<UnitQueue::CQEntry> UnitQueue::makeEntry(std::size_t size)
+{
+    std::vector<Unit> unitQueue;
+    unitQueue.reserve(size);
+    for (std::size_t i = 0; i < size; ++i)
+    {
+        unitQueue.push_back(Unit(this));
+        unitQueue.back().packet().payload().resize(m_iMSS);
+    }
+
+    return std::make_unique<CQEntry>(std::move(unitQueue));
 }
 
 int UnitQueue::increase()
@@ -101,56 +144,12 @@ int UnitQueue::increase()
     return 0;
 }
 
-int UnitQueue::shrink()
+std::shared_ptr<Unit> UnitQueue::wrapUnitPtr(Unit* unit)
 {
-    // currently queue cannot be shrunk.
-    return -1;
-}
-
-Unit* UnitQueue::getNextAvailUnit()
-{
-    if (m_iCount * 10 > m_iSize * 9)
-        increase();
-
-    if (m_iCount >= m_iSize)
-        return nullptr;
-
-    CQEntry* entrance = m_pCurrQueue;
-
-    do
-    {
-        for (Unit* sentinel = &m_pCurrQueue->unitQueue.back();
-            m_pAvailUnit <= sentinel;
-            ++m_pAvailUnit)
+    return std::shared_ptr<Unit>(
+        unit,
+        [](Unit* unit)
         {
-            if (m_pAvailUnit->flag() == Unit::Flag::free_)
-                return m_pAvailUnit;
-        }
-
-        if (m_pCurrQueue->unitQueue.front().flag() == Unit::Flag::free_)
-        {
-            m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-            return m_pAvailUnit;
-        }
-
-        m_pCurrQueue = m_pCurrQueue->next;
-        m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-    } while (m_pCurrQueue != entrance);
-
-    increase();
-
-    return nullptr;
-}
-
-std::unique_ptr<UnitQueue::CQEntry> UnitQueue::makeEntry(std::size_t size)
-{
-    std::vector<Unit> unitQueue;
-    unitQueue.reserve(size);
-    for (std::size_t i = 0; i < size; ++i)
-    {
-        unitQueue.push_back(Unit(this));
-        unitQueue.back().packet().payload().resize(m_iMSS);
-    }
-
-    return std::make_unique<CQEntry>(std::move(unitQueue));
+            unit->setFlag(Unit::Flag::free_);
+        });
 }

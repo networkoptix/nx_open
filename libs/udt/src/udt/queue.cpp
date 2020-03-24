@@ -631,6 +631,7 @@ CRcvQueue::CRcvQueue(
     AbstractUdpChannel* c,
     CTimer* t)
     :
+    m_UnitQueue(size, payload),
     m_channel(c),
     m_timer(t),
     m_iIPversion(ipVersion),
@@ -639,8 +640,6 @@ CRcvQueue::CRcvQueue(
     m_pRendezvousQueue(std::make_unique<CRendezvousQueue>())
 {
     assert(m_iPayloadSize > 0);
-
-    m_UnitQueue.init(size, payload);
 }
 
 CRcvQueue::~CRcvQueue()
@@ -687,7 +686,7 @@ void CRcvQueue::worker()
         }
 
         // find next available slot for incoming packet
-        Unit* unit = m_UnitQueue.getNextAvailUnit();
+        auto unit = m_UnitQueue.takeNextAvailUnit();
         if (!unit)
         {
             // TODO: #ak Actual read may happen much later, so buffer size should be checked
@@ -720,7 +719,7 @@ void CRcvQueue::worker()
         tracePacket("recv", addr, m_channel->getSockAddr(), unit->packet());
 #endif
 
-        processUnit(unit, addr);
+        processUnit(std::move(unit), addr);
         // Ignoring error since the socket could be removed before connect finished.
 
         timerCheck();
@@ -757,7 +756,7 @@ void CRcvQueue::timerCheck()
 }
 
 Result<> CRcvQueue::processUnit(
-    Unit* unit,
+    std::shared_ptr<Unit> unit,
     const detail::SocketAddress& addr)
 {
     int32_t id = unit->packet().m_iID;
@@ -792,7 +791,7 @@ Result<> CRcvQueue::processUnit(
                 if (u->connected() && !u->broken() && !u->isClosing())
                 {
                     if (unit->packet().getFlag() == PacketFlag::Data)
-                        u->processData(unit); // TODO: #ak It is unclear why the result is ignored.
+                        u->processData(std::move(unit)); // TODO: #ak It is unclear why the result is ignored.
                     else
                         u->processCtrl(unit->packet());
 

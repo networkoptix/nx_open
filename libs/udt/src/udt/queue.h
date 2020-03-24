@@ -358,7 +358,8 @@ private:
      */
     void timerCheck();
 
-    Result<> processUnit(Unit* unit, const detail::SocketAddress& addr);
+    Result<> processUnit(
+        std::shared_ptr<Unit> unit, const detail::SocketAddress& addr);
 
     std::thread m_WorkerThread;
 

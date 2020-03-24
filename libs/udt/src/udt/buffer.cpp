@@ -332,16 +332,9 @@ CRcvBuffer::CRcvBuffer(int bufsize):
     m_pUnit.resize(m_iSize);
 }
 
-CRcvBuffer::~CRcvBuffer()
-{
-    for (int i = 0; i < m_iSize; ++i)
-    {
-        if (NULL != m_pUnit[i])
-            m_pUnit[i]->setFlag(Unit::Flag::free_);
-    }
-}
+CRcvBuffer::~CRcvBuffer() = default;
 
-bool CRcvBuffer::addData(Unit* unit, int offset)
+bool CRcvBuffer::addData(std::shared_ptr<Unit> unit, int offset)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -378,9 +371,7 @@ int CRcvBuffer::readBuffer(char* data, int len)
 
         if ((rs > unitsize) || (rs == m_pUnit[p]->packet().getLength() - m_iNotch))
         {
-            Unit* tmp = m_pUnit[p];
-            m_pUnit[p] = NULL;
-            tmp->setFlag(Unit::Flag::free_);
+            m_pUnit[p] = nullptr;
 
             if (++p == m_iSize)
                 p = 0;
@@ -417,9 +408,7 @@ int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
 
         if ((rs > unitsize) || (rs == m_pUnit[p]->packet().getLength() - m_iNotch))
         {
-            Unit* tmp = m_pUnit[p];
-            m_pUnit[p] = NULL;
-            tmp->setFlag(Unit::Flag::free_);
+            m_pUnit[p] = nullptr;
 
             if (++p == m_iSize)
                 p = 0;
@@ -504,11 +493,7 @@ int CRcvBuffer::readMsg(char* data, int len)
         }
 
         if (!passack)
-        {
-            Unit* tmp = m_pUnit[p];
-            m_pUnit[p] = NULL;
-            tmp->setFlag(Unit::Flag::free_);
-        }
+            m_pUnit[p] = nullptr;
         else
             m_pUnit[p]->setFlag(Unit::Flag::outOfOrder);
 
@@ -573,9 +558,7 @@ bool CRcvBuffer::scanMsg(
                 break;
         }
 
-        Unit* tmp = m_pUnit[m_iStartPos];
-        m_pUnit[m_iStartPos] = NULL;
-        tmp->setFlag(Unit::Flag::free_);
+        m_pUnit[m_iStartPos] = nullptr;
 
         if (++m_iStartPos == m_iSize)
             m_iStartPos = 0;

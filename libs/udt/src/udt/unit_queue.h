@@ -6,7 +6,7 @@
 
 class UnitQueue;
 
-struct Unit
+struct UDT_API Unit
 {
     enum class Flag
     {
@@ -32,54 +32,23 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class UnitQueue
+/**
+ * Provides empty buffers for reading into.
+ * Reuses buffers that are no longer in use.
+ * The whole point of this class is to minimize memory allocation count.
+ */
+class UDT_API UnitQueue
 {
 public:
-    UnitQueue();
+    UnitQueue(int initialQueueSize, int bufferSize);
     ~UnitQueue();
 
     UnitQueue(const UnitQueue&) = delete;
     UnitQueue& operator=(const UnitQueue&) = delete;
 
-public:
-
-    // Functionality:
-    //    Initialize the unit queue.
-    // Parameters:
-    //    1) [in] size: queue size
-    //    2) [in] mss: maximum segament size
-    //    3) [in] version: IP version
-    // Returned value:
-    //    0: success, -1: failure.
-
-    int init(int size, int mss);
-
-    // Functionality:
-    //    Increase (double) the unit queue size.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    0: success, -1: failure.
-
-    int increase();
-
-    // Functionality:
-    //    Decrease (halve) the unit queue size.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    0: success, -1: failure.
-
-    int shrink();
-
-    // Functionality:
-    //    find an available unit for incoming packet.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    Pointer to the available unit, NULL if not found.
-
-    Unit* getNextAvailUnit();
+    // Finds an available unit for incoming packet.
+    // @return Pointer to the available unit, NULL if not found.
+    std::shared_ptr<Unit> takeNextAvailUnit();
 
     int decCount() { return --m_iCount; }
     int incCount() { return ++m_iCount; }
@@ -110,4 +79,15 @@ private:
 
 private:
     std::unique_ptr<CQEntry> makeEntry(std::size_t size);
+
+    // Functionality:
+    //    Increase (double) the unit queue size.
+    // Parameters:
+    //    None.
+    // Returned value:
+    //    0: success, -1: failure.
+
+    int increase();
+
+    std::shared_ptr<Unit> wrapUnitPtr(Unit* unit);
 };

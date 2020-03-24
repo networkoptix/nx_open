@@ -2206,7 +2206,7 @@ int CUDT::packData(CPacket& packet, std::chrono::microseconds& ts)
     return payloadSize;
 }
 
-Result<> CUDT::processData(Unit* unit)
+Result<> CUDT::processData(std::shared_ptr<Unit> unit)
 {
     CPacket& packet = unit->packet();
 
@@ -2233,7 +2233,7 @@ Result<> CUDT::processData(Unit* unit)
     if ((offset < 0) || (offset >= m_pRcvBuffer->getAvailBufSize()))
         return Error(UDT::ProtocolError::outOfWindowDataReceived);
 
-    if (!m_pRcvBuffer->addData(unit, offset))
+    if (!m_pRcvBuffer->addData(std::move(unit), offset))
         return Error(UDT::ProtocolError::retransmitReceived);
 
     // Loss detection.

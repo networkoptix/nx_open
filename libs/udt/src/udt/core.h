@@ -370,7 +370,7 @@ public: // internal API
     void sendCtrl(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
     void processCtrl(CPacket& ctrlpkt);
     int packData(CPacket& packet, std::chrono::microseconds& ts);
-    Result<> processData(Unit* unit);
+    Result<> processData(std::shared_ptr<Unit> unit);
 
     void checkTimers(bool forceAck);
 
