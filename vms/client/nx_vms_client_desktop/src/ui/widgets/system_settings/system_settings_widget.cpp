@@ -191,6 +191,11 @@ bool QnSystemSettingsWidget::hasChanges() const
     return false;
 }
 
+QWidget* QnSystemSettingsWidget::languageComboBox() const
+{
+    return ui->languageComboBox;
+}
+
 void QnSystemSettingsWidget::setReadOnlyInternal(bool readOnly)
 {
     using ::setReadOnly;

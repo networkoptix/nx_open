@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QAction>
+#include <QtGui/QResizeEvent>
 
 #include <api/runtime_info_manager.h>
 
@@ -39,6 +40,31 @@ static const int kMaxSystemNameLength = 64;
 
 static const int kPreferencesButtonSize = 104;
 static const QMargins kPreferencesButtonMargins(8, 4, 8, 4);
+
+// This class is used to align two widgets width.
+// We  can't use our standard Aligner for them, since one of them is Expanding.
+class Resizer: public QObject
+{
+public:
+    Resizer(QWidget* target, QObject* parent = nullptr):
+        QObject(parent),
+        target(target)
+    {
+    }
+
+    virtual bool eventFilter(QObject* watched, QEvent* event) override
+    {
+        if (event->type() == QEvent::Resize)
+        {
+            const auto reseizeEvent = static_cast<QResizeEvent*>(event);
+            target->setFixedWidth(reseizeEvent->size().width());
+        }
+        return false;
+    }
+
+private:
+    QWidget* target;
+};
 
 } // namespace
 
@@ -164,6 +190,9 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
         &SecuritySettingsWidget::forceVideoTrafficEncryptionChanged,
         ui->forceVideoEncryptionWarning,
         &QWidget::setVisible);
+
+    ui->securityGroupBox->installEventFilter(
+        new Resizer(ui->systemSettingsWidget->languageComboBox(), this));
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()

@@ -28,6 +28,9 @@ public:
     virtual bool hasChanges() const override;
     virtual void retranslateUi() override;
 
+    // Used by QnGeneralSystemAdministrationWidget to align widgets.
+    QWidget* languageComboBox() const;
+
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;
 

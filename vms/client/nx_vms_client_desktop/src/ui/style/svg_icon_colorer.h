@@ -18,10 +18,13 @@ public:
     }
 
     QByteArray makeNormalIcon() const { return makeIcon(); }
-    QByteArray makeDisabledIcon() const { return makeIcon("dark14", "dark17", "_disabled"); }
-    QByteArray makeSelectedIcon() const { return makeIcon("light4", "light1", "_selected"); }
-    QByteArray makeActiveIcon() const { return makeIcon("brand_core", "brand_l2", "_active"); }
-    QByteArray makeErrorIcon() const { return makeIcon("red_l2", "red_l3", "_error"); }
+    QByteArray makeDisabledIcon() const { return makeIcon("dark14", "dark17", /*FIXME*/"windowText", "_disabled"); }
+    QByteArray makeSelectedIcon() const { return makeIcon("light4", "light1", "light", "_selected"); }
+    QByteArray makeActiveIcon() const { return makeIcon("brand_core", "brand_l2", "light14", "_active"); }
+    QByteArray makeErrorIcon() const { return makeIcon("red_l2", "red_l3", /*FIXME*/"windowText", "_error"); }
+    //< TODO: Perhaps we need to do something with our coloring mechanics
+    // since our designers have started to use svg icons in Text Buttons,
+    // whose Disabled state uses opacity and Error state is not specified.
 
 private:
     void initializeDump();
@@ -31,6 +34,7 @@ private:
     QByteArray makeIcon(
         const QString& primaryColorName,
         const QString& secondaryColorName,
+        const QString& windowTextColorName,
         const QString& suffix) const;
     QByteArray substituteColors(const QMap<QString, QString>& colorSubstitutions) const;  //< Default #XXXXXX to updated #YYYYYY.
     int getNextColorPos(int startPos) const;

@@ -53,14 +53,17 @@ QString SvgIconColorer::colorStringValue(const QString& name) const
 
 QByteArray SvgIconColorer::makeIcon(const QString& primaryColorName,
         const QString& secondaryColorName,
+        const QString& windowTextColorName,
         const QString& suffix) const
 {
     static const QString basePrimaryColor = QColor("#a5b7c0").name(); //< Value of light10 in default customization.
     static const QString baseSecondaryColor = QColor("#e1e7eA").name(); //< Value of light4 in default customization.
+    static const QString windowTextColor = QColor("#698796").name(); //< Value of light16 ('windowText').
 
     QByteArray result = substituteColors(QMap<QString, QString>{
         {basePrimaryColor, colorStringValue(primaryColorName)},
-        {baseSecondaryColor, colorStringValue(secondaryColorName)}});
+        {baseSecondaryColor, colorStringValue(secondaryColorName)},
+        {windowTextColor, colorStringValue(windowTextColorName)}});
 
     dumpIconIfNeeded(result, suffix);
 
