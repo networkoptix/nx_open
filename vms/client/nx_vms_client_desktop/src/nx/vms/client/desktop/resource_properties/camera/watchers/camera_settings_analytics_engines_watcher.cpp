@@ -54,7 +54,7 @@ public:
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_engineNameChanged(const QnResourcePtr& resource);
     void at_engineManifestChanged(const AnalyticsEngineResourcePtr& engine);
-    void at_connectionOpened();
+    void at_initialResourcesReceived();
     void at_connectionClosed();
 
 public:
@@ -78,7 +78,7 @@ CameraSettingsAnalyticsEnginesWatcher::Private::Private(
         return;
 
     connect(messageProcessor, &QnCommonMessageProcessor::initialResourcesReceived,
-        this, &Private::at_connectionOpened);
+        this, &Private::at_initialResourcesReceived);
     connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed,
         this, &Private::at_connectionClosed);
 
@@ -88,7 +88,7 @@ CameraSettingsAnalyticsEnginesWatcher::Private::Private(
         this, &Private::at_resourceRemoved);
 
     if (messageProcessor->connectionStatus()->state() == QnConnectionState::Ready)
-        at_connectionOpened();
+        at_initialResourcesReceived();
 }
 
 QList<AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::Private::engineInfoList() const
@@ -115,7 +115,7 @@ QList<AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::Private::engin
     return enginesList;
 }
 
-void CameraSettingsAnalyticsEnginesWatcher::Private::at_connectionOpened()
+void CameraSettingsAnalyticsEnginesWatcher::Private::at_initialResourcesReceived()
 {
     NX_ASSERT(!m_online);
     m_online = true;
@@ -128,7 +128,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_connectionOpened()
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_connectionClosed()
 {
-    NX_ASSERT(m_online);
+    // Do not assert here as we can get connection closed before resources are received.
     m_online = false;
 }
 
