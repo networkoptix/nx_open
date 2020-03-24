@@ -27,6 +27,19 @@ namespace nx::analytics::db {
 
 static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
 
+QString toString(ChownMode mode)
+{
+    switch (mode)
+    {
+        case ChownMode::recursive: return "recursive";
+        case ChownMode::nonRecursive: return "nonRecursive";
+        case ChownMode::mountPoint: return "mountPoint";
+    }
+
+    NX_ASSERT(false);
+    return "?";
+}
+
 //-------------------------------------------------------------------------------------------------
 
 EventsStorage::EventsStorage(
@@ -94,11 +107,13 @@ std::vector<EventsStorage::PathAndMode> EventsStorage::enumerateSqlFiles(const Q
     for (const auto& ext: possibleExtensions)
         result.push_back(std::make_tuple(baseName + ext, ChownMode::nonRecursive));
 
+    NX_DEBUG(NX_SCOPE_TAG, "%1(%2) -> %3", __func__, dbFileName, result.size());
     return result;
 }
 
 bool EventsStorage::initialize(const Settings& settings)
 {
+    NX_INFO(this, "Initialize in %1", settings.path);
     if (m_dbController)
     {
         NX_ASSERT(false, "Reinitializing is not supported by this class.");
@@ -117,7 +132,11 @@ bool EventsStorage::initialize(const Settings& settings)
     m_dbController = std::make_unique<DbController>(dbConnectionOptions);
     const auto archivePath = closeDirPath(settings.path) + "archive/";
 
-    if (!makePath(archivePath)
+    // Security huck: we have to set chmod 755, otherwise SQLite will not be able to manage DB on
+    // this disk drive due to QT SQLite driver limitations.
+    const auto diskMountPoint = QDir(settings.path).absoluteFilePath("..");
+    if (!makeWritable({{diskMountPoint, ChownMode::mountPoint}})
+        || !makePath(archivePath)
         || !makeWritable({
             {settings.path, ChownMode::nonRecursive},
             {archivePath, ChownMode::nonRecursive}})

@@ -389,6 +389,14 @@ bool SystemCommands::changeOwner(const std::string& path, int uid, int gid, bool
     return execute(command.str()) == 0;
 }
 
+bool SystemCommands::makeReadable(const std::string& directoryPath)
+{
+    if (!checkOwnerPermissions(directoryPath) || execute("chmod 755 '" + directoryPath + "'"))
+        return false;
+
+    return true;
+}
+
 bool SystemCommands::makeDirectory(const std::string& directoryPath)
 {
     if (!checkOwnerPermissions(directoryPath) || execute("mkdir -p '" + directoryPath + "'"))

@@ -25,6 +25,11 @@ bool SystemCommands::changeOwner(
     return true;
 }
 
+bool SystemCommands::makeReadable(const std::string& directoryPath)
+{
+    return false;
+}
+
 bool SystemCommands::makeDirectory(const std::string& directoryPath)
 {
     return false;

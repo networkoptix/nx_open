@@ -55,6 +55,9 @@ public:
     /** Changes path ownership to real UID and GID. */
     bool changeOwner(const std::string& path, int uid, int gid, bool isRecursive);
 
+    /** Changes path permission so every user can read it. */
+    bool makeReadable(const std::string& directoryPath);
+
     /** Creates directory and gives ownership to real UID and GID. */
     bool makeDirectory(const std::string& directoryPath);
 

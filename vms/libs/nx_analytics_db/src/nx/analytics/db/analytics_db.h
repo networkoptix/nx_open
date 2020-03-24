@@ -27,6 +27,15 @@ class QnCommonModule;
 
 namespace nx::analytics::db {
 
+enum class ChownMode
+{
+    recursive,
+    nonRecursive,
+    mountPoint,
+};
+
+QString toString(ChownMode mode);
+
 class NX_ANALYTICS_DB_API EventsStorage:
     public AbstractEventsStorage
 {
@@ -71,12 +80,6 @@ public:
     virtual std::optional<nx::sql::QueryStatistics> statistics() const override;
 
 protected:
-    enum class ChownMode
-    {
-        recursive,
-        nonRecursive
-    };
-
     using PathAndMode = std::tuple<QString, ChownMode>;
 
     /**

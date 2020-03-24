@@ -134,10 +134,11 @@ private:
 
     QVector<IndexRecord> m_index;
     IndexHeader m_indexHeader;
+
 protected:
-    QString m_dataDir;
-    QString m_uniqueId;
-    int m_channel;
+    const QString m_dataDir;
+    const QString m_uniqueId;
+    const int m_channel;
 };
 
 } // namespace nx::vms::metadata

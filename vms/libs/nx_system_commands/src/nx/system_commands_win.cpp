@@ -22,6 +22,11 @@ bool SystemCommands::changeOwner(const std::string& /*path*/, int uid, int gid, 
     return true;
 }
 
+bool SystemCommands::makeReadable(const std::string& /*directoryPath*/)
+{
+    return true;
+}
+
 bool SystemCommands::makeDirectory(const std::string& directoryPath)
 {
     return QDir().mkpath(QString::fromStdString(directoryPath));

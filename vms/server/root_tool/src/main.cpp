@@ -48,9 +48,11 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                 };
         };
 
-    factory.reg({"mkdir"}, {"path"},
+    factory.reg(
+        {"mkdir"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::makeDirectory, systemCommands, _1)))
-    .reg({"rm"}, {"path"},
+    .reg(
+        {"rm"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::removePath, systemCommands, _1)))
     .reg(
         {"chown"}, {"path", "uid", "gid", "opt_recursive"},
@@ -67,6 +69,9 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             sendInt64(transportFd, result);
             return result ? Result::ok : Result::execFailed;
         })
+    .reg(
+        {"makeReadable"}, {"path"},
+        oneArgAction(std::bind(&nx::SystemCommands::makeReadable, systemCommands, _1)))
     .reg(
         {"mount"}, {"url", "path", "opt_user", "opt_password"},
         [systemCommands](const std::string& command, int transportFd)

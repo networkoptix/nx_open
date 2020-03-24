@@ -95,26 +95,28 @@ bool AnalyticsDb::makeWritable(const std::vector<PathAndMode>& pathAndModeList)
     {
         const ChownMode mode = std::get<ChownMode>(entry);
         const QString path = std::get<QString>(entry);
-        const QString modeString = mode == ChownMode::recursive ? "recursive" : "non-recursive";
         const auto rootFs = m_mediaServerModule->rootFileSystem();
 
         if (!rootFs->isPathExists(path))
         {
-            NX_DEBUG(
-                this,
+            NX_DEBUG(this,
                 "Requested to change owner for a path %1, but it doesn't exist. Skipping.", path);
+            continue;
+        }
+
+        if (mode == ChownMode::mountPoint && !rootFs->makeReadable(path))
+        {
+            NX_WARNING(this, "Failed to make readable. Mode: %1. Path: %2", mode, path);
             continue;
         }
 
         if (!rootFs->changeOwner(path, mode == ChownMode::recursive))
         {
-            NX_WARNING(
-                this, "Failed to change access rights. Mode: %1. Path: %2", modeString, path);
+            NX_WARNING(this, "Failed to change access rights. Mode: %1. Path: %2", mode, path);
             return false;
         }
 
-        NX_DEBUG(
-            this, "Suceeded to change access rights. Mode: %1. Path: %2", modeString, path);
+        NX_DEBUG(this, "Succeed to change access rights. Mode: %1. Path: %2", mode, path);
     }
 
     return true;
