@@ -1239,7 +1239,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 }
                 case ActionType::buzzerAction:
                 {
-                    return !filtered.isEmpty() || m_actionParams.useSource;
+                    return !filtered.isEmpty() || actionIsUsingSourceServer();
                 }
                 default:
                     break;

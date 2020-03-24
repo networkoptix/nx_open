@@ -199,9 +199,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->eventResourcesWidget->setVisible(isResourceRequired);
 
         initEventParameters();
-
-        if (m_model->actionIsUsingSourceServer())
-            setActionResourcesHolderDisplayFromModel(ui->actionResourcesHolder, m_model.get());
     }
 
     if (fields & Field::eventState)
@@ -217,7 +214,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->eventResourcesHolder->setIcon(iconHelper(m_model->data(Column::source,
             Qt::DecorationRole).value<QIcon>()));
 
-        if (m_model->actionIsUsingSourceServer())
+        if (vms::event::requiresServerResource(m_model->actionType()))
             setActionResourcesHolderDisplayFromModel(ui->actionResourcesHolder, m_model.get());
     }
 
