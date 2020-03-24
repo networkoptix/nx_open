@@ -145,17 +145,30 @@ static SendedPacketVerifier packetVerifier;
 
 //-------------------------------------------------------------------------------------------------
 
+CUnit::CUnit(CUnitQueue* unitQueue):
+    m_unitQueue(unitQueue)
+{
+}
+
 CPacket& CUnit::packet()
 {
     return m_Packet;
 }
 
-void CUnit::setFlag(int val)
+void CUnit::setFlag(Flag val)
 {
+    if (m_iFlag == val)
+        return;
+
     m_iFlag = val;
+
+    if (m_iFlag == Flag::free_)
+        m_unitQueue->decCount();
+    else if (m_iFlag == Flag::occupied)
+        m_unitQueue->incCount();
 }
 
-int CUnit::flag() const
+CUnit::Flag CUnit::flag() const
 {
     return m_iFlag;
 }
@@ -181,24 +194,15 @@ CUnitQueue::~CUnitQueue()
 
 int CUnitQueue::init(int size, int mss)
 {
-    auto tempq = new CQEntry;
-    auto tempb = Buffer(size * mss);
+    m_iSize = size;
+    m_iMSS = mss;
 
-    tempq->unitQueue = std::vector<CUnit>(size);
-    for (std::size_t i = 0; i < tempq->unitQueue.size(); ++i)
-    {
-        tempq->unitQueue[i].setFlag(0);
-        tempq->unitQueue[i].packet().setPayload(tempb.substr(i * mss));
-    }
-    tempq->m_pBuffer = std::move(tempb);
+    auto tempq = makeEntry(size).release();
 
     m_pQEntry = m_pCurrQueue = m_pLastQueue = tempq;
     m_pQEntry->next = m_pQEntry;
 
     m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-
-    m_iSize = size;
-    m_iMSS = mss;
 
     return 0;
 }
@@ -215,7 +219,7 @@ int CUnitQueue::increase()
     {
         real_count += (int) std::count_if(
             p->unitQueue.begin(), p->unitQueue.end(),
-            [](const auto& unit) { return unit.flag() != 0; });
+            [](const auto& unit) { return unit.flag() != CUnit::Flag::free_; });
 
         if (p == m_pLastQueue)
             p = nullptr;
@@ -226,19 +230,10 @@ int CUnitQueue::increase()
     if (double(real_count) / m_iSize < 0.9)
         return -1;
 
-    // all queues have the same size
+    // all queues have the same size.
     const auto size = m_pQEntry->unitQueue.size();
 
-    auto tempq = new CQEntry;
-    Buffer tempb(size * m_iMSS);
-
-    tempq->unitQueue = std::vector<CUnit>(size);
-    for (std::size_t i = 0; i < tempq->unitQueue.size(); ++i)
-    {
-        tempq->unitQueue[i].setFlag(0);
-        tempq->unitQueue[i].packet().setPayload(tempb.substr(i * m_iMSS));
-    }
-    tempq->m_pBuffer = std::move(tempb);
+    auto tempq = makeEntry(size).release();
 
     m_pLastQueue->next = tempq;
     m_pLastQueue = tempq;
@@ -268,14 +263,14 @@ CUnit* CUnitQueue::getNextAvailUnit()
     do
     {
         for (CUnit* sentinel = &m_pCurrQueue->unitQueue.back();
-            m_pAvailUnit != sentinel;
+            m_pAvailUnit <= sentinel;
             ++m_pAvailUnit)
         {
-            if (m_pAvailUnit->flag() == 0)
+            if (m_pAvailUnit->flag() == CUnit::Flag::free_)
                 return m_pAvailUnit;
         }
 
-        if (m_pCurrQueue->unitQueue.front().flag() == 0)
+        if (m_pCurrQueue->unitQueue.front().flag() == CUnit::Flag::free_)
         {
             m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
             return m_pAvailUnit;
@@ -288,6 +283,19 @@ CUnit* CUnitQueue::getNextAvailUnit()
     increase();
 
     return nullptr;
+}
+
+std::unique_ptr<CUnitQueue::CQEntry> CUnitQueue::makeEntry(std::size_t size)
+{
+    std::vector<CUnit> unitQueue;
+    unitQueue.reserve(size);
+    for (std::size_t i = 0; i < size; ++i)
+    {
+        unitQueue.push_back(CUnit(this));
+        unitQueue.back().packet().payload().resize(m_iMSS);
+    }
+
+    return std::make_unique<CQEntry>(std::move(unitQueue));
 }
 
 //-------------------------------------------------------------------------------------------------

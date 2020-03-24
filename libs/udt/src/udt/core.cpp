@@ -2670,7 +2670,7 @@ void CUDT::initializeConnectedSocket(const detail::SocketAddress& addr)
     m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
 
     m_pSndBuffer = std::make_unique<CSndBuffer>(32, m_iPayloadSize);
-    m_pRcvBuffer = std::make_unique<CRcvBuffer>(rcvQueue().unitQueue(), m_iRcvBufSize);
+    m_pRcvBuffer = std::make_unique<CRcvBuffer>(m_iRcvBufSize);
     // after introducing lite ACK, the sndlosslist may not be cleared in time, so it requires twice space.
     m_pSndLossList = std::make_unique<CSndLossList>(m_iFlowWindowSize * 2);
     m_pRcvLossList = std::make_unique<CRcvLossList>(m_iFlightFlagSize);

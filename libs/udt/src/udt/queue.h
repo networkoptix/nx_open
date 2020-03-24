@@ -58,18 +58,31 @@ Yunhong Gu, last updated 01/12/2011
 static constexpr auto kSyncRepeatMinPeriod = std::chrono::milliseconds(250);
 
 class CUDT;
+class CUnitQueue;
 
 struct CUnit
 {
+    enum class Flag
+    {
+        free_ = 0,
+        occupied,
+        outOfOrder, //< msg read but not freed
+        msgDropped,
+    };
+
+    // TODO: #ak There is a dependency loop between CUnitQueue and CUnit.
+    CUnit(CUnitQueue* unitQueue);
+
     CPacket& packet();
 
-    void setFlag(int val);
-    int flag() const;
+    void setFlag(Flag val);
+    Flag flag() const;
 
 private:
     CPacket m_Packet;
     // 0: free, 1: occupied, 2: msg read but not freed (out-of-order), 3: msg dropped.
-    int m_iFlag = 0;
+    Flag m_iFlag = Flag::free_;
+    CUnitQueue* m_unitQueue = nullptr;
 };
 
 class ServerSideConnectionAcceptor;
@@ -126,10 +139,14 @@ public:
 private:
     struct CQEntry
     {
+        // TODO: #ak It makes sense to use a single buffer of (size * m_iMSS) here.
         std::vector<CUnit> unitQueue;
-        Buffer m_pBuffer;
-
         CQEntry* next = nullptr;
+
+        CQEntry(std::vector<CUnit> unitQueue):
+            unitQueue(std::move(unitQueue))
+        {
+        }
     };
 
     CQEntry* m_pQEntry = nullptr;            // pointer to the first unit queue
@@ -144,6 +161,8 @@ private:
     int m_iMSS = 0;            // unit buffer size
 
 private:
+    std::unique_ptr<CQEntry> makeEntry(std::size_t size);
+
     CUnitQueue(const CUnitQueue&);
     CUnitQueue& operator=(const CUnitQueue&);
 };
@@ -434,12 +453,10 @@ public:
     void removeConnector(const UDTSOCKET& id);
 
     void addNewEntry(const std::weak_ptr<CUDT>& u);
-    std::shared_ptr<CUDT> takeNewEntry();
-
-    // The received packet queue.
-    CUnitQueue* unitQueue() { return &m_UnitQueue; }
 
 private:
+    std::shared_ptr<CUDT> takeNewEntry();
+
     void worker();
 
     /**

@@ -162,7 +162,7 @@ private:
 class CRcvBuffer
 {
 public:
-    CRcvBuffer(CUnitQueue* queue, int bufsize = 65536);
+    CRcvBuffer(int bufsize = 65536);
     ~CRcvBuffer();
 
     // Functionality:
@@ -262,7 +262,6 @@ private:
 
     std::vector<CUnit*> m_pUnit;                     // pointer to the protocol buffer
     int m_iSize;                         // size of the protocol buffer
-    CUnitQueue* m_pUnitQueue;        // the shared unit queue
 
     int m_iStartPos;                     // the head position for I/O (inclusive)
     int m_iLastAckPos;                   // the last ACKed position (exclusive)
