@@ -30,7 +30,8 @@ struct NX_VMS_API LicenseData: Data
      *     and for what kind of camera-like devices.</li>
      * <li><code>VERSION</code> VMS version.</li>
      * <li><code>BRAND</code> VMS product name.</li>
-     * <li><code>EXPIRATION</code> Expiration date in format <code>YYYY-MM-DD HH:MM:SS</code>.</li>
+     * <li><code>EXPIRATION</code> Expiration date in format <code>YYYY-MM-DD HH:MM:SS</code>.
+     *     Optional; if omitted, the License lifetime is unlimited.</li>
      * <li><code>SIGNATURE2</code> Digital signature created by the License Server.</li>
      * <li><code>COMPANY</code> VMS vendor.</li>
      * </ul>
