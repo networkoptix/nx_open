@@ -73,7 +73,6 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     m_averageVideoTimePerFrame(0),
     m_droppedFrames(0),
     m_useRealTimeOptimization(false),
-    m_outPacket(av_packet_alloc()),
     m_metrics(metrics),
     m_fixedFrameRate(0)
 {
@@ -98,7 +97,6 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 {
     qFreeAligned(m_videoEncodingBuffer);
     close();
-    av_packet_free(&m_outPacket);
     if (m_metrics)
         m_metrics->transcoders()--;
 }
@@ -287,21 +285,19 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         }
     }
 
-    m_outPacket->data = m_videoEncodingBuffer;
-    m_outPacket->size = kMaxEncodedFrameSize;
+    QnFfmpegAvPacket outPacket(m_videoEncodingBuffer, kMaxEncodedFrameSize);
     int got_packet = 0;
-    int encodeResult = avcodec_encode_video2(m_encoderCtx, m_outPacket, decodedFrame.data(), &got_packet);
-    av_packet_free_side_data(m_outPacket);
+    int encodeResult = avcodec_encode_video2(m_encoderCtx, &outPacket, decodedFrame.data(), &got_packet);
     if (encodeResult < 0)
         return -3;
     if (!got_packet)
         return 0;
 
-    QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size);
+    QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, outPacket.size);
 
     if (m_fixedFrameRate)
     {
-        auto itr = m_frameNumToPts.find(m_outPacket->pts);
+        auto itr = m_frameNumToPts.find(outPacket.pts);
         if (itr != m_frameNumToPts.end())
         {
             resultVideoData->timestamp = itr->second;
@@ -310,12 +306,12 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     }
     else
     {
-        resultVideoData->timestamp = av_rescale_q(m_outPacket->pts, m_encoderCtx->time_base, r);
+        resultVideoData->timestamp = av_rescale_q(outPacket.pts, m_encoderCtx->time_base, r);
     }
 
-    if (m_outPacket->flags & AV_PKT_FLAG_KEY)
+    if (outPacket.flags & AV_PKT_FLAG_KEY)
         resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-    resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, m_outPacket->size); // todo: remove data copy here!
+    resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, outPacket.size); // todo: remove data copy here!
     resultVideoData->compressionType = updateCodec(m_codecId);
 
     if (!m_ctxPtr)
