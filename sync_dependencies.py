@@ -56,6 +56,7 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["ffmpeg"] = "3.1.9-4"
+        v["libva"] = "2.6"
         v["sysroot"] = "xenial-1"
 
     if platform == "macosx":
@@ -108,7 +109,7 @@ def determine_package_versions(
     return v
 
 
-def sync_dependencies(syncher, platform, arch, box, release_version, options={}):
+def sync_dependencies(target, syncher, platform, arch, box, release_version, options={}):
     have_mediaserver = platform not in ("android", "ios", "macosx")
     have_desktop_client = platform in ("windows", "macosx") \
         or (platform == "linux" and (box == "none" or arch == "arm64"))
@@ -134,6 +135,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
             sync("linux_arm64/sdk-gcc")
         else:
             sync("linux-x64/sdk-gcc")
+        if box == "none" and target not in ("linux_arm32", "linux_arm64"):
+            sync("libva")
 
         if options.get("clang"):
             sync("linux/clang")
@@ -333,7 +336,7 @@ def main():
     syncher.rdep.fast_check = not args.force
     syncher.use_local = args.use_local and not args.force
 
-    sync_dependencies(syncher, platform, arch, box, args.release_version, options)
+    sync_dependencies(args.target, syncher, platform, arch, box, args.release_version, options)
 
     syncher.generate_cmake_include(args.cmake_include_file)
 

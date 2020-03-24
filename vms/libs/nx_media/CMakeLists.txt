@@ -4,13 +4,14 @@ nx_add_target(nx_media LIBRARY
         nx_audio common nx_fusion nx_utils dl
         /home/lbusygin/develop/msdk/build/__bin/release/libmfxhw64.so
         /home/lbusygin/develop/msdk/build/__bin/release/libmfx.so
-        /usr/local/lib/libva.so
-        libva-x11.so
+        libva
         X11
         GL
 )
 
-target_include_directories(nx_media PRIVATE ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS} /home/lbusygin/develop/msdk/api/include /usr/local/include)
+
+
+target_include_directories(nx_media PRIVATE ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS} /home/lbusygin/develop/msdk/api/include)
 
 
 if(ANDROID OR IOS)
