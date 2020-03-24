@@ -83,6 +83,7 @@ public:
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
     void setDoNotConfigureCamera(bool value) { m_doNotConfigureCamera = value; }
+    virtual void pleaseStop() override;
 protected:
     QnAbstractCompressedMetadataPtr getMetadata();
     virtual QnMetaDataV1Ptr getCameraMetadata();
@@ -114,7 +115,7 @@ private:
         bool isCameraConfigured);
 
     QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
-
+    void startUnsafe(Priority priority = InheritPriority);
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened.
     // TODO: Find the way to keep it in sync besides pleaseReopenStream() call, which causes delay.
@@ -135,7 +136,7 @@ private:
     QnVirtualCameraResourcePtr m_cameraRes;
     simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
     QElapsedTimer m_resolutionCheckTimer;
-    int m_framesSincePrevMediaStreamCheck;
+    std::atomic<int> m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
 
     QWeakPointer<nx::vms::server::analytics::StreamDataReceptor> m_streamDataReceptor;
@@ -147,6 +148,8 @@ private:
     std::unique_ptr<nx::analytics::MetadataLogger> m_metadataLogger;
     std::atomic_bool m_canStartThread{true};
     QnMetaDataV1Ptr m_lastMotionMetadata;
+    bool m_restartRequested;
+    QnMutex m_startMutex;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
