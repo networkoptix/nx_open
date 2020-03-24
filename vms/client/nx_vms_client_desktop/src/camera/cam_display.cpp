@@ -581,6 +581,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 bool firstWait = true;
                 QTime sleepTimer;
                 sleepTimer.start();
+                bool isAudioSuspended = false;
                 while (!m_afterJump && !m_buffering && !needToStop() && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
                 {
                     qint64 ct = m_extTimeSrc ? m_extTimeSrc->getCurrentTime() : displayedTime;
@@ -594,7 +595,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                     bool doDelayForAudio = m_playAudio
                         && m_audioDisplay->isPlaying()
                         && displayedTime > m_audioDisplay->getCurrentTime()
-                        && m_audioDisplay->msInBuffer() > 0;
+                        && m_audioDisplay->msInBuffer() > 0; //< Audio is ahead video.
                     if ((ct != DATETIME_NOW && speedSign * (displayedTime - ct) > 0)
                         || doDelayForAudio)
                     {
@@ -603,6 +604,11 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                             m_isLongWaiting = speedSign*(displayedTime - ct) > MAX_FRAME_DURATION_MS*1000;
                             if (m_jumpTime != DATETIME_NOW)
                                 m_isLongWaiting &= speedSign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION_MS*1000;
+                            if (m_isLongWaiting && !doDelayForAudio && m_audioDisplay->isPlaying())
+                            {
+                                isAudioSuspended = true;
+                                m_audioDisplay->suspend();
+                            }
 
                             /*
                             qDebug() << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz")
@@ -619,6 +625,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                         break;
                     }
                 }
+                if (isAudioSuspended)
+                    m_audioDisplay->resume();
                 m_isLongWaiting = false;
                 /*
                 if (sleepTimer.elapsed() > 0)

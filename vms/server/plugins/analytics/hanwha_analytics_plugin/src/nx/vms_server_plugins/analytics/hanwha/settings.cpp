@@ -695,7 +695,7 @@ void IvaObjectSize::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIn
 
 void IvaObjectSize::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
 {
-    nx::kit::Json objectSizeInfo = getObjectSizeInfo(channelInfo, "MotionDetection");
+    nx::kit::Json objectSizeInfo = getObjectSizeInfo(channelInfo, "IntelligentVideo");
     sunapiReadOrThrow(objectSizeInfo, frameSize, &constraints);
     initialized = true;
 }

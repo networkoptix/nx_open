@@ -220,10 +220,9 @@ void QnStreamRecorder::close()
         qint64 fileSize = 0;
         if (m_recordingContextVector[i].formatCtx)
         {
+            QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
             if (m_startDateTimeUs != qint64(AV_NOPTS_VALUE))
                 fileSize = m_recordingContextVector[i].storage->getFileSize(m_recordingContextVector[i].fileName);
-
-            QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
 #ifndef SIGN_FRAME_ENABLED
             if (m_needCalcSignature)
                 updateSignatureAttr(&m_recordingContextVector[i]);

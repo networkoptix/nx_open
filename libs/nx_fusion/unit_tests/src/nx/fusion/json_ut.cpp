@@ -143,24 +143,24 @@ const QByteArray kSerializedMapWithCustomStructAsKey = lm(
         .toUtf8();
 
 const QByteArray kMapWithCustomStructAsKeySerializedToArray =
-        "["
-            "{"
-                "\"key\":{"
-                    "\"integerField\":1,"
-                    "\"stringField\":\"someString\","
-                    "\"uuidField\":\"{0adc055b-3507-4c00-b1c7-d2a789b08d64}\""
-                "},"
-                "\"value\":{\"a\":1,\"b\":2,\"c\":3}"
+    "["
+        "{"
+            "\"key\":{"
+                "\"integerField\":1,"
+                "\"stringField\":\"someString\","
+                "\"uuidField\":\"{0adc055b-3507-4c00-b1c7-d2a789b08d64}\""
             "},"
-            "{"
-                "\"key\":{"
-                    "\"integerField\":2,"
-                    "\"stringField\":\"somethingElse\","
-                    "\"uuidField\":\"{251c6b73-674c-4773-a8fc-2577d7a0ecf6}\""
-                "},"
-                "\"value\":{\"a\":4,\"b\":5,\"c\":6}"
-            "}"
-        "]";
+            "\"value\":{\"a\":1,\"b\":2,\"c\":3}"
+        "},"
+        "{"
+            "\"key\":{"
+                "\"integerField\":2,"
+                "\"stringField\":\"somethingElse\","
+                "\"uuidField\":\"{251c6b73-674c-4773-a8fc-2577d7a0ecf6}\""
+            "},"
+            "\"value\":{\"a\":4,\"b\":5,\"c\":6}"
+        "}"
+    "]";
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((IntMockData), (json), _Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
@@ -484,6 +484,35 @@ TEST_F(QnJsonTextFixture, deserializeMapFromArray)
     std::map<MapKey, IntMockData> deserialized;
     ASSERT_TRUE(QJson::deserialize(kMapWithCustomStructAsKeySerializedToArray, &deserialized));
     ASSERT_EQ(kMapWithCustomStructAsKey, deserialized);
+}
+
+TEST_F(QnJsonTextFixture, deserializeMapWithUuidAsKey)
+{
+    static const std::map<QnUuid, int> kExpectedMap = {{kFirstUuid, 1}, {kSecondUuid, 2}};
+    static const QByteArray kSerializedMap =
+        lm(R"json({"%1":1,"%2":2})json").args(kFirstUuid, kSecondUuid).toUtf8();
+
+    std::map<QnUuid, int> actualMap;
+    ASSERT_TRUE(QJson::deserialize(kSerializedMap, &actualMap));
+    ASSERT_EQ(actualMap, kExpectedMap);
+}
+
+TEST_F(QnJsonTextFixture, deserializeMapWithIntegerAsKey)
+{
+    static const std::map<int, int> kExpectedMap = {{1, 1}, {2, 2}};
+    static const QByteArray kSerializedMap(R"json({"1":1,"2":2})json");
+
+    std::map<int, int> actualMap;
+    ASSERT_TRUE(QJson::deserialize(kSerializedMap, &actualMap));
+    ASSERT_EQ(actualMap, kExpectedMap);
+}
+
+TEST_F(QnJsonTextFixture, deserializeMapWithIncorrectJsonAsKeyFails)
+{
+    static const QByteArray kSerializedMap(R"json({"{a}":1,"{2}":2})json");
+
+    std::map<MapKey, int> result;
+    ASSERT_FALSE(QJson::deserialize(kSerializedMap, &result));
 }
 
 //-------------------------------------------------------------------------------------------------

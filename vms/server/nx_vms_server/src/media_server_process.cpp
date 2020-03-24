@@ -2654,12 +2654,20 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/logLevel
      * Get or set server log level.
-     * %param[opt]:integer id Log id
+     * %param[opt]:integer name Log name
+     *     %value MAIN Main server log
+     *     %value HTTP HTTP log
+     *     %value EC2_TRAN Transaction log
+     *     %value HWID Service log
+     *     %value PERMISSIONS Permissions log
+     * %param[opt]:integer id Log id. Deprecated, use name instead.
      *     %value 0 Main server log
-     *     %value 2 Http log
+     *     %value 1 HTTP log
+     *     %value 2 Service log
      *     %value 3 Transaction log
+     *     %value 4 Permissions log
      * %param[opt]:enum value Target value for log level. More detailed level includes all less
-     *     detailed levels.
+     *     detailed levels. This parameter is ignored if neither name or id is specified.
      *     %value None Disable log.
      *     %value Always Log only the most important messages.
      *     %value Error Log errors.

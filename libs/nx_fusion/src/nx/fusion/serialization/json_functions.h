@@ -36,6 +36,7 @@
 
 #include <nx/utils/collection.h>
 #include <nx/utils/latin1_array.h>
+#include <nx/utils/scope_guard.h>
 
 #include "collection_fwd.h"
 #include "json.h"
@@ -140,7 +141,7 @@ namespace QJsonDetail {
 
         QJsonObject result;
 
-        for(const auto& [key, value]: map)
+        for (const auto& [key, value]: map)
         {
             QJsonValue serializedValue;
             QJson::serialize(ctx, value, &serializedValue);
@@ -222,13 +223,18 @@ namespace QJsonDetail {
         QnCollection::clear(*target);
         QnCollection::reserve(*target, value.size());
 
-        for(auto it = value.begin(); it != value.end(); ++it)
+        for (auto it = value.begin(); it != value.end(); ++it)
         {
             typename Map::key_type deserializedKey;
-            if (!QJson::deserialize(ctx, it.key().toUtf8(), &deserializedKey))
-                return false;
 
-            if(!QJson::deserialize(ctx, it.value(), &(*target)[deserializedKey]))
+            {
+                nx::utils::ScopeGuard([ctx]() { ctx->setIsMapKeyDeserializationMode(false); });
+                ctx->setIsMapKeyDeserializationMode(true);
+                if (!QJson::deserialize(ctx, it.key().toUtf8(), &deserializedKey))
+                    return false;
+            }
+
+            if (!QJson::deserialize(ctx, it.value(), &(*target)[deserializedKey]))
                 return false;
         }
 
@@ -601,5 +607,13 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (QUrl)
     (QFont),
     (json))
+
+#define QN_FUSION_REGISTER_DIRECT_OBJECT_KEY_SERIALIZER(TYPE)\
+template<> \
+struct HasDirectObjectKeySerializer<TYPE>: public std::true_type \
+{ \
+};
+
+QN_FUSION_REGISTER_DIRECT_OBJECT_KEY_SERIALIZER(QnUuid)
 
 void qnJsonFunctionsUnitTest();

@@ -79,7 +79,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     m_softMotionLastChannel(0),
     m_videoChannels(1),
     m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1),
-    m_metadataReceptor(new MetadataDataReceptor())
+    m_metadataReceptor(new MetadataDataReceptor()),
+    m_restartRequested(false)
 {
     QnMotionEstimation::Config config;
     if (serverModule())
@@ -135,10 +136,24 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
     }
+
+    connect(this, &QThread::finished,  this,
+        [this]()
+        {
+            QnMutexLocker lock(&m_startMutex);
+            if (m_restartRequested)
+                startUnsafe();
+        }, Qt::DirectConnection);
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
 {
+    {
+        QnMutexLocker lock(&m_startMutex);
+        m_restartRequested = false;
+    }
+    stop();
+
     directDisconnectAll();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         qFreeAligned(m_motionMaskBinData[i]);
@@ -629,22 +644,40 @@ bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResource* netRes)
 
 void QnLiveStreamProvider::startIfNotRunning()
 {
-    QnMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_startMutex);
     if (!isRunning())
     {
         m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
-        start();
+        startUnsafe();
     }
+    else if (m_needStop)
+    {
+        m_restartRequested = true;
+    }
+}
+
+void QnLiveStreamProvider::pleaseStop()
+{
+    QnMutexLocker lock(&m_startMutex);
+    QnAbstractMediaStreamDataProvider::pleaseStop();
 }
 
 void QnLiveStreamProvider::start(Priority priority)
 {
+    QnMutexLocker lock(&m_startMutex);
+    startUnsafe(priority);
+}
+
+void QnLiveStreamProvider::startUnsafe(Priority priority)
+{
+    m_restartRequested = false;
     if (m_canStartThread)
         QnAbstractMediaStreamDataProvider::start(priority);
 }
 
 void QnLiveStreamProvider::disableStartThread()
 {
+    QnMutexLocker lock(&m_startMutex);
     m_canStartThread = false;
 }
 
