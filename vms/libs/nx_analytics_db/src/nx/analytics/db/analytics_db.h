@@ -34,7 +34,7 @@ enum class ChownMode
     mountPoint,
 };
 
-QString toString(ChownMode mode);
+QString NX_ANALYTICS_DB_API toString(ChownMode mode);
 
 class NX_ANALYTICS_DB_API EventsStorage:
     public AbstractEventsStorage
