@@ -82,6 +82,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     m_metadataReceptor(new MetadataDataReceptor()),
     m_restartRequested(false)
 {
+    moveToThread(serverModule()->thread()); //< To make sure QueuedConnection works.
+
     QnMotionEstimation::Config config;
     if (serverModule())
     {
