@@ -143,7 +143,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
             QnMutexLocker lock(&m_startMutex);
             if (m_restartRequested)
                 startUnsafe();
-        }, Qt::DirectConnection);
+        }, Qt::QueuedConnection);
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
