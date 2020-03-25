@@ -151,7 +151,7 @@ bool CLServerPushStreamReader::postProcessData(const QnAbstractMediaDataPtr& dat
         m_stat[videoData->channelNumber].onData(data);
 
         if (lp)
-            lp->onGotVideoFrame(videoData, m_currentLiveParams, m_openedWithStreamCtrl);
+            lp->onGotVideoFrame(videoData, m_openedWithStreamCtrl);
     }
     else if (audioData)
     {

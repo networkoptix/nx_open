@@ -83,7 +83,7 @@ const QString QnVirtualCameraResource::kDeviceAgentManifestsProperty(
 
 const QString QnVirtualCameraResource::kAnalyzedStreamIndexes(
     "analyzedStreamIndexes");
-	
+
 const QString QnVirtualCameraResource::kWearableClientTimeZone(
     "wearableClientTimeZone");
 
@@ -486,6 +486,8 @@ bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStre
 
 bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo )
 {
+    NX_ASSERT(bitrateInfo.resolution.indexOf('x') > 0, "Resolution: %1", bitrateInfo.resolution);
+
     auto bitrateInfos = QJson::deserialized<CameraBitrates>(
         getProperty(ResourcePropertyKey::kBitrateInfos).toLatin1() );
 

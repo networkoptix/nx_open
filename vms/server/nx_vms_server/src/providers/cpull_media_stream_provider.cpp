@@ -115,7 +115,7 @@ void QnClientPullMediaStreamProvider::run()
             m_stat[videoData->channelNumber].onData(videoData);
 
             if (lp)
-                lp->onGotVideoFrame(videoData, getLiveParams(), isCameraControlRequired());
+                lp->onGotVideoFrame(videoData, isCameraControlRequired());
 
         }
 
