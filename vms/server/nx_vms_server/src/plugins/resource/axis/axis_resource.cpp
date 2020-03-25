@@ -1005,7 +1005,7 @@ int QnPlAxisResource::readAxisParameter(
         }
     }
     NX_VERBOSE(this, "Can't read parameter %1 from url %2. Not Found",
-        paramName, httpClient->url(), result);
+        paramName, httpClient->url());
     return CL_HTTP_BAD_REQUEST;
 }
 
