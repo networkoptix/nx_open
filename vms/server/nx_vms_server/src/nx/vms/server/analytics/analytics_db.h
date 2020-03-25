@@ -6,6 +6,8 @@ class QnMediaServerModule;
 
 namespace nx::vms::server::analytics {
 
+using ChownMode = nx::analytics::db::ChownMode;
+
 class AnalyticsDb:
     public nx::analytics::db::EventsStorage
 {

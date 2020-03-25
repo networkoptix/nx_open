@@ -573,7 +573,11 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
         QString firmware;
         auto status = readAxisParameter(httpClient.get(), AXIS_FIRMWARE_VERSION_PARAM_NAME, &firmware);
         if (status == nx::network::http::StatusCode::ok)
+        {
+            NX_VERBOSE(this, 
+                "Update firmware version to %1 for camera %2", firmware, httpClient->url());
             setFirmware(firmware);
+        }
 
         if (status == nx::network::http::StatusCode::unauthorized)
             return CameraDiagnostics::NotAuthorisedResult(getUrl());
@@ -985,15 +989,23 @@ int QnPlAxisResource::readAxisParameter(
     QList<QPair<QByteArray,QByteArray>> params;
     auto result = readAxisParameters(paramName, httpClient, params);
     if (result != nx::network::http::StatusCode::ok)
+    {
+        NX_VERBOSE(this, "Can't read parameter %1 from url %2, result=%3",
+            paramName, httpClient->url(), result);
         return result;
+    }
     for (auto itr = params.constBegin(); itr != params.constEnd(); ++itr)
     {
         if (itr->first == paramName)
         {
             *paramValue = itr->second;
+            NX_VERBOSE(this, "Successfully read parameter %1=%2 from url %3",
+                paramName, *paramValue, httpClient->url());
             return nx::network::http::StatusCode::ok;
         }
     }
+    NX_VERBOSE(this, "Can't read parameter %1 from url %2. Not Found",
+        paramName, httpClient->url());
     return CL_HTTP_BAD_REQUEST;
 }
 

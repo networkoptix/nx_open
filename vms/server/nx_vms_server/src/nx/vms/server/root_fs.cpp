@@ -223,6 +223,14 @@ bool RootFileSystem::changeOwner(const QString& path, bool isRecursive)
         &receiveInt64Action);
 }
 
+bool RootFileSystem::makeReadable(const QString& path)
+{
+    if (m_ignoreTool)
+        return SystemCommands().makeReadable(path.toStdString());
+
+    return (bool) execViaRootTool("makeReadable " + enquote(path), &receiveInt64Action);
+}
+
 bool RootFileSystem::makeDirectory(const QString& path)
 {
     if (m_ignoreTool)

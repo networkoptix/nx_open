@@ -59,7 +59,6 @@ public:
 
     virtual void onGotVideoFrame(
         const QnCompressedVideoDataPtr& videoData,
-        const QnLiveStreamParams& currentLiveParams,
         bool isCameraControlRequired);
 
     virtual void onGotAudioFrame(const QnCompressedAudioDataPtr& audioData);

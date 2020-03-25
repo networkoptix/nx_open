@@ -413,7 +413,6 @@ void QnLiveStreamProvider::onStreamReopen()
 
 void QnLiveStreamProvider::onGotVideoFrame(
     const QnCompressedVideoDataPtr& compressedFrame,
-    const QnLiveStreamParams& currentLiveParams,
     bool isCameraControlRequired)
 {
     if (!NX_ASSERT(compressedFrame))
@@ -424,7 +423,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
 
     saveMediaStreamParamsIfNeeded(compressedFrame);
     if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
-        saveBitrateIfNeeded(compressedFrame, currentLiveParams, isCameraControlRequired);
+        saveBitrateIfNeeded(compressedFrame, getActualParams(), isCameraControlRequired);
 
     processMetadata(compressedFrame);
 }
@@ -659,6 +658,7 @@ void QnLiveStreamProvider::startIfNotRunning()
 void QnLiveStreamProvider::pleaseStop()
 {
     QnMutexLocker lock(&m_startMutex);
+    m_restartRequested = false;
     QnAbstractMediaStreamDataProvider::pleaseStop();
 }
 
