@@ -1,11 +1,7 @@
 #include "unit_queue.h"
 
 #include <algorithm>
-
-Unit::Unit(UnitQueue* unitQueue):
-    m_unitQueue(unitQueue)
-{
-}
+#include <cassert>
 
 CPacket& Unit::packet()
 {
@@ -14,15 +10,7 @@ CPacket& Unit::packet()
 
 void Unit::setFlag(Flag val)
 {
-    if (m_iFlag == val)
-        return;
-
     m_iFlag = val;
-
-    if (m_iFlag == Flag::free_)
-        m_unitQueue->decCount();
-    else if (m_iFlag == Flag::occupied)
-        m_unitQueue->incCount();
 }
 
 Unit::Flag Unit::flag() const
@@ -33,123 +21,57 @@ Unit::Flag Unit::flag() const
 //-------------------------------------------------------------------------------------------------
 
 UnitQueue::UnitQueue(int initialQueueSize, int bufferSize):
-    m_iSize(initialQueueSize),
-    m_iMSS(bufferSize)
+    m_bufferSize(bufferSize)
 {
-    auto tempq = makeEntry(m_iSize).release();
+    m_availableUnits.resize(initialQueueSize);
 
-    m_pQEntry = m_pCurrQueue = m_pLastQueue = tempq;
-    m_pQEntry->next = m_pQEntry;
-
-    m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
+    std::for_each(
+        m_availableUnits.begin(), m_availableUnits.end(),
+        [this](auto& unit)
+        {
+            unit = std::make_unique<Unit>();
+            unit->packet().payload().resize(m_bufferSize);
+        });
 }
 
 UnitQueue::~UnitQueue()
 {
-    CQEntry* p = m_pQEntry;
-
-    while (p != nullptr)
-    {
-        CQEntry* q = p;
-        if (p == m_pLastQueue)
-            p = nullptr;
-        else
-            p = p->next;
-        delete q;
-    }
+    assert(m_takenUnits == 0);
 }
 
 std::shared_ptr<Unit> UnitQueue::takeNextAvailUnit()
 {
-    if (m_iCount * 10 > m_iSize * 9)
-        increase();
+    std::lock_guard<std::mutex> lock(m_mutex);
 
-    if (m_iCount >= m_iSize)
-        return nullptr;
-
-    CQEntry* entrance = m_pCurrQueue;
-
-    do
+    std::unique_ptr<Unit> unit;
+    if (!m_availableUnits.empty())
     {
-        for (Unit* sentinel = &m_pCurrQueue->unitQueue.back();
-            m_pAvailUnit <= sentinel;
-            ++m_pAvailUnit)
-        {
-            if (m_pAvailUnit->flag() == Unit::Flag::free_)
-                return wrapUnitPtr(m_pAvailUnit);
-        }
-
-        if (m_pCurrQueue->unitQueue.front().flag() == Unit::Flag::free_)
-        {
-            m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-            return wrapUnitPtr(m_pAvailUnit);
-        }
-
-        m_pCurrQueue = m_pCurrQueue->next;
-        m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-    } while (m_pCurrQueue != entrance);
-
-    increase();
-
-    return nullptr;
-}
-
-std::unique_ptr<UnitQueue::CQEntry> UnitQueue::makeEntry(std::size_t size)
-{
-    std::vector<Unit> unitQueue;
-    unitQueue.reserve(size);
-    for (std::size_t i = 0; i < size; ++i)
+        unit = std::move(m_availableUnits.back());
+        m_availableUnits.pop_back();
+    }
+    else
     {
-        unitQueue.push_back(Unit(this));
-        unitQueue.back().packet().payload().resize(m_iMSS);
+        unit = std::make_unique<Unit>();
+        unit->packet().payload().resize(m_bufferSize);
     }
 
-    return std::make_unique<CQEntry>(std::move(unitQueue));
-}
+    ++m_takenUnits;
 
-int UnitQueue::increase()
-{
-    if (!m_pQEntry)
-        return -1;
-
-    // adjust/correct m_iCount
-    int real_count = 0;
-    CQEntry* p = m_pQEntry;
-    while (p != nullptr)
-    {
-        real_count += (int)std::count_if(
-            p->unitQueue.begin(), p->unitQueue.end(),
-            [](const auto& unit) { return unit.flag() != Unit::Flag::free_; });
-
-        if (p == m_pLastQueue)
-            p = nullptr;
-        else
-            p = p->next;
-    }
-    m_iCount = real_count;
-    if (double(real_count) / m_iSize < 0.9)
-        return -1;
-
-    // all queues have the same size.
-    const auto size = m_pQEntry->unitQueue.size();
-
-    auto tempq = makeEntry(size).release();
-
-    m_pLastQueue->next = tempq;
-    m_pLastQueue = tempq;
-    m_pLastQueue->next = m_pQEntry;
-
-    m_iSize += size;
-
-    return 0;
-}
-
-std::shared_ptr<Unit> UnitQueue::wrapUnitPtr(Unit* unit)
-{
+    auto unitPtr = unit.get();
     return std::shared_ptr<Unit>(
-        unit,
-        [](Unit* unit)
+        unitPtr,
+        [this, unit = std::move(unit)](Unit*) mutable
         {
-            unit->setFlag(Unit::Flag::free_);
+            putBack(std::move(unit));
         });
+}
+
+void UnitQueue::putBack(std::unique_ptr<Unit> unit)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    unit->setFlag(Unit::Flag::free_);
+    m_availableUnits.push_back(std::move(unit));
+
+    --m_takenUnits;
 }
