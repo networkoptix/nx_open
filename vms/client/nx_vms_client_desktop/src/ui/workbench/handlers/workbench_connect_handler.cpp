@@ -1015,11 +1015,8 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
 
 void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
 {
-    if (!qnCloudStatusWatcher->isCloudEnabled()
-        || qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
-    {
+    if (!NX_ASSERT(qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut))
         return;
-    }
 
     const auto parameters = menu()->currentParameters(sender());
     QString id = parameters.argument(Qn::CloudSystemIdRole).toString();
@@ -1027,7 +1024,10 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
 
     auto system = qnSystemsFinder->getSystem(id);
     if (!system || !system->isConnectable())
+    {
+        NX_WARNING(this, "System %1 is no longer accessible", id);
         return;
+    }
 
     nx::utils::Url url;
 

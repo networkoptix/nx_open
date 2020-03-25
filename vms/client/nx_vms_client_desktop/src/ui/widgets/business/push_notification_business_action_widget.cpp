@@ -72,7 +72,7 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
 
     setHelpTopic(this, Qn::EventsActions_SendMobileNotification_Help);
 
-    ui->languageButton->setIcon(qnSkin->pixmap("events/push_language.svg"));
+    ui->languageButton->setIcon(qnSkin->icon("events/push_language.svg"));
     connect(ui->languageButton, &QPushButton::clicked, this,
         [this]
         {

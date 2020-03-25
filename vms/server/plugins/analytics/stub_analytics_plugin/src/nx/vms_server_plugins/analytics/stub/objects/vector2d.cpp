@@ -3,6 +3,7 @@
 #include "vector2d.h"
 
 #include <cmath>
+#include <cstdint>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -14,11 +15,11 @@ namespace {
 static float fastInverseSqrt(float number)
 {
     static constexpr float kThreeHalfs = 1.5F;
-    long i;
+    int32_t i;
     float x2, y;
     x2 = number * 0.5F;
     y = number;
-    i = *(long*)& y;
+    i = *(int32_t*)& y;
     i = 0x5f3759df - (i >> 1);
     y = *(float*)& i;
     return y * (kThreeHalfs - (x2 * y * y));

@@ -7,7 +7,6 @@ set(depends
 set(deb_dependencies_list
     "zlib1g (>= 1:1.1.4)"
     "debconf (>= 0.5) | debconf-2.0"
-    "python"
     "psmisc"
     "systemd (>= 229)"
     "cifs-utils"
