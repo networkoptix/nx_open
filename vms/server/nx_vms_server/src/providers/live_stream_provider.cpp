@@ -659,6 +659,7 @@ void QnLiveStreamProvider::startIfNotRunning()
 void QnLiveStreamProvider::pleaseStop()
 {
     QnMutexLocker lock(&m_startMutex);
+    m_restartRequested = false;
     QnAbstractMediaStreamDataProvider::pleaseStop();
 }
 
