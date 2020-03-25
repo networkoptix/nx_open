@@ -257,18 +257,28 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
 
 QnLdapSettingsDialog::~QnLdapSettingsDialog() {}
 
-void QnLdapSettingsDialog::at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString) {
+void QnLdapSettingsDialog::at_testLdapSettingsFinished(
+    int status, const QnLdapUsers &users, int handle, const QString& errorString)
+{
     Q_D(QnLdapSettingsDialog);
 
     if (handle != d->testHandle)
         return;
 
     QString result;
-    if (status != 0 || !errorString.isEmpty()) {
+    if (status != 0 || !errorString.isEmpty())
+    {
         result = tr("Test failed");
-    if (!errorString.isEmpty())
-        result += lit(" (%1)").arg(errorString);
-    } else {
+        if (!errorString.isEmpty())
+        {
+            QString refinedErrorString = errorString.trimmed();
+            if (refinedErrorString.endsWith('.'))
+                refinedErrorString.chop(1);
+            result += lit(" (%1)").arg(refinedErrorString);
+        }
+    }
+    else
+    {
         result = tr("Test completed successfully: %n users found.", 0, users.size());
     }
     d->stopTesting(result);
