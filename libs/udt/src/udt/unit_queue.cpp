@@ -57,12 +57,11 @@ std::shared_ptr<Unit> UnitQueue::takeNextAvailUnit()
 
     ++m_takenUnits;
 
-    auto unitPtr = unit.get();
     return std::shared_ptr<Unit>(
-        unitPtr,
-        [this, unit = std::move(unit)](Unit*) mutable
+        unit.release(),
+        [this](Unit* unit) mutable
         {
-            putBack(std::move(unit));
+            putBack(std::unique_ptr<Unit>(unit));
         });
 }
 
