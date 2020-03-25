@@ -4,6 +4,7 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QMovie>
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QDateTime>
 #include <QtCore/QModelIndex>
 
 #include <api/model/api_model_fwd.h>
@@ -125,6 +126,16 @@ private:
     qint64 m_lastPerformedBackupTimeMs;
     qint64 m_nextScheduledBackupTimeMs;
 
+    enum ScheduleStage
+    {
+        NotScheduled,
+        SheduleJustChanged,
+        ScheduledImmediately,
+        StartedAfterScheduledImmediately,
+        ScheduledInFuture,
+    };
+    ScheduleStage m_nextScheduledBackupStage;
+
     bool m_backupCancelled;
     bool m_updating;
 
@@ -139,4 +150,5 @@ private:
         const QnStorageModelInfoList& storages) const;
     bool hasStoragesChanges(const QnStorageModelInfoList& storages) const;
     bool isServerOnline() const;
+    QDateTime currentServerTime() const;
 };
