@@ -105,6 +105,11 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     m_numberOfChannels.reset();
     setNeedKeyData();
+    resetMediaStatistics();
+}
+
+void QnAbstractMediaStreamDataProvider::resetMediaStatistics()
+{
     auto commonModule = m_resource->commonModule();
     for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
     {

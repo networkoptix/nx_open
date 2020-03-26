@@ -410,6 +410,7 @@ void QnLiveStreamProvider::onStreamReopen()
 {
     m_totalVideoFrames = 0;
     m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES;
+    resetMediaStatistics();
 }
 
 void QnLiveStreamProvider::onGotVideoFrame(
