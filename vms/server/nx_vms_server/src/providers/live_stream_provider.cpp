@@ -174,16 +174,15 @@ QnSharedResourcePointer<QnAbstractVideoCamera> QnLiveStreamProvider::getOwner() 
 void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
+}
 
-    if (role != Qn::ConnectionRole::CR_LiveVideo
-        && role != Qn::ConnectionRole::CR_SecondaryLiveVideo)
-    {
-        return;
-    }
+void QnLiveStreamProvider::beforeRun()
+{
+    QnAbstractMediaStreamDataProvider::beforeRun();
 
     updateSoftwareMotion();
 
-    if (NX_ASSERT(serverModule()))
+    if (NX_ASSERT(serverModule()) && !m_streamDataReceptor)
     {
         m_streamDataReceptor = serverModule()->analyticsManager()->registerMediaSource(
             m_cameraRes->getId(), Qn::toStreamIndex(getRole()));
@@ -201,7 +200,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
             "live_stream_provider_",
             m_cameraRes->getId(),
             /*engineId*/ QnUuid(),
-            role == Qn::ConnectionRole::CR_LiveVideo
+            getRole() == Qn::ConnectionRole::CR_LiveVideo
                 ? nx::vms::api::StreamIndex::primary
                 : nx::vms::api::StreamIndex::secondary);
     }

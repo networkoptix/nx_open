@@ -88,6 +88,7 @@ protected:
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
     bool needHardwareMotion();
+    virtual void beforeRun() override;
     virtual void afterRun() override;
 
     virtual void processMetadata(const QnCompressedVideoDataPtr& compressedFrame);
