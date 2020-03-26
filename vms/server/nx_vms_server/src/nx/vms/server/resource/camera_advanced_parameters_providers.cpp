@@ -207,8 +207,7 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
             }
             else
             {
-                reopenStream(
-                    (m_streamIndex == StreamIndex::primary)
+                reopenStream((m_streamIndex == StreamIndex::primary)
                     ? camera->getPrimaryReader()
                     : camera->getSecondaryReader());
             }
