@@ -5,7 +5,8 @@
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ServerRuntimeEventType,
     (nx::vms::api::ServerRuntimeEventType::undefined, "")
     (nx::vms::api::ServerRuntimeEventType::deviceAgentSettingsMaybeChanged,
-        "deviceAgentSettingsMaybeChanged"))
+        "deviceAgentSettingsMaybeChanged")
+    (nx::vms::api::ServerRuntimeEventType::deviceFootageChanged, "deviceFootageChanged"))
 
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::ServerRuntimeEventType, (numeric)(debug))
 
@@ -21,6 +22,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     DeviceAgentSettingsMaybeChangedData,
     (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
     nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields,
+    (optional, true))
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    DeviceFootageChangedData,
+    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
+    nx_vms_api_DeviceFootageChangedData_Fields,
     (optional, true))
 
 } // namespace nx::vms::api

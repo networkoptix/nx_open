@@ -50,8 +50,9 @@ bool SeekPosition::canJoinPosition(const SeekPosition& value) const
 }
 
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
+    event::ServerRuntimeEventManager* serverRuntimeEventManager,
     const AbstractSharedResourceContext::SharedId& sharedId)
-    :
+    :    
     information([this]() { return loadInformation(); }, kCacheDataTimeout),
     eventStatuses([this]() { return loadEventStatuses(); }, kCacheDataTimeout),
     videoSources([this]() { return loadVideoSources(); }, kCacheDataTimeout),
@@ -60,7 +61,8 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     isBypassSupported([this]() { return checkBypassSupport(); }, kCacheDataTimeout),
     ptzCalibratedChannels([this]() { return loadPtzCalibratedChannels(); }, kCacheDataTimeout),
     m_sharedId(sharedId),
-    m_requestLock(kMaxConcurrentRequestNumber)
+    m_requestLock(kMaxConcurrentRequestNumber),
+    m_serverRuntimeEventManager(serverRuntimeEventManager)
 {
 }
 
@@ -220,6 +222,11 @@ SessionContextPtr HanwhaSharedResourceContext::session(
         strongSessionCtx->sessionId);
 
     return strongSessionCtx;
+}
+
+event::ServerRuntimeEventManager* HanwhaSharedResourceContext::serverRuntimeEventManager() const
+{
+    return m_serverRuntimeEventManager;
 }
 
 OverlappedTimePeriods HanwhaSharedResourceContext::overlappedTimeline(int channelNumber) const

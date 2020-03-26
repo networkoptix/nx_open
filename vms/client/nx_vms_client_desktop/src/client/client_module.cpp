@@ -112,6 +112,7 @@
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager_factory.h>
+#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -221,6 +222,7 @@ QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
 struct QnClientModule::Private
 {
     std::unique_ptr<AnalyticsSettingsManager> analyticsSettingsManager;
+    std::unique_ptr<ServerRuntimeEventConnector> serverRuntimeEventConnector;
 };
 
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
@@ -492,6 +494,9 @@ void QnClientModule::initSingletons()
     d->analyticsSettingsManager = AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
         commonModule->resourcePool(),
         messageProcessor);
+
+    d->serverRuntimeEventConnector =
+        std::make_unique<ServerRuntimeEventConnector>(messageProcessor);
 
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
@@ -811,6 +816,11 @@ nx::vms::client::desktop::ResourceDirectoryBrowser*
 AnalyticsSettingsManager* QnClientModule::analyticsSettingsManager() const
 {
     return d->analyticsSettingsManager.get();
+}
+
+ServerRuntimeEventConnector* QnClientModule::serverRuntimeEventConnector() const
+{
+    return d->serverRuntimeEventConnector.get();
 }
 
 void QnClientModule::initLocalInfo()

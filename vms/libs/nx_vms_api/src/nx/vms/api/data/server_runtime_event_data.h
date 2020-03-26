@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QByteArray>
 
 #include <nx/vms/api/data/data.h>
@@ -13,6 +15,7 @@ enum class ServerRuntimeEventType
 {
     undefined = 0,
     deviceAgentSettingsMaybeChanged = 1,
+    deviceFootageChanged = 2,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerRuntimeEventType)
 
@@ -30,7 +33,7 @@ QN_FUSION_DECLARE_FUNCTIONS(ServerRuntimeEventData,
 
 // Specific event payload -------------------------------------------------------------------------
 
-struct DeviceAgentSettingsMaybeChangedData
+struct NX_VMS_API DeviceAgentSettingsMaybeChangedData
 {
     QnUuid deviceId;
     QnUuid engineId;
@@ -39,6 +42,16 @@ struct DeviceAgentSettingsMaybeChangedData
 #define nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields (deviceId)(engineId)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsMaybeChangedData,
+    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
+    NX_VMS_API)
+
+struct NX_VMS_API DeviceFootageChangedData
+{
+    std::vector<QnUuid> deviceIds;
+};
+
+#define nx_vms_api_DeviceFootageChangedData_Fields (deviceIds)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageChangedData,
     (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
     NX_VMS_API)
 
