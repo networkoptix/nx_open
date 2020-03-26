@@ -41,33 +41,31 @@ namespace LLUtil {
     {
         macHardwareIds.clear();
 
-        std::array<bool, 2> guidCompatibilities = { false, true };
-
         QStringList macs = version >= 4 ? getMacAddressList(hardwareInfo.nics) : QStringList("");
 
         // Workaround issue when in 2.6 hardwareid sometimes calculated without mac address
         if (version >= 4)
             macs << kEmptyMac;
 
-        for (QString mac : macs)
+        for (QString mac: macs)
         {
+            // Depending on OS and it's version may be lower or upper case or reversed,
+            // we have to check all of the variants to make sure that licenses are transferable.
             QStringList hardwareIds;
-            for (bool guidCompatibility : guidCompatibilities)
+            for (const auto& boardUuid: {
+                hardwareInfo.boardUUID, hardwareInfo.compatibilityBoardUUID,
+                hardwareInfo.boardUUID.toLower(), hardwareInfo.compatibilityBoardUUID.toLower(),
+                hardwareInfo.boardUUID.toUpper(), hardwareInfo.compatibilityBoardUUID.toUpper()})
             {
                 QMap<QString, QString> hardwareIdMap;
-                calcHardwareIdMap(hardwareIdMap, hardwareInfo, version, guidCompatibility);
+                calcHardwareIdMap(hardwareIdMap, hardwareInfo, boardUuid, version);
                 hardwareIds << hardwareIdMap[mac];
             }
 
+            hardwareIds.removeDuplicates();
             macHardwareIds << MacAndItsHardwareIds(mac, hardwareIds);
         }
-
-        for (auto& item : macHardwareIds)
-        {
-            item.hwids.removeDuplicates();
-        }
     }
-
 
     QStringList getMacAddressList(const QnMacAndDeviceClassList& devices)
     {

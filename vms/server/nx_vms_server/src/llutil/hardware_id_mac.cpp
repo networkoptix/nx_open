@@ -75,7 +75,7 @@ void fillHardwareIds(QList<QList<LLUtil::MacAndItsHardwareIds> >&, QnHardwareInf
     NX_CRITICAL(false);
 }
 
-void calcHardwareIdMap(QMap<QString, QString>&, const QnHardwareInfo&, int, bool)
+void calcHardwareIdMap(QMap<QString, QString>&, const QnHardwareInfo&, const QString&, int)
 {
     // Unused on macosx, but has to be present to linkage to succeed.
     NX_CRITICAL(false);

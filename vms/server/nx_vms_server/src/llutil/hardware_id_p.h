@@ -32,8 +32,13 @@ private:
     std::string msg;
 };
 
-void calcHardwareIds(HardwareIdListForVersion& macHardwareIds, const QnHardwareInfo& hardwareInfo, int version);
-void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareInfo& hi, int version, bool guidCompatibility);
+void calcHardwareIds(
+    HardwareIdListForVersion& macHardwareIds,
+    const QnHardwareInfo& hardwareInfo, int version);
+
+void calcHardwareIdMap(
+    QMap<QString, QString>& hardwareIdMap,
+    const QnHardwareInfo& hi, const QString& boardUuid, int version);
 
 QStringList getMacAddressList(const QnMacAndDeviceClassList& devices);
 QString saveMac(const QStringList& macs, QSettings* settings);
