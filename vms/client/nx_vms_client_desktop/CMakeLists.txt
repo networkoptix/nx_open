@@ -89,7 +89,7 @@ target_include_directories(nx_vms_client_desktop
         ${Qt5Widgets_PRIVATE_INCLUDE_DIRS})
 
 if(LINUX)
-    target_link_libraries(nx_vms_client_desktop PRIVATE Qt5::X11Extras Xss Xfixes X11 GL GLU /usr/local/lib/libva-x11.so)
+    target_link_libraries(nx_vms_client_desktop PRIVATE Qt5::X11Extras Xss Xfixes X11 GL GLU)
 endif()
 
 if(WINDOWS)

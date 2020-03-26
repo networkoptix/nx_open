@@ -20,7 +20,7 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 #ifndef __TIME_DEFS_H__
 #define __TIME_DEFS_H__
 
-#include "mfxdefs.h"
+#include <mfx/mfxdefs.h>
 
 #if defined(_WIN32) || defined(_WIN64)
 

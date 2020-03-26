@@ -1,6 +1,6 @@
 #pragma once
 #include <QString>
-#include <mfxvideo.h>
+#include <mfx/mfxvideo.h>
 
 QString toString(mfxStatus status)
 {

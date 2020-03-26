@@ -8,7 +8,7 @@ extern "C" {
 #include <chrono>
 #include <memory>
 
-#include <mfxvideo.h>
+#include <mfx/mfxvideo.h>
 
 #include "allocators/sysmem_allocator.h"
 

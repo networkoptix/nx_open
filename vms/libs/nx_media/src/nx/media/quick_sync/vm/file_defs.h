@@ -20,7 +20,7 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 #ifndef __FILE_DEFS_H__
 #define __FILE_DEFS_H__
 
-#include "mfxdefs.h"
+#include <mfx/mfxdefs.h"
 
 #include <stdio.h>
 

@@ -20,7 +20,7 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 #ifndef __ATOMIC_DEFS_H__
 #define __ATOMIC_DEFS_H__
 
-#include "mfxdefs.h"
+#include <mfx/mfxdefs.h>
 
 /* Thread-safe 16-bit variable incrementing */
 mfxU16 msdk_atomic_inc16(volatile mfxU16 *pVariable);

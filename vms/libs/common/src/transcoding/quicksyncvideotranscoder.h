@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include <mfxvideo++.h>
+#include <mfx/mfxvideo++.h>
 
 #include "transcoder.h"
 

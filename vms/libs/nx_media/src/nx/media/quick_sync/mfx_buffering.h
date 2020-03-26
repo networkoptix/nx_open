@@ -23,7 +23,7 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 #include <stdio.h>
 #include <mutex>
 
-#include "mfxstructures.h"
+#include <mfx/mfxstructures.h>
 
 #include "vm/strings_defs.h"
 #include "vm/thread_defs.h"

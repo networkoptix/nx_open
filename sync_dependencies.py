@@ -57,6 +57,7 @@ def determine_package_versions(
         v["festival-vox"] = "2.4"
         v["ffmpeg"] = "3.1.9-4"
         v["libva"] = "2.6"
+        v["intel-media-sdk"] = "19.4.0"
         v["sysroot"] = "xenial-1"
 
     if platform == "macosx":
@@ -137,6 +138,7 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
             sync("linux-x64/sdk-gcc")
         if box == "none" and target not in ("linux_arm32", "linux_arm64"):
             sync("libva")
+            sync("intel-media-sdk")
 
         if options.get("clang"):
             sync("linux/clang")

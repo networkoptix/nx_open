@@ -4,7 +4,7 @@
 #include <sstream>
 #include <cstring>
 
-#include <mfxvideo.h>
+#include <mfx/mfxvideo.h>
 
 #define START_PROC_ARRAY(arrName) for(unsigned int arrIdx=0;arrIdx<(sizeof(info.arrName)/sizeof(info.arrName[0]));arrIdx++){
 #define START_PROC_ARRAY_SIZE(arrName,numElems) for(unsigned int arrIdx=0;arrIdx<info.numElems;arrIdx++){

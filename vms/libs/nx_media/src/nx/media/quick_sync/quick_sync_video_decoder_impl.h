@@ -6,7 +6,7 @@
 #include "quick_sync_video_decoder.h"
 #include <nx/utils/log/log.h>
 
-#include <mfxvideo++.h>
+#include <mfx/mfxvideo++.h>
 #include "allocators/base_allocator.h"
 #include "mfx_buffering.h"
 
