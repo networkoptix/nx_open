@@ -60,6 +60,7 @@ namespace {
         char buf[64];
         struct dirent *dp;
 
+
         snprintf(buf, 64, "/proc/%i/fd/", getpid());
 
         auto dir = nx::utils::wrapUnique(opendir(buf), &closedir);
@@ -122,6 +123,10 @@ namespace {
 #endif
 
 } // namespace
+{
+    Q_D(QnGlobalMonitor);
+    QnMutexLocker locker(&d->mutex);
+    d->stopTimersLocked();
 
 GlobalMonitor::GlobalMonitor(
     std::unique_ptr<nx::vms::server::PlatformMonitor> base,

@@ -10,6 +10,7 @@
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
 #include <recording/time_period_list.h>
 #include <utils/common/synctime.h>
 
@@ -157,7 +158,13 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
         QDateTime startDateTime = QDateTime::fromString(startTimeString, Qt::ISODate);
         if (startDateTime.isValid())
         {
-            startDateTime.setTimeSpec(Qt::UTC);
+            bool clientTimeZone = false;
+            if (auto virtualCamera = d->camera.dynamicCast<QnVirtualCameraResource>())
+                clientTimeZone = virtualCamera->isWearableClientTimeZone();
+
+            if (!clientTimeZone)
+                startDateTime.setTimeSpec(Qt::UTC);
+
             startTimeMs = startDateTime.toMSecsSinceEpoch();
         }
     }

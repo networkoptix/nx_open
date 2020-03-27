@@ -62,7 +62,6 @@ private:
     qint64 m_droppedFrames;
 
     bool m_useRealTimeOptimization;
-    AVPacket* m_outPacket;
     QnConstMediaContextPtr m_ctxPtr;
     nx::metrics::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;
