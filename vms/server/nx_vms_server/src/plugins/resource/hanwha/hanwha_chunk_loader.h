@@ -11,7 +11,6 @@
 #include <recording/time_period_list.h>
 
 #include <plugins/resource/hanwha/hanwha_information.h>
-#include <common/common_module_aware.h>
 
 extern "C" {
 
@@ -49,18 +48,7 @@ class HanwhaChunkLoader: public QObject
         loadingTimeline,
     };
 
-    struct Parameter
-    {
-        Parameter(const QString& name, const QString& value):
-            name(name),
-            value(value)
-        {
-        }
-
-        QString name;
-        QString value;
-    };
-
+public:
     using OverlappedId = int;
     using OverlappedIdList = std::vector<OverlappedId>;
     using ChunksByChannel = std::vector<QnTimePeriodList>;
@@ -115,10 +103,8 @@ private:
     // Returns true if an HTTP error occurred.
     bool handleHttpError();
 
-    boost::optional<Parameter> parseLine(const nx::Buffer& line) const;
     void parseTimeRangeData(const nx::Buffer& data);
     bool parseTimelineData(const nx::Buffer& data, qint64 currentTimeMs);
-    void parseOverlappedIdListData(const nx::Buffer& data);
 
     void prepareHttpClient();
     void scheduleNextRequest(const std::chrono::milliseconds& delay);
@@ -182,6 +168,7 @@ private:
 
     HanwhaChunkLoaderSettings m_settings;
     nx::network::aio::Timer m_timer;
+    bool m_needToUpdateDeviceFootage{false};
 };
 
 } // namespace plugins

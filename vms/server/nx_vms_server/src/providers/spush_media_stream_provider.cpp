@@ -276,7 +276,7 @@ void CLServerPushStreamReader::run()
 
 void CLServerPushStreamReader::beforeRun()
 {
-    QnAbstractMediaStreamDataProvider::beforeRun();
+    QnLiveStreamProvider::beforeRun();
     m_camera->init();
     m_cameraAudioEnabled = m_camera->isAudioEnabled();
     connect(

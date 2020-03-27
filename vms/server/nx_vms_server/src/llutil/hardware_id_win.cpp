@@ -409,10 +409,9 @@ static void fillHardwareInfo(
         execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMemory"));
 }
 
-void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap,
-    const QnHardwareInfo& hi,
-    int version,
-    bool guidCompatibility)
+void calcHardwareIdMap(
+    QMap<QString, QString>& hardwareIdMap,
+    const QnHardwareInfo& hi, const QString& boardUuid, int version)
 {
     hardwareIdMap.clear();
 
@@ -420,12 +419,11 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap,
 
     if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length())
     {
-        hardwareId = hi.boardID + (guidCompatibility ? hi.compatibilityBoardUUID : hi.boardUUID) +
+        hardwareId = hi.boardID + boardUuid +
             hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
+
         if (version == 3)
-        {
             hardwareId += hi.memoryPartNumber + hi.memorySerialNumber;
-        }
     }
 
     if (version == 4 || version == 5)

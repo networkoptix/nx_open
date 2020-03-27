@@ -139,7 +139,7 @@ void QnClientPullMediaStreamProvider::run()
 
 void QnClientPullMediaStreamProvider::beforeRun()
 {
-    QnAbstractMediaStreamDataProvider::beforeRun();
+    QnLiveStreamProvider::beforeRun();
     getResource()->init();
 }
 

@@ -69,6 +69,8 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 
+#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+
 #include <nx/vms/client/desktop/ini.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
@@ -137,6 +139,11 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         &QnWorkbenchNavigator::updateLoaderPeriods);
 
     connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished, m_cameraDataManager, &QnCameraDataManager::clearCache);
+    connect(
+        qnClientModule->serverRuntimeEventConnector(),
+        &ServerRuntimeEventConnector::deviceFootageChanged,
+        this,
+        [this](const std::vector<QnUuid>&) { m_cameraDataManager->clearCache(); });
 
     // TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
     // then truncate cached chunks by this region and synchronize the cache.

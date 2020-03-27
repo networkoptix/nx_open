@@ -25,6 +25,7 @@ class WearableManager;
 class VideoCache;
 class ResourceDirectoryBrowser;
 class AnalyticsSettingsManager;
+class ServerRuntimeEventConnector;
 
 } // namespace nx::vms::client::desktop
 
@@ -51,6 +52,7 @@ public:
     nx::vms::client::desktop::VideoCache* videoCache() const;
     nx::vms::client::desktop::ResourceDirectoryBrowser* resourceDirectoryBrowser() const;
     nx::vms::client::desktop::AnalyticsSettingsManager* analyticsSettingsManager() const;
+    nx::vms::client::desktop::ServerRuntimeEventConnector* serverRuntimeEventConnector() const;
 
 private:
     void initApplication();

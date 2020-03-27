@@ -120,7 +120,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_isLongWaiting(false),
     m_skippingFramesTime(AV_NOPTS_VALUE),
     m_executingChangeSpeed(false),
-    m_eofSignalSended(false),
+    m_eofSignalSent(false),
     m_videoQueueDuration(0),
     m_useMTRealTimeDecode(false),
     m_forceMtDecoding(false),
@@ -703,7 +703,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
             m_lastFrameDisplayed = m_display[channel]->display(vd, draw, scaleFactor);
             if (m_isStillImage && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Skipped)
-                m_eofSignalSended = true;
+                m_eofSignalSent = true;
         }
 
         if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
@@ -848,8 +848,8 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
         blockTimeValue(qMin(time, getCurrentTime()));
 
     m_emptyPacketCounter = 0;
-    if (m_extTimeSrc && m_eofSignalSended)
-        sendEofSignal(false);
+    if (m_extTimeSrc && m_eofSignalSent)
+        notifyExternalTimeSrcAboutEof(false);
 }
 
 void QnCamDisplay::blockTimeValue(qint64 time)
@@ -900,7 +900,7 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     m_doNotChangeDisplayTime = false;
 
     m_emptyPacketCounter = 0;
-    if (m_extTimeSrc && m_eofSignalSended && time != DATETIME_NOW)
+    if (m_extTimeSrc && m_eofSignalSent && time != DATETIME_NOW)
     {
         /**
          * Function m_extTimeSrc->onEofReached is used for EOF logic.
@@ -1072,11 +1072,11 @@ void QnCamDisplay::unblockTimeValue()
     m_audioDisplay->unblockTimeValue();
 }
 
-void QnCamDisplay::sendEofSignal(bool value)
+void QnCamDisplay::notifyExternalTimeSrcAboutEof(bool isEof)
 {
     if (m_extTimeSrc)
-        m_extTimeSrc->onEofReached(this, value);
-    m_eofSignalSended = value;
+        m_extTimeSrc->onEofReached(this, isEof);
+    m_eofSignalSent = isEof;
 }
 
 void QnCamDisplay::processNewSpeed(float speed)
@@ -1101,8 +1101,8 @@ void QnCamDisplay::processNewSpeed(float speed)
     if (speed < 0 && m_prevSpeed >= 0)
         m_buffering = getBufferingMask(); // decode first gop is required some time
 
-    if (m_prevSpeed == 0 && m_extTimeSrc && m_eofSignalSended)
-        sendEofSignal(false);
+    if (m_prevSpeed == 0 && m_extTimeSrc && m_eofSignalSent)
+        notifyExternalTimeSrcAboutEof(false);
 
     // Speed sign was previously changed. Need unblock blocked resources
     if (m_executingChangeSpeed)
@@ -1238,9 +1238,9 @@ void QnCamDisplay::processFillerPacket(
     bool isFillerPacket = timestampUs > 0 && timestampUs < DATETIME_NOW;
     
     if (m_lastMediaEventTimeout.isValid() && 
-        m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay) && !m_eofSignalSended)
+        m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay) && !m_eofSignalSent)
     {
-        sendEofSignal(true);
+        notifyExternalTimeSrcAboutEof(true);
         return;
     }
 
@@ -1250,10 +1250,10 @@ void QnCamDisplay::processFillerPacket(
         if (m_extTimeSrc &&
             !isLive &&
             isVideoCamera &&
-            !m_eofSignalSended &&
+            !m_eofSignalSent &&
             !isFillerPacket)
         {
-            sendEofSignal(true);
+            notifyExternalTimeSrcAboutEof(true);
         }
 
         moveTimestampTo(timestampUs);
@@ -1492,8 +1492,8 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     }
     else
     {
-        if (m_extTimeSrc && m_eofSignalSended) 
-            sendEofSignal(false);
+        if (m_extTimeSrc && m_eofSignalSent) 
+            notifyExternalTimeSrcAboutEof(false);
         m_emptyPacketCounter = 0;
     }
 
@@ -2023,7 +2023,7 @@ bool QnCamDisplay::isStillImage() const
 
 bool QnCamDisplay::isEOFReached() const
 {
-    return m_eofSignalSended == true;
+    return m_eofSignalSent == true;
 }
 
 bool QnCamDisplay::isLongWaiting() const

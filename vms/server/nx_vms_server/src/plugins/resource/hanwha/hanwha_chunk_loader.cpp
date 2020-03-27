@@ -15,6 +15,8 @@
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
 
+#include <nx/vms/server/event/server_runtime_event_manager.h>
+
 namespace nx {
 namespace vms::server {
 namespace plugins {
@@ -44,6 +46,59 @@ static const std::chrono::seconds kSendTimeout(10);
 static const std::chrono::milliseconds kTimelineCacheTime(10000); //< Only for sync mode.
 
 } // namespace
+
+struct Parameter
+{
+    Parameter(const QString& name, const QString& value):
+        name(name),
+        value(value)
+    {
+    }
+
+    QString name;
+    QString value;
+};
+
+static boost::optional<Parameter> parseLine(const nx::Buffer& line)
+{
+    const auto separatorPosition = line.indexOf('=');
+    if (separatorPosition < 0)
+        return boost::none;
+
+    return Parameter(
+        line.left(separatorPosition).trimmed(),
+        line.mid(separatorPosition + 1).trimmed());
+}
+
+static HanwhaChunkLoader::OverlappedIdList parseOverlappedIdListData(const nx::Buffer& data)
+{
+    HanwhaChunkLoader::OverlappedIdList result;
+    for (const auto& line: data.split('\n'))
+    {
+        const auto parameter = parseLine(line.trimmed());
+        if (parameter == boost::none)
+            continue;
+
+        if (parameter->name != kOverlappedIdListParameter)
+            continue;
+
+        const auto split = parameter->value.split(L',');
+        if (split.isEmpty())
+            continue;
+
+        for (const auto& idString: split)
+        {
+            bool success = false;
+            auto id = idString.trimmed().toInt(&success);
+            if (success)
+                result.push_back(id);
+        }
+    }
+
+    std::sort(result.begin(), result.end());
+
+    return result;
+}
 
 HanwhaChunkLoaderSettings::HanwhaChunkLoaderSettings(
     const std::chrono::seconds& responseTimeout,
@@ -401,8 +456,12 @@ void HanwhaChunkLoader::handleSuccessfulOverlappedIdResponse()
 
     NX_DEBUG(this, lit("Handling successful overlapped ID response"));
 
-    m_overlappedIds.clear();
-    parseOverlappedIdListData(m_httpClient->fetchMessageBodyBuffer());
+    OverlappedIdList newOverlappedIds =
+        parseOverlappedIdListData(m_httpClient->fetchMessageBodyBuffer());
+
+    m_needToUpdateDeviceFootage = newOverlappedIds != m_overlappedIds;
+    m_overlappedIds = std::move(newOverlappedIds);
+
     if (m_overlappedIds.empty())
     {
         NX_DEBUG(this, lit("Overlapped ID list is empty. Trying one more time."));
@@ -412,7 +471,7 @@ void HanwhaChunkLoader::handleSuccessfulOverlappedIdResponse()
     }
 
     m_newChunks.clear();
-    m_currentOverlappedId = m_overlappedIds.cbegin();
+    m_currentOverlappedId = isNvr() ? std::prev(m_overlappedIds.end()) : m_overlappedIds.cbegin();
     m_state = nextState(m_state);
     sendRequest();
 }
@@ -453,6 +512,18 @@ void HanwhaChunkLoader::handleSuccessfulTimelineResponse()
 
     m_lastTimelineUpdate = std::chrono::milliseconds(
         qnSyncTime->currentMSecsSinceEpoch());
+
+    if (m_needToUpdateDeviceFootage)
+    {
+        if (event::ServerRuntimeEventManager* const serverRuntimeEventManager =
+            m_resourceContext->serverRuntimeEventManager())
+        {
+            // TODO pass device ids.
+            serverRuntimeEventManager->triggerDeviceFootageChangedEvent({});
+            m_needToUpdateDeviceFootage = false;
+        }
+
+    }
 
     m_state = nextState(m_state);
     m_wait.wakeAll();
@@ -495,18 +566,6 @@ bool HanwhaChunkLoader::handleHttpError()
 
     scopeGuard.disarm();
     return false;
-}
-
-boost::optional<HanwhaChunkLoader::Parameter> HanwhaChunkLoader::parseLine(
-    const nx::Buffer& line) const
-{
-    const auto separatorPosition = line.indexOf('=');
-    if (separatorPosition < 0)
-        return boost::none;
-
-    return Parameter(
-        line.left(separatorPosition).trimmed(),
-        line.mid(separatorPosition + 1).trimmed());
 }
 
 void HanwhaChunkLoader::parseTimeRangeData(const nx::Buffer& data)
@@ -635,33 +694,6 @@ bool HanwhaChunkLoader::parseTimelineData(const nx::Buffer& line, qint64 current
     return true;
 }
 
-void HanwhaChunkLoader::parseOverlappedIdListData(const nx::Buffer& data)
-{
-    for (const auto& line: data.split('\n'))
-    {
-        const auto parameter = parseLine(line.trimmed());
-        if (parameter == boost::none)
-            continue;
-
-        if (parameter->name != kOverlappedIdListParameter)
-            continue;
-
-        const auto split = parameter->value.split(L',');
-        if (split.isEmpty())
-            continue;
-
-        for (const auto& idString: split)
-        {
-            bool success = false;
-            auto id = idString.trimmed().toInt(&success);
-            if (success)
-                m_overlappedIds.push_back(id);
-        }
-    }
-
-    std::sort(m_overlappedIds.begin(), m_overlappedIds.end());
-}
-
 void HanwhaChunkLoader::prepareHttpClient()
 {
     const auto authenticator = m_resourceContext->authenticator();
@@ -695,7 +727,7 @@ void HanwhaChunkLoader::scheduleNextRequest(const std::chrono::milliseconds& del
 
 qint64 HanwhaChunkLoader::latestChunkTimeMs() const
 {
-    qint64 resultMs = 0;
+    qint64 resultMs = kMinDateTime.toMSecsSinceEpoch();
     for (const auto& entry: m_chunks)
     {
         const auto overlappedId = entry.first;

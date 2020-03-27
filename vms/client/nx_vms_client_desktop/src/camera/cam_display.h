@@ -207,7 +207,7 @@ private:
         QnAbstractMediaData::MediaFlags flags);
     bool useRealTimeHurryUp() const;
     void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
-    void sendEofSignal(bool value);
+    void notifyExternalTimeSrcAboutEof(bool isEof);
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -264,7 +264,7 @@ protected:
     qint64 m_skippingFramesTime;
 
     bool m_executingChangeSpeed;
-    bool m_eofSignalSended;
+    bool m_eofSignalSent;
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;

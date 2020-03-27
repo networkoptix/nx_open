@@ -314,7 +314,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
         dynamic_cast<QnAbstractArchiveStreamReader*>(dp.data());
     archiveReader->getArchiveDelegate()->setGroupId(clientId.toByteArray());
     archiveReader->getArchiveDelegate()->setPlaybackMode(PlaybackMode::Export);
-    if (!archiveReader || !archiveReader->open(/*archiveIntegrityWatcher*/ nullptr))
+    if (!archiveReader)
     {
         NX_WARNING(this, lm("Failed (2) to create archive data provider (resource %1)").
             arg(transcodeParams.srcResourceUniqueID()));

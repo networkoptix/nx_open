@@ -94,19 +94,21 @@ void findMacAddresses(QnMacAndDeviceClassList& devices) {
     }
 }
 
-void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareInfo& hi, int version, bool guidCompatibility)
+void calcHardwareIdMap(
+    QMap<QString, QString>& hardwareIdMap,
+    const QnHardwareInfo& hi, const QString& boardUuid, int version)
 {
     hardwareIdMap.clear();
 
     QString hardwareId;
 
-    if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length()) {
-        hardwareId = hi.boardID + (guidCompatibility ? hi.compatibilityBoardUUID : hi.boardUUID) + hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
-        if (version == 3 || version == 4) { // this part differs from windows, unfortunately
+    if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length())
+    {
+        hardwareId = hi.boardID + boardUuid +
+            hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
+
+        if (version == 3 || version == 4) // this part differs from windows, unfortunately
             hardwareId += hi.memoryPartNumber + hi.memorySerialNumber;
-        }
-    } else {
-        hardwareId.clear();
     }
 
     if (version == 4 || version == 5)
@@ -120,7 +122,8 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
                 hardwareIdMap[mac] = hardwareId + mac;
             }
         }
-    } else
+    }
+    else // this part differs from windows, but no one knows why
     {
         hardwareIdMap[kEmptyMac] = hardwareId;
     }
@@ -219,7 +222,9 @@ void fillHardwareIds(
     }
 }
 
-void calcHardwareIdMap(QMap<QString, QString>& /* hardwareIdMap */, const QnHardwareInfo& /*hi*/, int /*version*/, bool /*guidCompatibility*/)
+void calcHardwareIdMap(
+    QMap<QString, QString>& hardwareIdMap,
+    const QnHardwareInfo& hi, const QString& boardUuid, int version)
 {
 }
 

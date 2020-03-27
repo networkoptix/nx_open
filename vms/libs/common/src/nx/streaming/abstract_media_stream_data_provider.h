@@ -53,6 +53,7 @@ protected:
     void checkAndFixTimeFromCamera(const QnAbstractMediaDataPtr& data);
     void resetTimeCheck();
     void onEvent(std::chrono::microseconds timestamp, CameraDiagnostics::Result event);
+    void resetMediaStatistics();
 protected:
     QnMediaStreamStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
     int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];

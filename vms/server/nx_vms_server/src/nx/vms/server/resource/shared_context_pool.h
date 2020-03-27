@@ -9,8 +9,10 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/cpp14.h>
 
+#include <nx/vms/server/event/server_runtime_event_manager.h>
 #include <nx/vms/server/resource/abstract_shared_resource_context.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace vms::server {
@@ -44,7 +46,9 @@ public:
         if (const auto context = m_sharedContexts.value(sharedId).lock())
             return std::dynamic_pointer_cast<ContextType>(context);
 
-        const auto context = std::make_shared<ContextType>(sharedId);
+        const auto context = std::make_shared<ContextType>(
+            serverModule()->serverRuntimeEventManager(), sharedId);
+
         m_sharedContexts[sharedId] = context;
         return context;
     }

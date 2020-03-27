@@ -21,6 +21,9 @@
 
 namespace nx {
 namespace vms::server {
+
+namespace event { class ServerRuntimeEventManager; }
+
 namespace plugins {
 
 static const std::chrono::seconds kUpdateCacheTimeout(30);
@@ -135,6 +138,7 @@ class HanwhaSharedResourceContext:
 {
 public:
     HanwhaSharedResourceContext(
+        event::ServerRuntimeEventManager* serverRuntimeEventManager,
         const nx::vms::server::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
     // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
@@ -151,6 +155,8 @@ public:
         HanwhaSessionType sessionType,
         const QnUuid& clientId,
         bool generateNewOne = false);
+
+    event::ServerRuntimeEventManager* serverRuntimeEventManager() const;
 
     nx::core::resource::OverlappedTimePeriods overlappedTimeline(int channelNumber) const;
     nx::core::resource::OverlappedTimePeriods overlappedTimelineSync(int channelNumber) const;
@@ -212,6 +218,8 @@ private:
     std::atomic<int> m_maxArchiveSessions{kDefaultNvrMaxArchiveSessions};
 
     mutable QnMutex m_servicesMutex;
+
+    event::ServerRuntimeEventManager* const m_serverRuntimeEventManager = nullptr;
 };
 
 } // namespace plugins
