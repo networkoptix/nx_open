@@ -200,11 +200,14 @@ nx::network::SocketAddress QnPlAxisResourceSearcher::obtainFixedHostAddress(
 }
 
 QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
-    QnResourceList& result,
+    const QnResourceList& result,
     const QByteArray& responseData,
-    const QHostAddress& /*discoveryAddress*/,
+    const QHostAddress& discoveryAddress,
     const QHostAddress& foundHostAddress )
 {
+    QString discoveryAddressStr = discoveryAddress.toString();
+    QString foundAddressStr = foundHostAddress.toString();
+
     QString smac;
     QString name;
 
@@ -269,7 +272,9 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
-        if (net_res->getMAC().toString() == smac) {
+        if (net_res->getMAC().toString() == smac)
+            //&& QHostAddress(net_res->getHostAddress()) == foundHostAddress)
+        {
             return local_results; // already found;
         }
     }
@@ -292,12 +297,19 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
     QnMdnsPacket packet;
+    bool deviceAddressFound = false;
     if (packet.fromDatagram(responseData))
     {
         auto rrsToInspect = packet.answerRRs + packet.additionalRRs;
 
         for (const auto& record: rrsToInspect)
         {
+            if (record.recordType == QnMdnsPacket::kPtrRecordType
+                && record.recordName.contains("in-addr.arpa"))
+            {
+                deviceAddressFound = true;
+            }
+
             if (record.recordType == QnMdnsPacket::kSrvRecordType)
             {
                 QnMdnsSrvData srv;
@@ -306,6 +318,8 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
             }
         }
     }
+    if (!deviceAddressFound && resourceData.value<bool>("needAddrInMdnsSearch"))
+       return local_results;
 
     QUrl url;
     url.setScheme(lit("http"));

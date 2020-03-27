@@ -6,6 +6,63 @@
 
 #include "mdns_listener.h"
 #include <media_server/media_server_module.h>
+#include "mdns_packet.h"
+
+namespace {
+
+    static const QChar kSeparator = '.';
+
+    int getSimilarity(const QString& remoteAddress, const QString& localAddress)
+    {
+        const auto remoteParts = remoteAddress.splitRef(kSeparator);
+        const auto localParts = localAddress.splitRef(kSeparator);
+        int result = 0;
+        for (int i = 0; i < localParts.size(); ++i)
+        {
+            if (remoteParts.size() < i || remoteParts[i] != localParts[i])
+                break;
+            ++result;
+        }
+        return result;
+    }
+
+    QString extractIpFromPtrRecordName(const QString& ptrRecord)
+    {
+        const auto data = ptrRecord.split(kSeparator);
+        if (data.size() < 4)
+            return QString();
+        return data[3] + kSeparator + data[2] + kSeparator + data[1] + kSeparator + data[0];
+    }
+
+    QString getDeviceAddress(const QString& localAddress,
+        const QString& remoteAddress, const QByteArray& responseData)
+    {
+        QString result = remoteAddress;
+        QnMdnsPacket packet;
+        if (!packet.fromDatagram(responseData))
+            return result;
+
+        int similarity = getSimilarity(localAddress, remoteAddress);
+        for (const auto& record : packet.answerRRs)
+        {
+            if (record.recordType == QnMdnsPacket::kPtrRecordType
+                && record.recordName.contains("in-addr.arpa"))
+            {
+                const auto remoteAddress = extractIpFromPtrRecordName(record.recordName);
+                if (remoteAddress.isEmpty())
+                    continue;
+                const int newSimilarity = getSimilarity(localAddress, remoteAddress);
+                if (newSimilarity > similarity)
+                {
+                    similarity = newSimilarity;
+                    result = remoteAddress;
+                }
+            }
+        }
+        return result;
+    }
+
+} // namespace
 
 QnMdnsResourceSearcher::QnMdnsResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
@@ -31,15 +88,16 @@ QnResourceList QnMdnsResourceSearcher::findResources()
             const QString& localAddress,
             const QByteArray& responseData)
         {
+        const auto deviceAddress = getDeviceAddress(localAddress, remoteAddress, responseData);
             const QList<QnNetworkResourcePtr>& nresourceLst = processPacket(
                 result,
                 responseData,
                 QHostAddress(localAddress),
-                QHostAddress(remoteAddress));
+                QHostAddress(deviceAddress));
 
             for(const QnNetworkResourcePtr& nresource: nresourceLst)
             {
-                nresource->setHostAddress(remoteAddress);
+                nresource->setHostAddress(deviceAddress);
                 result.push_back(nresource);
             }
         });

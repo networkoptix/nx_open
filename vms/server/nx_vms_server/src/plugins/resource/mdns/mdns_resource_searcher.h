@@ -26,7 +26,7 @@ private:
      *     NOTE Searcher MUST not duplicate resources, already present in \a result.
      */
     virtual QList<QnNetworkResourcePtr> processPacket(
-        QnResourceList& result,
+        const QnResourceList& result,
         const QByteArray& responseData,
         const QHostAddress& discoveryAddress,
         const QHostAddress& foundHostAddress) = 0;

@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.1.251",
+    "version": "4.1.1.253",
     "data": [
         {
             "keys": [
@@ -379,6 +379,12 @@
                 "FC-Series-R|*", "FC-Series-S|*"
             ],
             "ignoreONVIF": true
+        },
+        {
+            "keys": [
+                "Axis|AxisM3046V"
+            ],
+            "needAddrInMdnsSearch": true
         },
         {
             "keys":[
