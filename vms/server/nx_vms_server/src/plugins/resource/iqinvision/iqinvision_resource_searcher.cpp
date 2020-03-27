@@ -141,6 +141,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
 }
 
 QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
+    QnResourceList& result,
     const QByteArray& responseData,
     const QHostAddress& /*discoveryAddress*/,
     const QHostAddress& /*foundHostAddress*/)
@@ -190,6 +191,13 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     nx::utils::MacAddress macAddress(smac);
     if (macAddress.isNull())
         return localResults;
+
+    for (const QnResourcePtr& res: result)
+    {
+        const QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+        if (netRes->getMAC().toString() == smac)
+            return localResults; //< Already found.
+    }
 
     QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))

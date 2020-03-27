@@ -182,6 +182,7 @@ QString QnFlirResourceSearcher::manufacturer() const
 }
 
 QList<QnNetworkResourcePtr> QnFlirResourceSearcher::processPacket(
+    QnResourceList& /*result*/,
     const QByteArray& /*responseData*/,
     const QHostAddress& /*discoveryAddress*/,
     const QHostAddress& /*foundHostAddress*/)

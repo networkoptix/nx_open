@@ -200,13 +200,11 @@ nx::network::SocketAddress QnPlAxisResourceSearcher::obtainFixedHostAddress(
 }
 
 QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
+    QnResourceList& result,
     const QByteArray& responseData,
-    const QHostAddress& discoveryAddress,
+    const QHostAddress& /*discoveryAddress*/,
     const QHostAddress& foundHostAddress )
 {
-    QString foundAddressStr = foundHostAddress.toString();
-    QString discoveryAddressStr = discoveryAddress.toString();
-
     QString smac;
     QString name;
 
@@ -266,6 +264,15 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     //response.fromDatagram(responseData);
 
     smac = smac.toUpper();
+
+    for(const QnResourcePtr& res: result)
+    {
+        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
+
+        if (net_res->getMAC().toString() == smac) {
+            return local_results; // already found;
+        }
+    }
 
     QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))

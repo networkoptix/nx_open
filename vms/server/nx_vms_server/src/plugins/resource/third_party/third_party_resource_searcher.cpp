@@ -244,6 +244,7 @@ ThirdPartyResourceSearcher* ThirdPartyResourceSearcher::instance()
 }
 
 QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
+    QnResourceList& /*result*/,
     const QByteArray& responseData,
     const QHostAddress& /*discoveryAddress*/,
     const QHostAddress& foundHostAddress )
