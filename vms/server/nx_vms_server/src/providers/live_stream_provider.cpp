@@ -159,7 +159,7 @@ void QnLiveStreamProvider::beforeRun()
         ? Qn::ConnectionRole::CR_SecondaryLiveVideo
         : Qn::ConnectionRole::CR_LiveVideo;
 
-    if (role == roleForAnalytics && serverModule() && !m_videoDataReceptor)
+    if (getRole() == roleForAnalytics && serverModule() && !m_videoDataReceptor)
     {
         m_videoDataReceptor = serverModule()->analyticsManager()->registerMediaSource(
             m_cameraRes->getId());
