@@ -259,7 +259,7 @@ SystemCommands::MountCode SystemCommands::mount(
         optionStream << "domain=" << *domain << ",";
     optionStream << "pass=" << (pass ? *pass : "") << ",";
     optionStream << "vers=";
-    auto options = optionStream.str();
+    const auto options = optionStream.str();
 
     const char* hostStart = url.c_str();
     const char* hostEnd = nullptr;
@@ -326,11 +326,11 @@ SystemCommands::MountCode SystemCommands::mount(
         std::transform(
             resultUrl.cbegin(), resultUrl.cend(), std::back_inserter(unc),
             [](char c) { return c == '/' ? '\\' : c; });
-        options = "unc=" + unc + "," + options;
+        const auto optionsWithUNC = "unc=" + unc + "," + options;
 
         for (const auto& v: versions)
         {
-            if (::mount(resultUrl.data(), localPath.data(), "cifs", 0, (options + v).data()) == 0)
+            if (::mount(resultUrl.data(), localPath.data(), "cifs", 0, (optionsWithUNC + v).data()) == 0)
             {
                 NX_OUTPUT << "Mount '" << resultUrl << "' to '" << localPath << "' succeeded";
                 return SystemCommands::MountCode::ok;
