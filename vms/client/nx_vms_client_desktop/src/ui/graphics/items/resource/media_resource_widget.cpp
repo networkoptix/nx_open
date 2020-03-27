@@ -1991,6 +1991,8 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     QString codecString;
     if (QnConstMediaContextPtr codecContext = d->display()->mediaProvider()->getCodecContext())
         codecString = codecContext->getCodecName();
+    if (m_renderer->isHardwareDecoderUsed(0))
+        codecString += " (HW)";
 
     QString hqLqString;
     QString protocolString;

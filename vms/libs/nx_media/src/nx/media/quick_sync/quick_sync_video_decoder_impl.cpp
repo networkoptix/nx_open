@@ -361,7 +361,6 @@ int QuickSyncVideoDecoderImpl::decode(
             &(outputSurface.syncp));
         if (MFX_WRN_DEVICE_BUSY != sts)
         {
-            //NX_DEBUG(this, "QQQQ decode size result pBitstream->DataOffset %1, pBitstream->DataLength %2", pBitstream->DataOffset, pBitstream->DataLength);
             memmove(m_bitstreamData.data(), m_bitstreamData.data() + pBitstream->DataOffset, pBitstream->DataLength);
             pBitstream->DataOffset = 0;
             m_bitstreamData.resize(pBitstream->DataLength);

@@ -24,7 +24,7 @@ public:
     virtual void setLightCpuMode(DecodeMode val) override;
     virtual void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy) override;
 
-    static bool isSupported(AVCodecID codec);
+    static bool isSupported(const QnConstCompressedVideoDataPtr& data);
 
 private:
     std::shared_ptr<nx::media::QuickSyncVideoDecoderImpl> m_impl;

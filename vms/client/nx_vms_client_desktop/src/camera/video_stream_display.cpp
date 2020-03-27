@@ -421,7 +421,7 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     QnCompressedVideoDataPtr data, bool mtDecoding) const
 {
     QnAbstractVideoDecoder* decoder;
-    if (!m_reverseMode && QuickSyncVideoDecoderOldPlayer::isSupported(data->compressionType))
+    if (!m_reverseMode && QuickSyncVideoDecoderOldPlayer::isSupported(data))
     {
         decoder = new QuickSyncVideoDecoderOldPlayer();
     }
@@ -518,6 +518,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     auto dec = m_decoderData.decoder.get();
     if (!dec || m_decoderData.compressionType != data->compressionType)
     {
+        if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+            return Status_Skipped;
         dec = createVideoDecoder(data, enableFrameQueue);
         m_decoderData.decoder.reset(dec);
         m_decoderData.compressionType = data->compressionType;

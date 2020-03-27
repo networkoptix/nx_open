@@ -5,9 +5,20 @@
 
 #include <utils/media/utils.h>
 
-bool QuickSyncVideoDecoderOldPlayer::isSupported(AVCodecID codec)
+bool QuickSyncVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDataPtr& data)
 {
-    return nx::media::QuickSyncVideoDecoderImpl::isCompatible(codec);
+    if (!nx::media::QuickSyncVideoDecoderImpl::isCompatible(data->compressionType))
+        return false;
+
+    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+    {
+        NX_ERROR(NX_SCOPE_TAG,
+            "Failed to check QuickSync compatibility, input frame is not a key frame");
+        return false;
+    }
+    nx::QVideoFramePtr result;
+    auto decoder = std::make_unique<nx::media::QuickSyncVideoDecoderImpl>();
+    return decoder->decode(data, &result) >= 0;
 }
 
 bool QuickSyncVideoDecoderOldPlayer::decode(
