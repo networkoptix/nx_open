@@ -266,6 +266,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     m_backupSchedule(),
     m_lastPerformedBackupTimeMs(0),
     m_nextScheduledBackupTimeMs(0),
+    m_nextScheduledBackupStage(NotScheduled),
     m_backupCancelled(false),
     m_updating(false),
     m_quality(qnGlobalSettings->backupQualities()),
@@ -636,6 +637,9 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
     m_model->setServer(server);
     restoreCamerasToBackup();
 
+    m_lastPerformedBackupTimeMs = m_nextScheduledBackupTimeMs = 0;
+    m_nextScheduledBackupStage = NotScheduled;
+
     if (m_server)
     {
         connect(m_server, &QnMediaServerResource::backupScheduleChanged, this,
@@ -730,6 +734,11 @@ bool QnStorageConfigWidget::hasStoragesChanges(const QnStorageModelInfoList& sto
 bool QnStorageConfigWidget::isServerOnline() const
 {
     return m_server && m_server->getStatus() == Qn::Online;
+}
+
+QDateTime QnStorageConfigWidget::currentServerTime() const
+{
+    return ServerTimeWatcher::serverTime(m_server, qnSyncTime->currentMSecsSinceEpoch());
 }
 
 void QnStorageConfigWidget::applyChanges()
@@ -909,7 +918,7 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
         return 0;
 
     // Backup schedule struct always contains server time.
-    const QDateTime current = ServerTimeWatcher::serverTime(m_server, qnSyncTime->currentMSecsSinceEpoch());
+    const QDateTime current = currentServerTime();
     const qint64 currentTimeMs = current.toMSecsSinceEpoch();
 
     static const int kDaysPerWeek = 7;
@@ -976,8 +985,6 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
 {
     QScopedValueRollback<bool> updatingGuard(m_updating, true);
 
-    m_lastPerformedBackupTimeMs = m_nextScheduledBackupTimeMs = 0;
-
     bool backupInProgress = reply.state == Qn::BackupState_InProgress;
     ui->backupStopButton->setEnabled(backupInProgress);
 
@@ -994,6 +1001,7 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
 
         if (m_backupSchedule.backupType == vms::api::BackupType::realtime)
         {
+            m_nextScheduledBackupStage = NotScheduled;
             ui->realtimeBackupWarningLabel->setText(backupInfo);
             ui->realtimeBackupWarningLabel->setVisible(!canStartBackup);
 
@@ -1013,12 +1021,34 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
         }
         else
         {
-            m_lastPerformedBackupTimeMs = reply.backupTimeMs;
+            if (reply.backupTimeMs != m_lastPerformedBackupTimeMs)
+            {
+                m_lastPerformedBackupTimeMs = reply.backupTimeMs;
+                if (m_nextScheduledBackupStage == ScheduledImmediately)
+                    m_nextScheduledBackupStage = StartedAfterScheduledImmediately;
+            }
 
             bool backupSchedule = m_backupSchedule.backupType == vms::api::BackupType::scheduled;
             ui->backupScheduleWidget->setVisible(backupSchedule);
             if (backupSchedule)
-                m_nextScheduledBackupTimeMs = nextScheduledBackupTimeMs();
+            {
+                if (m_backupSchedule.dateTimeFits(currentServerTime())
+                    && (m_nextScheduledBackupStage == SheduleJustChanged
+                        || m_nextScheduledBackupStage == ScheduledImmediately))
+                {
+                    m_nextScheduledBackupStage = ScheduledImmediately;
+                    m_nextScheduledBackupTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+                }
+                else
+                {
+                    m_nextScheduledBackupStage = ScheduledInFuture;
+                    m_nextScheduledBackupTimeMs = nextScheduledBackupTimeMs();
+                }
+            }
+            else
+            {
+                m_nextScheduledBackupStage = NotScheduled;
+            }
 
             updateIntervalLabels();
 
@@ -1172,9 +1202,11 @@ void QnStorageConfigWidget::updateIntervalLabels()
 
     if (m_backupSchedule.backupType == vms::api::BackupType::scheduled)
     {
-        if (m_nextScheduledBackupTimeMs)
+        if (m_nextScheduledBackupStage != NotScheduled)
         {
-            QString extra = intervalToString(m_nextScheduledBackupTimeMs);
+            QString extra = (m_nextScheduledBackupStage == ScheduledImmediately)
+                ? tr("now")
+                : intervalToString(m_nextScheduledBackupTimeMs);
             ui->backupScheduleLabel->setText(tr("Next backup is scheduled for <b>%1</b>").
                 arg(backupPositionToString(m_nextScheduledBackupTimeMs)));
             ui->backupScheduleLabelExtra->setVisible(!extra.isEmpty());
@@ -1348,6 +1380,9 @@ void QnStorageConfigWidget::invokeBackupSettings()
     m_backupSchedule = settingsDialog->schedule();
     m_camerasToBackup = settingsDialog->camerasToBackup();
     m_backupNewCameras = settingsDialog->backupNewCameras();
+
+    if (m_backupSchedule != m_server->getBackupSchedule())
+        m_nextScheduledBackupStage = SheduleJustChanged;
 
     emit hasChangesChanged();
 }
