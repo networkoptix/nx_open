@@ -59,8 +59,9 @@ int QnMergeSystemsRestHandler::execute(
     }
 
     nx::vms::utils::SystemMergeProcessor systemMergeProcessor(owner->commonModule());
-    using MergeStatus = ::utils::MergeSystemsStatus::Value;
+    systemMergeProcessor.enableDbBackup(serverModule()->settings().backupDir());
 
+    using MergeStatus = ::utils::MergeSystemsStatus::Value;
     if (QnPermissionsHelper::isSafeMode(serverModule()))
     {
         systemMergeProcessor.setMergeError(&result, MergeStatus::safeMode);
