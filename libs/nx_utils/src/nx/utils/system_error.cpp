@@ -47,7 +47,7 @@ QString toString(ErrorCode errorCode)
     if (errorCode == dnsServerFailure)
         return QLatin1String("DNS server falure");
 
-    return QString::fromLatin1(strerror(errorCode));
+    return QString::fromLocal8Bit(strerror(errorCode));
 #endif
 }
 
