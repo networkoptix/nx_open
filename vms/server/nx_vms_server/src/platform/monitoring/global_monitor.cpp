@@ -123,10 +123,6 @@ namespace {
 #endif
 
 } // namespace
-{
-    Q_D(QnGlobalMonitor);
-    QnMutexLocker locker(&d->mutex);
-    d->stopTimersLocked();
 
 GlobalMonitor::GlobalMonitor(
     std::unique_ptr<nx::vms::server::PlatformMonitor> base,
@@ -148,7 +144,7 @@ GlobalMonitor::GlobalMonitor(
     m_cachedThisProcessRamUsage(
         [this]()
         {
-            NX_MUTEX_LOCKER lock(&m_mutex); 
+            NX_MUTEX_LOCKER lock(&m_mutex);
             return m_monitorBase->thisProcessRamUsageBytes();
         },
         kCacheExpirationTime),
@@ -159,7 +155,7 @@ GlobalMonitor::GlobalMonitor(
     m_cachedTotalPartitionSpaceInfo(
         [this]()
         {
-            NX_MUTEX_LOCKER lock(&m_mutex); 
+            NX_MUTEX_LOCKER lock(&m_mutex);
             return m_monitorBase->totalPartitionSpaceInfo();
         },
         kCacheExpirationTime)
