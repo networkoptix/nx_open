@@ -1784,9 +1784,8 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
         {
             if (id.contains("videoprofile"))
                 videoParametersIds.insert(id);
-
-            storeCurrentVideoParametersToProperties(getApiParameters(videoParametersIds));
         }
+        storeCurrentVideoParametersToProperties(getApiParameters(videoParametersIds));
     }
 
     return CameraDiagnostics::NoErrorResult();
