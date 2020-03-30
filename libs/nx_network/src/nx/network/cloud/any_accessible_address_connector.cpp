@@ -65,7 +65,13 @@ void AnyAccessibleAddressConnector::connectAsync(
             }
 
             if (m_timeout > std::chrono::milliseconds::zero())
-                m_timer.start(m_timeout, std::bind(&AnyAccessibleAddressConnector::onTimeout, this));
+            {
+                // NOTE: Connectors support timeouts on their own.
+                // This timeout is added just in case of a bug in a connector(s).
+                // So, specifying double timeout here so that connectors always
+                // have a chance to report and handle timeout themselves.
+                m_timer.start(m_timeout * 2, [this]() { onTimeout(); });
+            }
         });
 }
 
