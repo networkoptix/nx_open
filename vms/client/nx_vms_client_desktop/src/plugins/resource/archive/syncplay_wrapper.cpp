@@ -126,28 +126,8 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
 
 bool QnArchiveSyncPlayWrapper::isMediaPaused() const
 {
-    if (nx::vms::client::desktop::ini().compatibilityIsMediaPaused)
-        return isMediaPausedUncached();
-
     Q_D(const QnArchiveSyncPlayWrapper);
     return d->paused || d->readers.empty();
-}
-
-bool QnArchiveSyncPlayWrapper::isMediaPausedUncached() const
-{
-    Q_D(const QnArchiveSyncPlayWrapper);
-    QnMutexLocker lock( &d->timeMutex );
-    bool rez = true;
-    foreach(const ReaderInfo& info, d->readers)
-    {
-        if (!info.reader->isEnabled())
-            continue;
-
-        info.reader->setNavDelegate(0);
-        rez &= info.reader->isMediaPaused();
-        info.reader->setNavDelegate(const_cast<QnArchiveSyncPlayWrapper *>(this));
-    }
-    return rez;
 }
 
 void QnArchiveSyncPlayWrapper::pauseMedia()

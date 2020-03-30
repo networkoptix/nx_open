@@ -722,7 +722,8 @@ void QnClientModule::initWebEngine()
     QtWebEngine::initialize();
 
     const auto settings = QWebEngineSettings::defaultSettings();
-    settings->setAttribute(QWebEngineSettings::PluginsEnabled, ini().enableWebKitPlugins);
+    // We must support Flash for some camera admin pages to work.
+    settings->setAttribute(QWebEngineSettings::PluginsEnabled, true);
 
     // TODO: Add ini parameters for WebEngine attributes
     //settings->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);

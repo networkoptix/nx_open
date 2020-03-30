@@ -35,10 +35,6 @@ struct Ini: nx::kit::IniConfig
         "the main camera window. If enabled, allows the user to specify the aspect ratio of the\n"
         "zoom window.");
     NX_INI_FLAG(0, hideEnhancedVideo, "Hides enhanced video from the scene.");
-    NX_INI_FLAG(1, enableObjectMetadataInterpolation,
-        "Allows the interpolation of the trajectories of the Analytics Objects between frames.\n"
-        "\n"
-        "If enabled, bounding boxes around the Analytics Objects are moving more smoothly.");
     NX_INI_STRING("", displayAnalyticsObjectsDebugInfo,
         "Whether to add a debug info label to Analytics Object description.\n"
         "\n"
@@ -82,12 +78,9 @@ struct Ini: nx::kit::IniConfig
         "Forces the compatibility mode dialog to appear when connecting to the system.");
     NX_INI_FLAG(0, allowOsScreenSaver,
         "Allows the OS to enable a screensaver when the user is not active.");
-    NX_INI_FLAG(1, enableWebKitPlugins,
-        "Enables WebKit NPAPI plugins (Flash, Java, etc.).");
     NX_INI_FLAG(1, modalServerSetupWizard,
         "Whether to show Server's setup wizard dialog in a modal window. Default behavior: modal\n"
         "window. To be changed for debugging of web-based components only.");
-    NX_INI_FLAG(1, showWebPageForAllCameras, "Always show Web page in Camera Settings.");
     NX_INI_FLAG(0, enableTimelineScreenshotCursor,
         "Allows to show the screenshot above the timeline when mouse pointer hovers over the\n"
         "timeline.\n"
@@ -95,9 +88,6 @@ struct Ini: nx::kit::IniConfig
         "Is currently used for demo purposes only (does not work in some specific scenarios).");
     NX_INI_STRING("press", passwordPreviewActivationMode,
         "Specifies one of password preview activation modes: \"press\", \"hover\" or \"toggle\".");
-    NX_INI_FLAG(1, automaticFilterByTimelineSelection,
-        "Allows to automatically switch Right Panel time selection to \"Selected on Timeline\"\n"
-        "mode when such selection exists.");
     NX_INI_FLAG(0, raiseCameraFromClickedTile,
         "Enables raising a camera when Right Panel camera-related tile is clicked.");
     NX_INI_INT(30, rightPanelPreviewReloadDelay,
@@ -115,8 +105,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, systemUpdateProgressInformers,
         "Whether to show Right Panel progress informers during System Update (unfinished\n"
         "functionality).");
-    NX_INI_FLAG(0, compatibilityIsMediaPaused,
-        "Switch to the old scheme of a check for paused video.");
     NX_INI_STRING("", autoUpdatesCheckChangesetOverride,
         "Background updates check will use this changeset instead of \"latest\".");
     NX_INI_INT(0, massSystemUpdateWaitForServerOnlineSecOverride,
@@ -150,7 +138,7 @@ struct Ini: nx::kit::IniConfig
         "Whether mouse hover toggles crop mode on Right Panel tiles and tooltips.");
     NX_INI_FLAG(0, pluginInformationInServerSettings,
         "Show information about installed plugin libraries in Server Settings.");
-    NX_INI_FLAG(0, cacheLiveVideoForRightPanelPreviews,
+    NX_INI_FLAG(1, cacheLiveVideoForRightPanelPreviews,
         "Cache live video to obtain right panel previews without querying the server.");
     NX_INI_INT(0, globalLiveVideoCacheLength,
         "Global live video cache length, in seconds. Set to zero to use built-in value.");
@@ -191,8 +179,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(1, resetResourceTreeModelOnUserChange,
         "Reset Resource Tree model during user session change.");
 
-    NX_INI_FLAG(1, limitAnalyticsTimePeriodsLoading,
-        "Send analytics time period requests only when these periods are visible.");
     NX_INI_STRING("", updateFeedUrl,
         "Overrides URL update server. Leave empty value to use built-in path.");
 
