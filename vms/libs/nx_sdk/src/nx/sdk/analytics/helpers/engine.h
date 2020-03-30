@@ -63,14 +63,16 @@ protected:
     std::string settingValue(const std::string& settingName);
 
     /**
-     * Action handler. Called when some action defined by this engine is triggered by Server.
-     * @param actionId Id of the action being triggered.
-     * @param objectTrackId Id of an object track for which the action has been triggered.
-     * @param params If the engine manifest defines params for the action being triggered,
-     *     contains their values after they are filled by the user via Client form. Otherwise,
+     * Action handler. Called when some Action defined by this Engine is triggered by the Server.
+     * @param actionId Id of the Action being triggered.
+     * @param objectTrackId Id of an Object Track for which the Action has been triggered.
+     * @param deviceId Id of a Device (e.g. a camera) from which the Action has been triggered.
+     * @param params If the Engine manifest defines params for the Action being triggered,
+     *     contains their values after they are filled by the user via the Client form. Otherwise,
      *     empty.
-     * @param outActionUrl If set by this call, Client will open this URL in an embedded browser.
-     * @param outMessageToUser If set by this call, Client will show this text to the user.
+     * @param outActionUrl If set by this call, the Client will open this URL in an embedded
+     *     browser.
+     * @param outMessageToUser If set by this call, the Client will show this text to the user.
      */
     virtual Result<IAction::Result> executeAction(
         const std::string& /*actionId*/,
