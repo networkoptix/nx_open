@@ -34,6 +34,7 @@ public:
     nx::plugins::flir::IoExecutor* ioExecutor() const;
 private:
     virtual QList<QnNetworkResourcePtr> processPacket(
+        const QnResourceList& result,
         const QByteArray& responseData,
         const QHostAddress& discoveryAddress,
         const QHostAddress& foundHostAddress ) override;

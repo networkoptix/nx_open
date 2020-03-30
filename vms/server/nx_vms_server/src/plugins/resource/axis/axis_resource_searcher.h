@@ -8,7 +8,7 @@
 #include "core/resource_management/resource_searcher.h"
 #include "../mdns/mdns_resource_searcher.h"
 
-class QnPlAxisResourceSearcher: public QnMdnsResourceSearcher
+class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 {
     using base_type = QnMdnsResourceSearcher;
     struct TimeMarkedAddress
@@ -36,6 +36,7 @@ public:
 
 private:
     virtual QList<QnNetworkResourcePtr> processPacket(
+        const QnResourceList& result,
         const QByteArray& responseData,
         const QHostAddress& discoveryAddress,
         const QHostAddress& foundHostAddress) override;

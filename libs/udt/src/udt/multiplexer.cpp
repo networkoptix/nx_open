@@ -2,6 +2,8 @@
 
 #include "queue.h"
 
+static constexpr int kDefaultRecvUnitQueueSize = 32;
+
 Multiplexer::Multiplexer(
     int ipVersion,
     int payloadSize,
@@ -17,7 +19,7 @@ Multiplexer::Multiplexer(
     m_timer(std::make_unique<CTimer>()),
     m_sendQueue(std::make_unique<CSndQueue>(m_udpChannel.get(), m_timer.get())),
     m_recvQueue(std::make_unique<CRcvQueue>(
-        32,
+        kDefaultRecvUnitQueueSize,
         payloadSize,
         ipVersion,
         m_udpChannel.get(),
@@ -42,10 +44,6 @@ void Multiplexer::shutdown()
         m_udpChannel->shutdown();
     if (m_recvQueue)
         m_recvQueue->stop();
-    m_sendQueue.reset();
-    m_recvQueue.reset();
-    m_timer.reset();
-    m_udpChannel.reset();
 }
 
 AbstractUdpChannel& Multiplexer::channel()

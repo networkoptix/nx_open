@@ -60,6 +60,7 @@ namespace {
         char buf[64];
         struct dirent *dp;
 
+
         snprintf(buf, 64, "/proc/%i/fd/", getpid());
 
         auto dir = nx::utils::wrapUnique(opendir(buf), &closedir);
@@ -143,7 +144,7 @@ GlobalMonitor::GlobalMonitor(
     m_cachedThisProcessRamUsage(
         [this]()
         {
-            NX_MUTEX_LOCKER lock(&m_mutex); 
+            NX_MUTEX_LOCKER lock(&m_mutex);
             return m_monitorBase->thisProcessRamUsageBytes();
         },
         kCacheExpirationTime),
@@ -154,7 +155,7 @@ GlobalMonitor::GlobalMonitor(
     m_cachedTotalPartitionSpaceInfo(
         [this]()
         {
-            NX_MUTEX_LOCKER lock(&m_mutex); 
+            NX_MUTEX_LOCKER lock(&m_mutex);
             return m_monitorBase->totalPartitionSpaceInfo();
         },
         kCacheExpirationTime)

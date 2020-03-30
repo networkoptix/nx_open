@@ -1955,10 +1955,16 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCurrentUser", new QnCurrentUserRestHandler());
 
     /**%apidoc POST /api/activateLicense
-     * Activate new license and return license JSON data on success. It requires internet to
-     * connect to the license server.
+     * Activate the new License and return the signed License Block on success. The activation is
+     * performed by sending the License serial number and the current Server Hardware Id to the
+     * License Server over the internet (thus, an internet connection is required), and getting
+     * back the LicenseBlock signed by the License Server. After activation, the License is
+     * registered in the System the same way as POST /ec2/addLicenses does.
      * %param:string licenseKey License serial number.
-     * %return:object License JSON data.
+     * %return:object JSON object containing the structured representation of the License Block.
+     *     See the description of License Block properties in the documentation for the result of
+     *     <code>GET /ec2/getLicenses</code>.
+     *     %struct DetailedLicenseData
      */
     reg("api/activateLicense", new QnActivateLicenseRestHandler());
 
@@ -2491,8 +2497,7 @@ void MediaServerProcess::registerRestHandlers(
      *     "dateTime": "2015-02-28T16:37:00",
      *     "timeZoneId": "Europe/Moscow"
      * }
-     * </code>
-     * </pre>
+     * </code></pre>
      * </p>
      * %permissions Owner.
      * %param[opt]:string timeZoneId Time zone identifier, can be obtained via /api/getTimeZones.
@@ -2588,7 +2593,7 @@ void MediaServerProcess::registerRestHandlers(
      * algorithm is described in <b>Calculating authentication hash</b> section (in the bottom
      * of the page). While calculating hashes, username and password of the target Server are
      * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
-     * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
+     * /api/getNonce</code> call. The lifetime of a nonce is about a few minutes.
      * %permissions Owner.
      * %param:string currentPassword Current user password.
      * %param:string url URL of one Server in the target System to join. The URL may contain
@@ -2747,14 +2752,14 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>[[{"x":0,"y":0,"width":43,"height":31}]]</code>
      *     <br/>Example of two rectangles for a single-sensor camera:
      *     <code>[[{"x":0,"y":0,"width":5,"height":7},{"x":12,"y":10,"width":8,"height":6}]]</code>
-     *     <br/>Analytics Search Format: string with a JSON object that might take the following
-     *     attributes as an input:
+     *     <br/>Analytics Search Format: string with a JSON object that might contain the following
+     *     fields (keys):
      *     <br/>
      *     <ul>
-     *     <li>"boundingBox" key represents a <i>rectangle</i>. The value is a dictionary with the
-     *     same format as for Motion Search rectangle;</li>
+     *     <li>"boundingBox" key represents a <i>rectangle</i>. The value is a JSON object with the
+     *     same format as the Motion Search rectangle;</li>
      *     <li>"freeText" key for full-text search over analytics data attributes. The value is
-     *     expected to be a string with the search input;
+     *     expected to be a string with search input;
      *     </li>
      *     </ul>
      *     <br/>Example of the JSON object:

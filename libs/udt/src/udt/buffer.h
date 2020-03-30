@@ -162,7 +162,7 @@ private:
 class CRcvBuffer
 {
 public:
-    CRcvBuffer(CUnitQueue* queue, int bufsize = 65536);
+    CRcvBuffer(int bufsize = 65536);
     ~CRcvBuffer();
 
     // Functionality:
@@ -173,7 +173,7 @@ public:
     // Returned value:
     //    false if data is repeated.
 
-    bool addData(CUnit* unit, int offset);
+    bool addData(std::shared_ptr<Unit> unit, int offset);
 
     // Functionality:
     //    Read data into a user buffer.
@@ -260,9 +260,8 @@ private:
 private:
     mutable std::mutex m_mutex;           // used to synchronize buffer operation
 
-    std::vector<CUnit*> m_pUnit;                     // pointer to the protocol buffer
+    std::vector<std::shared_ptr<Unit>> m_pUnit;                     // pointer to the protocol buffer
     int m_iSize;                         // size of the protocol buffer
-    CUnitQueue* m_pUnitQueue;        // the shared unit queue
 
     int m_iStartPos;                     // the head position for I/O (inclusive)
     int m_iLastAckPos;                   // the last ACKed position (exclusive)

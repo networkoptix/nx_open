@@ -53,100 +53,13 @@ Yunhong Gu, last updated 01/12/2011
 
 #include "channel.h"
 #include "common.h"
-#include "packet.h"
+#include "unit_queue.h"
 
 static constexpr auto kSyncRepeatMinPeriod = std::chrono::milliseconds(250);
 
 class CUDT;
 
-struct CUnit
-{
-    CPacket& packet();
-
-    void setFlag(int val);
-    int flag() const;
-
-private:
-    CPacket m_Packet;
-    // 0: free, 1: occupied, 2: msg read but not freed (out-of-order), 3: msg dropped.
-    int m_iFlag = 0;
-};
-
 class ServerSideConnectionAcceptor;
-
-class CUnitQueue
-{
-public:
-    CUnitQueue();
-    ~CUnitQueue();
-
-public:
-
-    // Functionality:
-    //    Initialize the unit queue.
-    // Parameters:
-    //    1) [in] size: queue size
-    //    2) [in] mss: maximum segament size
-    //    3) [in] version: IP version
-    // Returned value:
-    //    0: success, -1: failure.
-
-    int init(int size, int mss);
-
-    // Functionality:
-    //    Increase (double) the unit queue size.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    0: success, -1: failure.
-
-    int increase();
-
-    // Functionality:
-    //    Decrease (halve) the unit queue size.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    0: success, -1: failure.
-
-    int shrink();
-
-    // Functionality:
-    //    find an available unit for incoming packet.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    Pointer to the available unit, NULL if not found.
-
-    CUnit* getNextAvailUnit();
-
-    int decCount() { return --m_iCount; }
-    int incCount() { return ++m_iCount; }
-
-private:
-    struct CQEntry
-    {
-        std::vector<CUnit> unitQueue;
-        Buffer m_pBuffer;
-
-        CQEntry* next = nullptr;
-    };
-
-    CQEntry* m_pQEntry = nullptr;            // pointer to the first unit queue
-    CQEntry* m_pCurrQueue = nullptr;        // pointer to the current available queue
-    CQEntry* m_pLastQueue = nullptr;        // pointer to the last unit queue
-
-    CUnit* m_pAvailUnit = nullptr;         // recent available unit
-
-    int m_iSize = 0;            // total size of the unit queue, in number of packets
-    int m_iCount = 0;        // total number of valid packets in the queue
-
-    int m_iMSS = 0;            // unit buffer size
-
-private:
-    CUnitQueue(const CUnitQueue&);
-    CUnitQueue& operator=(const CUnitQueue&);
-};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -434,12 +347,10 @@ public:
     void removeConnector(const UDTSOCKET& id);
 
     void addNewEntry(const std::weak_ptr<CUDT>& u);
-    std::shared_ptr<CUDT> takeNewEntry();
-
-    // The received packet queue.
-    CUnitQueue* unitQueue() { return &m_UnitQueue; }
 
 private:
+    std::shared_ptr<CUDT> takeNewEntry();
+
     void worker();
 
     /**
@@ -447,12 +358,13 @@ private:
      */
     void timerCheck();
 
-    Result<> processUnit(CUnit* unit, const detail::SocketAddress& addr);
+    Result<> processUnit(
+        std::shared_ptr<Unit> unit, const detail::SocketAddress& addr);
 
     std::thread m_WorkerThread;
 
 private:
-    CUnitQueue m_UnitQueue;        // The received packet queue
+    UnitQueue m_UnitQueue;        // The received packet queue
 
     // List of UDT instances that will read packets from the queue.
     CRcvUList m_rcvUList;

@@ -247,6 +247,12 @@ SystemCommands::MountCode SystemCommands::mount(
         /*Win2008, Vista*/"2.0",
         /*NT, old linux kernels*/"1.0"};
 
+    if (url.size() < 3 || url[0] != '/' || url[1] != '/')
+    {
+        NX_OUTPUT << "Mount: invalid url: " << url;
+        return SystemCommands::MountCode::otherError;
+    }
+
     std::stringstream optionStream;
     optionStream << "user=" << (user ? *user : "") << ",";
     if (domain)
@@ -315,9 +321,16 @@ SystemCommands::MountCode SystemCommands::mount(
         }
 
         const auto resultUrl = ((std::stringstream&)(std::stringstream() << "//" << host.data() << hostEnd)).str();
+
+        std::string unc;
+        std::transform(
+            resultUrl.cbegin(), resultUrl.cend(), std::back_inserter(unc),
+            [](char c) { return c == '/' ? '\\' : c; });
+        const auto optionsWithUNC = "unc=" + unc + "," + options;
+
         for (const auto& v: versions)
         {
-            if (::mount(resultUrl.data(), localPath.data(), "cifs", 0, (options + v).data()) == 0)
+            if (::mount(resultUrl.data(), localPath.data(), "cifs", 0, (optionsWithUNC + v).data()) == 0)
             {
                 NX_OUTPUT << "Mount '" << resultUrl << "' to '" << localPath << "' succeeded";
                 return SystemCommands::MountCode::ok;
@@ -334,7 +347,7 @@ SystemCommands::MountCode SystemCommands::mount(
             }
         }
 
-        NX_OUTPUT << "Mount failed. errno: %d" << errno;
+        NX_OUTPUT << "Mount failed. errno: " << errno;
         continue;
     }
 

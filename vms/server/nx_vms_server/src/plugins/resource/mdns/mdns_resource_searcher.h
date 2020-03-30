@@ -17,11 +17,6 @@ public:
 
     virtual QnResourceList findResources() override;
 
-    /**
-     * Compare two ipv4 addresses.
-     * @return How many first numbers are equals.
-     */
-    static int getSimilarity(const QString& remoteAddress, const QString& localAddress);
 private:
     /**
      * @param result Just found resources. In case if same camera has been found on multiple
@@ -31,6 +26,7 @@ private:
      *     NOTE Searcher MUST not duplicate resources, already present in \a result.
      */
     virtual QList<QnNetworkResourcePtr> processPacket(
+        const QnResourceList& result,
         const QByteArray& responseData,
         const QHostAddress& discoveryAddress,
         const QHostAddress& foundHostAddress) = 0;

@@ -12,6 +12,7 @@
 #include <nx/vms/server/resource/resource_fwd.h>
 
 #include <nx/analytics/metadata_logger.h>
+#include <nx/utils/lockable.h>
 
 struct QnAbstractMediaData;
 
@@ -56,8 +57,7 @@ private:
     const nx::vms::server::resource::CameraPtr m_camera;
     bool m_needReopen = false;
     bool m_cameraAudioEnabled = false;
-    CameraDiagnostics::Result m_openStreamResult = CameraDiagnostics::Result(
-        CameraDiagnostics::ErrorCode::unknown);
+    nx::utils::Lockable<CameraDiagnostics::Result> m_openStreamResult;
     //!Incremented with every open stream attempt
     int m_openStreamCounter = 0;
     QnWaitCondition m_cond;

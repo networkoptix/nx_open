@@ -200,12 +200,13 @@ nx::network::SocketAddress QnPlAxisResourceSearcher::obtainFixedHostAddress(
 }
 
 QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
+    const QnResourceList& result,
     const QByteArray& responseData,
     const QHostAddress& discoveryAddress,
     const QHostAddress& foundHostAddress )
 {
-    QString foundAddressStr = foundHostAddress.toString();
     QString discoveryAddressStr = discoveryAddress.toString();
+    QString foundAddressStr = foundHostAddress.toString();
 
     QString smac;
     QString name;
@@ -267,6 +268,17 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
+    for(const QnResourcePtr& res: result)
+    {
+        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
+
+        if (net_res->getMAC().toString() == smac)
+            //&& QHostAddress(net_res->getHostAddress()) == foundHostAddress)
+        {
+            return local_results; // already found;
+        }
+    }
+
     QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return local_results; // model forced by ONVIF
@@ -285,12 +297,19 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
     QnMdnsPacket packet;
+    bool deviceAddressFound = false;
     if (packet.fromDatagram(responseData))
     {
         auto rrsToInspect = packet.answerRRs + packet.additionalRRs;
 
         for (const auto& record: rrsToInspect)
         {
+            if (record.recordType == QnMdnsPacket::kPtrRecordType
+                && record.recordName.contains("in-addr.arpa"))
+            {
+                deviceAddressFound = true;
+            }
+
             if (record.recordType == QnMdnsPacket::kSrvRecordType)
             {
                 QnMdnsSrvData srv;
@@ -299,6 +318,8 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
             }
         }
     }
+    if (!deviceAddressFound && resourceData.value<bool>("needAddrInMdnsSearch"))
+       return local_results;
 
     QUrl url;
     url.setScheme(lit("http"));

@@ -145,153 +145,6 @@ static SendedPacketVerifier packetVerifier;
 
 //-------------------------------------------------------------------------------------------------
 
-CPacket& CUnit::packet()
-{
-    return m_Packet;
-}
-
-void CUnit::setFlag(int val)
-{
-    m_iFlag = val;
-}
-
-int CUnit::flag() const
-{
-    return m_iFlag;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-CUnitQueue::CUnitQueue() = default;
-
-CUnitQueue::~CUnitQueue()
-{
-    CQEntry* p = m_pQEntry;
-
-    while (p != nullptr)
-    {
-        CQEntry* q = p;
-        if (p == m_pLastQueue)
-            p = nullptr;
-        else
-            p = p->next;
-        delete q;
-    }
-}
-
-int CUnitQueue::init(int size, int mss)
-{
-    auto tempq = new CQEntry;
-    auto tempb = Buffer(size * mss);
-
-    tempq->unitQueue = std::vector<CUnit>(size);
-    for (std::size_t i = 0; i < tempq->unitQueue.size(); ++i)
-    {
-        tempq->unitQueue[i].setFlag(0);
-        tempq->unitQueue[i].packet().setPayload(tempb.substr(i * mss));
-    }
-    tempq->m_pBuffer = std::move(tempb);
-
-    m_pQEntry = m_pCurrQueue = m_pLastQueue = tempq;
-    m_pQEntry->next = m_pQEntry;
-
-    m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-
-    m_iSize = size;
-    m_iMSS = mss;
-
-    return 0;
-}
-
-int CUnitQueue::increase()
-{
-    if (!m_pQEntry)
-        return -1;
-
-    // adjust/correct m_iCount
-    int real_count = 0;
-    CQEntry* p = m_pQEntry;
-    while (p != nullptr)
-    {
-        real_count += (int) std::count_if(
-            p->unitQueue.begin(), p->unitQueue.end(),
-            [](const auto& unit) { return unit.flag() != 0; });
-
-        if (p == m_pLastQueue)
-            p = nullptr;
-        else
-            p = p->next;
-    }
-    m_iCount = real_count;
-    if (double(real_count) / m_iSize < 0.9)
-        return -1;
-
-    // all queues have the same size
-    const auto size = m_pQEntry->unitQueue.size();
-
-    auto tempq = new CQEntry;
-    Buffer tempb(size * m_iMSS);
-
-    tempq->unitQueue = std::vector<CUnit>(size);
-    for (std::size_t i = 0; i < tempq->unitQueue.size(); ++i)
-    {
-        tempq->unitQueue[i].setFlag(0);
-        tempq->unitQueue[i].packet().setPayload(tempb.substr(i * m_iMSS));
-    }
-    tempq->m_pBuffer = std::move(tempb);
-
-    m_pLastQueue->next = tempq;
-    m_pLastQueue = tempq;
-    m_pLastQueue->next = m_pQEntry;
-
-    m_iSize += size;
-
-    return 0;
-}
-
-int CUnitQueue::shrink()
-{
-    // currently queue cannot be shrunk.
-    return -1;
-}
-
-CUnit* CUnitQueue::getNextAvailUnit()
-{
-    if (m_iCount * 10 > m_iSize * 9)
-        increase();
-
-    if (m_iCount >= m_iSize)
-        return nullptr;
-
-    CQEntry* entrance = m_pCurrQueue;
-
-    do
-    {
-        for (CUnit* sentinel = &m_pCurrQueue->unitQueue.back();
-            m_pAvailUnit != sentinel;
-            ++m_pAvailUnit)
-        {
-            if (m_pAvailUnit->flag() == 0)
-                return m_pAvailUnit;
-        }
-
-        if (m_pCurrQueue->unitQueue.front().flag() == 0)
-        {
-            m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-            return m_pAvailUnit;
-        }
-
-        m_pCurrQueue = m_pCurrQueue->next;
-        m_pAvailUnit = &m_pCurrQueue->unitQueue[0];
-    } while (m_pCurrQueue != entrance);
-
-    increase();
-
-    return nullptr;
-}
-
-//-------------------------------------------------------------------------------------------------
-
 CSndUList::CSndUList(
     CTimer* timer,
     std::mutex* windowLock,
@@ -778,6 +631,7 @@ CRcvQueue::CRcvQueue(
     AbstractUdpChannel* c,
     CTimer* t)
     :
+    m_UnitQueue(size, payload),
     m_channel(c),
     m_timer(t),
     m_iIPversion(ipVersion),
@@ -786,8 +640,6 @@ CRcvQueue::CRcvQueue(
     m_pRendezvousQueue(std::make_unique<CRendezvousQueue>())
 {
     assert(m_iPayloadSize > 0);
-
-    m_UnitQueue.init(size, payload);
 }
 
 CRcvQueue::~CRcvQueue()
@@ -834,7 +686,7 @@ void CRcvQueue::worker()
         }
 
         // find next available slot for incoming packet
-        CUnit* unit = m_UnitQueue.getNextAvailUnit();
+        auto unit = m_UnitQueue.takeNextAvailUnit();
         if (!unit)
         {
             // TODO: #ak Actual read may happen much later, so buffer size should be checked
@@ -867,7 +719,7 @@ void CRcvQueue::worker()
         tracePacket("recv", addr, m_channel->getSockAddr(), unit->packet());
 #endif
 
-        processUnit(unit, addr);
+        processUnit(std::move(unit), addr);
         // Ignoring error since the socket could be removed before connect finished.
 
         timerCheck();
@@ -904,7 +756,7 @@ void CRcvQueue::timerCheck()
 }
 
 Result<> CRcvQueue::processUnit(
-    CUnit* unit,
+    std::shared_ptr<Unit> unit,
     const detail::SocketAddress& addr)
 {
     int32_t id = unit->packet().m_iID;
@@ -939,7 +791,7 @@ Result<> CRcvQueue::processUnit(
                 if (u->connected() && !u->broken() && !u->isClosing())
                 {
                     if (unit->packet().getFlag() == PacketFlag::Data)
-                        u->processData(unit); // TODO: #ak It is unclear why the result is ignored.
+                        u->processData(std::move(unit)); // TODO: #ak It is unclear why the result is ignored.
                     else
                         u->processCtrl(unit->packet());
 
