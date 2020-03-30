@@ -34,7 +34,7 @@ namespace {
         return data[3] + kSeparator + data[2] + kSeparator + data[1] + kSeparator + data[0];
     }
 
-    QString getDeviceAddress(const QString& localAddress,
+    QString getDeviceAddress(const QList<nx::network::HostAddress>& localAddressList,
         const QString& remoteAddress, const QByteArray& responseData)
     {
         QString result = remoteAddress;
@@ -42,16 +42,26 @@ namespace {
         if (!packet.fromDatagram(responseData))
             return result;
 
-        int similarity = getSimilarity(localAddress, remoteAddress);
+        QStringList remoteAddressList;
         for (const auto& record : packet.answerRRs)
         {
             if (record.recordType == QnMdnsPacket::kPtrRecordType
                 && record.recordName.contains("in-addr.arpa"))
             {
                 const auto remoteAddress = extractIpFromPtrRecordName(record.recordName);
-                if (remoteAddress.isEmpty())
-                    continue;
-                const int newSimilarity = getSimilarity(localAddress, remoteAddress);
+                if (!remoteAddress.isEmpty())
+                    remoteAddressList << remoteAddress;
+            }
+        }
+        if (remoteAddressList.empty())
+            return remoteAddress;
+
+        int similarity = 0;
+        for (const auto& localAddress: localAddressList)
+        {
+            for (const auto& remoteAddress: remoteAddressList)
+            {
+                const int newSimilarity = getSimilarity(localAddress.toString(), remoteAddress);
                 if (newSimilarity > similarity)
                 {
                     similarity = newSimilarity;
@@ -81,19 +91,20 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 {
     QnResourceList result;
 
+    const auto addressList = allLocalAddresses(nx::network::AddressFilter::onlyFirstIpV4);
     auto consumerData = m_serverModule->mdnsListener()->getData((std::uintptr_t) this);
     consumerData->forEachEntry(
-        [this, &result](
+        [this, addressList, &result](
             const QString& remoteAddress,
             const QString& localAddress,
             const QByteArray& responseData)
         {
-        const auto deviceAddress = getDeviceAddress(localAddress, remoteAddress, responseData);
-            const QList<QnNetworkResourcePtr>& nresourceLst = processPacket(
-                result,
-                responseData,
-                QHostAddress(localAddress),
-                QHostAddress(deviceAddress));
+        const auto deviceAddress = getDeviceAddress(addressList, remoteAddress, responseData);
+        const QList<QnNetworkResourcePtr>& nresourceLst = processPacket(
+            result,
+            responseData,
+            QHostAddress(localAddress),
+            QHostAddress(deviceAddress));
 
             for(const QnNetworkResourcePtr& nresource: nresourceLst)
             {
