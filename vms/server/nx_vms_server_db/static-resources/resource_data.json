@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.252",
+    "version": "1.0.1.253",
     "data": [
         {
             "keys": [
@@ -4017,6 +4017,34 @@
                         "device":  [0.04, 0.10, 0.13, 0.17, 0.26, 0.43, 0.70, 0.87, 1.00],
                         "logical": [1.00, 1.72, 2.22, 3.17, 4.44, 6.81, 10.00, 12.39, 14.44],
                         "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapping for firmware: V5.5.0 build 171106",
+            "keys": [
+                "HIKVISION|DS-2DF8236*"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [20, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
+                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
+                        "logicalMultiplier": 36,
                         "space": "35MmEquiv"
                     }
                 }
