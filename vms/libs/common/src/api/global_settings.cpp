@@ -692,7 +692,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 
     m_licenseServerUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "licenseServer",
-        "http://licensing.vmsproxy.com", //< Licensing server does not support https.
+        "https://licensing.vmsproxy.com", //< Licensing server does not support https.
         this);
 
     m_resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::utils::Url>(
