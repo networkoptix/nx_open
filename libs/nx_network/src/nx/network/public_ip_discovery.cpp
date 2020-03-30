@@ -10,8 +10,8 @@
 
 namespace {
 
-const QString kDefaultPrimaryUrlsList(QLatin1String("http://tools.vmsproxy.com/myip"));
-const QString kDefaultSecondaryUrlsList(QLatin1String("http://tools-eu.vmsproxy.com/myip"));
+const QString kDefaultPrimaryUrlsList(QLatin1String("https://tools.vmsproxy.com/myip"));
+const QString kDefaultSecondaryUrlsList(QLatin1String("https://tools-eu.vmsproxy.com/myip"));
 const int kRequestTimeoutMs = 10 * 1000;
 const QLatin1String kIpRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 
