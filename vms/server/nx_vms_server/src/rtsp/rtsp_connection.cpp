@@ -656,7 +656,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::waitForKeyFrame(
     while(!m_needStop)
     {
         auto result = getKeyFrame(dataType, quality);
-        if (result)
+        if (result || dataType == QnAbstractMediaData::DataType::AUDIO)
             return result;
 
         std::this_thread::sleep_for(kSleepInterval);
