@@ -2944,7 +2944,10 @@ void MediaServerProcess::registerRestHandlers(
      * Get the static image from the camera.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
      *     or MAC address (not supported for certain cameras).
-     * %param[opt]:string time Timestamp of the requested image (in milliseconds since epoch).<br/>
+     * %param[opt]:string time Timestamp of the requested image (as a string containing time in
+     *     milliseconds since epoch, or a local time formatted like
+     *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
+     *     - the format is auto-detected).<br/>
      *     The special value "now" requires to retrieve the thumbnail only from the live stream.
      *     <br/>The special value "latest", which is the default value, requires to retrieve
      *     thumbnail from the live stream if possible, otherwise the latest one from the archive.
