@@ -39,6 +39,7 @@ CLServerPushStreamReader::CLServerPushStreamReader(
     QnLiveStreamProvider(dev),
     m_camera(dev)
 {
+    *m_openStreamResult.lock() = CameraDiagnostics::Result(CameraDiagnostics::ErrorCode::unknown);
 }
 
 CameraDiagnostics::Result CLServerPushStreamReader::diagnoseMediaStreamConnection()
@@ -48,12 +49,12 @@ CameraDiagnostics::Result CLServerPushStreamReader::diagnoseMediaStreamConnectio
     const int openStreamCounter = m_openStreamCounter;
     while( openStreamCounter == m_openStreamCounter
         && !needToStop()
-        && m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError )
+        && m_openStreamResult.lock()->errorCode != CameraDiagnostics::ErrorCode::noError )
     {
         m_cond.wait( lk.mutex() );
     }
 
-    return m_openStreamResult;
+    return *m_openStreamResult.lock();
 }
 
 CameraDiagnostics::Result CLServerPushStreamReader::openStream()
@@ -79,7 +80,7 @@ bool CLServerPushStreamReader::isCameraControlRequired() const
 
 bool CLServerPushStreamReader::processOpenStreamResult()
 {
-    if (m_openStreamResult.errorCode == CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
+    if (m_openStreamResult.lock()->errorCode == CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
     {
         const QnAbstractMediaDataPtr& data = createMetadataPacket();
         if (dataCanBeAccepted())
@@ -98,16 +99,16 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     bool isInitialized = m_camera->isInitialized();
     if (!isInitialized)
     {
-        if (m_openStreamResult)
-            m_openStreamResult = CameraDiagnostics::InitializationInProgress();
+        if (*m_openStreamResult.lock())
+            *m_openStreamResult.lock() = CameraDiagnostics::InitializationInProgress();
     }
     else
     {
         m_currentLiveParams = getLiveParams();
         NX_VERBOSE(this, "Opening stream with params: %1", m_currentLiveParams);
-        m_openStreamResult = openStreamInternal(isControlRequired, m_currentLiveParams);
+        *m_openStreamResult.lock() = openStreamInternal(isControlRequired, m_currentLiveParams);
         NX_VERBOSE(this, "Opening stream result: [%1]",
-            m_openStreamResult.toString(resourcePool()));
+            m_openStreamResult.lock()->toString(resourcePool()));
         m_needControlTimer.restart();
         m_openedWithStreamCtrl = isControlRequired;
     }
@@ -132,10 +133,10 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     {
         onEvent(
             std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
-            m_openStreamResult);
+            *m_openStreamResult.lock());
     }
 
-    return m_openStreamResult;
+    return *m_openStreamResult.lock();
 }
 
 bool CLServerPushStreamReader::postProcessData(const QnAbstractMediaDataPtr& data)
@@ -213,10 +214,10 @@ void CLServerPushStreamReader::run()
         if (data == nullptr)
         {
             setNeedKeyData();
-            m_openStreamResult = CameraDiagnostics::BadMediaStreamResult();
+            *m_openStreamResult.lock() = CameraDiagnostics::BadMediaStreamResult();
             onEvent(
                 std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()),
-                m_openStreamResult);
+                *m_openStreamResult.lock());
             QnSleep::msleep(kErrorDelayTimeoutMs); //< To avoid large CPU usage
             continue;
         }
@@ -309,7 +310,7 @@ void CLServerPushStreamReader::at_audioEnabledChanged(const QnResourcePtr& /*res
 
 CameraDiagnostics::Result CLServerPushStreamReader::lastOpenStreamResult() const
 {
-    return m_openStreamResult;
+    return *m_openStreamResult.lock();
 }
 
 #endif // ENABLE_DATA_PROVIDERS
