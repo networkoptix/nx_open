@@ -45,8 +45,7 @@ namespace {
         QStringList remoteAddressList;
         for (const auto& record : packet.answerRRs)
         {
-            if (record.recordType == QnMdnsPacket::kPtrRecordType
-                && record.recordName.contains("in-addr.arpa"))
+            if (record.recordName.contains("in-addr.arpa"))
             {
                 const auto remoteAddress = extractIpFromPtrRecordName(record.recordName);
                 if (!remoteAddress.isEmpty())

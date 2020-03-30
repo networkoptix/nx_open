@@ -304,11 +304,8 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
         for (const auto& record: rrsToInspect)
         {
-            if (record.recordType == QnMdnsPacket::kPtrRecordType
-                && record.recordName.contains("in-addr.arpa"))
-            {
+            if (record.recordName.contains("in-addr.arpa"))
                 deviceAddressFound = true;
-            }
 
             if (record.recordType == QnMdnsPacket::kSrvRecordType)
             {
