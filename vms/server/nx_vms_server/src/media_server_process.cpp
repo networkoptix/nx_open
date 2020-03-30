@@ -2635,7 +2635,8 @@ void MediaServerProcess::registerRestHandlers(
      *     milliseconds).
      * %param:integer startTime Start time of the bookmark (in milliseconds since epoch).
      * %param:integer duration Length of the bookmark (in milliseconds).
-     * %param[opt] tag Applied tag. Several tag parameters could be used to specify multiple tags.
+     * %param[opt]:string tag Applied tag. Several "tag" parameters can be specified to set
+     *     multiple tags.
      * %param[proprietary]:option local If present, the request should not be redirected to another
      *     server.
      * %param[proprietary]:option extraFormatting If present and the requested result format is
@@ -2671,7 +2672,7 @@ void MediaServerProcess::registerRestHandlers(
      *     milliseconds).
      * %param:integer startTime Start time of the bookmark (in milliseconds since epoch).
      * %param:integer duration Length of the bookmark (in milliseconds).
-     * %param[opt]:string tag Applied tag. Serveral tag parameters could be used to specify
+     * %param[opt]:string tag Applied tag. Several "tag" parameters can be specified to set
      *     multiple tags.
      * %param[proprietary]:option local If present, the request should not be redirected to another
      *     server.
