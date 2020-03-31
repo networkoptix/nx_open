@@ -803,21 +803,15 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
     {
         QnCachingCameraDataLoader::AllowedContent content =
             {Qn::RecordingContent, Qn::MotionContent};
-        if (ini().limitAnalyticsTimePeriodsLoading)
-        {
-            if (selectedExtraContent() == Qn::AnalyticsContent
-                && m_currentMediaWidget
-                && m_currentMediaWidget->resource() == syncedResource)
-            {
-                content.insert(Qn::AnalyticsContent);
-                // If the widget with the same resource is already present, we must not modify
-                // it's loader at all.
-                NX_ASSERT(loader->allowedContent() == content);
-            }
-        }
-        else
+
+        if (selectedExtraContent() == Qn::AnalyticsContent
+            && m_currentMediaWidget
+            && m_currentMediaWidget->resource() == syncedResource)
         {
             content.insert(Qn::AnalyticsContent);
+            // If the widget with the same resource is already present, we must not modify
+            // it's loader at all.
+            NX_ASSERT(loader->allowedContent() == content);
         }
 
         loader->setAllowedContent(content);
@@ -1164,16 +1158,13 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     if (m_currentWidget == widget)
         return;
 
-    if (ini().limitAnalyticsTimePeriodsLoading)
+    if (selectedExtraContent() == Qn::AnalyticsContent)
     {
-        if (selectedExtraContent() == Qn::AnalyticsContent)
+        if (auto loader = loaderByWidget(m_currentMediaWidget, /*createIfNotExists*/ false))
         {
-            if (auto loader = loaderByWidget(m_currentMediaWidget, /*createIfNotExists*/ false))
-            {
-                auto allowedContent = loader->allowedContent();
-                allowedContent.erase(Qn::AnalyticsContent);
-                loader->setAllowedContent(allowedContent);
-            }
+            auto allowedContent = loader->allowedContent();
+            allowedContent.erase(Qn::AnalyticsContent);
+            loader->setAllowedContent(allowedContent);
         }
     }
 
@@ -1234,16 +1225,13 @@ void QnWorkbenchNavigator::updateCurrentWidget()
             &QnWorkbenchNavigator::updateLines);
     }
 
-    if (ini().limitAnalyticsTimePeriodsLoading)
+    if (m_currentMediaWidget && selectedExtraContent() == Qn::AnalyticsContent)
     {
-        if (m_currentMediaWidget && selectedExtraContent() == Qn::AnalyticsContent)
+        if (auto loader = loaderByWidget(m_currentMediaWidget, /*createIfNotExists*/ true))
         {
-            if (auto loader = loaderByWidget(m_currentMediaWidget, /*createIfNotExists*/ true))
-            {
-                auto allowedContent = loader->allowedContent();
-                allowedContent.insert(Qn::AnalyticsContent);
-                loader->setAllowedContent(allowedContent);
-            }
+            auto allowedContent = loader->allowedContent();
+            allowedContent.insert(Qn::AnalyticsContent);
+            loader->setAllowedContent(allowedContent);
         }
     }
 
@@ -2786,17 +2774,14 @@ void QnWorkbenchNavigator::setSelectedExtraContent(Qn::TimePeriodContent value)
     if (m_timeSlider)
         m_timeSlider->setSelectedExtraContent(value);
 
-    if (ini().limitAnalyticsTimePeriodsLoading)
+    if (auto loader = loaderByWidget(m_currentMediaWidget, /*createIfNotExists*/ true))
     {
-        if (auto loader = loaderByWidget(m_currentMediaWidget, /*createIfNotExists*/ true))
-        {
-            auto allowedContent = loader->allowedContent();
-            if (value == Qn::AnalyticsContent)
-                allowedContent.insert(Qn::AnalyticsContent);
-            else
-                allowedContent.erase(Qn::AnalyticsContent);
-            loader->setAllowedContent(allowedContent);
-        }
+        auto allowedContent = loader->allowedContent();
+        if (value == Qn::AnalyticsContent)
+            allowedContent.insert(Qn::AnalyticsContent);
+        else
+            allowedContent.erase(Qn::AnalyticsContent);
+        loader->setAllowedContent(allowedContent);
     }
 
     if (value != Qn::RecordingContent)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QDateTime>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/vms/api/types_fwd.h>
 #include <nx/vms/api/types/days_of_week.h>
@@ -14,9 +16,20 @@ struct QnServerBackupSchedule
     int     backupBitrate;       // bitrate cap in bytes per second. Any value <= 0 if not capped.
 
     static const int defaultBackupBitrate;
+    static constexpr int kDurationUntilFinished = -1;
     QnServerBackupSchedule();
 
     bool isValid() const;
+    bool isUntilFinished() const;
+
+    /**
+     * Checks if dateTime is within any period of the schedule and within the day
+     * of the period if isUntilFinished() is true.
+     */
+    bool dateTimeFits(QDateTime dateTime) const;
+
+    /** Checks if dateTime day fits and dateTime is before period end. */
+    bool isDateTimeBeforeDayPeriodEnd(QDateTime dateTime) const;
 };
 
 #define QnServerBackupSchedule_Fields  \

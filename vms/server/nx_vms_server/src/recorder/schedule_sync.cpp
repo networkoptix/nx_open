@@ -572,7 +572,6 @@ void QnScheduleSync::run()
 
             QDateTime now = qnSyncTime->currentDateTime();
             const auto today = vms::api::dayOfWeek(Qt::DayOfWeek(now.date().dayOfWeek()));
-            const auto allowedDays = m_schedule.backupDaysOfTheWeek;
 
             if (m_curDow == vms::api::DayOfWeek::none || today != m_curDow)
             {
@@ -587,30 +586,11 @@ void QnScheduleSync::run()
             if (rebuildInfo.state != Qn::RebuildState::RebuildState_None)
                 return SyncCode::reindexInProgress;
 
-            if (allowedDays.testFlag(today))
-            {
-                const auto curTime = now.time();
-                const bool nowIsPastTheBackupStartPoint =
-                    curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec * 1000;
-                const bool syncUntilFinished = m_schedule.backupDurationSec == -1;
+            if (m_schedule.dateTimeFits(now))
+                return SyncCode::ok;
+            if (m_syncing && m_schedule.isDateTimeBeforeDayPeriodEnd(now))
+                return SyncCode::ok;
 
-                if (nowIsPastTheBackupStartPoint && syncUntilFinished)
-                    return SyncCode::ok;
-
-                const auto backupFinishTimePointMs =
-                    m_schedule.backupStartSec * 1000 + m_schedule.backupDurationSec * 1000;
-                const bool backupPeriodNotFinishedYet =
-                    curTime.msecsSinceStartOfDay() < backupFinishTimePointMs;
-
-                if (nowIsPastTheBackupStartPoint && backupPeriodNotFinishedYet)
-                    return SyncCode::ok;
-
-                if (m_syncing && syncUntilFinished)
-                    return SyncCode::ok;
-
-                if (m_syncing && backupPeriodNotFinishedYet)
-                    return SyncCode::ok;
-            }
             return SyncCode::wrongTime;
         };
 

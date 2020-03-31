@@ -318,19 +318,12 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         }
 
         auto areaInfo = areaInfoFromObject(objectInfo);
-        if (ini().enableObjectMetadataInterpolation)
-        {
-            areaInfo.rectangle = interpolatedRectangle(
-                objectInfo.rectangle,
-                objectInfo.startTimestamp,
-                objectInfo.futureRectangle,
-                objectInfo.futureRectangleTimestamp,
-                timestamp);
-        }
-        else
-        {
-            areaInfo.rectangle = objectInfo.rectangle;
-        }
+        areaInfo.rectangle = interpolatedRectangle(
+            objectInfo.rectangle,
+            objectInfo.startTimestamp,
+            objectInfo.futureRectangle,
+            objectInfo.futureRectangleTimestamp,
+            timestamp);
 
         if (!areaInfo.rectangle.isValid())
         {
@@ -358,8 +351,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             addInfoRow("trackId", "Track ID", objectInfo.trackId);
             addInfoRow("delay", "Delay", (timestamp - objectInfo.startTimestamp).count() / 1000);
             addInfoRow("actual_ts", "Timestamp", timestamp.count());
-            if (ini().enableObjectMetadataInterpolation)
-                addInfoRow("actual_rect", "Interpolated", areaInfo.rectangle);
+            addInfoRow("actual_rect", "Interpolated", areaInfo.rectangle);
             addInfoRow("object_ts", "Original TS", objectInfo.startTimestamp.count());
             addInfoRow("object_rect", "Original Rect", objectInfo.rectangle);
             addInfoRow("future_ts", "Future TS", objectInfo.futureRectangleTimestamp.count());

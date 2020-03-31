@@ -26,8 +26,6 @@ const int kDaysPerWeek = 7;
 const int kBitsPerMegabit = 1024 * 1024;
 const int kBitsPerByte = 8;
 
-const int kUntilFinished = -1;
-
 Qt::DayOfWeek nextDay(Qt::DayOfWeek day)
 {
     static_assert(Qt::Sunday == 7, "Make sure Sunday is the last day");
@@ -66,7 +64,8 @@ QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent):
 
     initDayOfWeekCheckboxes();
 
-    ui->comboBoxTimeTo->addItem(tr("Until finished"), kUntilFinished);
+    ui->comboBoxTimeTo->addItem(
+        tr("Until finished"), QnServerBackupSchedule::kDurationUntilFinished);
     for (int i = 0; i < 24; ++i)
     {
         QString hour = datetime::toString(QTime(i, 0, 0), datetime::Format::hh);
@@ -157,7 +156,8 @@ void QnBackupScheduleDialog::updateNextDayLabel()
 		ui->comboBoxTimeStart->itemData(ui->comboBoxTimeStart->currentIndex()).toInt();
     const int backupEnd = ui->comboBoxTimeTo->itemData(ui->comboBoxTimeTo->currentIndex()).toInt();
 
-    const bool showHint = (backupEnd != kUntilFinished && backupEnd <= backupStartSec);
+    const bool showHint = backupEnd != QnServerBackupSchedule::kDurationUntilFinished
+        && backupEnd <= backupStartSec;
     ui->finishNextDayLabel->setVisible(showHint);
 }
 
@@ -187,7 +187,7 @@ void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& va
     }
 
     setNearestValue(ui->comboBoxTimeStart, value.backupStartSec);
-    if (value.backupDurationSec == kUntilFinished)
+    if (value.isUntilFinished())
         setNearestValue(ui->comboBoxTimeTo, value.backupDurationSec);
     else
         setNearestValue(ui->comboBoxTimeTo, (value.backupStartSec + value.backupDurationSec) % kSecsPerDay);
@@ -214,7 +214,7 @@ void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
     value.backupStartSec =
 		ui->comboBoxTimeStart->itemData(ui->comboBoxTimeStart->currentIndex()).toInt();
     int backupEnd = ui->comboBoxTimeTo->itemData(ui->comboBoxTimeTo->currentIndex()).toInt();
-    if (backupEnd == kUntilFinished)
+    if (backupEnd == QnServerBackupSchedule::kDurationUntilFinished)
     {
         value.backupDurationSec = backupEnd;
     }

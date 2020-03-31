@@ -386,7 +386,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
                     ui->timeSelectionButton->setAccented(period == Period::selection);
                     setSelectedPeriod(period);
 
-                    if (ini().automaticFilterByTimelineSelection && period != Period::selection)
+                    if (period != Period::selection)
                         navigator()->clearTimelineSelection();
                 });
 
@@ -411,8 +411,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
     m_timeSelectionActions[Period::all]->trigger();
     ui->timeSelectionButton->setMenu(timeMenu);
 
-    m_timeSelectionActions[Period::selection]->setVisible(
-        !ini().automaticFilterByTimelineSelection);
+    m_timeSelectionActions[Period::selection]->setVisible(false);
 
     // Setup timeline selection watcher.
 
@@ -422,20 +421,17 @@ void AbstractSearchWidget::Private::setupTimeSelection()
     applyTimePeriod->setCallback(
         [this]()
         {
-            if (ini().automaticFilterByTimelineSelection)
+            const bool selectionExists = !m_timelineSelection.isNull();
+            const bool selectionFilter = m_period == Period::selection;
+
+            if (selectionExists != selectionFilter)
             {
-                const bool selectionExists = !m_timelineSelection.isNull();
-                const bool selectionFilter = m_period == Period::selection;
+                const auto action = selectionExists
+                    ? m_timeSelectionActions[Period::selection]
+                    : m_timeSelectionActions[m_previousPeriod];
 
-                if (selectionExists != selectionFilter)
-                {
-                    const auto action = selectionExists
-                        ? m_timeSelectionActions[Period::selection]
-                        : m_timeSelectionActions[m_previousPeriod];
-
-                    action->trigger();
-                    return;
-                }
+                action->trigger();
+                return;
             }
 
             if (m_period == Period::selection)
@@ -446,9 +442,6 @@ void AbstractSearchWidget::Private::setupTimeSelection()
         [this, applyTimePeriod](const QnTimePeriod& selection)
         {
             m_timelineSelection = selection;
-
-            if (m_period != Period::selection && !ini().automaticFilterByTimelineSelection)
-                return;
 
             // If selection was cleared, update immediately, otherwise update after small delay.
             if (m_timelineSelection.isNull())
