@@ -52,19 +52,13 @@ protected:
      * thread for long.
      * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
-    virtual bool pushCompressedVideoFrame(const ICompressedVideoPacket* /*videoFrame*/)
-    {
-        return true;
-    }
+    virtual bool pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame);
 
     /**
      * Override to accept next uncompressed video frame for processing.
      * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
-    virtual bool pushUncompressedVideoFrame(const IUncompressedVideoFrame* /*videoFrame*/)
-    {
-        return true;
-    }
+    virtual bool pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame);
 
     /**
      * Override to send the newly constructed metadata packets to Server - add the packets to the
@@ -72,10 +66,7 @@ protected:
      * the moment (not necessarily referring to that frame). As an alternative, send metadata to
      * Server by calling pushMetadataPacket() instead of implementing this method.
      */
-    virtual bool pullMetadataPackets(std::vector<IMetadataPacket*>* /*metadataPackets*/)
-    {
-        return true;
-    }
+    virtual bool pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets);
 
     /**
      * Send a newly constructed metadata packet to Server. Can be called at any time, from any

@@ -47,6 +47,10 @@ public:
     protected: virtual const IStringMap* getParams() const = 0;
     public: Ptr<const IStringMap> params() const { return toPtr(getParams()); }
 
+    /**
+     * Data returned to the Server after the Action has been executed. Only one of the strings can
+     * be set non-empty.
+     */
     struct Result
     {
         /** If neither null nor empty, Client will open this URL in an embedded browser. */

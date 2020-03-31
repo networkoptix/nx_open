@@ -42,6 +42,24 @@ VideoFrameProcessingDeviceAgent::~VideoFrameProcessingDeviceAgent()
     NX_PRINT << "Destroyed " << this;
 }
 
+bool VideoFrameProcessingDeviceAgent::pushCompressedVideoFrame(
+    const ICompressedVideoPacket* /*videoFrame*/)
+{
+    return true;
+}
+
+bool VideoFrameProcessingDeviceAgent::pushUncompressedVideoFrame(
+    const IUncompressedVideoFrame* /*videoFrame*/)
+{
+    return true;
+}
+
+bool VideoFrameProcessingDeviceAgent::pullMetadataPackets(
+    std::vector<IMetadataPacket*>* /*metadataPackets*/)
+{
+    return true;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Implementation of interface methods.
 

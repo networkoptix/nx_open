@@ -40,6 +40,17 @@ std::string Engine::settingValue(const std::string& settingName)
     return m_settings[settingName];
 }
 
+Result<IAction::Result> Engine::executeAction(
+    const std::string& /*actionId*/,
+    Uuid /*objectTrackId*/,
+    Uuid /*deviceId*/,
+    int64_t /*timestampUs*/,
+    Ptr<IObjectTrackInfo> /*trackInfo*/,
+    const std::map<std::string, std::string>& /*params*/)
+{
+    return {};
+}
+
 void Engine::pushPluginDiagnosticEvent(
     IPluginDiagnosticEvent::Level level,
     std::string caption,
