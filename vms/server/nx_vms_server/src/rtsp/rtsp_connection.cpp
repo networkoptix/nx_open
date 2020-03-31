@@ -650,21 +650,24 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::waitForKeyFrame(
     QnAbstractMediaData::DataType dataType, MediaQuality quality)
 {
     constexpr std::chrono::milliseconds kSleepInterval(100);
-    constexpr std::chrono::seconds kWaitTimeout(10);
-    std::chrono::milliseconds overallWait(0);
+    constexpr std::chrono::seconds kWaitTimeoutForVideo(10);
+    constexpr std::chrono::milliseconds kWaitTimeoutForAudio(100);
 
+    std::chrono::milliseconds overallWait(0);
     while(!m_needStop)
     {
         auto result = getKeyFrame(dataType, quality);
-        if (result || dataType == QnAbstractMediaData::DataType::AUDIO)
+        if (result)
             return result;
 
         std::this_thread::sleep_for(kSleepInterval);
         overallWait += kSleepInterval;
-        if (overallWait > kWaitTimeout)
+        const auto waitTimeout = (dataType == QnAbstractMediaData::DataType::VIDEO)
+            ? kWaitTimeoutForVideo : kWaitTimeoutForAudio;
+        if (overallWait > waitTimeout)
         {
-            NX_WARNING(this, "Stream initializing timeout expired: %1, dataType %2, quality %3",
-                kWaitTimeout, dataType, quality);
+            NX_DEBUG(this, "Stream initializing timeout expired: %1, dataType %2, quality %3",
+                waitTimeout, dataType, quality);
             return nullptr;
         }
     }

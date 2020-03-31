@@ -55,7 +55,7 @@ private:
 
 private:
     const nx::vms::server::resource::CameraPtr m_camera;
-    bool m_needReopen = false;
+    std::atomic<bool> m_needReopen = false;
     bool m_cameraAudioEnabled = false;
     nx::utils::Lockable<CameraDiagnostics::Result> m_openStreamResult;
     //!Incremented with every open stream attempt
