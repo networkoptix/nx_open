@@ -3,6 +3,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_connect_settings.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 
 #include "get_post_tunnel_client.h"
@@ -112,7 +113,10 @@ void ClientFactory::processClientFeedback(
     int tunnelTypeId, const std::string& tag, bool success)
 {
     if (success)
+    {
+        NX_VERBOSE(this, "Got tunnel type %1 success for tag %2", tunnelTypeId, tag);
         return;
+    }
 
     // Recording only failures.
 
@@ -124,6 +128,9 @@ void ClientFactory::processClientFeedback(
         return;
 
     it->second.sinkItem(tunnelTypeId, kTunnelTypeSinkDepth);
+
+    NX_DEBUG(this, "Tunnel type %1 failure. Tag %2. Tunnel type set to %3",
+        tunnelTypeId, tag, it->second.topItem());
 }
 
 } // namespace nx::network::http::tunneling::detail

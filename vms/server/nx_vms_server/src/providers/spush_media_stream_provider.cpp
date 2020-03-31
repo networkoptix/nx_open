@@ -94,6 +94,7 @@ bool CLServerPushStreamReader::processOpenStreamResult()
 
 CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bool isControlRequired)
 {
+    m_needReopen = false;
     onStreamReopen();
 
     bool isInitialized = m_camera->isInitialized();
@@ -202,7 +203,6 @@ void CLServerPushStreamReader::run()
 
         if (m_needReopen)
         {
-            m_needReopen = false;
             closeStream();
             continue;
         }
@@ -296,8 +296,7 @@ void CLServerPushStreamReader::afterRun()
 
 void CLServerPushStreamReader::pleaseReopenStream()
 {
-    if (isRunning())
-        m_needReopen = true;
+    m_needReopen = true;
 }
 
 void CLServerPushStreamReader::at_audioEnabledChanged(const QnResourcePtr& /*resource*/)
