@@ -306,6 +306,8 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
         {
             if (record.recordName.contains("in-addr.arpa"))
                 deviceAddressFound = true;
+            else if (record.recordType == QnMdnsPacket::kHostAddressType  && record.dataLength == 4)
+                deviceAddressFound = true;
 
             if (record.recordType == QnMdnsPacket::kSrvRecordType)
             {

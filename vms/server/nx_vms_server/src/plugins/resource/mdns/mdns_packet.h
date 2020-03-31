@@ -54,6 +54,7 @@ struct QnMdnsPacket
     }
 
 
+    static const quint16 kHostAddressType = 0x1;
     static const quint16 kSrvRecordType = 0x21;
     static const quint16 kPtrRecordType = 0x0c;
     static const quint16 kARecordType = 0x01;
