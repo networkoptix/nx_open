@@ -143,7 +143,7 @@ void QnMdnsListener::updateSocketList()
 {
     deleteSocketList();
     using namespace nx::network;
-    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
+    for (const auto& address: allLocalAddresses(AddressFilter::ipV4 | AddressFilter::noLocal | AddressFilter::noLoopback))
     {
         std::unique_ptr<UDPSocket> sock(new UDPSocket(AF_INET));
         QString localAddress = address.toString();

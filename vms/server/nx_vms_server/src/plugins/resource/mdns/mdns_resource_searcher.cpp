@@ -34,6 +34,12 @@ namespace {
         return data[3] + kSeparator + data[2] + kSeparator + data[1] + kSeparator + data[0];
     }
 
+    QString extractIpFromHostRecordType(const QByteArray& data)
+    {
+        return lit("%1.%2.%3.%4")
+            .arg((int)data[0]).arg((int)data[1]).arg((int)data[2]).arg((int)data[3]);
+    }
+
     QString getDeviceAddress(const QList<nx::network::HostAddress>& localAddressList,
         const QString& remoteAddress, const QByteArray& responseData)
     {
@@ -51,6 +57,11 @@ namespace {
                 if (!remoteAddress.isEmpty())
                     remoteAddressList << remoteAddress;
             }
+            else if (record.recordType == QnMdnsPacket::kHostAddressType && record.dataLength == 4)
+            {
+                remoteAddressList << extractIpFromHostRecordType(record.data);
+            }
+
         }
         if (remoteAddressList.empty())
             return remoteAddress;

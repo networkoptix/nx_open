@@ -289,10 +289,7 @@ Qn::StorageInitResult QnFileStorageResource::initStorageDirectory(const QString&
         return Qn::StorageInit_WrongPath;
     }
 
-    NX_DEBUG(
-        this, "[initOrUpdate] storage directory '%1' was successfully created",
-        hidePassword(url));
-
+    NX_DEBUG(this, "[initOrUpdate] storage directory '%1' was successfully created", url);
     return Qn::StorageInit_Ok;
 }
 
@@ -809,8 +806,7 @@ bool QnFileStorageResource::testWriteCapInternal() const
 #endif
 
     NX_ERROR(
-        this, "[initOrUpdate, WriteTest] Open file '%1' for writing failed",
-        hidePassword(fileName));
+        this, lm("[initOrUpdate, WriteTest] Open file %1 for writing failed").args(fileName));
 
     return false;
 }
@@ -826,27 +822,8 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
         const QString path = QDir(getFsPath()).canonicalPath();
     #endif
 
-    bool isMounted = false;
-    if (!path.isEmpty())
-    {
-        auto pathConfig = nx::vms::server::fs::media_paths::FilterConfig::createDefault(
-            m_serverModule->platform(), /*includeNonHdd*/ true, &m_serverModule->settings());
-
-        static const auto normalize =
-            [](const QString& s)
-            {
-                auto result = s;
-                result.replace('\\', '/');
-                return result;
-            };
-
-        const auto partitions = nx::vms::server::fs::media_paths::getMediaPartitions(pathConfig);
-        isMounted = std::any_of(
-            partitions.cbegin(), partitions.cend(),
-            [path = normalize(path)](const auto& p) { return normalize(p.path).startsWith(path); });
-    }
-
-    if (!isMounted)
+    const bool result = isLocalPathMounted(path);
+    if (!result)
     {
         NX_WARNING(
             this,
@@ -861,7 +838,7 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
             nx::utils::url::hidePassword(getUrl()), path);
     }
 
-    return isMounted ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
+    return result ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
 }
 
 QString QnFileStorageResource::getFsPath() const
@@ -869,6 +846,26 @@ QString QnFileStorageResource::getFsPath() const
     const QString resourcePath = getPath();
     QnMutexLocker lk(&m_mutex);
     return m_localPath.isEmpty() ? resourcePath : m_localPath;
+}
+
+bool QnFileStorageResource::isLocalPathMounted(const QString& path) const
+{
+    using namespace nx::vms::server::fs::media_paths;
+    auto pathConfig = FilterConfig::createDefault(
+        m_serverModule->platform(), /*includeNonHdd*/ true, &m_serverModule->settings());
+
+    static const auto normalize =
+        [](const QString& s)
+        {
+            auto result = s;
+            result.replace('\\', '/');
+            return result;
+        };
+
+    const auto partitions = getMediaPartitions(pathConfig);
+    return std::any_of(
+        partitions.cbegin(), partitions.cend(),
+        [path = normalize(path)](const auto& p) { return normalize(p.path).startsWith(path); });
 }
 
 Qn::StorageInitResult QnFileStorageResource::testWrite() const
