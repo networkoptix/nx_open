@@ -955,10 +955,10 @@ TEST_F(MediaDbTest, invalidFileSize)
 
     const QString id1("1");
 
-    nx::vms::server::Chunk chunk;
+    DeviceFileCatalog::Chunk chunk;
     chunk.startTimeMs = 10;
     chunk.durationMs = 5;
-    chunk.fileIndex = nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION;
+    chunk.fileIndex = DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION;
     chunk.storageIndex = serverModule().storageDbPool()->getStorageIndex(storage);
 
     chunk.setFileSize(-1);
