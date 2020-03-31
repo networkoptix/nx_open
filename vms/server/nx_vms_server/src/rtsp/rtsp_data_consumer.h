@@ -56,6 +56,7 @@ public:
     // Marker increased after play/seek operation
     void setLiveMarker(int marker);
     void setLiveQuality(MediaQuality liveQuality);
+    void autoSwitchQuality(MediaQuality liveQuality);
     virtual void clearUnprocessedData() override;
 
     // put data without mutex. Used for RTSP connection after lockDataQueue
@@ -119,8 +120,9 @@ private:
     bool m_singleShotMode;
     int m_packetSent;
     int m_liveMarker;
-    MediaQuality m_liveQuality;
-    MediaQuality m_newLiveQuality;
+    MediaQuality m_liveQuality; //< Current quality value.
+    MediaQuality m_userDefinedQuality; //< Rollback for user defined value if auto switch occurs.
+    MediaQuality m_newLiveQuality; //< Scheduled value. Quality is switched in consumer thread.
 
     std::optional<std::chrono::time_point<std::chrono::steady_clock>> m_lastSendBufferViaTcpTime;
 

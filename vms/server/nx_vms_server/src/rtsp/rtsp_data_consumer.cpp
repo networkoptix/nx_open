@@ -63,6 +63,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_singleShotMode(false),
     m_packetSent(false),
     m_liveQuality(MEDIA_Quality_High),
+    m_userDefinedQuality(MEDIA_Quality_High),
     m_newLiveQuality(MEDIA_Quality_None),
     m_streamingSpeed(MAX_STREAMING_SPEED),
     m_multiChannelVideo(false),
@@ -262,9 +263,11 @@ void QnRtspDataConsumer::switchQualityIfNeeded(bool isSecondaryProvider)
     const bool isPrimaryOpened = m_lastLiveFrameTime[0] > nowUs - kMaxTimeFromPreviousFrameUs;
     const bool isSecondaryOpened = m_lastLiveFrameTime[1] > nowUs - kMaxTimeFromPreviousFrameUs;
     if (!isLowMediaQuality(m_liveQuality) && !isPrimaryOpened && isSecondaryOpened)
-        setLiveQuality(MediaQuality::MEDIA_Quality_Low);
+        autoSwitchQuality(MediaQuality::MEDIA_Quality_Low);
     else if (isLowMediaQuality(m_liveQuality) && !isSecondaryOpened && isPrimaryOpened)
-        setLiveQuality(MediaQuality::MEDIA_Quality_High);
+        autoSwitchQuality(MediaQuality::MEDIA_Quality_High);
+    else if (isPrimaryOpened && isSecondaryOpened)
+        autoSwitchQuality(m_userDefinedQuality);
 }
 
 void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
@@ -372,6 +375,16 @@ void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
     if (m_liveQuality != liveQuality && m_newLiveQuality != liveQuality)
     {
         NX_DEBUG(this, "Schedule to change quality from %1, to %2", m_liveQuality, liveQuality);
+        m_userDefinedQuality = m_newLiveQuality = liveQuality;
+    }
+}
+
+void QnRtspDataConsumer::autoSwitchQuality(MediaQuality liveQuality)
+{
+    NX_MUTEX_LOCKER lock(&m_qualityChangeMutex);
+    if (m_liveQuality != liveQuality && m_newLiveQuality != liveQuality)
+    {
+        NX_DEBUG(this, "Schedule to change quality from %1, to %2 in automatic mode", m_liveQuality, liveQuality);
         m_newLiveQuality = liveQuality;
     }
 }
