@@ -7,8 +7,10 @@ from requests.packages.urllib3.util.retry import Retry
 
 chunk_size = 1024 * 1024
 
-DEFAULT_TIMEOUT = 600
+DEFAULT_SIGN_TIMEOUT = 90
+DEFAULT_REQUEST_TIMEOUT = 180
 DEFAULT_RETRIES = 10
+assert DEFAULT_SIGN_TIMEOUT < DEFAULT_REQUEST_TIMEOUT
 
 
 def bool_to_str(value):
@@ -21,12 +23,19 @@ def sign_binary(
     output,
     customization,
     trusted_timestamping,
-    timeout=DEFAULT_TIMEOUT,
+    sign_timeout=DEFAULT_SIGN_TIMEOUT,
+    request_timeout=DEFAULT_REQUEST_TIMEOUT,
     max_retries=DEFAULT_RETRIES
 ):
+    if request_timeout <= sign_timeout:
+        print('ERROR: Sign timeout ({}) must be less than request timeout ({})'.format(
+            sign_timeout, request_timeout))
+        return
+
     params = {
         'customization': customization,
-        'trusted_timestamping': bool_to_str(trusted_timestamping)
+        'trusted_timestamping': bool_to_str(trusted_timestamping),
+        'sign_timeout': sign_timeout
     }
 
     last_status_code = 0
@@ -41,7 +50,7 @@ def sign_binary(
         session = requests.Session()
         session.mount(url, HTTPAdapter(max_retries=retries))
         try:
-            r = session.post(url, params=params, files=files, timeout=timeout)
+            r = session.post(url, params=params, files=files, timeout=request_timeout)
             if r.status_code == 200:
                 with open(output, 'wb') as fd:
                     for chunk in r.iter_content(chunk_size=chunk_size):
@@ -53,7 +62,8 @@ def sign_binary(
 
         except requests.exceptions.ReadTimeout as e:
             print('ERROR: Connection to the signing server has timed out' +
-                  ' ({} seconds, {} retries) while signing {}'.format(timeout, max_retries, file))
+                  ' ({} seconds, {} retries) while signing {}'.format(
+                request_timeout, max_retries, file))
             print(e)
             last_status_code = 1
         except requests.exceptions.ConnectionError as e:
@@ -80,15 +90,22 @@ def main():
         action='store_true',
         help='Trusted timestamping')
     parser.add_argument(
+        '--sign-timeout',
+        help='Signing timeout in seconds ({}). Must be less than request timeout.'.format(
+            DEFAULT_SIGN_TIMEOUT),
+        type=int,
+        default=DEFAULT_SIGN_TIMEOUT)
+    parser.add_argument(
         '--retries',
         help='Max retries count ({})'.format(DEFAULT_RETRIES),
         type=int,
         default=DEFAULT_RETRIES)
     parser.add_argument(
-        '--timeout',
-        help='Request timeout in seconds ({})'.format(DEFAULT_TIMEOUT),
+        '--request-timeout',
+        help='Request timeout in seconds ({}). Must be greater than sign timeout'.format(
+            DEFAULT_REQUEST_TIMEOUT),
         type=int,
-        default=DEFAULT_TIMEOUT)
+        default=DEFAULT_REQUEST_TIMEOUT)
     args = parser.parse_args()
 
     return sign_binary(
@@ -97,7 +114,8 @@ def main():
         output=args.output if args.output else args.file,
         customization=args.customization,
         trusted_timestamping=args.trusted_timestamping,
-        timeout=args.timeout,
+        sign_timeout=args.sign_timeout,
+        request_timeout=args.request_timeout,
         max_retries=args.retries)
 
 
