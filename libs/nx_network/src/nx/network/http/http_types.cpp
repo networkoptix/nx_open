@@ -218,6 +218,8 @@ StringType toString(Value val)
             return StringType("Switching Protocols");
         case ok:
             return StringType("OK");
+        case created:
+            return StringType("Created");
         case noContent:
             return StringType("No Content");
         case partialContent:

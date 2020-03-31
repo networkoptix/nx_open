@@ -1,7 +1,5 @@
 #include "push_manager.h"
 
-#include <QtCore/QJsonObject>
-
 #include <api/global_settings.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
@@ -25,30 +23,6 @@ namespace nx::vms::server::event {
 static const QString kPushApiPath = "api/notifications/push_notification";
 static const size_t kPushThumbnailHeight = 480;
 
-struct PushPayload
-{
-    QString url;
-    QString imageUrl;
-};
-#define PushPayload_Fields (url)(imageUrl)
-
-struct PushNotification
-{
-    QString title;
-    QString body;
-    PushPayload payload;
-    QJsonObject options;
-};
-#define PushNotification_Fields (title)(body)(payload)(options)
-
-struct PushRequest
-{
-    QString systemId;
-    std::set<QString> targets;
-    PushNotification notification;
-};
-#define PushRequest_Fields (systemId)(targets)(notification)
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (PushPayload)(PushNotification)(PushRequest), (json), _Fields);
 
@@ -65,8 +39,9 @@ static const QString utf8Icon(const vms::event::Level level)
 
 // -----------------------------------------------------------------------------------------------
 
-PushManager::PushManager(QnMediaServerModule* serverModule):
-    nx::vms::server::ServerModuleAware(serverModule)
+PushManager::PushManager(QnMediaServerModule* serverModule, bool useEncryption):
+    nx::vms::server::ServerModuleAware(serverModule),
+    m_useEncryption(useEncryption)
 {
 }
 
@@ -93,8 +68,8 @@ bool PushManager::send(const vms::event::AbstractActionPtr& action)
         request.notification.title, request.notification.body);
 
     const auto url = nx::network::url::Builder()
-        .setScheme(nx::network::http::kSecureUrlSchemeName)
-        .setHost(settings->cloudHost())
+        .setScheme(nx::network::http::urlSheme(m_useEncryption))
+        .setEndpoint(settings->cloudHost())
         .setPath(kPushApiPath);
 
     nx::network::http::HttpClient client;
@@ -110,7 +85,7 @@ bool PushManager::send(const vms::event::AbstractActionPtr& action)
         result ? nx::utils::log::Level::debug : nx::utils::log::Level::warning,
         this,
         "Send notification to %1: %2 -- %3", url, serialized, client.response()
-            ? client.response()->toString()
+            ? client.response()->statusLine.toString().trimmed()
             : SystemError::toString(client.lastSysErrorCode()));
 
     return result;
@@ -121,7 +96,7 @@ PushPayload PushManager::makePayload(const vms::event::EventParameters& event, b
     const auto settings = serverModule()->commonModule()->globalSettings();
     nx::network::url::Builder url = nx::network::url::Builder()
         .setScheme(nx::vms::utils::AppInfo::nativeUriProtocol())
-        .setHost(settings->cloudHost())
+        .setEndpoint(settings->cloudHost())
         .setPathParts("client", settings->cloudSystemId(), "view")
         .addQueryItem("timestamp", event.eventTimestampUsec / 1000);
 
@@ -131,7 +106,7 @@ PushPayload PushManager::makePayload(const vms::event::EventParameters& event, b
         url.addQueryItem("resources", event.eventResourceId.toSimpleString());
         imageUrl = nx::network::url::Builder()
             .setScheme(nx::network::http::kSecureUrlSchemeName)
-            .setHost(settings->cloudSystemId())
+            .setEndpoint(settings->cloudSystemId())
             .setPath("ec2/cameraThumbnail")
             .addQueryItem("cameraId", event.eventResourceId.toSimpleString())
             .addQueryItem("time", event.eventTimestampUsec / 1000)
@@ -183,11 +158,15 @@ std::set<QString> PushManager::cloudUsers(const vms::event::ActionParameters& pa
     if (params.allUsers)
     {
         userList = serverModule()->resourcePool()->getResources<QnUserResource>();
+        NX_VERBOSE(this, "Looking for all cloud users in list of %1", userList.size());
     }
     else
     {
         QList<QnUuid> userRoles;
         userRolesManager()->usersAndRoles(params.additionalResources, userList, userRoles);
+        NX_VERBOSE(this, "Looking for cloud users %1 in list of %2 and roles of %3",
+            containerString(params.additionalResources), userList.size(), userRoles.size());
+
         for (const auto& role: userRoles)
         {
             for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(role))
