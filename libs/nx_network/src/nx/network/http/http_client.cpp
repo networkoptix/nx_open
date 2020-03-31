@@ -147,6 +147,8 @@ BufferType HttpClient::fetchMessageBodyBuffer()
         m_cond.wait(lk.mutex());
 
     nx::network::http::BufferType result;
+    if (!m_error)
+        m_error = lastSysErrorCode() != SystemError::noError;
     if (m_error)
         return result;
 
