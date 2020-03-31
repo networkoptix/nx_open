@@ -160,8 +160,12 @@ std::optional<BufferType> HttpClient::fetchEntireMessageBody()
     while (!eof())
         buffer += fetchMessageBodyBuffer();
 
-    if (const auto length = m_asyncHttpClient->contentLength(); length && *length > buffer.size())
+    if (const auto length = m_asyncHttpClient->contentLength()
+        ;
+        length && *length > (quint64) buffer.size())
+    {
         return std::nullopt;
+    }
 
     if (m_error)
         return std::nullopt;
