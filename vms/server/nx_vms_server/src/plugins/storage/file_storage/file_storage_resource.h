@@ -107,7 +107,6 @@ private:
     Qn::StorageInitResult checkMountedStatus() const;
     Qn::StorageInitResult testWrite() const;
     bool isValid() const;
-    bool isLocalPathMounted(const QString& path) const;
 
 public:
     // Try to remove old temporary dirs if any.
