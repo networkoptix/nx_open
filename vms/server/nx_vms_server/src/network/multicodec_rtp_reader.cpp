@@ -209,8 +209,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     if (result)
     {
-        NX_VERBOSE(this, "Got some stream data, device %1 (%2)",
-            m_resource->getName(), m_resource->getId());
+        NX_VERBOSE(this, "Got some stream data, device %1 (%2) dataType(%3)",
+            m_resource->getName(), m_resource->getId(), result->dataType);
 
         m_gotSomeFrame = true;
         return result;
