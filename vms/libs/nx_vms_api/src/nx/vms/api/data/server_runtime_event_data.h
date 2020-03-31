@@ -27,9 +27,7 @@ struct NX_VMS_API ServerRuntimeEventData: public Data
 
 #define nx_vms_api_ServerRuntimeEventData_Fields (eventType)(eventData)
 
-QN_FUSION_DECLARE_FUNCTIONS(ServerRuntimeEventData,
-    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
-    NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(ServerRuntimeEventData, (eq)(json)(ubjson), NX_VMS_API)
 
 // Specific event payload -------------------------------------------------------------------------
 
@@ -41,9 +39,7 @@ struct NX_VMS_API DeviceAgentSettingsMaybeChangedData
 
 #define nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields (deviceId)(engineId)
 
-QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsMaybeChangedData,
-    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
-    NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsMaybeChangedData, (eq)(json)(ubjson), NX_VMS_API)
 
 struct NX_VMS_API DeviceFootageChangedData
 {
@@ -51,9 +47,7 @@ struct NX_VMS_API DeviceFootageChangedData
 };
 
 #define nx_vms_api_DeviceFootageChangedData_Fields (deviceIds)
-QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageChangedData,
-    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
-    NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageChangedData, (eq)(json)(ubjson), NX_VMS_API)
 
 } // namespace nx::vms::api
 

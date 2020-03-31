@@ -45,6 +45,9 @@ extern "C"
 #include <nx/utils/pending_operation.h>
 
 #include <core/resource/avi/avi_resource.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <client_core/client_core_module.h>
 
 #include <server/server_storage_manager.h>
 
@@ -143,7 +146,25 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         qnClientModule->serverRuntimeEventConnector(),
         &ServerRuntimeEventConnector::deviceFootageChanged,
         this,
-        [this](const std::vector<QnUuid>&) { m_cameraDataManager->clearCache(); });
+        [this](const std::vector<QnUuid>& deviceIds)
+        {
+            const QnResourceList devices =
+                qnClientModule
+                    ->clientCoreModule()
+                    ->commonModule()
+                    ->resourcePool()
+                    ->getResourcesByIds(deviceIds);
+
+            for (const QnResourcePtr& device: devices)
+            {
+                const QnCachingCameraDataLoaderPtr loader = m_cameraDataManager->loader(
+                    device.dynamicCast<QnMediaResource>(),
+                    /*createIfNotExists*/ false);
+
+                if (loader)
+                    loader->discardCachedData();
+            }
+        });
 
     // TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
     // then truncate cached chunks by this region and synchronize the cache.

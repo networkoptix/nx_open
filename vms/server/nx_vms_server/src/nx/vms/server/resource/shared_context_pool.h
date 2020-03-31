@@ -47,7 +47,9 @@ public:
             return std::dynamic_pointer_cast<ContextType>(context);
 
         const auto context = std::make_shared<ContextType>(
-            serverModule()->serverRuntimeEventManager(), sharedId);
+            serverModule()->serverRuntimeEventManager(),
+            serverModule()->resourcePool(),
+            sharedId);
 
         m_sharedContexts[sharedId] = context;
         return context;

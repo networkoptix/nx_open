@@ -7,7 +7,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/scope_guard.h>
 #include <utils/common/synctime.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/security_cam_resource.h>
 
 #include "hanwha_request_helper.h"
 #include "hanwha_shared_resource_context.h"
@@ -518,8 +518,11 @@ void HanwhaChunkLoader::handleSuccessfulTimelineResponse()
         if (event::ServerRuntimeEventManager* const serverRuntimeEventManager =
             m_resourceContext->serverRuntimeEventManager())
         {
-            // TODO pass device ids.
-            serverRuntimeEventManager->triggerDeviceFootageChangedEvent({});
+            std::vector<QnUuid> deviceIds;
+            for (const auto& device: m_resourceContext->boundDevices())
+                deviceIds.push_back(device->getId());
+
+            serverRuntimeEventManager->triggerDeviceFootageChangedEvent(deviceIds);
             m_needToUpdateDeviceFootage = false;
         }
 

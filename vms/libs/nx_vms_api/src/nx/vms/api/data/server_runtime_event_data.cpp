@@ -14,19 +14,19 @@ namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     ServerRuntimeEventData,
-    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
+    (eq)(json)(ubjson),
     nx_vms_api_ServerRuntimeEventData_Fields,
     (optional, true))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     DeviceAgentSettingsMaybeChangedData,
-    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
+    (eq)(json)(ubjson),
     nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields,
     (optional, true))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     DeviceFootageChangedData,
-    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
+    (eq)(json)(ubjson),
     nx_vms_api_DeviceFootageChangedData_Fields,
     (optional, true))
 

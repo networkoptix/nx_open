@@ -51,8 +51,9 @@ bool SeekPosition::canJoinPosition(const SeekPosition& value) const
 
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     event::ServerRuntimeEventManager* serverRuntimeEventManager,
+    QnResourcePool* resourcePool,
     const AbstractSharedResourceContext::SharedId& sharedId)
-    :    
+    :
     information([this]() { return loadInformation(); }, kCacheDataTimeout),
     eventStatuses([this]() { return loadEventStatuses(); }, kCacheDataTimeout),
     videoSources([this]() { return loadVideoSources(); }, kCacheDataTimeout),
@@ -62,7 +63,8 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     ptzCalibratedChannels([this]() { return loadPtzCalibratedChannels(); }, kCacheDataTimeout),
     m_sharedId(sharedId),
     m_requestLock(kMaxConcurrentRequestNumber),
-    m_serverRuntimeEventManager(serverRuntimeEventManager)
+    m_serverRuntimeEventManager(serverRuntimeEventManager),
+    m_resourcePool(resourcePool)
 {
 }
 
@@ -494,6 +496,14 @@ void HanwhaSharedResourceContext::initializeAlarmInputs()
     NX_DEBUG(this,
         "Unable to enable alarm inputs, requestUrl: %1, error code: %2, error string: %3",
         setResponse.requestUrl(), setResponse.errorCode(), setResponse.errorString());
+}
+
+QnSecurityCamResourceList HanwhaSharedResourceContext::boundDevices() const
+{
+    if (!NX_ASSERT(m_resourcePool))
+        return {};
+
+    return m_resourcePool->getResourcesBySharedId(m_sharedId);
 }
 
 HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
