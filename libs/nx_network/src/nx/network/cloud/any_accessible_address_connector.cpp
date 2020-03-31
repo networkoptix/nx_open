@@ -38,8 +38,7 @@ void AnyAccessibleAddressConnector::connectAsync(
 {
     using namespace std::placeholders;
 
-    NX_VERBOSE(this,
-        lm("Connecting to %1 with timeout %2").args(containerString(m_entries), timeout));
+    NX_VERBOSE(this, "Connecting to %1 with timeout %2", containerString(m_entries), timeout);
 
     m_timeout = timeout;
     m_handler = std::move(handler);
@@ -82,6 +81,12 @@ void AnyAccessibleAddressConnector::stopWhileInAioThread()
     m_timer.pleaseStopSync();
     m_directConnections.clear();
     m_cloudConnectors.clear();
+
+    if (m_awaitedConnectOperationCount > 0)
+    {
+        NX_VERBOSE(this, "Interrupting ongoing %1 connection(s) to %2",
+            m_awaitedConnectOperationCount, containerString(m_entries));
+    }
 }
 
 std::unique_ptr<AbstractStreamSocket> AnyAccessibleAddressConnector::createTcpSocket(int ipVersion)
@@ -128,7 +133,7 @@ bool AnyAccessibleAddressConnector::establishDirectConnection(const SocketAddres
 {
     using namespace std::placeholders;
 
-    NX_VERBOSE(this, lm("Trying direct connection to %1").arg(endpoint));
+    NX_VERBOSE(this, "Trying direct connection to %1", endpoint);
 
     auto tcpSocket = createTcpSocket(m_ipVersion);
     tcpSocket->bindToAioThread(getAioThread());
@@ -165,8 +170,8 @@ void AnyAccessibleAddressConnector::onConnectDone(
     boost::optional<TunnelAttributes> cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection)
 {
-    NX_VERBOSE(this, lm("Connection completed with result %1")
-        .arg(SystemError::toString(sysErrorCode)));
+    NX_VERBOSE(this, "Connection completed with result %1",
+        SystemError::toString(sysErrorCode));
 
     if (sysErrorCode == SystemError::noError)
     {
@@ -183,8 +188,8 @@ void AnyAccessibleAddressConnector::onConnectDone(
     --m_awaitedConnectOperationCount;
     if (m_awaitedConnectOperationCount > 0 && sysErrorCode != SystemError::noError)
     {
-        NX_VERBOSE(this, lm("Waiting for another %1 connections to complete...")
-            .arg(m_awaitedConnectOperationCount));
+        NX_VERBOSE(this, "Waiting for another %1 connections to complete...",
+            m_awaitedConnectOperationCount);
         return; //< Waiting for other operations to finish.
     }
 
@@ -201,7 +206,7 @@ void AnyAccessibleAddressConnector::establishCloudConnection(const AddressEntry&
 {
     using namespace std::placeholders;
 
-    NX_VERBOSE(this, lm("Trying cloud connection to %1").arg(dnsEntry.host));
+    NX_VERBOSE(this, "Trying cloud connection to %1", dnsEntry.host);
 
     auto cloudConnector = std::make_unique<CloudAddressConnector>(
         dnsEntry,
@@ -240,13 +245,12 @@ void AnyAccessibleAddressConnector::cleanUpAndReportResult(
 {
     if (sysErrorCode == SystemError::noError)
     {
-        NX_VERBOSE(this, lm("Reporting connect success. Address %1")
-            .arg(containerString(m_entries)));
+        NX_VERBOSE(this, "Reporting connect success. Address %1", containerString(m_entries));
     }
     else
     {
-        NX_VERBOSE(this, lm("Reporting connect failure (%1). Address %2")
-            .arg(SystemError::toString(sysErrorCode)).arg(containerString(m_entries)));
+        NX_VERBOSE(this, "Reporting connect failure (%1). Address %2",
+            SystemError::toString(sysErrorCode), containerString(m_entries));
     }
 
     NX_ASSERT(isInSelfAioThread());

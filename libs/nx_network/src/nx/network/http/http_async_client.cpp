@@ -548,6 +548,12 @@ void AsyncClient::stopWhileInAioThread()
 {
     m_socket.reset();
     m_requestBody.reset();
+
+    if (m_state == State::sReceivingResponse)
+    {
+        NX_VERBOSE(this, "Client is stopped while waiting for response from %1",
+            m_contentLocationUrl);
+    }
 }
 
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
@@ -638,6 +644,8 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
     {
         return;
     }
+
+    NX_VERBOSE(this, "Waiting for response. Timeout %1", m_responseReadTimeout);
 
     m_state = m_expectOnlyBody ? State::sReadingMessageBody : State::sReceivingResponse;
     m_responseBuffer.resize(0);
