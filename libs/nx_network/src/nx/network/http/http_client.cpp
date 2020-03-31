@@ -147,8 +147,6 @@ BufferType HttpClient::fetchMessageBodyBuffer()
         m_cond.wait(lk.mutex());
 
     nx::network::http::BufferType result;
-    if (!m_error)
-        m_error = lastSysErrorCode() != SystemError::noError;
     if (m_error)
         return result;
 
@@ -161,6 +159,9 @@ std::optional<BufferType> HttpClient::fetchEntireMessageBody()
     QByteArray buffer;
     while (!eof())
         buffer += fetchMessageBodyBuffer();
+
+    if (const auto length = m_asyncHttpClient->contentLength(); length && *length > buffer.size())
+        return std::nullopt;
 
     if (m_error)
         return std::nullopt;
