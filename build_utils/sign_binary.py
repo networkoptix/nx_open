@@ -62,15 +62,24 @@ def sign_binary(
 
         except requests.exceptions.ReadTimeout as e:
             print('ERROR: Connection to the signing server has timed out' +
-                  ' ({} seconds, {} retries) while signing {}'.format(
-                request_timeout, max_retries, file))
+                  f' ({request_timeout} seconds, {max_retries} retries) ' +
+                  f'while signing {file}')
             print(e)
             last_status_code = 1
         except requests.exceptions.ConnectionError as e:
             print('ERROR: Connection to the signing server cannot be established ' +
-                  'while signing {}'.format(file))
+                  f'while signing {file}')
             print(e)
             last_status_code = 2
+        except requests.exceptions.ChunkedEncodingError as e:
+            print('ERROR: Connection to the signing server was broken ' +
+                  f'while signing {file}')
+            print(e)
+            last_status_code = 3
+        except Exception as e:
+            print(f'ERROR: Unexpected exception while signing {file}')
+            print(e)
+            last_status_code = 4
         print('Trying again')
 
     print('ERROR: Too max retries failed. Status code {}'.format(last_status_code))
