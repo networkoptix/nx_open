@@ -9,12 +9,14 @@ namespace nx::vms::server::nvr::hanwha {
 
 class IoModuleResource: public nx::vms::server::resource::Camera
 {
-    struct ExtendedIoPortState: public QnIOStateData
+    using base_type = nx::vms::server::resource::Camera;
+
+    struct PortStateNotification
     {
-        bool isActiveAsOpenCircuit = false;
+        QnIOStateData portState;
+        Qn::IOPortType portType;
     };
 
-    using base_type = nx::vms::server::resource::Camera;
 public:
     IoModuleResource(QnMediaServerModule* serverModule);
 
@@ -32,19 +34,21 @@ protected:
     virtual void stopInputPortStatesMonitoring() override;
 
 private:
-    void updatePortDescriptions(QnIOPortDataList portDescriptors);
+    void updatePortDescriptionsThreadUnsafe(QnIOPortDataList portDescriptors);
 
-    std::optional<QnIOPortData> portDescriptor(
+    std::optional<QnIOPortData> portDescriptionThreadUnsafe(
         const QString& portId,
         Qn::IOPortType portType = Qn::IOPortType::PT_Unknown) const;
 
-    void handleStateChange(const QnIOStateDataList& state);
+    /** @return List of ports states that have been changed. */
+    std::vector<PortStateNotification> updatePortStatesThreadUnsafe(
+        const QnIOStateDataList& state);
 
-    ExtendedIoPortState currentPortState(const QString& portId) const;
+    QnIOStateData currentPortStateThreadUnsafe(const QString& portId) const;
 
-    void updatePortState(ExtendedIoPortState newPortStateAsOpenCircuit);
+    QnIOStateDataList currentPortStatesThreadUnsafe() const;
 
-    void emitSignals(const QnIOPortData& portDescriptor, const QnIOStateData& portState);
+    void emitSignals(const QnIOStateData& portState, Qn::IOPortType portType);
 
     // Since the NVR IO manager always provides port state as if it works in the open cicuit mode,
     // it needs to be translated. When reading port IO states they have to be translated
@@ -55,6 +59,8 @@ private:
 
     QnIOPortDataList mergedPortDescriptions();
 
+    void handleStateChange(const QnIOStateDataList& portStates);
+
 private:
     void at_propertyChanged(const QnResourcePtr& resource, const QString& key);
 
@@ -63,7 +69,7 @@ private:
     HandlerId m_handlerId = 0;
 
     std::map<QString, QnIOPortData> m_portDescriptorsById;
-    std::map<QString, ExtendedIoPortState> m_portStateById;
+    std::map<QString, QnIOStateData> m_portStateById;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

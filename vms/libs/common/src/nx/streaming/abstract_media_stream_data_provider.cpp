@@ -106,6 +106,7 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
     m_numberOfChannels.reset();
     setNeedKeyData();
     resetMediaStatistics();
+    m_numberOfErrors = 0;
 }
 
 void QnAbstractMediaStreamDataProvider::resetMediaStatistics()
@@ -120,7 +121,6 @@ void QnAbstractMediaStreamDataProvider::resetMediaStatistics()
         }
         m_stat[i].reset();
     }
-    m_numberOfErrors = 0;
 }
 
 void QnAbstractMediaStreamDataProvider::afterRun()

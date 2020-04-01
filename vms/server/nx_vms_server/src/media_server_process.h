@@ -237,8 +237,7 @@ private:
         const QnUuid& serverId,
         const nx::vms::server::fs::media_paths::Partition& partition);
 
-    QList<nx::vms::server::fs::media_paths::Partition> listRecordFolders(bool includeNonHdd = false) const;
-    void connectSignals();
+   void connectSignals();
     void connectStorageSignals(QnStorageManager* storage);
     void setUpDataFromSettings();
     void saveMediaServerUserAttributes(

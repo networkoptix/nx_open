@@ -55,11 +55,12 @@ QString IoModuleResource::getDriverName() const
 bool IoModuleResource::setOutputPortState(
     const QString& outputId, bool isActive, unsigned int autoResetTimeoutMs)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     nvr::IIoManager* const ioManager = getIoManager(serverModule());
     if (!ioManager)
         return false;
 
-    const std::optional<QnIOPortData> descriptor = portDescriptor(
+    const std::optional<QnIOPortData> descriptor = portDescriptionThreadUnsafe(
         outputId, Qn::IOPortType::PT_Output);
 
     if (!NX_ASSERT(descriptor))
@@ -71,32 +72,36 @@ bool IoModuleResource::setOutputPortState(
         std::chrono::milliseconds(autoResetTimeoutMs));
 }
 
-void IoModuleResource::updatePortDescriptions(QnIOPortDataList portDescriptors)
-{
-    NX_DEBUG(this, "Got port descriptors: %1", containerString(portDescriptors));
-
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_portDescriptorsById.clear();
-    for (const QnIOPortData& descriptor: portDescriptors)
-        m_portDescriptorsById.emplace(descriptor.id, descriptor);
-}
-
 void IoModuleResource::startInputPortStatesMonitoring()
 {
-    updatePortDescriptions(ioPortDescriptions());
-
     nvr::IIoManager* const ioManager = getIoManager(serverModule());
     if (!NX_ASSERT(ioManager, "Unable to access IO manager while trying to register handler"))
         return;
 
-    m_handlerId = ioManager->registerStateChangeHandler(
-        [this](const QnIOStateDataList& state) { handleStateChange(state); });
+    QnIOStateDataList portStates;
+    std::map<QString, QnIOPortData> portDescriptions;
 
-    handleStateChange(ioManager->portStates());
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        updatePortDescriptionsThreadUnsafe(ioPortDescriptions());
+
+        portStates = currentPortStatesThreadUnsafe();
+        portDescriptions = m_portDescriptorsById;
+
+        m_handlerId = ioManager->registerStateChangeHandler(
+            [this](const QnIOStateDataList& state) { handleStateChange(state); });
+    }
+
+    for (const QnIOStateData& portState: portStates)
+    {
+        if (portState.isActive)
+            emitSignals(portState, portDescriptions[portState.id].portType);
+    }
 }
 
 void IoModuleResource::stopInputPortStatesMonitoring()
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_handlerId == 0)
     {
         NX_DEBUG(this, "Stopping input port monitoring, the state handler is not set");
@@ -110,9 +115,21 @@ void IoModuleResource::stopInputPortStatesMonitoring()
     ioManager->unregisterStateChangeHandler(m_handlerId);
 }
 
-std::optional<QnIOPortData> IoModuleResource::portDescriptor(
-    const QString& portId,
-    Qn::IOPortType portType) const
+void IoModuleResource::handleStateChange(const QnIOStateDataList& portStates)
+{
+    std::vector<PortStateNotification> changedStateNotifications;
+
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        changedStateNotifications = updatePortStatesThreadUnsafe(portStates);
+    }
+
+    for (const PortStateNotification& notification: changedStateNotifications)
+        emitSignals(notification.portState, notification.portType);
+}
+
+std::optional<QnIOPortData> IoModuleResource::portDescriptionThreadUnsafe(
+    const QString& portId, Qn::IOPortType portType) const
 {
     const auto logDescriptor =
         [this](const QnIOPortData& descriptor)
@@ -148,84 +165,95 @@ std::optional<QnIOPortData> IoModuleResource::portDescriptor(
     return std::nullopt;
 }
 
-void IoModuleResource::handleStateChange(const QnIOStateDataList& state)
+std::vector<IoModuleResource::PortStateNotification>
+    IoModuleResource::updatePortStatesThreadUnsafe(const QnIOStateDataList& state)
 {
     NX_DEBUG(this, "Handling IO port state change, IO state: %1", containerString(state));
+
+    std::vector<PortStateNotification> changedStateNotifications;
     for (const QnIOStateData& portState: state)
     {
-        // NVR ports are able to work only as open circuit.
-        ExtendedIoPortState newPortState;
+        const std::optional<QnIOPortData> portDescriptor =
+            portDescriptionThreadUnsafe(portState.id);
+
+        if (!NX_ASSERT(portDescriptor))
+            continue;
+
+        QnIOStateData newPortState;
         newPortState.id = portState.id;
         newPortState.timestamp = portState.timestamp;
-        newPortState.isActiveAsOpenCircuit = portState.isActive;
+        newPortState.isActive = isActiveTranslated(*portDescriptor, portState.isActive);
 
-        updatePortState(newPortState);
+        const QnIOStateData currentPortState = this->currentPortStateThreadUnsafe(portState.id);
+
+        if (!NX_ASSERT(newPortState.id == currentPortState.id))
+            continue;
+
+        m_portStateById[newPortState.id] = newPortState;
+
+        if (newPortState.isActive != currentPortState.isActive)
+        {
+            NX_DEBUG(this, "State of the port %1 has been changed to %2",
+                newPortState.id, newPortState.isActive);
+
+            changedStateNotifications.push_back({
+                std::move(newPortState),
+                portDescriptor->portType});
+        }
     }
+
+    return changedStateNotifications;
 }
 
-IoModuleResource::ExtendedIoPortState IoModuleResource::currentPortState(
-    const QString& portId) const
+void IoModuleResource::updatePortDescriptionsThreadUnsafe(QnIOPortDataList portDescriptors)
+{
+    NX_DEBUG(this, "Got port descriptors: %1", containerString(portDescriptors));
+
+    m_portDescriptorsById.clear();
+    for (const QnIOPortData& descriptor: portDescriptors)
+        m_portDescriptorsById.emplace(descriptor.id, descriptor);
+
+    updatePortStatesThreadUnsafe(getIoManager(serverModule())->portStates());
+}
+
+QnIOStateData IoModuleResource::currentPortStateThreadUnsafe(const QString& portId) const
 {
     if (const auto it = m_portStateById.find(portId); it != m_portStateById.cend())
     {
-        const ExtendedIoPortState& portState = it->second;
-        NX_DEBUG(this, "Current port state (found in cache) of the port %1: "
-            "is active as open circuit: %2, is active with current circuit type: %3",
-            portState.id, portState.isActiveAsOpenCircuit, portState.isActive);
+        const QnIOStateData& portState = it->second;
+        NX_DEBUG(this, "Current port state (found in cache) of the port %1: is active: %2",
+            portState.id, portState.isActive);
 
-        return it->second;
+        return portState;
     }
 
-    const std::optional<QnIOPortData> descriptor = portDescriptor(portId);
-    NX_ASSERT(descriptor);
-
-    ExtendedIoPortState result;
+    QnIOStateData result;
     result.id = portId;
-    result.isActiveAsOpenCircuit = false;
 
-    if (descriptor)
-        result.isActive = isActiveTranslated(*descriptor, result.isActiveAsOpenCircuit);
+    const std::optional<QnIOPortData> descriptor = portDescriptionThreadUnsafe(portId);
+    if (!NX_ASSERT(descriptor))
+        return result;
 
-    NX_DEBUG(this, "Current port state of the port %1: "
-        "is active as open circuit: %2, is active with current circuit type: %3",
-        result.id, result.isActiveAsOpenCircuit, result.isActive);
+    result.isActive = isActiveTranslated(*descriptor, result.isActive);
+    result.timestamp = qnSyncTime->currentUSecsSinceEpoch();
+
+    NX_DEBUG(this, "Current port state of the port %1: is active: %2", result.id, result.isActive);
 
     return result;
 }
 
-void IoModuleResource::updatePortState(ExtendedIoPortState newPortState)
+QnIOStateDataList IoModuleResource::currentPortStatesThreadUnsafe() const
 {
-    NX_DEBUG(this,
-        "Updating port state, port id: %1, timestamp: %2 us, is active as open circuit: %3",
-        newPortState.id, newPortState.timestamp, newPortState.isActiveAsOpenCircuit);
+    QnIOStateDataList portStates;
+    for (const auto& [portId, _]: m_portDescriptorsById)
+        portStates.push_back(currentPortStateThreadUnsafe(portId));
 
-    std::optional<QnIOPortData> portDescriptor;
-    ExtendedIoPortState currentPortState;
-
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        portDescriptor = this->portDescriptor(newPortState.id);
-        if (!NX_ASSERT(portDescriptor))
-            return;
-
-        currentPortState = this->currentPortState(newPortState.id);
-
-        newPortState.isActive = isActiveTranslated(
-            *portDescriptor, newPortState.isActiveAsOpenCircuit);
-
-        NX_DEBUG(this, "Updating port state of the port %1 to: "
-            "is active as open circuit: %2, is active with current circuit type: %3",
-            newPortState.id, newPortState.isActiveAsOpenCircuit, newPortState.isActive);
-        m_portStateById[newPortState.id] = newPortState;
-    }
-
-    emitSignals(*portDescriptor, newPortState);
+    return portStates;
 }
 
-void IoModuleResource::emitSignals(
-    const QnIOPortData& portDescriptor, const QnIOStateData& portState)
+void IoModuleResource::emitSignals(const QnIOStateData& portState, Qn::IOPortType portType)
 {
-    switch (portDescriptor.portType)
+    switch (portType)
     {
         case Qn::IOPortType::PT_Input:
         {
@@ -272,8 +300,9 @@ bool IoModuleResource::isActiveTranslated(const QnIOPortData& portDescription, b
         ? portDescription.iDefaultState
         : portDescription.oDefaultState;
 
-    const bool isActiveTranslated =
-        isActive ^ (defaultState != Qn::IODefaultState::IO_OpenCircuit);
+    const bool isActiveTranslated = (defaultState == Qn::IODefaultState::IO_OpenCircuit)
+        ? isActive
+        : !isActive;
 
     NX_DEBUG(this, "Translating port state for port %1, port type: %2, default input state: %3, "
         "default output state %4, is active (raw): %5, is active (translated): %6",
@@ -301,12 +330,9 @@ QnIOPortDataList IoModuleResource::mergedPortDescriptions()
     {
         const auto it = overridenPortDescriptorsById.find(descriptor.id);
         if (it == overridenPortDescriptorsById.cend())
-        {
             result.push_back(descriptor);
-            continue;
-        }
-
-        result.push_back(it->second);
+        else
+            result.push_back(it->second);
     }
 
     return result;
@@ -317,9 +343,28 @@ void IoModuleResource::at_propertyChanged(const QnResourcePtr& /*resource*/, con
     if (key != ResourcePropertyKey::kIoSettings)
         return;
 
-    updatePortDescriptions(ioPortDescriptions());
-    for (const auto& [portId, _]: m_portDescriptorsById)
-        updatePortState(currentPortState(portId));
+    std::map<QString, QnIOStateData> previousPortStates;
+    std::map<QString, QnIOStateData> newPortStates;
+    std::map<QString, QnIOPortData> newPortDescriptions;
+
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        previousPortStates = m_portStateById;
+        updatePortDescriptionsThreadUnsafe(ioPortDescriptions());
+        newPortStates = m_portStateById;
+        newPortDescriptions = m_portDescriptorsById;
+    }
+
+    for (const auto& [portId, newPortState]: newPortStates)
+    {
+        if (newPortState.isActive != previousPortStates[portId].isActive)
+        {
+            NX_DEBUG(this, "State of the port %1 has been changed to %2",
+                portId, newPortState.isActive);
+
+            emitSignals(newPortState, newPortDescriptions[portId].portType);
+        }
+    }
 }
 
 } // namespace nx::vms::server::nvr::hanwha

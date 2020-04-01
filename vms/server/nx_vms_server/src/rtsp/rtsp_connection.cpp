@@ -410,7 +410,7 @@ void QnRtspConnectionProcessor::sendResponse(
     nx::network::rtsp::StatusCodeValue statusCode,
     const QByteArray& contentType)
 {
-    Q_D(QnTCPConnectionProcessor);
+    Q_D(QnRtspConnectionProcessor);
 
     d->response.statusLine.version = d->request.requestLine.version;
     d->response.statusLine.statusCode = statusCode;
@@ -435,9 +435,11 @@ void QnRtspConnectionProcessor::sendResponse(
                 QByteArray::number(d->response.messageBody.size())));
 
     const QByteArray response = d->response.toString();
-
-    NX_VERBOSE(this, "Server response to %1:\n%2",
-        d->socket->getForeignAddress().address.toString(), response);
+    const auto resource = getResource();
+    NX_VERBOSE(this, "Send RTSP response to %1 for camera %2:\n%3",
+        d->socket->getForeignAddress(),
+        resource ? resource->toResourcePtr()->getUrl() : "",
+        response);
 
     NX_DEBUG(QnLog::HTTP_LOG_INDEX, "Sending response to %1:\n%2\n-------------------\n",
         d->socket->getForeignAddress(),
@@ -694,9 +696,11 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
 
     // 2. Find a packet inside the archive.
     QnServerArchiveDelegate archive(d->serverModule, quality);
-    if (!archive.open(getResource()->toResourcePtr(), d->serverModule->archiveIntegrityWatcher()))
+    const auto resource = getResource()->toResourcePtr();
+    if (!archive.open(resource, d->serverModule->archiveIntegrityWatcher()))
     {
-        NX_WARNING(this, "Failed to get camera data, couldn't open archive, quality: %1", quality);
+        NX_DEBUG(this, "Failed to get data for camera %1, couldn't open archive, quality: %2", 
+            resource->getUrl(), quality);
         return nullptr;
     }
     if (d->startTime != DATETIME_NOW)
@@ -704,7 +708,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
 
     if (archive.getAudioLayout()->channelCount() == 0 && dataType == QnAbstractMediaData::AUDIO)
     {
-        NX_WARNING(this, "Failed to get audio camera data, no audio stream found");
+        NX_DEBUG(this, "Failed to get audio data for camera %1, no audio stream found", resource->getUrl());
         return nullptr;
     }
 
@@ -713,16 +717,16 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
         QnConstAbstractMediaDataPtr media = archive.getNextData();
         if (!media)
         {
-            NX_WARNING(this,
-                "Failed to get camera data, couldn't read archive, quality: %1", quality);
+            NX_DEBUG(this,
+                "Failed to get data for camera %1, couldn't read archive, quality: %2", resource->getUrl(), quality);
             return nullptr;
         }
 
         if (media->dataType == dataType)
             return media;
     }
-    NX_WARNING(this,
-        "Failed to get camera data, the data is not found neither in archive nor in the gop keeper");
+    NX_DEBUG(this,
+        "Failed to get data for camera %1, the data is not found neither in archive nor in the gop keeper", resource->getUrl());
     return nullptr;
 }
 
