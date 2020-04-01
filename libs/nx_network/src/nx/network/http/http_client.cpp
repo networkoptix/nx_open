@@ -160,9 +160,8 @@ std::optional<BufferType> HttpClient::fetchEntireMessageBody()
     while (!eof())
         buffer += fetchMessageBodyBuffer();
 
-    if (const auto length = m_asyncHttpClient->contentLength()
-        ;
-        length && *length > (quint64) buffer.size())
+    const auto length = m_asyncHttpClient->contentLength();
+    if (length && *length > (quint64) buffer.size())
     {
         NX_DEBUG(this,
             "Received %1 of %2 bytes from %3, last error %4",

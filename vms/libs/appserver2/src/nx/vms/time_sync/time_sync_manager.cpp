@@ -149,7 +149,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
     nx::utils::ElapsedTimer rttTimer;
     // With gateway repeat request twice to make sure we have opened tunnel to the target server.
     // That way it is possible to reduce rtt.
-    const int iterations = route.gatewayId.isNull() ? 1 : 2;
+    int iterations = route.gatewayId.isNull() ? 1 : 2;
     std::optional<QByteArray> response;
     for (int i = 0; i < iterations; ++i)
     {
@@ -160,10 +160,12 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
             response.reset();
         if (!response)
         {
+            if (iterations == 1 && httpClient->lastSysErrorCode() == SystemError::noError)
+                ++iterations;
             NX_WARNING(this,
                 "Can't read time from server %1, iteration %2 of %3, timeout: %4, error: %5",
                 qnStaticCommon->moduleDisplayName(route.id),
-                i, iterations,
+                i + 1, iterations,
                 maxRtt,
                 httpClient->lastSysErrorCode());
         }
