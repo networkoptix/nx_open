@@ -823,7 +823,8 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
 
         const QString path = getUrl();
     #else
-        const QString path = QDir(getFsPath()).canonicalPath();
+        auto fsPath = getFsPath();
+        const QString path = QDir(fsPath.left(fsPath.lastIndexOf('/'))).canonicalPath();
     #endif
 
     bool isMounted = false;

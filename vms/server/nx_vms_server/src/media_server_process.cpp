@@ -547,27 +547,16 @@ StorageResourcePtr MediaServerProcess::createStorage(
     return storage;
 }
 
-QList<nx::vms::server::fs::media_paths::Partition> MediaServerProcess::listRecordFolders(
-    bool includeNonHdd) const
-{
-    using namespace nx::vms::server::fs::media_paths;
-
-    auto mediaPathList = getMediaPartitions(FilterConfig::createDefault(
-        serverModule()->platform(), includeNonHdd, &serverModule()->settings()));
-
-    NX_VERBOSE(this, lm("Record folders: %1").container(mediaPathList));
-    return mediaPathList;
-}
-
 StorageResourceList MediaServerProcess::createStorages()
 {
     StorageResourceList storages;
     qint64 bigStorageThreshold = 0;
 
-    const auto partitions = listRecordFolders();
+    auto partitions = getMediaPartitions(fs::media_paths::FilterConfig::createDefault(
+        serverModule()->platform(), /*includeNonHdd*/false, &serverModule()->settings()));
 
-    NX_DEBUG(kLogTag, lm("Available paths count: %1").arg(partitions.size()));
-    for(const auto& p: partitions)
+    NX_VERBOSE(this, "Record folders: %1", containerString(partitions));
+    for (const auto& p: partitions)
     {
         NX_DEBUG(kLogTag, lm("Available path: %1").arg(p.path));
         if (!m_mediaServer->getStorageByUrl(p.path).isNull())
