@@ -163,7 +163,7 @@ bool Session::parsePacket(const uint8_t* data, int64_t size, Packet& packet, con
     }
 
     const uint16_t sequence = qFromBigEndian(rtpHeader->sequence);
-    if (sequence != (uint16_t) (m_prevSequence + 1))
+    if (!m_config.ignoreSequenceNumberErrors && sequence != (uint16_t) (m_prevSequence + 1))
     {
         NX_WARNING(this, "Camera %1: Unexpected RTP packet sequence number: %2 instead of %3.",
             url, sequence, m_prevSequence);

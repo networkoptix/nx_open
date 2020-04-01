@@ -14,6 +14,7 @@ public:
         QString user;
         QString password;
         bool printTimestamps = false;
+        bool ignoreSequenceNumberErrors = false;
         std::chrono::milliseconds timeout{5000};
         std::chrono::microseconds maxTimestampDiff{0};
         std::chrono::microseconds minTimestampDiff{0};
