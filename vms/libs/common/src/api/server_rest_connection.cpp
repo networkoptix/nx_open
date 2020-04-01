@@ -1102,7 +1102,7 @@ Handle ServerConnection::getExtendedPluginInformation(
         "/ec2/pluginInfo",
         {},
         Result<QnJsonRestResult>::type(
-            [callback = std::move(callback), this](
+            [funcName = __func__, callback = std::move(callback), this](
                 bool success,
                 Handle requestId,
                 const QnJsonRestResult& result)
@@ -1111,9 +1111,8 @@ Handle ServerConnection::getExtendedPluginInformation(
                 if (!QJson::deserialize(result.reply, &pluginInfo))
                 {
                     NX_DEBUG(m_logTag,
-                        "getExtendedPluginInformation: "
-                        "Unable to deserialize the response from the Server %1, %2",
-                        m_serverId, QJson::serialize(result.reply));
+                        "%1: Unable to deserialize the response from the Server %2, %3",
+                        funcName, m_serverId, QJson::serialize(result.reply));
                 }
 
                 callback(
