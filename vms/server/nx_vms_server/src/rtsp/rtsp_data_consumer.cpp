@@ -89,6 +89,7 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
     const auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
+    m_resourceUrl = camera->getUrl();
 
     if (nx::analytics::loggingIni().isLoggingEnabled())
     {
@@ -721,17 +722,25 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
     if ((m_streamingSpeed != MAX_STREAMING_SPEED) && (!isLive))
         doRealtimeDelay(media);
 
+    NX_VERBOSE(this, "prepare to send data via RTSP. Camera %1, dataType=%2", m_resourceUrl, media->dataType);
+
     int trackNum = media->channelNumber;
     if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
         trackNum = 0; // multichannel video is going to be transcoded to a single track
     RtspServerTrackInfo* trackInfo = m_owner->getTrackInfo(trackNum);
 
     if (trackInfo == nullptr || trackInfo->clientPort == -1)
+    {
+        NX_VERBOSE(this, "Skip sending data via RTSP(no track prepared). Camera %1, dataType=%2", m_resourceUrl, media->dataType);
         return; // skip data (for example audio is disabled)
+    }
 
     AbstractRtspEncoderPtr codecEncoder = trackInfo->getEncoder();
     if (!codecEncoder)
+    {
+        NX_VERBOSE(this, "Skip sending data via RTSP(no codec encoder). Camera %1, dataType=%2", m_resourceUrl, media->dataType);
         return; // skip data (for example audio is disabled)
+    }
 
     QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder.get());
     if (ffmpegEncoder)

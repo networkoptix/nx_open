@@ -154,4 +154,5 @@ private:
     std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryPutDataLogger;
     nx::vms::metrics::StreamMetricHelper m_streamMetricHelper;
     std::unique_ptr<nx::vms::server::SimpleReorderer> m_reorderingProvider;
+    QString m_resourceUrl;
 };
