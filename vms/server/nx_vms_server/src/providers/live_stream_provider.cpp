@@ -105,14 +105,14 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     m_cameraRes = res.dynamicCast<QnVirtualCameraResource>();
     NX_CRITICAL(m_cameraRes && m_cameraRes->flags().testFlag(Qn::local_live_cam));
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
-    m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
     m_resolutionCheckTimer.invalidate();
 
-    Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
-        m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
-        QnMutexLocker lock(&m_liveMutex);
-        updateSoftwareMotion();
-    });
+    Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, 
+        [this](const QnResourcePtr&) 
+        {
+            QnMutexLocker lock(&m_liveMutex);
+            updateSoftwareMotion();
+        });
 
     m_dataReceptorMultiplexer.reset(new DataCopier());
     m_dataReceptorMultiplexer->add(m_metadataReceptor);
@@ -293,6 +293,8 @@ void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, con
 
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
+    m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
+
     for (int i = 0; i < m_videoChannels; ++i)
     {
         QnMotionRegion region = m_cameraRes->getMotionRegion(i);
