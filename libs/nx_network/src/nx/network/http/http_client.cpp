@@ -165,8 +165,8 @@ std::optional<BufferType> HttpClient::fetchEntireMessageBody()
         length && *length > (quint64) buffer.size())
     {
         NX_DEBUG(this,
-            "Received %1 of %2 bytes, last error %3",
-            buffer.size(), *length, m_asyncHttpClient->lastSysErrorCode());
+            "Received %1 of %2 bytes from %3, last error %4",
+            buffer.size(), *length, contentLocationUrl(), lastSysErrorCode());
         return std::nullopt;
     }
 
