@@ -46,57 +46,74 @@ static std::optional<RtspPerf::Config> makeConfig(const QCoreApplication& app)
     parser.setApplicationDescription("Rtsp performance test");
     parser.addHelpOption();
     parser.addVersionOption();
+
     QCommandLineOption serverOption(QStringList() << "s" << "server",
         "Server address and port. By default: '127.0.0.1:7001'.", "server address",
         "127.0.0.1:7001");
     parser.addOption(serverOption);
+
     QCommandLineOption countOption(QStringList() << "c" << "count",
         "Rtsp session count. By default: 1", "count", "1");
     parser.addOption(countOption);
+
     QCommandLineOption livePercentOption(QStringList() << "l" << "live_percent",
         "Percentage of live streams. By default: 100", "live percent", "100");
     parser.addOption(livePercentOption);
+
     QCommandLineOption timeoutOption(QStringList() << "t" << "timeout",
         "RTSP read timeout in milliseconds. By default: 5000ms", "timeout", "5000");
     parser.addOption(timeoutOption);
+
     QCommandLineOption intervalOption(QStringList() << "i" << "interval",
         "Session start interval in milliseconds, if 0 than auto mode will used, that increase "
         "interval two times (from 100ms up to 10 seconds) on every start session fail. "
         "By default: 0ms that mean auto", "interval", "0");
     parser.addOption(intervalOption);
+
     QCommandLineOption userOption(QStringList() << "u" << "user",
         "Server user name. By default: 'admin'", "user", "admin");
     parser.addOption(userOption);
+
     QCommandLineOption passwordOption(QStringList() << "p" << "password",
         "Server user password", "password", "");
     parser.addOption(passwordOption);
+
     QCommandLineOption sslOption(QStringList() << "ssl",
         "Use SSL. By default: 'false'");
     parser.addOption(sslOption);
+
     QCommandLineOption timestampsOption(QStringList() << "timestamps",
         "Print frame timestamps. By default: 'false'");
     parser.addOption(timestampsOption);
+
     QCommandLineOption urlOption(QStringList() << "url",
         "Force camera URL, all sessions will use this URL to connect to the Server, option "
         "'--server' will be ignored. Repeat to set multiple URLs.", "url", "");
     parser.addOption(urlOption);
+
     QCommandLineOption logLevelOption(QStringList() << "log-level",
         "Log level: one of NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE.", "level", "");
     parser.addOption(logLevelOption);
+
     QCommandLineOption disableRestart(QStringList() << "disable-restart",
         "Start every RTSP session only once.");
     parser.addOption(disableRestart);
+
     QCommandLineOption maxTimestampDiffUs(QStringList() << "max-timestamp-diff-us",
         "Max timestamp diff in microseconds.", "max-diff", "0");
     parser.addOption(maxTimestampDiffUs);
+
     QCommandLineOption minTimestampDiffUs(QStringList() << "min-timestamp-diff-us",
         "Min timestamp diff in microseconds.", "min-diff", "0");
     parser.addOption(minTimestampDiffUs);
 
+    QCommandLineOption ignoreSequenceNumberErrors(QStringList() << "ignore-sequence-number-errors",
+        "Disable sequential number error warnings");
+    parser.addOption(ignoreSequenceNumberErrors);
+
     parser.process(app);
 
     RtspPerf::Config config;
-
     config.count = parser.value(countOption).toInt();
     config.startInterval = std::chrono::milliseconds(parser.value(intervalOption).toInt());
     config.livePercent = parser.value(livePercentOption).toInt();
@@ -109,10 +126,12 @@ static std::optional<RtspPerf::Config> makeConfig(const QCoreApplication& app)
     config.sessionConfig.user = parser.value(userOption);
     config.sessionConfig.password = parser.value(passwordOption);
     config.sessionConfig.printTimestamps = parser.isSet(timestampsOption);
+    config.sessionConfig.ignoreSequenceNumberErrors = parser.isSet(ignoreSequenceNumberErrors);
     config.sessionConfig.maxTimestampDiff =
         std::chrono::microseconds(parser.value(maxTimestampDiffUs).toInt());
     config.sessionConfig.minTimestampDiff =
         std::chrono::microseconds(parser.value(minTimestampDiffUs).toInt());
+
 
     if (parser.isSet(logLevelOption))
     {
