@@ -435,10 +435,10 @@ void QnRtspConnectionProcessor::sendResponse(
                 QByteArray::number(d->response.messageBody.size())));
 
     const QByteArray response = d->response.toString();
-    const QnResourcePtr resource = getResource()->toResourcePtr();
+    const auto resource = getResource();
     NX_VERBOSE(this, "Send RTSP response to %1 for camera %2:\n%3",
         d->socket->getForeignAddress(),
-        resource ? resource->getUrl() : "",
+        resource ? resource->toResourcePtr()->getUrl() : "",
         response);
 
     NX_DEBUG(QnLog::HTTP_LOG_INDEX, "Sending response to %1:\n%2\n-------------------\n",
