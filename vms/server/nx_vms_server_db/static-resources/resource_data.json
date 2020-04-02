@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.253",
+    "version": "1.0.1.254",
     "data": [
         {
             "keys": [
@@ -1001,7 +1001,8 @@
                 "st-hdvr-161|embedded_net_dvr",
                 "bx100|indigovision bx100",
                 "panasonic|wj-gxe100",
-                "st-hdvr162pro-d-v2|general"
+                "st-hdvr162pro-d-v2|general",
+                "dahua| DHI-HCVR72*"
             ],
             "analogEncoder": true
         },
