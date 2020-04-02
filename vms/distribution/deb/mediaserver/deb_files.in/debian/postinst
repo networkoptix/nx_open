@@ -245,7 +245,9 @@ case "$1" in
             [ -z "$SYSTEM_NAME" ] && $CFG_HELPER systemName "$SYSTEM_NAME_DEFAULT"
         fi
 
-        useradd --system "$SYSTEM_USER" || true
+        groupadd --system "$SYSTEM_USER" 2>/dev/null || true
+        useradd --no-user-group --system --gid "$SYSTEM_USER" "$SYSTEM_USER" 2>/dev/null || true
+        usermod --groups video "$SYSTEM_USER" 2>/dev/null || true
 
         # Allow core dumps creation.
         chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"
