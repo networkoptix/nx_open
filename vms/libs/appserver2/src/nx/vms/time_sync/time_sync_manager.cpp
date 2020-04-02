@@ -159,11 +159,15 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
             response = httpClient->fetchEntireMessageBody();
         if (!success || !response)
         {
-            NX_WARNING(this, lm("Can't read time from server %1. Error: %2")
-                .args(qnStaticCommon->moduleDisplayName(route.id), httpClient->lastSysErrorCode()));
-            return Result::error;
+            NX_WARNING(this,
+                "Can't read time from server %1, timeout: %2, error: %3",
+                qnStaticCommon->moduleDisplayName(route.id),
+                maxRtt,
+                httpClient->lastSysErrorCode());
         }
     }
+    if (!response)
+        return Result::error;
 
     if (httpClient->contentLocationUrl() != httpClient->url())
     {
