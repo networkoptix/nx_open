@@ -629,6 +629,25 @@ Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& url)
 }
 #endif
 
+QnFileStorageResource::DependencyFactory::DependencyFactory(QnFileStorageResource* storage):
+    m_storage(storage)
+{
+}
+
+QString QnFileStorageResource::DependencyFactory::canonicalPath(const QString& path) const
+{
+    if (m_canonicalPathFunc)
+        return m_canonicalPathFunc(path);
+
+    return QDir(path).canonicalPath();
+}
+
+void QnFileStorageResource::DependencyFactory::setCanonicalPathFunc(
+    nx::utils::MoveOnlyFunc<QString(const QString&)> f)
+{
+    m_canonicalPathFunc = std::move(f);
+}
+
 void QnFileStorageResource::setUrl(const QString& url)
 {
     QnStorageResource::setUrl(url);
@@ -637,11 +656,17 @@ void QnFileStorageResource::setUrl(const QString& url)
 
 QnFileStorageResource::QnFileStorageResource(QnMediaServerModule* serverModule):
     base_type(serverModule),
-    m_serverModule(serverModule)
+    m_serverModule(serverModule),
+    m_dependencyFactory(this)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
     m_capabilities |= QnAbstractStorageResource::cap::ReadFile;
+}
+
+QnFileStorageResource::DependencyFactory* QnFileStorageResource::getDependencyFactory()
+{
+    return &m_dependencyFactory;
 }
 
 QnFileStorageResource::~QnFileStorageResource()
@@ -824,7 +849,8 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
         const QString path = getUrl();
     #else
         auto fsPath = getFsPath();
-        const QString path = QDir(fsPath.left(fsPath.lastIndexOf('/'))).canonicalPath();
+        const QString path =
+            m_dependencyFactory.canonicalPath(fsPath.left(fsPath.lastIndexOf('/')));
     #endif
 
     bool isMounted = false;
