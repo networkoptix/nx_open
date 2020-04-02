@@ -72,10 +72,10 @@ public:
 
     qint64 calcInitialSpaceLimit();
 
-    class DependencyFactory
+    class MockableCallFactory
     {
     public:
-        DependencyFactory(QnFileStorageResource* storage);
+        MockableCallFactory(QnFileStorageResource* storage);
 
         QString canonicalPath(const QString& path) const;
         void setCanonicalPathFunc(nx::utils::MoveOnlyFunc<QString(const QString&)> f);
@@ -85,7 +85,7 @@ public:
         nx::utils::MoveOnlyFunc<QString(const QString&)> m_canonicalPathFunc;
     };
 
-    DependencyFactory* getDependencyFactory();
+    MockableCallFactory* getMockableCallFactory();
 
 private:
     qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path) const;
@@ -144,6 +144,6 @@ private:
     QString m_localPath;
     nx::utils::Lockable<std::optional<bool>> m_isSystem;
     QnMediaServerModule* m_serverModule = nullptr;
-    DependencyFactory m_dependencyFactory;
+    MockableCallFactory m_mockableCallFactory;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;

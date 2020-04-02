@@ -629,12 +629,12 @@ Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& url)
 }
 #endif
 
-QnFileStorageResource::DependencyFactory::DependencyFactory(QnFileStorageResource* storage):
+QnFileStorageResource::MockableCallFactory::MockableCallFactory(QnFileStorageResource* storage):
     m_storage(storage)
 {
 }
 
-QString QnFileStorageResource::DependencyFactory::canonicalPath(const QString& path) const
+QString QnFileStorageResource::MockableCallFactory::canonicalPath(const QString& path) const
 {
     if (m_canonicalPathFunc)
         return m_canonicalPathFunc(path);
@@ -642,7 +642,7 @@ QString QnFileStorageResource::DependencyFactory::canonicalPath(const QString& p
     return QDir(path).canonicalPath();
 }
 
-void QnFileStorageResource::DependencyFactory::setCanonicalPathFunc(
+void QnFileStorageResource::MockableCallFactory::setCanonicalPathFunc(
     nx::utils::MoveOnlyFunc<QString(const QString&)> f)
 {
     m_canonicalPathFunc = std::move(f);
@@ -657,16 +657,16 @@ void QnFileStorageResource::setUrl(const QString& url)
 QnFileStorageResource::QnFileStorageResource(QnMediaServerModule* serverModule):
     base_type(serverModule),
     m_serverModule(serverModule),
-    m_dependencyFactory(this)
+    m_mockableCallFactory(this)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
     m_capabilities |= QnAbstractStorageResource::cap::ReadFile;
 }
 
-QnFileStorageResource::DependencyFactory* QnFileStorageResource::getDependencyFactory()
+QnFileStorageResource::MockableCallFactory* QnFileStorageResource::getMockableCallFactory()
 {
-    return &m_dependencyFactory;
+    return &m_mockableCallFactory;
 }
 
 QnFileStorageResource::~QnFileStorageResource()
@@ -850,7 +850,7 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
     #else
         auto fsPath = getFsPath();
         const QString path =
-            m_dependencyFactory.canonicalPath(fsPath.left(fsPath.lastIndexOf('/')));
+            m_mockableCallFactory.canonicalPath(fsPath.left(fsPath.lastIndexOf('/')));
     #endif
 
     bool isMounted = false;
