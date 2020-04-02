@@ -97,7 +97,6 @@ protected:
 
 private:
     float getDefaultFps() const;
-    QnLiveStreamParams getLastSavedStreamParams() const;
 
     bool doesStreamSuitMotionAnalysisRequirements();
     void strictFpsToLimit(float* fps) const;
@@ -126,7 +125,7 @@ private:
     bool m_prevCameraControlDisabled;
     unsigned int m_framesSinceLastMetaData;
     QTime m_timeSinceLastMetaData;
-    size_t m_totalVideoFrames;
+    size_t m_framesSinceSaveBitrate;
     size_t m_totalAudioFrames;
 
     std::vector<std::unique_ptr<QnMotionEstimation>> m_motionEstimation;

@@ -74,7 +74,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     nx::vms::server::ServerModuleAware(res->serverModule()),
     m_liveMutex(QnMutex::Recursive),
     m_framesSinceLastMetaData(0),
-    m_totalVideoFrames(0),
+    m_framesSinceSaveBitrate(0),
     m_totalAudioFrames(0),
     m_softMotionLastChannel(0),
     m_videoChannels(1),
@@ -409,7 +409,7 @@ bool QnLiveStreamProvider::needMetadata()
 
 void QnLiveStreamProvider::onStreamReopen()
 {
-    m_totalVideoFrames = 0;
+    m_framesSinceSaveBitrate = 0;
     m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES;
     resetMediaStatistics();
 }
@@ -421,12 +421,17 @@ void QnLiveStreamProvider::onGotVideoFrame(
     if (!NX_ASSERT(compressedFrame))
         return;
 
-    m_totalVideoFrames++;
+    m_framesSinceSaveBitrate++;
     m_framesSinceLastMetaData++;
 
     saveMediaStreamParamsIfNeeded(compressedFrame);
-    if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
-        saveBitrateIfNeeded(compressedFrame, getLastSavedStreamParams(), isCameraControlRequired);
+
+    if (m_framesSinceSaveBitrate >= SAVE_BITRATE_FRAME)
+    {
+        const auto actualParams = getActualParams();
+        if (actualParams.bitrateKbps > 0)
+            saveBitrateIfNeeded(compressedFrame, actualParams, isCameraControlRequired);
+    }
 
     processMetadata(compressedFrame);
 }
@@ -576,11 +581,7 @@ QnLiveStreamParams QnLiveStreamProvider::getActualParams() const
 {
     if (isConnectionLost())
         return QnLiveStreamParams();
-    return getLastSavedStreamParams();
-}
 
-QnLiveStreamParams QnLiveStreamProvider::getLastSavedStreamParams() const
-{
     QnLiveStreamParams result;
     result.bitrateKbps = bitrateBitsPerSecond() / 1024.0;
     result.fps = getFrameRate();
@@ -787,6 +788,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     const QnLiveStreamParams& liveParams,
     bool isCameraConfigured)
 {
+    m_framesSinceSaveBitrate = 0;
     auto now = qnSyncTime->currentDateTime().toUTC().toString(Qt::ISODate);
     CameraBitrateInfo info(encoderIndex(), std::move(now));
 
