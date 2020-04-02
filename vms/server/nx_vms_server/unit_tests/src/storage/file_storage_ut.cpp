@@ -63,7 +63,9 @@ TEST_F(CheckMountedStatusTest, FirstServerRun_FullMediaPathDoesNotExistYet)
     storage->setUrl("/opt/networkoptx/mediaserver/var/data");
 
     ASSERT_EQ(Qn::StorageInit_Ok, callCheckMounted());
-    ASSERT_EQ("/opt/networkoptx/mediaserver/var", canonicalPathArgument);
+    #if !defined (Q_OS_WIN)
+        ASSERT_EQ("/opt/networkoptx/mediaserver/var", canonicalPathArgument);
+    #endif
 }
 
 TEST_F(CheckMountedStatusTest, StorageWithNotExistentPathInDb)
@@ -76,5 +78,7 @@ TEST_F(CheckMountedStatusTest, PathExistsOnDiskButItsNotMounted)
 {
     storage->setUrl("/existing/path/NX Witness");
     ASSERT_NE(Qn::StorageInit_Ok, callCheckMounted());
-    ASSERT_EQ("/existing/path", canonicalPathArgument);
+    #if !defined (Q_OS_WIN)
+        ASSERT_EQ("/existing/path", canonicalPathArgument);
+    #endif
 }
