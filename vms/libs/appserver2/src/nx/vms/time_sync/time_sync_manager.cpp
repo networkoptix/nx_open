@@ -154,14 +154,16 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
     for (int i = 0; i < iterations; ++i)
     {
         rttTimer.restart();
-        bool success = httpClient->doGet(url);
-        if (success)
+        if (httpClient->doGet(url))
             response = httpClient->fetchEntireMessageBody();
-        if (!success || !response)
+        else
+            response.reset();
+        if (!response)
         {
             NX_WARNING(this,
-                "Can't read time from server %1, timeout: %2, error: %3",
+                "Can't read time from server %1, iteration %2 of %3, timeout: %4, error: %5",
                 qnStaticCommon->moduleDisplayName(route.id),
+                i, iterations,
                 maxRtt,
                 httpClient->lastSysErrorCode());
         }
