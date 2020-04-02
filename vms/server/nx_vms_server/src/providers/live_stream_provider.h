@@ -97,7 +97,7 @@ protected:
 
 private:
     float getDefaultFps() const;
-    QnLiveStreamParams getActualParamsInternal() const;
+    QnLiveStreamParams getLastSavedStreamParams() const;
 
     bool doesStreamSuitMotionAnalysisRequirements();
     void strictFpsToLimit(float* fps) const;
