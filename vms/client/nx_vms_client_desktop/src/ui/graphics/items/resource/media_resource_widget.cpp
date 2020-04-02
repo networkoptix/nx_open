@@ -2711,7 +2711,7 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
         && (bookmarksEnabled || isLive);
 
     const bool animate = m_compositeOverlay->scene() != nullptr;
-    setOverlayWidgetVisible(m_compositeOverlay, visible, animate, /*controlVisibility*/ false);
+    setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
 
     for (int i = 0; i < m_triggersContainer->count(); ++i)
     {
