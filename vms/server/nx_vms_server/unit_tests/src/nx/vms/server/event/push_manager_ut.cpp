@@ -20,9 +20,10 @@ namespace nx::vms::server::event::test {
 using namespace nx::network;
 using namespace nx::vms::event;
 using namespace nx::vms::server::event;
+using namespace std::chrono_literals;
 
 static const QString kMailSuffix("@xxx.com");
-static const boost::optional<std::chrono::milliseconds> kQueueTimeout(std::chrono::milliseconds(100));
+static const std::chrono::milliseconds kQueueTimeout(100);
 
 class PushManagerTest: public ::testing::Test
 {
@@ -32,10 +33,13 @@ public:
     QnUuid cameraId;
 
 public:
-    PushManagerTest():
+    PushManagerTest(RetryPolicy retryPolicy = {0, 0s, 0, 0s, 0}):
         systemId(QnUuid::createUuid().toSimpleString()),
         serverId(QnUuid::createUuid().toSimpleString()),
-        m_pushManager(&m_serverModule, /*useEncryption*/ false)
+        m_pushManager(
+            &m_serverModule,
+            RetryPolicy(1, kQueueTimeout * 3, 1, kQueueTimeout * 3, 0),
+            /*useEncryption*/ false)
     {
         m_cloudService.registerRequestProcessorFunc(
             "/api/notifications/push_notification",
@@ -67,7 +71,7 @@ public:
         }
     }
 
-    std::optional<PushRequest> sendEvent(
+    void generateEvent(
         EventType type, QnUuid resource = {}, QString text = {}, const std::string& users = "")
     {
         EventParameters event;
@@ -90,10 +94,20 @@ public:
         AbstractActionPtr actionPtr(new CommonAction(ActionType::pushNotificationAction, event));
         actionPtr->setParams(action);
         m_pushManager.send(actionPtr);
+    }
 
-        if (const auto request = m_cloudRequests.pop(kQueueTimeout))
+    std::optional<PushRequest> getRequestFromServer()
+    {
+        if (const auto request = m_cloudRequests.pop(boost::make_optional(kQueueTimeout)))
             return QJson::deserialized<PushRequest>(*request);
         return std::nullopt;
+    }
+
+    template<typename... Args>
+    std::optional<PushRequest> testEvent(Args... args)
+    {
+        generateEvent(std::forward<Args>(args)...);
+        return getRequestFromServer();
     }
 
     void setCloudState(http::StatusCode::Value value)
@@ -149,7 +163,7 @@ private:
 TEST_F(PushManagerTest, Events)
 {
     {
-        const auto sent = sendEvent(EventType::userDefinedEvent);
+        const auto sent = testEvent(EventType::userDefinedEvent);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
@@ -159,7 +173,7 @@ TEST_F(PushManagerTest, Events)
         EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl());
     }
     {
-        const auto sent = sendEvent(EventType::serverStartEvent, serverId);
+        const auto sent = testEvent(EventType::serverStartEvent, serverId);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
@@ -169,7 +183,7 @@ TEST_F(PushManagerTest, Events)
         EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl());
     }
     {
-        const auto sent = sendEvent(EventType::cameraMotionEvent, cameraId, "WTF!");
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, "WTF!");
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
@@ -179,7 +193,7 @@ TEST_F(PushManagerTest, Events)
         EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl(cameraId));
     }
     {
-        const auto sent = sendEvent(EventType::networkIssueEvent, cameraId, "Run!", "ab");
+        const auto sent = testEvent(EventType::networkIssueEvent, cameraId, "Run!", "ab");
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
@@ -192,16 +206,50 @@ TEST_F(PushManagerTest, Events)
 
 TEST_F(PushManagerTest, Errors)
 {
-    EXPECT_TRUE(sendEvent(EventType::userDefinedEvent));
-    EXPECT_TRUE(sendEvent(EventType::networkIssueEvent, cameraId));
+    EXPECT_TRUE(testEvent(EventType::userDefinedEvent));
+    EXPECT_TRUE(testEvent(EventType::networkIssueEvent, cameraId));
 
     setCloudState(http::StatusCode::serviceUnavailable);
-    EXPECT_FALSE(sendEvent(EventType::userDefinedEvent));
-    EXPECT_FALSE(sendEvent(EventType::networkIssueEvent, cameraId));
+    EXPECT_FALSE(testEvent(EventType::userDefinedEvent));
+    EXPECT_FALSE(testEvent(EventType::networkIssueEvent, cameraId));
 
     setCloudState(http::StatusCode::created);
-    EXPECT_TRUE(sendEvent(EventType::userDefinedEvent));
-    EXPECT_TRUE(sendEvent(EventType::networkIssueEvent, cameraId));
+    EXPECT_TRUE(testEvent(EventType::userDefinedEvent));
+    EXPECT_TRUE(testEvent(EventType::networkIssueEvent, cameraId));
+}
+
+class PushManagerRetryTest: public PushManagerTest
+{
+public:
+    PushManagerRetryTest():
+        PushManagerTest(RetryPolicy(1, kQueueTimeout * 2, 1, kQueueTimeout * 2, 0))
+    {
+    }
+};
+
+TEST_F(PushManagerRetryTest, Retransmissions)
+{
+    generateEvent(EventType::serverStartEvent);
+    ASSERT_TRUE(getRequestFromServer()) << "Normal operation";
+
+    setCloudState(http::StatusCode::serviceUnavailable);
+    generateEvent(EventType::serverStartEvent);
+    ASSERT_FALSE(getRequestFromServer()) << "Server error";
+
+    setCloudState(http::StatusCode::created);
+    std::this_thread::sleep_for(kQueueTimeout * 2);
+    ASSERT_TRUE(getRequestFromServer()) << "Retransmission";
+
+    setCloudState(http::StatusCode::serviceUnavailable);
+    generateEvent(EventType::serverStartEvent);
+    ASSERT_FALSE(getRequestFromServer()) << "Server error";
+
+    std::this_thread::sleep_for(kQueueTimeout);
+    ASSERT_FALSE(getRequestFromServer()) << "Server error on retransmission";
+
+    setCloudState(http::StatusCode::created);
+    generateEvent(EventType::serverStartEvent);
+    ASSERT_TRUE(getRequestFromServer()) << "Normal operation";
 }
 
 } // namespace nx::vms::server::event::test
