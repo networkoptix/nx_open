@@ -4662,13 +4662,16 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
         ? QnMediaResource::getVideoLayout(dataProvider)
         : QnConstResourceVideoLayoutPtr(QnCustomResourceVideoLayout::fromString(layoutStr));
 
-    auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
     {
         QnMutexLocker lock(&m_layoutMutex);
+        if (m_videoLayout)
+            return m_videoLayout;
         m_videoLayout = videoLayout;
-        nonConstThis->setProperty(ResourcePropertyKey::kVideoLayout, videoLayout->toString());
-        nonConstThis->saveProperties();
     }
+
+    auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
+    nonConstThis->setProperty(ResourcePropertyKey::kVideoLayout, videoLayout->toString());
+    nonConstThis->savePropertiesAsync();
 
     return m_videoLayout;
 }
