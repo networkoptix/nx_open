@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.255",
+    "version": "1.0.1.257",
     "data": [
         {
             "keys": [
@@ -1002,7 +1002,31 @@
                 "bx100|indigovision bx100",
                 "panasonic|wj-gxe100",
                 "st-hdvr162pro-d-v2|general",
-                "dahua| DHI-HCVR72*"
+                "dahua| DHI-HCVR72*",
+                "dw-enhd16|elevator3-4",
+                "dw-enhd16|enc1.af3260.wilmington",
+                "-1hdr16k|rvi",
+                "dw-enhd16|9902",
+                "dw-enhd16|viper-hdaenc16",
+                "nvr302a-16-4ks2|general",
+                "nr32p6-16|network video recorder",
+                "general|rvi-ipn16/2-pro-4k",
+                "rvi|rvi-1hdr16k",
+                "nv4432-hs|ac",
+                "dahua|n42b2p2",
+                "seyeon tech co., ltd|eha200",
+                "general|itse0804-gn5b-d",
+                "ds-6704hwi|tower 2",
+                "dahua|xvr5216an-4kl-x",
+                "ds-7608ni*|*",
+                "general|dr-tw1516e",
+                "dahua|dhi-nvr616d-128-4ks2",
+                "dw-en4k16|dw-en4k16",
+                "itse0804-gn5b-d|general",
+                "hrgx81|embedded_net_dvr",
+                "interlogix|tve-420",
+                "ali-qvr3008h|dvr3",
+                "ali-qvr3016h|dvr31"
             ],
             "analogEncoder": true
         },
