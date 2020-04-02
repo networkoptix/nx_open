@@ -82,6 +82,7 @@ public:
     const nx::utils::Url& url() const;
     const nx::utils::Url& contentLocationUrl() const;
     StringType contentType() const;
+    boost::optional<quint64> contentLength() const;
 
     /** See AsyncHttpClient::setSubsequentReconnectTries */
     void setSubsequentReconnectTries(int reconnectTries);

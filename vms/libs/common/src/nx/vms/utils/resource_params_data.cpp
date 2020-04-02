@@ -24,7 +24,14 @@ ResourceParamsData ResourceParamsData::load(const nx::utils::Url& url)
     {
         const auto body = httpClient.fetchEntireMessageBody();
         if (body)
-            result.value = *body;
+        {
+            // TODO: Remove length check here when it will be understood why GET
+            // `/api/synchronizedTime` response size mismatches with content length when received
+            // over SSL.
+            const auto length = httpClient.contentLength();
+            if (!length || *length <= (quint64) body->size())
+                result.value = *body;
+        }
     }
     if (result.value.isEmpty())
         NX_WARNING(NX_SCOPE_TAG, "Empty resource_data.json from %1", result.location);

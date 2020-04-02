@@ -166,7 +166,9 @@ std::optional<BufferType> HttpClient::fetchEntireMessageBody()
         NX_DEBUG(this,
             "Received %1 of %2 bytes from %3, last error %4",
             buffer.size(), *length, contentLocationUrl(), lastSysErrorCode());
-        return std::nullopt;
+        // TODO: Return nullopt here when it will be understood why GET `/api/synchronizedTime`
+        // response size mismatches with content length when received over SSL.
+        return buffer;
     }
 
     if (m_error)
@@ -209,6 +211,11 @@ const nx::utils::Url& HttpClient::contentLocationUrl() const
 StringType HttpClient::contentType() const
 {
     return m_asyncHttpClient->contentType();
+}
+
+boost::optional<quint64> HttpClient::contentLength() const
+{
+    return m_asyncHttpClient->contentLength();
 }
 
 void HttpClient::setSubsequentReconnectTries(int reconnectTries)
