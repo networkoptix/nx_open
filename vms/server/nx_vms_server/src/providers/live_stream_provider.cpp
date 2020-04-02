@@ -426,7 +426,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
 
     saveMediaStreamParamsIfNeeded(compressedFrame);
     if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
-        saveBitrateIfNeeded(compressedFrame, getActualParams(), isCameraControlRequired);
+        saveBitrateIfNeeded(compressedFrame, getActualParamsInternal(), isCameraControlRequired);
 
     processMetadata(compressedFrame);
 }
@@ -576,6 +576,11 @@ QnLiveStreamParams QnLiveStreamProvider::getActualParams() const
 {
     if (isConnectionLost())
         return QnLiveStreamParams();
+    return getActualParamsInternal();
+}
+
+QnLiveStreamParams QnLiveStreamProvider::getActualParamsInternal() const
+{
     QnLiveStreamParams result;
     result.bitrateKbps = bitrateBitsPerSecond() / 1024.0;
     result.fps = getFrameRate();
