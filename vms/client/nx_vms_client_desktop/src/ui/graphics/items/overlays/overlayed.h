@@ -49,8 +49,7 @@ namespace detail {
         void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility, bool animate);
         void updateOverlayWidgetsVisibility(bool animate);
 
-        static void setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible, bool animate,
-            bool controlVisibility = true);
+        static void setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible, bool animate);
         static bool isOverlayWidgetVisible(QGraphicsWidget* widget);
     private:
         template<class Base>
