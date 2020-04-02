@@ -518,11 +518,8 @@ void QnResourceWidget::updateDetailsText()
 
     const QString text = calculateDetailsText();
     m_hudOverlay->details()->setHtml(text);
-
-    setOverlayWidgetVisible(m_hudOverlay->details(),
-        /*visible*/ !text.isEmpty(),
-        /*animate*/ false,
-        /*controlVisibility*/ false);
+    setOverlayWidgetVisible(
+        m_hudOverlay->details(), /*visible*/ !text.isEmpty(), /*animate*/ false);
 }
 
 QString QnResourceWidget::calculatePositionText() const
@@ -537,11 +534,8 @@ void QnResourceWidget::updatePositionText()
 
     const QString text = calculatePositionText();
     m_hudOverlay->position()->setHtml(text);
-
-    setOverlayWidgetVisible(m_hudOverlay->position(),
-        /*visible*/ !text.isEmpty(),
-        /*animate*/ false,
-        /*controlVisibility*/ false);
+    setOverlayWidgetVisible(
+        m_hudOverlay->position(), /*visible*/ !text.isEmpty(), /*animate*/ false);
 }
 
 QnStatusOverlayController *QnResourceWidget::statusOverlayController() const
@@ -972,15 +966,12 @@ void QnResourceWidget::updateHud(bool animate)
 
     const bool updatePositionTextRequired = showPosition
         && !isOverlayWidgetVisible(m_hudOverlay->position());
-    const bool positionOverlayVisible = showPosition && !calculatePositionText().isEmpty();
-    setOverlayWidgetVisible(m_hudOverlay->position(), positionOverlayVisible, animate);
+    setOverlayWidgetVisible(m_hudOverlay->position(), showPosition, animate);
     if (updatePositionTextRequired)
         updatePositionText();
 
-    const bool updateDetailsTextRequired =
-        (showDetailedInfo && !isOverlayWidgetVisible(m_hudOverlay->details()));
-    const bool detailsOverlayVisible = showDetailedInfo && !calculateDetailsText().isEmpty();
-    setOverlayWidgetVisible(m_hudOverlay->details(), detailsOverlayVisible, animate);
+    const bool updateDetailsTextRequired = (showDetailedInfo && !isOverlayWidgetVisible(m_hudOverlay->details()));
+    setOverlayWidgetVisible(m_hudOverlay->details(), showDetailedInfo, animate);
     if (updateDetailsTextRequired)
         updateDetailsText();
 
