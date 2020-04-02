@@ -1335,7 +1335,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
 
     if (!currentDP)
     {
-        NX_WARNING(this, "Failed to play rtsp session, resource not initialized");
+        NX_DEBUG(this, "Failed to play rtsp session, resource %1 is not initialized yet", 
+            d->mediaRes ? d->mediaRes->toResource()->getUrl() : QString());
         return nx::network::http::StatusCode::serviceUnavailable;
     }
 

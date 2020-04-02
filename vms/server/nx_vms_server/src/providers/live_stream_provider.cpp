@@ -110,6 +110,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, 
         [this](const QnResourcePtr&) 
         {
+            m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
             QnMutexLocker lock(&m_liveMutex);
             updateSoftwareMotion();
         });
@@ -179,7 +180,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 void QnLiveStreamProvider::beforeRun()
 {
     QnAbstractMediaStreamDataProvider::beforeRun();
-
+    m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
     updateSoftwareMotion();
 
     if (NX_ASSERT(serverModule()) && !m_streamDataReceptor)
@@ -293,8 +294,6 @@ void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, con
 
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
-    m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
-
     for (int i = 0; i < m_videoChannels; ++i)
     {
         QnMotionRegion region = m_cameraRes->getMotionRegion(i);
