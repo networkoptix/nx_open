@@ -652,24 +652,39 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::waitForKeyFrame(
     QnAbstractMediaData::DataType dataType, MediaQuality quality)
 {
     constexpr std::chrono::milliseconds kSleepInterval(100);
-    constexpr std::chrono::seconds kWaitTimeoutForVideo(10);
-    constexpr std::chrono::milliseconds kWaitTimeoutForAudio(100);
+    constexpr std::chrono::seconds kWaitTimeout(10);
+
+    // Devices with forced audio stream could not have it actually in media stream.
+    // Forced stream just means user always see 'enable audio' checkbox and can not control it.
+    constexpr std::chrono::milliseconds kWaitTimeoutForForcedAudio(100);
 
     std::chrono::milliseconds overallWait(0);
+    const auto resource = getResource()->toResourcePtr();
+    bool isForcedAudio = false;
+    if (auto camera = resource.dynamicCast<QnSecurityCamResource>())
+        isForcedAudio = camera->isAudioForced();
+
+    const auto waitTimeout = dataType == QnAbstractMediaData::DataType::AUDIO && isForcedAudio
+        ? kWaitTimeoutForForcedAudio : kWaitTimeout;
+
+    NX_VERBOSE(this, "Wait for SDP data for camera %1, dataType %2, quality %3",
+        resource->getUrl(), dataType, quality);
     while(!m_needStop)
     {
         auto result = getKeyFrame(dataType, quality);
         if (result)
+        {
+            NX_VERBOSE(this, "Got SDP data for camera %1. expired: %2, dataType %3, quality %4",
+                resource->getUrl(), waitTimeout, dataType, quality);
             return result;
+        }
 
         std::this_thread::sleep_for(kSleepInterval);
         overallWait += kSleepInterval;
-        const auto waitTimeout = (dataType == QnAbstractMediaData::DataType::VIDEO)
-            ? kWaitTimeoutForVideo : kWaitTimeoutForAudio;
         if (overallWait > waitTimeout)
         {
-            NX_DEBUG(this, "Stream initializing timeout expired: %1, dataType %2, quality %3",
-                waitTimeout, dataType, quality);
+            NX_DEBUG(this, "Stream initializing timeout for camera %1. expired: %2, dataType %3, quality %4",
+                resource->getUrl(), waitTimeout, dataType, quality);
             return nullptr;
         }
     }
