@@ -73,6 +73,12 @@ void CameraSettingsDialogStore::loadCameras(
         });
 }
 
+void CameraSettingsDialogStore::updatePtzSettings(const QnVirtualCameraResourceList& cameras)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::updatePtzSettings(std::move(state), cameras); });
+}
+
 void CameraSettingsDialogStore::setReadOnly(bool value)
 {
     d->executeAction([&](State state) { return Reducer::setReadOnly(std::move(state), value); });

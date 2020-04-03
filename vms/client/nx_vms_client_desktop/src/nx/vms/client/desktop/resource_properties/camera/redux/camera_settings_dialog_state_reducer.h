@@ -21,6 +21,7 @@ public:
         DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter = nullptr,
         CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher = nullptr);
 
+    static State updatePtzSettings(State state, const QnVirtualCameraResourceList& cameras);
     static State setReadOnly(State state, bool value);
     static State setSettingsOptimizationEnabled(State state, bool value);
     static State setGlobalPermissions(State state, GlobalPermissions value);
