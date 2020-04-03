@@ -23,7 +23,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
 {
     bindToAioThread(getAioThread());
 
-    NX_VERBOSE(this, "Created new relay tunnel. Url %1, session %2", relayUrl, relaySessionId);
+    NX_VERBOSE(this, "Created new relay tunnel. Url %1, session %2", m_relayUrl, m_relaySessionId);
 }
 
 void OutgoingTunnelConnection::stopWhileInAioThread()
@@ -92,8 +92,12 @@ void OutgoingTunnelConnection::establishNewConnection(
 
             if (timeout > std::chrono::milliseconds::zero())
             {
+                // NOTE: The relayClient is supposed to report timeout itself.
+                // This timer should protect from a relay client timeout error (which actually happened).
+                // So, using double timeout to give the relayClient a good chance to report
+                // the connection error itself.
                 m_activeRequests.back()->timer.start(
-                    timeout,
+                    timeout * 2,
                     std::bind(&OutgoingTunnelConnection::onConnectionOpened, this,
                         nx::cloud::relay::api::ResultCode::timedOut, nullptr, requestIter));
             }

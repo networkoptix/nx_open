@@ -13,12 +13,6 @@
 
 using nx::vms::client::desktop::Rotation;
 
-namespace {
-
-static constexpr auto kOverlayVisibleProperty = "overlayVisible";
-
-} // namespace
-
 detail::OverlayedBase::OverlayWidget::OverlayWidget()
     : visibility(OverlayVisibility::Invisible)
     , widget(nullptr)
@@ -183,24 +177,16 @@ void detail::OverlayedBase::updateOverlayWidgetsVisibility(bool animate)
     }
 }
 
-void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible /*= true*/,
-    bool animate /*= true*/, bool controlVisibility /*= true*/)
+void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible /*= true*/, bool animate /*= true*/)
 {
     if (!widget)
         return;
 
-    if (controlVisibility)
-        widget->setProperty(kOverlayVisibleProperty, visible);
-
     const qreal opacity = visible ? 1.0 : 0.0;
     if (animate)
     {
-        // Allow widget to resize while it is fully transparent.
-        if (controlVisibility && visible && qFuzzyIsNull(widget->opacity()))
-            widget->setVisible(true);
-
         using namespace nx::vms::client::desktop::ui::workbench;
-        auto animator = opacityAnimator(widget, /*speed*/ 1.0, controlVisibility);
+        auto animator = opacityAnimator(widget);
 
         const bool sameTarget = animator->isRunning()
             && qFuzzyEquals(animator->targetValue().toReal(), opacity);
@@ -222,9 +208,9 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
             opacityAnimator(widget)->stop();
 
         widget->setOpacity(opacity);
-        if (controlVisibility)
-            widget->setVisible(visible);
     }
+
+    NX_ASSERT(isOverlayWidgetVisible(widget) == visible, "Validate checking function");
 }
 
 bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
@@ -232,7 +218,13 @@ bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
     if (!widget)
         return false;
 
-    return widget->property(kOverlayVisibleProperty).toBool();
+    if (hasOpacityAnimator(widget))
+    {
+        auto animator = opacityAnimator(widget);
+        if (animator->isRunning())
+            return !qFuzzyIsNull(animator->targetValue().toDouble());
+    }
+    return !qFuzzyIsNull(widget->opacity());
 }
 
 detail::OverlayParams::OverlayParams(OverlayedBase::OverlayVisibility visibility,

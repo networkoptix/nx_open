@@ -86,7 +86,7 @@ add_custom_command(
 add_custom_target(ssc_installer ALL
     COMMENT "Creating ssc analytics plugin distribution..."
     DEPENDS
-        ${installerMsiFile}h
+        ${installerMsiFile}
         ${installerUnsignedExeFile}
 )
 

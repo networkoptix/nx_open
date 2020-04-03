@@ -91,6 +91,7 @@ Engine::SharedResources::SharedResources(
     monitor(std::make_unique<MetadataMonitor>(engineManifest, url, auth)),
     sharedContext(std::make_shared<vms::server::plugins::HanwhaSharedResourceContext>(
         /*serverRuntimeEventManager*/ nullptr,
+        /*resourcePool*/ nullptr,
         sharedId))
 {
     sharedContext->setResourceAccess(url, auth);

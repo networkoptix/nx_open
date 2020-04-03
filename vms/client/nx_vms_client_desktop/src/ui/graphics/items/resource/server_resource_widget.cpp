@@ -754,13 +754,16 @@ bool QnServerResourceWidget::isLegendVisible() const {
     return detailsVisible || isHovered();
 }
 
+
 void QnServerResourceWidget::updateHud(bool animate /*= true*/) {
     base_type::updateHud(animate);
     bool visible = isLegendVisible();
 
     for (int i = 0; i < ButtonBarCount; i++)
-        setOverlayWidgetVisible(m_legendButtonBar[i], visible, animate, /*controlVisibility*/ false);
+        setOverlayWidgetVisible(m_legendButtonBar[i], visible, animate);
+        //m_legendButtonBar[i]->setOpacity(m_infoOpacity);
 }
+
 
 QString QnServerResourceWidget::calculateTitleText() const
 {

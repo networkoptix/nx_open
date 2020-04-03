@@ -8,27 +8,6 @@ namespace nx::vms::client::desktop {
 
 using namespace nx::vms::api;
 
-template<typename EventData, typename EventDataHandler>
-void handleEvent(
-    const nx::utils::log::Tag& logTag,
-    const ServerRuntimeEventData& eventData,
-    EventDataHandler handler)
-{
-    bool success = false;
-    const EventData deserialized = QJson::deserialized(eventData.eventData, EventData(), &success);
-
-    if (!success)
-    {
-        NX_DEBUG(logTag,
-            "Unable to deserialize a server runtime event. Event type: %1, event data: %2",
-            eventData.eventType, eventData.eventData);
-
-        return;
-    }
-
-    handler(deserialized);
-}
-
 ServerRuntimeEventConnector::ServerRuntimeEventConnector(
     QnDesktopClientMessageProcessor* messageProcessor)
 {
@@ -49,27 +28,23 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
     {
         case ServerRuntimeEventType::deviceAgentSettingsMaybeChanged:
         {
-            handleEvent<DeviceAgentSettingsMaybeChangedData>(
-                kLogTag,
-                eventData,
-                [this](const DeviceAgentSettingsMaybeChangedData& deserialized)
-                {
-                    emit deviceAgentSettingsMaybeChanged(
-                        deserialized.deviceId,
-                        deserialized.engineId);
-                });
+            DeviceAgentSettingsMaybeChangedData result;
+            if (!NX_ASSERT(QJson::deserialize(eventData.eventData, &result)));
+                return;
+
+            emit deviceAgentSettingsMaybeChanged(
+                result.deviceId,
+                result.engineId);
 
             return;
         }
         case ServerRuntimeEventType::deviceFootageChanged:
         {
-            handleEvent<DeviceFootageChangedData>(
-                kLogTag,
-                eventData,
-                [this](const DeviceFootageChangedData& deserialized)
-                {
-                    emit deviceFootageChanged(deserialized.deviceIds);
-                });
+            DeviceFootageChangedData result;
+            if (!NX_ASSERT(QJson::deserialize(eventData.eventData, &result)))
+                return;
+
+            emit deviceFootageChanged(result.deviceIds);
 
             return;
         }

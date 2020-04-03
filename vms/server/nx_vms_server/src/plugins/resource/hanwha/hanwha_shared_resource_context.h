@@ -19,6 +19,8 @@
 #include <recording/time_period_list.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 
+class QnResourcePool;
+
 namespace nx {
 namespace vms::server {
 
@@ -139,6 +141,7 @@ class HanwhaSharedResourceContext:
 public:
     HanwhaSharedResourceContext(
         event::ServerRuntimeEventManager* serverRuntimeEventManager,
+        QnResourcePool* resourcePool,
         const nx::vms::server::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
     // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
@@ -169,6 +172,8 @@ public:
     void setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings);
 
     void initializeAlarmInputs();
+
+    QnSecurityCamResourceList boundDevices() const;
 
     // NOTE: function objects return HanwhaResult<T>.
     HanwhaCachedData<HanwhaInformation> information;
@@ -220,6 +225,7 @@ private:
     mutable QnMutex m_servicesMutex;
 
     event::ServerRuntimeEventManager* const m_serverRuntimeEventManager = nullptr;
+    QnResourcePool* m_resourcePool = nullptr;
 };
 
 } // namespace plugins
