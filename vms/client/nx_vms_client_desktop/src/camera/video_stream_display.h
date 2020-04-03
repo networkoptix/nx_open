@@ -80,10 +80,7 @@ private:
     QSize getMaxScreenSizeUnsafe() const;
     QnAbstractVideoDecoder* createVideoDecoder(
         QnCompressedVideoDataPtr data, bool mtDecoding) const;
-    /**
-      * Return last decoded frame
-      */
-    QSharedPointer<CLVideoDecoderOutput> flush(QnFrameScaler::DownscaleFactor force_factor, int channelNum);
+
     QnVideoStreamDisplay::FrameDisplayStatus flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor);
     //!Blocks until all frames passed to \a display have been rendered
     void flushFramesToRenderer();

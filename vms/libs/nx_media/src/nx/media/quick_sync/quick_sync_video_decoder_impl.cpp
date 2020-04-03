@@ -19,7 +19,6 @@
 
 namespace nx::media {
 
-constexpr int kLatencySurfaceCount = 1;
 constexpr int kSyncWaitMsec = 5000;
 constexpr int kMaxBitstreamSizeBytes = 1024 * 1024 * 10;
 
@@ -41,13 +40,13 @@ QuickSyncVideoDecoderImpl::QuickSyncVideoDecoderImpl()
 QuickSyncVideoDecoderImpl::~QuickSyncVideoDecoderImpl()
 {
     NX_DEBUG(this, "Close quick sync video decoder");
-    if (m_allocator)
-        m_allocator->FreeFrames(&m_response);
-
     if (m_renderingSurface)
         vaDestroySurfaceGLX(m_display, m_renderingSurface);
 
     m_mfxSession.Close();
+
+    if (m_allocator)
+        m_allocator->FreeFrames(&m_response);
 }
 
 bool QuickSyncVideoDecoderImpl::initSession()
@@ -131,44 +130,10 @@ bool QuickSyncVideoDecoderImpl::allocFrames()
     else
         request.Type |= MFX_MEMTYPE_SYSTEM_MEMORY;
     request.NumFrameMin = request.NumFrameSuggested;
-    return allocFramesSample(request);
+    return allocSurfaces(request);
 }
 
-bool QuickSyncVideoDecoderImpl::reallocCurrentSurface(mfxFrameSurface1& surface)
-{
-    mfxVideoParam param {};
-    mfxStatus sts = MFXVideoDECODE_GetVideoParam(m_mfxSession, &param);
-    if (MFX_ERR_NONE != sts)
-    {
-        NX_ERROR(this, "Failed to get video params to reallocate surface: %1", sts);
-        return sts;
-    }
-    mfxMemId inMid = nullptr;
-    mfxMemId outMid = nullptr;
-
-    surface.Info.CropW = param.mfx.FrameInfo.CropW;
-    surface.Info.CropH = param.mfx.FrameInfo.CropH;
-    m_mfxDecParams.mfx.FrameInfo.Width =
-        MSDK_ALIGN16(std::max(param.mfx.FrameInfo.Width, m_mfxDecParams.mfx.FrameInfo.Width));
-    m_mfxDecParams.mfx.FrameInfo.Height =
-        MSDK_ALIGN16(std::max(param.mfx.FrameInfo.Height, m_mfxDecParams.mfx.FrameInfo.Height));
-    surface.Info.Width = m_mfxDecParams.mfx.FrameInfo.Width;
-    surface.Info.Height = m_mfxDecParams.mfx.FrameInfo.Height;
-
-    inMid = surface.Data.MemId;
-
-    sts = m_allocator->ReallocFrame(inMid, &surface.Info,
-        surface.Data.MemType, &outMid);
-    if (MFX_ERR_NONE != sts)
-    {
-        NX_ERROR(this, "Failed to reallocate surface, allocator failed: %1", sts);
-        return false;
-    }
-    surface.Data.MemId = outMid;
-    return true;
-}
-
-bool QuickSyncVideoDecoderImpl::allocFramesSample(mfxFrameAllocRequest& request)
+bool QuickSyncVideoDecoderImpl::allocSurfaces(mfxFrameAllocRequest& request)
 {
     // alloc frames for decoder
     mfxStatus status = m_allocator->Alloc(m_allocator->pthis, &request, &m_response);
@@ -178,20 +143,15 @@ bool QuickSyncVideoDecoderImpl::allocFramesSample(mfxFrameAllocRequest& request)
         return false;
     }
 
-    // prepare mfxFrameSurface1 array for decoder
-    status = m_surfaces.AllocBuffers(m_response.NumFrameActual);
-    if (status < MFX_ERR_NONE)
-    {
-        NX_ERROR(this, "Alloc buffers failed, status: %1", status);
-        return false;
-    }
-
+    // Allocate surface headers (mfxFrameSurface1) for decoder
+    m_surfaces = std::vector<SurfaceInfo>(m_response.NumFrameActual);
     for (int i = 0; i < m_response.NumFrameActual; i++)
     {
-        // initating each frame:
-        memcpy(&m_surfaces.m_pSurfaces[i].frame.Info, &(request.Info), sizeof(mfxFrameInfo));
-        m_surfaces.m_pSurfaces[i].frame.Data.MemType = request.Type;
-        m_surfaces.m_pSurfaces[i].frame.Data.MemId = m_response.mids[i];
+        memset(&m_surfaces[i].surface, 0, sizeof(mfxFrameSurface1));
+        m_surfaces[i].surface.Info = request.Info;
+
+        // MID (memory id) represents one video NV12 surface
+        m_surfaces[i].surface.Data.MemId = m_response.mids[i];
     }
     return true;
 }
@@ -242,54 +202,37 @@ bool QuickSyncVideoDecoderImpl::init(mfxBitstream& bitstream, AVCodecID codec)
         NX_ERROR(this, "Failed to init decoder, error: %1", status);
         return false;
     }
-    //m_surfacePool.setAllocator(std::move(allocator));
     return true;
 }
 
-bool QuickSyncVideoDecoderImpl::syncOutputSurface(nx::QVideoFramePtr* result)
+void QuickSyncVideoDecoderImpl::buildQVideoFrame(
+    SurfaceInfo& surface, nx::QVideoFramePtr* result) const
 {
-    if (m_outputSurfaces.empty())
-    {
-        NX_ERROR(this, "Empty output surface list");
-        return false;
-    }
-    OutputSurface surface = m_outputSurfaces.front();
-    m_outputSurfaces.pop_front();
-    mfxStatus sts = MFX_WRN_IN_EXECUTION;
-    while (MFX_WRN_IN_EXECUTION == sts) // TODO make hard limit
-    {
-        sts = m_mfxSession.SyncOperation(surface.syncp, kSyncWaitMsec);
-        if (MFX_ERR_GPU_HANG == sts)
-        {
-            NX_DEBUG(this, "GPU hang happened");
-            // Output surface can be corrupted
-            // But should be delivered to output anyway
-            sts = MFX_ERR_NONE;
-        }
-    }
-
-    if (MFX_ERR_NONE != sts)
-    {
-        NX_ERROR(this, "Failed to sync surface: %1", sts);
-        return false;
-    }
-
-    ++m_frameNumber;
     QAbstractVideoBuffer* buffer = nullptr;
+    surface.isRendered = false;
     if (m_config.useVideoMemory)
     {
-        vaapiMemId* surfaceData = (vaapiMemId*)surface.surface->frame.Data.MemId;
+        vaapiMemId* surfaceData = (vaapiMemId*)surface.surface.Data.MemId;
         VaSurfaceInfo surfaceDataHandle{*(surfaceData->m_surface), m_display};
-        buffer = new MfxDrmQtVideoBuffer(surface.surface, surfaceDataHandle);
+        buffer = new MfxDrmQtVideoBuffer(&surface.isRendered, surfaceDataHandle);
     }
     else
     {
-        buffer = new MfxQtVideoBuffer(surface.surface, m_allocator);
+        buffer = new MfxQtVideoBuffer(&surface.isRendered, &surface.surface, m_allocator);
     }
-    QSize frameSize(surface.surface->frame.Info.Width, surface.surface->frame.Info.Height);
+    QSize frameSize(surface.surface.Info.Width, surface.surface.Info.Height);
     result->reset(new QVideoFrame(buffer, frameSize, QVideoFrame::Format_NV12));
-    result->get()->setStartTime(surface.surface->frame.Data.TimeStamp);
-    return true;
+    result->get()->setStartTime(surface.surface.Data.TimeStamp);
+}
+
+QuickSyncVideoDecoderImpl::SurfaceInfo* QuickSyncVideoDecoderImpl::getFreeSurface()
+{
+    for (auto& surfaceInfo: m_surfaces)
+    {
+        if (0 == surfaceInfo.surface.Data.Locked && surfaceInfo.isRendered)
+            return &surfaceInfo;
+    }
+    return nullptr;
 }
 
 int QuickSyncVideoDecoderImpl::decode(
@@ -297,7 +240,7 @@ int QuickSyncVideoDecoderImpl::decode(
 {
     mfxBitstream bitstream;
     memset(&bitstream, 0, sizeof(bitstream));
-    if (frame) // TODO make flush
+    if (frame)
     {
         if (m_bitstreamData.size() + frame->dataSize() > kMaxBitstreamSizeBytes)
         {
@@ -311,8 +254,7 @@ int QuickSyncVideoDecoderImpl::decode(
         bitstream.DataLength = m_bitstreamData.size();
         bitstream.MaxLength = m_bitstreamData.size();
         bitstream.TimeStamp = frame->timestamp;
-    }
-    else
+    } else
         return 0;
 
     if (!m_mfxSession)
@@ -337,103 +279,57 @@ int QuickSyncVideoDecoderImpl::decode(
         }
     }
 
-    mfxFrameSurface1* pOutSurface = nullptr;
     mfxBitstream* pBitstream = frame ? &bitstream : nullptr;
     mfxStatus sts = MFX_ERR_NONE;
 
-    m_surfaces.SyncFrameSurfaces();
-    if (!m_pCurrentFreeSurface)
-        m_pCurrentFreeSurface = m_surfaces.m_FreeSurfacesPool.GetSurface();
-
-    if (m_outputSurfaces.size() > kLatencySurfaceCount)
+    SurfaceInfo* surface = getFreeSurface();
+    if (!surface)
     {
-        if (!syncOutputSurface(result))
-            return -1;
-    }
-
-    OutputSurface outputSurface;
-    do {
-        sts = MFXVideoDECODE_DecodeFrameAsync(
-            m_mfxSession,
-            pBitstream,
-            &(m_pCurrentFreeSurface->frame),
-            &pOutSurface,
-            &(outputSurface.syncp));
-        if (MFX_WRN_DEVICE_BUSY != sts)
-        {
-            memmove(m_bitstreamData.data(), m_bitstreamData.data() + pBitstream->DataOffset, pBitstream->DataLength);
-            pBitstream->DataOffset = 0;
-            m_bitstreamData.resize(pBitstream->DataLength);
-        }
-        //NX_DEBUG(this, "QQQQ decode size result %1, sts %2", pBitstream->DataLength, sts);
-        /*if (MFX_WRN_DEVICE_BUSY == sts && !syncOutputSurface(result))
-        {
-            NX_ERROR(this, "Device is busy and failed to free locked surface");
-            return -1;
-        }*/
-
-        if (MFX_ERR_NONE == sts || MFX_ERR_MORE_SURFACE == sts)
-            break;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    } while (MFX_WRN_DEVICE_BUSY == sts || (pBitstream && pBitstream->DataLength > 3));
-
-
-    if (sts > MFX_ERR_NONE) {
-        // ignoring warnings...
-
-        if (outputSurface.syncp)
-        {
-            MSDK_SELF_CHECK(pOutSurface);
-            // output is available
-            sts = MFX_ERR_NONE;
-        }
-        else
-        {
-            // output is not available
-            sts = MFX_ERR_MORE_SURFACE;
-        }
-    }
-    else if ((MFX_ERR_MORE_DATA == sts) && !pBitstream)
-    {
-        // Flush buffered surfaces.
-        // TODO make flush
-        //while (syncOutputSurface()) {}
-
-        return m_frameNumber;
-    }
-    else if (MFX_ERR_INCOMPATIBLE_VIDEO_PARAM == sts)
-    {
-        NX_ERROR(this, "Decode failed: %1", sts);
+        NX_ERROR(this, "Failed to decode frame, no free surfaces!");
         return -1;
     }
-    else if (MFX_ERR_REALLOC_SURFACE == sts)
-    {
-        if (!reallocCurrentSurface(m_pCurrentFreeSurface->frame))
-            return -1;
+    mfxSyncPoint syncp;
+    mfxFrameSurface1* outSurface = nullptr;
 
+    do
+    {
+        sts = MFXVideoDECODE_DecodeFrameAsync(
+            m_mfxSession, pBitstream, &surface->surface, &outSurface, &syncp);
+
+        if (MFX_WRN_DEVICE_BUSY == sts)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Wait if device is busy
+
+    } while (MFX_WRN_DEVICE_BUSY == sts);
+
+    if (pBitstream)
+    {
+        memmove(m_bitstreamData.data(),
+                m_bitstreamData.data() + pBitstream->DataOffset, pBitstream->DataLength);
+        pBitstream->DataOffset = 0;
+        m_bitstreamData.resize(pBitstream->DataLength);
+    }
+
+    // Ignore warnings if output is available (see intel media sdk samples)
+    if (MFX_ERR_NONE < sts && syncp)
+        sts = MFX_ERR_NONE;
+
+    if (MFX_ERR_NONE != sts)
+    {
+        if (sts < MFX_ERR_NONE)
+            NX_VERBOSE(this, "DecodeFrameAsync failed, error status: %1", sts);
         return m_frameNumber;
     }
-    if ((MFX_ERR_NONE == sts) || (MFX_ERR_MORE_DATA == sts) || (MFX_ERR_MORE_SURFACE == sts))
-    {
-        // if current free surface is locked we are moving it to the used surfaces array
-        if (m_pCurrentFreeSurface->frame.Data.Locked) {
-            m_surfaces.m_UsedSurfacesPool.AddSurface(m_pCurrentFreeSurface);
-            m_pCurrentFreeSurface = NULL;
-        }
-    }
-    else if (MFX_ERR_NONE != sts)
-    {
-        NX_DEBUG(this, "DecodeFrameAsync returned error status %1", sts);
-    }
 
-    if (MFX_ERR_NONE == sts)
+    // Synchronize. Wait until decoded frame is ready
+    sts = m_mfxSession.SyncOperation(syncp, kSyncWaitMsec);
+
+    if (MFX_ERR_NONE != sts)
     {
-        msdkFrameSurface* surface = (msdkFrameSurface*)(pOutSurface);
-        msdk_atomic_inc16(&(surface->render_lock));
-        outputSurface.surface = surface;
-        m_outputSurfaces.push_back(outputSurface);
+        NX_ERROR(this, "Failed to sync surface: %1", sts);
+        return -1;
     }
-    return m_frameNumber;
+    buildQVideoFrame(*surface, result);
+    return m_frameNumber++;
 }
 
 } // namespace nx::media

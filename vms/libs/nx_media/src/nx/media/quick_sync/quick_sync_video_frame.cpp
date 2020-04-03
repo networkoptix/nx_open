@@ -14,11 +14,11 @@ QuickSyncVideoFrame::QuickSyncVideoFrame(
 
 bool QuickSyncVideoFrame::renderToRgb(bool isNewTexture, GLuint textureId)
 {
-    auto surfaceInfo = m_frame->handle().value<VaSurfaceInfo>();
     auto decoder = m_decoder.lock();
     if (!decoder)
         return false;
 
+    auto surfaceInfo = m_frame->handle().value<VaSurfaceInfo>();
     VAStatus status;
     void** renderingSurface = decoder->getRenderingSurface();
     if (isNewTexture || !(*renderingSurface))

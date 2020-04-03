@@ -8,7 +8,6 @@
 
 #include <mfx/mfxvideo++.h>
 #include "allocators/base_allocator.h"
-#include "mfx_buffering.h"
 
 namespace nx::media {
 
@@ -24,34 +23,32 @@ public:
     static bool isCompatible(AVCodecID codec);
 
 private:
+    struct SurfaceInfo
+    {
+        mfxFrameSurface1 surface;
+        std::atomic<bool> isRendered = {true}; // signifies that frame is locked for rendering
+    };
+
+private:
     bool init(mfxBitstream& bitstream, AVCodecID codec);
     bool initSession();
     bool allocFrames();
-
-private:
-    struct OutputSurface
-    {
-        msdkFrameSurface* surface;
-        mfxSyncPoint syncp;
-    };
+    SurfaceInfo* getFreeSurface();
+    void buildQVideoFrame(SurfaceInfo& surface, nx::QVideoFramePtr* result) const;
 
 private:
     QuickSyncVideoDecoder::Config m_config;
     mfxVideoParam m_mfxDecParams;
 
     MFXVideoSession m_mfxSession;
-    std::deque<OutputSurface> m_outputSurfaces;
     std::vector<uint8_t> m_bitstreamData;
+    std::vector<SurfaceInfo> m_surfaces;
     int64_t m_frameNumber = 0;
 
     // Temporary copy code from SDK
-    bool allocFramesSample(mfxFrameAllocRequest& request);
-    bool reallocCurrentSurface(mfxFrameSurface1& surface);
-    bool syncOutputSurface(nx::QVideoFramePtr* result);
-    CBuffering m_surfaces;
+    bool allocSurfaces(mfxFrameAllocRequest& request);
     std::shared_ptr<MFXFrameAllocator> m_allocator;
     mfxFrameAllocResponse m_response;
-    msdkFrameSurface* m_pCurrentFreeSurface = nullptr; // Surface detached from free surfaces array.
     VADisplay m_display = nullptr;
 
     // Surface needed to render frame to opengl texture. Keep it here due to do not recreate it on

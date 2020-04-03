@@ -4,7 +4,6 @@
 
 #include <nx/utils/log/log.h>
 
-#include "mfx_buffering.h"
 #include "va_surface_info.h"
 
 namespace nx::media {
@@ -12,15 +11,15 @@ namespace nx::media {
 class MfxDrmQtVideoBuffer: public QAbstractVideoBuffer
 {
 public:
-    MfxDrmQtVideoBuffer(msdkFrameSurface* surface, VaSurfaceInfo surfaceData):
+    MfxDrmQtVideoBuffer(std::atomic<bool>* isRendered, VaSurfaceInfo surfaceData):
         QAbstractVideoBuffer(QAbstractVideoBuffer::HandleType(kHandleTypeVaSurface)),
         m_surfaceData(surfaceData),
-        m_surface(surface)
+        m_isRendered(isRendered)
     {}
 
     virtual ~MfxDrmQtVideoBuffer()
     {
-        msdk_atomic_dec16(&(m_surface->render_lock));
+        *m_isRendered = true;
     }
 
     virtual MapMode mapMode() const override
@@ -42,7 +41,7 @@ public:
 
 private:
     VaSurfaceInfo m_surfaceData;
-    msdkFrameSurface* m_surface;
+    std::atomic<bool>* m_isRendered;
 };
 
 } // namespace nx::media

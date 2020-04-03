@@ -6,7 +6,6 @@
 
 #include <va/va.h>
 
-
 constexpr int kHandleTypeVaSurface = QAbstractVideoBuffer::UserHandle + 1;
 
 struct VaSurfaceInfo

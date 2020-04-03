@@ -315,58 +315,6 @@ qint64 QnVideoStreamDisplay::nextReverseTime() const
     return AV_NOPTS_VALUE;
 }
 
-
-QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::DownscaleFactor force_factor, int channelNum)
-{
-    foreach(QnAbstractRenderer* render, m_renderList)
-        render->finishPostedFramesRender(channelNum);
-
-    QSharedPointer<CLVideoDecoderOutput> tmpFrame(new CLVideoDecoderOutput());
-    tmpFrame->setUseExternalData(false);
-
-
-    const auto dec = m_decoderData.decoder.get();
-    if (!dec)
-        return QSharedPointer<CLVideoDecoderOutput>();
-
-    QnFrameScaler::DownscaleFactor scaleFactor = determineScaleFactor(m_renderList, channelNum, dec->getWidth(), dec->getHeight(), force_factor);
-
-    QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
-    outFrame->channel = channelNum;
-
-    foreach(QnAbstractRenderer* render, m_renderList)
-    {
-        if (render->isDisplaying(outFrame))
-            render->finishPostedFramesRender(channelNum);
-    }
-
-    outFrame->channel = channelNum;
-
-    m_mtx.lock();
-
-    QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
-    while (dec->decode(emptyData, &tmpFrame))
-    {
-        calcSampleAR(outFrame, dec);
-
-        AVPixelFormat pixFmt = dec->GetPixelFormat();
-        if (!downscaleFrame(tmpFrame, outFrame, scaleFactor, pixFmt))
-            continue;
-        foreach(QnAbstractRenderer* render, m_renderList)
-            render->draw(outFrame, getMaxScreenSizeUnsafe());
-        foreach(QnAbstractRenderer* render, m_renderList)
-            render->finishPostedFramesRender(channelNum);
-    }
-
-    if (tmpFrame->width == 0) {
-        getLastDecodedFrame( dec, &tmpFrame );
-    }
-
-    m_mtx.unlock();
-
-    return tmpFrame;
-}
-
 void QnVideoStreamDisplay::updateRenderList()
 {
     QnMutexLocker lock(&m_renderListMtx);
@@ -515,6 +463,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
 
 
+    m_mtx.lock();
     auto dec = m_decoderData.decoder.get();
     if (!dec || m_decoderData.compressionType != data->compressionType)
     {
@@ -524,7 +473,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         m_decoderData.decoder.reset(dec);
         m_decoderData.compressionType = data->compressionType;
     }
-
+    m_mtx.unlock();
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
     if (dec->getWidth() > 0)
