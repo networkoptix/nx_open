@@ -4542,7 +4542,7 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOut
 
     for (const auto& output: response.RelayOutputs)
     {
-        if (output)
+        if (output && output->Properties)
         {
             m_relayOutputInfo.emplace_back(
                 output->token,
