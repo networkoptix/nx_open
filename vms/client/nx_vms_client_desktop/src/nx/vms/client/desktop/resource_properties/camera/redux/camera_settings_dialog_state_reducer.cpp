@@ -44,7 +44,7 @@ void fetchFromCameras(
     const Cameras& cameras,
     std::function<Data(const Camera&)> getter)
 {
-    Data data;
+    Data data{};
     value.resetBase();
     if (!cameras.isEmpty() &&
         utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
@@ -60,7 +60,7 @@ void fetchFromCameras(
     std::function<Intermediate(const Camera&)> getter,
     std::function<Data(const Intermediate&)> converter)
 {
-    Intermediate data;
+    Intermediate data{};
     value.resetBase();
     if (!cameras.isEmpty() &&
         utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
@@ -72,7 +72,7 @@ void fetchFromCameras(
 CombinedValue combinedValue(const Cameras& cameras,
     std::function<bool(const Camera&)> predicate)
 {
-    bool value;
+    bool value = false;
     if (cameras.isEmpty()
         || !utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &value))
     {
@@ -489,6 +489,11 @@ bool canForceZoomCapability(const Camera& camera)
         .testFlag(Ptz::Capability::ContinuousZoomCapability);
 };
 
+bool canSwitchPtzPresetTypes(const Camera& camera)
+{
+    return camera->canSwitchPtzPresetTypes();
+}
+
 bool canForcePanTiltCapabilities(const Camera& camera)
 {
     return camera->ptzCapabilitiesUserIsAllowedToModify() &
@@ -538,6 +543,49 @@ State CameraSettingsDialogStateReducer::setSingleWearableState(
         {
             state.wearableUploaderName = user->getName();
         }
+    }
+
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::updatePtzSettings(
+    State state,
+    const Cameras& cameras)
+{
+    state.devicesDescription.canSwitchPtzPresetTypes =
+        combinedValue(cameras, canSwitchPtzPresetTypes);
+
+    state.devicesDescription.canForcePanTiltCapabilities =
+        combinedValue(cameras, canForcePanTiltCapabilities);
+
+    state.devicesDescription.canForceZoomCapability =
+        combinedValue(cameras, canForceZoomCapability);
+
+    if (state.canSwitchPtzPresetTypes())
+    {
+        fetchFromCameras<nx::core::ptz::PresetType>(state.expert.preferredPtzPresetType,
+            cameras.filtered([](const Camera& camera) { return camera->canSwitchPtzPresetTypes(); }),
+            [](const Camera& camera) { return camera->userPreferredPtzPresetType(); });
+    }
+
+    if (state.canForcePanTiltCapabilities())
+    {
+        fetchFromCameras<bool>(state.expert.forcedPtzPanTiltCapability, cameras,
+            [](const Camera& camera)
+            {
+                return camera->ptzCapabilitiesAddedByUser().testFlag(
+                    Ptz::ContinuousPanTiltCapabilities);
+            });
+    }
+
+    if (state.canForceZoomCapability())
+    {
+        fetchFromCameras<bool>(state.expert.forcedPtzZoomCapability, cameras,
+            [](const Camera& camera)
+            {
+                return camera->ptzCapabilitiesAddedByUser().testFlag(
+                    Ptz::ContinuousZoomCapability);
+            });
     }
 
     return state;
@@ -620,14 +668,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
             return cameraType && cameraType->getManufacturer() == lit("ArecontVision");
         });
 
-    state.devicesDescription.canSwitchPtzPresetTypes = combinedValue(cameras,
-        [](const Camera& camera) { return camera->canSwitchPtzPresetTypes(); });
-
-    state.devicesDescription.canForcePanTiltCapabilities =
-        combinedValue(cameras, canForcePanTiltCapabilities);
-
-    state.devicesDescription.canForceZoomCapability =
-        combinedValue(cameras, canForceZoomCapability);
+    state = updatePtzSettings(std::move(state), cameras);
 
     state.devicesDescription.supportsMotionStreamOverride = combinedValue(cameras,
         [](const Camera& camera)
@@ -845,33 +886,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
         {
             return forcedMotionStreamType(camera) != vms::api::StreamIndex::undefined;
         });
-
-    if (state.canSwitchPtzPresetTypes())
-    {
-        fetchFromCameras<nx::core::ptz::PresetType>(state.expert.preferredPtzPresetType,
-            cameras.filtered([](const Camera& camera) { return camera->canSwitchPtzPresetTypes(); }),
-            [](const Camera& camera) { return camera->userPreferredPtzPresetType(); });
-    }
-
-    if (state.canForcePanTiltCapabilities())
-    {
-        fetchFromCameras<bool>(state.expert.forcedPtzPanTiltCapability, cameras,
-            [](const Camera& camera)
-            {
-                return camera->ptzCapabilitiesAddedByUser().testFlag(
-                    Ptz::ContinuousPanTiltCapabilities);
-            });
-    }
-
-    if (state.canForceZoomCapability())
-    {
-        fetchFromCameras<bool>(state.expert.forcedPtzZoomCapability, cameras,
-            [](const Camera& camera)
-            {
-                return camera->ptzCapabilitiesAddedByUser().testFlag(
-                    Ptz::ContinuousZoomCapability);
-            });
-    }
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
 

@@ -91,6 +91,7 @@ Item
                     if (cameraId !== resourceId)
                         return
 
+                    backgroundImage.source = ""
                     backgroundImage.source = thumbnailUrl
                     updateTimer.stop()
                 }
@@ -108,7 +109,9 @@ Item
 
             function updateThumbnail(forceReload)
             {
-                backgroundImage.source = ""
+                if (!forceReload)
+                    backgroundImage.source = ""
+
                 updateTimer.stop()
 
                 if (!resourceThumbnailProvider || !resourceId || resourceId.isNull()

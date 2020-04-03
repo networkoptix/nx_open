@@ -44,6 +44,7 @@ public:
         DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
         CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher);
 
+    void updatePtzSettings(const QnVirtualCameraResourceList& cameras);
     void setReadOnly(bool value);
     void setSettingsOptimizationEnabled(bool value);
     void setGlobalPermissions(GlobalPermissions value);

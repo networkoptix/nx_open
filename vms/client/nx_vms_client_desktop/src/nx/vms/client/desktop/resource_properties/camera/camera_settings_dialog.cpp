@@ -36,6 +36,7 @@
 #include "watchers/camera_settings_wearable_state_watcher.h"
 #include "watchers/camera_settings_global_settings_watcher.h"
 #include "watchers/camera_settings_global_permissions_watcher.h"
+#include "watchers/camera_settings_ptz_capabilities_watcher.h"
 #include "watchers/camera_settings_property_watcher.h"
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
@@ -64,6 +65,7 @@ struct CameraSettingsDialog::Private: public QObject
     QPointer<CameraSettingsAnalyticsEnginesWatcher> analyticsEnginesWatcher;
     QPointer<CameraSettingsWearableStateWatcher> wearableStateWatcher;
     QPointer<CameraSettingsPropertyWatcher> cameraPropertyWatcher;
+    QPointer<CameraSettingsPtzCapabilitiesWatcher> cameraPtzCapabilitiesWatcher;
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
@@ -272,6 +274,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->analyticsEnginesWatcher = new CameraSettingsAnalyticsEnginesWatcher(d->store, this);
     d->wearableStateWatcher = new CameraSettingsWearableStateWatcher(d->store, this);
     d->cameraPropertyWatcher = new CameraSettingsPropertyWatcher(d->store, this);
+    d->cameraPtzCapabilitiesWatcher = new CameraSettingsPtzCapabilitiesWatcher(d->store, this);
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
@@ -477,7 +480,10 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->readOnlyWatcher->setCameras(cameras);
     d->wearableStateWatcher->setCameras(cameras);
     d->previewManager->selectCamera(singleCamera);
-    d->cameraPropertyWatcher->setCameras(cameras.toSet());
+
+    const auto camerasSet = cameras.toSet();
+    d->cameraPropertyWatcher->setCameras(camerasSet);
+    d->cameraPtzCapabilitiesWatcher->setCameras(camerasSet);
 
     d->previewManager->refreshSelectedCamera();
 
