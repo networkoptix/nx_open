@@ -1418,7 +1418,6 @@ void ActionHandler::at_goToLayoutItemAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     const auto uuid = parameters.argument(Qn::ItemUuidRole).value<QnUuid>();
 
-    const auto shouldRaise = parameters.argument<bool>(Qn::RaiseSelectionRole);
     const auto centralItem = workbench()->item(Qn::CentralRole);
 
     QnWorkbenchItem* targetItem = nullptr;
@@ -1458,9 +1457,6 @@ void ActionHandler::at_goToLayoutItemAction_triggered()
         return;
 
     workbench()->setItem(Qn::SingleSelectedRole, targetItem);
-
-    if (shouldRaise)
-        workbench()->setItem(Qn::RaisedRole, targetItem);
 }
 
 void ActionHandler::openSystemAdministrationDialog(int page, const QUrl& url)
@@ -2542,7 +2538,7 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
     if (context()->closingDown())
         return;
 
-    if (ini().ignoreBetaWarning)
+    if (ini().developerMode)
         return;
 
     QString header = tr("Beta version %1").arg(qApp->applicationVersion());

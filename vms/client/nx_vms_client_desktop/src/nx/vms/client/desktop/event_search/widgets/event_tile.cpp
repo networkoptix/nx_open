@@ -295,10 +295,7 @@ EventTile::EventTile(QWidget* parent):
 
     ui->previewWidget->setAutoScaleUp(true);
     ui->previewWidget->setReloadMode(AsyncImageWidget::ReloadMode::showPreviousImage);
-
-    ui->previewWidget->setCropMode(ini().rightPanelHoverPreviewCrop
-        ? AsyncImageWidget::CropMode::notHovered
-        : AsyncImageWidget::CropMode::always);
+    ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::always);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);

@@ -499,10 +499,7 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     toolTip->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
     toolTip->updateTailPos();
     toolTip->pointTo(tooltipPos);
-
-    toolTip->setCropMode(ini().rightPanelHoverPreviewCrop
-        ? AsyncImageWidget::CropMode::notHovered
-        : AsyncImageWidget::CropMode::never);
+    toolTip->setCropMode(AsyncImageWidget::CropMode::never);
 
     if (multiImageProvider)
     {

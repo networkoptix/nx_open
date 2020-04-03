@@ -690,9 +690,11 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             m_prevLQ = isLQ;
 
             bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
-            bool draw = !ignoreVideo && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
 
-            if (draw && !nx::vms::client::desktop::ini().allowOsScreenSaver)
+            // Do not draw if computer is very slow and we still wanna sync with audio.
+            const bool draw = !ignoreVideo && (sleep || (m_displayLasts * 1000 < needToSleep));
+
+            if (draw)
                 updateActivity();
 
             if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))
@@ -1236,8 +1238,8 @@ void QnCamDisplay::processFillerPacket(
     // empty data signal about EOF, or read/network error. So, check counter before EOF signaling
     //bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
     bool isFillerPacket = timestampUs > 0 && timestampUs < DATETIME_NOW;
-    
-    if (m_lastMediaEventTimeout.isValid() && 
+
+    if (m_lastMediaEventTimeout.isValid() &&
         m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay) && !m_eofSignalSent)
     {
         notifyExternalTimeSrcAboutEof(true);
@@ -1492,7 +1494,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     }
     else
     {
-        if (m_extTimeSrc && m_eofSignalSent) 
+        if (m_extTimeSrc && m_eofSignalSent)
             notifyExternalTimeSrcAboutEof(false);
         m_emptyPacketCounter = 0;
     }

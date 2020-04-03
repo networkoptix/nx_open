@@ -230,10 +230,7 @@ void MediaResourceWidgetPrivate::setAnalyticsEnabledInStream(bool enabled)
 
 void MediaResourceWidgetPrivate::setAnalyticsFilter(const nx::analytics::db::Filter& value)
 {
-    m_forceDisabledAnalytics = !resource
-        || (ini().applyCameraFilterToSceneItems && !value.deviceIds.empty()
-            && std::find(value.deviceIds.cbegin(), value.deviceIds.cend(), resource->getId())
-                == value.deviceIds.cend());
+    m_forceDisabledAnalytics = !resource;
 
     if (m_forceDisabledAnalytics)
         analyticsController->clearAreas();
