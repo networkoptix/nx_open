@@ -272,7 +272,8 @@ void CLServerPushStreamReader::run()
 
     afterRun();
 
-    NX_VERBOSE(this, "Run loop has finished");
+    NX_VERBOSE(this, "Run loop has finished for resource %1, role %2", 
+        m_resource, getRole());
 }
 
 void CLServerPushStreamReader::beforeRun()

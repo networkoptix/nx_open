@@ -18,7 +18,7 @@ protected:
 
 
         storage = QnFileStorageResourcePtr(new QnFileStorageResource(m_server->serverModule()));
-        storage->getDependencyFactory()->setCanonicalPathFunc(
+        storage->getMockableCallFactory()->setCanonicalPathFunc(
             [this](const QString& path)
             {
                 canonicalPathArgument = path;

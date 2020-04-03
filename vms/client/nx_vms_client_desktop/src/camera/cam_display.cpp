@@ -1228,6 +1228,11 @@ void QnCamDisplay::moveTimestampTo(qint64 timestampUs)
         m_timeMutex.unlock();
 }
 
+bool QnCamDisplay::isNvrFillerPacket(qint64 timestampUs) const
+{
+    return timestampUs != 0 && timestampUs != DATETIME_NOW;
+}
+
 void QnCamDisplay::processFillerPacket(
     qint64 timestampUs,
     QnAbstractStreamDataProvider* dataProvider,
@@ -1237,7 +1242,7 @@ void QnCamDisplay::processFillerPacket(
     m_emptyPacketCounter++;
     // empty data signal about EOF, or read/network error. So, check counter before EOF signaling
     //bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
-    bool isFillerPacket = timestampUs > 0 && timestampUs < DATETIME_NOW;
+    bool isFillerPacket = isNvrFillerPacket(timestampUs);
 
     if (m_lastMediaEventTimeout.isValid() &&
         m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay) && !m_eofSignalSent)
@@ -1481,7 +1486,8 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     if (emptyData && !flushCurrentBuffer)
     {
         bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
-        if (!emptyData->flags.testFlag(QnAbstractMediaData::MediaFlags_AfterEOF) && isVideoCamera)
+        if (!emptyData->flags.testFlag(QnAbstractMediaData::MediaFlags_AfterEOF) && isVideoCamera
+            && !isNvrFillerPacket(emptyData->timestamp))
         {
             // Local EOF packet could be created on TCP stream reconnect.
             // Ignore such packets for video cameras.

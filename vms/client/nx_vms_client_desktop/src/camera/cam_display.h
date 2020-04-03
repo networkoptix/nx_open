@@ -208,6 +208,7 @@ private:
     bool useRealTimeHurryUp() const;
     void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
     void notifyExternalTimeSrcAboutEof(bool isEof);
+    bool isNvrFillerPacket(qint64 timestampUs) const;
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];

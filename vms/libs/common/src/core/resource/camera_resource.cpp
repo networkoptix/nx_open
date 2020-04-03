@@ -591,6 +591,7 @@ void QnVirtualCameraResource::saveResolutionList( const CameraMediaStreams& supp
 
     //saving fullStreamList;
     QByteArray serializedStreams = QJson::serialized( fullStreamList );
+    NX_VERBOSE(this, "Set media stream information for camera %1, data: %2", getUrl(), serializedStreams);
     setProperty(ResourcePropertyKey::kMediaStreams, QString::fromUtf8(serializedStreams));
 }
 
