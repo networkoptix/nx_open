@@ -218,6 +218,8 @@ State loadNetworkInfo(State state, const Camera& camera)
         camera->resourceData().value<int>("overrideXmlHttpRequestTimeout", 0);
     state.singleCameraProperties.overrideHttpUserAgent =
         camera->resourceData().value<QString>("overrideHttpUserAgent");
+    state.singleCameraProperties.fixupRequestUrls =
+        camera->resourceData().value<bool>("fixupRequestUrls", false);
     state.singleCameraSettings.primaryStream.setBase(camera->sourceUrl(Qn::CR_LiveVideo));
     state.singleCameraSettings.secondaryStream.setBase(camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
 

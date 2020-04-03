@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QRegExp>
 #include <QtGui/QContextMenuEvent>
 #include <QtWidgets/QAction>
 #include <QtNetwork/QAuthenticator>
@@ -15,6 +16,7 @@
 #include <QtWebEngineWidgets/QWebEngineScript>
 #include <QtWebEngineWidgets/QWebEngineScriptCollection>
 #include <QtWebEngineCore/QWebEngineCookieStore>
+#include <QtWebEngineCore/QWebEngineUrlRequestInterceptor>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -118,6 +120,50 @@ QString getNonLocalAddress(const QString& host)
     return host;
 }
 
+// Redirects GET request made by camera page if it is made using camera local IP address.
+class RequestUrlFixupInterceptor: public QWebEngineUrlRequestInterceptor
+{
+    using base_type = QWebEngineUrlRequestInterceptor;
+
+public:
+    RequestUrlFixupInterceptor(QObject* p, const QUrl& serverUrl, const QString& ipAddress):
+        base_type(p),
+        m_serverUrl(serverUrl),
+        m_ipAddress(ipAddress)
+    {
+    }
+
+    virtual void interceptRequest(QWebEngineUrlRequestInfo& info) override
+    {
+        // Camera wants to make requests using its local network IP address.
+        // Redirect such requests to the proxying server.
+
+        // Only GET request can be redirected.
+        if (info.requestMethod() != "GET")
+            return;
+
+        const auto pageHost = info.firstPartyUrl().host();
+
+        // Server or camera page makes the request.
+        if (pageHost != m_serverUrl.host() && pageHost != m_ipAddress)
+            return;
+
+        // Requested host matches camera IP address.
+        if (info.requestUrl().host() != m_ipAddress)
+            return;
+
+        // Redirect the request through the server.
+        QUrl redirectUrl = info.requestUrl();
+        redirectUrl.setHost(m_serverUrl.host());
+        redirectUrl.setPort(m_serverUrl.port());
+        info.redirect(redirectUrl);
+    }
+
+private:
+    QUrl m_serverUrl;
+    QString m_ipAddress;
+};
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -198,6 +244,32 @@ void CameraWebPageWidget::Private::createNewPage()
             })()
             )JS").arg(lastCamera.overrideXmlHttpRequestTimeout);
         script.setName("overrideXmlHttpRequestTimeout");
+        script.setSourceCode(s);
+        script.setInjectionPoint(QWebEngineScript::DocumentCreation);
+        script.setRunsOnSubFrames(true);
+        script.setWorldId(QWebEngineScript::MainWorld);
+        webView->page()->profile()->scripts()->insert(script);
+    }
+
+    if (lastCamera.fixupRequestUrls)
+    {
+        // Inject script that replaces camera host with server host
+        // in the request url before sending the XMLHttpRequest.
+        QWebEngineScript script;
+        const QString s = QString::fromUtf8(R"JS(
+            (function() {
+                XMLHttpRequest.prototype.realOpen = XMLHttpRequest.prototype.open;
+                var newOpen = function(method, url, async, user, password) {
+                    var newUrl = url.replace(/(https?:\/\/)?(%1)(:\d+)?(.*)/g, '$1' + '%2:%3' + '$4');
+                    this.realOpen(method, newUrl, async, user, password);
+                };
+                XMLHttpRequest.prototype.open = newOpen;
+            })()
+            )JS")
+            .arg(QRegExp::escape(lastCamera.ipAddress))
+            .arg(lastRequestUrl.host())
+            .arg(lastRequestUrl.port());
+        script.setName("fixupXmlHttpRequestUrl");
         script.setSourceCode(s);
         script.setInjectionPoint(QWebEngineScript::DocumentCreation);
         script.setRunsOnSubFrames(true);
@@ -382,10 +454,17 @@ void CameraWebPageWidget::Private::setupCameraCookie()
     origin.setUserName(QString());
     origin.setPassword(QString());
     origin.setPath(QString());
-    webWidget->webEngineView()->page()->profile()->cookieStore()->setCookie(
-        cameraCookie, origin);
-    webWidget->webEngineView()->page()->profile()->cookieStore()->setCookie(
-        sessionKeyCookie, origin);
+
+    auto profile = webWidget->webEngineView()->page()->profile();
+    profile->cookieStore()->setCookie(cameraCookie, origin);
+    profile->cookieStore()->setCookie(sessionKeyCookie, origin);
+
+    if (lastCamera.fixupRequestUrls)
+    {
+        auto interceptor =
+            new RequestUrlFixupInterceptor(profile, lastRequestUrl, lastCamera.ipAddress);
+        profile->setUrlRequestInterceptor(interceptor);
+    }
 }
 
 void CameraWebPageWidget::Private::loadPage()

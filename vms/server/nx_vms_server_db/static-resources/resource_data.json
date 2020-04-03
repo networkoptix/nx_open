@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.1.258",
+    "version": "4.1.2.258",
     "data": [
         {
             "keys": [
@@ -3928,6 +3928,12 @@
                 "Hanwha Techwin|*"
             ],
             "overrideXmlHttpRequestTimeout": 30000
+        },
+        {
+            "keys": [
+                "Hanwha Techwin|XRN-*"
+            ],
+            "fixupRequestUrls": true
         },
         {
             "_comment1": "Mapping for firmware: V102_2019_03_15",
