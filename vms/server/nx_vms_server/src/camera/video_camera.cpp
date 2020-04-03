@@ -1010,10 +1010,18 @@ void QnVideoCamera::stopIfNoActivity()
     const bool needStopSecondary = m_secondaryReader && m_secondaryReader->isRunning();
 
     if (needStopPrimary)
+    {
+        NX_DEBUG(this, "Stop video camera %1 for role 'Promary' because there is no dataConsumers any nore",  
+            m_resource);
         m_primaryReader->pleaseStop();
+    }
 
     if (needStopSecondary)
+    {
+        NX_DEBUG(this, "Stop video camera %1 for role 'Secondary' because there is no dataConsumers any nore", 
+            m_resource);
         m_secondaryReader->pleaseStop();
+    }
 }
 
 const MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality ) const

@@ -217,7 +217,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     }
 
     if (m_pleaseStop)
+    {
+        NX_VERBOSE(this, "Device %1 (%2). RTSP terminated because of pleaseStop call",
+            m_resource->getName(), m_resource->getId());
         return result;
+    }
 
     if (!m_gotSomeFrame)
     {

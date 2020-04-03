@@ -651,6 +651,21 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getKeyFrame(
 QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::waitForKeyFrame(
     QnAbstractMediaData::DataType dataType, MediaQuality quality)
 {
+    Q_D(QnRtspConnectionProcessor);
+	
+    const auto resource = getResource()->toResourcePtr();
+
+    auto provider = quality == MediaQuality::MEDIA_Quality_Low ? d->liveDpLow : d->liveDpHi;
+    auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
+    if (!provider || !camera)
+    {
+        NX_VERBOSE(this, 
+            "Wait for SDP data for camera %1 quality %2 failed. No data provider or camera", 
+            resource->getUrl(), quality);
+    }
+    camera->inUse(d);
+    provider->startIfNotRunning();
+
     constexpr std::chrono::milliseconds kSleepInterval(100);
     constexpr std::chrono::seconds kWaitTimeout(10);
 
@@ -659,7 +674,6 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::waitForKeyFrame(
     constexpr std::chrono::milliseconds kWaitTimeoutForForcedAudio(100);
 
     std::chrono::milliseconds overallWait(0);
-    const auto resource = getResource()->toResourcePtr();
     bool isForcedAudio = false;
     if (auto camera = resource.dynamicCast<QnSecurityCamResource>())
         isForcedAudio = camera->isAudioForced();
@@ -1103,10 +1117,8 @@ void QnRtspConnectionProcessor::createDataProvider()
                 );
             }
         }
-        if (d->liveDpHi) {
+        if (d->liveDpHi)
             d->liveDpHi->addDataProcessor(d->dataProcessor);
-            d->liveDpHi->startIfNotRunning();
-        }
 
         if (!d->liveDpLow && d->liveDpHi)
         {
@@ -1115,10 +1127,8 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (cameraRes->hasDualStreaming())
                 d->liveDpLow = initLiveProvider(camera, QnServer::LowQualityCatalog);
         }
-        if (d->liveDpLow) {
+        if (d->liveDpLow)
             d->liveDpLow->addDataProcessor(d->dataProcessor);
-            d->liveDpLow->startIfNotRunning();
-        }
     }
     if (!d->archiveDP)
     {
@@ -1321,7 +1331,13 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
     if (d->playbackMode == PlaybackMode::Live)
     {
         if (camera)
+        {
             camera->inUse(d);
+            if (d->liveDpHi)
+                d->liveDpHi->startIfNotRunning();
+            if (d->liveDpLow)
+                d->liveDpLow->startIfNotRunning();
+        }
         if (d->archiveDP)
             d->archiveDP->stop();
         if (d->thumbnailsDP)
