@@ -212,11 +212,6 @@ StringType HttpClient::contentType() const
     return m_asyncHttpClient->contentType();
 }
 
-boost::optional<quint64> HttpClient::contentLength() const
-{
-    return m_asyncHttpClient->contentLength();
-}
-
 void HttpClient::setSubsequentReconnectTries(int reconnectTries)
 {
     m_subsequentReconnectTries = reconnectTries;
