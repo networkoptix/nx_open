@@ -161,14 +161,13 @@ std::optional<BufferType> HttpClient::fetchEntireMessageBody()
         buffer += fetchMessageBodyBuffer();
 
     const auto length = m_asyncHttpClient->contentLength();
-    if (length && *length > (quint64) buffer.size())
+    const auto read = m_asyncHttpClient->messageBodyBytesRead();
+    if (length && *length > read)
     {
         NX_DEBUG(this,
             "Received %1 of %2 bytes from %3, last error %4",
-            buffer.size(), *length, contentLocationUrl(), lastSysErrorCode());
-        // TODO: Return nullopt here when it will be understood why GET `/api/synchronizedTime`
-        // response size mismatches with content length when received over SSL.
-        return buffer;
+            read, *length, contentLocationUrl(), lastSysErrorCode());
+        return std::nullopt;
     }
 
     if (m_error)

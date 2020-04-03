@@ -231,6 +231,7 @@ public:
     const Response* response() const;
     StringType contentType() const;
     boost::optional<quint64> contentLength() const { return m_httpStreamReader.contentLength(); }
+    quint64 messageBodyBytesRead() const { return m_httpStreamReader.messageBodyBytesRead(); }
 
     /**
      * Checks state as well as response return HTTP code (expect 2XX).
