@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.1.254",
+    "version": "4.1.1.257",
     "data": [
         {
             "keys": [
@@ -1008,7 +1008,32 @@
                 "st-hdvr-161|embedded_net_dvr",
                 "bx100|indigovision bx100",
                 "panasonic|wj-gxe100",
-                "st-hdvr162pro-d-v2|general"
+                "st-hdvr162pro-d-v2|general",
+                "dahua| DHI-HCVR72*",
+                "dw-enhd16|elevator3-4",
+                "dw-enhd16|enc1.af3260.wilmington",
+                "-1hdr16k|rvi",
+                "dw-enhd16|9902",
+                "dw-enhd16|viper-hdaenc16",
+                "nvr302a-16-4ks2|general",
+                "nr32p6-16|network video recorder",
+                "general|rvi-ipn16/2-pro-4k",
+                "rvi|rvi-1hdr16k",
+                "nv4432-hs|ac",
+                "dahua|n42b2p2",
+                "seyeon tech co., ltd|eha200",
+                "general|itse0804-gn5b-d",
+                "ds-6704hwi|tower 2",
+                "dahua|xvr5216an-4kl-x",
+                "ds-7608ni*|*",
+                "general|dr-tw1516e",
+                "dahua|dhi-nvr616d-128-4ks2",
+                "dw-en4k16|dw-en4k16",
+                "itse0804-gn5b-d|general",
+                "hrgx81|embedded_net_dvr",
+                "interlogix|tve-420",
+                "ali-qvr3008h|dvr3",
+                "ali-qvr3016h|dvr31"
             ],
             "analogEncoder": true
         },
@@ -4078,6 +4103,33 @@
                         "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
                         "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
                         "logicalMultiplier": 36,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment": "Calibration for camera fw ver. 0120",
+            "keys": [
+                "VIVOTEK|SD9374*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [ -1,    1],
+                        "logical": [180, -180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [ -1,  1],
+                        "logical": [  0, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0,  0.1, 0.2, 0.3, 0.4,  0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 0.97, 0.98, 0.99, 1],
+                        "logical": [1, 1.103, 1.385, 1.641, 2.025, 2.615, 3.564, 4.974, 7.461, 9.179, 11.154, 14.231, 16.026, 17.821, 20.128, 24.590],
+                        "logicalMultiplier": 42,
                         "space": "35MmEquiv"
                     }
                 }

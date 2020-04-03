@@ -42,6 +42,24 @@ ConsumingDeviceAgent::~ConsumingDeviceAgent()
     NX_PRINT << "Destroyed " << this;
 }
 
+bool ConsumingDeviceAgent::pushCompressedVideoFrame(
+    const ICompressedVideoPacket* /*videoFrame*/)
+{
+    return true;
+}
+
+bool ConsumingDeviceAgent::pushUncompressedVideoFrame(
+    const IUncompressedVideoFrame* /*videoFrame*/)
+{
+    return true;
+}
+
+bool ConsumingDeviceAgent::pullMetadataPackets(
+    std::vector<IMetadataPacket*>* /*metadataPackets*/)
+{
+    return true;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Implementation of interface methods.
 

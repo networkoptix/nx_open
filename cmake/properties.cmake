@@ -151,8 +151,8 @@ if(eulaVersionOverride)
 endif()
 
 #TODO: #GDM This can actually be overwritten (vista, ipera)
-set(product.updateGeneratorUrl "http://updates.hdw.mx/upcombiner/upcombine")
-set(product.updateFeedUrl "http://updates.vmsproxy.com/updates.json")
+set(product.updateGeneratorUrl "https://updates.hdw.mx/upcombiner/upcombine")
+set(product.updateFeedUrl "https://updates.vmsproxy.com/updates.json")
 set(product.freeLicenseCount 4)
 set(product.freeLicenseIsTrial true)
 
