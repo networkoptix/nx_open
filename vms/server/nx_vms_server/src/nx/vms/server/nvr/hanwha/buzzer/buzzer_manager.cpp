@@ -9,6 +9,11 @@ namespace nx::vms::server::nvr::hanwha {
 
 using namespace std::chrono;
 
+static int decreaseCounter(int currentValue)
+{
+    return currentValue > 0 ? --currentValue : 0;
+}
+
 BuzzerManager::BuzzerManager(std::unique_ptr<IBuzzerPlatformAbstraction> platformAbstraction):
     m_timerManager(std::make_unique<nx::utils::TimerManager>()),
     m_platformAbstraction(std::move(platformAbstraction))
@@ -56,7 +61,7 @@ bool BuzzerManager::setState(BuzzerState state, milliseconds duration)
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (state != BuzzerState::enabled)
     {
-        --m_enabledCounter;
+        m_enabledCounter = decreaseCounter(m_enabledCounter);
     }
     else if (duration == milliseconds::zero())
     {
@@ -70,7 +75,7 @@ bool BuzzerManager::setState(BuzzerState state, milliseconds duration)
             {
                 NX_DEBUG(this, "Buzzer callback is called");
                 NX_MUTEX_LOCKER lock(&m_mutex);
-                --m_enabledCounter;
+                m_enabledCounter = decreaseCounter(m_enabledCounter);
                 m_platformAbstraction->setState(calculateState());
             },
             duration);
