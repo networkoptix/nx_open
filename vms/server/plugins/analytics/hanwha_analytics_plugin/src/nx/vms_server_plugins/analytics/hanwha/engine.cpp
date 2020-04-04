@@ -50,6 +50,31 @@ QString specialEventName(const QString& eventName)
     return itr->second;
 }
 
+static bool isFirmwareActual(const std::string& firmwareVersion)
+{
+    // Firmware version has a format like this: 1.40.03_20190919_R32
+    if (firmwareVersion.empty())
+        return false;
+
+    QString extendedVersion = QString::fromStdString(firmwareVersion);
+    QStringList versionPartitions = extendedVersion.split('_'); //< {1.40.03 , 20190919 , R32}
+    if (versionPartitions.empty())
+        return false;
+
+    QStringList versionList = versionPartitions[0].split('.'); //< {1 , 40 , 03}
+    if (versionList.size() < 2)
+        return false;
+
+    int major = versionList[0].toInt();
+    int minor = versionList[1].toInt();
+
+    int revision = (versionList.size() >= 3) ? versionList[2].toInt() : 0;
+    if (revision == 99 && (minor % 10) == 9)
+        return false; //< beta version
+
+    return major >= 1 && minor >= 41;
+}
+
 template <typename Pred>
 QJsonValue filterJsonObjects(QJsonValue value, Pred pred)
 {
@@ -75,6 +100,16 @@ QJsonValue filterJsonObjects(QJsonValue value, Pred pred)
         return array;
     }
     return value;
+}
+
+QJsonValue filterOutItemsAndSections(QJsonValue value)
+{
+    if (!value.isObject())
+        return QJsonValue::Undefined;
+    auto object = value.toObject();
+    object["items"] = QJsonArray();
+    object["sections"] = QJsonArray();
+    return object;
 }
 
 } // namespace
@@ -155,12 +190,22 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
                 m_sharedResources.remove(QString::fromUtf8(deviceInfo->sharedId()));
         });
 
-    auto deviceAgentManifest = buildDeviceAgentManifest(sharedRes, deviceInfo);
+    const bool isNvr = fetchIsNvr(sharedRes);
+    const QSize maxResolution = fetchMaxResolution(sharedRes, deviceInfo);
+
+    const auto deviceAgent = new DeviceAgent(this, deviceInfo, isNvr, maxResolution);
+
+    const std::string firmwareVersion = deviceAgent->fetchFirmwareVersion();
+    const bool areSettingsAndTrackingAllowed = isFirmwareActual(firmwareVersion);
+
+    auto deviceAgentManifest = buildDeviceAgentManifest(sharedRes,
+        deviceInfo, areSettingsAndTrackingAllowed);
+
     if (!deviceAgentManifest)
         return;
 
-    const auto deviceAgent = new DeviceAgent(this, deviceInfo);
     deviceAgent->setManifest(std::move(*deviceAgentManifest));
+
     deviceAgent->readCameraSettings();
 
     ++sharedRes->deviceAgentCount;
@@ -173,32 +218,35 @@ void Engine::getManifest(Result<const IString*>* outResult) const
     *outResult = new nx::sdk::String(QJson::serialized(m_manifest));
 }
 
-void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+/*virtual*/ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
 }
 
-void Engine::doSetSettings(
+/*virtual*/ void Engine::doSetSettings(
     Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
+/*virtual*/ void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
 }
 
-void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
+/*virtual*/ void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 
-boost::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
+std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
     const std::shared_ptr<SharedResources>& sharedRes,
-    const IDeviceInfo* deviceInfo) const
+    const IDeviceInfo* deviceInfo,
+    bool areSettingsAndTrackingAllowed) const
 {
     Hanwha::DeviceAgentManifest deviceAgentManifest;
 
-    const auto supportsObjectDetection = fetchSupportsObjectDetection(sharedRes, deviceInfo->channelNumber());
-    if (supportsObjectDetection)
+    const auto supportsObjectTracking = areSettingsAndTrackingAllowed
+        && fetchSupportsObjectDetection(sharedRes, deviceInfo->channelNumber());
+
+    if (supportsObjectTracking)
     {
         // DeviceAgent should understand all engine's object types.
         deviceAgentManifest.supportedObjectTypeIds.reserve(m_manifest.objectTypes.size());
@@ -216,47 +264,57 @@ boost::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
     {
         NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
             deviceInfo->name(), deviceInfo->id());
-        return boost::none;
+        return std::nullopt;
     }
-    if (supportsObjectDetection) {
+    if (supportsObjectTracking)
+    {
         supportedEventTypeIds->insert("nx.hanwha.ObjectTracking.Start");
     }
 
     deviceAgentManifest.supportedEventTypeIds = QList<QString>::fromSet(*supportedEventTypeIds);
 
-    deviceAgentManifest.deviceAgentSettingsModel = filterJsonObjects(
-        m_manifest.deviceAgentSettingsModel,
-        [&](const QJsonObject& node) {
-            bool keepByDefault = true;
+    if (!areSettingsAndTrackingAllowed)
+    {
+        deviceAgentManifest.deviceAgentSettingsModel = filterOutItemsAndSections(
+            m_manifest.deviceAgentSettingsModel);
+    }
+    else
+    {
+        deviceAgentManifest.deviceAgentSettingsModel = filterJsonObjects(
+            m_manifest.deviceAgentSettingsModel,
+            [&](const QJsonObject& node) {
+                bool keepByDefault = true;
 
-            bool keepForObjectDetection = false;
-            if (const auto required = node["requiredForObjectDetection"]; required.toBool())
-            {
-                keepByDefault = false;
-                keepForObjectDetection = supportsObjectDetection;
-            }
-
-            bool keepForEvents = false;
-            if (const auto eventTypeIds = node["requiredForEventTypeIds"].toArray(); !eventTypeIds.empty())
-            {
-                keepByDefault = false;
-                for (const auto eventTypeId: eventTypeIds)
+                bool keepForObjectTracking = false;
+                if (const auto required = node["requiredForObjectDetection"]; required.toBool())
                 {
-                    if (supportedEventTypeIds->contains(eventTypeId.toString()))
+                    keepByDefault = false;
+                    keepForObjectTracking = supportsObjectTracking;
+                }
+
+                bool keepForEvents = false;
+                if (const auto eventTypeIds = node["requiredForEventTypeIds"].toArray();
+                    !eventTypeIds.empty())
+                {
+                    keepByDefault = false;
+                    for (const auto eventTypeId : eventTypeIds)
                     {
-                        keepForEvents = true;
-                        break;
+                        if (supportedEventTypeIds->contains(eventTypeId.toString()))
+                        {
+                            keepForEvents = true;
+                            break;
+                        }
                     }
                 }
-            }
 
-            return keepByDefault || keepForObjectDetection || keepForEvents;
-        });
+                return keepByDefault || keepForObjectTracking || keepForEvents;
+            });
+    }
 
     return deviceAgentManifest;
 }
 
-bool Engine::fetchSupportsObjectDetection(
+/*static*/ bool Engine::fetchSupportsObjectDetection(
     const std::shared_ptr<SharedResources>& sharedRes,
     int channel)
 {
@@ -272,70 +330,100 @@ bool Engine::fetchSupportsObjectDetection(
     return attributes.attribute<bool>("Eventsource", "ObjectDetection", channel).value_or(false);
 }
 
-boost::optional<QSet<QString>> Engine::fetchSupportedEventTypeIds(
+/*static*/ QSize Engine::fetchMaxResolution(const std::shared_ptr<SharedResources>& sharedRes,
+    const nx::sdk::IDeviceInfo* deviceInfo)
+{
+    static const QString kNoMaxResolution = "0x0";
+
+    if (const auto& information = sharedRes->sharedContext->information())
+    {
+        if (const auto& attributes = information->attributes; attributes.isValid())
+        {
+            const QString maxResolutionAsString = attributes.attribute<QString>(
+                "Media", "MaxResolution", deviceInfo->channelNumber())
+                .value_or(kNoMaxResolution);
+            const auto maxResolutionAsList = maxResolutionAsString.split('x');
+            if (maxResolutionAsList.size() == 2)
+                return QSize(maxResolutionAsList[0].toInt(), maxResolutionAsList[1].toInt());
+        }
+    }
+
+    return {};
+}
+
+/*static*/ bool Engine::fetchIsNvr(const std::shared_ptr<SharedResources>& sharedRes)
+{
+    if (const auto& information = sharedRes->sharedContext->information())
+        return information->deviceType == nx::vms::server::plugins::HanwhaDeviceType::nvr;
+    return false;
+}
+
+std::optional<QSet<QString>> Engine::fetchSupportedEventTypeIds(
     const std::shared_ptr<SharedResources>& sharedRes,
     int channel) const
 {
     const auto& information = sharedRes->sharedContext->information();
     if (!information)
-        return boost::none;
+        return std::nullopt;
+
     const auto& cgiParameters = information->cgiParameters;
     if (!cgiParameters.isValid())
-        return boost::none;
+        return std::nullopt;
 
     const auto& eventStatuses = sharedRes->sharedContext->eventStatuses();
     if (!eventStatuses || !eventStatuses->isSuccessful())
-        return boost::none;
+        return std::nullopt;
 
     return eventTypeIdsFromParameters(
         sharedRes->sharedContext->url(),
         cgiParameters, eventStatuses.value, channel);
 }
 
-boost::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
+std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
     const nx::utils::Url& url,
     const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
     const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
     int channel) const
 {
     if (!parameters.isValid())
-        return boost::none;
+        return std::nullopt;
 
-    auto supportedEventsParameter = parameters.parameter(
+    auto supportedEventTypesParameter = parameters.parameter(
         "eventstatus/eventstatus/monitor/Channel.#.EventType");
 
-    if (!supportedEventsParameter.is_initialized())
-        return boost::none;
+    if (!supportedEventTypesParameter.is_initialized())
+        return std::nullopt;
 
     QSet<QString> result;
 
-    auto supportedEvents = supportedEventsParameter->possibleValues();
+    auto supportedEventTypes = supportedEventTypesParameter->possibleValues();
     const auto alarmInputParameter = parameters.parameter(
         "eventstatus/eventstatus/monitor/AlarmInput");
 
     if (alarmInputParameter)
-        supportedEvents.push_back(alarmInputParameter->name());
+        supportedEventTypes.push_back(alarmInputParameter->name());
 
-    NX_VERBOSE(this, lm("camera %1 report supported analytics events %2").arg(url).arg(supportedEvents));
-    for (const auto& eventName: supportedEvents)
+    NX_VERBOSE(this,
+        lm("camera %1 report supported analytics events %2").arg(url).arg(supportedEventTypes));
+    for (const auto& eventTypeName: supportedEventTypes)
     {
-        auto eventTypeId = m_manifest.eventTypeIdByName(eventName);
+        auto eventTypeId = m_manifest.eventTypeIdByName(eventTypeName);
         if (!eventTypeId.isEmpty())
             result.insert(eventTypeId);
 
-        const auto altEventName = specialEventName(eventName);
+        const auto altEventName = specialEventName(eventTypeName);
         if (!altEventName.isEmpty())
         {
             const auto& responseParameters = eventStatuses.response();
             for (const auto& entry: responseParameters)
             {
-                const auto& fullEventName = entry.first;
+                const auto& fullEventTypeName = entry.first;
                 const bool isMatched =
-                    fullEventName.startsWith(lm("Channel.%1.%2.").args(channel, altEventName));
+                    fullEventTypeName.startsWith(lm("Channel.%1.%2.").args(channel, altEventName));
 
                 if (isMatched)
                 {
-                    eventTypeId = m_manifest.eventTypeIdByName(fullEventName);
+                    eventTypeId = m_manifest.eventTypeIdByName(fullEventTypeName);
                     if (!eventTypeId.isNull())
                         result.insert(eventTypeId);
                 }
@@ -438,12 +526,12 @@ std::shared_ptr<Engine::SharedResources> Engine::sharedResources(const IDeviceIn
     return sharedResourcesItr.value();
 }
 
-void Engine::setHandler(IEngine::IHandler* /*handler*/)
+/*virtual*/ void Engine::setHandler(IEngine::IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
 }
 
-bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
+/*virtual*/ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 {
     const QString vendor = QString(deviceInfo->vendor()).toLower();
     return vendor.startsWith(kHanwhaTechwinVendor) || vendor.startsWith(kSamsungTechwinVendor);

@@ -661,7 +661,7 @@ bool HanwhaChunkLoader::parseTimelineData(const nx::Buffer& line, qint64 current
         // while our VMS and the rest of the world uses open ended periods: [a, b), [b, c), ....
         static const qint64 kEndTimeFixMs = 1000;
 
-		m_lastParsedEndTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeShift) + kEndTimeFixMs;
+        m_lastParsedEndTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeShift) + kEndTimeFixMs;
     }
     else if (fieldName == kTypeParamName)
     {

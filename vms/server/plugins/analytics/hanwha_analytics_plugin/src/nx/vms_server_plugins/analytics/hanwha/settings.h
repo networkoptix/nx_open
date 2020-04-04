@@ -20,7 +20,6 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 enum class EventCategory
 {
     motionDetection,
-    faceDetectionGeneral, //< not supported
     tampering,
     audioDetection,
     defocusDetection,
@@ -407,76 +406,6 @@ struct FogDetection: public SettingGroup
 
 };
 //-------------------------------------------------------------------------------------------------
-#if 0
-Face detection event is now built in object detection event.
-So FaceDetectionGeneral and FaceDetectionExcludeArea semm to become unnecessary.
-
-struct FaceDetectionGeneral: public SettingGroup
-{
-    bool enabled = false;
-    int sensitivityLevel = 80;
-
-    enum class KeyIndex {
-        enabled,
-        sensitivityLevel,
-    };
-    static constexpr const char* kKeys[] = {
-        "FaceDetection.Enable",
-        "FaceDetection.SensitivityLevel",
-    };
-    static constexpr const char* kJsonEventName = "FaceDetection";
-    static constexpr const char* kSunapiEventName = "facedetection";
-
-    FaceDetectionGeneral(int /*roiIndex*/ = -1): SettingGroup(kKeys) {}
-    bool operator==(const FaceDetectionGeneral& rhs) const;
-    bool operator!=(const FaceDetectionGeneral& rhs) const { return !(*this == rhs); }
-
-    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
-    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
-
-    // The following functions perhaps should be moved to the inheritor-class.
-    // The idea is that the current class interacts with the server only,
-    // and the inheritor interacts with the device.
-    // The decision will be made during other plugins construction.
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize /*frameSize*/);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
-};
-
-//-------------------------------------------------------------------------------------------------
-
-// Not implemented because of ambiguities in documentation.
-struct FaceDetectionExcludeArea : public SettingGroup
-{
-    std::vector<PluginPoint> points;
-
-    static constexpr int kStartServerRoiIndexFrom = 1;
-    static constexpr int kStartDeviceRoiIndexFrom = 1;
-
-    enum class KeyIndex {
-        points,
-    };
-    static constexpr const char* kKeys[] = {
-        "FaceDetection.DetectionArea#.Points",
-    };
-    static constexpr const char* kJsonEventName = "FaceDetection";
-    static constexpr const char* kSunapiEventName = "facedetection";
-
-    FaceDetectionExcludeArea(int roiIndex = -1) :
-        SettingGroup(kKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
-    {
-    }
-
-    bool operator == (const FaceDetectionExcludeArea& rhs) const;
-    bool operator!=(const FaceDetectionExcludeArea& rhs) const { return !(*this == rhs); }
-
-    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
-    //void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
-
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
-};
-#endif
-//-------------------------------------------------------------------------------------------------
 struct ObjectDetectionGeneral: public SettingGroup
 {
     bool enabled = false;
@@ -555,38 +484,6 @@ struct ObjectDetectionBestShot: public SettingGroup
 
 private:
     std::string buildObjectTypes() const;
-};
-
-//-------------------------------------------------------------------------------------------------
-
-struct ObjectDetectionExcludeArea: public SettingGroup
-{
-    UnnamedPolygon unnamedPolygon;
-
-    static constexpr int kStartServerRoiIndexFrom = 1;
-    static constexpr int kStartDeviceRoiIndexFrom = 1;
-
-    enum class KeyIndex {
-        unnamedPolygon,
-    };
-    static constexpr const char* kKeys[] = {
-        "ObjectDetection.ExcludeArea#.Points",
-    };
-    static constexpr const char* kJsonEventName = "ObjectDetection";
-    static constexpr const char* kSunapiEventName = "objectdetection";
-
-    ObjectDetectionExcludeArea(int roiIndex = -1):
-    SettingGroup(kKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
-    {
-    }
-    bool operator == (const ObjectDetectionExcludeArea& rhs) const;
-    bool operator!=(const ObjectDetectionExcludeArea& rhs) const { return !(*this == rhs); }
-
-    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
-    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
-
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -875,40 +772,15 @@ struct Settings
     TamperingDetection tamperingDetection;
     DefocusDetection defocusDetection;
     FogDetection fogDetection;
-    //FaceDetectionGeneral faceDetectionGeneral;
-    //FaceDetectionExcludeArea faceDetectionExcludeArea[kMultiplicity];
     ObjectDetectionGeneral objectDetectionGeneral;
     ObjectDetectionBestShot objectDetectionBestShot;
-    ObjectDetectionExcludeArea objectDetectionExcludeArea[kMultiplicity];
     IvaLine ivaLine[kMultiplicity];
     IvaIncludeArea ivaIncludeArea[kMultiplicity];
     IvaExcludeArea ivaExcludeArea[kMultiplicity];
     AudioDetection audioDetection;
     SoundClassification soundClassification;
     SupportedEventCategories supportedCategories = {false};
-//    std::array<bool, int(EventCategory::count)> supportedCategories = { false };
 };
-
-//-------------------------------------------------------------------------------------------------
-
-// Simple way to check, if T has a member function `empty()`
-template <typename T, typename = void>
-struct maybeEmpty: std::false_type {};
-
-template <typename T>
-struct maybeEmpty<T, std::void_t<decltype(std::declval<T>().points.empty())>>: std::true_type {};
-
-template<class SettingGroupT>
-bool differesEnough(const SettingGroupT& lhs, const SettingGroupT& rhs)
-{
-    //if constexpr (maybeEmpty<SettingGroupT>())
-    //{
-    //    if (lhs.points.empty() && rhs.points.empty())
-    //        return false;
-    //}
-
-    return lhs != rhs;
-}
 
 //-------------------------------------------------------------------------------------------------
 

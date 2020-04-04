@@ -1,11 +1,11 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QMap>
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 #include <QtNetwork/QAuthenticator>
-
-#include <boost/optional/optional.hpp>
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
@@ -78,26 +78,32 @@ protected:
         const nx::sdk::analytics::IAction* action) override;
 
 private:
-    boost::optional<Hanwha::DeviceAgentManifest> buildDeviceAgentManifest(
-        const std::shared_ptr<SharedResources>& sharedRes,
-        const nx::sdk::IDeviceInfo* deviceInfo) const;
-
     static bool fetchSupportsObjectDetection(
         const std::shared_ptr<SharedResources>& sharedRes,
         int channel);
 
-    boost::optional<QSet<QString>> fetchSupportedEventTypeIds(
+    static QSize fetchMaxResolution(
+        const std::shared_ptr<SharedResources>& sharedRes,
+        const nx::sdk::IDeviceInfo* deviceInfo);
+
+    static bool fetchIsNvr(const std::shared_ptr<SharedResources>& sharedRes);
+
+    std::optional<QSet<QString>> fetchSupportedEventTypeIds(
         const std::shared_ptr<SharedResources>& sharedRes,
         int channel) const;
 
-    boost::optional<QSet<QString>> eventTypeIdsFromParameters(
+    std::optional<Hanwha::DeviceAgentManifest> buildDeviceAgentManifest(
+        const std::shared_ptr<SharedResources>& sharedRes,
+        const nx::sdk::IDeviceInfo* deviceInfo,
+        bool areSettingsAndTrackingAllowed) const;
+
+    std::optional<QSet<QString>> eventTypeIdsFromParameters(
         const nx::utils::Url& url,
         const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
         const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
         int channel) const;
 
-    std::shared_ptr<SharedResources> sharedResources(
-        const nx::sdk::IDeviceInfo* deviceInfo);
+    std::shared_ptr<SharedResources> sharedResources(const nx::sdk::IDeviceInfo* deviceInfo);
 
 private:
     nx::sdk::analytics::Plugin* const m_plugin;
@@ -105,6 +111,7 @@ private:
     mutable QnMutex m_mutex;
     Hanwha::EngineManifest m_manifest;
     Hanwha::ObjectMetadataAttributeFilters m_objectMetadataAttributeFilters;
+
     QMap<QString, std::shared_ptr<SharedResources>> m_sharedResources;
 };
 

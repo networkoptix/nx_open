@@ -35,50 +35,6 @@
                 "caption": "Detection type",
                 "range": [ "Off", "MotionDetection", "IntelligentVideo", "MDAndIV" ],
                 "defaultValue": "MotionDetection"
-            },
-            {
-                "type": "GroupBox",
-                "caption": "Motion Detection",
-                "requiredForEventTypeIds": [ "nx.hanwha.MotionDetection" ],
-                "items": 
-                [
-                    {
-                        "type": "ObjectSizeConstraints",
-                        "caption": "Object size",
-                        "name": "MotionDetection.ObjectSize.Constraints",
-                        "defaultValue": {
-                            "minimum": [ 0.1, 0.1 ],
-                            "maximum": [ 0.9, 0.9 ]
-                        }
-                    }
-                ]
-            },
-            {
-                "type": "GroupBox",
-                "caption": "AI (Object Detection and IVA)",
-                "items": 
-                [
-                    {
-                        "type": "ObjectSizeConstraints",
-                        "caption": "Object size",
-                        "name": "IVA.ObjectSize.Constraints",
-                        "defaultValue": 
-                        {
-                            "minimum": [ 0.1, 0.1 ],
-                            "maximum": [ 0.9, 0.9 ]
-                        },
-                        "requiredForObjectDetection": true,
-                        "requiredForEventTypeIds": 
-                        [
-                            "nx.hanwha.VideoAnalytics.Passing",
-                            "nx.hanwha.VideoAnalytics.Entering",
-                            "nx.hanwha.VideoAnalytics.Exiting",
-                            "nx.hanwha.VideoAnalytics.AppearDisappear",
-                            "nx.hanwha.VideoAnalytics.Intrusion",
-                            "nx.hanwha.VideoAnalytics.Loitering"
-                        ]
-                    }
-                ]
             }
         ],
         "sections":
@@ -128,7 +84,21 @@
                 [
                     {
                         "type": "GroupBox",
-                        "caption": "Motion Detection"
+                        "caption": "Motion Detection",
+                        "requiredForEventTypeIds": [ "nx.hanwha.MotionDetection" ],
+                        "items": 
+                        [
+                            {
+                                "type": "ObjectSizeConstraints",
+                                "caption": "Object size",
+                                "name": "MotionDetection.ObjectSize.Constraints",
+                                "defaultValue": 
+                                {
+                                    "minimum": [ 0.1, 0.1 ],
+                                    "maximum": [ 0.9, 0.9 ]
+                                }
+                            }
+                        ]
                     }
                 ],
                 "sections":
@@ -261,7 +231,7 @@
                                 "caption": "Minimum Duration (s)",
                                 "defaultValue": 1,
                                 "minValue": 1,
-                                "maxValue": 5
+                                "maxValue": 60
                             },
                             {
                                 "type": "CheckBox",
@@ -312,8 +282,8 @@
                                 "name": "DefocusDetection.MinimumDuration",
                                 "caption": "Minimum Duration (s)",
                                 "defaultValue": 0,
-                                "minValue": 1,
-                                "maxValue": 5
+                                "minValue": 30,
+                                "maxValue": 120
                             }
                         ]
                     }
@@ -366,150 +336,7 @@
             },
             {
                 "type": "Section",
-                "caption": "[AI] Objects",
-                "requiredForObjectDetection": true,
-                "items": 
-                [
-                    {
-                        "type": "SwitchButton",
-                        "name": "ObjectDetection.Enable",
-                        "caption": "Enable",
-                        "defaultValue": false
-                    },
-                    {
-                        "type": "GroupBox",
-                        "caption": "[AI] Objects",
-                        "items": 
-                        [
-                            {
-                                "type": "GroupBox",
-                                "caption": "Type",
-                                "items": 
-                                [
-                                    {
-                                        "type": "CheckBox",
-                                        "name": "ObjectDetection.Person",
-                                        "caption": "Person",
-                                        "defaultValue": false,
-                                        "value": false
-                                    },
-                                    {
-                                        "type": "CheckBox",
-                                        "name": "ObjectDetection.Vehicle",
-                                        "caption": "Vehicle",
-                                        "defaultValue": false,
-                                        "value": false
-                                    },
-                                    {
-                                        "type": "CheckBox",
-                                        "name": "ObjectDetection.Face",
-                                        "caption": "Face",
-                                        "defaultValue": false,
-                                        "value": false
-                                    },
-                                    {
-                                        "type": "CheckBox",
-                                        "name": "ObjectDetection.LicensePlate",
-                                        "caption": "License plate",
-                                        "defaultValue": false,
-                                        "value": false
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "SpinBox",
-                                "name": "ObjectDetection.MinimumDuration",
-                                "caption": "Minimum Duration (s)",
-                                "defaultValue": 0,
-                                "minValue": 0,
-                                "maxValue": 5
-                            }
-                        ]
-                    }
-                ],
-                "sections":
-                [
-                    {
-                        "type": "Section",
-                        "caption": "Best Short",
-                        "items": 
-                        [
-                            {
-                                "type": "GroupBox",
-                                "caption": "Objects Best Short",
-                                "items": 
-                                [
-                                    {
-                                        "type": "GroupBox",
-                                        "caption": "Type",
-                                        "items": 
-                                        [
-                                            {
-                                                "type": "CheckBox",
-                                                "name": "ObjectDetection.BestShot.Person",
-                                                "caption": "Person",
-                                                "defaultValue": false,
-                                                "value": false
-                                            },
-                                            {
-                                                "type": "CheckBox",
-                                                "name": "ObjectDetection.BestShot.Vehicle",
-                                                "caption": "Vehicle",
-                                                "defaultValue": false,
-                                                "value": false
-                                            },
-                                            {
-                                                "type": "CheckBox",
-                                                "name": "ObjectDetection.BestShot.Face",
-                                                "caption": "Face",
-                                                "defaultValue": false,
-                                                "value": false
-                                            },
-                                            {
-                                                "type": "CheckBox",
-                                                "name": "ObjectDetection.BestShot.LicensePlate",
-                                                "caption": "LicensePlate",
-                                                "defaultValue": false,
-                                                "value": false
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "type": "Section",
-                        "caption": "Exclude Areas",
-                        "items": 
-                        [
-                            {
-                                "type": "GroupBox",
-                                "caption": "Objects Exclude Areas",
-                                "items": 
-                                [
-                                    {
-                                        "type": "Repeater",
-                                        "count": 4,
-                                        "startIndex": 1,
-                                        "template": 
-                                        {
-                                            "type": "PolygonFigure",
-                                            "name": "ObjectDetection.ExcludeArea#.Points",
-                                            "caption": "Object Exclude Area #",
-                                            "minPoints": 4,
-                                            "maxPoints": 8
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "type": "Section",
-                "caption": "[AI] IVA",
+                "caption": "[AI] Objects & IVA",
                 "requiredForObjectDetection": true,
                 "requiredForEventTypeIds": 
                 [
@@ -525,31 +352,49 @@
                 [
                     {
                         "type": "GroupBox",
-                        "caption": "[AI] IVA"
-                    }
-                ],
-                "sections": 
-                [
-                    {
-                        "type": "Section",
-                        "caption": "Lines",
+                        "caption": "[AI] Object Detection and IVA",
                         "items": 
                         [
                             {
+                                "type": "ObjectSizeConstraints",
+                                "caption": "Object size",
+                                "name": "IVA.ObjectSize.Constraints",
+                                "defaultValue": 
+                                {
+                                    "minimum": [ 0.1, 0.1 ],
+                                    "maximum": [ 0.9, 0.9 ]
+                                },
+                                "requiredForObjectDetection": true,
+                                "requiredForEventTypeIds":
+                                [
+                                    "nx.hanwha.VideoAnalytics.Passing",
+                                    "nx.hanwha.VideoAnalytics.Entering",
+                                    "nx.hanwha.VideoAnalytics.Exiting",
+                                    "nx.hanwha.VideoAnalytics.AppearDisappear",
+                                    "nx.hanwha.VideoAnalytics.Intrusion",
+                                    "nx.hanwha.VideoAnalytics.Loitering"
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "sections": [
+                    {
+                        "type": "Section",
+                        "caption": "IVA Lines",
+                        "items": [
+                            {
                                 "type": "GroupBox",
                                 "caption": "[AI] IVA Lines",
-                                "items": 
-                                [
+                                "items": [
                                     {
                                         "type": "Repeater",
                                         "count": 4,
                                         "startIndex": 1,
-                                        "template": 
-                                        {
+                                        "template": {
                                             "type": "GroupBox",
                                             "caption": "IVA Line #",
-                                            "items": 
-                                            [
+                                            "items": [
                                                 {
                                                     "type": "LineFigure",
                                                     "name": "IVA.Line#.Points",
@@ -558,8 +403,7 @@
                                                 {
                                                     "type": "GroupBox",
                                                     "caption": "Type",
-                                                    "items": 
-                                                    [
+                                                    "items": [
                                                         {
                                                             "type": "CheckBox",
                                                             "name": "IVA.Line#.Person",
@@ -589,12 +433,12 @@
                     },
                     {
                         "type": "Section",
-                        "caption": "Include Areas",
+                        "caption": "IVA Areas",
                         "items": 
                         [
                             {
                                 "type": "GroupBox",
-                                "caption": "[AI] IVA Include Areas",
+                                "caption": "[AI] IVA Areas",
                                 "items": 
                                 [
                                     {
@@ -604,7 +448,7 @@
                                         "template": 
                                         {
                                             "type": "GroupBox",
-                                            "caption": "IVA Include area #",
+                                            "caption": "IVA Area #",
                                             "items": 
                                             [
                                                 {
@@ -636,7 +480,8 @@
                                                 {
                                                     "type": "GroupBox",
                                                     "caption": "Category",
-                                                    "items": [
+                                                    "items": 
+                                                    [
                                                         {
                                                             "type": "CheckBox",
                                                             "name": "IVA.IncludeArea#.Intrusion",
@@ -691,7 +536,7 @@
                                                     "caption": "Loitering duration",
                                                     "defaultValue": 10,
                                                     "minValue": 1,
-                                                    "maxValue": 60
+                                                    "maxValue": 600
                                                 }
                                             ]
                                         }
@@ -702,12 +547,119 @@
                     },
                     {
                         "type": "Section",
+                        "caption": "Objects",
+                        "requiredForObjectDetection": true,
+                        "items": 
+                        [
+                            {
+                                "type": "SwitchButton",
+                                "name": "ObjectDetection.Enable",
+                                "caption": "Enable",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "GroupBox",
+                                "caption": "Objects",
+                                "items": 
+                                [
+                                    {
+                                        "type": "GroupBox",
+                                        "caption": "Type",
+                                        "items": 
+                                        [
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.Person",
+                                                "caption": "Person",
+                                                "defaultValue": false,
+                                                "value": false
+                                            },
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.Vehicle",
+                                                "caption": "Vehicle",
+                                                "defaultValue": false,
+                                                "value": false
+                                            },
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.Face",
+                                                "caption": "Face",
+                                                "defaultValue": false,
+                                                "value": false
+                                            },
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.LicensePlate",
+                                                "caption": "License plate",
+                                                "defaultValue": false,
+                                                "value": false
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "SpinBox",
+                                        "name": "ObjectDetection.MinimumDuration",
+                                        "caption": "Minimum Duration (s)",
+                                        "defaultValue": 0,
+                                        "minValue": 0,
+                                        "maxValue": 5
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "GroupBox",
+                                "caption": "Extended Object Information (Best Short)",
+                                "items": 
+                                [
+                                    {
+                                        "type": "GroupBox",
+                                        "caption": "Type",
+                                        "items": 
+                                        [
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.BestShot.Person",
+                                                "caption": "Person",
+                                                "defaultValue": false,
+                                                "value": false
+                                            },
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.BestShot.Vehicle",
+                                                "caption": "Vehicle",
+                                                "defaultValue": false,
+                                                "value": false
+                                            },
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.BestShot.Face",
+                                                "caption": "Face",
+                                                "defaultValue": false,
+                                                "value": false
+                                            },
+                                            {
+                                                "type": "CheckBox",
+                                                "name": "ObjectDetection.BestShot.LicensePlate",
+                                                "caption": "LicensePlate",
+                                                "defaultValue": false,
+                                                "value": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+
+                        ]
+                    },
+                    {
+                        "type": "Section",
                         "caption": "Exclude Areas",
                         "items": 
                         [
                             {
                                 "type": "GroupBox",
-                                "caption": "[AI] IVA Exclude Areas",
+                                "caption": "Objects & IVA Exclude Areas",
                                 "items": 
                                 [
                                     {
