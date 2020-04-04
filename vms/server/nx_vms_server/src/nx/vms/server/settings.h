@@ -221,9 +221,9 @@ public:
         "Allows automatic inclusion of discovered local removable storages into the resource pool."
     };
     Option<QString> checkForUpdateUrl{this, "checkForUpdateUrl",
-        "http://updates.vmsproxy.com/updates.json",
+        "https://updates.vmsproxy.com/updates.json",
         "Url used by the Server as a root update information source. Default: "
-        "http://updates.vmsproxy.com."
+        "https://updates.vmsproxy.com."
     };
     Option<bool> secureAppserverConnection{this, "secureAppserverConnection", false, ""};
     Option<bool> lowPriorityPassword{this, "lowPriorityPassword", false, ""};
