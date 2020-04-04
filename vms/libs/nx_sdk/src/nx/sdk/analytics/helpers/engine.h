@@ -67,23 +67,18 @@ protected:
      * @param actionId Id of the Action being triggered.
      * @param objectTrackId Id of an Object Track for which the Action has been triggered.
      * @param deviceId Id of a Device (e.g. a camera) from which the Action has been triggered.
+     * @param timestampUs Timestamp of the object metadata for which the Action has been triggered.
      * @param params If the Engine manifest defines params for the Action being triggered,
      *     contains their values after they are filled by the user via the Client form. Otherwise,
      *     empty.
-     * @param outActionUrl If set by this call, the Client will open this URL in an embedded
-     *     browser.
-     * @param outMessageToUser If set by this call, the Client will show this text to the user.
      */
     virtual Result<IAction::Result> executeAction(
-        const std::string& /*actionId*/,
-        Uuid /*objectTrackId*/,
-        Uuid /*deviceId*/,
-        int64_t /*timestampUs*/,
-        Ptr<IObjectTrackInfo> /*trackInfo*/,
-        const std::map<std::string, std::string>& /*params*/)
-    {
-        return {};
-    }
+        const std::string& actionId,
+        Uuid objectTrackId,
+        Uuid deviceId,
+        int64_t timestampUs,
+        Ptr<IObjectTrackInfo> trackInfo,
+        const std::map<std::string, std::string>& params);
 
     /**
      * Sends a PluginDiagnosticEvent to the Server. Can be called from any thread, but if called
