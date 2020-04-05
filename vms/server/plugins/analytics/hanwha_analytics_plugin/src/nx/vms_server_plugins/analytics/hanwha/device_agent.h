@@ -96,7 +96,7 @@ private:
     MetadataMonitor* m_monitor = nullptr;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
-    std::unique_ptr<UrlDecorator> m_urlDecorator;
+    std::unique_ptr<ValueTransformer> m_valueTransformer;
 
     Settings m_settings;
     FrameSize m_frameSize;

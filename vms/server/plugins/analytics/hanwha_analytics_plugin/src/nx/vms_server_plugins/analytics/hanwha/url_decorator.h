@@ -4,27 +4,30 @@
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
-class UrlDecorator
+class ValueTransformer
 {
 public:
-	virtual ~UrlDecorator() = default;
-	virtual nx::utils::Url decorate(const nx::utils::Url& url) = 0;
+    virtual ~ValueTransformer() = default;
+    [[nodiscard]] virtual nx::utils::Url transformUrl(const nx::utils::Url& url) = 0;
+    [[nodiscard]] virtual int transformChannelNumber(int channelNumber) = 0;
 };
 
-class MockUrlDecorator : public UrlDecorator
+class CameraValueTransformer: public ValueTransformer
 {
 public:
-	virtual nx::utils::Url decorate(const nx::utils::Url& url) override;
+    [[nodiscard]] virtual nx::utils::Url transformUrl(const nx::utils::Url& url) override;
+    [[nodiscard]] virtual int transformChannelNumber(int channelNumber) override;
 };
 
-class BypassUrlDecorator : public UrlDecorator
+class NvrValueTransformer: public ValueTransformer
 {
 public:
-	BypassUrlDecorator(int channelNumber) : m_channelNumber(channelNumber) {};
-	virtual nx::utils::Url decorate(const nx::utils::Url& url) override;
+    NvrValueTransformer(int channelNumber) : m_channelNumber(channelNumber) {};
+    [[nodiscard]] virtual nx::utils::Url transformUrl(const nx::utils::Url& url) override;
+    [[nodiscard]] virtual int transformChannelNumber(int channelNumber) override;
 
 private:
-	int m_channelNumber;
+    int m_channelNumber;
 };
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

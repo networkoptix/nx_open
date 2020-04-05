@@ -90,13 +90,22 @@ QJsonValue filterJsonObjects(QJsonValue value, Pred pred)
     if (value.isArray())
     {
         auto array = value.toArray();
+        const auto s1 = array.size();
         for (auto it = array.begin(); it != array.end(); )
         {
+            const QString c1 = it->toObject()["caption"].toString();
             if (auto elementValue = filterJsonObjects(*it, pred); elementValue.isUndefined())
                 it = array.erase(it);
             else
                 ++it;
+
+            QString c2;
+            if (it != array.end())
+                c2 = it->toObject()["caption"].toString();
+
+            int xxx = 0;
         }
+        const auto s2 = array.size();
         return array;
     }
     return value;
@@ -191,6 +200,10 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
         });
 
     const bool isNvr = fetchIsNvr(sharedRes);
+
+    // We need max resolution to translate relative coordinates to absolute and backward.
+    // fetchMaxResolution may fail for some devices, in this case we get max resolution with
+    // a special request later.
     const QSize maxResolution = fetchMaxResolution(sharedRes, deviceInfo);
 
     const auto deviceAgent = new DeviceAgent(this, deviceInfo, isNvr, maxResolution);

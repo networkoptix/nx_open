@@ -180,9 +180,9 @@ DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo,
 {
     this->setDeviceInfo(deviceInfo);
     if (isNvr)
-        m_urlDecorator.reset(new BypassUrlDecorator(m_channelNumber));
+        m_valueTransformer.reset(new NvrValueTransformer(m_channelNumber));
     else
-        m_urlDecorator.reset(new MockUrlDecorator),
+        m_valueTransformer.reset(new CameraValueTransformer);
 
     m_frameSize.width = maxResolution.width();
     m_frameSize.height = maxResolution.height();
@@ -568,7 +568,7 @@ std::string DeviceAgent::sendWritingRequestToDeviceSync(const std::string& query
     constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
     command.setPath(kEventPath);
     command.setQuery(QString::fromStdString(query));
-    command = m_urlDecorator->decorate(command);
+    command = m_valueTransformer->transformUrl(command);
 
     auto settingsHttpClient = createSettingsHttpClient();
     const bool isSent = settingsHttpClient->doGet(command);
@@ -623,7 +623,7 @@ std::string DeviceAgent::sendReadingRequestToDeviceSync(
     command.setPath(QString::fromStdString(kPathPattern).arg(domain));
     command.setQuery(QString::fromStdString(kQueryPattern).
         arg(submenu).arg(action).arg(m_channelNumber));
-    command = m_urlDecorator->decorate(command);
+    command = m_valueTransformer->transformUrl(command);
 
     auto settingsHttpClient = createSettingsHttpClient();
     const bool isSent = settingsHttpClient->doGet(command);
@@ -676,29 +676,31 @@ void DeviceAgent::readCameraSettings()
     if (m_frameSize.width * m_frameSize.height == 0)
         loadFrameSize();
 
+    const int channelNumber = m_valueTransformer->transformChannelNumber(m_channelNumber);
+
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.ShockDetection"))
     {
         sunapiReply = loadEventSettings("shockdetection");
-        readFromDeviceReply(sunapiReply, &m_settings.shockDetection, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.shockDetection, m_frameSize, channelNumber);
     }
 
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.Tampering"))
     {
         sunapiReply = loadEventSettings("tamperingdetection");
-        readFromDeviceReply(sunapiReply, &m_settings.tamperingDetection, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.tamperingDetection, m_frameSize, channelNumber);
     }
 
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.MotionDetection"))
     {
         sunapiReply = loadEventSettings("videoanalysis2");
-        readFromDeviceReply(sunapiReply, &m_settings.motion, m_frameSize, m_channelNumber);
-        readFromDeviceReply(sunapiReply, &m_settings.motionDetectionObjectSize, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.motion, m_frameSize, channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.motionDetectionObjectSize, m_frameSize, channelNumber);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
-            readFromDeviceReply(sunapiReply, &m_settings.motionDetectionIncludeArea[i], m_frameSize, m_channelNumber, i);
+            readFromDeviceReply(sunapiReply, &m_settings.motionDetectionIncludeArea[i], m_frameSize, channelNumber, i);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
-            readFromDeviceReply(sunapiReply, &m_settings.motionDetectionExcludeArea[i], m_frameSize, m_channelNumber, i);
+            readFromDeviceReply(sunapiReply, &m_settings.motionDetectionExcludeArea[i], m_frameSize, channelNumber, i);
     }
     else
         sunapiReply.clear();
@@ -713,22 +715,22 @@ void DeviceAgent::readCameraSettings()
         if (sunapiReply.empty())
             sunapiReply = loadEventSettings("videoanalysis2");
 
-        readFromDeviceReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, channelNumber);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
-            readFromDeviceReply(sunapiReply, &m_settings.ivaLine[i], m_frameSize, m_channelNumber, i);
+            readFromDeviceReply(sunapiReply, &m_settings.ivaLine[i], m_frameSize, channelNumber, i);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
-            readFromDeviceReply(sunapiReply, &m_settings.ivaIncludeArea[i], m_frameSize, m_channelNumber, i);
+            readFromDeviceReply(sunapiReply, &m_settings.ivaIncludeArea[i], m_frameSize, channelNumber, i);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
-            readFromDeviceReply(sunapiReply, &m_settings.ivaExcludeArea[i], m_frameSize, m_channelNumber, i);
+            readFromDeviceReply(sunapiReply, &m_settings.ivaExcludeArea[i], m_frameSize, channelNumber, i);
     }
 
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.DefocusDetection"))
     {
         sunapiReply = loadEventSettings("defocusdetection");
-        readFromDeviceReply(sunapiReply, &m_settings.defocusDetection, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.defocusDetection, m_frameSize, channelNumber);
     }
 
 #if 1
@@ -736,23 +738,23 @@ void DeviceAgent::readCameraSettings()
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.FogDetection"))
     {
         sunapiReply = loadEventSettings("fogdetection");
-        readFromDeviceReply(sunapiReply, &m_settings.fogDetection, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.fogDetection, m_frameSize, channelNumber);
     }
 #endif
 
     if (!m_manifest.supportedObjectTypeIds.isEmpty())
     {
         sunapiReply = loadEventSettings("objectdetection");
-        readFromDeviceReply(sunapiReply, &m_settings.objectDetectionGeneral, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.objectDetectionGeneral, m_frameSize, channelNumber);
 
         sunapiReply = loadEventSettings("metaimagetransfer");
-        readFromDeviceReply(sunapiReply, &m_settings.objectDetectionBestShot, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.objectDetectionBestShot, m_frameSize, channelNumber);
     }
 
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioDetection"))
     {
         sunapiReply = loadEventSettings("audiodetection");
-        readFromDeviceReply(sunapiReply, &m_settings.audioDetection, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.audioDetection, m_frameSize, channelNumber);
     }
 
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Scream")
@@ -761,7 +763,7 @@ void DeviceAgent::readCameraSettings()
      || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.GlassBreak"))
     {
         sunapiReply = loadEventSettings("audioanalysis");
-        readFromDeviceReply(sunapiReply, &m_settings.soundClassification, m_frameSize, m_channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.soundClassification, m_frameSize, channelNumber);
     }
 }
 

@@ -4,14 +4,24 @@
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
-/*virtual*/ nx::utils::Url MockUrlDecorator::decorate(const nx::utils::Url& url)
+/*virtual*/ nx::utils::Url CameraValueTransformer::transformUrl(const nx::utils::Url& url)
 {
-	return url;
+    return url;
 }
 
-/*virtual*/ nx::utils::Url BypassUrlDecorator::decorate(const nx::utils::Url& url)
+/*virtual*/ int CameraValueTransformer::transformChannelNumber(int channelNumber)
 {
-	return nx::vms::server::plugins::HanwhaRequestHelper::makeBypassUrl(url, m_channelNumber);
+    return channelNumber;
+}
+
+/*virtual*/ nx::utils::Url NvrValueTransformer::transformUrl(const nx::utils::Url& url)
+{
+    return nx::vms::server::plugins::HanwhaRequestHelper::makeBypassUrl(url, m_channelNumber);
+}
+
+/*virtual*/ int NvrValueTransformer::transformChannelNumber(int channelNumber)
+{
+    return 0;
 }
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

@@ -85,7 +85,6 @@
                     {
                         "type": "GroupBox",
                         "caption": "Motion Detection",
-                        "requiredForEventTypeIds": [ "nx.hanwha.MotionDetection" ],
                         "items": 
                         [
                             {
@@ -341,7 +340,6 @@
                 "requiredForEventTypeIds": 
                 [
                     "nx.hanwha.VideoAnalytics.Passing",
-
                     "nx.hanwha.VideoAnalytics.Entering",
                     "nx.hanwha.VideoAnalytics.Exiting",
                     "nx.hanwha.VideoAnalytics.AppearDisappear",
@@ -378,23 +376,29 @@
                         ]
                     }
                 ],
-                "sections": [
+                "sections": 
+                [
                     {
                         "type": "Section",
                         "caption": "IVA Lines",
-                        "items": [
+                        "requiredForEventTypeIds": [ "nx.hanwha.VideoAnalytics.Passing" ],
+                        "items": 
+                        [
                             {
                                 "type": "GroupBox",
                                 "caption": "[AI] IVA Lines",
-                                "items": [
+                                "items": 
+                                [
                                     {
                                         "type": "Repeater",
                                         "count": 4,
                                         "startIndex": 1,
-                                        "template": {
+                                        "template": 
+                                        {
                                             "type": "GroupBox",
                                             "caption": "IVA Line #",
-                                            "items": [
+                                            "items": 
+                                            [
                                                 {
                                                     "type": "LineFigure",
                                                     "name": "IVA.Line#.Points",
@@ -403,7 +407,8 @@
                                                 {
                                                     "type": "GroupBox",
                                                     "caption": "Type",
-                                                    "items": [
+                                                    "items": 
+                                                    [
                                                         {
                                                             "type": "CheckBox",
                                                             "name": "IVA.Line#.Person",
@@ -434,6 +439,14 @@
                     {
                         "type": "Section",
                         "caption": "IVA Areas",
+                        "requiredForEventTypeIds": 
+                        [
+                            "nx.hanwha.VideoAnalytics.Entering",
+                            "nx.hanwha.VideoAnalytics.Exiting",
+                            "nx.hanwha.VideoAnalytics.AppearDisappear",
+                            "nx.hanwha.VideoAnalytics.Intrusion",
+                            "nx.hanwha.VideoAnalytics.Loitering"
+                        ],
                         "items": 
                         [
                             {
@@ -445,7 +458,7 @@
                                         "type": "Repeater",
                                         "count": 4,
                                         "startIndex": 1,
-                                        "template": 
+                                        "template":
                                         {
                                             "type": "GroupBox",
                                             "caption": "IVA Area #",
@@ -461,7 +474,7 @@
                                                 {
                                                     "type": "GroupBox",
                                                     "caption": "Type",
-                                                    "items": 
+                                                    "items":
                                                     [
                                                         {
                                                             "type": "CheckBox",
@@ -655,6 +668,16 @@
                     {
                         "type": "Section",
                         "caption": "Exclude Areas",
+                        "requiredForObjectDetection": true,
+                        "requiredForEventTypeIds": 
+                        [
+                            "nx.hanwha.VideoAnalytics.Passing",
+                            "nx.hanwha.VideoAnalytics.Entering",
+                            "nx.hanwha.VideoAnalytics.Exiting",
+                            "nx.hanwha.VideoAnalytics.AppearDisappear",
+                            "nx.hanwha.VideoAnalytics.Intrusion",
+                            "nx.hanwha.VideoAnalytics.Loitering"
+                        ],
                         "items": 
                         [
                             {
@@ -672,7 +695,7 @@
                                             "minPoints": 4,
                                             "maxPoints": 8,
                                             "name": "IVA.ExcludeArea#.Points",
-                                            "caption": "Area #"
+                                            "caption": "Exclude Area #"
                                         }
                                     }
                                 ]
