@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QtCore/QSortFilterProxyModel>
+#include <QtCore/QCollator>
+
 #include "private/current_system_servers.h"
 #include "private/server_online_status_watcher.h"
 
@@ -17,8 +20,21 @@ class DeviceAdditionDialog;
 
 namespace nx::vms::client::desktop {
 
-class ManualDeviceSearcher;
+class SortModel: public QSortFilterProxyModel
+{
+    Q_OBJECT
 
+public:
+    SortModel(QObject* parent = nullptr);
+
+private:
+    bool lessThan(const QModelIndex& source_left, const QModelIndex& source_right) const override;
+
+private:
+    QCollator m_predicate;
+};
+
+class ManualDeviceSearcher;
 class FoundDevicesModel;
 
 class DeviceAdditionDialog: public Connective<QnSessionAwareDialog>
@@ -94,6 +110,7 @@ private:
     QString m_lastSearchPassword;
 
     QScopedPointer<FoundDevicesModel> m_model;
+    SortModel* m_sortModel = nullptr;
     bool m_addressEditing = false;
 
     nx::vms::common::Credentials m_knownAddressCredentials;
