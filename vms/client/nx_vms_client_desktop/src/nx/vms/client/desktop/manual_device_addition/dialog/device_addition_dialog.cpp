@@ -45,29 +45,27 @@ bool isKnownAddressPage(QTabWidget* tabWidget)
     return tabWidget->currentIndex() == kKnownAddressPageIndex;
 }
 
-using ResourceCallback = std::function<void (const QnResourcePtr& resource)>;
-using CameraCallback = std::function<void (const QnVirtualCameraResourcePtr& camera)>;
-
-ResourceCallback createCameraCallback(const CameraCallback& cameraCallback)
-{
-    return
-        [cameraCallback](const QnResourcePtr& resource)
-        {
-            if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-                cameraCallback(camera);
-        };
-}
-
 } // namespace
 
 namespace nx::vms::client::desktop {
+
+SortModel::SortModel(QObject* parent) : QSortFilterProxyModel(parent)
+{
+    m_predicate.setNumericMode(true);
+}
+
+bool SortModel::lessThan(const QModelIndex& source_left, const QModelIndex& source_right) const
+{
+    return m_predicate(source_left.data().toString(), source_right.data().toString());
+}
 
 DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     base_type(parent),
     m_pool(commonModule()->resourcePool()),
     m_serversWatcher(parent),
     m_serverStatusWatcher(this),
-    ui(new Ui::DeviceAdditionDialog())
+    ui(new Ui::DeviceAdditionDialog()),
+    m_sortModel(new SortModel(this))
 {
     ui->setupUi(this);
 
@@ -110,13 +108,15 @@ void DeviceAdditionDialog::initializeControls()
     scrollBar->setUseMaximumSpace(true);
     ui->foundDevicesTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    ui->foundDevicesTable->setSortingEnabled(false);
+    ui->foundDevicesTable->setSortingEnabled(true);
 
     ui->searchButton->setFocusPolicy(Qt::StrongFocus);
     ui->stopSearchButton->setFocusPolicy(Qt::StrongFocus);
     ui->addDevicesButton->setFocusPolicy(Qt::StrongFocus);
     ui->knownAddressAutoPortCheckBox->setFocusPolicy(Qt::StrongFocus);
     ui->foundDevicesTable->setFocusPolicy(Qt::StrongFocus);
+
+    ui->foundDevicesTable->setModel(m_sortModel);
 
     // Monitor focus and change accent button accodringly.
     QWidget* const filteredWidgets[] = {
@@ -156,7 +156,7 @@ void DeviceAdditionDialog::initializeControls()
         ui->selectServerMenuButton, &QnChooseServerButton::addServer);
     connect(&m_serversWatcher, &CurrentSystemServers::serverRemoved,
         ui->selectServerMenuButton, &QnChooseServerButton::removeServer);
-    for (const auto server: m_serversWatcher.servers())
+    for (const auto& server: m_serversWatcher.servers())
         ui->selectServerMenuButton->addServer(server);
 
     ui->startAddressEdit->setPlaceholderText(tr("Start address"));
@@ -267,7 +267,7 @@ bool DeviceAdditionDialog::eventFilter(QObject *object, QEvent *event)
     return base_type::eventFilter(object, event);
 }
 
-void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
+void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& /*value*/)
 {
     if (m_addressEditing)
         return;
@@ -293,7 +293,7 @@ void DeviceAdditionDialog::handleStartAddressEditingFinished()
     }
 }
 
-void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& value)
+void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& /*value*/)
 {
     if (m_addressEditing)
         return;
@@ -394,6 +394,8 @@ void DeviceAdditionDialog::setupTableHeader()
         FoundDevicesModel::checkboxColumn, QHeaderView::ResizeToContents);
     header->setSectionResizeMode(
         FoundDevicesModel::presentedStateColumn, QHeaderView::ResizeToContents);
+
+    ui->foundDevicesTable->horizontalHeader()->setSectionsClickable(true);
 }
 
 void DeviceAdditionDialog::setupPortStuff(
@@ -500,6 +502,7 @@ void DeviceAdditionDialog::handleStartSearchClicked()
     resetButtonStyle(ui->searchButton);
 
     m_model.reset(new FoundDevicesModel(ui->foundDevicesTable));
+    m_sortModel->setSourceModel(m_model.data());
 
     updateResultsWidgetState();
 
@@ -517,7 +520,6 @@ void DeviceAdditionDialog::handleStartSearchClicked()
     connect(m_model, &FoundDevicesModel::rowsRemoved,
         this, &DeviceAdditionDialog::updateAddDevicesPanel);
 
-    ui->foundDevicesTable->setModel(m_model.data());
     setupTableHeader();
 
     connect(m_currentSearch, &ManualDeviceSearcher::devicesAdded,
@@ -713,10 +715,10 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     else
     {
         const auto status = m_currentSearch->status();
-        const int total = status.total ? status.total : 1;
-        const int current = status.total ? status.current : 0;
-        ui->searchProgressBar->setMaximum(total);
-        ui->searchProgressBar->setValue(current);
+        const auto total = status.total ? status.total : 1;
+        const auto current = status.total ? status.current : 0;
+        ui->searchProgressBar->setMaximum(static_cast<int>(total));
+        ui->searchProgressBar->setValue(static_cast<int>(current));
         const bool isSearching = m_currentSearch->searching();
         const auto text = isSearching
             ? tr("Searching...")

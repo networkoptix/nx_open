@@ -3218,7 +3218,9 @@ QRect QnNxStyle::subElementRect(
         {
             if (auto header = qstyleoption_cast<const QStyleOptionHeader *>(option))
             {
-                QRect rect = header->rect.adjusted(Metrics::kStandardPadding, 0, -Metrics::kStandardPadding, 0);
+                QRect maxRect = header->rect.adjusted(Metrics::kStandardPadding, 0, -Metrics::kStandardPadding, 0);
+
+                QRect rect = maxRect;
                 Qt::Alignment arrowAlignment =
                     static_cast<Qt::Alignment>(styleHint(SH_Header_ArrowAlignment, header, widget));
 
@@ -3227,6 +3229,18 @@ QRect QnNxStyle::subElementRect(
                     int margin = pixelMetric(PM_HeaderMargin, header, widget);
                     int arrowSize = pixelMetric(PM_HeaderMarkSize, header, widget);
                     rect.setLeft(rect.left() + arrowSize + margin);
+                }
+                else if (header->textAlignment & Qt::AlignRight)
+                {
+                    if (rect.width() + Metrics::kSortIndicatorSize > maxRect.width())
+                    {
+                        rect.setX(rect.x() - maxRect.width() - rect.width());
+                        rect.setWidth(rect.width() - Metrics::kSortIndicatorSize);
+                    }
+                    else
+                    {
+                        rect.setX(rect.x() - Metrics::kSortIndicatorSize);
+                    }
                 }
 
                 const auto horizontalAlignment = header->textAlignment & ~Qt::AlignVertical_Mask;
