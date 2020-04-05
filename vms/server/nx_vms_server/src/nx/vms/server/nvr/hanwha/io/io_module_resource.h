@@ -34,28 +34,11 @@ protected:
     virtual void stopInputPortStatesMonitoring() override;
 
 private:
-    void updatePortDescriptionsThreadUnsafe(QnIOPortDataList portDescriptors);
+    void updatePortDescriptionsThreadUnsafe(QnIOPortDataList portDescriptions);
 
-    std::optional<QnIOPortData> portDescriptionThreadUnsafe(
-        const QString& portId,
-        Qn::IOPortType portType = Qn::IOPortType::PT_Unknown) const;
-
-    /** @return List of ports states that have been changed. */
-    std::vector<PortStateNotification> updatePortStatesThreadUnsafe(
-        const QnIOStateDataList& state);
-
-    QnIOStateData currentPortStateThreadUnsafe(const QString& portId) const;
-
-    QnIOStateDataList currentPortStatesThreadUnsafe() const;
+    std::optional<QnIOPortData> portDescriptionThreadUnsafe(const QString& portId) const;
 
     void emitSignals(const QnIOStateData& portState, Qn::IOPortType portType);
-
-    // Since the NVR IO manager always provides port state as if it works in the open cicuit mode,
-    // it needs to be translated. When reading port IO states they have to be translated
-    // from the open circuit to the current circuit "coordinate system". Reverse translation has to
-    // be performed when changing an output port state. This method is able to translate port states
-    // in both directions.
-    bool isActiveTranslated(const QnIOPortData& portDescription, bool isActive) const;
 
     QnIOPortDataList mergedPortDescriptions();
 
@@ -67,9 +50,8 @@ private:
 private:
     mutable QnMutex m_mutex;
     HandlerId m_handlerId = 0;
-
-    std::map<QString, QnIOPortData> m_portDescriptorsById;
-    std::map<QString, QnIOStateData> m_portStateById;
+    bool m_initialilStateHasBeenProcessed = false;
+    std::map<QString, QnIOPortData> m_portDescriptions;
 };
 
 } // namespace nx::vms::server::nvr::hanwha

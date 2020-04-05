@@ -35,6 +35,19 @@ static IoPortState invertedState(IoPortState state)
     return state == IoPortState::inactive ? IoPortState::active : IoPortState::inactive;
 }
 
+static IoPortState translatePortState(IoPortState portState, Qn::IODefaultState circuitType)
+{
+    if (circuitType == Qn::IODefaultState::IO_OpenCircuit)
+        return portState;
+
+    return invertedState(portState);
+}
+
+static bool isActiveTranslated(bool isActive, Qn::IODefaultState circuitType)
+{
+    return circuitType == Qn::IODefaultState::IO_OpenCircuit ? isActive : !isActive;
+}
+
 IoManager::IoManager(std::unique_ptr<IIoPlatformAbstraction> platformAbstraction):
     m_platformAbstraction(std::move(platformAbstraction)),
     m_stateFetcher(std::make_unique<IoStateFetcher>(
@@ -43,6 +56,7 @@ IoManager::IoManager(std::unique_ptr<IIoPlatformAbstraction> platformAbstraction
     m_timerManager(std::make_unique<nx::utils::TimerManager>())
 {
     NX_DEBUG(this, "Creating the IO manager");
+    initialize();
 }
 
 IoManager::~IoManager()
@@ -82,7 +96,32 @@ void IoManager::stop()
 
 QnIOPortDataList IoManager::portDesriptiors() const
 {
-    return m_platformAbstraction->portDescriptors();
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    QnIOPortDataList rawDescriptors = m_platformAbstraction->portDescriptors();
+
+    for(QnIOPortData& portDescriptor: rawDescriptors)
+    {
+        const Qn::IODefaultState circuitType = m_portContexts[portDescriptor.id].circuitType;
+        if (portDescriptor.portType == Qn::IOPortType::PT_Input)
+            portDescriptor.iDefaultState = circuitType;
+        else if (portDescriptor.portType == Qn::IOPortType::PT_Output)
+            portDescriptor.oDefaultState = circuitType;
+    }
+
+    return rawDescriptors;
+}
+
+void IoManager::setPortCircuitTypes(const std::map<QString, Qn::IODefaultState>& circuitTypeByPort)
+{
+    NX_DEBUG(this, "Updating port circuit types, %1", containerString(circuitTypeByPort));
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    for (const auto& [portId, circuitType]: circuitTypeByPort)
+    {
+        IoPortContext& portContext = m_portContexts[portId];
+        portContext.circuitType = circuitType;
+        if (portContext.portType == Qn::IOPortType::PT_Output)
+            setOutputPortStateInternal(portId, m_portContexts[portId].currentState);
+    }
 }
 
 bool IoManager::setOutputPortState(
@@ -94,7 +133,8 @@ bool IoManager::setOutputPortState(
         portId, state, autoResetTimeout);
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-    auto& context = m_outputPortContexts[portId];
+
+    IoPortContext& context = m_portContexts[portId];
     if (context.timerId != 0)
     {
         NX_DEBUG(this, "Canceling timer '%1'", context.timerId);
@@ -104,20 +144,18 @@ bool IoManager::setOutputPortState(
     if (autoResetTimeout != std::chrono::milliseconds::zero())
     {
         context.timerId = m_timerManager->addTimer(
-            [this, portId, state](nx::utils::TimerId timerId)
+            [this, portId](nx::utils::TimerId timerId)
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
-                NX_DEBUG(this,
-                    "Timer '%1' callback is called for port '%2', state: %3",
-                    timerId, portId, invertedState(state));
+                NX_DEBUG(this, "Timer '%1' callback is called for port '%2'", timerId, portId);
 
-                if (m_outputPortContexts[portId].timerId != timerId)
+                if (m_portContexts[portId].timerId != timerId)
                 {
                     NX_DEBUG(this, "The timer '%1' has been canceled, exiting", timerId);
                     return;
                 }
 
-                setOutputPortStateInternal(portId, invertedState(state));
+                setOutputPortStateInternal(portId, IoPortState::inactive);
             },
             autoResetTimeout);
     }
@@ -143,7 +181,10 @@ HandlerId IoManager::registerStateChangeHandler(IoStateChangeHandler handler)
     NX_MUTEX_LOCKER lock(&m_handlerMutex);
     ++m_maxHandlerId;
     NX_DEBUG(this, "Registering handler with id %1", m_maxHandlerId);
-    m_handlers.emplace(m_maxHandlerId, std::move(handler));
+    m_handlerContexts.emplace(
+        m_maxHandlerId,
+        HandlerContext{/*initialStateHasBeenReported*/ false, std::move(handler)});
+
     return m_maxHandlerId;
 }
 
@@ -152,7 +193,29 @@ void IoManager::unregisterStateChangeHandler(HandlerId handlerId)
     NX_DEBUG(this, "Unregistering handler with id %1", handlerId);
 
     NX_MUTEX_LOCKER lock(&m_handlerMutex);
-    m_handlers.erase(handlerId);
+    m_handlerContexts.erase(handlerId);
+}
+
+void IoManager::initialize()
+{
+    const QnIOPortDataList descriptors = m_platformAbstraction->portDescriptors();
+    for (const QnIOPortData& portDescriptor: descriptors)
+    {
+        m_portContexts[portDescriptor.id] = {
+            /*timerId*/ 0,
+            IoPortState::inactive,
+            portDescriptor.portType == Qn::IOPortType::PT_Input
+                ? portDescriptor.iDefaultState
+                : portDescriptor.oDefaultState,
+            portDescriptor.portType
+        };
+
+        m_lastPortStates.insert({
+            portDescriptor.id,
+            /*isActive*/ false,
+            qnSyncTime->currentUSecsSinceEpoch()
+        });
+    }
 }
 
 void IoManager::updatePortStates(const std::set<QnIOStateData>& portStates)
@@ -161,14 +224,43 @@ void IoManager::updatePortStates(const std::set<QnIOStateData>& portStates)
         "Handling port states received from the state fetcher, %1",
         containerString(portStates));
 
+    {
+        NX_MUTEX_LOCKER lock(&m_handlerMutex);
+        std::optional<QnIOStateDataList> currentState;
+        for (auto& [_, handlerContext]: m_handlerContexts)
+        {
+            if (!handlerContext.intialStateHasBeenReported)
+            {
+                if (!currentState)
+                {
+                    currentState = QnIOStateDataList();
+                    for (const QnIOStateData& portState: m_lastPortStates)
+                        currentState->push_back(portState);
+                }
+
+                handlerContext.handler(*currentState);
+                handlerContext.intialStateHasBeenReported = true;
+            }
+        }
+    }
+
     QnIOStateDataList changedPortStates;
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        if (portStates == m_lastPortStates)
+
+        std::set<QnIOStateData> translatedPortStates;
+        for (QnIOStateData portState: portStates)
+        {
+            const IoPortContext& portContext = m_portContexts[portState.id];
+            portState.isActive = isActiveTranslated(portState.isActive, portContext.circuitType);
+            translatedPortStates.insert(std::move(portState));
+        }
+
+        if (translatedPortStates == m_lastPortStates)
             return;
 
-        changedPortStates = calculateChangedPortStates(m_lastPortStates, portStates);
-        m_lastPortStates = portStates;
+        changedPortStates = calculateChangedPortStates(m_lastPortStates, translatedPortStates);
+        m_lastPortStates = translatedPortStates;
     }
 
     if (changedPortStates.empty())
@@ -178,25 +270,21 @@ void IoManager::updatePortStates(const std::set<QnIOStateData>& portStates)
 
     {
         NX_MUTEX_LOCKER lock(&m_handlerMutex);
-        for (const auto& [_, handler]: m_handlers)
-            handler(changedPortStates);
+        for (const auto& [_, handlerContext]: m_handlerContexts)
+            handlerContext.handler(changedPortStates);
     }
 }
 
 bool IoManager::setOutputPortStateInternal(const QString& portId, IoPortState portState)
 {
-    if (portState == m_outputPortContexts[portId].currentState)
-    {
-        NX_DEBUG(this, "Current state of the output port '%1' is equal to requested: %2, ignoring",
-            portId, portState);
-        return true;
-    }
+    const IoPortContext& portContext = m_portContexts[portId];
+    const IoPortState translatedPortState = translatePortState(portState, portContext.circuitType);
 
-    const bool success = m_platformAbstraction->setOutputPortState(portId, portState);
+    const bool success = m_platformAbstraction->setOutputPortState(portId, translatedPortState);
     if (success)
     {
         NX_DEBUG(this, "Succcesfully set output port '%1' state to %2", portId, portState);
-        m_stateFetcher->updateOutputPortState(portId, portState);
+        m_stateFetcher->updateOutputPortState(portId, translatedPortState);
     }
     else
     {
