@@ -25,12 +25,13 @@ copyBins()
 
     mkdir -p "$STAGE_BIN"
 
-    cp -r "$BUILD_DIR/bin/$CLIENT_BINARY_NAME" "$STAGE_BIN/"
-    cp -r "$BUILD_DIR/bin/$APPLAUNCHER_BINARY_NAME" "$STAGE_BIN/"
-    cp -r "bin/client" "$STAGE_BIN/"
-    cp -r "$BUILD_DIR/bin/$LAUNCHER_VERSION_FILE" "$STAGE_BIN/"
-    cp -r "bin/applauncher" "$STAGE_BIN/"
-    cp -r "$SOURCE_DIR/nx_log_viewer.html" "$STAGE_BIN/"
+    install -m 755 "$BUILD_DIR/bin/client-bin" "$STAGE_BIN/"
+    install -m 755 "$BUILD_DIR/bin/$APPLAUNCHER_BINARY_NAME" "$STAGE_BIN/"
+    install -m 755 "bin/client" "$STAGE_BIN/$CLIENT_BINARY_NAME"
+    install -m 755 "$SOURCE_DIR/build_utils/linux/choose_newer_stdcpp.sh" "$STAGE_BIN/"
+    install -m 644 "$BUILD_DIR/bin/$LAUNCHER_VERSION_FILE" "$STAGE_BIN/"
+    install -m 755 "bin/applauncher" "$STAGE_BIN/"
+    install -m 644 "$SOURCE_DIR/nx_log_viewer.html" "$STAGE_BIN/"
 }
 
 # [in] STAGE
@@ -132,7 +133,9 @@ copyLibs()
     rm -f "$STAGE_LIB"/*.debug
 
     echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
-    distrib_copySystemLibs "$STAGE_LIB" "${CPP_RUNTIME_LIBS[@]}"
+    local -r STDCPP_LIBS_PATH="$STAGE_LIB/stdcpp"
+    mkdir "$STDCPP_LIBS_PATH"
+    distrib_copySystemLibs "$STDCPP_LIBS_PATH" "${CPP_RUNTIME_LIBS[@]}"
 
     if [ "$ARCH" != "arm" ]
     then
@@ -361,7 +364,7 @@ buildDistribution()
     find "$STAGE" -type f -print0 |xargs -0 chmod 644
 
     # Restore permissions for executables.
-    chmod 755 "$STAGE_BIN"/{applauncher*,client*}
+    chmod 755 "$STAGE_BIN"/{applauncher*,client*,*.sh}
     chmod 755 "$STAGE_LIBEXEC/QtWebEngineProcess"
 
     createDebianDir

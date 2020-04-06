@@ -11,5 +11,10 @@ if(LINUX)
     string(APPEND CMAKE_EXE_LINKER_FLAGS " -pie")
 endif()
 
-string(REPLACE ".exe" "" binary_name ${client.binary.name})
+if(LINUX)
+    set(binary_name client-bin)
+else()
+    string(REPLACE ".exe" "" binary_name ${client.binary.name})
+endif()
+
 set_target_properties(desktop_client PROPERTIES OUTPUT_NAME ${binary_name})
