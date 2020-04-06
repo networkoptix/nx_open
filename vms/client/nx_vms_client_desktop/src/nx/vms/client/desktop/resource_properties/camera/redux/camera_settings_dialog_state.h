@@ -302,7 +302,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     };
     WearableCameraMotionDetection wearableMotion;
 
-    bool wearableClientTimeZone = false;
+    bool wearableIgnoreTimeZone = false;
 
     // Helper methods.
 

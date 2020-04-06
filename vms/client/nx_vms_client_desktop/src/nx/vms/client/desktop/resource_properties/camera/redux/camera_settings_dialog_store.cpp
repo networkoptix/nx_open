@@ -496,12 +496,12 @@ bool CameraSettingsDialogStore::recordingEnabled() const
     return d->state.recording.enabled();
 }
 
-void CameraSettingsDialogStore::setWearableClientTimeZone(bool value)
+void CameraSettingsDialogStore::setWearableIgnoreTimeZone(bool value)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setWearableClientTimeZone(std::move(state), value);
+            return Reducer::setWearableIgnoreTimeZone(std::move(state), value);
         });
 }
 

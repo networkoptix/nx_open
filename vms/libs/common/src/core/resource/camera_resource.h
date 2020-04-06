@@ -41,7 +41,7 @@ public:
     static const QString kDeviceAgentsSettingsValuesProperty;
     static const QString kDeviceAgentManifestsProperty;
     static const QString kAnalyzedStreamIndexes;
-    static const QString kWearableClientTimeZone;
+    static const QString kWearableIgnoreTimeZone;
 
     static const nx::vms::api::StreamIndex kDefaultAnalyzedStreamIndex =
         nx::vms::api::StreamIndex::primary;
@@ -66,13 +66,13 @@ public:
     void issueOccured();
     void cleanCameraIssues();
 
-    bool isWearableClientTimeZone() const;
+    bool wearableIgnoreTimeZone() const;
     /**
      * Meaningful only for wearable camera.
      * If the value is true, video's timestamps is considered as local client time.
      * Otherwise, timestamps is considered as UTC.
      */
-    void setWearableClientTimeZone(bool value);
+    void setWearableIgnoreTimeZone(bool value);
 
     nx::vms::api::RtpTransportType preferredRtpTransport() const;
     CameraMediaStreams mediaStreams() const;

@@ -28,19 +28,15 @@ void WearableCameraTimeZoneWidget::setStore(CameraSettingsDialogStore* store)
     m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
         this, &WearableCameraTimeZoneWidget::loadState);
 
-    m_storeConnections << connect(ui->clientRadioButton, &QRadioButton::toggled,
-        store, &CameraSettingsDialogStore::setWearableClientTimeZone);
+    m_storeConnections << connect(ui->ignoreTimeZoneCheckBox, &QCheckBox::toggled,
+        store, &CameraSettingsDialogStore::setWearableIgnoreTimeZone);
 }
 
 void WearableCameraTimeZoneWidget::loadState(const CameraSettingsDialogState& state)
 {
-    setReadOnly(ui->autoRadioButton, state.readOnly);
-    setReadOnly(ui->clientRadioButton, state.readOnly);
+    setReadOnly(ui->ignoreTimeZoneCheckBox, state.readOnly);
 
-    if (state.wearableClientTimeZone)
-        ui->clientRadioButton->toggle();
-    else
-        ui->autoRadioButton->toggle();
+    ui->ignoreTimeZoneCheckBox->setChecked(state.wearableIgnoreTimeZone);
 }
 
 } // namespace nx::vms::client::desktop

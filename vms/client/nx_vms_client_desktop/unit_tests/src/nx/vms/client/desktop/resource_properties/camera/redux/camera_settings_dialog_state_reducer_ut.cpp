@@ -407,34 +407,34 @@ TEST_F(CameraSettingsDialogStateReducerTest, DISABLED_skipMotionAlertIfScheduleI
     ASSERT_EQ(initial.scheduleAlert, std::nullopt);
 }
 
-// "wearableClientTimeZone" property test
-TEST_F(CameraSettingsDialogStateReducerTest, wearableClientTimeZone)
+// "wearableIgnoreTimeZone" property test
+TEST_F(CameraSettingsDialogStateReducerTest, wearableIgnoreTimeZone)
 {
     // Test default state value
     State state1 = Reducer::setSettingsOptimizationEnabled({}, true);
-    ASSERT_FALSE(state1.wearableClientTimeZone);
-    state1 = Reducer::setWearableClientTimeZone(std::move(state1), true);
-    ASSERT_TRUE(state1.wearableClientTimeZone);
+    ASSERT_FALSE(state1.wearableIgnoreTimeZone);
+    state1 = Reducer::setWearableIgnoreTimeZone(std::move(state1), true);
+    ASSERT_TRUE(state1.wearableIgnoreTimeZone);
 
     // Test default camera state
     CameraResourceStubPtr camera(new CameraResourceStub());
-    ASSERT_FALSE(camera->isWearableClientTimeZone());
+    ASSERT_FALSE(camera->wearableIgnoreTimeZone());
     State state2 = Reducer::loadCameras({}, { camera });
-    ASSERT_FALSE(state2.wearableClientTimeZone);
+    ASSERT_FALSE(state2.wearableIgnoreTimeZone);
 
     // Test value ignoring for non wearable cameras
     ASSERT_EQ(state2.devicesDescription.isWearable, CombinedValue::None);
-    state2 = Reducer::setWearableClientTimeZone(std::move(state2), true);
+    state2 = Reducer::setWearableIgnoreTimeZone(std::move(state2), true);
     CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state2, {camera});
-    ASSERT_FALSE(camera->isWearableClientTimeZone());
+    ASSERT_FALSE(camera->wearableIgnoreTimeZone());
 
     // Test value setting for wearable cameras
     camera->addFlags(Qn::wearable_camera);
     State state3 = Reducer::loadCameras({}, { camera });
     ASSERT_EQ(state3.devicesDescription.isWearable, CombinedValue::All);
-    state3 = Reducer::setWearableClientTimeZone(std::move(state3), true);
+    state3 = Reducer::setWearableIgnoreTimeZone(std::move(state3), true);
     CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state3, {camera});
-    ASSERT_TRUE(camera->isWearableClientTimeZone());
+    ASSERT_TRUE(camera->wearableIgnoreTimeZone());
 }
 
 } // namespace test
