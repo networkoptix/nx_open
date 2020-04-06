@@ -76,8 +76,8 @@ const QString QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty(
 const QString QnVirtualCameraResource::kDeviceAgentManifestsProperty(
     "deviceAgentManifests");
 
-const QString QnVirtualCameraResource::kWearableClientTimeZone(
-    "wearableClientTimeZone");
+const QString QnVirtualCameraResource::kWearableIgnoreTimeZone(
+    "wearableIgnoreTimeZone");
 
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -255,17 +255,17 @@ void QnVirtualCameraResource::cleanCameraIssues() {
     }
 }
 
-bool QnVirtualCameraResource::isWearableClientTimeZone() const
+bool QnVirtualCameraResource::wearableIgnoreTimeZone() const
 {
     return QnLexical::deserialized(
-        getProperty(kWearableClientTimeZone),
+        getProperty(kWearableIgnoreTimeZone),
         false);
 }
 
-void QnVirtualCameraResource::setWearableClientTimeZone(bool value)
+void QnVirtualCameraResource::setWearableIgnoreTimeZone(bool value)
 {
     NX_ASSERT(hasFlags(Qn::wearable_camera));
-    setProperty(kWearableClientTimeZone, value ? true : QVariant());
+    setProperty(kWearableIgnoreTimeZone, value ? true : QVariant());
 }
 
 int QnVirtualCameraResource::issuesTimeoutMs() {

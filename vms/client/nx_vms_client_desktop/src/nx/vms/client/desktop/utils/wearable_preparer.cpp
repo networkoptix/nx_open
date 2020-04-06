@@ -158,11 +158,11 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
         QDateTime startDateTime = QDateTime::fromString(startTimeString, Qt::ISODate);
         if (startDateTime.isValid())
         {
-            bool clientTimeZone = false;
+            bool ignoreTimeZone = false;
             if (auto virtualCamera = d->camera.dynamicCast<QnVirtualCameraResource>())
-                clientTimeZone = virtualCamera->isWearableClientTimeZone();
+                ignoreTimeZone = virtualCamera->wearableIgnoreTimeZone();
 
-            if (!clientTimeZone)
+            if (!ignoreTimeZone)
                 startDateTime.setTimeSpec(Qt::UTC);
 
             startTimeMs = startDateTime.toMSecsSinceEpoch();
