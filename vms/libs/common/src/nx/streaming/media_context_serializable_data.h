@@ -11,7 +11,7 @@ extern "C"
 #include <libavcodec/avcodec.h>
 }
 
-/** POD
+/**
  * Contains fields of AVCodecContext (and respectively of QnMediaContext) which
  * are transferred from Server to Client with a media stream.
  *
@@ -41,8 +41,8 @@ struct QnMediaContextSerializableData
     /// Fields defined in ffmpeg's AVCodecContext.
     //@{
 
-    AVCodecID codecId;
-    AVMediaType codecType;
+    AVCodecID codecId = AV_CODEC_ID_NONE;
+    AVMediaType codecType = AVMEDIA_TYPE_UNKNOWN;
     QByteArray rcEq; ///< Empty (represents char* null) or nul-terminated.
     QByteArray extradata;
 
@@ -54,17 +54,17 @@ struct QnMediaContextSerializableData
 
     std::vector<RcOverride> rcOverride;
 
-    int channels;
-    int sampleRate;
-    AVSampleFormat sampleFmt;
-    int bitsPerCodedSample;
-    int codedWidth;
-    int codedHeight;
-    int width;
-    int height;
-    int bitRate;
-    quint64 channelLayout;
-    int blockAlign;
+    int channels = 0;
+    int sampleRate = 0;
+    AVSampleFormat sampleFmt = AV_SAMPLE_FMT_NONE;
+    int bitsPerCodedSample = 0;
+    int codedWidth = 0;
+    int codedHeight = 0;
+    int width = 0;
+    int height = 0;
+    int bitRate = 0;
+    quint64 channelLayout = 0;
+    int blockAlign = 0;
 
     //@}
 
