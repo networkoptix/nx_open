@@ -62,7 +62,7 @@ bool QuickSyncVideoDecoderOldPlayer::decode(
     outFrame->pkt_dts = result->startTime();
     outFrame->width = result->size().width();
     outFrame->height = result->size().height();
-    auto suraceFrame = std::make_unique<QuickSyncVideoFrame>(result, std::move(decoderWeakPtr));
+    auto suraceFrame = std::make_unique<QuickSyncVideoFrame>(result);
     outFrame->attachVideoSurface(std::move(suraceFrame));
     return true;
 }

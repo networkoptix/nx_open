@@ -51,15 +51,12 @@ class MfxQtVideoBuffer: public QAbstractVideoBuffer
     Q_DECLARE_PRIVATE(MfxQtVideoBuffer)
 public:
     MfxQtVideoBuffer(
-        std::atomic<bool>* isRendered,
         mfxFrameSurface1* surface,
         const std::shared_ptr<MFXFrameAllocator>& allocator):
-        QAbstractVideoBuffer(*(new MfxQtVideoBufferPrivate(surface, allocator)), NoHandle),
-        m_isRendered(isRendered)
+        QAbstractVideoBuffer(*(new MfxQtVideoBufferPrivate(surface, allocator)), NoHandle)
     {}
     virtual ~MfxQtVideoBuffer()
     {
-        *m_isRendered = true;
     }
 
 
@@ -86,8 +83,6 @@ public:
         Q_D(MfxQtVideoBuffer);
         d->allocator->UnlockFrame(d->surface->Data.MemId, &d->surface->Data);
     }
-private:
-    std::atomic<bool>* m_isRendered;
 };
 
 } // namespace nx::media

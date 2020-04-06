@@ -18,7 +18,7 @@ QSize QuickSyncVideoDecoder::maxResolution(const AVCodecID /*codec*/)
 QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     const RenderContextSynchronizerPtr& /*synchronizer*/, const QSize& /*resolution*/)
 {
-    m_impl = std::make_unique<QuickSyncVideoDecoderImpl>();
+    m_impl = std::make_shared<QuickSyncVideoDecoderImpl>();
 }
 
 QuickSyncVideoDecoder::~QuickSyncVideoDecoder()

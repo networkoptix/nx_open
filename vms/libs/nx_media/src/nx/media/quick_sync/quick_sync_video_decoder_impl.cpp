@@ -152,6 +152,7 @@ bool QuickSyncVideoDecoderImpl::allocSurfaces(mfxFrameAllocRequest& request)
 
         // MID (memory id) represents one video NV12 surface
         m_surfaces[i].surface.Data.MemId = m_response.mids[i];
+        m_surfaces[i].surface.Data.MemType = request.Type;
     }
     return true;
 }
@@ -205,32 +206,57 @@ bool QuickSyncVideoDecoderImpl::init(mfxBitstream& bitstream, AVCodecID codec)
     return true;
 }
 
-void QuickSyncVideoDecoderImpl::buildQVideoFrame(
-    SurfaceInfo& surface, nx::QVideoFramePtr* result) const
-{
-    QAbstractVideoBuffer* buffer = nullptr;
-    surface.isRendered = false;
-    if (m_config.useVideoMemory)
-    {
-        vaapiMemId* surfaceData = (vaapiMemId*)surface.surface.Data.MemId;
-        VaSurfaceInfo surfaceDataHandle{*(surfaceData->m_surface), m_display};
-        buffer = new MfxDrmQtVideoBuffer(&surface.isRendered, surfaceDataHandle);
-    }
-    else
-    {
-        buffer = new MfxQtVideoBuffer(&surface.isRendered, &surface.surface, m_allocator);
-    }
-    QSize frameSize(surface.surface.Info.Width, surface.surface.Info.Height);
-    result->reset(new QVideoFrame(buffer, frameSize, QVideoFrame::Format_NV12));
-    result->get()->setStartTime(surface.surface.Data.TimeStamp);
-}
-
-QuickSyncVideoDecoderImpl::SurfaceInfo* QuickSyncVideoDecoderImpl::getFreeSurface()
+void QuickSyncVideoDecoderImpl::lockSurface(const mfxFrameSurface1* surface)
 {
     for (auto& surfaceInfo: m_surfaces)
     {
-        if (0 == surfaceInfo.surface.Data.Locked && surfaceInfo.isRendered)
-            return &surfaceInfo;
+        if (surface == &surfaceInfo.surface)
+        {
+            surfaceInfo.isUsed = true;
+            return;
+        }
+    }
+}
+
+void QuickSyncVideoDecoderImpl::releaseSurface(const mfxFrameSurface1* surface)
+{
+    for (auto& surfaceInfo: m_surfaces)
+    {
+        if (surface == &surfaceInfo.surface)
+        {
+            surfaceInfo.isUsed = false;
+            return;
+        }
+    }
+}
+
+bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
+    mfxFrameSurface1* surface, nx::QVideoFramePtr* result)
+{
+    QAbstractVideoBuffer* buffer = nullptr;
+    if (m_config.useVideoMemory)
+    {
+        vaapiMemId* surfaceData = (vaapiMemId*)surface->Data.MemId;
+        VASurfaceID surfaceId = *(surfaceData->m_surface);
+        VaSurfaceInfo surfaceInfo {surfaceId, m_display, surface, weak_from_this()};
+        buffer = new MfxDrmQtVideoBuffer(surfaceInfo);
+    }
+    else
+    {
+        buffer = new MfxQtVideoBuffer(surface, m_allocator);
+    }
+    QSize frameSize(surface->Info.Width, surface->Info.Height);
+    result->reset(new QVideoFrame(buffer, frameSize, QVideoFrame::Format_NV12));
+    result->get()->setStartTime(surface->Data.TimeStamp);
+    return true;
+}
+
+mfxFrameSurface1* QuickSyncVideoDecoderImpl::getFreeSurface()
+{
+    for (auto& surfaceInfo: m_surfaces)
+    {
+        if (0 == surfaceInfo.surface.Data.Locked && !surfaceInfo.isUsed)
+            return &surfaceInfo.surface;
     }
     return nullptr;
 }
@@ -282,7 +308,7 @@ int QuickSyncVideoDecoderImpl::decode(
     mfxBitstream* pBitstream = frame ? &bitstream : nullptr;
     mfxStatus sts = MFX_ERR_NONE;
 
-    SurfaceInfo* surface = getFreeSurface();
+    mfxFrameSurface1* surface = getFreeSurface();
     if (!surface)
     {
         NX_ERROR(this, "Failed to decode frame, no free surfaces!");
@@ -294,7 +320,7 @@ int QuickSyncVideoDecoderImpl::decode(
     do
     {
         sts = MFXVideoDECODE_DecodeFrameAsync(
-            m_mfxSession, pBitstream, &surface->surface, &outSurface, &syncp);
+            m_mfxSession, pBitstream, surface, &outSurface, &syncp);
 
         if (MFX_WRN_DEVICE_BUSY == sts)
             std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Wait if device is busy
@@ -328,7 +354,9 @@ int QuickSyncVideoDecoderImpl::decode(
         NX_ERROR(this, "Failed to sync surface: %1", sts);
         return -1;
     }
-    buildQVideoFrame(*surface, result);
+    if (!buildQVideoFrame(outSurface, result))
+        return -1;
+
     return m_frameNumber++;
 }
 

@@ -29,7 +29,7 @@ public:
     virtual Capabilities capabilities() const override;
 
 private:
-    std::unique_ptr<QuickSyncVideoDecoderImpl> m_impl;
+    std::shared_ptr<QuickSyncVideoDecoderImpl> m_impl;
 };
 
 } // namespace nx::media

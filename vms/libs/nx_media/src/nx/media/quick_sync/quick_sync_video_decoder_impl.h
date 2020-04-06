@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <memory>
+
 #include <va/va.h>
 
 #include "quick_sync_video_decoder.h"
@@ -11,30 +13,33 @@
 
 namespace nx::media {
 
-class QuickSyncVideoDecoderImpl
+class QuickSyncVideoDecoderImpl : public std::enable_shared_from_this<QuickSyncVideoDecoderImpl>
 {
 public:
     QuickSyncVideoDecoderImpl();
     ~QuickSyncVideoDecoderImpl();
     int decode(const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result = nullptr);
 
-    void** getRenderingSurface() { return &m_renderingSurface; }
+    void lockSurface(const mfxFrameSurface1* surface);
+    void releaseSurface(const mfxFrameSurface1* surface);
 
+    void** getRenderingSurface() { return &m_renderingSurface; }
     static bool isCompatible(AVCodecID codec);
 
 private:
     struct SurfaceInfo
     {
         mfxFrameSurface1 surface;
-        std::atomic<bool> isRendered = {true}; // signifies that frame is locked for rendering
+        std::atomic<bool> isUsed = {false}; // signifies that frame is locked for rendering
     };
 
 private:
     bool init(mfxBitstream& bitstream, AVCodecID codec);
     bool initSession();
     bool allocFrames();
-    SurfaceInfo* getFreeSurface();
-    void buildQVideoFrame(SurfaceInfo& surface, nx::QVideoFramePtr* result) const;
+    mfxFrameSurface1* getFreeSurface();
+
+    bool buildQVideoFrame(mfxFrameSurface1* surface, nx::QVideoFramePtr* result);
 
 private:
     QuickSyncVideoDecoder::Config m_config;

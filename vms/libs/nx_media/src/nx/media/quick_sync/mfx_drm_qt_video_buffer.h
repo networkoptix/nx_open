@@ -11,15 +11,24 @@ namespace nx::media {
 class MfxDrmQtVideoBuffer: public QAbstractVideoBuffer
 {
 public:
-    MfxDrmQtVideoBuffer(std::atomic<bool>* isRendered, VaSurfaceInfo surfaceData):
+    MfxDrmQtVideoBuffer(VaSurfaceInfo surfaceData):
         QAbstractVideoBuffer(QAbstractVideoBuffer::HandleType(kHandleTypeVaSurface)),
-        m_surfaceData(surfaceData),
-        m_isRendered(isRendered)
-    {}
-
-    virtual ~MfxDrmQtVideoBuffer()
+        m_surfaceData(surfaceData)
     {
-        *m_isRendered = true;
+        auto decoder = m_surfaceData.decoder.lock();
+        if (!decoder)
+            return;
+
+        decoder->lockSurface(m_surfaceData.surface);
+    }
+
+    ~MfxDrmQtVideoBuffer()
+    {
+        auto decoder = m_surfaceData.decoder.lock();
+        if (!decoder)
+            return;
+
+        decoder->releaseSurface(m_surfaceData.surface);
     }
 
     virtual MapMode mapMode() const override
@@ -41,7 +50,6 @@ public:
 
 private:
     VaSurfaceInfo m_surfaceData;
-    std::atomic<bool>* m_isRendered;
 };
 
 } // namespace nx::media
