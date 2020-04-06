@@ -51,7 +51,7 @@ qint64 parseDateTime(const QString& dateTimeStr)
     }
     else if (dateTimeStr.contains(L'T') || (dateTimeStr.contains(L'-') && !dateTimeStr.startsWith(L'-')))
     {
-        const QStringList dateTimeParts = dateTimeStr.split(L'.');
+        const QStringList dateTimeParts = unquoteStr(dateTimeStr).split(L'.');
         QDateTime tmpDateTime = QDateTime::fromString(dateTimeParts[0], Qt::ISODate);
         if (dateTimeParts.size() > 1)
             tmpDateTime = tmpDateTime.addMSecs(dateTimeParts[1].toInt() / 1000);
