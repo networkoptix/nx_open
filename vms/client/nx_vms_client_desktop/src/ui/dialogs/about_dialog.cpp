@@ -26,11 +26,13 @@
 
 #include <client/client_app_info.h>
 
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
+#include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
+#include <nx/vms/client/desktop/licensing/customer_support.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/delegates/resource_item_delegate.h>
-#include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -39,12 +41,9 @@
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
 #include <helpers/cloud_url_helper.h>
-#include <utils/email/email.h>
-#include <utils/common/html.h>
 #include <nx/audio/audiodevice.h>
 #include <utils/common/app_info.h>
 #include <utils/common/html.h>
-#include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 
 #include <nx/utils/app_info.h>
 
@@ -57,27 +56,6 @@ QString versionString(const QString& version)
     QString result = version;
     result.replace("-SNAPSHOT", QString());
     return result;
-}
-
-/**
- * Try to deduce what have been provided: email, http link or phone number.
- */
-QString makeSupportHref(const QString& supportAddress)
-{
-    if (supportAddress.isEmpty())
-        return supportAddress;
-
-    // Check if email is provided
-    QnEmailAddress supportEmail(supportAddress);
-    if (supportEmail.isValid())
-        return makeMailHref(supportAddress);
-
-    // Simple check if phone is provided
-    if (supportAddress.startsWith("+"))
-        return supportAddress;
-
-    // In all uncertain cases try to make it a link.
-    return makeHref(supportAddress);
 }
 
 } // anonymous namespace
@@ -214,30 +192,17 @@ void QnAboutDialog::retranslateUi()
     ui->creditsLabel->setText(credits.join(lineSeparator));
     ui->gpuLabel->setText(gpu.join(lineSeparator));
 
-    ui->customerSupportTitleLabel->setText(nx::utils::AppInfo::organizationName());
-    ui->customerSupportLabel->setText(
-        makeSupportHref(qnGlobalSettings->emailSettings().supportEmail));
+    CustomerSupport customerSupport(commonModule());
 
-    std::set<QString> regionalSupportData;
-    for (const QnLicensePtr& license: licensePool()->getLicenses())
-    {
-        if (license->type() == Qn::LC_Trial)
-            continue;
-
-        const QnLicense::RegionalSupport regionalSupport = license->regionalSupport();
-        if (regionalSupport.isValid())
-        {
-            const QString text = regionalSupport.company + "<br>"
-                + makeSupportHref(regionalSupport.address);
-            regionalSupportData.insert(text);
-        }
-    }
+    ui->customerSupportTitleLabel->setText(customerSupport.systemContact.company);
+    ui->customerSupportLabel->setText(customerSupport.systemContact.address.href);
 
     int row = 1;
-    for (const auto& regionalSupport: regionalSupportData)
+    for (const CustomerSupport::Contact& contact: customerSupport.regionalContacts)
     {
+        const QString text = contact.company + "<br>" + contact.address.href;
         ui->supportLayout->addWidget(new QLabel(tr("Regional support")), row, /*column*/ 0);
-        ui->supportLayout->addWidget(new QLabel(regionalSupport), row, /*column*/ 1);
+        ui->supportLayout->addWidget(new QLabel(text), row, /*column*/ 1);
         ++row;
     }
 }

@@ -1600,7 +1600,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     {
         ensureMotionSelectionCache();
 
-        const auto metadata = !ini().applyCameraFilterToSceneItems || currentCamera
+        const auto metadata = currentCamera
             ? d->motionMetadataProvider->metadata(timestamp, channel)
             : nx::vms::client::core::MetaDataV1Ptr();
 

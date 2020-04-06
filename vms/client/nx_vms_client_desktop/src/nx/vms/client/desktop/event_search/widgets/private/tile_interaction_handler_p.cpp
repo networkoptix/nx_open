@@ -201,10 +201,7 @@ void TileInteractionHandler::navigateToSource(
     // Single-select first of opened requested cameras.
     const auto resource = openResources.empty() ? QnResourcePtr() : openResources.front();
     if (resource)
-    {
-        menu()->trigger(GoToLayoutItemAction, Parameters(resource)
-            .withArgument(Qn::RaiseSelectionRole, ini().raiseCameraFromClickedTile));
-    }
+        menu()->trigger(GoToLayoutItemAction, resource);
 
     // If no relevant resource is open on current layout, do no navigation.
     if (openResources.empty())

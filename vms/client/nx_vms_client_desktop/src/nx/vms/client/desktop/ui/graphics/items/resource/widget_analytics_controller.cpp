@@ -309,8 +309,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         const bool relevantCamera = relevantCameraIds.empty()
             || relevantCameraIds.contains(mediaResourceWidget->resource()->toResourcePtr()->getId());
 
-        if ((ini().applyCameraFilterToSceneItems && !relevantCamera)
-            || !filter.acceptsMetadata(objectInfo.rawData, /*checkBoundingBox*/ relevantCamera))
+        if (!filter.acceptsMetadata(objectInfo.rawData, /*checkBoundingBox*/ relevantCamera))
         {
             NX_VERBOSE(this, "Object %1 filtered out", objectInfo);
             areaHighlightWidget->removeArea(objectInfo.trackId);

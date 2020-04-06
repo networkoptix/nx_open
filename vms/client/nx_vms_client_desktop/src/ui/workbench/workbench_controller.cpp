@@ -1068,24 +1068,13 @@ void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnMediaResou
     widget->clearMotionSelection(false);
 }
 
-void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &region)
+void QnWorkbenchController::at_motionRegionSelected(
+    QGraphicsView* /*view*/,
+    QnMediaResourceWidget* widget,
+    const QRect& region)
 {
-    widget->addToMotionSelection(region); //< This will send changed() because it was not sent on at_motionRegionCleared.
-
-    if (region.isEmpty())
-        return;
-
-    if (!ini().exclusiveMotionSelection)
-        return;
-
-    for (auto otherWidget: display()->widgets())
-    {
-        if (otherWidget != widget)
-        {
-            if (auto otherMediaWidget = dynamic_cast<QnMediaResourceWidget*>(otherWidget))
-                otherMediaWidget->clearMotionSelection();
-        }
-    }
+    // This will send changed() because it was not sent on at_motionRegionCleared.
+    widget->addToMotionSelection(region);
 }
 
 void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info)

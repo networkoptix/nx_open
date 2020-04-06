@@ -116,6 +116,13 @@ bool QnLicense::RegionalSupport::isValid() const
     return !company.isEmpty() && !address.isEmpty();
 }
 
+bool QnLicense::RegionalSupport::operator<(const QnLicense::RegionalSupport& other) const
+{
+    if (company == other.company)
+        return address < other.address;
+    return company < other.company;
+}
+
 int QnLicense::deactivationsCount() const
 {
     return m_deactivationsCount;

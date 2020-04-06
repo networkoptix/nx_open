@@ -260,26 +260,20 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToOverlay()
         return;
 
     QnCameraBookmarkList bookmarksToDisplay;
+    QnCameraBookmarkSearchFilter filter;
+    filter.text = m_parent->m_textFilter;
 
-    if (!nx::vms::client::desktop::ini().applyCameraFilterToSceneItems
-        || m_parent->m_cameraFilter.empty()
-        || m_parent->m_cameraFilter.contains(m_camera))
+    for (const auto& bookmark: m_bookmarksAtPos.bookmarkList())
     {
-        QnCameraBookmarkSearchFilter filter;
-        filter.text = m_parent->m_textFilter;
+        if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
+            continue;
 
-        for (const auto& bookmark: m_bookmarksAtPos.bookmarkList())
-        {
-            if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
-                continue;
+        if (!filter.checkBookmark(bookmark))
+            continue;
 
-            if (!filter.checkBookmark(bookmark))
-                continue;
-
-            bookmarksToDisplay << bookmark;
-            if (bookmarksToDisplay.size() >= kBookmarksDisplayLimit)
-                break;
-        }
+        bookmarksToDisplay << bookmark;
+        if (bookmarksToDisplay.size() >= kBookmarksDisplayLimit)
+            break;
     }
 
     if (m_displayedBookmarks == bookmarksToDisplay)

@@ -6,12 +6,14 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/impl_ptr.h>
 
 namespace Ui { class LicenseWidget; }
 
-class QnLicenseWidget: public Connective<QWidget>
+class QnLicenseWidget: public Connective<QWidget>,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = Connective<QWidget>;
@@ -51,6 +53,8 @@ protected:
 
 private:
     void updateControls();
+    QString calculateManualActivationLinkText() const;
+    void updateManualActivationLinkText();
     void browseForLicenseFile();
 
 private:

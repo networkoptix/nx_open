@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 
 #include <licensing/license.h>
+#include <nx/vms/client/desktop/licensing/customer_support.h>
 
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -37,6 +38,7 @@ bool isValidSerialKey(const QString& key)
 
 QnLicenseWidget::QnLicenseWidget(QWidget* parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::LicenseWidget)
 {
     ui->setupUi(this);
@@ -73,20 +75,6 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
     setPaletteColor(ui->manualActivationTextWidget, QPalette::WindowText,
         ui->manualActivationTextWidget->palette().color(QPalette::Light));
 
-    const QString licensingAddress(nx::utils::AppInfo::licensingAddress());
-    const QnEmailAddress licensingEmail(licensingAddress);
-    static const QString kLineBreak = "<br>";
-
-    // Http links must be displayed on a separate string to avoid line break on "http://".
-    const QString activationLink = licensingEmail.isValid()
-        ? makeMailHref(licensingAddress, licensingAddress)
-        : kLineBreak + makeHref(licensingAddress, licensingAddress);
-
-    const QString activationText =
-        tr("To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.")
-        .arg(activationLink);
-
-    ui->manualActivationTextWidget->setText(activationText);
     ui->manualActivationTextWidget->setOpenExternalLinks(true);
 
     setWarningStyle(ui->licenseKeyWarningLabel);
@@ -124,6 +112,10 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
     ClipboardButton::createInline(ui->onlineKeyEdit, ClipboardButton::StandardType::paste);
 
     updateControls();
+
+    // Regional support info is stored in the licenses pool.
+    connect(commonModule()->licensePool(), &QnLicensePool::licensesChanged, this,
+        &QnLicenseWidget::updateManualActivationLinkText);
 }
 
 QnLicenseWidget::~QnLicenseWidget()
@@ -209,6 +201,46 @@ void QnLicenseWidget::updateControls()
         ui->activateFreeLicenseButton->hideIndicator();
         ui->activateLicenseButtonCopy->hideIndicator();
     }
+    updateManualActivationLinkText();
+}
+
+QString QnLicenseWidget::calculateManualActivationLinkText() const
+{
+    CustomerSupport customerSupport(commonModule());
+
+    if (customerSupport.regionalContacts.empty())
+    {
+        const ContactAddress licensingAddress = customerSupport.licensingContact.address;
+        if (NX_ASSERT(licensingAddress.channel != ContactAddress::Channel::empty,
+            "Customization is invalid!"))
+        {
+            // Http links must be displayed on a separate string to avoid line break on "http://".
+            static const QString kLineBreak = "<br>";
+            QString activationLink = licensingAddress.channel == ContactAddress::Channel::link
+                ? kLineBreak + licensingAddress.href
+                : licensingAddress.href;
+
+            return tr("To obtain an Activation Key file please send the provided License Key "
+                "and Hardware ID to %1.").arg(activationLink);
+        }
+
+        // Backup string, this must never happen.
+        return tr("Please send the provided License Key and Hardware ID "
+            "to your Regional support to obtain an Activation Key file.");
+    }
+
+    QStringList contactsList;
+    for (const CustomerSupport::Contact& contact: customerSupport.regionalContacts)
+        contactsList.push_back(contact.company + ": " + contact.address.href);
+
+    return tr("Please send the provided License Key and Hardware ID "
+        "to your Regional support (%1) to obtain an Activation Key file.",
+        "%1 will be substituted by a list of contacts").arg(contactsList.join("; "));
+}
+
+void QnLicenseWidget::updateManualActivationLinkText()
+{
+    ui->manualActivationTextWidget->setText(calculateManualActivationLinkText());
 }
 
 void QnLicenseWidget::changeEvent(QEvent* event)

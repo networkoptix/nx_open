@@ -49,6 +49,8 @@ public:
         QString address;
 
         bool isValid() const;
+
+        bool operator<(const RegionalSupport& other) const;
     };
 
     QnLicense() = default;
