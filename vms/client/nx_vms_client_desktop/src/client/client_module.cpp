@@ -719,7 +719,6 @@ void QnClientModule::initWebEngine()
     }
 
     qputenv("QTWEBENGINE_DIALOG_SET", "QtQuickControls2");
-    QtWebEngine::initialize();
 
     const auto settings = QWebEngineSettings::defaultSettings();
     // We must support Flash for some camera admin pages to work.

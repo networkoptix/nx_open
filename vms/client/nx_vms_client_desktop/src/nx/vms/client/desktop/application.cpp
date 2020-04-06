@@ -41,6 +41,8 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QOpenGLWidget>
 
+#include <QtWebEngine/QtWebEngine>
+
 #include <QtSingleApplication>
 
 #include <nx/kit/output_redirector.h>
@@ -405,6 +407,8 @@ int runApplication(int argc, char** argv)
 
         QSurfaceFormat::setDefaultFormat(format);
     }
+
+    QtWebEngine::initialize();
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
