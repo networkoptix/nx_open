@@ -87,12 +87,14 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
     {
         // Http links must be displayed on a separate string to avoid line break on "http://".
         static const QString kLineBreak = lit("<br>");
-        const QString siteLink = kLineBreak
-            + makeHref(licensingAddress, licensingAddress)
-            + kLineBreak;
+
+        QString activationAddress = licensingAddress.startsWith("<a href=")
+            ? licensingAddress
+            : kLineBreak + makeHref(licensingAddress, licensingAddress);
+
         activationText =
             tr("Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
-            .arg(siteLink);
+            .arg(activationAddress);
     }
 
     ui->manualActivationTextWidget->setText(activationText);
