@@ -173,7 +173,7 @@ public:
 
     void setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings);
 
-    void initializeAlarmInputs();
+    CameraDiagnostics::Result initializeAlarmInputs();
 
     QnSecurityCamResourceList boundDevices() const;
 
