@@ -16,7 +16,7 @@ def parse_value(value):
     elif type(value) is bool:
         return "TRUE" if value else "FALSE"
     else:
-        return '"' + str(value) + '"'
+        return '"' + str(value).replace('"', '\\"') + '"'
 
 
 def parse_list(l):
