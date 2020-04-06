@@ -4,6 +4,7 @@
 #include "hanwha_chunk_loader.h"
 #include "hanwha_common.h"
 
+#include <api/global_settings.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
@@ -52,6 +53,7 @@ bool SeekPosition::canJoinPosition(const SeekPosition& value) const
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     event::ServerRuntimeEventManager* serverRuntimeEventManager,
     QnResourcePool* resourcePool,
+    QnGlobalSettings* globalSettings,
     const AbstractSharedResourceContext::SharedId& sharedId)
     :
     information([this]() { return loadInformation(); }, kCacheDataTimeout),
@@ -64,7 +66,8 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     m_sharedId(sharedId),
     m_requestLock(kMaxConcurrentRequestNumber),
     m_serverRuntimeEventManager(serverRuntimeEventManager),
-    m_resourcePool(resourcePool)
+    m_resourcePool(resourcePool),
+    m_globalSettings(globalSettings)
 {
 }
 
@@ -439,6 +442,13 @@ void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoader
 
 void HanwhaSharedResourceContext::initializeAlarmInputs()
 {
+    if (!NX_ASSERT(m_globalSettings)
+        || m_globalSettings->keepHanwhaIoPortStateIntactOnInitialization())
+    {
+        NX_DEBUG(this, "IO ports initialization is forbidden in global settings");
+        return;
+    }
+
     {
         NX_MUTEX_LOCKER lock(&m_dataMutex);
         if (m_alarmInputInitializationTimer.isValid()
@@ -471,31 +481,60 @@ void HanwhaSharedResourceContext::initializeAlarmInputs()
     }
 
     std::map<QString, QString> alarmInputParameters = viewResponse.response();
+    std::map<QString, QString> portActivityStatuses;
+    std::map<QString, QString> portCircuitTypes;
+
     for (auto& [parameterName, parameterValue]: alarmInputParameters)
     {
         // Device response looks like:
         // ```
-        // AlarmOutput.1.Enabled=True
-        // AlarmOutput.1.State=NormallyOpen
-        // AlarmOutput.2.Enabled=False
-        // AlarmOutput.2.State=NormallyClose
+        // AlarmInput.1.Enable=True
+        // AlarmInput.1.State=NormallyOpen
+        // AlarmInput.2.Enable=False
+        // AlarmInput.2.State=NormallyClose
         // ...
         // ```
         // We enable all the outputs but keep their state intact.
-        if (parameterName.endsWith("Enabled"))
-        {
-            NX_DEBUG(this, "Settings parameter %1 to true", parameterName);
-            parameterValue = kHanwhaTrue;
-        }
+
+        const QStringList split = parameterName.split('.');
+        if (split.size() < 2 || split[0] != "AlarmInput")
+            continue;
+
+        const QString portNumber = split[1];
+
+        if (parameterName.endsWith("State"))
+            portCircuitTypes[portNumber] = parameterValue;
+
+
+        if (parameterName.endsWith("Enable"))
+            portActivityStatuses[portNumber] = parameterValue;
     }
 
-    const HanwhaResponse setResponse = helper.set("eventsources/alarminput", alarmInputParameters);
-    if (setResponse.isSuccessful())
-        timerGuard.disarm();
+    bool allRequestsSucceeded = false;
+    for (const auto& [portNumber, portActivityStatus]: portActivityStatuses)
+    {
+        const auto it = portCircuitTypes.find(portNumber);
+        const QString circuitType = (it == portCircuitTypes.cend() || it->second.isEmpty())
+            ? "NormallyOpen"
+            : it->second;
 
-    NX_DEBUG(this,
-        "Unable to enable alarm inputs, requestUrl: %1, error code: %2, error string: %3",
-        setResponse.requestUrl(), setResponse.errorCode(), setResponse.errorString());
+        const HanwhaResponse setResponse = helper.set("eventsources/alarminput", {
+            {lm("AlarmInput.%1.Enable").arg(portNumber), kHanwhaTrue},
+            {lm("AlarmInput.%1.State").arg(portNumber), circuitType}
+        });
+
+        if (!setResponse.isSuccessful())
+        {
+            NX_DEBUG(this,
+                "Unable to enable alarm inputs, requestUrl: %1, error code: %2, error string: %3",
+                setResponse.requestUrl(), setResponse.errorCode(), setResponse.errorString());
+        }
+
+        allRequestsSucceeded &= setResponse.isSuccessful();
+    }
+
+    if (allRequestsSucceeded)
+        timerGuard.disarm();
 }
 
 QnSecurityCamResourceList HanwhaSharedResourceContext::boundDevices() const

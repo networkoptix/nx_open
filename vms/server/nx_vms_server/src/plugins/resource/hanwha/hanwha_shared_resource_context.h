@@ -20,6 +20,7 @@
 #include <core/resource/abstract_remote_archive_manager.h>
 
 class QnResourcePool;
+class QnGlobalSettings;
 
 namespace nx {
 namespace vms::server {
@@ -142,6 +143,7 @@ public:
     HanwhaSharedResourceContext(
         event::ServerRuntimeEventManager* serverRuntimeEventManager,
         QnResourcePool* resourcePool,
+        QnGlobalSettings* globalSettings,
         const nx::vms::server::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
     // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
@@ -226,6 +228,7 @@ private:
 
     event::ServerRuntimeEventManager* const m_serverRuntimeEventManager = nullptr;
     QnResourcePool* m_resourcePool = nullptr;
+    const QnGlobalSettings* const m_globalSettings = nullptr;
 };
 
 } // namespace plugins

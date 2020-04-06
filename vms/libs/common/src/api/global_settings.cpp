@@ -108,6 +108,10 @@ const QString kMaxWearableArchiveSynchronizationThreads(
     "maxWearableArchiveSynchronizationThreads");
 const int kMaxWearableArchiveSynchronizationThreadsDefault(-1);
 
+const QString kKeepHanwhaIoPortStateIntactOnInitialization(
+    "keepHanwhaIoPortStateIntactOnInitialization");
+const bool kKeepHanwhaIoPortStateIntactOnInitializationDefault(false);
+
 } // namespace
 
 using namespace nx::settings_names;
@@ -756,6 +760,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "",
         this);
 
+    m_keepHanwhaIoPortStateIntactOnInitializationAdaptor =
+        new QnLexicalResourcePropertyAdaptor<bool>(
+            kKeepHanwhaIoPortStateIntactOnInitialization,
+            kKeepHanwhaIoPortStateIntactOnInitializationDefault,
+            this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -989,6 +999,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_specificFeaturesAdaptor
         << m_pushNotificationsLanguageAdaptor
         << m_additionalLocalFsTypesAdaptor
+        << m_keepHanwhaIoPortStateIntactOnInitializationAdaptor
     ;
 
     return result;
@@ -1865,6 +1876,16 @@ QString QnGlobalSettings::pushNotificationsLanguage() const
 void QnGlobalSettings::setPushNotificationsLanguage(const QString& value)
 {
     m_pushNotificationsLanguageAdaptor->setValue(value);
+}
+
+bool QnGlobalSettings::keepHanwhaIoPortStateIntactOnInitialization() const
+{
+    return m_keepHanwhaIoPortStateIntactOnInitializationAdaptor->value();
+}
+
+void QnGlobalSettings::setKeepHanwhaIoPortStateIntactOnInitialization(bool value)
+{
+    m_keepHanwhaIoPortStateIntactOnInitializationAdaptor->setValue(value);
 }
 
 QString QnGlobalSettings::additionalLocalFsTypes() const
