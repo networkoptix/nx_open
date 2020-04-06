@@ -1032,7 +1032,7 @@ void FogDetection::readFromCameraOrThrow(const nx::kit::Json& channelInfo, Frame
 {
     sunapiReadOrThrow(channelInfo, "Enable", frameSize, &enabled);
     sunapiReadOrThrow(channelInfo, "ThresholdLevel", frameSize, &thresholdLevel);
-    sunapiReadOrThrow(channelInfo, "Sensitivity", frameSize, &sensitivityLevel);
+    sunapiReadOrThrow(channelInfo, "SensitivityLevel", frameSize, &sensitivityLevel);
     sunapiReadOrThrow(channelInfo, "Duration", frameSize, &minimumDuration);
     initialized = true;
 }
@@ -1048,7 +1048,7 @@ std::string FogDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int c
             << "&Channel=" << channelNumber
             << "&Enable=" << buildBool(enabled)
             << "&ThresholdLevel=" << thresholdLevel
-            << "&Sensitivity=" << sensitivityLevel
+            << "&SensitivityLevel=" << sensitivityLevel
             << "&Duration=" << minimumDuration
             ;
     }

@@ -83,29 +83,29 @@ QJsonValue filterJsonObjects(QJsonValue value, Pred pred)
         auto object = value.toObject();
         if (!pred(object))
             return QJsonValue::Undefined;
-        for (auto elementValueRef: object)
+
+        for (QJsonValueRef elementValueRef: object)
+        {
+            if (!(elementValueRef.isArray() || elementValueRef.isObject()))
+                continue;
+
             elementValueRef = filterJsonObjects(elementValueRef, pred);
+        }
         return object;
     }
     if (value.isArray())
     {
         auto array = value.toArray();
-        const auto s1 = array.size();
         for (auto it = array.begin(); it != array.end(); )
         {
-            const QString c1 = it->toObject()["caption"].toString();
-            if (auto elementValue = filterJsonObjects(*it, pred); elementValue.isUndefined())
+            if (QJsonValue elementValue = filterJsonObjects(*it, pred); elementValue.isUndefined())
                 it = array.erase(it);
             else
+            {
+                *it = elementValue;
                 ++it;
-
-            QString c2;
-            if (it != array.end())
-                c2 = it->toObject()["caption"].toString();
-
-            int xxx = 0;
+            }
         }
-        const auto s2 = array.size();
         return array;
     }
     return value;
