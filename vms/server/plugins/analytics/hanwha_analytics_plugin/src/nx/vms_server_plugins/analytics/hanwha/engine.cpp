@@ -136,6 +136,7 @@ Engine::SharedResources::SharedResources(
     sharedContext(std::make_shared<vms::server::plugins::HanwhaSharedResourceContext>(
         /*serverRuntimeEventManager*/ nullptr,
         /*resourcePool*/ nullptr,
+        /*globalSettings*/ nullptr,
         sharedId))
 {
     sharedContext->setResourceAccess(url, auth);

@@ -813,7 +813,14 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    updateFirmware();
+    // 'updateFirmware' is an optional request. Check for unauthorized status only.
+    auto result = updateFirmware(); 
+    if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
+    {
+        setStatus(Qn::Unauthorized);
+        return result;
+    }
+
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -827,7 +834,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
      Warning! The capabilitiesResponse lifetime must be not more then deviceSoapWrapper lifetime,
      because DeviceSoapWrapper destructor destroys internals of _onvifDevice__GetCapabilitiesResponse.
     */
-    auto result = initOnvifCapabilitiesAndUrls(deviceSoapWrapper, &capabilitiesResponse); //< step 1
+    result = initOnvifCapabilitiesAndUrls(deviceSoapWrapper, &capabilitiesResponse); //< step 1
     if (!checkResultAndSetStatus(result))
         return result;
 
@@ -4840,7 +4847,7 @@ double QnPlOnvifResource::getClosestAvailableFps(double desiredFps)
     }
 }
 
-void QnPlOnvifResource::updateFirmware()
+CameraDiagnostics::Result QnPlOnvifResource::updateFirmware()
 {
     const QAuthenticator auth = getAuth();
     DeviceSoapWrapper soapWrapper(onvifTimeouts(),
@@ -4857,16 +4864,20 @@ void QnPlOnvifResource::updateFirmware()
     {
         NX_DEBUG(this, makeSoapFailMessage(
             soapWrapper, __func__, "GetDeviceInformation", soapRes, "", t.elapsed()));
-    }
-    else
-    {
-        NX_DEBUG(this, makeSoapSuccessMessage(
-            soapWrapper, __func__, "GetDeviceInformation", "", t.elapsed()));
 
-        QString firmware = QString::fromStdString(response.FirmwareVersion);
-        if (!firmware.isEmpty())
-            setFirmware(firmware);
+        if (soapWrapper.lastErrorIsNotAuthenticated())
+            return CameraDiagnostics::NotAuthorisedResult(getDeviceOnvifUrl());
+
+        return CameraDiagnostics::RequestFailedResult(
+            "getDeviceInformation", soapWrapper.getLastErrorDescription());
     }
+    
+    QString firmware = QString::fromStdString(response.FirmwareVersion);
+    NX_DEBUG(this, "Successfully read firmware for camera %1. firmware=%2", getUrl(), firmware);
+    if (!firmware.isEmpty())
+        setFirmware(firmware);
+    
+    return CameraDiagnostics::NoErrorResult();
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()

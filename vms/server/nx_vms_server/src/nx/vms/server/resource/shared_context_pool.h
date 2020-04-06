@@ -49,6 +49,7 @@ public:
         const auto context = std::make_shared<ContextType>(
             serverModule()->serverRuntimeEventManager(),
             serverModule()->resourcePool(),
+            serverModule()->globalSettings(),
             sharedId);
 
         m_sharedContexts[sharedId] = context;

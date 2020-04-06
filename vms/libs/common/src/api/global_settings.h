@@ -410,6 +410,9 @@ public:
 
     QString additionalLocalFsTypes() const;
 
+    bool keepHanwhaIoPortStateIntactOnInitialization() const;
+    void setKeepHanwhaIoPortStateIntactOnInitialization(bool value);
+
 signals:
     void initialized();
 
@@ -580,6 +583,7 @@ private:
     QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_pushNotificationsLanguageAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_additionalLocalFsTypesAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_keepHanwhaIoPortStateIntactOnInitializationAdaptor= nullptr;
 
     AdaptorList m_allAdaptors;
 

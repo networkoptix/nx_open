@@ -503,7 +503,7 @@ protected:
 
     //!Registers local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
-    void updateFirmware();
+    CameraDiagnostics::Result updateFirmware();
     void scheduleRetrySubscriptionTimer();
     void scheduleRetrySubscriptionTimerAsOdmThreadUnsafe();
     virtual bool subscribeToCameraNotifications();
