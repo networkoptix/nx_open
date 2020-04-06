@@ -105,7 +105,7 @@ private:
         const QString& path,
         const Parameters& parameters,
         nx::utils::RwLockType requestType);
-
+public:
     static utils::Url makeBypassUrl(const utils::Url &url, int bypassChannel);
 
 private:

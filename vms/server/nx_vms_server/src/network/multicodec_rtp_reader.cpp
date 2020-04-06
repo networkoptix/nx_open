@@ -165,7 +165,7 @@ bool QnMulticodecRtpReader::gotKeyData(const QnAbstractMediaDataPtr& mediaData)
 
 QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 {
-    NX_VERBOSE(this, "Getting next data %1 (%2)", m_resource->getName(), m_resource->getId());
+    NX_VERBOSE(this, "Getting next data %1 (%2), role=%3", m_resource->getName(), m_resource->getId(), m_role);
 
     if (!isStreamOpened())
     {
@@ -209,8 +209,9 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     if (result)
     {
-        NX_VERBOSE(this, "Got some stream data, device %1 (%2) dataType(%3)",
-            m_resource->getName(), m_resource->getId(), result->dataType);
+        NX_VERBOSE(this, "Got some stream data, device %1 (%2) dataType(%3), role=%4",
+            m_resource->getName(), m_resource->getId(), result->dataType,
+            m_role);
 
         m_gotSomeFrame = true;
         return result;
@@ -225,8 +226,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     if (!m_gotSomeFrame)
     {
-        NX_VERBOSE(this, "No frame has arrived since the stream was opened, device %1 (%2)",
-            m_resource->getName(), m_resource->getId());
+        NX_VERBOSE(this, "No frame has arrived since the stream was opened, device %1 (%2), role=%3",
+            m_resource->getName(), m_resource->getId(), m_role);
         return result; // if no frame received yet do not report network issue error
     }
 
@@ -239,13 +240,14 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     {
         reason = vms::api::EventReason::networkNoFrame;
         reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
-        NX_WARNING(this, "Can not read RTP frame for camera %1 during %2 ms", getResource(), elapsed);
+        NX_WARNING(this, "Can not read RTP frame for camera %1 during %2 ms, m_role=%3", 
+            getResource(), elapsed, m_role);
     }
     else
     {
         reason = vms::api::EventReason::networkConnectionClosed;
         reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
-        NX_WARNING(this, "RTP connection was forcibly closed by camera %1. Reopen stream", getResource());
+        NX_WARNING(this, "RTP connection was forcibly closed by camera %1. Role=%2. Reopen stream", getResource(), m_role);
     }
 
     emit networkIssue(getResource(),

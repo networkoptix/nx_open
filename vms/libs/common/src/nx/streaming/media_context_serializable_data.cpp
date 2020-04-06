@@ -75,13 +75,13 @@ void QnMediaContextSerializableData::initializeFrom(const AVCodecContext* contex
     codecType = context->codec_type;
     if (context->rc_eq)
     {
-        const int len = (int) strlen(context->rc_eq) + 1; //< Array should include '\0'.
-        rcEq = std::vector<char>(context->rc_eq, context->rc_eq + len);
+        rcEq = QByteArray(context->rc_eq,
+            (int) strlen(context->rc_eq) + 1); //< Array should include '\0'.
     }
     if (context->extradata)
     {
-        extradata = std::vector<quint8>(context->extradata,
-            context->extradata + context->extradata_size);
+        extradata = QByteArray((const char*) context->extradata,
+            context->extradata_size);
     }
     if (context->intra_matrix)
     {

@@ -26,6 +26,9 @@ public:
 
     virtual QnIOPortDataList portDesriptiors() const override;
 
+    virtual void setPortCircuitTypes(
+        const std::map<QString, Qn::IODefaultState>& circuitTypeByPort) override;
+
     virtual bool setOutputPortState(
         const QString& portId,
         IoPortState state,
@@ -38,6 +41,8 @@ public:
     virtual void unregisterStateChangeHandler(HandlerId handlerId) override;
 
 private:
+    void initialize();
+
     void updatePortStates(const std::set<QnIOStateData>& portStates);
     bool setOutputPortStateInternal(const QString& portId, IoPortState portState);
 
@@ -49,15 +54,23 @@ private:
     std::unique_ptr<IoStateFetcher> m_stateFetcher;
     std::unique_ptr<nx::utils::TimerManager> m_timerManager;
 
-    std::map<HandlerId, IoStateChangeHandler> m_handlers;
+    struct HandlerContext
+    {
+        bool intialStateHasBeenReported = false;
+        IoStateChangeHandler handler;
+    };
+
+    std::map<HandlerId, HandlerContext> m_handlerContexts;
 
     struct IoPortContext
     {
         nx::utils::TimerId timerId = 0;
         IoPortState currentState = IoPortState::undefined;
+        Qn::IODefaultState circuitType = Qn::IODefaultState::IO_OpenCircuit;
+        Qn::IOPortType portType = Qn::IOPortType::PT_Unknown;
     };
 
-    mutable std::map</*portId*/ QString, IoPortContext> m_outputPortContexts;
+    mutable std::map</*portId*/ QString, IoPortContext> m_portContexts;
     std::set<QnIOStateData> m_lastPortStates;
 
     HandlerId m_maxHandlerId = 0;

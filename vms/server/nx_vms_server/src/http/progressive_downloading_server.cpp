@@ -489,7 +489,7 @@ void ProgressiveDownloadingServer::run()
         d->transcoder->setUseRealTimeOptimization(true);
 
 
-    QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
+    QString position = decodedUrlQuery.queryItemValue(StreamingParams::START_POS_PARAM_NAME);
 
     bool isLive = position.isEmpty() || position == "now";
     auto requiredPermission = isLive
@@ -514,8 +514,8 @@ void ProgressiveDownloadingServer::run()
     consumerConfig.liveMode = isLive;
     consumerConfig.continuousTimestamps = continuousTimestamps;
     consumerConfig.audioOnly = audioOnly;
-    QByteArray endPosition =
-        decodedUrlQuery.queryItemValue(StreamingParams::END_POS_PARAM_NAME).toLatin1();
+    QString endPosition =
+        decodedUrlQuery.queryItemValue(StreamingParams::END_POS_PARAM_NAME);
     if (!endPosition.isEmpty())
         consumerConfig.endTimeUsec = nx::utils::parseDateTime(endPosition);
     ProgressiveDownloadingConsumer dataConsumer(this, consumerConfig);

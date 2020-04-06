@@ -20,6 +20,7 @@
 #include "metadata_monitor.h"
 #include "settings.h"
 #include "objectMetadataXmlParser.h"
+#include "url_decorator.h"
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
@@ -30,7 +31,8 @@ class DeviceAgent:
     Q_OBJECT
 
 public:
-    DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
+    DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo,
+        bool isNvr, QSize maxResolution);
     virtual ~DeviceAgent();
 
     virtual void setHandler(
@@ -38,6 +40,7 @@ public:
 
     void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
     void setManifest(Hanwha::DeviceAgentManifest manifest);
+
     void setMonitor(MetadataMonitor* monitor);
 
     void readCameraSettings();
@@ -75,6 +78,7 @@ private:
 
 public:
     void addSettingModel(nx::vms::api::analytics::DeviceAgentManifest* destinastionManifest);
+    std::string fetchFirmwareVersion();
 
 private:
     Engine* const m_engine;
@@ -91,6 +95,8 @@ private:
 
     MetadataMonitor* m_monitor = nullptr;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
+
+    std::unique_ptr<ValueTransformer> m_valueTransformer;
 
     Settings m_settings;
     FrameSize m_frameSize;

@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.1.257",
+    "version": "4.1.1.258",
     "data": [
         {
             "keys": [
@@ -3504,7 +3504,7 @@
             }
         },
         {
-            "keys": ["Hanwha|PNM-9320VQP"],
+            "keys": ["Hanwha|PNM-9320VQ*"],
             "ptzTargetChannel": 4
         },
         {

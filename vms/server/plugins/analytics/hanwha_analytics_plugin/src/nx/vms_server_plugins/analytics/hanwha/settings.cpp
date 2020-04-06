@@ -1032,7 +1032,7 @@ void FogDetection::readFromCameraOrThrow(const nx::kit::Json& channelInfo, Frame
 {
     sunapiReadOrThrow(channelInfo, "Enable", frameSize, &enabled);
     sunapiReadOrThrow(channelInfo, "ThresholdLevel", frameSize, &thresholdLevel);
-    sunapiReadOrThrow(channelInfo, "Sensitivity", frameSize, &sensitivityLevel);
+    sunapiReadOrThrow(channelInfo, "SensitivityLevel", frameSize, &sensitivityLevel);
     sunapiReadOrThrow(channelInfo, "Duration", frameSize, &minimumDuration);
     initialized = true;
 }
@@ -1048,65 +1048,12 @@ std::string FogDetection::buildCameraWritingQuery(FrameSize /*frameSize*/, int c
             << "&Channel=" << channelNumber
             << "&Enable=" << buildBool(enabled)
             << "&ThresholdLevel=" << thresholdLevel
-            << "&Sensitivity=" << sensitivityLevel
+            << "&SensitivityLevel=" << sensitivityLevel
             << "&Duration=" << minimumDuration
             ;
     }
     return query.str();
 }
-
-//-------------------------------------------------------------------------------------------------
-
-#if 0
-Face detection event is now built in object detection event.
-
-bool FaceDetectionGeneral::operator==(const FaceDetectionGeneral& rhs) const
-{
-    return initialized == rhs.initialized
-        && enabled == rhs.enabled
-        && sensitivityLevel == rhs.sensitivityLevel
-        ;
-}
-
-void FaceDetectionGeneral::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
-{
-    using namespace basicServerSettingsIo;
-    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
-    deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
-    initialized = true;
-}
-
-void FaceDetectionGeneral::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
-{
-    using namespace basicServerSettingsIo;
-    result->setValue(key(KeyIndex::enabled), serialize(enabled));
-    result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
-}
-
-void FaceDetectionGeneral::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
-{
-    sunapiReadOrThrow(channelInfo, "Enable", frameSize, &enabled);
-    sunapiReadOrThrow(channelInfo, "Sensitivity", frameSize, &sensitivityLevel);
-    initialized = true;
-}
-
-std::string FaceDetectionGeneral::buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
-{
-    std::ostringstream query;
-    if (initialized)
-    {
-        query
-            << "msubmenu=" << kSunapiEventName
-            << "&action=" << "set"
-            << "&Channel=" << channelNumber
-            << "&Enable=" << buildBool(enabled)
-            << "&Sensitivity=" << sensitivityLevel
-            ;
-    }
-    return query.str();
-}
-
-#endif
 
 //-------------------------------------------------------------------------------------------------
 
@@ -1262,67 +1209,6 @@ std::string ObjectDetectionBestShot::buildCameraWritingQuery(FrameSize /*frameSi
             << "&Channel=" << channelNumber
             << "&ObjectTypes=" << buildObjectTypes()
             ;
-    }
-    return query.str();
-}
-
-//-------------------------------------------------------------------------------------------------
-
-bool ObjectDetectionExcludeArea::operator==(const ObjectDetectionExcludeArea& rhs) const
-{
-    return initialized == rhs.initialized
-        && unnamedPolygon == rhs.unnamedPolygon
-        ;
-}
-void ObjectDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
-{
-    using namespace basicServerSettingsIo;
-    deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
-    initialized = true;
-}
-
-void ObjectDetectionExcludeArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
-{
-    using namespace basicServerSettingsIo;
-    result->setValue(key(KeyIndex::unnamedPolygon), serialize(unnamedPolygon));
-}
-
-void ObjectDetectionExcludeArea::readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
-{
-    nx::kit::Json roiInfo = getOdRoiInfo(channelInfo, this->deviceIndex());
-    if (roiInfo == nx::kit::Json())
-    {
-        *this = ObjectDetectionExcludeArea(this->nativeIndex());
-        return;
-    }
-    sunapiReadOrThrow(roiInfo, "Coordinates", frameSize, &unnamedPolygon);
-    initialized = true;
-}
-
-std::string ObjectDetectionExcludeArea::buildCameraWritingQuery(FrameSize frameSize, int channelNumber) const
-{
-    std::ostringstream query;
-    if (initialized)
-    {
-        if (!unnamedPolygon.points.empty())
-        {
-            const std::string prefix = "&ExcludeArea."s + std::to_string(deviceIndex());
-            query
-                << "msubmenu=" << kSunapiEventName
-                << "&action=" << "set"
-                << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << pluginPointsToSunapiString(unnamedPolygon.points, frameSize)
-                ;
-        }
-        else
-        {
-            query
-                << "msubmenu=" << kSunapiEventName
-                << "&action=" << "remove"
-                << "&Channel=" << channelNumber
-                << "&ExcludeAreaIndex=" << deviceIndex()
-                ;
-        }
     }
     return query.str();
 }

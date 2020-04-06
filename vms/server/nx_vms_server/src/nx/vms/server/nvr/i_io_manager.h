@@ -19,6 +19,9 @@ public:
 
     virtual QnIOPortDataList portDesriptiors() const = 0;
 
+    virtual void setPortCircuitTypes(
+        const std::map<QString, Qn::IODefaultState>& circuitTypeByPort) = 0;
+
     virtual bool setOutputPortState(
         const QString& portId,
         IoPortState state,
