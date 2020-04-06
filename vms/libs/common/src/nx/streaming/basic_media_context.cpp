@@ -105,14 +105,14 @@ const char* QnBasicMediaContext::getRcEq() const
 {
     if (m_data->rcEq.size() == 0)
         return nullptr;
-    return m_data->rcEq.data();
+    return m_data->rcEq.constData();
 }
 
 const quint8* QnBasicMediaContext::getExtradata() const
 {
     if (m_data->extradata.size() == 0)
         return nullptr;
-    return m_data->extradata.data();
+    return (const quint8*) m_data->extradata.constData();
 }
 
 int QnBasicMediaContext::getExtradataSize() const
