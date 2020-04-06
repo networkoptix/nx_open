@@ -44,7 +44,10 @@ public:
         if (const auto context = m_sharedContexts.value(sharedId).lock())
             return std::dynamic_pointer_cast<ContextType>(context);
 
-        const auto context = std::make_shared<ContextType>(sharedId);
+        const auto context = std::make_shared<ContextType>(
+            serverModule()->globalSettings(),
+            sharedId);
+
         m_sharedContexts[sharedId] = context;
         return context;
     }

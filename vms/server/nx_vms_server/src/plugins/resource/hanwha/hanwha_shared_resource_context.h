@@ -19,6 +19,8 @@
 #include <recording/time_period_list.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 
+class QnGlobalSettings;
+
 namespace nx {
 namespace vms::server {
 namespace plugins {
@@ -135,6 +137,7 @@ class HanwhaSharedResourceContext:
 {
 public:
     HanwhaSharedResourceContext(
+        QnGlobalSettings* globalSettings,
         const nx::vms::server::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
     // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
@@ -212,6 +215,7 @@ private:
     std::atomic<int> m_maxArchiveSessions{kDefaultNvrMaxArchiveSessions};
 
     mutable QnMutex m_servicesMutex;
+    const QnGlobalSettings* const m_globalSettings = nullptr;
 };
 
 } // namespace plugins

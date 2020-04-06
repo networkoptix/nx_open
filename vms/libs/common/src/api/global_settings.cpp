@@ -102,6 +102,10 @@ const QString kMaxWearableArchiveSynchronizationThreads(
     "maxWearableArchiveSynchronizationThreads");
 const int kMaxWearableArchiveSynchronizationThreadsDefault(-1);
 
+const QString kKeepHanwhaIoPortStateIntactOnInitialization(
+    "keepHanwhaIoPortStateIntactOnInitialization");
+const bool kKeepHanwhaIoPortStateIntactOnInitializationDefault(false);
+
 } // namespace
 
 using namespace nx::settings_names;
@@ -713,6 +717,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         nx::vms::api::MetadataStorageChangePolicy::keep,
         this);
 
+    m_keepHanwhaIoPortStateIntactOnInitializationAdaptor =
+        new QnLexicalResourcePropertyAdaptor<bool>(
+            kKeepHanwhaIoPortStateIntactOnInitialization,
+            kKeepHanwhaIoPortStateIntactOnInitializationDefault,
+            this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -940,6 +950,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_forceLiveCacheForPrimaryStreamAdaptor
         << m_metadataStorageChangePolicyAdaptor
         << m_maxRtpRetryCount
+        << m_keepHanwhaIoPortStateIntactOnInitializationAdaptor
     ;
 
     return result;
@@ -1776,6 +1787,16 @@ QString QnGlobalSettings::licenseServerUrl() const
 nx::utils::Url QnGlobalSettings::resourceFileUri() const
 {
     return m_resourceFileUriAdaptor->value();
+}
+
+bool QnGlobalSettings::keepHanwhaIoPortStateIntactOnInitialization() const
+{
+    return m_keepHanwhaIoPortStateIntactOnInitializationAdaptor->value();
+}
+
+void QnGlobalSettings::setKeepHanwhaIoPortStateIntactOnInitialization(bool value)
+{
+    m_keepHanwhaIoPortStateIntactOnInitializationAdaptor->setValue(value);
 }
 
 void QnGlobalSettings::setLowQualityScreenVideoCodec(const QString& value)

@@ -392,6 +392,9 @@ public:
 
     nx::utils::Url resourceFileUri() const;
 
+    bool keepHanwhaIoPortStateIntactOnInitialization() const;
+    void setKeepHanwhaIoPortStateIntactOnInitialization(bool value);
+
 signals:
     void initialized();
 
@@ -555,6 +558,7 @@ private:
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_keepHanwhaIoPortStateIntactOnInitializationAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 
