@@ -1368,7 +1368,8 @@ CameraDiagnostics::Result HanwhaResource::initIo()
             ioPorts.push_back(inputPortData);
         }
 
-        sharedContext()->initializeAlarmInputs();
+        if (const auto result = sharedContext()->initializeAlarmInputs(); !result)
+            return result;
     }
 
     if (maxAlarmOutputs.is_initialized() && *maxAlarmOutputs > 0)

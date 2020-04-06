@@ -165,7 +165,7 @@ public:
 
     void setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings);
 
-    void initializeAlarmInputs();
+    CameraDiagnostics::Result initializeAlarmInputs();
 
     // NOTE: function objects return HanwhaResult<T>.
     HanwhaCachedData<HanwhaInformation> information;

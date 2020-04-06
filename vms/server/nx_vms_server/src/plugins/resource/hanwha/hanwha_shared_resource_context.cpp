@@ -428,13 +428,13 @@ void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoader
     m_chunkLoaderSettings = settings;
 }
 
-void HanwhaSharedResourceContext::initializeAlarmInputs()
+CameraDiagnostics::Result HanwhaSharedResourceContext::initializeAlarmInputs()
 {
     if (!NX_ASSERT(m_globalSettings)
         || m_globalSettings->keepHanwhaIoPortStateIntactOnInitialization())
     {
         NX_DEBUG(this, "IO ports initialization is forbidden in global settings");
-        return;
+        return CameraDiagnostics::NoErrorResult();
     }
 
     {
@@ -444,7 +444,7 @@ void HanwhaSharedResourceContext::initializeAlarmInputs()
         {
             NX_DEBUG(this,
                 "Alram inputs have been initialized recently, ignoring initialization request");
-            return;
+            return CameraDiagnostics::NoErrorResult();
         }
 
         m_alarmInputInitializationTimer.restart();
@@ -465,7 +465,11 @@ void HanwhaSharedResourceContext::initializeAlarmInputs()
         NX_DEBUG(this, "Unable to fetch current alarm input port states, request URL: %1, "
             "error code: %2, error string: %3",
             viewResponse.requestUrl(), viewResponse.errorCode(), viewResponse.errorString());
-        return;
+
+        return CameraDiagnostics::RequestFailedResult(
+            viewResponse.requestUrl(),
+            lm("Error code: %1, Error: %2").args(
+                viewResponse.errorCode(), viewResponse.errorString()));
     }
 
     std::map<QString, QString> alarmInputParameters = viewResponse.response();
@@ -498,7 +502,6 @@ void HanwhaSharedResourceContext::initializeAlarmInputs()
             portActivityStatuses[portNumber] = parameterValue;
     }
 
-    bool allRequestsSucceeded = false;
     for (const auto& [portNumber, portActivityStatus]: portActivityStatuses)
     {
         const auto it = portCircuitTypes.find(portNumber);
@@ -518,11 +521,17 @@ void HanwhaSharedResourceContext::initializeAlarmInputs()
                 setResponse.requestUrl(), setResponse.errorCode(), setResponse.errorString());
         }
 
-        allRequestsSucceeded &= setResponse.isSuccessful();
+        if (!setResponse.isSuccessful())
+        {
+            return CameraDiagnostics::RequestFailedResult(
+                setResponse.requestUrl(),
+                lm("Error code: %1, Error: %2").args(
+                    setResponse.errorCode(), setResponse.errorString()));
+        }
     }
 
-    if (allRequestsSucceeded)
-        timerGuard.disarm();
+    timerGuard.disarm();
+    return CameraDiagnostics::NoErrorResult();
 }
 
 HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
