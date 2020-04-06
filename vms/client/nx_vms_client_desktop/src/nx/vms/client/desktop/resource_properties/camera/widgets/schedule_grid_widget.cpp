@@ -534,19 +534,17 @@ ScheduleGridWidget::CellParams ScheduleGridWidget::cellValue(const QPoint& cell)
     if (!isValidCell(cell))
         return CellParams();
 
-    return m_gridParams[cell.x()][cell.y()];
+    const auto value = m_gridParams[cell.x()][cell.y()];
+    return value == CellParams::kUnsetValue
+        ? CellParams::kEmptyValue
+        : value;
 }
 
 void ScheduleGridWidget::resetCellValues()
 {
-    CellParams emptyParams;
-    emptyParams.fps = 0;
-    emptyParams.quality = Qn::StreamQuality::undefined;
-    emptyParams.recordingType = Qn::RecordingType::never;
-
     for (int col = 0; col < columnCount(); ++col)
         for (int row = 0; row < rowCount(); ++row)
-            setCellValue(QPoint(col, row), emptyParams);
+            setCellValue(QPoint(col, row), CellParams::kUnsetValue);
 
     emit cellValuesChanged();
 }
