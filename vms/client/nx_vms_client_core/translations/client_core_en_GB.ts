@@ -6,9 +6,9 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
+      <translation>
+        <numerusform>Byte</numerusform>
+        <numerusform>Byte</numerusform>
       </translation>
     </message>
     <message>
@@ -19,9 +19,9 @@
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
+      <translation>
+        <numerusform>Kilobyte</numerusform>
+        <numerusform>Kilobyte</numerusform>
       </translation>
     </message>
     <message>
@@ -32,9 +32,9 @@
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
+      <translation>
+        <numerusform>Megabyte</numerusform>
+        <numerusform>Megabyte</numerusform>
       </translation>
     </message>
     <message>
@@ -45,9 +45,9 @@
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
+      <translation>
+        <numerusform>Gigabyte</numerusform>
+        <numerusform>Gigabyte</numerusform>
       </translation>
     </message>
     <message>
@@ -58,9 +58,9 @@
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
+      <translation>
+        <numerusform>Terabyte</numerusform>
+        <numerusform>Terabyte</numerusform>
       </translation>
     </message>
     <message>
@@ -71,9 +71,9 @@
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
+      <translation>
+        <numerusform>Petabyte</numerusform>
+        <numerusform>Petabyte</numerusform>
       </translation>
     </message>
     <message>
@@ -247,7 +247,7 @@
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>days</translation>
     </message>
     <message>
       <source>wks</source>
@@ -267,9 +267,9 @@
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>millisecond</numerusform>
+        <numerusform>millisecond</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -291,7 +291,7 @@
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>hours</numerusform>
         <numerusform>hours</numerusform>
       </translation>
@@ -299,7 +299,7 @@
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>days</numerusform>
         <numerusform>days</numerusform>
       </translation>
@@ -307,7 +307,7 @@
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>weeks</numerusform>
         <numerusform>weeks</numerusform>
       </translation>
@@ -315,7 +315,7 @@
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>months</numerusform>
         <numerusform>months</numerusform>
       </translation>
@@ -323,7 +323,7 @@
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>years</numerusform>
         <numerusform>years</numerusform>
       </translation>
