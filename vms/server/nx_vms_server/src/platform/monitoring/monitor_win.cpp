@@ -223,7 +223,14 @@ public:
 
             /* Fix partitions name for the mounted-into-folder drives. */
             if (!hdd.partitions.contains(L':'))
+            {
+                NX_VERBOSE(
+                    this,
+                    "readDiskCounterValues: Disk item '%1' partition '%2' doesn't contain ':'. "
+                    "Using id '%3' instead",
+                    item[i].szName, hdd.partitions, hdd.name);
                 hdd.partitions = hdd.name;
+            }
 
             (*items)[id] = HddItem(hdd,  item[i].RawValue);
         }
