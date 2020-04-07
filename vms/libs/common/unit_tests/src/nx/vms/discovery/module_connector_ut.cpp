@@ -1,11 +1,13 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/app_info.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/lockable.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/vms/discovery/module_connector.h>
@@ -104,26 +106,15 @@ public:
         waitCondition(kExpectNoChanesDelay);
     }
 
-    nx::network::SocketAddress addMediaserver(QnUuid id, nx::network::HostAddress ip = nx::network::HostAddress::localhost)
+    nx::network::SocketAddress addMediaserver(
+        QnUuid id, nx::network::HostAddress ip = nx::network::HostAddress::localhost)
     {
-        nx::vms::api::ModuleInformation module;
-        module.realm = nx::network::AppInfo::realm();
-        module.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
-        module.id = id;
+        auto server = std::make_unique<Server>(id);
+        EXPECT_TRUE(server->http.bindAndListen(ip));
 
-        QnJsonRestResult result;
-        result.setReply(module);
+        const auto endpoint = server->http.serverAddress();
+        NX_INFO(this, "Server %1 is added on %2", id, endpoint);
 
-        auto server = std::make_unique<nx::network::http::TestHttpServer>();
-        const bool registration = server->registerStaticProcessor(
-            QLatin1String("/api/moduleInformation"), QJson::serialized(result),
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
-
-        EXPECT_TRUE(registration);
-        EXPECT_TRUE(server->bindAndListen(ip));
-
-        const auto endpoint = server->serverAddress();
-        NX_INFO(this, lm("Server %1 is added on %2").args(id, endpoint));
         m_mediaservers[endpoint] = std::move(server);
         return endpoint;
     }
@@ -131,7 +122,13 @@ public:
     void removeMediaserver(const nx::network::SocketAddress& endpoint)
     {
         EXPECT_GT(m_mediaservers.erase(endpoint), 0);
-        NX_INFO(this, lm("Server is removed on %2").args(endpoint));
+        NX_INFO(this, "Server is removed on %1", endpoint);
+    }
+
+    void setCloudSystemId(const nx::network::SocketAddress& endpoint, const QString& id)
+    {
+        m_mediaservers[endpoint]->info.lock()->cloudSystemId = id;
+        NX_INFO(this, "Server on %1 is a new cloud system %2", endpoint, id);
     }
 
 private:
@@ -152,7 +149,29 @@ protected:
     ModuleConnector connector;
 
 private:
-    std::map<nx::network::SocketAddress, std::unique_ptr<nx::network::http::TestHttpServer>> m_mediaservers;
+    struct Server
+    {
+        nx::network::http::TestHttpServer http;
+        nx::utils::Lockable<nx::vms::api::ModuleInformation> info;
+
+        Server(const QnUuid& id)
+        {
+            info.lock()->id = id;
+            info.lock()->realm = nx::network::AppInfo::realm();
+            info.lock()->cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
+            http.registerContentProvider(
+                "/api/moduleInformation",
+                [this]()
+                {
+                    QnJsonRestResult result;
+                    result.setReply(*info.lock());
+                    return std::make_unique<nx::network::http::BufferSource>(
+                        "application/json", QJson::serialized(result));
+                });
+        }
+    };
+
+    std::map<nx::network::SocketAddress, std::unique_ptr<Server>> m_mediaservers;
 
     QnMutex m_mutex;
     QnWaitCondition m_condition;
@@ -264,8 +283,9 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     connector.newEndpoints({newLocalEndpoint}, id);
     expectConnect(id, newLocalEndpoint); //< New local is prioritized.
 
+    const auto cloudSystemId = QnUuid::createUuid().toSimpleString();
     const DnsAlias dnsEndpoint(addMediaserver(id), "local-domain-name-1.com");
-    const DnsAlias cloudEndpoint(addMediaserver(id), QnUuid::createUuid().toSimpleString());
+    const DnsAlias cloudEndpoint(addMediaserver(id), id.toSimpleString() + "." + cloudSystemId);
 
     connector.newEndpoints({dnsEndpoint.alias, cloudEndpoint.alias}, id);
     expectConnect(id, dnsEndpoint.alias);  //< DNS is the most prioritized.
@@ -273,7 +293,10 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     removeMediaserver(newLocalEndpoint);
     removeMediaserver(networkEndpoint);
     removeMediaserver(dnsEndpoint.original);
-    expectConnect(id, cloudEndpoint.alias);  //< Cloud endpoint is the last possible option.
+    expectDisconnect(id); //< Cloud address does not match endpoint.
+
+    setCloudSystemId(cloudEndpoint.original, cloudSystemId);
+    expectConnect(id, cloudEndpoint.alias);  //< Cloud endpoint is connectable now.
 
     const DnsAlias newDnsEndpoint(addMediaserver(id), "local-domain-name-2.com");
     connector.newEndpoints({newDnsEndpoint.alias}, id);

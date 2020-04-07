@@ -176,7 +176,8 @@ void ModuleConnector::InformationReader::start(const nx::network::SocketAddress&
 
     const auto keepAlive = m_parent->m_disconnectTimeout * 2 / 3;
     const auto keepAliveSec = std::chrono::duration_cast<std::chrono::seconds>(keepAlive).count();
-    m_httpClient->doGet(nx::network::url::Builder(kUrl.arg(keepAliveSec)).setEndpoint(endpoint));
+    m_endpoint = endpoint;
+    m_httpClient->doGet(nx::network::url::Builder(kUrl.arg(keepAliveSec)).setEndpoint(m_endpoint));
 }
 
 static inline boost::optional<nx::Buffer> takeJsonObject(nx::Buffer* buffer)
@@ -224,11 +225,14 @@ void ModuleConnector::InformationReader::readUntilError()
             return nx::utils::swapAndCall(m_handler, boost::none, "Module id is null");
 
         const auto host = m_endpoint.address.toString();
-        if (network::SocketGlobals::addressResolver().isCloudHostName(host)
-            && host != moduleInformation.cloudId())
+        const bool isCloud = network::SocketGlobals::addressResolver().isCloudHostName(host);
+        const bool isInvalid = isCloud && host != moduleInformation.cloudId();
+        NX_VERBOSE(this, "Host '%1' is %2cloud and %3valid, cloud id '%4'",
+            host, isCloud ? "" : "non-", isInvalid ? "in" : "", moduleInformation.cloudId());
+        if (isInvalid)
         {
             return nx::utils::swapAndCall(
-                m_handler, boost::none, "Wrong cloud host: " + moduleInformation.cloudId());
+                m_handler, boost::none, "Invalid cloud host: " + moduleInformation.cloudId());
         }
 
         nx::utils::ObjectDestructionFlag::Watcher destructionWatcher(&m_destructionFlag);
@@ -511,8 +515,7 @@ bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint
     saveEndpoint(endpoint);
     if (m_connectedReader)
         return true;
-
-    NX_VERBOSE(this, "Save connection to %1", endpoint);
+\
     m_attemptingReaders.clear();
     m_disconnectTimer.cancelSync();
 
