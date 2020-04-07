@@ -57,6 +57,9 @@ public:
     nxpt::CommonRefManager* refManager();
 
 private:
+    bool isCameraOnline() const;
+
+private:
     nxpt::CommonRefManager m_refManager;
     /*!
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager,
