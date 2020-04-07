@@ -380,6 +380,8 @@ void QnServerStreamRecorder::updateStreamParams()
                 params.fps = m_currentScheduleTask.fps;
                 params.quality = m_currentScheduleTask.streamQuality;
                 params.bitrateKbps = m_currentScheduleTask.bitrateKbps;
+                NX_VERBOSE(this, "Update HQ stream params to %1 for camera %2 according to the recording schedule", 
+                    params, m_resource);
             }
             else {
                 NX_ASSERT(camera);
@@ -387,6 +389,8 @@ void QnServerStreamRecorder::updateStreamParams()
                 params.fps = camera->getMaxFps();
                 params.quality = Qn::StreamQuality::highest;
                 params.bitrateKbps = 0;
+                NX_VERBOSE(this, "Update HQ stream params to %1 for camera %2 because recording is turned off",
+                    params, m_resource);
             }
             liveProvider->setPrimaryStreamParams(params);
         }
