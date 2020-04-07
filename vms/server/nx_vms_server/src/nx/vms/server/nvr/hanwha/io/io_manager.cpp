@@ -224,25 +224,7 @@ void IoManager::updatePortStates(const std::set<QnIOStateData>& portStates)
         "Handling port states received from the state fetcher, %1",
         containerString(portStates));
 
-    {
-        NX_MUTEX_LOCKER lock(&m_handlerMutex);
-        std::optional<QnIOStateDataList> currentState;
-        for (auto& [_, handlerContext]: m_handlerContexts)
-        {
-            if (!handlerContext.intialStateHasBeenReported)
-            {
-                if (!currentState)
-                {
-                    currentState = QnIOStateDataList();
-                    for (const QnIOStateData& portState: m_lastPortStates)
-                        currentState->push_back(portState);
-                }
-
-                handlerContext.handler(*currentState);
-                handlerContext.intialStateHasBeenReported = true;
-            }
-        }
-    }
+    sendInitialStateIfNeeded();
 
     QnIOStateDataList changedPortStates;
     {
@@ -272,6 +254,27 @@ void IoManager::updatePortStates(const std::set<QnIOStateData>& portStates)
         NX_MUTEX_LOCKER lock(&m_handlerMutex);
         for (const auto& [_, handlerContext]: m_handlerContexts)
             handlerContext.handler(changedPortStates);
+    }
+}
+
+void IoManager::sendInitialStateIfNeeded()
+{
+    NX_MUTEX_LOCKER lock(&m_handlerMutex);
+    std::optional<QnIOStateDataList> currentState;
+    for (auto& [_, handlerContext]: m_handlerContexts)
+    {
+        if (!handlerContext.intialStateHasBeenReported)
+        {
+            if (!currentState)
+            {
+                currentState = QnIOStateDataList();
+                for (const QnIOStateData& portState: m_lastPortStates)
+                    currentState->push_back(portState);
+            }
+
+            handlerContext.handler(*currentState);
+            handlerContext.intialStateHasBeenReported = true;
+        }
     }
 }
 

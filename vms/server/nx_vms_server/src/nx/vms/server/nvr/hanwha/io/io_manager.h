@@ -44,6 +44,8 @@ private:
     void initialize();
 
     void updatePortStates(const std::set<QnIOStateData>& portStates);
+    void sendInitialStateIfNeeded();
+
     bool setOutputPortStateInternal(const QString& portId, IoPortState portState);
 
 private:

@@ -6,11 +6,10 @@
 
 #include <nx/vms/server/nvr/hanwha/utils.h>
 #include <nx/vms/server/nvr/hanwha/common.h>
+#include <nx/vms/server/nvr/hanwha/hanwha_nvr_ini.h>
 #include <nx/vms/server/nvr/hanwha/io/i_io_platform_abstraction.h>
 
 namespace nx::vms::server::nvr::hanwha {
-
-static const std::chrono::milliseconds kSleepBetweenIterations(10);
 
 IoStateFetcher::IoStateFetcher(
     IIoPlatformAbstraction* platformAbstraction,
@@ -39,7 +38,7 @@ void IoStateFetcher::run()
 
     while (!needToStop())
     {
-        std::this_thread::sleep_for(kSleepBetweenIterations);
+        std::this_thread::sleep_for(std::chrono::milliseconds(nvrIni().ioStatePollingIntervalMs));
 
         std::set<QnIOStateData> portStateData;
         {
