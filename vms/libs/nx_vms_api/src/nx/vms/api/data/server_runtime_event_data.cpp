@@ -20,13 +20,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     DeviceAgentSettingsMaybeChangedData,
-    (eq)(json)(ubjson),
+    (eq)(json),
     nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields,
     (optional, true))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     DeviceFootageChangedData,
-    (eq)(json)(ubjson),
+    (eq)(json),
     nx_vms_api_DeviceFootageChangedData_Fields,
     (optional, true))
 

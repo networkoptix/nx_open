@@ -148,17 +148,11 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         this,
         [this](const std::vector<QnUuid>& deviceIds)
         {
-            const QnResourceList devices =
-                qnClientModule
-                    ->clientCoreModule()
-                    ->commonModule()
-                    ->resourcePool()
-                    ->getResourcesByIds(deviceIds);
-
-            for (const QnResourcePtr& device: devices)
+            for (const auto& device:
+                 resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds))
             {
                 const QnCachingCameraDataLoaderPtr loader = m_cameraDataManager->loader(
-                    device.dynamicCast<QnMediaResource>(),
+                    device,
                     /*createIfNotExists*/ false);
 
                 if (loader)
