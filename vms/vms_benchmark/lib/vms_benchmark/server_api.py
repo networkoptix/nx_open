@@ -345,7 +345,7 @@ class ServerApi:
     @_catch_http_errors
     def get_archive_start_time_ms(self, camera_id: str) -> int:
         request = urllib.request.Request(
-            f"http://{self.ip}:{self.port}" +
+            f"http://{self.ip}:{self.port}"
             f"/ec2/recordedTimePeriods?cameraId={camera_id}"
         )
         credentials = f"{self.user}:{self.password}"
