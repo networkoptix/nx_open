@@ -351,6 +351,48 @@ private:
     }
 };
 
+TEST_F(AddressResolver, isCloudHostName)
+{
+    EXPECT_TRUE(resolver().isCloudHostName(
+        "7bdfe97c-40b7-456c-83ad-b06eb8ba6248"));
+    EXPECT_TRUE(resolver().isCloudHostName(HostAddress(
+        "7bdfe97c-40b7-456c-83ad-b06eb8ba6248").toString()));
+    EXPECT_TRUE(resolver().isCloudHostName(SocketAddress(
+        "7bdfe97c-40b7-456c-83ad-b06eb8ba6248").address.toString()));
+    EXPECT_TRUE(resolver().isCloudHostName(SocketAddress(
+        "7bdfe97c-40b7-456c-83ad-b06eb8ba6248:7001").address.toString()));
+
+    EXPECT_TRUE(resolver().isCloudHostName(
+        "14a29d10-7456-83e0-44fd-a0cc627e9875.2cc33383-a9c5-4a8a-b6d4-c8017255dedd"));
+    EXPECT_TRUE(resolver().isCloudHostName(HostAddress(
+        "14a29d10-7456-83e0-44fd-a0cc627e9875.2cc33383-a9c5-4a8a-b6d4-c8017255dedd").toString()));
+    EXPECT_TRUE(resolver().isCloudHostName(SocketAddress(
+        "14a29d10-7456-83e0-44fd-a0cc627e9875.2cc33383-a9c5-4a8a-b6d4-c8017255dedd").address.toString()));
+    EXPECT_TRUE(resolver().isCloudHostName(SocketAddress(
+        "14a29d10-7456-83e0-44fd-a0cc627e9875.2cc33383-a9c5-4a8a-b6d4-c8017255dedd:7001").address.toString()));
+
+    EXPECT_FALSE(resolver().isCloudHostName("yandex.ru"));
+    EXPECT_FALSE(resolver().isCloudHostName(HostAddress("yandex.ru").toString()));
+    EXPECT_FALSE(resolver().isCloudHostName(SocketAddress("yandex.ru").address.toString()));
+    EXPECT_FALSE(resolver().isCloudHostName(SocketAddress("yandex.ru:433").address.toString()));
+
+    EXPECT_FALSE(resolver().isCloudHostName("cloud.nxvms.com"));
+    EXPECT_FALSE(resolver().isCloudHostName(HostAddress("cloud.nxvms.com").toString()));
+    EXPECT_FALSE(resolver().isCloudHostName(SocketAddress("cloud.nxvms.com").address.toString()));
+    EXPECT_FALSE(resolver().isCloudHostName(SocketAddress("cloud.nxvms.com:80").address.toString()));
+
+    EXPECT_FALSE(resolver().isCloudHostName("10.8.0.13"));
+    EXPECT_FALSE(resolver().isCloudHostName(HostAddress("10.8.0.13").toString()));
+    EXPECT_FALSE(resolver().isCloudHostName(SocketAddress("10.8.0.13").address.toString()));
+    EXPECT_FALSE(resolver().isCloudHostName(SocketAddress("10.8.0.13:7001").address.toString()));
+
+    EXPECT_FALSE(resolver().isCloudHostName("fe80::2090:f0b3:62de:53ca"));
+    EXPECT_FALSE(resolver().isCloudHostName(HostAddress("fe80::2090:f0b3:62de:53ca").toString()));
+    EXPECT_FALSE(resolver().isCloudHostName(SocketAddress("fe80::2090:f0b3:62de:53ca").address.toString()));
+    EXPECT_FALSE(resolver().isCloudHostName(SocketAddress("[fe80::2090:f0b3:62de:53ca]").address.toString()));
+    EXPECT_FALSE(resolver().isCloudHostName(SocketAddress("[fe80::2090:f0b3:62de:53ca%53]:7001").address.toString()));
+}
+
 TEST_F(
     AddressResolver,
     ipv4_resolve_does_not_invoke_dns_for_text_representation_of_ip_address)
