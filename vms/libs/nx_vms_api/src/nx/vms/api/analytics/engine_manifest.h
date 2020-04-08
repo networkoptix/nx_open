@@ -67,7 +67,7 @@ struct NX_VMS_API EngineManifest
         needUncompressedVideoFrames_rgb = 1 << 5,
         needUncompressedVideoFrames_bgr = 1 << 6,
         deviceDependent = 1 << 7,
-        keepObjectBoundingBoxRotation = 1 << 8
+        keepObjectBoundingBoxRotation = 1 << 8,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
