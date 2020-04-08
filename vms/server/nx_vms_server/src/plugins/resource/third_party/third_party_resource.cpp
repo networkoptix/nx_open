@@ -591,7 +591,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
             NX_DEBUG(this, lit("Failed to get encoder of third-party camera %1:%2 encoder %3. %4").
                 arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
                 arg(encoderNumber).arg(m_camManager->getLastErrorString()));
-            return CameraDiagnostics::UnknownErrorResult();
+            return CameraDiagnostics::PluginErrorResult("The plugin could not be initialized");
         }
         nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
         resolutionInfoList.clear();
