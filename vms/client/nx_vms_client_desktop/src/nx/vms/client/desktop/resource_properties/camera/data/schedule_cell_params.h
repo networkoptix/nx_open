@@ -4,7 +4,7 @@
 
 namespace nx::vms::client::desktop {
 
-struct ScheduleCellParams
+struct NX_VMS_CLIENT_DESKTOP_API ScheduleCellParams
 {
     static constexpr auto kAutomaticBitrate = 0.0;
     static constexpr auto kDefaultRecordingType = Qn::RecordingType::always;
