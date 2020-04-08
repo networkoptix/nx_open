@@ -559,7 +559,7 @@
                                             {
                                                 "type": "CheckBox",
                                                 "name": "ObjectDetection.LicensePlate",
-                                                "caption": "License plate",
+                                                "caption": "License Plate",
                                                 "defaultValue": false,
                                                 "value": false
                                             }
@@ -577,7 +577,7 @@
                             },
                             {
                                 "type": "GroupBox",
-                                "caption": "Extended Object Information (Best Short)",
+                                "caption": "Extended Object Information (Best Shot)",
                                 "items": 
                                 [
                                     {
@@ -609,7 +609,7 @@
                                             {
                                                 "type": "CheckBox",
                                                 "name": "ObjectDetection.BestShot.LicensePlate",
-                                                "caption": "LicensePlate",
+                                                "caption": "License Plate",
                                                 "defaultValue": false,
                                                 "value": false
                                             }
