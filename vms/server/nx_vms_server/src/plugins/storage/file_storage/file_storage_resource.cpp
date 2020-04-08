@@ -842,14 +842,21 @@ bool QnFileStorageResource::testWriteCapInternal() const
 
 Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
 {
+    static const auto normalize =
+        [](const QString& s)
+        {
+            auto result = s;
+            result.replace('\\', '/');
+            return result.left(result.lastIndexOf('/'));
+        };
+
     #if defined (Q_OS_WIN)
         if (isExternal())
             return Qn::StorageInit_Ok; //< #TODO #akulikov Implement real check by looking at opened samba connections
 
-        const QString path = getUrl();
+        const QString path = normalize(getUrl());
     #else
-        const auto trimPath = [](const QString& p) { return p.left(p.lastIndexOf('/')); };
-        const QString path = m_mockableCallFactory.canonicalPath(trimPath(getFsPath()));
+        const QString path = m_mockableCallFactory.canonicalPath(normalize(getFsPath()));
     #endif
 
     bool isMounted = false;
@@ -858,18 +865,10 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
         auto pathConfig = nx::vms::server::fs::media_paths::FilterConfig::createDefault(
             m_serverModule->platform(), /*includeNonHdd*/ true, &m_serverModule->settings());
 
-        static const auto normalize =
-            [](const QString& s)
-            {
-                auto result = s;
-                result.replace('\\', '/');
-                return result;
-            };
-
         const auto partitions = nx::vms::server::fs::media_paths::getMediaPartitions(pathConfig);
         isMounted = std::any_of(
             partitions.cbegin(), partitions.cend(),
-            [path = normalize(path), &trimPath](const auto& p) { return trimPath(p.path) == path; });
+            [path](const auto& p) { return normalize(p.path) == path; });
     }
 
     if (!isMounted)
