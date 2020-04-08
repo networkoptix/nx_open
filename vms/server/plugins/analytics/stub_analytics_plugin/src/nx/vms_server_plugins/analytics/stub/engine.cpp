@@ -108,6 +108,9 @@ void Engine::initCapabilities()
     if (ini().deviceDependent)
         m_capabilities += "|deviceDependent";
 
+    if (ini().keepObjectBoundingBoxRotation)
+        m_capabilities += "|keepObjectBoundingBoxRotation";
+
     m_streamTypeFilter = "motion|compressedVideo";
 
     const std::string pixelFormatString = ini().needUncompressedVideoFrames;
@@ -170,6 +173,10 @@ std::string Engine::manifestString() const
         {
             "id": ")json" + kStoneObjectType + R"json(",
             "name": "Stone"
+        },
+        {
+            "id": ")json" + kFixedObjectType + R"json(",
+            "name": "Fixed object"
         }
     ],
     "groups": [
@@ -293,6 +300,13 @@ std::string Engine::manifestString() const
                                 "type": "CheckBox",
                                 "name": ")json" + kGenerateStonesSetting + R"json(",
                                 "caption": "Generate stones",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateFixedObjectSetting + R"json(",
+                                "caption": "Generate fixed object",
+                                "description": "Generates a fixed object with coordinates (0.25, 0.25, 0.25, 0.25)",
                                 "defaultValue": false
                             },
                             {

@@ -66,6 +66,9 @@ private:
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
         nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
 
+    void addFixedObjectIfNeeded(
+        nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
+
     int64_t usSinceEpoch() const;
 
     void processVideoFrame(const nx::sdk::analytics::IDataPacket* videoFrame, const char* func);
@@ -153,6 +156,7 @@ private:
                 || generateHumanFaces
                 || generateBicycles
                 || generateStones
+                || generateFixedObject
                 || blinkingObjectPeriodMs.load() != std::chrono::milliseconds::zero());
         }
 
@@ -163,6 +167,7 @@ private:
         std::atomic<bool> generateHumanFaces{true};
         std::atomic<bool> generateBicycles{true};
         std::atomic<bool> generateStones{false};
+        std::atomic<bool> generateFixedObject{false};
 
         std::atomic<std::chrono::milliseconds> blinkingObjectPeriodMs{
             std::chrono::milliseconds::zero()};
@@ -235,6 +240,7 @@ const std::string kGunshotEventType = "nx.stub.gunshot";
 const std::string kSuspiciousNoiseEventType = "nx.stub.suspiciousNoise";
 const std::string kSoundRelatedEventGroup = "nx.stub.soundRelatedEvent";
 const std::string kBlinkingObjectType = "nx.stub.blinkingObject";
+const std::string kFixedObjectType = "nx.stub.fixedObject";
 
 } // namespace stub
 } // namespace analytics

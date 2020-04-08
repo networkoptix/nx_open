@@ -1,6 +1,6 @@
 {
     "streamTypeFilter": "metadata",
-    "capabilities": "deviceDependent",
+    "capabilities": "deviceDependent|keepObjectBoundingBoxRotation",
     "objectTypes":
     [
         {

@@ -43,6 +43,9 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_STRING("http://internal.server/addPerson?trackId=", addPersonActionUrlPrefix,
         "Prefix for the URL returned by addPerson action; track id will be appended to this "
         "prefix.");
+
+    NX_INI_FLAG(0, keepObjectBoundingBoxRotation,
+        "If set, Engine will declare the corresponding capability in the manifest.");
 };
 
 inline Ini& ini()

@@ -42,6 +42,16 @@ MetadataHandler::MetadataHandler(
     m_metadataLogger("outgoing_metadata_", m_resource->getId(), m_engineId),
     m_objectCoordinatesTranslator(device)
 {
+    const auto engineResource =
+        resourcePool()->getResourceById<resource::AnalyticsEngineResource>(m_engineId);
+
+    if (!NX_ASSERT(engineResource))
+        return;
+
+    const EngineManifest engineManifest = engineResource->manifest();
+    m_translateObjectBoundingBoxes = !engineManifest.capabilities.testFlag(
+        EngineManifest::Capability::keepObjectBoundingBoxRotation);
+
     connect(this,
         &MetadataHandler::sdkEventTriggered,
         serverModule->eventConnector(),
@@ -136,8 +146,12 @@ void MetadataHandler::handleObjectMetadataPacket(
         objectMetadata.typeId = item->typeId();
         objectMetadata.trackId = fromSdkUuidToQnUuid(item->trackId());
         const auto box = item->boundingBox();
-        objectMetadata.boundingBox =
-            m_objectCoordinatesTranslator.translate(QRectF(box.x, box.y, box.width, box.height));
+        objectMetadata.boundingBox = QRectF(box.x, box.y, box.width, box.height);
+        if (m_translateObjectBoundingBoxes)
+        {
+            objectMetadata.boundingBox =
+                m_objectCoordinatesTranslator.translate(objectMetadata.boundingBox);
+        }
 
         NX_VERBOSE(this, "%1(): x %2, y %3, width %4, height %5, typeId %6, id %7",
             __func__, box.x, box.y, box.width, box.height,
@@ -204,8 +218,10 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
         nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(objectTrackBestShotPacket->trackId());
     bestShot.bestShot = true;
     const auto box = objectTrackBestShotPacket->boundingBox();
-    bestShot.boundingBox = m_objectCoordinatesTranslator.translate(
-        QRectF(box.x, box.y, box.width, box.height));
+    bestShot.boundingBox = QRectF(box.x, box.y, box.width, box.height);
+
+    if (m_translateObjectBoundingBoxes)
+        bestShot.boundingBox = m_objectCoordinatesTranslator.translate(bestShot.boundingBox);
 
     bestShotPacket.objectMetadataList.push_back(std::move(bestShot));
 
