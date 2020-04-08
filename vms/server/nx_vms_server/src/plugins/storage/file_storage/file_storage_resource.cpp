@@ -848,9 +848,8 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
 
         const QString path = getUrl();
     #else
-        auto fsPath = getFsPath();
-        const QString path =
-            m_mockableCallFactory.canonicalPath(fsPath.left(fsPath.lastIndexOf('/')));
+        const auto trimPath = [](const QString& p) { return p.left(p.lastIndexOf('/')); };
+        const QString path = m_mockableCallFactory.canonicalPath(trimPath(getFsPath()));
     #endif
 
     bool isMounted = false;
@@ -870,7 +869,7 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
         const auto partitions = nx::vms::server::fs::media_paths::getMediaPartitions(pathConfig);
         isMounted = std::any_of(
             partitions.cbegin(), partitions.cend(),
-            [path = normalize(path)](const auto& p) { return normalize(p.path).startsWith(path); });
+            [path = normalize(path), &trimPath](const auto& p) { return trimPath(p.path) == path; });
     }
 
     if (!isMounted)
