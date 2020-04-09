@@ -79,6 +79,9 @@ private:
 
     void createActions();
 
+    inline bool hasEditPermissions() const;
+    inline bool hasChanges() const;
+
     bool saveAll();
 
     void testRule(const QnBusinessRuleViewModelPtr& ruleModel);

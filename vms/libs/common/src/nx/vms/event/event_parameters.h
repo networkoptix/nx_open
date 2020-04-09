@@ -95,7 +95,7 @@ struct EventParameters
      */
     bool omitDbLogging = false;
 
-    QString analyticsPluginId;
+    QString analyticsPluginId; //< #spanasenko: It's unused (?!).
     QnUuid analyticsEngineId;
 
     // TODO: #GDM #vkutin #rvasilenko Consider implementing via std::variant or similar.

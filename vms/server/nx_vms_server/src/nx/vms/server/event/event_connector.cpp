@@ -1,6 +1,7 @@
 #include "event_connector.h"
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <media_server/media_server_module.h>
@@ -13,6 +14,8 @@
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/server/resource/storage_resource.h>
+
+#include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
 namespace vms::server {
@@ -443,6 +446,8 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
 
     if (params.eventType >= vms::api::EventType::userDefinedEvent)
     {
+        // #spanasenko: Is this condition necessary?
+        // We don't check it when processing rules (e.g. the default rule has empty fields).
         if (!check(!params.resourceName.isEmpty()
                 || !params.caption.isEmpty()
                 || !params.description.isEmpty(),
@@ -474,16 +479,6 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
                 return false;
 
             at_cameraInput(resource, params.inputPortId, isOnState, params.eventTimestampUsec);
-            return true;
-        }
-
-        case vms::api::EventType::softwareTriggerEvent:
-        {
-            if (!check(resource, lit("'SoftwareTriggerEvent' requires 'resource' parameter")))
-                return false;
-
-            at_softwareTrigger(resource, params.inputPortId, userId,
-                params.eventTimestampUsec, eventState);
             return true;
         }
 
@@ -578,6 +573,16 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
+        case vms::api::EventType::softwareTriggerEvent:
+        {
+            if (!check(resource, lit("'SoftwareTriggerEvent' requires 'resource' parameter")))
+                return false;
+
+            at_softwareTrigger(resource, params.inputPortId, userId,
+                params.eventTimestampUsec, eventState);
+            return true;
+        }
+
         case vms::api::EventType::analyticsSdkEvent:
         {
             if (!check(resource, lit("'AnalyticsSdkEvent' requires 'resource' parameter")))
@@ -594,6 +599,75 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
                 params.eventTimestampUsec));
 
             at_analyticsSdkEvent(event);
+            return true;
+        }
+
+        case vms::api::EventType::pluginDiagnosticEvent:
+        {
+            if (!check(resource, lit("'PluginDiagnosticEvent' requires 'resource' parameter")))
+                return false;
+
+            const auto cameras = resourcePool()->getCamerasByFlexibleIds(params.metadata.cameraRefs);
+
+            if (!check(!cameras.isEmpty(), lit("'metadata' parameter must contain valid camera refs")))
+                return false;
+
+            for (const auto& camera: cameras)
+            {
+                nx::vms::event::PluginDiagnosticEventPtr event(new nx::vms::event::PluginDiagnosticEvent(
+                    params.eventTimestampUsec,
+                    resource->getId(),
+                    params.caption,
+                    params.description,
+                    params.metadata.level,
+                    camera));
+
+                at_pluginDiagnosticEvent(event);
+            }
+
+            return true;
+        }
+
+        case vms::api::EventType::poeOverBudgetEvent:
+        {
+            if (!resource)
+                resource = resourcePool()->getResourceById(params.sourceServerId);
+
+            const auto server = resource.dynamicCast<QnMediaServerResource>();
+            if (!check(server, lit("'resource' parameter must reference a Server")))
+                return false;
+
+            nx::vms::event::PoeOverBudgetEvent::Parameters poeParams;
+            if (bool success = QJson::deserialize(params.inputPortId, &poeParams);
+                !check(success, ""))
+            {
+                return false;
+            }
+
+            nx::vms::event::PoeOverBudgetEventPtr event(new nx::vms::event::PoeOverBudgetEvent(
+                server,
+                eventState,
+                std::chrono::microseconds(params.eventTimestampUsec),
+                poeParams.currentConsumptionWatts,
+                poeParams.upperLimitWatts,
+                poeParams.lowerLimitWatts));
+            at_poeOverBudget(event);
+            return true;
+        }
+
+        case vms::api::EventType::fanErrorEvent:
+        {
+            if (!resource)
+                resource = resourcePool()->getResourceById(params.sourceServerId);
+
+            const auto server = resource.dynamicCast<QnMediaServerResource>();
+            if (!check(server, lit("'resource' parameter must reference a Server")))
+                return false;
+
+            nx::vms::event::FanErrorEventPtr event(new nx::vms::event::FanErrorEvent(
+                server,
+                std::chrono::microseconds(params.eventTimestampUsec)));
+            at_fanError(event);
             return true;
         }
 

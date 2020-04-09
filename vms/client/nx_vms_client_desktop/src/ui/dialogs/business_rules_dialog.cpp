@@ -432,6 +432,17 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
 
 void QnBusinessRulesDialog::at_testRuleButton_clicked()
 {
+    if (hasChanges())
+    {
+        QnMessageBox::warning(
+            this,
+            "Apply changes",
+            "[Dev] You need to save rules before testing any of them",
+            QDialogButtonBox::Ok,
+            QDialogButtonBox::Ok);
+        return;
+    }
+
     if (auto model = m_currentDetailsWidget->model())
         testRule(model);
 }
@@ -555,6 +566,20 @@ void QnBusinessRulesDialog::createActions() {
     m_popupMenu->addAction(scheduleAct);
 }
 
+bool QnBusinessRulesDialog::hasEditPermissions() const
+{
+    return accessController()->hasGlobalPermission(GlobalPermission::admin)
+        && !commonModule()->isReadOnly();
+}
+
+bool QnBusinessRulesDialog::hasChanges() const
+{
+    return hasEditPermissions()
+        && (!m_pendingDeleteRules.isEmpty()
+            || !m_rulesViewModel->match(
+                m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty());
+}
+
 bool QnBusinessRulesDialog::saveAll()
 {
     QModelIndexList modified = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, -1, Qt::MatchExactly);
@@ -655,27 +680,22 @@ void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr& ruleMod
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::updateControlButtons() {
-    bool hasRights = accessController()->hasGlobalPermission(GlobalPermission::admin)
-        && !commonModule()->isReadOnly();
+void QnBusinessRulesDialog::updateControlButtons()
+{
+    const bool hasPermissions = hasEditPermissions();
+    const bool canModifyRule = hasPermissions && m_currentDetailsWidget->model();
 
-    bool hasChanges = hasRights && (
-                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
-             || !m_pendingDeleteRules.isEmpty()
-                );
-    bool canDelete = hasRights && m_currentDetailsWidget->model();
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasPermissions);
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges());
+    m_resetDefaultsButton->setEnabled(hasPermissions);
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights);
-    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges);
-    m_resetDefaultsButton->setEnabled(hasRights);
+    ui->testRuleButton->setEnabled(canModifyRule);
+    ui->deleteRuleButton->setEnabled(canModifyRule);
+    m_deleteAction->setEnabled(canModifyRule);
+    m_currentDetailsWidget->setVisible(canModifyRule);
 
-    ui->testRuleButton->setEnabled(canDelete);
-    ui->deleteRuleButton->setEnabled(canDelete);
-    m_deleteAction->setEnabled(canDelete);
-
-    m_currentDetailsWidget->setVisible(hasRights && m_currentDetailsWidget->model());
-    ui->addRuleButton->setEnabled(hasRights);
-    m_newAction->setEnabled(hasRights);
+    ui->addRuleButton->setEnabled(hasPermissions);
+    m_newAction->setEnabled(hasPermissions);
 }
 
 void QnBusinessRulesDialog::updateFilter() {
@@ -707,12 +727,7 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
         return true;
     }
 
-    bool hasRights = accessController()->hasGlobalPermission(GlobalPermission::admin) && !commonModule()->isReadOnly();
-    bool hasChanges = hasRights && (
-        !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
-        || !m_pendingDeleteRules.isEmpty()
-        ); // TODO: #GDM #Business calculate once and use anywhere
-    if (!hasChanges)
+    if (!hasChanges())
         return true;
 
     const auto result = QnMessageBox::question(this,

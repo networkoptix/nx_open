@@ -644,7 +644,17 @@ bool RuleProcessor::checkEventCondition(const vms::event::AbstractEventPtr& even
     if (rule->isDisabled() || rule->eventType() != event->getEventType())
         return false;
 
-    const bool resOK = !event->getResource()
+    // #spanasenko: Our current event type system is a mess.
+    // For some event types we store cameras as resources in the rule (so we can use standard
+    // camera selection widget for them), but when we fire an event of this type we expect that
+    // it will store resourceId of something else (e.g. Analytics Engine that created this event).
+    // As result, we can't simply compare resource ids in this checker,
+    // instead the event should check EventParameters itself.
+    const bool entangledResources =
+        (event->getEventType() == nx::vms::event::EventType::pluginDiagnosticEvent);
+
+    const bool resOK = entangledResources
+        || !event->getResource()
         || rule->eventResources().isEmpty()
         || rule->eventResources().contains(event->getResource()->getId());
 
