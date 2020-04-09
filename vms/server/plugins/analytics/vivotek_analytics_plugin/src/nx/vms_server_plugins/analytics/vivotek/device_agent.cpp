@@ -1,14 +1,12 @@
 #include "device_agent.h"
+#include "nx/sdk/ptr.h"
 
-#include <chrono>
+#include <string>
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#define NX_PRINT_PREFIX (m_logUtils.printPrefix)
 #include <nx/kit/debug.h>
 #include <nx/kit/json.h>
-#include <nx/sdk/analytics/helpers/event_metadata.h>
-#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
-#include <nx/sdk/analytics/helpers/object_metadata.h>
-#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/helpers/string.h>
 
 #include "ini.h"
 
@@ -18,14 +16,43 @@ using namespace nx::kit;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
-    ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
+namespace {
+
+const std::string kNewTrackEventType = "nx.vivotek.newTrack";
+const std::string kHelloWorldObjectType = "nx.vivotek.helloWorld";
+
+std::string makePrintPrefix(const IDeviceInfo* deviceInfo)
 {
+    return "[" + libContext().name() + "_device" +
+        (!deviceInfo ? "" : (std::string("_") + deviceInfo->id())) + "] ";
 }
 
-std::string DeviceAgent::manifestString() const
+} // namespace
+
+DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
+    m_logUtils(NX_DEBUG_ENABLE_OUTPUT, makePrintPrefix(deviceInfo))
 {
-    return Json(Json::object{
+    deviceInfo->addRef();
+    m_deviceInfo.reset(deviceInfo);
+}
+
+void DeviceAgent::doSetSettings(Result<const IStringMap*>* /*outResult*/, const IStringMap* settings)
+{
+    NX_OUTPUT << __func__;
+    for (int i = 0; i < settings->count(); ++i)
+        NX_OUTPUT << "    " << settings->key(i) << ": " << settings->value(i);
+}
+
+void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
+{
+    NX_OUTPUT << __func__;
+}
+
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
+{
+    NX_OUTPUT << __func__;
+
+    *outResult = new String(Json(Json::object{
         {"eventTypes", Json::array{
             Json::object{
                 {"id", kNewTrackEventType},
@@ -38,98 +65,30 @@ std::string DeviceAgent::manifestString() const
                 {"name", "Hello, World!"},
             },
         }},
-    }).dump();
+    }).dump());
+
+    NX_OUTPUT << "    " << outResult->value()->str();
 }
 
-bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
+void DeviceAgent::setHandler(IHandler* handler)
 {
-    ++m_frameIndex;
-    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
+    NX_OUTPUT << __func__;
 
-    auto eventMetadataPacket = generateEventMetadataPacket();
-    if (eventMetadataPacket)
-    {
-        // Send generated metadata packet to the Server.
-        pushMetadataPacket(eventMetadataPacket.releasePtr());
-    }
-
-    return true; //< There were no errors while processing the video frame.
+    handler->addRef();
+    m_handler.reset(handler);
 }
 
-bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
+void DeviceAgent::doSetNeededMetadataTypes(Result<void>* /*outResult*/, const IMetadataTypes* neededMetadataTypes)
 {
-    metadataPackets->push_back(generateObjectMetadataPacket().releasePtr());
-
-    return true; //< There were no errors while filling metadataPackets.
-}
-
-void DeviceAgent::doSetNeededMetadataTypes(
-    nx::sdk::Result<void>* /*outValue*/,
-    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
-//-------------------------------------------------------------------------------------------------
-// private
-
-Ptr<IMetadataPacket> DeviceAgent::generateEventMetadataPacket()
-{
-    // Generate event every kTrackFrameCount'th frame.
-    if (m_frameIndex % kTrackFrameCount != 0)
-        return nullptr;
-
-    // EventMetadataPacket contains arbitrary number of EventMetadata.
-    const auto eventMetadataPacket = makePtr<EventMetadataPacket>();
-    // Bind event metadata packet to the last video frame using a timestamp.
-    eventMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
-    // Zero duration means that the event is not sustained, but momental.
-    eventMetadataPacket->setDurationUs(0);
-
-    // EventMetadata contains an information about event.
-    const auto eventMetadata = makePtr<EventMetadata>();
-    // Set all required fields.
-    eventMetadata->setTypeId(kNewTrackEventType);
-    eventMetadata->setIsActive(true);
-    eventMetadata->setCaption("New sample plugin track started");
-    eventMetadata->setDescription("New track #" + std::to_string(m_trackIndex) + " started");
-
-    eventMetadataPacket->addItem(eventMetadata.get());
-
-    // Generate index and track id for the next track.
-    ++m_trackIndex;
-    m_trackId = nx::sdk::UuidHelper::randomUuid();
-
-    return eventMetadataPacket;
-}
-
-Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket()
-{
-    // ObjectMetadataPacket contains arbitrary number of ObjectMetadata.
-    const auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
-
-    // Bind the object metadata to the last video frame using a timestamp.
-    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
-    objectMetadataPacket->setDurationUs(0);
-
-    // ObjectMetadata contains information about an object on the frame.
-    const auto objectMetadata = makePtr<ObjectMetadata>();
-    // Set all required fields.
-    objectMetadata->setTypeId(kHelloWorldObjectType);
-    objectMetadata->setTrackId(m_trackId);
-
-    // Calculate bounding box coordinates each frame so that it moves from the top left corner
-    // to the bottom right corner during kTrackFrameCount frames.
-    static constexpr float d = 0.5F / kTrackFrameCount;
-    static constexpr float width = 0.5F;
-    static constexpr float height = 0.5F;
-    const int frameIndexInsideTrack = m_frameIndex % kTrackFrameCount;
-    const float x = d * frameIndexInsideTrack;
-    const float y = d * frameIndexInsideTrack;
-    objectMetadata->setBoundingBox(Rect(x, y, width, height));
-
-    objectMetadataPacket->addItem(objectMetadata.get());
-
-    return objectMetadataPacket;
+    NX_OUTPUT << __func__;
+    NX_OUTPUT << "    eventTypeIds:";
+    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
+    for (int i = 0; i < eventTypeIds->count(); ++i)
+        NX_OUTPUT << "        " << eventTypeIds->at(i);
+    NX_OUTPUT << "    objectTypeIds:";
+    const auto objectTypeIds = neededMetadataTypes->objectTypeIds();
+    for (int i = 0; i < objectTypeIds->count(); ++i)
+        NX_OUTPUT << "        " << objectTypeIds->at(i);
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

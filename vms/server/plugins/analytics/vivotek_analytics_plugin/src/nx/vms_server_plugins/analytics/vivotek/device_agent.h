@@ -1,48 +1,39 @@
 #pragma once
 
-#include <nx/sdk/analytics/helpers/consuming_device_agent.h>
-#include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/analytics/i_device_agent.h>
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/log_utils.h>
+#include <nx/sdk/ptr.h>
 
 #include "engine.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
+class DeviceAgent: public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
 public:
-    DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
+    explicit DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
 
 protected:
-    virtual std::string manifestString() const override;
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
 
-    virtual bool pushUncompressedVideoFrame(
-        const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) override;
+    virtual void getPluginSideSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
 
-    virtual bool pullMetadataPackets(
-        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
+    virtual void getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResult) const override;
 
-    virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* outValue,
+    virtual void setHandler(IHandler* handler) override;
+
+    virtual void doSetNeededMetadataTypes(nx::sdk::Result<void>* outResult,
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
 private:
-    nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateEventMetadataPacket();
-    nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateObjectMetadataPacket();
+    const nx::sdk::LogUtils m_logUtils;
 
-private:
-    const std::string kHelloWorldObjectType = "nx.vivotek.helloWorld";
-    const std::string kNewTrackEventType = "nx.vivotek.newTrack";
-
-    /** Lenght of the the track (in frames). The value was chosen arbitrarily. */
-    static constexpr int kTrackFrameCount = 256;
-
-private:
-    nx::sdk::Uuid m_trackId = nx::sdk::UuidHelper::randomUuid();
-    int m_frameIndex = 0; /**< Used for generating the detection in the right place. */
-    int m_trackIndex = 0; /**< Used in the description of the events. */
-
-    /** Used for binding object and event metadata to the particular video frame. */
-    int64_t m_lastVideoFrameTimestampUs = 0;
+    nx::sdk::Ptr<const nx::sdk::IDeviceInfo> m_deviceInfo;
+    nx::sdk::Ptr<IHandler> m_handler;
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek
