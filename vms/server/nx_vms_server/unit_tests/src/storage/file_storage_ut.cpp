@@ -22,21 +22,29 @@ protected:
             [this](const QString& path)
             {
                 canonicalPathArgument = path;
-                if (path == "/opt/networkoptx/mediaserver/var" || path == "/existing/path")
+                if (path == "/opt/networkoptx/mediaserver/var"
+                    || path == "/existing/path"
+                    || path == "/existing/pa")
+                {
                     return path;
+                }
 
                 return QString("");
             });
+    }
 
-
+    void mockMediaPathFilter(
+        QList<PlatformMonitor::PartitionSpace> additional = QList<PlatformMonitor::PartitionSpace>())
+    {
         nx::vms::server::fs::media_paths::FilterConfig filterConfig;
         filterConfig.isWindows = false;
 
         auto partition = PlatformMonitor::PartitionSpace(
             "/", /*freeSpace*/100'000'000'000, /*totalSpace*/100'000'000'000);
         partition.type = PlatformMonitor::LocalDiskPartition;
+        additional.push_back(partition);
 
-        filterConfig.partitions = { partition };
+        filterConfig.partitions = additional;
         filterConfig.serverUuid = m_server->commonModule()->moduleGUID();
         filterConfig.dataDirectory = "/opt/networkoptx/mediaserver/var";
         filterConfig.mediaFolderName = "Nx Witness";
@@ -60,6 +68,7 @@ private:
 
 TEST_F(CheckMountedStatusTest, FirstServerRun_FullMediaPathDoesNotExistYet)
 {
+    mockMediaPathFilter();
     storage->setUrl("/opt/networkoptx/mediaserver/var/data");
 
     ASSERT_EQ(Qn::StorageInit_Ok, callCheckMounted());
@@ -70,15 +79,31 @@ TEST_F(CheckMountedStatusTest, FirstServerRun_FullMediaPathDoesNotExistYet)
 
 TEST_F(CheckMountedStatusTest, StorageWithNotExistentPathInDb)
 {
+    mockMediaPathFilter();
     storage->setUrl("/not-existing/path");
     ASSERT_NE(Qn::StorageInit_Ok, callCheckMounted());
 }
 
 TEST_F(CheckMountedStatusTest, PathExistsOnDiskButItsNotMounted)
 {
+    mockMediaPathFilter();
     storage->setUrl("/existing/path/NX Witness");
     ASSERT_NE(Qn::StorageInit_Ok, callCheckMounted());
     #if !defined (Q_OS_WIN)
         ASSERT_EQ("/existing/path", canonicalPathArgument);
+    #endif
+}
+
+TEST_F(CheckMountedStatusTest, SimilarPathInMounted)
+{
+    auto partition = PlatformMonitor::PartitionSpace(
+        "/existing/path", /*freeSpace*/100'000'000'000, /*totalSpace*/100'000'000'000);
+    partition.type = PlatformMonitor::LocalDiskPartition;
+    mockMediaPathFilter({partition});
+
+    storage->setUrl("/existing/pa/NX Witness");
+    ASSERT_NE(Qn::StorageInit_Ok, callCheckMounted());
+    #if !defined (Q_OS_WIN)
+        ASSERT_EQ("/existing/pa", canonicalPathArgument);
     #endif
 }

@@ -64,11 +64,26 @@ int CameraManager::getEncoderCount( int* encoderCount ) const
     return nxcip::NX_NO_ERROR;
 }
 
+bool CameraManager::isCameraOnline() const
+{
+    nx::network::http::HttpClient httpClient;
+    nx::utils::Url url(m_info.url);
+    if (!httpClient.doGet(url))
+    {
+        NX_DEBUG(this, "Request %1 has failed", url);
+        return false;
+    }
+    return true;
+}
+
 //!Implementation of nxcip::BaseCameraManager::getEncoder
 int CameraManager::getEncoder( int index, nxcip::CameraMediaEncoder** encoderPtr )
 {
     if (index != 0 && index != 1)
         return nxcip::NX_INVALID_ENCODER_NUMBER;
+
+    if (!isCameraOnline())
+        return nxcip::NX_NETWORK_ERROR;
 
     if( !m_encoder[index].get() )
         m_encoder[index].reset( new MediaEncoder(this, m_timeProvider, index) );

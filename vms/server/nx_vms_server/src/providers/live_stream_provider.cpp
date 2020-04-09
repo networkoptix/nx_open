@@ -430,7 +430,12 @@ void QnLiveStreamProvider::onGotVideoFrame(
     {
         const auto actualParams = getActualParams();
         if (actualParams.bitrateKbps > 0)
+        {
+            NX_VERBOSE(this, "SaveBitrate for camera %1, bitrate=%2, resolution=%3, codec=%4, frameSize=%5",
+                m_resource, actualParams.bitrateKbps, actualParams.resolution, compressedFrame->compressionType,
+                nx::media::getFrameSize(compressedFrame));
             saveBitrateIfNeeded(compressedFrame, actualParams, isCameraControlRequired);
+        }
     }
 
     processMetadata(compressedFrame);
@@ -768,12 +773,17 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
 void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData)
 {
     ++m_framesSincePrevMediaStreamCheck;
-    if( m_framesSincePrevMediaStreamCheck < CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES ||
-        (videoData->flags & QnAbstractMediaData::MediaFlags_AVKey) == 0 )
+    if (m_framesSincePrevMediaStreamCheck < CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES ||
+        !videoData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+    {
+        return;
+    }
+
+    QSize streamResolution = nx::media::getFrameSize(videoData);
+    if (streamResolution.isEmpty())
         return;
     m_framesSincePrevMediaStreamCheck = 0;
 
-    QSize streamResolution = nx::media::getFrameSize(videoData);
     CameraMediaStreamInfo mediaStreamInfo(
         encoderIndex(),
         QSize(streamResolution.width(), streamResolution.height()),

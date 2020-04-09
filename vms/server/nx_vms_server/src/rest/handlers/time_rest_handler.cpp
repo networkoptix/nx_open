@@ -24,7 +24,7 @@ int QnTimeRestHandler::executeGet(
     // TODO: Remove parameter "local", making its behavior the default. Check nxtool.
     auto commonModule = owner->commonModule();
     if (params.contains("local"))
-        reply.utcTime =  QDateTime::currentDateTime().toMSecsSinceEpoch();
+        reply.utcTime =  nx::utils::millisSinceEpoch().count();
     else
         reply.utcTime = commonModule->ec2Connection()->timeSyncManager()->getSyncTime().count();
 

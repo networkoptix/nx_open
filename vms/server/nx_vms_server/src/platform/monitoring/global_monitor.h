@@ -50,7 +50,6 @@ private:
     nx::utils::CachedValue<quint64> m_cachedThisProcessRamUsage;
     nx::utils::CachedValue<QList<PlatformMonitor::HddLoad>> m_cachedTotalHddLoad;
     nx::utils::CachedValue<QList<PlatformMonitor::NetworkLoad>> m_cachedTotalNetworkLoad;
-    nx::utils::CachedValue<QList<PlatformMonitor::PartitionSpace>> m_cachedTotalPartitionSpaceInfo;
 
     nx::utils::ElapsedTimer m_uptimeTimer;
     nx::utils::TimerManager::TimerGuard m_timerGuard;

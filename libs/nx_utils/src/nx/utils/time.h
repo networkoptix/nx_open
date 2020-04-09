@@ -17,6 +17,9 @@ NX_UTILS_API std::chrono::system_clock::time_point utcTime();
 /** Should be used instead of ::time(). */
 NX_UTILS_API std::chrono::seconds timeSinceEpoch();
 
+/** 
+ * @return UTC time (time since epoch) in milliseconds.
+ */
 NX_UTILS_API std::chrono::milliseconds millisSinceEpoch();
 
 /**

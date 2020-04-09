@@ -586,12 +586,16 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         //const int result = m_camManager->getResolutionList( i, &resolutionInfoList );
         nxcip::CameraMediaEncoder* intf = NULL;
         int result = m_camManager->getEncoder( encoderNumber, &intf );
-        if( result == nxcip::NX_NO_ERROR )
+        if( result != nxcip::NX_NO_ERROR )
         {
-            nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
-            resolutionInfoList.clear();
-            result = cameraEncoder.getResolutionList( &resolutionInfoList );
+            NX_DEBUG(this, lit("Failed to get encoder of third-party camera %1:%2 encoder %3. %4").
+                arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
+                arg(encoderNumber).arg(m_camManager->getLastErrorString()));
+            return CameraDiagnostics::PluginErrorResult("The plugin could not be initialized");
         }
+        nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
+        resolutionInfoList.clear();
+        result = cameraEncoder.getResolutionList( &resolutionInfoList );
         if( result != nxcip::NX_NO_ERROR )
         {
             NX_DEBUG(this, lit("Failed to get resolution list of third-party camera %1:%2 encoder %3. %4").

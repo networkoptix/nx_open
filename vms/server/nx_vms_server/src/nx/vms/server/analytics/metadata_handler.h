@@ -84,6 +84,7 @@ private:
     nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;
     nx::analytics::MetadataLogger m_metadataLogger;
     ObjectCoordinatesTranslator m_objectCoordinatesTranslator;
+    bool m_translateObjectBoundingBoxes = true;
 };
 
 } // namespace nx::vms::server::analytics

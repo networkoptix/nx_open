@@ -297,6 +297,8 @@ void CLServerPushStreamReader::afterRun()
 
 void CLServerPushStreamReader::pleaseReopenStream()
 {
+    NX_VERBOSE(this, "Reopen stream has requested for camera %1 for role %2",
+        m_resource, getRole());
     m_needReopen = true;
 }
 

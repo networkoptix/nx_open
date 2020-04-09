@@ -645,6 +645,20 @@ void DeviceAgent::addBlinkingObjectIfNeeded(
     }
 }
 
+void DeviceAgent::addFixedObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
+{
+    if (!m_deviceAgentSettings.generateFixedObject)
+        return;
+
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    static const Uuid trackId = UuidHelper::randomUuid();
+    objectMetadata->setTypeId(kFixedObjectType);
+    objectMetadata->setTrackId(trackId);
+    objectMetadata->setBoundingBox(Rect(0.1, 0.1, 0.25, 0.25));
+
+    objectMetadataPacket->addItem(objectMetadata.get());
+}
+
 std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 {
     std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
@@ -664,6 +678,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     objectMetadataPacket->setDurationUs(0);
 
     addBlinkingObjectIfNeeded(metadataTimestampUs, &result, objectMetadataPacket);
+    addFixedObjectIfNeeded(objectMetadataPacket);
 
     const microseconds delay(m_lastVideoFrameTimestampUs - metadataTimestampUs);
 
@@ -878,6 +893,7 @@ void DeviceAgent::parseSettings()
     m_deviceAgentSettings.generateHumanFaces = toBool(settingValue(kGenerateHumanFacesSetting));
     m_deviceAgentSettings.generateBicycles = toBool(settingValue(kGenerateBicyclesSetting));
     m_deviceAgentSettings.generateStones = toBool(settingValue(kGenerateStonesSetting));
+    m_deviceAgentSettings.generateFixedObject = toBool(settingValue(kGenerateFixedObjectSetting));
 
     assignIntegerSetting(kBlinkingObjectPeriodMsSetting,
         &m_deviceAgentSettings.blinkingObjectPeriodMs);

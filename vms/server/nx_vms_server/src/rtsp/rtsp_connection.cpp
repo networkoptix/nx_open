@@ -656,11 +656,19 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::waitForKeyFrame(
     const auto resource = getResource()->toResourcePtr();
 
     auto provider = quality == MediaQuality::MEDIA_Quality_Low ? d->liveDpLow : d->liveDpHi;
+    if (!provider)
+    {
+        NX_DEBUG(this,
+            "Wait for SDP data for camera %1 quality %2 failed. No data provider",
+            resource->getUrl(), quality);
+        return QnConstAbstractMediaDataPtr();
+    }
+
     auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
-    if (!provider || !camera)
+    if (!camera)
     {
         NX_DEBUG(this, 
-            "Wait for SDP data for camera %1 quality %2 failed. No data provider or camera", 
+            "Wait for SDP data for camera %1 quality %2 failed. No camera", 
             resource->getUrl(), quality);
         return QnConstAbstractMediaDataPtr();
     }

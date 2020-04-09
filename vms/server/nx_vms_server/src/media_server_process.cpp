@@ -704,20 +704,6 @@ StorageResourceList MediaServerProcess::fromDataToStorageList(
     return result;
 }
 
-static void intializeAndLog(const StorageResourceList& storages)
-{
-    for (const auto& s: storages)
-    {
-        const auto initResult = s->initOrUpdate();
-        NX_DEBUG(
-            typeid(MediaServerProcess),
-            "[Storages init] Existing storage: '%1', initialization result: %2, space limit: %3",
-            nx::utils::url::hidePassword(s->getUrl()),
-            initResult,
-            s->getSpaceLimit());
-    }
-}
-
 static StorageResourceList subtractLists(
     const StorageResourceList& from,
     const StorageResourceList& what)
@@ -734,7 +720,6 @@ StorageResourceList MediaServerProcess::processExistingStorages()
 {
     const auto existing = fromDataToStorageList(loadStorages());
     const auto modified = updateStorages(existing);
-    intializeAndLog(existing);
     const auto tooSmall = getSmallStorages(existing);
     removeStorages(tooSmall);
     saveStorages(subtractLists(modified, tooSmall));

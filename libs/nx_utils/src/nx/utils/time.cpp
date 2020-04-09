@@ -24,7 +24,7 @@ namespace utils {
 
 namespace {
 
-static milliseconds utcTimeShift(0);
+static milliseconds utcTimeShift(0); //< Addition time shift for test purpose only.
 static milliseconds monotonicTimeShift(0);
 
 } // namespace

@@ -17,6 +17,8 @@ struct NvrIni: public nx::kit::IniConfig
         "If more than zero, the NVR will return to the 'normal' mode when power consumption\n"
         "becomes lower than this value. Otherwise the value of this limit is calculated\n"
         "automatically depending on the NVR model");
+
+    NX_INI_INT(50, ioStatePollingIntervalMs, "Interval of IO inputs polling.");
 };
 
 NvrIni& nvrIni();
