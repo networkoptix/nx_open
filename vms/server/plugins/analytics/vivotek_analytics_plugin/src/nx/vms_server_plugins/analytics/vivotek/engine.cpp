@@ -2,8 +2,11 @@
 
 #include "device_agent.h"
 
+#include <nx/kit/json.h>
+
 namespace nx::vms_server_plugins::analytics::vivotek {
 
+using namespace nx::kit;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
@@ -23,10 +26,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
 std::string Engine::manifestString() const
 {
-    return /*suppress newline*/ 1 + (const char*) R"json(
-{
-}
-)json";
+    return Json(Json::object{}).dump();
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

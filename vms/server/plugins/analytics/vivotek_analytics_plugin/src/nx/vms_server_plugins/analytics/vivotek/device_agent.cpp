@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include <nx/kit/json.h>
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
@@ -9,6 +10,7 @@
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
+using namespace nx::kit;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
@@ -23,22 +25,20 @@ DeviceAgent::~DeviceAgent()
 
 std::string DeviceAgent::manifestString() const
 {
-    return /*suppress newline*/ 1 + (const char*) R"json(
-{
-    "eventTypes": [
-        {
-            "id": ")json" + kNewTrackEventType + R"json(",
-            "name": "New track started"
-        }
-    ],
-    "objectTypes": [
-        {
-            "id": ")json" + kHelloWorldObjectType + R"json(",
-            "name": "Hello, World!"
-        }
-    ]
-}
-)json";
+    return Json(Json::object{
+        {"eventTypes", Json::array{
+            Json::object{
+                {"id", kNewTrackEventType},
+                {"name", "New track started"},
+            },
+        }},
+        {"objectTypes", Json::array{
+            Json::object{
+                {"id", kHelloWorldObjectType},
+                {"name", "Hello, World!"},
+            },
+        }},
+    }).dump();
 }
 
 bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
