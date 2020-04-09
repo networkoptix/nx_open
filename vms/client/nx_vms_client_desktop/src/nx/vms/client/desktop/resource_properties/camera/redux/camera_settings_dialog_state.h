@@ -100,6 +100,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         QString settingsUrlPath;
         int overrideXmlHttpRequestTimeout = 0;
         QString overrideHttpUserAgent;
+        bool fixupRequestUrls = false;
         bool hasVideo = true;
         bool editableStreamUrls = false;
         bool networkLink = false;
@@ -301,7 +302,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     };
     WearableCameraMotionDetection wearableMotion;
 
-    bool wearableClientTimeZone = false;
+    bool wearableIgnoreTimeZone = false;
 
     // Helper methods.
 

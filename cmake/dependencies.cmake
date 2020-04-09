@@ -113,9 +113,38 @@ macro(load_dependencies)
                 list(APPEND cpp_runtime_libs libmvec.so.1)
             endif()
 
-            copy_system_libraries(${cpp_runtime_libs})
             copy_system_libraries(${icu_runtime_libs})
             nx_copy_package(${QT_DIR})
+
+            # Check if we need newer libstdc++.
+            if(NOT DEFINED CACHE{useSystemStdcpp})
+                set(useSystemStdcpp ON)
+
+                execute_process(
+                    COMMAND ${CMAKE_CXX_COMPILER} --print-file-name libstdc++.so.6
+                    OUTPUT_VARIABLE stdcpp_lib_path
+                )
+
+                if(stdcpp_lib_path)
+                    get_filename_component(stdcpp_dir ${stdcpp_lib_path} DIRECTORY)
+                    execute_process(
+                        COMMAND ${CMAKE_SOURCE_DIR}/build_utils/linux/choose_newer_stdcpp.sh
+                            ${stdcpp_dir}
+                        OUTPUT_VARIABLE selected_stdcpp
+                    )
+
+                    if(selected_stdcpp)
+                        set(useSystemStdcpp OFF)
+                    endif()
+                endif()
+
+                set(useSystemStdcpp ${useSystemStdcpp} CACHE BOOL
+                    "Use system libstdc++ and do not copy it to lib directory from the compiler.")
+            endif()
+
+            if(NOT useSystemStdcpp)
+                copy_system_libraries(${cpp_runtime_libs})
+            endif()
         endif()
 
         string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")

@@ -4,4 +4,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export QT_QPA_PLATFORM=xcb
 
+STDCPP_DIR="$($DIR/choose_newer_stdcpp.sh $DIR/../lib/stdcpp)"
+if [ -n "$STDCPP_DIR" ]
+then
+    export LD_LIBRARY_PATH="$STDCPP_DIR"
+fi
+
 "$DIR/client-bin" $@

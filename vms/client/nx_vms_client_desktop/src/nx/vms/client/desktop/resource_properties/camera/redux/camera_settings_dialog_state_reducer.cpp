@@ -218,6 +218,8 @@ State loadNetworkInfo(State state, const Camera& camera)
         camera->resourceData().value<int>("overrideXmlHttpRequestTimeout", 0);
     state.singleCameraProperties.overrideHttpUserAgent =
         camera->resourceData().value<QString>("overrideHttpUserAgent");
+    state.singleCameraProperties.fixupRequestUrls =
+        camera->resourceData().value<bool>("fixupRequestUrls", false);
     state.singleCameraSettings.primaryStream.setBase(camera->sourceUrl(Qn::CR_LiveVideo));
     state.singleCameraSettings.secondaryStream.setBase(camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
 
@@ -621,7 +623,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.analytics.settingsByEngineId = {};
     state.analytics.streamByEngineId = {};
     state.enableMotionDetection = {};
-    state.wearableClientTimeZone = false;
+    state.wearableIgnoreTimeZone = false;
 
     state.deviceType = firstCamera
         ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
@@ -780,7 +782,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         state.analytics.enabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
         state.analytics.enabledEngines.resetUser();
 
-        state.wearableClientTimeZone = firstCamera->isWearableClientTimeZone();
+        state.wearableIgnoreTimeZone = firstCamera->wearableIgnoreTimeZone();
     }
 
     fetchFromCameras<bool>(state.recording.enabled, cameras,
@@ -1582,9 +1584,9 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
     return std::make_pair(true, std::move(state));
 }
 
-State CameraSettingsDialogStateReducer::setWearableClientTimeZone(State state, bool value)
+State CameraSettingsDialogStateReducer::setWearableIgnoreTimeZone(State state, bool value)
 {
-    state.wearableClientTimeZone = value;
+    state.wearableIgnoreTimeZone = value;
     state.hasChanges = true;
     return state;
 }

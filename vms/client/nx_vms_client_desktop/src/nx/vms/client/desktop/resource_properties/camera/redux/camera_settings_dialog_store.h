@@ -117,7 +117,7 @@ public:
     Q_INVOKABLE bool dualStreamingEnabled() const;
     Q_INVOKABLE bool recordingEnabled() const;
 
-    void setWearableClientTimeZone(bool value);
+    void setWearableIgnoreTimeZone(bool value);
     void setWearableMotionDetectionEnabled(bool value);
     void setWearableMotionSensitivity(int value);
     void setCredentials(

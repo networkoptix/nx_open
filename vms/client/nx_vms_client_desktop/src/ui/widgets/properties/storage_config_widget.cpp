@@ -321,7 +321,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui->storageView->sortByColumn(0, Qt::AscendingOrder);
     ui->storageView->header()->setStretchLastSection(false);
     ui->storageView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->storageView->header()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Fixed);
     ui->storageView->header()->setSectionResizeMode(QnStorageListModel::SeparatorColumn, QHeaderView::Stretch);
     ui->storageView->setMouseTracking(true);
     ui->storageView->installEventFilter(m_columnResizer.data());
