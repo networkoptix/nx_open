@@ -74,8 +74,9 @@ public:
      */
     BufferType fetchMessageBodyBuffer();
 
-    /** Blocks until entire message body is avaliable. */
-    std::optional<BufferType> fetchEntireMessageBody();
+    /** Blocks until entire message body is avaliable or timeout expired if it is specified. */
+    std::optional<BufferType> fetchEntireMessageBody(
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
     void addAdditionalHeader(const StringType& key, const StringType& value);
     void removeAdditionalHeader(const StringType& key);
