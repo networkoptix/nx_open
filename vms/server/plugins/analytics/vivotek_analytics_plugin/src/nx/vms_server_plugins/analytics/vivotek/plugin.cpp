@@ -1,8 +1,10 @@
 #include "plugin.h"
 
-#include "engine.h"
-
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
 #include <nx/kit/json.h>
+
+#include "engine.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 

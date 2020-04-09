@@ -11,7 +11,6 @@ class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
 {
 public:
     DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
-    virtual ~DeviceAgent() override;
 
 protected:
     virtual std::string manifestString() const override;

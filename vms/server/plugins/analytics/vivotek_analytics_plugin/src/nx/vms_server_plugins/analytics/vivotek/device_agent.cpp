@@ -2,11 +2,15 @@
 
 #include <chrono>
 
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
 #include <nx/kit/json.h>
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+
+#include "ini.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -15,11 +19,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
-    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true)
-{
-}
-
-DeviceAgent::~DeviceAgent()
+    ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
 }
 
