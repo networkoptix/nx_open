@@ -110,7 +110,7 @@ include(vms_protocol_version)
 include(customization_package)
 
 if(customization.advanced.useMetaVersion)
-    set(metaVersion R5)
+    set(metaVersion R6)
 endif()
 
 include(properties)
