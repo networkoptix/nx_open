@@ -298,7 +298,7 @@ void Appserver2Process::registerHttpHandlers(
     auto getNonce = [](const nx::network::http::Request&, QnHttpConnectionListener*, QnJsonRestResult* result)
     {
         QnGetNonceReply reply;
-        reply.nonce = QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch(), 16);
+        reply.nonce = QString::number(nx::utils::millisSinceEpoch().count(), 16);
         reply.realm = nx::network::AppInfo::realm();
         result->setReply(reply);
         return nx::network::http::StatusCode::ok;

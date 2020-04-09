@@ -25,7 +25,7 @@ int GetTimeHandler::executeGet(
     nx::vms::api::TimeReply reply;
 
     auto commonModule = owner->commonModule();
-    reply.osTime = milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    reply.osTime = nx::utils::millisSinceEpoch();
     reply.vmsTime = commonModule->ec2Connection()->timeSyncManager()->getSyncTime();
     reply.timeZoneOffset = milliseconds(currentTimeZone() * 1000LL);
 

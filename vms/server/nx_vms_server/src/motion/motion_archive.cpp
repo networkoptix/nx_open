@@ -56,7 +56,7 @@ QnAbstractCompressedMetadataPtr QnMotionArchiveConnection::getMotionData(qint64 
                 m_maxDate = AV_NOPTS_VALUE;
                 return QnMetaDataV1Ptr();
             }
-            m_maxDate = qMin(m_maxDate, QDateTime::currentDateTime().toMSecsSinceEpoch());
+            m_maxDate = qMin(m_maxDate, nx::utils::millisSinceEpoch().count());
         }
     }
 
