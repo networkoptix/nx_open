@@ -1567,6 +1567,14 @@ bool QnStorageManager::isArchiveTimeExists(
     QnMediaServerModule* serverModule,
     const QString& cameraUniqueId, qint64 timeMs)
 {
+    using namespace nx::vms::server::resource;
+    if (auto camera = serverModule->resourcePool()->getResourceByUniqueId<Camera>(cameraUniqueId);
+        camera && camera->isDtsBased())
+    {
+        return !camera->getDtsTimePeriods(/*startTime*/ timeMs, /*endTime*/ timeMs, /*limit*/ 1, 
+            /*keepSmallChunks*/ true, /*limit*/ 1, Qt::SortOrder::AscendingOrder).isEmpty();
+    }
+
     return serverModule->normalStorageManager()->isArchiveTimeExistsInternal(cameraUniqueId, timeMs) ||
         serverModule->backupStorageManager()->isArchiveTimeExistsInternal(cameraUniqueId, timeMs);
 }
