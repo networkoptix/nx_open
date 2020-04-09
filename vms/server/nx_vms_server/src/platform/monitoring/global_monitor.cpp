@@ -151,14 +151,7 @@ GlobalMonitor::GlobalMonitor(
     m_cachedTotalHddLoad(
         [this]() { NX_MUTEX_LOCKER lock(&m_mutex); return m_monitorBase->totalHddLoad(); }),
     m_cachedTotalNetworkLoad(
-        [this]() { NX_MUTEX_LOCKER lock(&m_mutex); return m_monitorBase->totalNetworkLoad(); }),
-    m_cachedTotalPartitionSpaceInfo(
-        [this]()
-        {
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            return m_monitorBase->totalPartitionSpaceInfo();
-        },
-        kCacheExpirationTime)
+        [this]() { NX_MUTEX_LOCKER lock(&m_mutex); return m_monitorBase->totalNetworkLoad(); })
 {
     NX_CRITICAL(m_monitorBase);
     NX_CRITICAL(m_monitorBase->thread() == thread(),
@@ -249,7 +242,7 @@ QList<nx::vms::server::PlatformMonitor::NetworkLoad> GlobalMonitor::totalNetwork
 
 QList<nx::vms::server::PlatformMonitor::PartitionSpace> GlobalMonitor::totalPartitionSpaceInfo()
 {
-    return m_cachedTotalPartitionSpaceInfo.get();
+    return m_monitorBase->totalPartitionSpaceInfo();
 }
 
 int GlobalMonitor::thisProcessThreads()

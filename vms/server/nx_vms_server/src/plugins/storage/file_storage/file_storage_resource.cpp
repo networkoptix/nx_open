@@ -262,6 +262,18 @@ void QnFileStorageResource::setIsSystemFlagIfNeeded()
     if (*m_isSystem.lock())
         return;
 
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (!m_localPath.isEmpty())
+        {
+            NX_DEBUG(
+                this,
+                "setIsSystemFlagIfNeeded: Storage '%1' is external, thus not system.",
+                nx::utils::url::hidePassword(getUrl()));
+            return;
+        }
+    }
+
     const QString sysPath = sysDrivePath(m_serverModule);
     const bool isSystem = !sysPath.isNull() && getDevicePath(m_serverModule, getUrl()).startsWith(sysPath);
     NX_DEBUG(
@@ -847,16 +859,24 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
         {
             auto result = s;
             result.replace('\\', '/');
-            return result.left(result.lastIndexOf('/'));
+            return result;
         };
+    static const auto trim = [](const QString& p) { return p.left(p.lastIndexOf('/')); };
 
     #if defined (Q_OS_WIN)
         if (isExternal())
             return Qn::StorageInit_Ok; //< #TODO #akulikov Implement real check by looking at opened samba connections
 
-        const QString path = normalize(getUrl());
+        const auto path = trim(normalize(getUrl()));
     #else
-        const QString path = m_mockableCallFactory.canonicalPath(normalize(getFsPath()));
+        bool isApiMountedSmb = false;
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            isApiMountedSmb = !m_localPath.isEmpty();
+        }
+
+        const auto fsPath = normalize(getFsPath());
+        auto path = m_mockableCallFactory.canonicalPath(isApiMountedSmb ? fsPath : trim(fsPath));
     #endif
 
     bool isMounted = false;
@@ -868,7 +888,7 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
         const auto partitions = nx::vms::server::fs::media_paths::getMediaPartitions(pathConfig);
         isMounted = std::any_of(
             partitions.cbegin(), partitions.cend(),
-            [path](const auto& p) { return normalize(p.path) == path; });
+            [path](const auto& p) { return trim(normalize(p.path)) == path; });
     }
 
     if (!isMounted)
