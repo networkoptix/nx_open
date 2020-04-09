@@ -54,7 +54,7 @@ static QString getTimeZoneFile([[maybe_unused]] const QString& timeZoneId)
 
 system_clock::time_point utcTime()
 {
-    return system_clock::time_point(millisSinceEpoch());
+    return system_clock::now() + utcTimeShift;
 }
 
 seconds timeSinceEpoch()
@@ -64,7 +64,7 @@ seconds timeSinceEpoch()
 
 std::chrono::milliseconds millisSinceEpoch()
 {
-    return milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch())  + utcTimeShift;
+    return duration_cast<milliseconds>(utcTime().time_since_epoch());
 }
 
 steady_clock::time_point monotonicTime()
