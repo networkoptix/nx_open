@@ -12,6 +12,8 @@ add_subdirectory(vca_analytics_plugin)
 
 add_subdirectory(dw_mtt_analytics_plugin)
 
+add_subdirectory(dw_tvt_analytics_plugin)
+
 add_subdirectory(ssc_analytics_plugin)
 
 add_subdirectory(dahua_analytics_plugin)
