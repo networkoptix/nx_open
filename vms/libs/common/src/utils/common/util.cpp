@@ -23,6 +23,7 @@
 #include <utils/common/app_info.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/time.h>
 
 QString strPadLeft(const QString &str, int len, char ch)
 {
@@ -92,7 +93,7 @@ int timeZone(QDateTime dt1)
 
 int currentTimeZone()
 {
-    return timeZone(QDateTime::currentDateTime());
+    return timeZone(QDateTime::fromMSecsSinceEpoch(nx::utils::millisSinceEpoch().count()));
 }
 
 static uint hash(const QChar *p, int n)
