@@ -43,6 +43,13 @@ struct NX_VMS_CLIENT_DESKTOP_API UserEditableMultiple
 
     bool equals(T value) const { return hasValue() && get() == value; }
 
+    static UserEditableMultiple<T> fromValue(const T& value)
+    {
+        UserEditableMultiple<T> result;
+        result.setBase(value);
+        return result;
+    }
+
 private:
     std::optional<T> m_base;
     std::optional<T> m_user;

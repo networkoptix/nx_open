@@ -74,6 +74,62 @@ protected:
     }
 };
 
+TEST_F(CameraSettingsDialogStateReducerTest, recordingDaysBasicChecks)
+{
+    State s;
+
+    // Checks basic conditions for initial (auto) state.
+    ASSERT_FALSE(s.recording.maxDays.isManualMode());
+    ASSERT_FALSE(s.recording.maxDays.hasManualDaysValue());
+    ASSERT_TRUE(s.recording.maxDays.isApplicable());
+    ASSERT_EQ(s.recording.maxDays.autoCheckState(), Qt::Checked);
+
+    // Checks basic conditions for manual mode.
+    s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
+    ASSERT_TRUE(s.recording.maxDays.isManualMode());
+    ASSERT_TRUE(s.recording.maxDays.hasManualDaysValue());
+    ASSERT_TRUE(s.recording.maxDays.isApplicable());
+    ASSERT_EQ(s.recording.maxDays.autoCheckState(), Qt::Unchecked);
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, recordingDaysApplicableChecks)
+{
+    const QnVirtualCameraResourceList cameras = {
+        CameraResourceStubPtr(new CameraResourceStub()),
+        CameraResourceStubPtr(new CameraResourceStub())};
+
+    // Same days value, same "manual" mode.
+    cameras[0]->setMinDays(1);
+    cameras[1]->setMinDays(1);
+    State state = Reducer::loadCameras({}, cameras);
+    ASSERT_TRUE(state.recording.minDays.isApplicable());
+
+    // Same days value, different "auto" mode.
+    cameras[0]->setMinDays(1);
+    cameras[1]->setMinDays(-1);
+    state = Reducer::loadCameras({}, cameras);
+    ASSERT_FALSE(state.recording.minDays.isApplicable());
+
+
+    // Same days value, same "auto" mode.
+    cameras[0]->setMinDays(-1);
+    cameras[1]->setMinDays(-1);
+    state = Reducer::loadCameras({}, cameras);
+    ASSERT_TRUE(state.recording.minDays.isApplicable());
+
+    // Different days value, same "auto" mode.
+    cameras[0]->setMinDays(-1);
+    cameras[1]->setMinDays(-2);
+    state = Reducer::loadCameras({}, cameras);
+    ASSERT_TRUE(state.recording.minDays.isApplicable());
+
+    // Different days value, same "manual" mode.
+    cameras[0]->setMinDays(1);
+    cameras[1]->setMinDays(2);
+    state = Reducer::loadCameras({}, cameras);
+    ASSERT_FALSE(state.recording.minDays.isApplicable());
+}
+
 TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)
 {
     static constexpr int kTestDaysBig = nx::vms::api::kDefaultMaxArchiveDays + 1;
@@ -81,68 +137,56 @@ TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)
     // Unchecking automatic max days when no fixed value is set: sets fixed value to default.
     State s;
     s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_FALSE(s.recording.maxDays.automatic.valueOr(true));
-    ASSERT_EQ(s.recording.maxDays.value(), nx::vms::api::kDefaultMaxArchiveDays);
+    ASSERT_EQ(s.recording.maxDays.days(), nx::vms::api::kDefaultMaxArchiveDays);
+
 
     // Unchecking automatic max days when fixed value is set: keeps fixed value.
     s = {};
-    s.recording.maxDays.value.setBase(kTestDaysBig);
+    s.recording.maxDays = RecordingDays::maxDays(-kTestDaysBig);
     s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_FALSE(s.recording.maxDays.automatic.valueOr(true));
-    ASSERT_EQ(s.recording.maxDays.value(), kTestDaysBig);
+    ASSERT_EQ(s.recording.maxDays.days(), kTestDaysBig);
 
     // Unchecking automatic max days when no fixed value is set: sets fixed value to default.
     // Checks that max days value stays greater or equal than fixed min days value.
     s = {};
-    s.recording.minDays.automatic.setBase(false);
-    s.recording.minDays.value.setBase(kTestDaysBig);
+    s.recording.minDays = RecordingDays::minDays(kTestDaysBig);
     s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_FALSE(s.recording.maxDays.automatic.valueOr(true));
-    ASSERT_GE(s.recording.maxDays.value(), s.recording.minDays.value());
+    ASSERT_GE(s.recording.maxDays.days(), s.recording.minDays.days());
 
     // Unchecking automatic max days when fixed value is set: keeps fixed value.
     // Checks that max days value stays greater or equal than fixed min days value.
     s = {};
-    s.recording.maxDays.value.setBase(kTestDaysBig);
-    s.recording.minDays.automatic.setBase(false);
-    s.recording.minDays.value.setBase(kTestDaysBig + 1);
+    s.recording.maxDays = RecordingDays::maxDays(-kTestDaysBig);
+    s.recording.minDays = RecordingDays::minDays(kTestDaysBig + 1);
     s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_FALSE(s.recording.maxDays.automatic.valueOr(true));
-    ASSERT_GE(s.recording.maxDays.value(), s.recording.minDays.value());
+    ASSERT_GE(s.recording.maxDays.days(), s.recording.minDays.days());
 
     // Unchecking automatic min days when no fixed value is set: sets fixed value to default.
     s = {};
     s = Reducer::setMinRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_FALSE(s.recording.minDays.automatic.valueOr(true));
-    ASSERT_EQ(s.recording.minDays.value(), nx::vms::api::kDefaultMinArchiveDays);
+    ASSERT_EQ(s.recording.minDays.days(), nx::vms::api::kDefaultMinArchiveDays);
 
     // Unchecking automatic min days when fixed value is set: keeps fixed value.
     // Checks that min days value stays lesser or equal than fixed max days value.
     s = {};
-    s.recording.minDays.value.setBase(kTestDaysBig);
-    s.recording.maxDays.automatic.setBase(false);
-    s.recording.maxDays.value.setBase(kTestDaysBig - 1);
+    s.recording.minDays = RecordingDays::minDays(-kTestDaysBig);
+    s.recording.maxDays = RecordingDays::maxDays(kTestDaysBig - 1);
     s = Reducer::setMinRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_FALSE(s.recording.minDays.automatic.valueOr(true));
-    ASSERT_LE(s.recording.minDays.value(), s.recording.maxDays.value());
+    ASSERT_LE(s.recording.minDays.days(), s.recording.maxDays.days());
 
-    // Setting fixed max days less than fixed min days pushes min days down.
+    // Checking automatic min days when has fixed non-default value: keep fixed value.
     s = {};
-    s.recording.minDays.automatic.setBase(false);
-    s.recording.maxDays.automatic.setBase(false);
-    s.recording.minDays.value.setBase(kTestDaysBig + 1);
-    s = Reducer::setMaxRecordingDaysValue(std::move(s), kTestDaysBig);
-    ASSERT_EQ(s.recording.maxDays.value(), kTestDaysBig);
-    ASSERT_GE(s.recording.maxDays.value(), s.recording.minDays.value());
+    s.recording.minDays = RecordingDays::minDays(kTestDaysBig);
+    s = Reducer::setMinRecordingDaysAutomatic(std::move(s), true);
+    ASSERT_EQ(s.recording.minDays.days(), kTestDaysBig);
 
     // Setting fixed min days greater than fixed max days pushes max days up.
     s = {};
-    s.recording.minDays.automatic.setBase(false);
-    s.recording.maxDays.automatic.setBase(false);
-    s.recording.maxDays.value.setBase(kTestDaysBig - 1);
+    s.recording.minDays.setManualMode();
+    s.recording.maxDays = RecordingDays::maxDays(kTestDaysBig - 1);
     s = Reducer::setMinRecordingDaysValue(std::move(s), kTestDaysBig);
-    ASSERT_EQ(s.recording.minDays.value(), kTestDaysBig);
-    ASSERT_LE(s.recording.minDays.value(), s.recording.maxDays.value());
+    ASSERT_EQ(s.recording.minDays.days(), kTestDaysBig);
+    ASSERT_LE(s.recording.minDays.days(), s.recording.maxDays.days());
 }
 
 // Setup fixed value of recording min days, leaving max days as auto.
@@ -152,19 +196,23 @@ TEST_F(CameraSettingsDialogStateReducerTest, setFixedRecordingMinDays)
     static constexpr int kTestDaysBig = nx::vms::api::kDefaultMaxArchiveDays + 1;
 
     CameraResourceStubPtr camera(new CameraResourceStub());
+
     // Unchecking 'auto' must keep previously saved (as negative) value.
     camera->setMinDays(-kTestDaysBig);
 
     State initial = Reducer::loadCameras({}, {camera});
-    ASSERT_TRUE(initial.recording.minDays.automatic());
+    ASSERT_TRUE(initial.recording.minDays.autoCheckState() == Qt::Checked);
+    ASSERT_FALSE(initial.recording.minDays.isManualMode());
+    ASSERT_FALSE(initial.recording.minDays.hasManualDaysValue());
 
     State unchecked = Reducer::setMinRecordingDaysAutomatic(std::move(initial), false);
-    ASSERT_FALSE(unchecked.recording.minDays.automatic.valueOr(true));
-    ASSERT_EQ(unchecked.recording.minDays.value(), kTestDaysBig);
+    ASSERT_FALSE(initial.recording.minDays.isManualMode());
+    ASSERT_FALSE(initial.recording.minDays.hasManualDaysValue());
+    ASSERT_EQ(unchecked.recording.minDays.days(), kTestDaysBig);
 
     CameraSettingsDialogStateConversionFunctions::applyStateToCameras(unchecked, {camera});
     State reloaded = Reducer::loadCameras(std::move(unchecked), {camera});
-    ASSERT_EQ(reloaded.recording.minDays.value(), kTestDaysBig);
+    ASSERT_EQ(reloaded.recording.minDays.days(), kTestDaysBig);
 }
 
 // Schedule brush should be correctly initialized after loadCameras.
@@ -195,7 +243,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, brushFpsIsValidAfterCleanSchedule)
     State initial = Reducer::loadCameras({}, cameras);
 
     State beforeClean = Reducer::setScheduleBrushRecordingType(std::move(initial),
-		Qn::RecordingType::never);
+        Qn::RecordingType::never);
     ASSERT_EQ(beforeClean.recording.brush.fps, kDefaultFps);
 
     State afterClean = Reducer::setSchedule(std::move(beforeClean), makeEmptySchedule());
@@ -272,7 +320,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, recordingAlertIfScheduleIsEmpty)
     CameraResourceStubPtr camera(new CameraResourceStub());
     camera->setScheduleTasks(makeEmptySchedule());
 
-	State initial = Reducer::loadCameras({}, {camera});
+    State initial = Reducer::loadCameras({}, {camera});
     ASSERT_FALSE(initial.recording.enabled());
     ASSERT_FALSE(initial.recordingHint.has_value());
 

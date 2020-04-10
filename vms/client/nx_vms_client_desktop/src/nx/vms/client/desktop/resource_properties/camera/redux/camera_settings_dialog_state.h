@@ -18,8 +18,9 @@
 #include <nx/vms/client/desktop/common/data/rotation.h>
 #include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
 #include <nx/vms/client/desktop/common/redux/redux_types.h>
-#include <nx/vms/client/desktop/resource_properties/camera/data/analytics_engine_info.h>
+#include <nx/vms/client/desktop/resource_properties/camera/data/recording_days.h>
 #include <nx/vms/client/desktop/resource_properties/camera/data/schedule_cell_params.h>
+#include <nx/vms/client/desktop/resource_properties/camera/data/analytics_engine_info.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
@@ -193,12 +194,6 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     ExpertSettings expert;
     bool isDefaultExpertSettings = false;
 
-    struct RecordingDays
-    {
-        UserEditableMultiple<bool> automatic;
-        UserEditableMultiple<int> value;
-    };
-
     struct RecordingSettings
     {
         UserEditableMultiple<bool> enabled;
@@ -235,8 +230,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         bool showQuality = true;
         bool showFps = true;
 
-        RecordingDays minDays;
-        RecordingDays maxDays;
+        RecordingDays minDays = RecordingDays::minDays();
+        RecordingDays maxDays = RecordingDays::maxDays();
 
         bool isCustomBitrate() const
         {
