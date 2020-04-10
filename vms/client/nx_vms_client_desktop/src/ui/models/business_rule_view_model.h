@@ -173,6 +173,7 @@ private:
     nx::vms::api::ActionType m_actionType;
     QSet<QnUuid> m_actionResources;
     nx::vms::event::ActionParameters m_actionParams;
+    QHash<nx::vms::api::ActionType, nx::vms::event::ActionParameters> m_cachedActionParams;
 
     int m_aggregationPeriodSec;
     bool m_disabled;

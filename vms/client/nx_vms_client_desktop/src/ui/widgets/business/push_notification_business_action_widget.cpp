@@ -118,9 +118,6 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
         this, &PushNotificationBusinessActionWidget::parametersChanged);
     connect(ui->addSourceNameCheckBox, &QCheckBox::clicked,
         this, &PushNotificationBusinessActionWidget::parametersChanged);
-
-    // TODO: #spanasenko We need to initialize model with the right value instead.
-    ui->addSourceNameCheckBox->setChecked(true);
 }
 
 PushNotificationBusinessActionWidget::~PushNotificationBusinessActionWidget()
