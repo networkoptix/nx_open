@@ -21,6 +21,8 @@ TEST(RotateImageFilter, values)
 {
     ASSERT_EQ(0, QnRotateImageFilter(-370).angle());
     ASSERT_EQ(90, QnRotateImageFilter(100).angle());
+    ASSERT_EQ(270, QnRotateImageFilter(-80).angle());
+    ASSERT_EQ(270, QnRotateImageFilter(-100).angle());
     ASSERT_EQ(180, QnRotateImageFilter(170).angle());
     ASSERT_EQ(180, QnRotateImageFilter(210).angle());
     ASSERT_EQ(0, QnRotateImageFilter(350).angle());
