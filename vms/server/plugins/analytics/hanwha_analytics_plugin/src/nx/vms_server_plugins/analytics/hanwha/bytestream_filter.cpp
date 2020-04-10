@@ -57,14 +57,14 @@ std::vector<Event> BytestreamFilter::parseMetadataState(
             QString::fromUtf8(nameAndValue[0]).trimmed(),
             QString::fromUtf8(nameAndValue[1]).toLower().trimmed());
 
-        if (event.is_initialized())
+        if (event)
             result.push_back(*event);
     }
 
     return result;
 }
 
-boost::optional<Event> BytestreamFilter::createEvent(
+std::optional<Event> BytestreamFilter::createEvent(
     const QString& eventSource,
     const QString& eventState) const
 {
@@ -72,7 +72,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
 
     auto eventTypeId = m_manifest.eventTypeIdByName(eventSource);
     if (eventTypeId.isEmpty())
-        return boost::none;
+        return std::nullopt;
     const auto eventTypeDescriptor = m_manifest.eventTypeDescriptorById(eventTypeId);
 
     Event event;
@@ -108,31 +108,31 @@ boost::optional<Event> BytestreamFilter::createEvent(
     return event;
 }
 
-/*static*/ boost::optional<int> BytestreamFilter::eventChannel(const QString& eventSource)
+/*static*/ std::optional<int> BytestreamFilter::eventChannel(const QString& eventSource)
 {
     auto split = eventSource.split(L'.');
     if (split.size() < 2)
-        return boost::none;
+        return std::nullopt;
 
     if (split[0].toLower() != kChannelField)
-        return boost::none;
+        return std::nullopt;
 
     bool success = false;
     int channel = split[1].toInt(&success);
 
     if (!success)
-        return boost::none;
+        return std::nullopt;
 
     return channel;
 }
 
-/*static*/ boost::optional<int> BytestreamFilter::eventRegion(const QString& eventSource)
+/*static*/ std::optional<int> BytestreamFilter::eventRegion(const QString& eventSource)
 {
     auto split = eventSource.split(L'.');
     auto splitSize = split.size();
 
     if (splitSize < 2)
-        return boost::none;
+        return std::nullopt;
 
     for (auto i = 0; i < splitSize; ++i)
     {
@@ -142,13 +142,13 @@ boost::optional<Event> BytestreamFilter::createEvent(
             int region = split[i + 1].toInt(&success);
 
             if (!success)
-                return boost::none;
+                return std::nullopt;
 
             return region;
         }
     }
 
-    return boost::none;
+    return std::nullopt;
 }
 
 /*static*/ bool BytestreamFilter::isEventActive(const QString& eventSourceState)
@@ -168,4 +168,3 @@ boost::optional<Event> BytestreamFilter::createEvent(
 } // namespace analytics
 } // namespace vms_server_plugins
 } // namespace nx
-

@@ -1,10 +1,9 @@
 #pragma once
 
 #include <unordered_map>
+#include <optional>
 
 #include <QtCore/QString>
-
-#include <boost/optional/optional.hpp>
 
 #include "common.h"
 
@@ -19,22 +18,22 @@ public:
     static QString buildCaption(
         const Hanwha::EngineManifest& manifest,
         const QString& eventTypeId,
-        boost::optional<int> eventChannel,
-        boost::optional<int> eventRegion,
+        std::optional<int> eventChannel,
+        std::optional<int> eventRegion,
         Hanwha::EventItemType eventItemType,
         bool isActive);
 
     static QString buildDescription(
         const Hanwha::EngineManifest& manifest,
         const QString& eventTypeId,
-        boost::optional<int> eventChannel,
-        boost::optional<int> eventRegion,
+        std::optional<int> eventChannel,
+        std::optional<int> eventRegion,
         Hanwha::EventItemType eventItemType,
         bool isActive);
 
 private:
     template<typename Key, typename Value>
-    static boost::optional<Value> findInMap(
+    static std::optional<Value> findInMap(
         const Key& key,
         const std::unordered_map<Key, Value>& mapForSearch)
     {
@@ -42,7 +41,7 @@ private:
         if (itr != mapForSearch.cend())
             return itr->second;
 
-        return boost::none;
+        return std::nullopt;
     }
 };
 

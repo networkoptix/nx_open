@@ -462,7 +462,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadata
 
             for (const auto& hanwhaEvent: events)
             {
-                if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channelNumber)
+                if (hanwhaEvent.channel.has_value() && *hanwhaEvent.channel != m_channelNumber)
                     return;
 
                 auto eventMetadata = makePtr<EventMetadata>();
