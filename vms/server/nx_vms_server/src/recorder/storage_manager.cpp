@@ -1571,7 +1571,7 @@ bool QnStorageManager::isArchiveTimeExists(
     if (auto camera = serverModule->resourcePool()->getResourceByUniqueId<Camera>(cameraUniqueId);
         camera && camera->isDtsBased())
     {
-        return !camera->getDtsTimePeriods(/*startTime*/ timeMs, /*endTime*/ timeMs, /*limit*/ 1, 
+        return !camera->getDtsTimePeriods(/*startTime*/ timeMs, /*endTime*/ timeMs, /*limit*/ 1,
             /*keepSmallChunks*/ true, /*limit*/ 1, Qt::SortOrder::AscendingOrder).isEmpty();
     }
 
@@ -2623,6 +2623,12 @@ QnStorageResourcePtr QnStorageManager::getStorageByIndex(int index) const
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot()
 {
+    if (!m_firstStoragesTestDone)
+    {
+        NX_DEBUG(this, "getOptimalStorageRoot: Storage test is not over yet. Returning NULL.");
+        return nullptr;
+    }
+
     return nx::vms::server::WritableStoragesHelper(this).optimalStorageForRecording(
         m_storageRoots.values());
 }
