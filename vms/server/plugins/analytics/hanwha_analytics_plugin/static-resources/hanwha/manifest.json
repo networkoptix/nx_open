@@ -816,6 +816,7 @@
             "name": "Appearing in the area",
             "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
             "description": "Object appeared %1",
+            "flags": "regionDependent",
             "regionDescription": "in the region #%1"
         },
         {
