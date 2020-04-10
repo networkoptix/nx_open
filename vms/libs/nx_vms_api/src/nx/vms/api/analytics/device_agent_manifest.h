@@ -18,6 +18,15 @@ namespace nx::vms::api::analytics {
  */
 struct NX_VMS_API DeviceAgentManifest
 {
+    enum Capability
+    {
+        noCapabilities = 0,
+        hideStreamSelection = 1 << 0,
+    };
+    Q_DECLARE_FLAGS(Capabilities, Capability);
+
+    Capabilities capabilities;
+
     /** Whitelist (filter) of Event types for types declared in the owner Engine manifest. */
     QList<QString> supportedEventTypeIds;
 
@@ -46,6 +55,7 @@ struct NX_VMS_API DeviceAgentManifest
 NX_VMS_API std::vector<ManifestError> validate(const DeviceAgentManifest& deviceAgentManifest);
 
 #define DeviceAgentManifest_Fields \
+    (capabilities) \
     (supportedEventTypeIds) \
     (supportedObjectTypeIds) \
     (eventTypes) \
@@ -53,6 +63,14 @@ NX_VMS_API std::vector<ManifestError> validate(const DeviceAgentManifest& device
     (groups) \
     (deviceAgentSettingsModel)
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(DeviceAgentManifest::Capabilities)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(DeviceAgentManifest::Capability)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentManifest, (json), NX_VMS_API)
 
 } // namespace nx::vms::api::analytics
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::DeviceAgentManifest::Capability,
+    (metatype)(numeric)(lexical), NX_VMS_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::DeviceAgentManifest::Capabilities,
+    (metatype)(numeric)(lexical), NX_VMS_API)

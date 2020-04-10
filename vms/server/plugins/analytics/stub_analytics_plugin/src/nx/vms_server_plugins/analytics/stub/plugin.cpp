@@ -39,6 +39,14 @@ std::string Plugin::manifestString() const
                         "caption": "Produce Plugin Diagnostic Events from the Engine",
                         "defaultValue": false,
                         "value": false
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kHideStreamSelectionSetting + R"json(",
+                        "caption": "Hide stream selection",
+                        "description": "If true, the stream selection control will be hidden for newly created DeviceAgents",
+                        "defaultValue": false,
+                        "value": false
                     }
                 ]
             },

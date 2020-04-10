@@ -50,6 +50,14 @@ Engine::~Engine()
         m_pluginDiagnosticEventThread->join();
 }
 
+std::string Engine::capabilities() const
+{
+    if (m_hideStreamSelection)
+        return "hideStreamSelection";
+
+    return "";
+}
+
 void Engine::generatePluginDiagnosticEvents()
 {
     while (!m_terminated)
@@ -775,6 +783,8 @@ std::string Engine::manifestString() const
 
 Result<const IStringMap*> Engine::settingsReceived()
 {
+    m_hideStreamSelection = toBool(settingValue(kHideStreamSelectionSetting));
+
     m_needToThrowPluginDiagnosticEvents = toBool(
         settingValue(kThrowPluginDiagnosticEventsFromEngineSetting));
 

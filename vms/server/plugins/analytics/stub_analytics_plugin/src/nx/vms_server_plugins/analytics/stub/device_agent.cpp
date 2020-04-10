@@ -173,6 +173,7 @@ std::string DeviceAgent::manifestString() const
 
     return /*suppress newline*/ 1 + (const char*) R"json(
 {
+    "capabilities": ")json" + capabilities() + R"json(",
     "supportedEventTypeIds": [
         ")json" + kLineCrossingEventType + R"json(",
         ")json" + kSuspiciousNoiseEventType + R"json(",
@@ -370,6 +371,11 @@ void DeviceAgent::processFrameMotion(Ptr<IList<IMetadataPacket>> metadataPacketL
 
         pushMetadataPacket(objectMetadataPacket.releasePtr());
     }
+}
+
+std::string DeviceAgent::capabilities() const
+{
+    return m_engine->capabilities();
 }
 
 bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)

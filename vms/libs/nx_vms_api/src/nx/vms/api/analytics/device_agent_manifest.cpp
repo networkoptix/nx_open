@@ -2,6 +2,26 @@
 
 #include <nx/fusion/model_functions.h>
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
+    nx::vms::api::analytics::DeviceAgentManifest,
+    Capability,
+    (nx::vms::api::analytics::DeviceAgentManifest::Capability::noCapabilities, "noCapabilities")
+    (nx::vms::api::analytics::DeviceAgentManifest::Capability::hideStreamSelection,
+        "hideStreamSelection"))
+
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::DeviceAgentManifest::Capability,
+    (numeric)(debug))
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
+    nx::vms::api::analytics::DeviceAgentManifest,
+    Capabilities,
+    (nx::vms::api::analytics::DeviceAgentManifest::Capability::noCapabilities, "noCapabilities")
+    (nx::vms::api::analytics::DeviceAgentManifest::Capability::hideStreamSelection,
+        "hideStreamSelection"))
+
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::DeviceAgentManifest::Capabilities,
+    (numeric)(debug))
+
 namespace nx::vms::api::analytics {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceAgentManifest, (json), DeviceAgentManifest_Fields,
