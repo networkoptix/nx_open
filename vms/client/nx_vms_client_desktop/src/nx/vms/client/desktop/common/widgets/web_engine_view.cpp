@@ -1,7 +1,10 @@
 #include "web_engine_view.h"
 
+#include <memory>
+
 #include <QtCore/QTimer>
 #include <QtCore/QEventLoop>
+#include <QtCore/QPointer>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QWindow>
@@ -21,6 +24,7 @@ struct WebEngineView::Private
     bool m_ignoreSslErrors = true;
     bool m_redirectLinksToDesktop = false;
     QWebEnginePage* m_masterPage = nullptr;
+    std::shared_ptr<QWebEngineProfile> m_profile;
     std::vector<QWebEnginePage::WebAction> m_hiddenActions;
 };
 
@@ -32,14 +36,14 @@ class WebEnginePage: public QWebEnginePage
 
 public:
     WebEnginePage(QWebEngineProfile* profile, QObject* parent, const WebEngineView& view):
-        QWebEnginePage(profile, parent),
+        base_type(profile, parent),
         m_view(view)
     {
         init();
     }
 
     WebEnginePage(QObject* parent, const WebEngineView& view):
-        QWebEnginePage(parent),
+        base_type(parent),
         m_view(view)
     {
         init();
@@ -104,6 +108,9 @@ WebEngineView::WebEngineView(QWidget* parent, WebEngineView* deriveFrom):
 
 WebEngineView::~WebEngineView()
 {
+    // Enforce deleting the page before deleting the shared profile.
+    if (page()->parent() == this)
+        delete page();
 }
 
 void WebEngineView::setHiddenActions(const std::vector<QWebEnginePage::WebAction> actions)
@@ -149,20 +156,26 @@ bool WebEngineView::isRedirectLinksToDesktop() const
 
 void WebEngineView::createPageWithNewProfile()
 {
-    // Since we are changine user agent here, create the off-the-record profile
+    // Since we are changing user agent here, create the off-the-record profile
     // to avoid mess in persistent storage.
+    auto profile = std::make_shared<QWebEngineProfile>();
 
-    QWebEngineProfile* oldProfile = page()->profile();
+    // QWebEngineView does not take ownership of the custom QWebEnginePage set via setPage()
+    // despite stating this in docs. So we need to delete it manually.
+    // Use QPointer in case setPage() gets a fix someday.
+    QPointer<QWebEnginePage> oldPage = page();
 
-    // Make new profile a parent of the web page because it should outlive the page.
-    auto profile = new QWebEngineProfile(this);
-    setPage(new WebEnginePage(profile, profile, *this));
+    // Deleting the page will trigger closing all of child windows.
+
+    setPage(new WebEnginePage(profile.get(), this, *this));
+    if (oldPage && oldPage->parent() == this)
+        delete oldPage.data();
+
     d->m_masterPage = page();
 
-    // Delete the old profile because it should no longer be used.
-    // This wiil close all derived windows.
-    if (oldProfile->parent() == this)
-        delete oldProfile;
+    // Release ownership of the off-the-record profile which was used by the old page.
+    // This profile may still be owned by child windows during closing.
+    d->m_profile = profile;
 }
 
 void WebEngineView::contextMenuEvent(QContextMenuEvent* event)
