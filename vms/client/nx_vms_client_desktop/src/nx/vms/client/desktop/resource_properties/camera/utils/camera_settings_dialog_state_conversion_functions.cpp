@@ -30,17 +30,20 @@ void tryStoreRecordingDaysChanges(
     const QnVirtualCameraResourceList& cameras,
     DaysType type)
 {
-    static const auto minGetter =
+    using getterType = std::function<int(const QnVirtualCameraResourcePtr&)>;
+    using setterType = std::function<void(const QnVirtualCameraResourcePtr&, int)>;
+
+    static const getterType minGetter =
         [](const QnVirtualCameraResourcePtr& camera) { return camera->minDays(); };
-    static const auto minSetter =
+    static const setterType minSetter =
         [](const QnVirtualCameraResourcePtr& camera, int value) { return camera->setMinDays(value); };
 
-    static const auto maxGetter =
+    static const getterType maxGetter =
         [](const QnVirtualCameraResourcePtr& camera) { return camera->maxDays(); };
-    static const auto maxSetter =
+    static const setterType maxSetter =
         [](const QnVirtualCameraResourcePtr& camera, int value) { return camera->setMaxDays(value); };
 
-    const auto& setter = type == DaysType::minDays ? minSetter : maxSetter;
+    const setterType& setter = type == DaysType::minDays ? minSetter : maxSetter;
 
     if (!data.isApplicable())
         return;
@@ -56,7 +59,7 @@ void tryStoreRecordingDaysChanges(
 
     // Preserves days value if there are different ones.
 
-    const auto& getter = type == DaysType::minDays ? minGetter : maxGetter;
+    const getterType& getter = type == DaysType::minDays ? minGetter : maxGetter;
     for (const auto& camera: cameras)
     {
         const auto value = getter(camera);
