@@ -5,7 +5,7 @@
 
 namespace nx::vms::client::desktop {
 
-class RecordingDays
+class NX_VMS_CLIENT_DESKTOP_API RecordingDays
 {
 public:
     static RecordingDays minDays(int daysCount);
