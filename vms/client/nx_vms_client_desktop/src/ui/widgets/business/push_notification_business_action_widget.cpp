@@ -108,13 +108,7 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
         [this](bool useCustomContent)
         {
             ui->customContentWidget->setVisible(useCustomContent);
-            if (useCustomContent
-                && ui->headerText->text().isEmpty()
-                && ui->bodyText->toPlainText().isEmpty())
-            {
-                // Default value.
-                ui->addSourceNameCheckBox->setChecked(true);
-            }
+            parametersChanged();
         });
     ui->customContentWidget->setVisible(ui->customContentCheckBox->isChecked());
 
@@ -124,6 +118,9 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
         this, &PushNotificationBusinessActionWidget::parametersChanged);
     connect(ui->addSourceNameCheckBox, &QCheckBox::clicked,
         this, &PushNotificationBusinessActionWidget::parametersChanged);
+
+    // TODO: #spanasenko We need to initialize model with the right value instead.
+    ui->addSourceNameCheckBox->setChecked(true);
 }
 
 PushNotificationBusinessActionWidget::~PushNotificationBusinessActionWidget()
@@ -140,7 +137,8 @@ void PushNotificationBusinessActionWidget::at_model_dataChanged(Fields fields)
         QScopedValueRollback<bool> guard(m_updating, true);
         const auto params = model()->actionParams();
 
-        const bool useCustomContent = !params.text.isEmpty() || !params.sayText.isEmpty();
+        const bool useCustomContent = !params.useSource
+            || !params.text.isEmpty() || !params.sayText.isEmpty();
 
         ui->headerText->setText(params.sayText);
         ui->bodyText->setPlainText(params.text);
@@ -174,7 +172,7 @@ void PushNotificationBusinessActionWidget::parametersChanged()
 
     params.sayText = useCustomContent ? ui->headerText->text() : QString();
     params.text = useCustomContent ? ui->bodyText->toPlainText() : QString();
-    params.useSource = useCustomContent ? ui->addSourceNameCheckBox->isChecked() : false;
+    params.useSource = useCustomContent ? ui->addSourceNameCheckBox->isChecked() : true;
     model()->setActionParams(params);
 
     updateSubjectsButton();
