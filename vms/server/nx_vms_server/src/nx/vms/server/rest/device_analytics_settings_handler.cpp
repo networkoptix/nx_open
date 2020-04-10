@@ -251,11 +251,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     const std::optional<DeviceAgentManfiest> deviceAgentManifest =
         commonRequestEntities.device->deviceAgentManifest(engineId);
 
-    if (!deviceAgentManifest)
-    {
-        response.hideStreamSelection = false;
-    }
-    else
+    if (deviceAgentManifest)
     {
         response.hideStreamSelection =
             deviceAgentManifest->capabilities.testFlag(

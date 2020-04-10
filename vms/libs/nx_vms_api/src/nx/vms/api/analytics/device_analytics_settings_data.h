@@ -48,8 +48,8 @@ struct NX_VMS_API DeviceAnalyticsSettingsResponse
     StreamIndex analyzedStreamIndex = StreamIndex::undefined;
 
     /**%apidoc
-     * Indicates whether stream selection control has to be hidden or not. If true, the Plugin is
-     * responsible for stream selection.
+     * Indicates whether the stream selection control has to be hidden or not. If true, the Plugin
+     * is responsible for stream selection.
      */
     bool hideStreamSelection = false;
 
