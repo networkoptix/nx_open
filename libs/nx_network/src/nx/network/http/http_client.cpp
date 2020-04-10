@@ -1,5 +1,6 @@
 #include "http_client.h"
 
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/type_utils.h>
@@ -162,8 +163,16 @@ BufferType HttpClient::fetchMessageBodyBuffer()
 std::optional<BufferType> HttpClient::fetchEntireMessageBody()
 {
     QByteArray buffer;
+    nx::utils::ElapsedTimer timer;
+    const bool hasTimeout = m_messageBodyReadTimeout && m_messageBodyReadTimeout->count() > 0;
+    if (hasTimeout)
+        timer.restart();
     while (!eof())
+    {
         buffer += fetchMessageBodyBuffer();
+        if (hasTimeout && timer.hasExpired(*m_messageBodyReadTimeout))
+            break;
+    }
 
     const auto length = m_asyncHttpClient->contentLength();
     const auto read = m_asyncHttpClient->messageBodyBytesRead();

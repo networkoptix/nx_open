@@ -45,7 +45,7 @@ class ConfigParser:
         import re
         from os import environ
         return re.sub(
-            r"\$([a-zA-Z_][a-zA-Z_]+)",
+            r"\$([a-zA-Z_][a-zA-Z0-9_]+)",
             lambda match: environ.get(match.group(1), ''),
             string
         )
