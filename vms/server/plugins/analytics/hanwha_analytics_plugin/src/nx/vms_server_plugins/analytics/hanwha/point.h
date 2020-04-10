@@ -108,11 +108,6 @@ inline std::optional<Direction> fromServerString<Direction>(const char* source)
     else if (strcmp(source, "absent") == 0)
         result = Direction::Both;
 
-    /*
-     GUI Team has not implemented direction support yet, so we consider all directions to be
-     bidirectional. This should be fixed later.
-    */
-    result = Direction::Both;
     return result;
 }
 
