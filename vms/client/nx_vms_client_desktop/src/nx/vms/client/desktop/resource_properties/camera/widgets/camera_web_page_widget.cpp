@@ -125,6 +125,13 @@ bool currentlyOnUiThread()
     return QThread::currentThread() == qApp->thread();
 }
 
+// Accoding to the docs, in Qt WebEngine, the QAuthenticator
+// must be explicitly set to null to cancel authentication.
+void cancelAuthentication(QAuthenticator* authenticator)
+{
+    *authenticator = QAuthenticator();
+}
+
 // Redirects GET request made by camera page if it is made using camera local IP address.
 class RequestUrlFixupInterceptor: public QWebEngineUrlRequestInterceptor
 {
@@ -320,7 +327,10 @@ void CameraWebPageWidget::Private::createNewPage()
 
             authDialodCounter.registerAttempt();
             if (authDialodCounter.exceeded(kHttpAuthSmallInterval))
+            {
+                cancelAuthentication(authenticator);
                 return;
+            }
 
             PasswordDialog dialog(parent);
 
@@ -343,6 +353,10 @@ void CameraWebPageWidget::Private::createNewPage()
             {
                 authenticator->setUser(dialog.username());
                 authenticator->setPassword(dialog.password());
+            }
+            else
+            {
+                cancelAuthentication(authenticator);
             }
         });
 
