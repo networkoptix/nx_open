@@ -12,14 +12,14 @@
     <name>Box</name>
     <message>
       <source>Click on video to start box.</source>
-      <translation type="unfinished">Click on video to start box.</translation>
+      <translation>Klik op de video om de box te starten.</translation>
     </message>
   </context>
   <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>Klik om meer te lezen</translation>
     </message>
   </context>
   <context>
@@ -48,15 +48,15 @@
     <name>Figure</name>
     <message>
       <source>Display on camera</source>
-      <translation type="unfinished">Display on camera</translation>
+      <translation>Weergeven op camera</translation>
     </message>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Figuur</translation>
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Klik om toe te voegen</translation>
     </message>
   </context>
   <context>
@@ -78,47 +78,47 @@
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versie</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Leverancier</translation>
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Camera stream</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Selecteer de video-stream van de camera voor analyse</translation>
     </message>
   </context>
   <context>
     <name>Line</name>
     <message>
       <source>Click on video to start line.</source>
-      <translation type="unfinished">Click on video to start line.</translation>
+      <translation>Klik op video om lijn te starten.</translation>
     </message>
     <message>
       <source>Click arrows to toggle the desired directions.</source>
-      <translation type="unfinished">Click arrows to toggle the desired directions.</translation>
+      <translation>Klik op pijlen om de gewenste richtingen in te schakelen.</translation>
     </message>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Lijn is niet geldig. Verwijder zelf-kruisingen om door te gaan.</translation>
     </message>
     <message numerus="yes">
       <source>Maximum points count is reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>Maximum points count is reached (%n points).</numerusform>
-        <numerusform>Maximum points count is reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Maximum aantal punten is bereikt (%n punten).</numerusform>
+        <numerusform>Maximum aantal punten is bereikt (%n punten).</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Deze regel vereist ten minste %n punten.</numerusform>
+        <numerusform>Deze regel vereist ten minste %n punten.</numerusform>
       </translation>
     </message>
   </context>
@@ -174,24 +174,24 @@
     <name>Polygon</name>
     <message>
       <source>Click on video to start polygon.</source>
-      <translation type="unfinished">Click on video to start polygon.</translation>
+      <translation>Klik op de video om veelhoek te starten.</translation>
     </message>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Polygoon is niet geldig. Verwijder zelf-kruisingen om door te gaan.</translation>
     </message>
     <message numerus="yes">
       <source>Maximum points count is reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>Maximum points count is reached (%n points).</numerusform>
-        <numerusform>Maximum points count is reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Maximum aantal punten is bereikt (%n punten).</numerusform>
+        <numerusform>Maximum aantal punten is bereikt (%n punten).</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Deze veelhoek vereist ten minste %n punten.</numerusform>
+        <numerusform>Deze veelhoek vereist ten minste %n punten.</numerusform>
       </translation>
     </message>
   </context>
@@ -199,7 +199,7 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Toevoegen</translation>
     </message>
   </context>
   <context>

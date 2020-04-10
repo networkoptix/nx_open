@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Clic para añadir</translation>
     </message>
   </context>
   <context>
@@ -86,11 +86,11 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Flujo de cámara</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Seleccionar flujo de vídeo de la cámara para análisis</translation>
     </message>
   </context>
   <context>
@@ -117,7 +117,7 @@
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
       <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>Esta línea requiere al menos %n puntos.</numerusform>
         <numerusform>This line requires at least %n points.</numerusform>
       </translation>
     </message>
@@ -190,7 +190,7 @@
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
       <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>Este polígono requiere al menos %n puntos.</numerusform>
         <numerusform>This polygon requires at least %n points.</numerusform>
       </translation>
     </message>
@@ -199,7 +199,7 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Añadir</translation>
     </message>
   </context>
   <context>

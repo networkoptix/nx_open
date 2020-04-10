@@ -498,7 +498,7 @@
     <message>
       <location/>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>Gebeurtenisbronserver gebruiken</translation>
     </message>
   </context>
   <context>
@@ -947,7 +947,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Verbinden...</translation>
     </message>
   </context>
   <context>
@@ -2076,7 +2076,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
       <source>Sign in</source>
-      <translation type="unfinished">Sign in</translation>
+      <translation>Log in</translation>
     </message>
     <message>
       <location/>
@@ -2160,7 +2160,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
       <source>Attention! Power limit exceeded</source>
-      <translation type="unfinished">Attention! Power limit exceeded</translation>
+      <translation>Opgelet! Vermogenslimiet overschreden</translation>
     </message>
   </context>
   <context>

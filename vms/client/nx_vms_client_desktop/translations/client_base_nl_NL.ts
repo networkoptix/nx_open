@@ -988,11 +988,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>Verbinden met deze server</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Vastzetten</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1496,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional support</source>
-      <translation type="unfinished">Regional support</translation>
+      <translation>Regionale ondersteuning</translation>
     </message>
   </context>
   <context>
@@ -2079,30 +2079,30 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Bronserver</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Broncamera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Bron- en %n meer camera's</numerusform>
+        <numerusform>Bron- en %n meer camera's</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Selecteer ten minste één apparaat</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Selecteer tenminste één camera</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Selecteer Server</translation>
     </message>
   </context>
   <context>
@@ -2232,7 +2232,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>Servers die een zoemer ondersteunen</translation>
     </message>
   </context>
   <context>
@@ -2646,7 +2646,7 @@ to %1</source>
     <name>QnCloudUsersValidationPolicy</name>
     <message>
       <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
-      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+      <translation>%1 van de %2 geselecteerde gebruikers zijn geen Cloud-gebruikers en ontvangen geen mobiele meldingen.</translation>
     </message>
   </context>
   <context>
@@ -3290,7 +3290,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Servers die fan-diagnose ondersteunen</translation>
     </message>
   </context>
   <context>
@@ -3624,27 +3624,27 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Algemeen</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Eigenschappen</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Schermen toegestaan</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Controlesessies toegestaan</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Archiefstreams toegestaan</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Resterende deactiveringen</translation>
     </message>
   </context>
   <context>
@@ -3930,9 +3930,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>%n resterende deactiveringen.</numerusform>
+        <numerusform>%n resterende deactiveringen.</numerusform>
       </translation>
     </message>
   </context>
@@ -3956,7 +3956,7 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Om een activatiesleutel bestand te verkrijgen, stuur de opgegeven licentiesleutel en Hardware ID naar %1.</translation>
     </message>
   </context>
   <context>
@@ -4510,7 +4510,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Servers die PoE monitoring ondersteunen</translation>
     </message>
   </context>
   <context>
@@ -5243,7 +5243,7 @@ to %1</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5829,7 +5829,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>smb</source>
-      <translation type="unfinished">smb</translation>
+      <translation>smb</translation>
     </message>
   </context>
   <context>
@@ -6609,7 +6609,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>Kan geen verbinding maken met de geselecteerde server</translation>
     </message>
   </context>
   <context>
@@ -6882,7 +6882,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Licentie activeren...</translation>
     </message>
   </context>
   <context>
@@ -7513,9 +7513,9 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n waarden</numerusform>
+        <numerusform>+%n waarden</numerusform>
       </translation>
     </message>
   </context>
@@ -8402,11 +8402,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>De proxy %1 vereist een gebruikersnaam en wachtwoord.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Map selecteren om te uploaden</translation>
     </message>
   </context>
   <context>
@@ -8500,7 +8500,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>Deze ID wordt al gebruikt in het systeem. Gebruik de knop Genereren om een beschikbaar ID te vinden.</translation>
     </message>
   </context>
   <context>
@@ -8933,7 +8933,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>Aanmelden</translation>
     </message>
   </context>
   <context>
@@ -9043,29 +9043,29 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>Verbinding verbroken</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>Verbonden</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>Aangesloten</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>Onverwacht</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>Leeg</translation>
     </message>
     <message>
       <source>&lt; Unknown device %1 &gt;</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">&lt; Unknown device %1 &gt;</translation>
+      <translation>&lt; Onbekend apparaat %1 &gt;</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9077,7 +9077,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Verbruik</translation>
     </message>
     <message>
       <source>Speed</source>
@@ -9089,11 +9089,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>Vermogen</translation>
     </message>
     <message>
       <source>&lt; Unknown device &gt;</source>
-      <translation type="unfinished">&lt; Unknown device &gt;</translation>
+      <translation>&lt; Onbekend apparaat &gt;</translation>
     </message>
   </context>
   <context>
@@ -9111,7 +9111,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
       <source>Cloud users</source>
-      <translation type="unfinished">Cloud users</translation>
+      <translation>Cloud gebruikers</translation>
     </message>
   </context>
   <context>
@@ -9246,7 +9246,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>Alleen client-server videoverkeer kan worden versleuteld</translation>
     </message>
   </context>
   <context>
@@ -9260,7 +9260,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>Er zijn geen compatibele servers</translation>
     </message>
   </context>
   <context>
@@ -9888,13 +9888,13 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Vul het volgende in om de licentie te deactiveren</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Let op dat elke licentiesleutel maximaal %n keer kan worden gedeactiveerd.</numerusform>
+        <numerusform>Let op dat elke licentiesleutel maximaal %n keer kan worden gedeactiveerd.</numerusform>
       </translation>
     </message>
   </context>

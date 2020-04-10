@@ -77,8 +77,8 @@
         "emailSignature": "Email handtekening",
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Edge recording inschakelen",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "Schakel WEB-sockets in",
+        "maxP2pAllClientsSizeBytes": "Maximale buffergrootte om p2p-gegevens naar alle clients te verzenden",
         "eventLogPeriodDays": "Event log periode (dagen)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP-zoekbasis",
@@ -87,7 +87,7 @@
         "localSystemId": "Lokaal systeem ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max verschil tussen gesynchroniseerde en internettijd (milliseconden)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max verschil tussen gesynchroniseerde en lokale tijd (milliseconden)",
-        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
+        "maxP2pQueueSizeBytes": "Max P2P wachtrijgrootte (bytes)",
         "maxRecordQueueSizeBytes": "Max records wachtrijgrootte (bytes)",
         "maxRecordQueueSizeElements": "Max records wachtrijgrootte (elementen)",
         "maxRemoteArchiveSynchronizationThreads": "Max. externe archief synchronisatie",
@@ -116,8 +116,8 @@
         "timeSynchronizationEnabled": "Tijdsynchronisatie ingeschakeld",
         "primaryTimeServer": "Primaire tijdsynchronisatieserver",
         "osTimeChangeCheckPeriodMs": "Controle van de tijd van het besturingssysteem",
-        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
-        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
+        "syncTimeExchangePeriod": "Synchroniseer tijd synchronisatie interval voor netwerkverzoeken",
+        "syncTimeEpsilon": "Synchroniseer tijd epsilon. Nieuwe waarde wordt niet toegepast als delta tijd minder is dan epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max. aantal draagbare camera archief synchronisatie verbindingen",
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",
@@ -133,7 +133,7 @@
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "Grafieken",
             "storage": "Opslagruimte",
             "log": "Log"
         }
