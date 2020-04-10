@@ -117,6 +117,11 @@
         <source>Disable blur</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Limit Frame Rate to save CPU</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AggregationWidget</name>
@@ -2167,17 +2172,17 @@
     <name>PopupBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-        <source>for</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Force Acknowledgment</source>
         <translation></translation>
     </message>
     <message>
         <location/>
         <source>Use custom text:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>to</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2274,12 +2279,27 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
-        <source>for</source>
+        <source>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Use custom text:</source>
+        <source>Nx Cloud Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add custom text:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2322,24 +2342,6 @@
     <message>
         <location/>
         <source>Restart to the updated version when ready</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnCredentialsDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/credentials_dialog.ui"/>
-        <source>User:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enter a valid username and password...</source>
         <translation></translation>
     </message>
 </context>
@@ -3359,6 +3361,24 @@
         <location/>
         <source>Detect motion</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>WearableCameraTimeZoneWidget</name>
+    <message>
+        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_time_zone_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ignore timezone in uploaded files</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
