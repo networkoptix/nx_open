@@ -120,6 +120,11 @@ QString getNonLocalAddress(const QString& host)
     return host;
 }
 
+bool currentlyOnUiThread()
+{
+    return QThread::currentThread() == qApp->thread();
+}
+
 // Redirects GET request made by camera page if it is made using camera local IP address.
 class RequestUrlFixupInterceptor: public QWebEngineUrlRequestInterceptor
 {
@@ -187,7 +192,6 @@ struct CameraWebPageWidget::Private
     CameraSettingsDialogState::SingleCameraProperties lastCamera;
     bool loadNeeded = false;
 
-    QnMutex mutex;
     AttemptCounter authDialodCounter;
     QUrl testPageUrl;
 };
@@ -296,7 +300,7 @@ void CameraWebPageWidget::Private::createNewPage()
     QObject::connect(webView->page(), &QWebEnginePage::authenticationRequired,
         [this](const QUrl& requestUrl, QAuthenticator* authenticator)
         {
-            QnMutexLocker lock(&mutex);
+            NX_ASSERT(currentlyOnUiThread());
 
             // Camera may redirect to another path and ask for credentials,
             // so check for host match.
@@ -478,34 +482,33 @@ void CameraWebPageWidget::Private::loadPage()
 
 void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
 {
-    QnMutexLocker lock(&d->mutex);
+    NX_ASSERT(currentlyOnUiThread());
+
+    d->credentials = state.credentials;
+
+    if (!state.canShowWebPage())
     {
-        d->credentials = state.credentials;
-
-        if (!state.canShowWebPage())
-        {
-            d->resetPage();
-            return;
-        }
-
-        NX_ASSERT(d->credentials.login.hasValue() && d->credentials.password.hasValue());
-        const auto currentServerUrl = commonModule()->currentUrl();
-
-        const auto targetUrl = nx::network::url::Builder()
-            .setScheme(nx::network::http::kUrlSchemeName)
-            .setHost(getNonLocalAddress(currentServerUrl.host()))
-            .setPort(currentServerUrl.port())
-            .setPath(state.singleCameraProperties.settingsUrlPath).toUrl().toQUrl();
-        NX_ASSERT(targetUrl.isValid());
-
-        const auto cameraId = state.singleCameraProperties.id;
-
-        if (d->lastRequestUrl == targetUrl && cameraId == d->lastCamera.id)
-            return;
-
-        d->lastRequestUrl = d->testPageUrl.isValid() ? d->testPageUrl : targetUrl;
-        d->lastCamera = state.singleCameraProperties;
+        d->resetPage();
+        return;
     }
+
+    NX_ASSERT(d->credentials.login.hasValue() && d->credentials.password.hasValue());
+    const auto currentServerUrl = commonModule()->currentUrl();
+
+    const auto targetUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(getNonLocalAddress(currentServerUrl.host()))
+        .setPort(currentServerUrl.port())
+        .setPath(state.singleCameraProperties.settingsUrlPath).toUrl().toQUrl();
+    NX_ASSERT(targetUrl.isValid());
+
+    const auto cameraId = state.singleCameraProperties.id;
+
+    if (d->lastRequestUrl == targetUrl && cameraId == d->lastCamera.id)
+        return;
+
+    d->lastRequestUrl = d->testPageUrl.isValid() ? d->testPageUrl : targetUrl;
+    d->lastCamera = state.singleCameraProperties;
 
     const bool visible = isVisible();
     d->loadNeeded = !visible;
