@@ -293,3 +293,55 @@ TEST_P(FtDisconnectSystemFromCloud, AfterDisconnect_NonCloudNonce)
 INSTANTIATE_TEST_CASE_P(P2pMode, FtDisconnectSystemFromCloud,
     ::testing::Values(TestParams(false), TestParams(true)
 ));
+
+//-------------------------------------------------------------------------------------------------
+
+class CloudSystemDbBackup:
+    public FtDisconnectSystemFromCloud
+{
+protected:
+    void givenServerConnectedToTheCloud()
+    {
+        connectSystemToCloud();
+    }
+
+    void whenMakeDbBackup()
+    {
+        auto mediaServerClient = prepareMediaServerClient();
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2DumpDatabase(&m_dump));
+    }
+
+    void whenRestoreDbBackup()
+    {
+        auto mediaServerClient = prepareMediaServerClientFromLocalAdmin();
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2RestoreDatabase(m_dump));
+    }
+
+    void whenResetServerState()
+    {
+        auto mediaServerClient = prepareMediaServerClient();
+        CurrentPasswordData request;
+        request.currentPassword = QString::fromStdString(ownerAccount().password);
+        ASSERT_EQ(QnJsonRestResult::NoError, mediaServerClient->detachFromSystem(request).error);
+    }
+
+protected:
+    nx::vms::api::DatabaseDumpData m_dump;
+};
+
+TEST_P(CloudSystemDbBackup, DISABLED_server_reconnects_to_the_cloud_after_restoring_db_backup)
+{
+    givenServerConnectedToTheCloud();
+    whenMakeDbBackup();
+
+    whenResetServerState();
+    waitUntilTheSystemIsOfflineInCloud();
+
+    whenRestoreDbBackup();
+    waitUntilTheSystemIsOnlineInCloud();
+}
+
+INSTANTIATE_TEST_CASE_P(
+    P2pMode,
+    CloudSystemDbBackup,
+    ::testing::Values(TestParams(true)));

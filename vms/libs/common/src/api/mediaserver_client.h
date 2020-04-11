@@ -20,6 +20,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/type_utils.h>
+#include <nx/vms/api/data/database_dump_data.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/module_information.h>
 
@@ -95,6 +96,11 @@ public:
         std::function<void(QnJsonRestResult)> completionHandler);
     QnJsonRestResult mergeSystems(const MergeSystemData& request);
 
+    void detachFromSystem(
+        const CurrentPasswordData& request,
+        std::function<void(QnJsonRestResult)> completionHandler);
+    QnJsonRestResult detachFromSystem(const CurrentPasswordData& request);
+
     //---------------------------------------------------------------------------------------------
     // /ec2/ requests
 
@@ -145,6 +151,15 @@ public:
     ec2::ErrorCode ec2AnalyticsLookupObjectTracks(
         const nx::analytics::db::Filter& request,
         nx::analytics::db::LookupResult* result);
+
+    void ec2DumpDatabase(
+        std::function<void(ec2::ErrorCode, nx::vms::api::DatabaseDumpData)> completionHandler);
+    ec2::ErrorCode ec2DumpDatabase(nx::vms::api::DatabaseDumpData* dump);
+
+    void ec2RestoreDatabase(
+        const nx::vms::api::DatabaseDumpData& dump,
+        std::function<void(ec2::ErrorCode)> completionHandler);
+    ec2::ErrorCode ec2RestoreDatabase(const nx::vms::api::DatabaseDumpData& dump);
 
     /**
      * NOTE: Can only be called within request completion handler.
@@ -272,15 +287,15 @@ protected:
             });
     }
 
-    template<typename ClientType, typename ResultCode, typename Output>
+    template<typename ClientType, typename ResultCode, typename... Output>
     ResultCode syncCallWrapper(
         ClientType* clientType,
-        void(ClientType::*asyncFunc)(std::function<void(ResultCode, Output)>),
-        Output* output)
+        void(ClientType::*asyncFunc)(std::function<void(ResultCode, Output...)>),
+        Output*... output)
     {
         ResultCode resultCode;
-        std::tie(resultCode, *output) =
-            makeSyncCall<ResultCode, Output>(std::bind(asyncFunc, clientType, std::placeholders::_1));
+        std::tie(resultCode, *output...) =
+            makeSyncCall<ResultCode, Output...>(std::bind(asyncFunc, clientType, std::placeholders::_1));
         return resultCode;
     }
 
@@ -337,10 +352,10 @@ protected:
                 }));
     }
 
-    template<typename Output>
+    template<typename... Output>
     void performApiRequest(
         const std::string& requestName,
-        std::function<void(QnJsonRestResult, Output)> completionHandler)
+        std::function<void(QnJsonRestResult, Output...)> completionHandler)
     {
         performGetRequest<QnJsonRestResult>(
             requestName,
@@ -357,12 +372,27 @@ protected:
                         result.error = toApiErrorCode(sysErrorCode, statusCode);
                     }
 
-                    Output output;
-                    if (result.error == QnRestResult::NoError)
-                        output = result.deserialized<Output>();
-
-                    completionHandler(std::move(result), std::move(output));
+                    reportApiRequestResult(std::move(result), std::move(completionHandler));
                 }));
+    }
+
+    template<typename Output>
+    void reportApiRequestResult(
+        QnJsonRestResult result,
+        std::function<void(QnJsonRestResult, Output)> completionHandler)
+    {
+        Output output;
+        if (result.error == QnRestResult::NoError)
+            output = result.deserialized<Output>();
+
+        completionHandler(std::move(result), std::move(output));
+    }
+
+    void reportApiRequestResult(
+        QnJsonRestResult result,
+        std::function<void(QnJsonRestResult)> completionHandler)
+    {
+        completionHandler(std::move(result));
     }
 
     QnRestResult::Error toApiErrorCode(

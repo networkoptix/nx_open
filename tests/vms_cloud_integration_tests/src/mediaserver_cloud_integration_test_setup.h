@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/utils/test_support/test_with_temporary_directory.h>
+
 #include <nx/cloud/db/test_support/cdb_launcher.h>
 
 #include <common/static_common_module.h>
@@ -19,7 +21,8 @@ struct TestParams
 };
 
 class MediaServerCloudIntegrationTest:
-    public ::testing::TestWithParam<TestParams>
+    public ::testing::TestWithParam<TestParams>,
+    public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
     MediaServerCloudIntegrationTest();
@@ -38,6 +41,7 @@ public:
 
     std::unique_ptr<MediaServerClient> prepareMediaServerClient();
     std::unique_ptr<MediaServerClient> prepareMediaServerClientFromCloudOwner();
+    std::unique_ptr<MediaServerClient> prepareMediaServerClientFromLocalAdmin();
     void configureSystemAsLocal();
     void connectSystemToCloud();
 
@@ -52,6 +56,9 @@ public:
     void waitForCloudDataSynchronizedToTheMediaServer();
     nx::vms::api::UserData inviteRandomCloudUser();
     void waitForUserToAppearInCloud(const std::string& email);
+
+    void waitUntilTheSystemIsOnlineInCloud();
+    void waitUntilTheSystemIsOfflineInCloud();
 
     static void SetUpTestCase();
 
@@ -75,4 +82,9 @@ private:
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 
     std::unique_ptr<MediaServerClient> allocateMediaServerClient();
+
+    template <typename T>
+    void waitUntilTheSystemSatisfies(
+        T nx::cloud::db::api::SystemDataEx::*field,
+        T expectedValue);
 };

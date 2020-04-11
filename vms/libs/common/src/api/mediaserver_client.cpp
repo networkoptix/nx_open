@@ -184,6 +184,30 @@ QnJsonRestResult MediaServerClient::mergeSystems(const MergeSystemData& request)
         request);
 }
 
+void MediaServerClient::detachFromSystem(
+    const CurrentPasswordData& request,
+    std::function<void(QnJsonRestResult)> completionHandler)
+{
+    performApiRequest(
+        "api/detachFromSystem",
+        request,
+        std::move(completionHandler));
+}
+
+QnJsonRestResult MediaServerClient::detachFromSystem(
+    const CurrentPasswordData& request)
+{
+    using AsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const CurrentPasswordData&,
+            std::function<void(QnJsonRestResult)>);
+
+    return syncCallWrapper(
+        this,
+        static_cast<AsyncFuncPointer>(&MediaServerClient::detachFromSystem),
+        request);
+}
+
 //-------------------------------------------------------------------------------------------------
 // /ec2/ requests
 
@@ -390,6 +414,47 @@ ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupObjectTracks(
         static_cast<AsyncFuncPointer>(&MediaServerClient::ec2AnalyticsLookupObjectTracks),
         request,
         result);
+}
+
+void MediaServerClient::ec2DumpDatabase(
+    std::function<void(ec2::ErrorCode, nx::vms::api::DatabaseDumpData)> completionHandler)
+{
+    performAsyncEc2Call(
+        "ec2/dumpDatabase",
+        std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::ec2DumpDatabase(nx::vms::api::DatabaseDumpData* dump)
+{
+    using Ec2DumpDatabaseAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            std::function<void(ec2::ErrorCode, nx::vms::api::DatabaseDumpData)>);
+
+    return syncCallWrapper(
+        this,
+        static_cast<Ec2DumpDatabaseAsyncFuncPointer>(&MediaServerClient::ec2DumpDatabase),
+        dump);
+}
+
+void MediaServerClient::ec2RestoreDatabase(
+    const nx::vms::api::DatabaseDumpData& dump,
+    std::function<void(ec2::ErrorCode)> completionHandler)
+{
+    performAsyncEc2Call("ec2/restoreDatabase", std::move(dump), std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::ec2RestoreDatabase(
+    const nx::vms::api::DatabaseDumpData& dump)
+{
+    using Ec2RestoreDatabaseAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const nx::vms::api::DatabaseDumpData&,
+            std::function<void(ec2::ErrorCode)>);
+
+    return syncCallWrapper(
+        this,
+        static_cast<Ec2RestoreDatabaseAsyncFuncPointer>(&MediaServerClient::ec2RestoreDatabase),
+        dump);
 }
 
 nx::network::http::StatusCode::Value MediaServerClient::lastResponseHttpStatusCode() const
