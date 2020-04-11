@@ -2626,7 +2626,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot()
     if (!m_firstStoragesTestDone)
     {
         NX_DEBUG(this, "getOptimalStorageRoot: Storage test is not over yet. Returning NULL.");
-        return nullptr;
+        return QnStorageResourcePtr();
     }
 
     return nx::vms::server::WritableStoragesHelper(this).optimalStorageForRecording(
