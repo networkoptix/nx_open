@@ -8,16 +8,6 @@ namespace nx {
 namespace network {
 namespace test {
 
-NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
-    TEST, BufferedStreamSocket,
-    []() { return std::make_unique<TCPServerSocket>(AF_INET); },
-    []()
-    {
-        return std::make_unique<BufferedStreamSocket>(
-            std::make_unique<TCPSocket>(AF_INET),
-            nx::Buffer());
-    })
-
 class BufferedStreamSocket:
     public ::testing::Test
 {
@@ -102,6 +92,16 @@ TEST_F(BufferedStreamSocket, catchRecvEvent)
     ASSERT_EQ(acceptedResults.pop(), SystemError::connectionReset);
     ASSERT_TRUE(acceptedResults.isEmpty());
 }
+
+NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
+    TEST_F, BufferedStreamSocket,
+    []() { return std::make_unique<TCPServerSocket>(AF_INET); },
+    []()
+    {
+        return std::make_unique<network::BufferedStreamSocket>(
+            std::make_unique<TCPSocket>(AF_INET),
+            nx::Buffer());
+    })
 
 } // namespace test
 } // namespace network
