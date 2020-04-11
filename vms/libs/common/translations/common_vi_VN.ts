@@ -162,11 +162,6 @@
       <translation>Phát hiện %1 lỗi không tương thích với hệ thống hiện tại.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Không thể kết nối với Hệ thống khác vì hiện tại Hệ thống đã được kết nối với %1.</translation>
-    </message>
-    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>Hệ thống điện toán %1 chỉ có thể được hợp nhất với hệ thống không sử dụng điện toán %1. Tên và mật khẩu hệ thống được lấy từ hệ thống điện toán %1.</translation>

@@ -1561,6 +1561,10 @@ om du vill visa fler bokmärken</translation>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
       <translation>Justera till minsta värde som inte försämrar live visning. Större buffert gör uppspelningen mjukare men ökar fördröjningen mellan realtid och livevisning, mindre buffert minskar fördröjningen men kan orsaka hackiga bilder.</translation>
     </message>
+    <message>
+      <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
+      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+    </message>
   </context>
   <context>
     <name>QnAuditItemDelegate</name>
@@ -2104,6 +2108,10 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Select Server</source>
       <translation>Välj server</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation type="unfinished">Source Server and %1</translation>
     </message>
   </context>
   <context>
@@ -2650,8 +2658,9 @@ till %1</translation>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
     <message>
-      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
-      <translation>%1 av %2 utvalda användare är inte molnanvändare och kommer inte att få mobilaviseringar.</translation>
+      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
+      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
     </message>
   </context>
   <context>
@@ -3962,6 +3971,15 @@ till %1</translation>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
       <translation>För att få en aktiveringsnyckel skicka den medföljande licensnyckeln och maskinvaru-ID till %1.</translation>
+    </message>
+    <message>
+      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+    </message>
+    <message>
+      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <comment>%1 will be substituted by a list of contacts</comment>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>
@@ -5745,6 +5763,14 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Aktuella analysdata flyttas inte automatiskt till en annan plats och blir otillgängliga. Du kan behålla det och manuellt flytta senare eller radera permanent.
 Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta support innan du fortsätter.</translation>
     </message>
+    <message>
+      <source>Server is unavailable.</source>
+      <translation type="unfinished">Server is unavailable.</translation>
+    </message>
+    <message>
+      <source>now</source>
+      <translation type="unfinished">now</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6882,10 +6908,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Ange namnet på videovägg att att skapa:</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall.</source>
-      <translation>Aktivera ytterligare en licens för att starta Videovägg.</translation>
-    </message>
-    <message>
       <source>Activate License...</source>
       <translation>Aktivera licens...</translation>
     </message>
@@ -7507,6 +7529,16 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7515,13 +7547,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Unknown track</source>
       <translation>Okänt spår</translation>
-    </message>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n värden</numerusform>
-        <numerusform>+%n värden</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -9043,10 +9068,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Disconnected</source>
       <translation>Frånkopplad</translation>
     </message>
@@ -9085,10 +9106,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Förbrukning</translation>
     </message>
     <message>
-      <source>Speed</source>
-      <translation>Hastighet</translation>
-    </message>
-    <message>
       <source>Status</source>
       <translation>Status</translation>
     </message>
@@ -9115,8 +9132,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
-      <source>Cloud users</source>
-      <translation>Molnanvändare</translation>
+      <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+    </message>
+    <message>
+      <source>%1 Settings</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">%1 Settings</translation>
     </message>
   </context>
   <context>
@@ -9804,6 +9827,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Custom Users</source>
       <translation>Anpassade användare</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>%1 användare</translation>
     </message>
   </context>
   <context>

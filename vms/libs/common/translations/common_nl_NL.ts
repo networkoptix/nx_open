@@ -168,11 +168,6 @@
       <translation>Het gevonden systeem %1 is niet samen te voegen met het huidige systeem.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kan niet verbinden met het andere systeem omdat het huidige systeem al is aangesloten op %1.</translation>
-    </message>
-    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 Systeem kan alleen worden samengevoegd met niet-%1. De systeemnaam en het wachtwoord zijn overgenomen van %1 Systeem.</translation>

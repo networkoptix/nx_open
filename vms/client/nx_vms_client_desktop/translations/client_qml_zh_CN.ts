@@ -9,13 +9,6 @@
     </message>
   </context>
   <context>
-    <name>Box</name>
-    <message>
-      <source>Click on video to start box.</source>
-      <translation>点击画面以启用圈选区域</translation>
-    </message>
-  </context>
-  <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
@@ -75,6 +68,13 @@
     </message>
   </context>
   <context>
+    <name>FigureView</name>
+    <message>
+      <source>NO PREVIEW</source>
+      <translation type="unfinished">NO PREVIEW</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
@@ -94,30 +94,37 @@
     </message>
   </context>
   <context>
+    <name>LabeledItem</name>
+    <message>
+      <source>Default value:</source>
+      <translation type="unfinished">Default value:</translation>
+    </message>
+  </context>
+  <context>
     <name>Line</name>
-    <message>
-      <source>Click on video to start line.</source>
-      <translation>点击画面以启用画线功能</translation>
-    </message>
-    <message>
-      <source>Click arrows to toggle the desired directions.</source>
-      <translation>点击箭头切换方向。</translation>
-    </message>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
       <translation>设定区域有误，请移除线条交错部分。</translation>
-    </message>
-    <message numerus="yes">
-      <source>Maximum points count is reached (%n points).</source>
-      <translation>
-        <numerusform>顶点数已达最大值 (已有 %n 个顶点)</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
       <translation type="unfinished">
         <numerusform>This line requires at least %n points.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Click on the last point to finish drawing the line.</source>
+      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+    </message>
+    <message numerus="yes">
+      <source>The maximum number of points has been reached (%n points).</source>
+      <translation type="unfinished">
+        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Click on each arrow to toggle the desired direction.</source>
+      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
     </message>
   </context>
   <context>
@@ -151,6 +158,13 @@
     </message>
   </context>
   <context>
+    <name>ObjectSizeConstraints</name>
+    <message>
+      <source>Size Constraints</source>
+      <translation type="unfinished">Size Constraints</translation>
+    </message>
+  </context>
+  <context>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
@@ -171,23 +185,23 @@
   <context>
     <name>Polygon</name>
     <message>
-      <source>Click on video to start polygon.</source>
-      <translation>点击画面以启用圈选区域</translation>
-    </message>
-    <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
       <translation>设定区域有误，请移除线条交错部分。</translation>
-    </message>
-    <message numerus="yes">
-      <source>Maximum points count is reached (%n points).</source>
-      <translation>
-        <numerusform>顶点数已达最大值 (已有 %n 个顶点)</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
       <translation type="unfinished">
         <numerusform>This polygon requires at least %n points.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Click on the last point to finish drawing the polygon.</source>
+      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+    </message>
+    <message numerus="yes">
+      <source>The maximum number of points has been reached (%n points).</source>
+      <translation type="unfinished">
+        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
       </translation>
     </message>
   </context>
@@ -196,6 +210,25 @@
     <message>
       <source>Add</source>
       <translation>添加</translation>
+    </message>
+  </context>
+  <context>
+    <name>SizeConstraints</name>
+    <message>
+      <source>MAX</source>
+      <translation type="unfinished">MAX</translation>
+    </message>
+    <message>
+      <source>MIN</source>
+      <translation type="unfinished">MIN</translation>
+    </message>
+    <message>
+      <source>Set minimum and maximum object size.</source>
+      <translation type="unfinished">Set minimum and maximum object size.</translation>
+    </message>
+    <message>
+      <source>Minimum object size cannot be greater than maximum.</source>
+      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
     </message>
   </context>
   <context>

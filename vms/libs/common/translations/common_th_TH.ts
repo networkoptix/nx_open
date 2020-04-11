@@ -162,11 +162,6 @@
       <translation>ระบบค้นพบ %1 ไม่สามารถทำงานร่วมกับระบบปัจจุบันได้</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>ไม่สามารถเชื่อมต่อกับระบบอื่นได้เนื่องจากระบบปัจจุบันได้เชื่อมต่อกับ %1 แล้ว</translation>
-    </message>
-    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 ระบบสามารถรวมเข้ากับ non-%1เท่านั้น ชื่อระบบและรหัสผ่านจะถูกนำมาจาก %1 ระบบ</translation>

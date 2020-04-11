@@ -174,11 +174,6 @@
       <translation>The discovered System %1 is incompatible with the current System.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot connect to the other System because current System is already connected to %1.</translation>
-    </message>
-    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>

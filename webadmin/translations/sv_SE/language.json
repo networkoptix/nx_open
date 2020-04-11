@@ -129,7 +129,8 @@
         "watermarkSettings": "Vattenmärkesinställningar",
         "maxWebMTranscoders": "Max antal WEBM-anslutningar för servern. Chrome öppnar 2 anslutningar samtidigt och stänger sedan den första. Så det rekommenderas att ange värdet> = 2 till denna parameter.",
         "maxEventLogRecords": "Maximal händelselogg poster för att hålla i databasen. Verklig mängd återlästa poster kan vara upp till 20% högre än det angivna värdet.",
-        "forceLiveCacheForPrimaryStream": "Om du vill cache några ramar för primärströmmen. Värden: \"ja\" - alltid aktiverat (kan använda mycket RAM), \"nej\" - alltid inaktiverat utom när det krävs av uppspelningen (t.ex. HLS), \"auto\" - liknande \"nej\" men tänds när det förbättras användarupplevelse (t.ex. när någon Analytics-plugin fungerar på kameran)."
+        "forceLiveCacheForPrimaryStream": "Om du vill cache några ramar för primärströmmen. Värden: \"ja\" - alltid aktiverat (kan använda mycket RAM), \"nej\" - alltid inaktiverat utom när det krävs av uppspelningen (t.ex. HLS), \"auto\" - liknande \"nej\" men tänds när det förbättras användarupplevelse (t.ex. när någon Analytics-plugin fungerar på kameran).",
+        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected."
     },
     "info": {
         "tabs": {

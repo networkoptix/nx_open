@@ -117,6 +117,11 @@
       <source>Disable blur</source>
       <translation>흐림 효과 사용 안 함</translation>
     </message>
+    <message>
+      <location/>
+      <source>Limit Frame Rate to save CPU</source>
+      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -2167,11 +2172,6 @@
     <name>PopupBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-      <source>for</source>
-      <translation>for</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force Acknowledgment</source>
       <translation>강제 승인</translation>
     </message>
@@ -2179,6 +2179,11 @@
       <location/>
       <source>Use custom text:</source>
       <translation>사용자 임의 내용 추가</translation>
+    </message>
+    <message>
+      <location/>
+      <source>to</source>
+      <translation>로</translation>
     </message>
   </context>
   <context>
@@ -2274,13 +2279,28 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
-      <source>for</source>
-      <translation>for</translation>
+      <source>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</source>
+      <translation type="unfinished">The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</translation>
     </message>
     <message>
       <location/>
-      <source>Use custom text:</source>
-      <translation>사용자 임의 내용 추가</translation>
+      <source>Nx Cloud Settings</source>
+      <translation type="unfinished">Nx Cloud Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>to</source>
+      <translation>로</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Set Language</source>
+      <translation type="unfinished">Set Language</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Add custom text:</source>
+      <translation type="unfinished">Add custom text:</translation>
     </message>
   </context>
   <context>
@@ -2323,24 +2343,6 @@
       <location/>
       <source>Restart to the updated version when ready</source>
       <translation>준비가되면 업데이트 된 버전으로 다시 시작하십시오.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCredentialsDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/credentials_dialog.ui"/>
-      <source>User:</source>
-      <translation>사용자:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password:</source>
-      <translation>비밀번호:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Enter a valid username and password...</source>
-      <translation>사용자 이름과 비밀번호를 입력하세요...</translation>
     </message>
   </context>
   <context>
@@ -3359,6 +3361,24 @@
       <location/>
       <source>Detect motion</source>
       <translation>움직임 감지</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableCameraTimeZoneWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_time_zone_widget.ui"/>
+      <source>Form</source>
+      <translation>틀</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Time</source>
+      <translation type="unfinished">Time</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Ignore timezone in uploaded files</source>
+      <translation type="unfinished">Ignore timezone in uploaded files</translation>
     </message>
   </context>
   <context>
