@@ -108,9 +108,9 @@
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Esta línea requiere al menos %n puntos.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>Esta línea requiere al menos %n puntos.</numerusform>
       </translation>
     </message>
     <message>
@@ -192,9 +192,9 @@
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Este polígono requiere al menos %n puntos.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>Este polígono requiere al menos %n puntos.</numerusform>
       </translation>
     </message>
     <message>

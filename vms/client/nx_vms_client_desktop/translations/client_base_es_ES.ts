@@ -3942,9 +3942,9 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n desactivaciones restantes.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+        <numerusform>%n desactivaciones restantes.</numerusform>
       </translation>
     </message>
   </context>
@@ -9922,9 +9922,9 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Tenga en cuenta que cada clave de licencia puede ser desactivada un máximo de %n veces.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Tenga en cuenta que cada clave de licencia se puede desactivar un máximo de %n veces.</numerusform>
+        <numerusform>Tenga en cuenta que cada clave de licencia se puede desactivar un máximo de %n veces.</numerusform>
       </translation>
     </message>
   </context>

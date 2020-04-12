@@ -91,7 +91,7 @@
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Petabyte(s)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
       </translation>
