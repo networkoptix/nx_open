@@ -21,6 +21,11 @@ function(nx_add_test target) # [NO_GTEST] ...
         )
     endif()
 
+    if(targetDevice STREQUAL "linux_arm32")
+        # Linux for ARM32 expects ffmpeg to be located in "../lib/ffmpeg" directory.
+        string(JOIN ":" CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_RPATH} "$ORIGIN/../lib/ffmpeg")
+    endif()
+
     nx_add_target(${target}
         EXECUTABLE
         NO_RC_FILE

@@ -96,6 +96,14 @@ macro(load_dependencies)
                 nx_copy_package_separately(${package_dir} "ffmpeg-arm32")
             endif()
 
+            set(ffmpeg_link ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ffmpeg)
+            if(NOT EXISTS ${ffmpeg_link})
+                # If you need a symlink to RPI variant, re-create it manually in the libs dir.
+                # CMake won't overwrite it.
+                file(CREATE_LINK "ffmpeg-arm32" ${ffmpeg_link} SYMBOLIC)
+                nx_store_known_file(${ffmpeg_link})
+            endif()
+
             continue()
         endif()
 
@@ -108,18 +116,21 @@ macro(load_dependencies)
         set(cpp_runtime_libs libstdc++.so.6 libatomic.so.1 libgcc_s.so.1)
         set(icu_runtime_libs libicuuc.so.55 libicudata.so.55 libicui18n.so.55)
 
-        if(arch MATCHES "x64|x86")
-            if(arch STREQUAL "x64")
-                list(APPEND cpp_runtime_libs libmvec.so.1)
-            endif()
+        if(arch STREQUAL "x64")
+            list(APPEND cpp_runtime_libs libmvec.so.1)
+        endif()
 
+        if(arch MATCHES "x64|x86|arm64")
             copy_system_libraries(${icu_runtime_libs})
-            nx_copy_package(${QT_DIR})
+        endif()
 
-            # Check if we need newer libstdc++.
-            if(NOT DEFINED CACHE{useSystemStdcpp})
-                set(useSystemStdcpp ON)
+        nx_copy_package(${QT_DIR} SKIP_BIN)
 
+        # Check if we need newer libstdc++.
+        if(NOT DEFINED CACHE{useSystemStdcpp})
+            set(useSystemStdcpp OFF)
+
+            if(arch MATCHES "x64|x86")
                 execute_process(
                     COMMAND ${CMAKE_CXX_COMPILER} --print-file-name libstdc++.so.6
                     OUTPUT_VARIABLE stdcpp_lib_path
@@ -132,19 +143,21 @@ macro(load_dependencies)
                             ${stdcpp_dir}
                         OUTPUT_VARIABLE selected_stdcpp
                     )
-
-                    if(selected_stdcpp)
-                        set(useSystemStdcpp OFF)
-                    endif()
+                else()
+                    set(selected_stdcpp)
                 endif()
 
-                set(useSystemStdcpp ${useSystemStdcpp} CACHE BOOL
-                    "Use system libstdc++ and do not copy it to lib directory from the compiler.")
+                if(NOT selected_stdcpp)
+                    set(useSystemStdcpp ON)
+                endif()
             endif()
 
-            if(NOT useSystemStdcpp)
-                copy_system_libraries(${cpp_runtime_libs})
-            endif()
+            set(useSystemStdcpp ${useSystemStdcpp} CACHE BOOL
+                "Use system libstdc++ and do not copy it to lib directory from the compiler.")
+        endif()
+
+        if(NOT useSystemStdcpp)
+            copy_system_libraries(${cpp_runtime_libs})
         endif()
 
         string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
