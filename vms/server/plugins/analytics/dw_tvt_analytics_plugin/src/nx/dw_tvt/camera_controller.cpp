@@ -65,7 +65,7 @@ const QByteArray kSubscriptionXmlBeginning = R"(
 </subscribeTypes>
 </types>
 <channelID type="uint32">0</channelID>
-<initTermTime type="uint32">60</initTermTime>
+<initTermTime type="uint32">0</initTermTime>
 <subscribeFlag type="subscribeTypes">BASE_SUBSCRIBE</subscribeFlag>
 <subscribeList type="list" count="1">)";
 
@@ -102,59 +102,22 @@ const QByteArray kSubscriptionXmlMotionItem = R"(
 <smartType type="openAlramObj">MOTION</smartType>
 <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
-/*
- * VFD - video face detection
- * The event cannot be combined with CDD, CPC, IPD, PEA or OSC event.
- * Name in web interface: "Face Detection".
- * Description in web interface: "Smart detection of faces appeared in the tracked scene".
- * Detection area: rectangle.
- * Currently (march 2018) VFD is not supported by DW MTT Camera.
- */
-const QByteArray kSubscriptionXmlVfdItem = R"(
-        <item>
-            <smartType type="smartType">VFD</smartType>
-            <subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
-        </item>)";
 
 /*
- * CDD - crowd density detection
- * The event cannot be combined with VFD, CPC, IPD, PEA or OSC event.
- * Name in web interface: "Crowd Density"
- * Description in web interface: "Detect the crowd density in certain area".
- * Detection area: rectangle.
- */
-const QByteArray kSubscriptionXmlCddItem = R"(
-        <item>
-            <smartType type="smartType">CDD</smartType>
-            <subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
-        </item>)";
-
-/*
- * CPC - cross-line people counting
- * The event cannot be combined with VFD, CDD, IPD, PEA or OSC event.
- * Name in web interface: "People Counting"
- * Description in web interface: "Detect and calculate the entrancing and departing people
- * in certain area".
- * Detection area: rectangle. Also The direction if people movement is set.
- */
-const QByteArray kSubscriptionXmlCpcItem = R"(
-        <item>
-            <smartType type="smartType">CPC</smartType>
-            <subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
-        </item>)";
-
-/*
- * IPD - intruding people detection
- * The event cannot be combined with VFD, CDD, CPC, PEA or OSC event.
- * Name in web interface: "People Intrusion"
- * Description in web interface: "Detect the intrusion people in a closed area".
+ * AVD - abnormal video diagnostic
+ * The event can be combined with any other event.
+ * Name in web interface: "Exception"
+ * Description in web interface: "Correction of image distortion" - which is confusing.
  * Detection Area: whole frame (no settings in web interface)
+ * AVD may detect one of the three events (names are taken from web interface):
+ * "Scene change detection", "Video blur detection" and "Video cast detection", which are
+ * described as "Scene change", "Abnormal clarity" and "Color abnormal".
  */
-const QByteArray kSubscriptionXmlIpdItem = R"(
-        <item>
-            <smartType type="smartType">IPD</smartType>
-            <subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
-        </item>)";
+const QByteArray kSubscriptionXmlAvdItem = R"(
+<item>
+<smartType type="openAlramObj">AVD</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>)";
 
 /*
  * PEA - some abbreviation, if you know - write it here
@@ -170,8 +133,62 @@ const QByteArray kSubscriptionXmlIpdItem = R"(
  */
 const QByteArray kSubscriptionXmlPeaItem = R"(
 <item>
-<smartType type="openAlramObj">PEA</openAlramObj>
-<subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
+<smartType type="openAlramObj">PEA</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>)";
+
+/*
+ * VFD - video face detection
+ * The event cannot be combined with CDD, CPC, IPD, PEA or OSC event.
+ * Name in web interface: "Face Detection".
+ * Description in web interface: "Smart detection of faces appeared in the tracked scene".
+ * Detection area: rectangle.
+ * Currently (march 2020) VFD is not supported by DW MTT Camera.
+ */
+const QByteArray kSubscriptionXmlVfdItem = R"(
+<item>
+<smartType type="openAlramObj">VFD</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>)";
+
+/*
+ * CDD - crowd density detection
+ * The event cannot be combined with VFD, CPC, IPD, PEA or OSC event.
+ * Name in web interface: "Crowd Density"
+ * Description in web interface: "Detect the crowd density in certain area".
+ * Detection area: rectangle.
+ */
+const QByteArray kSubscriptionXmlCddItem = R"(
+<item>
+<smartType type="openAlramObj">CDD</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>)";
+
+/*
+ * CPC - cross-line people counting
+ * The event cannot be combined with VFD, CDD, IPD, PEA or OSC event.
+ * Name in web interface: "People Counting"
+ * Description in web interface: "Detect and calculate the entrancing and departing people
+ * in certain area".
+ * Detection area: rectangle. Also The direction if people movement is set.
+ */
+const QByteArray kSubscriptionXmlCpcItem = R"(
+<item>
+<smartType type="openAlramObj">CPC</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>)";
+
+/*
+ * IPD - intruding people detection
+ * The event cannot be combined with VFD, CDD, CPC, PEA or OSC event.
+ * Name in web interface: "People Intrusion"
+ * Description in web interface: "Detect the intrusion people in a closed area".
+ * Detection Area: whole frame (no settings in web interface)
+ */
+const QByteArray kSubscriptionXmlIpdItem = R"(
+<item>
+<smartType type="openAlramObj">IPD</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
 
 /*
@@ -182,65 +199,58 @@ const QByteArray kSubscriptionXmlPeaItem = R"(
  * Detection Area: polygon (6 vertices max)
  */
 const QByteArray kSubscriptionXmlOscItem = R"(
-        <item>
-            <smartType type="smartType">OSC</smartType>
-            <subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
-        </item>)";
+<item>
+<smartType type="openAlramObj">OSC</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>)";
 
-/*
- * AVD - abnormal video diagnostic
- * The event can be combined with any other event.
- * Name in web interface: "Exception"
- * Description in web interface: "Correction of image distortion" - which is confusing.
- * Detection Area: whole frame (no settings in web interface)
- * AVD may detect one of the three events (names are taken from web interface):
- * "Scene change detection", "Video blur detection" and "Video cast detection", which are
- * described as "Scene change", "Abnormal clarity" and "Color abnormal".
- */
-const QByteArray kSubscriptionXmlAvdItem = R"(
-        <item>
-            <smartType type="smartType">AVD</smartType>
-            <subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
-        </item>)";
+/** New (March, 2020) events */
 
 const QByteArray kSubscriptionXmlAoientryItem = R"(
-        <item>
-            <smartType type="smartType">AOIENTRY</smartType>
-            <subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
-        </item>)";
+<item>
+<smartType type="openAlramObj">AOIENTRY</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>)";
+
 const QByteArray kSubscriptionXmlAoileaveItem = R"(
-        <item>
-            <smartType type="smartType">AOILEAVE</smartType>
-            <subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
-        </item>)";
+<item>
+<smartType type="openAlramObj">AOILEAVE</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>)";
+
 const QByteArray kSubscriptionXmlPasslinecountItem = R"(
-        <item>
-            <smartType type="smartType">PASSLINECOUNT</smartType>
-            <subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
-        </item>)";
+<item>
+<smartType type="openAlramObj">PASSLINECOUNT</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>)";
+
 const QByteArray kSubscriptionXmlTrafficItem = R"(
-        <item>
-            <smartType type="smartType">TRAFFIC</smartType>
-            <subscribeRelation type="subscribeOption">ALARM_FEATURE</subscribeRelation>
-        </item>)";
+<item>
+<smartType type="openAlramObj">TRAFFIC</smartType>
+<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>)";
 
 /*
  * Map allows to get subscription xml item for the event by its internal name.
  */
 const QMap<QByteArray, QByteArray> kXmlItemsByInternalName =
 {
-    {"MOTION", kSubscriptionXmlMotionItem},
-    {"VFD", kSubscriptionXmlVfdItem},
-    {"CDD", kSubscriptionXmlCddItem},
-    {"CPC", kSubscriptionXmlCpcItem},
-    {"IPD", kSubscriptionXmlIpdItem},
-    {"PEA", kSubscriptionXmlPeaItem},
-    {"OSC", kSubscriptionXmlOscItem},
-    {"AVD", kSubscriptionXmlAvdItem},
+    { "MOTION", kSubscriptionXmlMotionItem },
+    { "AVD", kSubscriptionXmlAvdItem },
+    { "PEA", kSubscriptionXmlPeaItem },
+
+    // VFD - OSC are not supported now (March 2020)
+    { "VFD", kSubscriptionXmlVfdItem },
+    { "CDD", kSubscriptionXmlCddItem },
+    { "CPC", kSubscriptionXmlCpcItem },
+    { "IPD", kSubscriptionXmlIpdItem },
+    { "OSC", kSubscriptionXmlOscItem },
 
     { "AOIENTRY", kSubscriptionXmlAoientryItem },
     { "AOILEAVE", kSubscriptionXmlAoileaveItem },
     { "PASSLINECOUNT", kSubscriptionXmlPasslinecountItem },
+
+    // Traffic is not supported now (March 2020)
     { "TRAFFIC", kSubscriptionXmlTrafficItem },
 };
 

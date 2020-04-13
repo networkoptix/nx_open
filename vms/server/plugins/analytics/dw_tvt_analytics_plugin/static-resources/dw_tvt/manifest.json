@@ -1,6 +1,7 @@
 {
     "capabilities": "deviceDependent",
-    "supportedCameraModels": [
+    "supportedCameraModels": 
+    [
         "TD-9442E3",
         "TD-9443E3",
         "TD-9541E3",
@@ -9,7 +10,8 @@
         "TD-9544E3",
         "TD-9545E3"
     ],
-    "eventTypes": [
+    "eventTypes": 
+    [
         {
             "id": "nx.dw_tvt.MOTION",
             "name": "Motion Detection",
@@ -24,7 +26,8 @@
             "internalName": "PEA",
             "alarmName": "perimeterAlarm",
             "group": 1,
-            "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
+            "_comment1": "PEA is responsible both for Line Crossing and Perimeter Intrusion",
+            "_comment2": "Notification is sent as long as the target keeps moving in the detected area"
         },
         {
             "id": "nx.dw_tvt.PEA.tripwireAlarm",
@@ -33,7 +36,8 @@
             "internalName": "PEA",
             "alarmName": "tripwireAlarm",
             "group": 1,
-            "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
+            "_comment1": "PEA is responsible both for Line Crossing and Perimeter Intrusion",
+            "_comment2": "Notification is sent as long as the target keeps moving in the detected area"
         },
         {
             "id": "nx.dw_tvt.AVD.sceneChange",
@@ -61,30 +65,6 @@
         },
 
         {
-            "id": "nx.dw_tvt.VFD",
-            "name": "Video Face Detection [exclusive]",
-            "flags": "stateDependent",
-            "internalName": "VFD",
-            "alarmName": "vfdAlarm",
-            "group": 1
-        },
-        {
-            "id": "nx.dw_tvt.CDD",
-            "name": "Crowd Density [exclusive]",
-            "flags": "stateDependent",
-            "internalName": "CDD",
-            "alarmName": "cddAlarm",
-            "group": 1
-        },
-        {
-            "id": "nx.dw_tvt.OSC",
-            "name": "Object Status Changed [exclusive]",
-            "flags": "stateDependent",
-            "internalName": "OSC",
-            "alarmName": "oscAlarm",
-            "group": 1
-        },
-        {
             "id": "nx.dw_tvt.AOIENTRY",
             "name": "_Entering Object Detection [exclusive]",
             "flags": "stateDependent",
@@ -107,14 +87,6 @@
             "internalName": "PASSLINECOUNT",
             "alarmName": "passlinecountAlarm",
             "group": 1
-        },
-        {
-            "id": "nx.dw_tvt.TRAFFIC",
-            "name": "_Traffic information [exclusive]",
-            "flags": "stateDependent",
-            "internalName": "TRAFFIC",
-            "alarmName": "trafficAlarm",
-            "group": 1
         }
     ],
     "ignoredEventTypes": [
@@ -132,6 +104,7 @@
             "flags": "stateDependent",
             "internalName": "VFD",
             "alarmName": "vfdAlarm",
+            "_comment": "There is also VFD_MATCH event and it is also should be ignored",
             "group": 1
         },
         {
@@ -164,6 +137,24 @@
             "flags": "stateDependent",
             "internalName": "OSC",
             "alarmName": "oscAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.VEHICE",
+            "name": "_Vehicle information [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "VEHICE",
+            "alarmName": "vehicleAlarm",
+            "_comment":  "alarmName will be probably changed",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.TRAFFIC",
+            "name": "_Traffic information [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "TRAFFIC",
+            "alarmName": "trafficAlarm",
+            "_comment": "alarmName will be probably changed",
             "group": 1
         }
     ]
