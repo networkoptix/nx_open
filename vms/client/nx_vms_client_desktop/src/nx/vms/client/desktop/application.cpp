@@ -163,6 +163,9 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
 
     QnClientModule client(startupParams);
 
+    QnGLCheckerInstrument::checkGLHardware();
+    client.initWebEngine();
+
     if (startupParams.customUri.isValid())
         sendCloudPortalConfirmation(startupParams.customUri, application);
 
@@ -270,8 +273,6 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
             mainWindow->move(targetPosition);
         }
     }
-
-    QnGLCheckerInstrument::checkGLHardware();
 
     #if defined(Q_OS_WIN)
         if (qnRuntime->isVideoWallMode())

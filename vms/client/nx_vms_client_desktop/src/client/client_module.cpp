@@ -249,7 +249,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initSkin();
     initLocalResources();
     initSurfaceFormat();
-    initWebEngine();
 }
 
 QnClientModule::~QnClientModule()

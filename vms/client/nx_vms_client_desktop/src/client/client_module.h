@@ -54,6 +54,8 @@ public:
     nx::vms::client::desktop::AnalyticsSettingsManager* analyticsSettingsManager() const;
     nx::vms::client::desktop::ServerRuntimeEventConnector* serverRuntimeEventConnector() const;
 
+    void initWebEngine();
+
 private:
     void initApplication();
     void initThread();
@@ -65,7 +67,6 @@ private:
     bool initLogFromFile(const QString& filename, const QString& suffix = QString());
     void initNetwork();
     void initSkin();
-    void initWebEngine();
     void initLocalResources();
     void initLocalInfo();
     void registerResourceDataProviders();
