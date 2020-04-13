@@ -1,4 +1,4 @@
-nx_add_server_plugin(dw_tvt_analytics_plugin
+nx_add_server_plugin(dw_tvt_analytics_plugin OPTIONAL
     PRIVATE_LIBS
         Qt5::Core
         nx_plugin_utils
