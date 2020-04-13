@@ -22,7 +22,7 @@ ResourceParamsData ResourceParamsData::load(const nx::utils::Url& url)
     if (httpClient.doGet(url)
         && httpClient.response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
     {
-        const auto body = httpClient.fetchEntireMessageBody();
+        const auto body = httpClient.fetchEntireMessageBody(kResourceDataReadingTimeout);
         if (body)
             result.value = *body;
     }

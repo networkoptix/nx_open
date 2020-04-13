@@ -160,17 +160,18 @@ BufferType HttpClient::fetchMessageBodyBuffer()
     return result;
 }
 
-std::optional<BufferType> HttpClient::fetchEntireMessageBody()
+std::optional<BufferType> HttpClient::fetchEntireMessageBody(
+    std::optional<std::chrono::milliseconds> timeout)
 {
     QByteArray buffer;
     nx::utils::ElapsedTimer timer;
-    const bool hasTimeout = m_messageBodyReadTimeout && m_messageBodyReadTimeout->count() > 0;
+    const bool hasTimeout = timeout && timeout->count() > 0;
     if (hasTimeout)
         timer.restart();
     while (!eof())
     {
         buffer += fetchMessageBodyBuffer();
-        if (hasTimeout && timer.hasExpired(*m_messageBodyReadTimeout))
+        if (hasTimeout && timer.hasExpired(*timeout))
             break;
     }
 
