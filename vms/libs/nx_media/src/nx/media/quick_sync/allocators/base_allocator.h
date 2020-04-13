@@ -20,12 +20,14 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 #ifndef __BASE_ALLOCATOR_H__
 #define __BASE_ALLOCATOR_H__
 
-#include <list>
 #include <string.h>
+
+#include <list>
 #include <functional>
-#include <mfx/mfxvideo.h>
 #include <memory>
 #include <mutex>
+
+#include <mfx/mfxvideo.h>
 
 struct mfxAllocatorParams
 {
@@ -157,17 +159,6 @@ protected:
 
     std::list<mfxFrameAllocResponse> m_responses;
     std::list<UniqueResponse> m_ExtResponses;
-
-    struct IsSame
-        : public std::binary_function<mfxFrameAllocResponse, mfxFrameAllocResponse, bool>
-    {
-        bool operator () (const mfxFrameAllocResponse & l, const mfxFrameAllocResponse &r)const
-        {
-            return r.mids != 0 && l.mids != 0 &&
-                r.mids[0] == l.mids[0] &&
-                r.NumFrameActual == l.NumFrameActual;
-        }
-    };
 
     // checks if request is supported
     virtual mfxStatus CheckRequestType(mfxFrameAllocRequest *request);

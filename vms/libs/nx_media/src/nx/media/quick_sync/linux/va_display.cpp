@@ -1,3 +1,6 @@
+
+#ifdef __linux__
+
 #include "va_display.h"
 
 #include <nx/utils/log/log.h>
@@ -29,3 +32,5 @@ VaDisplay::VaDisplay()
         return;
     }
 }
+
+#endif // __linux__

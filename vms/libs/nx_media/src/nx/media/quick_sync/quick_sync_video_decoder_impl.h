@@ -3,15 +3,13 @@
 #include <vector>
 #include <memory>
 
-#include <va/va.h>
-
 #include "quick_sync_video_decoder.h"
-#include <nx/utils/log/log.h>
 
 #include <mfx/mfxvideo++.h>
 #include "allocators/base_allocator.h"
+#include "utils.h"
 
-namespace nx::media {
+namespace nx::media::quick_sync {
 
 class QuickSyncVideoDecoderImpl : public std::enable_shared_from_this<QuickSyncVideoDecoderImpl>
 {
@@ -23,7 +21,7 @@ public:
     void lockSurface(const mfxFrameSurface1* surface);
     void releaseSurface(const mfxFrameSurface1* surface);
 
-    void** getRenderingSurface() { return &m_renderingSurface; }
+    RenderingContext& getRenderingContext() { return m_renderingContext; }
     static bool isCompatible(AVCodecID codec);
 
 private:
@@ -54,11 +52,10 @@ private:
     bool allocSurfaces(mfxFrameAllocRequest& request);
     std::shared_ptr<MFXFrameAllocator> m_allocator;
     mfxFrameAllocResponse m_response;
-    VADisplay m_display = nullptr;
 
-    // Surface needed to render frame to opengl texture. Keep it here due to do not recreate it on
+    // Context needed to render frame to opengl texture. Keep it here due to do not recreate it on
     // every frame.
-    void* m_renderingSurface = nullptr;
+    RenderingContext m_renderingContext;
 };
 
-} // namespace nx::media
+} // namespace nx::media::quick_sync

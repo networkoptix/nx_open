@@ -22,8 +22,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef VA_GLX_H
-#define VA_GLX_H
+#ifdef __linux__
+
+#pragma once
 
 #include <va/va.h>
 #include <GL/glx.h>
@@ -108,4 +109,4 @@ VAStatus vaCopySurfaceGLX_nx(
 }
 #endif
 
-#endif /* VA_GLX_H */
+#endif // __linux__

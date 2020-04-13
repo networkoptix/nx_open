@@ -22,6 +22,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __linux__
+
 #include <stdlib.h>
 #include "va_glx_private.h"
 #include "va_glx_impl.h"
@@ -166,3 +168,5 @@ VAStatus vaCopySurfaceGLX_nx(
     INVOKE(ctx, CopySurface, (ctx, gl_surface, surface, flags));
     return status;
 }
+
+#endif // __linux__

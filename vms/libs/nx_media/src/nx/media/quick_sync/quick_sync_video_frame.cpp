@@ -1,6 +1,6 @@
 #include "quick_sync_video_frame.h"
 
-#include <nx/media/quick_sync/va_surface_info.h>
+#include <nx/media/quick_sync/utils.h>
 
 QuickSyncVideoFrame::QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& frame)
 {
@@ -9,6 +9,5 @@ QuickSyncVideoFrame::QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& fra
 
 bool QuickSyncVideoFrame::renderToRgb(bool isNewTexture, GLuint textureId)
 {
-    auto surfaceInfo = m_frame->handle().value<VaSurfaceInfo>();
-    return surfaceInfo.renderToRgb(isNewTexture, textureId);
+    return nx::media::quick_sync::renderToRgb(*m_frame, isNewTexture, textureId);
 }

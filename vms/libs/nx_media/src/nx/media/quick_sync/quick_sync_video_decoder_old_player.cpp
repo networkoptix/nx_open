@@ -1,13 +1,14 @@
 #include "quick_sync_video_decoder_old_player.h"
-#include "quick_sync_video_decoder_impl.h"
-#include "quick_sync_video_frame.h"
-#include "va_display.h"
 
 #include <utils/media/utils.h>
+#include <nx/utils/log/log.h>
+
+#include "quick_sync_video_decoder_impl.h"
+#include "quick_sync_video_frame.h"
 
 bool QuickSyncVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDataPtr& data)
 {
-    if (!nx::media::QuickSyncVideoDecoderImpl::isCompatible(data->compressionType))
+    if (!nx::media::quick_sync::QuickSyncVideoDecoderImpl::isCompatible(data->compressionType))
         return false;
 
     if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
@@ -17,7 +18,7 @@ bool QuickSyncVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDat
         return false;
     }
     nx::QVideoFramePtr result;
-    auto decoder = std::make_unique<nx::media::QuickSyncVideoDecoderImpl>();
+    auto decoder = std::make_unique<nx::media::quick_sync::QuickSyncVideoDecoderImpl>();
     return decoder->decode(data, &result) >= 0;
 }
 
@@ -39,7 +40,7 @@ bool QuickSyncVideoDecoderOldPlayer::decode(
         {
             NX_DEBUG(this, "Create QuickSync video decoder");
             m_resolution = frameResolution;
-            m_impl = std::make_shared<nx::media::QuickSyncVideoDecoderImpl>();
+            m_impl = std::make_shared<nx::media::quick_sync::QuickSyncVideoDecoderImpl>();
         }
         m_codecId = data->compressionType;
         if (!frameResolution.isEmpty())
@@ -57,7 +58,7 @@ bool QuickSyncVideoDecoderOldPlayer::decode(
     if (!result)
         return false;
 
-    std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> decoderWeakPtr = m_impl;
+    std::weak_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> decoderWeakPtr = m_impl;
     outFrame->flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
     outFrame->pkt_dts = result->startTime();
     outFrame->width = result->size().width();

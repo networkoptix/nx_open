@@ -17,6 +17,7 @@ The original version of this sample may be obtained from https://software.intel.
 or https://software.intel.com/en-us/media-client-solutions-support.
 \**********************************************************************************/
 
+#ifdef __linux__
 
 #include <stdio.h>
 #include <assert.h>
@@ -751,3 +752,4 @@ mfxStatus VaapiFrameAllocator::GetFrameHDL(mfxMemId mid, mfxHDL *handle)
     return MFX_ERR_NONE;
 }
 
+#endif // _linux__

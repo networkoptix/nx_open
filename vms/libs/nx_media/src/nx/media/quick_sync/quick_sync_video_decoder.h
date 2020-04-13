@@ -3,7 +3,7 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/media/abstract_video_decoder.h>
 
-namespace nx::media {
+namespace nx::media::quick_sync {
 
 class QuickSyncVideoDecoderImpl;
 
@@ -32,4 +32,4 @@ private:
     std::shared_ptr<QuickSyncVideoDecoderImpl> m_impl;
 };
 
-} // namespace nx::media
+} // namespace nx::media::quick_sync

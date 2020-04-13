@@ -55,7 +55,7 @@ void DecoderRegistrar::registerDecoders(
     {
         FfmpegVideoDecoder::setMaxResolutions(maxFfmpegResolutions);
 
-        VideoDecoderRegistry::instance()->addPlugin<QuickSyncVideoDecoder>();
+        VideoDecoderRegistry::instance()->addPlugin<quick_sync::QuickSyncVideoDecoder>();
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
     }

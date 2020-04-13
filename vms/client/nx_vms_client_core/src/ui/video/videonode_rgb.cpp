@@ -40,10 +40,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include <QtX11Extras/QX11Info>
-
-#include <nx/media/quick_sync/va_surface_info.h>
-#include <nx/media/quick_sync/glx/va_glx.h>
+#include <nx/media/quick_sync/utils.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -60,7 +57,7 @@ QList<QVideoFrame::PixelFormat> QSGVideoNodeFactory_RGB::supportedPixelFormats(
         pixelFormats.append(QVideoFrame::Format_RGB565);
     } else if (handleType == QAbstractVideoBuffer::GLTextureHandle) {
         pixelFormats.append(QVideoFrame::Format_NV12);
-    } else if (handleType == kHandleTypeVaSurface) {
+    } else if (handleType == kHandleTypeQsvSurface) {
         pixelFormats.append(QVideoFrame::Format_NV12);
     }
 
@@ -128,9 +125,6 @@ public:
 
 class QSGVideoMaterial_RGB : public QSGMaterial
 {
-    void* m_vaglx_surface = nullptr;
-    VADisplay m_display;
-
 public:
     QSGVideoMaterial_RGB(const QVideoSurfaceFormat &format) :
         m_format(format),
@@ -143,9 +137,6 @@ public:
 
     ~QSGVideoMaterial_RGB()
     {
-        if (m_vaglx_surface)
-            vaDestroySurfaceGLX(m_display, m_vaglx_surface);
-
         if (m_textureId)
             QOpenGLContext::currentContext()->functions()->glDeleteTextures(1, &m_textureId);
     }
@@ -179,16 +170,16 @@ public:
         m_textureDirty = true;
     }
 
-    void renderVaSurface()
+    void renderQsvSurface()
     {
         QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
-        auto surfaceInfo = m_frame.handle().value<VaSurfaceInfo>();
-        m_display = surfaceInfo.display;
-
+        bool isNewTexture = false;
         if (m_textureSize != m_frame.size()) {
             if (!m_textureSize.isEmpty())
                 functions->glDeleteTextures(1, &m_textureId);
             functions->glGenTextures(1, &m_textureId);
+            isNewTexture = true;
+            // TODO make texture size equal to rendering rect
             m_textureSize = m_frame.size();
 
             functions->glActiveTexture(GL_TEXTURE0);
@@ -201,24 +192,13 @@ public:
             functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-            if (m_vaglx_surface)
-                vaDestroySurfaceGLX(m_display, m_vaglx_surface);
-
-            const auto status = vaCreateSurfaceGLX_nx(m_display, GL_TEXTURE_2D, m_textureId, 0, 0, &m_vaglx_surface);
-            if (status != VA_STATUS_SUCCESS)
-                NX_WARNING(this, "vaCreateSurfaceGLX failed: %1", status);
         }
 
-        auto status = vaCopySurfaceGLX_nx(m_display, m_vaglx_surface, surfaceInfo.id, 0);
-        if (status != VA_STATUS_SUCCESS)
-            NX_WARNING(this, "vaCopySurfaceGLX failed: %1", status);
-
+        if (!nx::media::quick_sync::renderToRgb(m_frame, isNewTexture, m_textureId))
+        {
+            NX_WARNING(this, "rendering surface failed");
+        }
         m_textureDirty = false;
-        status = vaSyncSurface(m_display, surfaceInfo.id);
-        if (status != VA_STATUS_SUCCESS)
-            NX_WARNING(this, "vaSyncSurface failed: %1", status);
-
         functions->glActiveTexture(GL_TEXTURE0);
         functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
     }
@@ -282,15 +262,15 @@ public:
         QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
 
         QMutexLocker lock(&m_frameMutex);
-        if (!m_frame.isValid() || (!m_textureDirty && m_frame.handleType() == kHandleTypeVaSurface))
+        if (!m_frame.isValid() || (!m_textureDirty && m_frame.handleType() == kHandleTypeQsvSurface))
         {
             functions->glActiveTexture(GL_TEXTURE0);
             functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
             return;
         }
 
-        if (m_frame.handleType() == kHandleTypeVaSurface)
-            renderVaSurface();
+        if (m_frame.handleType() == kHandleTypeQsvSurface)
+            renderQsvSurface();
         else
             renderSysMemory();
     }

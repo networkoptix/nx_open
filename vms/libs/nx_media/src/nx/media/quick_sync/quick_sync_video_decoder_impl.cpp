@@ -7,29 +7,22 @@
 #include <QtMultimedia/QVideoFrame>
 
 #include <utils/media/nalUnits.h>
+#include <nx/utils/log/log.h>
+
 #include "allocators/sysmem_allocator.h"
-#include "allocators/vaapi_allocator.h"
 #include "mfx_sys_qt_video_buffer.h"
-#include "mfx_drm_qt_video_buffer.h"
 #include "mfx_status_string.h"
-#include "va_display.h"
-#include "glx/va_glx.h"
 
 #define MSDK_ALIGN16(value) (((value + 15) >> 4) << 4) // round up to a multiple of 16
 
-namespace nx::media {
+namespace nx::media::quick_sync {
 
 constexpr int kSyncWaitMsec = 5000;
 constexpr int kMaxBitstreamSizeBytes = 1024 * 1024 * 10;
 
 bool QuickSyncVideoDecoderImpl::isCompatible(AVCodecID codec)
 {
-    if (VaDisplay::getDisplay() == nullptr)
-        return false;
-
-    if (codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265)
-        return true;
-    return false;
+    return nx::media::quick_sync::isCompatible(codec);
 }
 
 QuickSyncVideoDecoderImpl::QuickSyncVideoDecoderImpl()
@@ -40,8 +33,6 @@ QuickSyncVideoDecoderImpl::QuickSyncVideoDecoderImpl()
 QuickSyncVideoDecoderImpl::~QuickSyncVideoDecoderImpl()
 {
     NX_DEBUG(this, "Close quick sync video decoder");
-    if (m_renderingSurface)
-        vaDestroySurfaceGLX(m_display, m_renderingSurface);
 
     m_mfxSession.Close();
 
@@ -60,38 +51,33 @@ bool QuickSyncVideoDecoderImpl::initSession()
         return false;
     }
     NX_DEBUG(this, "MFX version %1.%2", version.Major, version.Minor);
-    m_display = VaDisplay::getDisplay();
-    if (!m_display)
-    {
-        NX_ERROR(this, "Failed to get VA display");
-        return false;
-    }
 
-    status = m_mfxSession.SetHandle(MFX_HANDLE_VA_DISPLAY, m_display);
-    if (status < MFX_ERR_NONE)
+    if (!quick_sync::setSessionHandle(m_mfxSession))
     {
-        NX_ERROR(this, "Failed to set VA handle to MFX session, error: %1", status);
+        NX_ERROR(this, "Failed to set handle to MFX session");
         return false;
     }
 
     // create memory allocator
     if (m_config.useVideoMemory)
     {
-        m_allocator = std::make_unique<VaapiFrameAllocator>();
-        vaapiAllocatorParams vaapiAllocParams;
-        vaapiAllocParams.m_dpy = m_display;
-        status = m_allocator->Init(&vaapiAllocParams);
+        m_allocator = createVideoMemoryAllocator();
+        if (!m_allocator)
+        {
+            NX_ERROR(this, "Failed to init video memory allocator");
+            return false;
+        }
     }
     else
     {
-        m_allocator = std::make_unique<SysMemFrameAllocator>();
-        status = m_allocator->Init(nullptr);
-    }
-
-    if (status < MFX_ERR_NONE)
-    {
-        NX_ERROR(this, "Failed to init allocator, error code: %1", status);
-        return false;
+        auto allocator = std::make_shared<SysMemFrameAllocator>();
+        status = allocator->Init(nullptr);
+        if (status < MFX_ERR_NONE)
+        {
+            NX_ERROR(this, "Failed to init allocator, error code: %1", status);
+            return false;
+        }
+        m_allocator = std::move(allocator);
     }
     m_mfxSession.SetFrameAllocator(m_allocator.get());
     return true;
@@ -235,16 +221,10 @@ bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
 {
     QAbstractVideoBuffer* buffer = nullptr;
     if (m_config.useVideoMemory)
-    {
-        vaapiMemId* surfaceData = (vaapiMemId*)surface->Data.MemId;
-        VASurfaceID surfaceId = *(surfaceData->m_surface);
-        VaSurfaceInfo surfaceInfo {surfaceId, m_display, surface, weak_from_this()};
-        buffer = new MfxDrmQtVideoBuffer(surfaceInfo);
-    }
+        buffer = createVideoBuffer(surface, weak_from_this());
     else
-    {
         buffer = new MfxQtVideoBuffer(surface, m_allocator);
-    }
+
     QSize frameSize(surface->Info.Width, surface->Info.Height);
     result->reset(new QVideoFrame(buffer, frameSize, QVideoFrame::Format_NV12));
     result->get()->setStartTime(surface->Data.TimeStamp);
@@ -360,4 +340,4 @@ int QuickSyncVideoDecoderImpl::decode(
     return m_frameNumber++;
 }
 
-} // namespace nx::media
+} // namespace nx::media::quick_sync

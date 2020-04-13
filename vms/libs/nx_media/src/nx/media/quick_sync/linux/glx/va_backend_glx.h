@@ -22,24 +22,36 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if defined __GNUC__ && defined HAVE_GNUC_VISIBILITY_ATTRIBUTE
-# define DLL_HIDDEN __attribute__((visibility("hidden")))
-# define DLL_EXPORT __attribute__((visibility("default")))
-#else
-# define DLL_HIDDEN
-# define DLL_EXPORT
-#endif
+#pragma once
 
-#ifndef VA_GLX_IMPL_H
-#define VA_GLX_IMPL_H
+#ifdef __linux__
 
-/**
- * Initialize GLX driver context
- *
- * @param[in]  ctx        the VA driver context
- * @return VA_STATUS_SUCCESS if successful
- */
-DLL_HIDDEN
-VAStatus va_glx_init_context(VADriverContextP ctx);
+struct VADriverContext;
 
-#endif /* VA_GLX_IMPL_H */
+struct VADriverVTableGLX {
+    /* Optional: create a surface used for display to OpenGL */
+    VAStatus (*vaCreateSurfaceGLX)(
+        struct VADriverContext *ctx,
+        unsigned int            gl_target,
+        unsigned int            gl_texture,
+        int                     src_width,
+        int                     src_height,
+        void                  **gl_surface
+    );
+
+    /* Optional: destroy a VA/GLX surface */
+    VAStatus (*vaDestroySurfaceGLX)(
+        struct VADriverContext *ctx,
+        void                   *gl_surface
+    );
+
+    /* Optional: copy a VA surface to a VA/GLX surface */
+    VAStatus (*vaCopySurfaceGLX)(
+        struct VADriverContext *ctx,
+        void                   *gl_surface,
+        VASurfaceID             surface,
+        unsigned int            flags
+    );
+};
+
+#endif // __linux__

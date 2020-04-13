@@ -22,8 +22,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef VA_GLX_PRIVATE_H
-#define VA_GLX_PRIVATE_H
+#ifdef __linux__
+#pragma once
 
 #include "va/va.h"
 #include "va/va_backend.h"
@@ -82,4 +82,4 @@ struct VADriverContextGLX {
     unsigned int                is_initialized  : 1;
 };
 
-#endif /* VA_GLX_PRIVATE_H */
+#endif // __linux__

@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef __linux__
+
 #include <va/va.h>
 
 class VaDisplay
@@ -18,3 +20,5 @@ private:
 private:
     VADisplay m_display;
 };
+
+#endif // __linux__

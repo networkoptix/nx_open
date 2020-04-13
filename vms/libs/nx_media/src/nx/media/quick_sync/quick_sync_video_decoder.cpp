@@ -2,7 +2,7 @@
 
 #include "quick_sync_video_decoder_impl.h"
 
-namespace nx::media {
+namespace nx::media::quick_sync {
 
 bool QuickSyncVideoDecoder::isCompatible(
     const AVCodecID codec, const QSize& /*resolution*/, bool /*allowOverlay*/)
@@ -37,4 +37,4 @@ AbstractVideoDecoder::Capabilities QuickSyncVideoDecoder::capabilities() const
     return Capability::hardwareAccelerated;
 }
 
-} // namespace nx::media
+} // namespace nx::media::quick_sync

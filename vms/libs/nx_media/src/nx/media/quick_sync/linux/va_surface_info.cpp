@@ -1,16 +1,19 @@
+#ifdef __linux__
+
 #include "va_surface_info.h"
 
-#include <nx/media/quick_sync/glx/va_glx.h>
+#include <nx/utils/log/log.h>
+#include "glx/va_glx.h"
 
 bool VaSurfaceInfo::renderToRgb(bool isNewTexture, GLuint textureId)
 {
-    //auto start =  std::chrono::high_resolution_clock::now();
+    auto start =  std::chrono::high_resolution_clock::now();
     auto decoderLock = decoder.lock();
     if (!decoderLock)
         return false;
 
     VAStatus status;
-    void** renderingSurface = decoderLock->getRenderingSurface();
+    void** renderingSurface = &(decoderLock->getRenderingContext().renderingSurface);
     if (isNewTexture || !(*renderingSurface))
     {
         if (*renderingSurface)
@@ -41,7 +44,9 @@ bool VaSurfaceInfo::renderToRgb(bool isNewTexture, GLuint textureId)
         NX_DEBUG(this, "vaSyncSurface failed: %1", status);
         return false;
     }
-    //auto end =  std::chrono::high_resolution_clock::now();
-    //NX_DEBUG(this, "render time: %1", std::chrono::duration_cast<std::chrono::milliseconds>(end - start));
+    auto end =  std::chrono::high_resolution_clock::now();
+    NX_DEBUG(this, "render time: %1", std::chrono::duration_cast<std::chrono::milliseconds>(end - start));
     return true;
 }
+
+#endif // _linux__

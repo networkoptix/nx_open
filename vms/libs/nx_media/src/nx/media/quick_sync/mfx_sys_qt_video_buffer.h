@@ -6,7 +6,7 @@
 #include <nx/utils/log/log.h>
 
 
-namespace nx::media {
+namespace nx::media::quick_sync {
 
 class MfxQtVideoBufferPrivate: public QAbstractVideoBufferPrivate
 {
@@ -85,4 +85,4 @@ public:
     }
 };
 
-} // namespace nx::media
+} // namespace nx::media::quick_sync

@@ -1,3 +1,4 @@
+
 /******************************************************************************\
 Copyright (c) 2005-2019, Intel Corporation
 All rights reserved.
@@ -19,84 +20,67 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 
 #pragma once
 
-#include <stdlib.h>
-#include <va/va.h>
-#include <va/va_drmcommon.h>
+#ifdef _WIN32
 
-#include "base_allocator.h"
+#include <atlbase.h>
+#include <d3d9.h>
+#include <dxva2api.h>
+#include <vector>
 
-// VAAPI Allocator internal Mem ID
-struct vaapiMemId
+#include "../allocators/base_allocator.h"
+
+enum eTypeHandle
 {
-    VASurfaceID* m_surface;
-    VAImage      m_image;
-    // variables for VAAPI Allocator internal color conversion
-    unsigned int m_fourcc;
-    mfxU8*       m_sys_buffer;
-    mfxU8*       m_va_buffer;
-    // buffer info to support surface export
-    VABufferInfo m_buffer_info;
-    // pointer to private export data
-    void*        m_custom;
+    DXVA2_PROCESSOR     = 0x00,
+    DXVA2_DECODER       = 0x01
 };
 
-namespace MfxLoader
+struct D3DAllocatorParams : mfxAllocatorParams
 {
-    class VA_Proxy;
-}
+    IDirect3DDeviceManager9 *pManager;
+    DWORD surfaceUsage;
 
-struct vaapiAllocatorParams : mfxAllocatorParams
-{
-    enum {
-      DONOT_EXPORT = 0,
-      FLINK = 0x01,
-      PRIME = 0x02,
-      NATIVE_EXPORT_MASK = FLINK | PRIME,
-      CUSTOM = 0x100,
-      CUSTOM_FLINK = CUSTOM | FLINK,
-      CUSTOM_PRIME = CUSTOM | PRIME
-    };
-    class Exporter
+    D3DAllocatorParams()
+        : pManager()
+        , surfaceUsage()
     {
-    public:
-      virtual ~Exporter(){}
-      virtual void* acquire(mfxMemId mid) = 0;
-      virtual void release(mfxMemId mid, void * hdl) = 0;
-    };
-
-    vaapiAllocatorParams()
-      : m_dpy(NULL)
-      , m_export_mode(DONOT_EXPORT)
-      , m_exporter(NULL)
-    {}
-
-    VADisplay m_dpy;
-    mfxU32 m_export_mode;
-    Exporter* m_exporter;
+    }
 };
 
-class VaapiFrameAllocator: public BaseFrameAllocator
+class D3DFrameAllocator: public BaseFrameAllocator
 {
 public:
-    VaapiFrameAllocator();
-    virtual ~VaapiFrameAllocator();
-    VaapiFrameAllocator(VaapiFrameAllocator const&) = delete;
-    VaapiFrameAllocator& operator=(VaapiFrameAllocator const&) = delete;
+    D3DFrameAllocator();
+    virtual ~D3DFrameAllocator();
 
     virtual mfxStatus Init(mfxAllocatorParams *pParams);
     virtual mfxStatus Close();
 
-protected:
+    virtual IDirect3DDeviceManager9* GetDeviceManager()
+    {
+        return m_manager;
+    };
+
     virtual mfxStatus LockFrame(mfxMemId mid, mfxFrameData *ptr);
     virtual mfxStatus UnlockFrame(mfxMemId mid, mfxFrameData *ptr);
     virtual mfxStatus GetFrameHDL(mfxMemId mid, mfxHDL *handle);
 
+protected:
     virtual mfxStatus CheckRequestType(mfxFrameAllocRequest *request);
     virtual mfxStatus ReleaseResponse(mfxFrameAllocResponse *response);
     virtual mfxStatus AllocImpl(mfxFrameAllocRequest *request, mfxFrameAllocResponse *response);
     virtual mfxStatus ReallocImpl(mfxMemId midIn, const mfxFrameInfo *info, mfxU16 memType, mfxMemId *midOut);
 
-    VADisplay m_dpy;
-    mfxU32 m_export_mode;
-    vaapiAllocatorParams::Exporter* m_exporter;
+    void DeallocateMids(mfxHDLPair** pairs, int n);
+
+    std::vector<mfxHDLPair**> m_midsAllocated;
+
+    CComPtr<IDirect3DDeviceManager9> m_manager;
+    CComPtr<IDirectXVideoDecoderService> m_decoderService;
+    CComPtr<IDirectXVideoProcessorService> m_processorService;
+    HANDLE m_hDecoder;
+    HANDLE m_hProcessor;
+    DWORD m_surfaceUsage;
 };
+
+#endif // #ifdef _WIN32

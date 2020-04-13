@@ -1,14 +1,13 @@
 #pragma once
 
-#include <memory>
+#ifdef __linux__
 
-#include <QtMultimedia/QAbstractVideoBuffer>
+#include <memory>
 
 #include <nx/media/quick_sync/quick_sync_video_decoder_impl.h>
 
 #include <va/va.h>
 
-constexpr int kHandleTypeVaSurface = QAbstractVideoBuffer::UserHandle + 1;
 
 struct VaSurfaceInfo
 {
@@ -17,8 +16,10 @@ struct VaSurfaceInfo
     mfxFrameSurface1* surface;
 
     // Contain reference to video decoder to ensure that it still alive
-    std::weak_ptr<nx::media::QuickSyncVideoDecoderImpl> decoder;
+    std::weak_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> decoder;
 
     bool renderToRgb(bool isNewTexture, GLuint textureId);
 };
 Q_DECLARE_METATYPE(VaSurfaceInfo);
+
+#endif // _linux__

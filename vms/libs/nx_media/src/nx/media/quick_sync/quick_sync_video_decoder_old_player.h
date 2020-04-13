@@ -3,7 +3,7 @@
 #include <decoders/video/abstract_video_decoder.h>
 #include <nx/streaming/video_data_packet.h>
 
-namespace nx::media {
+namespace nx::media::quick_sync {
     class QuickSyncVideoDecoderImpl;
 }
 
@@ -27,7 +27,7 @@ public:
     static bool isSupported(const QnConstCompressedVideoDataPtr& data);
 
 private:
-    std::shared_ptr<nx::media::QuickSyncVideoDecoderImpl> m_impl;
+    std::shared_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> m_impl;
     QSize m_resolution;
     AVCodecID m_codecId = AV_CODEC_ID_NONE;
 };

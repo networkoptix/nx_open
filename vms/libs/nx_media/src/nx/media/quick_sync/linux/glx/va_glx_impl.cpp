@@ -22,6 +22,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
+#ifdef __linux__
+
 #define _GNU_SOURCE 1
 
 #include "va_glx_private.h"
@@ -1136,3 +1139,5 @@ VAStatus va_glx_init_context(VADriverContextP ctx)
     glx_ctx->is_initialized = 1;
     return VA_STATUS_SUCCESS;
 }
+
+#endif // __linux__
