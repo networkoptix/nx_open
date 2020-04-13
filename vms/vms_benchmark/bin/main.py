@@ -1269,17 +1269,8 @@ def _format_exception(exception):
         return f"Missing key: {exception}"
     elif isinstance(exception, urllib.error.HTTPError):
         if exception.code == 401:
-            return ('Server refuses passed credentials: '
+            return ('Server refuses passed credentials: ' +
                 'check .conf options vmsUser and vmsPassword.')
-        elif exception.code == 403:
-            return ('Server failed to execute API request: '
-                'insufficient VMS user permissions (HTTP code 403)')
-        elif exception.code in [400, 404, 406]:
-            return ('Server failed to execute API request: '
-                f'Server internal error (HTTP code {exception.code}).')
-        elif 500 <= exception.code <= 599:
-            return ('Server failed to execute API request: '
-                f'Server internal error (HTTP code {exception.code}).')
         else:
             return f'Unexpected HTTP request error (code {exception.code}).'
     elif isinstance(exception, AssertionError):
