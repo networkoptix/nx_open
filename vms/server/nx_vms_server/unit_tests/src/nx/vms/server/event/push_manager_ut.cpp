@@ -71,7 +71,7 @@ public:
         }
     }
 
-    std::optional<PushRequest> generateEvent(
+    void generateEvent(
         EventType type,
         QnUuid resource = {},
         const std::string& users = "",
@@ -110,10 +110,15 @@ public:
         return std::nullopt;
     }
 
-    template<typename... Args>
-    std::optional<PushRequest> testEvent(Args... args)
+    std::optional<PushRequest> testEvent(
+        EventType type,
+        QnUuid resource = {},
+        const std::string& users = "",
+        QString caption = {},
+        QString body = {},
+        bool addSource = true)
     {
-        generateEvent(std::forward<Args>(args)...);
+        generateEvent(type, resource, users, caption, body, addSource);
         return getRequestFromServer();
     }
 
