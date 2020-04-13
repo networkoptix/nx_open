@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/optional/optional.hpp>
+#include <optional>
 
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
 
@@ -23,11 +23,11 @@ public:
 private:
     std::vector<Event> parseMetadataState(const QnByteArrayConstRef& buffer) const;
 
-    boost::optional<Event> createEvent(
+    std::optional<Event> createEvent(
         const QString& eventSource, const QString& eventSourceState) const;
 
-    static boost::optional<int> eventChannel(const QString& eventSource);
-    static boost::optional<int> eventRegion(const QString& eventSource);
+    static std::optional<int> eventChannel(const QString& eventSource);
+    static std::optional<int> eventRegion(const QString& eventSource);
     static bool isEventActive(const QString& eventSourceState);
 
     static Hanwha::EventItemType eventItemType(

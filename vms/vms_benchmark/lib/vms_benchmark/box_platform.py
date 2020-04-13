@@ -16,7 +16,9 @@ class BoxPlatform:
             raise BoxFileContentError('/proc/meminfo')
 
         return dict(
-            (part.strip() for part in line.split(':')) for line in meminfo.split('\n') if ':' in line
+            (
+                part.strip() for part in line.split(':')
+            ) for line in meminfo.split('\n') if ':' in line
         )
 
     @staticmethod

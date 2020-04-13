@@ -185,14 +185,10 @@ nx::vms::api::NetworkPortState::PoweringStatus NetworkBlockManager::getPoweringS
 nx::vms::api::NetworkPortWithPoweringMode::PoweringMode NetworkBlockManager::getPoweringMode(
     const NetworkPortState& portState) const
 {
-    const auto userDefinedPoweringModes = getUserDefinedPortPoweringModes();
-    for (const auto& portWithPoweringMode: userDefinedPoweringModes)
-    {
-        if (portWithPoweringMode.portNumber == portState.portNumber)
-            return portWithPoweringMode.poweringMode;
-    }
-
-    return nx::vms::api::NetworkPortWithPoweringMode::PoweringMode::automatic;
+    using nx::vms::api::NetworkPortWithPoweringMode;
+    return portState.isPoeEnabled
+        ? NetworkPortWithPoweringMode::PoweringMode::automatic
+        : NetworkPortWithPoweringMode::PoweringMode::off;
 }
 
 std::vector<nx::vms::api::NetworkPortWithPoweringMode>

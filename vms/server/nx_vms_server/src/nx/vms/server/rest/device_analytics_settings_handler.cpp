@@ -22,6 +22,7 @@ namespace nx::vms::server::rest {
 using namespace nx::network;
 using DeviceAnalyticsSettingsRequest = nx::vms::api::analytics::DeviceAnalyticsSettingsRequest;
 using DeviceAnalyticsSettingsResponse = nx::vms::api::analytics::DeviceAnalyticsSettingsResponse;
+using DeviceAgentManfiest = nx::vms::api::analytics::DeviceAgentManifest;
 
 using ParameterMap = std::map<QString, QString>;
 
@@ -246,6 +247,16 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
 
     response.analyzedStreamIndex =
         commonRequestEntities.device->analyzedStreamIndex(engineId);
+
+    const std::optional<DeviceAgentManfiest> deviceAgentManifest =
+        commonRequestEntities.device->deviceAgentManifest(engineId);
+
+    if (deviceAgentManifest)
+    {
+        response.hideStreamSelection =
+            deviceAgentManifest->capabilities.testFlag(
+                DeviceAgentManfiest::Capability::hideStreamSelection);
+    }
 
     if (settings)
     {

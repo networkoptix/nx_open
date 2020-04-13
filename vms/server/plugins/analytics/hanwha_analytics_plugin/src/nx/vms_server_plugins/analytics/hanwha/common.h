@@ -1,9 +1,9 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QString>
 #include <QtCore/QFlag>
-
-#include <boost/optional/optional.hpp>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
@@ -110,8 +110,8 @@ struct Event
     QString typeId;
     QString caption;
     QString description;
-    boost::optional<int> channel;
-    boost::optional<int> region;
+    std::optional<int> channel;
+    std::optional<int> region;
     bool isActive = false;
     Hanwha::EventItemType itemType; //< e.g Gunshot for sound classification.
     QString fullEventName;

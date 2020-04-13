@@ -125,6 +125,9 @@ microseconds QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int chann
 
 void QnResourceWidgetRenderer::blockTimeValue(int channel, microseconds timestamp)
 {
+    if (channel >= m_renderingContexts.size())
+        return;
+
     auto& ctx = m_renderingContexts[channel];
     ctx.timestampBlocked = true;
     ctx.forcedTimestampValue = timestamp;
@@ -132,6 +135,9 @@ void QnResourceWidgetRenderer::blockTimeValue(int channel, microseconds timestam
 
 void QnResourceWidgetRenderer::unblockTimeValue(int channel)
 {
+    if (channel >= m_renderingContexts.size())
+        return;
+
     auto& ctx = m_renderingContexts[channel];
     if (!ctx.timestampBlocked)
         return; //< TODO: Is nested blocking needed?

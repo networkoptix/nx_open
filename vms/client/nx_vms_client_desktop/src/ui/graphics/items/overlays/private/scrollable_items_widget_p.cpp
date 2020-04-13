@@ -89,7 +89,7 @@ void QnScrollableItemsWidgetPrivate::updateContentPosition()
             }
         }();
 
-    if (qFuzzyEquals(contentGeometry.left(), left))
+    if (qFuzzyEquals(contentGeometry.left(), left) || qFuzzyIsNull(contentGeometry.width()))
         return;
 
     m_scrollArea->contentWidget()->setPos(left, contentGeometry.top());

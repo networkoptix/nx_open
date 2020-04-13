@@ -762,26 +762,38 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
 
 nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid engineId) const
 {
-    const QString serializedProperty = getProperty(kAnalyzedStreamIndexes);
-    if (serializedProperty.isEmpty())
-        return kDefaultAnalyzedStreamIndex;
+    using nx::vms::api::analytics::DeviceAgentManifest;
 
-    bool success = false;
-    const auto analyzedStreamIndexMap =
-        QJson::deserialized(serializedProperty.toUtf8(), AnalyzedStreamIndexMap(), &success);
+    const std::optional<DeviceAgentManifest> deviceAgentManifest =
+        this->deviceAgentManifest(engineId);
 
-    if (!success)
+    const bool streamSelectionControlledByPlugin = deviceAgentManifest
+        && deviceAgentManifest->capabilities.testFlag(
+            DeviceAgentManifest::Capability::hideStreamSelection);
+
+    if (!streamSelectionControlledByPlugin)
     {
-        NX_WARNING(this,
-            "%1 Unable to deserialize the analyzedStreamIndex map for the Device %2 (%3), "
-            "\"%4\" property content: %5",
-            __func__, getUserDefinedName(), getId(), kAnalyzedStreamIndexes,
-            nx::kit::utils::toString(serializedProperty));
-        return kDefaultAnalyzedStreamIndex;
-    }
+        const QString serializedProperty = getProperty(kAnalyzedStreamIndexes);
+        if (serializedProperty.isEmpty())
+            return kDefaultAnalyzedStreamIndex;
 
-    if (analyzedStreamIndexMap.contains(engineId))
-        return analyzedStreamIndexMap[engineId];
+        bool success = false;
+        const auto analyzedStreamIndexMap =
+            QJson::deserialized(serializedProperty.toUtf8(), AnalyzedStreamIndexMap(), &success);
+
+        if (!success)
+        {
+            NX_WARNING(this,
+                "%1 Unable to deserialize the analyzedStreamIndex map for the Device %2 (%3), "
+                "\"%4\" property content: %5",
+                __func__, getUserDefinedName(), getId(), kAnalyzedStreamIndexes,
+                nx::kit::utils::toString(serializedProperty));
+            return kDefaultAnalyzedStreamIndex;
+        }
+
+        if (analyzedStreamIndexMap.contains(engineId))
+            return analyzedStreamIndexMap[engineId];
+    }
 
     const QnResourcePool* const resourcePool = this->resourcePool();
     if (!NX_ASSERT(resourcePool))

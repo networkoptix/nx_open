@@ -1,0 +1,170 @@
+{
+    "capabilities": "deviceDependent",
+    "supportedCameraModels": [
+        "TD-9442E3",
+        "TD-9443E3",
+        "TD-9541E3",
+        "TD-9542E3",
+        "TD-9543E3",
+        "TD-9544E3",
+        "TD-9545E3"
+    ],
+    "eventTypes": [
+        {
+            "id": "nx.dw_tvt.MOTION",
+            "name": "Motion Detection",
+            "flags": "stateDependent",
+            "internalName": "MOTION",
+            "alarmName": "motionAlarm"
+        },
+        {
+            "id": "nx.dw_tvt.PEA.perimeterAlarm",
+            "name": "Perimeter Intrusion [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "PEA",
+            "alarmName": "perimeterAlarm",
+            "group": 1,
+            "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
+        },
+        {
+            "id": "nx.dw_tvt.PEA.tripwireAlarm",
+            "name": "Line Crossing [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "PEA",
+            "alarmName": "tripwireAlarm",
+            "group": 1,
+            "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
+        },
+        {
+            "id": "nx.dw_tvt.AVD.sceneChange",
+            "name": "Scene Change",
+            "flags": "stateDependent",
+            "internalName": "AVD",
+            "alarmName": "sceneChange",
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
+        },
+        {
+            "id": "nx.dw_tvt.AVD.clarityAbnormal",
+            "name": "Video Blur Detection",
+            "flags": "stateDependent",
+            "internalName": "AVD",
+            "alarmName": "clarityAbnormal",
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
+        },
+        {
+            "id": "nx.dw_tvt.AVD.colorAbnormal",
+            "name": "Abnormal color detection",
+            "flags": "stateDependent",
+            "internalName": "AVD",
+            "alarmName": "colorAbnormal",
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
+        },
+
+        {
+            "id": "nx.dw_tvt.VFD",
+            "name": "Video Face Detection [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "VFD",
+            "alarmName": "vfdAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.CDD",
+            "name": "Crowd Density [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "CDD",
+            "alarmName": "cddAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.OSC",
+            "name": "Object Status Changed [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "OSC",
+            "alarmName": "oscAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.AOIENTRY",
+            "name": "_Entering Object Detection [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "AOIENTRY",
+            "alarmName": "aoientryAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.AOILEAVE",
+            "name": "_Leaving Object Detection [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "AOILEAVE",
+            "alarmName": "aoileaveAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.PASSLINECOUNT",
+            "name": "_Line Crossing Object Counting [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "PASSLINECOUNT",
+            "alarmName": "passlinecountAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.TRAFFIC",
+            "name": "_Traffic information [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "TRAFFIC",
+            "alarmName": "trafficAlarm",
+            "group": 1
+        }
+    ],
+    "ignoredEventTypes": [
+        {
+            "id": "nx.dw_tvt.SENSOR",
+            "name": "Sensor Alarm",
+            "flags": "stateDependent",
+            "internalName": "SENSOR",
+            "alarmName": "sensorAlarmIn",
+            "_comment": "Notification from camera external sensor"
+        },
+        {
+            "id": "nx.dw_tvt.VFD",
+            "name": "Video Face Detection [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "VFD",
+            "alarmName": "vfdAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.CDD",
+            "name": "Crowd Density [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "CDD",
+            "alarmName": "cddAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.CPC",
+            "name": "Cross-line People Counting [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "CPC",
+            "alarmName": "cpcAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.IPD",
+            "name": "Intruding People Detection [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "IPD",
+            "alarmName": "ipdAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.OSC",
+            "name": "Object Status Changed [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "OSC",
+            "alarmName": "oscAlarm",
+            "group": 1
+        }
+    ]
+}

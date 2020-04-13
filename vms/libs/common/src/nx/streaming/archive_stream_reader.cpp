@@ -1022,7 +1022,8 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
             }
         }
 
-        if (result && result->dataType == QnAbstractMediaData::GENERIC_METADATA
+        auto metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(result);
+        if (metadata && metadata->metadataType == MetadataType::ObjectDetection
             && !m_streamDataFilter.testFlag(StreamDataFilter::objectDetection))
         {
             continue;

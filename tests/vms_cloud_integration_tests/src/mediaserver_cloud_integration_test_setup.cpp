@@ -19,8 +19,10 @@ using nx::vms::api::UserData;
 using nx::vms::api::UserDataList;
 
 MediaServerCloudIntegrationTest::MediaServerCloudIntegrationTest():
+    nx::utils::test::TestWithTemporaryDirectory("mserver", ""),
     m_defaultOwnerCredentials({ "admin", "admin" })
 {
+    m_mediaServerLauncher.addSetting("dataDir", testDataDir());
     m_mediaServerLauncher.addSetting("delayBeforeSettingMasterFlag", "100ms");
     m_mediaServerLauncher.addSetting("p2pMode", GetParam().p2pMode);
     m_mediaServerLauncher.addSetting("publicIPEnabled", 1);
@@ -131,6 +133,16 @@ std::unique_ptr<MediaServerClient>
     mediaServerClient->setUserCredentials(nx::network::http::Credentials(
         m_ownerAccount.email.c_str(),
         nx::network::http::PasswordAuthToken(m_ownerAccount.password.c_str())));
+    return mediaServerClient;
+}
+
+std::unique_ptr<MediaServerClient> 
+    MediaServerCloudIntegrationTest::prepareMediaServerClientFromLocalAdmin()
+{
+    auto mediaServerClient = allocateMediaServerClient();
+    mediaServerClient->setUserCredentials(nx::network::http::Credentials(
+        m_defaultOwnerCredentials.first,
+        nx::network::http::PasswordAuthToken(m_defaultOwnerCredentials.second)));
     return mediaServerClient;
 }
 
@@ -260,6 +272,20 @@ void MediaServerCloudIntegrationTest::waitForUserToAppearInCloud(const std::stri
     }
 }
 
+void MediaServerCloudIntegrationTest::waitUntilTheSystemIsOnlineInCloud()
+{
+    waitUntilTheSystemSatisfies(
+        &nx::cloud::db::api::SystemDataEx::stateOfHealth,
+        nx::cloud::db::api::SystemHealth::online);
+}
+
+void MediaServerCloudIntegrationTest::waitUntilTheSystemIsOfflineInCloud()
+{
+    waitUntilTheSystemSatisfies(
+        &nx::cloud::db::api::SystemDataEx::stateOfHealth,
+        nx::cloud::db::api::SystemHealth::offline);
+}
+
 std::unique_ptr<QnStaticCommonModule> MediaServerCloudIntegrationTest::s_staticCommonModule;
 
 void MediaServerCloudIntegrationTest::SetUpTestCase()
@@ -288,4 +314,26 @@ std::unique_ptr<MediaServerClient> MediaServerCloudIntegrationTest::allocateMedi
             .setEndpoint(mediaServerEndpoint()));
     mediaServerClient->setRequestTimeout(kRequestTimeout);
     return mediaServerClient;
+}
+
+template <typename T>
+void MediaServerCloudIntegrationTest::waitUntilTheSystemSatisfies(
+    T nx::cloud::db::api::SystemDataEx::* field,
+    T expectedValue)
+{
+    using namespace nx::cloud::db::api;
+
+    for (;;)
+    {
+        SystemDataEx system;
+        ASSERT_EQ(
+            ResultCode::ok,
+            cdb()->getSystem(
+                m_ownerAccount.email, m_ownerAccount.password,
+                m_cloudSystem.id, &system));
+        if (system.*field == expectedValue)
+            return;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 }

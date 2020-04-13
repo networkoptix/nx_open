@@ -869,14 +869,9 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
 
         const auto path = trim(normalize(getUrl()));
     #else
-        bool isApiMountedSmb = false;
-        {
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            isApiMountedSmb = !m_localPath.isEmpty();
-        }
-
+        const bool isApiMountedSmb = !getLocalPathSafe().isEmpty();
         const auto fsPath = normalize(getFsPath());
-        auto path = m_mockableCallFactory.canonicalPath(isApiMountedSmb ? fsPath : trim(fsPath));
+        const auto path = m_mockableCallFactory.canonicalPath(isApiMountedSmb ? fsPath : trim(fsPath));
     #endif
 
     bool isMounted = false;

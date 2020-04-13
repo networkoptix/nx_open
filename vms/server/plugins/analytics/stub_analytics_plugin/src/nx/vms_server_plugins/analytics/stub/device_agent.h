@@ -123,6 +123,8 @@ private:
     void processFrameMotion(
         nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>> metadataPacketList);
 
+    std::string capabilities() const;
+
 private:
     Engine* const m_engine;
 

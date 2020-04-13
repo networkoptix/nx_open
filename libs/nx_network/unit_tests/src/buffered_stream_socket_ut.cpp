@@ -8,23 +8,13 @@ namespace nx {
 namespace network {
 namespace test {
 
-NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
-    TEST, BufferedStreamSocket,
-    []() { return std::make_unique<TCPServerSocket>(AF_INET); },
-    []()
-    {
-        return std::make_unique<BufferedStreamSocket>(
-            std::make_unique<TCPSocket>(AF_INET),
-            nx::Buffer());
-    })
-
-class BufferedStreamSocketTest:
+class BufferedStreamSocket:
     public ::testing::Test
 {
 protected:
     std::unique_ptr<AbstractStreamServerSocket> server;
     std::unique_ptr<AbstractStreamSocket> client;
-    std::unique_ptr<BufferedStreamSocket> accepted;
+    std::unique_ptr<network::BufferedStreamSocket> accepted;
 
     nx::utils::TestSyncQueue<SystemError::ErrorCode> acceptedResults;
     Buffer buffer;
@@ -46,18 +36,24 @@ protected:
         auto acceptedRaw = server->accept();
         ASSERT_NE(acceptedRaw, nullptr) << SystemError::getLastOSErrorText().toStdString();
 
-        accepted = std::make_unique<BufferedStreamSocket>(
+        accepted = std::make_unique<network::BufferedStreamSocket>(
             std::move(acceptedRaw),
             nx::Buffer());
-        ASSERT_TRUE(accepted->setRecvTimeout(500));
+        ASSERT_TRUE(accepted->setNonBlockingMode(true));
     }
 };
 
-TEST_F(BufferedStreamSocketTest, catchRecvEvent)
+TEST_F(BufferedStreamSocket, catchRecvEvent_times_out)
 {
-    ASSERT_TRUE(accepted->setNonBlockingMode(true));
+    ASSERT_TRUE(accepted->setRecvTimeout(1));
+
     accepted->catchRecvEvent(acceptedResults.pusher());
     ASSERT_EQ(SystemError::timedOut, acceptedResults.pop());
+}
+
+TEST_F(BufferedStreamSocket, catchRecvEvent)
+{
+    ASSERT_TRUE(accepted->setRecvTimeout(kNoTimeout.count()));
 
     const auto clientCount = testClientCount();
     buffer.reserve(kTestMessage.size() * clientCount);
@@ -96,6 +92,16 @@ TEST_F(BufferedStreamSocketTest, catchRecvEvent)
     ASSERT_EQ(acceptedResults.pop(), SystemError::connectionReset);
     ASSERT_TRUE(acceptedResults.isEmpty());
 }
+
+NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
+    TEST_F, BufferedStreamSocket,
+    []() { return std::make_unique<TCPServerSocket>(AF_INET); },
+    []()
+    {
+        return std::make_unique<network::BufferedStreamSocket>(
+            std::make_unique<TCPSocket>(AF_INET),
+            nx::Buffer());
+    })
 
 } // namespace test
 } // namespace network

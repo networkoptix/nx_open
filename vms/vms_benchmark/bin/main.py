@@ -756,7 +756,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                                 cpu_times,
                                 storage_failure_event_count,
                                 tx_rx_errors,
-                                swapped_kilobytes
+                                swapped_kilobytes,
                             ] = box_poller.get_results()
                         except LookupError:
                             continue
@@ -836,7 +836,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         if issues:
                             streaming_ended_expectedly = True
                             report(
-                                f"    Streaming test #{test_number} with {test_camera_count} " +
+                                f"    Streaming test #{test_number} with {test_camera_count} "
                                 "virtual camera(s) aborted because of issues."
                             )
                             break
@@ -844,7 +844,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
                         if timestamp_s - streaming_test_started_at_s > streaming_duration_mins * 60:
                             streaming_ended_expectedly = True
                             report(
-                                f"    Streaming test #{test_number} with {test_camera_count} " +
+                                f"    Streaming test #{test_number} with {test_camera_count} "
                                 "virtual camera(s) finished."
                             )
                             break
@@ -987,8 +987,9 @@ def _obtain_box_platform(box, linux_distribution):
         res = f"        {storage['fs']} on {storage['point']}"
 
         if 'space_free' in storage and 'space_total' in storage:
-            m = 1024 ** 3
-            res += f": free {int(storage['space_free']) / m:.1f} GB of {int(storage['space_total']) / m:.1f} GB"
+            free_gb = int(storage['space_free']) / 1024 ** 3
+            total_gb = int(storage['space_total']) / 1024 ** 3
+            res += f": free {free_gb:.1f} GB of {total_gb:.1f} GB"
 
         return res
 
@@ -1110,7 +1111,7 @@ def _connect_to_box(conf, conf_file):
                 "Can't connect to the box via SSH: " +
                 "check SSH configuration settings (host, login, password and so on)."
             ),
-            original_exception=e
+            original_exception=e,
         )
 
     box.obtain_connection_info()
@@ -1268,8 +1269,17 @@ def _format_exception(exception):
         return f"Missing key: {exception}"
     elif isinstance(exception, urllib.error.HTTPError):
         if exception.code == 401:
-            return ('Server refuses passed credentials: ' +
+            return ('Server refuses passed credentials: '
                 'check .conf options vmsUser and vmsPassword.')
+        elif exception.code == 403:
+            return ('Server failed to execute API request: '
+                'insufficient VMS user permissions (HTTP code 403)')
+        elif exception.code in [400, 404, 406]:
+            return ('Server failed to execute API request: '
+                f'Server internal error (HTTP code {exception.code}).')
+        elif 500 <= exception.code <= 599:
+            return ('Server failed to execute API request: '
+                f'Server internal error (HTTP code {exception.code}).')
         else:
             return f'Unexpected HTTP request error (code {exception.code}).'
     elif isinstance(exception, AssertionError):

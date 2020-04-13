@@ -13,8 +13,8 @@ namespace hanwha {
 QString StringHelper::buildCaption(
     const Hanwha::EngineManifest& /*manifest*/,
     const QString& /*eventTypeId*/,
-    boost::optional<int> /*eventChannel*/,
-    boost::optional<int> /*eventRegion*/,
+    std::optional<int> /*eventChannel*/,
+    std::optional<int> /*eventRegion*/,
     Hanwha::EventItemType /*eventItemType*/,
     bool /*isActive*/)
 {
@@ -24,8 +24,8 @@ QString StringHelper::buildCaption(
 QString StringHelper::buildDescription(
     const Hanwha::EngineManifest& manifest,
     const QString& eventTypeId,
-    boost::optional<int> /*eventChannel*/,
-    boost::optional<int> eventRegion,
+    std::optional<int> /*eventChannel*/,
+    std::optional<int> eventRegion,
     Hanwha::EventItemType eventItemType,
     bool isActive)
 {
@@ -42,20 +42,6 @@ QString StringHelper::buildDescription(
         if (!stateStr.isEmpty())
             description = description.arg(stateStr);
     }
-    //else
-    //{
-    //    if (isActive)
-    //    {
-    //        description = description.arg(descriptor.positiveState);
-    //    }
-    //    else
-    //    {
-    //        // This should never occur. If we are here - something is wrong with the manifest or
-    //        // with the device.
-    //        NX_DEBUG(NX_SCOPE_TAG,
-    //            lm("Inactive state for stateless event %1 received").arg(eventTypeId));
-    //    }
-    //}
 
     if (descriptor.flags.testFlag(EventTypeFlag::regionDependent))
     {
