@@ -798,6 +798,12 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     const QnLiveStreamParams& liveParams,
     bool isCameraConfigured)
 {
+    if (liveParams.resolution.isEmpty())
+    {
+        NX_VERBOSE(this, "Postpone save bitrate information for camera %1 "
+            "because there is no video resolution detected yet.", m_resource);
+        return;
+    }
     m_framesSinceSaveBitrate = 0;
     auto now = qnSyncTime->currentDateTime().toUTC().toString(Qt::ISODate);
     CameraBitrateInfo info(encoderIndex(), std::move(now));
