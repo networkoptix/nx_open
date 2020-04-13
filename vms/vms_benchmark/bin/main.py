@@ -1279,22 +1279,44 @@ def _format_exception(exception):
         return str(exception) or "Exception " + type(exception).__name__
 
 
-def _do_report_exception(exception, recursive_level, prefix=''):
+def _do_report_exception(exception, recursive_level, prefix='', logging_only=False):
+    exception_blacklist = (urllib.error.HTTPError,)
+
     indent = '    ' * recursive_level
     if isinstance(exception, VmsBenchmarkError):
         s = str(exception) or "Exception " + type(exception).__name__
-        report(f"{indent}{prefix}{str(exception)}")
+        if logging_only:
+            logging.info(f"{indent}{prefix}{s}")
+        else:
+            report(f"{indent}{prefix}{s}")
         if isinstance(exception, VmsBenchmarkIssue):
             for sub_issue in exception.sub_issues:
                 _do_report_exception(sub_issue, recursive_level=recursive_level + 1)
         if exception.original_exception:
-            report(f'{indent}Caused by:')
-            if isinstance(exception.original_exception, list):
-                sub_exceptions = exception.original_exception
-            else:
-                sub_exceptions = [exception.original_exception]
+            try:
+                sub_exceptions = tuple(exception.original_exception)
+            except TypeError:
+                sub_exceptions = (exception.original_exception,)
+
+            caused_by_printed = False
             for sub_exception in sub_exceptions:
-                _do_report_exception(sub_exception, recursive_level=recursive_level + 1)
+                if sub_exception.__class__ in exception_blacklist and not logging_only:
+                    _do_report_exception(
+                        sub_exception,
+                        recursive_level=recursive_level + 1,
+                        logging_only=True
+                    )
+                    continue
+
+                if not caused_by_printed:
+                    report(f'{indent}Caused by:')
+                    caused_by_printed = True
+
+                _do_report_exception(
+                    sub_exception,
+                    recursive_level=recursive_level + 1,
+                    logging_only=logging_only
+                )
     else:
         report(f'{indent}{prefix or "ERROR: "}{_format_exception(exception)}')
 

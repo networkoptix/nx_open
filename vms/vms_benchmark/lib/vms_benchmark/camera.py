@@ -2,6 +2,8 @@ import base64
 import json
 import urllib.request
 
+from vms_benchmark.utils.catch_http_errors import catch_http_errors
+
 
 class Camera:
     def __init__(self, api, id, name, mac):
@@ -10,6 +12,7 @@ class Camera:
         self.name = name
         self.mac = mac
 
+    @catch_http_errors
     def enable_recording(self, highStreamFps, enable=True):
         request = urllib.request.Request(f"http://{self.api.ip}:{self.api.port}/ec2/saveCameraUserAttributes")
         credentials = f"{self.api.user}:{self.api.password}"
