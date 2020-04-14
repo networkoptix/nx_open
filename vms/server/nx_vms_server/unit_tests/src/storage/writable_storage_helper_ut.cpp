@@ -18,6 +18,7 @@ protected:
         ASSERT_TRUE(m_server->start());
         storageManager.reset(new test_support::StorageManagerStub(
             m_server->serverModule(), nullptr, QnServer::StoragePool::Normal));
+        storageManager->testStoragesDone();
     }
 
     virtual void TearDown() override

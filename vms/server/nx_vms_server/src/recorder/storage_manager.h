@@ -225,6 +225,9 @@ public slots:
     void at_storageRoleChanged(const QnResourcePtr &storage);
     void testOfflineStorages();
 
+protected:
+    void testStoragesDone();
+
 private:
     friend class TestStorageThread;
 
@@ -280,7 +283,6 @@ private:
     bool writeCSVCatalog(const QString& fileName, const QVector<nx::vms::server::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
     void getCamerasWithArchiveInternal(std::set<QString>& result,  const FileCatalogMap& catalog) const;
-    void testStoragesDone();
     //QMap<QnUuid, QnRecordingStatsData> getChunkStatisticsInternal(qint64 startTime, qint64 endTime, QnServer::ChunksCatalog catalog);
     QnRecordingStatsData getChunkStatisticsByCamera(qint64 bitrateAnalyzePeriodMs, const QString& uniqueId);
 
