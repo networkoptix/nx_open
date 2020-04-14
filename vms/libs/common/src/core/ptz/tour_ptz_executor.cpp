@@ -21,8 +21,10 @@
 using namespace nx::core;
 
 namespace {
-    int pingTimeout = 333;
-    int samePositionTimeout = 5000;
+    const int pingTimeout = 333;
+    const int samePositionTimeout = 5000;
+    const int repeatTimeoutMultilier = 3;
+    const int maxRepeatTimeout = 10000;
 }
 
 // -------------------------------------------------------------------------- //
@@ -110,6 +112,7 @@ public:
     int newPositionRequestTime;
     bool tourGetPosWorkaround;
     bool canReadPosition;
+    int repeatTimeout = pingTimeout;
 };
 
 QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate():
@@ -261,7 +264,7 @@ void QnTourPtzExecutorPrivate::processMoving(bool status, const nx::core::ptz::V
     if(state != Entering && state != Moving)
         return;
 
-    NX_VERBOSE(this, "Got position: %1", position);
+    NX_VERBOSE(this, "Got position: %1, status: %2", position, status);
     bool moved = !qFuzzyEquals(startPosition, position);
     bool stopped = qFuzzyEquals(lastPosition, position);
 
@@ -269,23 +272,31 @@ void QnTourPtzExecutorPrivate::processMoving(bool status, const nx::core::ptz::V
         if(state == Moving) {
             QnPtzTourSpotData &spotData = currentSpotData();
             spotData.moveTime = lastPositionRequestTime;
-            if (tourGetPosWorkaround && !qFuzzyEquals(spotData.position, lastPosition))
+            if (tourGetPosWorkaround && !qFuzzyEquals(spotData.position, lastPosition)) {
                 spotData.moveTime += pingTimeout; // workaround for VIVOTEK SD8363E camera. It stops after getPosition call. So, increase getPosition timeout if we detect that camera changes position.
+                NX_DEBUG(this, "Increase spot move timeout to %1 ms", spotData.moveTime);
+            }
             spotData.position = lastPosition;
         }
 
+        repeatTimeout = pingTimeout;
         moveTimer.stop();
         startWaiting();
     } else {
         if(status) {
             lastPosition = position;
             lastPositionRequestTime = newPositionRequestTime;
+            repeatTimeout = pingTimeout;
+        } else {
+            // Some cameras like VIVOTEK SD9161 may lockdown due to a frequent requests. Increasing
+            // timeout helps them to get out of that state.
+            repeatTimeout = std::min(repeatTimeout * repeatTimeoutMultilier, maxRepeatTimeout);
         }
 
+        waitingForNewPosition = false;
         if(needPositionUpdate) {
-            requestPosition();
-        } else {
-            waitingForNewPosition = false;
+            moveTimer.start(repeatTimeout, q);
+            NX_VERBOSE(this, "Next get position in %1 ms", repeatTimeout);
         }
     }
 }
