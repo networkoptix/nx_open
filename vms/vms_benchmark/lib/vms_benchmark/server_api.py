@@ -17,6 +17,7 @@ from vms_benchmark.utils.catch_http_errors import catch_http_errors
 Response = namedtuple('Response', ['code', 'body'])
 
 
+# TODO: Warning: now urllib.request.* is also used in class Camera.
 class ServerApi:
     class Response:
         def __init__(self, code):

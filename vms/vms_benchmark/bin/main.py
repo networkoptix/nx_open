@@ -594,7 +594,7 @@ def _obtain_cameras(test_camera_count, api, box, test_camera_context, ini, conf)
 
     try:
         for camera in cameras:
-            if camera.enable_recording(highStreamFps=ini['testStreamFpsHigh']):
+            if camera.enable_radminecording(highStreamFps=ini['testStreamFpsHigh']):
                 report(f"    Recording on camera {camera.id} enabled.")
             else:
                 raise exceptions.TestCameraError(
@@ -1300,7 +1300,7 @@ def _do_report_exception(exception, recursive_level, prefix='', logging_only=Fal
 
             caused_by_printed = False
             for sub_exception in sub_exceptions:
-                if sub_exception.__class__ in exception_blacklist and not logging_only:
+                if isinstance(sub_exception, exception_blacklist) and not logging_only:
                     _do_report_exception(
                         sub_exception,
                         recursive_level=recursive_level + 1,
