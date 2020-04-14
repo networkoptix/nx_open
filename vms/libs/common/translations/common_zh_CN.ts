@@ -162,11 +162,6 @@
       <translation>发现的系统%1与当前系统不兼容。</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>无法连接到另一个系统，因为当前的系统已连接到 %1。</translation>
-    </message>
-    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1系统只能与非%1系统合并. 系统名称和密码将取自%1系统.</translation>

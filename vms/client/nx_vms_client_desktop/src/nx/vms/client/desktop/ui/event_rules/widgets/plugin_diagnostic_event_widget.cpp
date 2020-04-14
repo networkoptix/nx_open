@@ -104,6 +104,13 @@ void PluginDiagnosticEventWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventResources) || fields.testFlag(Field::eventParams))
         updateSelectedEventType();
+
+    if (fields.testFlag(Field::eventResources))
+    {
+        // #spanasenko: We need to update metadata field.
+        // (!) We must do it only after updateSelectedEventType() call.
+        model()->setEventParams(createEventParameters());
+    }
 }
 
 void PluginDiagnosticEventWidget::paramsChanged()
@@ -154,12 +161,14 @@ void PluginDiagnosticEventWidget::updateSelectedEventType()
 
 nx::vms::event::EventParameters PluginDiagnosticEventWidget::createEventParameters()
 {
+    // TODO: #spanasenko Split this function into resources and parameters parts?
     auto eventParams = model()->eventParams();
 
     eventParams.eventResourceId = ui->pirComboBox->currentData(PluginDiagnosticEventModel::PluginIdRole).value<QnUuid>();
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
 
+    // #spanasenko: Metadata is used to check parameters in PluginDiagnosticEvent::checkEventParams().
     eventParams.metadata.cameraRefs.clear();
     for (const auto& camera: model()->eventResources())
         eventParams.metadata.cameraRefs.push_back(camera.toString());

@@ -988,11 +988,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>Verbinden met deze server</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Vastzetten</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1496,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional support</source>
-      <translation type="unfinished">Regional support</translation>
+      <translation>Regionale ondersteuning</translation>
     </message>
   </context>
   <context>
@@ -1559,6 +1559,10 @@ to view more bookmarks</source>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
       <translation>Aanpassen aan de kleinste waarde die de liveweergave niet verslechtert. Een grotere buffer maakt het afspelen soepeler, maar vergroot de vertraging tussen de werkelijkheid en de weergave; een kleinere buffer verlaagt de vertraging maar kan stotteren gedurende de weergave veroorzaken.</translation>
+    </message>
+    <message>
+      <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
+      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
     </message>
   </context>
   <context>
@@ -2079,30 +2083,34 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Bronserver</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Broncamera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Bron- en %n meer camera's</numerusform>
+        <numerusform>Bron- en %n meer camera's</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Selecteer ten minste één apparaat</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Selecteer tenminste één camera</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Selecteer Server</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation type="unfinished">Source Server and %1</translation>
     </message>
   </context>
   <context>
@@ -2232,7 +2240,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>Servers die een zoemer ondersteunen</translation>
     </message>
   </context>
   <context>
@@ -2645,8 +2653,9 @@ to %1</source>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
     <message>
-      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
-      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
+      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
     </message>
   </context>
   <context>
@@ -3290,7 +3299,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Servers die fan-diagnose ondersteunen</translation>
     </message>
   </context>
   <context>
@@ -3624,27 +3633,27 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Algemeen</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Eigenschappen</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Schermen toegestaan</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Controlesessies toegestaan</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Archiefstreams toegestaan</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Resterende deactiveringen</translation>
     </message>
   </context>
   <context>
@@ -3930,9 +3939,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>%n resterende deactiveringen.</numerusform>
+        <numerusform>%n resterende deactiveringen.</numerusform>
       </translation>
     </message>
   </context>
@@ -3956,7 +3965,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Om een activatiesleutel bestand te verkrijgen, stuur de opgegeven licentiesleutel en Hardware ID naar %1.</translation>
+    </message>
+    <message>
+      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+    </message>
+    <message>
+      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <comment>%1 will be substituted by a list of contacts</comment>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>
@@ -4510,7 +4528,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Servers die PoE monitoring ondersteunen</translation>
     </message>
   </context>
   <context>
@@ -5243,7 +5261,7 @@ to %1</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5740,6 +5758,14 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Huidige analytics gegevens worden niet automatisch verplaatst naar een andere locatie en worden niet toegankelijk. U kunt het behouden en handmatig verplaatsen, of permanent verwijderen.
 Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem dan contact op met support voordat u verder gaat.</translation>
     </message>
+    <message>
+      <source>Server is unavailable.</source>
+      <translation type="unfinished">Server is unavailable.</translation>
+    </message>
+    <message>
+      <source>now</source>
+      <translation type="unfinished">now</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -5829,7 +5855,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>smb</source>
-      <translation type="unfinished">smb</translation>
+      <translation>smb</translation>
     </message>
   </context>
   <context>
@@ -6609,7 +6635,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>Kan geen verbinding maken met de geselecteerde server</translation>
     </message>
   </context>
   <context>
@@ -6877,12 +6903,8 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Voer de naam van de videowall in om deze aan te maken:</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall.</source>
-      <translation>Activeer nog een licentie om videowall te starten.</translation>
-    </message>
-    <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Licentie activeren...</translation>
     </message>
   </context>
   <context>
@@ -7502,6 +7524,16 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7510,13 +7542,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Unknown track</source>
       <translation>Onbekend nummer</translation>
-    </message>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -8402,11 +8427,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>De proxy %1 vereist een gebruikersnaam en wachtwoord.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Map selecteren om te uploaden</translation>
     </message>
   </context>
   <context>
@@ -8500,7 +8525,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>Deze ID wordt al gebruikt in het systeem. Gebruik de knop Genereren om een beschikbaar ID te vinden.</translation>
     </message>
   </context>
   <context>
@@ -8933,7 +8958,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>Aanmelden</translation>
     </message>
   </context>
   <context>
@@ -9038,34 +9063,30 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>Verbinding verbroken</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>Verbonden</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>Aangesloten</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>Onverwacht</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>Leeg</translation>
     </message>
     <message>
       <source>&lt; Unknown device %1 &gt;</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">&lt; Unknown device %1 &gt;</translation>
+      <translation>&lt; Onbekend apparaat %1 &gt;</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9077,11 +9098,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
-    </message>
-    <message>
-      <source>Speed</source>
-      <translation>Snelheid</translation>
+      <translation>Verbruik</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9089,11 +9106,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>Vermogen</translation>
     </message>
     <message>
       <source>&lt; Unknown device &gt;</source>
-      <translation type="unfinished">&lt; Unknown device &gt;</translation>
+      <translation>&lt; Onbekend apparaat &gt;</translation>
     </message>
   </context>
   <context>
@@ -9110,8 +9127,14 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
-      <source>Cloud users</source>
-      <translation type="unfinished">Cloud users</translation>
+      <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+    </message>
+    <message>
+      <source>%1 Settings</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">%1 Settings</translation>
     </message>
   </context>
   <context>
@@ -9246,7 +9269,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>Alleen client-server videoverkeer kan worden versleuteld</translation>
     </message>
   </context>
   <context>
@@ -9260,7 +9283,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>Er zijn geen compatibele servers</translation>
     </message>
   </context>
   <context>
@@ -9800,6 +9823,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Custom Users</source>
       <translation>Aangepaste gebruikers</translation>
     </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>%1 gebruikers</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
@@ -9888,13 +9916,13 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Vul het volgende in om de licentie te deactiveren</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Let op dat elke licentiesleutel maximaal %n keer kan worden gedeactiveerd.</numerusform>
+        <numerusform>Let op dat elke licentiesleutel maximaal %n keer kan worden gedeactiveerd.</numerusform>
       </translation>
     </message>
   </context>

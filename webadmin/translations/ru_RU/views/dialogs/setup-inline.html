@@ -253,16 +253,16 @@
                 <span class="text">Save password</span>
             </label>
         </div>
-
         <div class="form-group"
              ng-if="(!forms.localForm.localLogin.$touched || forms.localForm.localLogin.$valid) &&
-+                    !forms.localForm.passwordInput.$dirty &&
-+                    !forms.localForm.localPasswordConfirmation.$touched">
+                     !forms.localForm.passwordInput.$dirty &&
+                     !forms.localForm.localPasswordConfirmation.$touched">
             <div class="help-block">
                 Пароль должен содержать различные типы символов и иметь по крайней мере 8 символов
             </div>
         </div>
-        <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid">
+        <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid &&
+                  (forms.localForm.localLogin.$touched || forms.localForm.localPasswordConfirmation.$touched)">
             <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.weak &&
                   !forms.localForm.passwordInput.password.$error.common &&
                   !forms.localForm.passwordInput.password.$error.pattern &&
@@ -270,8 +270,8 @@
             <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.common &&
                   !forms.localForm.passwordInput.password.$error.pattern &&
                   !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.commonMessage}}</div>
-            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.minlength &&
-                  !forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.minLengthMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.minlength ||
+                                           forms.localForm.passwordInput.password.$error.required">{{L.passwordRequirements.minLengthMessage}}</div>
             <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.requiredMessage}}</div>
         </div>
 

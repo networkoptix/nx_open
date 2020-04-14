@@ -12,6 +12,8 @@
 #include <business/business_resource_validation.h>
 #include <core/resource/user_resource.h>
 
+#include <nx/vms/client/desktop/common/utils/aligner.h>
+
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
@@ -56,7 +58,8 @@ namespace nx::vms::client::desktop {
 PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::PushNotificationBusinessActionWidget)
+    ui(new Ui::PushNotificationBusinessActionWidget),
+    m_aligner(new Aligner(this))
 {
     ui->setupUi(this);
 
@@ -79,35 +82,8 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
             context()->menu()->trigger(ui::action::SystemAdministrationAction);
         });
 
-    connect(ui->customTextCheckBox, &QCheckBox::clicked, this,
-        [this]()
-        {
-            const bool useCustomText = ui->customTextCheckBox->isChecked();
-
-            if (!useCustomText)
-                m_lastCustomText = ui->customTextEdit->toPlainText();
-
-            ui->customTextEdit->setPlainText(useCustomText ? m_lastCustomText : QString());
-
-            parametersChanged();
-        });
-    ui->customTextEdit->installEventFilter(new Filter(
-        [this]
-        {
-            if (!ui->customTextCheckBox->isChecked())
-            {
-                ui->customTextCheckBox->setChecked(true);
-                ui->customTextEdit->setPlainText(m_lastCustomText);
-                ui->customTextEdit->setFocus(Qt::MouseFocusReason);
-                // TODO: set text cursor under the mouse cursor?
-            }
-        },
-        this));
-
-    connect(ui->customTextCheckBox, &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
-
-    connect(ui->customTextEdit, &QPlainTextEdit::textChanged,
-        this, &PushNotificationBusinessActionWidget::parametersChanged);
+    m_aligner->addWidgets(
+        {ui->usersLabel, ui->dummyLabel, ui->headerLabel, ui->bodyLabel, ui->dummyLabel2});
 
     setSubjectsButton(ui->selectUsersButton);
 
@@ -127,6 +103,21 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
         this,
         &PushNotificationBusinessActionWidget::updateCurrentTab);
     updateCurrentTab();
+
+    connect(ui->customContentCheckBox, &QCheckBox::toggled, this,
+        [this](bool useCustomContent)
+        {
+            ui->customContentWidget->setVisible(useCustomContent);
+            parametersChanged();
+        });
+    ui->customContentWidget->setVisible(ui->customContentCheckBox->isChecked());
+
+    connect(ui->headerText, &QLineEdit::textChanged,
+        this, &PushNotificationBusinessActionWidget::parametersChanged);
+    connect(ui->bodyText, &QPlainTextEdit::textChanged,
+        this, &PushNotificationBusinessActionWidget::parametersChanged);
+    connect(ui->addSourceNameCheckBox, &QCheckBox::clicked,
+        this, &PushNotificationBusinessActionWidget::parametersChanged);
 }
 
 PushNotificationBusinessActionWidget::~PushNotificationBusinessActionWidget()
@@ -140,12 +131,16 @@ void PushNotificationBusinessActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::actionParams))
     {
+        QScopedValueRollback<bool> guard(m_updating, true);
         const auto params = model()->actionParams();
 
-        const bool useCustomText = !params.text.isEmpty();
-        m_lastCustomText = params.text;
-        ui->customTextCheckBox->setChecked(useCustomText);
-        ui->customTextEdit->setPlainText(useCustomText ? params.text : QString());
+        const bool useCustomContent = !params.useSource
+            || !params.text.isEmpty() || !params.sayText.isEmpty();
+
+        ui->headerText->setText(params.sayText);
+        ui->bodyText->setPlainText(params.text);
+        ui->addSourceNameCheckBox->setChecked(params.useSource);
+        ui->customContentCheckBox->setChecked(useCustomContent);
     }
 
     base_type::at_model_dataChanged(fields);
@@ -154,9 +149,12 @@ void PushNotificationBusinessActionWidget::at_model_dataChanged(Fields fields)
 void PushNotificationBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* after)
 {
     setTabOrder(before, ui->selectUsersButton);
-    setTabOrder(ui->selectUsersButton, ui->customTextCheckBox);
-    setTabOrder(ui->customTextCheckBox, ui->customTextEdit);
-    setTabOrder(ui->customTextEdit, after);
+    setTabOrder(ui->selectUsersButton, ui->languageButton);
+    setTabOrder(ui->languageButton, ui->customContentCheckBox);
+    setTabOrder(ui->customContentCheckBox, ui->headerText);
+    setTabOrder(ui->headerText, ui->bodyText);
+    setTabOrder(ui->bodyText, ui->addSourceNameCheckBox);
+    setTabOrder(ui->addSourceNameCheckBox, after);
 }
 
 void PushNotificationBusinessActionWidget::parametersChanged()
@@ -166,8 +164,14 @@ void PushNotificationBusinessActionWidget::parametersChanged()
 
     QScopedValueRollback<bool> guard(m_updating, true);
     auto params = model()->actionParams();
-    params.text = ui->customTextCheckBox->isChecked() ? ui->customTextEdit->toPlainText() : QString();
+
+    const bool useCustomContent = ui->customContentCheckBox->isChecked();
+
+    params.sayText = useCustomContent ? ui->headerText->text() : QString();
+    params.text = useCustomContent ? ui->bodyText->toPlainText() : QString();
+    params.useSource = useCustomContent ? ui->addSourceNameCheckBox->isChecked() : true;
     model()->setActionParams(params);
+
     updateSubjectsButton();
 }
 

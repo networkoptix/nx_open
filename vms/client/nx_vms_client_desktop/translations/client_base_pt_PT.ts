@@ -1561,6 +1561,10 @@ para ver mais favoritos</translation>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
       <translation>Ajuste para o menor valor que não degrade a visualização ao vivo. Um buffer maior torna a reprodução mais suave, mas aumenta o atraso entre o tempo real e a visualização ao vivo; Um buffer menor diminui o atraso, mas pode causar soluços.</translation>
     </message>
+    <message>
+      <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
+      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+    </message>
   </context>
   <context>
     <name>QnAuditItemDelegate</name>
@@ -2104,6 +2108,10 @@ para ver mais favoritos</translation>
     <message>
       <source>Select Server</source>
       <translation type="unfinished">Select Server</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation type="unfinished">Source Server and %1</translation>
     </message>
   </context>
   <context>
@@ -2650,8 +2658,9 @@ a %1</translation>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
     <message>
-      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
-      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
+      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
     </message>
   </context>
   <context>
@@ -3962,6 +3971,15 @@ a %1</translation>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
       <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+    </message>
+    <message>
+      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+    </message>
+    <message>
+      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <comment>%1 will be substituted by a list of contacts</comment>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>
@@ -5745,6 +5763,14 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
     </message>
+    <message>
+      <source>Server is unavailable.</source>
+      <translation type="unfinished">Server is unavailable.</translation>
+    </message>
+    <message>
+      <source>now</source>
+      <translation type="unfinished">now</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6882,10 +6908,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Digite o nome de Video Wall para criar:</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall.</source>
-      <translation>Ative mais uma licença para iniciar o Video Wall.</translation>
-    </message>
-    <message>
       <source>Activate License...</source>
       <translation type="unfinished">Activate License...</translation>
     </message>
@@ -7507,6 +7529,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7515,13 +7547,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unknown track</source>
       <translation type="unfinished">Unknown track</translation>
-    </message>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -9043,10 +9068,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Disconnected</source>
       <translation type="unfinished">Disconnected</translation>
     </message>
@@ -9085,10 +9106,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Consumption</translation>
     </message>
     <message>
-      <source>Speed</source>
-      <translation>Velocidade</translation>
-    </message>
-    <message>
       <source>Status</source>
       <translation>Estado</translation>
     </message>
@@ -9115,8 +9132,14 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
-      <source>Cloud users</source>
-      <translation type="unfinished">Cloud users</translation>
+      <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+    </message>
+    <message>
+      <source>%1 Settings</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">%1 Settings</translation>
     </message>
   </context>
   <context>
@@ -9804,6 +9827,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Custom Users</source>
       <translation>Usuários personalizados</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>%1 usuários</translation>
     </message>
   </context>
   <context>

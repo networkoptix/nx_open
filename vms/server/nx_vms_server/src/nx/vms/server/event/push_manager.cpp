@@ -261,22 +261,29 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
         serverModule()->findInstance<QnTranslationManager>(), language);
 
     vms::event::StringsHelper strings(common);
-    const auto caption = strings.notificationCaption(event, camera, /*useHtml*/ false);
-    const auto description = strings.notificationDescription(event);
+    const auto caption = params.sayText.isEmpty() //< Used to store custom caption text.
+        ? strings.notificationCaption(event, camera, /*useHtml*/ false)
+        : params.sayText;
+    const auto description = params.text.isEmpty()
+        ? strings.notificationDescription(event)
+        : params.text;
 
     const auto icon = utf8Icon(vms::event::levelOf(action));
-    const auto isMultilineBody = !params.text.isEmpty() && !description.isEmpty();
+
     const auto resourceName = camera
         ? camera->getUserDefinedName()
         : (resource ? resource->getName() : QString());
+    const auto resourceText = params.useSource
+        ? (resourceName.isEmpty() ? QString() : ("[" + resourceName + "]"))
+        : QString();
+    const bool addNewLine = !description.isEmpty() && !resourceText.isEmpty();
 
     QJsonObject options;
     NX_ASSERT(QJson::deserialize(QByteArray(ini().pushNotifyOptions), &options));
 
     return {
         (icon.isEmpty() ? QString() : (icon + " ")) + caption,
-        (resourceName.isEmpty() ? QString() : ("[" + resourceName + "] ")) + params.text
-            + (isMultilineBody ? "\n" : "") + description,
+        description + (addNewLine ? "\n" : "") + resourceText,
         makePayload(event, camera),
         options,
     };

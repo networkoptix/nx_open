@@ -9,13 +9,6 @@
     </message>
 </context>
 <context>
-    <name>Box</name>
-    <message>
-        <source>Click on video to start box.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>ContextHintButton</name>
     <message>
         <source>Click to read more</source>
@@ -75,6 +68,13 @@
     </message>
 </context>
 <context>
+    <name>FigureView</name>
+    <message>
+        <source>NO PREVIEW</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>InformationPanel</name>
     <message>
         <source>Version</source>
@@ -94,25 +94,17 @@
     </message>
 </context>
 <context>
+    <name>LabeledItem</name>
+    <message>
+        <source>Default value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Line</name>
-    <message>
-        <source>Click on video to start line.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click arrows to toggle the desired directions.</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Line is not valid. Remove self-intersections to proceed.</source>
         <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Maximum points count is reached (%n points).</source>
-        <translation>
-            <numerusform>Maximum points count is reached (%n point).</numerusform>
-            <numerusform>Maximum points count is reached (%n points).</numerusform>
-        </translation>
     </message>
     <message numerus="yes">
         <source>This line requires at least %n points.</source>
@@ -120,6 +112,21 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Click on the last point to finish drawing the line.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>The maximum number of points has been reached (%n points).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Click on each arrow to toggle the desired direction.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -153,6 +160,13 @@
     </message>
 </context>
 <context>
+    <name>ObjectSizeConstraints</name>
+    <message>
+        <source>Size Constraints</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PluginsInformation</name>
     <message>
         <source>No plugins installed</source>
@@ -173,22 +187,22 @@
 <context>
     <name>Polygon</name>
     <message>
-        <source>Click on video to start polygon.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Polygon is not valid. Remove self-intersections to proceed.</source>
         <translation></translation>
     </message>
     <message numerus="yes">
-        <source>Maximum points count is reached (%n points).</source>
-        <translation>
-            <numerusform>Maximum points count is reached (%n point).</numerusform>
-            <numerusform>Maximum points count is reached (%n points).</numerusform>
+        <source>This polygon requires at least %n points.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
+    <message>
+        <source>Click on the last point to finish drawing the polygon.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <source>This polygon requires at least %n points.</source>
+        <source>The maximum number of points has been reached (%n points).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -199,6 +213,25 @@
     <name>Repeater</name>
     <message>
         <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SizeConstraints</name>
+    <message>
+        <source>MAX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set minimum and maximum object size.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum object size cannot be greater than maximum.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

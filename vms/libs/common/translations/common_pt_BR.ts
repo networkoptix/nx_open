@@ -168,11 +168,6 @@
       <translation>O sistema descoberto %1 é incompatível com o sistema atual.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Não é possível conectar-se ao outro sistema porque o sistema atual já está conectado a %1.</translation>
-    </message>
-    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>O sistema %1 só pode ser mesclado com não-%1. O nome do sistema e a senha são retirados do sistema %1.</translation>

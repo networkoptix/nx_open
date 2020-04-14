@@ -226,30 +226,6 @@ State loadNetworkInfo(State state, const Camera& camera)
     return state;
 }
 
-State::RecordingDays calculateRecordingDays(const Cameras& cameras,
-    std::function<int(const Camera&)> getter)
-{
-    State::RecordingDays result;
-
-    fetchFromCameras<bool>(result.automatic, cameras,
-        [getter](const Camera& camera) { return getter(camera) < 0; });
-
-    fetchFromCameras<int>(result.value, cameras,
-        [getter](const Camera& camera) { return qMax(qAbs(getter(camera)), 1); });
-
-    return result;
-}
-
-State::RecordingDays calculateMinRecordingDays(const Cameras& cameras)
-{
-    return calculateRecordingDays(cameras, [](const Camera& camera) { return camera->minDays(); });
-}
-
-State::RecordingDays calculateMaxRecordingDays(const Cameras& cameras)
-{
-    return calculateRecordingDays(cameras, [](const Camera& camera) { return camera->maxDays(); });
-}
-
 State::ImageControlSettings calculateImageControlSettings(
     const Cameras& cameras)
 {
@@ -471,10 +447,8 @@ std::optional<State::ScheduleAlert> calculateScheduleAlert(const State& state)
 
 std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state)
 {
-    const bool warning = state.recording.minDays.automatic.hasValue()
-        && !state.recording.minDays.automatic()
-        && state.recording.minDays.value.hasValue()
-        && state.recording.minDays.value() > kMinArchiveDaysAlertThreshold;
+    const bool warning = state.recording.minDays.hasManualDaysValue()
+        && state.recording.minDays.days() > kMinArchiveDaysAlertThreshold;
 
     if (warning)
         return State::RecordingAlert::highArchiveLength;
@@ -825,8 +799,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state = loadMinMaxCustomBitrate(std::move(state));
     state = fillBitrateFromFixedQuality(std::move(state));
 
-    state.recording.minDays = calculateMinRecordingDays(cameras);
-    state.recording.maxDays = calculateMaxRecordingDays(cameras);
+    state.recording.minDays = RecordingDays::minDays(cameras);
+    state.recording.maxDays = RecordingDays::maxDays(cameras);
 
     state.imageControl = calculateImageControlSettings(cameras);
 
@@ -1057,64 +1031,57 @@ State CameraSettingsDialogStateReducer::setRecordingBitrateNormalized(
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state, bool value)
 {
+    auto& minDays = state.recording.minDays;
     state.hasChanges = true;
-    state.recording.minDays.automatic.setUser(value);
 
-    if (!value)
+    if (value)
     {
-        if (!state.recording.minDays.value.hasValue())
-            state.recording.minDays.value.setUser(nx::vms::api::kDefaultMinArchiveDays);
-
-        const bool maxDaysFixed = !state.recording.maxDays.automatic.valueOr(true)
-            && state.recording.maxDays.value.hasValue();
-
-        if (maxDaysFixed)
-        {
-            state.recording.minDays.value.setUser(
-                qMin(state.recording.minDays.value(), state.recording.maxDays.value()));
-        }
+        minDays.setAutoMode();
     }
-
+    else
+    {
+        const auto& maxDays = state.recording.maxDays;
+        if (maxDays.hasManualDaysValue())
+            minDays.setManualModeWithDays(qMin(minDays.days(), maxDays.days()));
+        else
+            minDays.setManualMode();
+    }
     state.recordingAlert = updateArchiveLengthAlert(state);
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysValue(State state, int value)
 {
-    NX_ASSERT(!state.recording.minDays.automatic.valueOr(true));
+    auto& minDays = state.recording.minDays;
+    NX_ASSERT(minDays.isManualMode());
 
     state.hasChanges = true;
-    state.recording.minDays.value.setUser(value);
+    minDays.setManualModeWithDays(value);
     state.recordingAlert = updateArchiveLengthAlert(state);
 
-    if (!state.recording.maxDays.automatic.valueOr(true)
-        && state.recording.maxDays.value.hasValue()
-        && state.recording.maxDays.value() < value)
-    {
-        state.recording.maxDays.value.setUser(value);
-    }
+    auto& maxDays = state.recording.maxDays;
+    if (maxDays.hasManualDaysValue() && maxDays.days() < value)
+        maxDays.setManualModeWithDays(value);
 
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state, bool value)
 {
+    auto& maxDays = state.recording.maxDays;
     state.hasChanges = true;
-    state.recording.maxDays.automatic.setUser(value);
 
-    if (!value)
+    if (value)
     {
-        if (!state.recording.maxDays.value.hasValue())
-            state.recording.maxDays.value.setUser(nx::vms::api::kDefaultMaxArchiveDays);
-
-        const bool minDaysFixed = !state.recording.minDays.automatic.valueOr(true)
-            && state.recording.minDays.value.hasValue();
-
-        if (minDaysFixed)
-        {
-            state.recording.maxDays.value.setUser(
-                qMax(state.recording.minDays.value(), state.recording.maxDays.value()));
-        }
+        maxDays.setAutoMode();
+    }
+    else
+    {
+        const auto& minDays = state.recording.minDays;
+        if (minDays.hasManualDaysValue())
+            maxDays.setManualModeWithDays(qMax(minDays.days(), maxDays.days()));
+        else
+            maxDays.setManualMode();
     }
 
     return state;
@@ -1122,17 +1089,15 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state
 
 State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, int value)
 {
-    NX_ASSERT(!state.recording.maxDays.automatic.valueOr(true));
+    auto& maxDays = state.recording.maxDays;
+    NX_ASSERT(maxDays.isManualMode());
 
     state.hasChanges = true;
-    state.recording.maxDays.value.setUser(value);
+    maxDays.setManualModeWithDays(value);
 
-    if (!state.recording.minDays.automatic.valueOr(true)
-        && state.recording.minDays.value.hasValue()
-        && state.recording.minDays.value() > value)
-    {
-        state.recording.minDays.value.setUser(value);
-    }
+    auto& minDays = state.recording.minDays;
+    if (minDays.hasManualDaysValue() && minDays.days() > value)
+        minDays.setManualModeWithDays(value);
 
     return state;
 }

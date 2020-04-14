@@ -180,11 +180,6 @@
       <translation>Виявлена ​​Система %1 несумісна з поточною Системою.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Неможливо підключитися до іншої системи, оскільки поточна система вже підключена до %1.</translation>
-    </message>
-    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 система може бути об'єднана тільки з не-%1. Системне ім'я і пароль беруться з %1 системи.</translation>

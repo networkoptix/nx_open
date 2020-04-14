@@ -753,8 +753,30 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
     const bool wasEmailAction = m_actionType == ActionType::sendMailAction;
     const bool aggregationWasDisabled = !vms::event::allowsAggregation(m_actionType);
 
+    // Store params for the current action type
+    m_cachedActionParams[m_actionType] = m_actionParams;
+
     m_actionType = value;
     m_modified = true;
+
+    // Create or load params for the new action type
+    if (!m_cachedActionParams.contains(m_actionType))
+    {
+        nx::vms::event::ActionParameters actionParams;
+
+        switch (m_actionType)
+        {
+            case ActionType::pushNotificationAction:
+                actionParams.useSource = true; //< Default behaviour.
+                break;
+
+            default:
+                break;
+        }
+
+        m_cachedActionParams[m_actionType] = actionParams;
+    }
+    m_actionParams = m_cachedActionParams[m_actionType];
 
     const bool cameraIsRequired = vms::event::requiresCameraResource(m_actionType);
     const bool userIsRequired = vms::event::requiresUserResource(m_actionType);

@@ -52,9 +52,19 @@ int QnExternalEventRestHandler::executeGet(
         businessParams.eventTimestampUsec = nx::utils::parseDateTime(params["timestamp"]);
 
     if (params.contains("eventResourceId"))
-        businessParams.eventResourceId = nx::camera_id_helper::flexibleIdToId(
-            owner->commonModule()->resourcePool(),
-            params["eventResourceId"]);
+    {
+        const auto& id = params["eventResourceId"];
+        auto resourceId = QnUuid::fromStringSafe(id);
+
+        if (resourceId.isNull() || resourcePool()->getResourceById(resourceId).isNull())
+        {
+            resourceId = nx::camera_id_helper::flexibleIdToId(
+                owner->commonModule()->resourcePool(),
+                id);
+        }
+
+        businessParams.eventResourceId = resourceId;
+    }
 
     if (params.contains("state"))
     {
@@ -109,6 +119,9 @@ int QnExternalEventRestHandler::executeGet(
             return nx::network::http::StatusCode::ok;
         }
     }
+
+    if (params.contains("analyticsEngineId"))
+        businessParams.analyticsEngineId = QnUuid(params["analyticsEngineId"]);
 
     if (businessParams.eventTimestampUsec == 0)
         businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();

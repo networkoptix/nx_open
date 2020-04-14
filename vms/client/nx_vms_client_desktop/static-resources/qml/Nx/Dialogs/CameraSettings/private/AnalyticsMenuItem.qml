@@ -38,8 +38,8 @@ Column
         font.pixelSize: 13
 
         text: ctx_level > 0
-            ? ctx_modelData.caption //< section caption.
-            : ctx_modelData.name //< engine name.
+            ? ctx_modelData.caption || ""//< section caption.
+            : ctx_modelData.name || ""//< engine name.
 
         color:
         {

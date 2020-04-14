@@ -1,5 +1,6 @@
 #include "archive_length_widget.h"
 #include "ui_archive_length_widget.h"
+#include "../data/recording_days.h"
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
@@ -66,18 +67,12 @@ void ArchiveLengthWidget::setStore(CameraSettingsDialogStore* store)
 
 void ArchiveLengthWidget::loadState(const CameraSettingsDialogState& state)
 {
-    using RecordingDays = CameraSettingsDialogState::RecordingDays;
     const auto load =
-        [](QCheckBox* check, QSpinBox* value, const RecordingDays& data)
+        [](QCheckBox* checkBox, QSpinBox* valueSpinBox, const RecordingDays& data)
         {
-            static constexpr int kMinArchiveDays = 1;
-            check_box_utils::setupTristateCheckbox(check, data.automatic);
-
-            const bool someAreAutomatic = data.automatic.valueOr(true);
-            value->setEnabled(!someAreAutomatic);
-
-            spin_box_utils::setupSpinBox(value, !someAreAutomatic && data.value.hasValue(),
-                data.value.valueOr(0));
+            valueSpinBox->setEnabled(data.isManualMode());
+            spin_box_utils::setupSpinBox(valueSpinBox, data.hasManualDaysValue(), data.days());
+            checkBox->setCheckState(data.autoCheckState());
         };
 
     load(ui->checkBoxMinArchive, ui->spinBoxMinDays, state.recording.minDays);

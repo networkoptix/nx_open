@@ -77,8 +77,8 @@
         "emailSignature": "Email handtekening",
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Edge recording inschakelen",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "Schakel WEB-sockets in",
+        "maxP2pAllClientsSizeBytes": "Maximale buffergrootte om p2p-gegevens naar alle clients te verzenden",
         "eventLogPeriodDays": "Event log periode (dagen)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP-zoekbasis",
@@ -87,7 +87,7 @@
         "localSystemId": "Lokaal systeem ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max verschil tussen gesynchroniseerde en internettijd (milliseconden)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max verschil tussen gesynchroniseerde en lokale tijd (milliseconden)",
-        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
+        "maxP2pQueueSizeBytes": "Max P2P wachtrijgrootte (bytes)",
         "maxRecordQueueSizeBytes": "Max records wachtrijgrootte (bytes)",
         "maxRecordQueueSizeElements": "Max records wachtrijgrootte (elementen)",
         "maxRemoteArchiveSynchronizationThreads": "Max. externe archief synchronisatie",
@@ -116,8 +116,8 @@
         "timeSynchronizationEnabled": "Tijdsynchronisatie ingeschakeld",
         "primaryTimeServer": "Primaire tijdsynchronisatieserver",
         "osTimeChangeCheckPeriodMs": "Controle van de tijd van het besturingssysteem",
-        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
-        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
+        "syncTimeExchangePeriod": "Synchroniseer tijd synchronisatie interval voor netwerkverzoeken",
+        "syncTimeEpsilon": "Synchroniseer tijd epsilon. Nieuwe waarde wordt niet toegepast als delta tijd minder is dan epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max. aantal draagbare camera archief synchronisatie verbindingen",
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",
@@ -129,11 +129,12 @@
         "watermarkSettings": "Watermerkinstellingen",
         "maxWebMTranscoders": "Maximaal aantal WEBM-verbindingen voor de server. Chrome opent 2 verbindingen tegelijk en sluit vervolgens de eerste. Het wordt daarom aanbevolen om waarde> = 2 in te stellen op deze parameter.",
         "maxEventLogRecords": "Maximale logboekrecords om in de database te bewaren. Het werkelijke aantal niet-verwijderde records kan tot 20% hoger zijn dan de opgegeven waarde.",
-        "forceLiveCacheForPrimaryStream": "Of u sommige frames in de cache wilt opslaan voor de primaire stream. Waarden: \"yes\" - altijd ingeschakeld (kan veel RAM gebruiken), \"no\" - altijd uitgeschakeld behalve wanneer vereist voor het afspelen (bijv. HLS), \"auto\" - vergelijkbaar met \"no\", maar ingeschakeld wanneer de gebruikerservaring te verbeteren (bijvoorbeeld wanneer een bepaalde Analytics-plug-in op de camera werkt)."
+        "forceLiveCacheForPrimaryStream": "Of u sommige frames in de cache wilt opslaan voor de primaire stream. Waarden: \"yes\" - altijd ingeschakeld (kan veel RAM gebruiken), \"no\" - altijd uitgeschakeld behalve wanneer vereist voor het afspelen (bijv. HLS), \"auto\" - vergelijkbaar met \"no\", maar ingeschakeld wanneer de gebruikerservaring te verbeteren (bijvoorbeeld wanneer een bepaalde Analytics-plug-in op de camera werkt).",
+        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected."
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "Grafieken",
             "storage": "Opslagruimte",
             "log": "Log"
         }

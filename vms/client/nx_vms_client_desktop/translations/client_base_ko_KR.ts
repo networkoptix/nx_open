@@ -992,7 +992,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>고정</translation>
     </message>
   </context>
   <context>
@@ -1551,6 +1551,10 @@ to view more bookmarks</source>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
       <translation>라이브 뷰를 저하시키지 않는 최소값으로 조정하십시오. 버퍼가 클수록 재생이 원활 해지지 만 실시간 및 라이브 뷰 사이의 지연이 증가합니다. 버퍼가 작 으면 지연은 줄어들지 만 더듬 거리는 원인이 될 수 있습니다.</translation>
     </message>
+    <message>
+      <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
+      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+    </message>
   </context>
   <context>
     <name>QnAuditItemDelegate</name>
@@ -2080,6 +2084,10 @@ to view more bookmarks</source>
     <message>
       <source>Select Server</source>
       <translation type="unfinished">Select Server</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation type="unfinished">Source Server and %1</translation>
     </message>
   </context>
   <context>
@@ -2616,8 +2624,9 @@ to %1</source>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
     <message>
-      <source>%1 of %2 selected users are not Cloud users and will not get mobile notifications.</source>
-      <translation type="unfinished">%1 of %2 selected users are not Cloud users and will not get mobile notifications.</translation>
+      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
+      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
     </message>
   </context>
   <context>
@@ -3910,6 +3919,15 @@ to %1</source>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
       <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
     </message>
+    <message>
+      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+    </message>
+    <message>
+      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <comment>%1 will be substituted by a list of contacts</comment>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
+    </message>
   </context>
   <context>
     <name>QnLinkToCloudDialogPrivate</name>
@@ -5181,7 +5199,7 @@ to %1</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5677,6 +5695,14 @@ If you intended to move analytics data to another storage location, please conta
       <translation>현재 분석 데이터는 자동으로 다른 위치로 이동되지 않으며 액세스 할 수 없게됩니다. 보관하고 나중에 수동으로 이동하거나 영구적으로 삭제할 수 있습니다.
 분석 데이터를 다른 저장 위치로 이동하려면 계속 진행하기 전에 지원 센터에 문의하십시오.</translation>
     </message>
+    <message>
+      <source>Server is unavailable.</source>
+      <translation type="unfinished">Server is unavailable.</translation>
+    </message>
+    <message>
+      <source>now</source>
+      <translation>지금</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -5766,7 +5792,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>smb</source>
-      <translation type="unfinished">smb</translation>
+      <translation>smb</translation>
     </message>
   </context>
   <context>
@@ -6806,10 +6832,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>비디오 월 이름 입력:</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall.</source>
-      <translation>비디오월 제어 세션을 시작 하려면 하나 이상의 라이선스를 활성화 해야 합니다.</translation>
-    </message>
-    <message>
       <source>Activate License...</source>
       <translation type="unfinished">Activate License...</translation>
     </message>
@@ -7403,6 +7425,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7411,12 +7442,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unknown track</source>
       <translation>알 수없는 트랙</translation>
-    </message>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -8814,7 +8839,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>로그인</translation>
     </message>
   </context>
   <context>
@@ -8919,10 +8944,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
       <source>Disconnected</source>
       <translation type="unfinished">Disconnected</translation>
     </message>
@@ -8941,7 +8962,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>비어있음</translation>
     </message>
     <message>
       <source>&lt; Unknown device %1 &gt;</source>
@@ -8961,16 +8982,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Consumption</translation>
     </message>
     <message>
-      <source>Speed</source>
-      <translation>속도</translation>
-    </message>
-    <message>
       <source>Status</source>
       <translation>상태</translation>
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>전원</translation>
     </message>
     <message>
       <source>&lt; Unknown device &gt;</source>
@@ -8991,8 +9008,14 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
-      <source>Cloud users</source>
-      <translation type="unfinished">Cloud users</translation>
+      <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+    </message>
+    <message>
+      <source>%1 Settings</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">%1 Settings</translation>
     </message>
   </context>
   <context>
@@ -9673,6 +9696,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Custom Users</source>
       <translation>사용자 지정 사용자</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>%1 사용자</translation>
     </message>
   </context>
   <context>

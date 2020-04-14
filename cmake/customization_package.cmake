@@ -63,7 +63,7 @@ nx_store_known_file(${customization_cmake})
 
 include(${customization_cmake})
 
-if(NOT ${customization} STREQUAL ${customization.id})
+if(NOT "${customization}" STREQUAL "${customization.id}")
     message(FATAL_ERROR "Customization package integrity check failed.\
     Expected value: \"${customization}\". Actual value: \"${customization.id}\"")
 endif()

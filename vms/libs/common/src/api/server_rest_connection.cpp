@@ -39,6 +39,8 @@
 #include <nx/vms/api/data/peer_data.h>
 #include <common/static_common_module.h>
 
+#include <nx/vms/event/events/poe_over_budget_event.h>
+
 using namespace nx;
 
 namespace {
@@ -626,7 +628,17 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
     params.insert(lit("event_type"), QnLexical::serialized(rule->eventType()));
     params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
 
-    if (rule->eventResources().size() > 0)
+    if (rule->eventType() == nx::vms::api::EventType::pluginDiagnosticEvent)
+    {
+        QnUuid engineId = rule->eventParams().eventResourceId;
+
+        if (engineId.isNull())
+            engineId = nx::utils::random::choice(
+                resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>())->getId();
+
+        params.insert(lit("eventResourceId"), engineId.toString());
+    }
+    else if (rule->eventResources().size() > 0)
     {
         auto randomResource = nx::utils::random::choice(rule->eventResources());
         params.insert(lit("eventResourceId"), randomResource.toString());
@@ -648,12 +660,60 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
     if (toggleState != nx::vms::api::EventState::undefined)
         params.insert(lit("state"), QnLexical::serialized(toggleState));
 
-    params.insert(lit("inputPortId"), rule->eventParams().inputPortId);
+    if (rule->eventType() == nx::vms::api::EventType::poeOverBudgetEvent)
+    {
+        nx::vms::event::PoeOverBudgetEvent::Parameters poeParams;
+        // TODO: #spanasenko Use actual values from the server configuration.
+        poeParams.lowerLimitWatts = 0;
+        poeParams.currentConsumptionWatts = 5;
+        poeParams.currentConsumptionWatts = 5.5;
+        params.insert(lit("inputPortId"), QJson::serialized(poeParams));
+    }
+    else
+    {
+        params.insert(lit("inputPortId"), rule->eventParams().inputPortId);
+    }
+
     params.insert(lit("source"), rule->eventParams().resourceName);
     params.insert(lit("caption"), rule->eventParams().caption);
     params.insert(lit("description"), rule->eventParams().description);
-    params.insert(lit("metadata"), QString::fromUtf8(
-        QJson::serialized(rule->eventParams().metadata)));
+
+    if (rule->eventType() == nx::vms::api::EventType::pluginDiagnosticEvent)
+    {
+        const auto& cameras = rule->eventResources();
+        auto camera = cameras.isEmpty()
+            ? nx::utils::random::choice(resourcePool()->getAllCameras())->getId()
+            : nx::utils::random::choice(cameras);
+
+        using Level = nx::vms::api::EventLevel;
+        using Levels = nx::vms::api::EventLevels;
+
+        const auto levelFlags = QnLexical::deserialized<Levels>(
+            rule->eventParams().inputPortId);
+
+        QVector<Level> levels;
+        for (const auto& flag: {Level::ErrorEventLevel, Level::WarningEventLevel, Level::InfoEventLevel})
+        {
+            if (levelFlags & flag)
+                levels << flag;
+        }
+
+        nx::vms::event::EventMetaData data;
+        data.level = levels.isEmpty() ? Level::UndefinedEventLevel : nx::utils::random::choice(levels);
+        data.cameraRefs.push_back(camera.toString());
+
+        params.insert(lit("metadata"), QString::fromUtf8(QJson::serialized(data)));
+    }
+    else
+    {
+        params.insert(lit("metadata"), QString::fromUtf8(
+            QJson::serialized(rule->eventParams().metadata)));
+    }
+
+    if (rule->eventType() == nx::vms::api::EventType::analyticsSdkEvent)
+    {
+        params.insert("analyticsEngineId", rule->eventParams().analyticsEngineId.toString());
+    }
 
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }

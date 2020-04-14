@@ -168,11 +168,6 @@
       <translation>Bulunan %1 Sistemi geçerli sistemi ile uyuşmuyor.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Sistem zaten %1 e bağlı olduğundan başka sisteme bağlanılamıyor.</translation>
-    </message>
-    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 Sistem yalnızca %1 olmayan biriyle birleştirilebilir. Sistem adı ve şifre %1 Sisteminden alınmıştır.</translation>

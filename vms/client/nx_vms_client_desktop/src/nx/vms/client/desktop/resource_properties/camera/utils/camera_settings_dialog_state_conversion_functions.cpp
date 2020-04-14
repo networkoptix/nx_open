@@ -19,22 +19,60 @@ namespace {
 using State = CameraSettingsDialogState;
 using Cameras = QnVirtualCameraResourceList;
 
+enum class DaysType
+{
+    minDays,
+    maxDays
+};
+
+void tryStoreRecordingDaysChanges(
+    const RecordingDays& data,
+    const QnVirtualCameraResourceList& cameras,
+    DaysType type)
+{
+    using getterType = std::function<int(const QnVirtualCameraResourcePtr&)>;
+    using setterType = std::function<void(const QnVirtualCameraResourcePtr&, int)>;
+
+    static const getterType minGetter =
+        [](const QnVirtualCameraResourcePtr& camera) { return camera->minDays(); };
+    static const setterType minSetter =
+        [](const QnVirtualCameraResourcePtr& camera, int value) { return camera->setMinDays(value); };
+
+    static const getterType maxGetter =
+        [](const QnVirtualCameraResourcePtr& camera) { return camera->maxDays(); };
+    static const setterType maxSetter =
+        [](const QnVirtualCameraResourcePtr& camera, int value) { return camera->setMaxDays(value); };
+
+    const setterType& setter = type == DaysType::minDays ? minSetter : maxSetter;
+
+    if (!data.isApplicable())
+        return;
+
+    if (data.hasManualDaysValue())
+    {
+        // Sets direct values.
+        for (const auto& camera: cameras)
+            setter(camera, data.days());
+
+        return;
+    }
+
+    // Preserves days value if there are different ones.
+
+    const getterType& getter = type == DaysType::minDays ? minGetter : maxGetter;
+    for (const auto& camera: cameras)
+    {
+        const auto value = getter(camera);
+        const bool currentManualMode = value >= 0;
+        if (currentManualMode != data.isManualMode())
+            setter(camera, -value);
+    }
+}
+
 //TODO #lbusygin: move conversion to resource layer
 QString boolToPropertyStr(bool value)
 {
     return value ? lit("1") : lit("0");
-}
-
-void setRecordingDays(
-    const State::RecordingDays& minDays,
-    const State::RecordingDays& maxDays,
-    const Cameras& cameras)
-{
-    for (const auto& camera: cameras)
-    {
-        camera->setMinDays(minDays.automatic() ? -minDays.value() : minDays.value());
-        camera->setMaxDays(maxDays.automatic() ? -maxDays.value() : maxDays.value());
-    }
 }
 
 void setCustomRotation(
@@ -391,7 +429,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         setCredentials(state.credentials, cameras);
     }
 
-    setRecordingDays(state.recording.minDays, state.recording.maxDays, cameras);
+    const auto minDays = state.recording.minDays;
+    tryStoreRecordingDaysChanges(state.recording.minDays, cameras, DaysType::minDays);
+    tryStoreRecordingDaysChanges(state.recording.maxDays, cameras, DaysType::maxDays);
 
     if (state.imageControl.aspectRatio.hasValue())
         setCustomAspectRatio(state.imageControl.aspectRatio(), cameras);

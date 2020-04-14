@@ -9,13 +9,6 @@
     </message>
   </context>
   <context>
-    <name>Box</name>
-    <message>
-      <source>Click on video to start box.</source>
-      <translation>Haga clic en el video para iniciar la caja.</translation>
-    </message>
-  </context>
-  <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
@@ -56,7 +49,7 @@
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Clic para añadir</translation>
     </message>
   </context>
   <context>
@@ -75,6 +68,13 @@
     </message>
   </context>
   <context>
+    <name>FigureView</name>
+    <message>
+      <source>NO PREVIEW</source>
+      <translation>SIN VISTA PREVIA</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
@@ -86,40 +86,47 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Flujo de cámara</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Seleccionar flujo de vídeo de la cámara para análisis</translation>
+    </message>
+  </context>
+  <context>
+    <name>LabeledItem</name>
+    <message>
+      <source>Default value:</source>
+      <translation>Valor predeterminado:</translation>
     </message>
   </context>
   <context>
     <name>Line</name>
     <message>
-      <source>Click on video to start line.</source>
-      <translation>Haga clic en el video para comenzar la línea.</translation>
-    </message>
-    <message>
-      <source>Click arrows to toggle the desired directions.</source>
-      <translation>Haga clic en las flechas para alternar las direcciones deseadas.</translation>
-    </message>
-    <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
       <translation>La línea no es válida. Elimine las auto intersecciones para continuar.</translation>
     </message>
     <message numerus="yes">
-      <source>Maximum points count is reached (%n points).</source>
+      <source>This line requires at least %n points.</source>
       <translation>
-        <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
-        <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Esta línea requiere al menos %n puntos.</numerusform>
+        <numerusform>Esta línea requiere al menos %n puntos.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Click on the last point to finish drawing the line.</source>
+      <translation>Haga clic en el último punto para terminar de dibujar la línea.</translation>
+    </message>
     <message numerus="yes">
-      <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <source>The maximum number of points has been reached (%n points).</source>
+      <translation>
+        <numerusform>Se ha alcanzado el número máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Se ha alcanzado el número máximo de puntos (%n puntos).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Click on each arrow to toggle the desired direction.</source>
+      <translation>Haga clic en cada flecha para cambiar la dirección deseada.</translation>
     </message>
   </context>
   <context>
@@ -153,6 +160,13 @@
     </message>
   </context>
   <context>
+    <name>ObjectSizeConstraints</name>
+    <message>
+      <source>Size Constraints</source>
+      <translation>Restricciones de tamaño</translation>
+    </message>
+  </context>
+  <context>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
@@ -173,25 +187,25 @@
   <context>
     <name>Polygon</name>
     <message>
-      <source>Click on video to start polygon.</source>
-      <translation>Haga clic en el video para iniciar el polígono.</translation>
-    </message>
-    <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
       <translation>El polígono no es válido. Elimine las auto intersecciones para continuar.</translation>
     </message>
     <message numerus="yes">
-      <source>Maximum points count is reached (%n points).</source>
+      <source>This polygon requires at least %n points.</source>
       <translation>
-        <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
-        <numerusform>Se alcanza el recuento máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Este polígono requiere al menos %n puntos.</numerusform>
+        <numerusform>Este polígono requiere al menos %n puntos.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Click on the last point to finish drawing the polygon.</source>
+      <translation>Haga clic en el último punto para terminar de dibujar el polígono.</translation>
+    </message>
     <message numerus="yes">
-      <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <source>The maximum number of points has been reached (%n points).</source>
+      <translation>
+        <numerusform>Se ha alcanzado el número máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Se ha alcanzado el número máximo de puntos (%n puntos).</numerusform>
       </translation>
     </message>
   </context>
@@ -199,7 +213,26 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Añadir</translation>
+    </message>
+  </context>
+  <context>
+    <name>SizeConstraints</name>
+    <message>
+      <source>MAX</source>
+      <translation>MAX</translation>
+    </message>
+    <message>
+      <source>MIN</source>
+      <translation>MIN</translation>
+    </message>
+    <message>
+      <source>Set minimum and maximum object size.</source>
+      <translation>Establecer tamaño mínimo y máximo del objeto.</translation>
+    </message>
+    <message>
+      <source>Minimum object size cannot be greater than maximum.</source>
+      <translation>El tamaño mínimo del objeto no puede ser mayor que el máximo.</translation>
     </message>
   </context>
   <context>

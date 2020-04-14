@@ -117,6 +117,11 @@
       <source>Disable blur</source>
       <translation>Poista sumennus käytöstä</translation>
     </message>
+    <message>
+      <location/>
+      <source>Limit Frame Rate to save CPU</source>
+      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -2167,11 +2172,6 @@
     <name>PopupBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-      <source>for</source>
-      <translation>varten</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force Acknowledgment</source>
       <translation>Pakota kuittaus</translation>
     </message>
@@ -2179,6 +2179,11 @@
       <location/>
       <source>Use custom text:</source>
       <translation>Käytä mukautettua tekstiä:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>to</source>
+      <translation>vastaanottaja</translation>
     </message>
   </context>
   <context>
@@ -2274,13 +2279,28 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
-      <source>for</source>
-      <translation>varten</translation>
+      <source>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</source>
+      <translation type="unfinished">The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</translation>
     </message>
     <message>
       <location/>
-      <source>Use custom text:</source>
-      <translation>Käytä mukautettua tekstiä:</translation>
+      <source>Nx Cloud Settings</source>
+      <translation type="unfinished">Nx Cloud Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>to</source>
+      <translation>vastaanottaja</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Set Language</source>
+      <translation type="unfinished">Set Language</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Add custom text:</source>
+      <translation type="unfinished">Add custom text:</translation>
     </message>
   </context>
   <context>
@@ -2323,24 +2343,6 @@
       <location/>
       <source>Restart to the updated version when ready</source>
       <translation>Käynnistä päivitetty versio uudelleen, kun valmis</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCredentialsDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/credentials_dialog.ui"/>
-      <source>User:</source>
-      <translation>Käyttäjä:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password:</source>
-      <translation>Salasana:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Enter a valid username and password...</source>
-      <translation>Anna kelvollinen käyttäjätunnus ja salasana...</translation>
     </message>
   </context>
   <context>
@@ -3359,6 +3361,24 @@
       <location/>
       <source>Detect motion</source>
       <translation>Tunnista liike</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableCameraTimeZoneWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_time_zone_widget.ui"/>
+      <source>Form</source>
+      <translation>Lomake</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Time</source>
+      <translation type="unfinished">Time</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Ignore timezone in uploaded files</source>
+      <translation type="unfinished">Ignore timezone in uploaded files</translation>
     </message>
   </context>
   <context>

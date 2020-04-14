@@ -180,11 +180,6 @@
       <translation>מערכת %1 שהתגלתה אינה תואמת למערכת הנוכחית.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>אין אפשרות להתחבר למערכת השנייה מפני שהמערכת הנוכחית כבר מחוברת ל- %1.</translation>
-    </message>
-    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 המערכת יכולה להיות ממוזגת רק עם לא%1. שם המערכת והסיסמה נלקחים מתוך %1 מערכת.</translation>

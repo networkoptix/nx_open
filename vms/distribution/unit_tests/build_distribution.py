@@ -2,7 +2,8 @@
 
 
 from __future__ import print_function
-from glob import glob
+from glob import iglob
+from fnmatch import fnmatch
 from os.path import join
 import logging
 import os
@@ -40,7 +41,7 @@ def get_unit_tests_list():
 
 
 def archiveMacOsFrameworks(archiver, target_dir, source_dir):
-    for framework_dir in glob(join(source_dir, "*.framework")):
+    for framework_dir in iglob(join(source_dir, "*.framework")):
         framework, _ = os.path.splitext(os.path.basename(framework_dir))
         library_name = os.path.normpath(join(framework_dir, framework))
         if not os.path.exists(library_name):
@@ -53,15 +54,30 @@ def archiveMacOsFrameworks(archiver, target_dir, source_dir):
         archiver.add(real_name, join(target_dir, relative_name))
 
 
-def archiveFiles(archiver, target_dir, source_dir, file_list):
-    for file in file_list:
-        logging.info("  Adding %s", os.path.basename(file))
-        archiver.add(join(source_dir, file), join(target_dir, os.path.basename(file)))
+def archiveFiles(archiver, target_dir, source_dir, file_list, category=None):
+    if category:
+        logging.info(f"Archiving {category}")
+
+    for f in file_list:
+        source_file = join(source_dir, f)
+        target_file = join(target_dir, f)
+        logging.info(f"  Adding {target_file} ({source_file})")
+        archiver.add(source_file, target_file)
 
 
-def archiveByGlob(archiver, category, target_dir, pattern):
-    logging.info("Finding %s going to %s from %s", category, target_dir, pattern)
-    archiveFiles(archiver, target_dir, source_dir="", file_list=glob(pattern))
+def archiveByGlob(archiver, category, target_dir, source_dir, pattern, recursive=False):
+    if recursive:
+        files = []
+        for root, _, dir_files in os.walk(source_dir):
+            relative_root = os.path.relpath(root, source_dir)
+            for f in dir_files:
+                if fnmatch(f, pattern):
+                    files.append(os.path.normpath(join(relative_root, f)))
+    else:
+        full_pattern = join(source_dir, pattern)
+        files = [os.path.relpath(f, source_dir) for f in iglob(full_pattern, recursive=recursive)]
+
+    archiveFiles(archiver, target_dir, source_dir, files, category=category)
 
 
 def main():
@@ -78,37 +94,43 @@ def main():
 
     with archiver.Archiver(conf.PACKAGE_FILE) as a:
         src_bin_dir = join(conf.BUILD_DIR, bin_dir)
-        logging.info("Finding unit test executables going to %s at %s", bin_dir, src_bin_dir)
+        logging.info("Archiving unit test executables")
         archiveFiles(a, bin_dir, src_bin_dir, get_unit_tests_list())
 
         # NOTE: On Windows, mediaserver plugins go to "bin" to avoid PATH issues in unit tests.
 
         plugins_dir = join(bin_dir, "plugins")
-        target_dir = bin_dir if isWindows else plugins_dir
+        target_plugins_dir = bin_dir if isWindows else plugins_dir
         plugins_optional_dir = join(bin_dir, "plugins_optional")
-        target_optional_dir = bin_dir if isWindows else plugins_optional_dir
+        target_plugins_optional_dir = bin_dir if isWindows else plugins_optional_dir
 
         for lib_glob in lib_globs:
-            archiveByGlob(a, "libraries", lib_dir,
-                join(conf.BUILD_DIR, lib_dir, lib_glob))
-            archiveByGlob(a, "mediaserver plugins", target_dir,
-                join(conf.BUILD_DIR, plugins_dir, lib_glob))
-            archiveByGlob(a, "mediaserver optional plugins", target_optional_dir,
-                join(conf.BUILD_DIR, plugins_optional_dir, lib_glob))
+            archiveByGlob(a, "libraries", lib_dir, join(conf.BUILD_DIR, lib_dir), lib_glob,
+                recursive=True)
+            archiveByGlob(a, "mediaserver plugins", target_plugins_dir,
+                join(conf.BUILD_DIR, plugins_dir), lib_glob)
+            archiveByGlob(a, "mediaserver optional plugins", target_plugins_optional_dir,
+                join(conf.BUILD_DIR, plugins_optional_dir), lib_glob)
             for plugin_group in ["sqldrivers"]:
-                archiveByGlob(a, "Qt plugins from %s" % plugin_group, join(bin_dir, plugin_group),
-                    join(conf.QT_DIR, "plugins", plugin_group, lib_glob))
+                archiveByGlob(a, f"Qt plugins from {plugin_group}", join(bin_dir, plugin_group),
+                    join(conf.QT_DIR, "plugins", plugin_group), lib_glob)
 
         # Archive Qt for Windows build (only dlls).
         if isWindows:
             dll_glob = "*.dll"
             for plugin_group in WINDOWS_QT_PLUGINS:
-                archiveByGlob(a, "Qt plugins from %s" % plugin_group, join(bin_dir, plugin_group),
-                    join(conf.QT_DIR, "plugins", plugin_group, dll_glob))
-            archiveByGlob(a, "Qt dlls", bin_dir, join(conf.QT_DIR, "bin", dll_glob))
+                archiveByGlob(a, f"Qt plugins from {plugins_group}", join(bin_dir, plugin_group),
+                    join(conf.QT_DIR, "plugins", plugin_group), dll_glob)
+            archiveByGlob(a, "Qt dlls", bin_dir, join(conf.QT_DIR, "bin"), dll_glob)
 
         if isMac:
             archiveMacOsFrameworks(a, lib_dir, join(conf.QT_DIR, "lib"))
+
+        logging.info("Archiving misc files")
+
+        # Add FFmpeg variant for ARM32 devices.
+        if os.path.islink(join(conf.BUILD_DIR, lib_dir, "ffmpeg")):
+            archiveFiles(a, lib_dir, join(conf.BUILD_DIR, lib_dir), ["ffmpeg"])
 
         # Archive metadata_sdk unit tests.
         ut_bin_glob = "Debug\\*_ut.exe" if isWindows else "*_ut"
@@ -124,14 +146,14 @@ def main():
         src_metadata_sdk_nx_kit_ut_dir = join(conf.BUILD_DIR, metadata_sdk_nx_kit_ut_dir)
         for ut_lib_glob in ut_lib_globs:
             archiveByGlob(a, "metadata_sdk unit test libraries", metadata_sdk_dir,
-                join(src_metadata_sdk_ut_dir, ut_lib_glob))
+                src_metadata_sdk_ut_dir, ut_lib_glob)
             archiveByGlob(a, "metadata_sdk nx_kit unit test libraries", metadata_sdk_dir,
-                join(src_metadata_sdk_nx_kit_ut_dir, ut_lib_glob))
+                src_metadata_sdk_nx_kit_ut_dir, ut_lib_glob)
 
         archiveByGlob(a, "metadata_sdk nx_kit unit test executables", metadata_sdk_dir,
-            join(src_metadata_sdk_nx_kit_ut_dir, ut_bin_glob))
+            src_metadata_sdk_nx_kit_ut_dir, ut_bin_glob)
         archiveByGlob(a, "metadata_sdk unit test executables", metadata_sdk_dir,
-            join(src_metadata_sdk_ut_dir, ut_bin_glob))
+            src_metadata_sdk_ut_dir, ut_bin_glob)
 
 
 if __name__ == "__main__":

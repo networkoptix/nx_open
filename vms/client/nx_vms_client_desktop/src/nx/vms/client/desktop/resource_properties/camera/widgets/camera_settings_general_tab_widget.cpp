@@ -90,7 +90,8 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
     ui->enableAudioCheckBox->setEnabled(
         state.devicesDescription.supportsAudio != CombinedValue::None
         && state.devicesDescription.isAudioForced == CombinedValue::None
-        && state.settingsOptimizationEnabled);
+        && state.settingsOptimizationEnabled
+        && !state.expert.cameraControlDisabled.get());
 
     ui->editStreamsPanel->setVisible(state.singleCameraProperties.editableStreamUrls);
     ui->overEditStreamsLine->setVisible(state.singleCameraProperties.editableStreamUrls);

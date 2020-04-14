@@ -8,6 +8,8 @@ namespace Ui { class PushNotificationBusinessActionWidget; }
 
 namespace nx::vms::client::desktop {
 
+class Aligner;
+
 class PushNotificationBusinessActionWidget:
     public QnSubjectTargetActionWidget,
     public QnWorkbenchContextAware
@@ -30,7 +32,7 @@ private:
 
 private:
     QScopedPointer<Ui::PushNotificationBusinessActionWidget> ui;
-    QString m_lastCustomText;
+    nx::vms::client::desktop::Aligner* const m_aligner;
 };
 
 } // namespace nx::vms::client::desktop

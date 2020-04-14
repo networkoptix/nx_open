@@ -72,7 +72,12 @@ public:
     }
 
     void generateEvent(
-        EventType type, QnUuid resource = {}, QString text = {}, const std::string& users = "")
+        EventType type,
+        QnUuid resource = {},
+        const std::string& users = "",
+        QString caption = {},
+        QString body = {},
+        bool addSource = true)
     {
         EventParameters event;
         event.eventType = type;
@@ -80,7 +85,6 @@ public:
         event.eventResourceId = std::move(resource);
 
         ActionParameters action;
-        action.text = std::move(text);
         if (users.empty())
         {
             action.allUsers = true;
@@ -90,6 +94,9 @@ public:
             for (const auto u: users)
                 action.additionalResources.push_back(m_users[QString(u)]);
         }
+        action.sayText = std::move(caption);
+        action.text = std::move(body);
+        action.useSource = addSource;
 
         AbstractActionPtr actionPtr(new CommonAction(ActionType::pushNotificationAction, event));
         actionPtr->setParams(action);
@@ -103,10 +110,15 @@ public:
         return std::nullopt;
     }
 
-    template<typename... Args>
-    std::optional<PushRequest> testEvent(Args... args)
+    std::optional<PushRequest> testEvent(
+        EventType type,
+        QnUuid resource = {},
+        const std::string& users = "",
+        QString caption = {},
+        QString body = {},
+        bool addSource = true)
     {
-        generateEvent(std::forward<Args>(args)...);
+        generateEvent(type, resource, users, caption, body, addSource);
         return getRequestFromServer();
     }
 
@@ -160,8 +172,9 @@ private:
 #define EXPECT_LIST(VALUE, EXPECTED) \
     EXPECT_EQ(containerString(VALUE), containerString<std::vector<QString>> EXPECTED)
 
-TEST_F(PushManagerTest, Events)
+TEST_F(PushManagerTest, MessageCaption)
 {
+    // Default.
     {
         const auto sent = testEvent(EventType::userDefinedEvent);
         ASSERT_TRUE(sent);
@@ -172,33 +185,96 @@ TEST_F(PushManagerTest, Events)
         EXPECT_EQ(sent->notification.payload.url, openUrl());
         EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl());
     }
+    // User defined.
+    {
+        const auto sent = testEvent(EventType::userDefinedEvent, {}, {}, "My Special Generic Event");
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
+        EXPECT_EQ(sent->systemId, systemId);
+        EXPECT_EQ(sent->notification.title, "My Special Generic Event");
+        EXPECT_EQ(sent->notification.body, "");
+        EXPECT_EQ(sent->notification.payload.url, openUrl());
+        EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl());
+    }
+}
+
+TEST_F(PushManagerTest, MessageBody)
+{
+    // Default.
     {
         const auto sent = testEvent(EventType::serverStartEvent, serverId);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
         EXPECT_EQ(sent->notification.title, "Server Started");
-        EXPECT_EQ(sent->notification.body, "[My Cool Server] ");
+        EXPECT_EQ(sent->notification.body, "[My Cool Server]");
         EXPECT_EQ(sent->notification.payload.url, openUrl());
         EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl());
     }
+    // User defined.
     {
-        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, "WTF!");
+        const auto sent = testEvent(EventType::serverStartEvent, serverId, {}, {}, "... and it is named");
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
+        EXPECT_EQ(sent->systemId, systemId);
+        EXPECT_EQ(sent->notification.title, "Server Started");
+        EXPECT_EQ(sent->notification.body, "... and it is named\n[My Cool Server]");
+        EXPECT_EQ(sent->notification.payload.url, openUrl());
+        EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl());
+    }
+}
+
+TEST_F(PushManagerTest, AddSource)
+{
+    // With default message body.
+    {
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, {}, {}, {}, /*addSource*/ false);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
         EXPECT_EQ(sent->notification.title, "Motion on Cameras");
-        EXPECT_EQ(sent->notification.body, "[My Cool Camera] WTF!");
+        EXPECT_EQ(sent->notification.body, "");
         EXPECT_EQ(sent->notification.payload.url, openUrl(cameraId));
         EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl(cameraId));
     }
+    // With user defined message body.
     {
-        const auto sent = testEvent(EventType::networkIssueEvent, cameraId, "Run!", "ab");
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, {}, {}, "WTF!", /*addSource*/ false);
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
+        EXPECT_EQ(sent->systemId, systemId);
+        EXPECT_EQ(sent->notification.title, "Motion on Cameras");
+        EXPECT_EQ(sent->notification.body, "WTF!");
+        EXPECT_EQ(sent->notification.payload.url, openUrl(cameraId));
+        EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl(cameraId));
+    }
+}
+
+TEST_F(PushManagerTest, UserList)
+{
+    // Also checking icon with default caption.
+    {
+        const auto sent = testEvent(EventType::networkIssueEvent, cameraId, "ab");
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
         EXPECT_EQ(sent->notification.title, QString(QChar(0x26A0)) + " Network Issue");
-        EXPECT_EQ(sent->notification.body, "[My Cool Camera] Run!");
+        EXPECT_EQ(sent->notification.body, "[My Cool Camera]");
+        EXPECT_EQ(sent->notification.payload.url, openUrl(cameraId));
+        EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl(cameraId));
+    }
+}
+
+TEST_F(PushManagerTest, CaptionIcon)
+{
+    // Check icon with user defined caption.
+    {
+        const auto sent = testEvent(EventType::networkIssueEvent, cameraId, {}, "Alarm!");
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
+        EXPECT_EQ(sent->systemId, systemId);
+        EXPECT_EQ(sent->notification.title, QString(QChar(0x26A0)) + " Alarm!");
+        EXPECT_EQ(sent->notification.body, "[My Cool Camera]");
         EXPECT_EQ(sent->notification.payload.url, openUrl(cameraId));
         EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl(cameraId));
     }

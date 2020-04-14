@@ -34,16 +34,16 @@ bool PluginDiagnosticEvent::checkEventParams(const EventParameters& params) cons
         QnLexical::deserialized<nx::vms::api::EventLevels>(params.inputPortId);
 
     const auto& ruleCameras = params.metadata.cameraRefs;
+    const auto& ruleResource = params.eventResourceId;
 
     // Check Level flag
     const bool isValidLevel = ruleLevels & m_metadata.level;
 
     // Check Engine Resource id (null is used for 'Any Resource')
-    const bool isValidResource = params.eventResourceId.isNull()
-        || m_resourceId == params.eventResourceId;
+    const bool isValidResource = ruleResource.isNull()
+        || m_resourceId == ruleResource;
 
-    // Check Camera id (empty list means 'Any Camera')
-    const bool isValidCamera = params.metadata.cameraRefs.empty()
+    const bool isValidCamera = ruleCameras.empty()
         || (m_metadata.cameraRefs.size() == 1
             && std::find(
                 ruleCameras.begin(),

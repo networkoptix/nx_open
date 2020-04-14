@@ -129,7 +129,8 @@
         "watermarkSettings": "Watermark settings",
         "maxWebMTranscoders": "서버에 대한 최대 WEBM 연결 수. Chrome은 한 번에 2 개의 연결을 연 다음 첫 번째 연결을 닫습니다. 따라서 매개 변수의 값을 >=2로 설정하는 것이 좋습니다.",
         "maxEventLogRecords": "데이터베이스에 보관할 최대 이벤트 로그 레코드. 삭제되지 않은 실제 레코드 양은 지정된 값보다 최대 20 % 더 높을 수 있습니다.",
-        "forceLiveCacheForPrimaryStream": "기본 스트림의 일부 프레임을 캐시할지 여부입니다. 값: \"yes\"-항상 활성화 (많은 RAM을 사용할 수 있음), \"no\"-재생에 필요한 경우를 제외하고 항상 비활성화 (예: HLS), \"auto\"- \"no\"와 비슷하지만 사용자 경험치를 향상하기 위해 활성화 (예: 일부 웹 로그 분석 플러그인이 카메라에서 작동하는 경우)"
+        "forceLiveCacheForPrimaryStream": "기본 스트림의 일부 프레임을 캐시할지 여부입니다. 값: \"yes\"-항상 활성화 (많은 RAM을 사용할 수 있음), \"no\"-재생에 필요한 경우를 제외하고 항상 비활성화 (예: HLS), \"auto\"- \"no\"와 비슷하지만 사용자 경험치를 향상하기 위해 활성화 (예: 일부 웹 로그 분석 플러그인이 카메라에서 작동하는 경우)",
+        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected."
     },
     "info": {
         "tabs": {
