@@ -126,6 +126,12 @@ def main():
         if isMac:
             archiveMacOsFrameworks(a, lib_dir, join(conf.QT_DIR, "lib"))
 
+        logging.info("Archiving misc files")
+
+        # Add FFmpeg variant for ARM32 devices.
+        if os.path.islink(join(conf.BUILD_DIR, lib_dir, "ffmpeg")):
+            archiveFiles(a, lib_dir, join(conf.BUILD_DIR, lib_dir), ["ffmpeg"])
+
         # Archive metadata_sdk unit tests.
         ut_bin_glob = "Debug\\*_ut.exe" if isWindows else "*_ut"
         ut_lib_globs = {
