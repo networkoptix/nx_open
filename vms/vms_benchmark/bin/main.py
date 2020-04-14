@@ -594,7 +594,7 @@ def _obtain_cameras(test_camera_count, api, box, test_camera_context, ini, conf)
 
     try:
         for camera in cameras:
-            if camera.enable_radminecording(highStreamFps=ini['testStreamFpsHigh']):
+            if camera.enable_recording(highStreamFps=ini['testStreamFpsHigh']):
                 report(f"    Recording on camera {camera.id} enabled.")
             else:
                 raise exceptions.TestCameraError(
@@ -1267,6 +1267,7 @@ def _format_exception(exception):
         return f"Invalid value: {exception}"
     elif isinstance(exception, KeyError):
         return f"Missing key: {exception}"
+    # TODO: This should not happen, consider removing.
     elif isinstance(exception, urllib.error.HTTPError):
         if exception.code == 401:
             return ('Server refuses passed credentials: ' +
@@ -1279,44 +1280,22 @@ def _format_exception(exception):
         return str(exception) or "Exception " + type(exception).__name__
 
 
-def _do_report_exception(exception, recursive_level, prefix='', logging_only=False):
-    exception_blacklist = (urllib.error.HTTPError,)
-
+def _do_report_exception(exception, recursive_level, prefix=''):
     indent = '    ' * recursive_level
     if isinstance(exception, VmsBenchmarkError):
         s = str(exception) or "Exception " + type(exception).__name__
-        if logging_only:
-            logging.info(f"{indent}{prefix}{s}")
-        else:
-            report(f"{indent}{prefix}{s}")
+        report(f"{indent}{prefix}{str(exception)}")
         if isinstance(exception, VmsBenchmarkIssue):
             for sub_issue in exception.sub_issues:
                 _do_report_exception(sub_issue, recursive_level=recursive_level + 1)
         if exception.original_exception:
-            try:
-                sub_exceptions = tuple(exception.original_exception)
-            except TypeError:
-                sub_exceptions = (exception.original_exception,)
-
-            caused_by_printed = False
+            report(f'{indent}Caused by:')
+            if isinstance(exception.original_exception, list):
+                sub_exceptions = exception.original_exception
+            else:
+                sub_exceptions = [exception.original_exception]
             for sub_exception in sub_exceptions:
-                if isinstance(sub_exception, exception_blacklist) and not logging_only:
-                    _do_report_exception(
-                        sub_exception,
-                        recursive_level=recursive_level + 1,
-                        logging_only=True
-                    )
-                    continue
-
-                if not caused_by_printed:
-                    report(f'{indent}Caused by:')
-                    caused_by_printed = True
-
-                _do_report_exception(
-                    sub_exception,
-                    recursive_level=recursive_level + 1,
-                    logging_only=logging_only
-                )
+                _do_report_exception(sub_exception, recursive_level=recursive_level + 1)
     else:
         report(f'{indent}{prefix or "ERROR: "}{_format_exception(exception)}')
 
