@@ -767,11 +767,11 @@ nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid en
     const std::optional<DeviceAgentManifest> deviceAgentManifest =
         this->deviceAgentManifest(engineId);
 
-    const bool streamSelectionControlledByPlugin = deviceAgentManifest
-        && deviceAgentManifest->capabilities.testFlag(
-            DeviceAgentManifest::Capability::hideStreamSelection);
+    const bool userIsAllowedToSelectStream = !deviceAgentManifest
+        || !deviceAgentManifest->capabilities.testFlag(
+            DeviceAgentManifest::Capability::disableStreamSelection);
 
-    if (!streamSelectionControlledByPlugin)
+    if (userIsAllowedToSelectStream)
     {
         const QString serializedProperty = getProperty(kAnalyzedStreamIndexes);
         if (serializedProperty.isEmpty())

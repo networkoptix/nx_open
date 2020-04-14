@@ -253,9 +253,9 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
 
     if (deviceAgentManifest)
     {
-        response.hideStreamSelection =
+        response.disableStreamSelection =
             deviceAgentManifest->capabilities.testFlag(
-                DeviceAgentManfiest::Capability::hideStreamSelection);
+                DeviceAgentManfiest::Capability::disableStreamSelection);
     }
 
     if (settings)

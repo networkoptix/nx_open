@@ -48,10 +48,11 @@ struct NX_VMS_API DeviceAnalyticsSettingsResponse
     StreamIndex analyzedStreamIndex = StreamIndex::undefined;
 
     /**%apidoc
-     * Indicates whether the stream selection control has to be hidden or not. If true, the Plugin
-     * is responsible for stream selection.
+     * Indicates whether the primary/secondary stream selection control is available for this
+     * DeviceAgent. If true, the analyzed stream is selected according to the Plugin preferences
+     * (if any) or defaults to the primary stream.
      */
-    bool hideStreamSelection = false;
+    bool disableStreamSelection = false;
 
     /**%apidoc
      * Name-value map with setting values, using JSON types corresponding to each setting type.
@@ -65,7 +66,7 @@ struct NX_VMS_API DeviceAnalyticsSettingsResponse
 };
 #define nx_vms_api_analytics_DeviceAnalyticsSettingsResponse_Fields \
     (analyzedStreamIndex) \
-    (hideStreamSelection) \
+    (disableStreamSelection) \
     (settingsValues) \
     (settingsModel)
 

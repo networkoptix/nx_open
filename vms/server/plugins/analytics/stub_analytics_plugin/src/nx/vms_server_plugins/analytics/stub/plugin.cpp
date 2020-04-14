@@ -42,8 +42,8 @@ std::string Plugin::manifestString() const
                     },
                     {
                         "type": "CheckBox",
-                        "name": ")json" + kHideStreamSelectionSetting + R"json(",
-                        "caption": "Hide stream selection",
+                        "name": ")json" + kDisableStreamSelectionSetting + R"json(",
+                        "caption": "Disable stream selection",
                         "description": "If true, the stream selection control will be hidden for newly created DeviceAgents",
                         "defaultValue": false,
                         "value": false
