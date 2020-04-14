@@ -439,7 +439,7 @@ int CameraSettingsDialogStore::analyticsStreamIndex(const QnUuid& engineId) cons
 
 void CameraSettingsDialogStore::setAnalyticsStreamIndex(const QnUuid& engineId, int value)
 {
-    if (!NX_ASSERT(value == 0 || value == 1))
+    if (!NX_ASSERT(value <= 1))
         value = std::clamp(value, 0, 1);
 
     setAnalyticsStreamIndex(engineId, State::StreamIndex(value));

@@ -406,7 +406,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
         for (const auto& [id, index]: nx::utils::constKeyValueRange(state.analytics.streamByEngineId))
         {
-            if (index.hasUser())
+            if (index.hasUser() && NX_ASSERT(index() != nx::vms::api::StreamIndex::undefined))
                 camera->setAnalyzedStreamIndex(id, index());
         }
     }

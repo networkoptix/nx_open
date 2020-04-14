@@ -6,6 +6,8 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <nx/vms/api/types_fwd.h>
+
 #include "../data/analytics_engine_info.h"
 
 namespace nx::vms::client::desktop {
@@ -25,6 +27,8 @@ public:
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
     QList<AnalyticsEngineInfo> engineInfoList() const;
+
+    nx::vms::api::StreamIndex analyzedStreamIndex(const QnUuid& engineId) const;
 
 private:
     class Private;

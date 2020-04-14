@@ -225,7 +225,7 @@ Item
             checkable: !isDeviceDependent && !!currentEngineId
             checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
             engineInfo: currentEngineInfo
-            streamSelectorVisible: supportsDualStreaming
+            streamSelectorVisible: supportsDualStreaming && currentStreamIndex >= 0
             streamSelectorEnabled: settingsView.contentEnabled
             Layout.bottomMargin: 16
             Layout.fillWidth: true

@@ -736,14 +736,17 @@ State CameraSettingsDialogStateReducer::loadCameras(
             nullptr,
             false);
 
+        state.analytics.streamByEngineId = {};
+
         if (analyticsEnginesWatcher)
+        {
             state = setAnalyticsEngines(std::move(state), analyticsEnginesWatcher->engineInfoList());
 
-        state.analytics.streamByEngineId = {};
-        for (const auto& engine: state.analytics.engines)
-        {
-            state.analytics.streamByEngineId[engine.id].setBase(
-                firstCamera->analyzedStreamIndex(engine.id));
+            for (const auto& engine: state.analytics.engines)
+            {
+                state.analytics.streamByEngineId[engine.id].setBase(
+                    analyticsEnginesWatcher->analyzedStreamIndex(engine.id));
+            }
         }
 
         state.analytics.settingsByEngineId = {};
@@ -1507,12 +1510,19 @@ State CameraSettingsDialogStateReducer::setAnalyticsStreamIndex(
 {
     if (source == ModificationSource::local)
     {
+        if (!NX_ASSERT(state.analyticsStreamSelectionEnabled(engineId)))
+            return state;
+
         state.analytics.streamByEngineId[engineId].setUser(value);
         state.hasChanges = true;
     }
     else if (NX_ASSERT(source == ModificationSource::remote))
     {
-        state.analytics.streamByEngineId[engineId].setBase(value);
+        auto& streamRef = state.analytics.streamByEngineId[engineId];
+        streamRef.setBase(value);
+
+        if (value == State::StreamIndex::undefined)
+            streamRef.resetUser();
     }
     return state;
 }

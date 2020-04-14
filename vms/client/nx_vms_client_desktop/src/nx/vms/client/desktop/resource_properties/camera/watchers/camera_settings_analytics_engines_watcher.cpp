@@ -6,9 +6,11 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <utils/common/connective.h>
+
+#include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <utils/common/connective.h>
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
@@ -56,6 +58,8 @@ public:
     void at_engineManifestChanged(const AnalyticsEngineResourcePtr& engine);
     void at_initialResourcesReceived();
     void at_connectionClosed();
+
+    nx::vms::api::StreamIndex analyzedStreamIndex(const QnUuid& engineId) const;
 
 public:
     const QPointer<CameraSettingsDialogStore> store;
@@ -149,8 +153,12 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::setCamera(
         connect(camera, &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& key)
             {
-                if (resource == camera && key == QnVirtualCameraResource::kAnalyzedStreamIndexes)
+                if (resource == camera
+                    && (key == QnVirtualCameraResource::kAnalyzedStreamIndexes
+                        || key == QnVirtualCameraResource::kDeviceAgentManifestsProperty))
+                {
                     updateStore();
+                }
             });
     }
 }
@@ -164,11 +172,25 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::updateStore()
 
         for (const auto& engine: enginesList)
         {
-            store->setAnalyticsStreamIndex(engine.id, camera->analyzedStreamIndex(engine.id),
-                ModificationSource::remote);
+            store->setAnalyticsStreamIndex(
+                engine.id, analyzedStreamIndex(engine.id), ModificationSource::remote);
         }
-
     }
+}
+
+nx::vms::api::StreamIndex CameraSettingsAnalyticsEnginesWatcher::Private::analyzedStreamIndex(
+    const QnUuid& engineId) const
+{
+    if (!camera)
+        return nx::vms::api::StreamIndex::undefined;
+
+    const auto manifest = camera->deviceAgentManifest(engineId);
+    const auto hideStreamSelection = manifest && manifest->capabilities
+        .testFlag(nx::vms::api::analytics::DeviceAgentManifest::hideStreamSelection);
+
+    return hideStreamSelection
+        ? nx::vms::api::StreamIndex::undefined
+        : camera->analyzedStreamIndex(engineId);
 }
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
@@ -253,6 +275,12 @@ void CameraSettingsAnalyticsEnginesWatcher::setCamera(const QnVirtualCameraResou
 QList<AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::engineInfoList() const
 {
     return d->engineInfoList();
+}
+
+nx::vms::api::StreamIndex CameraSettingsAnalyticsEnginesWatcher::analyzedStreamIndex(
+    const QnUuid& engineId) const
+{
+    return d->analyzedStreamIndex(engineId);
 }
 
 } // namespace nx::vms::client::desktop

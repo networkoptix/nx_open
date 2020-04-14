@@ -285,7 +285,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 
         // This dictionary may contain engine ids that are no longer valid.
         // Don't iterate through all 'streamByEngineId' kv-pairs, iterate through 'engines' instead
-        // and use 'engine.id' as a key.
+        // and use 'engine.id' as a key. StreamIndex::undefined means there should be no selection.
         QHash<QnUuid /*engineId*/, UserEditable<StreamIndex> /*streamIndex*/> streamByEngineId;
     };
     AnalyticsSettings analytics;
@@ -352,6 +352,11 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         return devicesDescription.isWearable == CombinedValue::None
             && devicesDescription.isDtsBased == CombinedValue::None
             && devicesDescription.supportsVideo == CombinedValue::All;
+    }
+
+    bool analyticsStreamSelectionEnabled(const QnUuid& engineId) const
+    {
+        return analytics.streamByEngineId.value(engineId)() != StreamIndex::undefined;
     }
 
     bool canSwitchPtzPresetTypes() const
