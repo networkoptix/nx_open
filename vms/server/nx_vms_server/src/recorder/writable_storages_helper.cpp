@@ -28,6 +28,8 @@ WritableStoragesHelper::SpaceInfo WritableStoragesHelper::SpaceInfo::from(
     result.effective = result.nxOccupied + result.freeSpace - result.spaceLimit;
     result.isSystem = storage->isSystem();
     result.storage = storage;
+    if (result.isSystem)
+        result.isForcefullyDisabled = !owner->serverModule()->settings().allowSystemStorageRecording();
 
     return result;
 }
@@ -105,11 +107,6 @@ std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::toInfos(
     return result;
 }
 
-StorageResourceList WritableStoragesHelper::filterOutSmall(const StorageResourceList& storages)
-{
-    return SpaceInfo::toStorageList(filterOutSmallSystem(filterOutSmall(toInfos(storages, nullptr))));
-}
-
 StorageResourcePtr WritableStoragesHelper::optimalStorageForRecording(
     const StorageResourceList& storages) const
 {
@@ -147,7 +144,14 @@ std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::resultInf
 {
     auto result = filterOutSpaceless(candidates);
     result = filterOutSmall(result);
-    return filterOutSmallSystem(result);
+    result = filterOutSmallSystem(result);
+
+    result.erase(
+        std::remove_if(
+            result.begin(), result.end(), [](const auto& info) { return info.isForcefullyDisabled; }),
+        result.end());
+
+    return result;
 }
 
 std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::online(
