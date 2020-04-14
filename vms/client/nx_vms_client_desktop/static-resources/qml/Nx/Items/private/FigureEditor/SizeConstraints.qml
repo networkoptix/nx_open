@@ -77,7 +77,11 @@ Figure
         onPositionChanged:
         {
             if (pressed)
+            {
+                if (dragBox)
+                    dragBox.updateTextPlacement()
                 return
+            }
 
             if (minBox.contains(Qt.point(mouseX - minBox.x, mouseY - minBox.y)))
                 setDragBox(minBox)
@@ -114,35 +118,24 @@ Figure
             width: F.absX(maxRect.width, figure) + 2
             height: F.absY(maxRect.height, figure) + 2
 
-            Text
+            function updateTextPlacement()
             {
-                text: qsTr("MAX")
-                color: maxBoxColor
-                style: Text.Outline
-                styleColor: "black"
-                font.bold: true
+                maxText.update()
+            }
 
-                x: position.x
-                y: position.y
+            BoundLabel
+            {
+                id: maxText
 
-                readonly property point position:
-                {
-                    if (maxBox.width >= width)
-                    {
-                        if (maxDraggable.y + maxBox.y >= height + 8)
-                            return Qt.point(0, -height - 8)
+                boundingItem: figure
+                prefferTopLeftPosition: true
+                revertRotationAngle: figure.parent.parent.rotation
 
-                        if (maxBox.width >= width + 16 && maxBox.height >= height + 16)
-                            return Qt.point(8, 8)
-
-                        if (figure.height - maxDraggable.y - maxBox.y - maxBox.height >= height + 8)
-                            return Qt.point(0, maxBox.height + 8)
-                    }
-
-                    return maxDraggable.x + maxBox.x >= width + 8
-                        ? Qt.point(-width - 8, 0)
-                        : Qt.point(maxBox.width + 8, 0)
-                }
+                label.text: qsTr("MAX")
+                label.color: maxBoxColor
+                label.style: Text.Outline
+                label.styleColor: "black"
+                label.font.bold: true
             }
         }
 
@@ -363,35 +356,23 @@ Figure
             width: F.absX(minRect.width, figure) + 2
             height: F.absY(minRect.height, figure) + 2
 
-            Text
+            function updateTextPlacement()
             {
-                text: qsTr("MIN")
-                color: minBoxColor
-                style: Text.Outline
-                styleColor: "black"
-                font.bold: true
+                minText.update()
+            }
 
-                x: position.x
-                y: position.y
+            BoundLabel
+            {
+                id: minText
 
-                readonly property point position:
-                {
-                    if (minBox.width >= width)
-                    {
-                        if (figure.height - minDraggable.y - minBox.y - minBox.height >= height + 8)
-                            return Qt.point(minBox.width - width, minBox.height + 8)
+                boundingItem: figure
+                revertRotationAngle: figure.parent.parent.rotation
 
-                        if (minBox.width >= width + 16 && minBox.height >= height + 16)
-                            return Qt.point(minBox.width - width - 8, minBox.height - height - 8)
-
-                        if (minDraggable.y + minBox.y >= height + 8)
-                            return Qt.point(minBox.width - width - 8, -height - 8)
-                    }
-
-                    return figure.width - minDraggable.x - minBox.x - minBox.width >= width + 8
-                        ? Qt.point(minBox.width + 8, minBox.height - height)
-                        : Qt.point(-width - 8, minBox.height - height)
-                }
+                label.text: qsTr("MIN")
+                label.color: minBoxColor
+                label.style: Text.Outline
+                label.styleColor: "black"
+                label.font.bold: true
             }
         }
 
