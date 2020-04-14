@@ -114,7 +114,7 @@ StorageResourcePtr WritableStoragesHelper::optimalStorageForRecording(
     const StorageResourceList& storages) const
 {
     int64_t totalEffectiveSpace = 0LL;
-    const auto infos = filterOutUnused(resultInfos(online(toInfos(storages, m_owner))));
+    const auto infos = toInfos(storages, m_owner);
     NX_DEBUG(this, "Optimal storage selection: candidates number: %1", infos.size());
     for (const auto& info: infos)
     {

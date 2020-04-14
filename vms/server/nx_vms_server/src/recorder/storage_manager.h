@@ -148,8 +148,8 @@ public:
     /*
      * Return writable storages with checkBox 'usedForWriting'
      */
-    QSet<QnStorageResourcePtr> getUsedWritableStorages() const;
-    QSet<QnStorageResourcePtr> getClearableStorages() const;
+    QSet<StorageResourcePtr> getUsedWritableStorages() const;
+    QSet<StorageResourcePtr> getClearableStorages() const;
 
     /*
      * Return all storages which can be used for writing
