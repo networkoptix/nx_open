@@ -48,9 +48,9 @@ struct NX_VMS_API DeviceAnalyticsSettingsResponse
     StreamIndex analyzedStreamIndex = StreamIndex::undefined;
 
     /**%apidoc
-     * Indicates whether the primary/secondary stream selection control is available for this
-     * DeviceAgent. If true, the analyzed stream is selected according to the Plugin preferences
-     * (if any) or defaults to the primary stream.
+     * Indicates whether the User is allowed to select which stream (primary or secondary) has to
+     * be passed to the Plugin. If true, the analyzed stream is selected according to the Plugin
+     * preferences (if any) or defaults to the primary stream.
      */
     bool disableStreamSelection = false;
 
