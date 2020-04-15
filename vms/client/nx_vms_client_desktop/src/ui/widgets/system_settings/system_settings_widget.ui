@@ -162,7 +162,7 @@
      <item>
       <widget class="QCheckBox" name="customNotificationLanguageCheckBox">
        <property name="text">
-        <string notr="true">&lt;Custom language for mobile notifications&gt;</string>
+        <string>Custom language for mobile notifications</string>
        </property>
       </widget>
      </item>
