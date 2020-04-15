@@ -98,7 +98,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
         return false;
 
     // Searching for resource.
-    QnVirtualCameraResourcePtr cameraResource =
+    QnSecurityCamResourcePtr cameraResource =
         nx::camera_id_helper::findCameraByFlexibleId(
             serverModule()->resourcePool(),
             transcodeParams.srcResourceUniqueID());
@@ -185,7 +185,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 }
 
 DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
-    QnVirtualCameraResourcePtr cameraResource,
+    QnSecurityCamResourcePtr cameraResource,
     QnVideoCameraPtr camera,
     const StreamingChunkCacheKey& transcodeParams)
 {
@@ -290,7 +290,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createLiveMediaDataPro
 }
 
 AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
-    QnVirtualCameraResourcePtr cameraResource,
+    QnSecurityCamResourcePtr cameraResource,
     const StreamingChunkCacheKey& transcodeParams,
     const QnUuid& clientId)
 {
@@ -423,7 +423,7 @@ bool StreamingChunkTranscoder::validateTranscodingParameters(
 }
 
 std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
-    const QnVirtualCameraResourcePtr& mediaResource,
+    const QnSecurityCamResourcePtr& mediaResource,
     const StreamingChunkCacheKey& transcodeParams)
 {
     NX_VERBOSE(this, lm("Creating new chunk transcoder for resource %1 (%2)")

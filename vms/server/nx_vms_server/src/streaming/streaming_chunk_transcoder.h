@@ -82,7 +82,7 @@ protected:
 private:
     struct TranscodeContext
     {
-        QnVirtualCameraResourcePtr mediaResource;
+        QnSecurityCamResourcePtr mediaResource;
         DataSourceContextPtr dataSourceCtx;
         StreamingChunkCacheKey transcodeParams;
         StreamingChunkPtr chunk;
@@ -103,7 +103,7 @@ private:
     DataSourceCache m_dataSourceCache;
 
     DataSourceContextPtr prepareDataSourceContext(
-        QnVirtualCameraResourcePtr cameraResource,
+        QnSecurityCamResourcePtr cameraResource,
         QnVideoCameraPtr camera,
         const StreamingChunkCacheKey& transcodeParams);
     AbstractOnDemandDataProviderPtr createLiveMediaDataProvider(
@@ -111,7 +111,7 @@ private:
         QnVideoCameraPtr camera,
         const StreamingChunkCacheKey& transcodeParams);
     AbstractOnDemandDataProviderPtr createArchiveReader(
-        QnVirtualCameraResourcePtr cameraResource,
+        QnSecurityCamResourcePtr cameraResource,
         const StreamingChunkCacheKey& transcodeParams,
         const QnUuid& clientId);
 
@@ -125,7 +125,7 @@ private:
         int delayMSec);
     bool validateTranscodingParameters(const StreamingChunkCacheKey& transcodeParams);
     std::unique_ptr<QnTranscoder> createTranscoder(
-        const QnVirtualCameraResourcePtr& mediaResource,
+        const QnSecurityCamResourcePtr& mediaResource,
         const StreamingChunkCacheKey& transcodeParams);
     QnVideoCameraPool* videoCameraPool();
 
