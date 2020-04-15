@@ -10,6 +10,7 @@ import os
 import time
 import uuid
 from typing import List, Tuple, Optional
+from pathlib import Path
 
 from vms_benchmark.camera import Camera
 
@@ -61,6 +62,7 @@ from vms_benchmark import service_objects
 from vms_benchmark import box_tests
 from vms_benchmark import host_tests
 from vms_benchmark import exceptions
+from vms_benchmark.config import NoConfigFile
 
 vms_version = None
 
@@ -137,24 +139,42 @@ ini_definition = {
     "getStoragesAttemptIntervalSeconds": {"type": "int", "default": 3},
 }
 
-
-def load_configs(conf_file, ini_file_if_passed, ini_file_default):
+def load_configs(conf_file, ini_file):
     def abspath(path):
         if len(path) > 2 and path[0:2] == './':
             return os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), path)
         return path
 
-    conf = ConfigParser(conf_file, conf_definition)
+    ini_file_path = Path(ini_file)
+    conf_file_path = Path(conf_file)
 
-    ini_file = ini_file_if_passed or ini_file_default
+    benchmark_bin_path = Path(os.path.realpath(sys.argv[0])).parent
 
-    ini = ConfigParser(
-        abspath(ini_file) if (
-            ini_file_if_passed is None and not os.path.exists(ini_file)
-        ) else ini_file,
-        ini_definition,
-        is_file_optional=True
-    )
+    try:
+        conf = ConfigParser(conf_file, conf_definition)
+    except NoConfigFile as exception:
+        if conf_file_path.is_absolute():
+            raise exception
+        else:
+            try:
+                conf = ConfigParser(benchmark_bin_path / conf_file, conf_definition)
+            except NoConfigFile:
+                raise exception
+
+    ini = None
+
+    try:
+        ini = ConfigParser(ini_file, ini_definition)
+    except NoConfigFile:
+        if not ini_file_path.is_absolute():
+            try:
+                ini = ConfigParser(benchmark_bin_path / ini_file, ini_definition)
+            except NoConfigFile:
+                pass
+
+    # TODO: Loading default INI options. Refactor this.
+    if ini is None:
+        ini = ConfigParser(ini_file, ini_definition, is_file_optional=True)
 
     test_camera_runner.ini_testcamera_bin = abspath(ini['testcameraBin'])
     test_camera_runner.ini_test_file_high_resolution = abspath(ini['testFileHighResolution'])
@@ -1132,7 +1152,7 @@ def _connect_to_box(conf, conf_file):
     '--config',
     '-c',
     'conf_file',
-    default='./vms_benchmark.conf',
+    default='vms_benchmark.conf',
     metavar='<filename>',
     show_default=True,
     help='Configuration file.'
@@ -1142,6 +1162,7 @@ def _connect_to_box(conf, conf_file):
     '--ini-config',
     '-i',
     'ini_file',
+    default='vms_benchmark.ini',
     metavar='<filename>',
     help='Internal configuration file for experimenting and debugging.' +
         '  [default: vms_benchmark.ini]'
@@ -1169,7 +1190,7 @@ def main(conf_file, ini_file, log_file):
         with open('./build_info.txt', 'r') as f:
             logging.info('build_info.txt\n' + ''.join(f.readlines()))
 
-    conf, ini = load_configs(conf_file, ini_file, ini_file_default='./vms_benchmark.ini')
+    conf, ini = load_configs(conf_file, ini_file)
 
     if ini['liveStreamsPerCameraRatio'] == 0 and ini['archiveStreamsPerCameraRatio'] == 0:
         raise exceptions.ConfigOptionsRestrictionError(
