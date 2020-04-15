@@ -1,11 +1,20 @@
 import os
-from typing import Optional, List, Dict
+from typing import Optional, List
+from pathlib import Path
 
 from vms_benchmark import exceptions
 
 
 class NoConfigFile(exceptions.VmsBenchmarkError):
-    pass
+    def __init__(self, filepath, original_exception=None):
+        message = f"Config file '{filepath}' not found"
+
+        if not Path(filepath).is_absolute():
+            message += f" in directory '{Path.cwd()}'"
+
+        message += '.'
+        super(exceptions.VmsBenchmarkError, self).__init__(message)
+        self.original_exception = original_exception
 
 
 class InvalidConfigFileContent(exceptions.VmsBenchmarkError):
@@ -57,7 +66,7 @@ class ConfigParser:
         except FileNotFoundError:
             if is_file_optional:
                 return None
-            raise NoConfigFile(f"Config file {filename!r} not found.")
+            raise NoConfigFile(filename)
 
         options = {}
         line_number = 0
@@ -87,8 +96,8 @@ class ConfigParser:
     def __init__(self, filepath, definition=None, is_file_optional=False):
         assert definition or not is_file_optional
 
+        self.OPTIONS_FROM_FILE = ConfigParser._load_file(filepath, is_file_optional)
         self.filepath = os.path.realpath(filepath)
-        self.OPTIONS_FROM_FILE = ConfigParser._load_file(self.filepath, is_file_optional)
         self.options = self.OPTIONS_FROM_FILE.copy() if self.OPTIONS_FROM_FILE else {}
 
         if definition:
