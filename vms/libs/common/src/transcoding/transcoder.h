@@ -79,7 +79,6 @@ public:
     virtual bool existMoreData() const { return false; }
     static QRect roundRect(const QRect& srcRect);
     static QSize roundSize(const QSize& size);
-
 protected:
     QString m_lastErrMessage;
     QnCodecParams::Value m_params;
@@ -234,6 +233,13 @@ public:
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
 
     void setUseRealTimeOptimization(bool value);
+
+    using BeforeOpenCallback = std::function<void(
+        QnTranscoder* transcoder,
+        const QnConstCompressedVideoDataPtr & video,
+        const QnConstCompressedAudioDataPtr & audio)>;
+
+    void setBeforeOpenCallback(BeforeOpenCallback callback);
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -269,6 +275,7 @@ private:
     bool m_packetizedMode;
     QnLegacyTranscodingSettings m_transcodingSettings;
     bool m_useRealTimeOptimization;
+    BeforeOpenCallback m_beforeOpenCallback = nullptr;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;

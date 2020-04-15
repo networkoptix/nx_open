@@ -477,7 +477,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         else
             m_delayedAudioQueue << std::dynamic_pointer_cast<const QnCompressedAudioData> (media);
         doTranscoding = false;
-        if (m_videoCodec != AV_CODEC_ID_NONE && m_delayedVideoQueue.isEmpty()
+        if ((m_videoCodec != AV_CODEC_ID_NONE || m_beforeOpenCallback) && m_delayedVideoQueue.isEmpty()
             && m_delayedAudioQueue.size() < (int)kMaxDelayedQueueSize)
         {
             return 0; // not ready to init
@@ -487,8 +487,12 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         {
             return 0; // not ready to init
         }
-        int rez = open(m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first(),
-                       m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first());
+
+        const auto& video = m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first();
+        const auto& audio = m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first();
+        if (m_beforeOpenCallback)
+            m_beforeOpenCallback(this, video, audio);
+        int rez = open(video, audio);
         if (rez != 0)
             return rez;
     }
@@ -569,6 +573,11 @@ const QVector<int>& QnTranscoder::getPacketsSize()
 void QnTranscoder::setTranscodingSettings(const QnLegacyTranscodingSettings& settings)
 {
     m_transcodingSettings = settings;
+}
+
+void QnTranscoder::setBeforeOpenCallback(BeforeOpenCallback callback)
+{
+    m_beforeOpenCallback = callback;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -21,6 +21,7 @@
 #include "streaming_chunk_transcoder_thread.h"
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
+#include <utils/media/av_codec_helper.h>
 
 /**
  * Maximum time offset (in micros) requested chunk can be ahead of current live position.
@@ -97,7 +98,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
         return false;
 
     // Searching for resource.
-    QnSecurityCamResourcePtr cameraResource =
+    QnVirtualCameraResourcePtr cameraResource =
         nx::camera_id_helper::findCameraByFlexibleId(
             serverModule()->resourcePool(),
             transcodeParams.srcResourceUniqueID());
@@ -184,7 +185,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 }
 
 DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
-    QnSecurityCamResourcePtr cameraResource,
+    QnVirtualCameraResourcePtr cameraResource,
     QnVideoCameraPtr camera,
     const StreamingChunkCacheKey& transcodeParams)
 {
@@ -239,9 +240,8 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
             createTranscoder(cameraResource, transcodeParams);
         if (!dataSourceCtx->transcoder)
         {
-            NX_WARNING(this, lm("Failed to create transcoder. resource %1, format %2, video codec %3")
-                .arg(transcodeParams.srcResourceUniqueID()).arg(transcodeParams.containerFormat())
-                .arg(transcodeParams.videoCodec()));
+            NX_WARNING(this, "Failed to create transcoder. resource %1, format %2",
+                transcodeParams.srcResourceUniqueID(), transcodeParams.containerFormat());
             return nullptr;
         }
     }
@@ -290,7 +290,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createLiveMediaDataPro
 }
 
 AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
-    QnSecurityCamResourcePtr cameraResource,
+    QnVirtualCameraResourcePtr cameraResource,
     const StreamingChunkCacheKey& transcodeParams,
     const QnUuid& clientId)
 {
@@ -423,14 +423,13 @@ bool StreamingChunkTranscoder::validateTranscodingParameters(
 }
 
 std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
-    const QnSecurityCamResourcePtr& mediaResource,
+    const QnVirtualCameraResourcePtr& mediaResource,
     const StreamingChunkCacheKey& transcodeParams)
 {
     NX_VERBOSE(this, lm("Creating new chunk transcoder for resource %1 (%2)")
         .arg(mediaResource->toResource()->getName()).arg(mediaResource->toResource()->getId()));
 
-    //launching transcoding:
-    //creating transcoder
+
     QnFfmpegTranscoder::Config config;
     std::unique_ptr<QnTranscoder> transcoder(new QnFfmpegTranscoder(config, mediaResource->commonModule()->metrics()));
     if (transcoder->setContainer(transcodeParams.containerFormat()) != 0)
@@ -440,57 +439,12 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
             .arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()));
         return nullptr;
     }
-    AVCodecID codecID = AV_CODEC_ID_NONE;
-    QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-    // TODO #ak: Get codec of resource video stream. Currently (only HLS uses this class), it is always h.264.
-    const AVCodecID resourceVideoStreamCodecID = AV_CODEC_ID_H264;
-    QSize videoResolution;
-    if (transcodeParams.videoCodec().isEmpty() && !transcodeParams.pictureSizePixels().isValid())
-    {
-        codecID = resourceVideoStreamCodecID;
-        transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-    }
-    else
-    {
-        codecID =
-            transcodeParams.videoCodec().isEmpty()
-            ? resourceVideoStreamCodecID
-            : av_guess_codec(NULL, transcodeParams.videoCodec().toLatin1().data(), NULL, NULL, AVMEDIA_TYPE_VIDEO);
-        if (codecID == AV_CODEC_ID_NONE)
-        {
-            NX_WARNING(this, lm("Cannot start transcoding of streaming chunk of resource %1. "
-                "No codec %2 found in FFMPEG library")
-                .arg(mediaResource->toResource()->getUniqueId())
-                .arg(transcodeParams.videoCodec()));
-            return nullptr;
-        }
-        transcodeMethod = codecID == resourceVideoStreamCodecID ?   //< TODO: #ak and resolusion did not change
-            QnTranscoder::TM_DirectStreamCopy :
-            QnTranscoder::TM_FfmpegTranscode;
-        if (transcodeParams.pictureSizePixels().isValid())
-        {
-            videoResolution = transcodeParams.pictureSizePixels();
-        }
-        else
-        {
-            NX_ASSERT(false);
-            videoResolution = QSize(1280, 720); //< TODO/hls: #ak get resolution of resource video stream.
-                                                //< This resolution is ignored when TM_DirectStreamCopy is used.
-        }
-    }
-    if (transcoder->setVideoCodec(codecID, transcodeMethod, Qn::StreamQuality::normal, videoResolution) != 0)
-    {
-        NX_WARNING(this, lm("Failed to create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
-            arg(transcodeParams.videoCodec()).arg(transcodeParams.startTimestamp()).
-            arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()));
-        return nullptr;
-    }
 
     if (transcodeParams.audioCodecId() != AV_CODEC_ID_NONE)
     {
         if (transcoder->setAudioCodec(
-                transcodeParams.audioCodecId(),
-                QnTranscoder::TM_DirectStreamCopy) != 0)
+            transcodeParams.audioCodecId(),
+            QnTranscoder::TM_DirectStreamCopy) != 0)
         {
             NX_WARNING(this, lm("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
                 arg(transcodeParams.audioCodecId()).arg(transcodeParams.startTimestamp()).
@@ -498,6 +452,49 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
             return nullptr;
         }
     }
+
+    if (!mediaResource->hasVideo())
+        return transcoder;
+
+    transcoder->setBeforeOpenCallback(
+        [this, mediaResource, transcodeParams]
+        (QnTranscoder* transcoder,
+        const QnConstCompressedVideoDataPtr& video,
+        const QnConstCompressedAudioDataPtr& /*audio*/)
+        {
+            if (!video)
+                return;
+            
+            // Determine destination video codec and transcode method.
+            AVCodecID dstCodecId = video->compressionType;
+            bool isCodecSupported = false;
+            for (const auto& supportedCodec: transcodeParams.supportedVideoCodecs())
+                isCodecSupported |= supportedCodec == dstCodecId;
+            if (!isCodecSupported && !transcodeParams.supportedVideoCodecs().empty())
+                dstCodecId = (AVCodecID) *transcodeParams.supportedVideoCodecs().begin();
+
+            QSize videoSize = QSize(video->width, video->height);
+            QSize dstResolution = transcodeParams.pictureSizePixels();
+            if (!dstResolution.isValid())
+                dstResolution = videoSize;
+
+            QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+            if (video->compressionType != dstCodecId || videoSize != dstResolution)
+            {
+                transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
+                QnLegacyTranscodingSettings settings;
+                settings.resource = mediaResource; //< Need for image filters.
+                transcoder->setTranscodingSettings(settings);
+            }
+
+            if (transcoder->setVideoCodec(dstCodecId, transcodeMethod, Qn::StreamQuality::normal, dstResolution) != 0)
+            {
+                NX_WARNING(this, 
+                    "Failed to create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4",
+                    dstCodecId, transcodeParams.startTimestamp(),
+                    transcodeParams.endTimestamp(), transcodeParams.srcResourceUniqueID());
+            }
+    });
 
     return transcoder;
 }
