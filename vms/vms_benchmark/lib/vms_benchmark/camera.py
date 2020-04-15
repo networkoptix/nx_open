@@ -5,7 +5,7 @@ import urllib.request
 from vms_benchmark.utils.catch_http_errors import catch_http_errors
 
 
-# TODO: Refactor this class. It should use class ServerApi instead of use urllib directly.
+# TODO: Refactor this class. It should use class ServerApi instead of using urllib directly.
 class Camera:
     def __init__(self, api, id, name, mac):
         self.api = api
