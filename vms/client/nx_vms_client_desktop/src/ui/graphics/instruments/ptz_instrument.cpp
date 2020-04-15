@@ -197,7 +197,11 @@ PtzInstrument::PtzInstrument(QObject *parent):
                 if (wasInaccessible && isAccessible)
                 {
                     for (const auto& widget: display()->widgets(camera))
-                        updateTraits(dynamic_cast<QnMediaResourceWidget*>(widget));
+                    {
+                        // In the showreel preview mode we can have non-media widgets with a camera.
+                        if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
+                            updateTraits(mediaWidget);
+                    }
                 }
             }
         });

@@ -32,13 +32,15 @@ void FisheyePreviewController::preview(
     for (const auto widget: display()->widgets(resource->toResourcePtr()))
     {
         const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
-        if (NX_ASSERT(mediaWidget))
-        {
-            if (mediaWidget->dewarpingParams() == params)
-                continue;
 
-            mediaWidget->setDewarpingParams(params);
-        }
+        // In the showreel preview mode we can have non-media widgets with a camera.
+        if (!mediaWidget)
+            continue;
+
+        if (mediaWidget->dewarpingParams() == params)
+            continue;
+
+        mediaWidget->setDewarpingParams(params);
 
         const auto item = widget->item();
         auto itemParams = item->dewarpingParams();
@@ -56,7 +58,9 @@ void FisheyePreviewController::rollback()
     for (const auto widget: display()->widgets(m_resource->toResourcePtr()))
     {
         const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
-        if (NX_ASSERT(mediaWidget))
+
+       // In the showreel preview mode we can have non-media widgets with a camera.
+        if (mediaWidget)
             mediaWidget->setDewarpingParams(params);
     }
     m_resource.clear();
