@@ -119,7 +119,7 @@ def main():
         if isWindows:
             dll_glob = "*.dll"
             for plugin_group in WINDOWS_QT_PLUGINS:
-                archiveByGlob(a, f"Qt plugins from {plugins_group}", join(bin_dir, plugin_group),
+                archiveByGlob(a, f"Qt plugins from {plugin_group}", join(bin_dir, plugin_group),
                     join(conf.QT_DIR, "plugins", plugin_group), dll_glob)
             archiveByGlob(a, "Qt dlls", bin_dir, join(conf.QT_DIR, "bin"), dll_glob)
 
