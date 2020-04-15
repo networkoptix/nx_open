@@ -8,17 +8,17 @@ Item
 
     property real revertRotationAngle: 0
 
-    x: d.swapWidthandHeight ? (height - width ) / 2 : 0
-    y: d.swapWidthandHeight ? (width - height) / 2 : 0
-    width: d.swapWidthandHeight ? parent.height : parent.width
-    height: d.swapWidthandHeight ? parent.width : parent.height
+    x: d.swapWidthAndHeight ? (height - width ) / 2 : 0
+    y: d.swapWidthAndHeight ? (width - height) / 2 : 0
+    width: d.swapWidthAndHeight ? parent.height : parent.width
+    height: d.swapWidthAndHeight ? parent.width : parent.height
     rotation: -revertRotationAngle
 
     Object
     {
         id: d
 
-        readonly property bool swapWidthandHeight:
+        readonly property bool swapWidthAndHeight:
             control.revertRotationAngle == 90
             || control.revertRotationAngle == 270
     }

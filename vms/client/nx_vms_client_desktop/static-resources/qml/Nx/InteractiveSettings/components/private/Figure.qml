@@ -122,6 +122,11 @@ LabeledItem
         dialog.title = figureNameEdit.text || qsTr("Figure")
         dialog.deserializeFigure(figure)
         dialog.show()
+        dialog.closing.connect(
+            function()
+            {
+                dialogLoader.active = false
+            })
     }
 
     function getValue()

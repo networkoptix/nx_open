@@ -207,8 +207,8 @@ Window
                 isAccentButton: true
                 onClicked:
                 {
-                    close()
                     accepted()
+                    close()
                 }
                 width: Math.max(implicitWidth, 80)
                 enabled: editor.figureAcceptable

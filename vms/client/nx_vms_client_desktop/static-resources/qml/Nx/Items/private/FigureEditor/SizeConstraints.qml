@@ -128,7 +128,7 @@ Figure
                 id: maxText
 
                 boundingItem: figure
-                prefferTopLeftPosition: true
+                preferTopLeftPosition: true
                 revertRotationAngle: figure.parent.parent.rotation
 
                 label.text: qsTr("MAX")

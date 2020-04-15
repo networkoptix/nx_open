@@ -6,7 +6,7 @@ UnrotatedArea
 {
     id: control
 
-    property bool prefferTopLeftPosition: false
+    property bool preferTopLeftPosition: false
     property alias label: textItem
     property Item boundingItem: null
 
@@ -68,7 +68,7 @@ UnrotatedArea
 
         readonly property point position:
         {
-            if (control.prefferTopLeftPosition)
+            if (control.preferTopLeftPosition)
             {
                 if (d.enoughWidth)
                 {
@@ -89,21 +89,21 @@ UnrotatedArea
 
             if (d.enoughWidth)
             {
-                var prefferedX = control.width - textItem.width
+                var preferredX = control.width - textItem.width
                 if (d.enoughBottomOffset)
-                    return Qt.point(prefferedX, control.height + d.offset)
+                    return Qt.point(preferredX, control.height + d.offset)
 
                 if (d.enoughHeight && d.enoughWidth)
-                    return Qt.point(prefferedX - d.offset, control.height - d.minVerticalOffset)
+                    return Qt.point(preferredX - d.offset, control.height - d.minVerticalOffset)
 
                 if (d.enoughTopOffset)
-                    return Qt.point(prefferedX, -d.minVerticalOffset)
+                    return Qt.point(preferredX, -d.minVerticalOffset)
             }
 
-            var prefferedY = control.height - textItem.height
+            var preferredY = control.height - textItem.height
             return d.enoughRightOffset
-                ? Qt.point(control.width + d.offset, prefferedY)
-                : Qt.point(-d.minHorizontalOffset, prefferedY)
+                ? Qt.point(control.width + d.offset, preferredY)
+                : Qt.point(-d.minHorizontalOffset, preferredY)
         }
 
         function getTopLeft()
