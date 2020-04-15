@@ -120,7 +120,8 @@
                                         {
                                             "type": "GroupBox",
                                             "caption": "Include area #",
-                                            "items": 
+                                            "filledCheckItems": ["MotionDetection.IncludeArea#.Points"],
+                                            "items":
                                             [
                                                 {
                                                     "type": "PolygonFigure",
@@ -352,7 +353,8 @@
                                         {
                                             "type": "GroupBox",
                                             "caption": "IVA Line #",
-                                            "items": 
+                                            "filledCheckItems": ["IVA.Line#.Points"],
+                                            "items":
                                             [
                                                 {
                                                     "type": "LineFigure",
@@ -417,7 +419,8 @@
                                         {
                                             "type": "GroupBox",
                                             "caption": "IVA Area #",
-                                            "items": 
+                                            "filledCheckItems": ["IVA.IncludeArea#.Points"],
+                                            "items":
                                             [
                                                 {
                                                     "type": "PolygonFigure",

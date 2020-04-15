@@ -142,9 +142,10 @@ else()
 
     list(APPEND copy_dependencies_commands
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/linux/copy_system_library.py
-            --compiler ${CMAKE_CXX_COMPILER}
-            --link-flags "${CMAKE_SHARED_LINKER_FLAGS}"
-            --dest-dir vms_benchmark/testcamera
+            --compiler=${CMAKE_CXX_COMPILER}
+            --flags=${CMAKE_CXX_FLAGS}
+            --link-flags=${CMAKE_SHARED_LINKER_FLAGS}
+            --dest-dir=vms_benchmark/testcamera
             ${system_dependencies}
     )
 endif()

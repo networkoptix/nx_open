@@ -249,7 +249,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initSkin();
     initLocalResources();
     initSurfaceFormat();
-    initWebEngine();
 }
 
 QnClientModule::~QnClientModule()
@@ -692,9 +691,9 @@ void QnClientModule::initWebEngine()
     // where to load libraries. It's not a problem for release packages since everything is
     // gathered in one place, but it is a problem for development builds. The simplest solution for
     // this is to set library search path variable. In Linux this variable is needed only for
-    // QtWebEngine::initialize() call. After the variable could be restored to the original value.
-    // In macOS it's needed for every web page constructor, so we just set it for the whole
-    // lifetime of Client application.
+    // QtWebEngine::defaultSettings() call which seems to create a WebEngine process. After the
+    // variable could be restored to the original value. In macOS it's needed for every web page
+    // constructor, so we just set it for the whole lifetime of Client application.
 
     const QByteArray libraryPathVariable =
         nx::utils::AppInfo::isLinux()

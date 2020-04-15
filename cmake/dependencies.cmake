@@ -57,10 +57,10 @@ endif()
 function(copy_system_libraries)
     execute_process(COMMAND
         ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/linux/copy_system_library.py
-            --compiler ${CMAKE_CXX_COMPILER}
-            --flags "${CMAKE_CXX_FLAGS}"
-            --link-flags "${CMAKE_SHARED_LINKER_FLAGS}"
-            --dest-dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+            --compiler=${CMAKE_CXX_COMPILER}
+            --flags=${CMAKE_CXX_FLAGS}
+            --link-flags=${CMAKE_SHARED_LINKER_FLAGS}
+            --dest-dir=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
             --list
             ${ARGN}
         RESULT_VARIABLE result

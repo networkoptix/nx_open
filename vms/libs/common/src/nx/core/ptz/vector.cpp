@@ -291,7 +291,7 @@ Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType)
 
 QString Vector::toString() const
 {
-    return lm("ptz(%1, %2, %3, r=%4, f=%5").args(pan, tilt, zoom, rotation, focus);
+    return lm("ptz(%1, %2, %3, r=%4, f=%5)").args(pan, tilt, zoom, rotation, focus);
 }
 
 // Scale from [-1, 1] to [min, max] range.

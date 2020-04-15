@@ -467,7 +467,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, wearableIgnoreTimeZone)
     // Test default camera state
     CameraResourceStubPtr camera(new CameraResourceStub());
     ASSERT_FALSE(camera->wearableIgnoreTimeZone());
-    State state2 = Reducer::loadCameras({}, { camera });
+    State state2 = Reducer::loadCameras({}, {camera});
     ASSERT_FALSE(state2.wearableIgnoreTimeZone);
 
     // Test value ignoring for non wearable cameras
@@ -478,11 +478,45 @@ TEST_F(CameraSettingsDialogStateReducerTest, wearableIgnoreTimeZone)
 
     // Test value setting for wearable cameras
     camera->addFlags(Qn::wearable_camera);
-    State state3 = Reducer::loadCameras({}, { camera });
+    State state3 = Reducer::loadCameras({}, {camera});
     ASSERT_EQ(state3.devicesDescription.isWearable, CombinedValue::All);
     state3 = Reducer::setWearableIgnoreTimeZone(std::move(state3), true);
     CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state3, {camera});
     ASSERT_TRUE(camera->wearableIgnoreTimeZone());
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, analyzedStreamIndexAndVisibility)
+{
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    State initialState = Reducer::loadCameras({}, {camera});
+
+    // By default for some yet unknown device agent stream selection is considered enabled.
+    const auto testEngineId = QnUuid::createUuid();
+    ASSERT_TRUE(initialState.analyticsStreamSelectionEnabled(testEngineId));
+
+    // Set analytics stream index remotely to secondary.
+    auto state1 = Reducer::setAnalyticsStreamIndex(std::move(initialState), testEngineId,
+        State::StreamIndex::secondary, ModificationSource::remote);
+
+    ASSERT_TRUE(state1.analyticsStreamSelectionEnabled(testEngineId));
+    ASSERT_FALSE(state1.analytics.streamByEngineId.value(testEngineId).hasUser());
+    ASSERT_EQ(state1.analytics.streamByEngineId.value(testEngineId)(), State::StreamIndex::secondary);
+
+    // Change analytics stream index locally to primary.
+    auto state2 = Reducer::setAnalyticsStreamIndex(std::move(state1), testEngineId,
+        State::StreamIndex::primary, ModificationSource::local);
+
+    ASSERT_TRUE(state2.analyticsStreamSelectionEnabled(testEngineId));
+    ASSERT_TRUE(state2.analytics.streamByEngineId.value(testEngineId).hasUser());
+    ASSERT_EQ(state2.analytics.streamByEngineId.value(testEngineId)(), State::StreamIndex::primary);
+
+    // Change analytics stream index remotely to undefined, meaning stream selection is disabled.
+    auto state3 = Reducer::setAnalyticsStreamIndex(std::move(state2), testEngineId,
+        State::StreamIndex::undefined, ModificationSource::remote);
+
+    ASSERT_FALSE(state3.analyticsStreamSelectionEnabled(testEngineId));
+    ASSERT_FALSE(state3.analytics.streamByEngineId.value(testEngineId).hasUser());
+    ASSERT_EQ(state3.analytics.streamByEngineId.value(testEngineId)(), State::StreamIndex::undefined);
 }
 
 } // namespace test

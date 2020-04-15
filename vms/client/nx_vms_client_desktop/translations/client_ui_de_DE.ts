@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Bildrate begrenzen, um CPU zu speichern</translation>
     </message>
   </context>
   <context>
@@ -2280,12 +2280,12 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</source>
-      <translation type="unfinished">The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</translation>
+      <translation>Das System ist nicht mit Nx Cloud verbunden. Mobile Benachrichtigungen funktionieren nur, wenn das System mit Nx Cloud verbunden ist.</translation>
     </message>
     <message>
       <location/>
       <source>Nx Cloud Settings</source>
-      <translation type="unfinished">Nx Cloud Settings</translation>
+      <translation>Nx Cloudeinstellungen</translation>
     </message>
     <message>
       <location/>
@@ -2295,12 +2295,12 @@
     <message>
       <location/>
       <source>Set Language</source>
-      <translation type="unfinished">Set Language</translation>
+      <translation>Sprache festlegen</translation>
     </message>
     <message>
       <location/>
       <source>Add custom text:</source>
-      <translation type="unfinished">Add custom text:</translation>
+      <translation>Benutzerdefinierten Text hinzufügen:</translation>
     </message>
   </context>
   <context>
@@ -3373,12 +3373,12 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Zeit</translation>
     </message>
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>Zeitzone in hochgeladenen Dateien ignorieren</translation>
     </message>
   </context>
   <context>
