@@ -96,7 +96,7 @@ bool QnInterfaceAndAddr::isHostBelongToIpv4Network(const QHostAddress& address) 
 
 QString QnInterfaceAndAddr::toString() const
 {
-    return nx::utils::log::makeMessage("%1: %2 %3", name, address, netMask);
+    return NX_FMT("%1: %2 %3", name, address, netMask);
 }
 
 QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ignoreLoopback)

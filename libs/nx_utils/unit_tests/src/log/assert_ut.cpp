@@ -27,7 +27,7 @@ TEST(NxAssert, All3)
 
     EXPECT_DEATH((enableQtMessageAsserts(), qFatal("Fatal")), "");
     EXPECT_DEATH((enableQtMessageAsserts(), qCritical("Critical")), "");
-    EXPECT_DEATH((enableQtMessageAsserts(), log::Message("%1").args(1, 2)), "");
+    EXPECT_DEATH((enableQtMessageAsserts(), NX_FMT("%1", 1, 2)), "");
 }
 
 TEST(NxCritical, All3)

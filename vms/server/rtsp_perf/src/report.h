@@ -18,5 +18,5 @@ void reportString(const QString& message);
 template<typename Format, typename... Args>
 void report(const Format& format, const Args&... args)
 {
-    detail::reportString(nx::utils::log::makeMessage(format, args...));
+    detail::reportString(nx::format(format, args...));
 }

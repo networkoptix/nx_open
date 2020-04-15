@@ -81,7 +81,7 @@ QString forLog(const Values& serverValues)
 {
     QStringList strings;
     for (const auto& [name, values]: serverValues)
-        strings << nx::utils::log::makeMessage("%1 %2").args(values.size(), name);
+        strings << NX_FMT("%1 %2", values.size(), name);
     return strings.join(", ");
 }
 

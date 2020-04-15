@@ -21,7 +21,7 @@ namespace { static const int kMaxLineLength = 512; }
 
 QString PartitionInfo::toString() const
 {
-    return nx::utils::log::makeMessage("%1 -> %2 %3 %4/%5%6",
+    return NX_FMT("%1 -> %2 %3 %4/%5%6",
         devName, path, fsName, freeBytes, sizeBytes, isUsb ? " usb" : "");
 }
 

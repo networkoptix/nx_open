@@ -55,7 +55,7 @@ QString toString(NotificationSource source)
         case NotificationSource::Remote: return "remote";
     }
 
-    const QString error = nx::utils::log::makeMessage("unexpected(%1)", static_cast<int>(source));
+    const QString error = NX_FMT("unexpected(%1)", static_cast<int>(source));
     NX_ASSERT(false, error);
     return error;
 }

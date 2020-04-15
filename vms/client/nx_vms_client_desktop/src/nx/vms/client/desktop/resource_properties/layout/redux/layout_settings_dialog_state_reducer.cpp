@@ -175,7 +175,7 @@ int findFreeLogicalId(const std::set<int>& usedValues)
     return previousValue + 1;
 }
 
-void trace(const State& state, nx::utils::log::Message message)
+void trace(const State& state, QString message)
 {
     if (tracingEnabled)
     {

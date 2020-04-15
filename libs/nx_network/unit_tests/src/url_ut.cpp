@@ -35,10 +35,10 @@ TEST(Url, logging)
         url.setScheme("http");
         url.setHost("zorz.com");
         url.setUserName("zorzuser");
-        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(), "http://zorzuser@zorz.com");
+        ASSERT_EQ(nx::format("%1", url).toStdString(), "http://zorzuser@zorz.com");
 
         url.setPassword("zorzpassword");
-        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(), "http://zorzuser@zorz.com");
+        ASSERT_EQ(nx::format("%1", url).toStdString(), "http://zorzuser@zorz.com");
     }
     else
     {
@@ -46,11 +46,10 @@ TEST(Url, logging)
         url.setScheme("http");
         url.setHost("zorz.com");
         url.setUserName("zorzuser");
-        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(), "http://zorzuser@zorz.com");
+        ASSERT_EQ(nx::format("%1", url).toStdString(), "http://zorzuser@zorz.com");
 
         url.setPassword("zorzpassword");
-        ASSERT_EQ(nx::utils::log::Message("%1").arg(url).toStdString(),
-            "http://zorzuser:zorzpassword@zorz.com");
+        ASSERT_EQ(nx::format("%1", url).toStdString(), "http://zorzuser:zorzpassword@zorz.com");
     }
 }
 

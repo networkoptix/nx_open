@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Remove and replace by NX_FMT or just QString if performance is not required.
+
 #ifdef __cplusplus
 /**
  * \def lit

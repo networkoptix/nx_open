@@ -387,7 +387,7 @@ TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
                 return it->second->formattedValue().toVariant().toString();
 
             NX_ASSERT(false, "Value [%1] is not found for template [%2]", name, template_);
-            return nx::utils::log::makeMessage("{%1 IS NOT FOUND}", name);
+            return NX_FMT("{%1 IS NOT FOUND}", name);
         };
 
     return

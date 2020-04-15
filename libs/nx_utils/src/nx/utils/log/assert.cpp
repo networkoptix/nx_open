@@ -14,14 +14,14 @@ namespace nx::utils {
 /** Change to see more or less records at the end of execution */
 static const size_t kShowTheMostCount(30);
 
-static std::function<void(const log::Message&)> g_onAssertHandler;
+static std::function<void(const QString&)> g_onAssertHandler;
 
-void setOnAssertHandler(std::function<void(const log::Message&)> handler)
+void setOnAssertHandler(std::function<void(const QString&)> handler)
 {
     g_onAssertHandler = std::move(handler);
 }
 
-void crashProgram([[maybe_unused]] const log::Message& message)
+void crashProgram([[maybe_unused]] const QString& message)
 {
     #if defined(_WIN32)
         // Copy error text to a stack variable so it is present in the mini-dump.
@@ -41,7 +41,7 @@ void crashProgram([[maybe_unused]] const log::Message& message)
     #endif
 }
 
-bool assertFailure(bool isCritical, const log::Message& message)
+bool assertFailure(bool isCritical, const QString& message)
 {
     static const log::Tag kCrashTag(QLatin1String("CRASH"));
     static const log::Tag kAssertTag(QLatin1String("ASSERT"));

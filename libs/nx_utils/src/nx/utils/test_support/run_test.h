@@ -40,7 +40,7 @@ inline int runTest(
     InitFunction extraInit = nullptr,
     int gtestRunFlags = 0)
 {
-    nx::utils::setOnAssertHandler([&](const log::Message& m) { FAIL() << m.toStdString(); });
+    nx::utils::setOnAssertHandler([&](const QString& m) { FAIL() << m.toStdString(); });
     nx::utils::enableQtMessageAsserts();
     nx::kit::IniConfig::setOutput(nullptr);
 

@@ -23,13 +23,13 @@
 
 namespace nx::utils {
 
-void NX_UTILS_API setOnAssertHandler(std::function<void(const log::Message&)> handler);
-void NX_UTILS_API crashProgram(const log::Message& message);
+void NX_UTILS_API setOnAssertHandler(std::function<void(const QString&)> handler);
+void NX_UTILS_API crashProgram(const QString& message);
 
 /**
  * @return Always false.
  */
-bool NX_UTILS_API assertFailure(bool isCritical, const log::Message& message);
+bool NX_UTILS_API assertFailure(bool isCritical, const QString& message);
 
 void NX_UTILS_API enableQtMessageAsserts();
 void NX_UTILS_API disableQtMessageAsserts();
@@ -49,13 +49,11 @@ bool assertFailure(
 {
     // NOTE: If message is empty, an extra space will appear before newline, which is hard to avoid.
     #if defined(ANDROID) || defined(__ANDROID__)
-        const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4\nAndroid backtrace:\n%5")
-            .arg(file).arg(line).arg(condition)
-            .arg(log::makeMessage(std::forward<Args>(args)...)).arg(buildBacktrace());
+        const auto out = NX_FMT("ASSERTION FAILED: %1:%2 (%3) %4\nAndroid backtrace:\n%5",
+            file, line, condition, ::nx::format(std::forward<Args>(args)...), buildBacktrace());
     #else
-        const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4")
-            .arg(file).arg(line).arg(condition)
-            .arg(log::makeMessage(std::forward<Args>(args)...));
+        const auto out = NX_FMT("ASSERTION FAILED: %1:%2 (%3) %4",
+            file, line, condition, ::nx::format(std::forward<Args>(args)...));
     #endif
 
     return assertFailure(isCritical, out);
@@ -125,7 +123,7 @@ private:
  *     ```
  */
 #define NX_CRITICAL(CONDITION, ...) \
-    NX_CHECK(/*isCritical*/ true, CONDITION, nx::utils::log::makeMessage(__VA_ARGS__))
+    NX_CHECK(/*isCritical*/ true, CONDITION, ::nx::format(__VA_ARGS__))
 
 /**
  * - Debug: Causes segfault in case of assertion failure, if not disabled via
@@ -142,7 +140,7 @@ private:
  * @return Condition evaluation result.
  */
 #define NX_ASSERT(CONDITION, ...) \
-    NX_CHECK(/*isCritical*/ false, CONDITION, nx::utils::log::makeMessage(__VA_ARGS__))
+    NX_CHECK(/*isCritical*/ false, CONDITION, ::nx::format(__VA_ARGS__))
 
 /**
  * - Debug: Works the same way as NX_ASSERT(), if not disabled via
@@ -158,5 +156,5 @@ private:
 #define NX_ASSERT_HEAVY_CONDITION(CONDITION, ...) do \
 { \
     if (::nx::utils::detail::assertHeavyConditionEnabled) \
-        NX_CHECK(/*isCritical*/ false, CONDITION, nx::utils::log::makeMessage(__VA_ARGS__)); \
+        NX_CHECK(/*isCritical*/ false, CONDITION, ::nx::format(__VA_ARGS__)); \
 } while (0)
