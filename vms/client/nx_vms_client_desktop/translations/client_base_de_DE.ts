@@ -1562,7 +1562,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Warnung! Dies ist eine experimentelle Option, die CPU spart, aber die Animation beeinträchtigen kann.</translation>
     </message>
   </context>
   <context>
@@ -2110,7 +2110,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Quellserver und %1</translation>
     </message>
   </context>
   <context>
@@ -2655,7 +2655,7 @@ to %1</source>
     <message>
       <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
       <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
+      <translation>%1 von %2 ausgewählten Benutzern sind nicht %3-Benutzer und erhalten keine mobilen Benachrichtigungen.</translation>
     </message>
   </context>
   <context>
@@ -3969,12 +3969,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+      <translation>Bitte senden Sie den bereitgestellten Lizenzschlüssel und die Hardware-ID an Ihren regionalen Support, um eine Aktivierungsschlüsseldatei zu erhalten.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
+      <translation>Bitte senden Sie den bereitgestellten Lizenzschlüssel und die Hardware-ID an Ihren regionalen Support (%1), um eine Aktivierungsschlüsseldatei zu erhalten.</translation>
     </message>
   </context>
   <context>
@@ -5760,11 +5760,11 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>Server ist nicht erreichbar.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>jetzt</translation>
     </message>
   </context>
   <context>
@@ -7527,9 +7527,9 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n Wert</numerusform>
+        <numerusform>+%n Werte</numerusform>
       </translation>
     </message>
   </context>
@@ -9129,12 +9129,12 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>Das System ist nicht mit %1 verbunden. Mobile Benachrichtigungen funktionieren nur, wenn das System mit %1 verbunden ist.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 Einstellungen</translation>
     </message>
   </context>
   <context>
