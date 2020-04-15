@@ -40,6 +40,7 @@
 
 #include <nx/utils/log/log.h>
 
+#include <nx/media/quick_sync/quick_sync_surface.h>
 #include <nx/media/quick_sync/utils.h>
 
 QT_BEGIN_NAMESPACE

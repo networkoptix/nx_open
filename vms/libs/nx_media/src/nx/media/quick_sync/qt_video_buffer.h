@@ -2,14 +2,14 @@
 
 #include <QtMultimedia/QAbstractVideoBuffer>
 
-#include "va_surface_info.h"
+#include "quick_sync_surface.h"
 
 namespace nx::media::quick_sync {
 
-class VaQtVideoBuffer: public QAbstractVideoBuffer
+class QtVideoBuffer: public QAbstractVideoBuffer
 {
 public:
-    VaQtVideoBuffer(VaSurfaceInfo surfaceData):
+    QtVideoBuffer(QuickSyncSurface surfaceData):
         QAbstractVideoBuffer(QAbstractVideoBuffer::HandleType(kHandleTypeQsvSurface)),
         m_surfaceData(surfaceData)
     {
@@ -20,7 +20,7 @@ public:
         decoder->lockSurface(m_surfaceData.surface);
     }
 
-    ~VaQtVideoBuffer()
+    ~QtVideoBuffer()
     {
         auto decoder = m_surfaceData.decoder.lock();
         if (!decoder)
@@ -47,7 +47,7 @@ public:
     }
 
 private:
-    VaSurfaceInfo m_surfaceData;
+    QuickSyncSurface m_surfaceData;
 };
 
 } // namespace nx::media::quick_sync

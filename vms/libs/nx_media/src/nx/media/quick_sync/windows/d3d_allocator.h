@@ -29,6 +29,8 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 
 #include "../allocators/base_allocator.h"
 
+namespace nx::media::quick_sync::windows {
+
 enum eTypeHandle
 {
     DXVA2_PROCESSOR     = 0x00,
@@ -37,14 +39,8 @@ enum eTypeHandle
 
 struct D3DAllocatorParams : mfxAllocatorParams
 {
-    IDirect3DDeviceManager9 *pManager;
-    DWORD surfaceUsage;
-
-    D3DAllocatorParams()
-        : pManager()
-        , surfaceUsage()
-    {
-    }
+    IDirect3DDeviceManager9 *pManager = nullptr;
+    DWORD surfaceUsage = 0;
 };
 
 class D3DFrameAllocator: public BaseFrameAllocator
@@ -82,5 +78,7 @@ protected:
     HANDLE m_hProcessor;
     DWORD m_surfaceUsage;
 };
+
+} // namespace nx::media::quick_sync::windows
 
 #endif // #ifdef _WIN32

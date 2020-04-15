@@ -7,6 +7,8 @@
 
 #include <va/va_glx.h>
 
+namespace nx::media::quick_sync::linux {
+
 VaDisplay::~VaDisplay()
 {
     if (m_display)
@@ -18,7 +20,7 @@ VaDisplay::VaDisplay()
     m_display = vaGetDisplayGLX(XOpenDisplay(":0.0"));
     if (!m_display)
     {
-        NX_ERROR(this, "Cannot create VADisplay");
+        NX_DEBUG(this, "Cannot create VADisplay");
         return;
     }
 
@@ -28,9 +30,11 @@ VaDisplay::VaDisplay()
     {
         vaTerminate(m_display);
         m_display = nullptr;
-        NX_ERROR(this, "Cannot initialize VA-API: %1", status);
+        NX_DEBUG(this, "Cannot initialize VA-API: %1", status);
         return;
     }
 }
+
+} // namespace nx::media::quick_sync::linux
 
 #endif // __linux__

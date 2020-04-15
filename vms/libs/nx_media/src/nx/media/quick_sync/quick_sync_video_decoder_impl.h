@@ -21,7 +21,7 @@ public:
     void lockSurface(const mfxFrameSurface1* surface);
     void releaseSurface(const mfxFrameSurface1* surface);
 
-    RenderingContext& getRenderingContext() { return m_renderingContext; }
+    Device& getDevice() { return m_device; }
     static bool isCompatible(AVCodecID codec);
 
 private:
@@ -53,9 +53,7 @@ private:
     std::shared_ptr<MFXFrameAllocator> m_allocator;
     mfxFrameAllocResponse m_response;
 
-    // Context needed to render frame to opengl texture. Keep it here due to do not recreate it on
-    // every frame.
-    RenderingContext m_renderingContext;
+    Device m_device;
 };
 
 } // namespace nx::media::quick_sync

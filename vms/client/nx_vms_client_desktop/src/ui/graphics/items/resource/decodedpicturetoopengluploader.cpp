@@ -1216,7 +1216,7 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
             displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
     if (!frame->getVideoSurface()->renderToRgb(isNewTExture, texture->id()))
     {
-        NX_ERROR(this, "Failed to render video memeory to OpenGL texture");
+        NX_ERROR(this, "Failed to render video memory to OpenGL texture");
         return false;
     }
     d->glBindTexture(GL_TEXTURE_2D, texture->id());

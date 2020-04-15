@@ -104,6 +104,7 @@ def determine_package_versions(
     if platform == "windows":
         v["ffmpeg"] = "3.1.9-3"
         v["intel-media-sdk"] = "2019R1"
+        v["glew"] = "2.1.0"
         if debug:
             for package in ("qt", "festival", "openal", "openssl", "sigar", "icu"):
                 v[package] += "-debug"
@@ -183,6 +184,7 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
         sync("windows/wix-3.11", path_variable="wix_directory")
         sync("windows/ilmerge", path_variable="ilmerge_directory")
         sync("intel-media-sdk")
+        sync("glew")
 
     if platform in ("windows", "linux"):
         sync("%s/pandoc" % platform, path_variable="pandoc_directory")

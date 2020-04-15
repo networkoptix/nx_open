@@ -50,6 +50,8 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 
 #define MSDK_SAFE_FREE(X)                        {if (X) { free(X); X = NULL; }}
 
+namespace nx::media::quick_sync::windows {
+
 D3DFORMAT ConvertMfxFourccToD3dFormat(mfxU32 fourcc)
 {
     switch (fourcc)
@@ -476,5 +478,7 @@ void D3DFrameAllocator::DeallocateMids(mfxHDLPair** pair, int n)
     }
     MSDK_SAFE_FREE(pair);
 }
+
+} // namespace nx::media::quick_sync::windows
 
 #endif // #ifdef _WIN32

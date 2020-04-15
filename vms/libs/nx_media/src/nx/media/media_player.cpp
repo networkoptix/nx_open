@@ -33,7 +33,7 @@
 #include "frame_metadata.h"
 #include "video_decoder_registry.h"
 #include "audio_output.h"
-#include "quick_sync/utils.h"
+#include "quick_sync/quick_sync_surface.h"
 
 #include "media_player_quality_chooser.h"
 

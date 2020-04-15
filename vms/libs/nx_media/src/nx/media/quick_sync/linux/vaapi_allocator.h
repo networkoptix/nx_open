@@ -27,6 +27,8 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 
 #include "../allocators/base_allocator.h"
 
+namespace nx::media::quick_sync::linux {
+
 // VAAPI Allocator internal Mem ID
 struct vaapiMemId
 {
@@ -103,4 +105,6 @@ protected:
     vaapiAllocatorParams::Exporter* m_exporter;
 };
 
-#endif // _linux__
+} // namespace nx::media::quick_sync::linux
+
+#endif // __linux__

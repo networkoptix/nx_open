@@ -11,6 +11,7 @@
 
 #include "allocators/sysmem_allocator.h"
 #include "mfx_sys_qt_video_buffer.h"
+#include "qt_video_buffer.h"
 #include "mfx_status_string.h"
 
 #define MSDK_ALIGN16(value) (((value + 15) >> 4) << 4) // round up to a multiple of 16
@@ -52,7 +53,7 @@ bool QuickSyncVideoDecoderImpl::initSession()
     }
     NX_DEBUG(this, "MFX version %1.%2", version.Major, version.Minor);
 
-    if (!quick_sync::setSessionHandle(m_mfxSession))
+    if (!m_device.initialize(m_mfxSession))
     {
         NX_ERROR(this, "Failed to set handle to MFX session");
         return false;
@@ -61,12 +62,7 @@ bool QuickSyncVideoDecoderImpl::initSession()
     // create memory allocator
     if (m_config.useVideoMemory)
     {
-        m_allocator = createVideoMemoryAllocator();
-        if (!m_allocator)
-        {
-            NX_ERROR(this, "Failed to init video memory allocator");
-            return false;
-        }
+        m_allocator = m_device.getAllocator();
     }
     else
     {
@@ -169,7 +165,6 @@ bool QuickSyncVideoDecoderImpl::init(mfxBitstream& bitstream, AVCodecID codec)
     if (!initSession())
         return false;
 
-
     mfxStatus status = MFXVideoDECODE_DecodeHeader(m_mfxSession, &bitstream, &m_mfxDecParams);
     if (status < MFX_ERR_NONE)
     {
@@ -221,7 +216,9 @@ bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
 {
     QAbstractVideoBuffer* buffer = nullptr;
     if (m_config.useVideoMemory)
-        buffer = createVideoBuffer(surface, weak_from_this());
+    {
+        buffer = new QtVideoBuffer(QuickSyncSurface{surface, weak_from_this()});
+    }
     else
         buffer = new MfxQtVideoBuffer(surface, m_allocator);
 

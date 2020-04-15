@@ -4,6 +4,8 @@
 
 #include <va/va.h>
 
+namespace nx::media::quick_sync::linux {
+
 class VaDisplay
 {
 public:
@@ -20,5 +22,7 @@ private:
 private:
     VADisplay m_display;
 };
+
+} // namespace nx::media::quick_sync::linux
 
 #endif // __linux__

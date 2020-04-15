@@ -3,9 +3,9 @@
 #ifdef _WIN32
 
 #include <memory>
+
 #include <mfx/mfxvideo++.h>
 #include <QtMultimedia/QVideoFrame>
-#include <QtGui/QOpenGLFunctions>
 
 extern "C" {
 
@@ -13,22 +13,25 @@ extern "C" {
 
 } // extern "C"
 
+#include "simpleDX9Device.h"
+
 class MFXFrameAllocator;
 
 namespace nx::media::quick_sync {
 
 class QuickSyncVideoDecoderImpl;
 
-bool setSessionHandle(MFXVideoSession& session);
+struct Device
+{
+    bool initialize(MFXVideoSession& session);
+    std::shared_ptr<MFXFrameAllocator> getAllocator();
+
+    SimpleDXDevice device;
+    std::shared_ptr<MFXFrameAllocator> m_allocator;
+};
+
 bool isCompatible(AVCodecID codec);
 bool renderToRgb(const QVideoFrame& frame, bool isNewTexture, GLuint textureId);
-
-std::shared_ptr<MFXFrameAllocator> createVideoMemoryAllocator();
-QAbstractVideoBuffer* createVideoBuffer(mfxFrameSurface1* surface, std::weak_ptr<QuickSyncVideoDecoderImpl> decoderPtr);
-
-struct RenderingContext
-{
-};
 
 } // nx::media::quick_sync
 

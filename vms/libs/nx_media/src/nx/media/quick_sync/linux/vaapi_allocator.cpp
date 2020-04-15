@@ -26,6 +26,8 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 
 #include <nx/utils/log/log.h>
 
+namespace nx::media::quick_sync::linux {
+
 static mfxStatus va_to_mfx_status(VAStatus va_res)
 {
     mfxStatus mfxRes = MFX_ERR_NONE;
@@ -752,4 +754,6 @@ mfxStatus VaapiFrameAllocator::GetFrameHDL(mfxMemId mid, mfxHDL *handle)
     return MFX_ERR_NONE;
 }
 
-#endif // _linux__
+} // namespace nx::media::quick_sync::linux
+
+#endif // __linux__
