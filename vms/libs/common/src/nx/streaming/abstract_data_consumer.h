@@ -29,11 +29,13 @@ public:
     //virtual qint64 getDisplayedTime() const { return 0; }
     virtual bool isRealTimeSource() const { return false; }
     virtual void pleaseStop() override;
+    virtual bool isRunning() const { return QnLongRunnable::isRunning(); }
 protected:
 
     friend class QnArchiveStreamReader;
 
     void run();
+    void runCycle();
     virtual void setSpeed(float /*value*/) {}
     virtual bool processData(const QnAbstractDataPacketPtr& data) = 0;
     virtual void beforeRun();

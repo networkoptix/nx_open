@@ -55,6 +55,9 @@ public:
     bool needConfigureProvider() const;
     bool isQueueFull() const;
 
+    static qint64 totalQueuedBytes();
+    static qint64 totalQueuedPackets();
+
     /**
      * Sets whether this recorder can drop packets when its queue is full.
      * Note that this setter is not thread-safe, don't use it on a running stream recorder!
@@ -134,7 +137,7 @@ private:
     void pauseRebuildIfHighDataNoLock();
     void resumeRebuildIfLowDataNoLock();
     bool cleanupQueue();
-    void addQueueSizeUnsafe(qint64 value);
+    void addQueueSizeUnsafe(qint64 value, qint64 packets);
     bool mediaHasBuiltinContext(const QnConstAbstractMediaDataPtr& frame) const;
     virtual void updateContainerMetadata(QnAviArchiveMetadata* metadata) const override;
 
@@ -170,6 +173,7 @@ private:
     bool m_lastMotionState; // true if motion in progress
     qint64 m_queuedSize;
     static std::atomic<qint64> m_totalQueueSize;
+    static std::atomic<qint64> m_totalQueuePackets;
     static std::atomic<int> m_totalRecorders;
     mutable QnMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;

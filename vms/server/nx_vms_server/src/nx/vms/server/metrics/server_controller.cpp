@@ -2,17 +2,18 @@
 
 #include <QtCore/QDateTime>
 
-#include <nx/fusion/serialization/lexical.h>
+#include <api/common_message_processor.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
-#include <platform/platform_abstraction.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/metrics/metrics_storage.h>
-#include <api/common_message_processor.h>
+#include <platform/hardware_information.h>
+#include <platform/platform_abstraction.h>
+#include <plugins/plugin_manager.h>
+#include <recorder/recording_manager.h>
+#include <utils/common/synctime.h>
 
 #include "helpers.h"
-#include <utils/common/synctime.h>
-#include <platform/hardware_information.h>
-#include <plugins/plugin_manager.h>
 
 namespace nx::vms::server::metrics {
 
@@ -184,8 +185,8 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "logLevel",
-            [](const auto&) 
-            { 
+            [](const auto&)
+            {
                 auto str = toString(nx::utils::log::mainLogger()->maxLevel());
                 if (!str.isEmpty())
                     str[0] = str[0].toUpper();
@@ -279,6 +280,14 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
                 }
                 return result.isEmpty() ? Value() : Value(result.join(L'\n'));
             }
+        ),
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "recordingQueueB",
+            [this](const auto&) { return Value(QnServerStreamRecorder::totalQueuedBytes()); }
+        ),
+        utils::metrics::makeLocalValueProvider<Resource>(
+            "recordingQueueP",
+            [this](const auto&) { return Value(QnServerStreamRecorder::totalQueuedPackets()); }
         )
     );
 }
