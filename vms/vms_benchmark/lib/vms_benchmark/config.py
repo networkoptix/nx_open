@@ -1,6 +1,5 @@
 import os
 from typing import Optional, List
-from pathlib import Path
 
 from vms_benchmark import exceptions
 
@@ -8,15 +7,10 @@ from vms_benchmark import exceptions
 class NoConfigFile(exceptions.VmsBenchmarkError):
     def __init__(self, filepath, original_exception=None):
         self.filepath = filepath
-
-        message = f"Config file '{filepath}' not found"
-
-        if not Path(filepath).is_absolute():
-            message += f" in directory '{Path.cwd()}'"
-
-        message += '.'
-        super(exceptions.VmsBenchmarkError, self).__init__(message)
-        self.original_exception = original_exception
+        super(exceptions.VmsBenchmarkError, self).__init__(
+            f"Config file {filepath!r} not found.",
+            original_exception
+        )
 
 
 class InvalidConfigFileContent(exceptions.VmsBenchmarkError):
