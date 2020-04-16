@@ -26,6 +26,7 @@
 #include <database/migrations/access_rights_db_migration.h>
 #include <database/migrations/ptz_rotation_migration.h>
 #include <database/migrations/camera_user_attributes_migration.h>
+#include <database/migrations/convert_supported_port_types_in_io_settings.h>
 #include <network/system_helpers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
@@ -2191,6 +2192,16 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20200131_remove_default_license_server_values.sql")))
         return resyncIfNeeded(ResyncGlobalSettings);
+
+    if (updateName.endsWith(lit("/99_20200416_convert_supported_port_types_in_io_settings.sql")))
+    {
+        bool converted = false;
+        if (!convertSupportedPortTypesInIoSettings(m_sdb, &converted))
+            return false;
+        if (converted)
+            return resyncIfNeeded(ResyncResourceProperties);
+        return true;
+    }
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
