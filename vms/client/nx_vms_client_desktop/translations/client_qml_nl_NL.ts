@@ -71,7 +71,7 @@
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>GEEN VOORBEELD</translation>
     </message>
   </context>
   <context>
@@ -97,7 +97,7 @@
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Standaardwaarde:</translation>
     </message>
   </context>
   <context>
@@ -115,18 +115,18 @@
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Klik op het laatste punt om de tekening te voltooien.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Het maximale aantal punten is bereikt (%n punten).</numerusform>
+        <numerusform>Het maximale aantal punten is bereikt (%n punten).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Klik op elke pijl om de gewenste richting in te schakelen.</translation>
     </message>
   </context>
   <context>
@@ -163,7 +163,7 @@
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Grootte beperkingen</translation>
     </message>
   </context>
   <context>
@@ -199,13 +199,13 @@
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Klik op het laatste punt om het tekenen van de veelhoek te voltooien.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Het maximale aantal punten is bereikt (%n punten).</numerusform>
+        <numerusform>Het maximale aantal punten is bereikt (%n punten).</numerusform>
       </translation>
     </message>
   </context>
@@ -220,19 +220,19 @@
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>MAX</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>MIN</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Stel de minimale en maximale objectgrootte in.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>Minimale objectgrootte kan niet groter zijn dan het maximum.</translation>
     </message>
   </context>
   <context>

@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Begränsa bildfrekvens för att spara CPU</translation>
     </message>
   </context>
   <context>
@@ -2280,12 +2280,12 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</source>
-      <translation type="unfinished">The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</translation>
+      <translation>Systemet är inte anslutet till Nx Cloud. Mobila aviseringar fungerar endast när systemet är anslutet till Nx Cloud.</translation>
     </message>
     <message>
       <location/>
       <source>Nx Cloud Settings</source>
-      <translation type="unfinished">Nx Cloud Settings</translation>
+      <translation>Nx Cloud-inställningar</translation>
     </message>
     <message>
       <location/>
@@ -2295,12 +2295,12 @@
     <message>
       <location/>
       <source>Set Language</source>
-      <translation type="unfinished">Set Language</translation>
+      <translation>Ställ in språk</translation>
     </message>
     <message>
       <location/>
       <source>Add custom text:</source>
-      <translation type="unfinished">Add custom text:</translation>
+      <translation>Lägg till anpassad text:</translation>
     </message>
   </context>
   <context>
@@ -3373,12 +3373,12 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tid</translation>
     </message>
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>Ignorera tidszonen i uppladdade filer</translation>
     </message>
   </context>
   <context>
