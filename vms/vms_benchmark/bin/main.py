@@ -139,46 +139,44 @@ ini_definition = {
     "getStoragesAttemptIntervalSeconds": {"type": "int", "default": 3},
 }
 
-def load_configs(conf_file, ini_file):
-    def abspath(path):
-        if len(path) > 2 and path[0:2] == './':
-            return os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), path)
-        return path
 
+def load_configs(conf_file, ini_file):
     ini_file_path = Path(ini_file)
     conf_file_path = Path(conf_file)
 
     benchmark_bin_path = Path(os.path.realpath(sys.argv[0])).parent
 
-    try:
-        conf = ConfigParser(conf_file, conf_definition)
-    except NoConfigFile as exception:
-        if conf_file_path.is_absolute():
-            raise exception
-        else:
+    if conf_file_path.is_absolute():
+        conf = ConfigParser(benchmark_bin_path / conf_file, conf_definition)
+    else:
+        try:
+            conf = ConfigParser(conf_file, conf_definition)
+        except NoConfigFile:
             try:
                 conf = ConfigParser(benchmark_bin_path / conf_file, conf_definition)
             except NoConfigFile:
-                raise exception
+                raise exceptions.VmsBenchmarkError(
+                    f"Unable to find config with path '{conf_file}', searched in:\n"
+                    "  1) current directory;\n"
+                    "  2) benchmark binary directory.\n"
+                )
 
-    ini = None
+    if ini_file_path.is_absolute():
+        ini = ConfigParser(benchmark_bin_path / ini_file, ini_definition)
+    else:
+        try:
+            ini = ConfigParser(ini_file, ini_definition)
+        except NoConfigFile:
+            ini = ConfigParser(benchmark_bin_path / ini_file, ini_definition, is_file_optional=True)
 
-    try:
-        ini = ConfigParser(ini_file, ini_definition)
-    except NoConfigFile:
-        if not ini_file_path.is_absolute():
-            try:
-                ini = ConfigParser(benchmark_bin_path / ini_file, ini_definition)
-            except NoConfigFile:
-                pass
+    def path_from_config(path):
+        return path if Path(path).is_absolute() else benchmark_bin_path / path
 
-    # TODO: Loading default INI options. Refactor this.
-    if ini is None:
-        ini = ConfigParser(ini_file, ini_definition, is_file_optional=True)
-
-    test_camera_runner.ini_testcamera_bin = abspath(ini['testcameraBin'])
-    test_camera_runner.ini_test_file_high_resolution = abspath(ini['testFileHighResolution'])
-    test_camera_runner.ini_test_file_low_resolution = abspath(ini['testFileLowResolution'])
+    test_camera_runner.ini_testcamera_bin = path_from_config(ini['testcameraBin'])
+    test_camera_runner.ini_test_file_high_resolution = path_from_config(
+        ini['testFileHighResolution'])
+    test_camera_runner.ini_test_file_low_resolution = path_from_config(
+        ini['testFileLowResolution'])
     test_camera_runner.ini_testcamera_output_file = ini['testcameraOutputFile']
     test_camera_runner.ini_testcamera_frame_log_file = ini['testcameraFrameLogFile']
     test_camera_runner.ini_testcamera_extra_args = ini['testcameraExtraArgs']
@@ -186,9 +184,9 @@ def load_configs(conf_file, ini_file):
     test_camera_runner.ini_test_file_high_period_us = ini['testFileHighPeriodUs']
     test_camera_runner.ini_test_file_low_period_us = ini['testFileLowPeriodUs']
     test_camera_runner.ini_enable_secondary_stream = ini['enableSecondaryStream']
-    stream_reader_runner.ini_rtsp_perf_bin = abspath(ini['rtspPerfBin'])
+    stream_reader_runner.ini_rtsp_perf_bin = path_from_config(ini['rtspPerfBin'])
     stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
-    box_connection.ini_plink_bin = abspath(ini['plinkBin'])
+    box_connection.ini_plink_bin = path_from_config(ini['plinkBin'])
     box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
     box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
     vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']

@@ -7,6 +7,8 @@ from vms_benchmark import exceptions
 
 class NoConfigFile(exceptions.VmsBenchmarkError):
     def __init__(self, filepath, original_exception=None):
+        self.filepath = filepath
+
         message = f"Config file '{filepath}' not found"
 
         if not Path(filepath).is_absolute():
