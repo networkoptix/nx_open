@@ -324,6 +324,44 @@ TEST_F(BookmarksDatabaseTest, tagSearchTest)
     mediaServerLauncher->serverModule()->serverDb()->getBookmarks(cameras, filter, result);
     ASSERT_EQ(3, result.size());
 }
+
+TEST_F(BookmarksDatabaseTest, mergeWithSameTime)
+{
+    ASSERT_TRUE(mediaServerLauncher->start());
+    auto serverDb = mediaServerLauncher->serverModule()->serverDb();
+
+    static const QnUuid kCameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
+    static const QnUuid kCameraId2("6FD1F239-CEBC-81BF-C2D4-59789E2CEF03");
+    static const int kIterations = 100;
+
+    QnCameraBookmarkSearchFilter filter;
+    QnMultiServerCameraBookmarkList outputData;
+    outputData.resize(2);
+
+    for (int i = 0; i < 100 * kIterations; i += kIterations)
+    {
+        QnCameraBookmark bookmark;
+        bookmark.cameraId = kCameraId1;
+        bookmark.startTimeMs = milliseconds(i);
+        bookmark.durationMs = 500ms;
+        bookmark.name = QString::number(i);
+        bookmark.guid = QnUuid::createUuid();
+        
+        outputData[0].push_back(bookmark);
+        bookmark.cameraId = kCameraId2;
+        bookmark.guid = QnUuid::createUuid();
+        outputData[1].push_back(bookmark);
+    }
+    const auto result = QnCameraBookmark::mergeCameraBookmarks(
+        /*commonModule*/ nullptr,
+        outputData,
+        filter.orderBy,
+        filter.sparsing,
+        filter.limit);
+
+    ASSERT_EQ(2 * kIterations, result.size());
+}
+
 } // namespace test
 } // namespace bookmarks
 } // namespace vms::server

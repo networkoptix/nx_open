@@ -107,13 +107,17 @@ BinaryPredicate makePredByGetter(const GetterType &getter, bool isAscending)
     const BinaryPredicate ascPred =
         [getter](const QnCameraBookmark &first, const QnCameraBookmark &second)
         {
-            return getter(first) < getter(second);
+            if (getter(first) != getter(second))
+                return getter(first) < getter(second);
+            return first.guid < second.guid;
         };
 
     const BinaryPredicate descPred =
         [getter](const QnCameraBookmark &first, const QnCameraBookmark &second)
         {
-            return getter(first) > getter(second);
+            if (getter(first) != getter(second))
+                return getter(first) > getter(second);
+            return first.guid > second.guid;
         };
 
     return isAscending ? ascPred : descPred;
