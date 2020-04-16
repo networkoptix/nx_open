@@ -252,7 +252,10 @@ void MetadataHandler::handleEventMetadata(
     const auto descriptor = eventTypeDescriptor(eventTypeId);
     if (!descriptor)
     {
-        NX_WARNING(this, "Unable to find descriptor for %1", eventTypeId);
+        NX_WARNING(this, "Event %1 is not in the list of Events supported by %2 (%3)",
+            eventTypeId,
+            m_resource->getUserDefinedName(),
+            m_resource->getId());
         return;
     }
 
