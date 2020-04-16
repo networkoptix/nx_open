@@ -20,12 +20,14 @@ struct Rect
     }
 
     /**
-     * X coordinate of the top left corner. Valid value must be in the range [0..1].
+     * X coordinate of the top left corner. Valid value must be in the range [0..1]. Zero is at the
+     * leftmost position in the video frame.
      */
     float x = -1;
 
     /**
-     * Y coordinate of the top left corner. Valid value must be in the range [0..1].
+     * Y coordinate of the top left corner. Valid value must be in the range [0..1]. Zero is at the
+     * topmost position in the video frame.
      */
     float y = -1;
 
