@@ -1,10 +1,16 @@
 #include "analytics_search_synchronizer.h"
 
+#include <chrono>
+#include <limits>
+
+#include <camera/cam_display.h>
+#include <camera/resource_display.h>
 #include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_index.h>
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -21,6 +27,8 @@
 namespace nx::vms::client::desktop {
 
 namespace {
+
+using namespace std::chrono;
 
 QnMediaResourceWidget* asMediaWidget(QnResourceWidget* widget)
 {
@@ -150,6 +158,38 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
                     updateMediaResourceWidgetAnalyticsMode(widget);
                 }
             }
+        });
+
+    m_analyticsSearchWidget->setLiveTimestampGetter(
+        [this](const QnVirtualCameraResourcePtr& camera) -> milliseconds
+        {
+            static constexpr auto kMaxTimestamp = std::numeric_limits<milliseconds>::max();
+
+            auto widgets = display()->widgets(camera);
+            if (widgets.empty())
+                return kMaxTimestamp;
+
+            // In sync mode analyze only the first widget.
+            if (this->context()->instance<QnWorkbenchStreamSynchronizer>()->isRunning())
+                widgets = decltype(widgets)({*widgets.cbegin()});
+
+            for (const auto widget: widgets)
+            {
+                const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+                if (!NX_ASSERT(mediaWidget))
+                    continue;
+
+                const auto camDisplay = mediaWidget->display()->camDisplay();
+                if (camDisplay && camDisplay->isRealTimeSource())
+                {
+                    const auto timestampUs = camDisplay->getDisplayedTime();
+                    return timestampUs < 0 || timestampUs == DATETIME_NOW
+                        ? kMaxTimestamp
+                        : duration_cast<milliseconds>(microseconds(timestampUs));
+                }
+            }
+
+            return kMaxTimestamp;
         });
 }
 

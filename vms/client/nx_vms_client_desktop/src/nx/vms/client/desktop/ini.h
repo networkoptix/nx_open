@@ -254,6 +254,10 @@ struct Ini: nx::kit::IniConfig
         "When disabled, the aspect ratio of the zoom window is the same as the aspect ratio of\n"
         "the main camera window. If enabled, allows the user to specify the aspect ratio of the\n"
         "zoom window.");
+
+    NX_INI_FLAG(0, delayRightPanelLiveAnalytics,
+        "Prohibits showing right panel live analytics before corresponding frame appears on\n"
+        "the camera if the camera is playing live");
 };
 
 inline Ini& ini()

@@ -51,6 +51,8 @@ public:
     QString selectedObjectType() const;
     void setSelectedObjectType(const QString& value);
 
+    void setLiveTimestampGetter(LiveTimestampGetter value);
+
     virtual void clearData() override;
     virtual void truncateToMaximumCount() override;
     virtual void truncateToRelevantTimePeriod() override;
@@ -100,7 +102,7 @@ private:
     QString m_filterText;
     QString m_selectedObjectType;
 
-    const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
+    const QScopedPointer<nx::utils::PendingOperation> m_emitDataChanged;
     bool m_liveReceptionActive = false;
 
     using MetadataReceiverList = std::vector<std::unique_ptr<LiveAnalyticsReceiver>>;
@@ -112,6 +114,9 @@ private:
 
     QSet<QnUuid> m_dataChangedTrackIds; //< For which tracks delayed dataChanged is queued.
     QHash<QnUuid, std::chrono::milliseconds> m_objectTrackIdToTimestamp;
+
+    LiveTimestampGetter m_liveTimestampGetter;
+    QHash<QnVirtualCameraResourcePtr, QList<QnAbstractCompressedMetadataPtr>> m_deferredMetadata;
 };
 
 } // namespace nx::vms::client::desktop

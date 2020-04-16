@@ -47,6 +47,11 @@ bool AnalyticsSearchListModel::isConstrained() const
     return filterRect().isValid() || !filterText().trimmed().isEmpty() || base_type::isConstrained();
 }
 
+void AnalyticsSearchListModel::setLiveTimestampGetter(LiveTimestampGetter value)
+{
+    d->setLiveTimestampGetter(value);
+}
+
 bool AnalyticsSearchListModel::hasAccessRights() const
 {
     return accessController()->hasGlobalPermission(GlobalPermission::viewArchive);

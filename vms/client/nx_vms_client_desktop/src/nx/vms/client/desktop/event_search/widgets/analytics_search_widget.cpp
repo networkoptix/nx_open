@@ -64,6 +64,8 @@ public:
     bool areaSelectionEnabled() const;
     QString selectedObjectType() const;
 
+    void setLiveTimestampGetter(AnalyticsSearchListModel::LiveTimestampGetter value);
+
     void resetFilters();
 
     void executePluginAction(
@@ -159,6 +161,12 @@ bool AnalyticsSearchWidget::areaSelectionEnabled() const
 QString AnalyticsSearchWidget::selectedObjectType() const
 {
     return d->selectedObjectType();
+}
+
+void AnalyticsSearchWidget::setLiveTimestampGetter(
+    AnalyticsSearchListModel::LiveTimestampGetter value)
+{
+    d->setLiveTimestampGetter(value);
 }
 
 QString AnalyticsSearchWidget::placeholderText(bool constrained) const
@@ -262,6 +270,12 @@ void AnalyticsSearchWidget::Private::setSelectedObjectType(const QString& value)
 
     m_model->setSelectedObjectType(value);
     emit q->selectedObjectTypeChanged();
+}
+
+void AnalyticsSearchWidget::Private::setLiveTimestampGetter(
+    AnalyticsSearchListModel::LiveTimestampGetter value)
+{
+    m_model->setLiveTimestampGetter(value);
 }
 
 void AnalyticsSearchWidget::Private::resetFilters()
