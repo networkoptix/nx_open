@@ -1,6 +1,6 @@
 #include "device_agent.h"
 
-#include <exception>
+#include <stdexcept>
 #include <string>
 
 #define NX_PRINT_PREFIX (m_logUtils.printPrefix)
@@ -12,6 +12,8 @@
 
 #include "ini.h"
 #include "add_ptr_ref.h"
+#include "object_types.h"
+#include "parse_object_metadata_packet.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -74,16 +76,10 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
     NX_OUTPUT << __func__;
 
     *outResult = new sdk::String(Json(Json::object{
-        {"eventTypes", Json::array{
-            Json::object{
-                {"id", kNewTrackEventType},
-                {"name", "New track started"},
-            },
-        }},
         {"objectTypes", Json::array{
             Json::object{
-                {"id", kHelloWorldObjectType},
-                {"name", "Hello, World!"},
+                {"id", kObjectTypes.person},
+                {"name", "Person"},
             },
         }},
         {"deviceAgentSettingsModel", Json::object{
@@ -183,30 +179,26 @@ void DeviceAgent::reopenNativeMetadataSource()
                     m_nativeMetadataSource.open(m_url,
                         [this, self = std::move(self)](auto exceptionPtr) mutable
                         {
-                            if (exceptionPtr)
+                            try
                             {
-                                try
-                                {
+                                if (exceptionPtr)
                                     std::rethrow_exception(exceptionPtr);
-                                }
-                                catch (std::exception const& exception)
-                                {
-                                    emitDiagnostic(IPluginDiagnosticEvent::Level::error,
-                                        "Failed to open metadata source", exception.what());
-                                }
+
+                                NX_OUTPUT << "    nativeMetadataSource opened";
+
+                                readNextMetadata();
+                            }
+                            catch (std::exception const& exception)
+                            {
+                                emitDiagnostic(IPluginDiagnosticEvent::Level::error,
+                                    "Failed to open metadata source", exception.what());
 
                                 m_reopenDelayer.start(kReopenDelay,
                                     [this, self = std::move(self)]()
                                     {
                                         reopenNativeMetadataSource();
                                     });
-
-                                return;
                             }
-
-                            NX_OUTPUT << "    nativeMetadataSource opened";
-
-                            readNextMetadata();
                         });
                 });
         });
@@ -217,26 +209,23 @@ void DeviceAgent::readNextMetadata()
     m_nativeMetadataSource.read(
         [this, self = addPtrRef(this)](auto exceptionPtr, Json nativeMetadata) mutable
         {
-            if (exceptionPtr)
+            try
             {
-                try
-                {
+                if (exceptionPtr)
                     std::rethrow_exception(exceptionPtr);
-                }
-                catch (std::exception const& exception)
-                {
-                    emitDiagnostic(IPluginDiagnosticEvent::Level::error,
-                        "Failed to read metadata", exception.what());
-                }
+
+                if (auto packet = parseObjectMetadataPacket(nativeMetadata))
+                    m_handler->handleMetadata(packet.releasePtr());
+
+                readNextMetadata();
+            }
+            catch (std::exception const& exception)
+            {
+                emitDiagnostic(IPluginDiagnosticEvent::Level::error,
+                    "Failed to read metadata", exception.what());
 
                 reopenNativeMetadataSource();
-
-                return;
             }
-
-            NX_OUTPUT << nativeMetadata.dump();
-
-            readNextMetadata();
         });
 }
 

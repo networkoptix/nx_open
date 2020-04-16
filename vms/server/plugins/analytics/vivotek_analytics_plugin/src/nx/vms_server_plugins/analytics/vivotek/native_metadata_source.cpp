@@ -1,6 +1,6 @@
 #include "native_metadata_source.h"
 
-#include <exception>
+#include <stdexcept>
 #include <system_error>
 
 #include <nx/network/aio/event_type.h>
