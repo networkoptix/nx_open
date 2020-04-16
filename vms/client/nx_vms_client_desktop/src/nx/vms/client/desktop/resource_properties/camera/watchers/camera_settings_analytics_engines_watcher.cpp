@@ -185,10 +185,10 @@ nx::vms::api::StreamIndex CameraSettingsAnalyticsEnginesWatcher::Private::analyz
         return nx::vms::api::StreamIndex::undefined;
 
     const auto manifest = camera->deviceAgentManifest(engineId);
-    const auto hideStreamSelection = manifest && manifest->capabilities
-        .testFlag(nx::vms::api::analytics::DeviceAgentManifest::hideStreamSelection);
+    const auto disableStreamSelection = manifest && manifest->capabilities
+        .testFlag(nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
 
-    return hideStreamSelection
+    return disableStreamSelection
         ? nx::vms::api::StreamIndex::undefined
         : camera->analyzedStreamIndex(engineId);
 }
