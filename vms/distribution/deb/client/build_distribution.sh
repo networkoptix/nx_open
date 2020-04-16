@@ -96,7 +96,7 @@ copyLibs()
         'libEnginio.so*'
         'libqgsttools_p.*'
         'libtegra_video.*'
-        'libmediaserver*'
+        'libnx_vms_server*'
         'libcloud_db.*'
         'libnx_cassandra*'
         'libnx_relaying*'
