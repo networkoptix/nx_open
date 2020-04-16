@@ -31,6 +31,16 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
+    void ensureDetailMetadataMode(nx::utils::Url url,
+        nx::utils::MoveOnlyFunc<void(std::exception_ptr)> handler);
+
+    void setDetailMetadataMode(nx::utils::Url url,
+        nx::utils::MoveOnlyFunc<void(std::exception_ptr)> handler);
+
+    void reloadConfig(nx::utils::Url url,
+        nx::utils::MoveOnlyFunc<void(std::exception_ptr)> handler);
+
+private:
     nx::network::http::AsyncClient m_httpClient;
     std::optional<nx::network::websocket::WebSocket> m_websocket;
     nx::Buffer m_buffer;

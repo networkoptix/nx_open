@@ -47,7 +47,7 @@ DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
     m_url.setUserName(deviceInfo->login());
     m_url.setPassword(deviceInfo->password());
     m_url.setPath("");
-    m_url.setQuery("");
+    m_url.setQuery(QUrlQuery());
     m_url.setFragment("");
 
     NX_OUTPUT << "    m_url: " << m_url.toStdString();
@@ -234,7 +234,7 @@ void DeviceAgent::readNextMetadata()
                 return;
             }
 
-            //NX_OUTPUT << nativeMetadata.dump();
+            NX_OUTPUT << nativeMetadata.dump();
 
             readNextMetadata();
         });
