@@ -86,6 +86,33 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
                 {"name", "Hello, World!"},
             },
         }},
+        {"deviceAgentSettingsModel", Json::object{
+            {"type", "Settings"},
+            {"sections", Json::array{
+                Json::object{
+                    {"type", "Section"},
+                    {"caption", "Deep Learning VCA"},
+                    {"items", Json::array{
+                        Json::object{
+                            {"name", "Mount.Height"},
+                            {"type", "SpinBox"},
+                            {"caption", "Camera height (cm)"},
+                            {"description", "Distance between camera and floor"},
+                            {"minValue", 0},
+                            {"maxValue", 2000},
+                        },
+                        Json::object{
+                            {"name", "Mount.TiltAngle"},
+                            {"type", "SpinBox"},
+                            {"caption", "Camera tilt angle (°)"},
+                            {"description", "Angle between camera direction vector and down vector"},
+                            {"minValue", 0},
+                            {"maxValue", 179},
+                        },
+                    }},
+                },
+            }},
+        }},
     }).dump());
 
     NX_OUTPUT << "    " << outResult->value()->str();
@@ -207,7 +234,7 @@ void DeviceAgent::readNextMetadata()
                 return;
             }
 
-            NX_OUTPUT << nativeMetadata.dump();
+            //NX_OUTPUT << nativeMetadata.dump();
 
             readNextMetadata();
         });
