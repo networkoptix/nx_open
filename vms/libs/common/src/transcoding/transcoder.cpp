@@ -492,7 +492,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         const auto& audio = m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first();
         if (m_beforeOpenCallback)
             m_beforeOpenCallback(this, video, audio);
-        int rez = open(video, audio);
+        const int rez = open(video, audio);
         if (rez != 0)
             return rez;
     }
@@ -577,7 +577,7 @@ void QnTranscoder::setTranscodingSettings(const QnLegacyTranscodingSettings& set
 
 void QnTranscoder::setBeforeOpenCallback(BeforeOpenCallback callback)
 {
-    m_beforeOpenCallback = callback;
+    m_beforeOpenCallback = std::move(callback);
 }
 
 #endif // ENABLE_DATA_PROVIDERS

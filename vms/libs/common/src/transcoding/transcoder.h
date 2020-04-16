@@ -18,6 +18,7 @@ extern "C"
 #include <common/common_globals.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include "decoders/video/ffmpeg_video_decoder.h"
+#include <nx/utils/move_only_func.h>
 
 class CLVideoDecoderOutput;
 
@@ -234,7 +235,7 @@ public:
 
     void setUseRealTimeOptimization(bool value);
 
-    using BeforeOpenCallback = std::function<void(
+    using BeforeOpenCallback = nx::utils::MoveOnlyFunc<void(
         QnTranscoder* transcoder,
         const QnConstCompressedVideoDataPtr & video,
         const QnConstCompressedAudioDataPtr & audio)>;
@@ -275,7 +276,7 @@ private:
     bool m_packetizedMode;
     QnLegacyTranscodingSettings m_transcodingSettings;
     bool m_useRealTimeOptimization;
-    BeforeOpenCallback m_beforeOpenCallback = nullptr;
+    BeforeOpenCallback m_beforeOpenCallback;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;

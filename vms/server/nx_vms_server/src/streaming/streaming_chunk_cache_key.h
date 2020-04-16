@@ -60,7 +60,7 @@ public:
      * @return list of allowed video codecs. If source video has codec from the list
      * it will be not transcoded. Otherwise it is transcoded to the first codec of the list.
      */
-    std::set<int> supportedVideoCodecs() const;
+    std::vector<AVCodecID> supportedVideoCodecs() const;
 
     AVCodecID audioCodecId() const;
     void setAudioCodecId(AVCodecID);
@@ -86,7 +86,7 @@ private:
     MediaQuality m_streamQuality;
     bool m_isLive;
     QSize m_pictureSizePixels;
-    std::set<int> m_videoCodecs;
+    std::vector<AVCodecID> m_videoCodecs;
     AVCodecID m_audioCodecId = AV_CODEC_ID_NONE;
     std::multimap<QString, QString> m_auxiliaryParams;
 };

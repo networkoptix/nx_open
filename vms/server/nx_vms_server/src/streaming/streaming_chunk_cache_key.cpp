@@ -36,7 +36,7 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
 {
     NX_ASSERT(!containerFormat.isEmpty());
 
-    static const std::set<int> kDefaultSupportedCodecs =
+    static const std::vector<AVCodecID> kDefaultSupportedCodecs =
     {
          AV_CODEC_ID_H264,
          AV_CODEC_ID_H265
@@ -45,8 +45,8 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     std::multimap<QString, QString>::const_iterator it = auxiliaryParams.find(StreamingParams::VIDEO_CODEC_PARAM_NAME);
     if (it != auxiliaryParams.end())
     {
-        if (AVCodecID codecId = QnAvCodecHelper::codecIdFromString(it->second))
-            m_videoCodecs.insert(codecId);
+        if (const AVCodecID codecId = QnAvCodecHelper::codecIdFromString(it->second))
+            m_videoCodecs.push_back(codecId);
         else
             NX_WARNING(this, "Ignore unknown codec %1", it->second);
     }
@@ -121,7 +121,7 @@ const QString& StreamingChunkCacheKey::containerFormat() const
     return m_containerFormat;
 }
 
-std::set<int> StreamingChunkCacheKey::supportedVideoCodecs() const
+std::vector<AVCodecID> StreamingChunkCacheKey::supportedVideoCodecs() const
 {
     return m_videoCodecs;
 }
@@ -223,13 +223,14 @@ bool StreamingChunkCacheKey::operator!=(const StreamingChunkCacheKey& right) con
 
 uint qHash(const StreamingChunkCacheKey& key)
 {
-    auto videoCodecs = [&key]()
-    {
-        uint result = 0;
-        for (const auto& codec : key.supportedVideoCodecs())
-            result += codec;
-        return result;
-    };
+    auto videoCodecs = 
+        [&key]()
+        {
+            uint result = 0;
+            for (const auto& codec: key.supportedVideoCodecs())
+                result += codec;
+            return result;
+        };
 
     return qHash(key.srcResourceUniqueID())
         + key.channel()

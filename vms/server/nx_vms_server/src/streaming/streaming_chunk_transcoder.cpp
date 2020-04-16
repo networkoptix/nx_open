@@ -457,10 +457,10 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         return transcoder;
 
     transcoder->setBeforeOpenCallback(
-        [this, mediaResource, transcodeParams]
-        (QnTranscoder* transcoder,
-        const QnConstCompressedVideoDataPtr& video,
-        const QnConstCompressedAudioDataPtr& /*audio*/)
+        [this, mediaResource, transcodeParams] (
+            QnTranscoder* transcoder,
+            const QnConstCompressedVideoDataPtr& video,
+            const QnConstCompressedAudioDataPtr& /*audio*/)
         {
             if (!video)
                 return;
@@ -469,11 +469,11 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
             AVCodecID dstCodecId = video->compressionType;
             bool isCodecSupported = false;
             for (const auto& supportedCodec: transcodeParams.supportedVideoCodecs())
-                isCodecSupported |= supportedCodec == dstCodecId;
+                isCodecSupported |= (supportedCodec == dstCodecId);
             if (!isCodecSupported && !transcodeParams.supportedVideoCodecs().empty())
                 dstCodecId = (AVCodecID) *transcodeParams.supportedVideoCodecs().begin();
 
-            QSize videoSize = QSize(video->width, video->height);
+            const QSize videoSize = QSize(video->width, video->height);
             QSize dstResolution = transcodeParams.pictureSizePixels();
             if (!dstResolution.isValid())
                 dstResolution = videoSize;
@@ -486,11 +486,18 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
                 settings.resource = mediaResource; //< Need for image filters.
                 transcoder->setTranscodingSettings(settings);
             }
-
+            
             if (transcoder->setVideoCodec(dstCodecId, transcodeMethod, Qn::StreamQuality::normal, dstResolution) != 0)
             {
                 NX_WARNING(this, 
                     "Failed to create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4",
+                    dstCodecId, transcodeParams.startTimestamp(),
+                    transcodeParams.endTimestamp(), transcodeParams.srcResourceUniqueID());
+            }
+            else
+            {
+                NX_VERBOSE(this,
+                    "Create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4",
                     dstCodecId, transcodeParams.startTimestamp(),
                     transcodeParams.endTimestamp(), transcodeParams.srcResourceUniqueID());
             }
