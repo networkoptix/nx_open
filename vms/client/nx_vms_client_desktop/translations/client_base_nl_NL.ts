@@ -1562,7 +1562,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Waarschuwing! Dit is een experimentele optie die de CPU bespaart, maar de animatie kan beïnvloeden.</translation>
     </message>
   </context>
   <context>
@@ -2110,7 +2110,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Bronserver en %1</translation>
     </message>
   </context>
   <context>
@@ -2655,7 +2655,7 @@ to %1</source>
     <message>
       <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
       <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
+      <translation>%1 van %2 geselecteerde gebruikers zijn niet %3 gebruikers en zullen geen mobiele meldingen ontvangen.</translation>
     </message>
   </context>
   <context>
@@ -3969,12 +3969,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+      <translation>Stuur de meegeleverde licentiesleutel en hardware-ID naar uw lokale leverancier om een activatiebestand te verkrijgen.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
+      <translation>Stuur de meegeleverde licentiesleutel en hardware-ID naar uw lokale leverancier (%1) om een activatiebestand te verkrijgen.</translation>
     </message>
   </context>
   <context>
@@ -5760,11 +5760,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>Server is niet beschikbaar.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>nu</translation>
     </message>
   </context>
   <context>
@@ -7527,9 +7527,9 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n waarden</numerusform>
+        <numerusform>+%n waarden</numerusform>
       </translation>
     </message>
   </context>
@@ -9129,12 +9129,12 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>Het systeem is niet verbonden met %1. Mobiele meldingen werken alleen wanneer het systeem is verbonden met %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 - Instellingen</translation>
     </message>
   </context>
   <context>

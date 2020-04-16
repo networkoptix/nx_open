@@ -130,7 +130,7 @@
         "maxWebMTranscoders": "Maximaal aantal WEBM-verbindingen voor de server. Chrome opent 2 verbindingen tegelijk en sluit vervolgens de eerste. Het wordt daarom aanbevolen om waarde> = 2 in te stellen op deze parameter.",
         "maxEventLogRecords": "Maximale logboekrecords om in de database te bewaren. Het werkelijke aantal niet-verwijderde records kan tot 20% hoger zijn dan de opgegeven waarde.",
         "forceLiveCacheForPrimaryStream": "Of u sommige frames in de cache wilt opslaan voor de primaire stream. Waarden: \"yes\" - altijd ingeschakeld (kan veel RAM gebruiken), \"no\" - altijd uitgeschakeld behalve wanneer vereist voor het afspelen (bijv. HLS), \"auto\" - vergelijkbaar met \"no\", maar ingeschakeld wanneer de gebruikerservaring te verbeteren (bijvoorbeeld wanneer een bepaalde Analytics-plug-in op de camera werkt).",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected."
+        "additionalLocalFsTypes": "Aanvullende bestandstypes om na te gaan of een bepaalde partitie geschikt is voor serveropslag. Kommagescheiden lijst van bestandssysteemnamen zoals ze staan vermeld in /proc/mounts wordt verwacht."
     },
     "info": {
         "tabs": {

@@ -1563,7 +1563,7 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Varning! Detta är ett experimentellt alternativ som sparar CPU men kan påverka animeringen.</translation>
     </message>
   </context>
   <context>
@@ -2111,7 +2111,7 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Källserver och %1</translation>
     </message>
   </context>
   <context>
@@ -2660,7 +2660,7 @@ till %1</translation>
     <message>
       <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
       <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
+      <translation>%1 av %2 utvalda användare är inte %3 användare och får inte mobilaviseringar.</translation>
     </message>
   </context>
   <context>
@@ -3974,12 +3974,12 @@ till %1</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+      <translation>Skicka den medföljande licensnyckeln och maskinvaru-ID till ditt regionala support för att få en aktiveringsnyckelfil.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
+      <translation>Skicka den medföljande licensnyckeln och maskinvaru-ID till ditt regionala support (%1) för att få en aktiveringsnyckelfil.</translation>
     </message>
   </context>
   <context>
@@ -5765,11 +5765,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>Servern är inte tillgänglig.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>nu</translation>
     </message>
   </context>
   <context>
@@ -7532,9 +7532,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n värden</numerusform>
+        <numerusform>+%n värden</numerusform>
       </translation>
     </message>
   </context>
@@ -9134,12 +9134,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>Systemet är inte anslutet till %1. Mobila aviseringar fungerar endast när systemet är anslutet till %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 Inställningar</translation>
     </message>
   </context>
   <context>
