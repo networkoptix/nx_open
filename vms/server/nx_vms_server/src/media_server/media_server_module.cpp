@@ -299,18 +299,8 @@ QnMediaServerModule::QnMediaServerModule(
         new nx::vms::server::analytics::IframeSearchHelper(
             commonModule()->resourcePool(), m_videoCameraPool));
 
-    nx::analytics::db::EventsStorageFactory::instance().setCustomFunc(
-        [this](
-            QnCommonModule* /*commonModule*/,
-            nx::analytics::db::AbstractIframeSearchHelper* iframeSearchHelper)
-        {
-            return std::make_unique<nx::vms::server::analytics::AnalyticsDb>(
-                this, iframeSearchHelper);
-        });
-
     m_analyticsEventsStorage = store(
-        nx::analytics::db::EventsStorageFactory::instance().create(
-            commonModule(), m_analyticsIframeSearchHelper).release());
+        new nx::vms::server::analytics::AnalyticsDb(this, m_analyticsIframeSearchHelper));
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(

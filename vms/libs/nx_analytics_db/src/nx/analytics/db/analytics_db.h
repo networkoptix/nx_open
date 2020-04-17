@@ -138,35 +138,5 @@ private:
     static std::vector<PathAndMode> enumerateSqlFiles(const QString& dbFileName);
 };
 
-//-------------------------------------------------------------------------------------------------
-
-using EventsStorageFactoryFunction =
-    std::unique_ptr<AbstractEventsStorage>(QnCommonModule*, AbstractIframeSearchHelper*);
-
-/**
- * NOTE: The db must always be instantiated via EventsStorageFactory::create() call,
- * even if a custom AbstractEventsStorage descendant is used.
- * That's because this factory wraps AbstractEventsStorage instance to MovableAnalyticsDb.
- */
-class NX_ANALYTICS_DB_API EventsStorageFactory:
-    private nx::utils::BasicFactory<EventsStorageFactoryFunction>
-{
-    using base_type = nx::utils::BasicFactory<EventsStorageFactoryFunction>;
-
-public:
-    EventsStorageFactory();
-
-    std::unique_ptr<AbstractEventsStorage> create(
-        QnCommonModule*, AbstractIframeSearchHelper*);
-
-    using base_type::setCustomFunc;
-
-    static EventsStorageFactory& instance();
-
-private:
-    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(
-        QnCommonModule*,
-        AbstractIframeSearchHelper*);
-};
 
 } // namespace nx::analytics::db
