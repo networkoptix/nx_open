@@ -88,7 +88,7 @@ void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
 						m_url, SystemError::toString(errorCode));
 
                     if (errorCode != SystemError::noError)
-						return testFailed(errorCode);
+						return testFailed(errorCode, "failed to connect to endpoint");
 
 					m_pipeline = std::make_unique<network::http::AsyncMessagePipeline>(
 						std::exchange(m_tcpSocket, nullptr));
@@ -97,7 +97,10 @@ void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
 						std::bind(&UplinkBandwidthTester::onMessageReceived, this, _1));
 
 					m_pipeline->registerCloseHandler(
-						std::bind(&UplinkBandwidthTester::testFailed, this, SystemError::connectionReset));
+						[this]()
+						{ 
+							testFailed(SystemError::connectionReset, "registerCloseHandler");
+						});
 
 					m_pipeline->startReadingConnection();
 
@@ -161,23 +164,26 @@ std::optional<int> UplinkBandwidthTester::stopEarlyIfAble(int sequence) const
         return std::nullopt;
     }
 
-    auto end = m_testContext.runningValues.find(sequence);
+	auto end = m_testContext.runningValues.find(sequence);
 	NX_ASSERT(end != m_testContext.runningValues.end());
-	auto begin = std::prev(end, kMinRunningAverages);
+	
+	std::array<float, kMinRunningAverages> averages;
+	std::transform(std::prev(end, kMinRunningAverages), end, averages.begin(), 
+		[](const auto& elem){ return elem.second.averageBandwidth; });
 
 	NX_VERBOSE(this, "Comparing %1 bandwidths: %2, similarity threshold = %3",
-		std::distance(begin, end), containerString(begin, end), kSimilarityThreshold);
+		averages.size(), containerString(averages), kSimilarityThreshold);
 
-    for (auto it = std::next(begin, 1); it != end; ++it)
+    for (auto it = std::next(averages.begin(), 1); it != averages.end(); ++it)
     {
-		const auto high = std::max(begin->second.averageBandwidth, it->second.averageBandwidth);
-		const auto low = std::min(begin->second.averageBandwidth, it->second.averageBandwidth);
+		const auto high = std::max(*averages.begin(), *it);
+		const auto low = std::min(*averages.begin(), *it);
 
         if (!low || !high || low / high < kSimilarityThreshold)
             return std::nullopt;
     }
 
-	return begin->second.averageBandwidth;
+	return *averages.begin();
 }
 
 void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
@@ -187,7 +193,7 @@ void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
 
 	auto sequence = parseSequence(message);
 	if (!sequence)
-		return testFailed(SystemError::invalidData);
+		return testFailed(SystemError::invalidData, "failed to parse sequence");
 
 	auto messageSentTime = nx::utils::utcTime() - m_pingTime;
 	auto currentDuration = messageSentTime - m_testContext.startTime;
@@ -222,10 +228,15 @@ void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
 	if (!m_testContext.sendRequests && *sequence == m_testContext.sequence)
 	{
 		if (*sequence == 0)
-			return testFailed(SystemError::invalidData);
+			return testFailed(SystemError::invalidData, "*sequence == 0, should not happen");
 
 		if (currentDuration < kMinTestDuration)
+		{
+			NX_VERBOSE(this, "currentDuration(%1) < kMinTestDuration(%2)",
+				currentDuration, kMinTestDuration);
 			currentDuration = kMinTestDuration;
+		}
+		 	
 
         testComplete(
             m_testContext.totalBytesSent / duration_cast<milliseconds>(currentDuration).count());
@@ -255,14 +266,13 @@ void UplinkBandwidthTester::sendRequest()
 		[this](SystemError::ErrorCode errorCode)
 		{
 			if (errorCode != SystemError::noError)
-				return testFailed(errorCode);
+				return testFailed(errorCode, "pipeline failed to send data");
 
 			sendRequest();
 		});
 
-	NX_VERBOSE(this, "Sent request %1, totalBytesSent: %2 running value: %3",
-		sequence, m_testContext.totalBytesSent,
-		m_testContext.runningValues[sequence]);
+	NX_VERBOSE(this, "Sent request %1, totalBytesSent: %2", 
+		sequence, m_testContext.totalBytesSent);
 }
 
 void UplinkBandwidthTester::testComplete(int bytesPerMsec)
@@ -281,8 +291,10 @@ void UplinkBandwidthTester::testComplete(int bytesPerMsec)
     }
 }
 
-void UplinkBandwidthTester::testFailed(SystemError::ErrorCode errorCode)
+void UplinkBandwidthTester::testFailed(SystemError::ErrorCode errorCode, const QString& reason)
 {
+	NX_VERBOSE(this, "Test failed, errorCode: %1: %2", errorCode, reason);
+
     if (m_handler)
     {
         m_testContext = TestContext();
