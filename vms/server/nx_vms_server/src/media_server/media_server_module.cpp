@@ -104,6 +104,7 @@
 #include <nx/metrics/metrics_storage.h>
 #include <nx/vms/server/analytics/iframe_search_helper.h>
 #include <nx/vms/server/statistics/reporter.h>
+#include <nx/analytics/db/movable_analytics_db.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -298,9 +299,13 @@ QnMediaServerModule::QnMediaServerModule(
     m_analyticsIframeSearchHelper = store(
         new nx::vms::server::analytics::IframeSearchHelper(
             commonModule()->resourcePool(), m_videoCameraPool));
-
-    m_analyticsEventsStorage = store(
-        new nx::vms::server::analytics::AnalyticsDb(this, m_analyticsIframeSearchHelper));
+    
+    auto analyticsDb = new nx::analytics::db::MovableAnalyticsDb(
+        [this, helper = m_analyticsIframeSearchHelper]()
+        {
+            return std::make_unique<nx::vms::server::analytics::AnalyticsDb>(this, helper);
+        });
+    m_analyticsEventsStorage = store(analyticsDb);
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(

@@ -8,7 +8,7 @@ namespace nx::analytics::db {
 
 class AbstractIframeSearchHelper;
 
-class MovableAnalyticsDb:
+class NX_ANALYTICS_DB_API MovableAnalyticsDb:
     public AbstractEventsStorage
 {
 public:
