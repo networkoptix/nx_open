@@ -18,6 +18,7 @@ extern "C"
 #include <common/common_globals.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include "decoders/video/ffmpeg_video_decoder.h"
+#include <nx/utils/move_only_func.h>
 
 class CLVideoDecoderOutput;
 
@@ -79,7 +80,6 @@ public:
     virtual bool existMoreData() const { return false; }
     static QRect roundRect(const QRect& srcRect);
     static QSize roundSize(const QSize& size);
-
 protected:
     QString m_lastErrMessage;
     QnCodecParams::Value m_params;
@@ -234,6 +234,13 @@ public:
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
 
     void setUseRealTimeOptimization(bool value);
+
+    using BeforeOpenCallback = nx::utils::MoveOnlyFunc<void(
+        QnTranscoder* transcoder,
+        const QnConstCompressedVideoDataPtr & video,
+        const QnConstCompressedAudioDataPtr & audio)>;
+
+    void setBeforeOpenCallback(BeforeOpenCallback callback);
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -269,6 +276,7 @@ private:
     bool m_packetizedMode;
     QnLegacyTranscodingSettings m_transcodingSettings;
     bool m_useRealTimeOptimization;
+    BeforeOpenCallback m_beforeOpenCallback;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;

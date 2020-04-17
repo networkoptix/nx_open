@@ -52,8 +52,8 @@ Engine::~Engine()
 
 std::string Engine::capabilities() const
 {
-    if (m_hideStreamSelection)
-        return "hideStreamSelection";
+    if (m_disableStreamSelection)
+        return "disableStreamSelection";
 
     return "";
 }
@@ -783,7 +783,7 @@ std::string Engine::manifestString() const
 
 Result<const IStringMap*> Engine::settingsReceived()
 {
-    m_hideStreamSelection = toBool(settingValue(kHideStreamSelectionSetting));
+    m_disableStreamSelection = toBool(settingValue(kDisableStreamSelectionSetting));
 
     m_needToThrowPluginDiagnosticEvents = toBool(
         settingValue(kThrowPluginDiagnosticEventsFromEngineSetting));

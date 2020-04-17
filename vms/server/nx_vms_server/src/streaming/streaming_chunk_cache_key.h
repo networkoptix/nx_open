@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QSize>
 #include <QString>
+#include <set>
 
 #include <nx/streaming/media_data_packet.h>
 
@@ -54,7 +55,12 @@ public:
     const QSize& pictureSizePixels() const;
     /** Media format (codec format, container format). */
     const QString& containerFormat() const;
-    const QString& videoCodec() const;
+
+    /**
+     * @return list of allowed video codecs. If source video has codec from the list
+     * it will be not transcoded. Otherwise it is transcoded to the first codec of the list.
+     */
+    std::vector<AVCodecID> supportedVideoCodecs() const;
 
     AVCodecID audioCodecId() const;
     void setAudioCodecId(AVCodecID);
@@ -80,7 +86,7 @@ private:
     MediaQuality m_streamQuality;
     bool m_isLive;
     QSize m_pictureSizePixels;
-    QString m_videoCodec;
+    std::vector<AVCodecID> m_videoCodecs;
     AVCodecID m_audioCodecId = AV_CODEC_ID_NONE;
     std::multimap<QString, QString> m_auxiliaryParams;
 };

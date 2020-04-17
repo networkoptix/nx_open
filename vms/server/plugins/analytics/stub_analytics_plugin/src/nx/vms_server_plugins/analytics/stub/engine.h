@@ -65,7 +65,7 @@ private:
     std::unique_ptr<std::thread> m_pluginDiagnosticEventThread;
     std::atomic<bool> m_terminated{false};
     std::atomic<bool> m_needToThrowPluginDiagnosticEvents{false};
-    std::atomic<bool> m_hideStreamSelection{false};
+    std::atomic<bool> m_disableStreamSelection{false};
 
     std::string m_pluginHomeDir; /**< Can be empty. */
     std::string m_capabilities;
@@ -97,7 +97,7 @@ const std::string kThrowPluginDiagnosticEventsFromDeviceAgentSetting{
 
 const std::string kThrowPluginDiagnosticEventsFromEngineSetting{
     "throwPluginDiagnosticEventsFromDeviceAgent"};
-const std::string kHideStreamSelectionSetting{"hideStreamSelection"};
+const std::string kDisableStreamSelectionSetting{"disableStreamSelection"};
 const std::string kLeakFramesSetting{"leakFrames"};
 const std::string kAdditionalFrameProcessingDelayMsSetting{"additionalFrameProcessingDelayMs"};
 const std::string kOverallMetadataDelayMsSetting{"overallMetadataDelayMs"};

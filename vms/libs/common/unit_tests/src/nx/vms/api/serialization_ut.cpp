@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <api/model/api_ioport_data.h>
 #include <api/model/configure_system_data.h>
 #include <nx/core/resource/device_type.h>
 
@@ -42,6 +43,22 @@ TEST(DeviceType, serialization)
     ASSERT_EQ("Camera", QnLexical::serialized(DeviceType::camera));
     ASSERT_EQ(DeviceType::camera, QnLexical::deserialized<DeviceType>("Camera"));
     ASSERT_EQ(DeviceType::camera, QnLexical::deserialized<DeviceType>("1"));
+}
+
+TEST(IOPortType, serialization)
+{
+    QByteArray result;
+    Qn::IOPortType data = Qn::PT_Input;
+    QJson::serialize(data, &result);
+    ASSERT_EQ(result, "\"Input\"");
+}
+
+TEST(IOPortTypes, serialization)
+{
+    QByteArray result;
+    Qn::IOPortTypes data = Qn::PT_Input | Qn::PT_Output;
+    QJson::serialize(data, &result);
+    ASSERT_EQ(result, "\"Input|Output\"");
 }
 
 } // namespace nx::vms::api::test

@@ -14,7 +14,6 @@ public:
     WritableStoragesHelper(const QnStorageManager* owner);
     StorageResourceList list(const StorageResourceList& storages) const;
     StorageResourcePtr optimalStorageForRecording(const StorageResourceList& storages) const;
-    static StorageResourceList filterOutSmall(const StorageResourceList& storages);
 
 private:
     struct SpaceInfo
@@ -27,6 +26,7 @@ private:
         int64_t effective = -1LL;
         std::string url;
         bool isSystem = false;
+        bool isForcefullyDisabled = false;
         StorageResourcePtr storage;
 
         static SpaceInfo from(const StorageResourcePtr& storage, const QnStorageManager* owner);

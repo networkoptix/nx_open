@@ -1805,9 +1805,9 @@ struct CleanupInfo
     };
 
     int64_t total = 0;
-    std::vector<std::pair<QnStorageResourcePtr, PerStorageInfo>> perStorage;
+    std::vector<std::pair<StorageResourcePtr, PerStorageInfo>> perStorage;
 
-    CleanupInfo(const QSet<QnStorageResourcePtr>& storages)
+    CleanupInfo(const QSet<StorageResourcePtr>& storages)
     {
         for (const auto& s: storages)
         {
@@ -1822,7 +1822,7 @@ struct CleanupInfo
         }
     }
 
-    bool needToCleanup(const QnStorageResourcePtr& s) const
+    bool needToCleanup(const StorageResourcePtr& s) const
     {
         if (total == 0)
             return false;
@@ -1920,7 +1920,7 @@ void QnStorageManager::clearSpace(bool forced)
 
     // Free storage space.
     bool allStoragesReady = true;
-    QSet<QnStorageResourcePtr> storages = getClearableStorages();
+    const auto storages = getClearableStorages();
     for (const auto& storage: getUsedWritableStorages())
     {
         if (!storages.contains(storage))
@@ -1942,8 +1942,8 @@ void QnStorageManager::clearSpace(bool forced)
 
     const auto cleanupStartTime = std::chrono::steady_clock::now();
 
-    QnStorageResourceList delAgainList;
-    for(const QnStorageResourcePtr& storage: storages)
+    StorageResourceList delAgainList;
+    for(const auto& storage: storages)
     {
         if (!cleanupInfo.needToCleanup(storage))
             continue;
@@ -1952,7 +1952,7 @@ void QnStorageManager::clearSpace(bool forced)
             delAgainList << storage;
     }
 
-    for(const QnStorageResourcePtr& storage: delAgainList)
+    for(const auto& storage: delAgainList)
         clearOldestSpace(storage, false, storage->getSpaceLimit());
 
     if (cleanupInfo.needToCleanup())
@@ -1963,7 +1963,7 @@ void QnStorageManager::clearSpace(bool forced)
 
     // Cleanup motion.
     bool readyToDeleteMotion = (m_scanData.lock()->state == Qn::RebuildState_None); // do not delete motion while rebuilding in progress (just in case, unnecessary)
-    for (const QnStorageResourcePtr& storage: getAllStorages())
+    for (const auto& storage: getAllStorages())
     {
         if (storage->getStatus() == Qn::Offline)
         {
@@ -2399,10 +2399,10 @@ bool QnStorageManager::isWritableStoragesAvailable() const
     return m_isWritableStorageAvail;
 }
 
-QSet<QnStorageResourcePtr> QnStorageManager::getUsedWritableStorages() const
+QSet<StorageResourcePtr> QnStorageManager::getUsedWritableStorages() const
 {
     auto allWritableStorages = getAllWritableStorages();
-    QSet<QnStorageResourcePtr> result;
+    QSet<StorageResourcePtr> result;
     for (const auto& storage : allWritableStorages)
         if (storage->isUsedForWriting())
             result.insert(storage);
@@ -2414,9 +2414,9 @@ QSet<QnStorageResourcePtr> QnStorageManager::getUsedWritableStorages() const
     return result;
 }
 
-QSet<QnStorageResourcePtr> QnStorageManager::getClearableStorages() const
+QSet<StorageResourcePtr> QnStorageManager::getClearableStorages() const
 {
-    QSet<QnStorageResourcePtr> result;
+    QSet<StorageResourcePtr> result;
 
     for (const auto& storage : getUsedWritableStorages())
         if (!storage->hasFlags(Qn::storage_fastscan))
@@ -2428,12 +2428,20 @@ QSet<QnStorageResourcePtr> QnStorageManager::getClearableStorages() const
 StorageResourceList QnStorageManager::getAllWritableStorages(
     StorageResourceList additional) const
 {
+    if (!m_firstStoragesTestDone)
+    {
+        NX_DEBUG(this, "getAllWritableStorages: Storage test is not over yet. Returning NULL.");
+        return StorageResourceList();
+    }
+
     auto result = getStorages();
     QSet<QString> urls;
     for (const auto& value: result)
         urls << value->getUrl();
+
     nx::utils::remove_if(additional,
         [&urls](const auto& a) { return urls.contains(a->getUrl()); });
+
     return WritableStoragesHelper(this).list(result + additional);
 }
 
@@ -2623,14 +2631,8 @@ QnStorageResourcePtr QnStorageManager::getStorageByIndex(int index) const
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot()
 {
-    if (!m_firstStoragesTestDone)
-    {
-        NX_DEBUG(this, "getOptimalStorageRoot: Storage test is not over yet. Returning NULL.");
-        return QnStorageResourcePtr();
-    }
-
     return nx::vms::server::WritableStoragesHelper(this).optimalStorageForRecording(
-        m_storageRoots.values());
+        getUsedWritableStorages().toList());
 }
 
 QString QnStorageManager::getFileName(

@@ -6,8 +6,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     nx::vms::api::analytics::DeviceAgentManifest,
     Capability,
     (nx::vms::api::analytics::DeviceAgentManifest::Capability::noCapabilities, "noCapabilities")
-    (nx::vms::api::analytics::DeviceAgentManifest::Capability::hideStreamSelection,
-        "hideStreamSelection"))
+    (nx::vms::api::analytics::DeviceAgentManifest::Capability::disableStreamSelection,
+        "disableStreamSelection"))
 
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::DeviceAgentManifest::Capability,
     (numeric)(debug))
@@ -16,8 +16,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     nx::vms::api::analytics::DeviceAgentManifest,
     Capabilities,
     (nx::vms::api::analytics::DeviceAgentManifest::Capability::noCapabilities, "noCapabilities")
-    (nx::vms::api::analytics::DeviceAgentManifest::Capability::hideStreamSelection,
-        "hideStreamSelection"))
+    (nx::vms::api::analytics::DeviceAgentManifest::Capability::disableStreamSelection,
+        "disableStreamSelection"))
 
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::DeviceAgentManifest::Capabilities,
     (numeric)(debug))

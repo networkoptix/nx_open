@@ -4,6 +4,8 @@
 #include <QStringList>
 
 #include "streaming_params.h"
+#include <utils/media/av_codec_helper.h>
+#include <nx/utils/log/log_main.h>
 
 StreamingChunkCacheKey::StreamingChunkCacheKey():
     m_channel(0),
@@ -34,9 +36,22 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
 {
     NX_ASSERT(!containerFormat.isEmpty());
 
+    static const std::vector<AVCodecID> kDefaultSupportedCodecs =
+    {
+         AV_CODEC_ID_H264,
+         AV_CODEC_ID_H265
+    };
+
     std::multimap<QString, QString>::const_iterator it = auxiliaryParams.find(StreamingParams::VIDEO_CODEC_PARAM_NAME);
     if (it != auxiliaryParams.end())
-        m_videoCodec = it->second;
+    {
+        if (const AVCodecID codecId = QnAvCodecHelper::codecIdFromString(it->second))
+            m_videoCodecs.push_back(codecId);
+        else
+            NX_WARNING(this, "Ignore unknown codec %1", it->second);
+    }
+    if (m_videoCodecs.empty())
+        m_videoCodecs = kDefaultSupportedCodecs;
 
     it = auxiliaryParams.find(StreamingParams::PICTURE_SIZE_PIXELS_PARAM_NAME);
     if (it != auxiliaryParams.end())
@@ -106,9 +121,9 @@ const QString& StreamingChunkCacheKey::containerFormat() const
     return m_containerFormat;
 }
 
-const QString& StreamingChunkCacheKey::videoCodec() const
+std::vector<AVCodecID> StreamingChunkCacheKey::supportedVideoCodecs() const
 {
-    return m_videoCodec;
+    return m_videoCodecs;
 }
 
 AVCodecID StreamingChunkCacheKey::audioCodecId() const
@@ -142,7 +157,7 @@ bool StreamingChunkCacheKey::mediaStreamParamsEqualTo(
         streamQuality() == right.streamQuality() &&
         pictureSizePixels() == right.pictureSizePixels() &&
         containerFormat() == right.containerFormat() &&
-        videoCodec() == right.videoCodec() &&
+        supportedVideoCodecs() == right.supportedVideoCodecs() &&
         audioCodecId() == right.audioCodecId();
 }
 
@@ -173,8 +188,8 @@ bool StreamingChunkCacheKey::operator<(
     if (m_pictureSizePixels.height() != right.m_pictureSizePixels.height())
         return m_pictureSizePixels.height() < right.m_pictureSizePixels.height();
 
-    if (m_videoCodec != right.m_videoCodec)
-        return m_videoCodec < right.m_videoCodec;
+    if (m_videoCodecs != right.supportedVideoCodecs())
+        return m_videoCodecs < right.supportedVideoCodecs();
 
     if (m_audioCodecId != right.m_audioCodecId)
         return m_audioCodecId < right.m_audioCodecId;
@@ -208,6 +223,15 @@ bool StreamingChunkCacheKey::operator!=(const StreamingChunkCacheKey& right) con
 
 uint qHash(const StreamingChunkCacheKey& key)
 {
+    auto videoCodecs = 
+        [&key]()
+        {
+            uint result = 0;
+            for (const auto& codec: key.supportedVideoCodecs())
+                result += codec;
+            return result;
+        };
+
     return qHash(key.srcResourceUniqueID())
         + key.channel()
         + key.startTimestamp()
@@ -218,6 +242,6 @@ uint qHash(const StreamingChunkCacheKey& key)
         + key.pictureSizePixels().width()
         + key.pictureSizePixels().height()
         + qHash(key.containerFormat())
-        + qHash(key.videoCodec())
+        + qHash(videoCodecs())
         + qHash(key.audioCodecId());
 }

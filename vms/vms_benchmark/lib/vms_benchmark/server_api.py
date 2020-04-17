@@ -12,9 +12,12 @@ from vms_benchmark import exceptions
 from vms_benchmark.camera import Camera
 from vms_benchmark.license import License
 
+from vms_benchmark.utils.catch_http_errors import catch_http_errors
+
 Response = namedtuple('Response', ['code', 'body'])
 
 
+# TODO: Warning: now urllib.request.* is also used in class Camera.
 class ServerApi:
     class Response:
         def __init__(self, code):
@@ -61,6 +64,7 @@ class ServerApi:
             return None
         return result
 
+    @catch_http_errors
     def get_module_information(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
         credentials = f"{self.user}:{self.password}"
@@ -77,6 +81,7 @@ class ServerApi:
 
             return result.payload['reply']
 
+    @catch_http_errors
     def get_server_id(self):
         module_information = self.get_module_information()
 
@@ -88,6 +93,7 @@ class ServerApi:
 
         return server_id
 
+    @catch_http_errors
     def check_authentication(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
         credentials = f"{self.user}:{self.password}"
@@ -95,6 +101,7 @@ class ServerApi:
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
         self.get_request(request)
 
+    @catch_http_errors
     def get_test_cameras_all(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getCamerasEx")
         credentials = f"{self.user}:{self.password}"
@@ -121,6 +128,7 @@ class ServerApi:
 
         return None
 
+    @catch_http_errors
     def get_test_cameras(self) -> List[Camera]:
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getCamerasEx")
         credentials = f"{self.user}:{self.password}"
@@ -147,6 +155,7 @@ class ServerApi:
 
         return None
 
+    @catch_http_errors
     def get_licenses(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getLicenses")
         credentials = f"{self.user}:{self.password}"
@@ -165,6 +174,7 @@ class ServerApi:
 
         return None
 
+    @catch_http_errors
     def get_storage_spaces(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/storageSpace")
         credentials = f"{self.user}:{self.password}"
@@ -186,6 +196,7 @@ class ServerApi:
 
         return None
 
+    @catch_http_errors
     def get_events(self, ts_from):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/getEvents?from={ts_from}")
         credentials = f"{self.user}:{self.password}"
@@ -203,6 +214,7 @@ class ServerApi:
 
         return None
 
+    @catch_http_errors
     def get_statistics(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/statistics")
         credentials = f"{self.user}:{self.password}"
@@ -220,6 +232,7 @@ class ServerApi:
 
         return None
 
+    @catch_http_errors
     def get_time(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/getTime")
         credentials = f"{self.user}:{self.password}"
@@ -237,6 +250,7 @@ class ServerApi:
 
         return None
 
+    @catch_http_errors
     def add_cameras(self, hostname, count):
         from pprint import pformat
         cameras = []
@@ -272,6 +286,7 @@ class ServerApi:
             ))
         return cameras
 
+    @catch_http_errors
     def remove_camera(self, camera_id):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/removeResource")
         credentials = f"{self.user}:{self.password}"
@@ -288,6 +303,7 @@ class ServerApi:
 
         return 200 <= response.code < 300
 
+    @catch_http_errors
     def activate_license(self, license):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/addLicense")
         credentials = f"{self.user}:{self.password}"
@@ -305,6 +321,7 @@ class ServerApi:
 
         return 200 <= response.code < 300
 
+    @catch_http_errors
     def get_archive_start_time_ms(self, camera_id: str) -> int:
         request = urllib.request.Request(
             f"http://{self.ip}:{self.port}"

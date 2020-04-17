@@ -9,6 +9,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
+#include <nx/utils/log/log_main.h>
 #include <nx/fusion/serialization/serialization.h>
 
 #include "json_fwd.h"
@@ -229,13 +230,13 @@ bool deserialize(
     if (outFound != nullptr)
         *outFound = true;
 
-    bool ok = QJson::deserialize(ctx, *pos, outTarget);
-    if (!ok && !optional)
-    {
-        qWarning() << QString("Can't deserialize field \"%1\" from value \"%2\"").arg(
-            key, pos.value().toString());
-    }
-    return ok || optional;
+    if (QJson::deserialize(ctx, *pos, outTarget))
+        return true;
+
+    NX_WARNING(NX_SCOPE_TAG,
+        "Can't deserialize field `%1` from value `%2`",
+        key, QJson::serialized(pos.value()));
+    return optional;
 }
 
 /**

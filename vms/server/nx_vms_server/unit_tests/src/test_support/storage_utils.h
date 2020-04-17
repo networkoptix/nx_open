@@ -87,6 +87,8 @@ public:
 
     using QnStorageManager::QnStorageManager;
 
+    void testStoragesDone() { QnStorageManager::testStoragesDone(); }
+
 private:
     virtual std::chrono::milliseconds checkSystemFreeSpaceInterval() const override { return systemFreeSpaceInterval; }
     virtual StorageResourceList getStorages() const override { return storages; }

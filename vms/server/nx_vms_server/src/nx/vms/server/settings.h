@@ -462,6 +462,10 @@ public:
         "Disable metric 'outgoingConnections'. Used for test purpose only."
     };
 
+    Option<bool> allowSystemStorageRecording{ this, "allowSystemStorageRecording", true,
+        "Toggles recording on/off for system storage."
+    };
+
 #if defined(__arm__)
     static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB
     static constexpr unsigned int kDefaultHlsMaxChunkBufferSize = 2 * 1024 * 1024;

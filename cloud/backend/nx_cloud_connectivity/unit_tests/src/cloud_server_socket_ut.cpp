@@ -571,7 +571,7 @@ protected:
     std::unique_ptr<hpm::api::AbstractMediatorConnector> m_mediatorConnector;
     std::shared_ptr<stun::test::AsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
-    utils::TestSyncQueue<SystemError::ErrorCode> m_connectedResults;
+    utils::SyncQueue<SystemError::ErrorCode> m_connectedResults;
     std::vector<nx::utils::thread> m_threads;
 
     QnMutex m_mutex;
@@ -600,6 +600,8 @@ public:
     CloudServerSocket()
     {
         stun::AbstractAsyncClient::Settings stunClientSettings;
+        stunClientSettings.sendTimeout = kNoTimeout;
+        stunClientSettings.recvTimeout = kNoTimeout;
         stunClientSettings.reconnectPolicy =
             nx::network::RetryPolicy(
                 nx::network::RetryPolicy::kInfiniteRetries,
@@ -607,7 +609,8 @@ public:
                 nx::network::RetryPolicy::kDefaultDelayMultiplier,
                 std::chrono::minutes(1),
                 nx::network::RetryPolicy::kDefaultRandomRatio);
-        nx::hpm::api::MediatorConnector::setStunClientSettings(stunClientSettings);
+        m_settingsBak =
+            nx::hpm::api::MediatorConnector::setStunClientSettings(stunClientSettings);
 
         SocketGlobalsHolder::instance()->reinitialize();
 
@@ -618,6 +621,8 @@ public:
     {
         if (m_cloudServerSocket)
             destroyServerSocket();
+
+        nx::hpm::api::MediatorConnector::setStunClientSettings(m_settingsBak);
     }
 
 protected:
@@ -676,6 +681,7 @@ protected:
 
 private:
     std::unique_ptr<cloud::CloudServerSocket> m_cloudServerSocket;
+    network::stun::AbstractAsyncClient::Settings m_settingsBak;
 };
 
 TEST_F(CloudServerSocket, reconnect)

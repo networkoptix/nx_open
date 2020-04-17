@@ -19,7 +19,7 @@ public:
         registerKey<QnPtzMapperPtr>(lit("ptzMapper"));
         registerKey<Ptz::Traits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
-        registerKey<QnIOPortDataList>(lit("ioSettings"));
+        registerKey<QnIOPortDataList>(ResourceDataKey::kIoSettings);
         registerKey<QList<nx::vms::common::Credentials>>(
             ResourceDataKey::kPossibleDefaultCredentials);
         registerKey<nx::vms::common::Credentials>(ResourceDataKey::kForcedDefaultCredentials);
