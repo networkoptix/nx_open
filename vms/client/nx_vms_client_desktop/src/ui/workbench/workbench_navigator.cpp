@@ -141,7 +141,21 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(m_cameraDataManager, &QnCameraDataManager::periodsChanged, this,
         &QnWorkbenchNavigator::updateLoaderPeriods);
 
-    connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished, m_cameraDataManager, &QnCameraDataManager::clearCache);
+    connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished,
+        m_cameraDataManager, &QnCameraDataManager::clearCache);
+
+    connect(qnServerStorageManager, &QnServerStorageManager::activeMetadataStorageChanged, this,
+        [this](const QnMediaServerResourcePtr& server)
+        {
+            const auto serverFootageCameras = cameraHistoryPool()->getServerFootageCameras(server);
+            for (const auto& camera: serverFootageCameras)
+            {
+                const auto loader = m_cameraDataManager->loader(camera, /*createIfNotExists*/ false);
+                if (loader)
+                    loader->discardCachedDataType(Qn::AnalyticsContent);
+            }
+        });
+
     connect(
         qnClientModule->serverRuntimeEventConnector(),
         &ServerRuntimeEventConnector::deviceFootageChanged,

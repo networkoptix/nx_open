@@ -15,6 +15,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
+#include <server/server_storage_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
@@ -97,8 +98,8 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
 
     connect(q, &AbstractSearchListModel::camerasChanged, this, &Private::updateMetadataReceivers);
 
-    auto serverChangesListener = new QnResourceChangesListener(q);
-    serverChangesListener->connectToResources<QnVirtualCameraResource>(
+    auto cameraStatusListener = new QnResourceChangesListener(q);
+    cameraStatusListener->connectToResources<QnVirtualCameraResource>(
         q->resourcePool(),
         &QnResource::statusChanged,
         [this](const QnResourcePtr& resource)
@@ -108,6 +109,23 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
 
             if (isCameraApplicable(resource.dynamicCast<QnVirtualCameraResource>()))
                 updateMetadataReceivers();
+        });
+
+    connect(qnServerStorageManager, &QnServerStorageManager::activeMetadataStorageChanged, this,
+        [this](const QnMediaServerResourcePtr& server)
+        {
+            const auto relevantCameras = this->q->cameras();
+            const auto serverFootageCameras =
+                this->q->cameraHistoryPool()->getServerFootageCameras(server);
+
+            for (const auto& camera: serverFootageCameras)
+            {
+                if (relevantCameras.contains(camera.objectCast<QnVirtualCameraResource>()))
+                {
+                    this->q->clear();
+                    break;
+                }
+            }
         });
 }
 
