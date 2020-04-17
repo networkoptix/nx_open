@@ -69,6 +69,21 @@ QnOnvifStreamReader::~QnOnvifStreamReader()
     stop();
 }
 
+void QnOnvifStreamReader::preStreamConfigureHook(bool /*isCameraControlRequired*/)
+{
+}
+
+void QnOnvifStreamReader::postStreamConfigureHook(bool isCameraControlRequired)
+{
+    if (!isCameraControlRequired)
+        return;
+
+    const auto resData = m_onvifRes->resourceData();
+    const auto delayMs = resData.value<int>("afterConfigureStreamDelayMs");
+    if (delayMs > 0)
+        std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+}
+
 CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
@@ -95,7 +110,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
         NETOPTIX_SECONDARY_TOKEN += postfix;
     }
 
-    preStreamConfigureHook();
+    preStreamConfigureHook(isCameraControlRequired);
     executePreConfigurationRequests();
 
     if (m_onvifRes->preferredRtpTransport() == nx::vms::api::RtpTransportType::multicast)
@@ -123,7 +138,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
         return result;
     }
 
-    postStreamConfigureHook();
+    postStreamConfigureHook(isCameraControlRequired);
 
     auto resData = m_onvifRes->resourceData();
     if (resData.contains(ResourceDataKey::kPreferredAuthScheme))

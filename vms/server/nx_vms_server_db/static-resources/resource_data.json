@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.258",
+    "version": "4.1.3.259",
     "data": [
         {
             "keys": [
@@ -4135,6 +4135,12 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "DW|DWC-MV85DIA"
+            ],
+            "afterConfigureStreamDelayMs": 100
         }
     ]
 }
