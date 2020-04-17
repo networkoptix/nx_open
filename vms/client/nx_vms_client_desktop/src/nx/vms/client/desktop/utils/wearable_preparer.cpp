@@ -154,7 +154,11 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
 
     if (startTimeMs == 0)
     {
-        QString startTimeString = QLatin1String(delegate->getTagValue("creation_time"));
+        // correct creation time for iPhone raw files
+        QString startTimeString = delegate->getTagValue("com.apple.quicktime.creationdate");
+        if (startTimeString.isEmpty())
+            startTimeString = delegate->getTagValue("creation_time");
+
         QDateTime startDateTime = QDateTime::fromString(startTimeString, Qt::ISODate);
         if (startDateTime.isValid())
         {
