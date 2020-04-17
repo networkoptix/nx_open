@@ -233,7 +233,7 @@ void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
 		if (currentDuration < kMinTestDuration)
 		{
 			NX_VERBOSE(this, "currentDuration(%1) < kMinTestDuration(%2)",
-				currentDuration, kMinTestDuration);
+				duration_cast<milliseconds>(currentDuration), kMinTestDuration);
 			currentDuration = kMinTestDuration;
 		}
 		 	
