@@ -18,9 +18,15 @@ class AbstractSpeedTester:
     public aio::BasicPollable
 {
 public:
+    struct Settings {
+        nx::utils::Url url;
+        int maxPingRequests = 0;
+        std::chrono::milliseconds testDuration{0};
+    };
+
     virtual ~AbstractSpeedTester() = default;
 
-    virtual void start(const nx::utils::Url& speedTestUrl, CompletionHandler handler) = 0;
+    virtual void start(CompletionHandler handler) = 0;
 };
 
 } // namespace nx::network::cloud::speed_test

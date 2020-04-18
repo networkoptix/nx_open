@@ -47,6 +47,8 @@ UplinkBandwidthTester::UplinkBandwidthTester(
 	m_pingTime(pingTime)
 {
 	m_url.setPath({});
+	NX_VERBOSE(this, "url: %1, testDuration: %2, pingTime: %3",
+		m_url, testDuration, pingTime);
 }
 
 UplinkBandwidthTester::~UplinkBandwidthTester()
@@ -228,7 +230,7 @@ void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
 	if (!m_testContext.sendRequests && *sequence == m_testContext.sequence)
 	{
 		if (*sequence == 0)
-			return testFailed(SystemError::invalidData, "*sequence == 0, should not happen");
+			return testFailed(SystemError::invalidData, "sequence == 0, should not happen");
 
 		if (currentDuration < kMinTestDuration)
 		{
@@ -293,10 +295,10 @@ void UplinkBandwidthTester::testComplete(int bytesPerMsec)
 
 void UplinkBandwidthTester::testFailed(SystemError::ErrorCode errorCode, const QString& reason)
 {
-	NX_VERBOSE(this, "Test failed, errorCode: %1: %2", errorCode, reason);
-
     if (m_handler)
     {
+		NX_VERBOSE(this, "Test failed, errorCode: %1: %2", errorCode, reason);
+
         m_testContext = TestContext();
         nx::utils::swapAndCall(m_handler, errorCode, 0);
     }

@@ -6,8 +6,11 @@
 
 namespace nx::network::cloud::speed_test {
 
+using UplinkSpeedTesterFactoryType = 
+    std::unique_ptr<AbstractSpeedTester>(const AbstractSpeedTester::Settings&);
+
 class NX_NETWORK_API UplinkSpeedTesterFactory:
-    public nx::utils::BasicFactory<std::unique_ptr<AbstractSpeedTester>(void)>
+    public nx::utils::BasicFactory<UplinkSpeedTesterFactoryType>
 {
 public:
     UplinkSpeedTesterFactory();
@@ -15,7 +18,8 @@ public:
     static UplinkSpeedTesterFactory& instance();
 
 private:
-    std::unique_ptr<AbstractSpeedTester> defaultFactoryFunc();
+    std::unique_ptr<AbstractSpeedTester> defaultFactoryFunc(
+        const AbstractSpeedTester::Settings& settings);
 };
 
 }
