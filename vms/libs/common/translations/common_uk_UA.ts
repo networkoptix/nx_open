@@ -51,61 +51,61 @@
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
+      <translation>
+        <numerusform>Байт(ів)</numerusform>
+        <numerusform>Байт(ів)</numerusform>
+        <numerusform>Байт(ів)</numerusform>
+        <numerusform>Байт(ів)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
+      <translation>
+        <numerusform>Кілобайт(ів)</numerusform>
+        <numerusform>Кілобайт(ів)</numerusform>
+        <numerusform>Кілобайт(ів)</numerusform>
+        <numerusform>Кілобайт(ів)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
+      <translation>
+        <numerusform>Мегабайт(ів)</numerusform>
+        <numerusform>Мегабайт(ів)</numerusform>
+        <numerusform>Мегабайт(ів)</numerusform>
+        <numerusform>Мегабайт(ів)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
+      <translation>
+        <numerusform>Гігабайт(ів)</numerusform>
+        <numerusform>Гігабайт(ів)</numerusform>
+        <numerusform>Гігабайт(ів)</numerusform>
+        <numerusform>Гігабайт(ів)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
+      <translation>
+        <numerusform>Терабайт(ів)</numerusform>
+        <numerusform>Терабайт(ів)</numerusform>
+        <numerusform>Терабайт(ів)</numerusform>
+        <numerusform>Терабайт(ів)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
+      <translation>
+        <numerusform>Петабайт(ів)</numerusform>
+        <numerusform>Петабайт(ів)</numerusform>
+        <numerusform>Петабайт(ів)</numerusform>
+        <numerusform>Петабайт(ів)</numerusform>
       </translation>
     </message>
   </context>
@@ -1945,27 +1945,27 @@
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation type="unfinished">Show desktop notification</translation>
+      <translation>Показати повідомлення на робочому столі</translation>
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation type="unfinished">Send mobile notification</translation>
+      <translation>Надіслати сповіщення на мобільний телефон</translation>
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Споживання</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Пристрій було відключено</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Камера була відключена</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>Модуль Вводу/Виводу був відключений</translation>
     </message>
   </context>
   <context>
