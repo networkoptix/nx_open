@@ -247,13 +247,14 @@ case "$1" in
 
         groupadd --system "$SYSTEM_USER" 2>/dev/null || true
         useradd --no-user-group --system --gid "$SYSTEM_USER" "$SYSTEM_USER" 2>/dev/null || true
-        usermod --groups video "$SYSTEM_USER" 2>/dev/null || true
 
         # Allow core dumps creation.
         chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"
 
         if [[ $WITH_ROOT_TOOL == 'true' ]]
         then
+            usermod --groups audio video "$SYSTEM_USER" 2>/dev/null || true
+
             chown "root:${SYSTEM_USER}" "${BIN_DIR}/root-tool-bin"
             chmod u+s "${BIN_DIR}/root-tool-bin"
 
