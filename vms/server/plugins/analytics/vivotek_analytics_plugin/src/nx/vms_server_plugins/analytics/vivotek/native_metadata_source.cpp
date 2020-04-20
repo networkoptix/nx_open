@@ -17,6 +17,7 @@ using namespace nx::network;
 
 NativeMetadataSource::NativeMetadataSource()
 {
+    m_httpClient.emplace();
 }
 
 NativeMetadataSource::~NativeMetadataSource()
@@ -40,29 +41,29 @@ void NativeMetadataSource::open(const Url& baseUrl, MoveOnlyFunc<void(std::excep
             url.setPath("/ws/vca");
             url.setQuery("?data=meta,event");
 
-            websocket::addClientHeaders(&m_httpClient,
+            websocket::addClientHeaders(&*m_httpClient,
                 "tracker-protocol", websocket::CompressionType::perMessageDeflate);
 
-            m_httpClient.doGet(url,
+            m_httpClient->doGet(url,
                 [this, handler = std::move(handler)]() mutable
                 {
                     try
                     {
-                        if (m_httpClient.failed())
+                        if (m_httpClient->failed())
                             throw std::system_error(
-                                m_httpClient.lastSysErrorCode(), std::system_category(),
-                                "HTTP transport connection failed: " + m_httpClient.url().toStdString());
+                                m_httpClient->lastSysErrorCode(), std::system_category(),
+                                "HTTP transport connection failed: " + m_httpClient->url().toStdString());
 
                         const auto error = websocket::validateResponse(
-                            m_httpClient.request(), *m_httpClient.response());
+                            m_httpClient->request(), *m_httpClient->response());
                         if (error != websocket::Error::noError)
                             throw std::runtime_error("Websocket handshake failed");
 
                         m_websocket.emplace(
-                            m_httpClient.takeSocket(),
+                            m_httpClient->takeSocket(),
                             websocket::Role::client,
                             websocket::FrameType::text,
-                            websocket::compressionType(m_httpClient.response()->headers));
+                            websocket::compressionType(m_httpClient->response()->headers));
 
                         m_websocket->start();
 
@@ -103,9 +104,11 @@ void NativeMetadataSource::read(MoveOnlyFunc<void(std::exception_ptr, Json)> han
 
 void NativeMetadataSource::close(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_httpClient.cancelPostedCalls(
+    post(
         [this, handler = std::move(handler)]() mutable
         {
+            m_httpClient.emplace();
+
             if (!m_websocket)
             {
                 handler();
@@ -125,7 +128,8 @@ void NativeMetadataSource::close(nx::utils::MoveOnlyFunc<void()> handler)
 void NativeMetadataSource::stopWhileInAioThread()
 {
     BasicPollable::stopWhileInAioThread();
-    m_httpClient.pleaseStopSync();
+    if (m_httpClient)
+        m_httpClient.reset();
     if (m_websocket)
         m_websocket->pleaseStopSync();
 }
@@ -138,14 +142,14 @@ void NativeMetadataSource::ensureDetailMetadataMode(Url url,
 
     url.setScheme("http:");
     url.setPath("/VCA/Config/AE/WebSocket/DetailMetadata");
-    m_httpClient.doGet(url,
+    m_httpClient->doGet(url,
         [this, url, handler = std::move(handler)]() mutable
         {
             try
             {
-                checkResponse(m_httpClient);
+                checkResponse(*m_httpClient);
 
-                if (m_httpClient.fetchMessageBodyBuffer().trimmed() == "true")
+                if (m_httpClient->fetchMessageBodyBuffer().trimmed() == "true")
                 {
                     handler(nullptr);
                     return;
@@ -163,14 +167,14 @@ void NativeMetadataSource::ensureDetailMetadataMode(Url url,
 void NativeMetadataSource::setDetailMetadataMode(Url url,
     MoveOnlyFunc<void(std::exception_ptr)> handler)
 {
-    m_httpClient.setRequestBody(
+    m_httpClient->setRequestBody(
         std::make_unique<http::BufferSource>("application/json", "true"));
-    m_httpClient.doPost(url,
+    m_httpClient->doPost(url,
         [this, url, handler = std::move(handler)]() mutable
         {
             try
             {
-                checkResponse(m_httpClient);
+                checkResponse(*m_httpClient);
 
                 reloadConfig(url, std::move(handler));
             }
@@ -185,12 +189,12 @@ void NativeMetadataSource::reloadConfig(Url url,
     MoveOnlyFunc<void(std::exception_ptr)> handler)
 {
     url.setPath("/VCA/Config/Reload");
-    m_httpClient.doGet(url,
+    m_httpClient->doGet(url,
         [this, url, handler = std::move(handler)]() mutable
         {
             try
             {
-                checkResponse(m_httpClient);
+                checkResponse(*m_httpClient);
 
                 handler(nullptr);
             }

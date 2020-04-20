@@ -41,7 +41,7 @@ private:
         nx::utils::MoveOnlyFunc<void(std::exception_ptr)> handler);
 
 private:
-    nx::network::http::AsyncClient m_httpClient;
+    std::optional<nx::network::http::AsyncClient> m_httpClient;
     std::optional<nx::network::websocket::WebSocket> m_websocket;
     nx::Buffer m_buffer;
 };
