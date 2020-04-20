@@ -1,8 +1,9 @@
 #include "object_track_aggregator.h"
 
-#include <analytics/db/config.h>
+#include <nx/utils/log/log.h>
 
 #include <analytics/db/analytics_db_utils.h>
+#include <analytics/db/config.h>
 
 namespace nx::analytics::db {
 
@@ -54,6 +55,12 @@ std::vector<AggregatedTrackData> ObjectTrackAggregator::getAggregatedData(bool f
     if (flush || length(m_aggregations.front()) >= m_aggregationPeriod)
         takeOldestData(&totalAggregated);
 
+    for (const auto& data: totalAggregated)
+    {
+        NX_VERBOSE(this, "Returning aggregation: timestamp %1, box %2, trackIds %3",
+            data.timestamp, data.boundingBox, containerString(data.trackIds));
+    }
+
     return totalAggregated;
 }
 
@@ -64,6 +71,9 @@ void ObjectTrackAggregator::add(
     const QRectF& box)
 {
     const auto translatedBox = translateToSearchGrid(box);
+
+    NX_VERBOSE(this, "Adding track %1, box %2, timestamp %3. Translated box %4",
+        trackId, box, timestamp, translatedBox);
 
     context->rectAggregator.add(translatedBox, trackId);
 

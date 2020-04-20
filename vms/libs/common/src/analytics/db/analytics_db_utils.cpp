@@ -6,7 +6,13 @@ namespace nx::analytics::db {
 
 QRect translateToSearchGrid(const QRectF& box)
 {
-    return QnMetaDataV1::rectFromNormalizedRect(box);
+    auto rect = QnMetaDataV1::rectFromNormalizedRect(box);
+    // Making sure rect is not empty.
+    if (rect.width() == 0)
+        rect.setWidth(1);
+    if (rect.height() == 0)
+        rect.setHeight(1);
+    return rect;
 }
 
 bool rectsIntersectToSearchPrecision(const QRectF& one, const QRectF& two)
