@@ -15,6 +15,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
+#include <server/server_storage_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
@@ -97,8 +98,8 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
 
     connect(q, &AbstractSearchListModel::camerasChanged, this, &Private::updateMetadataReceivers);
 
-    auto serverChangesListener = new QnResourceChangesListener(q);
-    serverChangesListener->connectToResources<QnVirtualCameraResource>(
+    auto cameraStatusListener = new QnResourceChangesListener(q);
+    cameraStatusListener->connectToResources<QnVirtualCameraResource>(
         q->resourcePool(),
         &QnResource::statusChanged,
         [this](const QnResourcePtr& resource)
@@ -108,6 +109,23 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
 
             if (isCameraApplicable(resource.dynamicCast<QnVirtualCameraResource>()))
                 updateMetadataReceivers();
+        });
+
+    connect(qnServerStorageManager, &QnServerStorageManager::activeMetadataStorageChanged, this,
+        [this](const QnMediaServerResourcePtr& server)
+        {
+            const auto relevantCameras = this->q->cameras();
+            const auto serverFootageCameras =
+                this->q->cameraHistoryPool()->getServerFootageCameras(server);
+
+            for (const auto& camera: serverFootageCameras)
+            {
+                if (relevantCameras.contains(camera.objectCast<QnVirtualCameraResource>()))
+                {
+                    this->q->clear();
+                    break;
+                }
+            }
         });
 }
 
@@ -126,7 +144,6 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
     const nx::analytics::db::ObjectTrack& track = m_data[index.row()];
     handled = true;
 
-    static const auto kDefaultLocale = QString();
     switch (role)
     {
         case Qt::DisplayRole:
@@ -436,12 +453,25 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
         request, false /*isLocal*/, nx::utils::guarded(this, callback), thread());
 }
 
+void AnalyticsSearchListModel::Private::setLiveTimestampGetter(LiveTimestampGetter value)
+{
+    m_liveTimestampGetter = value;
+}
+
 void AnalyticsSearchListModel::Private::updateMetadataReceivers()
 {
     if (m_liveReceptionActive)
     {
         auto cameras = q->cameras();
         MetadataReceiverList newMetadataReceivers;
+
+        // Remove no longer relevant deferred metadata.
+        const auto deferredCameras = m_deferredMetadata.keys();
+        for (const auto& camera: deferredCameras)
+        {
+            if (!cameras.contains(camera))
+                m_deferredMetadata.remove(camera);
+        }
 
         // Preserve existing receivers that are still relevant.
         for (auto& receiver: m_metadataReceivers)
@@ -468,6 +498,7 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
     else
     {
         m_metadataReceivers.clear();
+        m_deferredMetadata.clear();
         NX_VERBOSE(q, "Released all metadata receivers");
     }
 }
@@ -505,11 +536,60 @@ void AnalyticsSearchListModel::Private::processMetadata()
     QList<QList<QnAbstractCompressedMetadataPtr>> packetsBySource;
     int totalPackets = 0;
 
+    static constexpr auto kMaxTimestamp = std::numeric_limits<milliseconds>::max();
+
+    milliseconds liveTimestamp{};
+    if (m_liveTimestampGetter && ini().delayRightPanelLiveAnalytics)
+    {
+        // Choose "live" of a camera with the longest delay.
+        for (const auto& receiver: m_metadataReceivers)
+        {
+            const auto timestamp = m_liveTimestampGetter(receiver->camera());
+            if (timestamp > 0ms && timestamp != kMaxTimestamp)
+                liveTimestamp = std::max(liveTimestamp, timestamp);
+        }
+    }
+
     for (const auto& receiver: m_metadataReceivers)
     {
-        auto packets = receiver->takeData();
+        auto packets = m_deferredMetadata.take(receiver->camera()) + receiver->takeData();
         if (packets.empty())
             continue;
+
+        const auto metadataTimestamp =
+            [this](const QnAbstractCompressedMetadataPtr& packet) -> milliseconds
+            {
+                return packet->isSpecialTimeValue()
+                    ? kMaxTimestamp
+                    : duration_cast<milliseconds>(microseconds(packet->timestamp));
+            };
+
+        // TODO: #vkutin Normally packets should be sorted except maybe best shot packets.
+        // Try to get rid of this additional sort in the future.
+        std::stable_sort(packets.begin(), packets.end(),
+            [metadataTimestamp](const auto& left, const auto& right)
+            {
+                return metadataTimestamp(left) < metadataTimestamp(right);
+            });
+
+        if (liveTimestamp > 0ms)
+        {
+            const auto pos = std::lower_bound(packets.begin(), packets.end(), liveTimestamp,
+                [metadataTimestamp](const auto& left, milliseconds right)
+                {
+                    return metadataTimestamp(left) < right;
+                });
+
+            if (pos == packets.begin())
+            {
+                m_deferredMetadata[receiver->camera()].swap(packets);
+            }
+            else if (pos != packets.end())
+            {
+                m_deferredMetadata[receiver->camera()] = packets.mid(pos - packets.begin());
+                packets.erase(pos, packets.end());
+            }
+        }
 
         packetsBySource.push_back(packets);
         totalPackets += packets.size();

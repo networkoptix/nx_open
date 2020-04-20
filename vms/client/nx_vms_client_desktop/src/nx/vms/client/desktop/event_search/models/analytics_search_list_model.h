@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QRectF>
 
 #include <nx/vms/client/desktop/event_search/models/abstract_async_search_list_model.h>
@@ -25,6 +27,11 @@ public:
 
     QString selectedObjectType() const;
     void setSelectedObjectType(const QString& value);
+
+    // Metadata newer than timestamp returned by this callback will be deferred.
+    using LiveTimestampGetter = std::function<
+        std::chrono::milliseconds(const QnVirtualCameraResourcePtr&)>;
+    void setLiveTimestampGetter(LiveTimestampGetter value);
 
     virtual bool isConstrained() const override;
     virtual bool hasAccessRights() const override;

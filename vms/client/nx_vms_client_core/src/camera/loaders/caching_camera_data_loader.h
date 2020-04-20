@@ -63,6 +63,7 @@ signals:
 
 public slots:
     void discardCachedData();
+    void discardCachedDataType(Qn::TimePeriodContent type);
     void invalidateCachedData();
 
 private slots:
@@ -75,8 +76,6 @@ private:
     void init();
     void initLoaders();
     void updateTimePeriods(Qn::TimePeriodContent dataType, bool forced = false);
-
-    void discardCachedDataType(Qn::TimePeriodContent type);
 
 private:
     AllowedContent m_allowedContent;

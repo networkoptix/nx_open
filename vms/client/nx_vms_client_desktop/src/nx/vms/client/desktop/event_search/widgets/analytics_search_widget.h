@@ -1,8 +1,11 @@
 #pragma once
 
+#include <chrono>
+
 #include "abstract_search_widget.h"
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 
 namespace nx::vms::client::desktop {
 
@@ -22,6 +25,8 @@ public:
 
     bool areaSelectionEnabled() const;
     QString selectedObjectType() const;
+
+    void setLiveTimestampGetter(AnalyticsSearchListModel::LiveTimestampGetter value);
 
 signals:
     void areaSelectionEnabledChanged(bool value, QPrivateSignal);

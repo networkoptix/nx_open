@@ -265,8 +265,14 @@ void QnIoModuleOverlayWidgetPrivate::at_connectionClosed()
     q->setEnabled(false);
     connectionOpened = false;
 
+    // Resets states since server initially sends only active states after restart.
     for (auto& item: states)
+    {
+        item.state.isActive = false;
+        item.state.timestamp = -1;
         item.stateChangeTimer.invalidate();
+        contents->stateChanged(item.config, item.state);
+    }
 
     executeDelayedParented([this](){ openConnection(); }, kReconnectDelayMs, this);
 }

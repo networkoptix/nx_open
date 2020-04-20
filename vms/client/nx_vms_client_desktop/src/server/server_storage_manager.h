@@ -47,6 +47,8 @@ public:
     void saveStorages(const QnStorageResourceList& storages);
     void deleteStorages(const nx::vms::api::IdDataList& ids);
 
+    QnStorageResourcePtr activeMetadataStorage(const QnMediaServerResourcePtr& server) const;
+
 signals:
     void serverProtocolsChanged(
         const QnMediaServerResourcePtr& server, const QSet<QString>& protocols);
@@ -66,6 +68,9 @@ signals:
     void storageChanged(const QnStorageResourcePtr& storage);
     void storageRemoved(const QnStorageResourcePtr& storage);
 
+    // For convenience this signal is also sent when the server goes online or offline or is removed.
+    void activeMetadataStorageChanged(const QnMediaServerResourcePtr& server);
+
 private:
     void invalidateRequests();
 
@@ -83,6 +88,14 @@ private:
 
     void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
+
+    QnStorageResourcePtr calculateActiveMetadataStorage(
+        const QnMediaServerResourcePtr& server) const;
+
+    void setActiveMetadataStorage(const QnMediaServerResourcePtr& server,
+        const QnStorageResourcePtr& storage);
+
+    void updateActiveMetadataStorage(const QnMediaServerResourcePtr& server);
 
 private slots:
     void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle);
@@ -103,6 +116,8 @@ private:
 
     QHash<QnMediaServerResourcePtr, ServerInfo> m_serverInfo;
     QHash<int, RequestKey> m_requests;
+
+    QHash<QnMediaServerResourcePtr, QnStorageResourcePtr> m_activeMetadataStorages;
 };
 
 #define qnServerStorageManager QnServerStorageManager::instance()

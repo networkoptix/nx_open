@@ -1580,7 +1580,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Попередження! Це експериментальний параметр, який зберігає ЦП, але може вплинути на анімацію.</translation>
     </message>
   </context>
   <context>
@@ -2156,7 +2156,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Вихідний Сервер і %1</translation>
     </message>
   </context>
   <context>
@@ -2717,7 +2717,7 @@ to %1</source>
     <message>
       <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
       <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
+      <translation>%1 з %2 обраних користувачів не %3 користувачів, і не зможуть отримати мобільні сповіщення.</translation>
     </message>
   </context>
   <context>
@@ -3711,27 +3711,27 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Загальні</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Особливості</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Дозволена кількість Екранів</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Дозволенi Підключення Керувань</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Дозволені Потоки Архіву</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Залишилося деактивації</translation>
     </message>
   </context>
   <context>
@@ -4037,11 +4037,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>Залишилося %n деактивації.</numerusform>
+        <numerusform>Залишилося %n деактивації.</numerusform>
+        <numerusform>Залишилося %n деактивації.</numerusform>
+        <numerusform>Залишилося %n деактивації.</numerusform>
       </translation>
     </message>
   </context>
@@ -4069,12 +4069,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+      <translation>Будь ласка, надішліть наданий Ліцензійний Ключ і Апаратний ID у вашу підтримку для отримання файлу з ключем активації.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
+      <translation>Будь ласка, надішліть наданий Ліцензійний ключ та Апаратний ID до вашої регіональної підтримки (%1) для отримання файлу з ключем активації.</translation>
     </message>
   </context>
   <context>
@@ -5890,11 +5890,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>Сервер недоступний.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>зараз</translation>
     </message>
   </context>
   <context>
@@ -7050,7 +7050,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Активувати ліцензію...</translation>
     </message>
   </context>
   <context>
@@ -7729,11 +7729,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n значень</numerusform>
+        <numerusform>+%n значень</numerusform>
+        <numerusform>+%n значень</numerusform>
+        <numerusform>+%n значень</numerusform>
       </translation>
     </message>
   </context>
@@ -9371,7 +9371,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>Система не підключена до %1. Мобільні сповіщення працюють тільки коли система підключена до %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>

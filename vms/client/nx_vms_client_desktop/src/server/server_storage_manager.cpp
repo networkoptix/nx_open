@@ -17,6 +17,8 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
 
+#include <nx/utils/range_adapters.h>
+
 namespace {
 
 using namespace std::chrono;
@@ -47,6 +49,14 @@ QnMediaServerResourcePtr getServerForResource(const QnResourcePtr& resource)
 
     return {};
 };
+
+bool isActive(const QnStorageResourcePtr& storage)
+{
+    return storage
+        && !storage->flags().testFlag(Qn::removed)
+        && storage->isWritable() && storage->isUsedForWriting()
+        && storage->isOnline();
+}
 
 } // namespace
 
@@ -96,7 +106,23 @@ void QnServerStorageManager::handleResourceAdded(const QnResourcePtr& resource)
     const auto emitStorageChanged =
         [this](const QnResourcePtr& resource)
         {
+            const auto storage = resource.objectCast<QnStorageResource>();
+            if (NX_ASSERT(storage))
+                emit storageChanged(storage);
+        };
+
+    const auto handleStorageChanged =
+        [this](const QnResourcePtr& resource)
+        {
+            const auto storage = resource.objectCast<QnStorageResource>();
+            if (!NX_ASSERT(storage))
+                return;
+
             emit storageChanged(resource.objectCast<QnStorageResource>());
+
+            const auto server = storage->getParentServer();
+            if (server && server->metadataStorageId() == resource->getId())
+                updateActiveMetadataStorage(server);
         };
 
     if (const auto& storage = resource.objectCast<QnClientStorageResource>())
@@ -104,17 +130,17 @@ void QnServerStorageManager::handleResourceAdded(const QnResourcePtr& resource)
         connect(storage, &QnResource::statusChanged,
             this, &QnServerStorageManager::checkStoragesStatusInternal);
 
-        connect(storage, &QnResource::statusChanged, this, emitStorageChanged);
+        connect(storage, &QnResource::statusChanged, this, handleStorageChanged);
 
         // Free space is not used in the client but called quite often.
         //connect(storage, &QnClientStorageResource::freeSpaceChanged,
         //    this, emitStorageChanged);
 
         connect(storage, &QnClientStorageResource::totalSpaceChanged, this, emitStorageChanged);
-        connect(storage, &QnClientStorageResource::isWritableChanged, this, emitStorageChanged);
+        connect(storage, &QnClientStorageResource::isWritableChanged, this, handleStorageChanged);
 
         connect(storage, &QnClientStorageResource::isUsedForWritingChanged,
-            this, emitStorageChanged);
+            this, handleStorageChanged);
 
         connect(storage, &QnClientStorageResource::isBackupChanged, this, emitStorageChanged);
         connect(storage, &QnClientStorageResource::isActiveChanged, this, emitStorageChanged);
@@ -146,6 +172,11 @@ void QnServerStorageManager::handleResourceRemoved(const QnResourcePtr& resource
         storage->disconnect(this);
         checkStoragesStatusInternal(storage);
         emit storageRemoved(storage);
+
+        const auto server = storage->getParentServer();
+        if (server && activeMetadataStorage(server) == storage)
+            updateActiveMetadataStorage(server);
+
         return;
     }
 
@@ -155,6 +186,8 @@ void QnServerStorageManager::handleResourceRemoved(const QnResourcePtr& resource
 
     m_serverInfo.remove(server);
     server->disconnect(this);
+
+    updateActiveMetadataStorage(server);
 };
 
 void QnServerStorageManager::invalidateRequests()
@@ -233,6 +266,11 @@ bool QnServerStorageManager::cancelBackupServerStorages(const QnMediaServerResou
 
 void QnServerStorageManager::checkStoragesStatus(const QnMediaServerResourcePtr& server)
 {
+    if (!server)
+        return;
+
+    updateActiveMetadataStorage(server);
+
     if (!isServerValid(server))
         return;
 
@@ -517,4 +555,44 @@ void QnServerStorageManager::at_storageSpaceReply(
         serverInfo.protocols = replyProtocols;
         emit serverProtocolsChanged(requestKey.server, replyProtocols);
     }
+}
+
+QnStorageResourcePtr QnServerStorageManager::activeMetadataStorage(
+    const QnMediaServerResourcePtr& server) const
+{
+    return m_activeMetadataStorages.value(server);
+}
+
+void QnServerStorageManager::setActiveMetadataStorage(const QnMediaServerResourcePtr& server,
+    const QnStorageResourcePtr& storage)
+{
+    if (!NX_ASSERT(server))
+        return;
+
+    if (m_activeMetadataStorages.value(server) == storage)
+        return;
+
+    m_activeMetadataStorages[server] = storage;
+    emit activeMetadataStorageChanged(server);
+}
+
+void QnServerStorageManager::updateActiveMetadataStorage(const QnMediaServerResourcePtr& server)
+{
+    setActiveMetadataStorage(server, calculateActiveMetadataStorage(server));
+}
+
+QnStorageResourcePtr QnServerStorageManager::calculateActiveMetadataStorage(
+    const QnMediaServerResourcePtr& server) const
+{
+    if (!isServerValid(server)) //< Includes online/offline check.
+        return {};
+
+    const auto storageId = server->metadataStorageId();
+    if (storageId.isNull())
+        return {};
+
+    const auto storage = resourcePool()->getResourceById<QnStorageResource>(storageId);
+    return isActive(storage) && storage->getParentServer() == server
+        ? storage
+        : QnStorageResourcePtr();
 }
