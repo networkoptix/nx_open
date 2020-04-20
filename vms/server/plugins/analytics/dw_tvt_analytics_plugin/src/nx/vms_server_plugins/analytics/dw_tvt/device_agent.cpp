@@ -76,6 +76,7 @@ QByteArray prepareUnsubscribeBody(const QByteArray subscribeResponseBody)
     doc.setContent(subscribeResponseBody);
 
     QDomNode configNode = doc.elementsByTagName("config").at(0);
+    // QDomNodeList::at(int index) return correct empty QDomNode object if index is out of range.
     if (configNode.isNull())
         return {};
 
@@ -126,7 +127,7 @@ bool DeviceAgent::logHttpRequestResult()
 {
     if (m_httpClient->state() == nx::network::http::AsyncClient::State::sFailed)
     {
-        NX_URL_PRINT << lm("Http request %1 failed with status code %2")
+        NX_URL_PRINT << lm("Http request %1 failed with error code %2")
             .args(m_httpClient->url(), m_httpClient->lastSysErrorCode())
             .toStdString();
         return false;
@@ -141,17 +142,17 @@ bool DeviceAgent::logHttpRequestResult()
         return false;
     }
 
-    NX_URL_PRINT << lm("Http request %1 succeeded with status code %2")
+    NX_URL_PRINT << lm("Http request %1 succeeded with error code %2")
         .args(m_httpClient->url(), m_httpClient->lastSysErrorCode()).toStdString();
 
     return true;
 }
 
 void DeviceAgent::prepareHttpClient(const QByteArray& messageBody,
-    std::unique_ptr<nx::network::AbstractStreamSocket> s/* = {}*/)
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket/* = {}*/)
 {
     NX_ASSERT(!m_httpClient);
-    m_httpClient = std::make_unique<nx::network::http::AsyncClient>(std::move(s));
+    m_httpClient = std::make_unique<nx::network::http::AsyncClient>(std::move(socket));
     m_httpClient->setUserName(m_auth.user());
     m_httpClient->setUserPassword(m_auth.password());
     m_httpClient->setSendTimeout(kSendTimeout);

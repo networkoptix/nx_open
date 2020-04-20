@@ -63,7 +63,7 @@ public:
 
     nx::utils::Url makeUrl(const QString& requestName);
     void prepareHttpClient(const QByteArray& messageBody,
-        std::unique_ptr<nx::network::AbstractStreamSocket> s = {});
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket = {});
     void makeSubscriptionAsync();
     void makeUnsubscriptionSync(std::unique_ptr<nx::network::AbstractStreamSocket> s);
     void makeDeferredSubscriptionAsync();
