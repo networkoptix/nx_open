@@ -525,35 +525,4 @@ void EventsStorage::logDataSaveResult(sql::DBResult resultCode)
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-
-EventsStorageFactory::EventsStorageFactory():
-    base_type([this](auto&&... args)
-        { return defaultFactoryFunction(std::forward<decltype(args)>(args)...); })
-{
-}
-
-std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::create(
-    QnCommonModule* commonModule, AbstractIframeSearchHelper* iframeSearchHelper)
-{
-    return std::make_unique<MovableAnalyticsDb>(
-        [this, commonModule, iframeSearchHelper]()
-        {
-            return base_type::create(commonModule, iframeSearchHelper);
-        });
-}
-
-EventsStorageFactory& EventsStorageFactory::instance()
-{
-    static EventsStorageFactory staticInstance;
-    return staticInstance;
-}
-
-std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunction(
-    QnCommonModule* commonModule,
-    AbstractIframeSearchHelper* iframeSearchHelper)
-{
-    return std::make_unique<EventsStorage>(commonModule, iframeSearchHelper);
-}
-
 } // namespace nx::analytics::db

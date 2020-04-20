@@ -5,7 +5,8 @@
 namespace nx::network::cloud::speed_test {
 
 UplinkSpeedTesterFactory::UplinkSpeedTesterFactory():
-    BasicFactory(std::bind(&UplinkSpeedTesterFactory::defaultFactoryFunc, this))
+    BasicFactory(
+        std::bind(&UplinkSpeedTesterFactory::defaultFactoryFunc, this, std::placeholders::_1))
 {
 }
 
@@ -15,9 +16,10 @@ UplinkSpeedTesterFactory& UplinkSpeedTesterFactory::instance()
     return factory;
 }
 
-std::unique_ptr<AbstractSpeedTester> UplinkSpeedTesterFactory::defaultFactoryFunc()
+std::unique_ptr<AbstractSpeedTester> UplinkSpeedTesterFactory::defaultFactoryFunc(
+    const AbstractSpeedTester::Settings& settings)
 {
-    return std::make_unique<UplinkSpeedTester>();
+    return std::make_unique<UplinkSpeedTester>(settings);
 }
 
 } //namespace nx::network::cloud::speed_test

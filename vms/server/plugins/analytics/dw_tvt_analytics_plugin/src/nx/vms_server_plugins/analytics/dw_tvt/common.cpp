@@ -2,10 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_tvt {
 
 bool operator==(const EventType& lh, const EventType& rh)
 {
@@ -17,8 +14,10 @@ bool EngineManifest::supportsModel(const QString& model) const noexcept
     if (supportedCameraModels.isEmpty())
         return true;
 
-    return std::find(supportedCameraModels.cbegin(), supportedCameraModels.cend(), model)
-        != supportedCameraModels.cend();
+    const auto modelIt = std::find_if(supportedCameraModels.cbegin(), supportedCameraModels.cend(),
+        [&model](const auto& supportedModel) { return model.startsWith(supportedModel); });
+
+    return modelIt != supportedCameraModels.cend();
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),
@@ -26,7 +25,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json),
     DwTvtEngineManifest_Fields, (brief, true))
 
-} // namespace dw_tvt
-} // namespace analytics
-} // namespace mediaserver_plugin
-} // namespace nx
+} // nx::vms_server_plugins::analytics::dw_tvt

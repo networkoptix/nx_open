@@ -137,7 +137,7 @@ bool AnyAccessibleAddressConnector::establishDirectConnection(const SocketAddres
 
     auto tcpSocket = createTcpSocket(m_ipVersion);
     tcpSocket->bindToAioThread(getAioThread());
-    if (!tcpSocket->setNonBlockingMode(true))
+    if (!tcpSocket->setNonBlockingMode(true) || !tcpSocket->setSendTimeout(m_timeout))
         return false; //< TODO: Provide error code?
 
     auto tpcSocketPtr = tcpSocket.get();

@@ -42,7 +42,7 @@ private:
 	void sendRequest();
 
 	void testComplete(int bytesPerMsec);
-	void testFailed(SystemError::ErrorCode errorCode);
+	void testFailed(SystemError::ErrorCode errorCode, const QString& reason);
 
 private:
     struct RunningValue

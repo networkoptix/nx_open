@@ -54,17 +54,18 @@ class MockUplinkSpeedTester: public UplinkSpeedTester
 {
 public:
     MockUplinkSpeedTester(
+        const Settings& settings,
         nx::utils::SyncQueue<std::tuple<
             SystemError::ErrorCode,
             std::optional<nx::hpm::api::ConnectionSpeed>>>* testRunEvent):
+        UplinkSpeedTester(settings),
         m_testRunEvent(testRunEvent)
     {
     }
 
-    virtual void start(const nx::utils::Url& url, CompletionHandler handler) override
+    virtual void start(CompletionHandler handler) override
     {
         UplinkSpeedTester::start(
-            url,
             [this, handler = std::move(handler)](const auto systemError, const auto uplinkSpeed)
             {
                 m_testRunEvent->push(std::make_tuple(systemError, uplinkSpeed));
@@ -135,6 +136,7 @@ protected:
 protected:
     nx::network::http::TestHttpServer m_testHttpServer;
 	UplinkSpeedTestServer m_speedTestServer;
+    AbstractSpeedTester::Settings m_speedTestSettings{{}, 20, std::chrono::seconds(30)};
 
 	nx::utils::SyncQueue<std::tuple<
 		SystemError::ErrorCode,
@@ -148,9 +150,9 @@ class UplinkSpeedTester: public TestFixture
 protected:
     void whenStartSpeedTest(const nx::utils::Url& url)
     {
-        m_speedTester = std::make_unique<speed_test::UplinkSpeedTester>();
+        m_speedTestSettings.url = url;
+        m_speedTester = std::make_unique<speed_test::UplinkSpeedTester>(m_speedTestSettings);
         m_speedTester->start(
-			url,
 			[this](auto&& ... args)
 			{
 				m_testDoneEvent.push(std::make_tuple(std::forward<decltype(args)>(args)...));
@@ -308,10 +310,12 @@ private:
     void overrideSpeedTestFactory()
     {
         m_factoryFuncBak = UplinkSpeedTesterFactory::instance().setCustomFunc(
-            [this]()
+            [this](const auto& speedTestSettings)
             {
                 // Forcing speed test to complete immediately when start() is called
-                return std::make_unique<MockUplinkSpeedTester>(&m_testDoneEvent);
+                return std::make_unique<MockUplinkSpeedTester>(
+                    speedTestSettings,
+                    &m_testDoneEvent);
             });
     }
 
@@ -345,7 +349,7 @@ private:
 
 private:
     CloudModulesXmlServer m_cloudModulesServer;
-    nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractSpeedTester>(void)> m_factoryFuncBak;
+    nx::utils::MoveOnlyFunc<speed_test::UplinkSpeedTesterFactoryType> m_factoryFuncBak;
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     std::unique_ptr<speed_test::UplinkSpeedReporter> m_reporter;
     nx::network::http::TestHttpServer m_fakeMediator;

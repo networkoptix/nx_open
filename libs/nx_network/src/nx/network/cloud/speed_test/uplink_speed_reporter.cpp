@@ -19,10 +19,13 @@ static constexpr std::chrono::milliseconds kOneDay = std::chrono::hours(24);
 UplinkSpeedReporter::UplinkSpeedReporter(
     const nx::utils::Url& cloudModulesXmlUrl,
     hpm::api::MediatorConnector* mediatorConnector,
-    std::unique_ptr<nx::network::aio::Scheduler> scheduler):
+    std::unique_ptr<nx::network::aio::Scheduler> scheduler,
+    const AbstractSpeedTester::Settings& settings)
+    :
     m_cloudModulesXmlUrl(cloudModulesXmlUrl),
     m_mediatorConnector(mediatorConnector),
-    m_scheduler(std::move(scheduler))
+    m_scheduler(std::move(scheduler)),
+    m_speedTestSettings(settings)
 {
     if (!m_scheduler)
     {
@@ -86,7 +89,6 @@ void UplinkSpeedReporter::start()
 void UplinkSpeedReporter::stopTest()
 {
     m_testInProgress = false;
-    m_peerConnectionSpeed = std::nullopt;
     m_speedTestUrlFetcher.reset();
     m_uplinkSpeedTester.reset();
     m_mediatorApiClient.reset();
@@ -158,11 +160,11 @@ void UplinkSpeedReporter::onFetchSpeedTestUrlComplete(
     if (!http::StatusCode::isSuccessCode(statusCode) || speedTestUrl.isEmpty())
         return stopTest();
 
+    m_speedTestSettings.url = speedTestUrl;
     if (!m_uplinkSpeedTester)
-        m_uplinkSpeedTester = UplinkSpeedTesterFactory::instance().create();
+        m_uplinkSpeedTester = UplinkSpeedTesterFactory::instance().create(m_speedTestSettings);
 
     m_uplinkSpeedTester->start(
-        speedTestUrl,
         std::bind(&UplinkSpeedReporter::onSpeedTestComplete, this, _1, _2));
 }
 
@@ -184,7 +186,7 @@ void UplinkSpeedReporter::onSpeedTestComplete(
         return disable(__func__);
     }
 
-    m_peerConnectionSpeed = hpm::api::PeerConnectionSpeed{
+    hpm::api::PeerConnectionSpeed peerConnectionSpeed{
         systemCredentials->serverId.toStdString(),
         systemCredentials->systemId.toStdString(),
         std::move(*connectionSpeed)
@@ -192,12 +194,14 @@ void UplinkSpeedReporter::onSpeedTestComplete(
 
     NX_VERBOSE(this, "Fetching Mediator address...");
     m_mediatorConnector->fetchAddress(
-        std::bind(&UplinkSpeedReporter::onFetchMediatorAddressComplete, this, _1, _2));
+        std::bind(&UplinkSpeedReporter::onFetchMediatorAddressComplete, this, 
+            _1, _2, std::move(peerConnectionSpeed)));
 }
 
 void UplinkSpeedReporter::onFetchMediatorAddressComplete(
         http::StatusCode::Value statusCode,
-        hpm::api::MediatorAddress mediatorAddress)
+        hpm::api::MediatorAddress mediatorAddress,
+        hpm::api::PeerConnectionSpeed peerConnectionSpeed)
 {
     NX_VERBOSE(this,
         "Fetched Mediator adress, http status code = %1, mediator address = {%2}",
@@ -212,22 +216,16 @@ void UplinkSpeedReporter::onFetchMediatorAddressComplete(
         return stopTest();
     }
 
-    if (!m_peerConnectionSpeed)
-    {
-        NX_ERROR(this, "Speed test was completed, but m_peerConnectionSpeed does not have a value");
-        return stopTest();
-    }
-
     if (!m_mediatorApiClient)
     {
         m_mediatorApiClient = std::make_unique<hpm::api::Client>(
             url::Builder(mediatorAddress.tcpUrl).setScheme(http::kUrlSchemeName));
     }
 
-    NX_VERBOSE(this, "Reporting PeerConnectionSpeed %1 to Mediator...", *m_peerConnectionSpeed);
+    NX_VERBOSE(this, "Reporting PeerConnectionSpeed %1 to Mediator...", peerConnectionSpeed);
 
     m_mediatorApiClient->reportUplinkSpeed(
-        *m_peerConnectionSpeed,
+        peerConnectionSpeed,
         [this](auto resultCode)
         {
             NX_VERBOSE(this, "reportUplinkSpeed complete, resultCode = %1", resultCode);

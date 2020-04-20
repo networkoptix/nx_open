@@ -1,6 +1,7 @@
 {
     "capabilities": "deviceDependent",
-    "supportedCameraModels": [
+    "supportedCameraModels":
+    [
         "DWC-MVT4Wi28",
         "DWC-MVT4Wi36",
         "DWC-MVT4Wi6",
@@ -12,7 +13,8 @@
         "DWC-MTT4Wi6",
         "DWC-MTT4WiA"
     ],
-    "eventTypes": [
+    "eventTypes":
+    [
         {
             "id": "nx.dw_mtt.MOTION",
             "name": "Motion Detection",
@@ -63,7 +65,8 @@
             "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
         }
     ],
-    "ignoredEventTypes": [
+    "ignoredEventTypes":
+    [
         {
             "id": "nx.dw_mtt.SENSOR",
             "name": "Sensor Alarm",

@@ -14,12 +14,13 @@ class NX_NETWORK_API UplinkSpeedTester:
     using base_type = aio::BasicPollable;
 
 public:
+    UplinkSpeedTester(const Settings& settings);
 	~UplinkSpeedTester();
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 	virtual void stopWhileInAioThread() override;
 
-    virtual void start(const nx::utils::Url& url, CompletionHandler handler) override;
+    virtual void start(CompletionHandler handler) override;
 
 private:
 	void startBandwidthTest(const std::chrono::microseconds& pingTime);
@@ -37,12 +38,12 @@ private:
     {
         std::chrono::system_clock::time_point startTime;
 		std::chrono::system_clock::time_point requestSentTime;
-		std::chrono::microseconds totalPingTime;
+		std::chrono::microseconds totalPingTime{0};
 		int totalPings = 0;
     };
 
 private:
-    nx::utils::Url m_url;
+    Settings m_settings;
 
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     std::unique_ptr<UplinkBandwidthTester> m_bandwidthTester;

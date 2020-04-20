@@ -18,6 +18,7 @@
 
 #include "attribute_dictionary.h"
 #include "utils.h"
+#include <nx/analytics/db/movable_analytics_db.h>
 
 namespace nx::analytics::db::test {
 
@@ -462,7 +463,12 @@ private:
 
     bool initializeStorage()
     {
-        m_eventsStorage = EventsStorageFactory::instance().create(nullptr, nullptr);
+        m_eventsStorage = std::make_unique<db::MovableAnalyticsDb>(
+            []()
+            {
+                return std::make_unique<EventsStorage>(nullptr, nullptr);
+            });
+
         return m_eventsStorage->initialize(m_settings);
     }
 

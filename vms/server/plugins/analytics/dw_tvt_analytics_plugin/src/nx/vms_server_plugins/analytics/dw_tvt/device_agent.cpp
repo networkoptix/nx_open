@@ -7,6 +7,7 @@
 
 #include <nx/utils/std/cppnx.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/scope_guard.h>
 
 #include <nx/network/http/buffer_source.h>
 
@@ -30,10 +31,7 @@
 
 using namespace std::literals::chrono_literals;
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_tvt {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
@@ -72,6 +70,30 @@ EventMetadataPacket* createCommonEventMetadataPacket(const EventType& event, boo
     return packet;
 }
 
+QByteArray prepareUnsubscribeBody(const QByteArray subscribeResponseBody)
+{
+    QDomDocument doc;
+    doc.setContent(subscribeResponseBody);
+
+    QDomNode configNode = doc.elementsByTagName("config").at(0);
+    // QDomNodeList::at(int index) return correct empty QDomNode object if index is out of range.
+    if (configNode.isNull())
+        return {};
+
+    QDomNode child = configNode.firstChild();
+    while (!child.isNull())
+    {
+        QDomNode nextChild = child.nextSibling();
+        if (const QDomElement element = child.toElement();
+            !element.isNull() && element.tagName() != "serverAddress")
+        {
+            configNode.removeChild(child);
+        }
+        child = nextChild;
+    }
+    return doc.toByteArray();
+}
+
 } // namespace
 
 DeviceAgent::DeviceAgent(
@@ -101,10 +123,36 @@ DeviceAgent::~DeviceAgent()
     NX_URL_PRINT << "DW TVT DeviceAgent destroyed";
 }
 
-void DeviceAgent::prepareHttpClient()
+bool DeviceAgent::logHttpRequestResult()
+{
+    if (m_httpClient->state() == nx::network::http::AsyncClient::State::sFailed)
+    {
+        NX_URL_PRINT << lm("Http request %1 failed with error code %2")
+            .args(m_httpClient->url(), m_httpClient->lastSysErrorCode())
+            .toStdString();
+        return false;
+    }
+
+    const nx::network::http::Response* response = m_httpClient->response();
+    const int statusCode = response->statusLine.statusCode;
+    if (statusCode != nx::network::http::StatusCode::ok)
+    {
+        NX_URL_PRINT << lm("Http request %1 failed with status code %2")
+            .args(m_httpClient->url(), statusCode).toStdString();
+        return false;
+    }
+
+    NX_URL_PRINT << lm("Http request %1 succeeded with error code %2")
+        .args(m_httpClient->url(), m_httpClient->lastSysErrorCode()).toStdString();
+
+    return true;
+}
+
+void DeviceAgent::prepareHttpClient(const QByteArray& messageBody,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket/* = {}*/)
 {
     NX_ASSERT(!m_httpClient);
-    m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
+    m_httpClient = std::make_unique<nx::network::http::AsyncClient>(std::move(socket));
     m_httpClient->setUserName(m_auth.user());
     m_httpClient->setUserPassword(m_auth.password());
     m_httpClient->setSendTimeout(kSendTimeout);
@@ -112,7 +160,8 @@ void DeviceAgent::prepareHttpClient()
     m_httpClient->setMessageBodyReadTimeout(kReceiveTimeout);
     m_httpClient->setAuthType(nx::network::http::AuthType::authBasic);
     m_httpClient->bindToAioThread(m_reconnectTimer.getAioThread());
-    m_httpClient->setOnDone([this]() { onSubsctiptionDone(); });
+    m_httpClient->setRequestBody(
+        std::make_unique<nx::network::http::BufferSource>(kXmlContentType, messageBody));
 }
 
 nx::utils::Url DeviceAgent::makeUrl(const QString& requestName)
@@ -123,32 +172,54 @@ nx::utils::Url DeviceAgent::makeUrl(const QString& requestName)
     return url;
 }
 
-void DeviceAgent::makeSubscription()
+void DeviceAgent::makeSubscriptionAsync()
 {
     if (m_terminated)
         return;
 
     QnMutexLocker lock(&m_mutex);
 
-    prepareHttpClient();
-
     const nx::utils::Url url = makeUrl("SetSubscribe");
     const QSet<QByteArray> names = internalNamesToCatch();
     const QByteArray messageBody = nx::dw_tvt::makeSubscriptionXml(names);
 
-    m_httpClient->setRequestBody(
-        std::make_unique<nx::network::http::BufferSource>(kXmlContentType, messageBody));
+    prepareHttpClient(messageBody);
 
-    m_httpClient->doPost(url);
-    NX_URL_PRINT << "Subscription request is sent to server.";
+    m_httpClient->doPost(url, [this]()
+        {
+            this->onSubsctiptionDone();
+        });
+    NX_URL_PRINT << "Subscription request started.";
 }
 
-void DeviceAgent::makeDeferredSubscription()
+void DeviceAgent::makeUnsubscriptionSync(std::unique_ptr<nx::network::AbstractStreamSocket> s)
+{
+    if (!m_terminated)
+        return;
+
+    QnMutexLocker lock(&m_mutex);
+
+    const nx::utils::Url url = makeUrl("SetUnSubscribe");
+    prepareHttpClient(m_unsubscribeBody, std::move(s));
+
+    std::promise<void> promise;
+    m_httpClient->doPost(url, [&promise](){ promise.set_value(); });
+    NX_URL_PRINT << "Unsubscription request started.";
+    promise.get_future().wait();
+
+    this->logHttpRequestResult();
+    m_httpClient.reset();
+}
+
+void DeviceAgent::makeDeferredSubscriptionAsync()
 {
     m_httpClient.reset();
     m_tcpSocket.reset();
     m_reconnectTimer.cancelSync();
-    m_reconnectTimer.start(kReconnectTimeout, [this]() { makeSubscription(); });
+    m_reconnectTimer.start(kReconnectTimeout, [this]()
+        {
+            makeSubscriptionAsync();
+        });
 }
 
 void DeviceAgent::onSubsctiptionDone()
@@ -158,27 +229,15 @@ void DeviceAgent::onSubsctiptionDone()
 
     QnMutexLocker lock(&m_mutex);
 
-    if (m_httpClient->state() == nx::network::http::AsyncClient::State::sFailed)
+    const bool requestIsSuccessful = logHttpRequestResult();
+    if (!requestIsSuccessful)
     {
-        NX_URL_PRINT << lm("Http request %1 failed with status code %2")
-            .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode())
-            .toStdString();
-        makeDeferredSubscription();
+        makeDeferredSubscriptionAsync();
         return;
     }
 
-    const nx::network::http::Response* response = m_httpClient->response();
-    const int statusCode = response->statusLine.statusCode;
-    if (statusCode != nx::network::http::StatusCode::ok)
-    {
-        NX_URL_PRINT << lm("Http request %1 failed with status code %2")
-            .args(m_httpClient->contentLocationUrl(), statusCode).toStdString();
-        makeDeferredSubscription();
-        return;
-    }
-
-    NX_URL_PRINT << lm("Http request %1 succeeded with status code %2")
-        .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()).toStdString();
+    const QByteArray xmlData = m_httpClient->fetchMessageBodyBuffer();
+    m_unsubscribeBody = prepareUnsubscribeBody(xmlData); //< Will be used in SetUnSubscribe request.
 
     m_buffer.clear();
     m_buffer.reserve(kBufferCapacity);
@@ -195,16 +254,15 @@ void DeviceAgent::readNextNotificationAsync()
 
     if (!m_tcpSocket)
     {
-        makeDeferredSubscription();
+        makeDeferredSubscriptionAsync();
         return;
     }
     m_tcpSocket->readSomeAsync(
         &m_buffer,
         [this](SystemError::ErrorCode errorCode, size_t size)
-    {
-        this->onReceive(errorCode, size);
-    });
-
+        {
+            this->onReceive(errorCode, size);
+        });
 }
 
 /*
@@ -225,7 +283,7 @@ void DeviceAgent::onReceive(SystemError::ErrorCode code, size_t size)
     {
         NX_URL_PRINT << "Receive failed. Connection broken or closed. Next connection attempt in "
             << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
-        makeDeferredSubscription();
+        makeDeferredSubscriptionAsync();
         return;
     }
 
@@ -242,7 +300,7 @@ void DeviceAgent::onReceive(SystemError::ErrorCode code, size_t size)
                 NX_URL_PRINT << "Reading buffer is full, but no complete message found. "
                     << "Connection will be closed. Next connection attempt in "
                     << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
-                makeDeferredSubscription();
+                makeDeferredSubscriptionAsync();
                 return;
             }
             else
@@ -459,31 +517,38 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
     NX_URL_PRINT << "DW TVT camera tcp notification port = "
         << m_cameraController.longPollingPort();
 
-    makeSubscription();
+    makeSubscriptionAsync();
     return {};
 }
 
 void DeviceAgent::stopFetchingMetadata()
 {
     m_terminated = true;
-    nx::utils::promise<void> promise;
+
+    std::promise<void> promise;
     m_reconnectTimer.pleaseStop(
         [&]()
         {
             m_eventsToCatch.clear();
+
             if (m_httpClient)
-            {
                 m_httpClient->pleaseStopSync();
-                m_httpClient.reset();
-            }
-            if (m_tcpSocket)
-            {
+            else if (m_tcpSocket)
                 m_tcpSocket->pleaseStopSync();
-                m_tcpSocket.reset();
-            }
+
             promise.set_value();
         });
     promise.get_future().wait();
+
+    if (m_httpClient)
+    {
+        this->makeUnsubscriptionSync(m_httpClient->takeSocket());
+        m_httpClient.reset();
+    }
+    else if (m_tcpSocket)
+    {
+        this->makeUnsubscriptionSync(std::move(m_tcpSocket));
+    }
 }
 
 void DeviceAgent::getManifest(Result<const IString*>* outResult) const
@@ -502,7 +567,4 @@ void DeviceAgent::getPluginSideSettings(
 {
 }
 
-} // namespace dw_tvt
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::dw_tvt

@@ -11,12 +11,11 @@ namespace nx::network::cloud::speed_test {
 using namespace std::chrono;
 using namespace nx::hpm::api;
 
-namespace {
-
-static constexpr int kMaxPingRequests = 10;
-static const milliseconds kTestDuration = seconds(3);
-
-} // namespace
+UplinkSpeedTester::UplinkSpeedTester(const Settings& settings)
+	:
+	m_settings(settings)
+{
+}
 
 UplinkSpeedTester::~UplinkSpeedTester()
 {
@@ -38,13 +37,12 @@ void UplinkSpeedTester::stopWhileInAioThread()
 	m_bandwidthTester.reset();
 }
 
-void UplinkSpeedTester::start(const nx::utils::Url& speedTestUrl, CompletionHandler handler)
+void UplinkSpeedTester::start(CompletionHandler handler)
 {
+	m_handler = std::move(handler);
 	dispatch(
-		[this, speedTestUrl, handler = std::move(handler)]() mutable
+		[this]() mutable
 		{
-			m_url = speedTestUrl;
-			m_handler = std::move(handler);
 			m_httpClient = std::make_unique<network::http::AsyncClient>();
 			startPingTest();
 		});
@@ -54,7 +52,10 @@ void UplinkSpeedTester::startBandwidthTest(const microseconds& pingTime)
 {
 	NX_VERBOSE(this, "Starting bandwidth test...");
 	m_bandwidthTester =
-		std::make_unique<UplinkBandwidthTester>(m_url, kTestDuration, pingTime);
+		std::make_unique<UplinkBandwidthTester>(
+			m_settings.url,
+			m_settings.testDuration,
+			pingTime);
 	m_bandwidthTester->bindToAioThread(getAioThread());
 	m_bandwidthTester->doBandwidthTest(
 		[this, pingTime](SystemError::ErrorCode errorCode, int bandwidth)
@@ -102,10 +103,13 @@ void UplinkSpeedTester::setupPingTest()
 
             auto averagePingTime =
                 m_testContext.totalPingTime / m_testContext.totalPings;
-            NX_VERBOSE(this, "Average ping: %1", averagePingTime);
+            
+			NX_VERBOSE(this, 
+			"current ping: %1, total ping time: %2, total pings: %3, average ping: %4", 
+				pingTime, m_testContext.totalPingTime, m_testContext.totalPings, averagePingTime);
 
-            if (now - m_testContext.startTime < kTestDuration
-				&& m_testContext.totalPings < kMaxPingRequests)
+            if (now - m_testContext.startTime < m_settings.testDuration
+				&& m_testContext.totalPings < m_settings.maxPingRequests)
             {
                 sendPing();
             }
@@ -127,7 +131,7 @@ void UplinkSpeedTester::startPingTest()
 
 void UplinkSpeedTester::sendPing()
 {
-    m_httpClient->doGet(url::Builder(m_url).setPath(http::kApiPath));
+    m_httpClient->doGet(url::Builder(m_settings.url).setPath(http::kApiPath));
     m_testContext.requestSentTime = nx::utils::utcTime();
 }
 

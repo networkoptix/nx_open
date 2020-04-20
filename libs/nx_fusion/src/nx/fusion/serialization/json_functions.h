@@ -45,7 +45,6 @@
 
 QN_FUSION_DECLARE_FUNCTIONS(qint32, (json)) /* Needed for (de)serialize_numeric_enum below. */
 
-
 inline void serialize(QnJsonContext *, const QJsonValue &value, QJsonValue *target) {
     *target = value;
 }
@@ -54,7 +53,6 @@ inline bool deserialize(QnJsonContext *, const QJsonValue &value, QJsonValue *ta
     *target = value;
     return true;
 }
-
 
 /* Situation with doubles is more complicated than with other built-in types
  * as we have to take non-finite numbers into account. */
@@ -76,7 +74,6 @@ inline bool deserialize(QnJsonContext *, const QJsonValue &value, double *target
     }
 }
 
-
 /* Floats are (de)serialized via conversion to/from double.
  * Note that we don't do any additional boundary checks for floats as we do for
  * integers as it doesn't really make much sense. */
@@ -92,8 +89,6 @@ inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, float *targ
     *target = tmp;
     return true;
 }
-
-
 
 namespace QJsonDetail {
 
@@ -228,7 +223,8 @@ namespace QJsonDetail {
             typename Map::key_type deserializedKey;
 
             {
-                nx::utils::ScopeGuard([ctx]() { ctx->setIsMapKeyDeserializationMode(false); });
+                nx::utils::ScopeGuard ctxGuard(
+                    [ctx]() { ctx->setIsMapKeyDeserializationMode(false); });
                 ctx->setIsMapKeyDeserializationMode(true);
                 if (!QJson::deserialize(ctx, it.key().toUtf8(), &deserializedKey))
                     return false;
@@ -324,7 +320,6 @@ namespace QJsonDetail {
     }
 } // namespace QJsonDetail
 
-
 /* Free-standing (de)serialization functions are picked up via ADL by
  * the actual implementation. Feel free to add them for your own types. */
 
@@ -348,7 +343,6 @@ QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QJsonArray,   Array,  toArray)
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QJsonObject,  Object, toObject)
 #undef QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS
 
-
 inline void serialize(QnJsonContext *, const std::string &value, QJsonValue *target) {
     *target = QJsonValue(QString::fromStdString(value));
 }
@@ -360,7 +354,6 @@ inline bool deserialize(QnJsonContext *, const QJsonValue &value, std::string *t
     *target = value.toString().toStdString();
     return true;
 }
-
 
 #ifndef Q_MOC_RUN
 #define QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(TYPE)                                         \
@@ -475,7 +468,6 @@ QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(int);
 QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(unsigned int);
 #undef QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS
 
-
 #define QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS(TYPE)             \
 inline void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
     QJsonDetail::serialize_integer_string<TYPE>(ctx, value, target);            \
@@ -510,7 +502,7 @@ inline bool deserialize(
 {
     if (!value.isArray())
         return false;
-    
+
     const auto array = value.toArray();
     if (array.size() != 2)
         return false;

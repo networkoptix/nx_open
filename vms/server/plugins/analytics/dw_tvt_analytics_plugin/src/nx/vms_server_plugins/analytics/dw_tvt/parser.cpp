@@ -2,15 +2,12 @@
 
 #include <QStringList>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_tvt {
 
 QList<AlarmPair> getAlarmPairs(const QDomDocument& dom)
 {
     /*
-    Incomming xml has the following format:
+    Incoming xml has the following format:
     <config version="1.0" xmlns="http://www.ipc.com/ver10">
         <alarmStatusInfo>
             <alarmTag1 type="boolean" id="1">false</alarmTag1>
@@ -32,7 +29,4 @@ QList<AlarmPair> getAlarmPairs(const QDomDocument& dom)
     return result;
 }
 
-} // namespace dw_tvt
-} // namespace analytics
-} // namespace mediaserver_plugin
-} // namespace nx
+} // nx::vms_server_plugins::analytics::dw_tvt

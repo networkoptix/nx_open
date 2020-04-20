@@ -9,6 +9,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/mediator/api/connection_speed.h>
+#include <nx/network/cloud/speed_test/abstract_speed_tester.h>
 
 namespace nx::hpm::api { class Client; }
 
@@ -22,8 +23,6 @@ class CloudModuleUrlFetcher;
 
 namespace speed_test {
 
-class AbstractSpeedTester;
-
 using FetchMediatorAddressHandler =
     nx::utils::MoveOnlyFunc<void(
         http::StatusCode::Value statusCode,
@@ -34,10 +33,14 @@ class NX_NETWORK_API UplinkSpeedReporter:
 {
     using base_type = aio::BasicPollable;
 public:
+    /**
+     * Note: url in speedTestSettings has no effect, it is fetched from cloud_modules.xml
+     */
     UplinkSpeedReporter(
         const nx::utils::Url& cloudModulesXmlUrl,
         hpm::api::MediatorConnector* mediatorConnector,
-        std::unique_ptr<nx::network::aio::Scheduler> scheduler = nullptr);
+        std::unique_ptr<nx::network::aio::Scheduler> scheduler = nullptr,
+        const AbstractSpeedTester::Settings& speedTestSettings = {{}, 16, std::chrono::seconds(3)});
     ~UplinkSpeedReporter();
 
     virtual void stopWhileInAioThread() override;
@@ -78,7 +81,8 @@ private:
 
     void onFetchMediatorAddressComplete(
         http::StatusCode::Value statusCode,
-        hpm::api::MediatorAddress mediatorAddress);
+        hpm::api::MediatorAddress mediatorAddress,
+        hpm::api::PeerConnectionSpeed peerConnectionSpeed);
 
     void stopTest();
     void disable(const char* callingFunc);
@@ -93,9 +97,9 @@ private:
     std::unique_ptr<hpm::api::Client> m_mediatorApiClient;
     std::unique_ptr<CloudModuleUrlFetcher> m_speedTestUrlFetcher;
     std::atomic_bool m_testInProgress = false;
-    std::optional<hpm::api::PeerConnectionSpeed> m_peerConnectionSpeed;
 
     std::unique_ptr<nx::network::aio::Scheduler> m_scheduler;
+    AbstractSpeedTester::Settings m_speedTestSettings;
     nx::utils::MoveOnlyFunc<void(bool /*inProgress*/)> m_aboutToRunSpeedTestHandler;
     FetchMediatorAddressHandler m_fetchMediatorAddressHandler;
 };

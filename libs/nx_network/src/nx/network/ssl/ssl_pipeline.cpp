@@ -189,7 +189,7 @@ int Pipeline::handleSslIoResult(int resultCode)
         return resultCode;
 
     const auto sslErrorCode = SSL_get_error(m_ssl.get(), resultCode);
-    NX_VERBOSE(this, lm("SSL error %1").args(sslErrorCodeToString(sslErrorCode)));
+    NX_VERBOSE(this, "SSL error %1", sslErrorCodeToString(sslErrorCode));
 
     switch (sslErrorCode)
     {
@@ -223,9 +223,14 @@ int Pipeline::handleSslIoResult(int resultCode)
         }
 
         case SSL_ERROR_SYSCALL:
+        {
+            NX_VERBOSE(this, "SSL_ERROR_SYSCALL. System error %1, read thirsty %2, write thirsty %3",
+                SystemError::getLastOSErrorText(), m_readThirsty, m_writeThirsty);
+
             if (m_readThirsty || m_writeThirsty)
                 return utils::bstream::StreamIoError::wouldBlock;
             return utils::bstream::StreamIoError::osError;
+        }
     }
 
     return resultCode;
