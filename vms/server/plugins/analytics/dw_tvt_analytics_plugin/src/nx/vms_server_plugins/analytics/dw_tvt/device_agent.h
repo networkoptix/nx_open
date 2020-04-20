@@ -23,10 +23,7 @@
 #include "parser.h"
 #include <nx/network/system_socket.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_tvt {
 
 /**
  * The purpose of ElapsedEvent is to store information when event of corresponding type happened
@@ -65,11 +62,15 @@ public:
     QDomDocument createDomFromRequest(const QByteArray& request);
 
     nx::utils::Url makeUrl(const QString& requestName);
-    void prepareHttpClient();
-    void makeSubscription();
-    void makeDeferredSubscription();
+    void prepareHttpClient(const QByteArray& messageBody,
+        std::unique_ptr<nx::network::AbstractStreamSocket> s = {});
+    void makeSubscriptionAsync();
+    void makeUnsubscriptionSync(std::unique_ptr<nx::network::AbstractStreamSocket> s);
+    void makeDeferredSubscriptionAsync();
     void onSubsctiptionDone();
     void readNextNotificationAsync();
+
+    bool logHttpRequestResult();
 
     QByteArray extractRequestFromBuffer();
 
@@ -83,7 +84,7 @@ protected:
     virtual void doSetNeededMetadataTypes(
         nx::sdk::Result<void>* outValue,
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
-        
+
 private:
     nx::sdk::Result<void> startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
@@ -97,6 +98,7 @@ private:
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;
+    QByteArray m_unsubscribeBody;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
     nx::network::aio::Timer m_reconnectTimer;
     mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug
@@ -111,7 +113,4 @@ private:
     std::atomic<bool> m_terminated{false};
 };
 
-} // namespace dw_tvt
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::dw_tvt

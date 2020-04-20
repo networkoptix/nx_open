@@ -4,10 +4,7 @@
 #include <QDomDocument>
 #include <QFlags>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_tvt {
 
 enum class EventState
 {
@@ -36,7 +33,4 @@ struct AlarmPair
 
 QList<AlarmPair> getAlarmPairs(const QDomDocument& dom);
 
-} // namespace dw_tvt
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::dw_tvt

@@ -34,7 +34,7 @@ namespace {
 
 const QByteArray kSubscriptionXmlBeginning = R"(
 <?xml version="1.0" encoding="UTF-8"?>
-<config version="1.7" xmlns="http://www.ipc.com/ver10">
+<config version="1.0" xmlns="http://www.ipc.com/ver10">
 <types>
 <openAlramObj>
 <enum>MOTION</enum>

@@ -1,6 +1,6 @@
 {
     "capabilities": "deviceDependent",
-    "supportedCameraModels": 
+    "supportedCameraModels":
     [
         "TD-9442E3",
         "TD-9443E3",
@@ -10,7 +10,7 @@
         "TD-9544E3",
         "TD-9545E3"
     ],
-    "eventTypes": 
+    "eventTypes":
     [
         {
             "id": "nx.dw_tvt.MOTION",
@@ -89,7 +89,8 @@
             "group": 1
         }
     ],
-    "ignoredEventTypes": [
+    "ignoredEventTypes":
+    [
         {
             "id": "nx.dw_tvt.SENSOR",
             "name": "Sensor Alarm",
@@ -145,7 +146,7 @@
             "flags": "stateDependent",
             "internalName": "VEHICE",
             "alarmName": "vehicleAlarm",
-            "_comment":  "alarmName will be probably changed",
+            "_comment": "alarmName will be probably changed",
             "group": 1
         },
         {

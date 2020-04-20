@@ -11,14 +11,12 @@
 #include "device_agent.h"
 #include "log.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_tvt {
 
 namespace {
 
 static const QString kDwTvtVendor("tvt");
+static const QString kDwTvtTemporaryVendor("customer");
 // Just for information:
 // DW VCA camera's vendor string is "cap",
 // DW TVT camera's vendor string is "digitalwatchdog"
@@ -105,7 +103,7 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
     const auto vendor = normalize(QString(deviceInfo->vendor()));
     const auto model = normalize(QString(deviceInfo->model()));
 
-    if (!vendor.startsWith(kDwTvtVendor))
+    if (!vendor.startsWith(kDwTvtVendor) && !vendor.startsWith(kDwTvtTemporaryVendor))
     {
         NX_PRINT << "Unsupported camera vendor: "
             << nx::kit::utils::toString(deviceInfo->vendor());
@@ -121,10 +119,7 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
     return true;
 }
 
-} // namespace dw_tvt
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::dw_tvt
 
 namespace {
 

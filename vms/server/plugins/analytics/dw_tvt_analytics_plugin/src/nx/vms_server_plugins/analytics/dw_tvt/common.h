@@ -7,10 +7,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_tvt {
 
 /** Description of the DwTvt analytics event. */
 struct EventType: nx::vms::api::analytics::EventType
@@ -37,7 +34,4 @@ QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json))
 
 bool operator==(const EventType& lh, const EventType& rh);
 
-} // namespace dw_tvt
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // nx::vms_server_plugins::analytics::dw_tvt
