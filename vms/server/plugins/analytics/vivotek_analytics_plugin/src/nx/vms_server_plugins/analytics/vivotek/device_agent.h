@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/helpers/ref_countable.h>
@@ -15,13 +16,14 @@
 #include <QtCore/QString>
 
 #include "engine.h"
+#include "camera_features.h"
+#include "camera_settings.h"
 #include "native_metadata_source.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 class DeviceAgent:
-    public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>,
-    nx::network::aio::BasicPollable
+    public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
 public:
     explicit DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
@@ -51,9 +53,12 @@ private:
     void readNextMetadata();
 
 private:
+    const std::unique_ptr<nx::network::aio::BasicPollable> m_basicPollable;
     const nx::sdk::LogUtils m_logUtils;
 
-    nx::utils::Url m_url; //< `//username:password@host:port` only
+    const nx::utils::Url m_url; //< `http://username:password@host:port` only
+
+    const CameraFeatures m_features;
 
     nx::sdk::Ptr<IHandler> m_handler;
 

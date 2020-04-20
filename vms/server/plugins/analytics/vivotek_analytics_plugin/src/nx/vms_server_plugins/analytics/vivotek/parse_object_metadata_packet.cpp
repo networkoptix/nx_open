@@ -27,7 +27,7 @@ namespace {
     std::optional<std::string> parseType(std::string_view type)
     {
         if (type == "Human")
-            return kObjectTypes.person;
+            return kObjectTypeHuman;
 
         return std::nullopt;
     }

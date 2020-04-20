@@ -1,14 +1,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-struct ObjectTypes
-{
-    std::string person = "nx.vivotek.Person";
-};
-
-extern const ObjectTypes kObjectTypes;
+extern const std::string kObjectTypeHuman;
 
 } // namespace nx::vms_server_plugins::analytics::vivotek
