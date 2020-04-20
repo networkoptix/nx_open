@@ -13,12 +13,13 @@
 #include <analytics/db/config.h>
 
 #include <nx/analytics/db/analytics_db.h>
+#include <nx/analytics/db/movable_analytics_db.h>
 #include <nx/analytics/db/object_track_searcher.h>
 #include <nx/analytics/db/serializers.h>
+#include <nx/analytics/db/test_support/custom_gtest_printers.h>
 
 #include "attribute_dictionary.h"
 #include "utils.h"
-#include <nx/analytics/db/movable_analytics_db.h>
 
 namespace nx::analytics::db::test {
 
