@@ -7,6 +7,8 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/websocket/websocket_handshake.h>
 
+#include "http_utils.h"
+
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace nx::kit;
@@ -49,7 +51,7 @@ void NativeMetadataSource::open(const Url& baseUrl, MoveOnlyFunc<void(std::excep
                         if (m_httpClient.failed())
                             throw std::system_error(
                                 m_httpClient.lastSysErrorCode(), std::system_category(),
-                                "HTTP connection failed");
+                                "HTTP transport connection failed: " + m_httpClient.url().toStdString());
 
                         const auto error = websocket::validateResponse(
                             m_httpClient.request(), *m_httpClient.response());
@@ -141,18 +143,7 @@ void NativeMetadataSource::ensureDetailMetadataMode(Url url,
         {
             try
             {
-                if (m_httpClient.failed())
-                    throw std::system_error(
-                        m_httpClient.lastSysErrorCode(), std::system_category(),
-                        "HTTP connection failed");
-
-                const auto& statusLine = m_httpClient.response()->statusLine;
-                if (statusLine.statusCode != 200)
-                    throw std::runtime_error(
-                        QString("HTTP GET %1 failed: %2")
-                            .arg(url.toString())
-                            .arg(QString::fromUtf8(statusLine.reasonPhrase))
-                            .toStdString());
+                checkResponse(m_httpClient);
 
                 if (m_httpClient.fetchMessageBodyBuffer().trimmed() == "true")
                 {
@@ -179,18 +170,7 @@ void NativeMetadataSource::setDetailMetadataMode(Url url,
         {
             try
             {
-                if (m_httpClient.failed())
-                    throw std::system_error(
-                        m_httpClient.lastSysErrorCode(), std::system_category(),
-                        "HTTP connection failed");
-
-                const auto& statusLine = m_httpClient.response()->statusLine;
-                if (statusLine.statusCode != 200)
-                    throw std::runtime_error(
-                        QString("HTTP POST %1 failed: %2")
-                            .arg(url.toString())
-                            .arg(QString::fromUtf8(statusLine.reasonPhrase))
-                            .toStdString());
+                checkResponse(m_httpClient);
 
                 reloadConfig(url, std::move(handler));
             }
@@ -210,19 +190,7 @@ void NativeMetadataSource::reloadConfig(Url url,
         {
             try
             {
-                if (m_httpClient.failed())
-                    throw std::system_error(
-                        m_httpClient.lastSysErrorCode(), std::system_category(),
-                        "HTTP connection failed");
-
-                const auto& response = *m_httpClient.response();
-
-                if (const auto& statusLine = response.statusLine; statusLine.statusCode != 200)
-                    throw std::runtime_error(
-                        QString("HTTP GET %1 failed: %2")
-                            .arg(url.toString())
-                            .arg(QString::fromUtf8(statusLine.reasonPhrase))
-                            .toStdString());
+                checkResponse(m_httpClient);
 
                 handler(nullptr);
             }
