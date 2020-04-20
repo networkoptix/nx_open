@@ -9,9 +9,9 @@ from vms_benchmark.exceptions import SshHostKeyObtainingFailed, BoxCommandError
 # only solution is to pass the key explicitly. Thus, on Windows we should preliminarily obtain the
 # ssh host key.
 class SshHostKeyObtainer:
-    def __init__(self, dev, conf_file):
+    def __init__(self, dev, conf):
         self.dev = dev
-        self.conf_file = conf_file
+        self.conf = conf
 
     def call(self):
         stderr = StringIO()
@@ -48,7 +48,7 @@ class SshHostKeyObtainer:
             logging.error('Connecting via ssh failed: plink reported:\n%r', error_messages)
             raise BoxCommandError(
                 'Unable to connect to the box via ssh; ' +
-                f'check box credentials in {self.conf_file!r}'
+                f'check box credentials in {self.conf.filepath!r}'
             )
 
         logging.error(

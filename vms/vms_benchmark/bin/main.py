@@ -140,34 +140,51 @@ ini_definition = {
 }
 
 
-def load_configs(conf_file, ini_file):
-    ini_file_path = Path(ini_file)
-    conf_file_path = Path(conf_file)
+def _load_config_file(config_path, default_path, config_definition, config_required):
+    benchmark_bin_path = Path(os.path.realpath(sys.argv[0])).parent
+    config_file_path = Path(config_path or default_path)
 
+    if config_file_path.is_absolute():
+        if config_file_path.exists():
+            config_file_path_final = config_file_path
+        else:
+            raise exceptions.VmsBenchmarkError(
+                f"Unable to find config with path '{config_file_path}'."
+            )
+    else:
+        if config_file_path.exists():
+            config_file_path_final = config_file_path
+        elif (benchmark_bin_path / config_file_path).exists():
+            config_file_path_final = benchmark_bin_path / config_file_path
+        else:
+            # Check config file required or config file was specified by user explicitly.
+            if config_required or config_path:
+                raise exceptions.VmsBenchmarkError(
+                    f"Unable to find config with path '{config_file_path}', searched in:\n"
+                    "  1) current directory;\n"
+                    "  2) benchmark binary directory."
+                )
+            else:
+                # ConfigParser() requires config path to be passed even if file is optional, thus
+                # just pass the default path (it doesn't matter that the file with this path doesn't
+                # exist).
+                # TODO: Refactor ConfigParser() to remove this quirk.
+                config_file_path_final = default_path
+
+    return ConfigParser(
+        config_file_path_final,
+        config_definition,
+        is_file_optional=not config_required
+    )
+
+
+def load_configs(conf_file, ini_file):
+    conf_file_default = 'vms_benchmark.conf'
+    ini_file_default = 'vms_benchmark.ini'
     benchmark_bin_path = Path(os.path.realpath(sys.argv[0])).parent
 
-    if conf_file_path.is_absolute():
-        conf = ConfigParser(benchmark_bin_path / conf_file, conf_definition)
-    else:
-        try:
-            conf = ConfigParser(conf_file, conf_definition)
-        except NoConfigFile:
-            try:
-                conf = ConfigParser(benchmark_bin_path / conf_file, conf_definition)
-            except NoConfigFile:
-                raise exceptions.VmsBenchmarkError(
-                    f"Unable to find config with path '{conf_file}', searched in:\n"
-                    "  1) current directory;\n"
-                    "  2) benchmark binary directory.\n"
-                )
-
-    if ini_file_path.is_absolute():
-        ini = ConfigParser(benchmark_bin_path / ini_file, ini_definition)
-    else:
-        try:
-            ini = ConfigParser(ini_file, ini_definition)
-        except NoConfigFile:
-            ini = ConfigParser(benchmark_bin_path / ini_file, ini_definition, is_file_optional=True)
+    conf = _load_config_file(conf_file, conf_file_default, conf_definition, True)
+    ini = _load_config_file(ini_file, ini_file_default, ini_definition, False)
 
     def path_from_config(path):
         return path if Path(path).is_absolute() else benchmark_bin_path / path
@@ -1099,7 +1116,7 @@ def _override_ini_config(vms, ini):
     })
 
 
-def _connect_to_box(conf, conf_file):
+def _connect_to_box(conf):
     password = conf.get('boxPassword', None)
     if password and platform.system() == 'Linux':
         res = host_tests.SshPassInstalled.call()
@@ -1118,7 +1135,7 @@ def _connect_to_box(conf, conf_file):
         port=conf['boxSshPort'],
     )
     if platform.system() == 'Windows':
-        host_key = service_objects.SshHostKeyObtainer(box, conf_file).call()
+        host_key = service_objects.SshHostKeyObtainer(box, conf).call()
         box.supply_host_key(host_key)
 
     try:
@@ -1150,20 +1167,18 @@ def _connect_to_box(conf, conf_file):
     '--config',
     '-c',
     'conf_file',
-    default='vms_benchmark.conf',
     metavar='<filename>',
     show_default=True,
-    help='Configuration file.'
+    help='Configuration file. [default: vms_benchmark.conf]'
 )
 # This options has the default value, see below (ini_file_default).
 @click.option(
     '--ini-config',
     '-i',
     'ini_file',
-    default='vms_benchmark.ini',
     metavar='<filename>',
-    help='Internal configuration file for experimenting and debugging.' +
-        '  [default: vms_benchmark.ini]'
+    help=('Internal configuration file for experimenting and debugging.'
+        '  [default: vms_benchmark.ini]')
 )
 @click.option(
     '--log', '-l', 'log_file',
@@ -1205,7 +1220,7 @@ def main(conf_file, ini_file, log_file):
         raise InvalidBoxLoginConfigOptionValue(
             f"Config option boxLogin should be set and not empty on Windows.")
 
-    box = _connect_to_box(conf, conf_file)
+    box = _connect_to_box(conf)
     linux_distribution = LinuxDistributionDetector.detect(box)
     box_platform = _obtain_box_platform(box, linux_distribution)
     _check_time_diff(box, ini)
