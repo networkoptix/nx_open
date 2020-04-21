@@ -628,6 +628,7 @@ private:
         {
             if (m_connectHandler)
             {
+                NX_VERBOSE(this, "Socket %1. Reporting connect timeout", this->m_socket);
                 reportConnectCompletion(SystemError::timedOut);
             }
             else
@@ -688,6 +689,8 @@ private:
 
         if (m_connectHandler)
         {
+            NX_VERBOSE(this, "Socket %1. Reporting connect failure. %2",
+                this->m_socket, SystemError::toString(sockErrorCode));
             reportConnectCompletion(sockErrorCode);
             if (watcher.interrupted())
                 return;
