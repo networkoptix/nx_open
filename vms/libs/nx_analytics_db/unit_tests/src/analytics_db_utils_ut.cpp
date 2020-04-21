@@ -14,13 +14,13 @@ TEST(AnalyticsDbUtils_translateToSearchGrid, result_rect_is_always_non_empty)
     //ASSERT_EQ(2, translated.width());
 
     translated = translateToSearchGrid(
-        QRectF(0.886326, 0.0, 3.91545e-05, 0.0));
+        QRectF(0.886326, 0.0, 3.91545e-05, 3.91545e-05));
     ASSERT_GT(translated.width() * translated.height(), 0);
     //ASSERT_EQ(2, translated.width());
     ASSERT_EQ(1, translated.height());
 
     translated = translateToSearchGrid(
-        QRectF(0.886326, 0.347431, 0.0, 0.0));
+        QRectF(0.886326, 0.347431, 1e-5, 1e-5));
     ASSERT_GT(translated.width() * translated.height(), 0);
     ASSERT_EQ(1, translated.width());
     ASSERT_EQ(1, translated.height());
