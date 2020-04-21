@@ -1033,7 +1033,8 @@
                 "hrgx81|embedded_net_dvr",
                 "interlogix|tve-420",
                 "ali-qvr3008h|dvr3",
-                "ali-qvr3016h|dvr31"
+                "ali-qvr3016h|dvr31",
+                "hikvision|ds-7216*"
             ],
             "analogEncoder": true
         },

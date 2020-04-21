@@ -139,46 +139,61 @@ ini_definition = {
     "getStoragesAttemptIntervalSeconds": {"type": "int", "default": 3},
 }
 
+
+def _load_config_file(config_path, default_path, config_definition, config_required):
+    benchmark_bin_path = Path(os.path.realpath(sys.argv[0])).parent
+    config_file_path = Path(config_path or default_path)
+
+    if config_file_path.is_absolute():
+        if config_file_path.exists():
+            config_file_path_final = config_file_path
+        else:
+            raise exceptions.VmsBenchmarkError(
+                f"Unable to find config with path '{config_file_path}'."
+            )
+    else:
+        if config_file_path.exists():
+            config_file_path_final = config_file_path
+        elif (benchmark_bin_path / config_file_path).exists():
+            config_file_path_final = benchmark_bin_path / config_file_path
+        else:
+            # Check config file required or config file was specified by user explicitly.
+            if config_required or config_path:
+                raise exceptions.VmsBenchmarkError(
+                    f"Unable to find config with path '{config_file_path}', searched in:\n"
+                    "  1) current directory;\n"
+                    "  2) benchmark binary directory."
+                )
+            else:
+                # ConfigParser() requires config path to be passed even if file is optional, thus
+                # just pass the default path (it doesn't matter that the file with this path doesn't
+                # exist).
+                # TODO: Refactor ConfigParser() to remove this quirk.
+                config_file_path_final = default_path
+
+    return ConfigParser(
+        config_file_path_final,
+        config_definition,
+        is_file_optional=not config_required
+    )
+
+
 def load_configs(conf_file, ini_file):
-    def abspath(path):
-        if len(path) > 2 and path[0:2] == './':
-            return os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), path)
-        return path
-
-    ini_file_path = Path(ini_file)
-    conf_file_path = Path(conf_file)
-
+    conf_file_default = 'vms_benchmark.conf'
+    ini_file_default = 'vms_benchmark.ini'
     benchmark_bin_path = Path(os.path.realpath(sys.argv[0])).parent
 
-    try:
-        conf = ConfigParser(conf_file, conf_definition)
-    except NoConfigFile as exception:
-        if conf_file_path.is_absolute():
-            raise exception
-        else:
-            try:
-                conf = ConfigParser(benchmark_bin_path / conf_file, conf_definition)
-            except NoConfigFile:
-                raise exception
+    conf = _load_config_file(conf_file, conf_file_default, conf_definition, True)
+    ini = _load_config_file(ini_file, ini_file_default, ini_definition, False)
 
-    ini = None
+    def path_from_config(path):
+        return path if Path(path).is_absolute() else benchmark_bin_path / path
 
-    try:
-        ini = ConfigParser(ini_file, ini_definition)
-    except NoConfigFile:
-        if not ini_file_path.is_absolute():
-            try:
-                ini = ConfigParser(benchmark_bin_path / ini_file, ini_definition)
-            except NoConfigFile:
-                pass
-
-    # TODO: Loading default INI options. Refactor this.
-    if ini is None:
-        ini = ConfigParser(ini_file, ini_definition, is_file_optional=True)
-
-    test_camera_runner.ini_testcamera_bin = abspath(ini['testcameraBin'])
-    test_camera_runner.ini_test_file_high_resolution = abspath(ini['testFileHighResolution'])
-    test_camera_runner.ini_test_file_low_resolution = abspath(ini['testFileLowResolution'])
+    test_camera_runner.ini_testcamera_bin = path_from_config(ini['testcameraBin'])
+    test_camera_runner.ini_test_file_high_resolution = path_from_config(
+        ini['testFileHighResolution'])
+    test_camera_runner.ini_test_file_low_resolution = path_from_config(
+        ini['testFileLowResolution'])
     test_camera_runner.ini_testcamera_output_file = ini['testcameraOutputFile']
     test_camera_runner.ini_testcamera_frame_log_file = ini['testcameraFrameLogFile']
     test_camera_runner.ini_testcamera_extra_args = ini['testcameraExtraArgs']
@@ -186,9 +201,9 @@ def load_configs(conf_file, ini_file):
     test_camera_runner.ini_test_file_high_period_us = ini['testFileHighPeriodUs']
     test_camera_runner.ini_test_file_low_period_us = ini['testFileLowPeriodUs']
     test_camera_runner.ini_enable_secondary_stream = ini['enableSecondaryStream']
-    stream_reader_runner.ini_rtsp_perf_bin = abspath(ini['rtspPerfBin'])
+    stream_reader_runner.ini_rtsp_perf_bin = path_from_config(ini['rtspPerfBin'])
     stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
-    box_connection.ini_plink_bin = abspath(ini['plinkBin'])
+    box_connection.ini_plink_bin = path_from_config(ini['plinkBin'])
     box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
     box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
     vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
@@ -1101,7 +1116,7 @@ def _override_ini_config(vms, ini):
     })
 
 
-def _connect_to_box(conf, conf_file):
+def _connect_to_box(conf):
     password = conf.get('boxPassword', None)
     if password and platform.system() == 'Linux':
         res = host_tests.SshPassInstalled.call()
@@ -1120,7 +1135,7 @@ def _connect_to_box(conf, conf_file):
         port=conf['boxSshPort'],
     )
     if platform.system() == 'Windows':
-        host_key = service_objects.SshHostKeyObtainer(box, conf_file).call()
+        host_key = service_objects.SshHostKeyObtainer(box, conf).call()
         box.supply_host_key(host_key)
 
     try:
@@ -1152,20 +1167,18 @@ def _connect_to_box(conf, conf_file):
     '--config',
     '-c',
     'conf_file',
-    default='vms_benchmark.conf',
     metavar='<filename>',
     show_default=True,
-    help='Configuration file.'
+    help='Configuration file. [default: vms_benchmark.conf]'
 )
 # This options has the default value, see below (ini_file_default).
 @click.option(
     '--ini-config',
     '-i',
     'ini_file',
-    default='vms_benchmark.ini',
     metavar='<filename>',
-    help='Internal configuration file for experimenting and debugging.' +
-        '  [default: vms_benchmark.ini]'
+    help=('Internal configuration file for experimenting and debugging.'
+        '  [default: vms_benchmark.ini]')
 )
 @click.option(
     '--log', '-l', 'log_file',
@@ -1207,7 +1220,7 @@ def main(conf_file, ini_file, log_file):
         raise InvalidBoxLoginConfigOptionValue(
             f"Config option boxLogin should be set and not empty on Windows.")
 
-    box = _connect_to_box(conf, conf_file)
+    box = _connect_to_box(conf)
     linux_distribution = LinuxDistributionDetector.detect(box)
     box_platform = _obtain_box_platform(box, linux_distribution)
     _check_time_diff(box, ini)
