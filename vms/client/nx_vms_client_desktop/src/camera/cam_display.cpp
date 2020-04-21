@@ -1244,14 +1244,13 @@ void QnCamDisplay::processFillerPacket(
     //bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
     bool isFillerPacket = isNvrFillerPacket(timestampUs);
 
-    if (m_lastMediaEventTimeout.isValid() &&
-        m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay) && !m_eofSignalSent)
+    if (m_lastMediaEventTimeout.isValid())
     {
-        notifyExternalTimeSrcAboutEof(true);
-        return;
+        moveTimestampTo(timestampUs);
+        if (m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay) && !m_eofSignalSent)
+            notifyExternalTimeSrcAboutEof(true);
     }
-
-    if (m_emptyPacketCounter >= 3 || isFillerPacket)
+    else if (m_emptyPacketCounter >= 3 || isFillerPacket)
     {
         bool isLive = flags & QnAbstractMediaData::MediaFlags_LIVE;
         if (m_extTimeSrc &&
