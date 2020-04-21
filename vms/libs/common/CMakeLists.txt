@@ -19,7 +19,6 @@ nx_add_target(common LIBRARY
         Qt5::Concurrent
         Qt5::Multimedia
         Qt5::Xml
-        Qt5::XmlPatterns
         Qt5::Sql
         ffmpeg
         detection_plugin_interface

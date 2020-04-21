@@ -232,7 +232,6 @@ copyQtLibs()
         XcbQpa
         DBus
         Xml
-        XmlPatterns
         Concurrent
         Network
         Sql

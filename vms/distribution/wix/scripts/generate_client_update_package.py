@@ -13,7 +13,6 @@ qt_libraries = [
     'Multimedia',
     'Network',
     'Xml',
-    'XmlPatterns',
     'Concurrent',
     'Svg',
     'Sql',
