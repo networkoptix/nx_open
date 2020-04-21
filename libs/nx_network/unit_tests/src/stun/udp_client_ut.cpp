@@ -100,9 +100,10 @@ public:
         m_messagesToIgnore += messagesToIgnore;
     }
 
-    size_t totalMessagesReceived() const
+    void waitUntilReceivedMessageCountIsGreaterOrEqual(std::size_t expected)
     {
-        return m_totalMessagesReceived;
+        while (m_totalMessagesReceived < expected)
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
 protected:
@@ -342,7 +343,7 @@ TEST_F(UdpClient, client_retransmits_general)
             std::placeholders::_1));
     ASSERT_EQ(SystemError::noError, errorCode);
     ASSERT_EQ(requestMessage.header.transactionId, response.header.transactionId);
-    ASSERT_EQ(2U, totalMessagesReceived());
+    waitUntilReceivedMessageCountIsGreaterOrEqual(2);
 }
 
 /**
@@ -354,15 +355,15 @@ TEST_F(UdpClient, client_retransmits_general)
  */
 TEST_F(UdpClient, client_retransmits_max_retransmits)
 {
-    const int MAX_RETRANSMISSIONS = 5;
+    const int kMaxRetransmissionCount = 5;
 
-    ignoreNextMessage(MAX_RETRANSMISSIONS+1);
+    ignoreNextMessage(kMaxRetransmissionCount+1);
 
     stun::UdpClient client;
     auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
-    client.setRetransmissionTimeOut(std::chrono::milliseconds(100));
-    client.setMaxRetransmissions(MAX_RETRANSMISSIONS);
+    client.setRetransmissionTimeOut(std::chrono::milliseconds(10));
+    client.setMaxRetransmissions(kMaxRetransmissionCount);
     nx::network::stun::Message requestMessage(
         stun::Header(
             nx::network::stun::MessageClass::request,
@@ -378,7 +379,7 @@ TEST_F(UdpClient, client_retransmits_max_retransmits)
             requestMessage,
             std::placeholders::_1));
     ASSERT_EQ(SystemError::timedOut, errorCode);
-    ASSERT_EQ((size_t)MAX_RETRANSMISSIONS+1, totalMessagesReceived());
+    waitUntilReceivedMessageCountIsGreaterOrEqual(kMaxRetransmissionCount + 1);
 }
 
 /**
@@ -523,7 +524,7 @@ public:
     {
         init();
 
-        m_client.setMaxRetransmissions(1);
+        setMaxRetransmissions(std::numeric_limits<int>::max());
     }
 
     ~UdpClientRedirect()
@@ -540,6 +541,11 @@ protected:
     ServerContext& redirectionServer()
     {
         return server(1);
+    }
+
+    void setMaxRetransmissions(int count)
+    {
+        m_client.setMaxRetransmissions(count);
     }
 
     void givenContentServer()
@@ -762,6 +768,8 @@ TEST_F(UdpClientRedirect, redirect_response_without_alternate_server_attribute)
 
 TEST_F(UdpClientRedirect, content_server_does_not_respond)
 {
+    setMaxRetransmissions(1);
+
     givenSilentContentServer();
     givenRedirectionServer();
 
