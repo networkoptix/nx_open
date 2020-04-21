@@ -192,7 +192,6 @@ copyQtLibs()
         Core
         Gui
         Xml
-        XmlPatterns
         Network
         Multimedia
         Sql

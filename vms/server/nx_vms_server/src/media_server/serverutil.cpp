@@ -46,8 +46,6 @@
 #include <api/resource_property_adaptor.h>
 
 #include <QtCore/QJsonDocument>
-#include <QtXmlPatterns/QXmlSchema>
-#include <QtXmlPatterns/QXmlSchemaValidator>
 #include <QtXml/QDomDocument>
 
 #include "server_connector.h"

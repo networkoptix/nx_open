@@ -16,7 +16,6 @@
             <Component><File Name="Qt5Network.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="Qt5Concurrent.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="Qt5Xml.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="Qt5XmlPatterns.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="Qt5Sql.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="Qt5Qml.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>

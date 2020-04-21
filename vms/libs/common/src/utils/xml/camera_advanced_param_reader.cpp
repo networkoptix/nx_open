@@ -1,9 +1,6 @@
 #include "camera_advanced_param_reader.h"
 
 #include <QtXml/QDomElement>
-#include <QtXmlPatterns/QXmlSchema>
-#include <QtXmlPatterns/QXmlSchemaValidator>
-#include <QtXmlPatterns/QAbstractMessageHandler>
 
 #include <core/resource/resource.h>
 #include <core/resource/param.h>
@@ -13,25 +10,6 @@
 
 namespace
 {
-    const QUrl validatorSchemaUrl = lit("qrc:/camera_advanced_params/schema.xsd");
-
-    //!Prints XML validation errors to log
-    class QnXMLValidationMessageHandler: public QAbstractMessageHandler
-    {
-    public:
-        //!Implementation of QAbstractMessageHandler::handleMessage
-        virtual void handleMessage(
-            QtMsgType type,
-            const QString& description,
-            const QUrl& identifier,
-            const QSourceLocation& sourceLocation ) override {
-                if( type >= QtCriticalMsg ) {
-                    NX_DEBUG(this, lit("Camera parameters XML validation error. Identifier: %1. Description: %2. Location: %3:%4").
-                        arg(identifier.toString()).arg(description).arg(sourceLocation.line()).arg(sourceLocation.column()));
-                }
-        }
-    };
-
     bool parseBooleanXmlValue(const QString &value)
     {
         return (value == lit("true")) || (value == lit("1"));
@@ -147,19 +125,6 @@ bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource)
 {
     // TODO: #GDM Why the file is not reset to initial position? It leads to 'EOF' error in parsing.
     return true;
-
-    QnIODeviceRAAI guard(xmlSource);
-    if (!guard.isValid())
-        return false;
-
-    QXmlSchema schema;
-    if (!schema.load(validatorSchemaUrl))
-        return false;
-    NX_ASSERT(schema.isValid());
-    QXmlSchemaValidator validator(schema);
-    QnXMLValidationMessageHandler msgHandler;
-    validator.setMessageHandler(&msgHandler);
-    return validator.validate(xmlSource);
 }
 
 namespace QnXmlTag {

@@ -164,7 +164,6 @@ copyQtLibs()
         Core
         Gui
         Xml
-        XmlPatterns
         Concurrent
         Network
         Sql

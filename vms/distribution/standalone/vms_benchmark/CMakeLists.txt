@@ -104,7 +104,6 @@ else()
         ${CMAKE_BINARY_DIR}/lib/libQt5Network.so*
         ${CMAKE_BINARY_DIR}/lib/libQt5Sql.so*
         ${CMAKE_BINARY_DIR}/lib/libQt5Xml.so*
-        ${CMAKE_BINARY_DIR}/lib/libQt5XmlPatterns.so*
         ${CMAKE_BINARY_DIR}/lib/libavcodec.so*
         ${CMAKE_BINARY_DIR}/lib/libavformat.so*
         ${CMAKE_BINARY_DIR}/lib/libavutil.so*

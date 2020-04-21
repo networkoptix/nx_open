@@ -176,7 +176,6 @@ find_package(Qt5
         Gui
         Network
         Xml
-        XmlPatterns
         Sql
         Concurrent
         Multimedia
