@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ostream>
+
 #include "../socket_common.h"
 
 namespace nx {
@@ -58,6 +60,11 @@ struct NX_NETWORK_API AddressEntry
     QString toString() const;
     SocketAddress toEndpoint() const;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const AddressEntry& value)
+{
+    return os << value.toString().toStdString();
+}
 
 } // namespace network
 } // namespace nx
