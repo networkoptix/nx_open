@@ -376,7 +376,18 @@ QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)
     const int x = x1 + kEpsilon;
     const int y = y1 + kEpsilon;
 
-    const auto result = QRect(x, y, x2 - x + (1.0 - kEpsilon), y2 - y + (1.0 - kEpsilon));
+    auto result = QRect(x, y, x2 - x + (1.0 - kEpsilon), y2 - y + (1.0 - kEpsilon));
+
+    // Making sure the result box is always non-empty and within the grid.
+    if (result.left() >= kMaxGridRect.width())
+        result.setLeft(kMaxGridRect.width() - 1);
+    if (result.top() >= kMaxGridRect.height())
+        result.setTop(kMaxGridRect.height() - 1);
+    if (result.width() <= 0)
+        result.setWidth(1);
+    if (result.height() <= 0)
+        result.setHeight(1);
+
     return result.intersected(kMaxGridRect);
 }
 
