@@ -66,6 +66,7 @@ bool scheduleTaskContainsWeekTimeMs(const QnScheduleTask& task, int weekTimeMs)
 } // namespace
 
 std::atomic<qint64> QnServerStreamRecorder::m_totalQueueSize;
+std::atomic<qint64> QnServerStreamRecorder::m_totalQueuePackets;
 std::atomic<int> QnServerStreamRecorder::m_totalRecorders;
 
 QnServerStreamRecorder::QnServerStreamRecorder(
@@ -188,7 +189,7 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
         QnMutexLocker lock(&m_queueSizeMutex);
         if (needToStop())
             return;
-        addQueueSizeUnsafe(media->dataSize());
+        addQueueSizeUnsafe(media->dataSize(), 1);
         QnStreamRecorder::putData(nonConstData);
     }
 }
@@ -247,6 +248,16 @@ bool QnServerStreamRecorder::isQueueFull() const
     return true;
 }
 
+qint64 QnServerStreamRecorder::totalQueuedBytes()
+{
+    return m_totalQueueSize;
+}
+
+qint64 QnServerStreamRecorder::totalQueuedPackets()
+{
+    return m_totalQueuePackets;
+}
+
 void QnServerStreamRecorder::setCanDropPackets(bool canDrop)
 {
     m_canDropPackets = canDrop;
@@ -292,7 +303,7 @@ bool QnServerStreamRecorder::cleanupQueue()
         while (m_dataQueue.pop(data, 0))
         {
             if (auto media = std::dynamic_pointer_cast<QnAbstractMediaData>(data))
-                addQueueSizeUnsafe(- (qint64) media->dataSize());
+                addQueueSizeUnsafe(- (qint64) media->dataSize(), -1);
         }
     }
 
@@ -380,7 +391,7 @@ void QnServerStreamRecorder::updateStreamParams()
                 params.fps = m_currentScheduleTask.fps;
                 params.quality = m_currentScheduleTask.streamQuality;
                 params.bitrateKbps = m_currentScheduleTask.bitrateKbps;
-                NX_VERBOSE(this, "Update HQ stream params to %1 for camera %2 according to the recording schedule", 
+                NX_VERBOSE(this, "Update HQ stream params to %1 for camera %2 according to the recording schedule",
                     params, m_resource);
             }
             else {
@@ -783,10 +794,11 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 }
 
-void QnServerStreamRecorder::addQueueSizeUnsafe(qint64 value)
+void QnServerStreamRecorder::addQueueSizeUnsafe(qint64 bytes, qint64 packets)
 {
-    m_queuedSize += value;
-    m_totalQueueSize += value;
+    m_queuedSize += bytes;
+    m_totalQueueSize += bytes;
+    m_totalQueuePackets += packets;
 }
 
 bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
@@ -797,7 +809,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 
     {
         QnMutexLocker lock( &m_queueSizeMutex );
-        addQueueSizeUnsafe(-((qint64) media->dataSize()));
+        addQueueSizeUnsafe(-((qint64) media->dataSize()), -1);
     }
 
     // For empty schedule, we record all the time.
@@ -961,7 +973,7 @@ void QnServerStreamRecorder::endOfRun()
 
     {
         QnMutexLocker lock( &m_queueSizeMutex );
-        addQueueSizeUnsafe(-m_queuedSize);
+        addQueueSizeUnsafe(-m_queuedSize, -m_dataQueue.size());
         m_dataQueue.clear();
         --m_totalRecorders;
         m_rebuildBlocked = false;

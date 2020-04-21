@@ -321,7 +321,7 @@ void EventSearchListModel::Private::fetchLive()
             q->addToFetchedTimeWindow(periodToCommit);
 
             NX_VERBOSE(q, "Live update commit");
-            commitInternal(periodToCommit, data.begin(), data.end(), 0, true);
+            commitInternal(periodToCommit, data.rbegin(), data.rend(), 0, true);
 
             if (count() > q->maximumCount())
             {

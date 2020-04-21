@@ -7,6 +7,8 @@ namespace nx {
 namespace vms::server {
 namespace test {
 
+namespace {
+
 struct TestData
 {
     TestData() {}
@@ -46,6 +48,8 @@ bool checkData(const std::array<TestData, size>& data)
     }
     return QnMServerResourceDiscoveryManager::hasIpConflict(resList);
 }
+
+} // namespace
 
 TEST(CameraIpConflict, main)
 {

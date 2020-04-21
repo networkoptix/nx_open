@@ -63,25 +63,29 @@ void QnAbstractDataConsumer::run()
     while(!needToStop())
     {
         pauseDelay();
-
-        QnAbstractDataPacketPtr data;
-        bool get = m_dataQueue.pop(data, kWaitTimeoutMs);
-
-        if (!get)
-        {
-            QnSleep::msleep(10);
-            continue;
-        }
-        while(!needToStop())
-        {
-            if (processData(data))
-                break;
-            else
-                QnSleep::msleep(10);
-        }
+        runCycle();
     }
 
     endOfRun();
+}
+
+void QnAbstractDataConsumer::runCycle()
+{
+    QnAbstractDataPacketPtr data;
+    bool get = m_dataQueue.pop(data, kWaitTimeoutMs);
+
+    if (!get)
+    {
+        QnSleep::msleep(10);
+        return;
+    }
+    while(!needToStop())
+    {
+        if (processData(data))
+            break;
+        else
+            QnSleep::msleep(10);
+    }
 }
 
 int QnAbstractDataConsumer::queueSize() const
