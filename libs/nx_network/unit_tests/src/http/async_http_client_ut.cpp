@@ -982,13 +982,15 @@ TEST_F(HttpClientAsyncReliability, BreakingConnectionAtRandomPoint)
 class HttpClientAsyncReusingConnection:
     public HttpClientAsync
 {
+    using base_type = HttpClientAsync;
+
 public:
     static const char* testPath;
 
     HttpClientAsyncReusingConnection()
     {
         m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
-        m_httpClient->setSendTimeout(std::chrono::seconds(1));
+        m_httpClient->setTimeouts(http::AsyncClient::kNoTimeouts);
         m_httpClient->setOnDone(
             [this]() { onRequestCompleted(m_httpClient.get()); });
     }
@@ -1000,6 +1002,16 @@ public:
     }
 
 protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        ASSERT_TRUE(m_brokenHttpServer.bindAndListen());
+        m_brokenHttpServer.registerRequestProcessorFunc(
+            "/.*",
+            [this](auto&&... args) { disregardRequest(std::forward<decltype(args)>(args)...); });
+    }
+
     void initializeStaticContentServer()
     {
         testHttpServer().setPersistentConnectionEnabled(false);
@@ -1042,7 +1054,9 @@ protected:
 
     void performRequestToInvalidUrl()
     {
-        m_httpClient->doGet(nx::utils::Url("http://example.com:58249/test"));
+        m_httpClient->doGet(url::Builder()
+            .setScheme(kUrlSchemeName)
+            .setEndpoint(m_brokenHttpServer.serverAddress()));
     }
 
     void assertRequestSucceeded()
@@ -1070,6 +1084,7 @@ private:
         nx::network::http::HttpServerConnection*,
         std::unique_ptr<HttpConnectionContext>> m_connectionToContext;
     QnMutex m_mutex;
+    TestHttpServer m_brokenHttpServer;
 
     void sendNextRequest()
     {
@@ -1143,6 +1158,14 @@ private:
         auto it = m_connectionToContext.find(connection);
         if (it != m_connectionToContext.end())
             m_connectionToContext.erase(it);
+    }
+
+    void disregardRequest(
+        RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler)
+    {
+        requestContext.connection->closeConnection(SystemError::connectionReset);
+        completionHandler(http::StatusCode::internalServerError);
     }
 };
 
