@@ -155,8 +155,9 @@ QRectF generateRandomRectf()
     rect.setTopLeft(QPointF(
         nx::utils::random::number<float>(0.0F, 0.95F),
         nx::utils::random::number<float>(0.0F, 0.95F)));
-    rect.setWidth(nx::utils::random::number<float>(0.0F, 1 - rect.topLeft().x()));
-    rect.setHeight(nx::utils::random::number<float>(0.0F, 1 - rect.topLeft().y()));
+    static const float kMinSize = 1e-6;
+    rect.setWidth(nx::utils::random::number<float>(kMinSize, 1 - rect.topLeft().x()));
+    rect.setHeight(nx::utils::random::number<float>(kMinSize, 1 - rect.topLeft().y()));
     return rect;
 }
 

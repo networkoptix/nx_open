@@ -217,7 +217,7 @@ public:
     Option<bool> p2pMode{this, "p2pMode", true,
         "Switch data synchronization to the new optimized mode"
     };
-    Option<int> allowRemovableStorages{this, "allowRemovableStorages", 1,
+    Option<int> allowRemovableStorages{this, "allowRemovableStorages", 0,
         "Allows automatic inclusion of discovered local removable storages into the resource pool."
     };
     Option<QString> checkForUpdateUrl{this, "checkForUpdateUrl",

@@ -54,6 +54,8 @@ void AIOThread::startMonitoring(
                 std::bind(&AIOEventHandler::eventTriggered, eventHandler, sock, aio::etError));
             return;
         }
+
+        NX_VERBOSE(this, "Read socket timeout %1, socket %2", timeoutMillis, sock);
     }
 
     QnMutexLocker lock(&m_taskQueue->mutex);

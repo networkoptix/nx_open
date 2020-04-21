@@ -367,6 +367,7 @@ void QnMetaDataV1::addMotion(quint64* dst64, quint64* src64)
 QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)
 {
     const qreal kEpsilon = 0.01;
+    const qreal kZeroEpsilon = 1e-9;
 
     const qreal x1 = rectF.left() * Qn::kMotionGridWidth;
     const qreal y1 = rectF.top() * Qn::kMotionGridHeight;
@@ -376,7 +377,18 @@ QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)
     const int x = x1 + kEpsilon;
     const int y = y1 + kEpsilon;
 
-    const auto result = QRect(x, y, x2 - x + (1.0 - kEpsilon), y2 - y + (1.0 - kEpsilon));
+    auto result = QRect(x, y, x2 - x + (1.0 - kEpsilon), y2 - y + (1.0 - kEpsilon));
+
+    // Making sure the result box is always non-empty and within the grid.
+    if (result.left() >= kMaxGridRect.width())
+        result.setLeft(kMaxGridRect.width() - 1);
+    if (result.top() >= kMaxGridRect.height())
+        result.setTop(kMaxGridRect.height() - 1);
+    if (result.width() <= 0  && rectF.width() > kZeroEpsilon)
+        result.setWidth(1);
+    if (result.height() <= 0  && rectF.height() > kZeroEpsilon)
+        result.setHeight(1);
+
     return result.intersected(kMaxGridRect);
 }
 

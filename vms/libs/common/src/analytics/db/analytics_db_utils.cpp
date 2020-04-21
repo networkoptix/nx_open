@@ -1,5 +1,7 @@
 #include "analytics_db_utils.h"
 
+#include <cmath>
+
 #include <nx/streaming/media_data_packet.h>
 
 namespace nx::analytics::db {

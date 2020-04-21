@@ -15,3 +15,9 @@ void PrintTo(const std::vector<ObjectTrack>& value, ::std::ostream* os)
 }
 
 } // namespace nx::analytics::db
+
+void PrintTo(const QRect& value, ::std::ostream* os)
+{
+    *os << "(" << value.x() << ", " << value.y() << "; " <<
+        value.width() << "x" << value.height() << ")";
+}
