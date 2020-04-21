@@ -193,11 +193,14 @@ public:
 
         resolve(
             endpoint.address,
-            [this, port = endpoint.port, handler = std::move(handler)](
+            [this, endpoint, port = endpoint.port, handler = std::move(handler)](
                 SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
             {
                 if (code != SystemError::noError)
                 {
+                    NX_VERBOSE(this, "%1 resolve failed. %2",
+                        endpoint, SystemError::toString(code));
+
                     return this->m_resolveResultScheduler.post(
                         [h = std::move(handler), code]() { h(code); });
                 }
@@ -235,28 +238,6 @@ public:
             // Socket has been terminated, no async call possible.
             return;
         }
-
-        unsigned int sendTimeout = 0;
-#ifdef _DEBUG
-        bool isNonBlockingModeEnabled = false;
-#endif
-        if (!this->m_socket->getSendTimeout(&sendTimeout)
-#ifdef _DEBUG
-            || !this->m_socket->getNonBlockingMode(&isNonBlockingModeEnabled)
-#endif
-            )
-        {
-            this->m_resolveResultScheduler.post(
-                [handler = std::move(handler),
-                    errorCode = SystemError::getLastOSErrorCode()]() mutable
-                {
-                    handler(errorCode);
-                });
-            return;
-        }
-#ifdef _DEBUG
-        NX_ASSERT(isNonBlockingModeEnabled);
-#endif
 
         m_connectHandler = std::move(handler);
         if (!startAsyncConnect(addr))
@@ -473,7 +454,6 @@ private:
 
     bool startAsyncConnect(const SocketAddress& resolvedAddress)
     {
-        unsigned int sendTimeout = 0;
 #ifdef _DEBUG
         bool isNonBlockingModeEnabled = false;
         if (!this->m_socket->getNonBlockingMode(&isNonBlockingModeEnabled))
@@ -483,6 +463,7 @@ private:
 
         NX_ASSERT(!m_asyncSendIssued.exchange(true));
 
+        unsigned int sendTimeout = 0;
         if (!this->m_socket->getSendTimeout(&sendTimeout))
             return false;
 
