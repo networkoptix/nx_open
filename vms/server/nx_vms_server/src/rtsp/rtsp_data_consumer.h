@@ -96,7 +96,18 @@ protected:
 private:
     void recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket);
     bool needData(const QnAbstractDataPacketPtr& data) const;
+
+    /**
+     * Set new quality. Switch to new quality will be done from RTSP thread later.
+     */
     void switchQualityIfNeeded(bool isSecondaryProvider);
+
+    /**
+     * RTSP thread apply specified quality.
+     * @return true if quality is changed
+     */
+    bool gotoNewQuality(bool isSecondaryProvider);
+
     void processMediaData(const QnAbstractMediaDataPtr& nonConstData);
     void flushReorderingBuffer();
     void sendBufferViaTcp(std::optional<int64_t> timestampForLogging = std::nullopt);

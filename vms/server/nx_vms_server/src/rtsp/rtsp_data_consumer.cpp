@@ -390,6 +390,20 @@ void QnRtspDataConsumer::autoSwitchQuality(MediaQuality liveQuality)
     }
 }
 
+bool QnRtspDataConsumer::gotoNewQuality(bool isSecondaryProvider)
+{
+    NX_MUTEX_LOCKER lock(&m_qualityChangeMutex);
+    const bool isLow = isLowMediaQuality(m_newLiveQuality);
+    if (m_newLiveQuality != MEDIA_Quality_None && isLow == isSecondaryProvider)
+    {
+        NX_VERBOSE(this, "Go to quality from %1, to %2", m_liveQuality, m_newLiveQuality);
+        m_liveQuality = m_newLiveQuality;
+        m_newLiveQuality = MEDIA_Quality_None;
+        return true;
+    }
+    return false;
+}
+
 void QnRtspDataConsumer::setStreamingSpeed(int speed)
 {
     NX_ASSERT( speed > 0 );
@@ -593,25 +607,11 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if (isVideo || isAudio)
     {
-        NX_MUTEX_LOCKER lock(&m_qualityChangeMutex);
-
         const bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
-        if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
+        if (isKeyFrame && isVideo && gotoNewQuality(isSecondaryProvider))
         {
-            if (isLowMediaQuality(m_newLiveQuality) && isSecondaryProvider)
-            {
-                m_liveQuality = m_newLiveQuality;
-                m_newLiveQuality = MEDIA_Quality_None;
-                flushReorderingBuffer();
-                setNeedKeyData();
-            }
-            else if (!isLowMediaQuality(m_newLiveQuality) && !isSecondaryProvider)
-            {
-                m_liveQuality = m_newLiveQuality;
-                m_newLiveQuality = MEDIA_Quality_None;
-                flushReorderingBuffer();
-                setNeedKeyData();
-            }
+            flushReorderingBuffer();
+            setNeedKeyData();
         }
 
         if (isLive)
