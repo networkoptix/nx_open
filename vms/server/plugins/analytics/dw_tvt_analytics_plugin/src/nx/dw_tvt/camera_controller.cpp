@@ -15,23 +15,26 @@ namespace nx::dw_tvt {
 
 namespace {
 
-/*
+/**
+ @defgroup subscriptionXml Subscription XML
+
  * Subscription xml consists of the beginning, several (usually up to three) items and the ending.
  * They should be just concatenated. Function "makeSubscriptionXml" does it.
+ *
+ * kSubscriptionXmlXXXXXItem constants are the xml elements for different kind of events in the
+ * subscription request. Each of them has one of the thee options:
+ * ALARM - SendAlarmStatus is sent in case of event
+ * FEATURE_RESULT - SendAlarmData is sent in case of event
+ * ALARM_FEATURE - both SendAlarmStatus and SendAlarmData are sent in case of event
+ * The current version of plugin uses ALARM_FEATURE option
  */
 
-/*
+ /** @{ */
+
+/**
  * The beginning of subscription xml.
  * %1 - is a parameter that should be replaced with a number of event types.
  */
-//const QByteArray kSubscriptionXmlBeginning = R"(
-//<?xml version="1.0" encoding="UTF-8"?>
-//<config version="1.0" xmlns="http://www.ipc.com/ver10">
-//    <channelID type="uint32">1</channelID>
-//    <initTermTime type="uint32">0</initTermTime>
-//    <subscribeFlag type="subscribeTypes">BASE_SUBSCRIBE</subscribeFlag>
-//    <subscribeList type="list" count="%1">)"; //< %1 - a number of events types
-
 const QByteArray kSubscriptionXmlBeginning = R"(
 <?xml version="1.0" encoding="UTF-8"?>
 <config version="1.0" xmlns="http://www.ipc.com/ver10">
@@ -67,9 +70,9 @@ const QByteArray kSubscriptionXmlBeginning = R"(
 <channelID type="uint32">0</channelID>
 <initTermTime type="uint32">0</initTermTime>
 <subscribeFlag type="subscribeTypes">BASE_SUBSCRIBE</subscribeFlag>
-<subscribeList type="list" count="1">)";
+<subscribeList type="list" count="%1">)";
 
-/*
+/**
  * The ending of subscription xml
  */
 const QByteArray kSubscriptionXmlEnding = R"(
@@ -78,24 +81,11 @@ const QByteArray kSubscriptionXmlEnding = R"(
 )";
 
 /**
- * The following constants are the xml elements for different kind of events in the
- * subscription request. Each of them has one of the thee options:
- * ALARM - SendAlarmStatus is sent in case of event
- * FEATURE_RESULT - SendAlarmData is sent in case of event
- * ALARM_FEATURE - both SendAlarmStatus and SendAlarmData are sent in case of event
- *
- * The current version of plugin uses ALARM option, i.e. SendAlarmStatus notification.
-*/
-
-/**
  * MOTION - motion detection.
  * The event can be combined with any other event.
  * Name in web interface: "Alarm/Motion Detection".
  * Description in web interface: no description.
  * Detection area: 22x15 matrix.
-
- ALARM does not work - no SendAlarmStatus is sent by camera
- FEATURE_RESULT and ALARM_FEATURE work, only SendAlarmData is sent by camera
  */
 const QByteArray kSubscriptionXmlMotionItem = R"(
 <item>
@@ -103,7 +93,7 @@ const QByteArray kSubscriptionXmlMotionItem = R"(
 <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
 
-/*
+/**
  * AVD - abnormal video diagnostic
  * The event can be combined with any other event.
  * Name in web interface: "Exception"
@@ -119,7 +109,7 @@ const QByteArray kSubscriptionXmlAvdItem = R"(
 <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
 
-/*
+/**
  * PEA - some abbreviation, if you know - write it here
  * The event cannot be combined with VFD, CDD, CPC, IPD or OSC event.
  * This event detects crossing of some border (this is similar to IPD and CPC events).
@@ -137,13 +127,13 @@ const QByteArray kSubscriptionXmlPeaItem = R"(
 <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
 
-/*
+/**
  * VFD - video face detection
  * The event cannot be combined with CDD, CPC, IPD, PEA or OSC event.
  * Name in web interface: "Face Detection".
  * Description in web interface: "Smart detection of faces appeared in the tracked scene".
  * Detection area: rectangle.
- * Currently (march 2020) VFD is not supported by DW MTT Camera.
+ * Currently (march 2020) VFD is not supported by DW TVT Camera.
  */
 const QByteArray kSubscriptionXmlVfdItem = R"(
 <item>
@@ -151,7 +141,7 @@ const QByteArray kSubscriptionXmlVfdItem = R"(
 <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
 
-/*
+/**
  * CDD - crowd density detection
  * The event cannot be combined with VFD, CPC, IPD, PEA or OSC event.
  * Name in web interface: "Crowd Density"
@@ -164,7 +154,7 @@ const QByteArray kSubscriptionXmlCddItem = R"(
 <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
 
-/*
+/**
  * CPC - cross-line people counting
  * The event cannot be combined with VFD, CDD, IPD, PEA or OSC event.
  * Name in web interface: "People Counting"
@@ -178,7 +168,7 @@ const QByteArray kSubscriptionXmlCpcItem = R"(
 <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
 
-/*
+/**
  * IPD - intruding people detection
  * The event cannot be combined with VFD, CDD, CPC, PEA or OSC event.
  * Name in web interface: "People Intrusion"
@@ -191,7 +181,7 @@ const QByteArray kSubscriptionXmlIpdItem = R"(
 <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
 
-/*
+/**
  * OSC - object status changed
  * The event cannot be combined with VFD, CDD, CPC, IPD or PEA event.
  * Name in web interface: "Object Removal"
@@ -204,7 +194,9 @@ const QByteArray kSubscriptionXmlOscItem = R"(
 <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
 
-/** New (March, 2020) events */
+/** @} */
+
+// New (March, 2020) events
 
 const QByteArray kSubscriptionXmlAoientryItem = R"(
 <item>
@@ -230,50 +222,46 @@ const QByteArray kSubscriptionXmlTrafficItem = R"(
 <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>)";
 
-/*
- * Map allows to get subscription xml item for the event by its internal name.
- */
+/** Map allows to get subscription xml item for the event by its internal name. */
 const QMap<QByteArray, QByteArray> kXmlItemsByInternalName =
 {
     { "MOTION", kSubscriptionXmlMotionItem },
     { "AVD", kSubscriptionXmlAvdItem },
     { "PEA", kSubscriptionXmlPeaItem },
 
-    // VFD - OSC are not supported now (March 2020)
-    { "VFD", kSubscriptionXmlVfdItem },
-    { "CDD", kSubscriptionXmlCddItem },
-    { "CPC", kSubscriptionXmlCpcItem },
-    { "IPD", kSubscriptionXmlIpdItem },
-    { "OSC", kSubscriptionXmlOscItem },
+    { "VFD", kSubscriptionXmlVfdItem }, //< mot supported in fw 5.0 (April 2020)
+    { "CDD", kSubscriptionXmlCddItem }, //< mot supported in fw 5.0 (April 2020)
+    { "CPC", kSubscriptionXmlCpcItem }, //< mot supported in fw 5.0 (April 2020)
+    { "IPD", kSubscriptionXmlIpdItem }, //< mot supported in fw 5.0 (April 2020)
+    { "OSC", kSubscriptionXmlOscItem }, //< mot supported in fw 5.0 (April 2020)
 
     { "AOIENTRY", kSubscriptionXmlAoientryItem },
     { "AOILEAVE", kSubscriptionXmlAoileaveItem },
     { "PASSLINECOUNT", kSubscriptionXmlPasslinecountItem },
 
-    // Traffic is not supported now (March 2020)
-    { "TRAFFIC", kSubscriptionXmlTrafficItem },
+    { "TRAFFIC", kSubscriptionXmlTrafficItem }, //< mot supported in fw 5.0 (April 2020)
 };
 
-/*
- * DW MTT camera is sensitive to endlines in xml int http body. Only '\n' is appropriate.
- * Also no endlines and spaces are allowed in the begin and in the end.
+/**
+ * XML standard demands '\n' as a line separator ('\r\n' and '\r' are not acceptable)
+ * (https://www.w3.org/TR/2008/REC-xml-20081126/#sec-line-ends),
+ * DW TVT cameras follow this demand.
+ * Also no endlines (and spaces) are allowed in the begin and in the end.
  */
-QByteArray normalizeXmlEndlines(const QByteArray& source)
+QByteArray normalizeXmlEndlines(QByteArray xml)
 {
-
     const QByteArray kSystemEndline = R"(
-)"; //< This line consists of endline marker (i.e. "\n" or "\r\n" or any other, it doesn't matter.)
+)"; //< This line consists of endline marker (i.e. "\n" or "\r\n" or any other, it doesn't matter).
 
-    const QByteArray kDesiredEndline = "\n"; //"\r\n";
-    QByteArray result = source;
-    result.replace(kSystemEndline, kDesiredEndline);
-    result = result.trimmed();
-    return result;
+    const QByteArray kDesiredEndline = "\n";
+    xml.replace(kSystemEndline, kDesiredEndline);
+    xml = xml.trimmed();
+    return xml;
 }
 
 } // namespace
 
-/*
+/**
  * Make xml body for subscription request. Concatenates the beginning, xml items from events and
  * the ending. The resulting xml is normalized (endlines are set to '\n'). Xml items are searched
  * in kXmlItemsByInternalName map.
@@ -292,7 +280,7 @@ QByteArray makeSubscriptionXml(const QSet<QByteArray>& eventInternalNames)
 
     if (checkedEventsCount == 0)
     {
-        NX_PRINT << "Mo events no subscribe to.";
+        NX_PRINT << "No events to subscribe to.";
         return QByteArray();
     }
 
@@ -343,7 +331,7 @@ public:
         m_client.setResponseReadTimeout(readTimeout);
     }
 
-    /*
+    /**
      * Execute command (e.g. GET http://10.0.0.1/bla-bla-bla).
      * If `reply` is not null the body of response is copied into it.
      */
@@ -391,25 +379,24 @@ int16_t readPort(const QDomElement& parent, const QString& name)
         return static_cast<uint16_t>(port.text().toInt());
 }
 
-CameraController::CameraController() : m_impl(new CameraControllerImpl) {}
+CameraController::CameraController(): m_impl(new CameraControllerImpl) {}
 
-CameraController::CameraController(const QByteArray& ip) :
-    m_ip(ip),
-    m_impl(new CameraControllerImpl)
+CameraController::CameraController(const QByteArray& ip):
+    CameraController()
 {
+    m_ip = ip;
     m_impl->setCgiPreamble(m_ip);
 }
 
 CameraController::CameraController(const QByteArray& ip,
-    const QByteArray& user, const QByteArray& password):
-    m_ip(ip),
-    m_user(user),
-    m_password(password),
-    m_impl(new CameraControllerImpl)
+    const QByteArray& user, const QByteArray& password)
+    :
+    CameraController(ip)
 {
-    m_impl->setCgiPreamble(m_ip);
     m_impl->setCredentials(m_user, m_password);
 }
+
+CameraController::~CameraController() = default;
 
 void CameraController::setIp(const QByteArray& ip)
 {

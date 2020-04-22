@@ -151,7 +151,7 @@ bool DeviceAgent::logHttpRequestResult()
 void DeviceAgent::prepareHttpClient(const QByteArray& messageBody,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket/* = {}*/)
 {
-    NX_ASSERT(!m_httpClient);
+    NX_CRITICAL(!m_httpClient);
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>(std::move(socket));
     m_httpClient->setUserName(m_auth.user());
     m_httpClient->setUserPassword(m_auth.password());
