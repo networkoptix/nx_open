@@ -215,8 +215,7 @@ static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*
     "id": "nx.hikvision",
     "name": "Hikvision analytics plugin",
     "description": "Supports built-in analytics on Hikvision cameras",
-    "version": "1.0.0",
-    "engineSettingsModel": ""
+    "version": "1.0.0"
 }
 )json";
 

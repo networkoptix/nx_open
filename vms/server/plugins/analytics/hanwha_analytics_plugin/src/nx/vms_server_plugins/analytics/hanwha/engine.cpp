@@ -573,8 +573,7 @@ static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*
     "name": "Hanwha analytics",
     "description": "Access control solution designed to make it easier than ever to manage and monitoring facility access.",
     "version": "1.0.1",
-    "vendor": "Hanwha",
-    "engineSettingsModel": ""
+    "vendor": "Hanwha"
 }
 )json";
 

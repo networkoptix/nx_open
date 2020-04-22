@@ -133,8 +133,7 @@ static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*
     "id": "nx.dw_mtt",
     "name": "DW MTT analytics plugin",
     "description": "Supports built-in analytics on Digital Watchdog cameras (MTT series)",
-    "version": "1.0.0",
-    "engineSettingsModel": ""
+    "version": "1.0.0"
 }
 )json";
 

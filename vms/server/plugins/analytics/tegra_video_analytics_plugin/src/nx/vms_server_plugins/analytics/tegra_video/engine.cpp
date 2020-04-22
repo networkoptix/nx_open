@@ -66,8 +66,7 @@ static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*
     "id": "nx.tegra_video",
     "name": "TegraVideo analytics plugin",
     "description": "Supports video analytics implemented using NVIDIA Tegra Multimedia API for Tegra (Jetson) AI platforms",
-    "version": "1.0.0",
-    "engineSettingsModel": ""
+    "version": "1.0.0"
 }
 )json";
 
