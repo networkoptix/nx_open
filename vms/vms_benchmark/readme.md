@@ -35,4 +35,5 @@ Use these bindings instead of spawning rtsp_perf and testcamera processes.
 12. Develop scripts for building `<platform>/vms_benchmark-dev/python`. The current version was made
 by hand. Now this artifact is just a copied native Python with the required libs installed into it.
 
-13. Write documentation (for something like Doxygen).
+13. Write documentation: in-code comments for classes and other entities.
+
