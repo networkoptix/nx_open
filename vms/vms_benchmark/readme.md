@@ -33,6 +33,6 @@ Use these bindings instead of spawning rtsp_perf and testcamera processes.
 11. Develop second connection type - telnet. It's needed for some box types (e.g. edge1).
 
 12. Develop scripts for building `<platform>/vms_benchmark-dev/python`. The current version was made
-by hand.
+by hand. At now this artifact is just copied native Python with installed required libs into it.
 
 13. Write documentation (for something like Doxygen).
