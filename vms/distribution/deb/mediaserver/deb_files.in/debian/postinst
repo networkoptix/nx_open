@@ -253,7 +253,7 @@ case "$1" in
 
         if [[ $WITH_ROOT_TOOL == 'true' ]]
         then
-            usermod --groups audio video "$SYSTEM_USER" 2>/dev/null || true
+            usermod --groups audio,video "$SYSTEM_USER" 2>/dev/null || true
 
             chown "root:${SYSTEM_USER}" "${BIN_DIR}/root-tool-bin"
             chmod u+s "${BIN_DIR}/root-tool-bin"
