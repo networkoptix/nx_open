@@ -6,8 +6,9 @@
 
 #include <nx/kit/json.h>
 #include <nx/sdk/i_string_map.h>
+#include <nx/sdk/helpers/string_map.h>
 #include <nx/utils/url.h>
-#include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/cf/cfuture.h>
 
 #include "camera_features.h"
 
@@ -32,6 +33,8 @@ struct CameraSettings
             Entry<int> tiltAngle{"Vca.Installation.TiltAngle"};
             Entry<int> rollAngle{"Vca.Installation.RollAngle"};
         } installation;
+
+        Entry<int> sensitivity{"Vca.Sensitivity"};
     };
     std::optional<Vca> vca;
 
@@ -39,16 +42,13 @@ struct CameraSettings
 
     explicit CameraSettings(const CameraFeatures& features);
 
-    void fetch(nx::utils::Url url,
-        nx::utils::MoveOnlyFunc<void(std::exception_ptr)> handler);
+    cf::future<cf::unit> fetch(nx::utils::Url url);
+    cf::future<cf::unit> store(nx::utils::Url url) const;
 
-    void store(nx::utils::Url url,
-        nx::utils::MoveOnlyFunc<void(std::exception_ptr)> handler) const;
+    void parse(const nx::sdk::IStringMap& rawSettings);
+    void unparse(nx::sdk::StringMap* rawSettings) const;
 
-    void parse(nx::sdk::IStringMap const& rawSettings);
-    void unparse(nx::sdk::IStringMap* rawSettings) const;
-
-    nx::kit::Json buildModel() const;
+    nx::kit::Json buildJsonModel() const;
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

@@ -2,13 +2,12 @@
 
 #include <string>
 #include <unordered_set>
-#include <exception>
 #include <optional>
 
 #include <nx/utils/url.h>
-#include <nx/utils/move_only_func.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/utils/thread/cf/cfuture.h>
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -18,15 +17,11 @@ public:
     explicit ParameterApi(nx::utils::Url url);
     ~ParameterApi();
 
-    void get(const std::unordered_set<std::string>& prefixes,
-        nx::utils::MoveOnlyFunc<void(std::exception_ptr,
-            std::unordered_map<std::string, std::string>)> handler);
+    cf::future<std::unordered_map<std::string, std::string>> get(
+        std::unordered_set<std::string> prefixes);
 
-    void set(const std::unordered_map<std::string, std::string>& parameters,
-        nx::utils::MoveOnlyFunc<void(std::exception_ptr,
-            std::unordered_map<std::string, std::string>)> handler);
-
-    void cancel(nx::utils::MoveOnlyFunc<void()> handler);
+    cf::future<std::unordered_map<std::string, std::string>>
+        set(std::unordered_map<std::string, std::string> parameters);
 
 protected:
     virtual void stopWhileInAioThread() override;

@@ -6,7 +6,9 @@
 #include <nx/network/aio/event_type.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/websocket/websocket_handshake.h>
+#include <nx/utils/thread/cf/cfuture.h>
 
+#include "future_utils.h"
 #include "http_utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -17,7 +19,6 @@ using namespace nx::network;
 
 NativeMetadataSource::NativeMetadataSource()
 {
-    m_httpClient.emplace();
 }
 
 NativeMetadataSource::~NativeMetadataSource()
@@ -25,18 +26,22 @@ NativeMetadataSource::~NativeMetadataSource()
     pleaseStopSync();
 }
 
-void NativeMetadataSource::open(const Url& baseUrl, MoveOnlyFunc<void(std::exception_ptr)> handler)
+cf::future<cf::unit> NativeMetadataSource::open(const Url& url)
 {
-    ensureDetailMetadataMode(baseUrl,
-        [this, baseUrl, handler = std::move(handler)](auto exceptionPtr) mutable
+    return cf::make_ready_future(cf::unit()).then(
+        [this, url = url](auto future) mutable
         {
-            if (exceptionPtr)
-            {
-                handler(exceptionPtr);
-                return;
-            }
+            future.get();
 
-            Url url = baseUrl;
+            m_httpClient.emplace();
+
+            return ensureDetailMetadataMode(std::move(url));
+        })
+    .then(
+        [this, url = url](auto future) mutable
+        {
+            future.get();
+
             url.setScheme("ws:");
             url.setPath("/ws/vca");
             url.setQuery("?data=meta,event");
@@ -44,164 +49,169 @@ void NativeMetadataSource::open(const Url& baseUrl, MoveOnlyFunc<void(std::excep
             websocket::addClientHeaders(&*m_httpClient,
                 "tracker-protocol", websocket::CompressionType::perMessageDeflate);
 
-            m_httpClient->doGet(url,
-                [this, handler = std::move(handler)]() mutable
+            return initiateFuture(
+                [this, url = std::move(url)](auto promise) mutable
                 {
-                    try
-                    {
-                        if (m_httpClient->failed())
-                            throw std::system_error(
-                                m_httpClient->lastSysErrorCode(), std::system_category(),
-                                "HTTP transport connection failed: " + m_httpClient->url().toStdString());
-
-                        const auto error = websocket::validateResponse(
-                            m_httpClient->request(), *m_httpClient->response());
-                        if (error != websocket::Error::noError)
-                            throw std::runtime_error("Websocket handshake failed");
-
-                        m_websocket.emplace(
-                            m_httpClient->takeSocket(),
-                            websocket::Role::client,
-                            websocket::FrameType::text,
-                            websocket::compressionType(m_httpClient->response()->headers));
-
-                        m_websocket->start();
-
-                        handler(nullptr);
-                    }
-                    catch (...)
-                    {
-                        handler(std::current_exception());
-                    }
+                    m_httpClient->doGet(url,
+                        [promise = std::move(promise)]() mutable
+                        {
+                            promise.set_value(cf::unit());
+                        });
                 });
+        })
+    .then(
+        [this](auto future)
+        {
+            future.get();
+
+            if (m_httpClient->failed())
+                throw std::system_error(
+                    m_httpClient->lastSysErrorCode(), std::system_category(),
+                    "HTTP transport connection failed: " + m_httpClient->url().toStdString());
+
+            const auto error = websocket::validateResponse(
+                m_httpClient->request(), *m_httpClient->response());
+            if (error != websocket::Error::noError)
+                throw std::runtime_error("Websocket handshake failed");
+
+            m_websocket.emplace(
+                m_httpClient->takeSocket(),
+                websocket::Role::client,
+                websocket::FrameType::text,
+                websocket::compressionType(m_httpClient->response()->headers));
+
+            m_websocket->start();
+
+            return cf::unit();
         });
 }
 
-void NativeMetadataSource::read(MoveOnlyFunc<void(std::exception_ptr, Json)> handler)
+cf::future<Json> NativeMetadataSource::read()
 {
-    m_websocket->readSomeAsync(&m_buffer,
-        [this, handler = std::move(handler)](auto errorCode, auto /*size*/) mutable
+    return initiateFuture<SystemError::ErrorCode>(
+        [this](auto promise) mutable
         {
-            try
-            {
-                if (errorCode)
-                    throw std::system_error(
-                        errorCode, std::system_category(), "HTTP connection failed");
+            m_buffer.clear();
+            m_websocket->readSomeAsync(&m_buffer,
+                [promise = std::move(promise)](auto errorCode, auto /*size*/) mutable
+                {
+                    promise.set_value(errorCode);
+                });
+        })
+    .then(
+        [this](auto future)
+        {
+            if (auto errorCode = future.get())
+                throw std::system_error(
+                    errorCode, std::system_category(), "HTTP connection failed");
 
-                std::string error;
-                auto metadata = Json::parse(m_buffer.toStdString(), error);
-                if (!error.empty())
-                    throw std::runtime_error("Failed to parse json: " + error);
+            std::string error;
+            auto metadata = Json::parse(m_buffer.toStdString(), error);
+            if (!error.empty())
+                throw std::runtime_error("Failed to parse json: " + error);
 
-                handler(nullptr, std::move(metadata));
-            }
-            catch (...)
-            {
-                handler(std::current_exception(), Json());
-            }
+            return metadata;
         });
 }
 
-void NativeMetadataSource::close(nx::utils::MoveOnlyFunc<void()> handler)
+void NativeMetadataSource::close()
 {
-    post(
-        [this, handler = std::move(handler)]() mutable
-        {
-            m_httpClient.emplace();
+    m_httpClient.reset();
 
-            if (!m_websocket)
-            {
-                handler();
-                return;
-            }
-
-            m_websocket->cancelIOAsync(aio::EventType::etRead,
-                [this, handler = std::move(handler)]() mutable {
-                    m_websocket->sendCloseAsync();
-                    m_websocket.reset();
-
-                    handler();
-                });
-        });
+    if (m_websocket)
+    {
+        m_websocket->pleaseStopSync();
+        m_websocket.reset();
+    }
 }
 
 void NativeMetadataSource::stopWhileInAioThread()
 {
     BasicPollable::stopWhileInAioThread();
-    if (m_httpClient)
-        m_httpClient.reset();
+
+    m_httpClient.reset();
+
     if (m_websocket)
+    {
         m_websocket->pleaseStopSync();
+        m_websocket.reset();
+    }
 }
 
-void NativeMetadataSource::ensureDetailMetadataMode(Url url,
-    MoveOnlyFunc<void(std::exception_ptr)> handler)
+cf::future<cf::unit> NativeMetadataSource::ensureDetailMetadataMode(Url url)
 {
     // 'Detail metadata mode' (undocumented as of 2020.04.16) enables, among others,
     // a `Pos2D` field describing object boundaries in normalized screen space.
-
-    url.setScheme("http:");
-    url.setPath("/VCA/Config/AE/WebSocket/DetailMetadata");
-    m_httpClient->doGet(url,
-        [this, url, handler = std::move(handler)]() mutable
+    return initiateFuture<Url>(
+        [this, url = std::move(url)](auto promise) mutable
         {
-            try
-            {
-                checkResponse(*m_httpClient);
-
-                if (m_httpClient->fetchMessageBodyBuffer().trimmed() == "true")
+            url.setPath("/VCA/Config/AE/WebSocket/DetailMetadata");
+            m_httpClient->doGet(url,
+                [promise = std::move(promise), url]() mutable
                 {
-                    handler(nullptr);
-                    return;
-                }
+                    promise.set_value(std::move(url));
+                });
+        })
+    .then(
+        [this](auto future) mutable
+        {
+            auto url = future.get();
 
-                setDetailMetadataMode(url, std::move(handler));
-            }
-            catch (...)
-            {
-                handler(std::current_exception());
-            }
+            checkResponse(*m_httpClient);
+
+            const auto responseBody = m_httpClient->fetchMessageBodyBuffer();
+            if (responseBody.trimmed() == "true") // already enabled
+                return cf::make_ready_future(cf::unit());
+
+            return setDetailMetadataMode(std::move(url));
         });
 }
 
-void NativeMetadataSource::setDetailMetadataMode(Url url,
-    MoveOnlyFunc<void(std::exception_ptr)> handler)
+cf::future<cf::unit> NativeMetadataSource::setDetailMetadataMode(Url url)
 {
-    m_httpClient->setRequestBody(
-        std::make_unique<http::BufferSource>("application/json", "true"));
-    m_httpClient->doPost(url,
-        [this, url, handler = std::move(handler)]() mutable
+    return initiateFuture(
+        [this, url](auto promise) mutable
         {
-            try
-            {
-                checkResponse(*m_httpClient);
+            m_httpClient->setRequestBody(
+                std::make_unique<http::BufferSource>("application/json", "true"));
+            m_httpClient->doPost(url,
+                [promise = std::move(promise)]() mutable
+                {
+                    promise.set_value(cf::unit());
+                });
+        })
+    .then(
+        [this, url = url](auto future) mutable
+        {
+            future.get();
 
-                reloadConfig(url, std::move(handler));
-            }
-            catch (...)
-            {
-                handler(std::current_exception());
-            }
+            checkResponse(*m_httpClient);
+
+            return reloadConfig(std::move(url));
         });
 }
 
-void NativeMetadataSource::reloadConfig(Url url,
-    MoveOnlyFunc<void(std::exception_ptr)> handler)
+cf::future<cf::unit> NativeMetadataSource::reloadConfig(Url url)
 {
-    url.setPath("/VCA/Config/Reload");
-    m_httpClient->doGet(url,
-        [this, url, handler = std::move(handler)]() mutable
+    return initiateFuture(
+        [this, url = std::move(url)](auto promise) mutable
         {
-            try
-            {
-                checkResponse(*m_httpClient);
+            url.setPath("/VCA/Config/Reload");
 
-                handler(nullptr);
-            }
-            catch (...)
-            {
-                handler(std::current_exception());
-            }
+            m_httpClient->doGet(url,
+                [promise = std::move(promise)]() mutable
+                {
+                    promise.set_value(cf::unit());
+                });
+        })
+    .then(
+        [this](auto future)
+        {
+            future.get();
+
+            checkResponse(*m_httpClient);
+
+            return cf::unit();
         });
 }
 

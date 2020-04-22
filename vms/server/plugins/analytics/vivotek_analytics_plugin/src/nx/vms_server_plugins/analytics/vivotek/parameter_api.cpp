@@ -1,9 +1,11 @@
 #include "parameter_api.h"
 
+#include <exception>
 #include <stdexcept>
 
 #include <QtCore/QUrlQuery>
 
+#include "future_utils.h"
 #include "http_utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -25,72 +27,59 @@ ParameterApi::~ParameterApi()
     pleaseStopSync();
 }
 
-void ParameterApi::get(const std::unordered_set<std::string>& prefixes,
-    MoveOnlyFunc<void(std::exception_ptr, std::unordered_map<std::string, std::string>)> handler)
+cf::future<std::unordered_map<std::string, std::string>> ParameterApi::get(
+    std::unordered_set<std::string> prefixes)
 {
-    QString query;
-    for (const auto& prefix: prefixes)
-        query += (query.isEmpty() ? "" : "&") + QString::fromStdString(prefix);
-
-    auto url = m_url;
-    url.setScheme("http");
-    url.setPath("/cgi-bin/admin/getparam.cgi");
-    url.setQuery(query);
-
-    m_httpClient->doGet(url,
-        [this, url, handler = std::move(handler)]() mutable
+    return initiateFuture(
+        [this, prefixes = std::move(prefixes)](auto promise)
         {
-            std::unordered_map<std::string, std::string> parameters;
-            try
-            {
-                checkResponse(*m_httpClient);
-                parameters = parseResponse();
-                handler(nullptr, std::move(parameters));
-            }
-            catch (...)
-            {
-                handler(std::current_exception(), parameters);
-            }
+            QString query;
+            for (const auto& prefix: prefixes)
+                query += (query.isEmpty() ? "" : "&") + QString::fromStdString(prefix);
+
+            auto url = m_url;
+            url.setPath("/cgi-bin/admin/getparam.cgi");
+            url.setQuery(query);
+
+            m_httpClient->doGet(url,
+                [promise = std::move(promise)]() mutable
+                {
+                    promise.set_value(cf::unit());
+                });
+        })
+    .then(
+        [this](auto future)
+        {
+            future.get();
+            checkResponse(*m_httpClient);
+            return parseResponse();
         });
 }
 
-void ParameterApi::set(const std::unordered_map<std::string, std::string>& parameters,
-    MoveOnlyFunc<void(std::exception_ptr, std::unordered_map<std::string, std::string>)> handler)
+cf::future<std::unordered_map<std::string, std::string>> ParameterApi::set(
+    std::unordered_map<std::string, std::string> parameters)
 {
-    QUrlQuery query;
-    for (const auto& [name, value]: parameters)
-        query.addQueryItem(QString::fromStdString(name), QString::fromStdString(value));
-
-    auto url = m_url;
-    url.setScheme("http");
-    url.setPath("/cgi-bin/admin/setparam.cgi");
-    url.setQuery(query);
-
-    m_httpClient->doPost(url,
-        [this, url, handler = std::move(handler)]() mutable
+    return initiateFuture(
+        [this, parameters = std::move(parameters)](auto promise)
         {
-            std::unordered_map<std::string, std::string> parameters;
-            try
-            {
-                checkResponse(*m_httpClient);
-                parameters = parseResponse();
-                handler(nullptr, std::move(parameters));
-            }
-            catch (...)
-            {
-                handler(std::current_exception(), parameters);
-            }
-        });
-}
+            QUrlQuery query;
+            for (const auto& [name, value]: parameters)
+                query.addQueryItem(QString::fromStdString(name), QString::fromStdString(value));
 
+            auto url = m_url;
+            url.setScheme("http");
+            url.setPath("/cgi-bin/admin/setparam.cgi");
+            url.setQuery(query);
 
-void ParameterApi::cancel(nx::utils::MoveOnlyFunc<void()> handler)
-{
-    post(
-        [this, handler = std::move(handler)]() mutable
-        {
-            m_httpClient.emplace();
-            handler();
+            m_httpClient->doPost(url,
+                [promise = std::move(promise)]() mutable
+                {
+                    promise.set_value(cf::unit());
+                });
+        }).then([this](auto future) {
+            future.get();
+            checkResponse(*m_httpClient);
+            return parseResponse();
         });
 }
 

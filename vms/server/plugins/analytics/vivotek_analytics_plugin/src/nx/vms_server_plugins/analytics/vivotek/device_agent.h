@@ -12,6 +12,7 @@
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
+#include <nx/utils/thread/cf/cfuture.h>
 
 #include <QtCore/QString>
 
@@ -27,6 +28,7 @@ class DeviceAgent:
 {
 public:
     explicit DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
+    ~DeviceAgent();
 
 protected:
     virtual void doSetSettings(
@@ -48,7 +50,8 @@ private:
         nx::sdk::IPluginDiagnosticEvent::Level level,
         const QString& caption, const QString& description);
 
-    void reopenNativeMetadataSource();
+    cf::future<cf::unit> startMetadataStreaming();
+    void stopMetadataStreaming();
 
     void readNextMetadata();
 
@@ -65,6 +68,7 @@ private:
     bool m_wantMetadata = false;
     NativeMetadataSource m_nativeMetadataSource;
     nx::network::aio::Timer m_reopenDelayer;
+    cf::future<cf::unit> m_metadataReadRetainer = cf::make_ready_future(cf::unit());
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek
