@@ -3,6 +3,8 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/action_parameters.h>
 
+class QnCommonModule;
+
 namespace nx::vms::rules {
 
 using ActionType = nx::vms::api::ActionType;
@@ -16,6 +18,10 @@ struct SubstitutionKeywords
         static const QString source;
         static const QString caption;
         static const QString description;
+        static const QString cameraId;
+        static const QString cameraName;
+        static const QString eventType;
+        static const QString eventName;
     };
 };
 
@@ -26,10 +32,12 @@ struct SubstitutionKeywords
  * @param actionType Type of the action.
  * @param sourceActionParameters Parameters that were used to setup the action in the rule.
  * @param eventRuntimeParameters Actual parameters event was triggered with.
+ * @param commonModule Pointer to the QnCommonModule instance.
  */
 ActionParameters actualActionParameters(
     ActionType actionType,
     const ActionParameters& sourceActionParameters,
-    const EventParameters& eventRuntimeParameters);
+    const EventParameters& eventRuntimeParameters,
+    const QnCommonModule* commonModule);
 
 } // namespace nx::vms::rules

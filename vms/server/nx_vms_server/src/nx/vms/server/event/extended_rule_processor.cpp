@@ -503,7 +503,8 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
     const auto actionParameters = nx::vms::rules::actualActionParameters(
         action->actionType(),
         action->getParams(),
-        action->getRuntimeParams());
+        action->getRuntimeParams(),
+        serverModule()->commonModule());
     nx::network::http::StringType requestType = actionParameters.requestType;
 
     nx::utils::Url url(actionParameters.url);
