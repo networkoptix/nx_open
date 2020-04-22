@@ -1295,6 +1295,7 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
         {
             result = QnStorageScanData(
                 Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0, 0.0);
+            setRebuildInfo(result);
         }
 
         m_archiveIndexer->addStoragesToScan(storagesToScan, false);
