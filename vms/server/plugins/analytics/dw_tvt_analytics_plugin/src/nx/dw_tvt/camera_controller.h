@@ -12,10 +12,10 @@
 
 namespace nx::dw_tvt {
 
-/*
- * Make xml body for subscruption request.
+/**
+ * Make xml body for subscription request.
  * @param items - list of internal names of the events to subscribe to.
-*/
+ */
 QByteArray makeSubscriptionXml(const QSet<QByteArray>& items);
 
 class CameraControllerImpl;
@@ -26,7 +26,7 @@ public:
     CameraController();
     CameraController(const QByteArray& ip);
     CameraController(const QByteArray& ip, const QByteArray& user, const QByteArray& password);
-    ~CameraController() = default;
+    ~CameraController();
 
     void setIp(const QByteArray& ip);
     void setCredentials(const QByteArray& user, const QByteArray& password);
@@ -52,7 +52,7 @@ private:
     QByteArray m_user;
     QByteArray m_password;
 
-    std::shared_ptr<CameraControllerImpl> m_impl;
+    std::unique_ptr<CameraControllerImpl> m_impl;
 
     uint16_t m_httpPort = 0;
     uint16_t m_netPort = 0;

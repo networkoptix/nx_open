@@ -19,9 +19,9 @@ static const QString kDwTvtVendor("tvt");
 static const QString kDwTvtTemporaryVendor("customer");
 // Just for information:
 // DW VCA camera's vendor string is "cap",
-// DW TVT camera's vendor string is "digitalwatchdog"
+// DW TVT camera's vendor string is "digitalwatchdog" or (temporarily?) "customer"
 
-QString normalize(const QString& name)
+QString toLowerSpaceless(const QString& name)
 {
     QString result = name.toLower().simplified();
     result.replace(" ", "");
@@ -51,7 +51,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
     }
     m_typedManifest = QJson::deserialized<EngineManifest>(m_manifest);
     for (auto& model: m_typedManifest.supportedCameraModels)
-        model = normalize(model);
+        model = toLowerSpaceless(model);
 }
 
 void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
@@ -100,8 +100,8 @@ void Engine::setHandler(IHandler* /*handler*/)
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 {
-    const auto vendor = normalize(QString(deviceInfo->vendor()));
-    const auto model = normalize(QString(deviceInfo->model()));
+    const auto vendor = toLowerSpaceless(QString(deviceInfo->vendor()));
+    const auto model = toLowerSpaceless(QString(deviceInfo->model()));
 
     if (!vendor.startsWith(kDwTvtVendor) && !vendor.startsWith(kDwTvtTemporaryVendor))
     {

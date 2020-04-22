@@ -29,12 +29,16 @@ protected:
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
         const nx::sdk::IStringMap* settings) override;
+
     virtual void getPluginSideSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+
     virtual void getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResult) const override;
+
     virtual void doObtainDeviceAgent(
         nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
         const nx::sdk::IDeviceInfo* deviceInfo) override;
+
     virtual void doExecuteAction(
         nx::sdk::Result<nx::sdk::analytics::IAction::Result>* outResult,
         const nx::sdk::analytics::IAction* action) override;

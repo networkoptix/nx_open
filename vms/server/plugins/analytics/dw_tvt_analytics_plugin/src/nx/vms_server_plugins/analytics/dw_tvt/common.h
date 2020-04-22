@@ -29,9 +29,6 @@ struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestB
 #define DwTvtEngineManifest_Fields EngineManifestBase_Fields \
     (supportedCameraModels)(eventTypes)
 
-QN_FUSION_DECLARE_FUNCTIONS(EventType, (json))
-QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json))
-
-bool operator==(const EventType& lh, const EventType& rh);
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((EventType)(EngineManifest), (json))
 
 } // nx::vms_server_plugins::analytics::dw_tvt

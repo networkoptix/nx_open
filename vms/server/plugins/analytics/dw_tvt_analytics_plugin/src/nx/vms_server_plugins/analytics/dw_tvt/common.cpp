@@ -4,11 +4,6 @@
 
 namespace nx::vms_server_plugins::analytics::dw_tvt {
 
-bool operator==(const EventType& lh, const EventType& rh)
-{
-    return lh.id == rh.id;
-}
-
 bool EngineManifest::supportsModel(const QString& model) const noexcept
 {
     if (supportedCameraModels.isEmpty())
@@ -20,9 +15,7 @@ bool EngineManifest::supportsModel(const QString& model) const noexcept
     return modelIt != supportedCameraModels.cend();
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),
-    DwTvtEventType_Fields, (brief, true))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json),
-    DwTvtEngineManifest_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (eq)(json), DwTvtEventType_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json), DwTvtEngineManifest_Fields, (brief, true))
 
 } // nx::vms_server_plugins::analytics::dw_tvt
