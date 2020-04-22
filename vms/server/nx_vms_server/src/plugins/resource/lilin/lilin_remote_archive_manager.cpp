@@ -35,6 +35,7 @@ static const std::chrono::milliseconds kWaitBeforeSync(30000);
 static const int kNumberOfSyncCycles = 2;
 static const int kDefaultOverlappedId = 0;
 static const int kTriesPerChunk = 2;
+static const int kMaxChunkSizeBytes = 100'000'000;
 
 std::chrono::seconds extractSeconds(const QString& dateTimeString)
 {
@@ -199,11 +200,26 @@ boost::optional<nx::network::http::BufferType> LilinRemoteArchiveManager::doRequ
 
     bool success = httpClient->doGet(requestUrl);
     if (!success)
-        return boost::none;
+        return boost::none;    
 
     nx::network::http::BufferType response;
     while (!httpClient->eof())
-        response.append(httpClient->fetchMessageBodyBuffer());
+    {
+        nx::network::http::BufferType currentDataChunk =
+            httpClient->fetchMessageBodyBuffer();
+
+        const int totalDataSize = currentDataChunk.size() + response.size();
+        if (totalDataSize > kMaxChunkSizeBytes)
+        {
+            NX_WARNING(this,
+                "Data chunk size limit exceeded. Response data size is: %1, max chunk size: %2",
+                totalDataSize, kMaxChunkSizeBytes);
+
+            return boost::none;
+        }
+
+        response.append(currentDataChunk);
+    }
 
     return response;
 }

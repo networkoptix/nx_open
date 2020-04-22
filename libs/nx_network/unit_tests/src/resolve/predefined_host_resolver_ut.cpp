@@ -85,11 +85,14 @@ private:
     std::string m_hostname;
     std::deque<AddressEntry> m_mappedEntries;
     std::deque<AddressEntry> m_lastResolveResult;
+    int m_sequence = -1;
 
-    static AddressEntry generateRandomEntry()
+    AddressEntry generateRandomEntry()
     {
-        return AddressEntry(SocketAddress(
-            HostAddress::localhost, nx::utils::random::number<int>(10000, 20000)));
+        if (m_sequence < 0)
+            m_sequence = nx::utils::random::number<int>(10000, 20000);
+
+        return AddressEntry(SocketAddress(HostAddress::localhost, m_sequence++));
     }
 };
 
