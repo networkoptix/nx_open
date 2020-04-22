@@ -162,6 +162,13 @@ void QnServerStorageManager::handleResourceAdded(const QnResourcePtr& resource)
     connect(server, &QnMediaServerResource::apiUrlChanged,
         this, &QnServerStorageManager::checkStoragesStatusInternal);
 
+    connect(server, &QnMediaServerResource::propertyChanged, this,
+        [this](const QnResourcePtr& resource, const QString& key)
+        {
+            if (key == QnMediaServerResource::kMetadataStorageIdKey)
+                updateActiveMetadataStorage(resource.objectCast<QnMediaServerResource>());
+        });
+
     checkStoragesStatus(server);
 };
 

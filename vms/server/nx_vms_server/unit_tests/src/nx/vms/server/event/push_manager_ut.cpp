@@ -131,7 +131,7 @@ public:
     QString openUrl(const QnUuid& resource = {}) const
     {
         const auto settings = m_serverModule.commonModule()->globalSettings();
-        QString url = nx::utils::log::makeMessage("%1://%2/client/%3/view?timestamp=111222333444",
+        QString url = NX_FMT("%1://%2/client/%3/view?timestamp=111222333444",
             nx::vms::utils::AppInfo::nativeUriProtocol(), settings->cloudHost(), systemId);
         if (!resource.isNull())
             url += "&resources=" + resource.toSimpleString();
@@ -142,8 +142,7 @@ public:
     {
         if (resource.isNull())
             return QString();
-        return nx::utils::log::makeMessage(
-            "https://%1/ec2/cameraThumbnail?cameraId=%2&time=111222333444&height=480",
+        return NX_FMT("https://%1/ec2/cameraThumbnail?cameraId=%2&time=111222333444&height=480",
             systemId, resource.toSimpleString());
     }
 

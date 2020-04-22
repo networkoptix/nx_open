@@ -55,7 +55,7 @@ bool IsapiPtzController::continuousMove(
     if (!isSupported(options))
         return false;
 
-    static const utils::log::Message request(R"xml(
+    static const nx::Formatter request(R"xml(
     <PTZData version="2.0" xmlns="http://www.isapi.org/ver20/XMLSchema">
         <pan>%1</pan>
         <tilt>%2</tilt>
@@ -81,7 +81,7 @@ bool IsapiPtzController::absoluteMove(
     if (!isSupported(options, space))
         return false;
 
-    static const utils::log::Message request(R"xml(
+    static const nx::Formatter request(R"xml(
     <PTZData version="2.0" xmlns="http://www.isapi.org/ver20/XMLSchema">
         <AbsoluteHigh>
             <elevation>%1</elevation>
@@ -216,7 +216,7 @@ bool IsapiPtzController::createPreset(const QnPtzPreset& preset)
     while (existingPresets->count(idOnCamera) || m_specialPresetNumbers.count(idOnCamera))
         ++idOnCamera;
 
-    static const utils::log::Message request(R"xml(
+    static const nx::Formatter request(R"xml(
     <PTZPreset version="2.0" xmlns="http://www.isapi.org/ver20/XMLSchema">
         <enabled>true</enabled>
         <id>%1</id>

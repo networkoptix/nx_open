@@ -280,7 +280,7 @@ private:
 
     void doPeriodicTasks();
 
-    void log(const nx::utils::log::Message& message) const;
+    void log(const QString& message) const;
     void clearCurrentFrame();
 
     void configureMetadataForReader();
@@ -860,7 +860,7 @@ void PlayerPrivate::handleMediaEventChanged()
     emit q->tooManyConnectionsErrorChanged();
 }
 
-void PlayerPrivate::log(const nx::utils::log::Message& message) const
+void PlayerPrivate::log(const QString& message) const
 {
     NX_DEBUG(q_ptr, message);
 }

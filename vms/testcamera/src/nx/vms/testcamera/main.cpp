@@ -25,7 +25,7 @@ namespace {
 template<typename... Args>
 void print(std::ostream& stream, const QString& message, Args... args)
 {
-    stream << nx::utils::log::makeMessage(message + "\n", args...).toStdString();
+    stream << nx::format(message + "\n", args...).toStdString();
 }
 
 static CameraOptions makeCameraOptions(

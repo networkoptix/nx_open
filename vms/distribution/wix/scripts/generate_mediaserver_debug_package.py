@@ -19,8 +19,10 @@ def create_mediaserver_debug_file(binaries_dir, output_filename):
         'plugins/axis_analytics_plugin.pdb',
         'plugins/vca_analytics_plugin.pdb',
         'plugins/dahua_analytics_plugin.pdb',
+        'plugins_optional/dw_tvt_analytics_plugin.pdb',
         'plugins_optional/image_library_plugin.pdb',
         'plugins_optional/stub_analytics_plugin.pdb',
+        'plugins_optional/sample_analytics_plugin.pdb',
         'plugins/mjpeg_link_plugin.pdb',
         'plugins/usb_camera_plugin.pdb']
     zip_files(pdb_filenames, binaries_dir, output_filename, mandatory=False)

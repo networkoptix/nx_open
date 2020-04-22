@@ -1,3 +1,5 @@
+// TODO: Move to nx/formatter_ut.h
+
 #include <gtest/gtest.h>
 #include <nx/utils/log/log_message.h>
 
@@ -18,7 +20,7 @@ void testArgsQString(const char* format, const Args& ... args)
     EXPECT_EQ(QString::fromUtf8(format).arg(args ...), result);
 }
 
-TEST(QnLogMessage, argQString)
+TEST(Formatter, argQString)
 {
     testArgQString("%1", QLatin1String("hello"));
 
@@ -39,7 +41,7 @@ void testCustom(QString expected, const Value& value)
     EXPECT_EQ(expected, result);
 }
 
-TEST(QnLogMessage, argCustom)
+TEST(Formatter, argCustom)
 {
     testCustom(QLatin1String("hello"), QByteArray("hello"));
     testCustom(QLatin1String("positive"), std::string("positive"));
@@ -84,7 +86,7 @@ void testStrQString(const char* format, const Args& ... args)
 struct SomeLongStructNameForThisTest {};
 class SomeLongClassNameForThisTest {};
 
-TEST(QnLogMessage, str)
+TEST(Formatter, str)
 {
     testStrQString("%1", QLatin1String("hello"));
     testStrQString("%1 %2", 123);
@@ -111,3 +113,12 @@ TEST(QnLogMessage, str)
     EXPECT_TRUE(QString(lm("%1").arg(obj2.get())).startsWith(name2));
 }
 
+TEST(Formatter, NX_FMT)
+{
+    const auto expectEq = [](const QString& f, const QString& s) { EXPECT_EQ(f, s); };
+
+    expectEq(NX_FMT(), "");
+    expectEq(NX_FMT("hello"), "hello");
+    expectEq(NX_FMT("value is %1", 777), "value is 777");
+    expectEq(NX_FMT("%1 = %2", "number", 777), "number = 777");
+}

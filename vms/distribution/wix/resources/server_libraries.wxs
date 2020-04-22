@@ -42,7 +42,9 @@
                 Source="$(var.plugins_optional_dir)"
                 Directory="plugins_optional">
             <Component><File Name="stub_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="sample_analytics_plugin.dll" KeyPath="yes"/></Component>
             <Component><File Name="dw_tvt_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="image_library_plugin.dll" KeyPath="yes"/></Component>
         </ComponentGroup>
     </Fragment>
 </Wix>
