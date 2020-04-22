@@ -395,8 +395,7 @@ static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*
     "id": "nx.ssc",
     "name": "SSC analytics plugin",
     "description": "Supports integration with SSC gasoline guns using RS232 protocol",
-    "version": "1.0.0",
-    "engineSettingsModel": ""
+    "version": "1.0.0"
 }
 )json";
 

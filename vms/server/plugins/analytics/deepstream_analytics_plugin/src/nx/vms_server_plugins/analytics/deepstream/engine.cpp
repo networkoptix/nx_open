@@ -280,8 +280,7 @@ namespace {
 static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.deepstream",
-    "name": "DeepStream analytics plugin",
-    "engineSettingsModel": ""
+    "name": "DeepStream analytics plugin"
 }
 )json";
 

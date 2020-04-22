@@ -149,7 +149,7 @@ def _load_config_file(config_path, default_path, config_definition, config_requi
             config_file_path_final = config_file_path
         else:
             raise exceptions.VmsBenchmarkError(
-                f"Unable to find config with path '{config_file_path}'."
+                f'Unable to find the config file {config_file_path!r}.'
             )
     else:
         if config_file_path.exists():
@@ -157,17 +157,16 @@ def _load_config_file(config_path, default_path, config_definition, config_requi
         elif (benchmark_bin_path / config_file_path).exists():
             config_file_path_final = benchmark_bin_path / config_file_path
         else:
-            # Check config file required or config file was specified by user explicitly.
+            # Check that the config file is required or was specified by the user explicitly.
             if config_required or config_path:
                 raise exceptions.VmsBenchmarkError(
-                    f"Unable to find config with path '{config_file_path}', searched in:\n"
-                    "  1) current directory;\n"
-                    "  2) benchmark binary directory."
+                    f'Unable to find the config file {config_file_path!r}'
+                    ' either in the current directory or in the VMS Benchmark executable directory.'
                 )
             else:
-                # ConfigParser() requires config path to be passed even if file is optional, thus
-                # just pass the default path (it doesn't matter that the file with this path doesn't
-                # exist).
+                # ConfigParser() requires config path to be passed even if the file is optional,
+                # thus just pass the default path (it doesn't matter that the file with this path
+                # doesn't exist).
                 # TODO: Refactor ConfigParser() to remove this quirk.
                 config_file_path_final = default_path
 
