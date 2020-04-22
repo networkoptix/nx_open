@@ -5,6 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/app_info.h>
 #include <nx/update/update_information.h>
 #include <utils/common/process.h>
 #include <nx/update/update_check.h>
@@ -398,9 +399,10 @@ UpdateInstaller::State UpdateInstaller::checkContents(const QString& outputPath)
 QString UpdateInstaller::workDir() const
 {
     const auto& selfPath = moduleGUID().toString();
-    // This path will look like /tmp/nx_isntaller-server_guid/
-    // We add server_guid to allow to run multiple servers on a single machine.
-    return closeDirPath(dataDirectoryPath()) + "nx_installer-" + selfPath;
+    // This path will look like /tmp/networkoptix_installer-{server_guid}/
+    // We add server_guid to allow running multiple servers on a single machine.
+    return closeDirPath(dataDirectoryPath())
+        + nx::utils::AppInfo::linuxOrganizationName() + "_installer-" + selfPath;
 }
 
 void UpdateInstaller::stopInstallationTimerAsync()
