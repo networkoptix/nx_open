@@ -1,0 +1,265 @@
+#include <gtest/gtest.h>
+
+#include <nx/vms/rules/action_parameters_processing.h>
+#include <nx/vms/event/event_parameters.h>
+#include <nx/vms/event/action_parameters.h>
+
+#include <common/common_module.h>
+#include <nx/core/access/access_types.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <test_support/resource/camera_resource_stub.h>
+#include <nx/core/resource/server_mock.h>
+
+#include <nx/analytics/event_type_descriptor_manager.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
+
+namespace nx::vms::rules::test {
+
+using ActionParameters = nx::vms::event::ActionParameters;
+using EventParameters = nx::vms::event::EventParameters;
+
+using ActionType = nx::vms::api::ActionType;
+using EventType = nx::vms::api::EventType;
+
+namespace {
+
+EventParameters createGenericEvent(
+    const QString& source,
+    const QString& caption,
+    const QString& description)
+{
+    EventParameters result;
+    result.eventType = EventType::userDefinedEvent;
+    result.resourceName = source;
+    result.caption = caption;
+    result.description = description;
+    return result;
+}
+
+EventParameters createAnalyticsEvent(
+    const QnUuid& cameraId,
+    const QString& caption,
+    const QString& description,
+    const QString& eventType)
+{
+    EventParameters result;
+    result.eventType = EventType::analyticsSdkEvent;
+    result.eventResourceId = cameraId;
+    result.caption = caption;
+    result.description = description;
+    result.setAnalyticsEventTypeId(eventType);
+    return result;
+}
+
+EventParameters createRandomEvent()
+{
+    EventParameters result;
+
+    // Right now poeOverBudgetEvent is the maximum enum value, except UserDefinedEvent.
+    result.eventType = (EventType)(qrand() % ((int)EventType::poeOverBudgetEvent + 1));
+    if (result.eventType == EventType::undefinedEvent)
+        result.eventType = EventType::userDefinedEvent;
+
+    result.resourceName = "Some source";
+    result.caption = "Some caption";
+    result.description = "Some description";
+    result.eventResourceId = QnUuid::createUuid();
+    result.setAnalyticsEventTypeId("Some event type");
+    return result;
+}
+
+EventParameters createUnsupportedEvent()
+{
+    EventParameters result = createRandomEvent();
+    while (result.eventType == EventType::undefinedEvent
+        || result.eventType == EventType::analyticsSdkEvent
+        || result.eventType == EventType::userDefinedEvent)
+    {
+        // Right now poeOverBudgetEvent is the maximum enum value, except UserDefinedEvent.
+        result.eventType = (EventType)(qrand() % ((int)EventType::poeOverBudgetEvent + 1));
+    }
+    return result;
+}
+
+enum Keywords {kSource, kCaption, kDescription, kCameraId, kCameraName, kEventType, kEventName};
+
+QString createText(const QHash<Keywords, QString>& filled)
+{
+    using Placeholder = nx::vms::rules::SubstitutionKeywords::Event;
+
+    QString result;
+    result += filled.value(kSource, Placeholder::source);
+    result += filled.value(kCaption, Placeholder::caption);
+    result += filled.value(kDescription, Placeholder::description);
+    result += filled.value(kCameraId, Placeholder::cameraId);
+    result += filled.value(kCameraName, Placeholder::cameraName);
+    result += filled.value(kEventType, Placeholder::eventType);
+    result += filled.value(kEventName, Placeholder::eventName);
+    return result;
+}
+
+ActionParameters createActionParams()
+{
+    ActionParameters result;
+    result.text = createText({});
+    return result;
+}
+
+const char* kManifest = R"json(
+{
+    "eventTypes": [
+        {
+            "id": "nx.stub.DummyEvent",
+            "name": "Dummy Event Created For The Testing Purposes"
+        }
+    ]
+}
+)json";
+
+const QString kDummyEventType = "nx.stub.DummyEvent";
+const QString kDummyEventName = "Dummy Event Created For The Testing Purposes";
+
+} // namespace
+
+class ActionParametersProcessingTest: public ::testing::Test
+{
+protected:
+    virtual void SetUp() override
+    {
+        m_commonModule = std::make_unique<QnCommonModule>(
+            /*clientMode*/ false,
+            nx::core::access::Mode::direct);
+        m_commonModule->setModuleGUID(QnUuid::createUuid());
+
+        m_camera.reset(new nx::CameraResourceStub());
+        m_camera->setName("BigBro");
+        m_commonModule->resourcePool()->addResource(m_camera);
+
+        // We need a whole Server just to make analytics descriptors work.
+        QnMediaServerResourcePtr server(
+            new nx::core::resource::ServerMock(m_commonModule.get()));
+        server->setIdUnsafe(m_commonModule->moduleGUID());
+        m_commonModule->resourcePool()->addResource(server);
+
+        m_commonModule->analyticsEventTypeDescriptorManager()->updateFromEngineManifest(
+            "PluginId",
+            QnUuid::createUuid(),
+            "EngineName",
+            QJson::deserialized<nx::vms::api::analytics::EngineManifest>(QByteArray(kManifest)));
+    }
+
+    QnCommonModule* commonModule() const
+    {
+        return m_commonModule.get();
+    }
+
+    const QnVirtualCameraResourcePtr& camera() const
+    {
+        return m_camera;
+    }
+
+private:
+    std::unique_ptr<QnCommonModule> m_commonModule;
+    QnVirtualCameraResourcePtr m_camera;
+};
+
+TEST_F(ActionParametersProcessingTest, genericEvent)
+{
+    const auto actionParameters = nx::vms::rules::actualActionParameters(
+        ActionType::execHttpRequestAction,
+        createActionParams(),
+        createGenericEvent("S", "C", "D"),
+        commonModule());
+
+    EXPECT_EQ(actionParameters.text,
+        createText({ {kSource, "S"}, {kCaption, "C"}, {kDescription, "D"} }));
+}
+
+TEST_F(ActionParametersProcessingTest, genericEventWithKeywords)
+{
+    using Placeholder = nx::vms::rules::SubstitutionKeywords::Event;
+    const auto actionParameters = nx::vms::rules::actualActionParameters(
+        ActionType::execHttpRequestAction,
+        createActionParams(),
+        createGenericEvent(Placeholder::description, Placeholder::source, Placeholder::caption),
+        commonModule());
+
+    EXPECT_EQ(actionParameters.text,
+        createText({
+            {kSource, Placeholder::description},
+            {kCaption, Placeholder::source},
+            {kDescription, Placeholder::caption}}));
+}
+
+TEST_F(ActionParametersProcessingTest, analyticsEvent)
+{
+    static const auto id = camera()->getId();
+    const auto actionParameters = nx::vms::rules::actualActionParameters(
+        ActionType::execHttpRequestAction,
+        createActionParams(),
+        createAnalyticsEvent(id, "C", "D", kDummyEventType),
+        commonModule());
+
+    EXPECT_EQ(actionParameters.text,
+        createText({
+            {kCameraId, id.toString()},
+            {kCameraName, camera()->getUserDefinedName()},
+            {kCaption, "C"},
+            {kDescription, "D"},
+            {kEventType, kDummyEventType},
+            {kEventName, kDummyEventName}}));
+}
+
+TEST_F(ActionParametersProcessingTest, analyticsEventWithKeywords)
+{
+    using Placeholder = nx::vms::rules::SubstitutionKeywords::Event;
+    static const auto id = QnUuid::createUuid();
+    const auto actionParameters = nx::vms::rules::actualActionParameters(
+        ActionType::execHttpRequestAction,
+        createActionParams(),
+        createAnalyticsEvent(id, Placeholder::description, Placeholder::eventType, Placeholder::caption),
+        commonModule());
+
+    EXPECT_EQ(actionParameters.text,
+        createText({
+            {kCameraId, id.toString()},
+            {kCameraName, Placeholder::cameraName}, //< Invalid camera id, name should not be processed.
+            {kCaption, Placeholder::description},
+            {kDescription, Placeholder::eventType},
+            {kEventType, Placeholder::caption},
+            {kEventName, Placeholder::eventName}})); //< Invalid event id, name should not be processed.
+}
+
+TEST_F(ActionParametersProcessingTest, unsupportedEventType)
+{
+    const auto originalParameters = createActionParams();
+    const auto actionParameters = nx::vms::rules::actualActionParameters(
+        ActionType::execHttpRequestAction,
+        originalParameters,
+        createUnsupportedEvent(),
+        commonModule());
+
+    EXPECT_EQ(actionParameters.text, originalParameters.text);
+}
+
+TEST_F(ActionParametersProcessingTest, unsupportedActionType)
+{
+    ActionType actionType = ActionType::undefinedAction;
+    while (actionType == ActionType::undefinedAction || actionType == ActionType::execHttpRequestAction)
+    {
+        // Right now pushNotificationAction is the maximum enum value.
+        actionType = (ActionType)(qrand() % ((int)ActionType::pushNotificationAction + 1));
+    }
+
+    const auto originalParameters = createActionParams();
+    const auto actionParameters = nx::vms::rules::actualActionParameters(
+        actionType,
+        originalParameters,
+        createUnsupportedEvent(),
+        commonModule());
+
+    EXPECT_EQ(actionParameters.text, originalParameters.text);
+}
+
+} // namespace nx::vms::rules::test
