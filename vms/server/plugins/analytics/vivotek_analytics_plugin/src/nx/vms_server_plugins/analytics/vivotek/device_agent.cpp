@@ -1,7 +1,9 @@
 #include "device_agent.h"
+#include "nx/sdk/i_plugin_diagnostic_event.h"
 #include "nx/utils/thread/cf/cfuture.h"
 #include "nx/vms_server_plugins/analytics/vivotek/camera_features.h"
 
+#include <exception>
 #include <stdexcept>
 #include <string>
 
@@ -15,11 +17,11 @@
 #include <nx/utils/url.h>
 
 #include "ini.h"
+#include "exception.h"
 #include "add_ptr_ref.h"
 #include "object_types.h"
 #include "parse_object_metadata_packet.h"
 #include "parameter_api.h"
-#include "future_utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -58,6 +60,13 @@ namespace {
         features.fetch(std::move(url)).get();
         return features;
     }
+
+    void emitDiagnostic(IDeviceAgent::IHandler* handler,
+        IPluginDiagnosticEvent::Level level, std::string caption, std::string description)
+    {
+        const auto event = makePtr<PluginDiagnosticEvent>(level, caption, description);
+        handler->handlePluginDiagnosticEvent(event.get());
+    }
 }
 
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
@@ -75,137 +84,174 @@ DeviceAgent::~DeviceAgent()
 {
 }
 
-void DeviceAgent::doSetSettings(Result<const IStringMap*>* /*outResult*/, const IStringMap* rawSettings)
+void DeviceAgent::doSetSettings(Result<const IStringMap*>* outResult, const IStringMap* rawSettings)
 {
-    NX_OUTPUT << __func__;
+    try
+    {
+        NX_OUTPUT << __func__;
 
-    for (int i = 0; i < rawSettings->count(); ++i)
-        NX_OUTPUT << "    " << rawSettings->key(i) << ": " << rawSettings->value(i);
+        for (int i = 0; i < rawSettings->count(); ++i)
+            NX_OUTPUT << "    " << rawSettings->key(i) << ": " << rawSettings->value(i);
 
-    CameraSettings settings(m_features);
-    settings.parse(*rawSettings);
+        CameraSettings settings(m_features);
+        settings.parse(*rawSettings);
 
-    cf::make_ready_future(cf::unit()).then(*m_basicPollable,
-        [&](auto future)
-        {
-            future.get();
+        cf::make_ready_future(cf::unit()).then(*m_basicPollable,
+            [&](auto future)
+            {
+                future.get();
 
-            return settings.store(m_url);
-        })
-    .get();
+                return settings.store(m_url);
+            })
+        .get();
+    }
+    catch (...)
+    {
+        *outResult = toError(std::current_exception());
+    }
 }
 
 void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const
 {
-    NX_OUTPUT << __func__;
+    try
+    {
+        NX_OUTPUT << __func__;
 
-    CameraSettings settings(m_features);
+        CameraSettings settings(m_features);
 
-    cf::make_ready_future(cf::unit()).then(*m_basicPollable,
-        [&](auto future)
-        {
-            future.get();
+        cf::make_ready_future(cf::unit()).then(*m_basicPollable,
+            [&](auto future)
+            {
+                future.get();
 
-            return settings.fetch(m_url);
-        })
-    .get();
+                return settings.fetch(m_url);
+            })
+        .get();
 
-    auto rawSettings = makePtr<StringMap>();
-    settings.unparse(rawSettings.get());
+        auto rawSettings = makePtr<StringMap>();
+        settings.unparse(rawSettings.get()); // TODO: implement per-setting errors
 
-    for (int i = 0; i < rawSettings->count(); ++i)
-        NX_OUTPUT << "    " << rawSettings->key(i) << ": " << rawSettings->value(i);
+        for (int i = 0; i < rawSettings->count(); ++i)
+            NX_OUTPUT << "    " << rawSettings->key(i) << ": " << rawSettings->value(i);
 
-    auto response = makePtr<SettingsResponse>();
-    response->setValues(std::move(rawSettings));
+        auto response = makePtr<SettingsResponse>();
+        response->setValues(std::move(rawSettings));
 
-    *outResult = response.releasePtr();
+        *outResult = response.releasePtr();
+    }
+    catch (...)
+    {
+        *outResult = toError(std::current_exception());
+    }
 }
 
 void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    NX_OUTPUT << __func__;
+    try
+    {
+        NX_OUTPUT << __func__;
 
-    // manifest doesn't depend on setting values, so we don't fetch them
-    CameraSettings settings(m_features);
+        // manifest doesn't depend on setting values, so we don't fetch them
+        CameraSettings settings(m_features);
 
-    Json manifest = Json::object{
-        {"objectTypes", [&]{
-            Json::array types;
+        Json manifest = Json::object{
+            {"objectTypes", [&]{
+                Json::array types;
 
-            if (m_features.vca)
-                types.insert(types.end(), {
-                    Json::object{
-                        {"id", kObjectTypeHuman},
-                        {"name", "Human"},
-                    },
-                });
+                if (m_features.vca)
+                    types.insert(types.end(), {
+                        Json::object{
+                            {"id", kObjectTypeHuman},
+                            {"name", "Human"},
+                        },
+                    });
 
-            return types;
-        }()},
-        {"deviceAgentSettingsModel", settings.buildJsonModel()},
-    };
+                return types;
+            }()},
+            {"deviceAgentSettingsModel", settings.buildJsonModel()},
+        };
 
-    *outResult = new sdk::String(manifest.dump());
+        *outResult = new sdk::String(manifest.dump());
 
-    NX_OUTPUT << "    " << outResult->value()->str();
+        NX_OUTPUT << "    " << outResult->value()->str();
+    }
+    catch (...)
+    {
+        *outResult = toError(std::current_exception());
+    }
 }
 
 void DeviceAgent::setHandler(IHandler* handler)
 {
-    NX_OUTPUT << __func__;
+    try
+    {
+        NX_OUTPUT << __func__;
 
-    cf::make_ready_future(cf::unit()).then(*m_basicPollable,
-        [&](auto future)
-        {
-            future.get();
+        cf::make_ready_future(cf::unit()).then(*m_basicPollable,
+            [&](auto future)
+            {
+                future.get();
 
-            m_handler = addPtrRef(handler);
+                m_handler = addPtrRef(handler);
 
-            return cf::unit();
-        })
-    .get();
+                return cf::unit();
+            })
+        .get();
+    }
+    catch (...)
+    {
+        vivotek::emitDiagnostic(handler,
+            IPluginDiagnosticEvent::Level::error,
+            "Failed to set device agent handler",
+            toError(std::current_exception()).errorMessage()->str());
+    }
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(Result<void>* /*outResult*/, const IMetadataTypes* neededMetadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    NX_OUTPUT << __func__;
+    try
+    {
+        NX_OUTPUT << __func__;
 
-    NX_OUTPUT << "    eventTypeIds:";
-    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
-    for (int i = 0; i < eventTypeIds->count(); ++i)
-        NX_OUTPUT << "        " << eventTypeIds->at(i);
-    NX_OUTPUT << "    objectTypeIds:";
-    const auto objectTypeIds = neededMetadataTypes->objectTypeIds();
-    for (int i = 0; i < objectTypeIds->count(); ++i)
-        NX_OUTPUT << "        " << objectTypeIds->at(i);
+        NX_OUTPUT << "    eventTypeIds:";
+        const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
+        for (int i = 0; i < eventTypeIds->count(); ++i)
+            NX_OUTPUT << "        " << eventTypeIds->at(i);
+        NX_OUTPUT << "    objectTypeIds:";
+        const auto objectTypeIds = neededMetadataTypes->objectTypeIds();
+        for (int i = 0; i < objectTypeIds->count(); ++i)
+            NX_OUTPUT << "        " << objectTypeIds->at(i);
 
-    const bool wantMetadata = !neededMetadataTypes->isEmpty();
+        const bool wantMetadata = !neededMetadataTypes->isEmpty();
 
-    cf::make_ready_future(cf::unit()).then(*m_basicPollable,
-        [&](auto future)
-        {
-            future.get();
+        cf::make_ready_future(cf::unit()).then(*m_basicPollable,
+            [&](auto future)
+            {
+                future.get();
 
-            stopMetadataStreaming();
+                stopMetadataStreaming();
 
-            m_wantMetadata = wantMetadata;
-            if (m_wantMetadata)
-                return startMetadataStreaming();
+                m_wantMetadata = wantMetadata;
+                if (m_wantMetadata)
+                    return startMetadataStreaming();
 
-            return cf::make_ready_future(cf::unit());
-        })
-    .get();
+                return cf::make_ready_future(cf::unit());
+            })
+        .get();
+    }
+    catch (...)
+    {
+        *outResult = toError(std::current_exception());
+    }
 }
 
 void DeviceAgent::emitDiagnostic(
     IPluginDiagnosticEvent::Level level,
-    const QString& caption, const QString& description)
+    std::string caption, std::string description)
 {
-    const auto event = makePtr<PluginDiagnosticEvent>(
-        level, caption.toStdString(), description.toStdString());
-
-    m_handler->handlePluginDiagnosticEvent(event.get());
+    vivotek::emitDiagnostic(m_handler.get(),
+        level, std::move(caption), std::move(description));
 }
 
 cf::future<cf::unit> DeviceAgent::startMetadataStreaming()
@@ -223,7 +269,7 @@ cf::future<cf::unit> DeviceAgent::startMetadataStreaming()
 
 void DeviceAgent::stopMetadataStreaming()
 {
-    m_reopenDelayer.cancelSync();
+    m_reopenDelayer.cancel();
     m_nativeMetadataSource.close();
 }
 
@@ -234,33 +280,19 @@ void DeviceAgent::readNextMetadata()
         {
             try
             {
-                try
-                {
-                    future.get();
-                }
-                catch (const cf::future_error& exception)
-                {
-                    if (exception.ecode() == cf::errc::broken_promise)
-                        return cf::make_ready_future(cf::unit()); // cancelled
-                    throw;
-                }
+                future.get();
             }
-            catch (const std::exception& exception)
+            catch (...)
             {
-                emitDiagnostic(IPluginDiagnosticEvent::Level::error,
-                    "Metadata streaming failed", exception.what());
+                if (isCancelled(std::current_exception()))
+                    return cf::make_ready_future(cf::unit());
 
-                return initiateFuture(
-                    [this, self](auto promise)
-                    {
-                        m_reopenDelayer.start(kReopenDelay,
-                            [promise = std::move(promise)]() mutable
-                            {
-                                promise.set_value(cf::unit());
-                            });
-                    })
-                .then(
-                    [this, self](auto future)
+                emitDiagnostic(IPluginDiagnosticEvent::Level::error,
+                    "Metadata streaming failed",
+                    toError(std::current_exception()).errorMessage()->str());
+
+                return m_reopenDelayer.wait(kReopenDelay).then(
+                    [this, self = std::move(self)](auto future)
                     {
                         future.get();
 

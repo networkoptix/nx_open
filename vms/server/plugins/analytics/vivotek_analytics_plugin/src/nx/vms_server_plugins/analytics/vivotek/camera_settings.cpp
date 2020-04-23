@@ -1,12 +1,11 @@
 #include "camera_settings.h"
 
-#include <exception>
+#include <stdexcept>
 
 #include <nx/network/http/http_async_client.h>
 
-#include "future_utils.h"
+#include "http_client.h"
 #include "parameter_api.h"
-#include "http_utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -29,7 +28,8 @@ namespace {
     {
         const auto& value = rawVca[name];
         if (!value.is_number())
-            throw std::runtime_error("$." + std::string(name) + " in VCA settings json is not a number");
+            throw std::runtime_error("$." + std::string(name) + " is not a number");
+
         entry->value = value.int_value();
     }
 
@@ -71,40 +71,53 @@ namespace {
 
                 url.setPath("/VCA/Config/AE");
 
-                const auto httpClient = std::make_shared<http::AsyncClient>();
-                return initiateFuture(
-                    [httpClient, url = std::move(url)](auto promise)
-                    {
-                        httpClient->doGet(std::move(url),
-                            [promise = std::move(promise)]() mutable
-                            {
-                                promise.set_value(cf::unit());
-                            });
-                    })
-                .then(
+                const auto httpClient = std::make_shared<HttpClient>();
+                return httpClient->get(std::move(url)).then(
                     [vca, httpClient](auto future)
                     {
-                        future.get();
+                        const auto response = future.get();
 
-                        checkResponse(*httpClient);
-
-                        const auto body = httpClient->fetchMessageBodyBuffer();
+                        const auto statusCode = response.statusLine.statusCode;
+                        if (response.statusLine.statusCode != 200)
+                            throw std::runtime_error(
+                                "Camera returned unexpected HTTP status code " + std::to_string(statusCode));
 
                         std::string error;
-                        const auto rawVca = Json::parse(body.data(), error);
+                        const auto rawVca = Json::parse(response.messageBody.data(), error);
                         if (!error.empty())
                             throw std::runtime_error(
-                                "Failed to parse VCA settings json: " + error);
+                                "Camera returned malformed json: " + error);
 
-                        forEachOtherVcaEntry(vca,
-                            [&](auto* entry, const char* name) {
-                                parseOtherVca(entry, rawVca, name);
-                            });
+                        try
+                        {
+                            forEachOtherVcaEntry(vca,
+                                [&](auto* entry, const char* name) {
+                                    parseOtherVca(entry, rawVca, name);
+                                });
 
-                        vca->installation.height.value /= 10; // cm in UI, but api returns as mm
+                            vca->installation.height.value /= 10; // cm in UI, but api returns mm
+                        }
+                        catch (...)
+                        {
+                            std::throw_with_nested(std::runtime_error(
+                                "Failed to parse VCA settings json"));
+                        }
 
                         return cf::unit();
                     });
+            })
+        .then(
+            [](auto future)
+            {
+                try
+                {
+                    return future.get();
+                }
+                catch (...)
+                {
+                    std::throw_with_nested(std::runtime_error(
+                        "Failed to fetch camera VCA settings"));
+                }
             });
     }
 
@@ -167,6 +180,7 @@ cf::future<cf::unit> CameraSettings::fetch(Url url)
 
 cf::future<cf::unit> CameraSettings::store(nx::utils::Url url) const
 {
+    // TODO
     return cf::make_ready_future(cf::unit());
 }
 

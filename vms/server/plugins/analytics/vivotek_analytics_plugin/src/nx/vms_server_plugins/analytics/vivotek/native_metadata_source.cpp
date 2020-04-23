@@ -1,21 +1,21 @@
 #include "native_metadata_source.h"
 
+#include <exception>
 #include <stdexcept>
 #include <system_error>
 
-#include <nx/network/aio/event_type.h>
 #include <nx/network/http/buffer_source.h>
-#include <nx/network/websocket/websocket_handshake.h>
 #include <nx/utils/thread/cf/cfuture.h>
-
-#include "future_utils.h"
-#include "http_utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace nx::kit;
 using namespace nx::utils;
 using namespace nx::network;
+
+namespace {
+    const char kDetailMetadataModePath[] = "/VCA/Config/AE/WebSocket/DetailMetadata";
+}
 
 NativeMetadataSource::NativeMetadataSource()
 {
@@ -28,16 +28,7 @@ NativeMetadataSource::~NativeMetadataSource()
 
 cf::future<cf::unit> NativeMetadataSource::open(const Url& url)
 {
-    return cf::make_ready_future(cf::unit()).then(
-        [this, url = url](auto future) mutable
-        {
-            future.get();
-
-            m_httpClient.emplace();
-
-            return ensureDetailMetadataMode(std::move(url));
-        })
-    .then(
+    return setDetailMetadataMode(url, true).then(
         [this, url = url](auto future) mutable
         {
             future.get();
@@ -46,172 +37,183 @@ cf::future<cf::unit> NativeMetadataSource::open(const Url& url)
             url.setPath("/ws/vca");
             url.setQuery("?data=meta,event");
 
-            websocket::addClientHeaders(&*m_httpClient,
-                "tracker-protocol", websocket::CompressionType::perMessageDeflate);
-
-            return initiateFuture(
-                [this, url = std::move(url)](auto promise) mutable
-                {
-                    m_httpClient->doGet(url,
-                        [promise = std::move(promise)]() mutable
-                        {
-                            promise.set_value(cf::unit());
-                        });
-                });
+            return m_websocket.connect(std::move(url));
         })
     .then(
-        [this](auto future)
+        [](auto future)
         {
-            future.get();
-
-            if (m_httpClient->failed())
-                throw std::system_error(
-                    m_httpClient->lastSysErrorCode(), std::system_category(),
-                    "HTTP transport connection failed: " + m_httpClient->url().toStdString());
-
-            const auto error = websocket::validateResponse(
-                m_httpClient->request(), *m_httpClient->response());
-            if (error != websocket::Error::noError)
-                throw std::runtime_error("Websocket handshake failed");
-
-            m_websocket.emplace(
-                m_httpClient->takeSocket(),
-                websocket::Role::client,
-                websocket::FrameType::text,
-                websocket::compressionType(m_httpClient->response()->headers));
-
-            m_websocket->start();
-
-            return cf::unit();
+            try
+            {
+                return future.get();
+            }
+            catch (...)
+            {
+                std::throw_with_nested(std::runtime_error(
+                    "Failed to open native metadata source"));
+            }
         });
 }
 
 cf::future<Json> NativeMetadataSource::read()
 {
-    return initiateFuture<SystemError::ErrorCode>(
-        [this](auto promise) mutable
+    return m_websocket.read().then(
+        [](auto future)
         {
-            m_buffer.clear();
-            m_websocket->readSomeAsync(&m_buffer,
-                [promise = std::move(promise)](auto errorCode, auto /*size*/) mutable
-                {
-                    promise.set_value(errorCode);
-                });
-        })
-    .then(
-        [this](auto future)
-        {
-            if (auto errorCode = future.get())
-                throw std::system_error(
-                    errorCode, std::system_category(), "HTTP connection failed");
+            const auto buffer = future.get();
 
             std::string error;
-            auto metadata = Json::parse(m_buffer.toStdString(), error);
+            auto metadata = Json::parse(buffer.toStdString(), error);
             if (!error.empty())
-                throw std::runtime_error("Failed to parse json: " + error);
+                throw std::runtime_error("Received malformed metadata json: " + error);
 
             return metadata;
+        })
+    .then(
+        [](auto future)
+        {
+            try
+            {
+                return future.get();
+            }
+            catch (...)
+            {
+                std::throw_with_nested(std::runtime_error(
+                    "Failed to read native metadata"));
+            }
         });
 }
 
 void NativeMetadataSource::close()
 {
-    m_httpClient.reset();
-
-    if (m_websocket)
-    {
-        m_websocket->pleaseStopSync();
-        m_websocket.reset();
-    }
+    m_httpClient.cancel();
+    m_websocket.close();
 }
 
 void NativeMetadataSource::stopWhileInAioThread()
 {
     BasicPollable::stopWhileInAioThread();
-
-    m_httpClient.reset();
-
-    if (m_websocket)
-    {
-        m_websocket->pleaseStopSync();
-        m_websocket.reset();
-    }
+    m_httpClient.pleaseStopSync();
+    m_websocket.pleaseStopSync();
 }
 
-cf::future<cf::unit> NativeMetadataSource::ensureDetailMetadataMode(Url url)
+cf::future<bool> NativeMetadataSource::getDetailMetadataMode(Url url)
 {
     // 'Detail metadata mode' (undocumented as of 2020.04.16) enables, among others,
     // a `Pos2D` field describing object boundaries in normalized screen space.
-    return initiateFuture<Url>(
-        [this, url = std::move(url)](auto promise) mutable
-        {
-            url.setPath("/VCA/Config/AE/WebSocket/DetailMetadata");
-            m_httpClient->doGet(url,
-                [promise = std::move(promise), url]() mutable
-                {
-                    promise.set_value(std::move(url));
-                });
-        })
-    .then(
-        [this](auto future) mutable
-        {
-            auto url = future.get();
-
-            checkResponse(*m_httpClient);
-
-            const auto responseBody = m_httpClient->fetchMessageBodyBuffer();
-            if (responseBody.trimmed() == "true") // already enabled
-                return cf::make_ready_future(cf::unit());
-
-            return setDetailMetadataMode(std::move(url));
-        });
-}
-
-cf::future<cf::unit> NativeMetadataSource::setDetailMetadataMode(Url url)
-{
-    return initiateFuture(
-        [this, url](auto promise) mutable
-        {
-            m_httpClient->setRequestBody(
-                std::make_unique<http::BufferSource>("application/json", "true"));
-            m_httpClient->doPost(url,
-                [promise = std::move(promise)]() mutable
-                {
-                    promise.set_value(cf::unit());
-                });
-        })
-    .then(
-        [this, url = url](auto future) mutable
+    return cf::make_ready_future(cf::unit()).then(
+        [this, url = std::move(url)](auto future) mutable
         {
             future.get();
 
-            checkResponse(*m_httpClient);
+            url.setPath(kDetailMetadataModePath);
 
-            return reloadConfig(std::move(url));
+            return m_httpClient.get(std::move(url));
+        })
+    .then(
+        [](auto future) mutable
+        {
+            const auto response = future.get();
+
+            const auto statusCode = response.statusLine.statusCode;
+            if (response.statusLine.statusCode != 200)
+                throw std::runtime_error(
+                    "Camera returned unexpected HTTP status code " + std::to_string(statusCode));
+
+            return response.messageBody.trimmed() != "false";
+        })
+    .then(
+        [](auto future)
+        {
+            try
+            {
+                return future.get();
+            }
+            catch (...)
+            {
+                std::throw_with_nested(std::runtime_error(
+                    "Failed to get detail metadata mode"));
+            }
+        });
+}
+
+cf::future<cf::unit> NativeMetadataSource::setDetailMetadataMode(const Url& url, bool value)
+{
+    return getDetailMetadataMode(url).then(
+        [this, url = url, value](auto future) mutable
+        {
+            const auto oldValue = future.get();
+            if (oldValue == value)
+                return cf::make_ready_future(cf::unit());
+
+            url.setPath(kDetailMetadataModePath);
+
+            m_httpClient.setRequestBody(std::make_unique<http::BufferSource>(
+                "application/json", value ? "true" : "false"));
+
+            return m_httpClient.post(std::move(url)).then(
+                [this, url](auto future) mutable
+                {
+                    const auto response = future.get();
+
+                    const auto statusCode = response.statusLine.statusCode;
+                    if (response.statusLine.statusCode != 200)
+                        throw std::runtime_error(
+                            "Camera returned unexpected HTTP status code "
+                            + std::to_string(statusCode));
+
+                    return reloadConfig(std::move(url));
+                });
+        })
+    .then(
+        [](auto future)
+        {
+            try
+            {
+                return future.get();
+            }
+            catch (...)
+            {
+                std::throw_with_nested(std::runtime_error(
+                    "Failed to set detail metadata mode"));
+            }
         });
 }
 
 cf::future<cf::unit> NativeMetadataSource::reloadConfig(Url url)
 {
-    return initiateFuture(
-        [this, url = std::move(url)](auto promise) mutable
-        {
-            url.setPath("/VCA/Config/Reload");
-
-            m_httpClient->doGet(url,
-                [promise = std::move(promise)]() mutable
-                {
-                    promise.set_value(cf::unit());
-                });
-        })
-    .then(
-        [this](auto future)
+    return cf::make_ready_future(cf::unit()).then(
+        [this, url = std::move(url)](auto future) mutable
         {
             future.get();
 
-            checkResponse(*m_httpClient);
+            url.setPath("/VCA/Config/Reload");
+
+            return m_httpClient.get(std::move(url));
+        })
+    .then(
+        [](auto future) mutable
+        {
+            const auto response = future.get();
+
+            const auto statusCode = response.statusLine.statusCode;
+            if (response.statusLine.statusCode != 200)
+                throw std::runtime_error(
+                    "Camera returned unexpected HTTP status code " + std::to_string(statusCode));
 
             return cf::unit();
+        })
+    .then(
+        [](auto future)
+        {
+            try
+            {
+                return future.get();
+            }
+            catch (...)
+            {
+                std::throw_with_nested(std::runtime_error(
+                    "Failed to get detail metadata mode"));
+            }
         });
 }
 

@@ -5,10 +5,10 @@
 #include <nx/kit/json.h>
 #include <nx/utils/url.h>
 #include <nx/utils/thread/cf/cfuture.h>
-#include <nx/network/buffer.h>
 #include <nx/network/aio/basic_pollable.h>
-#include <nx/network/http/http_async_client.h>
-#include <nx/network/websocket/websocket.h>
+
+#include "http_client.h"
+#include "websocket.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -27,14 +27,13 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    cf::future<cf::unit> ensureDetailMetadataMode(nx::utils::Url url);
-    cf::future<cf::unit> setDetailMetadataMode(nx::utils::Url url);
+    cf::future<bool> getDetailMetadataMode(nx::utils::Url url);
+    cf::future<cf::unit> setDetailMetadataMode(const nx::utils::Url& url, bool value);
     cf::future<cf::unit> reloadConfig(nx::utils::Url url);
 
 private:
-    std::optional<nx::network::http::AsyncClient> m_httpClient;
-    std::optional<nx::network::websocket::WebSocket> m_websocket;
-    nx::Buffer m_buffer;
+    HttpClient m_httpClient;
+    WebSocket m_websocket;
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

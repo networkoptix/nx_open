@@ -11,7 +11,6 @@
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 #include <nx/network/aio/basic_pollable.h>
-#include <nx/network/aio/timer.h>
 #include <nx/utils/thread/cf/cfuture.h>
 
 #include <QtCore/QString>
@@ -20,6 +19,7 @@
 #include "camera_features.h"
 #include "camera_settings.h"
 #include "native_metadata_source.h"
+#include "timer.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -48,7 +48,7 @@ protected:
 private:
     void emitDiagnostic(
         nx::sdk::IPluginDiagnosticEvent::Level level,
-        const QString& caption, const QString& description);
+        std::string caption, std::string description);
 
     cf::future<cf::unit> startMetadataStreaming();
     void stopMetadataStreaming();
@@ -67,7 +67,9 @@ private:
 
     bool m_wantMetadata = false;
     NativeMetadataSource m_nativeMetadataSource;
-    nx::network::aio::Timer m_reopenDelayer;
+    Timer m_reopenDelayer;
+
+    // required because cf::future doesn't support detachment
     cf::future<cf::unit> m_metadataReadRetainer = cf::make_ready_future(cf::unit());
 };
 

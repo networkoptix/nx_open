@@ -9,6 +9,8 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/thread/cf/cfuture.h>
 
+#include "http_client.h"
+
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 class ParameterApi: public nx::network::aio::BasicPollable
@@ -23,15 +25,14 @@ public:
     cf::future<std::unordered_map<std::string, std::string>>
         set(std::unordered_map<std::string, std::string> parameters);
 
+    void cancel();
+
 protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    std::unordered_map<std::string, std::string> parseResponse();
-
-private:
     nx::utils::Url m_url;
-    std::optional<nx::network::http::AsyncClient> m_httpClient;
+    HttpClient m_httpClient;
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek
