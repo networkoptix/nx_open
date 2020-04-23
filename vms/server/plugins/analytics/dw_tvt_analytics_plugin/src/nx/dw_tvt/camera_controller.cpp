@@ -315,9 +315,10 @@ public:
         m_client.setMessageBodyReadTimeout(std::chrono::seconds(5));
     }
 
-    void setCgiPreamble(const QByteArray& ip)
+    void setCgiPreamble(const QByteArray& ip, unsigned short port = 0)
     {
-        m_cgiPreamble = kProtocol + ip + kPath;
+        QByteArray portAsString = port ? (":" + QByteArray::number(port)) : QByteArray();
+        m_cgiPreamble = kProtocol + ip + portAsString + kPath;
     }
 
     void setCredentials(const QByteArray& user, const QByteArray& password)
@@ -381,27 +382,29 @@ int16_t readPort(const QDomElement& parent, const QString& name)
 
 CameraController::CameraController(): m_impl(new CameraControllerImpl) {}
 
-CameraController::CameraController(const QByteArray& ip):
+CameraController::CameraController(const QByteArray& ip, unsigned short port):
     CameraController()
 {
     m_ip = ip;
-    m_impl->setCgiPreamble(m_ip);
+    m_port = port;
+    m_impl->setCgiPreamble(m_ip, m_port);
 }
 
-CameraController::CameraController(const QByteArray& ip,
+CameraController::CameraController(const QByteArray& ip, unsigned short port,
     const QByteArray& user, const QByteArray& password)
     :
-    CameraController(ip)
+    CameraController(ip, port)
 {
     m_impl->setCredentials(m_user, m_password);
 }
 
 CameraController::~CameraController() = default;
 
-void CameraController::setIp(const QByteArray& ip)
+void CameraController::setIpPort(const QByteArray& ip, unsigned short port)
 {
     m_ip = ip;
-    m_impl->setCgiPreamble(m_ip);
+    m_port = port;
+    m_impl->setCgiPreamble(m_ip, m_port);
 }
 
 void CameraController::setCredentials(const QByteArray& user, const QByteArray& password)

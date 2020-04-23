@@ -67,7 +67,7 @@ public:
     void makeSubscriptionAsync();
     void makeUnsubscriptionSync(std::unique_ptr<nx::network::AbstractStreamSocket> s);
     void makeDeferredSubscriptionAsync();
-    void onSubsctiptionDone();
+    void onSubscriptionDone();
     void readNextNotificationAsync();
 
     bool logHttpRequestResult();

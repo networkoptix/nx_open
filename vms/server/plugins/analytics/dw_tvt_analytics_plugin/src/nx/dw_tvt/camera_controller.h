@@ -24,15 +24,17 @@ class CameraController
 {
 public:
     CameraController();
-    CameraController(const QByteArray& ip);
-    CameraController(const QByteArray& ip, const QByteArray& user, const QByteArray& password);
+    CameraController(const QByteArray& ip, unsigned short port);
+    CameraController(const QByteArray& ip, unsigned short port,
+        const QByteArray& user, const QByteArray& password);
     ~CameraController();
 
-    void setIp(const QByteArray& ip);
+    void setIpPort(const QByteArray& ip, unsigned short port);
     void setCredentials(const QByteArray& user, const QByteArray& password);
     void setReadTimeout(std::chrono::seconds readTimeout);
 
     QByteArray ip() const noexcept { return m_ip; }
+    unsigned short port() const noexcept { return m_port; }
     QByteArray user() const noexcept { return m_user; }
     QByteArray password() const noexcept { return m_password; }
 
@@ -49,6 +51,7 @@ public:
     nx::network::http::Request makeHttpRequest(const QByteArray& body);
 private:
     QByteArray m_ip;
+    unsigned short m_port;
     QByteArray m_user;
     QByteArray m_password;
 
