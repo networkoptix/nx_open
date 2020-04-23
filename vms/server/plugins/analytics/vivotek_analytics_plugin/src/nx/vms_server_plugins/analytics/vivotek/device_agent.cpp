@@ -36,9 +36,6 @@ using namespace nx::network::websocket;
 namespace {
     const auto kReopenDelay = 10s;
 
-    const std::string kNewTrackEventType = "nx.vivotek.newTrack";
-    const std::string kHelloWorldObjectType = "nx.vivotek.helloWorld";
-
     std::string makePrintPrefix(const IDeviceInfo* deviceInfo)
     {
         return "[" + libContext().name() + "_device" +
