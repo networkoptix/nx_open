@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.259",
+    "version": "4.1.3.260",
     "data": [
         {
             "keys": [
@@ -4142,6 +4142,35 @@
                 "DW|DWC-MV85DIA"
             ],
             "afterConfigureStreamDelayMs": 100
-        }
+        },
+        {
+            "_comment1": "Mapped for V5.5.8 build 180902",
+            "keys": [
+                "HIKVISION|DS-2DE4215IW*",
+                "HIKVISION|DS-2DE4*A*215IW*"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1, -1],
+                        "logical": [-90, -15]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1.00, 2.85, 4.92, 6.46, 8.31, 10.08, 12.15, 14.00, 16.00, 18.23, 19.77],
+                        "logicalMultiplier": 33,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        }	
     ]
 }

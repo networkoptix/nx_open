@@ -221,6 +221,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     if (m_videoPacket.get())
     {
+        NX_VERBOSE(this, "New packet, timestamp: %1", m_videoPacket->timestamp());
         *lpPacket = m_videoPacket.release();
         const auto plugin = HttpLinkPlugin::instance();
         if (!plugin)

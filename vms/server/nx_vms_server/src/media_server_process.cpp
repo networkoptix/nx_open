@@ -960,8 +960,6 @@ void MediaServerProcess::saveStorages(const StorageResourceList& storages)
     }
 }
 
-static const std::chrono::minutes kSystemUsageDumpTimeout(30);
-
 void MediaServerProcess::dumpSystemUsageStats()
 {
     if (!serverModule()->platform()->monitor())
@@ -990,7 +988,8 @@ void MediaServerProcess::dumpSystemUsageStats()
     if (m_dumpSystemResourceUsageTaskId == 0)  // Monitoring cancelled
         return;
     m_dumpSystemResourceUsageTaskId = commonModule()->timerManager()->addTimer(
-        std::bind(&MediaServerProcess::dumpSystemUsageStats, this), kSystemUsageDumpTimeout);
+        std::bind(&MediaServerProcess::dumpSystemUsageStats, this), 
+        std::chrono::seconds(ini().systemUsageDumpTimeoutS));
 }
 
 #ifdef Q_OS_WIN
@@ -5283,7 +5282,8 @@ void MediaServerProcess::run()
     commonModule()->resourceDiscoveryManager()->setReady(true);
 
     m_dumpSystemResourceUsageTaskId = commonModule()->timerManager()->addTimer(
-        std::bind(&MediaServerProcess::dumpSystemUsageStats, this), kSystemUsageDumpTimeout);
+        std::bind(&MediaServerProcess::dumpSystemUsageStats, this), 
+        std::chrono::seconds(ini().systemUsageDumpTimeoutS));
 
     nx::mserver_aux::makeFakeData(
         cmdLineArguments().createFakeData, m_ec2Connection, commonModule()->moduleGUID());

@@ -1246,9 +1246,11 @@ void QnCamDisplay::processFillerPacket(
 
     if (m_lastMediaEventTimeout.isValid())
     {
-        moveTimestampTo(timestampUs);
         if (m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay) && !m_eofSignalSent)
+        {
+            moveTimestampTo(timestampUs);
             notifyExternalTimeSrcAboutEof(true);
+        }
     }
     else if (m_emptyPacketCounter >= 3 || isFillerPacket)
     {
