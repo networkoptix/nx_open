@@ -67,7 +67,7 @@ public:
     }
 
 private:
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
 
     mutable std::optional<ValueType> m_value;
     const MoveOnlyFunc<ValueType()> m_valueGenerator;

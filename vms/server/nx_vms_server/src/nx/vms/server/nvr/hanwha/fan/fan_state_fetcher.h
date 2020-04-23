@@ -27,8 +27,8 @@ protected:
     virtual void run() override;
 
 private:
-    mutable nx::utils::Mutex m_mutex;
-    mutable nx::utils::WaitCondition m_waitCondition;
+    mutable nx::Mutex m_mutex;
+    mutable nx::WaitCondition m_waitCondition;
 
     IFanPlatformAbstraction* m_platformAbstraction = nullptr;
     StateHandler m_stateHandler;

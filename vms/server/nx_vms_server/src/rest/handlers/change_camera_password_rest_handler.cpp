@@ -75,12 +75,12 @@ int QnChangeCameraPasswordRestHandler::executePost(
     auth.setPassword(data.password);
 
     const auto groupId = requestedCamera->getGroupId();
-    std::unique_ptr<nx::utils::MutexLocker> lock;
+    std::unique_ptr<nx::MutexLocker> lock;
     {
         static QnMutex commonLock;
         QnMutexLocker commonLocker(&commonLock);
         if (!groupId.isEmpty())
-            lock.reset(new nx::utils::MutexLocker(&m_cameraGroupLock[groupId], __FILE__, __LINE__));
+            lock.reset(new nx::MutexLocker(&m_cameraGroupLock[groupId], __FILE__, __LINE__));
     }
 
     if (requestedCamera->getAuth() == auth)

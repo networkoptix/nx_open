@@ -32,7 +32,7 @@ private:
     BuzzerState calculateState() const;
 
 private:
-    nx::utils::Mutex m_mutex;
+    nx::Mutex m_mutex;
 
     std::unique_ptr<nx::utils::TimerManager> m_timerManager;
     std::unique_ptr<IBuzzerPlatformAbstraction> m_platformAbstraction;

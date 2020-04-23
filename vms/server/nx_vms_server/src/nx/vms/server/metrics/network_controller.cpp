@@ -129,7 +129,7 @@ private:
 
 private:
     QNetworkInterface m_interface;
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
 };
 
 NetworkController::NetworkController(QnMediaServerModule* serverModule):

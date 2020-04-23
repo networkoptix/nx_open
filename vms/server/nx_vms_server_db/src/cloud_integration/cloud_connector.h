@@ -21,7 +21,7 @@ public:
     virtual void stopDataSynchronization() override;
 
 private:
-    nx::utils::Mutex m_mutex;
+    nx::Mutex m_mutex;
     AbstractTransactionMessageBus* m_messageBus;
     std::optional<QnUuid> m_currentPeerId;
 };

@@ -179,8 +179,8 @@ private:
     }
 
 private:
-    nx::utils::Mutex m_mutex;
-    nx::utils::WaitCondition m_waitCondition;
+    nx::Mutex m_mutex;
+    nx::WaitCondition m_waitCondition;
     int m_establishedConnectionCount = 0;
     std::set<QnUuid> m_serversThatAlreadySentSignals;
 

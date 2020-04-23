@@ -54,7 +54,7 @@ private:
 private:
     const std::chrono::milliseconds m_maxAge;
     const size_t m_maxSize = 0;
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     std::deque<std::pair<Value, std::chrono::steady_clock::time_point>> m_values;
 };
 

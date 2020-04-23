@@ -2,7 +2,7 @@
 
 #include <nx/utils/thread/thread_util.h>
 
-namespace nx::utils {
+namespace nx {
 
 MutexDebugDelegate::MutexDebugDelegate(Mutex::RecursionMode mode, bool isAnalyzerInUse):
     m_mutex(mode == Mutex::Recursive ? QMutex::Recursive : QMutex::NonRecursive),
@@ -142,5 +142,5 @@ void WaitConditionDebugDelegate::wakeOne()
     m_delegate.wakeOne();
 }
 
-} // namespace nx::utils
+} // namespace nx
 

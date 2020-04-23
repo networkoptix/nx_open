@@ -466,7 +466,7 @@ private:
         m_waitCondition.wakeOne();
     }
 
-    Qn::RebuildState processNextTask(nx::utils::MutexLocker* lock)
+    Qn::RebuildState processNextTask(nx::MutexLocker* lock)
     {
         switch (currentlyBeingProcessingTasksType())
         {
@@ -492,7 +492,7 @@ private:
         }
     }
 
-   void processNextFullTask(nx::utils::MutexLocker* lock)
+   void processNextFullTask(nx::MutexLocker* lock)
    {
         nx::caminfo::ArchiveCameraDataList archiveCameras;
         const auto scanTask = m_fullScanTasks.front();
@@ -543,7 +543,7 @@ private:
             (qreal) ++m_processedCatalogs / m_totalCatalogs});
     }
 
-    void processNextPartialTask(nx::utils::MutexLocker* lock)
+    void processNextPartialTask(nx::MutexLocker* lock)
     {
         const auto scanTask = m_partialScanTasks.front();
         m_partialScanTasks.pop_front();

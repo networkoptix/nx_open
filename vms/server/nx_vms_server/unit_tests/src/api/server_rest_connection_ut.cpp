@@ -54,8 +54,8 @@ public:
     }
 
 private:
-    nx::utils::Mutex m_mutex;
-    nx::utils::WaitCondition m_condition;
+    nx::Mutex m_mutex;
+    nx::WaitCondition m_condition;
     std::set<Handle> m_started;
     std::set<Handle> m_notified;
 };

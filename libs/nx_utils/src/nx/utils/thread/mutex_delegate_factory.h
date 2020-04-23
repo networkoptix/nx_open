@@ -2,7 +2,7 @@
 
 #include "mutex.h"
 
-namespace nx::utils {
+namespace nx {
 
 namespace MutexImplementations
 {
@@ -31,4 +31,4 @@ std::unique_ptr<MutexDelegate> NX_UTILS_API makeMutexDelegate(Mutex::RecursionMo
 std::unique_ptr<ReadWriteLockDelegate> NX_UTILS_API makeReadWriteLockDelegate(ReadWriteLock::RecursionMode mode);
 std::unique_ptr<WaitConditionDelegate> NX_UTILS_API makeWaitConditionDelegate();
 
-} // namespace nx::utils
+} // namespace nx

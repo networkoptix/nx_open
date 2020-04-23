@@ -39,7 +39,7 @@ private:
     QnAudioDeviceInfo getDeviceByName(const QString& name) const;
 
 private:
-    nx::utils::Mutex m_mutex;
+    nx::Mutex m_mutex;
     nx::utils::CachedValue<DeviceList> m_devices;
     QSettings m_settings;
 };

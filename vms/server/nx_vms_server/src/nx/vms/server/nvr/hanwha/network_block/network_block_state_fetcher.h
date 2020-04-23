@@ -29,8 +29,8 @@ protected:
     virtual void run() override;
 
 private:
-    nx::utils::Mutex m_mutex;
-    nx::utils::WaitCondition m_waitCondition;
+    nx::Mutex m_mutex;
+    nx::WaitCondition m_waitCondition;
 
     INetworkBlockPlatformAbstraction* m_platformAbstraction = nullptr;
     StateHandler m_stateHandler;

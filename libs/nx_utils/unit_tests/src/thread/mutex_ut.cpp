@@ -6,20 +6,18 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx {
-namespace utils {
-namespace test {
+namespace nx::test {
 
 static const auto kIncrementCount = 100 * 1000;
 static const auto kRecursiveLockCount = 100;
 
 TEST(Mutex, DISABLED_Performance)
 {
-    QnMutex mutex;
+    Mutex mutex;
     int data = 0;
     for (int i = 0; i < kIncrementCount * kRecursiveLockCount; ++i)
     {
-        QnMutexLocker lock(&mutex);
+        NX_MUTEX_LOCKER lock(&mutex);
         ++data;
     }
 
@@ -28,7 +26,7 @@ TEST(Mutex, DISABLED_Performance)
 
 TEST(Mutex, DISABLED_PerformanceRecursive)
 {
-    QnMutex mutex(QnMutex::Recursive);
+    Mutex mutex(Mutex::Recursive);
     int data = 0;
     for (int i = 0; i < kIncrementCount; ++i)
     {
@@ -46,14 +44,14 @@ TEST(Mutex, DISABLED_PerformanceRecursive)
 
 TEST(MutexAnalyzer, DISABLED_Deadlock_2Threads)
 {
-    QnMutex m1;
-    QnMutex m2;
+    Mutex m1;
+    Mutex m2;
 
     utils::thread t1(
         [&]()
         {
-            QnMutexLocker lock1(&m1);
-            QnMutexLocker lock2(&m2);
+            NX_MUTEX_LOCKER lock1(&m1);
+            NX_MUTEX_LOCKER lock2(&m2);
             NX_DEBUG(this, lm("Thread 1"));
         });
 
@@ -62,8 +60,8 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_2Threads)
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            QnMutexLocker lock2(&m2);
-            QnMutexLocker lock1(&m1);
+            NX_MUTEX_LOCKER lock2(&m2);
+            NX_MUTEX_LOCKER lock1(&m1);
             NX_DEBUG(this, lm("Thread 2"));
         });
 
@@ -80,8 +78,8 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_3Threads)
     utils::thread t1(
         [&]()
         {
-            QnMutexLocker lock1(&m1);
-            QnMutexLocker lock2(&m2);
+            NX_MUTEX_LOCKER lock1(&m1);
+            NX_MUTEX_LOCKER lock2(&m2);
             NX_DEBUG(this, lm("Thread 1"));
         });
 
@@ -90,8 +88,8 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_3Threads)
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            QnMutexLocker lock2(&m2);
-            QnMutexLocker lock3(&m3);
+            NX_MUTEX_LOCKER lock2(&m2);
+            NX_MUTEX_LOCKER lock3(&m3);
             NX_DEBUG(this, lm("Thread 2"));
         });
 
@@ -99,8 +97,8 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_3Threads)
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            QnMutexLocker lock3(&m3);
-            QnMutexLocker lock1(&m1);
+            NX_MUTEX_LOCKER lock3(&m3);
+            NX_MUTEX_LOCKER lock1(&m1);
             NX_DEBUG(this, lm("Thread 3"));
         });
 
@@ -115,7 +113,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition)
     Mutex m2;
     WaitCondition c;
 
-    thread t1(
+    utils::thread t1(
         [&]()
         {
             NX_MUTEX_LOCKER lock1(&m1);
@@ -124,7 +122,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition)
             NX_DEBUG(this, lm("Thread 1"));
         });
 
-    thread t2(
+    utils::thread t2(
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -144,7 +142,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition_2Waiters)
     Mutex m2;
     WaitCondition c;
 
-    thread t1(
+    utils::thread t1(
         [&]()
         {
             NX_MUTEX_LOCKER lock1(&m1);
@@ -153,7 +151,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition_2Waiters)
             NX_DEBUG(this, lm("Thread 1"));
         });
 
-    thread t2(
+    utils::thread t2(
         [&]()
         {
             NX_MUTEX_LOCKER lock1(&m1);
@@ -162,7 +160,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition_2Waiters)
             NX_DEBUG(this, lm("Thread 2"));
         });
 
-    thread t3(
+    utils::thread t3(
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -179,6 +177,4 @@ TEST(MutexAnalyzer, DISABLED_Deadlock_WaitCondition_2Waiters)
     t2.join();
 }
 
-} // namespace test
-} // namespace utils
-} // namespace nx
+} // namespace nx::test

@@ -26,7 +26,7 @@ public:
     void logFrameIfNeeded(const QString& message, const Logger* logger) const;
 
 private:
-    mutable nx::utils::Mutex m_logFramesFileMutex;
+    mutable nx::Mutex m_logFramesFileMutex;
     std::unique_ptr<QFile> m_logFramesFile; //< Null if frame logging is disabled.
 };
 

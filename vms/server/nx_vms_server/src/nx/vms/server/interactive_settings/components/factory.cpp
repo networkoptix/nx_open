@@ -31,7 +31,7 @@ namespace {
 using ItemInstantiator = std::function<Item*(QObject*)>;
 QHash<QString, ItemInstantiator> itemInstantiators;
 const char* kUri = "nx.mediaserver.interactive_settings";
-utils::Mutex mutex;
+Mutex mutex;
 
 template<typename T>
 void registerType(const char* name)

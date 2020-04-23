@@ -58,7 +58,7 @@ public:
     static void registerQmlType();
 
 private:
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     QHash<QnUuid, rest::Handle> m_requestByCameraId;
     QHash<QString, QPixmap> m_pixmapById;
     QThread* m_decompressionThread = nullptr;

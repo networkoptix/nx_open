@@ -36,7 +36,7 @@ private:
     const QString m_serverId;
 
     nx::utils::ElapsedTimer m_lastInterfacesUpdate;
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     std::map<QString, std::shared_ptr<NetworkInterfaceResource>> m_interfacesPool;
 };
 

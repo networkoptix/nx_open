@@ -32,7 +32,7 @@ public:
 
 private:
     QList<Qt::HANDLE> m_threads;
-    mutable nx::utils::ReadWriteLock m_lock;
+    mutable nx::ReadWriteLock m_lock;
 };
 
 } //namespace nx::vms::translation

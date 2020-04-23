@@ -174,7 +174,7 @@ void Logger::writeLogHeader()
         nx::utils::bytesToString(m_settings.maxFileSize), m_settings.maxBackupCount,
         filePath ? *filePath : QString("-")));
 
-    write(lm("Mutex implementation: %1").args(nx::utils::mutexImplementation()));
+    write(lm("Mutex implementation: %1").args(mutexImplementation()));
 }
 
 void Logger::handleLevelChange(QnMutexLockerBase* lock) const

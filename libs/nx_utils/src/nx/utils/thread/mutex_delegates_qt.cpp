@@ -1,6 +1,6 @@
 #include "mutex_delegates_qt.h"
 
-namespace nx::utils {
+namespace nx {
 
 MutexQtDelegate::MutexQtDelegate(Mutex::RecursionMode mode):
     m_delegate(mode == Mutex::Recursive ? QMutex::Recursive : QMutex::NonRecursive)
@@ -84,4 +84,4 @@ void WaitConditionQtDelegate::wakeOne()
     m_delegate.wakeOne();
 }
 
-} // namespace nx::utils
+} // namespace nx

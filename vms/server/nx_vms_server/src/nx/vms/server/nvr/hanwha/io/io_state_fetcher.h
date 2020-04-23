@@ -32,7 +32,7 @@ protected:
     virtual void run() override;
 
 private:
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
 
     IIoPlatformAbstraction* m_platformAbstraction = nullptr;
     StateHandler m_stateHandler;

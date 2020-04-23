@@ -8,7 +8,7 @@
 
 #include "mutex.h"
 
-namespace nx::utils {
+namespace nx {
 
 class NX_UTILS_API MutexStdDelegate: public MutexDelegate
 {
@@ -57,4 +57,4 @@ private:
     std::condition_variable m_condition;
 };
 
-} // namespace nx::utils
+} // namespace nx

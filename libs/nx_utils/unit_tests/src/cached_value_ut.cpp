@@ -208,7 +208,7 @@ TEST(CachedValue, Concurrency)
         [](){ SomeType::m_catcher = &SomeType::m_defaultCatcher; });
 
     expectSpecialFunctionCalls(catcherMock, -1, -1, 2, 0);
-    nx::utils::Mutex mutex;
+    nx::Mutex mutex;
     CachedValue<SomeType> value(
         [&timeShift, &mutex]() mutable
         {

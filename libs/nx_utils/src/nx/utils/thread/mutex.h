@@ -5,7 +5,7 @@
 
 #include "mutex_locker.h"
 
-namespace nx::utils {
+namespace nx {
 
 class NX_UTILS_API MutexDelegate
 {
@@ -44,10 +44,10 @@ public:
 };
 
 #define NX_MUTEX_LOCKER \
-    struct NX_CONCATENATE(NxUtilsMutexLocker, __LINE__): public ::nx::utils::MutexLocker \
+    struct NX_CONCATENATE(NxUtilsMutexLocker, __LINE__): public ::nx::MutexLocker \
     { \
-        NX_CONCATENATE(NxUtilsMutexLocker, __LINE__)(::nx::utils::Mutex* mutex): \
-            ::nx::utils::MutexLocker(mutex, __FILE__, __LINE__) {}  \
+        NX_CONCATENATE(NxUtilsMutexLocker, __LINE__)(::nx::Mutex* mutex): \
+            ::nx::MutexLocker(mutex, __FILE__, __LINE__) {}  \
     }
 
 //-------------------------------------------------------------------------------------------------
@@ -92,10 +92,10 @@ public:
 };
 
 #define NX_READ_LOCKER \
-    struct NX_CONCATENATE(NxUtilsReadLocker, __LINE__): public ::nx::utils::ReadLocker \
+    struct NX_CONCATENATE(NxUtilsReadLocker, __LINE__): public ::nx::ReadLocker \
     { \
-        NX_CONCATENATE(NxUtilsReadLocker, __LINE__)(::nx::utils::ReadWriteLock* mutex): \
-            ::nx::utils::ReadLocker(mutex, __FILE__, __LINE__) {} \
+        NX_CONCATENATE(NxUtilsReadLocker, __LINE__)(::nx::ReadWriteLock* mutex): \
+            ::nx::ReadLocker(mutex, __FILE__, __LINE__) {} \
     }
 
 class NX_UTILS_API WriteLocker: public Locker<ReadWriteLock>
@@ -105,10 +105,10 @@ public:
 };
 
 #define NX_WRITE_LOCKER \
-    struct NX_CONCATENATE(NxUtilsWriteLocker, __LINE__): public ::nx::utils::WriteLocker \
+    struct NX_CONCATENATE(NxUtilsWriteLocker, __LINE__): public ::nx::WriteLocker \
     { \
-        NX_CONCATENATE(NxUtilsWriteLocker, __LINE__)(::nx::utils::ReadWriteLock* mutex): \
-            ::nx::utils::WriteLocker(mutex, __FILE__, __LINE__) {} \
+        NX_CONCATENATE(NxUtilsWriteLocker, __LINE__)(::nx::ReadWriteLock* mutex): \
+            ::nx::WriteLocker(mutex, __FILE__, __LINE__) {} \
     }
 
 //-------------------------------------------------------------------------------------------------
@@ -138,19 +138,19 @@ private:
     std::unique_ptr<WaitConditionDelegate> m_delegate;
 };
 
-} // namespace nx::utils
+} // namespace nx
 
 //-------------------------------------------------------------------------------------------------
 
 // Remove as soon as all usages are fixed:
 
 // TODO: Remove with all usages.
-using QnMutex = nx::utils::Mutex;
-using QnMutexLockerBase = nx::utils::Locker<nx::utils::Mutex>;
-using QnMutexUnlocker = nx::utils::Unlocker<nx::utils::Mutex>;
+using QnMutex = nx::Mutex;
+using QnMutexLockerBase = nx::Locker<nx::Mutex>;
+using QnMutexUnlocker = nx::Unlocker<nx::Mutex>;
 #define QnMutexLocker NX_MUTEX_LOCKER
 
 // TODO: Remove with all usages.
-using QnReadWriteLock = nx::utils::ReadWriteLock;
+using QnReadWriteLock = nx::ReadWriteLock;
 #define QnReadLocker NX_READ_LOCKER
 #define QnWriteLocker NX_WRITE_LOCKER

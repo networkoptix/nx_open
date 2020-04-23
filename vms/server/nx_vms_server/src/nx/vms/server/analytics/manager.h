@@ -113,7 +113,7 @@ private:
     void updateEnabledAnalyticsEngines(const QnVirtualCameraResourcePtr& device);
 
 private:
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
 
     QThread* m_thread;
 
