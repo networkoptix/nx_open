@@ -989,7 +989,7 @@ void MediaServerProcess::dumpSystemUsageStats()
         return;
     m_dumpSystemResourceUsageTaskId = commonModule()->timerManager()->addTimer(
         std::bind(&MediaServerProcess::dumpSystemUsageStats, this), 
-        std::chrono::seconds(ini().systemUsageDumpTimeoutSec));
+        std::chrono::seconds(ini().systemUsageDumpTimeoutS));
 }
 
 #ifdef Q_OS_WIN
@@ -5283,7 +5283,7 @@ void MediaServerProcess::run()
 
     m_dumpSystemResourceUsageTaskId = commonModule()->timerManager()->addTimer(
         std::bind(&MediaServerProcess::dumpSystemUsageStats, this), 
-        std::chrono::seconds(ini().systemUsageDumpTimeoutSec));
+        std::chrono::seconds(ini().systemUsageDumpTimeoutS));
 
     nx::mserver_aux::makeFakeData(
         cmdLineArguments().createFakeData, m_ec2Connection, commonModule()->moduleGUID());
