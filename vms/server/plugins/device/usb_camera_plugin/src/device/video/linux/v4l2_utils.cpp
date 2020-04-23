@@ -50,6 +50,16 @@ struct DeviceInitializer
     int fileDescriptor = -1;
 };
 
+
+bool isVideoCaptureDevice(int fileDescriptor)
+{
+    struct v4l2_capability deviceCapability;
+    if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
+        return false;
+
+    return deviceCapability.capabilities & V4L2_CAP_VIDEO_CAPTURE;
+};
+
 std::string getDeviceName(int fileDescriptor)
 {
     struct v4l2_capability deviceCapability;
@@ -182,6 +192,12 @@ std::vector<DeviceData> getDeviceList()
         {
             int error = errno;
             NX_V4L2_LOG("failed to open %1: %2", devicePath, strerror(error));
+            continue;
+        }
+
+        if (!isVideoCaptureDevice(fileDescriptor))
+        {
+            NX_VERBOSE(NX_SCOPE_TAG, "Device(%1) is not a capture device", devicePath);
             continue;
         }
 
