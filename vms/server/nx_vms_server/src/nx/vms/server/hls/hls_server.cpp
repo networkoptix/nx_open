@@ -85,6 +85,7 @@ HttpLiveStreamingProcessor::HttpLiveStreamingProcessor(
     QnTCPConnectionProcessor(std::move(socket), owner),
     nx::vms::server::ServerModuleAware(serverModule),
     m_state(State::receiving),
+    m_metricsHelper(serverModule->commonModule()->metrics()),
     m_switchToChunkedTransfer(false),
     m_useChunkedTransfer(false),
     m_bytesSent(0)
@@ -871,7 +872,17 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
             .arg(remoteHostAddress().toString()));
         return nx::network::http::StatusCode::notFound;
     }
+
     m_currentChunk = chunk;
+    if (chunk)
+    {
+        // This is not the most accurate measure since it's only counts the stream only for the
+        // short duration while processor is alive, but it's better than nothing and will show up
+        // on many clients anyway.
+        m_metricsHelper.setStream(isLowMediaQuality(params.streamQuality)
+            ? nx::vms::api::StreamIndex::secondary
+            : nx::vms::api::StreamIndex::primary);
+    }
 
     //using this simplified test for accept-encoding since hls client do not use syntax with q= ...
     const auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");

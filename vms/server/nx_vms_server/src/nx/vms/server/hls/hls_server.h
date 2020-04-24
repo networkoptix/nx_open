@@ -11,6 +11,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <streaming/streaming_chunk.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/metrics/streams_metric_helper.h>
 
 #include "hls_playlist_manager.h"
 
@@ -81,6 +82,7 @@ private:
     StreamingChunkPtr m_currentChunk;
     /** For reading data from m_currentChunk. */
     std::unique_ptr<StreamingChunkInputStream> m_chunkInputStream;
+    nx::vms::metrics::StreamMetricHelper m_metricsHelper;
     QnMutex m_mutex;
     QnWaitCondition m_cond;
     bool m_switchToChunkedTransfer;

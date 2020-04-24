@@ -123,7 +123,8 @@ ProgressiveDownloadingServer::ProgressiveDownloadingServer(
     QnTcpListener* owner,
     QnMediaServerModule* serverModule)
     :
-    QnTCPConnectionProcessor(new ProgressiveDownloadingServerPrivate, std::move(socket), owner)
+    QnTCPConnectionProcessor(new ProgressiveDownloadingServerPrivate, std::move(socket), owner),
+    m_metricsHelper(serverModule->commonModule()->metrics())
 {
     Q_D(ProgressiveDownloadingServer);
     d->serverModule = serverModule;
@@ -458,6 +459,10 @@ void ProgressiveDownloadingServer::run()
             "Compatible video stream not found, transcoding will used, codec id[%1]",
             videoCodec);
     }
+
+    m_metricsHelper.setStream(qualityToUse == QnServer::HiQualityCatalog
+        ? nx::vms::api::StreamIndex::secondary
+        : nx::vms::api::StreamIndex::primary);
 
     if (!audioOnly && d->transcoder->setVideoCodec(
             videoCodec,

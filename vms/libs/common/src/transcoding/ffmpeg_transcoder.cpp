@@ -90,8 +90,7 @@ QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metrics::Storag
     m_formatCtx(0),
     m_baseTime(AV_NOPTS_VALUE),
     m_inMiddleOfStream(false),
-    m_startTimeOffset(0),
-    m_streamMetricHelper(metrics)
+    m_startTimeOffset(0)
 {
     NX_DEBUG(this, lit("Created new ffmpeg transcoder. Total transcoder count %1").
         arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1));
@@ -352,10 +351,6 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
     packet.dts = packet.pts;
     m_lastPacketTimestamp.ntpTimestamp = mediaPacket->timestamp;
     m_lastPacketTimestamp.rtpTimestamp = packet.pts;
-
-    const bool isSecondary = mediaPacket->flags.testFlag(QnAbstractMediaData::MediaFlags_LowQuality);
-    StreamIndex index = isSecondary ? StreamIndex::secondary : StreamIndex::primary;
-    m_streamMetricHelper.setStream(index);
 
     int status = av_write_frame(m_formatCtx, &packet);
     if (status < 0)

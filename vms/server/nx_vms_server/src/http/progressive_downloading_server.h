@@ -6,6 +6,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/metrics/streams_metric_helper.h>
 
 class QnFfmpegTranscoder;
 
@@ -41,4 +42,5 @@ private:
 
 private:
     Q_DECLARE_PRIVATE(ProgressiveDownloadingServer);
+    nx::vms::metrics::StreamMetricHelper m_metricsHelper;
 };
