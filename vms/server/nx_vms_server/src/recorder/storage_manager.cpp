@@ -409,7 +409,7 @@ private:
 
     void resetState()
     {
-        m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
+        m_owner->setRebuildInfo({Qn::RebuildState_None, QString(), 0.0, 0.0});
         m_totalCatalogs = 0;
         m_beingProcessedStoragesUrls.clear();
         m_processedCatalogs = 0;
@@ -534,11 +534,11 @@ private:
             (qreal) ++m_storageToProgress[storage->getUrl()].processedCatalogs
             / m_storageToProgress[storage->getUrl()].totalCatalogs;
 
-        m_owner->setRebuildInfo(QnStorageScanData(
+        m_owner->setRebuildInfo({
             state,
             storage->getUrl(),
             storageProgress,
-            (qreal) ++m_processedCatalogs / m_totalCatalogs));
+            (qreal) ++m_processedCatalogs / m_totalCatalogs});
     }
 
     void processNextPartialTask(nx::utils::MutexLocker* lock)
@@ -1293,8 +1293,7 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 
         if (result.state <= Qn::RebuildState_None)
         {
-            result = QnStorageScanData(
-                Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0, 0.0);
+            result = {Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0, 0.0};
             setRebuildInfo(result);
         }
 

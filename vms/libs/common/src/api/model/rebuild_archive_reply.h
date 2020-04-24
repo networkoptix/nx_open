@@ -7,16 +7,21 @@
 /** Info about storage rebuild process (if running). */
 struct QnStorageScanData
 {
-    QnStorageScanData();
-    QnStorageScanData(Qn::RebuildState state, const QString& path, qreal progress, qreal totalProgress);
+    /** Current process state */
+    Qn::RebuildState state = Qn::RebuildState::RebuildState_None;
 
-    Qn::RebuildState state;     /**< Current process state */
-    QString path;               /**< Url of the storage being processed */
-    qreal progress;             /**< Progress of the current storage (0.0 to 1.0). */
-    qreal totalProgress;        /**< Total progress of the process (0.0 to 1.0). */
+    /** Url of the storage being processed. */
+    QString path;
+
+    /** Progress of the current storage (0.0 to 1.0). */
+    qreal progress = 0.0;
+
+    /** Total progress of the process (0.0 to 1.0). */
+    qreal totalProgress = 0.0;
+
+    QString toString() const;
 };
 
 #define QnStorageScanData_Fields (state)(path)(progress)(totalProgress)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnStorageScanData, (json)(metatype)(eq))
-
