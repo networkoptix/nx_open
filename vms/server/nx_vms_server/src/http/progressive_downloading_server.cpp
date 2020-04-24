@@ -184,7 +184,7 @@ QByteArray ProgressiveDownloadingServer::getMimeType(const QByteArray& streaming
     else if (streamingFormat == "f4v")
         return "video/x-f4v";
     else if (streamingFormat == "mpjpeg")
-        return "multipart/x-mixed-replace;boundary=--ffserver";
+        return "multipart/x-mixed-replace;boundary=ffserver";
     else
         return QByteArray();
 }
