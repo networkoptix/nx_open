@@ -24,7 +24,7 @@ public:
 private:
     std::vector<std::unique_ptr<ResourceController>> m_resourceControllers;
 
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     mutable std::unique_ptr<api::metrics::SystemManifest> m_manifestCache;
 };
 

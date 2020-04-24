@@ -49,8 +49,8 @@ private:
     bool setOutputPortStateInternal(const QString& portId, IoPortState portState);
 
 private:
-    mutable nx::utils::Mutex m_mutex;
-    mutable nx::utils::Mutex m_handlerMutex;
+    mutable nx::Mutex m_mutex;
+    mutable nx::Mutex m_handlerMutex;
 
     std::unique_ptr<IIoPlatformAbstraction> m_platformAbstraction;
     std::unique_ptr<IoStateFetcher> m_stateFetcher;

@@ -34,7 +34,7 @@ protected:
 
 private:
     const QString m_name;
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     api::metrics::ResourceRules m_rules;
     std::map<QString /*id*/, std::unique_ptr<ResourceMonitor>> m_monitors;
 };

@@ -32,8 +32,8 @@ private:
     void updateState(FanState state);
 
 public:
-    mutable nx::utils::Mutex m_mutex;
-    mutable nx::utils::Mutex m_handlerMutex;
+    mutable nx::Mutex m_mutex;
+    mutable nx::Mutex m_handlerMutex;
 
     std::unique_ptr<IFanPlatformAbstraction> m_platformAbstraction;
     std::unique_ptr<FanStateFetcher> m_stateFetcher;

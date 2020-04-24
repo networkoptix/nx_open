@@ -24,10 +24,10 @@ namespace {
 using namespace std::chrono;
 
 // Delay between requests when the rebuild is running.
-static constexpr auto kUpdateRebuildStatusDelay = 500ms;
+static constexpr auto kUpdateRebuildStatusDelay = 1s;
 
 // Delay between requests when the backup is running.
-static constexpr auto kUpdateBackupStatusDelay = 500ms;
+static constexpr auto kUpdateBackupStatusDelay = 1s;
 
 void processStorage(const QnClientStorageResourcePtr& storage, const QnStorageSpaceData& spaceInfo)
 {
@@ -244,12 +244,15 @@ QnBackupStatusData QnServerStorageManager::backupStatus(
 bool QnServerStorageManager::rebuildServerStorages(
     const QnMediaServerResourcePtr& server, QnServerStoragesPool pool)
 {
+    NX_VERBOSE(this, "Starting rebuild %1 of %2", (int)pool, server);
     if (!sendArchiveRebuildRequest(server, pool, Qn::RebuildAction_Start))
         return false;
 
     auto& serverInfo = m_serverInfo[server];
     auto& poolInfo = serverInfo.storages[static_cast<int>(pool)];
     poolInfo.rebuildStatus.state = Qn::RebuildState_FullScan;
+    NX_VERBOSE(this, "Initializing status of pool %1 to fullscan", (int)pool);
+
     emit serverRebuildStatusChanged(server, pool, poolInfo.rebuildStatus);
 
     return true;
@@ -281,6 +284,7 @@ void QnServerStorageManager::checkStoragesStatus(const QnMediaServerResourcePtr&
     if (!isServerValid(server))
         return;
 
+    NX_VERBOSE(this, "Check storages status on server changes");
     sendArchiveRebuildRequest(server, QnServerStoragesPool::Main);
     sendArchiveRebuildRequest(server, QnServerStoragesPool::Backup);
     sendBackupRequest(server);
@@ -340,6 +344,8 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
         this,
         SLOT(at_archiveRebuildReply(int, const QnStorageScanData&, int)));
 
+    NX_VERBOSE(this, "Send request %1 to rebuild pool %2 of %3 (action %4)",
+        handle, (int)pool, server, action);
     if (handle <= 0)
         return false;
 
@@ -353,10 +359,12 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
 void QnServerStorageManager::at_archiveRebuildReply(
     int status, const QnStorageScanData& reply, int handle)
 {
+    NX_VERBOSE(this, "Received archive rebuild reply %1, status %2, %3", handle, status, reply);
     if (!m_requests.contains(handle))
         return;
 
     const auto requestKey = m_requests.take(handle);
+    NX_VERBOSE(this, "Target server %1, pool %2", requestKey.server, (int)requestKey.pool);
 
     // Whether server was removed from the pool.
     if (!m_serverInfo.contains(requestKey.server))
@@ -368,13 +376,22 @@ void QnServerStorageManager::at_archiveRebuildReply(
     Callback delayedCallback;
     if ((reply.state > Qn::RebuildState_None) || (status != 0))
     {
+        NX_VERBOSE(this, "Queue next rebuild progress request");
         delayedCallback =
-            [this, requestKey]() { sendArchiveRebuildRequest(requestKey.server, requestKey.pool); };
+            [this, requestKey]()
+            {
+                NX_VERBOSE(this, "Sending delayed info request");
+                sendArchiveRebuildRequest(requestKey.server, requestKey.pool);
+            };
     }
     else
     {
+        NX_VERBOSE(this, "Queue space request");
         delayedCallback =
-            [this, requestKey]() { sendStorageSpaceRequest(requestKey.server); };
+            [this, requestKey]()
+            {
+                sendStorageSpaceRequest(requestKey.server);
+            };
     }
 
     executeDelayedParented(delayedCallback, kUpdateRebuildStatusDelay, this);
@@ -386,6 +403,8 @@ void QnServerStorageManager::at_archiveRebuildReply(
     {
         const bool finished = (poolInfo.rebuildStatus.state == Qn::RebuildState_FullScan
             && reply.state == Qn::RebuildState_None);
+
+        NX_VERBOSE(this, "Rebuild status changed, is finished: %1", finished);
 
         poolInfo.rebuildStatus = reply;
         emit serverRebuildStatusChanged(requestKey.server, requestKey.pool, reply);

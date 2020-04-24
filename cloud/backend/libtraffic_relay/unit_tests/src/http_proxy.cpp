@@ -217,7 +217,7 @@ protected:
         httpClient->setSendTimeout(network::kNoTimeout);
         httpClient->setResponseReadTimeout(network::kNoTimeout);
         httpClient->setMessageBodyReadTimeout(network::kNoTimeout);
-        
+
         httpClient->executeInAioThreadSync(
             [this, &httpClient, method, url]()
             {
@@ -348,7 +348,7 @@ protected:
 private:
     std::string m_listeningPeerHostName;
     std::unique_ptr<nx::network::http::TestHttpServer> m_peerServer;
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     std::vector<std::unique_ptr<nx::network::http::AsyncClient>> m_httpClients;
     nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Response>>
         m_httpResponseQueue;

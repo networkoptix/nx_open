@@ -19,7 +19,7 @@
 #include <nx/utils/algorithm/same.h>
 #include <nx/utils/log/log.h>
 
-namespace nx::utils {
+namespace nx {
 
 //-------------------------------------------------------------------------------------------------
 // class MutexLockKey
@@ -172,7 +172,7 @@ bool LockGraphEdgeData::connectedTo(const LockGraphEdgeData& rhs) const
     //note: lockPositions is sorted by threadID
 
     //two edges are connected if there are elements with different thread id
-    return !algorithm::same_sorted_ranges_if(
+    return !utils::algorithm::same_sorted_ranges_if(
         lockPositions.cbegin(), lockPositions.cend(),
         rhs.lockPositions.cbegin(), rhs.lockPositions.cend(),
         [](const TwoMutexLockData& one, const TwoMutexLockData& two)
@@ -486,4 +486,4 @@ bool MutexLockAnalyzer::pathConnected(const std::list<LockGraphEdgeData>& edgesT
     return true;
 }
 
-} // namespace nx::utils
+} // namespace nx

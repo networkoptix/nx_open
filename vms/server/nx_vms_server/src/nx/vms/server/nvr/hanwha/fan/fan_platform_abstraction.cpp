@@ -80,8 +80,8 @@ public:
 private:
     int m_ioDeviceDescriptor = -1;
 
-    mutable nx::utils::Mutex m_mutex;
-    mutable nx::utils::WaitCondition m_waitCondition;
+    mutable nx::Mutex m_mutex;
+    mutable nx::WaitCondition m_waitCondition;
 
     bool m_interrupted = false;
 };

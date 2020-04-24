@@ -2,7 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 
-namespace nx::utils {
+namespace nx {
 
 template<typename Mutex>
 class NX_UTILS_API Locker
@@ -105,4 +105,4 @@ private:
     Locker<Mutex>* m_locker;
 };
 
-} // namespace nx::utils
+} // namespace nx

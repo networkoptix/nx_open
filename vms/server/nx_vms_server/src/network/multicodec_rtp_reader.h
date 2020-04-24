@@ -204,7 +204,7 @@ private:
     std::optional<std::chrono::steady_clock::time_point> m_packetLossReportTime;
 
     mutable QnMutex m_mutex;
-    static nx::utils::Mutex s_defaultTransportMutex;
+    static nx::Mutex s_defaultTransportMutex;
     static nx::vms::api::RtpTransportType s_defaultTransportToUse;
     std::set<nx::vms::server::network::MulticastAddressRegistry::RegisteredAddressHolderPtr>
         m_registeredMulticastAddresses;

@@ -6,7 +6,7 @@
 
 #include "mutex.h"
 
-namespace nx::utils {
+namespace nx {
 
 class NX_UTILS_API MutexQtDelegate: public MutexDelegate
 {
@@ -53,4 +53,4 @@ private:
     QWaitCondition m_delegate;
 };
 
-} // namespace nx::utils
+} // namespace nx

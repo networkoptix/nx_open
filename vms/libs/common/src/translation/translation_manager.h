@@ -72,7 +72,7 @@ private:
     QList<QnTranslation> m_translations;
     bool m_translationsValid;
 
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     QHash<Qt::HANDLE, QString> m_threadLocales;
     QHash<QString, QSharedPointer<nx::vms::translation::TranslationOverlay>> m_overlays;
 

@@ -35,7 +35,7 @@ private:
 
     bool m_installed = false;
     QList<Qt::HANDLE> m_threads;
-    nx::utils::Mutex m_mutex;
+    nx::Mutex m_mutex;
 };
 
 } // namespace nx::vms::translation

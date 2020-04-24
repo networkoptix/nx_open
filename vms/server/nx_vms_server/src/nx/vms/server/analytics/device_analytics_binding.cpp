@@ -317,7 +317,7 @@ std::optional<StreamRequirements> DeviceAnalyticsBinding::calculateStreamRequire
 
         if (!requiredStreamTypes)
         {
-            NX_DEBUG(this, "Pixel format is specified but no stream type filter is defined in the"
+            NX_DEBUG(this, "Pixel format is specified but no stream type filter is defined in the "
                 "manifest of the Engine %1 (%2). Adding `uncompressedVideo` stream type to "
                 "requirements. Device: %3 (%4)",
                 m_engine->getName(), m_engine->getId(),

@@ -2,7 +2,7 @@
 
 #include <nx/utils/scope_guard.h>
 
-namespace nx::utils {
+namespace nx {
 
 MutexStdDelegate::MutexStdDelegate(Mutex::RecursionMode mode)
 {
@@ -106,7 +106,7 @@ bool WaitConditionStdDelegate::wait(MutexDelegate* mutex, std::chrono::milliseco
 
     // std::condition_variable interface requires unique_lock<std::mutex> to be used.
     std::unique_lock<std::mutex> lock(*delegate->m_mutex, std::adopt_lock);
-    const auto unlockGuard = makeScopeGuard([&] { lock.release(); });
+    const auto unlockGuard = utils::makeScopeGuard([&] { lock.release(); });
 
     if (timeout != std::chrono::milliseconds::max())
         return m_condition.wait_for(lock, timeout) == std::cv_status::no_timeout;
@@ -125,4 +125,4 @@ void WaitConditionStdDelegate::wakeOne()
     m_condition.notify_one();
 }
 
-} // namespace nx::utils
+} // namespace nx

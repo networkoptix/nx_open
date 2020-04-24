@@ -70,7 +70,7 @@ private:
     const std::unique_ptr<Logger> m_logger;
 
     // State for supporting 'offline' parameter.
-    mutable nx::utils::Mutex m_offlineMutex;
+    mutable nx::Mutex m_offlineMutex;
     std::atomic<bool> m_isEnabled = true;
     QTime m_offlineTimer;
     QTime m_checkTimer;

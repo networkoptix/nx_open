@@ -57,7 +57,7 @@ public:
         auto edgeInsertionPair = vFrom->edges.emplace(vTo, std::forward<EdgeDataRef>(edgeData));
         if (edgeInsertionPair.second)
             vTo->incomingEdges.insert(vFrom); //added new edge, adding back path
-        
+
         return std::pair<edge_data_type*, bool>(
             &edgeInsertionPair.first->second,
             edgeInsertionPair.second);
@@ -225,7 +225,7 @@ private:
                 if (edgesTravelled)
                     edgesTravelled->push_front(edge.second);
             }
-            
+
             // Unrolling recursive calls.
             if (result)
             {

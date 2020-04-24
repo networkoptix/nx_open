@@ -3,7 +3,7 @@
 #include "mutex.h"
 
 // TODO: Remove with all usages.
-using QnWaitCondition = nx::utils::WaitCondition;
+using QnWaitCondition = nx::WaitCondition;
 
 class NX_UTILS_API WaitConditionTimer
 {

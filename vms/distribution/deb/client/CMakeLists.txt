@@ -51,7 +51,7 @@ set(common_depends
     "libpulse0"
     "libgl1-mesa-glx | libgl1"
     "libglu1-mesa-glx | libglu1"
-    "libegl1-mesa | libegl1-x11"
+    "libegl1-mesa0 | libegl-mesa | libegl1-x11 | libegl1"
     # Extra WebEngine dependencies.
     "libdbus-1-3"
     "libnss3"

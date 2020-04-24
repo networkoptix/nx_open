@@ -411,7 +411,7 @@ private:
 
     void resetState()
     {
-        m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
+        m_owner->setRebuildInfo({Qn::RebuildState_None, QString(), 0.0, 0.0});
         m_totalCatalogs = 0;
         m_beingProcessedStoragesUrls.clear();
         m_processedCatalogs = 0;
@@ -466,7 +466,7 @@ private:
         m_waitCondition.wakeOne();
     }
 
-    Qn::RebuildState processNextTask(nx::utils::MutexLocker* lock)
+    Qn::RebuildState processNextTask(nx::MutexLocker* lock)
     {
         switch (currentlyBeingProcessingTasksType())
         {
@@ -492,7 +492,7 @@ private:
         }
     }
 
-   void processNextFullTask(nx::utils::MutexLocker* lock)
+   void processNextFullTask(nx::MutexLocker* lock)
    {
         nx::caminfo::ArchiveCameraDataList archiveCameras;
         const auto scanTask = m_fullScanTasks.front();
@@ -536,14 +536,14 @@ private:
             (qreal) ++m_storageToProgress[storage->getUrl()].processedCatalogs
             / m_storageToProgress[storage->getUrl()].totalCatalogs;
 
-        m_owner->setRebuildInfo(QnStorageScanData(
+        m_owner->setRebuildInfo({
             state,
             storage->getUrl(),
             storageProgress,
-            (qreal) ++m_processedCatalogs / m_totalCatalogs));
+            (qreal) ++m_processedCatalogs / m_totalCatalogs});
     }
 
-    void processNextPartialTask(nx::utils::MutexLocker* lock)
+    void processNextPartialTask(nx::MutexLocker* lock)
     {
         const auto scanTask = m_partialScanTasks.front();
         m_partialScanTasks.pop_front();
@@ -1295,8 +1295,7 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 
         if (result.state <= Qn::RebuildState_None)
         {
-            result = QnStorageScanData(
-                Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0, 0.0);
+            result = {Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0, 0.0};
             setRebuildInfo(result);
         }
 

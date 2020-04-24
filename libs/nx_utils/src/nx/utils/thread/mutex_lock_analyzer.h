@@ -10,7 +10,7 @@
 
 #include <nx/utils/math/digraph.h>
 
-namespace nx::utils {
+namespace nx {
 
 class MutexDelegate;
 
@@ -147,7 +147,7 @@ public:
     static MutexLockAnalyzer* instance();
 
 private:
-    using MutexLockDigraph = Digraph<MutexDelegate*, LockGraphEdgeData>;
+    using MutexLockDigraph = utils::Digraph<MutexDelegate*, LockGraphEdgeData>;
 
     mutable QReadWriteLock m_mutex;
     MutexLockDigraph m_lockDigraph;
@@ -173,4 +173,4 @@ private:
     bool pathConnected(const std::list<LockGraphEdgeData>& edgesTravelled) const;
 };
 
-} // namespace nx::utils
+} // namespace nx

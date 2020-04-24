@@ -32,7 +32,7 @@ private:
         const QString& parameterId, const api::metrics::ValueRule& rule, bool skipOnMissingArgument);
 
 private:
-    mutable nx::utils::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     ValueMonitors m_valueMonitors;
     AlarmMonitors m_alarmMonitors;
 };

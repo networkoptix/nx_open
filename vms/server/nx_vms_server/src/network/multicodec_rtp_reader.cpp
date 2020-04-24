@@ -86,7 +86,7 @@ nx::streaming::rtp::TimePolicy getTimePolicy(const QnResourcePtr& res)
 
 } // namespace
 
-nx::utils::Mutex QnMulticodecRtpReader::s_defaultTransportMutex;
+nx::Mutex QnMulticodecRtpReader::s_defaultTransportMutex;
 nx::vms::api::RtpTransportType QnMulticodecRtpReader::s_defaultTransportToUse =
     nx::vms::api::RtpTransportType::automatic;
 
@@ -187,7 +187,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
             playbackRange.startTimeUsec,
             playbackRange.endTimeUsec,
             m_resource->getName(), m_resource->getId());
-	
+
         m_RtpSession.sendPlay(
             playbackRange.startTimeUsec,
             playbackRange.endTimeUsec,
@@ -240,7 +240,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     {
         reason = vms::api::EventReason::networkNoFrame;
         reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
-        NX_WARNING(this, "Can not read RTP frame for camera %1 during %2 ms, m_role=%3", 
+        NX_WARNING(this, "Can not read RTP frame for camera %1 during %2 ms, m_role=%3",
             getResource(), elapsed, m_role);
     }
     else

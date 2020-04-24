@@ -8,7 +8,7 @@
 #include "mutex.h"
 #include "mutex_lock_analyzer.h"
 
-namespace nx::utils {
+namespace nx {
 
 class NX_UTILS_API MutexDebugDelegate: public MutexDelegate
 {
@@ -64,5 +64,5 @@ private:
     QWaitCondition m_delegate;
 };
 
-} // namespace nx::utils
+} // namespace nx
 

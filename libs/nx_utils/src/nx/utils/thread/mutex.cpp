@@ -2,7 +2,7 @@
 
 #include "mutex_delegate_factory.h"
 
-namespace nx::utils {
+namespace nx {
 
 Mutex::Mutex(RecursionMode mode):
     m_delegate(makeMutexDelegate(mode))
@@ -103,5 +103,5 @@ void WaitCondition::wakeOne()
     m_delegate->wakeOne();
 }
 
-} // namespace nx::utils
+} // namespace nx
 

@@ -7,7 +7,7 @@
 #include "mutex_delegates_std.h"
 #include "mutex_delegates_qt.h"
 
-namespace nx::utils {
+namespace nx {
 
 static constexpr auto kUndefinedName("undefined");
 static constexpr auto kQtName("qt");
@@ -52,13 +52,13 @@ MutexImplementations::Value mutexImplementation()
     static const auto value =
         []()
         {
-            const auto value = ini().mutexImplementation;
+            const auto value = utils::ini().mutexImplementation;
             const auto parsed = MutexImplementations::parse(value);
             if (parsed != MutexImplementations::undefined)
                 return parsed;
 
             NX_ASSERT(false, lm("Unknown mutex implementaiton in ini: %1").args(value));
-            return MutexImplementations::parse(Ini::kDefaultMutexImplementation);
+            return MutexImplementations::parse(utils::Ini::kDefaultMutexImplementation);
         }();
 
     return value;
@@ -112,5 +112,5 @@ std::unique_ptr<WaitConditionDelegate> makeWaitConditionDelegate()
     return std::make_unique<WaitConditionQtDelegate>();
 }
 
-} // namespace nx::utils
+} // namespace nx
 
