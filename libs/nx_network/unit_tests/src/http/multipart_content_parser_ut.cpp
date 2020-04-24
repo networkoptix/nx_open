@@ -60,8 +60,10 @@ TEST( HttpMultipartContentParser, genericTest )
             parser.setContentType( "multipart/x-mixed-replace;boundary=fbdr" );
 
             std::deque<QByteArray> frames;
-            auto decodedFramesProcessor = [&frames]( const QnByteArrayConstRef& data ) {
+            std::deque<nx::network::http::HttpHeaders> headers;
+            auto decodedFramesProcessor = [&frames, &headers, &parser]( const QnByteArrayConstRef& data ) {
                 frames.push_back( data );
+                headers.push_back(parser.prevFrameHeaders());
             };
 
             parser.setNextFilter(
@@ -83,17 +85,24 @@ TEST( HttpMultipartContentParser, genericTest )
             {
                 ASSERT_TRUE(parser.eof());
                 ASSERT_EQ(5U, frames.size());
+                ASSERT_EQ(5U, headers.size());
                 ASSERT_TRUE(frames[4].isEmpty());
             }
             else
             {
                 ASSERT_FALSE(parser.eof());
                 ASSERT_EQ(4U, frames.size());
+                ASSERT_EQ(4U, headers.size());
             }
             ASSERT_EQ(frames[0], frame1);
+            ASSERT_EQ(nx::network::http::getHeaderValue(headers[0], "Content-Type"), "image/jpeg");
             ASSERT_EQ(frames[1], frame2);
+            ASSERT_EQ(nx::network::http::getHeaderValue(headers[1], "Content-Type"), "image/jpeg");
             ASSERT_EQ(frames[2], frame3);
+            ASSERT_EQ(nx::network::http::getHeaderValue(headers[2], "Content-Type"), "image/jpeg");
+            ASSERT_EQ(nx::network::http::getHeaderValue(headers[2], "Content-Length"), nx::Buffer::number(frame3.size()));
             ASSERT_EQ(frames[3], frame4);
+            ASSERT_EQ(nx::network::http::getHeaderValue(headers[3], "Content-Type"), "image/jpeg");
         }
     }
 }
