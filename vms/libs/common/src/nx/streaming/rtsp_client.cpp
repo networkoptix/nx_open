@@ -598,7 +598,7 @@ CameraDiagnostics::Result QnRtspClient::sendOptions()
     QByteArray response;
     const auto result = sendRequestAndReceiveResponse(std::move(request), response);
     if (!result)
-        NX_ERROR(this, "OPTIONS request failed");
+        NX_DEBUG(this, "OPTIONS request failed for URL %1", request.requestLine.url);
 
     QString allowedMethods = extractRTSPParam(QLatin1String(response), QLatin1String("Public:"));
     if (!allowedMethods.contains("GET_PARAMETER"))
