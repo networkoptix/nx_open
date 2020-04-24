@@ -19,6 +19,8 @@ public:
     WebSocket();
     ~WebSocket();
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
     cf::future<cf::unit> connect(nx::utils::Url url);
     cf::future<nx::Buffer> read();
     void close();

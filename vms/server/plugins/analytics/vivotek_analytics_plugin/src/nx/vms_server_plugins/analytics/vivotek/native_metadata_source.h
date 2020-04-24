@@ -19,6 +19,8 @@ public:
     NativeMetadataSource();
     ~NativeMetadataSource();
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
     cf::future<cf::unit> open(const nx::utils::Url& url);
     cf::future<nx::kit::Json> read();
     void close();

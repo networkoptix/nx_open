@@ -14,6 +14,8 @@ public:
     Timer();
     ~Timer();
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
     cf::future<cf::unit> wait(std::chrono::milliseconds delay);
     void cancel();
 

@@ -50,7 +50,12 @@ ParameterApi::ParameterApi(Url url):
 
 ParameterApi::~ParameterApi()
 {
-    pleaseStopSync();
+}
+
+void ParameterApi::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    BasicPollable::bindToAioThread(aioThread);
+    m_httpClient.bindToAioThread(aioThread);
 }
 
 cf::future<std::unordered_map<std::string, std::string>> ParameterApi::get(

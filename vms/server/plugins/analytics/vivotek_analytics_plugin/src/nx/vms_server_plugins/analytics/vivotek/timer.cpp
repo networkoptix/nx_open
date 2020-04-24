@@ -5,6 +5,7 @@
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace std::literals;
+using namespace nx::network;
 
 Timer::Timer()
 {
@@ -12,7 +13,12 @@ Timer::Timer()
 
 Timer::~Timer()
 {
-    pleaseStopSync();
+}
+
+void Timer::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    BasicPollable::bindToAioThread(aioThread);
+    m_nested.bindToAioThread(aioThread);
 }
 
 cf::future<cf::unit> Timer::wait(std::chrono::milliseconds delay)

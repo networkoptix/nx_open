@@ -16,6 +16,8 @@ public:
     HttpClient();
     ~HttpClient();
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
     const nx::network::http::Request& request();
 
     void setAdditionalRequestHeaders(nx::network::http::HttpHeaders headers);

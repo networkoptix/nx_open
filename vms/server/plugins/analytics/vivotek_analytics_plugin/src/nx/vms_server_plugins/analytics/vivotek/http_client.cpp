@@ -5,6 +5,7 @@
 #include <nx/network/http/buffer_source.h>
 
 #include "exception.h"
+#include "nx/network/aio/basic_pollable.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -44,7 +45,13 @@ HttpClient::HttpClient()
 
 HttpClient::~HttpClient()
 {
-    pleaseStopSync();
+}
+
+void HttpClient::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    BasicPollable::bindToAioThread(aioThread);
+    if (m_nested)
+        m_nested->bindToAioThread(aioThread);
 }
 
 const nx::network::http::Request& HttpClient::request()
@@ -136,7 +143,10 @@ void HttpClient::stopWhileInAioThread()
 http::AsyncClient& HttpClient::nested()
 {
     if (!m_nested)
+    {
         m_nested.emplace();
+        m_nested->bindToAioThread(getAioThread());
+    }
 
     return *m_nested;
 }

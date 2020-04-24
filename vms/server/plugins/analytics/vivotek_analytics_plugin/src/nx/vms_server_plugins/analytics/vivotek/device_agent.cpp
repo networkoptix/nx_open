@@ -74,6 +74,9 @@ DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
 {
     NX_OUTPUT << __func__;
 
+    m_nativeMetadataSource.bindToAioThread(m_basicPollable->getAioThread());
+    m_reopenDelayer.bindToAioThread(m_basicPollable->getAioThread());
+
     NX_OUTPUT << "    m_url: " << m_url.toStdString();
 }
 

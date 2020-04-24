@@ -23,7 +23,13 @@ NativeMetadataSource::NativeMetadataSource()
 
 NativeMetadataSource::~NativeMetadataSource()
 {
-    pleaseStopSync();
+}
+
+void NativeMetadataSource::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    BasicPollable::bindToAioThread(aioThread);
+    m_httpClient.bindToAioThread(aioThread);
+    m_websocket.bindToAioThread(aioThread);
 }
 
 cf::future<cf::unit> NativeMetadataSource::open(const Url& url)

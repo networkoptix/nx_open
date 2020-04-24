@@ -19,6 +19,8 @@ public:
     explicit ParameterApi(nx::utils::Url url);
     ~ParameterApi();
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
     cf::future<std::unordered_map<std::string, std::string>> get(
         std::unordered_set<std::string> prefixes);
 

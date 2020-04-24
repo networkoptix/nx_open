@@ -17,7 +17,14 @@ WebSocket::WebSocket()
 
 WebSocket::~WebSocket()
 {
-    pleaseStopSync();
+}
+
+void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    BasicPollable::bindToAioThread(aioThread);
+    m_httpClient.bindToAioThread(aioThread);
+    if (m_nested)
+        m_nested->bindToAioThread(aioThread);
 }
 
 cf::future<cf::unit> WebSocket::connect(nx::utils::Url url)
@@ -51,6 +58,7 @@ cf::future<cf::unit> WebSocket::connect(nx::utils::Url url)
                 websocket::Role::client,
                 websocket::FrameType::text,
                 websocket::compressionType(response.headers));
+            m_nested->bindToAioThread(getAioThread());
 
             m_nested->start();
 
