@@ -112,7 +112,7 @@ void DeviceAgent::prepareHttpClient()
     m_httpClient->setMessageBodyReadTimeout(kReceiveTimeout);
     m_httpClient->setAuthType(nx::network::http::AuthType::authBasic);
     m_httpClient->bindToAioThread(m_reconnectTimer.getAioThread());
-    m_httpClient->setOnDone([this]() { onSubsctiptionDone(); });
+    m_httpClient->setOnDone([this]() { onSubscriptionDone(); });
 }
 
 nx::utils::Url DeviceAgent::makeUrl(const QString& requestName)
@@ -151,7 +151,7 @@ void DeviceAgent::makeDeferredSubscription()
     m_reconnectTimer.start(kReconnectTimeout, [this]() { makeSubscription(); });
 }
 
-void DeviceAgent::onSubsctiptionDone()
+void DeviceAgent::onSubscriptionDone()
 {
     if (m_terminated)
         return;

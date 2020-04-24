@@ -15,11 +15,20 @@ namespace nx::dw_tvt {
 
 namespace {
 
+/** Makes proper xml: no indentations, no empty lines, correct endlines. */
+QByteArray operator""_proper_xml(const char* data, size_t size)
+{
+    QByteArray xml(data, size);
+    normalizeEndlines(&xml);
+    unindentLines(&xml);
+    return xml.trimmed();
+}
+
 /**
  @defgroup subscriptionXml Subscription XML
 
  * Subscription xml consists of the beginning, several (usually up to three) items and the ending.
- * They should be just concatenated. Function "makeSubscriptionXml" does it.
+ * They should be just concatenated. Function "buildSubscriptionXml" does it.
  *
  * kSubscriptionXmlXXXXXItem constants are the xml elements for different kind of events in the
  * subscription request. Each of them has one of the thee options:
@@ -32,53 +41,50 @@ namespace {
  /** @{ */
 
 /**
- * The beginning of subscription xml.
- * %1 - is a parameter that should be replaced with a number of event types.
+ * The pattern of the subscription xml.
+ * %1 - should be replaced with a number of event types.
+ * %2 - should be replaced with event type items.
  */
-const QByteArray kSubscriptionXmlBeginning = R"(
+static QByteArray kSubscriptionXmlPattern = R"(
 <?xml version="1.0" encoding="UTF-8"?>
 <config version="1.0" xmlns="http://www.ipc.com/ver10">
-<types>
-<openAlramObj>
-<enum>MOTION</enum>
-<enum>SENSOR</enum>
-<enum>PEA</enum>
-<enum>AVD</enum>
-<enum>OSC</enum>
-<enum>CPC</enum>
-<enum>CDD</enum>
-<enum>IPD</enum>
-<enum>VFD</enum>
-<enum>VFD_MATCH</enum>
-<enum>VEHICE</enum>
-<enum>AOIENTRY</enum>
-<enum>AOILEAVE</enum>
-<enum>PASSLINECOUNT</enum>
-<enum>TRAFFIC</enum>
-</openAlramObj>
-<subscribeRelation>
-<enum>ALARM</enum>
-<enum>FEATURE_RESULT</enum>
-<enum>ALARM_FEATURE</enum>
-</subscribeRelation>
-<subscribeTypes>
-<enum>BASE_SUBSCRIBE</enum>
-<enum>REALTIME_SUBSCRIBE</enum>
-<enum>STREAM_SUBSCRIBE</enum>
-</subscribeTypes>
-</types>
-<channelID type="uint32">0</channelID>
-<initTermTime type="uint32">0</initTermTime>
-<subscribeFlag type="subscribeTypes">BASE_SUBSCRIBE</subscribeFlag>
-<subscribeList type="list" count="%1">)";
-
-/**
- * The ending of subscription xml
- */
-const QByteArray kSubscriptionXmlEnding = R"(
-</subscribeList>
+    <types>
+        <openAlramObj>
+            <enum>MOTION</enum>
+            <enum>SENSOR</enum>
+            <enum>PEA</enum>
+            <enum>AVD</enum>
+            <enum>OSC</enum>
+            <enum>CPC</enum>
+            <enum>CDD</enum>
+            <enum>IPD</enum>
+            <enum>VFD</enum>
+            <enum>VFD_MATCH</enum>
+            <enum>VEHICE</enum>
+            <enum>AOIENTRY</enum>
+            <enum>AOILEAVE</enum>
+            <enum>PASSLINECOUNT</enum>
+            <enum>TRAFFIC</enum>
+        </openAlramObj>
+        <subscribeRelation>
+            <enum>ALARM</enum>
+            <enum>FEATURE_RESULT</enum>
+            <enum>ALARM_FEATURE</enum>
+        </subscribeRelation>
+        <subscribeTypes>
+            <enum>BASE_SUBSCRIBE</enum>
+            <enum>REALTIME_SUBSCRIBE</enum>
+            <enum>STREAM_SUBSCRIBE</enum>
+        </subscribeTypes>
+    </types>
+    <channelID type="uint32">0</channelID>
+    <initTermTime type="uint32">0</initTermTime>
+    <subscribeFlag type="subscribeTypes">BASE_SUBSCRIBE</subscribeFlag>
+    <subscribeList type="list" count="%1">
+        %2
+    </subscribeList>
 </config>
-)";
+)"_proper_xml;
 
 /**
  * MOTION - motion detection.
@@ -87,11 +93,12 @@ const QByteArray kSubscriptionXmlEnding = R"(
  * Description in web interface: no description.
  * Detection area: 22x15 matrix.
  */
-const QByteArray kSubscriptionXmlMotionItem = R"(
+static const QByteArray kSubscriptionXmlMotionItem = R"(
 <item>
-<smartType type="openAlramObj">MOTION</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">MOTION</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
 /**
  * AVD - abnormal video diagnostic
@@ -103,11 +110,12 @@ const QByteArray kSubscriptionXmlMotionItem = R"(
  * "Scene change detection", "Video blur detection" and "Video cast detection", which are
  * described as "Scene change", "Abnormal clarity" and "Color abnormal".
  */
-const QByteArray kSubscriptionXmlAvdItem = R"(
+static const QByteArray kSubscriptionXmlAvdItem = R"(
 <item>
-<smartType type="openAlramObj">AVD</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">AVD</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
 /**
  * PEA - some abbreviation, if you know - write it here
@@ -121,11 +129,12 @@ const QByteArray kSubscriptionXmlAvdItem = R"(
  * The main differences from IPD and CPC is that they people, and PEA - any objects.
  * Also detection areas are set differently (e.g. IPD's area is always a whole frame).
  */
-const QByteArray kSubscriptionXmlPeaItem = R"(
+static const QByteArray kSubscriptionXmlPeaItem = R"(
 <item>
-<smartType type="openAlramObj">PEA</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">PEA</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
 /**
  * VFD - video face detection
@@ -135,11 +144,12 @@ const QByteArray kSubscriptionXmlPeaItem = R"(
  * Detection area: rectangle.
  * Currently (march 2020) VFD is not supported by DW TVT Camera.
  */
-const QByteArray kSubscriptionXmlVfdItem = R"(
+static const QByteArray kSubscriptionXmlVfdItem = R"(
 <item>
-<smartType type="openAlramObj">VFD</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">VFD</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
 /**
  * CDD - crowd density detection
@@ -148,11 +158,12 @@ const QByteArray kSubscriptionXmlVfdItem = R"(
  * Description in web interface: "Detect the crowd density in certain area".
  * Detection area: rectangle.
  */
-const QByteArray kSubscriptionXmlCddItem = R"(
+static const QByteArray kSubscriptionXmlCddItem = R"(
 <item>
-<smartType type="openAlramObj">CDD</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">CDD</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
 /**
  * CPC - cross-line people counting
@@ -162,11 +173,12 @@ const QByteArray kSubscriptionXmlCddItem = R"(
  * in certain area".
  * Detection area: rectangle. Also The direction if people movement is set.
  */
-const QByteArray kSubscriptionXmlCpcItem = R"(
+static const QByteArray kSubscriptionXmlCpcItem = R"(
 <item>
-<smartType type="openAlramObj">CPC</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">CPC</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
 /**
  * IPD - intruding people detection
@@ -175,11 +187,12 @@ const QByteArray kSubscriptionXmlCpcItem = R"(
  * Description in web interface: "Detect the intrusion people in a closed area".
  * Detection Area: whole frame (no settings in web interface)
  */
-const QByteArray kSubscriptionXmlIpdItem = R"(
+static const QByteArray kSubscriptionXmlIpdItem = R"(
 <item>
-<smartType type="openAlramObj">IPD</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">IPD</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
 /**
  * OSC - object status changed
@@ -188,42 +201,47 @@ const QByteArray kSubscriptionXmlIpdItem = R"(
  * Description in web interface: "Smart detection of left, lost or moved items".
  * Detection Area: polygon (6 vertices max)
  */
-const QByteArray kSubscriptionXmlOscItem = R"(
+static const QByteArray kSubscriptionXmlOscItem = R"(
 <item>
-<smartType type="openAlramObj">OSC</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">OSC</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
 /** @} */
 
 // New (March, 2020) events
 
-const QByteArray kSubscriptionXmlAoientryItem = R"(
+static const QByteArray kSubscriptionXmlAoientryItem = R"(
 <item>
-<smartType type="openAlramObj">AOIENTRY</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">AOIENTRY</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
-const QByteArray kSubscriptionXmlAoileaveItem = R"(
+static const QByteArray kSubscriptionXmlAoileaveItem = R"(
 <item>
-<smartType type="openAlramObj">AOILEAVE</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">AOILEAVE</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
-const QByteArray kSubscriptionXmlPasslinecountItem = R"(
+static const QByteArray kSubscriptionXmlPasslinecountItem = R"(
 <item>
-<smartType type="openAlramObj">PASSLINECOUNT</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">PASSLINECOUNT</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
-const QByteArray kSubscriptionXmlTrafficItem = R"(
+static const QByteArray kSubscriptionXmlTrafficItem = R"(
 <item>
-<smartType type="openAlramObj">TRAFFIC</smartType>
-<subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
-</item>)";
+    <smartType type="openAlramObj">TRAFFIC</smartType>
+    <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
+</item>
+)"_proper_xml;
 
 /** Map allows to get subscription xml item for the event by its internal name. */
-const QMap<QByteArray, QByteArray> kXmlItemsByInternalName =
+static const QMap<QByteArray, QByteArray> kXmlItemsByInternalName =
 {
     { "MOTION", kSubscriptionXmlMotionItem },
     { "AVD", kSubscriptionXmlAvdItem },
@@ -242,31 +260,42 @@ const QMap<QByteArray, QByteArray> kXmlItemsByInternalName =
     { "TRAFFIC", kSubscriptionXmlTrafficItem }, //< mot supported in fw 5.0 (April 2020)
 };
 
-/**
- * XML standard demands '\n' as a line separator ('\r\n' and '\r' are not acceptable)
- * (https://www.w3.org/TR/2008/REC-xml-20081126/#sec-line-ends),
- * DW TVT cameras follow this demand.
- * Also no endlines (and spaces) are allowed in the begin and in the end.
- */
-QByteArray normalizeXmlEndlines(QByteArray xml)
+} // namespace
+
+void normalizeEndlines(QByteArray* xml)
 {
     const QByteArray kSystemEndline = R"(
 )"; //< This line consists of endline marker (i.e. "\n" or "\r\n" or any other, it doesn't matter).
 
     const QByteArray kDesiredEndline = "\n";
-    xml.replace(kSystemEndline, kDesiredEndline);
-    xml = xml.trimmed();
-    return xml;
+    xml->replace(kSystemEndline, kDesiredEndline);
 }
 
-} // namespace
+void unindentLines(QByteArray* xml)
+{
+    QByteArray result;
+    result.reserve(xml->size());
 
-/**
- * Make xml body for subscription request. Concatenates the beginning, xml items from events and
- * the ending. The resulting xml is normalized (endlines are set to '\n'). Xml items are searched
- * in kXmlItemsByInternalName map.
- */
-QByteArray makeSubscriptionXml(const QSet<QByteArray>& eventInternalNames)
+    bool newLine = true;
+    for (const char c : *xml)
+    {
+        if (newLine)
+        {
+            if (std::isspace(c))
+                continue;
+            else
+                newLine = false;
+        }
+
+        result.push_back(c);
+
+        if (c == '\n')
+            newLine = true;
+    }
+    *xml = result;
+}
+
+QByteArray buildSubscriptionXml(const QSet<QByteArray>& eventInternalNames)
 {
     // First, check the names.
     int checkedEventsCount = 0;
@@ -284,23 +313,19 @@ QByteArray makeSubscriptionXml(const QSet<QByteArray>& eventInternalNames)
         return QByteArray();
     }
 
-    QByteArray result = kSubscriptionXmlBeginning;
-
-    static const QByteArray kItemsCountMarker("%1");
-
-    int markerIndex = result.lastIndexOf(kItemsCountMarker);
-    if (markerIndex != -1)
-        result.replace(markerIndex, kItemsCountMarker.size(), QByteArray::number(checkedEventsCount));
-
+    QByteArray xmlCore;
     for (const auto& item: eventInternalNames)
-        result += kXmlItemsByInternalName.value(item, "");
+        xmlCore += kXmlItemsByInternalName.value(item, "");
 
-    result += kSubscriptionXmlEnding;
-    result = normalizeXmlEndlines(result);
+    QByteArray result = kSubscriptionXmlPattern;
+    result.replace("%1", QByteArray::number(checkedEventsCount)).replace("%2", xmlCore);
+
     return result;
 }
 
-class CameraControllerImpl
+//-------------------------------------------------------------------------------------------------
+
+class CameraHttpClient
 {
     nx::network::SocketGlobals::InitGuard m_initGuard;
     nx::network::http::HttpClient m_client;
@@ -309,7 +334,7 @@ class CameraControllerImpl
     static const QByteArray kPath;
 
 public:
-    CameraControllerImpl()
+    CameraHttpClient()
     {
         m_client.setResponseReadTimeout(std::chrono::seconds(5));
         m_client.setMessageBodyReadTimeout(std::chrono::seconds(5));
@@ -357,8 +382,8 @@ public:
         return true;
     }
 };
-const QByteArray CameraControllerImpl::kProtocol("http://");
-const QByteArray CameraControllerImpl::kPath("/");
+const QByteArray CameraHttpClient::kProtocol("http://");
+const QByteArray CameraHttpClient::kPath("/");
 
 QDomElement findChildTag(QDomElement parent, QString tagName)
 {
@@ -380,14 +405,14 @@ int16_t readPort(const QDomElement& parent, const QString& name)
         return static_cast<uint16_t>(port.text().toInt());
 }
 
-CameraController::CameraController(): m_impl(new CameraControllerImpl) {}
+CameraController::CameraController(): m_cameraHttpClient(new CameraHttpClient) {}
 
 CameraController::CameraController(const QByteArray& ip, unsigned short port):
     CameraController()
 {
     m_ip = ip;
     m_port = port;
-    m_impl->setCgiPreamble(m_ip, m_port);
+    m_cameraHttpClient->setCgiPreamble(m_ip, m_port);
 }
 
 CameraController::CameraController(const QByteArray& ip, unsigned short port,
@@ -395,7 +420,7 @@ CameraController::CameraController(const QByteArray& ip, unsigned short port,
     :
     CameraController(ip, port)
 {
-    m_impl->setCredentials(m_user, m_password);
+    m_cameraHttpClient->setCredentials(m_user, m_password);
 }
 
 CameraController::~CameraController() = default;
@@ -404,19 +429,19 @@ void CameraController::setIpPort(const QByteArray& ip, unsigned short port)
 {
     m_ip = ip;
     m_port = port;
-    m_impl->setCgiPreamble(m_ip, m_port);
+    m_cameraHttpClient->setCgiPreamble(m_ip, m_port);
 }
 
 void CameraController::setCredentials(const QByteArray& user, const QByteArray& password)
 {
     m_user = user;
     m_password = password;
-    m_impl->setCredentials(m_user, m_password);
+    m_cameraHttpClient->setCredentials(m_user, m_password);
 }
 
 void CameraController::setReadTimeout(std::chrono::seconds readTimeout)
 {
-    m_impl->setReadTimeout(readTimeout);
+    m_cameraHttpClient->setReadTimeout(readTimeout);
 }
 
 bool CameraController::readPortConfiguration()
@@ -433,7 +458,7 @@ bool CameraController::readPortConfiguration()
         {&m_httpPort, &m_netPort, &m_rtspPort, &m_httpsPort, &m_longPollingPort};
 
     QByteArray xml;
-    if (!m_impl->execute(kGetPortConfigCommand, &xml))
+    if (!m_cameraHttpClient->execute(kGetPortConfigCommand, &xml))
         return false;
 
     if (xml.isEmpty())
@@ -454,24 +479,6 @@ bool CameraController::readPortConfiguration()
          *portNumbers[i] = readPort(ports, kPortNames[i]);
 
     return true;
-}
-
-nx::network::http::Request CameraController::makeHttpRequest(const QByteArray& body)
-{
-    nx::network::http::RequestLine requestLine{ "POST", nx::utils::Url("/SetSubscribe"), { "HTTP", "1.1" } };
-
-    nx::network::http::header::BasicAuthorization basic(m_user, m_password);
-    QByteArray bodyLength = QByteArray::number(body.size());
-
-    nx::network::http::HttpHeaders headers =
-    {
-        { nx::network::http::header::Authorization::NAME, basic.serialized() },
-        { "User-Agent", "ApiTool" },
-        { "Host", m_ip },
-        { "Content-Length", bodyLength },
-    };
-
-    return nx::network::http::Request{ requestLine, headers, body };
 }
 
 } // namespace nx::dw_tvt

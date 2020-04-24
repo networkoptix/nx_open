@@ -91,7 +91,9 @@ QByteArray prepareUnsubscribeBody(const QByteArray subscribeResponseBody)
         }
         child = nextChild;
     }
-    return doc.toByteArray();
+    QByteArray result = doc.toByteArray();
+    nx::dw_tvt::unindentLines(&result);
+    return result.trimmed();
 }
 
 } // namespace
@@ -181,7 +183,7 @@ void DeviceAgent::makeSubscriptionAsync()
 
     const nx::utils::Url url = makeUrl("SetSubscribe");
     const QSet<QByteArray> names = internalNamesToCatch();
-    const QByteArray messageBody = nx::dw_tvt::makeSubscriptionXml(names);
+    const QByteArray messageBody = nx::dw_tvt::buildSubscriptionXml(names);
 
     prepareHttpClient(messageBody);
 
@@ -194,6 +196,7 @@ void DeviceAgent::makeSubscriptionAsync()
 
 void DeviceAgent::makeUnsubscriptionSync(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
 {
+    NX_ASSERT(m_terminated);
     if (!m_terminated)
         return;
 
@@ -487,7 +490,6 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
 {
     m_terminated = false;
 
-    const QByteArray host = m_url.host().toLatin1();
     m_cameraController.setIpPort(m_url.host().toLatin1(), m_url.port());
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
