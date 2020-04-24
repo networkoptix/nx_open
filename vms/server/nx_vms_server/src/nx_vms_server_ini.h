@@ -54,7 +54,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_STRING("", pushNotifyImageUrl, "Overrides imageUrl for all push notifications.");
     NX_INI_STRING(R"json({"priority": "high", "mutable_content": true})json", pushNotifyOptions, "");
 
-    NX_INI_FLAG(1800, systemUsageDumpTimeoutS, "How often print to log CPU/RAM usage. The value in seconds.");
+    NX_INI_INT(1800, systemUsageDumpTimeoutS, "How often print to log CPU/RAM usage. The value in seconds.");
 };
 
 inline Ini& ini()
