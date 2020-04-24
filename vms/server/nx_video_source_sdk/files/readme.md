@@ -85,9 +85,9 @@ build_samples_rpi.sh
 ```
 
 ATTENTION: The Qt library should be available to cmake, and its version should be the same as the
-one that comes with the Server (see Server installation files), otherwise an unpredictable behavior
-may take place. If cmake cannot find Qt, add the following arg to a build_samples* script (will be
-passed to cmake):
+one that comes with the Server (see the installed Server files), otherwise an unpredictable
+behavior may take place. If cmake cannot find Qt, add the following arg to a build_samples* script
+(will be passed to cmake):
 ```
 # Windows:
 # Note the quotes - otherwise, .bat interpreter will split the arg into two by "=".
