@@ -1,6 +1,7 @@
 #include "websocket.h"
 
 #include <exception>
+
 #include <nx/network/websocket/websocket_handshake.h>
 
 #include "exception.h"

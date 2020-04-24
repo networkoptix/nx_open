@@ -1,7 +1,4 @@
 #include "device_agent.h"
-#include "nx/sdk/i_plugin_diagnostic_event.h"
-#include "nx/utils/thread/cf/cfuture.h"
-#include "nx/vms_server_plugins/analytics/vivotek/camera_features.h"
 
 #include <exception>
 #include <stdexcept>
