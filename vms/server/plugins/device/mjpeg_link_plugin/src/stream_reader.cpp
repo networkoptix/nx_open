@@ -66,7 +66,6 @@ StreamReader::StreamReader(
 StreamReader::~StreamReader()
 {
     NX_ASSERT(m_isInGetNextData == 0);
-    m_videoPacket.reset();
 }
 
 void* StreamReader::queryInterface(const nxpl::NX_GUID& interfaceID)
@@ -199,7 +198,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
         case mjpg:
             // Reading mjpg picture.
-            while (!m_videoPacket.get() && !localHttpClientPtr->eof())
+            while (m_videoPackets.empty() && !localHttpClientPtr->eof())
             {
                 m_multipartContentParser->processData(
                     localHttpClientPtr->fetchMessageBodyBuffer());
@@ -219,17 +218,17 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
             break;
     }
 
-    if (m_videoPacket.get())
+    if (!m_videoPackets.empty())
     {
-        NX_VERBOSE(this, "New packet, timestamp: %1", m_videoPacket->timestamp());
-        *lpPacket = m_videoPacket.release();
+        *lpPacket = m_videoPackets.front().release();
+        m_videoPackets.pop_front();
         const auto plugin = HttpLinkPlugin::instance();
         if (!plugin)
         {
             NX_DEBUG(this, "No plugin");
             return nxcip::NX_OTHER_ERROR;
         }
-
+        NX_VERBOSE(this, "New packet, timestamp: %1", (*lpPacket)->timestamp());
         plugin->setStreamState(m_url, /*isStreamRunning*/ true);
         return nxcip::NX_NO_ERROR;
     }
@@ -329,14 +328,15 @@ int StreamReader::doRequest(nx::network::http::HttpClient* const httpClient)
 void StreamReader::gotJpegFrame(const nx::network::http::ConstBufferRefType& jpgFrame)
 {
     // Creating video packet.
-    m_videoPacket.reset(new ILPVideoPacket(
+    m_videoPackets.emplace_back(new ILPVideoPacket(
         0,
         m_timeProvider->millisSinceEpoch() * USEC_IN_MS,
         nxcip::MediaDataPacket::fKeyPacket,
         0));
-    m_videoPacket->resizeBuffer(jpgFrame.size());
-    if (m_videoPacket->data())
-        memcpy(m_videoPacket->data(), jpgFrame.constData(), jpgFrame.size());
+    m_videoPackets.back()->resizeBuffer(jpgFrame.size());
+    if (m_videoPackets.back()->data())
+        memcpy(m_videoPackets.back()->data(), jpgFrame.constData(), jpgFrame.size());
+    NX_VERBOSE(this, "Got packet, timestamp: %1", m_videoPackets.back()->timestamp());
 }
 
 bool StreamReader::waitForNextFrameTime()

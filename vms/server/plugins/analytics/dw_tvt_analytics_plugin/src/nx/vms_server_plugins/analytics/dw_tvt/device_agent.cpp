@@ -91,7 +91,9 @@ QByteArray prepareUnsubscribeBody(const QByteArray subscribeResponseBody)
         }
         child = nextChild;
     }
-    return doc.toByteArray();
+    QByteArray result = doc.toByteArray();
+    nx::dw_tvt::unindentLines(&result);
+    return result.trimmed();
 }
 
 } // namespace
@@ -181,26 +183,38 @@ void DeviceAgent::makeSubscriptionAsync()
 
     const nx::utils::Url url = makeUrl("SetSubscribe");
     const QSet<QByteArray> names = internalNamesToCatch();
-    const QByteArray messageBody = nx::dw_tvt::makeSubscriptionXml(names);
+    const QByteArray messageBody = nx::dw_tvt::buildSubscriptionXml(names);
 
     prepareHttpClient(messageBody);
 
     m_httpClient->doPost(url, [this]()
         {
-            this->onSubsctiptionDone();
+            this->onSubscriptionDone();
         });
     NX_URL_PRINT << "Subscription request started.";
 }
 
-void DeviceAgent::makeUnsubscriptionSync(std::unique_ptr<nx::network::AbstractStreamSocket> s)
+void DeviceAgent::makeUnsubscriptionSync(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
 {
+    NX_ASSERT(m_terminated);
     if (!m_terminated)
         return;
 
     QnMutexLocker lock(&m_mutex);
 
     const nx::utils::Url url = makeUrl("SetUnSubscribe");
-    prepareHttpClient(m_unsubscribeBody, std::move(s));
+
+    if (socket)
+    {
+        // Recreate httpClient and attach it to `socket`.
+        prepareHttpClient(m_unsubscribeBody, std::move(socket));
+    }
+    else
+    {
+        // Use existing httpClient, just set new body.
+        m_httpClient->setRequestBody(
+            std::make_unique<nx::network::http::BufferSource>(kXmlContentType, m_unsubscribeBody));
+    }
 
     std::promise<void> promise;
     m_httpClient->doPost(url, [&promise](){ promise.set_value(); });
@@ -222,7 +236,7 @@ void DeviceAgent::makeDeferredSubscriptionAsync()
         });
 }
 
-void DeviceAgent::onSubsctiptionDone()
+void DeviceAgent::onSubscriptionDone()
 {
     if (m_terminated)
         return;
@@ -476,8 +490,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
 {
     m_terminated = false;
 
-    const QByteArray host = m_url.host().toLatin1();
-    m_cameraController.setIp(m_url.host().toLatin1());
+    m_cameraController.setIpPort(m_url.host().toLatin1(), m_url.port());
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     // Assuming that the list contains only events, since this plugin does not produce objects.
@@ -542,7 +555,7 @@ void DeviceAgent::stopFetchingMetadata()
 
     if (m_httpClient)
     {
-        this->makeUnsubscriptionSync(m_httpClient->takeSocket());
+        this->makeUnsubscriptionSync({});
         m_httpClient.reset();
     }
     else if (m_tcpSocket)

@@ -68,7 +68,7 @@ public:
     void prepareHttpClient();
     void makeSubscription();
     void makeDeferredSubscription();
-    void onSubsctiptionDone();
+    void onSubscriptionDone();
     void readNextNotificationAsync();
 
     QByteArray extractRequestFromBuffer();
@@ -83,7 +83,7 @@ protected:
     virtual void doSetNeededMetadataTypes(
         nx::sdk::Result<void>* outValue,
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
-        
+
 private:
     nx::sdk::Result<void> startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
