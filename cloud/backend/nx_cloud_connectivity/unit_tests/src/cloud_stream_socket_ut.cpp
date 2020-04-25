@@ -524,7 +524,7 @@ public:
 protected:
     virtual void SetUp() override
     {
-        nx::network::SocketGlobalsHolder::instance()->reinitialize();
+        nx::network::SocketGlobals::cloud().reinitialize();
 
         base_type::SetUp();
 

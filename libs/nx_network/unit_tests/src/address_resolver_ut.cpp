@@ -621,14 +621,13 @@ class AddressResolverNat64:
 public:
     AddressResolverNat64()
     {
-        nx::network::SocketGlobalsHolder::instance()->reinitialize();
         std::vector<HostAddress> ipList{HostAddress(*kV6.ipV6().first), HostAddress(*kV4.ipV4())};
         SocketGlobals::addressResolver().dnsResolver().addEtcHost(kV4.toString(), ipList);
     }
 
     ~AddressResolverNat64()
     {
-        SocketGlobals::addressResolver().dnsResolver().removeEtcHost("192.168.1.2");
+        SocketGlobals::addressResolver().dnsResolver().removeEtcHost(kV4.toString());
     }
 
     static const HostAddress kV4;

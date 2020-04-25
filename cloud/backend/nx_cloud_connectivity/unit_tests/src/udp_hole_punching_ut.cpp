@@ -37,7 +37,7 @@ public:
     {
         base_type::SetUp();
 
-        nx::network::SocketGlobalsHolder::instance()->reinitialize();
+        nx::network::SocketGlobals::cloud().reinitialize();
 
         ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 

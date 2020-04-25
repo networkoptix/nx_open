@@ -35,7 +35,7 @@ VmsGatewayFunctionalTest::VmsGatewayFunctionalTest(int flags):
 {
     // Starting clean test.
     if ((flags & doNotReinitialiseSocketGlobals) == 0)
-        nx::network::SocketGlobalsHolder::instance()->reinitialize();
+        nx::network::SocketGlobals::cloud().reinitialize();
     m_testHttpServer = std::make_unique<nx::network::http::TestHttpServer>();
 
     m_tmpDir =

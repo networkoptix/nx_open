@@ -8,7 +8,7 @@ namespace test {
 
 MediatorCloudDbIntegrationTestSetup::MediatorCloudDbIntegrationTestSetup()
 {
-    nx::network::SocketGlobalsHolder::instance()->reinitialize();
+    nx::network::SocketGlobals::cloud().reinitialize();
 
     m_cdbLauncher = std::make_unique<nx::cloud::db::CdbLauncher>();
     m_mediator = std::make_unique<hpm::MediatorFunctionalTest>(
