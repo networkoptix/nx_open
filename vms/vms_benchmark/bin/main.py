@@ -62,7 +62,6 @@ from vms_benchmark import service_objects
 from vms_benchmark import box_tests
 from vms_benchmark import host_tests
 from vms_benchmark import exceptions
-from vms_benchmark.config import NoConfigFile
 
 vms_version = None
 
@@ -186,7 +185,7 @@ def load_configs(conf_file, ini_file):
     ini = _load_config_file(ini_file, ini_file_default, ini_definition, False)
 
     def path_from_config(path):
-        return path if Path(path).is_absolute() else benchmark_bin_path / path
+        return path if Path(path).is_absolute() else str(benchmark_bin_path / path)
 
     test_camera_runner.ini_testcamera_bin = path_from_config(ini['testcameraBin'])
     test_camera_runner.ini_test_file_high_resolution = path_from_config(
