@@ -180,7 +180,7 @@ void MetadataHandler::handleObjectMetadataPacket(
     data.streamIndex = m_resource->analyzedStreamIndex(m_engineId);
 
     if (data.timestampUs <= 0)
-        NX_WARNING(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUs);
+        NX_DEBUG(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUs);
 
     if (m_metadataSink && data.timestampUs >= 0) //< Warn about 0 but still accept it.
         m_metadataSink->putData(nx::common::metadata::toCompressedMetadataPacket(data));
@@ -199,7 +199,7 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
     bestShotPacket.timestampUs = objectTrackBestShotPacket->timestampUs();
     if (bestShotPacket.timestampUs < 0)
     {
-        NX_WARNING(this,
+        NX_DEBUG(this,
             "Invalid ObjectTrackBestShotPacket timestamp: %1, ignoring packet",
             bestShotPacket.timestampUs);
 
@@ -252,7 +252,7 @@ void MetadataHandler::handleEventMetadata(
     const auto descriptor = eventTypeDescriptor(eventTypeId);
     if (!descriptor)
     {
-        NX_WARNING(this, "Event %1 is not in the list of Events supported by %2 (%3)",
+        NX_DEBUG(this, "Event %1 is not in the list of Events supported by %2 (%3)",
             eventTypeId,
             m_resource->getUserDefinedName(),
             m_resource->getId());

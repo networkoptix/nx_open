@@ -148,7 +148,7 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
         deviceAgentContext.deviceAgent = createDeviceAgentUnsafe();
         if (!deviceAgentContext.deviceAgent)
         {
-            NX_ERROR(this,
+            NX_WARNING(this,
                 "DeviceAgent creation failed for the Engine %1 (%2) and the Device %3 (%4)",
                 m_engine->getName(), m_engine->getId(),
                 m_device->getUserDefinedName(), m_device->getId());

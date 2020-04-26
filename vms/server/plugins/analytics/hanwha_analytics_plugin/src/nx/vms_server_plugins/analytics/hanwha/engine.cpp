@@ -273,7 +273,7 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
             deviceInfo->name(), deviceInfo->id());
     }
 
-    auto supportedEventTypeIds = fetchSupportedEventTypeIds(sharedRes, deviceInfo->channelNumber());
+    auto supportedEventTypeIds = fetchSupportedEventTypeIds(sharedRes, deviceInfo);
     if (!supportedEventTypeIds)
     {
         NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
@@ -374,39 +374,61 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
 
 std::optional<QSet<QString>> Engine::fetchSupportedEventTypeIds(
     const std::shared_ptr<SharedResources>& sharedRes,
-    int channel) const
+    const IDeviceInfo* deviceInfo) const
 {
     const auto& information = sharedRes->sharedContext->information();
     if (!information)
+    {
+        NX_DEBUG(this, "Unable to fetch device information for %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
         return std::nullopt;
+    }
 
     const auto& cgiParameters = information->cgiParameters;
     if (!cgiParameters.isValid())
+    {
+        NX_DEBUG(this, "CGI parameters are invalid for %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
         return std::nullopt;
+    }
 
     const auto& eventStatuses = sharedRes->sharedContext->eventStatuses();
     if (!eventStatuses || !eventStatuses->isSuccessful())
+    {
+        NX_DEBUG(this, "Unable to fetch event statuses for %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
         return std::nullopt;
+    }
 
     return eventTypeIdsFromParameters(
         sharedRes->sharedContext->url(),
-        cgiParameters, eventStatuses.value, channel);
+        cgiParameters,
+        eventStatuses.value,
+        deviceInfo);
 }
 
 std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
     const nx::utils::Url& url,
     const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
     const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
-    int channel) const
+    const IDeviceInfo* deviceInfo) const
 {
     if (!parameters.isValid())
+    {
+        NX_DEBUG(this, "CGI parameters are invalid for %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
         return std::nullopt;
+    }
 
     auto supportedEventTypesParameter = parameters.parameter(
         "eventstatus/eventstatus/monitor/Channel.#.EventType");
 
     if (!supportedEventTypesParameter.is_initialized())
+    {
+        NX_DEBUG(this, "Supported event types parameter is not initialzied for %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
         return std::nullopt;
+    }
 
     QSet<QString> result;
 
@@ -415,7 +437,12 @@ std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
         "eventstatus/eventstatus/monitor/AlarmInput");
 
     if (alarmInputParameter)
+    {
+        NX_VERBOSE(this, "Adding %1 to supported event type list for %2 (%3)",
+            alarmInputParameter->name(), deviceInfo->name(), deviceInfo->id());
+
         supportedEventTypes.push_back(alarmInputParameter->name());
+    }
 
     NX_VERBOSE(this,
         lm("camera %1 report supported analytics events %2").arg(url).arg(supportedEventTypes));
@@ -423,7 +450,11 @@ std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
     {
         auto eventTypeId = m_manifest.eventTypeIdByName(eventTypeName);
         if (!eventTypeId.isEmpty())
+        {
+            NX_VERBOSE(this, "Adding %1 to supported event type list %2 (%3)",
+                eventTypeId, deviceInfo->name(), deviceInfo->id());
             result.insert(eventTypeId);
+        }
 
         const auto altEventName = specialEventName(eventTypeName);
         if (!altEventName.isEmpty())
@@ -433,18 +464,25 @@ std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
             {
                 const auto& fullEventTypeName = entry.first;
                 const bool isMatched =
-                    fullEventTypeName.startsWith(lm("Channel.%1.%2.").args(channel, altEventName));
+                    fullEventTypeName.startsWith(lm("Channel.%1.%2.").args(
+                        deviceInfo->channelNumber(), altEventName));
 
                 if (isMatched)
                 {
                     eventTypeId = m_manifest.eventTypeIdByName(fullEventTypeName);
                     if (!eventTypeId.isNull())
+                    {
+                        NX_VERBOSE(this, "Adding %1 to supported event type list %2 (%3)",
+                            eventTypeId, deviceInfo->name(), deviceInfo->id());
+
                         result.insert(eventTypeId);
+                    }
                 }
             }
         }
     }
 
+    NX_VERBOSE(this, "Supported event type list for %1 (%2): %3");
     return result;
 }
 
