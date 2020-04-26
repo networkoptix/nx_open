@@ -142,7 +142,6 @@ std::stack <std::unique_ptr<DirNode>> buildStack(const QnStorageResourcePtr& sto
             current->childrenCount++;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
         result.push(std::move(current));
     }
 
@@ -166,7 +165,6 @@ static void remove(const QnStorageResourcePtr& storage)
                 nx::utils::url::hidePassword(node->url));
 
             storage->removeDir(node->url);
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
             if (node->parent)
                 node->parent->childrenCount--;
         }
@@ -2577,7 +2575,7 @@ void QnStorageManager::startAuxTimerTasks()
         kCheckStorageSpace,
         kCheckStorageSpace);
 
-    static const std::chrono::hours kRemoveEmptyDirsInterval(12);
+    static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId)
         {
