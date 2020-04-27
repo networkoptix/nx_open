@@ -298,6 +298,7 @@ public:
     {
         m_client.setResponseReadTimeout(std::chrono::seconds(5));
         m_client.setMessageBodyReadTimeout(std::chrono::seconds(5));
+        m_client.addAdditionalHeader("Connection", "close");
     }
 
     void setCgiPreamble(const QByteArray& ip, unsigned short port = 0)
@@ -332,6 +333,12 @@ public:
             return false;
 
         auto optionalBody = m_client.fetchEntireMessageBody();
+
+        // We control DW TVT cameras through one port and receive notifications through the other.
+        // DW TVT has a remarkable bug. If control port is not closed, notification port does not
+        // work correct.
+        // We need to close socket manually after each control request.
+        m_client.socket()->close();
 
         if (!optionalBody)
             return false;
