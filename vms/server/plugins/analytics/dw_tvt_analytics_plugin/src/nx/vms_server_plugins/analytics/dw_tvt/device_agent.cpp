@@ -26,6 +26,7 @@
 
 #include "parser.h"
 #include "log.h"
+#include "nx/dw_tvt/literals.h"
 
 #define NX_URL_PRINT NX_PRINT << m_url.host().toStdString() << " : "
 
@@ -91,9 +92,7 @@ QByteArray prepareUnsubscribeBody(const QByteArray subscribeResponseBody)
         }
         child = nextChild;
     }
-    QByteArray result = doc.toByteArray();
-    nx::dw_tvt::unindentLines(&result);
-    return result.trimmed();
+    return linesTrimmed(doc.toByteArray());
 }
 
 } // namespace
@@ -211,6 +210,7 @@ void DeviceAgent::makeUnsubscriptionSync(std::unique_ptr<nx::network::AbstractSt
     }
     else
     {
+        NX_CRITICAL(m_httpClient);
         // Use existing httpClient, just set new body.
         m_httpClient->setRequestBody(
             std::make_unique<nx::network::http::BufferSource>(kXmlContentType, m_unsubscribeBody));

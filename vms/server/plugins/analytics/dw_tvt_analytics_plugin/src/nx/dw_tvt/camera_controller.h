@@ -13,19 +13,6 @@
 namespace nx::dw_tvt {
 
 /**
- * XML standard demands '\n' as a line separator ('\r\n' and '\r' are not acceptable)
- * (https://www.w3.org/TR/2008/REC-xml-20081126/#sec-line-ends),
- * DW TVT cameras follow this demand.
- */
-    void normalizeEndlines(QByteArray* xml);
-
-/**
- * Eliminates all indentations (whitespaces in the beginning of each line).
- * Converts "human convenient readable" format to "flat format".
- */
-void unindentLines(QByteArray* xml);
-
-/**
  * Make xml body for subscription request.
  * @param items - list of internal names of the events to subscribe to.
  */
