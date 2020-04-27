@@ -123,7 +123,7 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
                 continue;
 
             binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
-            binding->setMetadataSink(m_metadataSink);
+            binding->setMetadataSinks(m_metadataSinks);
             m_bindings.emplace(engine->getId(), binding);
         }
 
@@ -148,17 +148,15 @@ void DeviceAnalyticsContext::removeEngine(const resource::AnalyticsEngineResourc
     updateStreamProviderRequirements();
 }
 
-void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink)
+void DeviceAnalyticsContext::setMetadataSinks(MetadataSinkSet metadataSinks)
 {
-    BindingMap bindings;
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        m_metadataSink = std::move(metadataSink);
-        bindings = m_bindings;
-    }
+        m_metadataSinks = std::move(metadataSinks);
 
-    for (auto& [_, binding]: bindings)
-        binding->setMetadataSink(m_metadataSink);
+        for (auto& [_, binding]: m_bindings)
+            binding->setMetadataSinks(m_metadataSinks);
+    }
 }
 
 void DeviceAnalyticsContext::setSettingsValues(const QString& engineId, const QJsonObject& settings)

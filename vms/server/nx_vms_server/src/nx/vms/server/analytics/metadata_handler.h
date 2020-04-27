@@ -22,6 +22,8 @@
 
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/vms/server/server_module_aware.h>
+
+#include <nx/vms/server/analytics/types.h>
 #include <nx/vms/server/analytics/object_coordinates_translator.h>
 
 #include <nx/analytics/metadata_logger.h>
@@ -45,10 +47,7 @@ public:
         QnUuid engineId);
 
     void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket);
-    void setMetadataSink(QnAbstractDataReceptor* metadataSink);
-    void removeMetadataSink(QnAbstractDataReceptor* metadataSink);
-
-    void setVisualDebugger(nx::debugging::AbstractVisualMetadataDebugger* visualDebugger);
+    void setMetadataSinks(MetadataSinkSet metadataSinks);
 
 signals:
     void sdkEventTriggered(const nx::vms::event::AnalyticsSdkEventPtr& event);
@@ -75,13 +74,15 @@ private:
         const nx::sdk::Ptr<const nx::sdk::analytics::IEventMetadata>& eventMetadata,
         qint64 timestampUsec);
 
+    void pushObjectMetadataToSinks(const nx::common::metadata::ObjectMetadataPacket& packet);
+
 private:
+    nx::utils::Mutex m_mutex;
     QnVirtualCameraResourcePtr m_resource;
     QnUuid m_engineId;
     mutable std::optional<nx::analytics::EventTypeDescriptorMap> m_eventTypeDescriptors;
     QMap<QString, nx::vms::api::EventState> m_eventStateMap;
-    QnAbstractDataReceptor* m_metadataSink = nullptr;
-    nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;
+    MetadataSinkSet m_metadataSinks;
     nx::analytics::MetadataLogger m_metadataLogger;
     ObjectCoordinatesTranslator m_objectCoordinatesTranslator;
     bool m_translateObjectBoundingBoxes = true;

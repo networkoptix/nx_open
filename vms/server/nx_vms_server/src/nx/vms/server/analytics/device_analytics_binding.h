@@ -21,6 +21,7 @@
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
 
+#include <nx/vms/server/analytics/types.h>
 #include <nx/vms/server/analytics/stream_requirements.h>
 #include <nx/vms/server/analytics/device_agent_handler.h>
 #include <nx/vms/server/analytics/stream_data_receptor.h>
@@ -59,7 +60,7 @@ public:
     QJsonObject getSettings() const;
     void setSettings(const QJsonObject& settings);
 
-    void setMetadataSink(QnAbstractDataReceptorPtr dataReceptor);
+    void setMetadataSinks(MetadataSinkSet metadataSinks);
     bool isStreamConsumer() const;
     std::optional<nx::vms::api::analytics::EngineManifest> engineManifest() const;
 
@@ -109,7 +110,7 @@ private:
     nx::vms::server::resource::AnalyticsEngineResourcePtr m_engine;
     DeviceAgentContext m_deviceAgentContext;
 
-    QnAbstractDataReceptorPtr m_metadataSink;
+    MetadataSinkSet m_metadataSinks;
     std::atomic<bool> m_started{false};
     nx::analytics::MetadataLogger m_incomingFrameLogger;
     std::optional<sdk_support::MetadataTypes> m_lastNeededMetadataTypes;

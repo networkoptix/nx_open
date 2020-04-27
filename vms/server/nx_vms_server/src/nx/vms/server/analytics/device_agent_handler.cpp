@@ -51,9 +51,9 @@ void DeviceAgentHandler::handlePluginDiagnosticEvent(
     emit pluginDiagnosticEventTriggered(pluginDiagnosticEvent);
 }
 
-void DeviceAgentHandler::setMetadataSink(QnAbstractDataReceptor* metadataSink)
+void DeviceAgentHandler::setMetadataSinks(MetadataSinkSet metadataSinks)
 {
-    m_metadataHandler.setMetadataSink(metadataSink);
+    m_metadataHandler.setMetadataSinks(std::move(metadataSinks));
 }
 
 } // namespace nx::vms::server::analytics

@@ -251,14 +251,16 @@ void CLServerPushStreamReader::run()
             }
         }
 
-        if(data)
-            data->dataProvider = this;
+        data->dataProvider = this;
 
         if (!postProcessData(data))
             continue;
 
-        if (data && getRole() == Qn::CR_SecondaryLiveVideo)
-            data->flags |= QnAbstractMediaData::MediaFlags_LowQuality; //< TODO: properly set flags for analytics.
+        if (getRole() == Qn::CR_LiveVideo)
+            data->flags &= ~QnAbstractMediaData::MediaFlags_LowQuality;
+
+        if (getRole() == Qn::CR_SecondaryLiveVideo)
+            data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
         // check queue sizes
         if (dataCanBeAccepted())

@@ -14,6 +14,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/analytics/types.h>
 #include <nx/vms/server/analytics/settings.h>
 #include <nx/vms/server/analytics/stream_data_receptor.h>
 #include <nx/vms/server/sdk_support/file_utils.h>
@@ -52,7 +53,7 @@ public:
         const resource::AnalyticsEngineResourceList& engines);
     void removeEngine(const resource::AnalyticsEngineResourcePtr& engine);
 
-    void setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink);
+    void setMetadataSinks(MetadataSinkSet metadataSink);
     void setSettingsValues(const QString& engineId, const QJsonObject& settings);
     std::optional<Settings> getSettings(const QString& engineId) const;
 
@@ -115,7 +116,7 @@ private:
     mutable QnMutex m_mutex;
     resource::CameraPtr m_device;
     BindingMap m_bindings;
-    QWeakPointer<QnAbstractDataReceptor> m_metadataSink;
+    MetadataSinkSet m_metadataSinks;
 
     StreamProviderRequirementsMap m_cachedStreamProviderRequirements;
 
