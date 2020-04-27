@@ -599,6 +599,10 @@ void QnServerStorageManager::setActiveMetadataStorage(const QnMediaServerResourc
         return;
 
     m_activeMetadataStorages[server] = storage;
+
+    NX_VERBOSE(this, "Metadata storage state changed on server %1 (%2)", server->getName(),
+        server->getId().toSimpleString());
+
     emit activeMetadataStorageChanged(server);
 }
 
