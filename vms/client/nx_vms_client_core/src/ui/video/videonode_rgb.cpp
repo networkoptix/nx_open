@@ -195,7 +195,7 @@ public:
             functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
 
-        if (!nx::media::quick_sync::renderToRgb(m_frame, isNewTexture, m_textureId))
+        if (!nx::media::quick_sync::renderToRgb(m_frame, isNewTexture, m_textureId, nullptr /*TODO*/))
         {
             NX_WARNING(this, "rendering surface failed");
         }

@@ -40,7 +40,7 @@ class AbstractVideoSurface
 {
 public:
     virtual ~AbstractVideoSurface() {}
-    virtual bool renderToRgb(bool isNewTexture, GLuint textureId) = 0;
+    virtual bool renderToRgb(bool isNewTexture, GLuint textureId, QOpenGLContext* context) = 0;
 };
 
 /**

@@ -124,6 +124,7 @@ private:
     bool m_useMtDecoding;
     bool m_needRecreate;
     nx::metrics::Storage* m_metrics = nullptr;
+    int m_lastDecodeResult = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

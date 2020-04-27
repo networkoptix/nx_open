@@ -25,31 +25,32 @@ in Materials by Intel or Intel’s suppliers or licensors in any way.”
 
 #include <mfx/mfxvideo++.h>
 
+#include "renderer.h"
+#include "renderer_share.h"
+
 class SimpleDXDevice
 {
 public:
-    SimpleDXDevice();
     ~SimpleDXDevice();
 
-    HRESULT CreateDevice(DWORD dwWidth, DWORD dwHeight, mfxU32 adapterNum);
+    HRESULT CreateDevice(int width, int height, mfxU32 adapterNum);
     IDirect3DDeviceManager9* GetDeviceManager9() { return m_pDeviceManager9; }
     IDirect3DDevice9Ex* GetDevice() { return m_pDevice;}
-    IDirect3DSurface9* GetSharedSurface() { return m_pSharedSurface; }
-    HANDLE GetSharedHandle() { return m_hSharedSurface; }
     HWND getWindow() { return m_hWnd; }
 
-protected:
-    HWND SimpleDXDevice::CreateDxWindow(DWORD dwWidth, DWORD dwHeight);
+    nx::media::quick_sync::windows::RendererShare& getRenderer() { return m_renderer; }
 
 private:
-    IDirect3D9Ex* m_pD3d;
-    IDirect3DDevice9Ex* m_pDevice;
-    IDirect3DSurface9* m_pRenderTargetSurface;
-    IDirect3DSurface9* m_pSharedSurface;
-    HANDLE m_hSharedSurface;
-    IDirect3DDeviceManager9* m_pDeviceManager9;
+    HWND CreateDxWindow(int dwWidth, int dwHeight);
 
-    HWND m_hWnd;
+private:
+    IDirect3D9Ex* m_pD3d = nullptr;
+    IDirect3DDevice9Ex* m_pDevice = nullptr;
+    IDirect3DDeviceManager9* m_pDeviceManager9 = nullptr;
+
+    HWND m_hWnd = 0;
+
+    nx::media::quick_sync::windows::RendererShare m_renderer;
 };
 
 #endif // _WIN32

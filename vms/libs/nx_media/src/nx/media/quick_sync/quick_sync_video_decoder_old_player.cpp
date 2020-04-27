@@ -17,9 +17,10 @@ bool QuickSyncVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDat
             "Failed to check QuickSync compatibility, input frame is not a key frame");
         return false;
     }
-    nx::QVideoFramePtr result;
-    auto decoder = std::make_unique<nx::media::quick_sync::QuickSyncVideoDecoderImpl>();
-    return decoder->decode(data, &result) >= 0;
+    return true;
+    //nx::QVideoFramePtr result;
+    //auto decoder = std::make_unique<nx::media::quick_sync::QuickSyncVideoDecoderImpl>();
+    //return decoder->decode(data, &result) >= 0;
 }
 
 bool QuickSyncVideoDecoderOldPlayer::decode(

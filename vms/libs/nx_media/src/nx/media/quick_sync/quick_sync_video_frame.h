@@ -7,7 +7,7 @@ class QuickSyncVideoFrame : public AbstractVideoSurface
 public:
     QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& frame);
 
-    virtual bool renderToRgb(bool isNewTexture, GLuint textureId) override;
+    virtual bool renderToRgb(bool isNewTexture, GLuint textureId, QOpenGLContext* context) override;
 
 private:
     // Contain video surface

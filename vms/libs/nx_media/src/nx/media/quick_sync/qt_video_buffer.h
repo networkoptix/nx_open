@@ -34,7 +34,7 @@ public:
         return NotMapped;
     }
 
-    virtual uchar* map(MapMode /*mode*/, int */*numBytes*/, int */*bytesPerLine*/) override
+    virtual uchar* map(MapMode /*mode*/, int* /*numBytes*/, int* /*bytesPerLine*/) override
     {
         return nullptr;
     }

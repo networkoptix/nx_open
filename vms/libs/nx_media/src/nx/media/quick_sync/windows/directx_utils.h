@@ -31,7 +31,7 @@ struct Device
 };
 
 bool isCompatible(AVCodecID codec);
-bool renderToRgb(const QVideoFrame& frame, bool isNewTexture, GLuint textureId);
+bool renderToRgb(const QVideoFrame& frame, bool isNewTexture, GLuint textureId, QOpenGLContext* context);
 
 } // nx::media::quick_sync
 

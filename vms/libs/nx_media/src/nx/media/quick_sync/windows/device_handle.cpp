@@ -18,7 +18,7 @@ bool DeviceHandle::createDeviceManager(int adapterNumber)
     HRESULT hr = Direct3DCreate9Ex(D3D_SDK_VERSION, &D3D9);
     if (!D3D9 || FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to create device, error code: %1", hr);
+        NX_DEBUG(this, "Failed to create device, error code: %1", std::system_category().message(hr));
         return false;
     }
 
@@ -48,21 +48,23 @@ bool DeviceHandle::createDeviceManager(int adapterNumber)
         &D3DD9);
     if (FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to create device for adapter %1, error code: %2", adapterNumber, hr);
+        NX_DEBUG(this, "Failed to create device for adapter %1, error code: %2", adapterNumber,
+            std::system_category().message(hr));
         return false;
     }
 
     hr = D3DD9->ResetEx(&D3DPP, nullptr);
     if (FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to reset device: %1", hr);
+        NX_DEBUG(this, "Failed to reset device: %1", std::system_category().message(hr));
         return false;
     }
 
     hr = D3DD9->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
     if (FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to clear device, error code: %1", hr);
+        NX_DEBUG(this, "Failed to clear device, error code: %1",
+            std::system_category().message(hr));
         return false;
     }
 
@@ -71,14 +73,16 @@ bool DeviceHandle::createDeviceManager(int adapterNumber)
     if (FAILED(hr))
     {
         deviceManager9 = nullptr;
-        NX_DEBUG(this, "Failed to create device manager, error code: %1", hr);
+        NX_DEBUG(this, "Failed to create device manager, error code: %1",
+            std::system_category().message(hr));
         return false;
     }
 
     hr = deviceManager9->ResetDevice(D3DD9, resetToken);
     if (FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to reset device manager, error code: %1", hr);
+        NX_DEBUG(this, "Failed to reset device manager, error code: %1",
+            std::system_category().message(hr));
         return false;
     }
     return true;
@@ -86,7 +90,7 @@ bool DeviceHandle::createDeviceManager(int adapterNumber)
 
 DeviceHandle::DeviceHandle(MFXVideoSession& /*session*/)
 {
-    //int adapter = getIntelDeviceAdapter(session);
+   // int adapter = getIntelDeviceAdapter(session);
     //createDeviceManager(adapter);
 }
 

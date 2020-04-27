@@ -7,7 +7,7 @@ QuickSyncVideoFrame::QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& fra
     m_frame = frame;
 }
 
-bool QuickSyncVideoFrame::renderToRgb(bool isNewTexture, GLuint textureId)
+bool QuickSyncVideoFrame::renderToRgb(bool isNewTexture, GLuint textureId, QOpenGLContext* context)
 {
-    return nx::media::quick_sync::renderToRgb(*m_frame, isNewTexture, textureId);
+    return nx::media::quick_sync::renderToRgb(*m_frame, isNewTexture, textureId, context);
 }

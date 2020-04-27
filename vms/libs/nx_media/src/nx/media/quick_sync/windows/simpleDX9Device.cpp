@@ -23,8 +23,15 @@ in Materials by Intel or Intel�s suppliers or licensors in any way.�
 
 #include <windowsx.h>
 #include <stdio.h>
+#include <system_error>
+
+#include "GL/glew.h"
+#include "GL/wglew.h"
+#include "GL/gl.h"
 
 #include "simpleDX9Device.h"
+
+#include <nx/utils/log/log.h>
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -49,25 +56,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
-
-SimpleDXDevice::SimpleDXDevice()
-{
-    m_pD3d = NULL;
-    m_pDevice = NULL;
-    m_pRenderTargetSurface = NULL;
-    m_pSharedSurface = NULL;
-    m_hSharedSurface = NULL;
-    m_pDeviceManager9 = NULL;
-}
-
 SimpleDXDevice::~SimpleDXDevice()
 {
-    if (m_pSharedSurface)
-        m_pSharedSurface->Release();
-
-    if (m_pRenderTargetSurface)
-        m_pRenderTargetSurface->Release();
-
     if (m_pDevice)
         m_pDevice->Release();
 
@@ -75,10 +65,10 @@ SimpleDXDevice::~SimpleDXDevice()
         m_pD3d->Release();
 
     if (m_pDeviceManager9)
-    m_pDeviceManager9->Release();
+        m_pDeviceManager9->Release();
 }
 
-HWND SimpleDXDevice::CreateDxWindow(DWORD dwWidth, DWORD dwHeight)
+HWND SimpleDXDevice::CreateDxWindow(int width, int height)
 {
     WNDCLASSEX wc;
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
@@ -92,13 +82,13 @@ HWND SimpleDXDevice::CreateDxWindow(DWORD dwWidth, DWORD dwHeight)
 
     RegisterClassEx(&wc);
 
-    HWND hWnd = CreateWindowEx(NULL, L"WindowClass", L"Shared Resource Test - DX",
-        WS_OVERLAPPEDWINDOW, 0, 0, dwWidth, dwHeight,
+    HWND hWnd = CreateWindowEx(NULL, L"WindowClass", L"Shared Resource - DX",
+        WS_OVERLAPPEDWINDOW, 0, 0, width, height,
         NULL, NULL, (HINSTANCE)GetModuleHandle(NULL), NULL);
 
     if (IsWindow(hWnd))
     {
-        RECT rc = { 0, 0, dwWidth, dwHeight};
+        RECT rc = { 0, 0, width, height};
 
         DWORD dwStyle = GetWindowLongPtr(hWnd, GWL_STYLE);
         DWORD dwExStyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
@@ -107,12 +97,12 @@ HWND SimpleDXDevice::CreateDxWindow(DWORD dwWidth, DWORD dwHeight)
     }
     return hWnd;
     //POINT point = {0, 0};
-    //return WindowFromPoint(point);;
+    //return WindowFromPoint(point);
 }
 
-HRESULT SimpleDXDevice::CreateDevice(DWORD dwWidth, DWORD dwHeight, mfxU32 adapterNum)
+HRESULT SimpleDXDevice::CreateDevice(int width, int height, mfxU32 adapterNum)
 {
-    m_hWnd = CreateDxWindow(dwWidth, dwHeight);
+    m_hWnd = CreateDxWindow(width, height);
 
     D3DPRESENT_PARAMETERS d3dpp;
     ZeroMemory(&d3dpp, sizeof(d3dpp));
@@ -132,20 +122,6 @@ HRESULT SimpleDXDevice::CreateDevice(DWORD dwWidth, DWORD dwHeight, mfxU32 adapt
         &d3dpp,
         NULL,
         &m_pDevice);
-
-    hr = m_pDevice->GetRenderTarget(0, &m_pRenderTargetSurface);
-
-    D3DSURFACE_DESC rtDesc;
-    m_pRenderTargetSurface->GetDesc(&rtDesc);
-
-    // g_pSharedSurface should be able to be opened in OGL via the WGL_NV_DX_interop extension
-    // Vendor support for various textures/surfaces may vary
-    hr = m_pDevice->CreateOffscreenPlainSurface(rtDesc.Width,
-        rtDesc.Height,
-        rtDesc.Format,
-        D3DPOOL_DEFAULT,
-        &m_pSharedSurface,
-        &m_hSharedSurface);
 
     // Since this demo only shows RGB->RGB conversion, verify that the hardware can do NV12->RGB conversion
     hr = m_pD3d->CheckDeviceFormatConversion(
@@ -170,6 +146,9 @@ HRESULT SimpleDXDevice::CreateDevice(DWORD dwWidth, DWORD dwHeight, mfxU32 adapt
 
     hr = m_pDeviceManager9->ResetDevice(m_pDevice, resetToken);
     if (FAILED(hr)) return hr;
+
+    if (!m_renderer.init(m_hWnd, m_pDevice, m_pD3d, width, height))
+        return false;
 
     return S_OK;
 }

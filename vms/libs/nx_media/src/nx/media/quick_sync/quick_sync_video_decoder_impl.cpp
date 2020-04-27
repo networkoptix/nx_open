@@ -48,7 +48,7 @@ bool QuickSyncVideoDecoderImpl::initSession()
     mfxStatus status = m_mfxSession.Init(impl, &version);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "Failed to init MFX session, error: %1", status);
+        NX_ERROR(this, "Failed to init MFX session, error: %1", toString(status));
         return false;
     }
     NX_DEBUG(this, "MFX version %1.%2", version.Major, version.Minor);
@@ -70,7 +70,7 @@ bool QuickSyncVideoDecoderImpl::initSession()
         status = allocator->Init(nullptr);
         if (status < MFX_ERR_NONE)
         {
-            NX_ERROR(this, "Failed to init allocator, error code: %1", status);
+            NX_ERROR(this, "Failed to init allocator, error code: %1", toString(status));
             return false;
         }
         m_allocator = std::move(allocator);
@@ -84,7 +84,7 @@ bool QuickSyncVideoDecoderImpl::allocFrames()
     mfxStatus status = MFXVideoDECODE_Query(m_mfxSession, &m_mfxDecParams, &m_mfxDecParams);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "Query failed, error: %1", status);
+        NX_ERROR(this, "Query failed, error: %1", toString(status));
         return false;
     }
 
@@ -93,7 +93,7 @@ bool QuickSyncVideoDecoderImpl::allocFrames()
     status = MFXVideoDECODE_QueryIOSurf(m_mfxSession, &m_mfxDecParams, &request);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "QueryIOSurf failed, error: %1", status);
+        NX_ERROR(this, "QueryIOSurf failed, error: %1", toString(status));
         return false;
     }
 
@@ -121,7 +121,7 @@ bool QuickSyncVideoDecoderImpl::allocSurfaces(mfxFrameAllocRequest& request)
     mfxStatus status = m_allocator->Alloc(m_allocator->pthis, &request, &m_response);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "Alloc failed, status: %1", status);
+        NX_ERROR(this, "Alloc failed, toString(status): %1", toString(status));
         return false;
     }
 
@@ -168,7 +168,7 @@ bool QuickSyncVideoDecoderImpl::init(mfxBitstream& bitstream, AVCodecID codec)
     mfxStatus status = MFXVideoDECODE_DecodeHeader(m_mfxSession, &bitstream, &m_mfxDecParams);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "Failed to decode video header, error: %1", status);
+        NX_ERROR(this, "Failed to decode video header, error: %1", toString(status));
         return false;
     }
 
@@ -181,7 +181,7 @@ bool QuickSyncVideoDecoderImpl::init(mfxBitstream& bitstream, AVCodecID codec)
     if (MFX_WRN_PARTIAL_ACCELERATION == status) {
         NX_DEBUG(this, "Quick Sync partial acceleration!");
     } else if (status < MFX_ERR_NONE) {
-        NX_ERROR(this, "Failed to init decoder, error: %1", status);
+        NX_ERROR(this, "Failed to init decoder, error: %1", toString(status));
         return false;
     }
     return true;
@@ -225,6 +225,9 @@ bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
     QSize frameSize(surface->Info.Width, surface->Info.Height);
     result->reset(new QVideoFrame(buffer, frameSize, QVideoFrame::Format_NV12));
     result->get()->setStartTime(surface->Data.TimeStamp);
+
+    //if (!getDevice().device.getRenderer().render(surface))
+     //   return false;
     return true;
 }
 
@@ -241,6 +244,7 @@ mfxFrameSurface1* QuickSyncVideoDecoderImpl::getFreeSurface()
 int QuickSyncVideoDecoderImpl::decode(
     const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result)
 {
+    NX_INFO(this, "Decode");
     mfxBitstream bitstream;
     memset(&bitstream, 0, sizeof(bitstream));
     if (frame)
@@ -283,7 +287,7 @@ int QuickSyncVideoDecoderImpl::decode(
     }
 
     mfxBitstream* pBitstream = frame ? &bitstream : nullptr;
-    mfxStatus sts = MFX_ERR_NONE;
+    mfxStatus status = MFX_ERR_NONE;
 
     mfxFrameSurface1* surface = getFreeSurface();
     if (!surface)
@@ -296,13 +300,13 @@ int QuickSyncVideoDecoderImpl::decode(
 
     do
     {
-        sts = MFXVideoDECODE_DecodeFrameAsync(
+        status = MFXVideoDECODE_DecodeFrameAsync(
             m_mfxSession, pBitstream, surface, &outSurface, &syncp);
 
-        if (MFX_WRN_DEVICE_BUSY == sts)
+        if (MFX_WRN_DEVICE_BUSY == status)
             std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Wait if device is busy
 
-    } while (MFX_WRN_DEVICE_BUSY == sts);
+    } while (MFX_WRN_DEVICE_BUSY == status);
 
     if (pBitstream)
     {
@@ -313,27 +317,28 @@ int QuickSyncVideoDecoderImpl::decode(
     }
 
     // Ignore warnings if output is available (see intel media sdk samples)
-    if (MFX_ERR_NONE < sts && syncp)
-        sts = MFX_ERR_NONE;
+    if (MFX_ERR_NONE < status && syncp)
+        status = MFX_ERR_NONE;
 
-    if (MFX_ERR_NONE != sts)
+    if (MFX_ERR_NONE != status)
     {
-        if (sts < MFX_ERR_NONE)
-            NX_VERBOSE(this, "DecodeFrameAsync failed, error status: %1", sts);
+        if (status < MFX_ERR_NONE && status != MFX_ERR_MORE_DATA)
+            NX_ERROR(this, "DecodeFrameAsync failed, error status: %1", toString(status));
         return m_frameNumber;
     }
 
     // Synchronize. Wait until decoded frame is ready
-    sts = m_mfxSession.SyncOperation(syncp, kSyncWaitMsec);
+    status = m_mfxSession.SyncOperation(syncp, kSyncWaitMsec);
 
-    if (MFX_ERR_NONE != sts)
+    if (MFX_ERR_NONE != status)
     {
-        NX_ERROR(this, "Failed to sync surface: %1", sts);
+        NX_ERROR(this, "Failed to sync surface: %1", toString(status));
         return -1;
     }
     if (!buildQVideoFrame(outSurface, result))
         return -1;
 
+    NX_INFO(this, "New frame");
     return m_frameNumber++;
 }
 

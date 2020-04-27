@@ -95,109 +95,16 @@ bool isCompatible(AVCodecID codec)
     return false;
 }
 
-bool convertToRgb(
-    IDirect3DDevice9Ex *pDevice, mfxFrameSurface1* mfxSurface, IDirect3DSurface9* pSharedSurface)
-{
-    mfxHDLPair* pair = (mfxHDLPair*)mfxSurface->Data.MemId;
-    IDirect3DSurface9* decodedSurface = (IDirect3DSurface9*)pair->first;
-    // Copy the result to the shared surface
-    RECT rc = { 0, 0, mfxSurface->Info.Width, mfxSurface->Info.Height};
-    HRESULT hr = pDevice->BeginScene();
-    if (FAILED(hr))
-    {
-        NX_DEBUG(NX_SCOPE_TAG, "Failed to convert to RGB, begin scene, error code: %1", hr);
-        return false;
-    }
-
-    hr = pDevice->StretchRect(decodedSurface, &rc, pSharedSurface, &rc, D3DTEXF_NONE);
-    if (FAILED(hr))
-    {
-        NX_DEBUG(NX_SCOPE_TAG, "Failed to convert to RGB, stretch rect, error code: %1", hr);
-        return false;
-    }
-
-    hr = pDevice->EndScene();
-    if (FAILED(hr))
-    {
-        NX_DEBUG(NX_SCOPE_TAG, "Failed to convert to RGB, end scene, error code: %1", hr);
-        return false;
-    }
-    return true;
-}
-
-bool renderToRgb(const QVideoFrame& frame, bool isNewTexture, GLuint textureId)
+bool renderToRgb(const QVideoFrame& frame, bool isNewTexture, GLuint textureId, QOpenGLContext* context)
 {
     auto surfaceInfo = frame.handle().value<QuickSyncSurface>();
     auto decoderLock = surfaceInfo.decoder.lock();
     if (!decoderLock)
         return false;
 
-    auto start =  std::chrono::high_resolution_clock::now();
-    SimpleDXDevice& device = decoderLock->getDevice().device;
-
-    IDirect3DSurface9* pRgbSurface = device.GetSharedSurface();
-
-    if (!convertToRgb(device.GetDevice(), surfaceInfo.surface, pRgbSurface))
-        return false;
-
-    if (isNewTexture)
+    if (!decoderLock->getDevice().device.getRenderer().render(surfaceInfo.surface, isNewTexture, textureId, context))
     {
-        /*static PIXELFORMATDESCRIPTOR pfd =
-        {
-            sizeof(PIXELFORMATDESCRIPTOR),  1,
-            PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-            PFD_TYPE_RGBA,
-            32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0,
-            PFD_MAIN_PLANE,
-            0, 0, 0, 0
-        };
-        auto hDC = ::GetDC(device.getWindow());
-        GLuint PixelFormat = ChoosePixelFormat(hDC, &pfd);
-        SetPixelFormat(hDC, PixelFormat, &pfd);
-        auto hRC = wglCreateContext(hDC);
-        wglMakeCurrent(hDC, hRC);
-        
-        GLenum err = glewInit();
-        if (GLEW_OK != err)
-        {
-            NX_DEBUG(NX_SCOPE_TAG, "Failed init glew: %1", glewGetErrorString(err));
-            return false;
-        }
-        
-        wglSwapIntervalEXT(0);
-        wglMakeCurrent(NULL, NULL);
-        wglMakeCurrent(hDC, hRC);*/
-
-        
-//         auto wglSwapIntervalEXT = (WGL_SWAP_INTERVAL_EXT)wglGetProcAddress("wglSwapIntervalEXT");
-//         auto wglDXOpenDeviceNV = (WGL_DX_OPEN_DEVICE_NV)wglGetProcAddress("wglDXOpenDeviceNV");
-//         auto wglDXRegisterObjectNV = (WGL_DX_REGISTER_OBJECT_NV)wglGetProcAddress("wglDXRegisterObjectNV");
-//         auto wglDXSetResourceShareHandleNV =
-//             (WGL_DX_SET_RESOURCE_SHARE_HANDLE_NV)wglGetProcAddress("wglDXSetResourceShareHandleNV");
-
-
-
-
-
-        // Acquire a handle to the D3D device for use in OGL
-        auto hDevice = wglDXOpenDeviceNV(device.GetDevice());
-        if (!hDevice)
-        {
-            NX_DEBUG(NX_SCOPE_TAG, "Failed open device NV");
-            return false;
-        }
-        // This registers a resource that was created as shared in DX with its shared handle
-        HANDLE hSurface = device.GetSharedHandle();
-        BOOL success = wglDXSetResourceShareHandleNV(pRgbSurface, hSurface);
-
-        // g_hTexture is the shared texture data, now identified by the texture name
-        auto err0 = GetLastError();
-        auto hTexture = wglDXRegisterObjectNV(
-            hDevice, pRgbSurface, textureId, GL_TEXTURE_2D, WGL_ACCESS_READ_ONLY_NV);
-        auto err1 = GetLastError();
-        if (hTexture == NULL)
-            return false;
-        wglMakeCurrent(NULL, NULL);
+        return false;
     }
 
     return true;
