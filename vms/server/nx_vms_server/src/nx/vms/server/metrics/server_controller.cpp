@@ -18,7 +18,6 @@
 namespace nx::vms::server::metrics {
 
 static const std::chrono::seconds kUpdateInterval(5);
-static const std::chrono::minutes kTimeChangedInterval(1);
 static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
 
 ServerController::ServerController(QnMediaServerModule* serverModule):
@@ -26,9 +25,6 @@ ServerController::ServerController(QnMediaServerModule* serverModule):
     utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders()),
     m_currentDateTime(&QDateTime::currentDateTime)
 {
-    Qn::directConnect(
-        serverModule->commonModule()->messageProcessor(), &QnCommonMessageProcessor::syncTimeChanged,
-        this, [this](auto) { m_timeChangeEvents++; });
 }
 
 ServerController::~ServerController()
@@ -217,8 +213,19 @@ utils::metrics::ValueProviders<ServerController::Resource> ServerController::mak
         ),
         utils::metrics::makeLocalValueProvider<Resource>(
             "vmsTimeChanged",
-            [this](const auto&) { return Value(m_timeChangeEvents.load()); },
-            timerWatch<QnMediaServerResource*>(kTimeChangedInterval)
+            [this](const auto&) { return Value(m_timeChangeEvents); },
+            [this](const auto& resource, auto onChange)
+            {
+                const auto connection = QObject::connect(
+                    resource->commonModule()->messageProcessor(), &QnCommonMessageProcessor::syncTimeChanged,
+                    [this, onChange = std::move(onChange)](auto)
+                    {
+                        m_timeChangeEvents += 1;
+                        onChange();
+                    });
+
+                return nx::utils::makeSharedGuard([connection]() { QObject::disconnect(connection); });
+            }
         ),
         utils::metrics::makeSystemValueProvider<Resource>(
             "cpu",
