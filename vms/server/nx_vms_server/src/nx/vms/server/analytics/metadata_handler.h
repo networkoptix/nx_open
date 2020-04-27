@@ -77,7 +77,7 @@ private:
     void pushObjectMetadataToSinks(const nx::common::metadata::ObjectMetadataPacket& packet);
 
 private:
-    nx::utils::Mutex m_mutex;
+    nx::Mutex m_mutex;
     QnVirtualCameraResourcePtr m_resource;
     QnUuid m_engineId;
     mutable std::optional<nx::analytics::EventTypeDescriptorMap> m_eventTypeDescriptors;
