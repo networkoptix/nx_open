@@ -9,6 +9,7 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/server_module_aware.h>
 
+#include <nx/vms/server/analytics/types.h>
 #include <nx/vms/server/analytics/metadata_handler.h>
 
 namespace nx::vms::server::analytics {
@@ -30,7 +31,7 @@ public:
     virtual void handlePluginDiagnosticEvent(
         nx::sdk::IPluginDiagnosticEvent* sdkPluginDiagnosticEvent) override;
 
-    void setMetadataSink(QnAbstractDataReceptor* metadataSink);
+    void setMetadataSinks(MetadataSinkSet metadataSinks);
 
 signals:
     void pluginDiagnosticEventTriggered(

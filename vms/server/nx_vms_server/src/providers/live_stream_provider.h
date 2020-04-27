@@ -116,6 +116,8 @@ private:
 
     QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
     void startUnsafe(Priority priority = InheritPriority);
+
+    void connectToAnalyticsDbIfNeeded();
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened.
     // TODO: Find the way to keep it in sync besides pleaseReopenStream() call, which causes delay.
@@ -142,7 +144,7 @@ private:
     QWeakPointer<nx::vms::server::analytics::StreamDataReceptor> m_streamDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
-    QSharedPointer<DataCopier> m_dataReceptorMultiplexer;
+    std::shared_ptr<DataCopier> m_dataReceptorMultiplexer;
     bool m_doNotConfigureCamera = false;
 
     std::unique_ptr<nx::analytics::MetadataLogger> m_metadataLogger;

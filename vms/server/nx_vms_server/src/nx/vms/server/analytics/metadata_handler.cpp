@@ -80,6 +80,8 @@ std::optional<EventTypeDescriptor> MetadataHandler::eventTypeDescriptor(
 
 void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     if (!metadataPacket)
     {
         NX_VERBOSE(this, "%1(): Received null metadata packet; ignoring", __func__);
@@ -180,16 +182,9 @@ void MetadataHandler::handleObjectMetadataPacket(
     data.streamIndex = m_resource->analyzedStreamIndex(m_engineId);
 
     if (data.timestampUs <= 0)
-        NX_WARNING(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUs);
+        NX_DEBUG(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUs);
 
-    if (m_metadataSink && data.timestampUs >= 0) //< Warn about 0 but still accept it.
-        m_metadataSink->putData(nx::common::metadata::toCompressedMetadataPacket(data));
-
-    if (m_visualDebugger)
-        m_visualDebugger->push(nx::common::metadata::toCompressedMetadataPacket(data));
-
-    if (nx::analytics::loggingIni().isLoggingEnabled())
-        m_metadataLogger.pushObjectMetadata(data);
+    pushObjectMetadataToSinks(data);
 }
 
 void MetadataHandler::handleObjectTrackBestShotPacket(
@@ -199,7 +194,7 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
     bestShotPacket.timestampUs = objectTrackBestShotPacket->timestampUs();
     if (bestShotPacket.timestampUs < 0)
     {
-        NX_WARNING(this,
+        NX_DEBUG(this,
             "Invalid ObjectTrackBestShotPacket timestamp: %1, ignoring packet",
             bestShotPacket.timestampUs);
 
@@ -209,9 +204,8 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
     bestShotPacket.durationUs = 0;
     bestShotPacket.deviceId = m_resource->getId();
 
-    // This is not very precise, but is ok, since stream index isn't changed very often.
-    const nx::vms::api::StreamIndex currentStreamIndex = m_resource->analyzedStreamIndex(m_engineId);
-    bestShotPacket.streamIndex = currentStreamIndex;
+    // This is not very precise, but is ok, since stream index isn't changed very often.    
+    bestShotPacket.streamIndex = m_resource->analyzedStreamIndex(m_engineId);
 
     nx::common::metadata::ObjectMetadata bestShot;
     bestShot.trackId =
@@ -225,19 +219,7 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
 
     bestShotPacket.objectMetadataList.push_back(std::move(bestShot));
 
-    if (m_metadataSink)
-    {
-        QnCompressedMetadataPtr compressedMetadata =
-            nx::common::metadata::toCompressedMetadataPacket(bestShotPacket);
-
-        if (currentStreamIndex == nx::vms::api::StreamIndex::secondary)
-            compressedMetadata->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
-
-        m_metadataSink->putData(compressedMetadata);
-    }
-
-    if (nx::analytics::loggingIni().isLoggingEnabled())
-        m_metadataLogger.pushObjectMetadata(bestShotPacket);
+    pushObjectMetadataToSinks(bestShotPacket);
 }
 
 void MetadataHandler::handleEventMetadata(
@@ -252,7 +234,7 @@ void MetadataHandler::handleEventMetadata(
     const auto descriptor = eventTypeDescriptor(eventTypeId);
     if (!descriptor)
     {
-        NX_WARNING(this, "Event %1 is not in the list of Events supported by %2 (%3)",
+        NX_DEBUG(this, "Event %1 is not in the list of Events supported by %2 (%3)",
             eventTypeId,
             m_resource->getUserDefinedName(),
             m_resource->getId());
@@ -296,20 +278,47 @@ void MetadataHandler::handleEventMetadata(
     emit sdkEventTriggered(sdkEvent);
 }
 
-void MetadataHandler::setMetadataSink(QnAbstractDataReceptor* dataReceptor)
+void MetadataHandler::pushObjectMetadataToSinks(
+    const nx::common::metadata::ObjectMetadataPacket& packet)
 {
-    m_metadataSink = dataReceptor;
+    if (nx::analytics::loggingIni().isLoggingEnabled())
+        m_metadataLogger.pushObjectMetadata(packet);
+
+    if (m_metadataSinks.empty())
+    {
+        NX_DEBUG(this, "No metadata sinks are set for the Engine %1 and the Device %2 (%3)",
+            m_engineId, m_resource->getUserDefinedName(), m_resource->getId());
+        return;
+    }
+
+    if (packet.timestampUs < 0) //< Allow packets with 0 timestmap.
+        return;
+
+    const QnCompressedMetadataPtr compressedMetadata =
+        nx::common::metadata::toCompressedMetadataPacket(packet);
+
+    if (packet.streamIndex == nx::vms::api::StreamIndex::secondary)
+        compressedMetadata->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
+
+    if (!NX_ASSERT(compressedMetadata))
+        return;
+
+    bool isOriginalPacketPushed = false;
+    for (const MetadataSinkPtr& sink: m_metadataSinks)
+    {
+        const QnAbstractDataPacketPtr dataPacketToPush = isOriginalPacketPushed
+            ? QnAbstractDataPacketPtr(compressedMetadata->clone())
+            : compressedMetadata;
+
+        isOriginalPacketPushed = true;
+        sink->putData(dataPacketToPush);
+    }
 }
 
-void MetadataHandler::removeMetadataSink(QnAbstractDataReceptor* /*dataReceptor*/)
+void MetadataHandler::setMetadataSinks(MetadataSinkSet metadataSinks)
 {
-    m_metadataSink = nullptr;
-}
-
-void MetadataHandler::setVisualDebugger(
-    nx::debugging::AbstractVisualMetadataDebugger* visualDebugger)
-{
-    m_visualDebugger = visualDebugger;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_metadataSinks = std::move(metadataSinks);
 }
 
 nx::vms::api::EventState MetadataHandler::lastEventState(const QString& eventTypeId) const

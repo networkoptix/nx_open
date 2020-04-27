@@ -612,7 +612,7 @@ public:
         m_settingsBak =
             nx::hpm::api::MediatorConnector::setStunClientSettings(stunClientSettings);
 
-        SocketGlobalsHolder::instance()->reinitialize();
+        nx::network::SocketGlobals::cloud().reinitialize();
 
         m_mediator.setUseProxy(true);
     }

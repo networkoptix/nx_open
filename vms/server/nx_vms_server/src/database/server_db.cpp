@@ -893,7 +893,7 @@ QString QnServerDb::getRequestStr(const QnEventLogFilterData& request,
             .arg(guidToSqlString(request.ruleId));
     }
 
-    requestStr += lit(" ORDER BY rowid");
+    requestStr += lit(" ORDER BY timestamp");
 
     if (order == Qt::DescendingOrder)
         requestStr += lit(" DESC");

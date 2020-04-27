@@ -292,7 +292,7 @@ void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& devi
     auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), camera);
     context->setEnabledAnalyticsEngines(
         camera->enabledAnalyticsEngineResources().filtered<resource::AnalyticsEngineResource>());
-    context->setMetadataSink(metadataSinkUnsafe(camera->getId()));
+    context->setMetadataSinks(metadataSinksUnsafe(camera->getId()));
 
     if (auto source = mediaSourceUnsafe(camera->getId()).toStrongRef())
         source->setProxiedReceptor(context);
@@ -304,7 +304,12 @@ void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& devi
 void Manager::handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& device)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_deviceAnalyticsContexts.erase(device->getId());
+
+    const QnUuid deviceId = device->getId();
+
+    m_deviceAnalyticsContexts.erase(deviceId);
+    m_metadataSinks.erase(deviceId);
+    m_mediaSources.erase(deviceId);
 }
 
 void Manager::at_engineAdded(const AnalyticsEngineResourcePtr& engine)
@@ -411,7 +416,7 @@ std::unique_ptr<metrics::PluginResourceBindingInfoHolder> Manager::bindingInfoHo
 
 void Manager::registerMetadataSink(
     const QnResourcePtr& deviceResource,
-    QWeakPointer<QnAbstractDataReceptor> metadataSink)
+    MetadataSinkPtr metadataSink)
 {
     auto device = deviceResource.dynamicCast<QnVirtualCameraResource>();
     if (!device)
@@ -423,14 +428,18 @@ void Manager::registerMetadataSink(
     }
 
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
+    MetadataSinkSet metadataSinks;
+
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        m_metadataSinks[deviceResource->getId()] = metadataSink;
+        m_metadataSinks[deviceResource->getId()].insert(std::move(metadataSink));
+
+        metadataSinks = m_metadataSinks[deviceResource->getId()];
         analyticsContext = deviceAnalyticsContextUnsafe(device);
     }
 
     if (analyticsContext)
-        analyticsContext->setMetadataSink(metadataSink);
+        analyticsContext->setMetadataSinks(metadataSinks);
 }
 
 QWeakPointer<StreamDataReceptor> Manager::registerMediaSource(
@@ -509,11 +518,12 @@ QJsonObject Manager::getSettings(const QString& engineId) const
     return engine->settingsValues();
 }
 
-QWeakPointer<QnAbstractDataReceptor> Manager::metadataSinkUnsafe(const QnUuid& deviceId) const
+MetadataSinkSet Manager::metadataSinksUnsafe(
+    const QnUuid& deviceId) const
 {
     auto it = m_metadataSinks.find(deviceId);
     if (it == m_metadataSinks.cend())
-        return QWeakPointer<QnAbstractDataReceptor>();
+        return {};
 
     return it->second;
 }

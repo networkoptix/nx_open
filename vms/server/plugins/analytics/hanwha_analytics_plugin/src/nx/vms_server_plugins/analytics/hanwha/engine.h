@@ -90,7 +90,7 @@ private:
 
     std::optional<QSet<QString>> fetchSupportedEventTypeIds(
         const std::shared_ptr<SharedResources>& sharedRes,
-        int channel) const;
+        const nx::sdk::IDeviceInfo* deviceInfo) const;
 
     std::optional<Hanwha::DeviceAgentManifest> buildDeviceAgentManifest(
         const std::shared_ptr<SharedResources>& sharedRes,
@@ -101,7 +101,7 @@ private:
         const nx::utils::Url& url,
         const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
         const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
-        int channel) const;
+        const nx::sdk::IDeviceInfo* deviceInfo) const;
 
     std::shared_ptr<SharedResources> sharedResources(const nx::sdk::IDeviceInfo* deviceInfo);
 

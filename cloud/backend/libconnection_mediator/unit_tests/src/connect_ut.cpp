@@ -44,7 +44,7 @@ protected:
     ConnectTest():
         m_listeningPeerPool(m_settings.listeningPeer())
     {
-        nx::network::SocketGlobalsHolder::instance()->reinitialize();
+        nx::network::SocketGlobals::cloud().reinitialize();
 
         m_relayClusterClient = std::make_unique<RelayClusterClient>(m_settings);
 

@@ -11,21 +11,14 @@
 
 #include <nx/network/http/http_types.h>
 
+#include "literals.h"
+
 namespace nx::dw_tvt {
 
 namespace {
 
-/** Makes proper xml: no indentations, no empty lines, correct endlines. */
-QByteArray operator""_proper_xml(const char* data, size_t size)
-{
-    QByteArray xml(data, size);
-    normalizeEndlines(&xml);
-    unindentLines(&xml);
-    return xml.trimmed();
-}
-
 /**
- @defgroup subscriptionXml Subscription XML
+ * @defgroup subscriptionXml Subscription XML
 
  * Subscription xml consists of the beginning, several (usually up to three) items and the ending.
  * They should be just concatenated. Function "buildSubscriptionXml" does it.
@@ -45,7 +38,7 @@ QByteArray operator""_proper_xml(const char* data, size_t size)
  * %1 - should be replaced with a number of event types.
  * %2 - should be replaced with event type items.
  */
-static QByteArray kSubscriptionXmlPattern = R"(
+static QByteArray kSubscriptionXmlPattern = R"xml(
 <?xml version="1.0" encoding="UTF-8"?>
 <config version="1.0" xmlns="http://www.ipc.com/ver10">
     <types>
@@ -84,7 +77,7 @@ static QByteArray kSubscriptionXmlPattern = R"(
         %2
     </subscribeList>
 </config>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
 /**
  * MOTION - motion detection.
@@ -93,12 +86,12 @@ static QByteArray kSubscriptionXmlPattern = R"(
  * Description in web interface: no description.
  * Detection area: 22x15 matrix.
  */
-static const QByteArray kSubscriptionXmlMotionItem = R"(
+static const QByteArray kSubscriptionXmlMotionItem = R"xml(
 <item>
     <smartType type="openAlramObj">MOTION</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
 /**
  * AVD - abnormal video diagnostic
@@ -110,12 +103,12 @@ static const QByteArray kSubscriptionXmlMotionItem = R"(
  * "Scene change detection", "Video blur detection" and "Video cast detection", which are
  * described as "Scene change", "Abnormal clarity" and "Color abnormal".
  */
-static const QByteArray kSubscriptionXmlAvdItem = R"(
+static const QByteArray kSubscriptionXmlAvdItem = R"xml(
 <item>
     <smartType type="openAlramObj">AVD</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
 /**
  * PEA - some abbreviation, if you know - write it here
@@ -129,12 +122,12 @@ static const QByteArray kSubscriptionXmlAvdItem = R"(
  * The main differences from IPD and CPC is that they people, and PEA - any objects.
  * Also detection areas are set differently (e.g. IPD's area is always a whole frame).
  */
-static const QByteArray kSubscriptionXmlPeaItem = R"(
+static const QByteArray kSubscriptionXmlPeaItem = R"xml(
 <item>
     <smartType type="openAlramObj">PEA</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
 /**
  * VFD - video face detection
@@ -144,12 +137,12 @@ static const QByteArray kSubscriptionXmlPeaItem = R"(
  * Detection area: rectangle.
  * Currently (march 2020) VFD is not supported by DW TVT Camera.
  */
-static const QByteArray kSubscriptionXmlVfdItem = R"(
+static const QByteArray kSubscriptionXmlVfdItem = R"xml(
 <item>
     <smartType type="openAlramObj">VFD</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
 /**
  * CDD - crowd density detection
@@ -158,12 +151,12 @@ static const QByteArray kSubscriptionXmlVfdItem = R"(
  * Description in web interface: "Detect the crowd density in certain area".
  * Detection area: rectangle.
  */
-static const QByteArray kSubscriptionXmlCddItem = R"(
+static const QByteArray kSubscriptionXmlCddItem = R"xml(
 <item>
     <smartType type="openAlramObj">CDD</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
 /**
  * CPC - cross-line people counting
@@ -173,12 +166,12 @@ static const QByteArray kSubscriptionXmlCddItem = R"(
  * in certain area".
  * Detection area: rectangle. Also The direction if people movement is set.
  */
-static const QByteArray kSubscriptionXmlCpcItem = R"(
+static const QByteArray kSubscriptionXmlCpcItem = R"xml(
 <item>
     <smartType type="openAlramObj">CPC</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
 /**
  * IPD - intruding people detection
@@ -187,12 +180,12 @@ static const QByteArray kSubscriptionXmlCpcItem = R"(
  * Description in web interface: "Detect the intrusion people in a closed area".
  * Detection Area: whole frame (no settings in web interface)
  */
-static const QByteArray kSubscriptionXmlIpdItem = R"(
+static const QByteArray kSubscriptionXmlIpdItem = R"xml(
 <item>
     <smartType type="openAlramObj">IPD</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
 /**
  * OSC - object status changed
@@ -201,44 +194,44 @@ static const QByteArray kSubscriptionXmlIpdItem = R"(
  * Description in web interface: "Smart detection of left, lost or moved items".
  * Detection Area: polygon (6 vertices max)
  */
-static const QByteArray kSubscriptionXmlOscItem = R"(
+static const QByteArray kSubscriptionXmlOscItem = R"xml(
 <item>
     <smartType type="openAlramObj">OSC</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
 /** @} */
 
 // New (March, 2020) events
 
-static const QByteArray kSubscriptionXmlAoientryItem = R"(
+static const QByteArray kSubscriptionXmlAoientryItem = R"xml(
 <item>
     <smartType type="openAlramObj">AOIENTRY</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
-static const QByteArray kSubscriptionXmlAoileaveItem = R"(
+static const QByteArray kSubscriptionXmlAoileaveItem = R"xml(
 <item>
     <smartType type="openAlramObj">AOILEAVE</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
-static const QByteArray kSubscriptionXmlPasslinecountItem = R"(
+static const QByteArray kSubscriptionXmlPasslinecountItem = R"xml(
 <item>
     <smartType type="openAlramObj">PASSLINECOUNT</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
-static const QByteArray kSubscriptionXmlTrafficItem = R"(
+static const QByteArray kSubscriptionXmlTrafficItem = R"xml(
 <item>
     <smartType type="openAlramObj">TRAFFIC</smartType>
     <subscribeRelation type="subscribeRelation">ALARM_FEATURE</subscribeRelation>
 </item>
-)"_proper_xml;
+)xml"_linesTrimmed;
 
 /** Map allows to get subscription xml item for the event by its internal name. */
 static const QMap<QByteArray, QByteArray> kXmlItemsByInternalName =
@@ -261,39 +254,6 @@ static const QMap<QByteArray, QByteArray> kXmlItemsByInternalName =
 };
 
 } // namespace
-
-void normalizeEndlines(QByteArray* xml)
-{
-    const QByteArray kSystemEndline = R"(
-)"; //< This line consists of endline marker (i.e. "\n" or "\r\n" or any other, it doesn't matter).
-
-    const QByteArray kDesiredEndline = "\n";
-    xml->replace(kSystemEndline, kDesiredEndline);
-}
-
-void unindentLines(QByteArray* xml)
-{
-    QByteArray result;
-    result.reserve(xml->size());
-
-    bool newLine = true;
-    for (const char c : *xml)
-    {
-        if (newLine)
-        {
-            if (std::isspace(c))
-                continue;
-            else
-                newLine = false;
-        }
-
-        result.push_back(c);
-
-        if (c == '\n')
-            newLine = true;
-    }
-    *xml = result;
-}
 
 QByteArray buildSubscriptionXml(const QSet<QByteArray>& eventInternalNames)
 {
@@ -338,6 +298,7 @@ public:
     {
         m_client.setResponseReadTimeout(std::chrono::seconds(5));
         m_client.setMessageBodyReadTimeout(std::chrono::seconds(5));
+        m_client.addAdditionalHeader("Connection", "close");
     }
 
     void setCgiPreamble(const QByteArray& ip, unsigned short port = 0)
@@ -372,6 +333,12 @@ public:
             return false;
 
         auto optionalBody = m_client.fetchEntireMessageBody();
+
+        // We control DW TVT cameras through one port and receive notifications through the other.
+        // DW TVT has a remarkable bug. If control port is not closed, notification port does not
+        // work correct.
+        // We need to close socket manually after each control request.
+        m_client.socket()->close();
 
         if (!optionalBody)
             return false;

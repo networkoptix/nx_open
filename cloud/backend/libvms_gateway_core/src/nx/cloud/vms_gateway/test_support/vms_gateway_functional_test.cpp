@@ -7,6 +7,7 @@
 #include <thread>
 #include <tuple>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket.h>
@@ -35,7 +36,7 @@ VmsGatewayFunctionalTest::VmsGatewayFunctionalTest(int flags):
 {
     // Starting clean test.
     if ((flags & doNotReinitialiseSocketGlobals) == 0)
-        nx::network::SocketGlobalsHolder::instance()->reinitialize();
+        nx::network::SocketGlobals::cloud().reinitialize();
     m_testHttpServer = std::make_unique<nx::network::http::TestHttpServer>();
 
     m_tmpDir =

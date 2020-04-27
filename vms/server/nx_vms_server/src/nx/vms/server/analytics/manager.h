@@ -14,6 +14,7 @@
 
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/analytics/types.h>
 #include <nx/vms/server/analytics/settings.h>
 #include <nx/vms/server/analytics/rule_holder.h>
 #include <nx/vms/server/metrics/plugin_resource_binding_info_provider.h>
@@ -52,9 +53,7 @@ public:
     virtual std::unique_ptr<metrics::PluginResourceBindingInfoHolder>
         bindingInfoHolder() const override;
 
-    void registerMetadataSink(
-        const QnResourcePtr& deviceResource,
-        QWeakPointer<QnAbstractDataReceptor> metadataSink);
+    void registerMetadataSink(const QnResourcePtr& deviceResource, MetadataSinkPtr metadataSink);
 
     QWeakPointer<StreamDataReceptor> registerMediaSource(
         const QnUuid& deviceId,
@@ -99,7 +98,8 @@ private:
 
     void at_engineInitializationStateChanged(const AnalyticsEngineResourcePtr& engine);
 
-    QWeakPointer<QnAbstractDataReceptor> metadataSinkUnsafe(const QnUuid& deviceId) const;
+    MetadataSinkSet metadataSinksUnsafe(const QnUuid& deviceId) const;
+
     QWeakPointer<ProxyStreamDataReceptor> mediaSourceUnsafe(const QnUuid& deviceId) const;
 
     nx::vms::server::resource::AnalyticsEngineResourceList localEngines() const;
@@ -119,8 +119,8 @@ private:
 
     std::map<QnUuid, QSharedPointer<DeviceAnalyticsContext>> m_deviceAnalyticsContexts;
 
-    // TODO: Switch to std pointers.
-    std::map<QnUuid, QWeakPointer<QnAbstractDataReceptor>> m_metadataSinks;
+    std::map<QnUuid, MetadataSinkSet> m_metadataSinks;
+
     std::map<QnUuid, QSharedPointer<ProxyStreamDataReceptor>> m_mediaSources;
 };
 

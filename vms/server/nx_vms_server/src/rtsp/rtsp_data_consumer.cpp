@@ -603,25 +603,29 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     const bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     const bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     const bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
+    const bool isGenericMetadata = media->dataType == QnAbstractMediaData::GENERIC_METADATA;
     const bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
 
-    if (isVideo || isAudio)
+    if (isVideo)
     {
         const bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
-        if (isKeyFrame && isVideo && gotoNewQuality(isSecondaryProvider))
+        if (isKeyFrame && gotoNewQuality(isSecondaryProvider))
         {
             flushReorderingBuffer();
             setNeedKeyData();
         }
+    }
 
-        if (isLive)
-        {
-            if (!isLowMediaQuality(m_liveQuality) && isSecondaryProvider)
-                return true; // data for other live quality stream
-            else if (isLowMediaQuality(m_liveQuality) && !isSecondaryProvider)
-                return true; // data for other live quality stream
-        }
+    if (isLive && (isVideo || isAudio || isGenericMetadata))
+    {
+        if (!isLowMediaQuality(m_liveQuality) && isSecondaryProvider)
+            return true; // data for other live quality stream
+        else if (isLowMediaQuality(m_liveQuality) && !isSecondaryProvider)
+            return true; // data for other live quality stream
+    }
 
+    if (isAudio || isVideo)
+    {
         const StreamIndex streamIndex = isSecondaryProvider
             ? StreamIndex::secondary
             : StreamIndex::primary;

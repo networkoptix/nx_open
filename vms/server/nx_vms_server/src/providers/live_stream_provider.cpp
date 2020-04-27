@@ -115,30 +115,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
             updateSoftwareMotion();
         });
 
-    m_dataReceptorMultiplexer.reset(new DataCopier());
+    m_dataReceptorMultiplexer = std::make_shared<DataCopier>();
     m_dataReceptorMultiplexer->add(m_metadataReceptor);
-
-    // Forwarding metadata to analytics events DB.
-    if (serverModule())
-    {
-        m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
-            new nx::analytics::db::AnalyticsEventsReceptor(
-                serverModule()->commonModule(),
-                serverModule()->analyticsEventsStorage()));
-        m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
-            new ConditionalDataProxy(
-                m_analyticsEventsSaver,
-                [deviceWeakPtr = m_cameraRes.toWeakRef()](const QnAbstractDataPacketPtr& /*data*/)
-                {
-                    // TODO: Weak pointer solution is temporary. Live stream provider should
-                    // properly unsubscribe from metadata source.
-                    if (const auto device = deviceWeakPtr.toStrongRef())
-                        return device->getStatus() == Qn::Recording;
-
-                    return false;
-                }));
-        m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-    }
 
     connect(this, &QThread::finished,  this,
         [this]()
@@ -188,11 +166,10 @@ void QnLiveStreamProvider::beforeRun()
         m_streamDataReceptor = serverModule()->analyticsManager()->registerMediaSource(
             m_cameraRes->getId(), Qn::toStreamIndex(getRole()));
 
-        if (getRole() == Qn::ConnectionRole::CR_LiveVideo)
-        {
-            serverModule()->analyticsManager()->registerMetadataSink(
-                getResource(), m_dataReceptorMultiplexer.toWeakRef());
-        }
+        connectToAnalyticsDbIfNeeded();
+
+        serverModule()->analyticsManager()->registerMetadataSink(
+            getResource(), m_dataReceptorMultiplexer);
     }
 
     if (nx::analytics::loggingIni().isLoggingEnabled() && !m_metadataLogger)
@@ -625,6 +602,36 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
     {
         return getCameraMetadata();
     }
+}
+
+void QnLiveStreamProvider::connectToAnalyticsDbIfNeeded()
+{
+    if (getRole() != Qn::ConnectionRole::CR_LiveVideo)
+        return;
+
+    NX_DEBUG(this, "Creating Analytics DB connection for Device %1 (%2), stream: %3",
+        m_cameraRes->getUserDefinedName(), m_cameraRes->getId(), getRole());
+
+    const auto analyticsEventReceptor = QnAbstractDataReceptorPtr(
+        new nx::analytics::db::AnalyticsEventsReceptor(
+            serverModule()->commonModule(),
+            serverModule()->analyticsEventsStorage()));
+
+    m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
+        new ConditionalDataProxy(
+            analyticsEventReceptor,
+            [deviceWeakPtr = m_cameraRes.toWeakRef()](
+                const QnAbstractDataPacketPtr& /*data*/)
+            {
+                // TODO: Weak pointer solution is temporary. Live stream provider should
+                // properly unsubscribe from metadata source.
+                if (const auto device = deviceWeakPtr.toStrongRef())
+                    return device->getStatus() == Qn::Recording;
+
+                return false;
+            }));
+
+    m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
 }
 
 QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()

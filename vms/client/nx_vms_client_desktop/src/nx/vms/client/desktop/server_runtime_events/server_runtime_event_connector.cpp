@@ -29,7 +29,7 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
         case ServerRuntimeEventType::deviceAgentSettingsMaybeChanged:
         {
             DeviceAgentSettingsMaybeChangedData result;
-            if (!NX_ASSERT(QJson::deserialize(eventData.eventData, &result)));
+            if (!NX_ASSERT(QJson::deserialize(eventData.eventData, &result)))
                 return;
 
             emit deviceAgentSettingsMaybeChanged(

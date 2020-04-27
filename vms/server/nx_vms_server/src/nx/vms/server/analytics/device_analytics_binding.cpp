@@ -148,7 +148,7 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
         deviceAgentContext.deviceAgent = createDeviceAgentUnsafe();
         if (!deviceAgentContext.deviceAgent)
         {
-            NX_ERROR(this,
+            NX_WARNING(this,
                 "DeviceAgent creation failed for the Engine %1 (%2) and the Device %3 (%4)",
                 m_engine->getName(), m_engine->getId(),
                 m_device->getUserDefinedName(), m_device->getId());
@@ -353,12 +353,12 @@ std::optional<StreamRequirements> DeviceAnalyticsBinding::calculateStreamRequire
         m_device->analyzedStreamIndex(m_engine->getId())};
 }
 
-void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)
+void DeviceAnalyticsBinding::setMetadataSinks(MetadataSinkSet metadataSinks)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_metadataSink = std::move(metadataSink);
+    m_metadataSinks = std::move(metadataSinks);
     if (m_deviceAgentContext.handler)
-        m_deviceAgentContext.handler->setMetadataSink(m_metadataSink.get());
+        m_deviceAgentContext.handler->setMetadataSinks(m_metadataSinks);
 }
 
 bool DeviceAnalyticsBinding::isStreamConsumer() const
@@ -423,7 +423,7 @@ nx::sdk::Ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandlerUnsafe()
 
     auto handler = nx::sdk::makePtr<DeviceAgentHandler>(
         serverModule(), m_engine->getId(), m_device);
-    handler->setMetadataSink(m_metadataSink.get());
+    handler->setMetadataSinks(m_metadataSinks);
 
     return handler;
 }
