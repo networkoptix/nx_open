@@ -79,14 +79,15 @@ bool isVideoInfo(AM_MEDIA_TYPE* mediaType);
 nxcip::CompressionType toNxCodecID(DWORD biCompression);
 
 HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION pinDirection, IPin **ppPin);
-HRESULT getDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * outVar);
 HRESULT enumerateDevices(REFGUID category, IEnumMoniker **ppEnum);
 HRESULT enumerateMediaTypes(
     IMoniker* pMoniker,
     IEnumMediaTypes ** outEnumMediaTypes,
     IPin** outPin = NULL);
 
-HRESULT findDevice(REFGUID category, const std::string& devicePath, IMoniker ** outMoniker);
+using IMonikerPtr = std::unique_ptr<IMoniker, void(*)(IMoniker*)>;
+
+HRESULT findDevice(REFGUID category, const std::string& devicePath, IMonikerPtr* outMoniker);
 
 HRESULT getSupportedCodecs(
     IMoniker *pMoniker,

@@ -65,15 +65,20 @@ BITMAPINFOHEADER *  DShowCompressionTypeDescriptor::videoInfoBitMapHeader() cons
     return videoInfo ? &videoInfo->bmiHeader : nullptr;
 }
 
+IMonikerPtr wrapMoniker(IMoniker* outMoniker)
+{
+    return IMonikerPtr(outMoniker, [](IMoniker* moniker) { moniker->Release(); });
+}
+
 } // namespace
 
 std::string getDeviceName(const std::string& devicePath)
 {
     DShowInitializer init;
-    IMoniker * pMoniker = NULL;
+    IMonikerPtr pMoniker = wrapMoniker(nullptr);
     HRESULT result = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
     if (SUCCEEDED(result) && pMoniker)
-        return getDeviceName(pMoniker);
+        return getDeviceName(pMoniker.get());
     return {};
 }
 
@@ -122,13 +127,10 @@ std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const std::
 
     std::vector<device::CompressionTypeDescriptorPtr> codecList;
 
-    IMoniker * pMoniker = NULL;
+    IMonikerPtr pMoniker = wrapMoniker(nullptr);
     HRESULT result = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
     if (SUCCEEDED(result) && pMoniker)
-        getSupportedCodecs(pMoniker, &codecList);
-
-    if (pMoniker)
-        pMoniker->Release();
+        getSupportedCodecs(pMoniker.get(), &codecList);
 
     return codecList;
 }
@@ -142,16 +144,13 @@ std::vector<ResolutionData> getResolutionList(
 
     std::vector<ResolutionData> resolutionList;
 
-    IMoniker * pMoniker = NULL;
+    IMonikerPtr pMoniker = wrapMoniker(nullptr);
     HRESULT result = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
     if (FAILED(result))
         return {};
 
     if (pMoniker)
-    {
-        getResolutionList(pMoniker, &resolutionList, targetCodec);
-        pMoniker->Release();
-    }
+        getResolutionList(pMoniker.get(), &resolutionList, targetCodec);
 
     return resolutionList;
 }
@@ -162,7 +161,7 @@ void setBitrate(
     const device::CompressionTypeDescriptorPtr& targetCodec)
 {
     DShowInitializer init;
-    IMoniker * pMoniker = NULL;
+    IMonikerPtr pMoniker = wrapMoniker(nullptr);
     HRESULT result = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
     if (FAILED(result))
         return;
@@ -336,16 +335,37 @@ HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION pinDirection, IPin **outPin)
     return E_FAIL;
 }
 
-HRESULT getDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * outVar)
+HRESULT getVariantDeviceProperty(IMoniker* pMoniker, LPCOLESTR propName, VARIANT* outVar)
 {
-    IPropertyBag *bag = NULL;
-    HRESULT result = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**) &bag);
+    IPropertyBag* bag = NULL;
+    HRESULT result = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&bag);
     if (FAILED(result))
         return result;
 
     VariantInit(outVar);
     result = bag->Read(propName, outVar, 0);
     bag->Release();
+    return result;
+}
+
+HRESULT getStrDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, std::string* outVar)
+{
+    VARIANT var;
+    HRESULT result = getVariantDeviceProperty(pMoniker, propName, &var);
+    if (!FAILED(result))
+    {
+        *outVar = toStdString(var.bstrVal);
+        SysFreeString(var.bstrVal);
+    }
+    return result;
+}
+
+HRESULT getLongDeviceProperty(IMoniker* pMoniker, LPCOLESTR propName, LONG* outVar)
+{
+    VARIANT var;
+    HRESULT result = getVariantDeviceProperty(pMoniker, propName, &var);
+    if (!FAILED(result))
+        *outVar = var.lVal;
     return result;
 }
 
@@ -412,7 +432,7 @@ HRESULT enumerateDevices(REFGUID category, IEnumMoniker ** ppEnum)
     return result;
 }
 
-HRESULT findDevice(REFGUID category, const std::string& devicePath, IMoniker ** outMoniker)
+HRESULT findDevice(REFGUID category, const std::string& devicePath, IMonikerPtr* outMoniker)
 {
     IEnumMoniker* pEnum = NULL;
     HRESULT result = enumerateDevices(category, &pEnum);
@@ -424,23 +444,22 @@ HRESULT findDevice(REFGUID category, const std::string& devicePath, IMoniker ** 
     IMoniker* pMoniker = NULL;
     while (S_OK == (result = pEnum->Next(1, &pMoniker, NULL)))
     {
-        VARIANT var;
-        result = getDeviceProperty(pMoniker, L"DevicePath", &var);
+        std::string strResult;
+        result = getStrDeviceProperty(pMoniker, L"DevicePath", &strResult);
         if (FAILED(result))
             return result;
 
         // don't release the moniker in this case, it's the one we are looking for
-        if (wcscmp(var.bstrVal, devicePathBstr) == 0)
+        if (strResult == devicePath)
         {
             pEnum->Release();
-            *outMoniker = pMoniker;
+            *outMoniker = wrapMoniker(pMoniker);
             return result;
         }
         pMoniker->Release();
     }
 
     pEnum->Release();
-    *outMoniker = NULL;
     return result;
 }
 
@@ -563,27 +582,27 @@ std::string toStdString(BSTR bstr)
     if (ch)
     {
         str = ch;
-        delete ch;
+        delete [] ch;
     }
     return str;
 }
 
 std::string getDeviceName(IMoniker *pMoniker)
 {
-    VARIANT var;
-    HRESULT result = getDeviceProperty(pMoniker, L"FriendlyName", &var);
+    std::string strVal;
+    HRESULT result = getStrDeviceProperty(pMoniker, L"FriendlyName", &strVal);
     if (FAILED(result))
         return {};
-    return toStdString(var.bstrVal);
+    return strVal;
 }
 
 std::string getDevicePath(IMoniker *pMoniker)
 {
-    VARIANT var;
-    HRESULT result = getDeviceProperty(pMoniker, L"DevicePath", &var);
+    std::string strVal;
+    HRESULT result = getStrDeviceProperty(pMoniker, L"DevicePath", &strVal);
     if (FAILED(result))
         return {};
-    return toStdString(var.bstrVal);
+    return strVal;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -591,11 +610,11 @@ std::string getDevicePath(IMoniker *pMoniker)
 
 LONG getWaveInID(IMoniker * pMoniker)
 {
-    VARIANT var;
-    HRESULT result = getDeviceProperty(pMoniker, L"WaveInID", &var);
+    LONG longVal = 0;
+    HRESULT result = getLongDeviceProperty(pMoniker, L"WaveInID", &longVal);
     if (FAILED(result))
         return {};
-    return var.lVal;
+    return longVal;
 }
 
 std::string getDisplayName(IMoniker * pMoniker)

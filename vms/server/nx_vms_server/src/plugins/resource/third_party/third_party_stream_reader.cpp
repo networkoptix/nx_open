@@ -647,10 +647,10 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
     const int errorCode = streamReader->getNextData( &packet );
     if( outErrorCode )
         *outErrorCode = errorCode;
-    if( errorCode != nxcip::NX_NO_ERROR || !packet)
-        return QnAbstractMediaDataPtr();    //error reading data
 
     auto packetAp = toPtr(packet);
+    if( errorCode != nxcip::NX_NO_ERROR || !packet)
+        return QnAbstractMediaDataPtr();    //error reading data
 
     QnAbstractMediaDataPtr mediaPacket;
 
