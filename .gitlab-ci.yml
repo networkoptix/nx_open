@@ -1,0 +1,7 @@
+# All actual GitLab pipelines configuration is placed in another repository. The main reason for
+# it is to make pipelines coniguration independent from the branches in the current repository.
+# See: https://docs.gitlab.com/ee/ci/yaml/#include
+
+include:
+  - project: 'dev/ci'
+    file: 'pipelines/review-ci.yml'
