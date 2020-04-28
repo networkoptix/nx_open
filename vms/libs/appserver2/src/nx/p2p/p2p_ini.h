@@ -9,7 +9,7 @@ struct Ini: public nx::kit::IniConfig
     Ini(): IniConfig("nx_p2p.ini") { reload(); }
 
     NX_INI_FLAG(false, forceWebSocketForClient,
-        "Force to use webSocket for clients inspite of user settings to enable/disable webSocket "
+        "Force to use webSocket for clients in spite of user settings to enable/disable webSocket "
         "on the advanced tab.");
 };
 
