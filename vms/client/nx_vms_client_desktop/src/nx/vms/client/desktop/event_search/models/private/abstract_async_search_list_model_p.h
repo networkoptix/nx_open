@@ -51,7 +51,7 @@ protected:
     const FetchInformation& currentRequest() const;
 
 private:
-    AbstractAsyncSearchListModel * const q;
+    AbstractAsyncSearchListModel* const q;
     PrefetchCompletionHandler m_prefetchCompletionHandler;
     FetchInformation m_request;
 };

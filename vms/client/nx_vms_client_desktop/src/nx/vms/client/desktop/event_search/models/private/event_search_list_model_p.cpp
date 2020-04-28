@@ -52,6 +52,25 @@ static const auto upperBoundPredicate =
         return left > startTime(right);
     };
 
+void truncate(ActionDataList& data, AbstractSearchListModel::FetchDirection direction,
+    milliseconds maxTimestamp)
+{
+    if (direction == AbstractSearchListModel::FetchDirection::earlier)
+    {
+        const auto end = std::lower_bound(data.begin(), data.end(), maxTimestamp,
+            lowerBoundPredicate);
+
+        data.erase(data.begin(), end);
+    }
+    else if (NX_ASSERT(direction == AbstractSearchListModel::FetchDirection::later))
+    {
+        const auto begin = std::lower_bound(data.rbegin(), data.rend(), maxTimestamp,
+            lowerBoundPredicate).base();
+
+        data.erase(begin, data.end());
+    }
+}
+
 } // namespace
 
 EventSearchListModel::Private::Private(EventSearchListModel* q):
@@ -200,6 +219,10 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& 
 
             if (success)
             {
+                // Ignore events later than current system time.
+                truncate(data, currentRequest().direction,
+                    duration_cast<milliseconds>(qnSyncTime->currentTimePoint()));
+
                 m_prefetch = std::move(data);
                 if (!m_prefetch.empty())
                 {
@@ -304,24 +327,25 @@ void EventSearchListModel::Private::fetchLive()
         {
             const auto scopedClear = nx::utils::makeScopeGuard([this]() { m_liveFetch = {}; });
 
-            if (!success || data.empty() || !q->isLive() || !requestId || requestId != m_liveFetch.id)
+            if (!success || !q->isLive() || !requestId || requestId != m_liveFetch.id)
+                return;
+
+            // Ignore events later than current system time.
+            truncate(data, m_liveFetch.direction,
+                duration_cast<milliseconds>(qnSyncTime->currentTimePoint()));
+
+            if (data.empty())
                 return;
 
             auto periodToCommit = QnTimePeriod::fromInterval(
                 startTime(data.back()), startTime(data.front()));
-
-            if (data.size() >= m_liveFetch.batchSize)
-            {
-                periodToCommit.truncateFront(periodToCommit.startTimeMs + 1);
-                q->clear(); //< Otherwise there will be a gap between live and archive events.
-            }
 
             ScopedLiveCommit liveCommit(q);
 
             q->addToFetchedTimeWindow(periodToCommit);
 
             NX_VERBOSE(q, "Live update commit");
-            commitInternal(periodToCommit, data.begin(), data.end(), 0, true);
+            commitInternal(periodToCommit, data.rbegin(), data.rend(), 0, true);
 
             if (count() > q->maximumCount())
             {
@@ -332,7 +356,7 @@ void EventSearchListModel::Private::fetchLive()
 
     NX_VERBOSE(q, "Live update request");
 
-    m_liveFetch.id = getEvents(m_liveFetch.period, liveEventsReceived, Qt::DescendingOrder,
+    m_liveFetch.id = getEvents(m_liveFetch.period, liveEventsReceived, Qt::AscendingOrder,
         m_liveFetch.batchSize);
 }
 
