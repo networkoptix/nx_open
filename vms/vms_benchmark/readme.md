@@ -37,3 +37,4 @@ by hand. Now this artifact is just a copied native Python with the required libs
 
 13. Write documentation: in-code comments for classes and other entities.
 
+14. Enable UPX to reduce executable on Windows.

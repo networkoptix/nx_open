@@ -1167,6 +1167,9 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     QnAbstractDataConsumer::putData(data);
     if (video && m_dataQueue.size() < 2)
         hurryUpCkeckForCamera2(video); // check if slow network
+
+    NX_VERBOSE(this, "Media queue size for resource %1 is %2 packets", 
+        m_resource, m_dataQueue.size());
 }
 
 bool QnCamDisplay::canAcceptData() const
@@ -1545,17 +1548,27 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
             doDelayForAudio(ad, speed);
         }
-
+        
         // we synch video to the audio; so just put audio in player with out thinking
         if (m_playAudio && qAbs(speed-1.0) < FPS_EPS)
         {
+            NX_VERBOSE(this, "Sync video to audio for resource %1. "
+                "Current audio buffer size %2, maxSize = %3, isRTS=%4",
+                m_resource, m_audioDisplay->msInBuffer(), m_audioBufferSize, m_isRealTimeSource);
             if (m_audioDisplay->msInBuffer() > m_audioBufferSize)
             {
                 bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && m_hasVideo;
                 if (m_isRealTimeSource || useSync)
+                {
+                    NX_VERBOSE(this, "Skip audio data for resource %1. Current audio buffer size %2 "
+                        "is too large, maxSize = %3",
+                        m_resource, m_audioDisplay->msInBuffer(), m_audioBufferSize);
                     return true; // skip data
+                }
                 else
+                {
                     QnSleep::msleep(40); // Audio buffer too large. waiting
+                }
             }
 
             if (m_audioDisplay->putData(ad, nextVideoImageTime(0)))

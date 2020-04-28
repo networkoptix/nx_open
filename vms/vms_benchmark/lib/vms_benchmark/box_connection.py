@@ -118,6 +118,16 @@ class BoxConnection:
                 raise exceptions.BoxCommandError(message=message)
             else:
                 return self.BoxConnectionResult(None, message, command=command_wrapped)
+        except FileNotFoundError as exception:
+            raise exceptions.VmsBenchmarkError(
+                f'Unable to find plink executable file: {run_args[0]!r}',
+                original_exception=exception
+            )
+        except PermissionError as exception:
+            raise exceptions.VmsBenchmarkError(
+                f'Unable to run plink executable file: {run_args[0]!r}',
+                original_exception=exception
+            )
 
         logging.info(
             f"Remote command finished with exit status {run.returncode}\n"

@@ -62,7 +62,6 @@ from vms_benchmark import service_objects
 from vms_benchmark import box_tests
 from vms_benchmark import host_tests
 from vms_benchmark import exceptions
-from vms_benchmark.config import NoConfigFile
 
 vms_version = None
 
@@ -186,7 +185,7 @@ def load_configs(conf_file, ini_file):
     ini = _load_config_file(ini_file, ini_file_default, ini_definition, False)
 
     def path_from_config(path):
-        return path if Path(path).is_absolute() else benchmark_bin_path / path
+        return path if Path(path).is_absolute() else str(benchmark_bin_path / path)
 
     test_camera_runner.ini_testcamera_bin = path_from_config(ini['testcameraBin'])
     test_camera_runner.ini_test_file_high_resolution = path_from_config(
@@ -1134,7 +1133,13 @@ def _connect_to_box(conf):
         port=conf['boxSshPort'],
     )
     if platform.system() == 'Windows':
-        host_key = service_objects.SshHostKeyObtainer(box, conf).call()
+        try:
+            host_key = service_objects.SshHostKeyObtainer(box, conf).call()
+        except exceptions.SshHostKeyObtainingFailed as exception:
+            raise exceptions.BoxCommandError(
+                f'Unable to connect to the box via ssh; check box credentials in {conf.filepath!r}',
+                original_exception=exception
+            )
         box.supply_host_key(host_key)
 
     try:
@@ -1156,7 +1161,7 @@ def _connect_to_box(conf):
             raise exceptions.SshHostKeyObtainingFailed(
                 'Sudo is not configured properly, check that user is root or can run `sudo true` '
                 'without typing a password.\n'
-                f"Details of the error: {res.formatted_message()}"
+                f"Details of the error:\n{res.formatted_message()}"
             )
     return box
 
