@@ -120,12 +120,12 @@ class BoxConnection:
                 return self.BoxConnectionResult(None, message, command=command_wrapped)
         except FileNotFoundError as exception:
             raise exceptions.VmsBenchmarkError(
-                f'Unable to find plink executable file: {run_args[0]!r}.',
+                f'Unable to find plink executable file: {run_args[0]!r}',
                 original_exception=exception
             )
         except PermissionError as exception:
             raise exceptions.VmsBenchmarkError(
-                f'Unable to run plink executable file: {run_args[0]!r}.',
+                f'Unable to run plink executable file: {run_args[0]!r}',
                 original_exception=exception
             )
 

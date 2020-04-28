@@ -33,7 +33,7 @@ class SshHostKeyObtainer:
                 )
             else:
                 logging.error(
-                    'Obtaining host key failed: %s. plink closed without error messages',
+                    'Obtaining host key failed: %s. plink closed without error messages.',
                     reason
                 )
             raise SshHostKeyObtainingFailed('Unable to obtain ssh host key of the box.')
