@@ -22,6 +22,7 @@
 #include <nx/p2p/p2p_server_message_bus.h>
 #include <nx/p2p/transport/p2p_http_server_transport.h>
 #include <nx/p2p/transport/p2p_websocket_transport.h>
+#include <nx/p2p/p2p_ini.h>
 
 namespace nx {
 namespace p2p {
@@ -324,7 +325,9 @@ void ConnectionProcessor::run()
     if (!tryAcquireConnected(sameDirectionConnectionLockGuard, remotePeer))
         return;
 
-    bool useWebSocket = commonModule()->globalSettings()->isWebSocketEnabled()
+    const bool forcedForClient = !remotePeer.isServer() 
+        && ini().forceWebSocketForClient; //< For test purpose only.
+    bool useWebSocket = (commonModule()->globalSettings()->isWebSocketEnabled() || forcedForClient)
         && !d->request.requestLine.url.path().contains(ConnectionBase::kHttpUrlPath);
 
 
