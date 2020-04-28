@@ -67,11 +67,17 @@ std::optional<QSet<QString>> parseEventTypes(const std::string& jsonReply)
     std::string error;
     nx::kit::Json json = nx::kit::Json::parse(jsonReply, error);
     if (!json.is_object())
+    {
+        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. Root is not an object"));
         return std::nullopt;
+    }
 
     const nx::kit::Json jsonChannelEvent = json["ChannelEvent"];
     if (!jsonChannelEvent.is_array())
+    {
+        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. \"ChannelEvent\" field absent"));
         return std::nullopt;
+    }
 
     QSet<QString> result;
     auto items = jsonChannelEvent[0].object_items();
@@ -595,21 +601,31 @@ std::optional<QSet<QString>> DeviceAgent::getRealSupportedEventTypes()
     nx::utils::Url command(m_url);
     constexpr const char* kEventPath = "/stw-cgi/eventstatus.cgi";
     command.setPath(kEventPath);
-    command.setQuery(QString::fromStdString(query));
+    command.setQuery(QString::fromUtf8(query));
     command = NvrValueTransformer(m_channelNumber).transformUrl(command);
 
     auto settingsHttpClient = createSettingsHttpClient();
     const bool isSent = settingsHttpClient->doGet(command);
     if (!isSent)
+    {
+        NX_DEBUG(this, NX_FMT("Request failed. Url = %1", command));
         return std::nullopt;
+    }
 
     auto* response = settingsHttpClient->response();
     if (response->statusLine.statusCode != 200)
+    {
+        NX_DEBUG(this, NX_FMT("Request returned status code %1. Url = %2",
+            response->statusLine.statusCode, command));
         return std::nullopt;
+    }
 
     auto messageBodyOptional = settingsHttpClient->fetchEntireMessageBody();
     if (!messageBodyOptional)
-        return std::nullopt;
+    {
+        NX_DEBUG(this, NX_FMT("Request returned unexpected empty body. Url = %1", command));
+            return std::nullopt;
+    }
 
     std::string body = messageBodyOptional->toStdString();
     return parseEventTypes(body);

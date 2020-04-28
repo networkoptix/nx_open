@@ -12,6 +12,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/std/algorithm.h>
 
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/error.h>
@@ -422,7 +423,7 @@ std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
     const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
     const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
     const IDeviceInfo* deviceInfo,
-    std::optional<QSet<QString>> filter) const
+    const std::optional<QSet<QString>>& filter) const
 {
     if (!parameters.isValid())
     {
@@ -457,13 +458,11 @@ std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
 
     if (filter)
     {
-        QSet<QString> supportedEventTypesAsSet;
-        for (const QString& string : supportedEventTypes)
-            supportedEventTypesAsSet.insert(string);
-        supportedEventTypesAsSet.intersect(*filter);
-        supportedEventTypes.clear();
-        for (const QString& string: supportedEventTypesAsSet)
-            supportedEventTypes.push_back(string);
+        nx::utils::remove_if(supportedEventTypes,
+            [&filter](const QString& value)
+            {
+                return !filter->contains(value);
+            });
     }
 
     NX_VERBOSE(this,
