@@ -37,7 +37,7 @@ protected:
     void createUdpSocket()
     {
         m_udpSocket = ::socket(kIpVersion, SOCK_DGRAM, 0);
-        ASSERT_NE(INVALID_SOCKET, m_udpSocket)
+        ASSERT_NE(INVALID_UDP_SOCKET, m_udpSocket)
             << SystemError::getLastOSErrorText().toStdString();
     }
 
@@ -49,13 +49,13 @@ protected:
             ::close(m_udpSocket);
         #endif
 
-        m_udpSocket = INVALID_SOCKET;
+        m_udpSocket = INVALID_UDP_SOCKET;
     }
 
 private:
     std::optional<Result<int>> m_lastSendResult;
     std::unique_ptr<::UdpChannel> m_channel;
-    UDPSOCKET m_udpSocket = INVALID_SOCKET;
+    UDPSOCKET m_udpSocket = INVALID_UDP_SOCKET;
 };
 
 TEST_F(UdpChannel, error_reported)
