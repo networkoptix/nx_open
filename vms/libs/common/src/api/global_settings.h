@@ -413,6 +413,9 @@ public:
     bool keepHanwhaIoPortStateIntactOnInitialization() const;
     void setKeepHanwhaIoPortStateIntactOnInitialization(bool value);
 
+
+    int rtspBufferSizeKb() const;
+    void setRtspBufferSizeKb(int value);
 signals:
     void initialized();
 
@@ -584,6 +587,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_pushNotificationsLanguageAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_additionalLocalFsTypesAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_keepHanwhaIoPortStateIntactOnInitializationAdaptor= nullptr;
+    QnResourcePropertyAdaptor<int>* m_rtspBufferSizeKbAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 
