@@ -74,17 +74,21 @@ std::string Error::prepareErrorText()
     {
 #if defined(_WIN32)
         LPVOID lpMsgBuf;
-        FormatMessage(
+        const auto msgLen = FormatMessage(
             FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL,
             m_osError,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        text = converter.to_bytes(std::wstring((wchar_t*)lpMsgBuf));
-        LocalFree(lpMsgBuf);
 
-        while (!text.empty() && std::isspace(text.back()))
-            text.pop_back();
+        if (msgLen > 0)
+        {
+            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+            text = converter.to_bytes((wchar_t*) lpMsgBuf, ((wchar_t*) lpMsgBuf) + msgLen);
+            LocalFree(lpMsgBuf);
+
+            while (!text.empty() && std::isspace(text.back()))
+                text.pop_back();
+        }
 #else
         char errmsg[1024];
         if (strerror_r(m_osError, errmsg, 1024) == 0)
