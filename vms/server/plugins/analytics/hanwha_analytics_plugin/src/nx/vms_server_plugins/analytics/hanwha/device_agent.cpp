@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iostream>
 #include <charconv>
+#include <string>
+#include <vector>
 
 #include <QtCore/QUrl>
 
@@ -54,6 +56,32 @@ std::optional<std::string> parseError(const std::string& jsonReply)
         return json["Error"]["Details"].string_value(); //< may be empty
 
     return std::nullopt; //< not an error
+}
+
+/**
+ * Parse the reply to check eventstatus BYPASS request to get the list of event types, supported by
+ * the device, connected to the current channel of NVR.
+ */
+std::optional<QSet<QString>> parseEventTypes(const std::string& jsonReply)
+{
+    std::string error;
+    nx::kit::Json json = nx::kit::Json::parse(jsonReply, error);
+    if (!json.is_object())
+        return std::nullopt;
+
+    const nx::kit::Json jsonChannelEvent = json["ChannelEvent"];
+    if (!jsonChannelEvent.is_array())
+        return std::nullopt;
+
+    QSet<QString> result;
+    auto items = jsonChannelEvent[0].object_items();
+    for (const auto& [key, value]: items)
+    {
+        if (key != "Channel") //< Channel is a special field, not an EventType
+            result.insert(QString::fromStdString(key));
+    }
+
+    return result;
 }
 
 /** Extract frameSize from json string. If fail, returns std::nullopt. */
@@ -555,6 +583,36 @@ std::unique_ptr<nx::network::http::HttpClient> DeviceAgent::createSettingsHttpCl
     result->setUserPassword(m_auth.password());
     result->addAdditionalHeader("Accept", "application/json");
     return result;
+}
+
+/**
+ * Used for NVRs only. Get the event types, supported directly by the device, not by NVR channel.
+ */
+std::optional<QSet<QString>> DeviceAgent::getRealSupportedEventTypes()
+{
+    constexpr const char* query = "msubmenu=eventstatus&action=check&Channel=0";
+
+    nx::utils::Url command(m_url);
+    constexpr const char* kEventPath = "/stw-cgi/eventstatus.cgi";
+    command.setPath(kEventPath);
+    command.setQuery(QString::fromStdString(query));
+    command = NvrValueTransformer(m_channelNumber).transformUrl(command);
+
+    auto settingsHttpClient = createSettingsHttpClient();
+    const bool isSent = settingsHttpClient->doGet(command);
+    if (!isSent)
+        return std::nullopt;
+
+    auto* response = settingsHttpClient->response();
+    if (response->statusLine.statusCode != 200)
+        return std::nullopt;
+
+    auto messageBodyOptional = settingsHttpClient->fetchEntireMessageBody();
+    if (!messageBodyOptional)
+        return std::nullopt;
+
+    std::string body = messageBodyOptional->toStdString();
+    return parseEventTypes(body);
 }
 
 /**

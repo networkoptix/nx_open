@@ -72,7 +72,7 @@ static bool isFirmwareActual(const std::string& firmwareVersion)
     if (revision == 99 && (minor % 10) == 9)
         return false; //< beta version
 
-    return major >= 1 && minor >= 41;
+    return major > 1 || (major == 1 && minor >= 41);
 }
 
 template <typename Pred>
@@ -212,8 +212,12 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
     const std::string firmwareVersion = deviceAgent->fetchFirmwareVersion();
     const bool areSettingsAndTrackingAllowed = isFirmwareActual(firmwareVersion);
 
+    std::optional<QSet<QString>> eventTypeFilter;
+    if (isNvr)
+        eventTypeFilter = deviceAgent->getRealSupportedEventTypes();
+
     auto deviceAgentManifest = buildDeviceAgentManifest(sharedRes,
-        deviceInfo, areSettingsAndTrackingAllowed);
+        deviceInfo, areSettingsAndTrackingAllowed, eventTypeFilter);
 
     if (!deviceAgentManifest)
         return;
@@ -253,7 +257,8 @@ void Engine::getManifest(Result<const IString*>* outResult) const
 std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
     const std::shared_ptr<SharedResources>& sharedRes,
     const IDeviceInfo* deviceInfo,
-    bool areSettingsAndTrackingAllowed) const
+    bool areSettingsAndTrackingAllowed,
+    std::optional<QSet<QString>> filter) const
 {
     Hanwha::DeviceAgentManifest deviceAgentManifest;
 
@@ -273,7 +278,9 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
             deviceInfo->name(), deviceInfo->id());
     }
 
-    auto supportedEventTypeIds = fetchSupportedEventTypeIds(sharedRes, deviceInfo);
+    std::optional<QSet<QString>> supportedEventTypeIds =
+        fetchSupportedEventTypeIds(sharedRes, deviceInfo, filter);
+
     if (!supportedEventTypeIds)
     {
         NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
@@ -325,6 +332,10 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
             });
     }
 
+    // Stream selection is always disabled.
+    deviceAgentManifest.capabilities.setFlag(
+        nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
+
     return deviceAgentManifest;
 }
 
@@ -374,7 +385,8 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
 
 std::optional<QSet<QString>> Engine::fetchSupportedEventTypeIds(
     const std::shared_ptr<SharedResources>& sharedRes,
-    const IDeviceInfo* deviceInfo) const
+    const IDeviceInfo* deviceInfo,
+    std::optional<QSet<QString>> filter) const
 {
     const auto& information = sharedRes->sharedContext->information();
     if (!information)
@@ -402,16 +414,15 @@ std::optional<QSet<QString>> Engine::fetchSupportedEventTypeIds(
 
     return eventTypeIdsFromParameters(
         sharedRes->sharedContext->url(),
-        cgiParameters,
-        eventStatuses.value,
-        deviceInfo);
+        cgiParameters, eventStatuses.value, deviceInfo, filter);
 }
 
 std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
     const nx::utils::Url& url,
     const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
     const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
-    const IDeviceInfo* deviceInfo) const
+    const IDeviceInfo* deviceInfo,
+    std::optional<QSet<QString>> filter) const
 {
     if (!parameters.isValid())
     {
@@ -432,7 +443,7 @@ std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
 
     QSet<QString> result;
 
-    auto supportedEventTypes = supportedEventTypesParameter->possibleValues();
+    QStringList supportedEventTypes = supportedEventTypesParameter->possibleValues();
     const auto alarmInputParameter = parameters.parameter(
         "eventstatus/eventstatus/monitor/AlarmInput");
 
@@ -442,6 +453,17 @@ std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
             alarmInputParameter->name(), deviceInfo->name(), deviceInfo->id());
 
         supportedEventTypes.push_back(alarmInputParameter->name());
+    }
+
+    if (filter)
+    {
+        QSet<QString> supportedEventTypesAsSet;
+        for (const QString& string : supportedEventTypes)
+            supportedEventTypesAsSet.insert(string);
+        supportedEventTypesAsSet.intersect(*filter);
+        supportedEventTypes.clear();
+        for (const QString& string: supportedEventTypesAsSet)
+            supportedEventTypes.push_back(string);
     }
 
     NX_VERBOSE(this,
