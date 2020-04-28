@@ -1161,7 +1161,7 @@ def _connect_to_box(conf):
             raise exceptions.SshHostKeyObtainingFailed(
                 'Sudo is not configured properly, check that user is root or can run `sudo true` '
                 'without typing a password.\n'
-                f"Details of the error: {res.formatted_message()}"
+                f"Details of the error:\n{res.formatted_message()}"
             )
     return box
 

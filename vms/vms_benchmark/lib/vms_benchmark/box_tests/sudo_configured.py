@@ -23,7 +23,8 @@ class SudoConfigured:
         if not res or res.return_code != 0 or obtained_test_message != test_message:
             return BoxTestResult(
                 success=False,
-                message=f"Command `{res.command}` failed: {str(error_message.getvalue().strip())}"
+                message="Command `{0}` failed: {1}",
+                details=(res.command, str(error_message.getvalue().strip()))
             )
 
         return BoxTestResult(success=True)
