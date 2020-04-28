@@ -28,7 +28,7 @@ public:
 
 private:
     std::deque<char>* m_tempBuffer;
-    const nx::Buffer& m_buffer;
+    const nx::Buffer m_buffer;
     std::size_t m_position;
 
     bool ensure(std::size_t byteSize, void* buffer);
