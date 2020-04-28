@@ -25,11 +25,17 @@ class SshHostKeyObtainer:
         )
 
         def fail(reason):
-            logging.error(
-                'Obtaining host key failed: %s. plink reported:\n%r',
-                reason,
-                error_messages
-            )
+            if error_messages:
+                logging.error(
+                    'Obtaining host key failed: %s. plink reported:\n%r',
+                    reason,
+                    error_messages
+                )
+            else:
+                logging.error(
+                    'Obtaining host key failed: %s. plink closed without error messages',
+                    reason
+                )
             raise SshHostKeyObtainingFailed('Unable to obtain ssh host key of the box.')
 
         if error_messages:
@@ -54,7 +60,7 @@ class SshHostKeyObtainer:
             if error_messages:
                 logging.error('Connecting via ssh failed: plink reported:\n%r', error_messages)
             else:
-                logging.error("Connecting via ssh failed: plink closed without error messages")
+                logging.error('Connecting via ssh failed: plink closed without error messages.')
         else:
             logging.error(
                 'Obtaining host key failed: plink executed successfully, but reported no messages.'
