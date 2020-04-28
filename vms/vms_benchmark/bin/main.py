@@ -1133,7 +1133,13 @@ def _connect_to_box(conf):
         port=conf['boxSshPort'],
     )
     if platform.system() == 'Windows':
-        host_key = service_objects.SshHostKeyObtainer(box, conf).call()
+        try:
+            host_key = service_objects.SshHostKeyObtainer(box, conf).call()
+        except exceptions.SshHostKeyObtainingFailed as exception:
+            raise exceptions.BoxCommandError(
+                f'Unable to connect to the box via ssh; check box credentials in {conf.filepath!r}',
+                original_exception=exception
+            )
         box.supply_host_key(host_key)
 
     try:
