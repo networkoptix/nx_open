@@ -141,7 +141,8 @@
             maxEventLogRecords: {type: 'number'},
 
             forceLiveCacheForPrimaryStream: {type: 'text'},
-            additionalLocalFsTypes: {type: 'text'}
+            additionalLocalFsTypes: {type: 'text'},
+            rtspBufferSizeKb: {type: 'number'}
         },
         webclient: {
             useServerTime: true,

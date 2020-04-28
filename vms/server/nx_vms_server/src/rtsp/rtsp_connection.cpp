@@ -1742,7 +1742,7 @@ void QnRtspConnectionProcessor::run()
     // NOTE: Sending data bigger than socket's send buffer size causes unexpected delays in some
     // scenarios. E.g., when streaming within a single Linux PC (VMS-11880).
     // Also, send buffer size cannot be set to a value less than 32K in Linux.
-    d->socket->setSendBufferSize(64*1024);
+    d->socket->setSendBufferSize(globalSettings()->rtspBufferSizeKb() * 1024);
 
     if (d->clientRequest.isEmpty())
         readRequest();
