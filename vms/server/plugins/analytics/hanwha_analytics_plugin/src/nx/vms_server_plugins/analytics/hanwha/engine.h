@@ -103,13 +103,8 @@ private:
         const nx::utils::Url& url,
         const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
         const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
-<<<<<<< HEAD
         const nx::sdk::IDeviceInfo* deviceInfo,
-        std::optional<QSet<QString>> filter) const;
-=======
-        int channel,
         const std::optional<QSet<QString>>& filter) const;
->>>>>>> VMS-17891. Plugins tab is displayed for active NVR channel. Review fix
 
     std::shared_ptr<SharedResources> sharedResources(const nx::sdk::IDeviceInfo* deviceInfo);
 
