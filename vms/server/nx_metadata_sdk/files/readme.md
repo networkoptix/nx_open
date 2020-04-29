@@ -15,8 +15,8 @@ See the license texts in `license_*.md` files in the root directory of this pack
 ---------------------------------------------------------------------------------------------------
 ## Introduction
 
-This package provides an SDK to create so-called Analytics Plugins for the Video Management System
-(VMS).
+This package provides an SDK to create Analytics Plugins for the Video Management System (VMS).
+Such plugins can analyze video streams and produce metadata.
 
 From the business logic point of view, a typical Analytics Plugin is connected to a video camera,
 may receive video frames from the camera or interact with the camera using a certain proprietary

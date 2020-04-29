@@ -73,7 +73,7 @@ else()
 endif()
 
 if(targetDevice STREQUAL "windows-x64")
-    set(compilingOptions "")
+    set(compilingOptions "-Tv140") #< Use MSVC 2015 compiler.
 else()
     if(targetDevice STREQUAL "linux_arm32"
         OR targetDevice STREQUAL "bpi"

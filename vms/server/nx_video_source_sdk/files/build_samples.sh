@@ -1,17 +1,22 @@
 #!/bin/bash
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-# NOTE: If cmake cannot find Qt, add the following arg to this script (will be passed to cmake):
-# -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
-
 set -e #< Exit on error.
 set -u #< Prohibit undefined variables.
+
+if [[ $# > 0 && ($1 == "/?" || $1 == "-h" || $1 == "--help") ]]
+then
+    echo "Usage: $(basename "$0") [--with-rpi-samples] [--release] [<cmake-generation-args>...]"
+    echo "NOTE: If cmake cannot find Qt, add the following arg to this script (will be passed to cmake):"
+    echo "-DCMAKE_PREFIX_PATH=<full-path-to-Qt5-dir>"
+    exit
+fi
 
 # Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 BASE_DIR=$(readlink -f "$(dirname "$0")") #< Absolute path to this script's dir.
 BUILD_DIR="$BASE_DIR-build"
 
-if (($# > 0)) && [[ $1 == "--with-rpi-samples" ]]
+if [[ $# > 0 && $1 == "--with-rpi-samples" ]]
 then
     shift
     WITH_RPI_SAMPLES=1
@@ -19,11 +24,23 @@ else
     WITH_RPI_SAMPLES=0
 fi
 
+if [[ $# > 0 && $1 == "--release" ]]
+then
+    shift
+    BUILD_TYPE=Release
+else
+    BUILD_TYPE=Debug
+fi
+
 case "$(uname -s)" in #< Check if running in Windows from Cygwin/MinGW.
     CYGWIN*|MINGW*)
-        GEN_OPTIONS=( -Ax64 -Tv140,host=x64 ) #< Generate for Visual Studio 2015 compiler.
+        GEN_OPTIONS=( -Ax64 )
         BASE_DIR=$(cygpath -w "$BASE_DIR") #< Windows-native cmake requires Windows path.
         BUILD_OPTIONS=()
+        if [[ $BUILD_TYPE == Release ]]
+        then
+            BUILD_OPTIONS+=( --config $BUILD_TYPE )
+        fi
         ;;
     *) # Assume Linux; use Ninja if it is available on PATH.
         if which ninja >/dev/null
@@ -33,6 +50,10 @@ case "$(uname -s)" in #< Check if running in Windows from Cygwin/MinGW.
         else
             GEN_OPTIONS=() #< Generate for GNU make and gcc.
             BUILD_OPTIONS=( -- -j ) #< Use all available CPU cores.
+        fi
+        if [[ $BUILD_TYPE == Release ]]
+        then
+            GEN_OPTIONS+=( -DCMAKE_BUILD_TYPE=$BUILD_TYPE )
         fi
         ;;
 esac
@@ -64,8 +85,7 @@ do
         exit 64
     fi
     echo ""
-    echo "Plugin built:"
-    echo "$ARTIFACT"
+    echo "Plugin built: $ARTIFACT"
     echo ""
 done
 
