@@ -130,7 +130,7 @@ macro(load_dependencies)
         if(NOT DEFINED CACHE{useSystemStdcpp})
             set(useSystemStdcpp OFF)
 
-            if(arch MATCHES "x64|x86")
+            if(NOT developerBuild AND arch MATCHES "x64|x86")
                 execute_process(
                     COMMAND ${CMAKE_CXX_COMPILER} --print-file-name libstdc++.so.6
                     OUTPUT_VARIABLE stdcpp_lib_path
