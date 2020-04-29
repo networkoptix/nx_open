@@ -135,8 +135,8 @@ static bool recursiveRemove(const QnStorageResourcePtr& storage, const QString& 
 
 static void removeEmptyDirs(const QnStorageResourcePtr& storage)
 {
-    QElapsedTimer timer;
-    timer.start();
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
     const auto rootPath = closeDirPath(storage->getUrl());
     for (const auto& qualityPath: {rootPath + "hi_quality", rootPath + "low_quality"})
     {
@@ -146,7 +146,7 @@ static void removeEmptyDirs(const QnStorageResourcePtr& storage)
                 recursiveRemove(storage, fileInfo.absoluteFilePath());
         }
     }
-    NX_INFO(typeid(QnStorageManager), "removeEmptyDirs: Finished. %1ms elapsed", timer.elapsed());
+    NX_INFO(typeid(QnStorageManager), "removeEmptyDirs: Finished. %1 elapsed", timer.elapsed());
 }
 
 } // namespace
