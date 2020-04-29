@@ -66,7 +66,7 @@ private:
     void stopFetchingMetadata();
 
 public:
-    std::optional<QSet<QString>> DeviceAgent::getRealSupportedEventTypes();
+    std::optional<QSet<QString>> getRealSupportedEventTypes();
 
 private:
     std::string sendWritingRequestToDeviceSync(const std::string& query);
