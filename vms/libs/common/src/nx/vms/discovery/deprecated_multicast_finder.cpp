@@ -196,7 +196,7 @@ bool DeprecatedMulticastFinder::processDiscoveryRequest(UDPSocket *udpSocket)
     if (bytesRead == -1)
     {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-        NX_ERROR(this, lm("Failed to read socket on local address (%1). %2").args(
+        NX_WARNING(this, lm("Failed to read socket on local address (%1). %2").args(
             udpSocket->getLocalAddress(), SystemError::toString(prevErrorCode)));
         return false;
     }
@@ -265,7 +265,7 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
     if (bytesRead == -1)
     {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-        NX_ERROR(this, lm("Failed to read response on local address (%1). %2").args(
+        NX_WARNING(this, lm("Failed to read response on local address (%1). %2").args(
             udpSocket->getLocalAddress(), SystemError::toString(prevErrorCode)));
         return false;
     }
@@ -396,7 +396,7 @@ void DeprecatedMulticastFinder::run()
             if (prevErrorCode == SystemError::interrupted)
                 continue;
 
-            NX_ERROR(this, lit("Poll failed. %1").arg(SystemError::toString(prevErrorCode)));
+            NX_WARNING(this, lit("Poll failed. %1").arg(SystemError::toString(prevErrorCode)));
             msleep(errorWaitTimeoutMs);
             continue;
         }

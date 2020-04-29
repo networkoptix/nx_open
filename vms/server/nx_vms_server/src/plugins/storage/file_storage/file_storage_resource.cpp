@@ -845,7 +845,7 @@ bool QnFileStorageResource::testWriteCapInternal() const
     }
 #endif
 
-    NX_ERROR(
+    NX_WARNING(
         this, "[initOrUpdate, WriteTest] Open file '%1' for writing failed",
         hidePassword(fileName));
 
