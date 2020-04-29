@@ -861,21 +861,25 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
             result.replace('\\', '/');
             return result;
         };
+
     static const auto trim = [](const QString& p) { return p.left(p.lastIndexOf('/')); };
+    const bool isMultiInstances = serverModule()->settings().enableMultipleInstances();
 
     #if defined (Q_OS_WIN)
         if (isExternal())
             return Qn::StorageInit_Ok; //< #TODO #akulikov Implement real check by looking at opened samba connections
 
-        const auto path = trim(normalize(getUrl()));
+        const auto path =
+            isMultiInstances ? trim(trim(normalize(getUrl()))) : trim(normalize(getUrl()));
     #else
         const bool isApiMountedSmb = !getLocalPathSafe().isEmpty();
-        const bool isMultiInstances = serverModule()->settings().enableMultipleInstances();
         const auto fsPath = normalize(getFsPath());
         const auto path = m_mockableCallFactory.canonicalPath(
             isApiMountedSmb
-                ? fsPath
-                : isMultiInstances ? trim(trim(fsPath)) : trim(fsPath));
+                ? fsPath //< There is no postfix for user-mounted storage paths. Nothing to trim.
+                : isMultiInstances
+                    ? trim(trim(fsPath)) //< Path looks like /existing/path/HD Witness Media/{server-guid}. Two trims are required.
+                    : trim(fsPath)); //< Path looks like /existing/path/HD Witness Media/. One trims is required.
     #endif
 
     bool isMounted = false;
