@@ -16,6 +16,7 @@ enum class ServerRuntimeEventType
     undefined = 0,
     deviceAgentSettingsMaybeChanged = 1,
     deviceFootageChanged = 2,
+    analyticsStorageParametersChanged = 3,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerRuntimeEventType)
 
@@ -39,7 +40,7 @@ struct NX_VMS_API DeviceAgentSettingsMaybeChangedData
 
 #define nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields (deviceId)(engineId)
 
-QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsMaybeChangedData, (eq)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsMaybeChangedData, (json), NX_VMS_API)
 
 struct NX_VMS_API DeviceFootageChangedData
 {
@@ -47,7 +48,15 @@ struct NX_VMS_API DeviceFootageChangedData
 };
 
 #define nx_vms_api_DeviceFootageChangedData_Fields (deviceIds)
-QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageChangedData, (eq)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageChangedData, (json), NX_VMS_API)
+
+struct NX_VMS_API AnalyticsStorageParametersChangedData
+{
+    QnUuid serverId;
+};
+
+#define nx_vms_api_AnalyticsStorageParametersChangedData_Fields (serverId)
+QN_FUSION_DECLARE_FUNCTIONS(AnalyticsStorageParametersChangedData, (json), NX_VMS_API)
 
 } // namespace nx::vms::api
 

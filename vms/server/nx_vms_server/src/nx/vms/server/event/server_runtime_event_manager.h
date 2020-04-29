@@ -15,6 +15,8 @@ public:
 
     void triggerDeviceFootageChangedEvent(std::vector<QnUuid> deviceIds);
 
+    void triggerAnalyticsStorageParametersChanged(QnUuid serverId);
+
 private:
     void sendEvent(const nx::vms::api::ServerRuntimeEventData& eventData);
 };

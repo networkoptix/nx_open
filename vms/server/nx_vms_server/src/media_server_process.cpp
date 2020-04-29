@@ -289,6 +289,7 @@
 #include <rest/handlers/metrics_rest_handler.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/event/extended_rule_processor.h>
+#include <nx/vms/server/event/server_runtime_event_manager.h>
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/storage_plugin_factory.h>
@@ -4759,6 +4760,8 @@ bool MediaServerProcess::initializeAnalyticsEvents()
     if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
     {
         NX_ERROR(this, "Failed to change analytics events storage, initialization error");
+        serverModule()->serverRuntimeEventManager()->triggerAnalyticsStorageParametersChanged(
+            commonModule()->moduleGUID());
         return false;
     }
 
@@ -4781,6 +4784,8 @@ bool MediaServerProcess::initializeAnalyticsEvents()
     }
 
     m_oldAnalyticsStoragePath = closeDirPath(settings.path) + settings.dbConnectionOptions.dbName;
+    serverModule()->serverRuntimeEventManager()->triggerAnalyticsStorageParametersChanged(
+        commonModule()->moduleGUID());
     return true;
 }
 

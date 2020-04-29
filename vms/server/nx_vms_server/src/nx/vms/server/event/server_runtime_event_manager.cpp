@@ -39,6 +39,12 @@ void ServerRuntimeEventManager::triggerDeviceFootageChangedEvent(std::vector<QnU
     sendEvent(makeEvent(ServerRuntimeEventType::deviceFootageChanged, eventData));
 }
 
+void ServerRuntimeEventManager::triggerAnalyticsStorageParametersChanged(QnUuid serverId)
+{
+    const AnalyticsStorageParametersChangedData eventData{serverId};
+    sendEvent(makeEvent(ServerRuntimeEventType::analyticsStorageParametersChanged, eventData));
+}
+
 void ServerRuntimeEventManager::sendEvent(const ServerRuntimeEventData& eventData)
 {
     ec2::TransactionMessageBusAdapter* const messageBus =

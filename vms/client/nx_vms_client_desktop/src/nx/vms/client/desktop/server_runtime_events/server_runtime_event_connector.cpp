@@ -48,6 +48,16 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
 
             return;
         }
+        case ServerRuntimeEventType::analyticsStorageParametersChanged:
+        {
+            AnalyticsStorageParametersChangedData result;
+            if (!NX_ASSERT(QJson::deserialize(eventData.eventData, &result)))
+                return;
+
+            emit analyticsStorageParametersChanged(result.serverId);
+
+            return;
+        }
         default:
             NX_ASSERT(false, "Unexpected event type %1", eventData.eventType);
     }

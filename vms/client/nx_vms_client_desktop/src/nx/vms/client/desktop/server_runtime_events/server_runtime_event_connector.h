@@ -21,6 +21,7 @@ public:
 signals:
     void deviceAgentSettingsMaybeChanged(QnUuid deviceId, QnUuid engineId);
     void deviceFootageChanged(const std::vector<QnUuid>& deviceIds);
+    void analyticsStorageParametersChanged(QnUuid serverId);
 
 private:
     void at_serverRuntimeEventOccurred(const nx::vms::api::ServerRuntimeEventData& eventData);
