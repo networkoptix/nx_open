@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.258",
+    "version": "1.0.1.260",
     "data": [
         {
             "keys": [
@@ -1027,7 +1027,26 @@
                 "interlogix|tve-420",
                 "ali-qvr3008h|dvr3",
                 "ali-qvr3016h|dvr31",
-                "hikvision|ds-7216*"
+                "hikvision|ds-7216*",
+                "digital watchdog|dw-cpuhd16",
+                "ipcamera|edge16e_00-10-be-11-98-58",
+                "merit-lilin|vs212",
+                "axis|axisq7424*",
+                "digital watchdog|nbf8-slah2",
+                "438ir|avertx",
+                "tdhdx161-4k-2t|general",
+                "ds-7316hqhi-f4/n|embedded net dvr",
+                "tvi-ar304-4|embedded_net_dvr",
+                "dahua|dhi-nvr5424*",
+                "general|nvr7000k",
+                "s-64 e v2-xt|siqura",
+                "d44_nvr8pro7|general",
+                "bosch|vip_x16*",
+                "private|dhi-nvr5216-4ks2",
+                "general|dvr08cvi-4k",
+                "dh-nvr608-32-4ks2|private",
+                "private|dh-nvr4832-4k",
+                "dh-nvr4208-8p-4k|private"
             ],
             "analogEncoder": true
         },
@@ -3420,7 +3439,10 @@
             "Arecont Vision|*",
             "flir systems|pt-644*",
             "axis|p3719*",
-            "digital watchdog|nvm2-a21"
+            "digital watchdog|nvm2-a21",
+            "Axis|AXISP3719*",
+            "pelcooptera|imm12018-base",
+            "par-p8panmulti|onvif"
             ],
             "canShareLicenseGroup": true
         },
