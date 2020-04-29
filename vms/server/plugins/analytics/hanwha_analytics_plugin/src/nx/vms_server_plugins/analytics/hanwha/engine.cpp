@@ -259,7 +259,7 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
     const std::shared_ptr<SharedResources>& sharedRes,
     const IDeviceInfo* deviceInfo,
     bool areSettingsAndTrackingAllowed,
-    std::optional<QSet<QString>> filter) const
+    const std::optional<QSet<QString>>& filter) const
 {
     Hanwha::DeviceAgentManifest deviceAgentManifest;
 
@@ -387,7 +387,7 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
 std::optional<QSet<QString>> Engine::fetchSupportedEventTypeIds(
     const std::shared_ptr<SharedResources>& sharedRes,
     const IDeviceInfo* deviceInfo,
-    std::optional<QSet<QString>> filter) const
+    const std::optional<QSet<QString>>& filter) const
 {
     const auto& information = sharedRes->sharedContext->information();
     if (!information)
