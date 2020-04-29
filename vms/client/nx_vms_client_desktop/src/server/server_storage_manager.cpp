@@ -7,6 +7,7 @@
 #include <api/model/backup_status_reply.h>
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/storage_space_reply.h>
+#include <client/client_module.h>
 #include <common/common_module.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
@@ -18,10 +19,12 @@
 #include <utils/common/delayed.h>
 
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 
 namespace {
 
 using namespace std::chrono;
+using namespace nx::vms::client::desktop;
 
 // Delay between requests when the rebuild is running.
 static constexpr auto kUpdateRebuildStatusDelay = 1s;
@@ -95,6 +98,16 @@ QnServerStorageManager::QnServerStorageManager(QObject* parent):
 
     for (const auto& server: allServers)
         handleResourceAdded(server);
+
+    connect(qnClientModule->serverRuntimeEventConnector(),
+        &ServerRuntimeEventConnector::analyticsStorageParametersChanged,
+        this,
+        [this](const QnUuid& serverId)
+        {
+            const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
+            if (server && isServerValid(server))
+                emit activeMetadataStorageChanged(server);
+        });
 }
 
 QnServerStorageManager::~QnServerStorageManager()
@@ -165,8 +178,11 @@ void QnServerStorageManager::handleResourceAdded(const QnResourcePtr& resource)
     connect(server, &QnMediaServerResource::propertyChanged, this,
         [this](const QnResourcePtr& resource, const QString& key)
         {
-            if (key == QnMediaServerResource::kMetadataStorageIdKey)
-                updateActiveMetadataStorage(resource.objectCast<QnMediaServerResource>());
+            if (key != QnMediaServerResource::kMetadataStorageIdKey)
+                return;
+
+            updateActiveMetadataStorage(resource.objectCast<QnMediaServerResource>(),
+                /*suppressNotificationSignal*/ true);
         });
 
     checkStoragesStatus(server);
@@ -590,7 +606,7 @@ QnStorageResourcePtr QnServerStorageManager::activeMetadataStorage(
 }
 
 void QnServerStorageManager::setActiveMetadataStorage(const QnMediaServerResourcePtr& server,
-    const QnStorageResourcePtr& storage)
+    const QnStorageResourcePtr& storage, bool suppressNotificationSignal)
 {
     if (!NX_ASSERT(server))
         return;
@@ -603,12 +619,15 @@ void QnServerStorageManager::setActiveMetadataStorage(const QnMediaServerResourc
     NX_VERBOSE(this, "Metadata storage state changed on server %1 (%2)", server->getName(),
         server->getId().toSimpleString());
 
-    emit activeMetadataStorageChanged(server);
+    if (!suppressNotificationSignal)
+        emit activeMetadataStorageChanged(server);
 }
 
-void QnServerStorageManager::updateActiveMetadataStorage(const QnMediaServerResourcePtr& server)
+void QnServerStorageManager::updateActiveMetadataStorage(
+    const QnMediaServerResourcePtr& server, bool suppressNotificationSignal)
 {
-    setActiveMetadataStorage(server, calculateActiveMetadataStorage(server));
+    setActiveMetadataStorage(server, calculateActiveMetadataStorage(server),
+        suppressNotificationSignal);
 }
 
 QnStorageResourcePtr QnServerStorageManager::calculateActiveMetadataStorage(

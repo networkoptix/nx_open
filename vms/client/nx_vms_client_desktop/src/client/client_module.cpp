@@ -222,7 +222,6 @@ QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
 struct QnClientModule::Private
 {
     std::unique_ptr<AnalyticsSettingsManager> analyticsSettingsManager;
-    std::unique_ptr<ServerRuntimeEventConnector> serverRuntimeEventConnector;
 };
 
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
@@ -449,8 +448,13 @@ void QnClientModule::initSingletons()
     auto messageProcessor = commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>();
     commonModule->store(new QnClientResourceFactory());
 
+    commonModule->store(new ServerRuntimeEventConnector(messageProcessor));
+
     commonModule->store(new QnCameraBookmarksManager());
+
+    // Depends on ServerRuntimeEventConnector.
     commonModule->store(new QnServerStorageManager());
+
     commonModule->instance<QnLayoutTourManager>();
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
@@ -493,9 +497,6 @@ void QnClientModule::initSingletons()
     d->analyticsSettingsManager = AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
         commonModule->resourcePool(),
         messageProcessor);
-
-    d->serverRuntimeEventConnector =
-        std::make_unique<ServerRuntimeEventConnector>(messageProcessor);
 
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
@@ -819,7 +820,7 @@ AnalyticsSettingsManager* QnClientModule::analyticsSettingsManager() const
 
 ServerRuntimeEventConnector* QnClientModule::serverRuntimeEventConnector() const
 {
-    return d->serverRuntimeEventConnector.get();
+    return m_clientCoreModule->commonModule()->findInstance<ServerRuntimeEventConnector>();
 }
 
 void QnClientModule::initLocalInfo()

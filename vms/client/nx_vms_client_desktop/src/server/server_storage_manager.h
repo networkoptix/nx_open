@@ -93,9 +93,10 @@ private:
         const QnMediaServerResourcePtr& server) const;
 
     void setActiveMetadataStorage(const QnMediaServerResourcePtr& server,
-        const QnStorageResourcePtr& storage);
+        const QnStorageResourcePtr& storage, bool suppressNotificationSignal);
 
-    void updateActiveMetadataStorage(const QnMediaServerResourcePtr& server);
+    void updateActiveMetadataStorage(const QnMediaServerResourcePtr& server,
+        bool suppressNotificationSignal = false);
 
 private slots:
     void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle);
