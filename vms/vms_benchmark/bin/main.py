@@ -1194,13 +1194,10 @@ def _connect_to_box(conf):
 def main(conf_file, ini_file, log_file):
     global log_file_ref
     log_file_ref = repr(log_file)
-    logging.basicConfig(
-        filename=log_file,
-        filemode='w',
-        level=logging.DEBUG,
-        format='%(asctime)s.%(msecs)03d %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
+    handler = logging.FileHandler(log_file, 'w', 'utf8')
+    handler.setFormatter(logging.Formatter('%(asctime)s.%(msecs)03d %(message)s', '%Y-%m-%d %H:%M:%S'))
+    logging.getLogger().addHandler(handler)
+    logging.getLogger().setLevel(logging.DEBUG)
     report(f"VMS Benchmark (version: {vms_version()}) started; logging to {log_file_ref}.")
 
     if os.path.exists('./build_info.txt'):
