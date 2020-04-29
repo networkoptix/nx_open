@@ -870,8 +870,12 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
         const auto path = trim(normalize(getUrl()));
     #else
         const bool isApiMountedSmb = !getLocalPathSafe().isEmpty();
+        const bool isMultiInstances = serverModule()->settings().enableMultipleInstances();
         const auto fsPath = normalize(getFsPath());
-        const auto path = m_mockableCallFactory.canonicalPath(isApiMountedSmb ? fsPath : trim(fsPath));
+        const auto path = m_mockableCallFactory.canonicalPath(
+            isApiMountedSmb
+                ? fsPath
+                : isMultiInstances ? trim(trim(fsPath)) : trim(fsPath));
     #endif
 
     bool isMounted = false;
@@ -883,7 +887,10 @@ Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const
         const auto partitions = nx::vms::server::fs::media_paths::getMediaPartitions(pathConfig);
         isMounted = std::any_of(
             partitions.cbegin(), partitions.cend(),
-            [path](const auto& p) { return trim(normalize(p.path)) == path; });
+            [path, isMultiInstances](const auto& p)
+            {
+                return (isMultiInstances ? trim(trim(normalize(p.path))) : trim(normalize(p.path))) == path;
+            });
     }
 
     if (!isMounted)
