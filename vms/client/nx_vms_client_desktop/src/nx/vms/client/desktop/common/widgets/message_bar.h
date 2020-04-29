@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+#include <ui/widgets/word_wrapped_label.h>
 
 class QLabel;
 class QHBoxLayout;
@@ -57,6 +58,16 @@ class PromoBar: public MessageBar
 
 public:
     using base_type::base_type; //< Forward constructors.
+};
+
+// TODO: #v4.2 Unify multiline message bars with the ones that reserve space.
+class MultilineAlertBar: public QnWordWrappedLabel
+{
+    Q_OBJECT
+    using base_type = QnWordWrappedLabel;
+
+public:
+    explicit MultilineAlertBar(QWidget* parent = nullptr);
 };
 
 } // namespace nx::vms::client::desktop

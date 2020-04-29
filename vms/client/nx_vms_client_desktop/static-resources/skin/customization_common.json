@@ -287,6 +287,16 @@
         }
     },
 
+    "nx::vms::client::desktop::MultilineAlertBar": {
+        "palette": {
+            "default": {
+                "window": "#61282b",
+                "link": "light4",
+                "linkVisited": "light1"
+            }
+        }
+    },
+
     "QHeaderView": {
         "palette": {
             "default": {

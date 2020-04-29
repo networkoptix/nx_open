@@ -55,6 +55,9 @@ void QnWordWrappedLabel::ensureInitialized()
 
 QSize QnWordWrappedLabel::sizeHint() const
 {
+    if (m_initialized && text().isEmpty())
+        return {};
+
     QSize result(m_label->sizeHint().width(),
         m_label->heightForWidth(this->geometry().width()));
 

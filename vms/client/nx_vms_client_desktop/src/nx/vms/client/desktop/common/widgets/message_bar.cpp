@@ -85,4 +85,18 @@ void MessageBar::updateVisibility()
         parentWidget()->layout()->activate();
 }
 
+MultilineAlertBar::MultilineAlertBar(QWidget* parent): base_type(parent)
+{
+    setPaletteColor(this, QPalette::Window, Qt::red); //< Sensible default.
+
+    label()->setAutoFillBackground(true);
+    label()->setForegroundRole(QPalette::Text);
+
+    label()->setContentsMargins(
+        style::Metrics::kDefaultTopLevelMargin, style::Metrics::kStandardPadding,
+        style::Metrics::kDefaultTopLevelMargin, style::Metrics::kStandardPadding);
+
+    setOpenExternalLinks(true);
+}
+
 } // namespace nx::vms::client::desktop

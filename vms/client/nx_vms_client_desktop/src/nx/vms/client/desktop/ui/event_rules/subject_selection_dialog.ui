@@ -260,7 +260,7 @@
     </widget>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="alertBar" native="true"/>
+    <widget class="nx::vms::client::desktop::MultilineAlertBar" name="alertBar" native="true"/>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -317,7 +317,7 @@
    <header location="global">nx/vms/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::AlertBar</class>
+   <class>nx::vms::client::desktop::MultilineAlertBar</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
   </customwidget>

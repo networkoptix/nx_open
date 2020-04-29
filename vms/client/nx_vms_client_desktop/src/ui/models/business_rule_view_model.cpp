@@ -748,7 +748,6 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
 
     const bool cameraWasRequired = vms::event::requiresCameraResource(m_actionType);
     const bool userWasRequired = vms::event::requiresUserResource(m_actionType);
-    const bool additionalUserWasRequired = vms::event::requiresAdditionalUserResource(m_actionType);
 
     const bool wasEmailAction = m_actionType == ActionType::sendMailAction;
     const bool aggregationWasDisabled = !vms::event::allowsAggregation(m_actionType);
@@ -759,10 +758,19 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
     m_actionType = value;
     m_modified = true;
 
+    const bool cameraIsRequired = vms::event::requiresCameraResource(m_actionType);
+    const bool userIsRequired = vms::event::requiresUserResource(m_actionType);
+    const bool additionalUserIsRequired = vms::event::requiresAdditionalUserResource(m_actionType);
+
     // Create or load params for the new action type
     if (!m_cachedActionParams.contains(m_actionType))
     {
         nx::vms::event::ActionParameters actionParams;
+
+        actionParams.allUsers = false;
+        actionParams.additionalResources = additionalUserIsRequired
+            ? userRolesManager()->adminRoleIds().toVector().toStdVector()
+            : std::vector<QnUuid>();
 
         switch (m_actionType)
         {
@@ -778,25 +786,12 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
     }
     m_actionParams = m_cachedActionParams[m_actionType];
 
-    const bool cameraIsRequired = vms::event::requiresCameraResource(m_actionType);
-    const bool userIsRequired = vms::event::requiresUserResource(m_actionType);
-    const bool additionalUserIsRequired = vms::event::requiresAdditionalUserResource(m_actionType);
-
     if (userIsRequired && !userWasRequired)
         m_actionResources = userRolesManager()->adminRoleIds().toSet();
 
-    Fields fields = Field::actionType | Field::modified;
+    Fields fields = Field::actionType | Field::actionParams | Field::modified;
     if (cameraIsRequired != cameraWasRequired || userIsRequired != userWasRequired)
         fields |= Field::actionResources;
-
-    if (additionalUserWasRequired != additionalUserIsRequired)
-    {
-        fields |= Field::actionParams;
-        m_actionParams.allUsers = false;
-        m_actionParams.additionalResources = additionalUserIsRequired
-            ? userRolesManager()->adminRoleIds().toVector().toStdVector()
-            : std::vector<QnUuid>();
-    }
 
     if (!vms::event::allowsAggregation(m_actionType))
     {
