@@ -398,7 +398,7 @@ void QnServerStreamRecorder::updateStreamParams()
                 NX_ASSERT(camera);
 
                 params.fps = camera->getMaxFps();
-                params.quality = Qn::StreamQuality::highest;
+                params.quality = Qn::StreamQuality::undefined; //< Use default value.
                 params.bitrateKbps = 0;
                 NX_VERBOSE(this, "Update HQ stream params to %1 for camera %2 because recording is turned off",
                     params, m_resource);
