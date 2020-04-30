@@ -2821,8 +2821,10 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
 
         targetUrl = proxyFactory.urlToResource(targetUrl, request.server);
 
+        // Client local gateway uses SSL regardless of its endpoint, so it never makes sense to open
+        // gateway url by https.
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-        targetUrl = nx::utils::Url(lit("https://%1/%2:%3:%4%5?%6")
+        targetUrl = nx::utils::Url(lit("http://%1/%2:%3:%4%5?%6")
             .arg(gateway->endpoint().toString()).arg(targetUrl.scheme())
             .arg(targetUrl.host()).arg(targetUrl.port())
             .arg(targetUrl.path()).arg(targetUrl.query()));
