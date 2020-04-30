@@ -80,8 +80,8 @@ Figure
         target: figure
         minX: -pathUtil.boundingRect.x
         minY: -pathUtil.boundingRect.y
-        maxX: width - pathUtil.boundingRect.x + pathUtil.boundingRect.width
-        maxY: height - pathUtil.boundingRect.y + pathUtil.boundingRect.height
+        maxX: width - (pathUtil.boundingRect.x + pathUtil.boundingRect.width)
+        maxY: height - (pathUtil.boundingRect.y + pathUtil.boundingRect.height)
     }
 
     readonly property var pathUtil: PathUtil
