@@ -101,77 +101,56 @@ struct TasksQueueInfo {
 
 const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
-namespace empty_dirs {
-
-namespace detail {
-
-struct DirNode
+// Returns true if all children were removed, false otherwise.
+static bool recursiveRemove(const QnStorageResourcePtr& storage, const QString& path)
 {
-    const QString url;
-    const int depth = 0;
-    DirNode* parent = nullptr;
-    int childrenCount = 0;
-
-    DirNode(const QString& url, int depth, DirNode* parent, int childrenCount = 0):
-        url(url),
-        depth(depth),
-        parent(parent),
-        childrenCount(childrenCount)
+    QList<QString> children;
+    bool hasFiles = false;
+    for (const auto& fileInfo: storage->getFileList(path))
     {
+        if (fileInfo.isDir())
+            children.append(fileInfo.absoluteFilePath());
+        else
+            hasFiles = true;
     }
-};
 
-std::stack <std::unique_ptr<DirNode>> buildStack(const QnStorageResourcePtr& storage)
-{
-    std::stack<std::unique_ptr<DirNode>> result;
-    std::queue<std::unique_ptr<DirNode>> queue;
-    queue.emplace(std::make_unique<DirNode>(storage->getUrl(), 0, nullptr, 1));
-    while (!queue.empty())
+    // Older first.
+    std::sort(children.begin(), children.end(), [](const auto& c1, const auto& c2) { return c1 < c2; });
+    for (const auto& c: children)
     {
-        auto current = std::move(queue.front());
-        queue.pop();
-        if (current->depth > 10)
-            continue;
-
-        const auto children = storage->getFileList(current->url);
-        for (const auto& c: children)
+        if (recursiveRemove(storage, c))
         {
-            if (c.isDir())
-                queue.emplace(std::make_unique<DirNode>(c.absoluteFilePath(), current->depth + 1, current.get()));
-
-            current->childrenCount++;
+            NX_VERBOSE(typeid(QnStorageManager), "recursiveRemove: Removing empty directory '%1'", c);
+            storage->removeDir(c);
         }
-
-        result.push(std::move(current));
-    }
-
-    return result;
-}
-
-} // namespace detail
-
-static void remove(const QnStorageResourcePtr& storage)
-{
-    using namespace detail;
-    auto stack = buildStack(storage);
-    while (!stack.empty())
-    {
-        const auto node = std::move(stack.top());
-        stack.pop();
-        if (node->childrenCount == 0)
+        else
         {
-            NX_DEBUG(
-                typeid(QnStorageManager), "Removing empty directory %1",
-                nx::utils::url::hidePassword(node->url));
-
-            storage->removeDir(node->url);
-            if (node->parent)
-                node->parent->childrenCount--;
+            NX_VERBOSE(
+                typeid(QnStorageManager),
+                "recursiveRemove: Found non-empty directory '%1'. Stopping to remove '%2' children.",
+                c, path);
+            return false;
         }
     }
+
+    return !hasFiles;
 }
 
-} // namespace empty_dirs
+static void removeEmptyDirs(const QnStorageResourcePtr& storage)
+{
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
+    const auto rootPath = closeDirPath(storage->getUrl());
+    for (const auto& qualityPath: {rootPath + "hi_quality", rootPath + "low_quality"})
+    {
+        for (const auto& fileInfo: storage->getFileList(qualityPath))
+        {
+            if (fileInfo.isDir())
+                recursiveRemove(storage, fileInfo.absoluteFilePath());
+        }
+    }
+    NX_INFO(typeid(QnStorageManager), "removeEmptyDirs: Finished. %1 elapsed", timer.elapsed());
+}
 
 } // namespace
 
@@ -2583,7 +2562,7 @@ void QnStorageManager::startAuxTimerTasks()
             {
                 if (storage->hasFlags(Qn::storage_fastscan))
                     continue;
-                empty_dirs::remove(storage);
+                removeEmptyDirs(storage);
             }
         },
         kRemoveEmptyDirsInterval,

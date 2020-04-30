@@ -6,9 +6,13 @@ set -u #< Prohibit undefined variables.
 
 if [[ $# > 0 && ($1 == "/?" || $1 == "-h" || $1 == "--help") ]]
 then
-    echo "Usage: $(basename "$0") [--with-rpi-samples] [--release] [<cmake-generation-args>...]"
-    echo "NOTE: If cmake cannot find Qt, add the following arg to this script (will be passed to cmake):"
-    echo "-DCMAKE_PREFIX_PATH=<full-path-to-Qt5-dir>"
+    echo "Usage: $(basename "$0") [--with-rpi-samples] [--no-qt-samples] [--release] [<cmake-generation-args>...]"
+    echo " --with-rpi-samples Build Raspberry Pi samples (use only when building for 32-bit ARM)."
+    echo " --no-qt-samples Exclude samples that require the Qt library."
+    echo " --release Compile using Release configuration (with optimizations) instead of Debug."
+    echo "NOTE: If --no-qt-samples is not specified, and cmake cannot find Qt, add the following"
+    echo " argument to this script (will be passed to the cmake generation command):"
+    echo " -DCMAKE_PREFIX_PATH=<absolute-path-to-Qt5-dir>"
     exit
 fi
 
@@ -22,6 +26,14 @@ then
     WITH_RPI_SAMPLES=1
 else
     WITH_RPI_SAMPLES=0
+fi
+
+if [[ $# > 0 && $1 == "--no-qt-samples" ]]
+then
+    shift
+    NO_QT_SAMPLES=1
+else
+    NO_QT_SAMPLES=0
 fi
 
 if [[ $# > 0 && $1 == "--release" ]]
@@ -68,6 +80,12 @@ do
     if [[ $WITH_RPI_SAMPLES == 0 && $SAMPLE == rpi_* ]]
     then
         echo "ATTENTION: Skipping $SAMPLE because --with-rpi-samples is not specified."
+        echo ""
+        continue
+    fi
+    if [[ $NO_QT_SAMPLES == 1 && $SAMPLE == axis_camera_plugin ]]
+    then
+        echo "ATTENTION: Skipping $SAMPLE because --no-qt-samples is specified."
         echo ""
         continue
     fi

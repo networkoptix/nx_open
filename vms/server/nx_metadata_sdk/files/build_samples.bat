@@ -8,6 +8,7 @@ if [%1] == [--help] goto :show_usage
 goto :skip_show_usage
 :show_usage
     echo Usage: %~n0%~x0 [--no-tests] [--release] [^<cmake-generation-args^>...]
+    echo  --release Compile using Release configuration (with optimizations) instead of Debug.
     exit /b
 :skip_show_usage
 

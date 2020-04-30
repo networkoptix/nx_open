@@ -67,7 +67,6 @@ Yunhong Gu, last updated 01/27/2011
 
 #ifndef _WIN32
 #   define NET_ERROR errno
-#   define INVALID_SOCKET -1
 #else
 #   define NET_ERROR WSAGetLastError()
 #endif
@@ -98,7 +97,7 @@ UdpChannelFactory& UdpChannelFactory::instance()
 
 UdpChannel::UdpChannel(int version):
     m_iIPversion(version),
-    m_iSocket(INVALID_SOCKET),
+    m_iSocket(INVALID_UDP_SOCKET),
     m_iSndBufSize(65536),
     m_iRcvBufSize(65536)
 {
@@ -113,7 +112,7 @@ Result<> UdpChannel::open(const std::optional<detail::SocketAddress>& addr)
 {
     // construct an socket
     m_iSocket = ::socket(m_iIPversion, SOCK_DGRAM, 0);
-    if (INVALID_SOCKET == m_iSocket)
+    if (INVALID_UDP_SOCKET == m_iSocket)
         return OsError();
 
     if (addr)
@@ -232,7 +231,7 @@ detail::SocketAddress UdpChannel::getSockAddr() const
 
 Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket packet)
 {
-    assert(m_iSocket != INVALID_SOCKET);
+    assert(m_iSocket != INVALID_UDP_SOCKET);
 
     // converting packet into network order
     encodePacket(&packet);
@@ -273,7 +272,7 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket packet
 
 Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet)
 {
-    assert(m_iSocket != INVALID_SOCKET);
+    assert(m_iSocket != INVALID_UDP_SOCKET);
 
     // Reserving size for any address.
     addr = detail::SocketAddress(AF_INET6);
@@ -330,7 +329,7 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet)
 
 Result<void> UdpChannel::shutdown()
 {
-    if (m_iSocket == INVALID_SOCKET)
+    if (m_iSocket == INVALID_UDP_SOCKET)
         return success();
 
     int result = 0;
@@ -348,7 +347,7 @@ Result<void> UdpChannel::shutdown()
 
 void UdpChannel::closeSocket()
 {
-    if (m_iSocket == INVALID_SOCKET)
+    if (m_iSocket == INVALID_UDP_SOCKET)
         return;
 
 #ifndef _WIN32
@@ -357,7 +356,7 @@ void UdpChannel::closeSocket()
     ::closesocket(m_iSocket);
 #endif
 
-    m_iSocket = INVALID_SOCKET;
+    m_iSocket = INVALID_UDP_SOCKET;
 }
 
 template<typename Func>

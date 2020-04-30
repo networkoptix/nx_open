@@ -99,6 +99,12 @@ typedef int SYSSOCKET;
 typedef SYSSOCKET UDPSOCKET;
 typedef int UDTSOCKET;
 
+#ifdef _WIN32
+#define INVALID_UDP_SOCKET INVALID_SOCKET
+#else
+#define INVALID_UDP_SOCKET -1
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef std::set<UDTSOCKET> ud_set;
