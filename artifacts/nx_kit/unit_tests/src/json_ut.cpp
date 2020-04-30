@@ -12,7 +12,7 @@
 // Tests added by nx_kit: test that nx::kit::Json is in the proper namespace.
 
 namespace test {
-    
+
 TEST(json, nx_kit_added)
 {
     std::string err;
