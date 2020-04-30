@@ -34,6 +34,19 @@ protected:
         ASSERT_FALSE(m_lastSendResult->ok());
     }
 
+    void whenRecv()
+    {
+        detail::SocketAddress addr;
+        CPacket packet;
+        packet.setLength(128);
+        m_lastRecvResult = m_channel->recvfrom(addr, packet);
+    }
+
+    void thenRecvFailed()
+    {
+        ASSERT_FALSE(m_lastRecvResult->ok());
+    }
+
     void createUdpSocket()
     {
         m_udpSocket = ::socket(kIpVersion, SOCK_DGRAM, 0);
@@ -54,15 +67,23 @@ protected:
 
 private:
     std::optional<Result<int>> m_lastSendResult;
+    std::optional<Result<int>> m_lastRecvResult;
     std::unique_ptr<::UdpChannel> m_channel;
     UDPSOCKET m_udpSocket = INVALID_UDP_SOCKET;
 };
 
-TEST_F(UdpChannel, error_reported)
+TEST_F(UdpChannel, send_error_reported)
 {
     givenChannelWithBrokenSocket();
     whenSend();
     thenSendFailed();
+}
+
+TEST_F(UdpChannel, recv_error_reported)
+{
+    givenChannelWithBrokenSocket();
+    whenRecv();
+    thenRecvFailed();
 }
 
 } // namespace test
