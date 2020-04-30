@@ -113,6 +113,7 @@
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
 #include <rest/handlers/debug_handler.h>
+#include <rest/handlers/ini_config_handler.h>
 #include <rest/handlers/external_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
 #include <rest/handlers/log_rest_handler.h>
@@ -3174,6 +3175,13 @@ void MediaServerProcess::registerRestHandlers(
      * %permissions Owner.
      */
     reg("api/debug", new QnDebugHandler(), kAdmin);
+
+    /**%apidoc[proprietary] GET /api/iniConfig
+     * Intended for debugging and experimenting. Retrieves the current state of ini-config
+     * mechanism, including the directory used for .ini files. Note that this directory is also
+     * used for other mechanisms like Output Redirector and log configuration snippets.
+     */
+    reg("api/iniConfig", new QnIniConfigHandler());
 
     /**%apidoc[proprietary] TODO /api/startLiteClient
      * %// TODO: Write apidoc comment.
