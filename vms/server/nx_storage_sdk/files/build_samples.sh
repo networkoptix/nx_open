@@ -7,6 +7,7 @@ set -u #< Prohibit undefined variables.
 if [[ $# > 0 && ($1 == "/?" || $1 == "-h" || $1 == "--help") ]]
 then
     echo "Usage: $(basename "$0") [--release] [<cmake-generation-args>...]"
+    echo " --release Compile using Release configuration (with optimizations) instead of Debug."
     exit
 fi
 
