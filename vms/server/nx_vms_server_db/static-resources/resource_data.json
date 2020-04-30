@@ -3941,12 +3941,12 @@
                     "x": {
                         "extrapolationMode": "PeriodicExtrapolation",
                         "device":  [-1, 1],
-                        "logical": [180, -180]
+                        "logical": [0, 360]
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [-1, 1],
-                        "logical": [-15, 90]
+                        "logical": [15, -90]
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
@@ -4003,7 +4003,7 @@
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [-1, 1],
-                        "logical": [-15, 90]
+                        "logical": [15, -90]
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
