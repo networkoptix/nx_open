@@ -253,20 +253,6 @@ std::tuple<api::ResultCode, api::ListeningPeers>
     return mediatorClient.getListeningPeers();
 }
 
-void MediatorFunctionalTest::beforeModuleCreation()
-{
-    if (m_stunUdpEndpoint)
-    {
-        removeArgByName("stun/udpAddrToListenList");
-        addArg("-stun/udpAddrToListenList", m_stunUdpEndpoint->toStdString().c_str());
-    }
-}
-
-void MediatorFunctionalTest::afterModuleDestruction()
-{
-    //clearArgs();
-}
-
 bool MediatorFunctionalTest::startProxy()
 {
     if (!m_tcpPortsAllocated)
