@@ -48,7 +48,7 @@ public:
 
     bool processEvent(const HikvisionEvent& hikvisionEvent);
 
-    void setLogInformation(const QString& deviceName, const QString& id);
+    void setDeviceInfo(const QString& deviceName, const QString& id);
 private:
     nx::utils::Url buildMonitoringUrl(
         const nx::utils::Url& resourceUrl,
@@ -104,6 +104,12 @@ private:
 
     QString m_deviceName;
     QString m_deviceId;
+
+    /**
+     * When a notification with unsupported event type arrives, we log it and store this
+     * type in `m_receivedUnsupportedEventTypes` to provide exactly one record for each
+     * event type.
+     */
     std::set<QString> m_receivedUnsupportedEventTypes;
 };
 
