@@ -6,7 +6,7 @@
 #include <vector>
 #include <chrono>
 
-#include <boost/optional/optional.hpp>
+#include <optional>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QUrl>
@@ -50,7 +50,7 @@ protected:
         const nx::sdk::analytics::IAction* action) override;
 
 private:
-    boost::optional<QList<QString>> fetchSupportedEventTypeIds(
+    std::optional<QList<QString>> fetchSupportedEventTypeIds(
         const nx::sdk::IDeviceInfo* deviceInfo);
     QList<QString> parseSupportedEvents(const QByteArray& data);
 

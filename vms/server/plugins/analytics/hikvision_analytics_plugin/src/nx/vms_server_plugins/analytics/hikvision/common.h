@@ -3,7 +3,7 @@
 #include <QtCore/QString>
 #include <QtCore/QDateTime>
 
-#include <boost/optional/optional.hpp>
+#include <optional>
 
 #include <nx/vms_server_plugins/utils/analytics/engine_manifest_base.h>
 #include <nx/fusion/model_functions_fwd.h>
@@ -58,8 +58,8 @@ struct HikvisionEvent
     QString typeId;
     QString caption;
     QString description;
-    boost::optional<int> channel;
-    boost::optional<int> region;
+    std::optional<int> channel;
+    std::optional<int> region;
     bool isActive = false;
     QString picName;
 };

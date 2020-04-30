@@ -38,14 +38,14 @@ static QString normalizeInternalName(const QString& rawInternalName)
 
 } // namespace
 
-boost::optional<std::vector<QString>> AttributesParser::parseSupportedEventsXml(
+std::optional<std::vector<QString>> AttributesParser::parseSupportedEventsXml(
     const QByteArray& content)
 {
     std::vector<QString> result;
     QXmlStreamReader reader(content);
 
     if (!reader.readNextStartElement())
-        return boost::optional<std::vector<QString>>(); //< Read root element.
+        return std::optional<std::vector<QString>>(); //< Read root element.
     while (reader.readNextStartElement())
     {
         auto eventTypeName = normalizeInternalName(reader.name().toString());
@@ -55,11 +55,11 @@ boost::optional<std::vector<QString>> AttributesParser::parseSupportedEventsXml(
     }
 
     if (reader.error() != QXmlStreamReader::NoError)
-        return boost::optional<std::vector<QString>>();
+        return std::optional<std::vector<QString>>();
     return result;
 }
 
-boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
+std::optional<HikvisionEvent> AttributesParser::parseEventXml(
     const QByteArray& content,
     const Hikvision::EngineManifest& manifest)
 {
@@ -68,7 +68,7 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
     QXmlStreamReader reader(content);
 
     if (!reader.readNextStartElement())
-        return boost::optional<HikvisionEvent>(); //< Read root element.
+        return std::optional<HikvisionEvent>(); //< Read root element.
     while (reader.readNextStartElement())
     {
         const auto name = reader.name().toString().toLower().trimmed();
@@ -111,7 +111,7 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
     if (reader.error() != QXmlStreamReader::NoError)
     {
         NX_VERBOSE(typeid(AttributesParser), lm("XML parse error: %1").arg(reader.errorString()));
-        return boost::optional<HikvisionEvent>();
+        return std::optional<HikvisionEvent>();
     }
     return result;
 }

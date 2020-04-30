@@ -76,7 +76,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
 
             for (const auto& hikvisionEvent: events)
             {
-                const bool wrongChannel = hikvisionEvent.channel.is_initialized()
+                const bool wrongChannel = hikvisionEvent.channel.has_value()
                     && hikvisionEvent.channel != m_channelNumber;
 
                 if (wrongChannel)
@@ -125,6 +125,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
             m_auth,
             eventTypes);
 
+    m_monitor->setLogInformation(m_name, m_uniqueId);
     m_monitor->addHandler(m_uniqueId, monitorHandler);
     m_monitor->startMonitoring();
 
@@ -154,6 +155,7 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_url = deviceInfo->url();
     m_model = deviceInfo->model();
     m_firmware = deviceInfo->firmware();
+    m_name = deviceInfo->name();
     m_auth.setUser(deviceInfo->login());
     m_auth.setPassword(deviceInfo->password());
     m_uniqueId = deviceInfo->id();

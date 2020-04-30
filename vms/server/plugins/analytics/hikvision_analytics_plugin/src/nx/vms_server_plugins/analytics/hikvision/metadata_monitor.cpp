@@ -4,6 +4,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <chrono>
+#include <algorithm>
 
 #include "attributes_parser.h"
 #include "string_helper.h"
@@ -44,6 +45,12 @@ HikvisionMetadataMonitor::HikvisionMetadataMonitor(
 }
 
 HikvisionMetadataMonitor::~HikvisionMetadataMonitor() { stopMonitoring(); }
+
+void HikvisionMetadataMonitor::setLogInformation(const QString& deviceName, const QString& id)
+{
+    m_deviceName = deviceName;
+    m_deviceId = id;
+}
 
 void HikvisionMetadataMonitor::startMonitoring()
 {
@@ -250,8 +257,29 @@ void HikvisionMetadataMonitor::reopenLprConnection()
 bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent)
 {
     std::vector<HikvisionEvent> result;
+
     if (!hikvisionEvent.typeId.isEmpty())
-        result.push_back(hikvisionEvent);
+    {
+        if (std::find_if(m_deviceManifest.eventTypes.cbegin(), m_deviceManifest.eventTypes.cend(),
+            [&hikvisionEvent](const auto& eventType)
+            {
+                return eventType.id == hikvisionEvent.typeId;
+            })
+            != m_deviceManifest.eventTypes.cend())
+        {
+            // Normal case: supported event received.
+            result.push_back(hikvisionEvent);
+        }
+        else if (m_receivedUnsupportedEventTypes.count(hikvisionEvent.typeId) == 0)
+        {
+            // The event is not supported by the current device agent. We should log it,
+            // but only once.
+            NX_DEBUG(this, NX_FMT("Unsupported event type notification \"%1\" received"
+                " for the Device %2 (%3)",
+                hikvisionEvent.typeId, m_deviceName, m_deviceId));
+            m_receivedUnsupportedEventTypes.insert(hikvisionEvent.typeId);
+        }
+    }
 
     auto getEventKey =
         [](const HikvisionEvent& event)

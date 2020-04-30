@@ -16,8 +16,8 @@ namespace hikvision {
 class AttributesParser
 {
 public:
-    static boost::optional<std::vector<QString>> parseSupportedEventsXml(const QByteArray& content);
-    static boost::optional<HikvisionEvent> parseEventXml(
+    static std::optional<std::vector<QString>> parseSupportedEventsXml(const QByteArray& content);
+    static std::optional<HikvisionEvent> parseEventXml(
         const QByteArray& content,
         const Hikvision::EngineManifest& manifest);
 

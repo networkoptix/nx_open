@@ -132,7 +132,7 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
     return result;
 }
 
-boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
+std::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     const IDeviceInfo* deviceInfo)
 {
     auto& data = m_cachedDeviceData[deviceInfo->sharedId()];
@@ -160,7 +160,7 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
             this,
             lm("No response for supported events request %1.").args(deviceInfo->url()));
         data.timeout.invalidate();
-        return boost::optional<QList<QString>>();
+        return std::optional<QList<QString>>();
     }
 
     const auto statusCode = response->statusLine.statusCode;
@@ -172,7 +172,7 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
             lm("Unable to fetch supported events for device %1. HTTP status code: %2")
                 .args(deviceInfo->url(), statusCode));
         data.timeout.invalidate();
-        return boost::optional<QList<QString>>();
+        return std::optional<QList<QString>>();
     }
 
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").

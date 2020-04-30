@@ -61,6 +61,7 @@ private:
     nx::utils::Url m_url;
     QString m_model;
     QString m_firmware;
+    QString m_name;
     QAuthenticator m_auth;
     QString m_uniqueId;
     QString m_sharedId;

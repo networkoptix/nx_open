@@ -47,6 +47,8 @@ public:
     void clearHandlers();
 
     bool processEvent(const HikvisionEvent& hikvisionEvent);
+
+    void setLogInformation(const QString& deviceName, const QString& id);
 private:
     nx::utils::Url buildMonitoringUrl(
         const nx::utils::Url& resourceUrl,
@@ -67,7 +69,6 @@ private:
 private:
     void at_monitorResponseReceived();
     void at_monitorSomeBytesAvailable();
-    void at_connectionClosed();
 
     void at_LprRequestDone();
 private:
@@ -100,6 +101,10 @@ private:
     };
 
     QMap<QString, StartedEvent> m_startedEvents;
+
+    QString m_deviceName;
+    QString m_deviceId;
+    std::set<QString> m_receivedUnsupportedEventTypes;
 };
 
 } // namespace hikvision
