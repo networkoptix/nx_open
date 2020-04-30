@@ -570,9 +570,8 @@ update::Status UpdateManager::start()
         shouldDownloadFromScratch, package.isValid());
 
     setInstallationDetected(false);
-    const bool shouldClearFiles = !package.isValid() || shouldDownloadFromScratch;
-    m_installer.stopSync(shouldClearFiles);
-    clearDownloader(shouldClearFiles);
+    m_installer.stopSync(shouldDownloadFromScratch);
+    clearDownloader(!package.isValid() || shouldDownloadFromScratch);
     if (!package.isValid())
         return updateStatus;
 
