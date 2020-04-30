@@ -485,12 +485,14 @@ void socketTransferFragmentation(
         endpointToConnectTo = std::move(serverAddress);
 
     auto client = clientMaker();
-    ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout));
+    ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout))
+        << SystemError::getLastOSErrorText().toStdString();
     ASSERT_TRUE(client->setNonBlockingMode(true));
     const auto clientGuard = nx::utils::makeScopeGuard([&](){ client->pleaseStopSync(); });
 
     auto accepted = server->accept();
-    ASSERT_NE(nullptr, accepted);
+    ASSERT_NE(nullptr, accepted)
+        << SystemError::getLastOSErrorText().toStdString();
 
     for (size_t runNumber = 0; runNumber <= kTestRuns; ++runNumber)
     {
