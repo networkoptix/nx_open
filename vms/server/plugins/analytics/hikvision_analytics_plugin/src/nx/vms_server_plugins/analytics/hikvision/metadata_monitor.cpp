@@ -46,7 +46,7 @@ HikvisionMetadataMonitor::HikvisionMetadataMonitor(
 
 HikvisionMetadataMonitor::~HikvisionMetadataMonitor() { stopMonitoring(); }
 
-void HikvisionMetadataMonitor::setLogInformation(const QString& deviceName, const QString& id)
+void HikvisionMetadataMonitor::setDeviceInfo(const QString& deviceName, const QString& id)
 {
     m_deviceName = deviceName;
     m_deviceId = id;

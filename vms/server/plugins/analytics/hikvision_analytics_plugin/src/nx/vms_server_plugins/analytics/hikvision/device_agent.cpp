@@ -125,7 +125,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
             m_auth,
             eventTypes);
 
-    m_monitor->setLogInformation(m_name, m_uniqueId);
+    m_monitor->setDeviceInfo(m_name, m_uniqueId);
     m_monitor->addHandler(m_uniqueId, monitorHandler);
     m_monitor->startMonitoring();
 
