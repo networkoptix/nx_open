@@ -989,7 +989,7 @@ void MediaServerProcess::dumpSystemUsageStats()
     if (m_dumpSystemResourceUsageTaskId == 0)  // Monitoring cancelled
         return;
     m_dumpSystemResourceUsageTaskId = commonModule()->timerManager()->addTimer(
-        std::bind(&MediaServerProcess::dumpSystemUsageStats, this), 
+        std::bind(&MediaServerProcess::dumpSystemUsageStats, this),
         std::chrono::seconds(ini().systemUsageDumpTimeoutS));
 }
 
@@ -3175,6 +3175,11 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/debug", new QnDebugHandler(), kAdmin);
 
+    /**%apidoc[proprietary] GET /api/iniConfig
+     * Intended for debugging and experimenting. Reports the status of ini_config mechanism.
+     */
+    reg("api/iniConfig", new QnIniConfigHandler(), kAdmin);
+
     /**%apidoc[proprietary] TODO /api/startLiteClient
      * %// TODO: Write apidoc comment.
      */
@@ -5287,7 +5292,7 @@ void MediaServerProcess::run()
     commonModule()->resourceDiscoveryManager()->setReady(true);
 
     m_dumpSystemResourceUsageTaskId = commonModule()->timerManager()->addTimer(
-        std::bind(&MediaServerProcess::dumpSystemUsageStats, this), 
+        std::bind(&MediaServerProcess::dumpSystemUsageStats, this),
         std::chrono::seconds(ini().systemUsageDumpTimeoutS));
 
     nx::mserver_aux::makeFakeData(
