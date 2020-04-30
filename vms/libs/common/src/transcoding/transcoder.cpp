@@ -9,6 +9,7 @@
 #include <transcoding/ffmpeg_transcoder.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
+#include <transcoding/transcoding_utils.h>
 
 #include <transcoding/filters/abstract_image_filter.h>
 #include <nx/streaming/media_data_packet.h>
@@ -18,13 +19,6 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/metrics/metrics_storage.h>
 #include <utils/media/utils.h>
-
-namespace {
-
-static const int kWidthRoundingFactor = 16;
-static const int kHeightRoundingFactor = 4;
-
-} // namespace
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
@@ -103,6 +97,11 @@ void QnVideoTranscoder::setResolution(const QSize& value)
     m_resolution = value;
 }
 
+QSize QnVideoTranscoder::getResolution() const
+{
+    return m_resolution;
+}
+
 void QnVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filterList)
 {
     m_filters = filterList;
@@ -120,11 +119,6 @@ CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecod
             break;
     }
     return result;
-}
-
-QSize QnVideoTranscoder::getResolution() const
-{
-    return m_resolution;
 }
 
 QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
@@ -147,37 +141,27 @@ QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
     }
     return result;
 }
-
-bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
+bool QnVideoTranscoder::adjustDstResolution(
+    AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video)
 {
+    // TODO Fix it, resolution from data should be used firstly
     QSize streamResolution = findSavedResolution(video);
     if (streamResolution.isEmpty())
         streamResolution = nx::media::getFrameSize(video);
 
-    if (m_resolution.width() == 0 && m_resolution.height() > 0)
-    {
-        if (streamResolution.isValid())
-            m_resolution.setHeight(qMin(streamResolution.height(), m_resolution.height())); // strict to source frame height
-        // Round resolution height.
-        m_resolution.setHeight(
-            qPower2Round((unsigned) m_resolution.height(), kHeightRoundingFactor));
+    m_resolution = nx::transcoding::normalizeResolution(
+        dstCodec, m_resolution, streamResolution);
 
-        float ar = 1.0;
-        if (streamResolution.isValid())
-            ar = streamResolution.width() / (float)streamResolution.height();
-        m_resolution.setWidth(m_resolution.height() * ar);
-        // Round resolution width.
-        m_resolution.setWidth(qPower2Round((unsigned) m_resolution.width(), kWidthRoundingFactor));
-    }
-    else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty())
+    if (m_resolution.isEmpty())
     {
-        m_resolution = streamResolution;
+        NX_WARNING(this, "Invalid resolution specified source %1, target %2",
+            streamResolution, m_resolution);
+        return false;
     }
 
     m_sourceResolution = m_resolution;
-
     for (auto filter: m_filters)
-        setResolution(filter->updatedResolution(getResolution()));
+        m_resolution = filter->updatedResolution(m_resolution);
 
     return true;
 }
@@ -210,7 +194,7 @@ QnTranscoder::~QnTranscoder()
 }
 
 int QnTranscoder::suggestBitrate(
-    AVCodecID codec,
+    AVCodecID /*codec*/,
     QSize resolution,
     Qn::StreamQuality quality,
     const char* codecName)

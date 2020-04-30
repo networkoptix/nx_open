@@ -51,6 +51,12 @@ private:
 
 AVCodecID findEncoderCodecId(const QString& codecName);
 
+QSize normalizeResolution(AVCodecID codec, const QSize& target, const QSize& source);
+QSize adjustCodecRestrictions(AVCodecID codec, const QSize& source);
+QSize cropResolution(const QSize& source, const QSize& max);
+QSize downscaleByHeight(const QSize& source, int newHeight);
+QSize downscaleByWidth(const QSize& source, int newWidth);
+
 inline const char* ffmpegErrorText(const int error)
 {
     static char error_buffer[255];

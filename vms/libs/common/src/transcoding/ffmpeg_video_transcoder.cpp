@@ -117,7 +117,8 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
     close();
 
-    QnVideoTranscoder::open(video);
+    if (!adjustDstResolution(m_codecId, video))
+        return false;
 
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)

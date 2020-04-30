@@ -4,6 +4,9 @@
 
 namespace nx::media_utils::h263 {
 
+constexpr int kMaxHeight = 1152;
+constexpr int kMaxWidth = 2048;
+
 enum class PictureType
 {
     IPicture,

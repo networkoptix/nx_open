@@ -40,6 +40,7 @@ public:
     virtual void init() override;
 
 private:
+    QSize getTargetSize(QnConstAbstractMediaDataPtr media, QSize targetSize);
     void buildSdp(
         QnConstAbstractMediaDataPtr mediaHigh,
         QnConstAbstractMediaDataPtr mediaLow,

@@ -106,21 +106,18 @@ public:
     //!Returns picture size (in pixels) of output video stream
     QSize getResolution() const;
 
-    virtual bool open(const QnConstCompressedVideoDataPtr& video);
+    virtual bool open(const QnConstCompressedVideoDataPtr& video) = 0;
 
     virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList);
 
 protected:
-    static const int WIDTH_ALIGN = 16;
-    static const int HEIGHT_ALIGN = 2;
-
     QSharedPointer<CLVideoDecoderOutput> processFilterChain(const QSharedPointer<CLVideoDecoderOutput>& decodedFrame);
+    bool adjustDstResolution(AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video);
 
 protected:
     QSize m_resolution;
     QSize m_sourceResolution;
     QList<QnAbstractImageFilterPtr> m_filters;
-    bool m_opened;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 

@@ -16,3 +16,47 @@ TEST(TranscodingUtils, findEncoderCodecIdTest)
     ASSERT_EQ(nx::transcoding::findEncoderCodecId("MPEG4"), AV_CODEC_ID_MPEG4);
     ASSERT_EQ(nx::transcoding::findEncoderCodecId("mpeg2video"), AV_CODEC_ID_MPEG2VIDEO);
 }
+
+TEST(TranscodingUtils, adjustCodecRestrictions)
+{
+    ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H263P, QSize(640, 480)), QSize(640, 480));
+    ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H264, QSize(640, 480)), QSize(640, 480));
+    ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H265, QSize(640, 480)), QSize(640, 480));
+    ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_MPEG2VIDEO, QSize(640, 480)), QSize(640, 480));
+    ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H264, QSize(2048, 1152)), QSize(2048, 1152));
+    ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H265, QSize(2048, 1152)), QSize(2048, 1152));
+    ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H263P, QSize(2048, 1152)), QSize(2048, 1152));
+    ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_MPEG2VIDEO, QSize(2048, 1152)), QSize(2048, 1152));
+
+    // Should be croped to max allowed size
+    ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H263P, QSize(4096, 2304)), QSize(2048, 1152));
+    ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H263P, QSize(4096, 4096)), QSize(1152, 1152));
+
+    // Should avoid 4096 align
+    ASSERT_NE(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_MPEG2VIDEO, QSize(4096, 2304)), QSize(4096, 2304));
+}
+
+TEST(TranscodingUtils, normalizeResolution)
+{
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_NONE, QSize(-1, -1), QSize(-1, -1)), QSize(-1, -1));
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_NONE, QSize(-1, -1), QSize(640, 480)), QSize(640, 480));
+
+    // Limit by source size.
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_NONE, QSize(0, 1080), QSize(640, 480)), QSize(640, 480));
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_H264, QSize(0, 1080), QSize(640, 480)), QSize(640, 480));
+
+    // Auto by height.
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_MPEG2VIDEO, QSize(0, 1080), QSize(6400, 4800)), QSize(1440, 1080));
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_MPEG2VIDEO, QSize(0, 480), QSize(6400, 4800)), QSize(640, 480));
+
+    // Align of incorrect target.
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_H263P, QSize(0, 483), QSize(6400, 4800)), QSize(640, 484));
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_H263P, QSize(0, 479), QSize(6400, 4800)), QSize(640, 480));
+
+    // Target resolution specified.
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_H264, QSize(1920, 1080), QSize(640, 480)), QSize(1920, 1080));
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_H263P, QSize(1920, 1080), QSize(640, 480)), QSize(1920, 1080));
+
+    // Codec restrictions adjust.
+    ASSERT_EQ(nx::transcoding::normalizeResolution(AV_CODEC_ID_H263P, QSize(4096, 2304), QSize(640, 480)), QSize(2048, 1152));
+}

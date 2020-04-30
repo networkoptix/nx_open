@@ -3,6 +3,8 @@
 #include <array>
 
 #include <nx/streaming/config.h>
+#include <utils/media/utils.h>
+#include <transcoding/transcoding_utils.h>
 #include <nx/streaming/rtp/onvif_header_extension.h>
 #include "common/common_module.h"
 
@@ -237,6 +239,24 @@ void QnUniversalRtpEncoder::buildSdp(
     }
 }
 
+QSize QnUniversalRtpEncoder::getTargetSize(QnConstAbstractMediaDataPtr media, QSize targetSize)
+{
+    QnConstCompressedVideoDataPtr videoData =
+        std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
+    if (!videoData)
+    {
+        NX_WARNING(this, "Invalid media data");
+        return QSize();
+    }
+    QSize sourceSize = nx::media::getFrameSize(videoData);
+    if (sourceSize.isEmpty())
+    {
+        NX_WARNING(this, "Failed to get frame size, codec: %1", media->compressionType);
+        return QSize();
+    }
+    return nx::transcoding::normalizeResolution(m_codec, targetSize, sourceSize);
+}
+
 bool QnUniversalRtpEncoder::open(
     QnConstAbstractMediaDataPtr mediaHigh,
     QnConstAbstractMediaDataPtr mediaLow,
@@ -276,8 +296,14 @@ bool QnUniversalRtpEncoder::open(
     int status = -1;
     if (media->dataType == QnAbstractMediaData::VIDEO)
     {
+        QSize targetSize = getTargetSize(media, videoSize);
+        if (targetSize.isEmpty())
+        {
+            NX_WARNING(this, "Failed to get target video size %1", videoSize);
+            return false;
+        }
         m_transcoder.setTranscodingSettings(extraTranscodeParams);
-        m_transcoder.setVideoCodec(m_codec, method, Qn::StreamQuality::normal, videoSize);
+        m_transcoder.setVideoCodec(m_codec, method, Qn::StreamQuality::normal, targetSize);
         status = m_transcoder.open(
             std::dynamic_pointer_cast<const QnCompressedVideoData>(media),
             QnConstCompressedAudioDataPtr());

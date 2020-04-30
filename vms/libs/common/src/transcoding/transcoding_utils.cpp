@@ -1,9 +1,12 @@
 #include "transcoding_utils.h"
 
+#include <array>
+
 #include <nx/utils/log/log.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <utils/media/ffmpeg_helper.h>
-
+#include <utils/media/h263_utils.h>
+#include <utils/math/math.h>
 
 namespace nx {
 namespace transcoding {
@@ -13,6 +16,9 @@ namespace {
 static const std::size_t kBufferSize = 1024 *32;
 static const int kWritableBufferFlag = 1;
 static const int kReadOnlyBufferFlag = 0;
+
+constexpr int kWidthAlign = 16;
+constexpr int kHeightAlign = 4;
 
 int readFromQIODevice(void* opaque, uint8_t* buf, int size)
 {
@@ -363,6 +369,118 @@ Error remux(QIODevice* inputMedia, QIODevice* outputMedia, const QString& dstCon
     qDebug() << "RETURN VALUE" << ret;
 
     return cleanUp(Error::noError);
+}
+
+QSize downscaleByHeight(const QSize& source, int newHeight)
+{
+    float ar = source.width() / (float)source.height();
+    return QSize(newHeight * ar, newHeight);
+}
+
+QSize downscaleByWidth(const QSize& source, int newWidth)
+{
+    float ar = source.width() / (float)source.height();
+    return QSize(newWidth, newWidth / ar);
+}
+
+QSize cropResolution(const QSize& source, const QSize& max)
+{
+    QSize result = source;
+    if (result.height() > max.height())
+        result = downscaleByHeight(result, max.height());
+
+    if (result.width() > max.width())
+        result = downscaleByWidth(result, max.width());
+
+    return result;
+}
+
+
+QSize maxResolution(AVCodecID codec)
+{
+    using namespace nx::media_utils;
+    struct CodecMaxSize
+    {
+        AVCodecID codec;
+        QSize maxSize;
+    };
+    static const CodecMaxSize maxSizes[] =
+    {
+        { AV_CODEC_ID_H263P, QSize(h263::kMaxWidth, h263::kMaxHeight)},
+    };
+
+    for(auto& size: maxSizes)
+    {
+        if (size.codec == codec)
+            return size.maxSize;
+    }
+    return QSize(8192, 8192);
+}
+
+QSize adjustCodecRestrictions(AVCodecID codec, const QSize& source)
+{
+    QSize result(source);
+    QSize maxSize = maxResolution(codec);
+    if (source.width() > maxSize.width() || source.height() > maxSize.height())
+    {
+        result = cropResolution(result, maxSize);
+        result.setWidth(qPower2Round(result.width(), kWidthAlign));
+        result.setHeight(qPower2Round(result.height(), kHeightAlign));
+        NX_DEBUG(NX_SCOPE_TAG, "Codec '%1' does not support resolution %2, downscale to %3",
+            avcodec_get_name(codec), source, result);
+    }
+    switch (codec)
+    {
+        case AV_CODEC_ID_MPEG2VIDEO:
+            // Width or Height are not allowed to be multiples of 4096 (see ffmpeg sources)
+            if ((result.width() & 0xFFF) == 0)
+                result.setWidth(result.width() - 4);
+
+            if ((result.height() & 0xFFF) == 0)
+                result.setHeight(result.height() - 4);
+
+            if (source != result)
+            {
+                NX_DEBUG(NX_SCOPE_TAG, "mpeg2video does not support resolution %1, change it to %2",
+                    source, result);
+            }
+            return result;
+
+        default:
+            return result;
+    }
+}
+
+QSize normalizeResolution(AVCodecID codec, const QSize& target, const QSize& source)
+{
+    QSize result;
+    if (target.width() < 1 && target.height() < 1)
+    {
+        result = source;
+    }
+    else if (target.width() == 0 && target.height() > 0)
+    {
+        if (source.isEmpty())
+            return QSize();
+
+        // TODO is it correct?
+        int height = qMin(target.height(), source.height()); // Limit by source size.
+
+        // TODO is align needed for all codecs(may be h263 only)?
+        height = qPower2Round(height, kHeightAlign); // Round resolution height.
+
+        result = downscaleByHeight(source, height);
+        result.setWidth(qPower2Round(result.width(), kWidthAlign));
+    }
+    else
+    {
+        result = target;
+    }
+
+    if (codec != AV_CODEC_ID_NONE)
+        result = adjustCodecRestrictions(codec, result);
+
+    return result;
 }
 
 } // namespace transcoding
