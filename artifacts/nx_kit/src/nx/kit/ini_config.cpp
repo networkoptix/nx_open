@@ -151,7 +151,7 @@ static std::string determineIniFilesDir()
 
             const std::string env = getEnv(kIniDirEnvVar);
             if (!env.empty())
-                return std::string(env) + kPathSeparator + extraDir + "nx_ini" +kPathSeparator;
+                return std::string(env) + kPathSeparator + extraDir + "nx_ini" + kPathSeparator;
 
             return defaultDir;
         #endif
