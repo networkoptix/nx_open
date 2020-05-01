@@ -32,7 +32,4 @@ private:
     */
     QnStorageSpaceDataList getOptionalStorages() const;
     QList<nx::vms::server::PlatformMonitor::PartitionSpace> getSuitablePartitions() const;
-    nx::vms::server::StorageResourceList storageListFrom(
-        const QList<nx::vms::server::PlatformMonitor::PartitionSpace>& partitions) const;
-    bool wouldBeWritableInPool(const nx::vms::server::StorageResourcePtr& storage) const;
 };

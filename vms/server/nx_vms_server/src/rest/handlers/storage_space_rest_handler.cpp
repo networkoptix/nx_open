@@ -123,92 +123,54 @@ QList<nx::vms::server::PlatformMonitor::PartitionSpace> QnStorageSpaceRestHandle
     return result;
 }
 
-static QString storageUrl(const QString& partitionPath)
-{
-    return closeDirPath(partitionPath) + QnAppInfo::mediaFolderName();
-}
-
-nx::vms::server::StorageResourceList QnStorageSpaceRestHandler::storageListFrom(
-    const QList<nx::vms::server::PlatformMonitor::PartitionSpace>& partitions) const
-{
-    nx::vms::server::StorageResourceList result;
-    std::transform(
-        partitions.cbegin(), partitions.cend(), std::back_inserter(result),
-        [this](const auto& p) -> QnSharedResourcePointer<nx::vms::server::StorageResource>
-        {
-            const auto url = storageUrl(p.path);
-            NX_VERBOSE(this, "Creating a file storage for an optional path %1", url);
-            const auto commonModule = serverModule()->commonModule();
-            auto storage = QnStorageResourcePtr(
-                commonModule->storagePluginFactory()->createStorage(commonModule, url, false))
-                .dynamicCast<QnFileStorageResource>();
-
-            if (!storage)
-            {
-                NX_VERBOSE(this, "Failed to create storage with the optional path %1", url);
-                return QnSharedResourcePointer<nx::vms::server::StorageResource>();
-            }
-
-            storage->setUrl(url);
-            if (storage->getStorageType().isNull())
-                storage->setStorageType(QnLexical::serialized(p.type));
-
-            NX_VERBOSE(this, "Starting initOrUpdate for storage %1", storage->getUrl());
-            if (storage->initOrUpdate() != Qn::StorageInit_Ok)
-            {
-                NX_VERBOSE(this, "InitOrUpdate failed for storage with the optional path %1", url);
-                return QnSharedResourcePointer<nx::vms::server::StorageResource>();
-            }
-
-            storage->setIdUnsafe(QnUuid::createUuid());
-            storage->setStatus(Qn::Online);
-            storage->setSpaceLimit(storage->calcInitialSpaceLimit());
-            if (!wouldBeWritableInPool(storage))
-            {
-                NX_VERBOSE(this, "Storage %1 would not be writable if put among other storages", url);
-                return QnSharedResourcePointer<nx::vms::server::StorageResource>();
-            }
-
-            NX_VERBOSE(this, "Optional storage %1 is operational", url);
-            return storage.dynamicCast<nx::vms::server::StorageResource>();
-        });
-
-
-    result.erase(
-        std::remove_if(result.begin(), result.end(), [](const auto& s) { return !s; }),
-        result.end());
-
-    return result;
-}
-
-static QList<QnStorageSpaceData> spaceDataListFrom(
-    QnMediaServerModule* serverModule,
-    const QnStorageResourceList& storages)
-{
-    QList<QnStorageSpaceData> result;
-    std::transform(
-        storages.cbegin(), storages.cend(), std::back_inserter(result),
-        [serverModule](const auto& storage)
-        {
-            auto s = QnStorageSpaceData(storage, /*fastCreate*/ false);
-            s.storageId = QnUuid(); // This is needed for client to correctly treat this storage as a new one.
-            s.storageStatus = QnStorageManager::storageStatus(serverModule, storage);
-            return s;
-        });
-    return result;
-}
-
-bool QnStorageSpaceRestHandler::wouldBeWritableInPool(
-    const nx::vms::server::StorageResourcePtr& storage) const
-{
-    nx::vms::server::StorageResourceList additionalStorages{storage};
-    return serverModule()->normalStorageManager()->getAllWritableStorages(
-        additionalStorages).contains(storage);
-}
-
 QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
 {
     const auto partitions = getSuitablePartitions();
-    const auto storages = storageListFrom(partitions);
-    return spaceDataListFrom(serverModule(), storages);
+    QList<QnStorageSpaceData> result;
+    for (const auto& p: partitions)
+    {
+        const auto url = closeDirPath(p.path) + QnAppInfo::mediaFolderName();
+        NX_VERBOSE(this, "Creating a file storage for an optional path %1", url);
+        const auto commonModule = serverModule()->commonModule();
+        auto storage = QnStorageResourcePtr(
+            commonModule->storagePluginFactory()->createStorage(commonModule, url, false))
+            .dynamicCast<QnFileStorageResource>();
+
+        if (!storage)
+        {
+            NX_VERBOSE(this, "Failed to create storage with the optional path %1", url);
+            continue;
+        }
+
+        storage->setUrl(url);
+        if (storage->getStorageType().isNull())
+            storage->setStorageType(QnLexical::serialized(p.type));
+
+        NX_VERBOSE(this, "Starting initOrUpdate for storage %1", storage->getUrl());
+        if (storage->initOrUpdate() != Qn::StorageInit_Ok)
+        {
+            NX_VERBOSE(this, "InitOrUpdate failed for storage with the optional path %1", url);
+            continue;
+        }
+
+        storage->setIdUnsafe(QnUuid::createUuid());
+        storage->setStatus(Qn::Online);
+        storage->setSpaceLimit(storage->calcInitialSpaceLimit());
+
+        const bool wouldBeWritable = serverModule()->normalStorageManager()->getAllWritableStorages(
+            { storage }).contains(storage);
+
+        if (!wouldBeWritable)
+            NX_VERBOSE(this, "Storage %1 would not be writable if put among other storages", url);
+        else
+            NX_VERBOSE(this, "Optional storage %1 is operational", url);
+
+        auto spaceData = QnStorageSpaceData(storage, /*fastCreate*/ false);
+        spaceData.storageId = QnUuid(); //< This is needed for client to correctly treat this storage as a new one.
+        spaceData.storageStatus = QnStorageManager::storageStatus(serverModule(), storage);
+        spaceData.isWritable &= wouldBeWritable;
+        result.append(spaceData);
+    }
+
+    return result;
 }
