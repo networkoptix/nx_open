@@ -125,9 +125,8 @@ QList<nx::vms::server::PlatformMonitor::PartitionSpace> QnStorageSpaceRestHandle
 
 QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
 {
-    const auto partitions = getSuitablePartitions();
     QList<QnStorageSpaceData> result;
-    for (const auto& p: partitions)
+    for (const auto& p: getSuitablePartitions())
     {
         const auto url = closeDirPath(p.path) + QnAppInfo::mediaFolderName();
         NX_VERBOSE(this, "Creating a file storage for an optional path %1", url);
