@@ -3175,11 +3175,6 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/debug", new QnDebugHandler(), kAdmin);
 
-    /**%apidoc[proprietary] GET /api/iniConfig
-     * Intended for debugging and experimenting. Reports the status of ini_config mechanism.
-     */
-    reg("api/iniConfig", new QnIniConfigHandler(), kAdmin);
-
     /**%apidoc[proprietary] TODO /api/startLiteClient
      * %// TODO: Write apidoc comment.
      */
