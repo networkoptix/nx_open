@@ -57,6 +57,8 @@ enum class MessageClass
     unknown = -1,
 };
 
+NX_NETWORK_API const char* toString(MessageClass);
+
 //!Contains STUN method types defined in RFC
 enum MethodType
 {
@@ -90,6 +92,8 @@ public:
     Header(MessageClass messageClass_, int method_, Buffer transactionId_);
 
     Header& operator=(Header&& rhs);    //TODO #ak #msvc2015 =default
+
+    std::string toString() const;
 
     static Buffer makeTransactionId();
     static Buffer nullTransactionId;

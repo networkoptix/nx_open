@@ -109,12 +109,18 @@ void AsyncClientWithHttpTunneling::sendRequest(
             requestContext.handler = std::move(handler);
             requestContext.client = client;
 
+            NX_VERBOSE(this, "Sending request %1 (id %2)", request.header, requestId);
+
             if (m_stunClient)
             {
                 m_stunClient->sendRequest(
                     requestContext.request,
                     std::bind(&AsyncClientWithHttpTunneling::onRequestCompleted, this,
                         _1, _2, requestId));
+            }
+            else
+            {
+                NX_VERBOSE(this, "Request %1 (id %2) is postponed", request.header, requestId);
             }
 
             m_activeRequests.emplace(requestId, std::move(requestContext));
@@ -298,10 +304,11 @@ void AsyncClientWithHttpTunneling::sendPendingRequests()
 {
     using namespace std::placeholders;
 
-    NX_VERBOSE(this, "Sending %1 pending requests", m_activeRequests.size());
-
     for (const auto& requestContext: m_activeRequests)
     {
+        NX_VERBOSE(this, "Sending pending request %1 (id %2)",
+            requestContext.second.request.header, requestContext.first);
+
         m_stunClient->sendRequest(
             requestContext.second.request,
             std::bind(&AsyncClientWithHttpTunneling::onRequestCompleted, this,
@@ -394,6 +401,9 @@ void AsyncClientWithHttpTunneling::onRequestCompleted(
     int requestId)
 {
     NX_ASSERT(isInSelfAioThread());
+
+    NX_VERBOSE(this, "Request (id %1) completed. Result %2, response %3",
+        requestId, SystemError::toString(sysErrorCode), response.header);
 
     auto requestIter = m_activeRequests.find(requestId);
     if (requestIter == m_activeRequests.end())
