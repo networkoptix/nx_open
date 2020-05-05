@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <udt/common.h>
+#include <udt/buffer.h>
 
 namespace test {
 
@@ -10,6 +10,8 @@ class Buffer:
     public ::testing::Test
 {
 protected:
+    using BufferType = ::BasicBuffer<char>;
+
     template <typename Str, typename... Args>
     Str generate(Args&&... args)
     {
@@ -20,18 +22,18 @@ protected:
         return one;
     }
 
-    void assertBufferMemoryIsValid(::Buffer& buf)
+    void assertBufferMemoryIsValid(BufferType& buf)
     {
         memset(buf.data(), 'x', buf.size());
     }
 
-    void assertSameMemoryIsUsedToHoldData(const ::Buffer& one, const ::Buffer& two)
+    void assertSameMemoryIsUsedToHoldData(const BufferType& one, const BufferType& two)
     {
         ASSERT_GE(two.data(), one.data());
         ASSERT_LE(two.data() + two.size(), one.data() + one.size());
     }
 
-    void assertDifferentMemoryIsUsedToHoldData(const ::Buffer& one, const ::Buffer& two)
+    void assertDifferentMemoryIsUsedToHoldData(const BufferType& one, const BufferType& two)
     {
         // Memory regions of one and two must not intersect.
         ASSERT_TRUE(
@@ -40,29 +42,29 @@ protected:
     }
 
     template<typename Other>
-    void assertEqual(const ::Buffer& buf, const Other& other)
+    void assertEqual(const BufferType& buf, const Other& other)
     {
         ASSERT_EQ(buf.size(), other.size());
         ASSERT_EQ(0, memcmp(buf.data(), other.data(), buf.size()));
     }
 
     void assertSubstrValid(
-        const ::Buffer& buf,
+        const BufferType& buf,
         std::size_t offset, std::size_t count)
     {
         auto two = buf.substr(offset, count);
         assertSameMemoryIsUsedToHoldData(buf, two);
-        ASSERT_EQ(0, memcmp(((const ::Buffer&)two).data(), buf.data() + offset, count));
+        ASSERT_EQ(0, memcmp(((const BufferType&)two).data(), buf.data() + offset, count));
 
         // Causing substr relocation.
         two.data();
-        ASSERT_EQ(0, memcmp(((const ::Buffer&)two).data(), buf.data() + offset, count));
+        ASSERT_EQ(0, memcmp(((const BufferType&)two).data(), buf.data() + offset, count));
     }
 };
 
 TEST_F(Buffer, constructing_preallocated_buffer)
 {
-    ::Buffer one(1024);
+    BufferType one(1024, 0);
 
     ASSERT_EQ(1024, one.size());
     assertBufferMemoryIsValid(one);
@@ -70,8 +72,8 @@ TEST_F(Buffer, constructing_preallocated_buffer)
 
 TEST_F(Buffer, data_shared_implicitely)
 {
-    ::Buffer one(1024);
-    ::Buffer two = one;
+    BufferType one(1024, 0);
+    BufferType two = one;
 
     assertEqual(one, two);
     assertSameMemoryIsUsedToHoldData(one, two);
@@ -87,9 +89,9 @@ TEST_F(Buffer, data_modification_causes_realocation)
 {
     static constexpr std::string_view kData = "Hello, world";
 
-    ::Buffer one(kData.data(), kData.size());
+    BufferType one(kData.data(), kData.size());
 
-    ::Buffer two(one);
+    BufferType two(one);
     two[7] = 'W';
 
     assertEqual(one, std::string_view("Hello, world"));
@@ -100,7 +102,7 @@ TEST_F(Buffer, assign)
 {
     static constexpr std::string_view kData = "Hello, world";
 
-    ::Buffer one(1024);
+    BufferType one(1024, 0);
     one.assign(kData.data(), kData.size());
 
     assertEqual(one, kData);
@@ -108,7 +110,7 @@ TEST_F(Buffer, assign)
 
 TEST_F(Buffer, substr)
 {
-    auto one = generate<::Buffer>(1024);
+    auto one = generate<BufferType>(1024, '\0');
 
     assertSubstrValid(one, 0, 1024);
     assertSubstrValid(one, 0, 128);
@@ -119,7 +121,7 @@ TEST_F(Buffer, substr)
 TEST_F(Buffer, resize)
 {
     auto data = generate<std::string>(1024, 'x');
-    ::Buffer one(data.data(), data.size());
+    BufferType one(data.data(), data.size());
 
     one.resize(100);
     data.resize(100);
@@ -131,7 +133,7 @@ TEST_F(Buffer, resize)
 
 TEST_F(Buffer, resize_down_does_not_reallocate)
 {
-    auto one = generate<::Buffer>(1024);
+    auto one = generate<BufferType>(1024, '\0');
     auto oneBuf = one.data();
 
     one.resize(one.size() / 2);
@@ -141,7 +143,7 @@ TEST_F(Buffer, resize_down_does_not_reallocate)
 
 TEST_F(Buffer, substr_bounds_checking)
 {
-    auto one = generate<::Buffer>(1024);
+    auto one = generate<BufferType>(1024, '\0');
 
     {
         const auto substr = one.substr(1000, 100);
@@ -150,7 +152,7 @@ TEST_F(Buffer, substr_bounds_checking)
     }
 
     {
-        const auto substr = one.substr(1000, ::Buffer::npos);
+        const auto substr = one.substr(1000, BufferType::npos);
         ASSERT_EQ(substr.size(), 24);
         ASSERT_EQ(0, memcmp(substr.data(), one.data() + 1000, substr.size()));
     }
@@ -163,7 +165,7 @@ TEST_F(Buffer, substr_bounds_checking)
 
 TEST_F(Buffer, substr_from_substr)
 {
-    auto one = generate<::Buffer>(1024);
+    auto one = generate<BufferType>(1024, '\0');
 
     const auto substr1 = one.substr(100, 200);
     const auto substr2 = substr1.substr(100, 100);
@@ -175,7 +177,7 @@ TEST_F(Buffer, overwriting_substr)
 {
     static constexpr std::string_view kData = "Hello, world";
 
-    auto one = generate<::Buffer>(1024);
+    auto one = generate<BufferType>(1024, '\0');
 
     auto substr = one.substr(100, 200);
     substr.assign(kData.data(), kData.size());
