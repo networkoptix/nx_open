@@ -38,7 +38,7 @@ written by
 Yunhong Gu, last updated 03/12/2011
 *****************************************************************************/
 
-#include "buffer.h"
+#include "connection_buffer.h"
 
 #include <cstring>
 #include <cmath>
