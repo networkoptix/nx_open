@@ -374,6 +374,13 @@ bool RequestLine::parse(const ConstBufferRefType& data)
     parsingState = psMethod;
 
     const char* str = data.constData();
+    #if defined(_WIN32)
+        // This function may crash in random places (like in VMS-18435). Copy request line to the
+        // stack so it is present in the mini-dump.
+        char urlOnStack[256] = {0};
+        snprintf(urlOnStack, sizeof(urlOnStack), "%s", str);
+    #endif
+
     const char* strEnd = str + data.size();
     const char* tokenStart = nullptr;
     bool waitingNextToken = true;
