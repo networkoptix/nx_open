@@ -3,8 +3,8 @@
 function get_glibcxx_version
 {
     local -r FILE="$1"
-    # `sed` searches for something like `blabla@@GLIBCXX_3.4.25` and prints `3.4.25`.
-    readelf -sV "$FILE" | sed -n 's/.*@@GLIBCXX_//p' | sort -uV | tail -n 1
+    # `sed` searches for something like `0000000000000000 A GLIBCXX_3.4.25` and prints `3.4.25`.
+    nm "$FILE" | sed -n 's/.* GLIBCXX_//p' | sort -uV | tail -n 1
 }
 
 LOCAL_STDCPP_DIR="$1"
