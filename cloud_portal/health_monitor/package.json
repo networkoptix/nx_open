@@ -56,7 +56,7 @@
         "zone.js": "0.10.0"
     },
     "devDependencies": {
-        "@angular-builders/jest": "8.0.4",
+        "@angular-builders/jest": "9.0.0",
         "@angular-devkit/build-angular": "~0.13.9",
         "@angular/cli": "8.1.3",
         "@angular/compiler-cli": "8.2.0",
@@ -72,7 +72,7 @@
         "@types/hammerjs": "2.0.35",
         "@types/hls.js": "0.10.2",
         "@types/jasmine": "2.8.8",
-        "@types/jest": "24.0.16",
+        "@types/jest": "25.1.3",
         "@types/node": "12.6.8",
         "@types/uglify-js": "3.0.3",
         "@types/webpack": "4.4.10",
@@ -98,8 +98,8 @@
         "istanbul-instrumenter-loader": "~3.0.1",
         "jasmine": "~3.3.0",
         "jasmine-core": "~3.3.0",
-        "jest": "24.8.0",
-        "jest-preset-angular": "6.0.1",
+        "jest": "25.2.2",
+        "jest-preset-angular": "8.0.0",
         "karma": "4.2.0",
         "karma-chrome-launcher": "~2.2.0",
         "karma-coverage": "~1.1.2",
