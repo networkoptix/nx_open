@@ -56,5 +56,7 @@
             <string>Viewer</string>
         </dict>
     </array>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Please grant access to the microphone to send sound to the camera .</string>
 </dict>
 </plist>
