@@ -25,6 +25,11 @@ static const char* streamTypeToString(uint16_t flags)
 void Session::run(const QString& url, const Config& config, bool live)
 {
     static const int kTcpPrefixLength = 4;
+
+    m_prevTimestampUs = -1;
+    m_prevSequence = (uint16_t) -1; //< The sequence number of the first packet will be 0.
+    m_newPacket = true;
+    m_lastFrameTime.reset();
     int64_t position = DATETIME_NOW;
     if (!live)
     {
