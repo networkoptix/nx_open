@@ -72,7 +72,7 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
 
     const float result = qualityFactor * resolutionFactor * frameRateFactor * bitrateMultiplyer;
 
-    return std::max(kMaxSuggestedBitrateKbps, result);
+    return std::round(std::max(kMaxSuggestedBitrateKbps, result));
 }
 
 float CameraBitrateCalculator::suggestBitrateForQualityKbps(
