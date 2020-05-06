@@ -29,8 +29,11 @@ public:
     }
 
     virtual void connect(const nx::utils::Url&, ConnectHandler) override {}
+
+    virtual void addOnReconnectedHandler(
+        ReconnectHandler handler, void* client = 0) {}
+
     MOCK_METHOD3(setIndicationHandler, bool(int, IndicationHandler, void*));
-    MOCK_METHOD2(addOnReconnectedHandler, void(ReconnectHandler, void*));
     MOCK_METHOD3(addConnectionTimer, bool(std::chrono::milliseconds, TimerHandler, void*));
     MOCK_CONST_METHOD0(localAddress, SocketAddress());
     MOCK_CONST_METHOD0(remoteAddress, SocketAddress());
