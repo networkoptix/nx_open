@@ -39,11 +39,7 @@ public:
 
     ~ListeningPeer()
     {
-        for (auto& ctx: m_serverConnections)
-        {
-            ctx.serverConnection.reset();
-            ctx.stunClient->pleaseStopSync();
-        }
+        m_serverConnections.clear();
 
         m_mediatorClient.reset();
     }
@@ -86,8 +82,6 @@ protected:
 
     void whenCloseConnectionToMediator()
     {
-        m_serverConnections.back().serverConnection.reset();
-        m_serverConnections.back().stunClient->pleaseStopSync();
         m_serverConnections.pop_back();
     }
 
@@ -197,6 +191,15 @@ protected:
 private:
     struct ServerConnectionContext
     {
+        ServerConnectionContext(ServerConnectionContext&&) = default;
+
+        ~ServerConnectionContext()
+        {
+            serverConnection.reset();
+            if (stunClient)
+                stunClient->pleaseStopSync();
+        }
+
         std::shared_ptr<nx::network::stun::AsyncClient> stunClient;
         std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> serverConnection;
     };
