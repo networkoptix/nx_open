@@ -147,6 +147,7 @@ QIODevice* QnFileStorageResource::openInternal(
         return nullptr;
 
     QString fileName = removeProtocolPrefix(translateUrlToLocal(url));
+    NX_VERBOSE(this, "openInternal: Opening file '%1'", fileName);
 
     int ioBlockSize = 0;
     int ffmpegBufferSize = 0;
@@ -445,9 +446,15 @@ QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
         QString storagePath = QUrl(getUrl()).path().replace(FROM_SEP, TO_SEP);
         QString tmpPath = QUrl(url).path().replace(FROM_SEP, TO_SEP);
         if (storagePath == tmpPath)
+        {
             tmpPath.clear();
+        }
         else
-            tmpPath = tmpPath.mid(storagePath.size());
+        {
+            tmpPath = tmpPath.mid(
+                storagePath.endsWith(TO_SEP) ? storagePath.size() - 1 : storagePath.size());
+        }
+
         tmpPath = m_localPath + tmpPath;
         return tmpPath;
     }

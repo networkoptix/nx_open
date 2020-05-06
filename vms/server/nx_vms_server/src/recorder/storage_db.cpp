@@ -228,6 +228,7 @@ bool QnStorageDb::resetIoDevice()
         return false;
     }
 
+    NX_DEBUG(this, "Db file '%1' has been opened successfully", m_dbFileName);
     return true;
 }
 
@@ -292,6 +293,7 @@ void QnStorageDb::addCatalogFromMediaFolder(
 bool QnStorageDb::startDbFile()
 {
     m_ioDevice.reset();
+    NX_DEBUG(this, "startDbFile: Removing DB file '%1'", m_dbFileName);
     m_storage->removeFile(m_dbFileName);
 
     if (!resetIoDevice())
@@ -411,6 +413,7 @@ bool QnStorageDb::writeVacuumedData(
         this,
         "QnStorageDb::serializedData() completed successfully. time = %1 ms", timer.elapsedMs());
 
+    NX_DEBUG(this, "writeVacuumedData: Removing DB file '%1'", m_dbFileName);
     bool res = m_storage->removeFile(m_dbFileName);
     NX_ASSERT(res);
     if (!res)
