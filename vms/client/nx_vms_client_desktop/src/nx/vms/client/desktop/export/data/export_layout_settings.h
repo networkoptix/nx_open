@@ -7,6 +7,7 @@
 
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <core/resource/camera_bookmark.h>
+#include <nx/core/transcoding/filters/transcoding_settings.h>
 
 namespace nx::vms::client::desktop {
 
@@ -32,6 +33,8 @@ struct ExportLayoutSettings
         bool on = false;
         QString password;
     } encryption;
+
+    nx::core::transcoding::Settings transcodingSettings;
 };
 
 } // namespace nx::vms::client::desktop

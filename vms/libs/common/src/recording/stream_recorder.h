@@ -253,6 +253,7 @@ private:
     Qn::StreamQuality m_transcodeQuality = Qn::StreamQuality::normal;
     int m_transcoderFixedFrameRate = 0;
     QnMutex m_mutex;
+    AVCodecID m_lastCompressionType = AV_CODEC_ID_NONE;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -51,6 +51,7 @@ public:
         QnStorageResourcePtr storage,
         StreamRecorderRole role,
         qint64 serverTimeZoneMs,
+        const nx::core::transcoding::Settings& transcodingSettings,
         const QnTimePeriodList& playbackMask = QnTimePeriodList());
 
     void setResource(QnMediaResourcePtr resource);

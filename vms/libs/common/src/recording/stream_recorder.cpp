@@ -108,6 +108,8 @@ QString QnStreamRecorder::errorString(StreamRecorderError errCode)
             return tr("Invalid audio codec information.");
         case StreamRecorderError::incompatibleCodec:
             return tr("Video or audio codec is incompatible with the selected format.");
+        case StreamRecorderError::transcodingRequired:
+            return tr("Video transcoding required.");
         case StreamRecorderError::fileWrite:
             return tr("File write error. Not enough free space.");
         case StreamRecorderError::invalidResourceType:
@@ -212,6 +214,7 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
 
 void QnStreamRecorder::close()
 {
+    m_lastCompressionType = AV_CODEC_ID_NONE;
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
         if (m_packetWrited)
@@ -247,7 +250,7 @@ void QnStreamRecorder::close()
                     fileSize);
             }
         }
-        else
+        else if (m_lastError.lastError == StreamRecorderError::noError)
         {
             m_lastError.lastError = StreamRecorderError::dataNotFound;
         }
@@ -527,6 +530,30 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
                 .arg((md->timestamp - m_startDateTimeUs) / 1000000));
             close();
         }
+    }
+
+    if (md->dataType == QnAbstractMediaData::VIDEO)
+    {
+        if (m_lastCompressionType != AV_CODEC_ID_NONE
+            && md->compressionType != m_lastCompressionType
+            && !m_videoTranscoder)
+        {
+            NX_DEBUG(this, "Video compression type has changed from %1 to %2. Close file",
+                m_lastCompressionType, md->compressionType);
+            close();
+
+            if (m_role == StreamRecorderRole::fileExport)
+            {
+                m_lastError = StreamRecorderErrorStruct(
+                    StreamRecorderError::transcodingRequired,
+                    QnStorageResourcePtr()
+                );
+                m_recordingFinished = true;
+                m_needStop = true;
+                return false;
+            }
+        }
+        m_lastCompressionType = md->compressionType;
     }
 
     if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)

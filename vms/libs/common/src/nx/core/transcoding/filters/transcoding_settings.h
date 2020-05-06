@@ -58,6 +58,9 @@ struct Settings
     Watermark watermark;
 
     QVector<OverlaySettingsPtr> overlays;
+
+    // Force transcoding
+    bool forceTranscoding = false;
 };
 
 struct ImageOverlaySettings: OverlaySettings

@@ -29,6 +29,9 @@ ExportProcessError convertError(StreamRecorderError value)
         case StreamRecorderError::dataNotFound:
             return ExportProcessError::dataNotFound;
 
+        case StreamRecorderError::transcodingRequired:
+            return ExportProcessError::transcodingRequired;
+
         default:
             break;
     }

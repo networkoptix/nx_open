@@ -28,7 +28,8 @@ enum class ExportProcessError
     ffmpegError,
     incompatibleCodec,
     fileAccess,
-    dataNotFound
+    dataNotFound,
+    transcodingRequired
 };
 
 ExportProcessError convertError(StreamRecorderError value);

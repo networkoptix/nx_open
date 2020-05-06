@@ -142,6 +142,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     QnStorageResourcePtr storage,
     StreamRecorderRole role,
     qint64 serverTimeZoneMs,
+    const nx::core::transcoding::Settings& transcodingSettings,
     const QnTimePeriodList& playbackMask)
 {
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
@@ -224,6 +225,9 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
     m_exportRecorder->setNeedCalcSignature(true);
+
+    nx::core::transcoding::FilterChain filters(transcodingSettings);
+    m_exportRecorder->setTranscodeFilters(filters);
 
     m_exportReader->addDataProcessor(m_exportRecorder);
     if (archiveReader)

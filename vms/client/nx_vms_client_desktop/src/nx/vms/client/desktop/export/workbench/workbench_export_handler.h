@@ -9,6 +9,9 @@
 #include <nx/vms/client/desktop/export/data/export_layout_settings.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 
+#include <variant>
+
+
 namespace nx::vms::client::desktop {
 
 class ExportSettingsDialog;
@@ -29,6 +32,8 @@ public:
     virtual ~WorkbenchExportHandler() override;
 
 private:
+    using Settings = std::variant<ExportMediaSettings, ExportLayoutSettings>;
+
     void at_exportStandaloneClientAction_triggered();
     void at_saveLocalLayoutAction_triggered();
 
@@ -42,6 +47,8 @@ private:
     typedef std::pair<QnUuid, std::unique_ptr<AbstractExportTool>> ExportToolInstance;
     // Extracts selected parameters from the dialog and prepares appropriate export tool.
     ExportToolInstance prepareExportTool(const ExportSettingsDialog& dialog);
+    ExportToolInstance prepareExportTool(Settings settings, bool saveExistingLayout, bool forceTranscoding);
+
     void runExport(ExportToolInstance&& context);
 
     bool validateItemTypes(const QnLayoutResourcePtr& layout) const;

@@ -23,6 +23,7 @@ enum class StreamRecorderError
     fileWrite,
     invalidResourceType,
     dataNotFound,
+    transcodingRequired,
 
     LastError
 };

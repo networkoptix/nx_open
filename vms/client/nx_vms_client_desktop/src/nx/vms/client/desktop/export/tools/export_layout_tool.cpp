@@ -502,6 +502,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
         d->storage,
         role,
         serverTimeZone,
+        d->settings.transcodingSettings,
         playbackMask);
 
     return true;

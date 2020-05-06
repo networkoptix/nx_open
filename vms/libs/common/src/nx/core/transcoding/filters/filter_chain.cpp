@@ -109,6 +109,9 @@ bool FilterChain::isTranscodingRequired() const
     if (!m_legacyFilters.empty())
         return true;
 
+    if (m_settings.forceTranscoding)
+        return true;
+
     if (m_settings.aspectRatio.isValid())
         return true;
 
