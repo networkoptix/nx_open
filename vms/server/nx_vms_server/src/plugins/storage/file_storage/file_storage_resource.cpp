@@ -199,7 +199,7 @@ QIODevice* QnFileStorageResource::openInternal(
 
         if (fd < 0)
         {
-            NX_ERROR(this, "[open] failed to open file %1", hidePassword(fileName));
+            NX_DEBUG(this, "[open] failed to open file %1", hidePassword(fileName));
             return nullptr;
         }
     }
