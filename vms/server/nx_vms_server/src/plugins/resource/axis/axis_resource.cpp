@@ -590,15 +590,16 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     {
         // enable send motion into H.264 stream
         QByteArray body;
+        const QString kRequestName = "action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=yes";
         int status = doHttpRequest(
-            "action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=yes", nullptr);
+            kRequestName, nullptr);
         //"/axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes"
         //"/axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"
         if (status == nx::network::http::StatusCode::unauthorized)
             return CameraDiagnostics::NotAuthorisedResult(getUrl());
 
         if (status != nx::network::http::StatusCode::ok)
-            return CameraDiagnostics::UnknownErrorResult();
+            return CameraDiagnostics::RequestFailedResult(kRequestName, NX_FMT("Http error %1", status));
     }
     else
     {
