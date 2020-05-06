@@ -19,6 +19,8 @@ StackLayout
         ? parent.contentEnabled
         : true
 
+    property bool contentVisible: true
+
     Scrollable
     {
         id: view
@@ -74,6 +76,7 @@ StackLayout
 
                 width: parent.width
                 enabled: control.contentEnabled
+                visible: control.contentVisible
             }
         }
     }
