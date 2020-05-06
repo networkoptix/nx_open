@@ -31,7 +31,7 @@ public:
     virtual void connect(const nx::utils::Url&, ConnectHandler) override {}
 
     virtual void addOnReconnectedHandler(
-        ReconnectHandler handler, void* client = 0) {}
+        ReconnectHandler /*handler*/, void* /*client*/ = 0) {}
 
     MOCK_METHOD3(setIndicationHandler, bool(int, IndicationHandler, void*));
     MOCK_METHOD3(addConnectionTimer, bool(std::chrono::milliseconds, TimerHandler, void*));
