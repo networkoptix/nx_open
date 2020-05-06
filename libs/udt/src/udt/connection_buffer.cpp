@@ -38,7 +38,7 @@ written by
 Yunhong Gu, last updated 03/12/2011
 *****************************************************************************/
 
-#include "buffer.h"
+#include "connection_buffer.h"
 
 #include <cstring>
 #include <cmath>
@@ -208,7 +208,7 @@ std::optional<Buffer> CSndBuffer::readData(int32_t& msgno)
 
     // No data to read
     if (m_pCurrBlock == m_pLastBlock)
-        return 0;
+        return std::nullopt;
 
     std::optional<Buffer> data;
     // TODO: #ak Avoid copying here by switching Block::m_pcData to Buffer.

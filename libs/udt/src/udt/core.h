@@ -47,7 +47,7 @@ Yunhong Gu, last updated 02/28/2012
 #include "udt.h"
 #include "common.h"
 #include "list.h"
-#include "buffer.h"
+#include "connection_buffer.h"
 #include "window.h"
 #include "packet.h"
 #include "channel.h"

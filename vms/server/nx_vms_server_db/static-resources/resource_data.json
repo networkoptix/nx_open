@@ -1461,12 +1461,11 @@
             "keys": [
                 "HIKVISION|DS-2CD2132F-IWS",
                 "HIKVISION|DS-2CD2655FWD-IZS",
-                "HIKVISION|DS-2CD2742FWD-IS",
+                "HIKVISION|DS-2CD2742FWD*",
                 "HIKVISION|DS-2CD2942F-IS",
                 "HIKVISION|DS-2CD63C2F-IS",
                 "HIKVISION|DS-2DE4A220IW-DE",
                 "Hikvision|DS-2CD2655FWD-IZS",
-                "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
                 "Hikvision|DS-2CD63C2F-IS",
                 "Hikvision|DS-2DE4A220IW-DE",
@@ -3964,12 +3963,12 @@
                     "x": {
                         "extrapolationMode": "PeriodicExtrapolation",
                         "device":  [-1, 1],
-                        "logical": [180, -180]
+                        "logical": [0, 360]
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [-1, 1],
-                        "logical": [-15, 90]
+                        "logical": [15, -90]
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
@@ -4026,7 +4025,7 @@
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [-1, 1],
-                        "logical": [-15, 90]
+                        "logical": [15, -90]
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",

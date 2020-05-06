@@ -1,280 +1,218 @@
-/*****************************************************************************
-Copyright (c) 2001 - 2009, The Board of Trustees of the University of Illinois.
-All rights reserved.
+#pragma once
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
+#include <algorithm>
+#include <cstring>
+#include <memory>
+#include <string>
 
-* Redistributions of source code must retain the above
-copyright notice, this list of conditions and the
-following disclaimer.
-
-* Redistributions in binary form must reproduce the
-above copyright notice, this list of conditions
-and the following disclaimer in the documentation
-and/or other materials provided with the distribution.
-
-* Neither the name of the University of Illinois
-nor the names of its contributors may be used to
-endorse or promote products derived from this
-software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
-IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*****************************************************************************/
-
-/*****************************************************************************
-written by
-Yunhong Gu, last updated 05/05/2009
-*****************************************************************************/
-
-#ifndef __UDT_BUFFER_H__
-#define __UDT_BUFFER_H__
-
-#include <fstream>
-#include <mutex>
-#include <optional>
-
-#include "common.h"
-#include "queue.h"
-
-
-static const int kDefaultMtuSize = 1400;
-
-class CSndBuffer
+/**
+ * Buffer with implicit sharing.
+ */
+template<typename ValueType>
+class BasicBuffer
 {
 public:
-    CSndBuffer(int size = 32, int mss = kDefaultMtuSize);
-    ~CSndBuffer();
+    using size_type = std::size_t;
+    using value_type = ValueType;
 
-    // Functionality:
-    //    Insert a user buffer into the sending list.
-    // Parameters:
-    //    0) [in] data: pointer to the user data block.
-    //    1) [in] len: size of the block.
-    //    2) [in] ttl: time to live in milliseconds
-    //    3) [in] order: if the block should be delivered in order, for DGRAM only
-    // Returned value:
-    //    None.
+    static constexpr size_type npos = (size_type)-1;
 
-    void addBuffer(
-        const char* data, int len,
-        std::chrono::milliseconds ttl = std::chrono::milliseconds(-1), bool order = false);
+    BasicBuffer() = default;
+    BasicBuffer(std::size_t initialSize, ValueType ch);
+    BasicBuffer(const value_type* data, size_type count);
 
-    // Functionality:
-    //    Read a block of data from file and insert it into the sending list.
-    // Parameters:
-    //    0) [in] ifs: input file stream.
-    //    1) [in] len: size of the block.
-    // Returned value:
-    //    actual size of data added from the file.
+    BasicBuffer(const BasicBuffer&) = default;
+    BasicBuffer(BasicBuffer&&) = default;
+    BasicBuffer& operator=(const BasicBuffer&) = default;
+    BasicBuffer& operator=(BasicBuffer&&) = default;
 
-    int addBufferFromFile(std::fstream& ifs, int len);
+    value_type* data();
+    const value_type* data() const;
+    size_type size() const;
 
-    // Functionality:
-    //    Find data position to pack a DATA packet from the furthest reading point.
-    // Parameters:
-    //    0) [out] msgno: message number of the packet.
+    /**
+     * NOTE: Decreasing size does not cause reallocation.
+     */
+    void resize(size_type newSize);
 
-    std::optional<Buffer> readData(int32_t& msgno);
+    void assign(const value_type* data, size_type count);
 
-    // Functionality:
-    //    Find data position to pack a DATA packet for a retransmission.
-    // Parameters:
-    //    0) [in] offset: offset from the last ACK point.
-    //    1) [out] msgno: message number of the packet.
-    //    2) [out] msglen: length of the message
+    /**
+     * NOTE: No bounds checking is performed. So, if pos > size() behavior is undefined.
+     */
+    value_type& operator[](size_type pos);
+    const value_type& operator[](size_type pos) const;
 
-    std::optional<Buffer> readData(const int offset, int32_t& msgno, int& msglen);
-
-    // Functionality:
-    //    Update the ACK point and may release/unmap/return the user data according to the flag.
-    // Parameters:
-    //    0) [in] offset: number of packets acknowledged.
-    // Returned value:
-    //    None.
-
-    void ackData(int offset);
-
-    // Functionality:
-    //    Read size of data still in the sending list.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    Current size of the data in the sending list.
-
-    int getCurrBufSize() const;
+    /**
+     * @return BasicBuffer that points to the existing buffer with offset.
+     * So, data is not copied.
+     */
+    BasicBuffer substr(size_type offset, size_type count = npos) const;
+    bool empty() const;
 
 private:
-    void increase();
+    std::shared_ptr<ValueType> m_data;
+    size_type m_offset = 0;
+    size_type m_size = 0;
 
-private:
-    mutable std::mutex m_mutex;           // used to synchronize buffer operation
+    // Substring initializer.
+    BasicBuffer(
+        std::shared_ptr<ValueType> data,
+        std::size_t offset,
+        std::size_t size);
 
-    struct Block
-    {
-        char* m_pcData;                   // pointer to the data block
-        int m_iLength;                    // length of the block
-
-        int32_t m_iMsgNo;                 // message number
-        std::chrono::microseconds m_OriginTime;            // original request time
-        std::chrono::milliseconds m_iTTL;                       // time to live (milliseconds)
-
-        Block* m_pNext;                   // next block
-    } *m_pBlock, *m_pFirstBlock, *m_pCurrBlock, *m_pLastBlock;
-
-    // m_pBlock:         The head pointer
-    // m_pFirstBlock:    The first block
-    // m_pCurrBlock:    The current block
-    // m_pLastBlock:     The last block (if first == last, buffer is empty)
-
-    struct BufferNode
-    {
-        char* m_pcData;            // buffer
-        int m_iSize;            // size
-        BufferNode* m_pNext;            // next buffer
-    } *m_pBuffer;            // physical buffer
-
-    int32_t m_iNextMsgNo;                // next message number
-
-    int m_iSize;                // buffer size (number of packets)
-    int m_iMSS;                          // maximum seqment/packet size
-
-    int m_iCount;            // number of used blocks
-
-private:
-    CSndBuffer(const CSndBuffer&);
-    CSndBuffer& operator=(const CSndBuffer&);
+    std::shared_ptr<ValueType> allocate(size_type size);
+    void ensureExclusiveOwnershipOverData();
 };
 
-////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
 
-class CRcvBuffer
+template<typename ValueType>
+BasicBuffer<ValueType>::BasicBuffer(std::size_t initialSize, ValueType ch):
+    m_size(initialSize)
 {
-public:
-    CRcvBuffer(int bufsize = 65536);
-    ~CRcvBuffer();
+    if (m_size > 0)
+    {
+        m_data = allocate(m_size);
+        memset(m_data.get(), ch, m_size * sizeof(ch));
+    }
+}
 
-    // Functionality:
-    //    Write data into the buffer.
-    // Parameters:
-    //    0) [in] unit: pointer to a data unit containing new packet
-    //    1) [in] offset: offset from last ACK point.
-    // Returned value:
-    //    false if data is repeated.
+template<typename ValueType>
+BasicBuffer<ValueType>::BasicBuffer(const value_type* data, size_type count)
+{
+    assign(data, count);
+}
 
-    bool addData(std::shared_ptr<Unit> unit, int offset);
+template<typename ValueType>
+ValueType* BasicBuffer<ValueType>::data()
+{
+    ensureExclusiveOwnershipOverData();
+    return m_data.get() + m_offset;
+}
 
-    // Functionality:
-    //    Read data into a user buffer.
-    // Parameters:
-    //    0) [in] data: pointer to user buffer.
-    //    1) [in] len: length of user buffer.
-    // Returned value:
-    //    size of data read.
+template<typename ValueType>
+const ValueType* BasicBuffer<ValueType>::data() const
+{
+    return m_data.get() + m_offset;
+}
 
-    int readBuffer(char* data, int len);
+template<typename ValueType>
+typename BasicBuffer<ValueType>::size_type BasicBuffer<ValueType>::size() const
+{
+    return m_size;
+}
 
-    // Functionality:
-    //    Read data directly into file.
-    // Parameters:
-    //    0) [in] file: C++ file stream.
-    //    1) [in] len: expected length of data to write into the file.
-    // Returned value:
-    //    size of data read.
+template<typename ValueType>
+void BasicBuffer<ValueType>::resize(size_type newSize)
+{
+    if (newSize <= m_size && newSize > 0)
+    {
+        m_size = newSize;
+        return;
+    }
 
-    int readBufferToFile(std::fstream& ofs, int len);
+    if (newSize > 0)
+    {
+        auto newData = allocate(newSize);
+        memcpy(newData.get(), ((const BasicBuffer*)this)->data(), std::min(m_size, newSize));
+        m_data = std::move(newData);
+    }
+    else
+    {
+        m_data.reset();
+    }
 
-    // Functionality:
-    //    Update the ACK point of the buffer.
-    // Parameters:
-    //    0) [in] len: size of data to be acknowledged.
-    // Returned value:
-    //    1 if a user buffer is fulfilled, otherwise 0.
+    m_offset = 0;
+    m_size = newSize;
+}
 
-    void ackData(int len);
+template<typename ValueType>
+void BasicBuffer<ValueType>::assign(const value_type* data, size_type count)
+{
+    m_data.reset();
 
-    // Functionality:
-    //    Query how many buffer space left for data receiving.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    size of available buffer space (including user buffer) for data receiving.
+    m_size = count;
+    m_offset = 0;
+    if (m_size > 0)
+    {
+        m_data = allocate(m_size);
+        memcpy(m_data.get(), data, count);
+    }
+}
 
-    int getAvailBufSize() const;
+template<typename ValueType>
+typename BasicBuffer<ValueType>::value_type&
+BasicBuffer<ValueType>::operator[](size_type pos)
+{
+    return data()[pos];
+}
 
-    // Functionality:
-    //    Query how many data has been continuously received (for reading).
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    size of valid (continous) data for reading.
+template<typename ValueType>
+const typename BasicBuffer<ValueType>::value_type&
+BasicBuffer<ValueType>::operator[](size_type pos) const
+{
+    return data()[pos];
+}
 
-    int getRcvDataSize() const;
+/**
+ * NOTE: If the requested substring extends past the buffer then
+ * substring will be shorter than count. So, the bound checking is performed.
+ */
+template<typename ValueType>
+BasicBuffer<ValueType> BasicBuffer<ValueType>::substr(
+    size_type offset, size_type count) const
+{
+    if (offset >= m_size)
+    {
+        return BasicBuffer();
+    }
+    else if (count == npos || offset + count > m_size)
+    {
+        count = m_size - offset;
+    }
 
-    // Functionality:
-    //    mark the message to be dropped from the message list.
-    // Parameters:
-    //    0) [in] msgno: message nuumer.
-    // Returned value:
-    //    None.
+    return BasicBuffer(m_data, m_offset + offset, count);
+}
 
-    void dropMsg(int32_t msgno);
+template<typename ValueType>
+bool BasicBuffer<ValueType>::empty() const
+{
+    return size() == 0;
+}
 
-    // Functionality:
-    //    read a message.
-    // Parameters:
-    //    0) [out] data: buffer to write the message into.
-    //    1) [in] len: size of the buffer.
-    // Returned value:
-    //    actuall size of data read.
+template<typename ValueType>
+BasicBuffer<ValueType>::BasicBuffer(
+    std::shared_ptr<ValueType> data,
+    std::size_t offset,
+    std::size_t size)
+    :
+    m_data(std::move(data)),
+    m_offset(offset),
+    m_size(size)
+{
+}
 
-    int readMsg(char* data, int len);
+template<typename ValueType>
+void BasicBuffer<ValueType>::ensureExclusiveOwnershipOverData()
+{
+    if (m_data.use_count() > 1)
+    {
+        auto newData = allocate(m_size);
+        memcpy(newData.get(), m_data.get() + m_offset, m_size);
 
-    // Functionality:
-    //    Query how many messages are available now.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    number of messages available for recvmsg.
+        m_data = std::move(newData);
+        m_offset = 0;
+    }
+}
 
-    int getRcvMsgNum();
+template<typename ValueType>
+std::shared_ptr<ValueType> BasicBuffer<ValueType>::allocate(size_type size)
+{
+    return std::shared_ptr<ValueType>(new ValueType[size], std::default_delete<ValueType[]>());
+}
 
-private:
-    int getRcvDataSize(const std::lock_guard<std::mutex>&) const;
+//using Buffer = BasicBuffer<char>;
 
-    bool scanMsg(
-        const std::lock_guard<std::mutex>& lock,
-        int& start, int& end, bool& passack);
-
-private:
-    mutable std::mutex m_mutex;           // used to synchronize buffer operation
-
-    std::vector<std::shared_ptr<Unit>> m_pUnit;                     // pointer to the protocol buffer
-    int m_iSize;                         // size of the protocol buffer
-
-    int m_iStartPos;                     // the head position for I/O (inclusive)
-    int m_iLastAckPos;                   // the last ACKed position (exclusive)
-                                         // EMPTY: m_iStartPos = m_iLastAckPos   FULL: m_iStartPos = m_iLastAckPos + 1
-    int m_iMaxPos;            // the furthest data position
-
-    int m_iNotch;            // the starting read point of the first unit
-
-private:
-    CRcvBuffer();
-    CRcvBuffer(const CRcvBuffer&);
-    CRcvBuffer& operator=(const CRcvBuffer&);
-};
-
-
-#endif
+// NOTE: Disabling implicit sharing to see if it resolves the problem VMS-18365.
+using Buffer = std::string;

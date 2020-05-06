@@ -46,6 +46,7 @@ Yunhong Gu, last updated 01/02/2011
 #include <memory>
 #include <tuple>
 
+#include "buffer.h"
 #include "common.h"
 #include "udt.h"
 
