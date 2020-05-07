@@ -45,7 +45,7 @@ Yunhong Gu, last updated 03/12/2011
 
 using namespace std;
 
-CSndBuffer::CSndBuffer(int size, int mss):
+SendBuffer::SendBuffer(int size, int mss):
     m_pBlock(NULL),
     m_pFirstBlock(NULL),
     m_pCurrBlock(NULL),
@@ -85,7 +85,7 @@ CSndBuffer::CSndBuffer(int size, int mss):
     m_pFirstBlock = m_pCurrBlock = m_pLastBlock = m_pBlock;
 }
 
-CSndBuffer::~CSndBuffer()
+SendBuffer::~SendBuffer()
 {
     Block* pb = m_pBlock->m_pNext;
     while (pb != m_pBlock)
@@ -105,7 +105,7 @@ CSndBuffer::~CSndBuffer()
     }
 }
 
-void CSndBuffer::addBuffer(const char* data, int len, std::chrono::milliseconds ttl, bool order)
+void SendBuffer::addBuffer(const char* data, int len, std::chrono::milliseconds ttl, bool order)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -151,7 +151,7 @@ void CSndBuffer::addBuffer(const char* data, int len, std::chrono::milliseconds 
         m_iNextMsgNo = 1;
 }
 
-int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
+int SendBuffer::addBufferFromFile(fstream& ifs, int len)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -202,7 +202,7 @@ int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
     return total;
 }
 
-std::optional<Buffer> CSndBuffer::readData(int32_t& msgno)
+std::optional<Buffer> SendBuffer::readData(int32_t& msgno)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -222,7 +222,7 @@ std::optional<Buffer> CSndBuffer::readData(int32_t& msgno)
     return data;
 }
 
-std::optional<Buffer> CSndBuffer::readData(const int offset, int32_t& msgno, int& msglen)
+std::optional<Buffer> SendBuffer::readData(const int offset, int32_t& msgno, int& msglen)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -259,7 +259,7 @@ std::optional<Buffer> CSndBuffer::readData(const int offset, int32_t& msgno, int
     return data;
 }
 
-void CSndBuffer::ackData(int offset)
+void SendBuffer::ackData(int offset)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -271,14 +271,14 @@ void CSndBuffer::ackData(int offset)
     CTimer::triggerEvent();
 }
 
-int CSndBuffer::getCurrBufSize() const
+int SendBuffer::getCurrBufSize() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     return m_iCount;
 }
 
-void CSndBuffer::increase()
+void SendBuffer::increase()
 {
     int unitsize = m_pBuffer->m_iSize;
 
@@ -322,7 +322,7 @@ void CSndBuffer::increase()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-CRcvBuffer::CRcvBuffer(int bufsize):
+ReceiveBuffer::ReceiveBuffer(int bufsize):
     m_iSize(bufsize),
     m_iStartPos(0),
     m_iLastAckPos(0),
@@ -332,9 +332,9 @@ CRcvBuffer::CRcvBuffer(int bufsize):
     m_pUnit.resize(m_iSize);
 }
 
-CRcvBuffer::~CRcvBuffer() = default;
+ReceiveBuffer::~ReceiveBuffer() = default;
 
-bool CRcvBuffer::addData(std::shared_ptr<Unit> unit, int offset)
+bool ReceiveBuffer::addData(std::shared_ptr<Unit> unit, int offset)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -352,7 +352,7 @@ bool CRcvBuffer::addData(std::shared_ptr<Unit> unit, int offset)
     return true;
 }
 
-int CRcvBuffer::readBuffer(char* data, int len)
+int ReceiveBuffer::readBuffer(char* data, int len)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -388,7 +388,7 @@ int CRcvBuffer::readBuffer(char* data, int len)
     return len - rs;
 }
 
-int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
+int ReceiveBuffer::readBufferToFile(fstream& ofs, int len)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -426,7 +426,7 @@ int CRcvBuffer::readBufferToFile(fstream& ofs, int len)
     return len - rs;
 }
 
-void CRcvBuffer::ackData(int len)
+void ReceiveBuffer::ackData(int len)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -438,7 +438,7 @@ void CRcvBuffer::ackData(int len)
     CTimer::triggerEvent();
 }
 
-int CRcvBuffer::getAvailBufSize() const
+int ReceiveBuffer::getAvailBufSize() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -446,13 +446,13 @@ int CRcvBuffer::getAvailBufSize() const
     return m_iSize - getRcvDataSize(lock) - 1;
 }
 
-int CRcvBuffer::getRcvDataSize() const
+int ReceiveBuffer::getRcvDataSize() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return getRcvDataSize(lock);
 }
 
-int CRcvBuffer::getRcvDataSize(const std::lock_guard<std::mutex>&) const
+int ReceiveBuffer::getRcvDataSize(const std::lock_guard<std::mutex>&) const
 {
     if (m_iLastAckPos >= m_iStartPos)
         return m_iLastAckPos - m_iStartPos;
@@ -460,7 +460,7 @@ int CRcvBuffer::getRcvDataSize(const std::lock_guard<std::mutex>&) const
     return m_iSize + m_iLastAckPos - m_iStartPos;
 }
 
-void CRcvBuffer::dropMsg(int32_t msgno)
+void ReceiveBuffer::dropMsg(int32_t msgno)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -469,7 +469,7 @@ void CRcvBuffer::dropMsg(int32_t msgno)
             m_pUnit[i]->setFlag(Unit::Flag::msgDropped);
 }
 
-int CRcvBuffer::readMsg(char* data, int len)
+int ReceiveBuffer::readMsg(char* data, int len)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -507,7 +507,7 @@ int CRcvBuffer::readMsg(char* data, int len)
     return len - rs;
 }
 
-int CRcvBuffer::getRcvMsgNum()
+int ReceiveBuffer::getRcvMsgNum()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -516,7 +516,7 @@ int CRcvBuffer::getRcvMsgNum()
     return scanMsg(lock, p, q, passack) ? 1 : 0;
 }
 
-bool CRcvBuffer::scanMsg(
+bool ReceiveBuffer::scanMsg(
     const std::lock_guard<std::mutex>& lock,
     int& p, int& q, bool& passack)
 {
