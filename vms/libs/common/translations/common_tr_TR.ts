@@ -901,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kayıt İçin Akış Çıkışı Ayrılamadı.</translation>
+      <translation>Kayıt İçin Çıkış Akışı Sağlanamadı.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>

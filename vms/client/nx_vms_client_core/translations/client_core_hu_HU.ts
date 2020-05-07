@@ -32,9 +32,9 @@
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Megabájt</numerusform>
-        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabájt</numerusform>
       </translation>
     </message>
     <message>
