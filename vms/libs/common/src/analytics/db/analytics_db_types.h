@@ -105,6 +105,14 @@ QN_FUSION_DECLARE_FUNCTIONS(ObjectTrackEx, (json)(ubjson));
 
 struct Filter
 {
+    enum Option
+    {
+        none = 0x0,
+        ignoreAttributes = 0x1,
+    };
+
+    Q_DECLARE_FLAGS(Options, Option)
+
     /** If empty, any device is matched. */
     std::vector<QnUuid> deviceIds;
 
@@ -143,8 +151,8 @@ struct Filter
     bool acceptsAttributes(const nx::common::metadata::Attributes& attributes) const;
     bool acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata,
         bool checkBoundingBox = true) const;
-    bool acceptsTrack(const ObjectTrack& track) const;
-    bool acceptsTrackEx(const ObjectTrackEx& track) const;
+    bool acceptsTrack(const ObjectTrack& track, Options options = Option::none) const;
+    bool acceptsTrackEx(const ObjectTrackEx& track, Options options = Option::none) const;
 
     /**
      * Search is implemented by attribute values only. SqLite fts4 syntax supports only full match
@@ -160,9 +168,10 @@ struct Filter
 
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;
+
 private:
     template <typename ObjectTrackType>
-    bool acceptsTrackInternal(const ObjectTrackType& track) const;
+    bool acceptsTrackInternal(const ObjectTrackType& track, Options options) const;
 };
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params);

@@ -20,6 +20,7 @@ struct ObjectTrackUpdate
 {
     int64_t dbId = kInvalidDbId;
     QnUuid trackId;
+    QString objectTypeId;
     ObjectRegion appendedTrack;
     /** Attributes that were added since the last insert/update. */
     std::vector<common::metadata::Attribute> appendedAttributes;

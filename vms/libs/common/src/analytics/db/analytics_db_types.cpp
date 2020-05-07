@@ -185,18 +185,18 @@ bool Filter::acceptsMetadata(const ObjectMetadata& metadata, bool checkBoundingB
         && acceptsAttributes(metadata.attributes);
 }
 
-bool Filter::acceptsTrack(const ObjectTrack& track) const
+bool Filter::acceptsTrack(const ObjectTrack& track, Options options) const
 {
-    return acceptsTrackInternal(track);
+    return acceptsTrackInternal(track, options);
 }
 
-bool Filter::acceptsTrackEx(const ObjectTrackEx& track) const
+bool Filter::acceptsTrackEx(const ObjectTrackEx& track, Options options) const
 {
-    return acceptsTrackInternal(track);
+    return acceptsTrackInternal(track, options);
 }
 
 template <typename ObjectTrackType>
-bool Filter::acceptsTrackInternal(const ObjectTrackType& track) const
+bool Filter::acceptsTrackInternal(const ObjectTrackType& track, Options options) const
 {
      using namespace std::chrono;
 
@@ -225,7 +225,7 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track) const
         return false;
     }
 
-    if (!acceptsAttributes(track.attributes))
+    if (!options.testFlag(Option::ignoreAttributes) && !acceptsAttributes(track.attributes))
     {
         if constexpr (std::is_same<decltype(track), const ObjectTrackEx&>::value)
         {

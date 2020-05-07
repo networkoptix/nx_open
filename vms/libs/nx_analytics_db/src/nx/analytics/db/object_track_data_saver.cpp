@@ -113,7 +113,7 @@ void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         const auto deviceDbId = m_deviceDao->insertOrFetch(queryContext, track.deviceId);
         const auto objectTypeDbId = m_objectTypeDao->insertOrFetch(queryContext, track.objectTypeId);
         const auto attributesId = m_attributesDao->insertOrFetchAttributes(
-            queryContext, track.attributes);
+            queryContext, track.objectTypeId, track.attributes);
 
         auto trackMinTimestamp = track.firstAppearanceTimeUs;
         auto trackMaxTimestamp = track.lastAppearanceTimeUs;
@@ -236,7 +236,7 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
     for (const auto& trackUpdate: m_tracksToUpdate)
     {
         const auto newAttributesId = m_attributesDao->insertOrFetchAttributes(
-            queryContext, trackUpdate.allAttributes);
+            queryContext, trackUpdate.objectTypeId, trackUpdate.allAttributes);
 
         auto trackMinTimestamp = trackUpdate.firstAppearanceTimeUs;
         auto trackMaxTimestamp = trackUpdate.lastAppearanceTimeUs;

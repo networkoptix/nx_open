@@ -27,6 +27,8 @@ class QnCommonModule;
 
 namespace nx::analytics::db {
 
+class AbstractObjectTypeDictionary;
+
 enum class ChownMode
 {
     recursive,
@@ -42,7 +44,8 @@ class NX_ANALYTICS_DB_API EventsStorage:
 public:
     EventsStorage(
         QnCommonModule* commonModule,
-        AbstractIframeSearchHelper* iframeSearchHelper);
+        AbstractIframeSearchHelper* iframeSearchHelper,
+        AbstractObjectTypeDictionary* objectTypeDictionary);
     virtual ~EventsStorage();
 
     /**
@@ -97,6 +100,7 @@ protected:
 private:
     QnCommonModule* m_commonModule = nullptr;
     AbstractIframeSearchHelper* m_iframeSearchHelper = nullptr;
+    AbstractObjectTypeDictionary* m_objectTypeDictionary = nullptr;
     std::unique_ptr<DbController> m_dbController;
     std::list<AbstractCursor*> m_openedCursors;
     std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
@@ -137,6 +141,5 @@ private:
 
     static std::vector<PathAndMode> enumerateSqlFiles(const QString& dbFileName);
 };
-
 
 } // namespace nx::analytics::db

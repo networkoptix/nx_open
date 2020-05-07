@@ -10,20 +10,25 @@ namespace std { uint qHash(const std::set<int64_t>& value); }
 
 namespace nx::analytics::db {
 
+class AbstractObjectTypeDictionary;
+
 /**
  * NOTE: Not thread-safe.
  */
 class AttributesDao
 {
 public:
-    AttributesDao();
+    AttributesDao(AbstractObjectTypeDictionary* objectTypeDictionary);
 
     /**
+     * Saves attributes and makes them available for the full-text search.
+     * @param objectTypeId Resolved to object type name and made available through the full-text search.
      * @return attributesId
      * NOTE: Throws on failure.
      */
     int64_t insertOrFetchAttributes(
         nx::sql::QueryContext* queryContext,
+        const QString& objectTypeId,
         const std::vector<common::metadata::Attribute>& eventAttributes);
 
     int64_t combineAttributes(
@@ -36,18 +41,24 @@ public:
 
     void clear();
 
+    static QByteArray serialize(
+        const std::optional<QString>& objectTypeName,
+        const std::vector<common::metadata::Attribute>& attributes);
+
     static std::vector<common::metadata::Attribute> deserialize(
         const QString& attributesStr);
 
 private:
     QCache<QByteArray /*md5*/, int64_t /*id*/> m_attributesCache;
     QCache<std::set<int64_t> /*attributesIds*/, int64_t /*id*/> m_combinedAttrsCache;
+    AbstractObjectTypeDictionary* m_objectTypeDictionary = nullptr;
 
     /**
      * @return Attributes set id.
      */
     int64_t insertAttributes(
         nx::sql::QueryContext* queryContext,
+        const std::optional<QString>& objectTypeName,
         const std::vector<common::metadata::Attribute>& attributes,
         const QByteArray& serializedAttributes);
 
