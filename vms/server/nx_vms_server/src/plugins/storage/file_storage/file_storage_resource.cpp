@@ -441,42 +441,39 @@ QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
 
     if (m_localPath.isEmpty())
         return url;
+
+    const auto storageUrl = nx::utils::Url(getUrl());
+    const auto urlToTranslate = nx::utils::Url(url);
+
+    // For example:
+    // storageUrl = smb://host/path OR storageUrl = smb://host/path/
+    // urlToTranslate = smb://host/path/subfolder
+
+    const auto urlToClosedPath =
+        [](const auto& u) { return closeDirPath(u.toString(QUrl::RemoveAuthority)); };
+
+    // Requested url should belong to our storage, otherwise translation makes no sense.
+    if (!NX_ASSERT(urlToClosedPath(urlToTranslate).startsWith(urlToClosedPath(storageUrl))))
+        return url;
+
+    QString storagePath = storageUrl.path().replace(FROM_SEP, TO_SEP);
+    QString subPath = urlToTranslate.path().replace(FROM_SEP, TO_SEP);
+
+    if (storagePath == subPath) //< Base folder
+    {
+        subPath.clear();
+    }
     else
     {
-        const auto storageUrl = nx::utils::Url(getUrl());
-        const auto urlToTranslate = nx::utils::Url(url);
+        // Our goal here is to extract '/subfolder' postfix.
 
-        // For example:
-        // storageUrl = smb://host/path OR storageUrl = smb://host/path/
-        // urlToTranslate = smb://host/path/subfolder
-
-        const auto urlToClosedPath =
-            [](const auto& u) { return closeDirPath(u.toString(QUrl::RemoveAuthority)); };
-
-        // Requested url should belong to our storage, otherwise translation makes no sense.
-        if (!NX_ASSERT(urlToClosedPath(urlToTranslate).startsWith(urlToClosedPath(storageUrl))))
-            return url;
-
-        QString storagePath = storageUrl.path().replace(FROM_SEP, TO_SEP);
-        QString result = urlToTranslate.path().replace(FROM_SEP, TO_SEP);
-
-        if (storagePath == result) //< Base folder
-        {
-            result.clear();
-        }
-        else
-        {
-            // Our goal here is to extract '/subfolder' postfix.
-
-            if (storagePath.endsWith(TO_SEP)) //< storagePath = /path/, requested url = /path/subfolder
-                result = result.mid(storagePath.size() - 1);
-            else //< storagePath = /path, requested url = /path/subfolder
-                result = result.mid(storagePath.size());
-        }
-
-        result = m_localPath + result;
-        return result;
+        if (storagePath.endsWith(TO_SEP)) //< storagePath = /path/, requested url = /path/subfolder
+            subPath = subPath.mid(storagePath.size() - 1);
+        else //< storagePath = /path, requested url = /path/subfolder
+            subPath = subPath.mid(storagePath.size());
     }
+
+    return m_localPath + subPath;
 }
 
 QString QnFileStorageResource::translateUrlToRemote(const QString &url) const
