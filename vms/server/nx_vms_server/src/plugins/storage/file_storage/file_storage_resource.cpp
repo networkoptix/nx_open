@@ -443,20 +443,40 @@ QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
         return url;
     else
     {
-        QString storagePath = QUrl(getUrl()).path().replace(FROM_SEP, TO_SEP);
-        QString tmpPath = QUrl(url).path().replace(FROM_SEP, TO_SEP);
-        if (storagePath == tmpPath)
+        const auto storageUrl = nx::utils::Url(getUrl());
+        const auto urlToTranslate = nx::utils::Url(url);
+
+        // For example:
+        // storageUrl = smb://host/path OR storageUrl = smb://host/path/
+        // urlToTranslate = smb://host/path/subfolder
+
+        const auto urlToClosedPath =
+            [](const auto& u)
+            { return closeDirPath(u.toString(QUrl::RemoveAuthority)); };
+
+        // Requested url should belong to our storage, otherwise translation makes no sense.
+        if (!NX_ASSERT(urlToClosedPath(urlToTranslate).startsWith(urlToClosedPath(storageUrl))))
+            return url;
+
+        QString storagePath = storageUrl.path().replace(FROM_SEP, TO_SEP);
+        QString result = urlToTranslate.path().replace(FROM_SEP, TO_SEP);
+
+        if (storagePath == result) //< Base folder
         {
-            tmpPath.clear();
+            result.clear();
         }
         else
         {
-            tmpPath = tmpPath.mid(
-                storagePath.endsWith(TO_SEP) ? storagePath.size() - 1 : storagePath.size());
+            // Our goal here is to extract '/subfolder' postfix.
+
+            if (storagePath.endsWith(TO_SEP)) //< storagePath = /path/, requested url = /path/subfolder
+                result = result.mid(storagePath.size() - 1);
+            else //< storagePath = /path, requested url = /path/subfolder
+                result = result.mid(storagePath.size());
         }
 
-        tmpPath = m_localPath + tmpPath;
-        return tmpPath;
+        result = m_localPath + result;
+        return result;
     }
 }
 
@@ -837,7 +857,7 @@ bool QnFileStorageResource::testWriteCapInternal() const
     QString fileName(lit("%1%2.tmp"));
     QString localGuid = commonModule()->moduleGUID().toString();
     localGuid = localGuid.mid(1, localGuid.length() - 2);
-    fileName = fileName.arg(closeDirPath(translateUrlToLocal(getPath()))).arg(localGuid);
+    fileName = fileName.arg(closeDirPath(translateUrlToLocal(getUrl()))).arg(localGuid);
 
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly))
