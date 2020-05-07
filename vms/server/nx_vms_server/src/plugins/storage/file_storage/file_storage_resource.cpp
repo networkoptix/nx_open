@@ -451,8 +451,7 @@ QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
         // urlToTranslate = smb://host/path/subfolder
 
         const auto urlToClosedPath =
-            [](const auto& u)
-            { return closeDirPath(u.toString(QUrl::RemoveAuthority)); };
+            [](const auto& u) { return closeDirPath(u.toString(QUrl::RemoveAuthority)); };
 
         // Requested url should belong to our storage, otherwise translation makes no sense.
         if (!NX_ASSERT(urlToClosedPath(urlToTranslate).startsWith(urlToClosedPath(storageUrl))))
