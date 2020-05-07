@@ -69,6 +69,11 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 int StreamReader::nextPacket(std::shared_ptr<ffmpeg::Packet>& packet)
 {
+    using namespace std::chrono;
+    static const auto kCameraReadTimeout = 3s;
+    static const auto kSleepInterval = 10ms;
+
+    const auto startTime = steady_clock::now();
     while (!m_interrupted)
     {
         int status;
@@ -76,16 +81,17 @@ int StreamReader::nextPacket(std::shared_ptr<ffmpeg::Packet>& packet)
             status = m_camera->nextPacket(packet);
         else
             status = m_camera->nextBufferedPacket(packet);
-        if (status == AVERROR(EAGAIN))
+        const auto currentTime = steady_clock::now();
+        if (status == AVERROR(EAGAIN) && currentTime - startTime < kCameraReadTimeout)
         {
             // Some sleep needed because video reading is non blocking when no audio.
             if (!m_camera->audioEnabled())
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                std::this_thread::sleep_for(kSleepInterval);
             continue;
         }
         if (status < 0)
         {
-            NX_ERROR(this, "Usb camera plugin reading error: %1",
+            NX_WARNING(this, "Usb camera plugin reading error: %1",
                 ffmpeg::utils::errorToString(status));
             m_camera->uninitialize();
             return nxcip::NX_IO_ERROR;
