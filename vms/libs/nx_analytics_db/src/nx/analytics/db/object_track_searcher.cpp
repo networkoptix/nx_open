@@ -224,7 +224,11 @@ void ObjectTrackSearcher::fetchTracksFromDb(
 
     query->exec();
 
-    auto tracks = loadTracks(query.get(), m_filter.maxObjectTracksToSelect);
+    auto tracks = loadTracks(
+        query.get(),
+        m_filter.maxObjectTracksToSelect,
+        Filter::Option::ignoreAttributes);
+
     if (m_filter.sortOrder == Qt::AscendingOrder)
         std::reverse(tracks.begin(), tracks.end());
 
@@ -280,14 +284,17 @@ void ObjectTrackSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* quer
 }
 
 std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
-    nx::sql::AbstractSqlQuery* query, int limit)
+    nx::sql::AbstractSqlQuery* query, int limit, Filter::Options filterOptions)
 {
     std::vector<ObjectTrack> tracks;
     while (query->next())
     {
         auto track = loadTrack(
             query,
-            [this](const auto& track) { return m_filter.acceptsTrack(track); });
+            [this, filterOptions](const auto& track)
+            {
+                return m_filter.acceptsTrack(track, filterOptions);
+            });
 
         if (!track)
             continue;

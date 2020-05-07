@@ -14,6 +14,7 @@
 
 #include <analytics/db/config.h>
 
+#include "abstract_object_type_dictionary.h"
 #include "cleaner.h"
 #include "object_track_searcher.h"
 #include "movable_analytics_db.h"
@@ -44,10 +45,13 @@ QString toString(ChownMode mode)
 
 EventsStorage::EventsStorage(
     QnCommonModule* commonModule,
-    AbstractIframeSearchHelper* iframeSearchHelper)
+    AbstractIframeSearchHelper* iframeSearchHelper,
+    AbstractObjectTypeDictionary* objectTypeDictionary)
     :
     m_commonModule(commonModule),
     m_iframeSearchHelper(iframeSearchHelper),
+    m_objectTypeDictionary(objectTypeDictionary),
+    m_attributesDao(objectTypeDictionary),
     m_trackAggregator(
         kTrackSearchResolutionX,
         kTrackSearchResolutionY,

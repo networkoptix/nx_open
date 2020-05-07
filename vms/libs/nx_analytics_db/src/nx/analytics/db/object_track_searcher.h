@@ -93,7 +93,10 @@ private:
 
     void prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query);
 
-    std::vector<ObjectTrack> loadTracks(nx::sql::AbstractSqlQuery* query, int limit = 0);
+    std::vector<ObjectTrack> loadTracks(
+        nx::sql::AbstractSqlQuery* query,
+        int limit,
+        Filter::Options filterOptions = Filter::Option::none);
 
     /**
      * Loads current record from query as an ObjectTrack.

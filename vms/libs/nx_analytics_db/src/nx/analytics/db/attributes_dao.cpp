@@ -4,6 +4,8 @@
 
 #include <analytics/db/config.h>
 
+#include "abstract_object_type_dictionary.h"
+
 namespace std {
 
 uint qHash(const std::set<int64_t>& value)
@@ -22,7 +24,8 @@ namespace nx::analytics::db {
 
 static constexpr int kAttributesCacheSize = 10001;
 
-AttributesDao::AttributesDao()
+AttributesDao::AttributesDao(AbstractObjectTypeDictionary* objectTypeDictionary):
+    m_objectTypeDictionary(objectTypeDictionary)
 {
     m_attributesCache.setMaxCost(kAttributesCacheSize);
     m_combinedAttrsCache.setMaxCost(kAttributesCacheSize);
@@ -30,9 +33,11 @@ AttributesDao::AttributesDao()
 
 int64_t AttributesDao::insertOrFetchAttributes(
     sql::QueryContext* queryContext,
+    const QString& objectTypeId,
     const std::vector<common::metadata::Attribute>& attributes)
 {
-    const auto content = QnUbjson::serialized(attributes);
+    const auto objectTypeName = m_objectTypeDictionary->idToName(objectTypeId);
+    const auto content = serialize(objectTypeName, attributes);
 
     auto attributesId = findAttributesIdInCache(content);
     if (attributesId >= 0)
@@ -50,7 +55,7 @@ int64_t AttributesDao::insertOrFetchAttributes(
     }
 
     // No such value. Inserting.
-    const auto id = insertAttributes(queryContext, attributes, content);
+    const auto id = insertAttributes(queryContext, objectTypeName, attributes, content);
 
     addToAttributesCache(id, content);
 
@@ -121,15 +126,37 @@ void AttributesDao::clear()
     m_combinedAttrsCache.clear();
 }
 
+static constexpr char kObjectTypeAttributesSeparator = '\n';
+
+QByteArray AttributesDao::serialize(
+    const std::optional<QString>& objectTypeName,
+    const std::vector<common::metadata::Attribute>& attributes)
+{
+    QByteArray result;
+    if (objectTypeName)
+        result += objectTypeName->toUtf8();
+    // Assuming that object type does not contain kObjectTypeAttributesSeparator.
+    result += kObjectTypeAttributesSeparator;
+    result += QnUbjson::serialized(attributes);
+    return result;
+}
+
 std::vector<common::metadata::Attribute> AttributesDao::deserialize(
     const QString& attributesStr)
 {
+    const auto data = attributesStr.toUtf8();
+    auto pos = data.indexOf(kObjectTypeAttributesSeparator);
+    if (pos == -1)
+        return QnUbjson::deserialized<std::vector<common::metadata::Attribute>>(data);
+
+    ++pos; // Skipping the separator.
     return QnUbjson::deserialized<std::vector<common::metadata::Attribute>>(
-        attributesStr.toUtf8());
+        QByteArray::fromRawData(data.data() + pos, data.size() - pos));
 }
 
 int64_t AttributesDao::insertAttributes(
     nx::sql::QueryContext* queryContext,
+    const std::optional<QString>& objectTypeName,
     const std::vector<common::metadata::Attribute>& attributes,
     const QByteArray& serializedAttributes)
 {
@@ -141,8 +168,12 @@ int64_t AttributesDao::insertAttributes(
     const auto id = insertContentQuery->impl().lastInsertId().toLongLong();
 
     // Full text search table stores only attribute values.
-    static const auto kSeparator = ' ';
+    static constexpr auto kSeparator = ' ';
     QString contentForTextSearch;
+
+    if (objectTypeName)
+        contentForTextSearch += *objectTypeName + kSeparator;
+
     for (const auto& attribute: attributes)
     {
         if (!contentForTextSearch.isEmpty())

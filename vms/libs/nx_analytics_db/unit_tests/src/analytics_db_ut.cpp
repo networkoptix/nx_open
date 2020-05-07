@@ -19,6 +19,7 @@
 #include <nx/analytics/db/test_support/custom_gtest_printers.h>
 
 #include "attribute_dictionary.h"
+#include "object_type_dictionary.h"
 #include "utils.h"
 
 namespace nx::analytics::db::test {
@@ -442,6 +443,8 @@ protected:
         m_fixedObjectId = trackId;
     }
 
+    ObjectTypeDictionary& objectTypeDictionary() { return m_objectTypeDictionary; }
+
 private:
     struct LookupResult
     {
@@ -461,13 +464,14 @@ private:
     std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
         m_allowedTimeRange;
     AttributeDictionary m_attributeDictionary;
+    ObjectTypeDictionary m_objectTypeDictionary;
 
     bool initializeStorage()
     {
         m_eventsStorage = std::make_unique<db::MovableAnalyticsDb>(
-            []()
+            [this]()
             {
-                return std::make_unique<EventsStorage>(nullptr, nullptr);
+                return std::make_unique<EventsStorage>(nullptr, nullptr, &m_objectTypeDictionary);
             });
 
         return m_eventsStorage->initialize(m_settings);
@@ -909,6 +913,20 @@ protected:
         m_filter.boundingBox->setBottomRight(bottomRight);
     }
 
+    void addRandomObjectTypeToTextFilter()
+    {
+        const auto& randomPacket = nx::utils::random::choice(analyticsDataPackets());
+        const auto& randomObject = nx::utils::random::choice(randomPacket->objectMetadataList);
+
+        const auto objectTypeName = objectTypeDictionary().idToName(randomObject.typeId);
+        ASSERT_TRUE(objectTypeName);
+
+        m_effectiveLookupFilter = m_filter;
+
+        m_effectiveLookupFilter->freeText = *objectTypeName;
+        m_filter.objectTypeId.push_back(randomObject.typeId);
+    }
+
     void givenEmptyFilter()
     {
         m_filter = buildEmptyFilter();
@@ -1098,8 +1116,15 @@ protected:
     }
 
 private:
+    /**
+     * Always used to build expected result set.
+     * If m_effectiveLookupFilter is not defined, then it is also used to query the DB.
+     */
     Filter m_filter;
+
+    /** If present, then this filter is used to query the Analytics DB. */
     std::optional<Filter> m_effectiveLookupFilter;
+
     QnUuid m_specificObjectTrackId;
     QnTimePeriod m_specificObjectTrackTimePeriod;
 
@@ -1277,7 +1302,14 @@ TEST_F(AnalyticsDbLookup, lookup_by_objectTypeId)
     thenResultMatchesExpectations();
 }
 
-// TEST_F(AnalyticsDbLookup, lookup_by_multiple_objectTypeId)
+TEST_F(AnalyticsDbLookup, object_type_is_supported_in_text_search)
+{
+    addRandomObjectTypeToTextFilter();
+
+    whenLookupObjectTracks();
+
+    thenResultMatchesExpectations();
+}
 
 TEST_F(AnalyticsDbLookup, lookup_stress_test)
 {
@@ -1588,14 +1620,14 @@ protected:
     }
 
     void assertTimePeriodsMatchUpToAggregationPeriod(
-        const QnTimePeriodList& left, const QnTimePeriodList& right)
+        const QnTimePeriodList& expected, const QnTimePeriodList& actual)
     {
-        ASSERT_EQ(left.size(), right.size());
+        ASSERT_EQ(expected.size(), actual.size());
 
-        for (int i = 0; i < left.size(); ++i)
+        for (int i = 0; i < expected.size(); ++i)
         {
             ASSERT_LE(
-                std::chrono::abs(left[i].startTime() - right[i].startTime()),
+                std::chrono::abs(expected[i].startTime() - actual[i].startTime()),
                 kTrackAggregationPeriod);
         }
     }

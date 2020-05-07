@@ -105,6 +105,7 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
 
         ObjectTrackUpdate trackUpdate;
         trackUpdate.trackId = trackId;
+        trackUpdate.objectTypeId = ctx.track.objectTypeId;
         trackUpdate.appendedTrack = std::exchange(ctx.track.objectPosition, {});
         trackUpdate.firstAppearanceTimeUs = ctx.track.firstAppearanceTimeUs;
         trackUpdate.lastAppearanceTimeUs = ctx.track.lastAppearanceTimeUs;
