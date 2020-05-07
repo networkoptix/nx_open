@@ -50,7 +50,6 @@ EventsStorage::EventsStorage(
     :
     m_commonModule(commonModule),
     m_iframeSearchHelper(iframeSearchHelper),
-    m_objectTypeDictionary(objectTypeDictionary),
     m_attributesDao(objectTypeDictionary),
     m_trackAggregator(
         kTrackSearchResolutionX,
