@@ -65,9 +65,16 @@ BITMAPINFOHEADER *  DShowCompressionTypeDescriptor::videoInfoBitMapHeader() cons
     return videoInfo ? &videoInfo->bmiHeader : nullptr;
 }
 
+template <typename Object>
+std::unique_ptr<Object, void(*)(Object*)> wrapComObject(Object* outObject)
+{
+    return std::unique_ptr<Object, void(*)(Object*)>(
+        outObject, [](Object* object) { object->Release(); });
+}
+
 IMonikerPtr wrapMoniker(IMoniker* outMoniker)
 {
-    return IMonikerPtr(outMoniker, [](IMoniker* moniker) { moniker->Release(); });
+    return wrapComObject(outMoniker);
 }
 
 } // namespace
@@ -438,12 +445,14 @@ HRESULT findDevice(REFGUID category, const std::string& devicePath, IMonikerPtr*
     HRESULT result = enumerateDevices(category, &pEnum);
     if (FAILED(result))
         return result;
+    auto pEnumPtr = wrapComObject(pEnum);
 
     CComBSTR devicePathBstr(devicePath.c_str());
 
     IMoniker* pMoniker = NULL;
     while (S_OK == (result = pEnum->Next(1, &pMoniker, NULL)))
     {
+        auto pMonikerPtr = wrapMoniker(pMoniker);
         std::string strResult;
         result = getStrDeviceProperty(pMoniker, L"DevicePath", &strResult);
         if (FAILED(result))
@@ -452,14 +461,11 @@ HRESULT findDevice(REFGUID category, const std::string& devicePath, IMonikerPtr*
         // don't release the moniker in this case, it's the one we are looking for
         if (strResult == devicePath)
         {
-            pEnum->Release();
-            *outMoniker = wrapMoniker(pMoniker);
+            *outMoniker = std::move(pMonikerPtr);
             return result;
         }
-        pMoniker->Release();
     }
 
-    pEnum->Release();
     return result;
 }
 
