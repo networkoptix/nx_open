@@ -415,5 +415,11 @@
         <resource name = "AXISM3116" public = "AXISQ6044"/>
         <resource name = "AXISM1134" public = "AXISQ6044"/>
         <resource name = "AXISQ6074" public = "AXISQ1775"/>
+
+        <resource name = "AXISC8033" public = "AXIS_COMMON">
+            <params>
+                <param name = "forcedAudioStream" default_value ="1"/>
+            </params>
+        </resource>
     </oem>
 </resources>
