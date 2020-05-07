@@ -100,7 +100,6 @@ protected:
 private:
     QnCommonModule* m_commonModule = nullptr;
     AbstractIframeSearchHelper* m_iframeSearchHelper = nullptr;
-    AbstractObjectTypeDictionary* m_objectTypeDictionary = nullptr;
     std::unique_ptr<DbController> m_dbController;
     std::list<AbstractCursor*> m_openedCursors;
     std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
