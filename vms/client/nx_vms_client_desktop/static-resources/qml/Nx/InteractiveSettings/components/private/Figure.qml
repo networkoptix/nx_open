@@ -87,7 +87,7 @@ LabeledItem
         CheckBox
         {
             id: showOnCameraCheckBox
-            text: qsTr("Display on camera")
+            text: qsTr("Display on video")
             enabled: figureView.hasFigure
             onCheckedChanged: valueChanged()
             topPadding: 0
