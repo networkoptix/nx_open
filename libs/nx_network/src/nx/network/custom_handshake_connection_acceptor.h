@@ -5,6 +5,7 @@
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 
