@@ -6,9 +6,9 @@ namespace nx::analytics::db::test {
 
 std::optional<QString> ObjectTypeDictionary::idToName(const QString& id) const
 {
-    return QString::fromUtf8(nx::utils::QnCryptographicHash::hash(
+    return nx::utils::QnCryptographicHash::hash(
         id.toUtf8(),
-        nx::utils::QnCryptographicHash::Md5).toHex());
+        nx::utils::QnCryptographicHash::Md5).toHex();
 }
 
 } // namespace nx::analytics::db::test
