@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Eklemek için tıklayın</translation>
     </message>
   </context>
   <context>
@@ -71,7 +71,7 @@
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>ÖNİZLEME YOK</translation>
     </message>
   </context>
   <context>
@@ -86,18 +86,18 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Kamera akışı</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Analiz için kameradan video akışı seçin</translation>
     </message>
   </context>
   <context>
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Varsayılan değer:</translation>
     </message>
   </context>
   <context>
@@ -108,25 +108,25 @@
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Bu çizgi için en az %n puan gerekir.</numerusform>
+        <numerusform>Bu çizgi için en az %n puan gerekir.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Çizgi çizmeyi bitirmek için son noktayı tıklayın.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Maksimum nokta sayısına ulaşıldı (%n nokta).</numerusform>
+        <numerusform>Maksimum nokta sayısına ulaşıldı (%n nokta).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>İstenen yönleri değiştirmek için okları tıklayın.</translation>
     </message>
   </context>
   <context>
@@ -163,7 +163,7 @@
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Boyut Kısıtlamaları</translation>
     </message>
   </context>
   <context>
@@ -192,20 +192,20 @@
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Bu çokgen en az %n nokta gerektirir.</numerusform>
+        <numerusform>Bu çokgen en az %n nokta gerektirir.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Çizgi çizmeyi bitirmek için son noktayı tıklayın.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Maksimum nokta sayısına ulaşıldı (%n nokta).</numerusform>
+        <numerusform>Maksimum nokta sayısına ulaşıldı (%n nokta).</numerusform>
       </translation>
     </message>
   </context>
@@ -213,26 +213,26 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Ekle</translation>
     </message>
   </context>
   <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>MAX</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>MİN</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Minimum ve maksimum nesne boyutunu ayarlayın.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>Minimum nesne boyutu maksimumdan büyük olamaz.</translation>
     </message>
   </context>
   <context>
