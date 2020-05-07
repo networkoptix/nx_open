@@ -242,7 +242,7 @@ public:
     QnRtspDataConsumer* dataProcessor;
 
     QString sessionId;
-    int sessionTimeOut; // timeout in seconds. Not used if zerro
+    int sessionTimeOut; // timeout in seconds. Not used if zero
     QnMediaResourcePtr mediaRes;
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
@@ -276,6 +276,7 @@ public:
     int metadataChannelNum;
     bool tcpMode;
     QString errorMessage;
+    QString logContext;
     QnMutex archiveDpMutex;
     QnMediaServerModule* serverModule = nullptr;
     std::atomic<CameraParameters> m_cameraParameters{CameraParameter::noParams};
@@ -320,6 +321,9 @@ bool QnRtspConnectionProcessor::parseRequestParams()
 {
     Q_D(QnRtspConnectionProcessor);
     QnTCPConnectionProcessor::parseRequest();
+    if (d->logContext.isEmpty())
+        d->logContext = d->request.requestLine.url.toString();
+
     NX_DEBUG(this, "Processing request: [%1], from: [%2]",
         d->request.requestLine.toString().trimmed(),
         d->socket->getForeignAddress().address.toString());
@@ -1767,11 +1771,17 @@ void QnRtspConnectionProcessor::run()
     });
 
 
-    while (!m_needStop && d->socket->isConnected())
+    while (!m_needStop)
     {
-        int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-        if (readed > 0) {
-            d->receiveBuffer.append((const char*) d->tcpReadBuffer, readed);
+        if (!d->socket->isConnected())
+        {
+            NX_DEBUG(this, "%1: Tcp socket disconnected, close rtsp session", d->logContext);
+            break;
+        }
+        int bytesRead = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+        if (bytesRead > 0)
+        {
+            d->receiveBuffer.append((const char*) d->tcpReadBuffer, bytesRead);
             if (d->receiveBuffer[0] == '$')
             {
                 // binary request
@@ -1790,7 +1800,11 @@ void QnRtspConnectionProcessor::run()
                 {
                     const auto msgLen = isFullMessage(d->receiveBuffer);
                     if (msgLen < 0)
+                    {
+                        NX_DEBUG(this, "%1: Failed to read rtsp message, close rtsp session",
+                            d->logContext);
                         return;
+                    }
 
                     if (msgLen == 0)
                         break;
@@ -1802,19 +1816,33 @@ void QnRtspConnectionProcessor::run()
                 }
             }
         }
-        else if (d->sessionTimeOut > 0)
+        else if (bytesRead < 0)
         {
-            if (SystemError::getLastOSErrorCode() == SystemError::timedOut ||
-                SystemError::getLastOSErrorCode() == SystemError::again)
+            const auto errorCode = SystemError::getLastOSErrorCode();
+            if (errorCode == SystemError::timedOut || errorCode == SystemError::again)
             {
-                // check rtcp keep alive
-                if (d->dataProcessor &&
-                    d->dataProcessor->timeFromLastReceiverReport() < kDefaultRtspTimeout)
-                    continue;
+                bool timeoutExpired = !d->dataProcessor ||
+                    d->dataProcessor->timeFromLastReceiverReport() >= kDefaultRtspTimeout;
+                if (d->sessionTimeOut > 0 && timeoutExpired)
+                {
+                    NX_DEBUG(this, "%1, Timeout expired, close rtsp session", d->logContext);
+                    break;
+                }
             }
+            else
+            {
+                NX_DEBUG(this,
+                    "%1: Failed to read from socket error code: %2(%3), close rtsp session",
+                    d->logContext, SystemError::toString(errorCode), errorCode);
+                break;
+            }
+        }
+        else // bytesRead == 0
+        {
             break;
         }
     }
+    NX_DEBUG(this, "%1, Close rtsp session", d->logContext);
 }
 
 void QnRtspConnectionProcessor::resetTrackTiming()
