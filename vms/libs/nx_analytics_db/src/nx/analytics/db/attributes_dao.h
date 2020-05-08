@@ -15,9 +15,12 @@ class AbstractObjectTypeDictionary;
 /**
  * NOTE: Not thread-safe.
  */
-class AttributesDao
+class NX_ANALYTICS_DB_API AttributesDao
 {
 public:
+    static constexpr char kNameValueSeparator = ' ';
+    static constexpr char kParamNamePrefix[] = "000";
+
     AttributesDao(AbstractObjectTypeDictionary* objectTypeDictionary);
 
     /**
@@ -47,6 +50,8 @@ public:
 
     static std::vector<common::metadata::Attribute> deserialize(
         const QString& attributesStr);
+
+    static QString convertTextFilterToSqliteFtsExpression(const QString& text);
 
 private:
     QCache<QByteArray /*md5*/, int64_t /*id*/> m_attributesCache;

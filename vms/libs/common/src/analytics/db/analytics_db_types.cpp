@@ -167,15 +167,15 @@ bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
 
 bool Filter::acceptsAttributes(const Attributes& attributes) const
 {
-    const auto filterWords = freeText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
+    auto filterText = freeText.trimmed();
     if (attributes.empty())
-        return filterWords.empty();
+        return filterText.isEmpty();
 
-    return std::all_of(filterWords.cbegin(), filterWords.cend(),
-        [&attributes](const QString& filterWord)
-        {
-            return wordMatchAnyOfAttributes(filterWord, attributes);
-        });
+    const auto attributesToMatch = takeExactAttrMatchFiltersFromText(&filterText);
+    if (!attributesToMatch.empty() && !matchExactAttributes(attributesToMatch, attributes))
+        return false;
+
+    return matchAttributeValues(filterText, attributes);
 }
 
 bool Filter::acceptsMetadata(const ObjectMetadata& metadata, bool checkBoundingBox) const
@@ -292,6 +292,67 @@ bool Filter::operator==(const Filter& right) const
 bool Filter::operator!=(const Filter& right) const
 {
     return !(*this == right);
+}
+
+nx::common::metadata::Attributes Filter::takeExactAttrMatchFiltersFromText(
+    QString* textFilter)
+{
+    nx::common::metadata::Attributes attributesToMatch;
+
+    QRegularExpression attrRegexp("[\\w\\d\\-_]+\\s*:\\s*[\\w\\d\\-_]+");
+    for (;;)
+    {
+        QRegularExpressionMatch match;
+        auto pos = textFilter->indexOf(attrRegexp, 0, &match);
+        if (pos == -1)
+            break;
+
+        auto paramExpr = match.captured();
+        textFilter->remove(pos, match.capturedLength());
+
+        const auto tokens = paramExpr.split(":");
+        attributesToMatch.push_back(nx::common::metadata::Attribute(
+            tokens[0].trimmed(),
+            tokens[1].trimmed()));
+    }
+
+    return attributesToMatch;
+}
+
+bool Filter::matchExactAttributes(
+    const nx::common::metadata::Attributes& attributesToMatch,
+    const nx::common::metadata::Attributes& attributes) const
+{
+    for (const auto& attrToMatch: attributesToMatch)
+    {
+        bool matched = false;
+        for (const auto& attr: attributes)
+        {
+            if (attr.name.startsWith(attrToMatch.name) &&
+                attr.value.startsWith(attrToMatch.value))
+            {
+                matched = true;
+            }
+        }
+
+        if (!matched)
+            return false;
+    }
+
+    return true;
+}
+
+bool Filter::matchAttributeValues(
+    const QString& filterText,
+    const nx::common::metadata::Attributes& attributes) const
+{
+    auto filterWords = filterText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
+    return std::all_of(
+        filterWords.cbegin(), filterWords.cend(),
+        [&attributes](const QString& filterWord)
+        {
+            return wordMatchAnyOfAttributes(filterWord, attributes);
+        });
 }
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params)

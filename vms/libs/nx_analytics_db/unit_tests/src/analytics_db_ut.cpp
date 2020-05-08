@@ -862,6 +862,21 @@ protected:
         m_filter.freeText = attributeDictionary().getRandomText();
     }
 
+    std::tuple<QString, QString> getAnyAttributePresentInData()
+    {
+        for (const auto& p: analyticsDataPackets())
+        {
+            for (const auto& object: p->objectMetadataList)
+            {
+                if (!object.attributes.empty())
+                    return std::make_tuple(object.attributes.front().name, object.attributes.front().value);
+            }
+        }
+
+        []() { FAIL() << "The control should never reach this"; }();
+        return std::make_tuple(QString(), QString());
+    }
+
     void addRandomTextPrefixFoundInDataToFilter()
     {
         QString text;
@@ -877,7 +892,7 @@ protected:
 
     void addTextToFilter(const QString& text)
     {
-        m_filter.freeText = text;
+        m_filter.freeText += text;
     }
 
     void addRandomUnknownText()
@@ -1279,6 +1294,16 @@ TEST_F(AnalyticsDbLookup, full_text_search_case_insensitive)
 {
     addRandomTextFoundInDataToFilter();
     invertTextFilterCase();
+    whenLookupObjectTracks();
+
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookup, search_by_specific_param_value)
+{
+    const auto [name, value] = getAnyAttributePresentInData();
+    addTextToFilter(name + ":" + value);
+
     whenLookupObjectTracks();
 
     thenResultMatchesExpectations();

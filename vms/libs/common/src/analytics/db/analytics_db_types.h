@@ -172,6 +172,17 @@ struct Filter
 private:
     template <typename ObjectTrackType>
     bool acceptsTrackInternal(const ObjectTrackType& track, Options options) const;
+
+    static nx::common::metadata::Attributes takeExactAttrMatchFiltersFromText(
+        QString* textFilter);
+
+    bool matchExactAttributes(
+        const nx::common::metadata::Attributes& attributesToMatch,
+        const nx::common::metadata::Attributes& attributes) const;
+
+    bool matchAttributeValues(
+        const QString& filterText,
+        const nx::common::metadata::Attributes& attributes) const;
 };
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params);

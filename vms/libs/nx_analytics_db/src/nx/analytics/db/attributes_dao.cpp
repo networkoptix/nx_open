@@ -1,5 +1,7 @@
 #include "attributes_dao.h"
 
+#include <QtCore/QRegularExpression>
+
 #include <nx/fusion/model_functions.h>
 
 #include <analytics/db/config.h>
@@ -110,7 +112,7 @@ std::set<int64_t> AttributesDao::lookupCombinedAttributes(
         WHERE content MATCH ?
     )sql");
 
-    query->addBindValue(text);
+    query->addBindValue(convertTextFilterToSqliteFtsExpression(text));
     query->exec();
 
     std::set<int64_t> attributesIds;
@@ -154,6 +156,15 @@ std::vector<common::metadata::Attribute> AttributesDao::deserialize(
         QByteArray::fromRawData(data.data() + pos, data.size() - pos));
 }
 
+QString AttributesDao::convertTextFilterToSqliteFtsExpression(const QString& text)
+{
+    auto result = text;
+    result.replace(
+        QRegularExpression("([\\w\\d\\-_]+)\\s*:\\s*([\\w\\d\\-_]+)"),
+        kParamNamePrefix + QString("\\1 NEAR/0 \\2"));
+    return result;
+}
+
 int64_t AttributesDao::insertAttributes(
     nx::sql::QueryContext* queryContext,
     const std::optional<QString>& objectTypeName,
@@ -168,16 +179,26 @@ int64_t AttributesDao::insertAttributes(
     const auto id = insertContentQuery->impl().lastInsertId().toLongLong();
 
     // Full text search table stores only attribute values.
-    static constexpr auto kSeparator = ' ';
     QString contentForTextSearch;
 
     if (objectTypeName)
-        contentForTextSearch += *objectTypeName + kSeparator;
+        contentForTextSearch += *objectTypeName + kNameValueSeparator;
 
     for (const auto& attribute: attributes)
     {
         if (!contentForTextSearch.isEmpty())
-            contentForTextSearch += kSeparator;
+            contentForTextSearch += kNameValueSeparator;
+
+        // NOTE: SQLITE fts NEAR term does not support token ordering.
+        // So, inserting additional separator for the following case:
+        // name1 foo name2 yahoo.
+        // Search "name2: foo" is not expected to find the string, but it will by default.
+        // Modifying string to the following: name1 foo 000 name2 yahoo
+
+        contentForTextSearch += kParamNamePrefix;
+        contentForTextSearch += kNameValueSeparator;
+        contentForTextSearch += kParamNamePrefix + attribute.name;
+        contentForTextSearch += kNameValueSeparator;
         contentForTextSearch += attribute.value;
     }
 
