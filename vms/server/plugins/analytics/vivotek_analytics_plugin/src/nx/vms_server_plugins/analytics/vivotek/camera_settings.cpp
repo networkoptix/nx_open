@@ -2,161 +2,360 @@
 
 #include <stdexcept>
 
-#include <nx/network/http/http_async_client.h>
+#include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/helpers/settings_response.h>
+#include <nx/utils/log/log_message.h>
+
+#include <QtCore/QString>
+#include <QtCore/QUrlQuery>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 #include "http_client.h"
-#include "parameter_api.h"
+#include "camera_parameter_api.h"
+#include "camera_vca_parameter_api.h"
+#include "json_utils.h"
+#include "exception_utils.h"
+#include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
+using namespace std::literals;
 using namespace nx::kit;
 using namespace nx::sdk;
 using namespace nx::utils;
 using namespace nx::network;
 
 namespace {
-    template <typename Vca, typename Visitor>
-    void forEachOtherVcaEntry(Vca* vca, Visitor visit)
-    {
-        visit(&vca->installation.height, "CamHeight");
-        visit(&vca->installation.tiltAngle, "TiltAngle");
-        visit(&vca->installation.rollAngle, "RollAngle");
-        visit(&vca->sensitivity, "Sensitivity");
-    }
-    
-    void parseOtherVca(CameraSettings::Entry<int>* entry, const Json& rawVca, const char* name)
-    {
-        const auto& value = rawVca[name];
-        if (!value.is_number())
-            throw std::runtime_error("$." + std::string(name) + " is not a number");
 
-        entry->value = value.int_value();
-    }
+class VadpModuleInfo
+{
+public:
+    int index = -1;
+    bool enabled = false;
 
-    cf::future<cf::unit> fetchVcaEnabled(bool* enabled, Url url)
+public:
+    static VadpModuleInfo fetchFrom(const Url& cameraUrl, const QString& moduleName)
     {
-        const auto api = std::make_shared<ParameterApi>(url);
-        return api->get({"vadp_module"}).then(
-            [enabled, api](auto future)
+        try
+        {
+            const auto parameters = CameraParameterApi(cameraUrl).fetch({"vadp_module"});
+
+            const auto count = toInt(parameters.at("vadp_module_number"));
+            for (int i = 0; i < count; ++i)
             {
-                const auto parameters = future.get();
+                if (parameters.at(NX_FMT("vadp_module_i%1_name", i)) == moduleName)
+                    return {i, parseStatus(parameters.at(NX_FMT("vadp_module_i%1_status", i)))};
+            }
 
-                const int count = std::stoi(parameters.at("vadp_module_number"));
-                for (int i = 0; i < count; ++i)
-                {
-                    const auto prefix = "vadp_module_i" + std::to_string(i);
-                    if (parameters.at(prefix + "_name") == "VCA")
-                    {
-                        const auto value = parameters.at(prefix + "_status");
-
-                        *enabled = value != "off";
-                        
-                        return cf::unit();
-                    }
-                }
-
-                throw std::runtime_error("Camera suddenly stopped supporting VCA");
-            });
-    }
-
-    cf::future<cf::unit> fetchVca(CameraSettings::Vca* vca, Url url)
-    {
-        return fetchVcaEnabled(&vca->enabled.value, url).then(
-            [vca, url = std::move(url)](auto future) mutable
-            {
-                future.get();
-
-                if (!vca->enabled.value)
-                    return cf::make_ready_future(cf::unit());
-
-                url.setPath("/VCA/Config/AE");
-
-                const auto httpClient = std::make_shared<HttpClient>();
-                return httpClient->get(std::move(url)).then(
-                    [vca, httpClient](auto future)
-                    {
-                        const auto response = future.get();
-
-                        const auto statusCode = response.statusLine.statusCode;
-                        if (response.statusLine.statusCode != 200)
-                            throw std::runtime_error(
-                                "Camera returned unexpected HTTP status code " + std::to_string(statusCode));
-
-                        std::string error;
-                        const auto rawVca = Json::parse(response.messageBody.data(), error);
-                        if (!error.empty())
-                            throw std::runtime_error(
-                                "Camera returned malformed json: " + error);
-
-                        try
-                        {
-                            forEachOtherVcaEntry(vca,
-                                [&](auto* entry, const char* name) {
-                                    parseOtherVca(entry, rawVca, name);
-                                });
-
-                            vca->installation.height.value /= 10; // cm in UI, but api returns mm
-                        }
-                        catch (...)
-                        {
-                            std::throw_with_nested(std::runtime_error(
-                                "Failed to parse VCA settings json"));
-                        }
-
-                        return cf::unit();
-                    });
-            })
-        .then(
-            [](auto future)
-            {
-                try
-                {
-                    return future.get();
-                }
-                catch (...)
-                {
-                    std::throw_with_nested(std::runtime_error(
-                        "Failed to fetch camera VCA settings"));
-                }
-            });
-    }
-
-    template <typename Settings, typename Visitor>
-    void forEachEntry(Settings* settings, Visitor visit)
-    {
-        if (settings->vca) {
-            visit(&settings->vca->enabled);
-            visit(&settings->vca->installation.height);
-            visit(&settings->vca->installation.tiltAngle);
-            visit(&settings->vca->installation.rollAngle);
-            visit(&settings->vca->sensitivity);
+            throw std::runtime_error("Module is not installed");
+        }
+        catch (const std::exception&)
+        {
+            rethrowWithContext("Failed to fetch info for %1 VADP module", moduleName);
         }
     }
 
-    void parse(CameraSettings::Entry<bool>* entry, const IStringMap& rawSettings)
+private:
+    static bool parseStatus(const QString& unparsedValue)
     {
-        if (const char* value = rawSettings.value(entry->name.data()))
-            entry->value = std::strcmp(value, "false");
+        if (unparsedValue == "off")
+            return false;
+        if (unparsedValue == "on")
+            return true;
+        throw std::runtime_error("Failed to parse module status");
+    }
+};
+
+
+template <typename Vca, typename Visitor>
+void enumerateVcaEntries(Vca* vca, Visitor visit)
+{
+    // intentionaly skip vca->enabled, since it's processed separately
+    visit(&vca->installation.height, "CamHeight");
+    visit(&vca->installation.tiltAngle, "TiltAngle");
+    visit(&vca->installation.rollAngle, "RollAngle");
+    visit(&vca->sensitivity, "Sensitivity");
+}
+
+
+void fetchFromCamera(CameraSettings::Vca::Enabled* enabled, const Url& cameraUrl)
+{
+    try
+    {
+        const auto moduleInfo = VadpModuleInfo::fetchFrom(cameraUrl, "VCA");
+        enabled->emplaceValue(moduleInfo.enabled);
+    }
+    catch (const std::exception& exception)
+    {
+        enabled->emplaceErrorMessage(collectNestedMessages(exception));
+    }
+}
+
+
+template <typename Type>
+void parseVcaFromCamera(CameraSettings::Entry<Type>* entry,
+    const QJsonValue& parameters, const QString& propertyName)
+{
+    get(&entry->emplaceValue(), parameters, propertyName);
+}
+
+template <typename... Args>
+void parseVcaFromCamera(CameraSettings::Vca::Installation::Height* entry,
+    const QJsonValue& parameters, const QString& propertyName)
+{
+    auto& value = entry->emplaceValue();
+    get(&value, parameters, propertyName);
+    value /= 10; // API returns millimeters, while web UI presents centimeters
+}
+
+
+void fetchFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
+{
+    auto& enabled = vca->enabled;
+    fetchFromCamera(&enabled, cameraUrl);
+
+    if (!enabled.hasValue() || !enabled.value())
+    {
+        enumerateVcaEntries(vca,
+            [&](auto* entry, auto&&) { entry->emplaceNothing(); });
+        return;
     }
 
-    void parse(CameraSettings::Entry<int>* entry, const IStringMap& rawSettings)
+    try
     {
-        if (const char* value = rawSettings.value(entry->name.data()))
-            entry->value = std::stoi(value);
+        const auto parameters = CameraVcaParameterApi(cameraUrl).fetch().get();
+        enumerateVcaEntries(vca,
+            [&](auto* entry, const QString& propertyName)
+            {
+                try
+                {
+                    parseVcaFromCamera(entry, parameters, propertyName);
+                }
+                catch (const std::exception& exception)
+                {
+                    entry->emplaceErrorMessage(collectNestedMessages(exception));
+                }
+            });
+    }
+    catch (const std::exception& exception)
+    {
+        const auto message = collectNestedMessages(exception);
+        enumerateVcaEntries(vca,
+            [&](auto* entry, auto&&) { entry->emplaceErrorMessage(message); });
+    }
+}
+
+
+void storeToCamera(const Url& cameraUrl, CameraSettings::Vca::Enabled* enabled)
+{
+    try
+    {
+        if (!enabled->hasValue())
+            return;
+
+        const auto moduleInfo = VadpModuleInfo::fetchFrom(cameraUrl, "VCA");
+        if (moduleInfo.enabled == enabled->value())
+            return;
+
+        QUrlQuery query;
+        query.addQueryItem("idx", QString::number(moduleInfo.index));
+        query.addQueryItem("cmd", enabled->value() ? "start" : "stop");
+
+        auto url = cameraUrl;
+        url.setPath("/cgi-bin/admin/vadpctrl.cgi");
+        url.setQuery(query);
+
+        const auto responseBody = HttpClient().get(url).get();
+
+        const auto successPattern =
+            NX_FMT("'VCA is %1'", enabled->value() ? "started" : "stopped").toUtf8();
+        if (!responseBody.contains(successPattern))
+        {
+            throw std::runtime_error(
+                "HTTP response doesn't contain expected pattern indicating success");
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        enabled->emplaceErrorMessage(collectNestedMessages(exception));
+    }
+}
+
+
+template <typename Type>
+void unparseVcaToCamera(QJsonValue* parameters, const QString& propertyName,
+    const CameraSettings::Entry<Type>& entry)
+{
+    if (!entry.hasValue())
+        return;
+
+    set(parameters, propertyName, entry.value());
+}
+
+void unparseVcaToCamera(QJsonValue* parameters, const QString& propertyName,
+    const CameraSettings::Vca::Installation::Height& entry)
+{
+    if (!entry.hasValue())
+        return;
+
+    // API returns millimeters, while web UI presents centimeters
+    set(parameters, propertyName, entry.value() * 10);
+}
+
+
+void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
+{
+    auto& enabled = vca->enabled;
+    storeToCamera(cameraUrl, &enabled);
+
+    if (!enabled.hasValue() || !enabled.value())
+    {
+        enumerateVcaEntries(vca,
+            [&](auto* entry, auto&&) { entry->emplaceNothing(); });
+        return;
     }
 
-    void unparse(StringMap* rawSettings, const CameraSettings::Entry<bool>& entry)
+    try
     {
-        rawSettings->setItem(entry.name, entry.value ? "true" : "false");
-    }
+        CameraVcaParameterApi api(cameraUrl);
 
-    void unparse(StringMap* rawSettings, const CameraSettings::Entry<int>& entry)
-    {
-        rawSettings->setItem(entry.name, std::to_string(entry.value));
+        auto parameters = api.fetch().get();
+
+        enumerateVcaEntries(vca,
+            [&](auto* entry, const QString& propertyName)
+            {
+                try
+                {
+                    unparseVcaToCamera(&parameters, propertyName, *entry);
+                }
+                catch (const std::exception& exception)
+                {
+                    entry->emplaceErrorMessage(collectNestedMessages(exception));
+                }
+            });
+
+        api.store(parameters).get();
     }
+    catch (const std::exception& exception)
+    {
+        const auto message = collectNestedMessages(exception);
+        enumerateVcaEntries(vca,
+            [&](auto* entry, auto&&) { entry->emplaceErrorMessage(message); });
+    }
+}
+
+
+template <typename Settings, typename Visitor>
+void enumerateEntries(Settings* settings, Visitor visit)
+{
+    if (settings->vca)
+    {
+        visit(&settings->vca->enabled);
+        visit(&settings->vca->installation.height);
+        visit(&settings->vca->installation.tiltAngle);
+        visit(&settings->vca->installation.rollAngle);
+        visit(&settings->vca->sensitivity);
+    }
+}
+
+
+void parseEntryValueFromServer(bool* value, const QString& unparsedValue)
+{
+    if (unparsedValue == "false")
+        *value = false;
+    else if (unparsedValue == "true")
+        *value = true;
+    else
+        throw std::runtime_error("Failed to parse boolean");
+}
+
+void parseEntryValueFromServer(int* value, const QString& unparsedValue)
+{
+    *value = toInt(unparsedValue);
+}
+
+
+template <typename Type>
+QString unparseEntryValueToServer(Type value) = delete;
+
+QString unparseEntryValueToServer(bool value)
+{
+    return value ? "true" : "false";
+}
+
+QString unparseEntryValueToServer(int value)
+{
+    return QString::number(value);
+}
+
+
+QJsonValue getVcaInstallationModelForManifest()
+{
+    using Installation = CameraSettings::Vca::Installation;
+    return QJsonObject{
+        {"type", "GroupBox"},
+        {"caption", "Camera installation"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"name", Installation::Height::name},
+                {"type", "SpinBox"},
+                {"caption", "Height (cm)"},
+                {"description", "Distance between camera and floor"},
+                {"defaultValue", 200},
+                {"minValue", 0},
+                {"maxValue", 2000},
+            },
+            QJsonObject{
+                {"name", Installation::TiltAngle::name},
+                {"type", "SpinBox"},
+                {"caption", "Tilt angle (°)"},
+                {"description", "Angle between camera direction axis and down direction"},
+                {"defaultValue", 0},
+                {"minValue", 0},
+                {"maxValue", 179},
+            },
+            QJsonObject{
+                {"name", Installation::RollAngle::name},
+                {"type", "SpinBox"},
+                {"caption", "Roll angle (°)"},
+                {"description", "Angle of camera rotation around direction axis"},
+                {"defaultValue", 0},
+                {"minValue", -74},
+                {"maxValue", +74},
+            },
+        }},
+    };
+}
+
+QJsonValue getVcaModelForManifest()
+{
+    using Vca = CameraSettings::Vca;
+    return QJsonObject{
+        {"type", "Section"},
+        {"caption", "Deep Learning VCA"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"name", Vca::Enabled::name},
+                {"type", "SwitchButton"},
+                {"caption", "Enabled"},
+                {"defaultValue", false},
+            },
+            getVcaInstallationModelForManifest(),
+            QJsonObject{
+                {"name", Vca::Sensitivity::name},
+                {"type", "SpinBox"},
+                {"caption", "Sensitivity"},
+                {"description", "The higher the value the more likely an object will be detected as human"},
+                {"defaultValue", 5},
+                {"minValue", 1},
+                {"maxValue", 10},
+            },
+        }},
+    };
+}
+
 } //namespace
-
-CameraSettings::CameraSettings() = default;
 
 CameraSettings::CameraSettings(const CameraFeatures& features)
 {
@@ -164,105 +363,94 @@ CameraSettings::CameraSettings(const CameraFeatures& features)
         vca.emplace();
 }
 
-cf::future<cf::unit> CameraSettings::fetch(Url url)
+void CameraSettings::fetchFrom(const Url& cameraUrl)
 {
-    return cf::make_ready_future(cf::unit()).then(
-        [this, url = std::move(url)](auto future) mutable
-        {
-            future.get();
-
-            if (!vca)
-                return cf::make_ready_future(cf::unit());
-
-            return fetchVca(&*vca, std::move(url));
-        });
+    if (vca)
+        fetchFromCamera(&*vca, cameraUrl);
 }
 
-cf::future<cf::unit> CameraSettings::store(nx::utils::Url url) const
+void CameraSettings::storeTo(const Url& cameraUrl)
 {
-    // TODO
-    return cf::make_ready_future(cf::unit());
+    if (vca)
+        storeToCamera(cameraUrl, &*vca);
 }
 
-void CameraSettings::parse(const IStringMap& rawSettings)
+void CameraSettings::parseFromServer(const IStringMap& values)
 {
-    forEachEntry(this,
+    enumerateEntries(this,
         [&](auto* entry)
         {
-            vivotek::parse(entry, rawSettings);
+            try
+            {
+                const char* unparsedValue = values.value(entry->name);
+                if (!unparsedValue)
+                {
+                    entry->emplaceNothing();
+                    return;
+                }
+
+                parseEntryValueFromServer(&entry->emplaceValue(), unparsedValue);
+            }
+            catch (const std::exception& exception)
+            {
+                entry->emplaceErrorMessage(collectNestedMessages(exception));
+            }
         });
 }
 
-void CameraSettings::unparse(StringMap* rawSettings) const
+Ptr<StringMap> CameraSettings::unparseToServer()
 {
-    forEachEntry(this,
+    auto values = makePtr<StringMap>();
+
+    enumerateEntries(this,
+        [&](auto* entry)
+        {
+            try
+            {
+                if (!entry->hasValue())
+                    return;
+
+                values->setItem(entry->name, unparseEntryValueToServer(entry->value()).toStdString());
+            }
+            catch (const std::exception& exception)
+            {
+                entry->emplaceErrorMessage(collectNestedMessages(exception));
+            }
+        });
+
+    return values;
+}
+
+Ptr<StringMap> CameraSettings::getErrorMessages() const
+{
+    auto errorMessages = makePtr<StringMap>();
+
+    enumerateEntries(this,
         [&](const auto* entry)
         {
-            vivotek::unparse(rawSettings, *entry);
+            if (!entry->hasError())
+                return;
+
+            errorMessages->setItem(entry->name, entry->errorMessage().toStdString());
         });
+
+    return errorMessages;
 }
 
-Json CameraSettings::buildJsonModel() const
+QJsonValue CameraSettings::getModelForManifest(const CameraFeatures& features)
 {
-    return Json::object{
+    return QJsonObject{
         {"type", "Settings"},
-        {"sections", [&]{
-            Json::array sections;
+        {"sections",
+            [&]{
+                QJsonArray sections;
 
-            if (vca)
-                sections.push_back(Json::object{
-                    {"type", "Section"},
-                    {"caption", "Deep Learning VCA"},
-                    {"items", Json::array{
-                        Json::object{
-                            {"name", vca->enabled.name},
-                            {"type", "SwitchButton"},
-                            {"caption", "Enabled"},
-                            {"defaultValue", false},
-                        },
-                        Json::object{
-                            {"type", "GroupBox"},
-                            {"caption", "Camera installation"},
-                            {"items", Json::array{
-                                Json::object{
-                                    {"name", vca->installation.height.name},
-                                    {"type", "SpinBox"},
-                                    {"caption", "Height (cm)"},
-                                    {"description", "Distance between camera and floor"},
-                                    {"minValue", 0},
-                                    {"maxValue", 2000},
-                                },
-                                Json::object{
-                                    {"name", vca->installation.tiltAngle.name},
-                                    {"type", "SpinBox"},
-                                    {"caption", "Tilt angle (°)"},
-                                    {"description", "Angle between camera direction axis and down direction"},
-                                    {"minValue", 0},
-                                    {"maxValue", 179},
-                                },
-                                Json::object{
-                                    {"name", vca->installation.rollAngle.name},
-                                    {"type", "SpinBox"},
-                                    {"caption", "Roll angle (°)"},
-                                    {"description", "Angle of camera rotation around direction axis"},
-                                    {"minValue", -74},
-                                    {"maxValue", +74},
-                                },
-                                Json::object{
-                                    {"name", vca->sensitivity.name},
-                                    {"type", "SpinBox"},
-                                    {"caption", "Sensitivity"},
-                                    {"description", "The higher the value the more likely an object will be detected as human"},
-                                    {"minValue", 1},
-                                    {"maxValue", 10},
-                                },
-                            }},
-                        },
-                    }},
-                });
+                if (features.vca)
+                    sections.push_back(getVcaModelForManifest());
 
-            return sections;
-        }()},
+                return sections;
+            }(),
+        },
     };
 }
 

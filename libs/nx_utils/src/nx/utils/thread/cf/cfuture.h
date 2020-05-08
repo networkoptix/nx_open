@@ -126,6 +126,9 @@ struct future_error : public std::exception {
 template<typename T>
 class future;
 
+template<typename T>
+future<T> make_ready_future(T&& t);
+
 namespace detail {
 
 template<typename Derived>
@@ -312,6 +315,60 @@ struct future_held_type<future<T>> {
   using type = std::decay_t<T>;
 };
 
+template<typename R>
+void arg_type(R(*)());
+
+template<typename R, typename A>
+A arg_type(R(*)(A));
+
+template<typename R, typename C>
+void arg_type(R(C::*)());
+
+template<typename R, typename C, typename A>
+A arg_type(R(C::*)(A));
+
+template<typename R, typename C>
+void arg_type(R(C::*)() const);
+
+template<typename R, typename C, typename A>
+A arg_type(R(C::*)(A) const);
+
+template<typename F>
+decltype(arg_type(&F::operator())) arg_type(F f);
+
+template<typename F>
+using arg_type_t = decltype(arg_type(std::declval<F>()));
+
+template<typename F>
+auto make_then_ok_handler(F&& f) {
+  return [f = std::forward<F>(f)](auto future) mutable {
+    return std::move(f)(future.get());
+  };
+}
+
+template<typename T, typename U>
+auto ensure_future(U&& u) {
+  return make_ready_future<T>(std::forward<U>(u));
+}
+
+template<typename T>
+auto ensure_future(future<T> t) {
+    return t;
+}
+
+template<typename F>
+auto make_then_fail_handler(F&& f) {
+  return [f = std::forward<F>(f)](auto future) mutable {
+    using T = decltype(future.get());
+    using E = arg_type_t<std::decay_t<F>>;
+    try {
+      return make_ready_future<T>(future.get());
+    } catch (E e) {
+      return ensure_future<T>(std::move(f)(std::forward<E>(e)));
+    }
+  };
+}
+
 } // namespace detail
 
 template<typename T>
@@ -351,6 +408,12 @@ public:
   template<typename F>
   detail::then_ret_type<T, F> then(F&& f);
 
+  template<typename F>
+  auto then_ok(F&& f);
+
+  template<typename F>
+  auto then_fail(F&& f);
+
 template<typename Rep, typename Period, typename TimeWatcher, typename Exception>
 future<T> timeout(std::chrono::duration<Rep, Period> duration,
                   const Exception& exception,
@@ -358,6 +421,12 @@ future<T> timeout(std::chrono::duration<Rep, Period> duration,
 
   template<typename F, typename Executor>
   detail::then_ret_type<T, F> then(Executor& executor, F&& f);
+
+  template<typename F, typename Executor>
+  auto then_ok(Executor& executor, F&& f);
+
+  template<typename F, typename Executor>
+  auto then_fail(Executor& executor, F&& f);
 
   bool is_ready() const {
     check_state(state_);
@@ -452,6 +521,18 @@ detail::then_ret_type<T, F> future<T>::then(F&& f) {
 }
 
 template<typename T>
+template<typename F>
+auto future<T>::then_ok(F&& f) {
+  return then(detail::make_then_ok_handler(std::forward<F>(f)));
+}
+
+template<typename T>
+template<typename F>
+auto future<T>::then_fail(F&& f) {
+  return then(detail::make_then_fail_handler(std::forward<F>(f)));
+}
+
+template<typename T>
 template<typename F, typename Executor>
 detail::then_ret_type<T, F> future<T>::then(Executor& executor, F&& f) {
   check_state(state_);
@@ -459,10 +540,19 @@ detail::then_ret_type<T, F> future<T>::then(Executor& executor, F&& f) {
 }
 
 template<typename T>
-class promise;
+template<typename F, typename Executor>
+auto future<T>::then_ok(Executor& executor, F&& f) {
+  return then(executor, detail::make_then_ok_handler(std::forward<F>(f)));
+}
 
 template<typename T>
-future<T> make_ready_future(T&& t);
+template<typename F, typename Executor>
+auto future<T>::then_fail(Executor& executor, F&& f) {
+  return then(executor, detail::make_then_fail_handler(std::forward<F>(f)));
+}
+
+template<typename T>
+class promise;
 
 // future<R> F(future<T>) specialization
 template<typename T>
@@ -1101,6 +1191,14 @@ void fill_result_helper(const Context& context, FirstFuture&& f, Futures&&... fs
   fill_result_helper<I+1>(context, std::forward<Futures>(fs)...);
 }
 
+template<typename F>
+auto make_initiate_handler(F&& f) {
+  return [f = std::forward<F>(f)](auto future) mutable {
+    future.get();
+    return std::move(f)();
+  };
+}
+
 }
 
 template<typename... Futures>
@@ -1135,4 +1233,17 @@ auto when_any(Futures&&... futures)
   }
   return shared_context->p.get_future();
 }
+
+template<typename F>
+auto initiate(F&& f) {
+  return cf::make_ready_future(cf::unit()).then(
+    detail::make_initiate_handler(std::forward<F>(f)));
+}
+
+template<typename F, typename Executor>
+auto initiate(Executor& executor, F&& f) {
+  return cf::make_ready_future(cf::unit()).then(executor,
+    detail::make_initiate_handler(std::forward<F>(f)));
+}
+
 } // namespace cf

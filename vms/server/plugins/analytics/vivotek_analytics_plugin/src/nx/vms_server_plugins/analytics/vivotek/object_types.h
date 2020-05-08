@@ -1,10 +1,9 @@
 #pragma once
 
-#include <string>
-#include <vector>
+#include <QtCore/QString>
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-extern const std::string kObjectTypeHuman;
+extern const QString kObjectTypeHuman;
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

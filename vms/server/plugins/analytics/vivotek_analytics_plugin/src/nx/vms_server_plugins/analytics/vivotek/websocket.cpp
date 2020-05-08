@@ -1,145 +1,95 @@
 #include "websocket.h"
 
 #include <exception>
+#include <stdexcept>
 
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log_message.h>
+#include <nx/utils/thread/cf/wrappers.h>
 #include <nx/network/websocket/websocket_handshake.h>
 
-#include "exception.h"
+#include "exception_utils.h"
+#include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-using namespace nx::sdk;
 using namespace nx::utils;
 using namespace nx::network;
 
-WebSocket::WebSocket()
+cf::future<cf::unit> WebSocket::open(const Url& url)
 {
-}
+    close();
 
-WebSocket::~WebSocket()
-{
-}
+    m_httpClient.emplace();
 
-void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
-{
-    BasicPollable::bindToAioThread(aioThread);
-    m_httpClient.bindToAioThread(aioThread);
-    if (m_nested)
-        m_nested->bindToAioThread(aioThread);
-}
+    http::HttpHeaders headers;
+    websocket::addClientHeaders(&headers,
+        "tracker-protocol", websocket::CompressionType::perMessageDeflate);
+    for (const auto& [name, value]: headers)
+        m_httpClient->addAdditionalHeader(name, value);
 
-cf::future<cf::unit> WebSocket::connect(nx::utils::Url url)
-{
-    return cf::make_ready_future(cf::unit()).then(
-        [this, url = std::move(url)](auto future) mutable
-        {
-            future.get();
-
-            close();
-
-            http::HttpHeaders headers;
-            websocket::addClientHeaders(&headers,
-                "tracker-protocol", websocket::CompressionType::perMessageDeflate);
-            m_httpClient.addAdditionalRequestHeaders(headers);
-
-            return m_httpClient.get(std::move(url));
-        })
-    .then(
-        [this](auto future)
-        {
-            const auto response = future.get();
-
-            const auto error = websocket::validateResponse(
-                m_httpClient.request(), response);
-            if (error != websocket::Error::noError)
-                throw std::runtime_error("Handshake failed");
-
-            m_nested.emplace(
-                m_httpClient.takeSocket(),
-                websocket::Role::client,
-                websocket::FrameType::text,
-                websocket::compressionType(response.headers));
-            m_nested->bindToAioThread(getAioThread());
-
-            m_nested->start();
-
-            return cf::unit();
-        })
-    .then(
-        [](auto future)
-        {
-            try
+    return m_httpClient->get(url)
+        .then_ok(
+            [this](auto&&)
             {
-                return future.get();
-            }
-            catch (...)
-            {
-                std::throw_with_nested(std::runtime_error(
-                    "Failed to connect websocket"));
-            }
-        });
+                const auto& request = m_httpClient->request();
+                const auto& response = *m_httpClient->response();
+
+                const auto error = websocket::validateResponse(request, response);
+                if (error != websocket::Error::noError)
+                    throw std::runtime_error("Handshake failed");
+
+                m_nested.emplace(
+                    m_httpClient->takeSocket(),
+                    websocket::Role::client,
+                    websocket::FrameType::text,
+                    websocket::compressionType(response.headers));
+
+                m_httpClient.reset();
+
+                m_nested->start();
+
+                return cf::unit();
+            })
+        .then(addExceptionContext(
+            "Failed to connect to websocket server at %1", withoutUserInfo(std::move(url))));
 }
 
 cf::future<nx::Buffer> WebSocket::read()
 {
-    return cf::make_ready_future(cf::unit()).then(
-        [this](auto upFuture)
+    return cf::initiate(
+        [this]
         {
-            upFuture.get();
+            if (!NX_ASSERT(m_nested))
+                throw std::logic_error("Not connected");
 
             cf::promise<SystemError::ErrorCode> promise;
-            auto future = treatBrokenPromiseAsCancelled(promise.get_future());
+            auto future = promise.get_future();
 
             m_buffer.clear();
-            m_nested->readSomeAsync(&m_buffer,
-                [promise = std::move(promise)](auto errorCode, auto /*size*/) mutable
-                {
-                    promise.set_value(errorCode);
-                });
+            m_nested->readSomeAsync(&m_buffer, toHandler(std::move(promise)));
 
-            return future;
+            return future
+                .then(translateBrokenPromiseToOperationCancelled);
         })
-    .then(
-        [this](auto future)
-        {
-            try
+        .then_ok(
+            [this](auto errorCode)
             {
-                const auto errorCode = future.get();
                 if (errorCode)
-                    throw std::system_error(
-                        errorCode, std::system_category(), "Socket read failed");
+                    throw std::system_error(errorCode, std::system_category());
 
                 return std::move(m_buffer);
-            }
-            catch (...)
-            {
-                std::throw_with_nested(Exception("Failed to read from websocket",
-                    ErrorCode::networkError));
-            }
-        });
+            })
+        .then(addExceptionContext("Failed to read from websocket"));
 }
 
 void WebSocket::close()
 {
-    m_httpClient.cancel();
-
-    if (m_nested)
-    {
-        m_nested->cancelIOSync(aio::EventType(aio::etRead | aio::etWrite));
-        m_nested->pleaseStopSync();
-        m_nested.reset();
-    }
-
     m_buffer.clear();
     m_buffer.shrink_to_fit();
-}
 
-void WebSocket::stopWhileInAioThread()
-{
-    BasicPollable::stopWhileInAioThread();
-    m_httpClient.pleaseStopSync();
-    if (m_nested)
-        m_nested->pleaseStopSync();
+    m_httpClient.reset();
+    m_nested.reset();
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

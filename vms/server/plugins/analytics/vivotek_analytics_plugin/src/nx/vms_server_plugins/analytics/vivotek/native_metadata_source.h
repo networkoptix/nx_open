@@ -2,40 +2,29 @@
 
 #include <optional>
 
-#include <nx/kit/json.h>
-#include <nx/utils/url.h>
 #include <nx/utils/thread/cf/cfuture.h>
-#include <nx/network/aio/basic_pollable.h>
+#include <nx/utils/url.h>
 
-#include "http_client.h"
+#include <QtCore/QJsonValue>
+
+#include "camera_vca_parameter_api.h"
 #include "websocket.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-class NativeMetadataSource:
-    public nx::network::aio::BasicPollable
+class NativeMetadataSource
 {
 public:
-    NativeMetadataSource();
-    ~NativeMetadataSource();
-
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
-
     cf::future<cf::unit> open(const nx::utils::Url& url);
-    cf::future<nx::kit::Json> read();
+    cf::future<QJsonValue> read();
     void close();
 
-protected:
-    virtual void stopWhileInAioThread() override;
+private:
+    cf::future<cf::unit> enableDetailMetadata(nx::utils::Url url);
 
 private:
-    cf::future<bool> getDetailMetadataMode(nx::utils::Url url);
-    cf::future<cf::unit> setDetailMetadataMode(const nx::utils::Url& url, bool value);
-    cf::future<cf::unit> reloadConfig(nx::utils::Url url);
-
-private:
-    HttpClient m_httpClient;
-    WebSocket m_websocket;
+    std::optional<CameraVcaParameterApi> m_vcaParameterApi;
+    WebSocket m_webSocket;
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

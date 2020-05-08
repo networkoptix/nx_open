@@ -1,50 +1,30 @@
 #pragma once
 
+#include "nx/network/aio/basic_pollable.h"
 #include <optional>
 
-#include <nx/utils/url.h>
 #include <nx/utils/thread/cf/cfuture.h>
-#include <nx/network/aio/basic_pollable.h>
+#include <nx/utils/url.h>
+#include <nx/utils/move_only_func.h>
 #include <nx/network/http/http_async_client.h>
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-class HttpClient:
-    public nx::network::aio::BasicPollable
+class HttpClient: public nx::network::http::AsyncClient
 {
 public:
     HttpClient();
-    ~HttpClient();
 
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+    cf::future<nx::network::http::BufferType> get(nx::utils::Url url);
 
-    const nx::network::http::Request& request();
+    cf::future<nx::network::http::BufferType> post(nx::utils::Url url,
+        nx::network::http::StringType contentType,
+        nx::network::http::BufferType requestBody);
 
-    void setAdditionalRequestHeaders(nx::network::http::HttpHeaders headers);
-    void addAdditionalRequestHeader(
-        const nx::network::http::StringType& name, const nx::network::http::StringType& value);
-    void addAdditionalRequestHeaders(const nx::network::http::HttpHeaders& headers);
-    void removeAdditionalRequestHeader(const nx::network::http::StringType& name);
-
-    void setRequestBody(std::unique_ptr<nx::network::http::AbstractMsgBodySource> body);
-
-    cf::future<nx::network::http::Response> request(
-        nx::network::http::Method::ValueType method, nx::utils::Url url);
-    cf::future<nx::network::http::Response> get(nx::utils::Url url);
-    cf::future<nx::network::http::Response> post(nx::utils::Url url);
-    using BasicPollable::post;
-
-    void cancel();
-
-    std::unique_ptr<nx::network::AbstractStreamSocket> takeSocket();
-
-protected:
-    virtual void stopWhileInAioThread() override;
-
-    nx::network::http::AsyncClient& nested();
+    using network::aio::BasicPollable::post;
 
 private:
-    std::optional<nx::network::http::AsyncClient> m_nested;
+    nx::network::http::BufferType processResponse();
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek
