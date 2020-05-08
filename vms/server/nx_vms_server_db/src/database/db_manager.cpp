@@ -4825,9 +4825,17 @@ ErrorCode QnDbManager::doQuery(const StoredFilePath& dumpFilePath,
     m_sdbStatic.close();
 
     ErrorCode result = ErrorCode::ok;
-    QFile::remove(dumpFilePath.path);
-    if( !QFile::copy( m_sdb.databaseName(), dumpFilePath.path ) )
+    if (!QFile::remove(dumpFilePath.path))
+    {
+        NX_ERROR(this, "Database backup error. Can't remove file %1", dumpFilePath.path);
         result = ErrorCode::ioError;
+    }
+    if( !QFile::copy(m_sdb.databaseName(), dumpFilePath.path))
+    {
+        NX_ERROR(this, "Database backup error. Can't copy file from %1 to %2",
+            m_sdb.databaseName(), dumpFilePath.path);
+        result = ErrorCode::ioError;
+    }
 
     QFileInfo dumpFileInfo( dumpFilePath.path );
     databaseDumpToFileData.size = dumpFileInfo.size();
