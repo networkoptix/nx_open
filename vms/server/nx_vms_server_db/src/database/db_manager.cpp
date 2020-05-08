@@ -4825,7 +4825,7 @@ ErrorCode QnDbManager::doQuery(const StoredFilePath& dumpFilePath,
     m_sdbStatic.close();
 
     ErrorCode result = ErrorCode::ok;
-    if (!QFile::remove(dumpFilePath.path))
+    if (QFile::exists(dumpFilePath.path) && !QFile::remove(dumpFilePath.path))
     {
         NX_ERROR(this, "Database backup error. Can't remove file %1", dumpFilePath.path);
         result = ErrorCode::ioError;
