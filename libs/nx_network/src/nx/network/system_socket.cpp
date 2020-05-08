@@ -770,9 +770,11 @@ void CommunicatingSocket<SocketInterfaceToImplement>::connectAsync(
 {
     return m_aioHelper->connectAsync(
         addr,
-        [handler = std::move(handler), this](
+        [this, addr, handler = std::move(handler)](
             SystemError::ErrorCode code)
         {
+            NX_VERBOSE(this, "Connect to %1 completed with result %2",
+                addr, SystemError::toString(code));
             m_connected = (code == SystemError::noError);
             handler(code);
         });
@@ -952,6 +954,9 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
     this->setNonBlockingMode(isNonBlockingModeBak);
 
     SystemError::setLastErrorCode(connectErrorCode);
+
+    NX_VERBOSE(this, "Connect to %1 completed with result %2",
+        remoteAddress, SystemError::toString(connectErrorCode));
 
     return m_connected;
 }
@@ -1438,7 +1443,13 @@ bool TCPServerSocket::getProtocol(int* protocol) const
 
 bool TCPServerSocket::listen(int queueLen)
 {
-    return ::listen(handle(), queueLen) == 0;
+    if (::listen(handle(), queueLen) == 0)
+    {
+        NX_VERBOSE(this, "Listening on local address %1", getLocalAddress());
+        return true;
+    }
+
+    return false;
 }
 
 void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)

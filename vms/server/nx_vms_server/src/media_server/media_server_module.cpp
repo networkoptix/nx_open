@@ -105,6 +105,7 @@
 #include <nx/vms/server/analytics/iframe_search_helper.h>
 #include <nx/vms/server/statistics/reporter.h>
 #include <nx/analytics/db/movable_analytics_db.h>
+#include <nx/vms/server/analytics/object_type_dictionary.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -299,11 +300,15 @@ QnMediaServerModule::QnMediaServerModule(
     m_analyticsIframeSearchHelper = store(
         new nx::vms::server::analytics::IframeSearchHelper(
             commonModule()->resourcePool(), m_videoCameraPool));
+    m_objectTypeDictionary = store(
+        new nx::vms::server::analytics::ObjectTypeDictionary(
+            commonModule()->analyticsObjectTypeDescriptorManager()));
     
     auto analyticsDb = new nx::analytics::db::MovableAnalyticsDb(
-        [this, helper = m_analyticsIframeSearchHelper]()
+        [this, helper = m_analyticsIframeSearchHelper, typeDictionary = m_objectTypeDictionary]()
         {
-            return std::make_unique<nx::vms::server::analytics::AnalyticsDb>(this, helper);
+            return std::make_unique<nx::vms::server::analytics::AnalyticsDb>(
+                this, helper, typeDictionary);
         });
     m_analyticsEventsStorage = store(analyticsDb);
 

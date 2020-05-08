@@ -222,7 +222,7 @@ TEST_F(CameraAdvancedParametersProviders, StreamCapabilities)
     expectVideoStreams(descriptions.groups.front());
 
     // Default values for streams.
-    expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(480, 270), 262, 7);
+    expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(480, 270), 263, 7);
     EXPECT_TRUE(camera->getProperty(QString("primaryStreamConfiguration")).isEmpty());
     EXPECT_TRUE(camera->getProperty(QString("secondaryStreamConfiguration")).isEmpty());
 
@@ -230,7 +230,7 @@ TEST_F(CameraAdvancedParametersProviders, StreamCapabilities)
     expectEq(QnCameraAdvancedParamValueMap{
             {"primaryStream.codec", "H264"},
             {"secondaryStream.resolution", "480x270"},
-            {"secondaryStream.bitrateKbps", "262"}},
+            {"secondaryStream.bitrateKbps", "263"}},
         camera->getAdvancedParameters(
             {"primaryStream.codec", "secondaryStream.resolution", "secondaryStream.bitrateKbps"}));
 
@@ -240,10 +240,10 @@ TEST_F(CameraAdvancedParametersProviders, StreamCapabilities)
             {"secondaryStream.resolution", "800x600"},
             {"secondaryStream.fps", "15"}}));
 
-    expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(800, 600), 262, 15);
+    expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(800, 600), 263, 15);
     EXPECT_TRUE(camera->getProperty(QString("primaryStreamConfiguration")).isEmpty());
     EXPECT_EQ(QString(
-            R"json({"bitrateKbps":262,"codec":"MJPEG","fps":15,"quality":"undefined","resolution":{"height":600,"width":800}})json"),
+            R"json({"bitrateKbps":263,"codec":"MJPEG","fps":15,"quality":"undefined","resolution":{"height":600,"width":800}})json"),
         camera->getProperty(QString("secondaryStreamConfiguration")));
 
     // Brocken setProperty().
@@ -260,7 +260,7 @@ TEST_F(CameraAdvancedParametersProviders, StreamCapabilities)
     expectEq(QSet<QString>{"secondaryStream.resetToDefaults"},
         camera->setAdvancedParameters({{"secondaryStream.resetToDefaults", "true"}}));
 
-    expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(480, 270), 262, 7);
+    expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(480, 270), 263, 7);
     EXPECT_TRUE(camera->getProperty(QString("primaryStreamConfiguration")).isEmpty());
     EXPECT_TRUE(camera->getProperty(QString("secondaryStreamConfiguration")).isEmpty());
 }

@@ -147,6 +147,7 @@ QIODevice* QnFileStorageResource::openInternal(
         return nullptr;
 
     QString fileName = removeProtocolPrefix(translateUrlToLocal(url));
+    NX_VERBOSE(this, "openInternal: Opening file '%1'", fileName);
 
     int ioBlockSize = 0;
     int ffmpegBufferSize = 0;
@@ -440,17 +441,39 @@ QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
 
     if (m_localPath.isEmpty())
         return url;
+
+    const auto storageUrl = nx::utils::Url(getUrl());
+    const auto urlToTranslate = nx::utils::Url(url);
+
+    // For example:
+    // storageUrl = smb://host/path OR storageUrl = smb://host/path/
+    // urlToTranslate = smb://host/path/subfolder
+
+    const auto urlToClosedPath =
+        [](const auto& u) { return closeDirPath(u.toString(QUrl::RemoveAuthority)); };
+
+    // Requested url should belong to our storage, otherwise translation makes no sense.
+    if (!NX_ASSERT(urlToClosedPath(urlToTranslate).startsWith(urlToClosedPath(storageUrl))))
+        return url;
+
+    QString storagePath = storageUrl.path().replace(FROM_SEP, TO_SEP);
+    QString subPath = urlToTranslate.path().replace(FROM_SEP, TO_SEP);
+
+    if (storagePath == subPath) //< Base folder
+    {
+        subPath.clear();
+    }
     else
     {
-        QString storagePath = QUrl(getUrl()).path().replace(FROM_SEP, TO_SEP);
-        QString tmpPath = QUrl(url).path().replace(FROM_SEP, TO_SEP);
-        if (storagePath == tmpPath)
-            tmpPath.clear();
-        else
-            tmpPath = tmpPath.mid(storagePath.size());
-        tmpPath = m_localPath + tmpPath;
-        return tmpPath;
+        // Our goal here is to extract '/subfolder' postfix.
+
+        if (storagePath.endsWith(TO_SEP)) //< storagePath = /path/, requested url = /path/subfolder
+            subPath = subPath.mid(storagePath.size() - 1);
+        else //< storagePath = /path, requested url = /path/subfolder
+            subPath = subPath.mid(storagePath.size());
     }
+
+    return m_localPath + subPath;
 }
 
 QString QnFileStorageResource::translateUrlToRemote(const QString &url) const
@@ -830,7 +853,7 @@ bool QnFileStorageResource::testWriteCapInternal() const
     QString fileName(lit("%1%2.tmp"));
     QString localGuid = commonModule()->moduleGUID().toString();
     localGuid = localGuid.mid(1, localGuid.length() - 2);
-    fileName = fileName.arg(closeDirPath(translateUrlToLocal(getPath()))).arg(localGuid);
+    fileName = fileName.arg(closeDirPath(translateUrlToLocal(getUrl()))).arg(localGuid);
 
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly))

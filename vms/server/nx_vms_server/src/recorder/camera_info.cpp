@@ -127,8 +127,6 @@ QString Writer::makeFullPath(
     auto separator = getPathSeparator(storageUrl);
     auto basePath =
         closeDirPath(storageUrl) + DeviceFileCatalog::prefixByCatalog(catalog) + separator;
-    if (!QDir().exists(basePath))
-        QDir().mkpath(basePath);
     return basePath + cameraId + separator + lit("info.txt");
 }
 

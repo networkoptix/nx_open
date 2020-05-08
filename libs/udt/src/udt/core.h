@@ -208,8 +208,8 @@ public: // internal API
 
     void setMultiplexer(const std::shared_ptr<Multiplexer>& multiplexer);
 
-    CSndBuffer* sndBuffer() { return m_pSndBuffer.get(); }
-    CRcvBuffer* rcvBuffer() { return m_pRcvBuffer.get(); }
+    SendBuffer* sndBuffer() { return m_pSndBuffer.get(); }
+    ReceiveBuffer* rcvBuffer() { return m_pRcvBuffer.get(); }
 
     bool synRecving() const { return m_bSynRecving; }
     bool synSending() const { return m_bSynSending; }
@@ -460,7 +460,7 @@ private: // Status
     std::chrono::microseconds m_llLastReqTime = std::chrono::microseconds::zero();
 
 private: // Sending related data
-    std::unique_ptr<CSndBuffer> m_pSndBuffer;
+    std::unique_ptr<SendBuffer> m_pSndBuffer;
     std::unique_ptr<CSndLossList> m_pSndLossList;
     std::unique_ptr<CPktTimeWindow> m_pSndTimeWindow;
 
@@ -483,7 +483,7 @@ private: // Sending related data
     void CCUpdate();
 
 private: // Receiving related data
-    std::unique_ptr<CRcvBuffer> m_pRcvBuffer;
+    std::unique_ptr<ReceiveBuffer> m_pRcvBuffer;
     std::unique_ptr<CRcvLossList> m_pRcvLossList;
     std::unique_ptr<CACKWindow> m_pACKWindow;                    // ACK history window
     std::unique_ptr<CPktTimeWindow> m_pRcvTimeWindow;

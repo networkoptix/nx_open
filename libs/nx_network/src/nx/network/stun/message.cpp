@@ -18,6 +18,25 @@ namespace nx {
 namespace network {
 namespace stun {
 
+const char* toString(MessageClass value)
+{
+    switch (value)
+    {
+        case MessageClass::request:
+            return "request";
+        case MessageClass::indication:
+            return "indication";
+        case MessageClass::successResponse:
+            return "successResponse";
+        case MessageClass::errorResponse:
+            return "errorResponse";
+        default:
+            return "unknown";
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
 Header::Header()
     : messageClass(MessageClass::unknown)
     , method(MethodType::invalid)
@@ -65,6 +84,12 @@ Header& Header::operator=(Header&& rhs)
         transactionId = std::move(rhs.transactionId);
     }
     return *this;
+}
+
+std::string Header::toString() const
+{
+    return nx::format("class %1, method %2, transaction id %3")
+        .args(messageClass, method, transactionId.toHex()).toStdString();
 }
 
 Buffer Header::makeTransactionId()

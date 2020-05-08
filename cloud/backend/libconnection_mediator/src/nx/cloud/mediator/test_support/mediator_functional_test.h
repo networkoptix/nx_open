@@ -87,10 +87,6 @@ public:
     std::tuple<api::ResultCode, api::ListeningPeers>
         getListeningPeers() const;
 
-protected:
-    virtual void beforeModuleCreation() override;
-    virtual void afterModuleDestruction() override;
-
 private:
     struct TcpProxyContext
     {

@@ -1682,7 +1682,7 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation type="unfinished">
-        <numerusform>%1 / %n folyamat részletei</numerusform>
+        <numerusform>Details for %n sessions of %1</numerusform>
         <numerusform>Details for %n sessions of %1</numerusform>
       </translation>
     </message>
@@ -1690,7 +1690,7 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation type="unfinished">
-        <numerusform>%1 / %n kamera részletei</numerusform>
+        <numerusform>Details for %n cameras of %1</numerusform>
         <numerusform>Details for %n cameras of %1</numerusform>
       </translation>
     </message>
@@ -3137,7 +3137,7 @@ to %1</source>
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
       <translation type="unfinished">
-        <numerusform>Esemény naplóban %1 és %2 között - %n eseménytalálat</numerusform>
+        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
         <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
       </translation>
     </message>
@@ -3145,7 +3145,7 @@ to %1</source>
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation type="unfinished">
-        <numerusform>Eseménynapló %1- %n eseménytalálat</numerusform>
+        <numerusform>Event log for %1 - %n events found</numerusform>
         <numerusform>Event log for %1 - %n events found</numerusform>
       </translation>
     </message>
@@ -3229,7 +3229,7 @@ to %1</source>
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
       <translation type="unfinished">
-        <numerusform>%1 (%n kamera)</numerusform>
+        <numerusform>%1 (%n cameras)</numerusform>
         <numerusform>%1 (%n cameras)</numerusform>
       </translation>
     </message>
@@ -4634,7 +4634,7 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minutes</source>
       <translation type="unfinished">
-        <numerusform>nagyjából %n perc</numerusform>
+        <numerusform>about %n minutes</numerusform>
         <numerusform>about %n minutes</numerusform>
       </translation>
     </message>
@@ -7050,7 +7050,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <translation type="unfinished">
-        <numerusform>Feltöltheti ezeket a fájlokat egy virtuális kamera másik példányára.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
         <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
       </translation>
     </message>
@@ -7279,7 +7279,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
       <translation type="unfinished">
-        <numerusform>Néhány videofájlok még mindig töltődnek a %n virtuális kamerára:</numerusform>
+        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
         <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
       </translation>
     </message>
@@ -7560,7 +7560,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message numerus="yes">
       <source>%n objects</source>
       <translation type="unfinished">
-        <numerusform>%n objektumok</numerusform>
+        <numerusform>%n objects</numerusform>
         <numerusform>%n objects</numerusform>
       </translation>
     </message>

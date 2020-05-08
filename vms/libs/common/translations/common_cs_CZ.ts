@@ -716,9 +716,9 @@
     <message numerus="yes">
       <source>%n Free Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Bezplatné licence</numerusform>
-        <numerusform>%n Bezplatné licence</numerusform>
-        <numerusform>%n Bezplatné licence</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
         <numerusform>%n Free Licenses</numerusform>
       </translation>
     </message>
@@ -816,7 +816,7 @@
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n%1 Bezplatné licence</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
         <numerusform>%n/%1 Free Licenses</numerusform>
         <numerusform>%n/%1 Free Licenses</numerusform>
         <numerusform>%n/%1 Free Licenses</numerusform>
@@ -992,8 +992,8 @@
     <message numerus="yes">
       <source>%n I/O Modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O Modul</numerusform>
-        <numerusform>%n I/O Moduly</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
         <numerusform>%n I/O Modules</numerusform>
         <numerusform>%n I/O Modules</numerusform>
       </translation>
@@ -1001,7 +1001,7 @@
     <message numerus="yes">
       <source>%n I/O modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O moduly</numerusform>
+        <numerusform>%n I/O modules</numerusform>
         <numerusform>%n I/O modules</numerusform>
         <numerusform>%n I/O modules</numerusform>
         <numerusform>%n I/O modules</numerusform>

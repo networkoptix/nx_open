@@ -223,7 +223,7 @@ void ServerTimeSyncManager::updateSyncTimeToOsTimeDelta()
 {
     const auto ownId = commonModule()->moduleGUID();
     qint64 systemTimeDeltaMs = getPrimaryTimeServerId() == ownId ? 0 :
-        qAbs(milliseconds(getSyncTime() - m_systemClock->millisSinceEpoch()).count());
+        milliseconds(getSyncTime() - m_systemClock->millisSinceEpoch()).count();
     const auto epsilonMs = duration_cast<milliseconds>(globalSettings()->syncTimeEpsilon());
     if (qAbs(m_systemTimeDeltaMs - systemTimeDeltaMs) >  epsilonMs.count())
         saveSystemTimeDeltaMs(systemTimeDeltaMs);

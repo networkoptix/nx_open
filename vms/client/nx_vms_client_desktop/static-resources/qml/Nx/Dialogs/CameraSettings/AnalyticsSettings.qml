@@ -213,6 +213,7 @@ Item
 
         enabled: !loading
         contentEnabled: header.checked || isDeviceDependent
+        contentVisible: contentEnabled
         scrollBarParent: scrollBarsParent
 
         onValuesEdited:

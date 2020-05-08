@@ -1562,7 +1562,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Uyarı! Bu, CPU'yu kaydeden ancak animasyonu etkileyebilecek deneysel bir seçenektir.</translation>
     </message>
   </context>
   <context>
@@ -2110,7 +2110,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Kaynak Sunucu ve %1</translation>
     </message>
   </context>
   <context>
@@ -2655,7 +2655,7 @@ to %1</source>
     <message>
       <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
       <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
+      <translation>Seçilen %2 kullanıcıdan %1 tanesi %3 kullanıcı değil ve mobil bildirim almayacak.</translation>
     </message>
   </context>
   <context>
@@ -3969,12 +3969,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+      <translation>Bir Etkinleştirme Anahtarı dosyası edinmek için lütfen sağlanan Lisans Anahtarı ve Donanım Kimliğini Bölgesel desteğinize gönderin.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
+      <translation>Aktivasyon dosyasını almak için Lütfen (%1) e ait lisans anahtarını ve donanım kimliğini e-posta olarak gönderin.</translation>
     </message>
   </context>
   <context>
@@ -5759,11 +5759,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>Sunucu'ya Ulaşılamıyor.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>şimdi</translation>
     </message>
   </context>
   <context>
@@ -7526,9 +7526,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n değer</numerusform>
+        <numerusform>+%n değer</numerusform>
       </translation>
     </message>
   </context>
@@ -9128,12 +9128,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>Sistem %1 bağlı değil. Mobil bildirimler yalnızca sistem %1 bağlı olduğunda çalışır.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 Ayarlar</translation>
     </message>
   </context>
   <context>

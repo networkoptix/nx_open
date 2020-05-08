@@ -57,6 +57,8 @@ void AsyncClient::connect(
             });
     }
 
+    NX_VERBOSE(this, "Connecting to URL %1", url);
+
     QnMutexLocker lock(&m_mutex);
     m_endpoint = nx::network::url::getEndpoint(url);
     m_useSsl = url.scheme() == nx::network::stun::kSecureUrlSchemeName;
@@ -104,6 +106,8 @@ void AsyncClient::setOnConnectionClosedHandler(
 void AsyncClient::sendRequest(
     Message request, RequestHandler handler, void* client)
 {
+    NX_VERBOSE(this, "Queuing request %1 (id %2)", request.header, client);
+
     QnMutexLocker lock(&m_mutex);
     m_requestQueue.push_back(std::make_pair(
         std::move(request), std::make_pair(client, std::move(handler))));
@@ -371,6 +375,8 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* /*lock*/)
             continue;
         }
 
+        NX_VERBOSE(this, "Sending request %1", request.header);
+
         emplace.first->second = std::move(handler);
         m_baseConnection->sendMessage(
             std::move(request),
@@ -452,6 +458,8 @@ void AsyncClient::processMessage(Message message)
     QnMutexLocker lock(&m_mutex);
     message.transportHeader.requestedEndpoint = m_baseConnection->socket()->getForeignAddress();
     message.transportHeader.locationEndpoint = message.transportHeader.requestedEndpoint;
+
+    NX_VERBOSE(this, "Received message %1", message.header);
 
     switch (message.header.messageClass)
     {

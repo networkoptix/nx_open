@@ -55,7 +55,7 @@ Column
             ? ctx_modelData.sections
             : ctx_settingsModel && ctx_settingsModel.sections
 
-        readonly property bool collapsible: !!sectionsModel && sectionsModel.length > 0
+        readonly property bool collapsible: !!sectionsModel && sectionsModel.length > 0 && active
 
         onClicked:
         {
@@ -102,6 +102,7 @@ Column
         width: parent.width
         height: collapsed ? 0 : implicitHeight
         clip: true
+        visible: ctx_active
 
         Repeater
         {

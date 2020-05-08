@@ -13,6 +13,7 @@ Item
 
     property Item contentItem: null
     property bool contentEnabled: true
+    property bool contentVisible: true
     property Item scrollBarParent: null
     property Item headerItem: null
 
@@ -26,6 +27,7 @@ Item
 
         contentItem = Settings.createItems(settingsView, model)
         contentItem.contentEnabled = Qt.binding(function() { return contentEnabled })
+        contentItem.contentVisible = Qt.binding(function() { return contentVisible })
         contentItem.scrollBarParent = Qt.binding(function() { return scrollBarParent })
         contentItem.extraHeaderItem = Qt.binding(function() { return headerItem })
 

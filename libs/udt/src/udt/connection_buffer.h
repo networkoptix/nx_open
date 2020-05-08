@@ -38,8 +38,7 @@ written by
 Yunhong Gu, last updated 05/05/2009
 *****************************************************************************/
 
-#ifndef __UDT_BUFFER_H__
-#define __UDT_BUFFER_H__
+#pragma once
 
 #include <fstream>
 #include <mutex>
@@ -51,11 +50,14 @@ Yunhong Gu, last updated 05/05/2009
 
 static const int kDefaultMtuSize = 1400;
 
-class CSndBuffer
+/**
+ * Socket's send buffer.
+ */
+class SendBuffer
 {
 public:
-    CSndBuffer(int size = 32, int mss = kDefaultMtuSize);
-    ~CSndBuffer();
+    SendBuffer(int size = 32, int mss = kDefaultMtuSize);
+    ~SendBuffer();
 
     // Functionality:
     //    Insert a user buffer into the sending list.
@@ -153,17 +155,20 @@ private:
     int m_iCount;            // number of used blocks
 
 private:
-    CSndBuffer(const CSndBuffer&);
-    CSndBuffer& operator=(const CSndBuffer&);
+    SendBuffer(const SendBuffer&);
+    SendBuffer& operator=(const SendBuffer&);
 };
 
-////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
 
-class CRcvBuffer
+/**
+ * Socket's receive buffer.
+ */
+class ReceiveBuffer
 {
 public:
-    CRcvBuffer(int bufsize = 65536);
-    ~CRcvBuffer();
+    ReceiveBuffer(int bufsize = 65536);
+    ~ReceiveBuffer();
 
     // Functionality:
     //    Write data into the buffer.
@@ -271,10 +276,7 @@ private:
     int m_iNotch;            // the starting read point of the first unit
 
 private:
-    CRcvBuffer();
-    CRcvBuffer(const CRcvBuffer&);
-    CRcvBuffer& operator=(const CRcvBuffer&);
+    ReceiveBuffer();
+    ReceiveBuffer(const ReceiveBuffer&);
+    ReceiveBuffer& operator=(const ReceiveBuffer&);
 };
-
-
-#endif

@@ -985,7 +985,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Nem lehet lefoglalni a kimeneti streamet a rögzítéshez.</translation>
+      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>

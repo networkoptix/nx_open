@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <nx/utils/log/log.h>
+
 #include "ssl_stream_socket.h"
 #include "../aio/async_channel_adapter.h"
 
@@ -51,6 +53,8 @@ std::string EncryptionDetectingStreamSocket::serverName() const
 std::unique_ptr<AbstractStreamSocket> EncryptionDetectingStreamSocket::createSslSocket(
     std::unique_ptr<AbstractStreamSocket> rawDataSource)
 {
+    NX_VERBOSE(this, "Detected SSL connection. Initializing SSL socket");
+
     m_sslUsed = true;
     return std::make_unique<ssl::StreamSocket>(std::move(rawDataSource), true);
 }

@@ -39,8 +39,7 @@ public:
 
     ~ListeningPeer()
     {
-        for (auto& connection: m_serverConnections)
-            connection->pleaseStopSync();
+        m_serverConnections.clear();
 
         m_mediatorClient.reset();
     }
@@ -83,7 +82,6 @@ protected:
 
     void whenCloseConnectionToMediator()
     {
-        m_serverConnections.back()->pleaseStopSync();
         m_serverConnections.pop_back();
     }
 
@@ -123,7 +121,7 @@ protected:
     void thenOldConnectionIsClosedByMediator()
     {
         auto closedConnection = m_closeConnectionEvents.pop();
-        ASSERT_EQ(closedConnection, m_serverConnections.front().get());
+        ASSERT_EQ(closedConnection, m_serverConnections.front().stunClient.get());
     }
 
     void thenConnectSucceeded()
@@ -168,21 +166,19 @@ protected:
         auto connection = std::make_unique<nx::hpm::api::MediatorServerTcpConnection>(
             stunClient,
             this);
-        m_serverConnections.push_back(std::move(stunClient));
+        m_serverConnections.push_back({std::move(stunClient), std::move(connection)});
 
         nx::hpm::api::ListenRequest request;
         request.systemId = m_system.id;
         request.serverId = m_serverId;
-        auto connectionPtr = connection.get();
-        connectionPtr->listen(
+        m_serverConnections.back().serverConnection->listen(
             request,
-            [this, connection = std::move(connection)](
+            [this](
                 nx::hpm::api::ResultCode resultCode,
                 nx::hpm::api::ListenResponse response) mutable
             {
                 m_listenResponseQueue.push(
                     std::make_tuple(resultCode, std::move(response)));
-                connection.reset();
             });
     }
 
@@ -193,10 +189,25 @@ protected:
     }
 
 private:
+    struct ServerConnectionContext
+    {
+        ServerConnectionContext(ServerConnectionContext&&) = default;
+
+        ~ServerConnectionContext()
+        {
+            serverConnection.reset();
+            if (stunClient)
+                stunClient->pleaseStopSync();
+        }
+
+        std::shared_ptr<nx::network::stun::AsyncClient> stunClient;
+        std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> serverConnection;
+    };
+
     nx::hpm::AbstractCloudDataProvider::System m_system;
     std::unique_ptr<MediaServerEmulator> m_mediaServerEmulator;
     nx::String m_serverId;
-    std::vector<std::shared_ptr<nx::network::stun::AsyncClient>> m_serverConnections;
+    std::vector<ServerConnectionContext> m_serverConnections;
     nx::utils::SyncQueue<nx::network::stun::AsyncClient*> m_closeConnectionEvents;
     nx::utils::SyncQueue<std::tuple<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse>>
         m_listenResponseQueue;
