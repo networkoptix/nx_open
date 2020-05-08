@@ -18,7 +18,7 @@ std::optional<QString> ObjectTypeDictionary::idToName(const QString& id) const
 
     if (const auto descriptor = m_objectTypeManager->descriptor(id))
     {
-        m_idToNameCache[descriptor->name] = id;
+        m_idToNameCache[id] = descriptor->name;
         return descriptor->name;
     }
     return std::nullopt;

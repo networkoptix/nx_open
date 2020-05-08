@@ -105,7 +105,7 @@
 #include <nx/vms/server/analytics/iframe_search_helper.h>
 #include <nx/vms/server/statistics/reporter.h>
 #include <nx/analytics/db/movable_analytics_db.h>
-#include <nx/vms/server/analytics/11/object_type_dictionary.h>
+#include <nx/vms/server/analytics/object_type_dictionary.h>
 
 using namespace nx;
 using namespace nx::vms::server;
