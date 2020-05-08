@@ -167,7 +167,7 @@ public:
         playbackMode(PlaybackMode::Live),
         lastMediaPacketTime(AV_NOPTS_VALUE),
         dataProcessor(0),
-        sessionTimeOut(0),
+        sessionTimeout(0),
         useProprietaryFormat(false),
         startTime(DATETIME_NOW), //< Default value
         endTime(0),
@@ -242,7 +242,7 @@ public:
     QnRtspDataConsumer* dataProcessor;
 
     QString sessionId;
-    int sessionTimeOut; // timeout in seconds. Not used if zero
+    int sessionTimeout; //< Timeout in seconds. Not used if zero.
     QnMediaResourcePtr mediaRes;
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
@@ -356,9 +356,9 @@ bool QnRtspConnectionProcessor::parseRequestParams()
     }
     else
     {
-        d->sessionTimeOut =
+        d->sessionTimeout =
             std::chrono::duration_cast<std::chrono::seconds>(kDefaultRtspTimeout).count();
-        d->socket->setRecvTimeout(d->sessionTimeOut * 1500);
+        d->socket->setRecvTimeout(d->sessionTimeout * 1500);
     }
 
     d->qualityFastSwitch = true;
@@ -396,8 +396,8 @@ void QnRtspConnectionProcessor::initResponse(
 
     if (!d->sessionId.isEmpty()) {
         QString sessionId = d->sessionId;
-        if (d->sessionTimeOut > 0)
-            sessionId += QString(QLatin1String(";timeout=%1")).arg(d->sessionTimeOut);
+        if (d->sessionTimeout > 0)
+            sessionId += QString(QLatin1String(";timeout=%1")).arg(d->sessionTimeout);
         d->response.headers.insert(nx::network::http::HttpHeader("Session", sessionId.toLatin1()));
     }
 }
@@ -1318,7 +1318,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
         if (nx::network::http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
             return nx::network::http::StatusCode::internalServerError;
         d->useProprietaryFormat = true;
-        d->sessionTimeOut = 0;
+        d->sessionTimeout = 0;
         d->socket->setSendTimeout(kNativeRtspConnectionSendTimeout); // set large timeout for native connection
         QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
         createPredefinedTracks(videoLayout);
@@ -1823,7 +1823,7 @@ void QnRtspConnectionProcessor::run()
             {
                 bool timeoutExpired = !d->dataProcessor ||
                     d->dataProcessor->timeFromLastReceiverReport() >= kDefaultRtspTimeout;
-                if (d->sessionTimeOut > 0 && timeoutExpired)
+                if (d->sessionTimeout > 0 && timeoutExpired)
                 {
                     NX_DEBUG(this, "%1, Timeout expired, close rtsp session", d->logContext);
                     break;
@@ -1832,8 +1832,8 @@ void QnRtspConnectionProcessor::run()
             else
             {
                 NX_DEBUG(this,
-                    "%1: Failed to read from socket error code: %2(%3), close rtsp session",
-                    d->logContext, SystemError::toString(errorCode), errorCode);
+                    "%1: Failed to read from the socket, close rtsp session: OS code %2: %3",
+                    d->logContext, errorCode, SystemError::toString(errorCode));
                 break;
             }
         }
