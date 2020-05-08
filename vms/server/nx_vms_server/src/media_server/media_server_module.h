@@ -54,7 +54,10 @@ namespace nx::vms::server { class CmdLineArguments; }
 namespace nx::vms::server::analytics {
     class SdkObjectFactory;
 } // namespace nx::vms::server::analytics
-namespace nx::analytics::db { class AbstractIframeSearchHelper; }
+namespace nx::analytics::db { 
+    class AbstractIframeSearchHelper; 
+    class AbstractObjectTypeDictionary;
+}
 
 namespace nx::vms::server::network { class MulticastAddressRegistry;  }
 
@@ -241,6 +244,7 @@ private:
     std::unique_ptr<nx::vms::server::nvr::IService> m_nvrService;
     StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
     nx::analytics::db::AbstractIframeSearchHelper* m_analyticsIframeSearchHelper = nullptr;
+    nx::analytics::db::AbstractObjectTypeDictionary* m_objectTypeDictionary = nullptr;
     std::unique_ptr<nx::vms::server::event::ServerRuntimeEventManager> m_serverRuntimeEventManager;
     std::unique_ptr<nx::vms::server::statistics::Reporter> m_statisticsReporter;
 

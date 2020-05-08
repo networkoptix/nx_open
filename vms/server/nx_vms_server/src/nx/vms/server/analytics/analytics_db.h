@@ -16,7 +16,8 @@ class AnalyticsDb:
 public:
     AnalyticsDb(
         QnMediaServerModule* mediaServerModule,
-        nx::analytics::db::AbstractIframeSearchHelper* iframeSearchHelper);
+        nx::analytics::db::AbstractIframeSearchHelper* iframeSearchHelper,
+        nx::analytics::db::AbstractObjectTypeDictionary* objectTypeDictionary);
 
     virtual std::vector<nx::analytics::db::ObjectPosition>
         lookupTrackDetailsSync(const nx::analytics::db::ObjectTrack& track) override;
