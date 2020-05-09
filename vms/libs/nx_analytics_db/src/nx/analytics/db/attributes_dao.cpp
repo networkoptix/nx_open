@@ -162,6 +162,7 @@ QString AttributesDao::convertTextFilterToSqliteFtsExpression(const QString& tex
     result.replace(
         QRegularExpression("([\\w\\d\\-_]+)\\s*:\\s*([\\w\\d\\-_]+)"),
         kParamNamePrefix + QString("\\1 NEAR/0 \\2"));
+    result.replace("$", kParamNamePrefix);
     return result;
 }
 

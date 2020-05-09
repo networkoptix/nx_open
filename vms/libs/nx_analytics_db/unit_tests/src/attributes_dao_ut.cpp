@@ -22,7 +22,7 @@ TEST_F(AttributesDao, prepare_sqlite_fts_expression)
     ASSERT_EQ(kParamNamePrefix + "name1 NEAR/0 val1", prepareFtsFilter("name1:val1"));
     ASSERT_EQ(kParamNamePrefix + "name1 NEAR/0 val1", prepareFtsFilter("name1: val1"));
     ASSERT_EQ(kParamNamePrefix + "name1 NEAR/0 val1", prepareFtsFilter("name1 :val1"));
-    ASSERT_EQ(kParamNamePrefix + "name1", prepareFtsFilter(kParamNamePrefix + "name1"));
+    ASSERT_EQ(kParamNamePrefix + "name1", prepareFtsFilter("$name1"));
 }
 
 } // namespace nx::analytics::db::test

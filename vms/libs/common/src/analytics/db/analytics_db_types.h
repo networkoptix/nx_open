@@ -180,6 +180,12 @@ private:
         const nx::common::metadata::Attributes& attributesToMatch,
         const nx::common::metadata::Attributes& attributes) const;
 
+    static std::vector<QString> takeAttributeToFindNamesFromText(QString* textFilter);
+
+    bool checkAttributesPresence(
+        const std::vector<QString>& names,
+        const nx::common::metadata::Attributes& attributes) const;
+
     bool matchAttributeValues(
         const QString& filterText,
         const nx::common::metadata::Attributes& attributes) const;

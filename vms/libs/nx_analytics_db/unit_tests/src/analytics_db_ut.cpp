@@ -1283,7 +1283,7 @@ TEST_F(AnalyticsDbLookup, lookup_historic_attribute_value)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbLookup, lookup_by_unknown_text_produces_no_objects)
+TEST_F(AnalyticsDbLookup, full_text_search_by_unknown_text_produces_no_objects)
 {
     addRandomUnknownText();
     whenLookupObjectTracks();
@@ -1299,10 +1299,20 @@ TEST_F(AnalyticsDbLookup, full_text_search_case_insensitive)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbLookup, search_by_specific_param_value)
+TEST_F(AnalyticsDbLookup, full_text_search_by_specific_param_value)
 {
     const auto [name, value] = getAnyAttributePresentInData();
     addTextToFilter(name + ":" + value);
+
+    whenLookupObjectTracks();
+
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookup, full_text_search_by_attribute_presence)
+{
+    const auto [name, value] = getAnyAttributePresentInData();
+    addTextToFilter("$" + name);
 
     whenLookupObjectTracks();
 

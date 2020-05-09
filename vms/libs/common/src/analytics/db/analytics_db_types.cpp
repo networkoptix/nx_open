@@ -175,6 +175,10 @@ bool Filter::acceptsAttributes(const Attributes& attributes) const
     if (!attributesToMatch.empty() && !matchExactAttributes(attributesToMatch, attributes))
         return false;
 
+    const auto attributeToFindNames = takeAttributeToFindNamesFromText(&filterText);
+    if (!attributeToFindNames.empty() && !checkAttributesPresence(attributeToFindNames, attributes))
+        return false;
+
     return matchAttributeValues(filterText, attributes);
 }
 
@@ -299,7 +303,7 @@ nx::common::metadata::Attributes Filter::takeExactAttrMatchFiltersFromText(
 {
     nx::common::metadata::Attributes attributesToMatch;
 
-    QRegularExpression attrRegexp("[\\w\\d\\-_]+\\s*:\\s*[\\w\\d\\-_]+");
+    QRegularExpression attrRegexp("[\\w\\d\\-_.]+\\s*:\\s*[\\w\\d\\-_.]+");
     for (;;)
     {
         QRegularExpressionMatch match;
@@ -336,6 +340,41 @@ bool Filter::matchExactAttributes(
         }
 
         if (!matched)
+            return false;
+    }
+
+    return true;
+}
+
+std::vector<QString> Filter::takeAttributeToFindNamesFromText(QString* textFilter)
+{
+    std::vector<QString> names;
+
+    QRegularExpression attrPresenseRegexp("\\$[\\w\\d\\-_.]+");
+    for (;;)
+    {
+        QRegularExpressionMatch match;
+        auto pos = textFilter->indexOf(attrPresenseRegexp, 0, &match);
+        if (pos == -1)
+            break;
+
+        names.push_back(match.captured().mid(1)); //< Omitting $.
+        textFilter->remove(pos, match.capturedLength());
+    }
+
+    return names;
+}
+
+bool Filter::checkAttributesPresence(
+    const std::vector<QString>& names,
+    const nx::common::metadata::Attributes& attributes) const
+{
+    for (const auto& name: names)
+    {
+        const auto found = std::any_of(
+            attributes.begin(), attributes.end(),
+            [&name](const auto& attr) { return attr.name.startsWith(name); });
+        if (!found)
             return false;
     }
 
