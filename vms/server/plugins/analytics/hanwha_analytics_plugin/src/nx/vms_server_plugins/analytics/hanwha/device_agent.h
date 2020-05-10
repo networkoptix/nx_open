@@ -46,6 +46,10 @@ public:
     void readCameraSettings();
 
 protected:
+    void setSupportedEventCategoties();
+
+    void writeAnalyticsModeToCamera() const;
+
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
         const nx::sdk::IStringMap* settings) override;
@@ -69,12 +73,12 @@ public:
     std::optional<QSet<QString>> getRealSupportedEventTypes();
 
 private:
-    std::string sendWritingRequestToDeviceSync(const std::string& query);
+    std::string sendWritingRequestToDeviceSync(const std::string& query) const;
 
     std::string sendReadingRequestToDeviceSync(
-        const char* domain, const char* submenu, const char* action);
+        const char* domain, const char* submenu, const char* action, bool useChannel = true) const;
 
-    std::string loadEventSettings(const char* eventName);
+    std::string loadEventSettings(const char* eventName) const;
 
     void loadFrameSize();
 

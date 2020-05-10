@@ -73,7 +73,11 @@ static bool isFirmwareActual(const std::string& firmwareVersion)
     if (revision == 99 && (minor % 10) == 9)
         return false; //< beta version
 
+#if 0
+    // Only old devices use version 2 (they have their own numbering)
     return major > 1 || (major == 1 && minor >= 41);
+#endif
+    return major == 1 && minor >= 41;
 }
 
 template <typename Pred>

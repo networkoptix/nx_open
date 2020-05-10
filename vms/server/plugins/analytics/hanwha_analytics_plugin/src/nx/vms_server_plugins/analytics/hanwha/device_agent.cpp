@@ -138,35 +138,34 @@ static std::optional<std::string> parseFirmwareVersion(const std::string& jsonRe
     return json["FirmwareVersion"].string_value();
 }
 
-/** Extract frameSize from json string. If fail, returns std::nullopt. */
-static std::optional<SupportedEventCategories> parseSupportedEventCategories(
-    const std::string& jsonReply)
-{
-    SupportedEventCategories result = {false};
-
-    std::string error;
-    nx::kit::Json json = nx::kit::Json::parse(jsonReply, error);
-    if (!json.is_object())
-        return std::nullopt;
-
-    json = json["ChannelEvent"];
-    if (!json.is_array() || json.array_items().empty())
-        return std::nullopt;
-    json = json.array_items().front();
-
-    result[int(EventCategory::motionDetection)] = json["MotionDetection"].is_bool();
-    result[int(EventCategory::tampering)] = json["Tampering"].is_bool();
-    result[int(EventCategory::audioDetection)] = json["AudioDetection"].is_bool();
-    result[int(EventCategory::defocusDetection)] = json["DefocusDetection"].is_bool();
-    result[int(EventCategory::fogDetection)] = json["FogDetection"].is_bool();
-    result[int(EventCategory::videoAnalytics)] = json["VideoAnalytics"].is_bool();
-    result[int(EventCategory::audioAnalytics)] = json["AudioAnalytics"].is_bool();
-    result[int(EventCategory::queues)] = json["QueueEvent"].is_bool();
-    result[int(EventCategory::shockDetection)] = json["ShockDetection"].is_bool();
-    result[int(EventCategory::objectDetection)] = json["ObjectDetection"].is_bool();
-
-    return result;
-}
+///** Extract frameSize from json string. If fail, returns std::nullopt. */
+//static std::optional<SupportedEventCategories> parseSupportedEventCategories(
+//    const std::string& jsonReply)
+//{
+//    SupportedEventCategories result = {false};
+//
+//    std::string error;
+//    nx::kit::Json json = nx::kit::Json::parse(jsonReply, error);
+//    if (!json.is_object())
+//        return std::nullopt;
+//
+//    json = json["ChannelEvent"];
+//    if (!json.is_array() || json.array_items().empty())
+//        return std::nullopt;
+//    json = json.array_items().front();
+//
+//    result[int(EventCategory::motionDetection)] = json["MotionDetection"].is_bool();
+//    result[int(EventCategory::shockDetection)] = json["ShockDetection"].is_bool();
+//    result[int(EventCategory::tampering)] = json["Tampering"].is_bool();
+//    result[int(EventCategory::defocusDetection)] = json["DefocusDetection"].is_bool();
+//    result[int(EventCategory::fogDetection)] = json["FogDetection"].is_bool();
+//    result[int(EventCategory::videoAnalytics)] = json["VideoAnalytics"].is_bool();
+//    result[int(EventCategory::objectDetection)] = json["ObjectDetection"].is_bool();
+//    result[int(EventCategory::audioDetection)] = json["AudioDetection"].is_bool();
+//    result[int(EventCategory::audioAnalytics)] = json["AudioAnalytics"].is_bool();
+//
+//    return result;
+//}
 
 /**
  * The core function - transfers settings from server to device.
@@ -251,6 +250,8 @@ void DeviceAgent::doSetNeededMetadataTypes(
         *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Receives `dataPacket` from Server. This packet is a `CustomMetadataPacket`, that contains xml
  * with the information about events occurred. The function parses the xml and extracts
@@ -287,12 +288,90 @@ void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dat
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 /**
- * Reads settings from `sourceMap` and writes them into the agent's device. If a setting can not
- * be written, its name is added to `outResult` error map.h
+ * Read current analytics mode (i.e. detection type) from the device, change the mode if needed and
+ * send changed value to the device if changed.
+ */
+void DeviceAgent::writeAnalyticsModeToCamera() const
+{
+    const int channelNumber = m_valueTransformer->transformChannelNumber(m_channelNumber);
+    AnalyticsMode currentAnalyticsMode;
+    std::string sunapiReply = loadEventSettings("videoanalysis2");
+    readFromDeviceReply(sunapiReply, &currentAnalyticsMode, m_frameSize, channelNumber);
+
+    AnalyticsMode desiredAnalyticsMode = (m_settings.IntelligentVideoIsActive())
+        ? currentAnalyticsMode.addIntelligentVideoMode()
+        : currentAnalyticsMode.removeIntelligentVideoMode();
+
+    if (desiredAnalyticsMode != currentAnalyticsMode)
+    {
+        const auto sender = [this](const std::string& s)
+        {
+            return this->sendWritingRequestToDeviceSync(s);
+        };
+
+        const std::string query =
+            desiredAnalyticsMode.buildCameraWritingQuery(m_frameSize, m_channelNumber);
+        const std::string error = sender(query);
+        if (!error.empty())
+            NX_DEBUG(this, NX_FMT("Request failed. Url = %1", query));
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void DeviceAgent::setSupportedEventCategoties()
+{
+    m_settings.supportedEventCategories.fill(false);
+
+    m_settings.supportedEventCategories[EventCategory::motionDetection] =
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.MotionDetection");
+
+    m_settings.supportedEventCategories[EventCategory::shockDetection] =
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.ShockDetection");
+
+    m_settings.supportedEventCategories[EventCategory::tampering] =
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.Tampering");
+
+    m_settings.supportedEventCategories[EventCategory::defocusDetection] =
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.DefocusDetection");
+
+    m_settings.supportedEventCategories[EventCategory::fogDetection] =
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.FogDetection");
+
+    m_settings.supportedEventCategories[EventCategory::videoAnalytics] =
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Passing")
+        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Entering")
+        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Exiting")
+        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.AppearDisappear")
+        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Intrusion")
+        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Loitering");
+
+    m_settings.supportedEventCategories[EventCategory::objectDetection] =
+        !m_manifest.supportedObjectTypeIds.isEmpty();
+
+    m_settings.supportedEventCategories[EventCategory::audioDetection] =
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioDetection");
+
+    m_settings.supportedEventCategories[EventCategory::audioAnalytics] =
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Scream")
+        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Gunshot")
+        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Explosion")
+        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.GlassBreak");
+}
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Read the plugin settings from the server to deviceAgent settings and write them into the
+ * agent's device (usually a camera).
+ * If a setting can not be written, its name is added to `outResult` error map.
+ * if a setting is written successfully, corresponding deviceAgest setting is updated.
 */
-void DeviceAgent::doSetSettings(
-    Result<const IStringMap*>* outResult, const IStringMap* sourceMap)
+/*virtual*/ void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* outResult, const IStringMap* sourceMap) /*override*/
 {
     if (!m_serverHasSentInitialSettings)
     {
@@ -301,32 +380,27 @@ void DeviceAgent::doSetSettings(
         return;
     }
 
-    int c = sourceMap->count();
+    const int settingsCount = sourceMap->count();
+    NX_DEBUG(this, NX_FMT("Server sent %1 setting(s) to Hanwha plugin to set on camera",
+        settingsCount));
+
     auto errorMap = makePtr<nx::sdk::StringMap>();
 
-    // Here we use temporary error map, because setting empty exclude area leads to false
-    // error report.
-    auto unusedErrorMap = makePtr<nx::sdk::StringMap>();
-
-    const auto sender = [this](const std::string& s) {return this->sendWritingRequestToDeviceSync(s); };
-
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.ShockDetection"))
+    const auto sender = [this](const std::string& s)
     {
-        copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.shockDetection, sender, m_frameSize, m_channelNumber);
-    }
+        return this->sendWritingRequestToDeviceSync(s);
+    };
 
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.Tampering"))
+    if (m_settings.supportedEventCategories[EventCategory::motionDetection])
     {
+#if 0
+        // Hanwha analyticsMode detection selection is currently removed from the Clients interface
+        // desired analytics mode if selected implicitly now.
         copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber);
-    }
-
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.MotionDetection"))
-    {
-        copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.motion, sender, m_frameSize, m_channelNumber);
-
+            m_settings.analyticsMode, sender, m_frameSize, m_channelNumber);
+#endif
+#if 0
+        // Hanwha Motion detection support is currently removed from the Clients interface
         copySettingsFromServerToCamera(errorMap, sourceMap,
             m_settings.motionDetectionObjectSize, sender, m_frameSize, m_channelNumber);
 
@@ -341,38 +415,22 @@ void DeviceAgent::doSetSettings(
             copySettingsFromServerToCamera(errorMap, sourceMap,
                 m_settings.motionDetectionExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
         }
+#endif
     }
 
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Passing")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Entering")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Exiting")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.AppearDisappear")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Intrusion")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Loitering"))
+    if (m_settings.supportedEventCategories[EventCategory::shockDetection])
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
-            m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber);
-
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-        {
-            copySettingsFromServerToCamera(errorMap, sourceMap,
-                m_settings.ivaLine[i], sender, m_frameSize, m_channelNumber, i);
-        }
-
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-        {
-            copySettingsFromServerToCamera(errorMap, sourceMap,
-                m_settings.ivaIncludeArea[i], sender, m_frameSize, m_channelNumber, i);
-        }
-
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-        {
-            copySettingsFromServerToCamera(errorMap, sourceMap,
-                m_settings.ivaExcludeArea[i], sender, m_frameSize, m_channelNumber, i);
-        }
+            m_settings.shockDetection, sender, m_frameSize, m_channelNumber);
     }
 
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.DefocusDetection"))
+    if (m_settings.supportedEventCategories[EventCategory::tampering])
+    {
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.tamperingDetection, sender, m_frameSize, m_channelNumber);
+    }
+
+    if (m_settings.supportedEventCategories[EventCategory::defocusDetection])
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
             m_settings.defocusDetection, sender, m_frameSize, m_channelNumber);
@@ -380,14 +438,40 @@ void DeviceAgent::doSetSettings(
 
 #if 1
     // Fog detection is broken in Hanwha firmware <= 1.41.
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.FogDetection"))
+    if (m_settings.supportedEventCategories[EventCategory::fogDetection])
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
             m_settings.fogDetection, sender, m_frameSize, m_channelNumber);
     }
 #endif
 
-    if (!m_manifest.supportedObjectTypeIds.isEmpty())
+    if (m_settings.supportedEventCategories[EventCategory::videoAnalytics])
+    {
+        writeAnalyticsModeToCamera();
+
+        copySettingsFromServerToCamera(errorMap, sourceMap,
+            m_settings.ivaObjectSize, sender, m_frameSize, m_channelNumber);
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+        {
+            copySettingsFromServerToCamera(errorMap, sourceMap,
+                m_settings.ivaLines[i], sender, m_frameSize, m_channelNumber, i);
+        }
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+        {
+            copySettingsFromServerToCamera(errorMap, sourceMap,
+                m_settings.ivaAreas[i], sender, m_frameSize, m_channelNumber, i);
+        }
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+        {
+            copySettingsFromServerToCamera(errorMap, sourceMap,
+                m_settings.ivaExcludeAreas[i], sender, m_frameSize, m_channelNumber, i);
+        }
+    }
+
+    if (m_settings.supportedEventCategories[EventCategory::objectDetection])
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
             m_settings.objectDetectionGeneral, sender, m_frameSize, m_channelNumber);
@@ -396,16 +480,13 @@ void DeviceAgent::doSetSettings(
             m_settings.objectDetectionBestShot, sender, m_frameSize, m_channelNumber);
     }
 
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioDetection"))
+    if (m_settings.supportedEventCategories[EventCategory::audioDetection])
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
             m_settings.audioDetection, sender, m_frameSize, m_channelNumber);
     }
 
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Scream")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Gunshot")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Explosion")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.GlassBreak"))
+    if (m_settings.supportedEventCategories[EventCategory::audioAnalytics])
     {
         copySettingsFromServerToCamera(errorMap, sourceMap,
             m_settings.soundClassification, sender, m_frameSize, m_channelNumber);
@@ -414,20 +495,20 @@ void DeviceAgent::doSetSettings(
     *outResult = errorMap.releasePtr();
 }
 
-void DeviceAgent::getPluginSideSettings(
-    Result<const ISettingsResponse*>* outResult) const
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Write current plugin settings to the server.
+ */
+/*virtual*/ void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* outResult) const /*override*/
 {
     const auto response = new nx::sdk::SettingsResponse();
 
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.ShockDetection"))
-        m_settings.shockDetection.writeToServer(response);
-
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.Tampering"))
-        m_settings.tamperingDetection.writeToServer(response);
-
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.MotionDetection"))
+    if (m_settings.supportedEventCategories[EventCategory::motionDetection])
     {
-        m_settings.motion.writeToServer(response);
+#if 0
+        // Hanwha Motion detection support is currently removed from the Clients interface
 
         m_settings.motionDetectionObjectSize.writeToServer(response);
 
@@ -436,55 +517,54 @@ void DeviceAgent::getPluginSideSettings(
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
             m_settings.motionDetectionExcludeArea[i].writeToServer(response);
+#endif
     }
 
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Passing")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Entering")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Exiting")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.AppearDisappear")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Intrusion")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Loitering"))
-    {
-        m_settings.ivaObjectSize.writeToServer(response);
+    if (m_settings.supportedEventCategories[EventCategory::shockDetection])
+        m_settings.shockDetection.writeToServer(response);
 
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-            m_settings.ivaLine[i].writeToServer(response);
+    if (m_settings.supportedEventCategories[EventCategory::tampering])
+        m_settings.tamperingDetection.writeToServer(response);
 
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-            m_settings.ivaIncludeArea[i].writeToServer(response);
-
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-            m_settings.ivaExcludeArea[i].writeToServer(response);
-    }
-
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.DefocusDetection"))
+    if (m_settings.supportedEventCategories[EventCategory::defocusDetection])
         m_settings.defocusDetection.writeToServer(response);
 
 #if 1
     // Fog detection is broken in Hanwha firmware <= 1.41.
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.FogDetection"))
+    if (m_settings.supportedEventCategories[EventCategory::fogDetection])
         m_settings.fogDetection.writeToServer(response);
 #endif
 
-    if (!m_manifest.supportedObjectTypeIds.isEmpty())
+    if (m_settings.supportedEventCategories[EventCategory::videoAnalytics])
+    {
+        m_settings.ivaObjectSize.writeToServer(response);
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            m_settings.ivaLines[i].writeToServer(response);
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            m_settings.ivaAreas[i].writeToServer(response);
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            m_settings.ivaExcludeAreas[i].writeToServer(response);
+    }
+
+    if (m_settings.supportedEventCategories[EventCategory::objectDetection])
     {
         m_settings.objectDetectionGeneral.writeToServer(response);
         m_settings.objectDetectionBestShot.writeToServer(response);
     }
 
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioDetection"))
+    if (m_settings.supportedEventCategories[EventCategory::audioDetection])
         m_settings.audioDetection.writeToServer(response);
 
-    if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Scream")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Gunshot")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Explosion")
-     || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.GlassBreak"))
-    {
+    if (m_settings.supportedEventCategories[EventCategory::audioAnalytics])
         m_settings.soundClassification.writeToServer(response);
-    }
 
     *outResult = response;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
@@ -543,6 +623,8 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadata
     return {};
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void DeviceAgent::stopFetchingMetadata()
 {
     if (m_monitor)
@@ -555,10 +637,14 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
     *outResult = new nx::sdk::String(QJson::serialized(m_manifest));
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
 {
@@ -572,15 +658,22 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_channelNumber = deviceInfo->channelNumber();
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void DeviceAgent::setManifest(Hanwha::DeviceAgentManifest manifest)
 {
     m_manifest = manifest;
+    setSupportedEventCategoties();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void DeviceAgent::setMonitor(MetadataMonitor* monitor)
 {
     m_monitor = monitor;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 std::unique_ptr<nx::network::http::HttpClient> DeviceAgent::createSettingsHttpClient() const
 {
@@ -590,6 +683,8 @@ std::unique_ptr<nx::network::http::HttpClient> DeviceAgent::createSettingsHttpCl
     result->addAdditionalHeader("Accept", "application/json");
     return result;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Used for NVRs only. Get the event types, supported directly by the device, not by NVR channel.
@@ -631,12 +726,14 @@ std::optional<QSet<QString>> DeviceAgent::getRealSupportedEventTypes()
     return parseEventTypes(body);
 }
 
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Synchronously send the request that should change analytics settings on the agent's device.
  * \return empty string, if the request is successful
  *     string with error message, if not
  */
-std::string DeviceAgent::sendWritingRequestToDeviceSync(const std::string& query)
+std::string DeviceAgent::sendWritingRequestToDeviceSync(const std::string& query) const
 {
     nx::utils::Url command(m_url);
     constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
@@ -679,6 +776,8 @@ std::string DeviceAgent::sendWritingRequestToDeviceSync(const std::string& query
     return {};
 }
 
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Synchronously send reading request to the agent's device.
  * Typical parameter tuples for `domain/submenu/action`:
@@ -688,15 +787,19 @@ std::string DeviceAgent::sendWritingRequestToDeviceSync(const std::string& query
  * /return the answer from the device or empty string, if no answer received.
 */
 std::string DeviceAgent::sendReadingRequestToDeviceSync(
-    const char* domain, const char* submenu, const char* action)
+    const char* domain, const char* submenu, const char* action, bool useChannel /*= true*/) const
 {
     std::string result;
     nx::utils::Url command(m_url);
     constexpr const char* kPathPattern = "/stw-cgi/%1.cgi";
-    constexpr const char* kQueryPattern = "msubmenu=%1&action=%2&Channel=%3";
+    constexpr const char* kQuerySubmenuActionPattern = "msubmenu=%1&action=%2";
+    constexpr const char* kQueryChannelPattern = "&Channel=%1";
+    QString query = QString::fromStdString(kQuerySubmenuActionPattern)
+        .arg(submenu).arg(action);
+    if (useChannel)
+        query += QString::fromStdString(kQueryChannelPattern).arg(m_channelNumber);
     command.setPath(QString::fromStdString(kPathPattern).arg(domain));
-    command.setQuery(QString::fromStdString(kQueryPattern).
-        arg(submenu).arg(action).arg(m_channelNumber));
+    command.setQuery(query);
     command = m_valueTransformer->transformUrl(command);
 
     auto settingsHttpClient = createSettingsHttpClient();
@@ -716,10 +819,14 @@ std::string DeviceAgent::sendReadingRequestToDeviceSync(
     return result;
 }
 
-std::string DeviceAgent::loadEventSettings(const char* eventName)
+//-------------------------------------------------------------------------------------------------
+
+std::string DeviceAgent::loadEventSettings(const char* eventName) const
 {
     return sendReadingRequestToDeviceSync("eventsources", eventName, "view");
 }
+
+//-------------------------------------------------------------------------------------------------
 
 /** Load max resolution from the device. */
 void DeviceAgent::loadFrameSize()
@@ -732,16 +839,21 @@ void DeviceAgent::loadFrameSize()
         m_frameSize = *frameSize;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 std::string DeviceAgent::fetchFirmwareVersion()
 {
     // request path = /stw-cgi/system.cgi?msubmenu=deviceinfo&action=view
-    std::string jsonReply = sendReadingRequestToDeviceSync("system", "deviceinfo", "view");
+    std::string jsonReply = sendReadingRequestToDeviceSync("system", "deviceinfo", "view",
+        false /*useChanel*/);
     std::string result;
     auto firmwareVersion = parseFirmwareVersion(jsonReply);
     if (firmwareVersion)
         result = *firmwareVersion;
     return result;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void DeviceAgent::readCameraSettings()
 {
@@ -764,10 +876,15 @@ void DeviceAgent::readCameraSettings()
         readFromDeviceReply(sunapiReply, &m_settings.tamperingDetection, m_frameSize, channelNumber);
     }
 
+    sunapiReply.clear();
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.MotionDetection"))
     {
+#if 0
+        // Hanwha analyticsMode detection selection is currently removed from the Clients interface
+        // Hanwha Motion detection support is currently removed from the Clients interface
+
         sunapiReply = loadEventSettings("videoanalysis2");
-        readFromDeviceReply(sunapiReply, &m_settings.motion, m_frameSize, channelNumber);
+        readFromDeviceReply(sunapiReply, &m_settings.analyticsMode, m_frameSize, channelNumber);
         readFromDeviceReply(sunapiReply, &m_settings.motionDetectionObjectSize, m_frameSize, channelNumber);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
@@ -775,9 +892,8 @@ void DeviceAgent::readCameraSettings()
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
             readFromDeviceReply(sunapiReply, &m_settings.motionDetectionExcludeArea[i], m_frameSize, channelNumber, i);
+#endif
     }
-    else
-        sunapiReply.clear();
 
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Passing")
      || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Entering")
@@ -792,13 +908,13 @@ void DeviceAgent::readCameraSettings()
         readFromDeviceReply(sunapiReply, &m_settings.ivaObjectSize, m_frameSize, channelNumber);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
-            readFromDeviceReply(sunapiReply, &m_settings.ivaLine[i], m_frameSize, channelNumber, i);
+            readFromDeviceReply(sunapiReply, &m_settings.ivaLines[i], m_frameSize, channelNumber, i);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
-            readFromDeviceReply(sunapiReply, &m_settings.ivaIncludeArea[i], m_frameSize, channelNumber, i);
+            readFromDeviceReply(sunapiReply, &m_settings.ivaAreas[i], m_frameSize, channelNumber, i);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
-            readFromDeviceReply(sunapiReply, &m_settings.ivaExcludeArea[i], m_frameSize, channelNumber, i);
+            readFromDeviceReply(sunapiReply, &m_settings.ivaExcludeAreas[i], m_frameSize, channelNumber, i);
     }
 
     if (m_manifest.supportedEventTypeIds.contains("nx.hanwha.DefocusDetection"))
