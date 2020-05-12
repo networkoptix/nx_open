@@ -42,11 +42,6 @@ public:
             return std::get<valueIndex>(m_state);
         }
 
-        Type& value()
-        {
-            return std::get<valueIndex>(m_state);
-        }
-
         template <typename... Args>
         Type& emplaceValue(Args&&... args)
         {
@@ -60,11 +55,6 @@ public:
         }
 
         const QString& errorMessage() const
-        {
-            return std::get<errorIndex>(m_state);
-        }
-
-        QString& errorMessage()
         {
             return std::get<errorIndex>(m_state);
         }

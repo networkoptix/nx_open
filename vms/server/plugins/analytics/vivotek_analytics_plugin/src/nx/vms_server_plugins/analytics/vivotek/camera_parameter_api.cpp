@@ -54,7 +54,8 @@ std::map<QString, QString> CameraParameterApi::fetch(
         url.setPath("/cgi-bin/admin/getparam.cgi");
         url.setQuery(query);
 
-        return parse(QString::fromUtf8(HttpClient().get(url).get()));
+        const auto responseBody = HttpClient().get(url).get();
+        return parse(QString::fromUtf8(responseBody));
     }
     catch (const std::exception&)
     {
