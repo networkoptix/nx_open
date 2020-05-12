@@ -6,6 +6,7 @@
         viewsDir: 'views/', //'lang_' + lang + '/views/';
         viewsDirCommon: 'web_common/views/',
         developersFeedbackForm: 'https://docs.google.com/forms/d/e/1FAIpQLSdN0Woxlo2UgHFF243604gsae9ol9J_N24CtPdRk8EgMFyG4A/viewform?usp=pp_url&entry.1099959647={{PRODUCT}}',
+        developersKnowledgeBase: '',
         webadminSystemApiCompatibility: true,
         defaultLanguage: 'en_US',
         supportedLanguages: [
