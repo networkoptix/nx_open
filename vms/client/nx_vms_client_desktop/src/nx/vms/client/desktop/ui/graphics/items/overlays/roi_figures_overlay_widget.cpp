@@ -98,7 +98,7 @@ void parseItem(RoiFiguresOverlayWidget::Item& item, const QJsonObject& object)
     if (figure.isEmpty())
         return;
 
-    item.visible = object.value(QStringLiteral("showOnCamera")).toBool(true);
+    item.visible = object.value(QStringLiteral("showOnCamera")).toBool();
     item.color = figure.value(QStringLiteral("color")).toString(
         ColorTheme::instance()->color("roi1").name());
 
