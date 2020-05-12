@@ -100,14 +100,15 @@ Prerequisites:
 ```
 - CMake >= 3.3.2
 - Windows (7 or 10): Microsoft Visual Studio >= 2015
-- Linux (Ubuntu 16.04 or 18.04) including ARM (e.g. Raspberry Pi or Nvidia Tegra) native or
+- Linux (Ubuntu 16.04, 18.04, 20.04) including ARM (e.g. Raspberry Pi or Nvidia Tegra) native or
     cross-compiling:
     - g++ >= 5.4.0
     - make or Ninja
 ```
 
 To compile the samples, and (if not cross-compiling) run unit tests, execute the commands collected
-into the provided scripts (use their source code as a reference):
+into the provided scripts (use their source code as a reference; run with `-h` or `/?` to see
+the possible options):
 ```
 # Windows, x64:
 build_samples.bat

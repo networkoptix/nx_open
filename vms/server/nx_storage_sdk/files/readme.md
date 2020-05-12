@@ -48,13 +48,14 @@ Prerequisites:
 ```
 - CMake >= 3.1
 - Windows (7 or 10): Microsoft Visual Studio >= 2015
-- Linux (Ubuntu 16.04 or 18.04) including 64-bit ARM (e.g. Nvidia Tegra) native or cross-compiling:
+- Linux (Ubuntu 16.04, 18.04, 20.04) including 64-bit ARM (e.g. Nvidia Tegra) native or
+    cross-compiling:
     - g++ >= 5.4.0
     - make or Ninja
 ```
 
 To compile the samples, execute the commands collected into the provided scripts (use their source
-code as a reference):
+code as a reference; run with `-h` or `/?` to see the possible options):
 ```
 # Windows, x64:
 build_samples.bat

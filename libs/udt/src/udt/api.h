@@ -225,7 +225,7 @@ private:
     std::mutex m_ControlLock;                    // used to synchronize UDT API
 
     std::mutex m_IDLock;                         // used to synchronize ID generation
-    UDTSOCKET m_SocketId = 0;                             // seed to generate a new unique socket ID
+    UDTSOCKET m_SocketIdSequence = 0;                             // seed to generate a new unique socket ID
 
     /**
      * Recording accepted connections to detect connection request retransmits.
@@ -259,6 +259,8 @@ private:
         const UDPSOCKET* = NULL);
 
     Result<> updateMux(CUDTSocket* s, const CUDTSocket* ls);
+
+    UDTSOCKET generateSocketId();
 
 private:
     std::map<int, std::shared_ptr<Multiplexer>> m_multiplexers;

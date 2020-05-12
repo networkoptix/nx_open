@@ -35,7 +35,7 @@ qint64 PartitionsInformationProvider::totalSpace(const QByteArray& fsPath) const
     if (m_deviceSpacesCache[fsPath].totalSpace == kUnknownValue)
     {
         m_deviceSpacesCache[fsPath].totalSpace =
-            m_rootFs->totalSpace(QString::fromLatin1(fsPath));
+            m_rootFs->totalSpace(QString::fromUtf8(fsPath));
     }
     return m_deviceSpacesCache[fsPath].totalSpace;
 }
@@ -46,14 +46,14 @@ qint64 PartitionsInformationProvider::freeSpace(const QByteArray& fsPath) const
     if (m_deviceSpacesCache[fsPath].freeSpace == kUnknownValue)
     {
         m_deviceSpacesCache[fsPath].freeSpace =
-            m_rootFs->freeSpace(QString::fromLatin1(fsPath));
+            m_rootFs->freeSpace(QString::fromUtf8(fsPath));
     }
 
     bool freeSpaceIsInvalid = m_deviceSpacesCache[fsPath].freeSpace <= 0;
     if (m_tries++ % 10 == 0 || !freeSpaceIsInvalid)
     {
         m_deviceSpacesCache[fsPath].freeSpace =
-            m_rootFs->freeSpace(QString::fromLatin1(fsPath));
+            m_rootFs->freeSpace(QString::fromUtf8(fsPath));
     }
 
     // If free space becomes available and total space is invalid let's reset totalSpace to the

@@ -47,8 +47,11 @@ Yunhong Gu, last updated 07/09/2011
 #else
 #include <unistd.h>
 #endif
+
 #include <cstring>
 #include <functional>
+#include <limits>
+
 #include "api.h"
 #include "core.h"
 #include "multiplexer.h"
@@ -79,11 +82,14 @@ void CUDTSocket::removeEPoll(const int eid)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static constexpr int kMinSocketId = 3;
+static constexpr int kMaxSocketId = std::numeric_limits<int>::max() - 1;
+
 CUDTUnited::CUDTUnited()
 {
     // Socket ID MUST start from a random value
     srand(CTimer::getTime().count());
-    m_SocketId = 1 + (int)((1 << 30) * (double(rand()) / RAND_MAX));
+    m_SocketIdSequence = kMinSocketId + (int)((1 << 30) * (double(rand()) / RAND_MAX));
 
     m_cache = std::make_unique<CCache<CInfoBlock>>();
 }
@@ -168,10 +174,7 @@ Result<UDTSOCKET> CUDTUnited::newSocket(int af, int type)
     auto ns = std::make_shared<CUDTSocket>();
     ns->m_pUDT = std::make_shared<CUDT>();
 
-    {
-        std::unique_lock<std::mutex> lock(m_IDLock);
-        ns->m_SocketId = --m_SocketId;
-    }
+    ns->m_SocketId = generateSocketId();
 
     ns->m_Status = INIT;
     ns->m_ListenSocket = 0;
@@ -239,10 +242,7 @@ Result<int> CUDTUnited::createConnection(
     ns->m_pPeerAddr = remotePeerAddress;
     ns->m_pPeerAddr.get()->sa_family = ls->m_iIPversion;
 
-    {
-        std::unique_lock<std::mutex> lock(m_IDLock);
-        ns->m_SocketId = --m_SocketId;
-    }
+    ns->m_SocketId = generateSocketId();
 
     ns->m_ListenSocket = listen;
     ns->m_iIPversion = ls->m_iIPversion;
@@ -1233,6 +1233,17 @@ Result<> CUDTUnited::updateMux(
     multiplexer->start();
 
     return success();
+}
+
+UDTSOCKET CUDTUnited::generateSocketId()
+{
+    std::unique_lock<std::mutex> lock(m_IDLock);
+
+    // Rotating socket sequence.
+    if (m_SocketIdSequence <= kMinSocketId)
+        m_SocketIdSequence = kMaxSocketId;
+
+    return --m_SocketIdSequence;
 }
 
 Result<> CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
