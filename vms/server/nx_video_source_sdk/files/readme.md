@@ -55,7 +55,8 @@ Prerequisites:
 ```
 - CMake >= 3.1
 - Windows (7 or 10): Microsoft Visual Studio >= 2015
-- Linux (Ubuntu 16.04 or 18.04) including 64-bit ARM (e.g. Nvidia Tegra) native or cross-compiling:
+- Linux (Ubuntu 16.04, 18.04, 20.04) including 64-bit ARM (e.g. Nvidia Tegra) native or
+    cross-compiling:
     - g++ >= 5.4.0
     - make or Ninja
 - Qt5 (required by certain samples only)
