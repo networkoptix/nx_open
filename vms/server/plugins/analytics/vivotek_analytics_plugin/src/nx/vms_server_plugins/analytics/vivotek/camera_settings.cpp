@@ -72,10 +72,10 @@ template <typename Vca, typename Visitor>
 void enumerateVcaEntries(Vca* vca, Visitor visit)
 {
     // intentionaly skip vca->enabled, since it's processed separately
+    visit(&vca->sensitivity, "Sensitivity");
     visit(&vca->installation.height, "CamHeight");
     visit(&vca->installation.tiltAngle, "TiltAngle");
     visit(&vca->installation.rollAngle, "RollAngle");
-    visit(&vca->sensitivity, "Sensitivity");
 }
 
 
@@ -93,20 +93,19 @@ void fetchFromCamera(CameraSettings::Vca::Enabled* enabled, const Url& cameraUrl
 }
 
 
-template <typename Type>
-void parseVcaFromCamera(CameraSettings::Entry<Type>* entry,
-    const QJsonValue& parameters, const QString& propertyName)
-{
-    get(&entry->emplaceValue(), parameters, propertyName);
-}
-
-template <typename... Args>
-void parseVcaFromCamera(CameraSettings::Vca::Installation::Height* entry,
+template <typename Entry>
+void parseVcaEntryFromCamera(Entry* entry,
     const QJsonValue& parameters, const QString& propertyName)
 {
     auto& value = entry->emplaceValue();
     get(&value, parameters, propertyName);
-    value /= 10; // API returns millimeters, while web UI presents centimeters
+
+    using Type = typename Entry::Type;
+    if constexpr (std::is_same_v<Type, int>)
+    {
+        if (!std::strcmp(Entry::name, CameraSettings::Vca::Installation::Height::name))
+            value /= 10; // API uses millimeters, while web UI uses centimeters
+    }
 }
 
 
@@ -130,7 +129,7 @@ void fetchFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
             {
                 try
                 {
-                    parseVcaFromCamera(entry, parameters, propertyName);
+                    parseVcaEntryFromCamera(entry, parameters, propertyName);
                 }
                 catch (const std::exception& exception)
                 {
@@ -183,24 +182,23 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca::Enabled* enabled)
 }
 
 
-template <typename Type>
-void unparseVcaToCamera(QJsonValue* parameters, const QString& propertyName,
-    const CameraSettings::Entry<Type>& entry)
+template <typename Entry>
+void unparseVcaEntryToCamera(QJsonValue* parameters, const QString& propertyName,
+    const Entry& entry)
 {
     if (!entry.hasValue())
         return;
 
-    set(parameters, propertyName, entry.value());
-}
+    auto value = entry.value();
 
-void unparseVcaToCamera(QJsonValue* parameters, const QString& propertyName,
-    const CameraSettings::Vca::Installation::Height& entry)
-{
-    if (!entry.hasValue())
-        return;
+    using Type = typename Entry::Type;
+    if constexpr (std::is_same_v<Type, int>)
+    {
+        if (!std::strcmp(Entry::name, CameraSettings::Vca::Installation::Height::name))
+            value *= 10; // API uses millimeters, while web UI uses centimeters
+    }
 
-    // API returns millimeters, while web UI presents centimeters
-    set(parameters, propertyName, entry.value() * 10);
+    set(parameters, propertyName, value);
 }
 
 
@@ -227,7 +225,7 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
             {
                 try
                 {
-                    unparseVcaToCamera(&parameters, propertyName, *entry);
+                    unparseVcaEntryToCamera(&parameters, propertyName, *entry);
                 }
                 catch (const std::exception& exception)
                 {
@@ -252,41 +250,68 @@ void enumerateEntries(Settings* settings, Visitor visit)
     if (settings->vca)
     {
         visit(&settings->vca->enabled);
+        visit(&settings->vca->sensitivity);
         visit(&settings->vca->installation.height);
         visit(&settings->vca->installation.tiltAngle);
         visit(&settings->vca->installation.rollAngle);
-        visit(&settings->vca->sensitivity);
     }
 }
 
 
-void parseEntryValueFromServer(bool* value, const QString& unparsedValue)
+void parseEntryFromServer(const QString& /*name*/, CameraSettings::Entry<bool>* entry, const QString& unparsedValue)
 {
     if (unparsedValue == "false")
-        *value = false;
+        entry->emplaceValue(false);
     else if (unparsedValue == "true")
-        *value = true;
+        entry->emplaceValue(true);
     else
         throw std::runtime_error("Failed to parse boolean");
 }
 
-void parseEntryValueFromServer(int* value, const QString& unparsedValue)
+void parseEntryFromServer(const QString& name, CameraSettings::Entry<int>* entry, const QString& unparsedValue)
 {
-    *value = toInt(unparsedValue);
+    // Some integer settings are in `TextField`s because SpinBoxes can't represent empty state,
+    // which we need to work around camera not returning settings for disabled functionality.
+    const auto parseIntFromTextField =
+        [&](int low, int high)
+        {
+            entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), low, high));
+        };
+
+    if (unparsedValue.isEmpty() && name.startsWith("Vca."))
+        entry->emplaceNothing();
+    else if (name == CameraSettings::Vca::Sensitivity::name)
+        parseIntFromTextField(1, 10);
+    else if (name == CameraSettings::Vca::Installation::Height::name)
+        parseIntFromTextField(0, 2000);
+    else if (name == CameraSettings::Vca::Installation::TiltAngle::name)
+        parseIntFromTextField(0, 179);
+    else if (name == CameraSettings::Vca::Installation::RollAngle::name)
+        parseIntFromTextField(-74, +74);
+    else
+        entry->emplaceValue(toInt(unparsedValue));
 }
 
 
-template <typename Type>
-QString unparseEntryValueToServer(Type value) = delete;
-
-QString unparseEntryValueToServer(bool value)
+std::optional<QString> unparseEntryToServer(const QString& /*name*/, const CameraSettings::Entry<bool>& entry)
 {
-    return value ? "true" : "false";
+    if (!entry.hasValue())
+        return std::nullopt;
+
+    return entry.value() ? "true" : "false";
 }
 
-QString unparseEntryValueToServer(int value)
+std::optional<QString> unparseEntryToServer(const QString& name, const CameraSettings::Entry<int>& entry)
 {
-    return QString::number(value);
+    if (!entry.hasValue())
+    {
+        if (name.startsWith("Vca."))
+            return "";
+
+        return std::nullopt;
+    }
+
+    return QString::number(entry.value());
 }
 
 
@@ -299,30 +324,27 @@ QJsonValue getVcaInstallationModelForManifest()
         {"items", QJsonArray{
             QJsonObject{
                 {"name", Installation::Height::name},
-                {"type", "SpinBox"},
+                // Should really be SpinBox, but need empty state to work around camera not
+                // returning settings for disabled functionality.
+                {"type", "TextField"},
                 {"caption", "Height (cm)"},
                 {"description", "Distance between camera and floor"},
-                {"defaultValue", 200},
-                {"minValue", 0},
-                {"maxValue", 2000},
             },
             QJsonObject{
                 {"name", Installation::TiltAngle::name},
-                {"type", "SpinBox"},
+                // Should really be SpinBox, but need empty state to work around camera not
+                // returning settings for disabled functionality.
+                {"type", "TextField"},
                 {"caption", "Tilt angle (°)"},
                 {"description", "Angle between camera direction axis and down direction"},
-                {"defaultValue", 0},
-                {"minValue", 0},
-                {"maxValue", 179},
             },
             QJsonObject{
                 {"name", Installation::RollAngle::name},
-                {"type", "SpinBox"},
+                // Should really be SpinBox, but need empty state to work around camera not
+                // returning settings for disabled functionality.
+                {"type", "TextField"},
                 {"caption", "Roll angle (°)"},
                 {"description", "Angle of camera rotation around direction axis"},
-                {"defaultValue", 0},
-                {"minValue", -74},
-                {"maxValue", +74},
             },
         }},
     };
@@ -339,18 +361,16 @@ QJsonValue getVcaModelForManifest()
                 {"name", Vca::Enabled::name},
                 {"type", "SwitchButton"},
                 {"caption", "Enabled"},
-                {"defaultValue", false},
             },
-            getVcaInstallationModelForManifest(),
             QJsonObject{
                 {"name", Vca::Sensitivity::name},
-                {"type", "SpinBox"},
+                // Should really be SpinBox, but need empty state to work around camera not
+                // returning settings for disabled functionality.
+                {"type", "TextField"}, 
                 {"caption", "Sensitivity"},
                 {"description", "The higher the value the more likely an object will be detected as human"},
-                {"defaultValue", 5},
-                {"minValue", 1},
-                {"maxValue", 10},
             },
+            getVcaInstallationModelForManifest(),
         }},
     };
 }
@@ -389,7 +409,7 @@ void CameraSettings::parseFromServer(const IStringMap& values)
                     return;
                 }
 
-                parseEntryValueFromServer(&entry->emplaceValue(), unparsedValue);
+                parseEntryFromServer(entry->name, entry, unparsedValue);
             }
             catch (const std::exception& exception)
             {
@@ -407,10 +427,8 @@ Ptr<StringMap> CameraSettings::unparseToServer()
         {
             try
             {
-                if (!entry->hasValue())
-                    return;
-
-                values->setItem(entry->name, unparseEntryValueToServer(entry->value()).toStdString());
+                if (const auto unparsedValue = unparseEntryToServer(entry->name, *entry))
+                    values->setItem(entry->name, unparsedValue->toStdString());
             }
             catch (const std::exception& exception)
             {

@@ -11,12 +11,21 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 using namespace std::literals;
 using namespace nx::utils;
 
+double toDouble(const QString& string)
+{
+    bool ok;
+    int value = string.toDouble(&ok);
+    if (!ok)
+        throw std::runtime_error(NX_FMT("Failed to parse double: %1", string).toStdString());
+    return value;
+}
+
 int toInt(const QString& string)
 {
     bool ok;
     int value = string.toInt(&ok);
     if (!ok)
-        throw std::runtime_error(NX_FMT("Failed to parse integer: ", string).toStdString());
+        throw std::runtime_error(NX_FMT("Failed to parse integer: %1", string).toStdString());
     return value;
 }
 

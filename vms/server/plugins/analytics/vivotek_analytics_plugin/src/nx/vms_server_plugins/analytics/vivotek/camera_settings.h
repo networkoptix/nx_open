@@ -73,20 +73,24 @@ public:
     };
 
 public:
-    #define NX_CAMERA_SETTINGS_ENTRY(namePrefix, name_, type) \
-        struct name_: Entry<type> \
+    #define NX_CAMERA_SETTINGS_ENTRY(NAME_PREFIX, NAME, ...) \
+        struct NAME: Entry<__VA_ARGS__> \
         { \
-            using Base = Entry<type>; \
+            using Base = Entry<__VA_ARGS__>; \
             \
             using Base::Base; \
             using Base::operator=; \
             \
-            static constexpr char name[] = #namePrefix "." #name_; \
+            using Type = __VA_ARGS__; \
+            \
+            static constexpr char name[] = #NAME_PREFIX "." #NAME; \
         }
 
     struct Vca
     {
         NX_CAMERA_SETTINGS_ENTRY(Vca, Enabled, bool) enabled;
+
+        NX_CAMERA_SETTINGS_ENTRY(Vca, Sensitivity, int) sensitivity;
 
         struct Installation
         {
@@ -94,8 +98,6 @@ public:
             NX_CAMERA_SETTINGS_ENTRY(Vca.Installation, TiltAngle, int) tiltAngle;
             NX_CAMERA_SETTINGS_ENTRY(Vca.Installation, RollAngle, int) rollAngle;
         } installation;
-
-        NX_CAMERA_SETTINGS_ENTRY(Vca, Sensitivity, int) sensitivity;
     };
     std::optional<Vca> vca;
 

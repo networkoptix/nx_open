@@ -10,6 +10,7 @@
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
+double toDouble(const QString& string);
 int toInt(const QString& string);
 
 nx::utils::Url withoutUserInfo(nx::utils::Url url);
