@@ -107,7 +107,8 @@ Prerequisites:
 ```
 
 To compile the samples, and (if not cross-compiling) run unit tests, execute the commands collected
-into the provided scripts (use their source code as a reference):
+into the provided scripts (use their source code as a reference; run with `-h` or `/?` to see
+the possible options):
 ```
 # Windows, x64:
 build_samples.bat
