@@ -146,6 +146,10 @@ angular.module('webadminApp')
             $scope.developersFeedbackForm =
                 $scope.Config.developersFeedbackForm.replace("{{PRODUCT}}",encodeURIComponent(Config.productName));
         }
+        if($scope.Config.developersKnowledgeBase){
+            $scope.developersKnowledgeBase =
+                $scope.Config.developersKnowledgeBase.replace("{{PRODUCT}}",encodeURIComponent(Config.productName));
+        }
 
         /* API Test Tool */
         if(!$scope.apiMethod){
