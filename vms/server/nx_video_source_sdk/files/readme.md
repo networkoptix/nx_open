@@ -63,7 +63,7 @@ Prerequisites:
 ```
 
 To compile the samples, execute the commands collected into the provided scripts (use their source
-code as a reference):
+code as a reference; run with `-h` or `/?` to see the possible options):
 ```
 # Windows, x64:
 build_samples.bat
@@ -79,22 +79,26 @@ build_samples_arm64.sh
 # NOTE: The provided file toolchain_arm32.cmake defines which cross-compiler will be used.
 build_samples_arm32.sh
 
-# Linux, Raspberry Pi (32-bit ARM) cross-compiling, with Raspberry Pi specific samples:
+# Linux, Raspberry Pi (32-bit ARM) cross-compiling, with samples specific to Raspberry Pi:
 # NOTE: The provided file toolchain_arm32.cmake defines which cross-compiler will be used.
 build_samples_rpi.sh
 ```
 
-ATTENTION: The Qt library should be available to cmake, and its version should be the same as the
-one that comes with the Server (see the installed Server files), otherwise an unpredictable
-behavior may take place. If cmake cannot find Qt, add the following arg to a build_samples* script
-(will be passed to cmake):
+ATTENTION: Some of the samples require the Qt library. The Qt version should be the same as the one
+that comes with the Server (see the installed Server files), otherwise an unpredictable behavior
+may take place. If CMake cannot find Qt, specify its path to a build_samples* script (will be
+passed to cmake), or choose to skip Qt-based samples via `--no-qt-samples` option, as shown below:
 ```
 # Windows:
 # Note the quotes - otherwise, .bat interpreter will split the arg into two by "=".
 build_samples.bat "-DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>"
+# or
+build_samples.bat --no-qt-samples
 
 # Linux:
-build_samples.sh -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
+./build_samples.sh -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
+# or
+./build_samples.sh --no-qt-samples
 ```
         
 On Windows, after CMake generation phase, Visual Studio GUI can be used to compile a sample:

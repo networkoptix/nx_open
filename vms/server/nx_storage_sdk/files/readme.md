@@ -54,7 +54,7 @@ Prerequisites:
 ```
 
 To compile the samples, execute the commands collected into the provided scripts (use their source
-code as a reference):
+code as a reference; run with `-h` or `/?` to see the possible options):
 ```
 # Windows, x64:
 build_samples.bat
