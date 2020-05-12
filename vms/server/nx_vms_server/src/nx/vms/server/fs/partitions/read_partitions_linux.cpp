@@ -75,11 +75,11 @@ SystemError::ErrorCode readPartitionsInformation(
         PartitionInfo partitionInfo;
 
         // #TODO #akulikov Move below to PartitionsInformationProvider
-        partitionInfo.isUsb = nx::utils::file_system::isUsb(QString::fromLatin1(deviceKey));
-        partitionInfo.devName = QString::fromLatin1(deviceKey);
-        partitionInfo.path = QString::fromLatin1(std::get<fsPath>(pathInfo));
+        partitionInfo.isUsb = nx::utils::file_system::isUsb(QString::fromUtf8(deviceKey));
+        partitionInfo.devName = QString::fromUtf8(deviceKey);
+        partitionInfo.path = QString::fromUtf8(std::get<fsPath>(pathInfo));
 
-        partitionInfo.fsName = QString::fromLatin1(std::get<fsType>(pathInfo));
+        partitionInfo.fsName = QString::fromUtf8(std::get<fsType>(pathInfo));
         partitionInfo.sizeBytes = partitionsInfoProvider->totalSpace(std::get<fsPath>(pathInfo));
 
         if (partitionInfo.sizeBytes == -1 || partitionInfo.freeBytes == -1)
