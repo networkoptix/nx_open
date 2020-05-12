@@ -17,6 +17,7 @@
 #include <nx/streaming/abstract_data_packet.h>
 #include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/lockable.h>
 
 namespace detail {
 
@@ -29,7 +30,7 @@ public:
 
 public:
     /*!
-        \param desiredCacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis 
+        \param desiredCacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis
             is dropped unless data is blocked by \a MediaStreamCache::blockData call
         \param maxCacheSizeMillis if cache size increases this value, data is dropped despite existing blockings
     */
@@ -110,7 +111,7 @@ private:
     qint64 m_prevPacketSrcTimestamp;
     size_t m_cacheSizeInBytes;
     std::map<int, quint64> m_dataBlockings;
-    mutable QElapsedTimer m_inactivityTimer;
+    mutable nx::utils::Lockable<QElapsedTimer> m_inactivityTimer;
     nx::utils::Subscription<quint64 /*currentPacketTimestampUSec*/> m_onKeyFrame;
     nx::utils::Subscription<> m_onDiscontinue;
 

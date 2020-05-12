@@ -29,7 +29,7 @@ MediaStreamCache::MediaStreamCache(
     m_prevPacketSrcTimestamp( -1 ),
     m_cacheSizeInBytes( 0 )
 {
-    m_inactivityTimer.restart();
+    m_inactivityTimer.lock()->restart();
 }
 
 //! Implementation of QnAbstractMediaDataReceptor::canAcceptData
@@ -116,7 +116,7 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
         malloc_statsCounter = 0;
     }
 #endif
-    
+
     eventsToDeliver.push_back(
         [this, timestamp = data->timestamp]() { m_onKeyFrame.notify(timestamp); });
 }
@@ -239,7 +239,7 @@ QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(quint64 desiredTimesta
 {
     QnMutexLocker lk(&m_mutex);
 
-    m_inactivityTimer.restart();
+    m_inactivityTimer.lock()->restart();
     const auto result = std::find_if(m_packetsByTimestamp.crbegin(), m_packetsByTimestamp.crend(),
         [channelNumber, findKeyFrameOnly, desiredTimestamp](const auto& value)
         {
@@ -358,8 +358,7 @@ void MediaStreamCache::unblockData( int blockingID )
 
 qint64 MediaStreamCache::inactivityPeriod() const
 {
-    QnMutexLocker lk(&m_mutex);
-    return m_inactivityTimer.elapsed();
+    return m_inactivityTimer.lock()->elapsed();
 }
 
 }
