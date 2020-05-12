@@ -769,7 +769,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_rtspBufferSizeKbAdaptor =
         new QnLexicalResourcePropertyAdaptor<int>(
             "rtspBufferSizeKb",
-            64, //< Default value.
+            256, //< Default value.
             this);
 
     connect(
