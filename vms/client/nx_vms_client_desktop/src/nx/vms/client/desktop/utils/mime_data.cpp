@@ -10,6 +10,7 @@
 #include <core/resource/file_processor.h>
 
 #include <nx/utils/range_adapters.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -296,6 +297,15 @@ void MimeData::updateInternalStorage()
     if (!urls.empty())
     {
         QMimeData d;
+
+        // See QTBUG-71939, VMS-18536. Presence more than one URL in MIME data for drag'n'drop may
+        // lead to irreversible malfunction of drag'n'drop in the entire application. Relevant
+        // only for macOS.
+        // TODO: Remove this workaround as soon as issue will be fixed in the Qt framework for
+        // latest macOS versions either.
+        if (nx::utils::AppInfo::isMacOsX())
+            urls = {urls.first()};
+
         d.setUrls(urls);
         setData(kUriListMimeType, d.data(kUriListMimeType));
     }
