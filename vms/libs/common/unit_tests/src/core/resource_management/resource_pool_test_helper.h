@@ -34,6 +34,7 @@ public:
     static constexpr auto kUseDefaultLicense = Qn::LC_Count;
     nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
     nx::CameraResourceStubPtr addCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
+    std::vector<nx::CameraResourceStubPtr> addCameras(size_t count);
 
     QnWebPageResourcePtr addWebPage();
 

@@ -21,6 +21,7 @@ public:
     explicit MacAddress(const QByteArray& mac);
 
     static MacAddress fromRawData(const unsigned char* mac);
+    static MacAddress random();
 
     bool isNull() const;
 

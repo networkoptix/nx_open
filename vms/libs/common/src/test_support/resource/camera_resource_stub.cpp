@@ -20,6 +20,8 @@ CameraResourceStub::CameraResourceStub(Qn::LicenseType licenseType):
 {
     d->licenseType = licenseType;
     setIdUnsafe(QnUuid::createUuid());
+    setPhysicalId("physical_" + QnUuid::createUuid().toSimpleString());
+    setMAC(nx::utils::MacAddress::random());
     addFlags(Qn::server_live_cam);
     setForceUseLocalProperties(true);
 

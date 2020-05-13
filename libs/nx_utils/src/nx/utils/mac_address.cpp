@@ -2,6 +2,8 @@
 
 #include <QtCore/QList>
 
+#include <nx/utils/random.h>
+
 namespace nx::utils {
 
 namespace {
@@ -90,6 +92,14 @@ MacAddress MacAddress::fromRawData(const unsigned char* mac)
 {
     MacAddress result;
     std::copy(mac, mac + kMacAddressLength, std::begin(result.m_data));
+    return result;
+}
+
+MacAddress MacAddress::random()
+{
+    MacAddress result;
+    for (auto& byte: result.m_data)
+        byte = (uint8_t) nx::utils::random::number<int>(0, std::numeric_limits<uint8_t>::max());
     return result;
 }
 

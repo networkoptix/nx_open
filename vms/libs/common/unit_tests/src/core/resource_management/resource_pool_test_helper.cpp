@@ -73,6 +73,15 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::addCamera(Qn::LicenseType li
     return camera;
 }
 
+std::vector<nx::CameraResourceStubPtr> QnResourcePoolTestHelper::addCameras(size_t count)
+{
+    std::vector<nx::CameraResourceStubPtr> cameras;
+    cameras.reserve(count);
+    for (size_t i = 0; i < count; ++i)
+        cameras.push_back(addCamera());
+    return cameras;
+}
+
 QnWebPageResourcePtr QnResourcePoolTestHelper::addWebPage()
 {
     QnWebPageResourcePtr webPage(new QnWebPageResource());

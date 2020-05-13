@@ -302,11 +302,7 @@ QnResourcePtr QnResourcePool::getResourceByUrl(const QString& url) const
 
 QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString& physicalId) const
 {
-    return getResource<QnNetworkResource>(
-        [&physicalId](const QnNetworkResourcePtr& resource)
-        {
-            return resource->getPhysicalId() == physicalId;
-        });
+    return getResourceByUniqueId(physicalId).dynamicCast<QnNetworkResource>();
 }
 
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString& mac) const
