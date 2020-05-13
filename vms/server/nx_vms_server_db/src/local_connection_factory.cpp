@@ -451,12 +451,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %// TODO: Write apidoc comment.
      */
     regUpdate<IdDataList>(p, ApiCommand::removeStorages);
-    
+
     /**%apidoc[proprietary] POST /ec2/removeStorage
      * %// TODO: Write apidoc comment.
      */
     regUpdate<IdData>(p, ApiCommand::removeStorage);
-    
+
     /**%apidoc[proprietary] POST /ec2/removeResources
      * %// TODO: Write apidoc comment.
      */
@@ -1195,7 +1195,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %// TODO: Write apidoc comment.
      */
     regUpdate<ResetEventRulesData>(p, ApiCommand::resetEventRules);
-    
+
     /**%apidoc[proprietary] POST /ec2/broadcastAction
      * %// TODO: Write apidoc comment.
      */
@@ -1440,24 +1440,24 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %// AbstractVideowallManager::getVideowalls
      */
     regGet<QnUuid, VideowallDataList>(p, ApiCommand::getVideowalls);
-    
+
     /**%apidoc[proprietary] POST /ec2/saveVideowall
      * %// TODO: Write apidoc comment.
      * %// AbstractVideowallManager::save
      */
     regUpdate<VideowallData>(p, ApiCommand::saveVideowall);
-    
+
     /**%apidoc[proprietary] POST /ec2/removeVideowall
      * %// TODO: Write apidoc comment.
      * %// AbstractVideowallManager::remove
      */
     regUpdate<IdData>(p, ApiCommand::removeVideowall);
-    
+
     /**%apidoc[proprietary] POST /ec2/videowallControl
      * %// TODO: Write apidoc comment.
      */
     regUpdate<VideowallControlMessageData>(p, ApiCommand::videowallControl);
-    
+
     /**%apidoc[proprietary] POST /ec2/runtimeInfoChanged
      * %// TODO: Write apidoc comment.
      */
@@ -1774,13 +1774,13 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %// AbstractStoredFileManager::addStoredFile
      */
     regUpdate<StoredFileData>(p, ApiCommand::addStoredFile);
-    
+
     /**%apidoc[proprietary] POST /ec2/updateStoredFile
      * %// TODO: Write apidoc comment.
      * %// AbstractStoredFileManager::updateStoredFile
      */
     regUpdate<StoredFileData>(p, ApiCommand::updateStoredFile);
-    
+
     /**%apidoc[proprietary] POST /ec2/removeStoredFile
      * %// TODO: Write apidoc comment.
      * %// AbstractStoredFileManager::deleteStoredFile
@@ -1792,7 +1792,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %// AbstractDiscoveryManager::discoveredServerChanged
      */
     regUpdate<DiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
-    
+
     /**%apidoc[proprietary] POST /ec2/discoveredServersList
      * %// TODO: Write apidoc comment.
      * %// AbstractDiscoveryManager::discoveredServersList
@@ -1804,25 +1804,25 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %// AbstractDiscoveryManager::discoverPeer
      */
     regUpdate<DiscoverPeerData>(p, ApiCommand::discoverPeer);
-    
+
     /**%apidoc[proprietary] POST /ec2/addDiscoveryInformation
      * %// TODO: Write apidoc comment.
      * %// AbstractDiscoveryManager::addDiscoveryInformation
      */
     regUpdate<DiscoveryData>(p, ApiCommand::addDiscoveryInformation);
-    
+
     /**%apidoc[proprietary] POST /ec2/removeDiscoveryInformation
      * %// TODO: Write apidoc comment.
      * %// AbstractDiscoveryManager::removeDiscoveryInformation
      */
     regUpdate<DiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
-    
+
     /**%apidoc[proprietary] GET /ec2/getDiscoveryData
      * %// TODO: Write apidoc comment.
      * %// AbstractDiscoveryManager::getDiscoveryData
      */
     regGet<QnUuid, DiscoveryDataList>(p, ApiCommand::getDiscoveryData);
-    
+
     /**%apidoc[proprietary] POST /ec2/changeSystemId
      * %// TODO: Write apidoc comment.
      * %// AbstractMiscManager::changeSystemId
@@ -1863,7 +1863,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regFunctorWithResponse<ConnectionData, QnConnectionInfo>(p, ApiCommand::connect,
         std::bind(&LocalConnectionFactory::fillConnectionInfo, this, _1, _2, _3));
-    
+
     /**%apidoc[proprietary] GET /ec2/testConnection
      * %// TODO: Write apidoc comment.
      */
