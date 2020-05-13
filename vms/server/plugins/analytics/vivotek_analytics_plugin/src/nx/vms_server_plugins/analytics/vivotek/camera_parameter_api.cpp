@@ -19,11 +19,10 @@ namespace {
 
 std::map<QString, QString> parse(const QString& responseBody)
 {
-    static const QRegularExpression nameValueRe(
+    static const QRegularExpression globalNameValueRe(
         R"REGEX(^\s*(?P<name>[^=]+)\s*=\s*'(?P<value>[^']*)'\s*$)REGEX",
         QRegularExpression::MultilineOption);
-
-    static const std::runtime_error parseError("Failed to parse fetched parameters");
+    const auto nameValueRe = globalNameValueRe;
 
     std::map<QString, QString> parameters;
     for (auto matchIter = nameValueRe.globalMatch(responseBody); matchIter.hasNext(); )
