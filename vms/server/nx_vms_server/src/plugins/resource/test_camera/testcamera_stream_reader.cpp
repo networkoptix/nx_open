@@ -42,8 +42,16 @@ bool QnTestCameraStreamReader::receiveData(
             const QString errorMessage = (bytesRead == 0)
                 ? "Connection closed."
                 : lm("%1 (OS code %2).").args(lastOsErrorText, lastOsErrorCode);
-            NX_ERROR(this, "Unable to receive %1 (have read %2 of %3 bytes): %4",
-                dataCaptionForErrorMessage, totalBytesRead, size, errorMessage);
+            if (needToStop())
+            {
+                NX_DEBUG(this, "Shutting down the testcamera socket while receiving %1: %2",
+                    dataCaptionForErrorMessage, errorMessage);
+            }
+            else
+            {
+                NX_ERROR(this, "Unable to receive %1 (have read %2 of %3 bytes): %4",
+                    dataCaptionForErrorMessage, totalBytesRead, size, errorMessage);
+            }
             return false;
         }
         totalBytesRead += bytesRead;
