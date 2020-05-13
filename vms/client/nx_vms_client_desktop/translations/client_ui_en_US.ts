@@ -2289,17 +2289,42 @@
     </message>
     <message>
         <location/>
-        <source>to</source>
+        <source>To</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Set Language</source>
+        <source>Language Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Add custom text:</source>
+        <source>Custom notification content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Header</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Default notification title will be used if left empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Body</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Default text will be used if this field is empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add source device name in body</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3207,6 +3232,11 @@
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Custom language for mobile notifications</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -40,15 +40,15 @@
 <context>
     <name>Figure</name>
     <message>
-        <source>Display on camera</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Figure</source>
         <translation></translation>
     </message>
     <message>
         <source>Click to add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display on video</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

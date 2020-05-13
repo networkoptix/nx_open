@@ -1011,6 +1011,10 @@
         <source>No data exported.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Video transcoding required.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTimeStrings</name>

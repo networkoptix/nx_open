@@ -8220,6 +8220,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Internal error</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Video transcoding required.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
