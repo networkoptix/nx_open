@@ -105,12 +105,12 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_rtpTransport(nx::vms::api::RtpTransportType::automatic)
 {
     const auto& globalSettings = res->commonModule()->globalSettings();
+    m_logName = toString(res);
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
     m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();
 
     m_RtpSession.setTCPTimeout(std::chrono::milliseconds(m_rtpFrameTimeoutMs));
 
-    QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = 1;
     m_customVideoLayout.clear();
 
@@ -209,12 +209,13 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         if (elapsed > m_rtpFrameTimeoutMs) {
             reason = vms::api::EventReason::networkNoFrame;
             reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
-            NX_WARNING(this, "RTP read timeout for camera %1. Reopen stream", getResource());
+            NX_WARNING(this, "%1: RTP read timeout. Reopen stream", m_logName);
         }
         else {
             reason = vms::api::EventReason::networkConnectionClosed;
             reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
-            NX_WARNING(this, "RTP connection was forcibly closed by camera %1. Reopen stream", getResource());
+            NX_WARNING(this, "%1: RTP connection was forcibly closed by camera. Reopen stream",
+                m_logName);
         }
 
         emit networkIssue(getResource(),
@@ -401,8 +402,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                 m_demuxedData[rtpChannelNum]->clear();
                 if (++errorRetryCnt > m_maxRtpRetryCount)
                 {
-                    NX_WARNING(this, "Too many RTP errors for camera %1. Reopen stream",
-                            getResource());
+                    NX_WARNING(this, "%1: Too many RTP errors. Reopen stream", m_logName);
                     closeStream();
                     return QnAbstractMediaDataPtr(0);
                 }
@@ -432,8 +432,14 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
 
     m_dataTimer.restart();
 
-    while (m_RtpSession.isOpened() && !m_pleaseStop && m_dataTimer.elapsed() <= m_rtpFrameTimeoutMs)
+    while (m_RtpSession.isOpened() && !m_pleaseStop)
     {
+        if (m_dataTimer.elapsed() > m_rtpFrameTimeoutMs)
+        {
+            NX_DEBUG(this, "%1: Failed to read from UDP socket, timeout expired: %2 ms",
+                m_logName, m_rtpFrameTimeoutMs);
+            break;
+        }
         while (m_gotData)
         {
             QnAbstractMediaDataPtr data = getNextDataInternal();
@@ -474,7 +480,16 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                 quint8* rtpBuffer = QnRtspClient::prepareDemuxedData(m_demuxedData, rtpChannelNum, MAX_RTP_PACKET_SIZE); // todo: update here
                 int bytesRead = track.ioDevice->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
                 if (bytesRead < 1)
+                {
+                    auto errorCode = SystemError::getLastOSErrorCode();
+                    if (errorCode != SystemError::timedOut && errorCode != SystemError::again)
+                    {
+                        NX_DEBUG(this, "%1: Failed to read from UDP socket, OS code %2: %3",
+                            m_logName, errorCode, SystemError::toString(errorCode));
+                    }
                     break;
+                }
+                NX_VERBOSE(this, "%1: %2 bytes read form UDP socket", m_logName, bytesRead);
                 m_demuxedData[rtpChannelNum]->finishWriting(bytesRead);
                 quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
 
@@ -488,8 +503,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                     clearKeyData(track.logicalChannelNum);
                     m_demuxedData[rtpChannelNum]->clear();
                     if (++errorRetryCount > m_maxRtpRetryCount) {
-                        NX_WARNING(this, "Too many RTP errors for camera %1. Reopen stream",
-                            getResource());
+                        NX_WARNING(this, "%1: Too many RTP errors. Reopen stream", m_logName);
                         closeStream();
                         return QnAbstractMediaDataPtr(0);
                     }
@@ -513,7 +527,7 @@ nx::streaming::rtp::StreamParser* QnMulticodecRtpReader::createParser(const QStr
     if (codecName.isEmpty())
         return 0;
     else if (codecName == QLatin1String("H264"))
-        result = new nx::streaming::rtp::H264Parser();
+        result = new nx::streaming::rtp::H264Parser(m_logName);
     else if (codecName == QLatin1String("H265"))
         result = new nx::streaming::rtp::HevcParser();
     else if (codecName == QLatin1String("JPEG"))
@@ -583,8 +597,8 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
             .port(nx::network::rtsp::DEFAULT_RTSP_PORT);
     if (isTransportChanged || isMediaPortChanged)
     {
-        NX_DEBUG(this, "Transport type or media port changed, stopping. Transport type: %1",
-            getRtpTransport());
+        NX_DEBUG(this, "%1: Transport type or media port changed, stopping. Transport type: %2",
+            m_logName, getRtpTransport());
         pleaseStop();
     }
 
@@ -595,7 +609,7 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
 void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 {
     const QnResourcePtr& resource = getResource();
-    NX_VERBOSE(this, "Packet loss detected on %1, prev seq %2, next seq %3", resource, prev, next);
+    NX_VERBOSE(this, "%1: Packet loss detected, prev seq %2, next seq %3", m_logName, prev, next);
 
     if (const auto camera = dynamic_cast<QnVirtualCameraResource*>(resource.data()))
         camera->issueOccured();
@@ -604,7 +618,7 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
     if (!m_packetLossReportTime || *m_packetLossReportTime + PACKET_LOSS_WARNING_TIME < now)
     {
         m_packetLossReportTime = now;
-        NX_WARNING(this, "Packet loss detected on %1", resource);
+        NX_WARNING(this, "%1: Packet loss detected", m_logName);
     }
 
     emit networkIssue(
@@ -863,6 +877,7 @@ void QnMulticodecRtpReader::setDefaultTransport(nx::vms::api::RtpTransportType r
 void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)
 {
     m_role = role;
+    m_logName += "(Role: " + toString(role) + ")";
 
     // Force camera time for NVR archives
     if (role == Qn::ConnectionRole::CR_Archive)
@@ -985,7 +1000,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::registerMulticastAddressesIfNee
     auto tracks = m_RtpSession.getTrackInfo();
     if (tracks.empty())
     {
-        NX_WARNING(this, "Tracks are empty for [%1]", m_currentStreamUrl);
+        NX_WARNING(this, "%1: Tracks are empty for [%2]", m_logName, m_currentStreamUrl);
         return CameraDiagnostics::CameraInvalidParams("The list of tracks are empty");
     }
 

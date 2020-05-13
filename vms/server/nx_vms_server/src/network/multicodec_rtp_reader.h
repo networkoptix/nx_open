@@ -149,6 +149,7 @@ private:
     std::map<int, int> m_trackIndices;
 
     QString m_request;
+    QString m_logName;
 
     std::vector<QnByteArray*> m_demuxedData;
     int m_numberOfVideoChannels;
