@@ -77,7 +77,7 @@ int GenericRTSPDiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const 
 int GenericRTSPDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )
 {
     QUrl url( address );
-    if( url.scheme().toLower() != "rtsp" )
+    if( const auto scheme = url.scheme().toLower(); scheme != "rtsp" && scheme != "rtsps" )
         return 0;
 
     //TODO/IMPL trying to connect to \a address as RTSP url

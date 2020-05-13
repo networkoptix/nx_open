@@ -942,7 +942,7 @@ void QnMulticodecRtpReader::calcStreamUrl()
         return;
 
     int mediaPort = nres->mediaPort();
-    if (m_request.startsWith(QLatin1String("rtsp://")))
+    if (m_request.startsWith("rtsp://") || m_request.startsWith("rtsps://"))
     {
         m_currentStreamUrl = m_request;
         if (mediaPort)
