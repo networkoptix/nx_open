@@ -37,7 +37,9 @@ QByteArray unparseJson(const QJsonValue& json)
 }
 
 
-const QString jsonPathRoot = "$";
+namespace json_utils_detail {
+
+const QString rootPath = "$";
 
 
 void get(QJsonValue* value, const QString& /*path*/, const QJsonValue& json)
@@ -91,5 +93,7 @@ void get(QJsonArray* value, const QString& path, const QJsonValue& json)
         throw std::runtime_error(NX_FMT("%1 is not an array", path).toStdString());
     *value = json.toArray();
 }
+
+} // namespace json_utils_detail
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

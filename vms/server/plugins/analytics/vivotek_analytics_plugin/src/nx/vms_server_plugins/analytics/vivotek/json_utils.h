@@ -15,8 +15,9 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 QJsonValue parseJson(const QByteArray& bytes);
 QByteArray unparseJson(const QJsonValue& json);
 
+namespace json_utils_detail {
 
-extern const QString jsonPathRoot;
+extern const QString rootPath;
 
 
 void get(QJsonValue* value, const QString& path, const QJsonValue& json);
@@ -76,22 +77,6 @@ void get(Type* value, const QString& path, const QJsonValue& json, int index,
     get(value, path, array, index, args...);
 }
 
-template <typename Type, typename... Args>
-auto get(Type* value, const Args&... args)
-    -> decltype(get(value, jsonPathRoot, args...))
-{
-    return get(value, jsonPathRoot, args...);
-}
-
-template <typename Type, typename... Args>
-auto get(const Args&... args)
-    -> decltype((void)get(std::declval<Type*>(), args...), Type{})
-{
-    Type value;
-    get(&value, args...);
-    return value;
-}
-
 
 template <typename Type>
 void set(const QString& /*path*/, QJsonValue* json, const Type& value)
@@ -99,19 +84,19 @@ void set(const QString& /*path*/, QJsonValue* json, const Type& value)
     *json = value;
 }
 
-template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*...>
+template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>* = nullptr>
 void set(const QString& path, QJsonObject* json, const QString& key, const Args&... args);
 
-template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*...>
+template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>* = nullptr>
 void set(const QString& path, QJsonValue* json, const QString& key, const Args&... args);
 
-template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*...>
+template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>* = nullptr>
 void set(const QString& path, QJsonArray* json, int index, const Args&... args);
 
-template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*...>
+template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>* = nullptr>
 void set(const QString& path, QJsonValue* json, int index, const Args&... args);
 
-template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*...>
+template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*>
 void set(const QString& path, QJsonObject* json, const QString& key, const Args&... args)
 {
     QJsonValue subJson = (*json)[key];
@@ -119,7 +104,7 @@ void set(const QString& path, QJsonObject* json, const QString& key, const Args&
     (*json)[key] = subJson;
 }
 
-template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*...>
+template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*>
 void set(const QString& path, QJsonValue* json, const QString& key, const Args&... args)
 {
     QJsonObject object;
@@ -128,7 +113,7 @@ void set(const QString& path, QJsonValue* json, const QString& key, const Args&.
     *json = object;
 }
 
-template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*...>
+template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*>
 void set(const QString& path, QJsonArray* json, int index, const Args&... args)
 {
     QJsonValue subJson = (*json)[index];
@@ -136,7 +121,7 @@ void set(const QString& path, QJsonArray* json, int index, const Args&... args)
     (*json)[index] = subJson;
 }
 
-template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*...>
+template <typename... Args, std::enable_if_t<(sizeof...(Args) > 0)>*>
 void set(const QString& path, QJsonValue* json, int index, const Args&... args)
 {
     QJsonArray array;
@@ -145,11 +130,53 @@ void set(const QString& path, QJsonValue* json, int index, const Args&... args)
     *json = array;
 }
 
+} // namespace json_utils_detail
+
+template <typename Type, typename... Args>
+auto get(Type* value, const QString& path, const Args&... args)
+    -> decltype(json_utils_detail::get(value, path, args...))
+{
+    return json_utils_detail::get(value, path, args...);
+}
+
+template <typename Type, typename... Args>
+auto get(Type* value, const Args&... args)
+    -> decltype(json_utils_detail::get(value, json_utils_detail::rootPath, args...))
+{
+    return json_utils_detail::get(value, json_utils_detail::rootPath, args...);
+}
+
+template <typename Type, typename... Args>
+auto get(const QString& path, const Args&... args)
+    -> decltype((void)json_utils_detail::get(std::declval<Type*>(), path, args...), Type{})
+{
+    Type value;
+    json_utils_detail::get(&value, path, args...);
+    return value;
+}
+
+template <typename Type, typename... Args>
+auto get(const Args&... args)
+    -> decltype((void)json_utils_detail::get(std::declval<Type*>(), json_utils_detail::rootPath, args...), Type{})
+{
+    Type value;
+    json_utils_detail::get(&value, json_utils_detail::rootPath, args...);
+    return value;
+}
+
+
+template <typename... Args>
+auto set(const QString& path, const Args&... args)
+    -> decltype(json_utils_detail::set(path, args...))
+{
+    return json_utils_detail::set(path, args...);
+}
+
 template <typename... Args>
 auto set(const Args&... args)
-    -> decltype(set(jsonPathRoot, args...))
+    -> decltype(json_utils_detail::set(json_utils_detail::rootPath, args...))
 {
-    return set(jsonPathRoot, args...);
+    return json_utils_detail::set(json_utils_detail::rootPath, args...);
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek
