@@ -18,12 +18,12 @@ public:
 
     Result<> initialize();
 
-    void addUdtSocket(const UDTSOCKET& u, const int* events);
-    void removeUdtSocket(const UDTSOCKET& u);
+    Result<> addUdtSocket(const UDTSOCKET& u, const int* events);
+    Result<> removeUdtSocket(const UDTSOCKET& u);
     void removeUdtSocketEvents(const UDTSOCKET& socket);
 
-    void add(const SYSSOCKET& s, const int* events);
-    void remove(const SYSSOCKET& s);
+    Result<> add(const SYSSOCKET& s, const int* events);
+    Result<> remove(const SYSSOCKET& s);
 
     /**
      * @return Signalled socket count.

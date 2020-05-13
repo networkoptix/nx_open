@@ -87,8 +87,7 @@ Result<> CEPoll::add_usock(const int eid, const UDTSOCKET& u, const int* events)
     if (p == m_mPolls.end())
         return Error(OsErrorCode::badDescriptor);
 
-    p->second->addUdtSocket(u, events);
-    return success();
+    return p->second->addUdtSocket(u, events);
 }
 
 Result<> CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
@@ -99,9 +98,7 @@ Result<> CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
     if (p == m_mPolls.end())
         return Error(OsErrorCode::badDescriptor);
 
-    p->second->add(s, events);
-
-    return success();
+    return p->second->add(s, events);
 }
 
 Result<> CEPoll::remove_usock(const int eid, const UDTSOCKET& u)
@@ -112,8 +109,7 @@ Result<> CEPoll::remove_usock(const int eid, const UDTSOCKET& u)
     if (p == m_mPolls.end())
         return Error(OsErrorCode::badDescriptor);
 
-    p->second->removeUdtSocket(u);
-    return success();
+    return p->second->removeUdtSocket(u);
 }
 
 Result<> CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
@@ -124,9 +120,7 @@ Result<> CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
     if (p == m_mPolls.end())
         return Error(OsErrorCode::badDescriptor);
 
-    p->second->remove(s);
-
-    return success();
+    return p->second->remove(s);
 }
 
 Result<int> CEPoll::wait(

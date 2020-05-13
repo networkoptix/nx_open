@@ -15,7 +15,7 @@ Result<> EpollImpl::initialize()
     return m_systemEpoll->initialize();
 }
 
-void EpollImpl::addUdtSocket(const UDTSOCKET& u, const int* events)
+Result<> EpollImpl::addUdtSocket(const UDTSOCKET& u, const int* events)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -23,9 +23,11 @@ void EpollImpl::addUdtSocket(const UDTSOCKET& u, const int* events)
         m_sUDTSocksIn.insert(u);
     if (!events || (*events & UDT_EPOLL_OUT))
         m_sUDTSocksOut.insert(u);
+
+    return success();
 }
 
-void EpollImpl::removeUdtSocket(const UDTSOCKET& u)
+Result<> EpollImpl::removeUdtSocket(const UDTSOCKET& u)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -34,6 +36,8 @@ void EpollImpl::removeUdtSocket(const UDTSOCKET& u)
     m_sUDTSocksEx.erase(u);
 
     removeUdtSocketEvents(lock, u);
+
+    return success();
 }
 
 void EpollImpl::removeUdtSocketEvents(const UDTSOCKET& socket)
@@ -42,16 +46,17 @@ void EpollImpl::removeUdtSocketEvents(const UDTSOCKET& socket)
     removeUdtSocketEvents(lock, socket);
 }
 
-void EpollImpl::add(const SYSSOCKET& s, const int* events)
+Result<> EpollImpl::add(const SYSSOCKET& s, const int* events)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_systemEpoll->add(s, events);
+    return m_systemEpoll->add(s, events);
 }
 
-void EpollImpl::remove(const SYSSOCKET& s)
+Result<> EpollImpl::remove(const SYSSOCKET& s)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_systemEpoll->remove(s);
+    return success();
 }
 
 Result<int> EpollImpl::wait(
