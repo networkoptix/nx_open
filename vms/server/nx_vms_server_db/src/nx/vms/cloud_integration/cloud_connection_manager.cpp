@@ -229,11 +229,11 @@ bool CloudConnectionManager::removeCloudUsers()
     {
         const auto errCode = commonModule()->ec2Connection()
             ->getUserManager(Qn::kSystemAccess)->removeSync(user->getId());
-        NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
         if (errCode != ec2::ErrorCode::ok)
         {
-            NX_WARNING(this, lit("Error removing cloud user (%1:%2) from local DB: %3")
-                .arg(user->getId().toString()).arg(user->getName()).arg(ec2::toString(errCode)));
+            NX_WARNING(this, "Error removing cloud user (%1:%2) from local DB: %3",
+                user->getId(), user->getName(), ec2::toString(errCode));
+            NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
             return false;
         }
     }
