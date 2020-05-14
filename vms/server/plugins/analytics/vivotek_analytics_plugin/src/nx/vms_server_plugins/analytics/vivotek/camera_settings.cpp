@@ -1,5 +1,6 @@
 #include "camera_settings.h"
 
+#include <qnamespace.h>
 #include <stdexcept>
 
 #include <nx/sdk/helpers/string_map.h>
@@ -146,6 +147,46 @@ void fetchFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
 }
 
 
+QByteArray getRaw(const Url& url)
+{
+    HttpClient httpClient;
+
+    std::promise<std::unique_ptr<AbstractStreamSocket>> promise;
+    httpClient.setOnDone(
+        [&]
+        {
+            NX_ASSERT(httpClient.failed());
+            promise.set_exception(std::make_exception_ptr(
+                std::system_error(httpClient.lastSysErrorCode(), std::system_category())));
+        });
+    httpClient.setOnRequestHasBeenSent(
+        [&](auto&&)
+        {
+            promise.set_value(httpClient.takeSocket());
+        });
+    httpClient.doGet(url);
+    const auto socket = promise.get_future().get();
+
+    socket->setNonBlockingMode(false);
+
+    constexpr static auto kReceiveTimeout = 10s;
+    socket->setRecvTimeout(kReceiveTimeout);
+
+    constexpr static auto kMaxResponseSize = 16 * 1024;
+    QByteArray response(kMaxResponseSize, Qt::Uninitialized);
+    for (int offset = 0;; )
+    {
+        int addedLength = socket->recv(response.data() + offset, response.length() - offset);
+        if (addedLength == -1 || addedLength == 0)
+        {
+            response.chop(offset);
+            return response;
+        }
+
+        offset += addedLength;
+    }
+}
+
 void storeToCamera(const Url& cameraUrl, CameraSettings::Vca::Enabled* enabled)
 {
     try
@@ -165,11 +206,12 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca::Enabled* enabled)
         url.setPath("/cgi-bin/admin/vadpctrl.cgi");
         url.setQuery(query);
 
-        const auto responseBody = HttpClient().get(url).get();
+        // work around camera not inserting \r\n between response headers and body
+        const auto response = getRaw(url);
 
         const auto successPattern =
             NX_FMT("'VCA is %1'", enabled->value() ? "started" : "stopped").toUtf8();
-        if (!responseBody.contains(successPattern))
+        if (!response.contains(successPattern))
         {
             throw std::runtime_error(
                 "HTTP response doesn't contain expected pattern indicating success");

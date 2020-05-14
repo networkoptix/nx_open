@@ -28,7 +28,6 @@ class DeviceAgent:
 {
 public:
     explicit DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
-    ~DeviceAgent();
 
 protected:
     virtual void doSetSettings(
@@ -50,6 +49,8 @@ private:
         nx::sdk::IPluginDiagnosticEvent::Level level,
         const QString& caption, const QString& description);
 
+    void updateMetadataStreaming();
+
     cf::future<cf::unit> startMetadataStreaming();
     cf::future<cf::unit> restartMetadataStreamingLater();
     void stopMetadataStreaming();
@@ -64,7 +65,9 @@ private:
 
     nx::sdk::Ptr<IHandler> m_handler;
 
-    bool m_wantMetadata = false;
+    bool m_serverWantsMetadata = false;
+    bool m_cameraHasMetadata = false;
+    bool m_streamingMetadata = false;
     std::optional<NativeMetadataSource> m_nativeMetadataSource;
     std::optional<Timer> m_restartDelayer;
 };

@@ -2,6 +2,8 @@
 #include "nx/vms_server_plugins/analytics/vivotek/camera_features.h"
 
 #include <exception>
+#include <mutex>
+#include <thread>
 
 #define NX_PRINT_PREFIX (m_logUtils.printPrefix)
 #include <nx/kit/debug.h>
@@ -56,19 +58,22 @@ DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
 {
 }
 
-DeviceAgent::~DeviceAgent()
-{
-    if (m_wantMetadata)
-        stopMetadataStreaming();
-}
-
 void DeviceAgent::doSetSettings(Result<const IStringMap*>* outResult, const IStringMap* values)
 {
     try
     {
         CameraSettings settings(m_features);
+
         settings.parseFromServer(*values);
+
+        if (settings.vca && settings.vca->enabled.hasValue() && !settings.vca->enabled.value())
+        {
+            m_cameraHasMetadata = false;
+            updateMetadataStreaming();
+        }
+
         settings.storeTo(m_url);
+
         *outResult = settings.getErrorMessages().releasePtr();
     }
     catch (const std::exception& exception)
@@ -79,10 +84,22 @@ void DeviceAgent::doSetSettings(Result<const IStringMap*>* outResult, const IStr
 
 void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const
 {
+    // this is a temporary workaround until server is fixed to not call this method concurrently
+    static std::mutex mutex;
+    std::lock_guard lockGuard(mutex);
+    // ---
+
     try
     {
         CameraSettings settings(m_features);
+
         settings.fetchFrom(m_url);
+
+        auto& self = const_cast<DeviceAgent&>(*this);
+        self.m_cameraHasMetadata =
+            settings.vca && settings.vca->enabled.hasValue() && settings.vca->enabled.value();
+        self.updateMetadataStreaming();
+
         auto values = settings.unparseToServer();
         auto errorMessages = settings.getErrorMessages();
         *outResult = new SettingsResponse(std::move(values), std::move(errorMessages));
@@ -146,22 +163,8 @@ void DeviceAgent::doSetNeededMetadataTypes(
 {
     try
     {
-        const bool wantMetadata = !neededMetadataTypes->isEmpty();
-        if (!wantMetadata && m_wantMetadata)
-        {
-            m_wantMetadata = wantMetadata;
-            m_basicPollable->executeInAioThreadSync([&]{ stopMetadataStreaming(); });
-        }
-        else if (wantMetadata && !m_wantMetadata)
-        {
-            m_wantMetadata = wantMetadata;
-            cf::initiate(*m_basicPollable,
-                [&]
-                {
-                    return startMetadataStreaming();
-                })
-                .get();
-        }
+        m_serverWantsMetadata = !neededMetadataTypes->isEmpty();
+        updateMetadataStreaming();
     }
     catch (const std::exception& exception)
     {
@@ -174,6 +177,18 @@ void DeviceAgent::emitDiagnostic(
 {
     vivotek::emitDiagnostic(m_handler.get(),
         level, std::move(caption), std::move(description));
+}
+
+void DeviceAgent::updateMetadataStreaming()
+{
+    const bool shouldBeStreaming = m_cameraHasMetadata && m_serverWantsMetadata;
+
+    if (!shouldBeStreaming && m_streamingMetadata)
+        m_basicPollable->executeInAioThreadSync([&]{ stopMetadataStreaming(); });
+    else if (shouldBeStreaming && !m_streamingMetadata)
+        cf::initiate(*m_basicPollable, [&] { return startMetadataStreaming(); }).get();
+
+    m_streamingMetadata = shouldBeStreaming;
 }
 
 cf::future<cf::unit> DeviceAgent::startMetadataStreaming()
@@ -196,7 +211,7 @@ cf::future<cf::unit> DeviceAgent::restartMetadataStreamingLater()
                 if (nestedContains(exception, std::errc::operation_canceled))
                     return cf::make_ready_future(cf::unit());
 
-                emitDiagnostic(IPluginDiagnosticEvent::Level::error,
+                emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
                     "Failed to restart metadata streaming", collectNestedMessages(exception));
 
                 return restartMetadataStreamingLater();
@@ -222,7 +237,7 @@ cf::future<cf::unit> DeviceAgent::streamMetadataPackets()
                     .then_fail(
                         [this](const std::exception& exception)
                         {
-                            emitDiagnostic(IPluginDiagnosticEvent::Level::error,
+                            emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
                                 "Metadata streaming failed", collectNestedMessages(exception));
 
                             return restartMetadataStreamingLater();
