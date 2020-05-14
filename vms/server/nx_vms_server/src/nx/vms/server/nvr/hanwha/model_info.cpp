@@ -13,9 +13,9 @@ static const std::map</*boardId*/ int, /*model*/ QString> kModelByBoardId = {
 };
 
 static const std::map</*model*/ QString, PowerConsumptionLimits> kDefaultPowerConsumptionLimits = {
-    {kWrn410, {40.0, 50.0}},
-    {kWrn810, {80.0, 100.0}},
-    {kWrn1610, {180.0, 200.0}}
+    {kWrn410, {50.0, 50.0}},
+    {kWrn810, {100.0, 100.0}},
+    {kWrn1610, {200.0, 200.0}}
 };
 
 PowerConsumptionLimits getPowerConsumptionLimit(const DeviceInfo& deviceInfo)
