@@ -520,7 +520,7 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
             if (!baseResolution)
                 baseResolution = provider->getParameters().resolution;
 
-            // TODO: It might make sence to insert these before driver specific providers.
+            // TODO: It might make sense to insert these before driver specific providers.
             allProviders.push_back(provider.get());
             m_streamCapabilityAdvancedProviders.emplace(streamType, std::move(provider));
         }
