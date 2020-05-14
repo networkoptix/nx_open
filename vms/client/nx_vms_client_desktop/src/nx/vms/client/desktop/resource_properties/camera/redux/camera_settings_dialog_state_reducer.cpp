@@ -1557,7 +1557,7 @@ State CameraSettingsDialogStateReducer::refreshDeviceAgentSettings(
         return state;
 
     qnClientModule->analyticsSettingsManager()->refreshSettings(
-        DeviceAgentId{state.singleCameraProperties.id, engineId});
+        DeviceAgentId{QnUuid::fromStringSafe(state.singleCameraProperties.id), engineId});
 
     auto& settings = state.analytics.settingsByEngineId[engineId];
     settings.loading = true;
