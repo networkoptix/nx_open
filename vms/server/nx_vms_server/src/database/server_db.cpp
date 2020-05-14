@@ -285,15 +285,14 @@ QnServerDb::QnServerDb(QnMediaServerModule* serverModule)
 bool QnServerDb::open()
 {
     const QString eventsDBFilePath = serverModule()->settings().eventsDBFilePath();
-    const QString fileName = closeDirPath(eventsDBFilePath)
-        + QString(lit("mserver.sqlite"));
+    const QString fileName = closeDirPath(eventsDBFilePath) + QString(lit("mserver.sqlite"));
 
     QString connectionName = "QnServerDb" + serverModule()->commonModule()->moduleGUID().toString();
     addDatabase(fileName, connectionName);
     if (m_sdb.open())
     {
         if (!createDatabase()) // Create tables if DB is empty.
-            qWarning() << "Cannot create tables for sqlLite database";
+            NX_WARNING(this, "Cannot create tables for sqlLite database");
         else
             m_runtimeActionsTotalRecords = getRuntimeActionsRecordCount();
     }
@@ -305,13 +304,13 @@ bool QnServerDb::open()
 
     if (!execSQLScript("vacuum;", m_sdb))
     {
-        qWarning() << "failed to vacuum mserver database" << Q_FUNC_INFO;
+        NX_WARNING(this, "Failed to vacuum mserver database");
         return false;
     }
 
     if (!tuneDBAfterOpen(&m_sdb))
     {
-        qWarning() << "failed to turn on journal mode for mserver database" << Q_FUNC_INFO;
+        NX_WARNING(this, "Failed to turn on journal mode for mserver database");
         return false;
     }
 

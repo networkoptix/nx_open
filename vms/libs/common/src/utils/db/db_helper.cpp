@@ -60,7 +60,8 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
     enableWalQuery.prepare(lit("PRAGMA journal_mode = WAL"));
     if( !enableWalQuery.exec() )
     {
-        qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
+        NX_WARNING(this, "Failed to enable WAL mode on sqlLite database: [%1]",
+            enableWalQuery.lastError().text());
         return false;
     }
 
@@ -68,7 +69,8 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
     limitWalQuery.prepare(lit("PRAGMA journal_size_limit = 16777216")); //< 16 MB
     if( !limitWalQuery.exec() )
     {
-        qWarning() << "Failed to limit WAL mode on sqlLite database!" << limitWalQuery.lastError().text();
+        NX_WARNING(this, "Failed to limit WAL mode on sqlLite database: [%1]",
+            limitWalQuery.lastError().text());
         return false;
     }
 
@@ -76,7 +78,8 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
     enableFKQuery.prepare(lit("PRAGMA foreign_keys = ON"));
     if( !enableFKQuery.exec() )
     {
-        qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
+        NX_WARNING(this, "Failed to enable FK support on sqlLite database: [%1]",
+            enableFKQuery.lastError().text());
         return false;
     }
 
@@ -98,7 +101,8 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
         query.prepare(queryLine);
         if (!query.exec())
         {
-            qWarning() << "Failed to execute" << queryLine << "on sqlLite database!" << query.lastError().text();
+            NX_WARNING(this, "Failed to execute %1 on sqlLite database: [%2]",
+                queryLine, query.lastError().text());
             return false;
         }
     }

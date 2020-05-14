@@ -454,6 +454,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         }
 
         m_sdbStatic = nx::sql::Database::addDatabase("QSQLITE", getDatabaseName("QnDbManagerStatic"));
+        NX_ASSERT(m_sdbStatic.isValid());
         QString path2 = dbFilePathStatic.isEmpty() ? dbFilePath : dbFilePathStatic;
         m_sdbStatic.setDatabaseName(closeDirPath(path2) + QString::fromLatin1("ecs_static.sqlite"));
 

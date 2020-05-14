@@ -200,6 +200,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
         QnUserResourcePtr user(new QnUserResource(QnUserType::Ldap));
         user->setName(ldapUser.login);
         user->setEmail(ldapUser.email);
+        user->setFullName(ldapUser.fullName);
         user->fillIdUnsafe();
         user->setEnabled(enableUsers);
         if (selectedRole == Qn::UserRole::customUserRole)
@@ -214,11 +215,11 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
 QnLdapUsers QnLdapUsersDialog::filterExistingUsers(const QnLdapUsers &users) const
 {
     QSet<QString> logins;
-    for (const auto &user : resourcePool()->getResources<QnUserResource>())
+    for (const auto& user: resourcePool()->getResources<QnUserResource>())
         logins.insert(user->getName().toLower());
 
     QnLdapUsers result;
-    for (const auto user : users)
+    for (const auto& user: users)
     {
         if (logins.contains(user.login.toLower()))
             continue;

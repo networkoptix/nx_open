@@ -55,6 +55,7 @@ int QnMergeLdapUsersRestHandler::executePost(
         {
             dbUser.id = QnUuid::createUuid();
             dbUser.name = login;
+            dbUser.fullName = ldapUser.fullName;
             dbUser.realm = nx::network::AppInfo::realm();
 
             // Without hash DbManager wont'd do anything
