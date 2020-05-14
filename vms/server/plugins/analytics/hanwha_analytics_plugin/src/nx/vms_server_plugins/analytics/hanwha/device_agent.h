@@ -3,7 +3,6 @@
 #include <vector>
 #include <string_view>
 
-#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtNetwork/QAuthenticator>
 
@@ -19,17 +18,15 @@
 #include "engine.h"
 #include "metadata_monitor.h"
 #include "settings.h"
-#include "objectMetadataXmlParser.h"
-#include "url_decorator.h"
+#include "settings_processor.h"
+#include "object_metadata_xml_parser.h"
+#include "value_transformer.h"
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
 class DeviceAgent:
-    public QObject,
     public nx::sdk::RefCountable<nx::sdk::analytics::IConsumingDeviceAgent>
 {
-    Q_OBJECT
-
 public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo,
         bool isNvr, QSize maxResolution);
@@ -43,12 +40,10 @@ public:
 
     void setMonitor(MetadataMonitor* monitor);
 
-    void readCameraSettings();
+    void loadAndHoldDeviceSettings();
 
 protected:
     void setSupportedEventCategoties();
-
-    void writeAnalyticsModeToCamera() const;
 
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
@@ -70,23 +65,9 @@ private:
     void stopFetchingMetadata();
 
 public:
-    std::optional<QSet<QString>> getRealSupportedEventTypes();
+    std::optional<QSet<QString>> loadRealSupportedEventTypes() const;
 
-private:
-    std::string sendWritingRequestToDeviceSync(const std::string& query) const;
-
-    std::string sendReadingRequestToDeviceSync(
-        const char* domain, const char* submenu, const char* action, bool useChannel = true) const;
-
-    std::string loadEventSettings(const char* eventName) const;
-
-    void loadFrameSize();
-
-    std::unique_ptr<nx::network::http::HttpClient> createSettingsHttpClient() const;
-
-public:
-    void addSettingModel(nx::vms::api::analytics::DeviceAgentManifest* destinastionManifest);
-    std::string fetchFirmwareVersion();
+    std::string loadFirmwareVersion() const;
 
 private:
     Engine* const m_engine;
@@ -104,10 +85,9 @@ private:
     MetadataMonitor* m_monitor = nullptr;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
-    std::unique_ptr<ValueTransformer> m_valueTransformer;
-
-    Settings m_settings;
     FrameSize m_frameSize;
+    Settings m_settings;
+    SettingsProcessor m_settingsProcessor;
     bool m_serverHasSentInitialSettings = false;
 
     ObjectMetadataXmlParser m_objectMetadataXmlParser;

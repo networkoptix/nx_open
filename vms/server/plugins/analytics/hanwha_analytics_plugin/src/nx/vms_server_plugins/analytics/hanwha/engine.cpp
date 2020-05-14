@@ -19,7 +19,6 @@
 
 #include "device_agent.h"
 #include "common.h"
-#include "attributes_parser.h"
 #include "string_helper.h"
 
 namespace nx::vms_server_plugins::analytics::hanwha {
@@ -214,12 +213,12 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
     const auto deviceAgent = new DeviceAgent(this, deviceInfo, isNvr, maxResolution);
 
-    const std::string firmwareVersion = deviceAgent->fetchFirmwareVersion();
+    const std::string firmwareVersion = deviceAgent->loadFirmwareVersion();
     const bool areSettingsAndTrackingAllowed = isFirmwareActual(firmwareVersion);
 
-    std::optional<QSet<QString>> eventTypeFilter;
-    if (isNvr)
-        eventTypeFilter = deviceAgent->getRealSupportedEventTypes();
+    std::optional<QSet<QString>> eventTypeFilter = isNvr
+        ? deviceAgent->loadRealSupportedEventTypes()
+        : std::nullopt;
 
     auto deviceAgentManifest = buildDeviceAgentManifest(sharedRes,
         deviceInfo, areSettingsAndTrackingAllowed, eventTypeFilter);
@@ -229,7 +228,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
     deviceAgent->setManifest(std::move(*deviceAgentManifest));
 
-    deviceAgent->readCameraSettings();
+    deviceAgent->loadAndHoldDeviceSettings();
 
     ++sharedRes->deviceAgentCount;
 
@@ -363,7 +362,7 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
 /*static*/ QSize Engine::fetchMaxResolution(const std::shared_ptr<SharedResources>& sharedRes,
     const nx::sdk::IDeviceInfo* deviceInfo)
 {
-    static const QString kNoMaxResolution = "0x0";
+    static const QString kNoMaxResolution = "1x1";
 
     if (const auto& information = sharedRes->sharedContext->information())
     {

@@ -3,8 +3,9 @@
 #include <chrono>
 
 #include <nx/utils/std/cpp14.h>
-#include "bytestream_filter.h"
 #include <nx/utils/log/log.h>
+
+#include "bytestream_filter.h"
 
 namespace nx {
 namespace vms_server_plugins {

@@ -1,4 +1,4 @@
-#include "objectMetadataXmlParser.h"
+#include "object_metadata_xml_parser.h"
 
 #include <chrono>
 #include <cmath>
@@ -20,7 +20,6 @@ using namespace nx::sdk::analytics;
 
 namespace {
 //-------------------------------------------------------------------------------------------------
-
 
 //-------------------------------------------------------------------------------------------------
 

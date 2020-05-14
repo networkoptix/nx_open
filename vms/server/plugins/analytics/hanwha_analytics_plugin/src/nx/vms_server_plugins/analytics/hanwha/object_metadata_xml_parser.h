@@ -7,8 +7,8 @@
 #include <string>
 #include <optional>
 
-#include <QString>
-#include <QByteArray>
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
 #include <QtXml/QDomDocument>
 
 #include <nx/sdk/ptr.h>

@@ -12,8 +12,6 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 
 //-------------------------------------------------------------------------------------------------
 
-struct parser_error {};
-
 /** Video frame dimensions - needed for translating relative coordinates to absolute. */
 struct FrameSize
 {
@@ -25,6 +23,11 @@ struct FrameSize
     bool operator<(const FrameSize other) const
     {
         return width * height < other.width*other.height;
+    }
+
+    bool operator==(const FrameSize other) const
+    {
+        return width == other.width && height == other.height;
     }
 
     int xRelativeToAbsolute(double x) const
@@ -50,6 +53,7 @@ struct FrameSize
 };
 
 //-------------------------------------------------------------------------------------------------
+
 /** Point in relative coordinates (plugin format). Every figure is a vector of such points.*/
 struct PluginPoint
 {
@@ -70,59 +74,11 @@ struct PluginPoint
     std::istream& fromSunapiStream(std::istream& is, FrameSize frameSize);
 };
 
-// We need separate typed for width and height
-struct Width
-{
-    double value = 0.;
-    Width& operator=(double v) { value = v; return *this; }
-    operator double() const { return value; }
-};
-
-struct Height
-{
-    double value = 0.;
-    Height& operator=(double v) { value = v; return *this; }
-    operator double() const { return value; }
-};
-
-std::optional<std::vector<PluginPoint>> WidthHeightToPluginPoints(Width width, Height height);
+//-------------------------------------------------------------------------------------------------
 
 enum class Direction { Right, Left, Both };
 
-template<typename SettingType>
-std::optional<SettingType> fromServerString(const char* source);
-
-template<>
-inline std::optional<Direction> fromServerString<Direction>(const char* source)
-{
-    std::optional<Direction> result;
-    if (!source)
-        return result;
-
-    if (strcmp(source, "right") == 0)
-        result = Direction::Right;
-
-    else if (strcmp(source, "left") == 0)
-        result = Direction::Left;
-
-    else if (strcmp(source, "absent") == 0)
-        result = Direction::Both;
-
-    return result;
-}
-
-inline std::string toServerString(Direction direction)
-{
-    switch (direction)
-    {
-    case Direction::Right: return "right";
-    case Direction::Left: return "left";
-    case Direction::Both: return "absent";
-    }
-    //NX_ASSERT(false, "unexpected Direction value");
-    return "";
-
-}
+//-------------------------------------------------------------------------------------------------
 
 struct NamedLineFigure
 {
@@ -137,23 +93,19 @@ struct NamedLineFigure
     std::string toServerString() const;
 };
 
-struct UnnamedBoxFigure
-{
-    Width width;
-    Height height;
-    static std::optional<UnnamedBoxFigure> fromServerString(const char* source);
-    std::string toServerString() const;
-};
+//-------------------------------------------------------------------------------------------------
 
 struct ObjectSizeConstraints
 {
-    Width minWidth;
-    Height minHeight;
-    Width maxWidth;
-    Height maxHeight;
+    double minWidth = 0.1;
+    double minHeight = 0.1;
+    double maxWidth = 0.9;
+    double maxHeight = 0.9;
     static std::optional<ObjectSizeConstraints> fromServerString(const char* source);
     std::string toServerString() const;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 struct UnnamedPolygon
 {
@@ -164,6 +116,8 @@ struct UnnamedPolygon
     std::string toServerString() const;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 struct NamedPolygon
 {
     std::vector<PluginPoint> points;
@@ -173,29 +127,6 @@ struct NamedPolygon
     static std::optional<NamedPolygon> fromServerString(const char* source);
     std::string toServerString() const;
 };
-
-/**
- * Parse the json string (received from server) that contains points. The points have two
- * coordinates of type double.
- * \return vector of points (may be empty). nullopt - if json is broken.
- */
-std::optional<std::vector<PluginPoint>> ServerStringToPluginPoints(
-    const char* source, std::string* label = nullptr, Direction* direction = nullptr);
-
-std::optional<Width> ServerStringToWidth(const char* value);
-
-std::optional<Height> ServerStringToHeight(const char* value);
-
-std::optional<Direction> ServerStringToDirection(const char* value);
-
-/**
- * Convert the points into a string in sunapi format (comma separated coordinates). The coordinates
- * are translated from relative values [0 .. 1) into absolute values [0 .. frame size].
- */
-std::string pluginPointsToSunapiString(const std::vector<PluginPoint>& points, FrameSize frameSize);
-
-std::string pluginPointsToServerString(const std::vector<PluginPoint>& points,
-    const std::string* label = nullptr, const Direction* direction = nullptr);
 
 //-------------------------------------------------------------------------------------------------
 

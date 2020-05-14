@@ -1,8 +1,5 @@
 #pragma once
 
-#include "point.h"
-#include "basicServerSettingsIo.h"
-
 #include <array>
 #include <vector>
 #include <memory>
@@ -12,6 +9,10 @@
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
+
+#include "setting_primitives.h"
+#include "setting_primitives_io.h"
+#include "device_response_json_parser.h" //< low level parsing
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
@@ -61,12 +62,82 @@ struct SettingGroup
     template<class E>
     const char* value(const nx::sdk::IStringMap* sourceMap, E keyIndexE);
 
-    void replanishErrorMap(
-        nx::sdk::Ptr<nx::sdk::StringMap>& errorMap, const std::string& reason) const;
+    void replanishErrorMap(nx::sdk::StringMap* errorMap, const std::string& reason) const;
 
     int nativeIndex() const { return m_nativeIndex; }
     int serverIndex() const { return m_serverIndex; }
     int deviceIndex() const { return m_deviceIndex; }
+
+    template<class SettingGroupT>
+    static bool readFromServer(const nx::sdk::IStringMap* from, SettingGroupT* to,
+        int roiIndex = -1)
+    {
+        SettingGroupT tmp(roiIndex);
+        try
+        {
+            tmp.readFromServerOrThrow(from, roiIndex);
+        }
+        catch (const SettingPrimitivesServerIo::DeserializationError&)
+        {
+            return false;
+        }
+        *to = std::move(tmp);
+        return true;
+    }
+
+    template<class SettingGroupT>
+    static bool readFromDeviceReply(const std::string& from, SettingGroupT* to,
+        FrameSize frameSize, int channelNumber, int roiIndex = -1)
+    {
+        SettingGroupT tmp(roiIndex);
+        try
+        {
+            nx::kit::Json channelInfo = DeviceResponseJsonParser::extractChannelInfo(
+                from, SettingGroupT::kJsonEventName, channelNumber);
+
+            tmp.readFromDeviceReplyOrThrow(channelInfo, frameSize);
+        }
+        catch (const SettingPrimitivesDeviceIo::CameraResponseJsonError&)
+        {
+            return false;
+        }
+        *to = std::move(tmp);
+        return true;
+    }
+
+    /**
+     * The core function - transfers settings from server to device.
+     * Read a bunch of settings `settingGroup` from the server (from `sourceMap`) and write it
+     * to the agent's device, using `sendingFunction`.
+     */
+    template<class SettingGroupT, class SendingFunctor>
+    static void transferFromServerToDevice(nx::sdk::StringMap* errorMap,
+        const nx::sdk::IStringMap* sourceMap,
+        SettingGroupT& previousState,
+        SendingFunctor sendingFunctor,
+        FrameSize frameSize,
+        int channelNumber,
+        int objectIndex = -1)
+    {
+        SettingGroupT settingGroup;
+        if (!SettingGroup::readFromServer(sourceMap, &settingGroup, objectIndex))
+        {
+            settingGroup.replanishErrorMap(errorMap, "read failed");
+            return;
+        }
+
+        if (settingGroup == previousState)
+            return;
+
+        const std::string settingQuery =
+            settingGroup.buildDeviceWritingQuery(frameSize, channelNumber);
+
+        const std::string error = sendingFunctor(settingQuery);
+        if (!error.empty())
+            settingGroup.replanishErrorMap(errorMap, error);
+        else
+            previousState = settingGroup;
+    }
 
 protected:
     bool initialized = false;
@@ -113,12 +184,12 @@ struct AnalyticsMode: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize /*frameSize*/);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize /*frameSize*/);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
 
 //-------------------------------------------------------------------------------------------------
-#if 0
+#if 1
 // Hanwha Motion detection support is currently removed from the Clients interface
 
 struct MotionDetectionObjectSize: public SettingGroup
@@ -141,8 +212,8 @@ struct MotionDetectionObjectSize: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 
 private:
     std::string buildMinObjectSize(FrameSize frameSize) const;
@@ -186,8 +257,8 @@ struct MotionDetectionIncludeArea: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -219,8 +290,8 @@ struct MotionDetectionExcludeArea: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
 
 #endif
@@ -256,8 +327,8 @@ struct ShockDetection : public SettingGroup
     // The idea is that the current class interacts with the server only,
     // and the inheritor interacts with the device.
     // The decision will be made during other plugins construction.
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize /*frameSize*/);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize /*frameSize*/);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -294,8 +365,8 @@ struct TamperingDetection: SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -329,8 +400,8 @@ struct DefocusDetection: SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -364,8 +435,8 @@ struct FogDetection: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 
 };
 //-------------------------------------------------------------------------------------------------
@@ -404,8 +475,8 @@ struct ObjectDetectionGeneral: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 
 private:
     std::string buildObjectTypes() const;
@@ -442,8 +513,8 @@ struct ObjectDetectionBestShot: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 
 private:
     std::string buildObjectTypes() const;
@@ -471,8 +542,8 @@ struct IvaObjectSize : public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 
 private:
     std::string buildMinObjectSize(FrameSize frameSize) const;
@@ -484,8 +555,6 @@ private:
 struct IvaLine: public SettingGroup
 {
     NamedLineFigure namedLineFigure;
-    //Direction direction = Direction::Right;
-    //std::string name;
     bool person = false;
     bool vehicle = false;
     bool crossing = false;
@@ -495,8 +564,6 @@ struct IvaLine: public SettingGroup
 
     enum class KeyIndex {
         namedLineFigure,
-        //direction,
-        //name,
         person,
         vehicle,
         crossing,
@@ -504,8 +571,6 @@ struct IvaLine: public SettingGroup
 
     static constexpr const char* kKeys[] = {
         "IVA.Line#.Points",
-        //"IVA.Line#.Points", //< direction is also read from "Points"
-        //"IVA.Line#.Name",
         "IVA.Line#.Person",
         "IVA.Line#.Vehicle",
         "IVA.Line#.Crossing",
@@ -528,12 +593,13 @@ struct IvaLine: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 
 private:
+    static Direction invertedDirection(Direction direction);
     std::string buildFilter() const;
-    std::string buildMode() const;
+    std::string buildMode(bool inverted = false) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -601,8 +667,8 @@ struct IvaArea: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 
 private:
     std::string buildMode() const;
@@ -638,8 +704,8 @@ struct IvaExcludeArea: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -667,8 +733,8 @@ struct AudioDetection: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -711,55 +777,13 @@ struct SoundClassification: public SettingGroup
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/ = -1) const;
 
-    void readFromCameraOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
-    std::string buildCameraWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
 
 private:
     std::string buildSoundType() const;
 };
 
-//-------------------------------------------------------------------------------------------------
-struct DeviceValueError {};
-//-------------------------------------------------------------------------------------------------
-template<class SettingsGroupT>
-bool readSettingsFromServer(const nx::sdk::IStringMap* from, SettingsGroupT* to,
-    int roiIndex = -1)
-{
-    SettingsGroupT tmp(roiIndex);
-    try
-    {
-        tmp.readFromServerOrThrow(from, roiIndex);
-    }
-    catch (ServerValueError&)
-    {
-        return false;
-    }
-    *to = std::move(tmp);
-    return true;
-}
-//-------------------------------------------------------------------------------------------------
-nx::kit::Json getChannelInfoOrThrow(
-    const std::string& cameraReply, const char* eventName, int channelNumber);
-//-------------------------------------------------------------------------------------------------
-template<class SettingGroupT>
-bool readFromDeviceReply(const std::string& from, SettingGroupT* to,
-    FrameSize frameSize, int channelNumber, int roiIndex = -1)
-{
-    SettingGroupT tmp(roiIndex);
-    try
-    {
-        nx::kit::Json channelInfo = getChannelInfoOrThrow(
-            from, SettingGroupT::kJsonEventName, channelNumber);
-
-        tmp.readFromCameraOrThrow(channelInfo, frameSize);
-    }
-    catch (DeviceValueError&)
-    {
-        return false;
-    }
-    *to = std::move(tmp);
-    return true;
-}
 //-------------------------------------------------------------------------------------------------
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

@@ -1,4 +1,4 @@
-#include "point.h"
+#include "setting_primitives.h"
 
 #include <charconv>
 #include <cmath>
@@ -78,9 +78,55 @@ std::istream& PluginPoint::fromSunapiStream(std::istream& is, FrameSize frameSiz
     return is;
 }
 //-------------------------------------------------------------------------------------------------
-std::optional<std::vector<PluginPoint>> ServerStringToPluginPoints(
-    const char* source, std::string* label /*= nullptr*/, Direction* direction /*= nullptr*/)
+
+std::optional<Direction> directionFromServerString(const char* source)
 {
+    std::optional<Direction> result;
+    if (!source)
+        return result;
+
+    if (strcmp(source, "right") == 0)
+        result = Direction::Right;
+
+    else if (strcmp(source, "left") == 0)
+        result = Direction::Left;
+
+    else if (strcmp(source, "absent") == 0)
+        result = Direction::Both;
+
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+std::string directionToServerString(Direction direction)
+{
+    switch (direction)
+    {
+        case Direction::Right: return "right";
+        case Direction::Left: return "left";
+        case Direction::Both: return "absent";
+    }
+    //NX_ASSERT(false, "unexpected Direction value");
+    return "";
+}
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Parse the json string (received from server) that contains points. The points have two
+ * coordinates of type double.
+ * \return vector of points (may be empty). nullopt - if json is broken.
+ */
+std::optional<std::vector<PluginPoint>> ServerStringToPluginPoints(
+    const char* source,
+    std::string* label = nullptr,
+    Direction* direction = nullptr)
+{
+/**
+The source example:
+{"figure":{"color":"#e040fb","direction":"right","points":[[0.3567708432674408,0.5513888597488403],[0.3565104305744171,0.8416666388511658]]},"label":"","showOnCamera":true}
+*/
     NX_ASSERT(source);
     std::vector<PluginPoint> result;
 
@@ -122,7 +168,7 @@ std::optional<std::vector<PluginPoint>> ServerStringToPluginPoints(
             if (!jsonDirection.is_string())
                 return std::nullopt;
 
-            auto optionalDirection = fromServerString<Direction>(jsonDirection.string_value().c_str());
+            auto optionalDirection = directionFromServerString(jsonDirection.string_value().c_str());
             if (!optionalDirection)
                 return std::nullopt;
             else
@@ -140,78 +186,10 @@ std::optional<std::vector<PluginPoint>> ServerStringToPluginPoints(
     return result;
 }
 
-std::optional<Width> ServerStringToWidth(const char* value)
-{
-    const std::optional<std::vector<PluginPoint>> box = ServerStringToPluginPoints(value);
-    if (!box || box->size() != 2)
-        return std::nullopt;
-    return Width{ std::abs((*box)[0].x - (*box)[1].x) };
-}
-
-std::optional<Height> ServerStringToHeight(const char* value)
-{
-    const std::optional<std::vector<PluginPoint>> box = ServerStringToPluginPoints(value);
-    if (!box || box->size() != 2)
-        return std::nullopt;
-    return Height{ std::abs((*box)[0].y - (*box)[1].y) };
-}
-
-/** Make a vector of two points that set a centered rectangle with definite width and height. */
-std::optional<std::vector<PluginPoint>> WidthHeightToPluginPoints(Width width, Height height)
-{
-    NX_ASSERT(width <= 1.0 && height <= 1.0);
-    std::vector<PluginPoint> result;
-
-    const double x0 = (1.0 - width) / 2.0;
-    const double x1 = x0 + width;
-
-    const double y0 = (1.0 - height) / 2.0;
-    const double y1 = y0 + height;
-
-    result.emplace_back(x0, y0);
-    result.emplace_back(x1, y1);
-    return result;
-}
-
-std::optional<Direction> ServerStringToDirection(const char* value)
-{
-    NX_ASSERT(value);
-    std::string err;
-    nx::kit::Json json = nx::kit::Json::parse(value, err);
-    if (!json.is_object())
-        return std::nullopt;
-
-    const nx::kit::Json& jsonPoints = json["direction"];
-    if (!jsonPoints.is_string())
-        return std::nullopt;
-
-    std::string direction = jsonPoints.string_value();
-    if (direction == "b")
-        return Direction::Right;
-    if (direction == "a")
-        return Direction::Left;
-    if (direction == "")
-        return Direction::Both;
-
-    return std::nullopt;
-}
-
-std::string pluginPointsToSunapiString(const std::vector<PluginPoint>& points, FrameSize frameSize)
-{
-    std::stringstream stream;
-    if (!points.empty())
-        points.front().toSunapiStream(stream, frameSize);
-    for (size_t i = 1; i < points.size(); ++i)
-        points[i].toSunapiStream(stream << ',', frameSize);
-    return stream.str();
-}
-
-//-----------------------
-
 std::string pluginPointsToServerString(
     const std::vector<PluginPoint>& points,
-    const std::string* label /*= nullptr*/,
-    const Direction* direction /*= nullptr*/)
+    const std::string* label = nullptr,
+    const Direction* direction = nullptr)
 {
     if (points.empty())
         return "null"s;
@@ -232,7 +210,7 @@ std::string pluginPointsToServerString(
 
     if (direction)
     {
-        nx::kit::Json jsonDirection(toServerString(*direction));
+        nx::kit::Json jsonDirection(directionToServerString(*direction));
         jsonFigure.insert(std::pair("direction"s, jsonDirection));
     }
 
@@ -247,48 +225,14 @@ std::string pluginPointsToServerString(
     }
 
     std::string result = nx::kit::Json(jsonResult).dump();
-
-//    std::string rrr = R"({ "figure":{"color":"#b2ff59", "points" : [[0.39666666666666667, 0.5096296296296297], [0.74, 0.5777777777777777]]}, "name" : "", "showOnCamera" : true })";
-
+/**
+The result example:
+{"figure": {"direction": "right", "points": [[0.3567708432674408, 0.55138885974884033], [0.35651043057441711, 0.84166663885116577]]}, "label": ""}
+*/
     return result;
-
 }
 
 //-------------------------------------------------------------------------------------------------
-
-/*static*/ std::optional<UnnamedBoxFigure> UnnamedBoxFigure::fromServerString(const char* source)
-{
-    std::optional<std::vector<PluginPoint>> boxPoints = ServerStringToPluginPoints(source);
-
-    if (!boxPoints)
-        return std::nullopt; //< Failed to read points.
-
-    if (boxPoints->size() != 2)
-        return std::nullopt; //< Has a wrong number of points.
-
-    UnnamedBoxFigure result;
-    result.width = std::abs((*boxPoints)[0].x - (*boxPoints)[1].x);
-    result.height = std::abs((*boxPoints)[0].y - (*boxPoints)[1].y);
-    return result;
-}
-
-std::string UnnamedBoxFigure::toServerString() const
-{
-    NX_ASSERT(width <= 1.0 && height <= 1.0);
-    std::vector<PluginPoint> points;
-
-    const double x0 = (1.0 - width) / 2.0;
-    const double x1 = x0 + width;
-
-    const double y0 = (1.0 - height) / 2.0;
-    const double y1 = y0 + height;
-
-    points.emplace_back(x0, y0);
-    points.emplace_back(x1, y1);
-
-    return pluginPointsToServerString(points);
-}
-
 //-------------------------------------------------------------------------------------------------
 
 /*static*/ std::optional<ObjectSizeConstraints> ObjectSizeConstraints::fromServerString(

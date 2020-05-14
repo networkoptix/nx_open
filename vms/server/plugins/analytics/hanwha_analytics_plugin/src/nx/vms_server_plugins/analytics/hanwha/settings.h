@@ -4,11 +4,11 @@
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
-enum EventCategory
+enum AnalyticsCategory
 {
     motionDetection, //< currently not used
     shockDetection,
-    tampering,
+    tamperingDetection,
     defocusDetection,
     fogDetection,
     videoAnalytics, //< includes Passing, Intrusion, Entering, Exiting, Appearing, Loitering
@@ -18,7 +18,7 @@ enum EventCategory
     count //< number event of categories
 };
 
-using SupportedEventCategories = std::array<bool, EventCategory::count>;
+using AnalyticsCategories = std::array<bool, AnalyticsCategory::count>;
 //-------------------------------------------------------------------------------------------------
 
 struct Settings
@@ -48,7 +48,7 @@ struct Settings
     AudioDetection audioDetection;
     SoundClassification soundClassification;
 
-    SupportedEventCategories supportedEventCategories = {false};
+    AnalyticsCategories analyticsCategories = {false};
 
     bool IntelligentVideoIsActive() const;
 };
