@@ -102,12 +102,8 @@ public:
     template<class Resource>
     QnSharedResourcePointerList<Resource> getResources() const
     {
-        QnMutexLocker locker(&m_resourcesMtx);
-        QnSharedResourcePointerList<Resource> result;
-        for (const QnResourcePtr& resource: m_resources)
-            if (auto derived = resource.template dynamicCast<Resource>())
-                result.push_back(derived);
-        return result;
+        NX_READ_LOCKER locker(&m_resourcesMutex);
+        return getResourcesUnsafe<Resource>();
     }
 
     //---------------------------------------------------------------------------------------------
@@ -116,7 +112,7 @@ public:
     template<class IdList>
     QnResourceList getResourcesByIds(IdList idList) const
     {
-        QnMutexLocker locker(&m_resourcesMtx);
+        NX_READ_LOCKER locker(&m_resourcesMutex);
         QnResourceList result;
         for (const auto& id: idList)
         {
@@ -132,7 +128,7 @@ public:
     template<class Resource, class IdList>
     QnSharedResourcePointerList<Resource> getResourcesByIds(const IdList& idList) const
     {
-        QnMutexLocker locker(&m_resourcesMtx);
+        NX_READ_LOCKER locker(&m_resourcesMutex);
         QnSharedResourcePointerList<Resource> result;
         for (const QnUuid& id: idList)
         {
@@ -151,7 +147,7 @@ public:
 
     QnResourceList getResources(ResourceFilter filter) const
     {
-        QnMutexLocker locker(&m_resourcesMtx);
+        NX_READ_LOCKER locker(&m_resourcesMutex);
         QnResourceList result;
         for (const QnResourcePtr& resource: m_resources)
         {
@@ -164,7 +160,7 @@ public:
     template<class Resource>
     QnSharedResourcePointerList<Resource> getResources(ResourceClassFilter<Resource> filter) const
     {
-        QnMutexLocker locker(&m_resourcesMtx);
+        NX_READ_LOCKER locker(&m_resourcesMutex);
         QnSharedResourcePointerList<Resource> result;
         for (const QnResourcePtr& resource: m_resources)
         {
@@ -201,7 +197,7 @@ public:
 
     QnResourcePtr getResource(ResourceFilter filter) const
     {
-        QnMutexLocker locker(&m_resourcesMtx);
+        NX_READ_LOCKER locker(&m_resourcesMutex);
         auto itr = std::find_if(m_resources.begin(), m_resources.end(), filter);
         return itr != m_resources.end() ? itr.value() : QnResourcePtr();
     }
@@ -209,7 +205,7 @@ public:
     template<class Resource>
     QnSharedResourcePointer<Resource> getResource(ResourceClassFilter<Resource> filter) const
     {
-        QnMutexLocker locker(&m_resourcesMtx);
+        NX_READ_LOCKER locker(&m_resourcesMutex);
         for (const QnResourcePtr& resource: m_resources)
         {
             if (auto derived = resource.template dynamicCast<Resource>())
@@ -232,7 +228,7 @@ public:
     template<class Resource>
     QnSharedResourcePointer<Resource> getResourceById(const QnUuid& id) const
     {
-        QnMutexLocker locker(&m_resourcesMtx);
+        NX_READ_LOCKER locker(&m_resourcesMutex);
         auto itr = m_resources.find(id);
         return itr != m_resources.end()
             ? itr.value().template dynamicCast<Resource>()
@@ -309,10 +305,23 @@ signals:
     void statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
 
 private:
+    template<class Resource>
+    QnSharedResourcePointerList<Resource> getResourcesUnsafe() const
+    {
+        QnSharedResourcePointerList<Resource> result;
+        for (const QnResourcePtr& resource: m_resources)
+        {
+            if (auto derived = resource.template dynamicCast<Resource>())
+                result.push_back(derived);
+        }
+        return result;
+    }
+
+private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 
-    mutable QnMutex m_resourcesMtx;
+    mutable nx::ReadWriteLock m_resourcesMutex;
     bool m_tranInProgress;
 
     QnResourceList m_tmpResources;

@@ -24,22 +24,19 @@
 
 namespace {
 
-// Returns true, if a resource has been inserted. false - if updated existing resource
+// Retuns updates function if resource exists and requires an update.
 template<class T>
-bool insertOrUpdateResource(const T& resource, QHash<QnUuid, T>* const resourcePool)
+std::function<void()> insertOrUpdateResource(const T& resource, QHash<QnUuid, T>* const resourcePool)
 {
     QnUuid id = resource->getId();
     auto itr = resourcePool->find(id);
     if (itr == resourcePool->end())
     {
-        // Inserting new resource.
         resourcePool->insert(id, resource);
-        return true;
+        return nullptr;
     }
 
-    // Updating existing resource.
-    itr.value()->update(resource);
-    return false;
+    return [existing = itr.value(), resource] { existing->update(resource); };
 }
 
 } // namespace
@@ -50,7 +47,6 @@ QnResourcePool::QnResourcePool(QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent),
     d(new Private(this)),
-    m_resourcesMtx(QnMutex::Recursive),
     m_tranInProgress(false)
 {
     m_threadPool.reset(new QThreadPool());
@@ -58,7 +54,6 @@ QnResourcePool::QnResourcePool(QObject* parent):
 
 QnResourcePool::~QnResourcePool()
 {
-    QnMutexLocker locker(&m_resourcesMtx);
     clear();
 }
 
@@ -101,7 +96,7 @@ void QnResourcePool::addNewResources(const QnResourceList& resources, AddResourc
 
 void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFlags flags)
 {
-    QnMutexLocker resourcesLock(&m_resourcesMtx);
+    NX_WRITE_LOCKER resourcesLock(&m_resourcesMutex);
 
     for (const auto& resource: resources)
     {
@@ -114,7 +109,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
     }
 
     QMap<QnUuid, QnResourcePtr> newResources; // sort by id
-
+    std::vector<std::function<void()>> updateExistingResources;
     for (const QnResourcePtr& resource: resources)
     {
         NX_ASSERT(!resource->getId().isNull(), "Got resource with empty id.");
@@ -123,7 +118,11 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
 
         if (!flags.testFlag(UseIncompatibleServerPool))
         {
-            if (insertOrUpdateResource(resource, &m_resources))
+            if (const auto updateExisting = insertOrUpdateResource(resource, &m_resources))
+            {
+                updateExistingResources.push_back(std::move(updateExisting));
+            }
+            else
             {
                 d->handleResourceAdded(resource);
                 newResources.insert(resource->getId(), resource);
@@ -134,12 +133,18 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         {
             auto server = resource.dynamicCast<QnMediaServerResource>();
             NX_ASSERT(server, "Only fake servers allowed here");
-            if (insertOrUpdateResource(server, &m_incompatibleServers))
+            if (const auto updateExisting = insertOrUpdateResource(server, &m_incompatibleServers))
+                updateExistingResources.push_back(std::move(updateExisting));
+            else
                 newResources.insert(resource->getId(), resource);
         }
     }
 
     resourcesLock.unlock();
+
+    // Resource updates may emit signal, which should not be done under mutex.
+    for (const auto& update: updateExistingResources)
+        update();
 
     QnResourceList addedResources = newResources.values();
     for (const auto& resource: addedResources)
@@ -174,16 +179,21 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
                 removedOtherResources.push_back(resource);
         };
 
-    QnMutexLocker lk(&m_resourcesMtx);
 
-    for (const QnResourcePtr& resource: resources)
+    QnResourceList ownResources;
+    for (const auto& resource: resources)
     {
         if (!resource || resource->resourcePool() != this)
             continue;
 
         resource->disconnect(this);
         resource->addFlags(Qn::removed);
+        ownResources << resource;
+    }
 
+    NX_WRITE_LOCKER lk(&m_resourcesMutex);
+    for (const QnResourcePtr& resource: ownResources)
+    {
         //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
         QnUuid resId = resource->getId();
         if (m_adminResource && resId == m_adminResource->getId())
@@ -209,8 +219,8 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
     // After resources removing, we must check if removed layouts left on the videowall items and
     // if the removed cameras / webpages / server left as the layout items.
-    const auto existingVideoWalls = getResources<QnVideoWallResource>();
-    const auto existingLayouts = getResources<QnLayoutResource>();
+    const auto existingVideoWalls = getResourcesUnsafe<QnVideoWallResource>();
+    const auto existingLayouts = getResourcesUnsafe<QnLayoutResource>();
 
     lk.unlock();
 
@@ -266,13 +276,13 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
 QnResourceList QnResourcePool::getResources() const
 {
-    QnMutexLocker locker(&m_resourcesMtx);
+    NX_READ_LOCKER locker(&m_resourcesMutex);
     return m_resources.values();
 }
 
 QnResourcePtr QnResourcePool::getResourceById(const QnUuid& id) const
 {
-    QnMutexLocker locker(&m_resourcesMtx);
+    NX_READ_LOCKER locker(&m_resourcesMutex);
     auto resIter = m_resources.find(id);
     if (resIter != m_resources.end())
         return resIter.value();
@@ -324,7 +334,7 @@ QnVirtualCameraResourceList QnResourcePool::getAllCameras(
 {
     QnUuid parentId = mServer ? mServer->getId() : QnUuid();
     QnVirtualCameraResourceList result;
-    QnMutexLocker locker(&m_resourcesMtx);
+    NX_READ_LOCKER locker(&m_resourcesMutex);
     for (const QnResourcePtr& resource: m_resources)
     {
         if (ignoreDesktopCameras && resource->hasFlags(Qn::desktop_camera))
@@ -353,7 +363,7 @@ QnMediaServerResourcePtr QnResourcePool::getOwnMediaServerOrThrow() const
 
 QnMediaServerResourceList QnResourcePool::getAllServers(Qn::ResourceStatus status) const
 {
-    QnMutexLocker lock(&m_resourcesMtx); //m_resourcesMtx is recursive
+    NX_READ_LOCKER lock(&m_resourcesMutex);
 
     if (status == Qn::AnyStatus)
         return d->mediaServers.values();
@@ -388,7 +398,7 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(
 
 QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString& uniqueId) const
 {
-    QnMutexLocker locker(&m_resourcesMtx);
+    NX_READ_LOCKER locker(&m_resourcesMutex);
     return d->resourcesByUniqueId.value(uniqueId);
 }
 
@@ -421,7 +431,7 @@ QnResourceList QnResourcePool::getResourcesWithFlag(Qn::ResourceFlag flag) const
 
 QnUserResourcePtr QnResourcePool::getAdministrator() const
 {
-    QnMutexLocker locker(&m_resourcesMtx);
+    NX_WRITE_LOCKER locker(&m_resourcesMutex);
     if (m_adminResource)
         return m_adminResource;
 
@@ -441,7 +451,7 @@ void QnResourcePool::clear()
 {
     QnResourceList tempList;
     {
-        QnMutexLocker lk(&m_resourcesMtx);
+        NX_WRITE_LOCKER lk(&m_resourcesMutex);
 
         for (const auto& resource: m_resources)
             tempList << resource;
@@ -466,7 +476,7 @@ void QnResourcePool::clear()
 
 bool QnResourcePool::containsIoModules() const
 {
-    QnMutexLocker lk(&m_resourcesMtx);
+    NX_READ_LOCKER lk(&m_resourcesMutex);
     return !d->ioModules.empty();
 }
 
@@ -481,7 +491,7 @@ QnMediaServerResourcePtr QnResourcePool::getIncompatibleServerById(
     const QnUuid& id,
     bool useCompatible) const
 {
-    QnMutexLocker locker(&m_resourcesMtx);
+    NX_READ_LOCKER locker(&m_resourcesMutex);
 
     auto it = m_incompatibleServers.find(id);
     if (it != m_incompatibleServers.end())
@@ -495,13 +505,13 @@ QnMediaServerResourcePtr QnResourcePool::getIncompatibleServerById(
 
 QnMediaServerResourceList QnResourcePool::getIncompatibleServers() const
 {
-    QnMutexLocker locker(&m_resourcesMtx);
+    NX_READ_LOCKER locker(&m_resourcesMutex);
     return m_incompatibleServers.values();
 }
 
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QnUuid& uuid) const
 {
-    QnMutexLocker lk(&m_resourcesMtx);
+    NX_READ_LOCKER lk(&m_resourcesMutex);
     for (const QnResourcePtr& resource: m_resources)
     {
         QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
@@ -526,7 +536,7 @@ QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QnU
 
 QnVideoWallMatrixIndex QnResourcePool::getVideoWallMatrixByUuid(const QnUuid& uuid) const
 {
-    QnMutexLocker lk(&m_resourcesMtx);
+    NX_READ_LOCKER lk(&m_resourcesMutex);
     for (const QnResourcePtr& resource: m_resources)
     {
         QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
