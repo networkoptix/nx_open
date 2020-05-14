@@ -39,12 +39,12 @@ public:
         int* errorCode = nullptr,
         Extras* outExtras = nullptr);
 
-    virtual void updateSoftwareMotion() override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 
     void setNeedCorrectTime(bool value);
     virtual CameraDiagnostics::Result lastOpenStreamResult() const override;
 protected:
+    virtual void updateSoftwareMotion() override;
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStreamInternal(
         bool isCameraControlRequired, const QnLiveStreamParams& params) override;

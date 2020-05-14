@@ -114,6 +114,17 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
             QnMutexLocker lock(&m_liveMutex);
             updateSoftwareMotion();
         });
+    
+    if (m_cameraRes)
+    {
+        Qn::directConnect(m_cameraRes.data(), &QnSecurityCamResource::motionRegionChanged, this,
+            [this](const QnResourcePtr&)
+        {
+            QnMutexLocker lock(&m_liveMutex);
+            updateSoftwareMotion();
+        });
+    }
+
 
     m_dataReceptorMultiplexer = std::make_shared<DataCopier>();
     m_dataReceptorMultiplexer->add(m_metadataReceptor);

@@ -66,8 +66,6 @@ public:
     virtual void onGotInStreamMetadata(
         const std::shared_ptr<nx::streaming::InStreamCompressedMetadata>& metadata);
 
-    virtual void updateSoftwareMotion();
-
     static bool hasRunningLiveProvider(QnNetworkResource* netRes);
     virtual void startIfNotRunning() override;
     virtual void start(Priority priority = InheritPriority) override;
@@ -84,6 +82,7 @@ public:
     void setDoNotConfigureCamera(bool value) { m_doNotConfigureCamera = value; }
     virtual void pleaseStop() override;
 protected:
+    virtual void updateSoftwareMotion();
     QnAbstractCompressedMetadataPtr getMetadata();
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);

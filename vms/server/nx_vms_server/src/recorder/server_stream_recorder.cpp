@@ -826,12 +826,6 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
     m_lastSchedulePeriod.clear();
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 
-    if (m_mediaProvider)
-    {
-        QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-        liveProvider->updateSoftwareMotion();
-    }
-
     if (isRunning() && isAudioPresent() != cameraRes->isAudioEnabled())
         setNeedReopen();
 }
