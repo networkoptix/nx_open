@@ -1509,6 +1509,8 @@ std::unique_ptr<AbstractStreamSocket> TCPServerSocket::systemAccept()
         return nullptr;
     }
 
+    NX_VERBOSE(this, "Accepted new connection from %1", acceptedSocket->getForeignAddress());
+
     return acceptedSocket;
 }
 
