@@ -407,6 +407,7 @@ QSize maxResolution(AVCodecID codec)
     static const CodecMaxSize maxSizes[] =
     {
         { AV_CODEC_ID_H263P, QSize(h263::kMaxWidth, h263::kMaxHeight)},
+        { AV_CODEC_ID_MJPEG, QSize(2048, 2048)},
     };
 
     for(auto& size: maxSizes)
