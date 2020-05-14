@@ -398,7 +398,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %offlineEvents 0",
-                                "text": "went offline %offlineEvents times in the last hour"
+                                "text": "went offline %offlineEvents time(s) in the last hour"
                             },
                             {
                                 "level": "error",
@@ -417,7 +417,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %streamIssues1h 0",
-                                "text": "had %streamIssues1h Stream Issues in the last hour"
+                                "text": "had %streamIssues1h Stream Issue(s) in the last hour"
                             },
                             {
                                 "level": "error",
@@ -630,7 +630,7 @@
                             {
                                 "level": "warning",
                                 "condition": "greaterThan %issues24h 0",
-                                "text": "has %issues24h Storage Issue events in the last 24 hours"
+                                "text": "has %issues24h Storage Issue event(s) in the last 24 hours"
                             },
                             {
                                 "level": "error",
