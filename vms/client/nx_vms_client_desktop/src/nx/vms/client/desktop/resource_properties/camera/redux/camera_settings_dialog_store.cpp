@@ -476,6 +476,15 @@ void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
         });
 }
 
+void CameraSettingsDialogStore::refreshDeviceAgentSettings(const QnUuid& engineId)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::refreshDeviceAgentSettings(std::move(state), engineId);
+        });
+}
+
 void CameraSettingsDialogStore::resetDeviceAgentData(
     const QnUuid& engineId, const DeviceAgentData& data)
 {

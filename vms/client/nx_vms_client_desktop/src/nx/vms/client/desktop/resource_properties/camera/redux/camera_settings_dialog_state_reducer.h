@@ -79,6 +79,8 @@ public:
     static std::pair<bool, State> setDeviceAgentSettingsValues(
         State state, const QnUuid& engineId, const QJsonObject& values);
 
+    static State refreshDeviceAgentSettings(State state, const QnUuid& engineId);
+
     static std::pair<bool, State> resetDeviceAgentData(
         State state, const QnUuid& engineId, const DeviceAgentData& values);
 

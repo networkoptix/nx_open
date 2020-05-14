@@ -143,7 +143,7 @@ LabeledItem
     function setValue(value)
     {
         figureNameEdit.text = (value && value.label) || ""
-        showOnCameraCheckBox.checked = value && value.showOnCamera
+        showOnCameraCheckBox.checked = (value && value.showOnCamera) || false
         figure = value && value.figure
     }
 

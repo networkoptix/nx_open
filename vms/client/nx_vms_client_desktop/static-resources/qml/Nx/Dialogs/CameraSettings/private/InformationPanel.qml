@@ -13,12 +13,14 @@ Control
 
     property bool checkable: true
     property bool checked: false
+    property bool refreshing: false
 
     property alias streamSelectorVisible: streamSelection.visible
     property alias streamSelectorEnabled: streamSelection.enabled
     property alias currentStreamIndex: streamComboBox.currentIndex
 
     signal enableSwitchClicked()
+    signal refreshButtonClicked()
 
     padding: 12
 
@@ -41,19 +43,8 @@ Control
                 id: caption
 
                 width: parent.width
+                height: 20
                 spacing: 8
-
-                Text
-                {
-                    id: name
-
-                    text: engineInfo ? engineInfo.name : ""
-                    color: ColorTheme.text
-                    font.pixelSize: 15
-                    font.weight: Font.Medium
-                    elide: Text.ElideRight
-                    Layout.fillWidth: true
-                }
 
                 SwitchIcon
                 {
@@ -62,6 +53,7 @@ Control
                     visible: informationPanel.checkable
                     hovered: mouseArea.containsMouse && !mouseArea.containsPress
                     checkState: informationPanel.checked ? Qt.Checked : Qt.Unchecked
+                    Layout.alignment: Qt.AlignBaseline
 
                     MouseArea
                     {
@@ -73,6 +65,51 @@ Control
 
                         onClicked:
                             informationPanel.enableSwitchClicked()
+                    }
+                }
+
+                Text
+                {
+                    id: name
+
+                    text: engineInfo ? engineInfo.name : ""
+                    color: ColorTheme.text
+                    font.pixelSize: 15
+                    font.weight: Font.Medium
+                    elide: Text.ElideRight
+                    Layout.alignment: Qt.AlignBaseline
+                    Layout.fillWidth: true
+                }
+
+                TextButton
+                {
+                    id: refreshButton
+
+                    text: qsTr("Refresh")
+                    icon.source: "qrc:///skin/text_buttons/refresh.png"
+                    visible: informationPanel.checked && !informationPanel.refreshing
+
+                    onClicked:
+                        informationPanel.refreshButtonClicked()
+                }
+
+                RowLayout
+                {
+                    id: refreshingIndicator
+
+                    spacing: 2
+                    visible: informationPanel.checked && informationPanel.refreshing
+
+                    AnimatedImage
+                    {
+                        source: "qrc:///skin/legacy/loading.gif"
+                    }
+
+                    Text
+                    {
+                        text: qsTr("Refreshing...")
+                        font: refreshButton.font
+                        color: refreshButton.color
                     }
                 }
             }

@@ -100,7 +100,6 @@ public:
     Q_INVOKABLE QnUuid currentAnalyticsEngineId() const;
     Q_INVOKABLE void setCurrentAnalyticsEngineId(const QnUuid& engineId);
     Q_INVOKABLE bool analyticsSettingsLoading() const;
-    void setAnalyticsSettingsLoading(bool value);
     Q_INVOKABLE void setEnabledAnalyticsEngines(const QVariantList& value);
     Q_INVOKABLE int analyticsStreamIndex(const QnUuid& engineId) const;
     Q_INVOKABLE void setAnalyticsStreamIndex(const QnUuid& engineId, int value);
@@ -112,6 +111,7 @@ public:
     Q_INVOKABLE QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
     Q_INVOKABLE void setDeviceAgentSettingsValues(
         const QnUuid& engineId, const QJsonObject& values);
+    Q_INVOKABLE void refreshDeviceAgentSettings(const QnUuid& engineId);
     void resetDeviceAgentData(const QnUuid& engineId, const DeviceAgentData& data);
 
     Q_INVOKABLE bool dualStreamingEnabled() const;

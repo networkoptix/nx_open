@@ -18,6 +18,7 @@ Item
 
     implicitWidth: 30
     implicitHeight: 15
+    baselineOffset: implicitHeight - 2
 
     readonly property bool _transparentHandle: handleColor.a === 0
 

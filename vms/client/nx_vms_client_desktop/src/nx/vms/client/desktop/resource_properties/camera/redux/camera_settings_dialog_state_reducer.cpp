@@ -3,6 +3,7 @@
 #include <limits>
 
 #include <camera/fps_calculator.h>
+#include <client/client_module.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
@@ -17,6 +18,7 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 
 #include "../utils/device_agent_settings_adapter.h"
 #include "../watchers/camera_settings_analytics_engines_watcher.h"
@@ -47,7 +49,7 @@ void fetchFromCameras(
     Data data{};
     value.resetBase();
     if (!cameras.isEmpty() &&
-        utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+        nx::utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
     {
         value.setBase(data);
     }
@@ -63,7 +65,7 @@ void fetchFromCameras(
     Intermediate data{};
     value.resetBase();
     if (!cameras.isEmpty() &&
-        utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+        nx::utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
     {
         value.setBase(converter(data));
     }
@@ -74,7 +76,7 @@ CombinedValue combinedValue(const Cameras& cameras,
 {
     bool value = false;
     if (cameras.isEmpty()
-        || !utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &value))
+        || !nx::utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &value))
     {
         return CombinedValue::Some;
     }
@@ -1546,6 +1548,20 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
     state.hasChanges = true;
 
     return {true, std::move(state)};
+}
+
+State CameraSettingsDialogStateReducer::refreshDeviceAgentSettings(
+    State state, const QnUuid& engineId)
+{
+    if (!NX_ASSERT(state.isSingleCamera()))
+        return state;
+
+    qnClientModule->analyticsSettingsManager()->refreshSettings(
+        DeviceAgentId{state.singleCameraProperties.id, engineId});
+
+    auto& settings = state.analytics.settingsByEngineId[engineId];
+    settings.loading = true;
+    return state;
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(

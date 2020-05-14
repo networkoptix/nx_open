@@ -225,6 +225,7 @@ Item
 
             checkable: !isDeviceDependent && !!currentEngineId
             checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
+            refreshing: analyticsSettings.loading
             engineInfo: currentEngineInfo
             streamSelectorVisible: supportsDualStreaming && currentStreamIndex >= 0
             streamSelectorEnabled: settingsView.contentEnabled
@@ -235,6 +236,12 @@ Item
             {
                 if (currentEngineId)
                     setEngineEnabled(currentEngineId, !checked)
+            }
+
+            onRefreshButtonClicked:
+            {
+                if (currentEngineId)
+                    store.refreshDeviceAgentSettings(currentEngineId)
             }
 
             onCurrentStreamIndexChanged:
