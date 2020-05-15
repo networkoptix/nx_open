@@ -68,7 +68,7 @@
 #include <ui/widgets/common/elided_label.h>
 #include <ui/widgets/common/dialog_button_box.h>
 #include <ui/widgets/common/progress_widget.h>
-
+#include <ui/widgets/word_wrapped_label.h>
 
 namespace {
     /* If the operation is expected to take this long (as predicted by
@@ -178,10 +178,9 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
 
     if (!infoText.isEmpty())
     {
-        label = new QnElidedLabel(q);
-        label->setText(infoText);
-        label->setAlignment(Qt::Alignment(Qt::AlignLeft));
-        contentLayout->addWidget(label, 1);
+        auto infoLabel = new QnWordWrappedLabel(q);
+        infoLabel->setText(infoText);
+        contentLayout->addWidget(infoLabel, 1);
     }
 
     contentLayout->addWidget(bar);
