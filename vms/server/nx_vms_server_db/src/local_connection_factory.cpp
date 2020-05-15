@@ -328,7 +328,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * content type "application/json". An example of such array can be seen in the result of
      * <code>GET /ec2/getMediaServerUserAttributesList</code>.
      * </p>
-     * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
+     * %param serverId Server unique id.
      * %param serverName Server name.
      * %param maxCameras Maximum number of cameras on the server.
      * %param allowAutoRedundancy Whether the server can take cameras from an offline server
@@ -1259,8 +1259,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * <code>GET /ec2/getUsers</code>.
     * </p>
     * %permissions Administrator.
-    * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
-    *     exists, omitted fields will not be changed.
+    * %param id User unique id.
     * %param[opt] parentId Should be empty.
     * %param name User name.
     * %param[opt] url Should be empty.
@@ -1544,8 +1543,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * content type "application/json". An example of such array can be seen in the result of
      * <code>GET /ec2/getLayouts</code>.
      * </p>
-     * %param id Layout unique id. Can be omitted when creating a new object. If such object
-     *     exists, omitted fields will not be changed.
+     * %param id Layout unique id.
      * %param parentId Unique id of the user owning the layout.
      * %param name Layout name.
      * %param url Should be empty string.
