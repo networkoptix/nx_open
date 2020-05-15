@@ -288,15 +288,15 @@ void StreamingChunkTranscoderThread::finishTranscoding(
 {
     QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE);
 
-    //neccessary source data has been processed, depleting transcoder buffer
-    for (;;)
+    int res = transcodingIter->second->dataSourceCtx->transcoder->finalize(&resultStream);
+
+    if (res != 0)
     {
-        resultStream.clear();
-        int res = transcodingIter->second->dataSourceCtx->transcoder->transcodePacket(
-            QnAbstractMediaDataPtr(new QnEmptyMediaData()),
-            &resultStream);
-        if (res || (resultStream.size() == 0))
-            break;
+        NX_WARNING(this, "Failed to finalize transcoding, error code: %1, resource %2",
+            res, transcodingIter->second->transcodeParams.srcResourceUniqueID());
+    }
+    else if (resultStream.size() > 0)
+    {
         transcodingIter->second->chunk->appendData(
             QByteArray::fromRawData(resultStream.constData(), resultStream.size()));
     }

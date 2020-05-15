@@ -430,6 +430,46 @@ QnTranscoder::OperationResult QnTranscoder::setAudioCodec(AVCodecID codec, Trans
         : OperationResult::Error;
 }
 
+int QnTranscoder::openAndTranscodeDelayedData(QnByteArray* const result)
+{
+    const auto& video = m_delayedVideoQueue.isEmpty() ?
+        QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first();
+    const auto& audio = m_delayedAudioQueue.isEmpty() ?
+        QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first();
+
+    if (m_beforeOpenCallback)
+        m_beforeOpenCallback(this, video, audio);
+
+    int errCode = open(video, audio);
+    if (errCode != 0)
+    {
+        NX_WARNING(this, "Failed to open transcoder, error code: %1", errCode);
+        return errCode;
+    }
+
+    errCode = OperationResult::Success;
+    while (!m_delayedVideoQueue.isEmpty())
+    {
+        errCode = transcodePacketInternal(m_delayedVideoQueue.dequeue(), result);
+        if (errCode != 0)
+        {
+            NX_WARNING(this, "Failed to transcode video packet, error code: %1", errCode);
+            return errCode;
+        }
+    }
+    while (!m_delayedAudioQueue.isEmpty())
+    {
+        errCode = transcodePacketInternal(m_delayedAudioQueue.dequeue(), result);
+        if (errCode != 0)
+        {
+            NX_WARNING(this, "Failed to transcode audio packet, error code: %1", errCode);
+            return errCode;
+        }
+    }
+    return 0;
+}
+
+
 int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
 {
     m_internalBuffer.clear();
@@ -451,8 +491,12 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
     if (m_firstTime == AV_NOPTS_VALUE)
         m_firstTime = media->timestamp;
 
+    int errCode = OperationResult::Success;
     bool doTranscoding = true;
     static const size_t kMaxDelayedQueueSize = 60;
+
+    if (result)
+        result->clear();
 
     if (!m_initialized)
     {
@@ -471,14 +515,13 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         {
             return 0; // not ready to init
         }
-
-        const auto& video = m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first();
-        const auto& audio = m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first();
-        if (m_beforeOpenCallback)
-            m_beforeOpenCallback(this, video, audio);
-        const int rez = open(video, audio);
-        if (rez != 0)
-            return rez;
+        // Ready to initialize transcoder.
+        errCode = openAndTranscodeDelayedData(result);
+        if (errCode != 0)
+        {
+            NX_WARNING(this, "Failed to transcode delayed data, error code: %1", errCode);
+            return errCode;
+        }
     }
 
     if ((media->dataType == QnAbstractMediaData::AUDIO && !m_initializedAudio) ||
@@ -487,27 +530,13 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         return OperationResult::Success;
     }
 
-    if( result )
-        result->clear();
-    int errCode = OperationResult::Success;
-    while (!m_delayedVideoQueue.isEmpty()) {
-        errCode = transcodePacketInternal(m_delayedVideoQueue.dequeue(), result);
-        if (errCode != 0)
-            return errCode;
-    }
-    while (!m_delayedAudioQueue.isEmpty()) {
-        errCode = transcodePacketInternal(m_delayedAudioQueue.dequeue(), result);
-        if (errCode != 0)
-            return errCode;
-    }
-
     if (doTranscoding) {
         errCode = transcodePacketInternal(media, result);
         if (errCode != 0)
             return errCode;
     }
 
-    if( result )
+    if (result)
         result->write(m_internalBuffer.data(), m_internalBuffer.size());
 
     return OperationResult::Success;
@@ -515,10 +544,21 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
 
 int QnTranscoder::finalize(QnByteArray* const result)
 {
+    m_internalBuffer.clear();
+    if (!m_initialized)
+    {
+        int errCode = openAndTranscodeDelayedData(result);
+        if (errCode != 0)
+        {
+            NX_WARNING(this, "Failed to transcode delayed data on finalize, error code: %1",
+                errCode);
+            return errCode;
+        }
+    }
+
     if (!m_initialized)
         return OperationResult::Success;
 
-    m_internalBuffer.clear();
     finalizeInternal(result);
     if (result)
         result->write(m_internalBuffer.data(), m_internalBuffer.size());

@@ -248,6 +248,10 @@ protected:
 
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) = 0;
     virtual int finalizeInternal(QnByteArray* const result) = 0;
+private:
+    int openAndTranscodeDelayedData(QnByteArray* const result);
+
+protected:
 
     DecoderConfig m_decoderConfig;
     QSharedPointer<QnFfmpegVideoTranscoder> m_vTranscoder;

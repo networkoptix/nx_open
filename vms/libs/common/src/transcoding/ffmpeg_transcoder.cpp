@@ -389,11 +389,11 @@ int QnFfmpegTranscoder::transcodePacketInternal(
 
     bool doTranscoding = true;
     do {
-        QnAbstractMediaDataPtr transcodedPacket;
         QnConstAbstractMediaDataPtr mediaPacket;
         if (transcoder)
         {
             // transcode media
+            QnAbstractMediaDataPtr transcodedPacket;
             int errCode = transcoder->transcodePacket(doTranscoding ? media : QnConstAbstractMediaDataPtr(), result ? &transcodedPacket : NULL);
             if (errCode != 0)
                 return errCode;
@@ -428,7 +428,6 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
         QnAbstractMediaDataPtr transcodedData;
         do
         {
-            QnFfmpegAvPacket packet;
             transcodedData.reset();
 
             // transcode media

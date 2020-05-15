@@ -1158,9 +1158,10 @@ AVCodecID HttpLiveStreamingProcessor::detectAudioCodecId(
     if (!resource)
         return AV_CODEC_ID_NONE;
 
-    QnServerArchiveDelegate archive(serverModule());
+    QnServerArchiveDelegate archive(serverModule(), chunkParams.streamQuality());
     if (!archive.open(resource, serverModule()->archiveIntegrityWatcher()))
         return AV_CODEC_ID_NONE;
+
     if (chunkParams.startTimestamp() != DATETIME_NOW)
         archive.seek(chunkParams.startTimestamp(), true);
     if (archive.getAudioLayout() &&
