@@ -177,6 +177,7 @@ void setBitrate(
     result = pMoniker->BindToObject(NULL, NULL, IID_IBaseFilter, (void **) &baseFilter);
     if (FAILED(result))
         return;
+    auto baseFilterPtr = wrapComObject(baseFilter);
 
     IPin * pin = NULL;
     //todo find out if there are multiple output pins for a device. For now we assume only one
@@ -218,7 +219,6 @@ void setBitrate(
         deleteMediaType(mediaType);
     }
 
-    baseFilter->Release();
     delete[] array;
 }
 
@@ -322,6 +322,7 @@ HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION pinDirection, IPin **outPin)
     result = pFilter->EnumPins(&pEnum);
     if (FAILED(result))
         return result;
+    auto pEnumPtr = wrapComObject(pEnum);
 
     while (pEnum->Next(1, &pPin, 0) == S_OK)
     {
@@ -331,14 +332,12 @@ HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION pinDirection, IPin **outPin)
         {
             // Found a match. Return the IPin pointer to the caller.
             *outPin = pPin;
-            pEnum->Release();
             return S_OK;
         }
         // Release the pin for the next time through the loop.
         pPin->Release();
     }
     // No more pins. We did not find a match.
-    pEnum->Release();
     return E_FAIL;
 }
 
