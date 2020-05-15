@@ -78,7 +78,8 @@ static auto execViaRootTool(const QString& command, ReceiveAction receiveAction)
             return RetType();
         }
 
-        sendBuffer(clientFd, command.toLatin1().constData(), command.toLatin1().size());
+        const auto buffer = command.toUtf8();
+        sendBuffer(clientFd, buffer.constData(), buffer.size());
         auto result = receiveAction(clientFd);
 
         ::close(clientFd);
