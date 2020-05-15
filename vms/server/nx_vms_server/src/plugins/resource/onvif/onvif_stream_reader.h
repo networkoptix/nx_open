@@ -69,10 +69,10 @@ private:
 
     CameraDiagnostics::Result fetchUpdateProfile(
         CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
-    onvifXsd__Profile* selectExistingProfile(
-        std::vector<onvifXsd__Profile *>& profiles, bool isPrimary, CameraInfoParams& info) const;
-    CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, onvifXsd__Profile* profile) const;
-    CameraDiagnostics::Result createNewProfile(std::string name, std::string token) const;
+
+    CameraDiagnostics::Result updateProfileConfigurations(
+        const CameraInfoParams& desiredParameters,
+        const CameraInfoParams& actualParameters) const;
 
     // Returned pointers are valid while response object is living.
     // (For all functions in the following block.)
@@ -103,11 +103,6 @@ private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_multiCodec;
     QnPlOnvifResourcePtr m_onvifRes;
-
-    QByteArray NETOPTIX_PRIMARY_NAME;
-    QByteArray NETOPTIX_SECONDARY_NAME;
-    QByteArray NETOPTIX_PRIMARY_TOKEN;
-    QByteArray NETOPTIX_SECONDARY_TOKEN;
 
     QString m_streamUrl;
     QElapsedTimer m_cachedTimer;

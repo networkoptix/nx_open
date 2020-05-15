@@ -213,6 +213,9 @@ namespace ResourceDataKey
 
     static const QString kFixWrongUri("fixWrongUri");
     static const QString kAlternativeSecondStreamSorter("alternativeSecondStreamSorter");
+
+    static const QString kUseMedia2ToFetchProfiles("useMedia2ToFetchProfiles");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
