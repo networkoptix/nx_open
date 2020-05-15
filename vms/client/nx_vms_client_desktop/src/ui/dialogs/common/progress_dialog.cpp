@@ -107,7 +107,8 @@ public:
 
     virtual ~QnProgressDialogPrivate() {}
 
-    void init(const QString &labelText, const QString &cancelText, int min, int max);
+    void init(const QString& labelText, const QString& cancelText, int min, int max,
+        const QString& infoText = QString());
     void retranslateStrings();
     void _q_disconnectOnClose();
     void showInfiniteProgress(bool enable);
@@ -145,7 +146,7 @@ public:
 };
 
 void QnProgressDialogPrivate::init(const QString &labelText, const QString &cancelText,
-                                  int min, int max)
+    int min, int max, const QString& infoText)
 {
     Q_Q(QnProgressDialog);
 
@@ -174,6 +175,15 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
 
     QVBoxLayout* contentLayout = new QVBoxLayout();
     contentLayout->addLayout(hlayout);
+
+    if (!infoText.isEmpty())
+    {
+        label = new QnElidedLabel(q);
+        label->setText(infoText);
+        label->setAlignment(Qt::Alignment(Qt::AlignLeft));
+        contentLayout->addWidget(label, 1);
+    }
+
     contentLayout->addWidget(bar);
     contentLayout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
 
@@ -345,16 +355,19 @@ QnProgressDialog::QnProgressDialog(QWidget *parent, Qt::WindowFlags f):
   setMinimum(), setMaximum()
 */
 
-QnProgressDialog::QnProgressDialog(const QString &labelText,
-                                 const QString &cancelButtonText,
-                                 int minimum, int maximum,
-                                 QWidget *parent, Qt::WindowFlags f):
+QnProgressDialog::QnProgressDialog(
+    const QString &labelText,
+    const QString &cancelButtonText,
+    int minimum, int maximum,
+    QWidget *parent, Qt::WindowFlags f,
+    const QString& infoText)
+    :
     base_type(parent, f),
     d_ptr(new QnProgressDialogPrivate())
 {
     Q_D(QnProgressDialog);
     d->q_ptr = this;
-    d->init(labelText, cancelButtonText, minimum, maximum);
+    d->init(labelText, cancelButtonText, minimum, maximum, infoText);
 }
 
 

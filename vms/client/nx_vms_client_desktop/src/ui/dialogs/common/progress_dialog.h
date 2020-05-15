@@ -79,7 +79,14 @@ class QnProgressDialog : public QnDialog {
     typedef QnDialog base_type;
 public:
     explicit QnProgressDialog(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Dialog);
-    QnProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = 0, Qt::WindowFlags flags = Qt::Dialog);
+    QnProgressDialog(
+        const QString &labelText, 
+        const QString &cancelButtonText, 
+        int minimum, 
+        int maximum, 
+        QWidget *parent = 0, 
+        Qt::WindowFlags flags = Qt::Dialog,
+        const QString& infoText = QString());
     virtual ~QnProgressDialog();
 
     void setLabel(QLabel *label);
