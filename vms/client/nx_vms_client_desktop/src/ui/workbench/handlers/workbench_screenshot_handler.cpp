@@ -303,7 +303,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         parameters.utcTimestampMsec = screenshotTimeMSec(widget);
         parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
         parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
-        Key timeKey(keyStack, lit("_") + parameters.timeString());
+        Key timeKey(keyStack, lit("_") + parameters.timeString(/*forFilename*/ true));
 
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
         parameters.resource = widget->resource();
