@@ -55,6 +55,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_STRING(R"json({"priority": "high", "mutable_content": true})json", pushNotifyOptions, "");
 
     NX_INI_INT(1800, systemUsageDumpTimeoutS, "How often print to log CPU/RAM usage. The value in seconds.");
+
+    NX_INI_FLAG(1, enableVmsMetrics, "Enable metrics subsystem and /{api/ec2}/metrics/ handlers");
 };
 
 inline Ini& ini()
