@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 /**
  * Needed as a workaround for an MSVC issue: if __VA_ARGS__ is used as an argument to another
  * macro, it forms a single macro argument even if contains commas.
@@ -37,9 +39,24 @@
 #define NX_DIRECT_CONCATENATE(s1, s2) s1 ## s2
 
 /**
- * We can't pass function templates as template parameters, so we're unable to use them with
- * std::apply, std::invoke etc. But generic lambdas are ok in such contexts (because they are
- * essentially class templates).
+ * We can't pass function templates or overload sets as template parameters, so we're unable to
+ * use them with std::apply, std::invoke etc. But generic lambdas are ok in such contexts (because
+ * they are class objects with `operator()`).
  */
-#define NX_WRAP_FUNC_TO_LAMBDA(FUNC) \
-    [](auto&&... args) { return FUNC(std::forward<decltype(args)>(args)...); }
+#define NX_WRAP_FUNC_TO_LAMBDA(...) (\
+    [](auto&&... args) \
+    { \
+        return (__VA_ARGS__)(std::forward<decltype(args)>(args)...); \
+    })
+
+/**
+ * We can't pass member function templates or overload sets as template parameters, so we're unable
+ * to use them with std::apply, std::invoke etc. But generic lambdas are ok in such contexts
+ * (because they are class objects with `operator()`).
+ */
+#define NX_WRAP_MEM_FUNC_TO_LAMBDA(...) ( \
+    [](auto&& self, auto&&... args) \
+    { \
+        return (std::forward<decltype(self)>(self).__VA_ARGS__)( \
+            std::forward<decltype(args)>(args)...); \
+    })
