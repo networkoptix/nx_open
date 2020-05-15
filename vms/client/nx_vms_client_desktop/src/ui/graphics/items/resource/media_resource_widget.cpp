@@ -1594,15 +1594,12 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
 void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channel, const QRectF &rect)
 {
     const auto timestamp = m_renderer->lastDisplayedTimestamp(channel);
-    const bool currentCamera = navigator()->currentResource() == resource()->toResource();
 
     if (options().testFlag(DisplayMotion))
     {
         ensureMotionSelectionCache();
 
-        const auto metadata = currentCamera
-            ? d->motionMetadataProvider->metadata(timestamp, channel)
-            : nx::vms::client::core::MetaDataV1Ptr();
+        const auto metadata = d->motionMetadataProvider->metadata(timestamp, channel);
 
         paintMotionGrid(painter, channel, rect, metadata);
 

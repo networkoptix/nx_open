@@ -210,7 +210,7 @@ struct WorkbenchExportHandler::Private
         return false;
     }
 
-    QnUuid createExportContext(Settings settings, bool saveExistingLayout)
+    QnUuid createExportContext(Settings settings, bool saveExistingLayout, bool forceTranscoding)
     {
         const auto& manager = q->context()->instance<WorkbenchProgressManager>();
         QString fullPath = fileName(settings).completeFileName();
@@ -218,12 +218,15 @@ struct WorkbenchExportHandler::Private
         const auto exportProcessId = manager->add(
             saveExistingLayout ? tr("Saving layout") : tr("Exporting video"), fullPath);
 
+
         const auto progressDialog = new QnProgressDialog(
             fullPath,
             saveExistingLayout ? tr("Stop Saving") :  tr("Stop Export"),
             0,
             100,
-            q->mainWindowWidget());
+            q->mainWindowWidget(),
+            Qt::Dialog,
+            forceTranscoding ? tr("Transcoding is required. Export session restarted.") : QString());
 
         auto minimizeButton = new QPushButton(tr("Minimize"), progressDialog);
         progressDialog->addButton(minimizeButton, QDialogButtonBox::ActionRole);
@@ -602,7 +605,7 @@ void WorkbenchExportHandler::runExport(ExportToolInstance&& context)
 WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExportTool(
     Settings settings, bool saveExistingLayout, bool forceTranscoding)
 {
-    const auto exportId = d->createExportContext(settings, saveExistingLayout);
+    const auto exportId = d->createExportContext(settings, saveExistingLayout, forceTranscoding);
     std::unique_ptr<AbstractExportTool> tool;
     if (auto mediaSettings = std::get_if<ExportMediaSettings>(&settings))
     {
@@ -634,7 +637,8 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
         case ExportSettingsDialog::Mode::Media:
         {
             auto settings = dialog.exportMediaSettings();
-            exportId = d->createExportContext(settings, /*saveExistingLayout*/ false);
+            exportId = d->createExportContext(settings, 
+                /*saveExistingLayout*/ false, /*forceTranscoding*/ false);
 
             if (FileExtensionUtils::isLayout(settings.fileName.extension))
             {
@@ -674,7 +678,8 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
         case ExportSettingsDialog::Mode::Layout:
         {
             const auto settings = dialog.exportLayoutSettings();
-            exportId = d->createExportContext(settings, /*saveExistingLayout*/ false);
+            exportId = d->createExportContext(settings, 
+                /*saveExistingLayout*/ false, /*forceTranscoding*/ false);
             tool.reset(new ExportLayoutTool(settings));
             break;
         }
@@ -800,7 +805,8 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     std::unique_ptr<nx::vms::client::desktop::AbstractExportTool> exportTool;
     exportTool.reset(new ExportLayoutTool(layoutSettings));
 
-    QnUuid exportId = d->createExportContext(layoutSettings, /*saveExistingLayout*/ true);
+    QnUuid exportId = d->createExportContext(layoutSettings, 
+        /*saveExistingLayout*/ true, /*forceTranscoding*/ false);
 
     runExport(std::make_pair(exportId, std::move(exportTool)));
 }
