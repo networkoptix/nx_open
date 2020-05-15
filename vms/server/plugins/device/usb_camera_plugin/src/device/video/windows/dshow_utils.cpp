@@ -184,11 +184,13 @@ void setBitrate(
     result = getPin(baseFilter, PINDIR_OUTPUT, &pin);
     if (FAILED(result))
         return;
+    auto pinPtr = wrapComObject(pin);
 
     IAMStreamConfig * pConfig = NULL;
     result = pin->QueryInterface(IID_IAMStreamConfig, (void**) &pConfig);
     if (FAILED(result))
         return;
+    auto configPtr = wrapComObject(pConfig);
 
     int capCount;
     int iSize;
