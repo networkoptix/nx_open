@@ -119,10 +119,10 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     {
         Qn::directConnect(m_cameraRes.data(), &QnSecurityCamResource::motionRegionChanged, this,
             [this](const QnResourcePtr&)
-        {
-            QnMutexLocker lock(&m_liveMutex);
-            updateSoftwareMotion();
-        });
+            {
+                QnMutexLocker lock(&m_liveMutex);
+                updateSoftwareMotion();
+            });
     }
 
 
