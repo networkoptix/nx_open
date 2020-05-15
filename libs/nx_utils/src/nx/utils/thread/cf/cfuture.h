@@ -340,7 +340,7 @@ template<typename F>
 using arg_type_t = decltype(arg_type(std::declval<F>()));
 
 template<typename F>
-auto make_then_ok_handler(F&& f) {
+auto make_then_unwrap_handler(F&& f) {
   return [f = std::forward<F>(f)](auto future) mutable {
     return std::move(f)(future.get());
   };
@@ -357,7 +357,7 @@ auto ensure_future(future<T> t) {
 }
 
 template<typename F>
-auto make_then_fail_handler(F&& f) {
+auto make_catch_handler(F&& f) {
   return [f = std::forward<F>(f)](auto future) mutable {
     using T = decltype(future.get());
     using E = arg_type_t<std::decay_t<F>>;
@@ -409,10 +409,10 @@ public:
   detail::then_ret_type<T, F> then(F&& f);
 
   template<typename F>
-  auto then_ok(F&& f);
+  auto then_unwrap(F&& f);
 
   template<typename F>
-  auto then_fail(F&& f);
+  auto catch_(F&& f);
 
 template<typename Rep, typename Period, typename TimeWatcher, typename Exception>
 future<T> timeout(std::chrono::duration<Rep, Period> duration,
@@ -423,10 +423,10 @@ future<T> timeout(std::chrono::duration<Rep, Period> duration,
   detail::then_ret_type<T, F> then(Executor& executor, F&& f);
 
   template<typename F, typename Executor>
-  auto then_ok(Executor& executor, F&& f);
+  auto then_unwrap(Executor& executor, F&& f);
 
   template<typename F, typename Executor>
-  auto then_fail(Executor& executor, F&& f);
+  auto catch_(Executor& executor, F&& f);
 
   bool is_ready() const {
     check_state(state_);
@@ -522,14 +522,14 @@ detail::then_ret_type<T, F> future<T>::then(F&& f) {
 
 template<typename T>
 template<typename F>
-auto future<T>::then_ok(F&& f) {
-  return then(detail::make_then_ok_handler(std::forward<F>(f)));
+auto future<T>::then_unwrap(F&& f) {
+  return then(detail::make_then_unwrap_handler(std::forward<F>(f)));
 }
 
 template<typename T>
 template<typename F>
-auto future<T>::then_fail(F&& f) {
-  return then(detail::make_then_fail_handler(std::forward<F>(f)));
+auto future<T>::catch_(F&& f) {
+  return then(detail::make_catch_handler(std::forward<F>(f)));
 }
 
 template<typename T>
@@ -541,14 +541,14 @@ detail::then_ret_type<T, F> future<T>::then(Executor& executor, F&& f) {
 
 template<typename T>
 template<typename F, typename Executor>
-auto future<T>::then_ok(Executor& executor, F&& f) {
-  return then(executor, detail::make_then_ok_handler(std::forward<F>(f)));
+auto future<T>::then_unwrap(Executor& executor, F&& f) {
+  return then(executor, detail::make_then_unwrap_handler(std::forward<F>(f)));
 }
 
 template<typename T>
 template<typename F, typename Executor>
-auto future<T>::then_fail(Executor& executor, F&& f) {
-  return then(executor, detail::make_then_fail_handler(std::forward<F>(f)));
+auto future<T>::catch_(Executor& executor, F&& f) {
+  return then(executor, detail::make_catch_handler(std::forward<F>(f)));
 }
 
 template<typename T>

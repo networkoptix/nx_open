@@ -29,7 +29,7 @@ cf::future<cf::unit> WebSocket::open(const Url& url)
         m_httpClient->addAdditionalHeader(name, value);
 
     return m_httpClient->get(url)
-        .then_ok(
+        .then_unwrap(
             [this](auto&&)
             {
                 const auto& request = m_httpClient->request();
@@ -72,7 +72,7 @@ cf::future<nx::Buffer> WebSocket::read()
             return future
                 .then(translateBrokenPromiseToOperationCancelled);
         })
-        .then_ok(
+        .then_unwrap(
             [this](auto errorCode)
             {
                 if (errorCode)

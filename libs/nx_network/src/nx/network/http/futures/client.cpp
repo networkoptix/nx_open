@@ -22,7 +22,7 @@ cf::future<Response> futurize(Func func, Client* client, Args&&... args)
         [promise = std::move(promise)]() mutable { promise.set_value(cf::unit()); });
 
     return future
-        .then_fail(
+        .catch_(
             [](const cf::future_error& exception) -> cf::unit
             {
                 if (exception.ecode() != cf::errc::broken_promise)
@@ -31,7 +31,7 @@ cf::future<Response> futurize(Func func, Client* client, Args&&... args)
                 throw std::system_error(
                     (int) std::errc::operation_canceled, std::generic_category());
             })
-        .then_ok(
+        .then_unwrap(
             [client](auto&&)
             {
                 if (client->failed())

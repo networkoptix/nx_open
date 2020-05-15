@@ -16,7 +16,7 @@ using namespace nx::network;
 cf::future<cf::unit> NativeMetadataSource::open(const Url& url)
 {
     return enableDetailMetadata(url)
-        .then_ok(
+        .then_unwrap(
             [this, url = url](auto&&) mutable
             {
                 url.setPath("/ws/vca");
@@ -29,7 +29,7 @@ cf::future<cf::unit> NativeMetadataSource::open(const Url& url)
 cf::future<QJsonValue> NativeMetadataSource::read()
 {
     return m_webSocket.read()
-        .then_ok(NX_WRAP_FUNC_TO_LAMBDA(parseJson))
+        .then_unwrap(NX_WRAP_FUNC_TO_LAMBDA(parseJson))
         .then(addExceptionContext("Failed to read native metadata"));
 }
 
@@ -43,7 +43,7 @@ cf::future<cf::unit> NativeMetadataSource::enableDetailMetadata(Url url)
 {
     m_vcaParameterApi.emplace(std::move(url));
     return m_vcaParameterApi->fetch()
-        .then_ok(
+        .then_unwrap(
             [this](auto parameters)
             {
                 if (get<bool>(parameters, "WebSocket", "DetailMetadata"))

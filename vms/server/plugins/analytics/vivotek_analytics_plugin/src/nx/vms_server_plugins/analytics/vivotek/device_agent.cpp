@@ -195,7 +195,7 @@ cf::future<cf::unit> DeviceAgent::startMetadataStreaming()
 {
     m_nativeMetadataSource.emplace();
     return m_nativeMetadataSource->open(m_url)
-        .then_ok([this](auto&&) { return streamMetadataPackets(); });
+        .then_unwrap([this](auto&&) { return streamMetadataPackets(); });
 }
 
 cf::future<cf::unit> DeviceAgent::restartMetadataStreamingLater()
@@ -204,8 +204,8 @@ cf::future<cf::unit> DeviceAgent::restartMetadataStreamingLater()
 
     m_restartDelayer.emplace();
     return m_restartDelayer->wait(kRestartDelay)
-        .then_ok([this](auto&&) { return startMetadataStreaming(); })
-        .then_fail(
+        .then_unwrap([this](auto&&) { return startMetadataStreaming(); })
+        .catch_(
             [this](const std::exception& exception)
             {
                 if (nestedContains(exception, std::errc::operation_canceled))
@@ -227,14 +227,14 @@ void DeviceAgent::stopMetadataStreaming()
 cf::future<cf::unit> DeviceAgent::streamMetadataPackets()
 {
     return m_nativeMetadataSource->read()
-        .then_ok(
+        .then_unwrap(
             [this](const auto& nativePacket)
             {
                 if (auto packet = parseObjectMetadataPacket(nativePacket))
                     m_handler->handleMetadata(packet.releasePtr());
 
                 streamMetadataPackets()
-                    .then_fail(
+                    .catch_(
                         [this](const std::exception& exception)
                         {
                             emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
@@ -245,7 +245,7 @@ cf::future<cf::unit> DeviceAgent::streamMetadataPackets()
 
                 return cf::unit();
             })
-        .then_fail(
+        .catch_(
             [](const std::exception& exception)
             {
                 if (nestedContains(exception, std::errc::operation_canceled))
