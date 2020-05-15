@@ -9134,7 +9134,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 - Instellingen</translation>
+      <translation>%1 Instellingen</translation>
     </message>
   </context>
   <context>
