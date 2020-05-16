@@ -202,7 +202,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     // Disable unactual controls leaving only Logical Id for dts, wearable cameras or i/o modules.
     ui->leftWidget->setEnabled(state.supportsVideoStreamControl());
     ui->groupBoxArchive->setEnabled(state.supportsVideoStreamControl());
-    ui->groupBoxRTP->setEnabled(state.supportsVideoStreamControl());
+    ui->groupBoxRTP->setEnabled(state.supportsSchedule() /*has video and/or audio stream(s)*/);
 
     const bool hasDualStreaming =
         state.devicesDescription.hasDualStreamingCapability != CombinedValue::None;
