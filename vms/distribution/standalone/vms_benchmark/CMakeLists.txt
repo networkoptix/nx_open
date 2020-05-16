@@ -121,6 +121,7 @@ else()
         ${CMAKE_BINARY_DIR}/lib/libswresample.so*
         ${CMAKE_BINARY_DIR}/lib/libswscale.so*
         ${CMAKE_BINARY_DIR}/lib/libudt.so
+        ${CMAKE_BINARY_DIR}/lib/libgl_stub/libGL.so.1
         ${CMAKE_BINARY_DIR}/bin/rtsp_perf
         ${CMAKE_BINARY_DIR}/bin/testcamera
     )

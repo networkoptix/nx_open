@@ -99,6 +99,9 @@ copyLibs()
         distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
     fi
 
+    echo "  Copying libGL stub"
+    cp -P "$BUILD_DIR/lib/libgl_stub/libGL.so.1" "$STAGE_LIB/"
+
     stripIfNeeded "$STAGE_LIB"
 }
 

@@ -16,3 +16,7 @@ endif()
 if(WINDOWS)
     add_subdirectory(nx_gdi_tracer)
 endif()
+
+if(LINUX)
+    add_subdirectory(libgl_stub)
+endif()

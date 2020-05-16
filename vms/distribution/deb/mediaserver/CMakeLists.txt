@@ -15,21 +15,6 @@ set(deb_dependencies_list
     "libldap-2.4-2"
 )
 
-if(withDesktopClient)
-    # For platforms with Desktop Clients, Server uses the same Qt as Client. Because of this, on
-    # such platforms Server has these "strange" dependencies:
-    list(APPEND deb_dependencies_list
-        "libxrender1"
-        "libgl1-mesa-glx"
-        "libxfixes3"
-        "libfontconfig1"
-        "libsm6"
-        "libice6"
-        "libaudio2"
-        "libogg0"
-    )
-endif()
-
 list(JOIN deb_dependencies_list ", " deb_dependencies)
 
 if(withRootTool)
