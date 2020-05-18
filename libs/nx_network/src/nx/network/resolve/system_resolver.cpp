@@ -109,11 +109,28 @@ SystemError::ErrorCode SystemResolver::resolve(
         hints.ai_family = ipVersion;
 
     addrinfo* addressInfo = nullptr;
+
+    // `freeaddrinfo` should be called for `addrinfo` filled with `getaddrinfo` successful call,
+    // it is unsafe to call it for unsuccessful `getaddrinfo` calls
+    // however Valgrind shows that some unsuccessful calls may also fill `addrinfo`
+    // so we use a special unique_ptr deleter for all cases
+    auto deleter = [](addrinfo** ppAddressInfo)
+    {
+        if (*ppAddressInfo)
+        {
+            freeaddrinfo(*ppAddressInfo);
+            *ppAddressInfo = nullptr;
+        }
+    };
+    std::unique_ptr<addrinfo*, decltype(deleter)> addressInfoGuard(
+        &addressInfo, deleter);
+
     NX_VERBOSE(this, lm("Resolving %1 on DNS").arg(hostName));
     int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
 
     if (status == EAI_BADFLAGS)
     {
+        addressInfoGuard.get_deleter()(addressInfoGuard.get());
         // If the lookup failed with AI_ALL, try again without it.
         hints.ai_flags = 0;
         status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
@@ -127,9 +144,6 @@ SystemError::ErrorCode SystemResolver::resolve(
             .arg(hostName).arg(SystemError::toString(resultCode)));
         return resultCode;
     }
-
-    std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addressInfoGuard(
-        addressInfo, &freeaddrinfo);
 
     convertAddrInfo(addressInfo, resolvedEntries);
     if (resolvedEntries->empty())
