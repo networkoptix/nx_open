@@ -268,7 +268,7 @@ private:
 
     /**
      * Sfinae: Called when RequestData does not provide id for merging or is IdData (because
-     * merging for API parameters of exact type IdData has no sence) - do not perform the merge.
+     * merging for API parameters of exact type IdData has no sense) - do not perform the merge.
      */
     template<typename T = RequestData>
     nx::network::http::StatusCode::Value buildRequestDataMergingIfNeededSfinae(
@@ -284,7 +284,7 @@ private:
 
     /**
      * Sfinae: Called when RequestData provides id for merging and is not IdData (because
-     * merging for API parameters of exact type IdData has no sence) - attempt the merge.
+     * merging for API parameters of exact type IdData has no sense) - attempt the merge.
      *
      * @param requestData In: potentially incomplete data. Out: merge result.
      */
@@ -370,7 +370,7 @@ private:
 
     /**
      * Sfinae: Used only when RequestData provides id for merging but is not IdData (because
-     * merging for API parameters of exact type IdData has no sence).
+     * merging for API parameters of exact type IdData has no sense).
      */
     template<typename T>
     ErrorCode processQueryAsync(

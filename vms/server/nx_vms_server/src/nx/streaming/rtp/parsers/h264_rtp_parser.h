@@ -14,7 +14,7 @@ namespace nx::streaming::rtp {
 class H264Parser: public VideoStreamParser
 {
 public:
-    H264Parser();
+    H264Parser(const QString& logName);
     virtual void setSdpInfo(const Sdp::Media& sdp) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
@@ -37,7 +37,8 @@ private:
     //QnByteArray m_videoBuffer;
     int m_videoFrameSize;
     quint32 m_lastRtpTime;
-    QString m_resourceId;
+    QString m_logName;
+
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
@@ -47,7 +48,7 @@ private:
     QnCompressedVideoDataPtr createVideoData(const quint8* rtpBuffer, quint32 rtpTime);
     bool isBufferOverflow() const;
 
-    bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
+    void clearInternalBuffer();
     void updateNalFlags(const quint8* data, int dataLen);
     int getSpsPpsSize() const;
 };
