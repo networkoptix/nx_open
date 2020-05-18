@@ -50,7 +50,7 @@ const char* SettingGroup::value(const nx::sdk::IStringMap* sourceMap, E keyIndex
     return sourceMap->value(key.c_str());
 }
 
-void SettingGroup::replanishErrorMap(nx::sdk::StringMap* errorMap, const std::string& reason) const
+void SettingGroup::replenishErrorMap(nx::sdk::StringMap* errorMap, const std::string& reason) const
 {
     for ( int i = 0; i < serverKeyCount; ++i)
         errorMap->setItem(serverKeys[i], reason);

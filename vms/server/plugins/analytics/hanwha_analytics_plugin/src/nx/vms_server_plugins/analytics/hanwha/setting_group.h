@@ -62,7 +62,7 @@ struct SettingGroup
     template<class E>
     const char* value(const nx::sdk::IStringMap* sourceMap, E keyIndexE);
 
-    void replanishErrorMap(nx::sdk::StringMap* errorMap, const std::string& reason) const;
+    void replenishErrorMap(nx::sdk::StringMap* errorMap, const std::string& reason) const;
 
     int nativeIndex() const { return m_nativeIndex; }
     int serverIndex() const { return m_serverIndex; }
@@ -122,7 +122,7 @@ struct SettingGroup
         SettingGroupT settingGroup;
         if (!SettingGroup::readFromServer(sourceMap, &settingGroup, objectIndex))
         {
-            settingGroup.replanishErrorMap(errorMap, "read failed");
+            settingGroup.replenishErrorMap(errorMap, "read failed");
             return;
         }
 
@@ -134,7 +134,7 @@ struct SettingGroup
 
         const std::string error = sendingFunctor(settingQuery);
         if (!error.empty())
-            settingGroup.replanishErrorMap(errorMap, error);
+            settingGroup.replenishErrorMap(errorMap, error);
         else
             previousState = settingGroup;
     }
