@@ -234,6 +234,9 @@ State::Status TimeSynchronizationWidgetReducer::actualStatus(const State& state)
     if (!state.enabled)
         return State::Status::notSynchronized;
 
+    if (state.servers.isEmpty())
+        return State::Status::notSynchronized; //< Reachable during disconnect. Any value is ok here.
+
     const auto primaryServer = actualPrimaryServer(state);
     NX_ASSERT(state.primaryServer == primaryServer.id);
 
