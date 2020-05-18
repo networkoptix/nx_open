@@ -4,6 +4,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/type_utils.h>
 
 namespace nx {
 namespace network {
@@ -114,16 +115,15 @@ SystemError::ErrorCode SystemResolver::resolve(
     // it is unsafe to call it for unsuccessful `getaddrinfo` calls
     // however Valgrind shows that some unsuccessful calls may also fill `addrinfo`
     // so we use a special unique_ptr deleter for all cases
-    auto deleter = [](addrinfo** ppAddressInfo)
-    {
-        if (*ppAddressInfo)
+    auto addressInfoGuard = nx::utils::wrapUnique(&addressInfo,
+        [](addrinfo** ppAddressInfo)
         {
-            freeaddrinfo(*ppAddressInfo);
-            *ppAddressInfo = nullptr;
-        }
-    };
-    std::unique_ptr<addrinfo*, decltype(deleter)> addressInfoGuard(
-        &addressInfo, deleter);
+            if (*ppAddressInfo)
+            {
+                freeaddrinfo(*ppAddressInfo);
+                *ppAddressInfo = nullptr;
+            }
+        });
 
     NX_VERBOSE(this, lm("Resolving %1 on DNS").arg(hostName));
     int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
