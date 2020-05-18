@@ -634,12 +634,20 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         {
             nx::api::CameraImageRequest request;
             request.camera = camera;
-            request.usecSinceEpoch = std::chrono::microseconds(std::chrono::milliseconds(
-                localParameters.utcTimestampMsec)).count();
             request.roundMethod = nx::api::ImageRequest::RoundMethod::precise;
             request.rotation = 0;
 
-            imageProvider = new nx::vms::client::desktop::CameraThumbnailProvider(request);;
+            // TODO: #vkutin #common Change to `raw` when it's supported.
+            request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::png;
+
+            request.streamSelectionMode =
+                nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary;
+
+            request.usecSinceEpoch = localParameters.utcTimestampMsec == latestScreenshotTime
+                ? nx::api::ImageRequest::kLatestThumbnail
+                : localParameters.utcTimestampMsec * 1000;
+
+            imageProvider = new nx::vms::client::desktop::CameraThumbnailProvider(request);
         }
         else
             imageProvider = getLocalScreenshotProvider(widget, localParameters, true);
