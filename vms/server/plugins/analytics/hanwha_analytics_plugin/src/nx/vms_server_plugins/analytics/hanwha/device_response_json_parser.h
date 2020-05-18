@@ -15,8 +15,9 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 class DeviceResponseJsonParser
 {
 public:
+
     /**
-     * Extract frameSize from json string. If fail, returns std::nullopt.
+     * Parse the reply to setting request.
      * \return error message, if jsonReply indicates an error and contains an error message
      *     empty string, if jsonReply indicates an error and contains no error message
      *     std::nullopt, if jsonReply does not indicates an error
@@ -24,12 +25,14 @@ public:
     static std::optional<std::string> parseError(const std::string& jsonReply);
 
     /**
-     * Parse the reply to check eventstatus BYPASS request to get the list of event types, supported by
-     * the device, connected to the current channel of NVR.
+     * Parse the reply to check eventstatus BYPASS request to get the list of event types,
+     * supported by the device, connected to the current channel of NVR.
      */
     static std::optional<QSet<QString>> parseEventTypes(const std::string& jsonReply);
 
-    /** Extract frameSize from json string. If fail, returns std::nullopt. */
+    /**
+     * Extract frameSize from json string. If fail, returns std::nullopt.
+     */
     static std::optional<FrameSize> parseFrameSize(const std::string& jsonReply);
 
     /** Extract FirmwareVersion from json string. If fail, returns std::nullopt.*/

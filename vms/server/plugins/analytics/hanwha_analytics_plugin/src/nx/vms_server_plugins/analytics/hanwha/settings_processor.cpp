@@ -27,7 +27,7 @@ std::unique_ptr<nx::network::http::HttpClient> createHttpClient(
 
 void SettingsProcessor::setFrameSize(FrameSize frameSize)
 {
-    if (!(frameSize == FrameSize()))
+    if (FrameSize() < frameSize)
     {
         m_frameSize = frameSize;
         return;

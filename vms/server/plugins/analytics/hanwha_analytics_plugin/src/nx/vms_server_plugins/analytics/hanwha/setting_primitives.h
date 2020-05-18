@@ -20,14 +20,11 @@ struct FrameSize
     FrameSize() = default;
     FrameSize(int width, int height) : width(width), height(height) {}
 
+    int area() const { return width * height; }
+
     bool operator<(const FrameSize other) const
     {
-        return width * height < other.width*other.height;
-    }
-
-    bool operator==(const FrameSize other) const
-    {
-        return width == other.width && height == other.height;
+        return area() < other.area();
     }
 
     int xRelativeToAbsolute(double x) const

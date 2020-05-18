@@ -268,14 +268,17 @@ void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*
 
     if (const auto& param = json[key]; param.is_string())
     {
+        const std::string& value = param.string_value();
         // Different firmware versions have different valid value sets for line crossing direction.
-        if ((param.string_value() == "RightSide") || (param.string_value() == "Right"))
+        if ((value == "RightSide") || (value == "Right"))
             *result = Direction::Right;
-        else if ((param.string_value() == "LeftSide") || (param.string_value() == "Left"))
+        else if ((value == "LeftSide") || (value == "Left"))
             *result = Direction::Left;
-        else if (param.string_value() == "BothDirections")
+        else if (value == "BothDirections")
             *result = Direction::Both;
-        else if (param.string_value() != "Off")
+        else if (value == "Off")
+            ; //< do not set `result`
+        else
             throw CameraResponseJsonError{}; //< unknown direction
     }
     else
