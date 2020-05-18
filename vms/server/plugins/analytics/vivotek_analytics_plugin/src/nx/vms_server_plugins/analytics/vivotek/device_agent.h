@@ -13,13 +13,13 @@
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 #include <nx/utils/thread/cf/cfuture.h>
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/timer.h>
 
 #include <QtCore/QString>
 
 #include "engine.h"
 #include "camera_features.h"
 #include "native_metadata_source.h"
-#include "timer.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -69,7 +69,7 @@ private:
     bool m_cameraHasMetadata = false;
     bool m_streamingMetadata = false;
     std::optional<NativeMetadataSource> m_nativeMetadataSource;
-    std::optional<Timer> m_restartDelayer;
+    std::optional<nx::network::aio::Timer> m_restartDelayer;
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

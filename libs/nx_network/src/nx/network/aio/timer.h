@@ -3,6 +3,7 @@
 #include <chrono>
 #include <functional>
 
+#include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/object_destruction_flag.h>
 
@@ -34,8 +35,13 @@ public:
         std::chrono::milliseconds timeout,
         TimerEventHandler timerFunc);
 
+    cf::future<cf::unit> start(std::chrono::milliseconds timeout);
+
     boost::optional<std::chrono::nanoseconds> timeToEvent() const;
+
     void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
+
+    cf::future<cf::unit> cancel();
 
     /**
      * Cancels timer waiting for timerFunc to complete.

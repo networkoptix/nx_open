@@ -45,6 +45,18 @@ void Timer::start(
         });
 }
 
+cf::future<cf::unit> Timer::start(std::chrono::milliseconds timeout)
+{
+    cf::promise<cf::unit> promise;
+    auto future = promise.get_future();
+
+    start(timeout,
+        [promise = std::move(promise)]() mutable { promise.set_value(cf::unit()); });
+
+    return future
+        .then(cf::translate_broken_promise_to_operation_canceled);
+}
+
 boost::optional<std::chrono::nanoseconds> Timer::timeToEvent() const
 {
     if (!m_timerStartClock)
@@ -64,6 +76,17 @@ void Timer::cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
             stopWhileInAioThread();
             completionHandler();
         });
+}
+
+cf::future<cf::unit> Timer::cancel()
+{
+    cf::promise<cf::unit> promise;
+    auto future = promise.get_future();
+
+    cancelAsync([promise = std::move(promise)]() mutable { promise.set_value(cf::unit()); });
+
+    return future
+        .then(cf::translate_broken_promise_to_operation_canceled);
 }
 
 void Timer::cancelSync()

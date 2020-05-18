@@ -203,7 +203,7 @@ cf::future<cf::unit> DeviceAgent::restartMetadataStreamingLater()
     constexpr auto kRestartDelay = 10s;
 
     m_restartDelayer.emplace();
-    return m_restartDelayer->wait(kRestartDelay)
+    return m_restartDelayer->start(kRestartDelay)
         .then_unwrap([this](auto&&) { return startMetadataStreaming(); })
         .catch_(
             [this](const std::exception& exception)
