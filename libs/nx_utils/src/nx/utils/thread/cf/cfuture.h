@@ -12,6 +12,7 @@
 #include <vector>
 #include <iterator>
 #include <tuple>
+#include <system_error>
 
 #if !defined(__clang__) && defined (__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)
 #include "cpp14_type_traits.h"
@@ -1245,5 +1246,16 @@ auto initiate(Executor& executor, F&& f) {
   return cf::make_ready_future(cf::unit()).then(executor,
     detail::make_initiate_handler(std::forward<F>(f)));
 }
+
+constexpr auto translate_broken_promise_to_operation_canceled = [](auto f) {
+  try {
+    return f.get();
+  } catch (const future_error& e) {
+    if (e.ecode() != errc::broken_promise)
+      throw;
+    throw std::system_error(
+      (int) std::errc::operation_canceled, std::generic_category());
+  }
+};
 
 } // namespace cf

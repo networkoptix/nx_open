@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/utils/thread/cf/cfuture.h>
-#include <nx/network/http/http_async_client.h>
+#include "../http_async_client.h"
 
 namespace nx::network::http::futures {
 
@@ -16,7 +16,7 @@ namespace nx::network::http::futures {
  * result of fetchMessageBodyBuffer() (meaning only the last part of the body if you've been
  * fetching it in chunks from in setOnSomeMessageBodyAvailable callback).
  */
-class Client: public AsyncClient
+class NX_NETWORK_API Client: public AsyncClient
 {
 public:
     using AsyncClient::AsyncClient;

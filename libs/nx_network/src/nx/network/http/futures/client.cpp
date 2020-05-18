@@ -4,7 +4,7 @@
 #include <system_error>
 
 #include <nx/utils/general_macros.h>
-#include <nx/network/http/buffer_source.h>
+#include "../buffer_source.h"
 
 namespace nx::network::http::futures {
 
@@ -22,15 +22,7 @@ cf::future<Response> futurize(Func func, Client* client, Args&&... args)
         [promise = std::move(promise)]() mutable { promise.set_value(cf::unit()); });
 
     return future
-        .catch_(
-            [](const cf::future_error& exception) -> cf::unit
-            {
-                if (exception.ecode() != cf::errc::broken_promise)
-                    throw;
-
-                throw std::system_error(
-                    (int) std::errc::operation_canceled, std::generic_category());
-            })
+        .then(cf::translate_broken_promise_to_operation_canceled)
         .then_unwrap(
             [client](auto&&)
             {

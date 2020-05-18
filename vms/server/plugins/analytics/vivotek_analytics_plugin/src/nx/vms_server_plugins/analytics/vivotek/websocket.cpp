@@ -5,7 +5,6 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log_message.h>
-#include <nx/utils/thread/cf/wrappers.h>
 #include <nx/network/websocket/websocket_handshake.h>
 
 #include "exception_utils.h"
@@ -63,23 +62,10 @@ cf::future<nx::Buffer> WebSocket::read()
             if (!NX_ASSERT(m_nested))
                 throw std::logic_error("Not connected");
 
-            cf::promise<SystemError::ErrorCode> promise;
-            auto future = promise.get_future();
-
             m_buffer.clear();
-            m_nested->readSomeAsync(&m_buffer, toHandler(std::move(promise)));
-
-            return future
-                .then(translateBrokenPromiseToOperationCancelled);
+            return m_nested->readSome(&m_buffer);
         })
-        .then_unwrap(
-            [this](auto errorCode)
-            {
-                if (errorCode)
-                    throw std::system_error(errorCode, std::system_category());
-
-                return std::move(m_buffer);
-            })
+        .then_unwrap([this](auto&&) { return std::move(m_buffer); })
         .then(addExceptionContext("Failed to read from websocket"));
 }
 

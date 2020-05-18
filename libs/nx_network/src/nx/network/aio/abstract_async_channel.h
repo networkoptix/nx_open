@@ -1,9 +1,9 @@
 #pragma once
 
-#include <functional>
+#include <cstddef>
 #include <memory>
 
-#include <nx/utils/system_error.h>
+#include <nx/utils/thread/cf/cfuture.h>
 
 #include "basic_pollable.h"
 #include "event_type.h"
@@ -26,9 +26,13 @@ public:
         nx::Buffer* const buffer,
         IoCompletionHandler handler) = 0;
 
+    virtual cf::future<std::size_t> readSome(nx::Buffer* buffer);
+
     virtual void sendAsync(
         const nx::Buffer& buffer,
         IoCompletionHandler handler) = 0;
+
+    virtual cf::future<std::size_t> send(const nx::Buffer& buffer);
 
     /**
      * Cancel async socket operation. cancellationDoneHandler is invoked when cancelled.
@@ -37,6 +41,8 @@ public:
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
         nx::utils::MoveOnlyFunc<void()> handler) final;
+
+    cf::future<cf::unit> cancelIO(nx::network::aio::EventType eventType);
 
     /**
      * Does not block if called within object's AIO thread.
