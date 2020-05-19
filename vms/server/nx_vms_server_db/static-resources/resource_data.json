@@ -1055,7 +1055,8 @@
                 "general|dvr08cvi-4k",
                 "dh-nvr608-32-4ks2|private",
                 "private|dh-nvr4832-4k",
-                "dh-nvr4208-8p-4k|private"
+                "dh-nvr4208-8p-4k|private",
+                "MarchNetworks|Edge16e"
             ],
             "analogEncoder": true
         },
