@@ -1,9 +1,5 @@
 #include "utils.h"
 
-#include <stdexcept>
-
-#include <nx/utils/log/log_message.h>
-
 #include <QtCore/QDateTime>
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -16,7 +12,7 @@ double toDouble(const QString& string)
     bool ok;
     int value = string.toDouble(&ok);
     if (!ok)
-        throw std::runtime_error(NX_FMT("Failed to parse double: %1", string).toStdString());
+        throw Exception("Failed to parse double: %1", string);
     return value;
 }
 
@@ -25,7 +21,7 @@ int toInt(const QString& string)
     bool ok;
     int value = string.toInt(&ok);
     if (!ok)
-        throw std::runtime_error(NX_FMT("Failed to parse integer: %1", string).toStdString());
+        throw Exception("Failed to parse integer: %1", string);
     return value;
 }
 
@@ -39,10 +35,7 @@ std::int64_t parseIsoTimestamp(const QString& isoTimestamp)
 {
     const auto dateTime = QDateTime::fromString(isoTimestamp, Qt::ISODateWithMs);
     if (!dateTime.isValid())
-    {
-        throw std::runtime_error(
-            NX_FMT("Failed to parse iso timestamp: %1", isoTimestamp).toStdString());
-    }
+        throw Exception("Failed to parse iso timestamp: %1", isoTimestamp);
     return dateTime.toMSecsSinceEpoch() * 1000; // to microseconds
 }
 

@@ -1,13 +1,10 @@
 #include "websocket.h"
 
-#include <exception>
-#include <stdexcept>
-
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/network/websocket/websocket_handshake.h>
 
-#include "exception_utils.h"
+#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -36,7 +33,7 @@ cf::future<cf::unit> WebSocket::open(const Url& url)
 
                 const auto error = websocket::validateResponse(request, response);
                 if (error != websocket::Error::noError)
-                    throw std::runtime_error("Handshake failed");
+                    throw Exception("Handshake failed");
 
                 m_nested.emplace(
                     m_httpClient->takeSocket(),
@@ -50,7 +47,7 @@ cf::future<cf::unit> WebSocket::open(const Url& url)
 
                 return cf::unit();
             })
-        .then(addExceptionContext(
+        .then(addExceptionContextAndRethrow(
             "Failed to connect to websocket server at %1", withoutUserInfo(std::move(url))));
 }
 
@@ -66,7 +63,7 @@ cf::future<nx::Buffer> WebSocket::read()
             return m_nested->readSome(&m_buffer);
         })
         .then_unwrap([this](auto&&) { return std::move(m_buffer); })
-        .then(addExceptionContext("Failed to read from websocket"));
+        .then(addExceptionContextAndRethrow("Failed to read from websocket"));
 }
 
 void WebSocket::close()

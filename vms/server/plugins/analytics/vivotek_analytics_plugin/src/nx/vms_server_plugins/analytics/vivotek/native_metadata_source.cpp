@@ -1,12 +1,9 @@
 #include "native_metadata_source.h"
 
-#include <stdexcept>
-
 #include <nx/utils/general_macros.h>
-#include <nx/utils/log/log_message.h>
 
 #include "json_utils.h"
-#include "exception_utils.h"
+#include "exception.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -23,14 +20,14 @@ cf::future<cf::unit> NativeMetadataSource::open(const Url& url)
                 url.setQuery("data=meta");
                 return m_webSocket.open(std::move(url));
             })
-        .then(addExceptionContext("Failed to open native metadata source"));
+        .then(addExceptionContextAndRethrow("Failed to open native metadata source"));
 }
 
 cf::future<QJsonValue> NativeMetadataSource::read()
 {
     return m_webSocket.read()
         .then_unwrap(NX_WRAP_FUNC_TO_LAMBDA(parseJson))
-        .then(addExceptionContext("Failed to read native metadata"));
+        .then(addExceptionContextAndRethrow("Failed to read native metadata"));
 }
 
 void NativeMetadataSource::close()
@@ -53,7 +50,7 @@ cf::future<cf::unit> NativeMetadataSource::enableDetailMetadata(Url url)
 
                 return m_vcaParameterApi->store(parameters);
             })
-        .then(addExceptionContext("Failed to enable detail metadata"));
+        .then(addExceptionContextAndRethrow("Failed to enable detail metadata"));
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

@@ -1,6 +1,5 @@
 #include "parse_object_metadata_packet.h"
 
-#include <stdexcept>
 #include <algorithm>
 #include <optional>
 #include <cstring>
@@ -8,9 +7,11 @@
 #include <nx/sdk/analytics/point.h>
 #include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
+#include <nx/utils/log/log_message.h>
 
 #include "object_types.h"
 #include "json_utils.h"
+#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -46,9 +47,8 @@ Point parsePoint(const QString& path, const QJsonObject& point)
             const auto value = get<double>(path, point, key);
             if (value < 0 || value > kDomain)
             {
-                throw std::runtime_error(
-                    NX_FMT("%1.%2 = %3 is outside of expected range of [0; 10000]",
-                        path, key, value).toStdString());
+                throw Exception("%1.%2 = %3 is outside of expected range of [0; 10000]",
+                    path, key, value);
             }
 
             return value / kDomain;
@@ -60,7 +60,7 @@ Point parsePoint(const QString& path, const QJsonObject& point)
 Rect parseBoundingBox(const QString& path, const QJsonArray& pos2d)
 {
     if (pos2d.isEmpty())
-        throw std::runtime_error(NX_FMT("%1 array is empty", path).toStdString());
+        throw Exception("%1 array is empty", path);
 
     Point min = {1, 1};
     Point max = {0, 0};

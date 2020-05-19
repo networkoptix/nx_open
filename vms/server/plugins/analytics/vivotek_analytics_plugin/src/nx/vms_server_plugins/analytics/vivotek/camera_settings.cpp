@@ -1,8 +1,5 @@
 #include "camera_settings.h"
 
-#include <qnamespace.h>
-#include <stdexcept>
-
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
 #include <nx/utils/log/log_message.h>
@@ -16,7 +13,7 @@
 #include "camera_parameter_api.h"
 #include "camera_vca_parameter_api.h"
 #include "json_utils.h"
-#include "exception_utils.h"
+#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -42,18 +39,19 @@ public:
         {
             const auto parameters = CameraParameterApi(cameraUrl).fetch({"vadp_module"});
 
-            const auto count = toInt(parameters.at("vadp_module_number"));
+            const auto count = toInt(at(parameters, "vadp_module_number"));
             for (int i = 0; i < count; ++i)
             {
-                if (parameters.at(NX_FMT("vadp_module_i%1_name", i)) == moduleName)
-                    return {i, parseStatus(parameters.at(NX_FMT("vadp_module_i%1_status", i)))};
+                if (at(parameters, NX_FMT("vadp_module_i%1_name", i)) == moduleName)
+                    return {i, parseStatus(at(parameters, NX_FMT("vadp_module_i%1_status", i)))};
             }
 
-            throw std::runtime_error("Module is not installed");
+            throw Exception("Module is not installed");
         }
-        catch (const std::exception&)
+        catch (Exception& exception)
         {
-            rethrowWithContext("Failed to fetch info for %1 VADP module", moduleName);
+            exception.addContext("Failed to fetch info for %1 VADP module", moduleName);
+            throw;
         }
     }
 
@@ -64,7 +62,7 @@ private:
             return false;
         if (unparsedValue == "on")
             return true;
-        throw std::runtime_error("Failed to parse module status");
+        throw Exception("Failed to parse module status");
     }
 };
 
@@ -89,7 +87,7 @@ void fetchFromCamera(CameraSettings::Vca::Enabled* enabled, const Url& cameraUrl
     }
     catch (const std::exception& exception)
     {
-        enabled->emplaceErrorMessage(collectNestedMessages(exception));
+        enabled->emplaceErrorMessage(exception.what());
     }
 }
 
@@ -134,13 +132,13 @@ void fetchFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
                 }
                 catch (const std::exception& exception)
                 {
-                    entry->emplaceErrorMessage(collectNestedMessages(exception));
+                    entry->emplaceErrorMessage(exception.what());
                 }
             });
     }
     catch (const std::exception& exception)
     {
-        const auto message = collectNestedMessages(exception);
+        const QString message = exception.what();
         enumerateVcaEntries(vca,
             [&](auto* entry, auto&&) { entry->emplaceErrorMessage(message); });
     }
@@ -213,13 +211,13 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca::Enabled* enabled)
             NX_FMT("'VCA is %1'", enabled->value() ? "started" : "stopped").toUtf8();
         if (!response.contains(successPattern))
         {
-            throw std::runtime_error(
+            throw Exception(
                 "HTTP response doesn't contain expected pattern indicating success");
         }
     }
     catch (const std::exception& exception)
     {
-        enabled->emplaceErrorMessage(collectNestedMessages(exception));
+        enabled->emplaceErrorMessage(exception.what());
     }
 }
 
@@ -271,7 +269,7 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
                 }
                 catch (const std::exception& exception)
                 {
-                    entry->emplaceErrorMessage(collectNestedMessages(exception));
+                    entry->emplaceErrorMessage(exception.what());
                 }
             });
 
@@ -279,7 +277,7 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
     }
     catch (const std::exception& exception)
     {
-        const auto message = collectNestedMessages(exception);
+        const QString message = exception.what();
         enumerateVcaEntries(vca,
             [&](auto* entry, auto&&) { entry->emplaceErrorMessage(message); });
     }
@@ -307,7 +305,7 @@ void parseEntryFromServer(const QString& /*name*/, CameraSettings::Entry<bool>* 
     else if (unparsedValue == "true")
         entry->emplaceValue(true);
     else
-        throw std::runtime_error("Failed to parse boolean");
+        throw Exception("Failed to parse boolean");
 }
 
 void parseEntryFromServer(const QString& name, CameraSettings::Entry<int>* entry, const QString& unparsedValue)
@@ -455,7 +453,7 @@ void CameraSettings::parseFromServer(const IStringMap& values)
             }
             catch (const std::exception& exception)
             {
-                entry->emplaceErrorMessage(collectNestedMessages(exception));
+                entry->emplaceErrorMessage(exception.what());
             }
         });
 }
@@ -474,7 +472,7 @@ Ptr<StringMap> CameraSettings::unparseToServer()
             }
             catch (const std::exception& exception)
             {
-                entry->emplaceErrorMessage(collectNestedMessages(exception));
+                entry->emplaceErrorMessage(exception.what());
             }
         });
 

@@ -1,11 +1,9 @@
 #include "camera_vca_parameter_api.h"
 
-#include <stdexcept>
-
 #include <nx/utils/general_macros.h>
 
 #include "json_utils.h"
-#include "exception_utils.h"
+#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -23,7 +21,7 @@ cf::future<QJsonValue> CameraVcaParameterApi::fetch()
     url.setPath("/VCA/Config/AE");
     return m_httpClient.get(std::move(url))
         .then_unwrap(NX_WRAP_FUNC_TO_LAMBDA(parseJson))
-        .then(addExceptionContext(
+        .then(addExceptionContextAndRethrow(
             "Failed to fetch VCA parameters from camera at %1", withoutUserInfo(m_url)));
 }
 
@@ -40,7 +38,7 @@ cf::future<cf::unit> CameraVcaParameterApi::store(const QJsonValue& parameters)
                 return m_httpClient.get(url);
             })
         .then_unwrap([](auto&&) { return cf::unit(); })
-        .then(addExceptionContext(
+        .then(addExceptionContextAndRethrow(
             "Failed to store VCA parameters to camera at %1", withoutUserInfo(m_url)));
 }
 

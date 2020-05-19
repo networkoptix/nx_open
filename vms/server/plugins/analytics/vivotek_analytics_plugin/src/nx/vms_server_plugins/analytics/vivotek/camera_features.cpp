@@ -1,11 +1,9 @@
 #include "camera_features.h"
 
-#include <stdexcept>
-
 #include <nx/utils/log/log_message.h>
 
 #include "camera_parameter_api.h"
-#include "exception_utils.h"
+#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -20,10 +18,10 @@ CameraFeatures CameraFeatures::fetchFrom(const nx::utils::Url& cameraUrl)
 
         CameraFeatures features;
 
-        const auto count = toInt(parameters.at("vadp_module_number"));
+        const auto count = toInt(at(parameters, "vadp_module_number"));
         for (int i = 0; i < count; ++i)
         {
-            if (parameters.at(NX_FMT("vadp_module_i%1_name", i)) == "VCA")
+            if (at(parameters, NX_FMT("vadp_module_i%1_name", i)) == "VCA")
             {
                 features.vca = true;
                 break;
@@ -32,9 +30,10 @@ CameraFeatures CameraFeatures::fetchFrom(const nx::utils::Url& cameraUrl)
 
         return features;
     }
-    catch (const std::exception&)
+    catch (Exception& exception)
     {
-        rethrowWithContext("Failed to fetch features from camera at %1", cameraUrl);
+        exception.addContext("Failed to fetch features from camera at %1", cameraUrl);
+        throw;
     }
 }
 

@@ -2,11 +2,13 @@
 
 #include <cmath>
 #include <climits>
-#include <stdexcept>
 
 #include <nx/utils/log/assert.h>
 
 #include <QtCore/QJsonDocument>
+#include <stdexcept>
+
+#include "exception.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -18,10 +20,7 @@ QJsonValue parseJson(const QByteArray& bytes)
         return document.object();
     if (document.isArray())
         return document.array();
-    throw std::runtime_error(
-        QStringLiteral("Failed to parse json: %1")
-            .arg(error.errorString())
-            .toStdString());
+    throw Exception("Failed to parse json: %1", error.errorString());
 }
 
 QByteArray unparseJson(const QJsonValue& json)
@@ -32,7 +31,7 @@ QByteArray unparseJson(const QJsonValue& json)
     else if (json.isArray())
         document.setArray(json.toArray());
     else if (!NX_ASSERT(json.isObject() || json.isArray()))
-        document.setObject({});
+        throw std::invalid_argument("Can only unparse object or array");
     return document.toJson(QJsonDocument::Compact);
 }
 
@@ -50,14 +49,14 @@ void get(QJsonValue* value, const QString& /*path*/, const QJsonValue& json)
 void get(bool* value, const QString& path, const QJsonValue& json)
 {
     if (!json.isBool())
-        throw std::runtime_error(NX_FMT("%1 is not a boolean", path).toStdString());
+        throw Exception("%1 is not a boolean", path);
     *value = json.toBool();
 }
 
 void get(double* value, const QString& path, const QJsonValue& json)
 {
     if (!json.isDouble())
-        throw std::runtime_error(NX_FMT("%1 is not a number", path).toStdString());
+        throw Exception("%1 is not a number", path);
     *value = json.toDouble();
 }
 
@@ -67,30 +66,30 @@ void get(int* value, const QString& path, const QJsonValue& json)
     get(&doubleValue, path, json);
     double roundedDoubleValue = std::round(doubleValue);
     if (roundedDoubleValue != doubleValue)
-        throw std::runtime_error(NX_FMT("%1 is not an integer", path).toStdString());
+        throw Exception("%1 is not an integer", path);
     if (roundedDoubleValue < INT_MIN || INT_MAX < roundedDoubleValue)
-        throw std::runtime_error(NX_FMT("%1 is out of int range", path).toStdString());
+        throw Exception("%1 is out of int range", path);
     *value = roundedDoubleValue;
 }
 
 void get(QString* value, const QString& path, const QJsonValue& json)
 {
     if (!json.isString())
-        throw std::runtime_error(NX_FMT("%1 is not a string", path).toStdString());
+        throw Exception("%1 is not a string", path);
     *value = json.toString();
 }
 
 void get(QJsonObject* value, const QString& path, const QJsonValue& json)
 {
     if (!json.isObject())
-        throw std::runtime_error(NX_FMT("%1 is not an object", path).toStdString());
+        throw Exception("%1 is not an object", path);
     *value = json.toObject();
 }
 
 void get(QJsonArray* value, const QString& path, const QJsonValue& json)
 {
     if (!json.isArray())
-        throw std::runtime_error(NX_FMT("%1 is not an array", path).toStdString());
+        throw Exception("%1 is not an array", path);
     *value = json.toArray();
 }
 

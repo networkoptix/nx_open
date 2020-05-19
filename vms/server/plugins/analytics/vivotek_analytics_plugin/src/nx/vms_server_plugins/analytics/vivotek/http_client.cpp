@@ -1,18 +1,18 @@
 #include "http_client.h"
 
 #include <utility>
-#include <stdexcept>
 #include <system_error>
 
 #include <nx/utils/log/log_message.h>
 
 #include <QtCore/QString>
 
-#include "exception_utils.h"
+#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
+using namespace nx::sdk;
 using namespace nx::utils;
 using namespace nx::network;
 
@@ -28,7 +28,7 @@ cf::future<http::BufferType> HttpClient::get(const Url& url)
 {
     return Client::get(url)
         .then_unwrap([this](auto&& response) { return processResponse(std::move(response)); })
-        .then(addExceptionContext("HTTP GET %1 failed", url));
+        .then(addExceptionContextAndRethrow("HTTP GET %1 failed", url));
 }
 
 cf::future<http::BufferType> HttpClient::post(const Url& url,
@@ -36,7 +36,7 @@ cf::future<http::BufferType> HttpClient::post(const Url& url,
 {
     return Client::post(url, std::move(contentType), std::move(requestBody))
         .then_unwrap([this](auto&& response) { return processResponse(std::move(response)); })
-        .then(addExceptionContext("HTTP POST %1 failed", url));
+        .then(addExceptionContextAndRethrow("HTTP POST %1 failed", url));
 }
 
 http::BufferType HttpClient::processResponse(http::Response&& response)
@@ -53,15 +53,11 @@ http::BufferType HttpClient::processResponse(http::Response&& response)
     {
         case http::StatusCode::unauthorized:
         case http::StatusCode::forbidden:
-            throw std::system_error(
-                (int) std::errc::permission_denied, std::generic_category(),
-                NX_FMT("Response status %1, expected %2", statusCode, expectedStatusCode)
-                    .toStdString());
+            throw Exception(ErrorCode::unauthorized,
+                "Response status %1, expected %2", statusCode, expectedStatusCode);
 
         default:
-            throw std::runtime_error(
-                NX_FMT("Response status %1, expected %2", statusCode, expectedStatusCode)
-                    .toStdString());
+            throw Exception("Response status %1, expected %2", statusCode, expectedStatusCode);
     }
 }
 

@@ -1,12 +1,12 @@
 #include "device_agent.h"
 #include "nx/vms_server_plugins/analytics/vivotek/camera_features.h"
 
-#include <exception>
 #include <mutex>
-#include <thread>
+#include <system_error>
 
 #define NX_PRINT_PREFIX (m_logUtils.printPrefix)
 #include <nx/kit/debug.h>
+#include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
@@ -17,7 +17,7 @@
 #include "camera_settings.h"
 #include "object_types.h"
 #include "parse_object_metadata_packet.h"
-#include "exception_utils.h"
+#include "exception.h"
 #include "json_utils.h"
 #include "utils.h"
 
@@ -76,9 +76,13 @@ void DeviceAgent::doSetSettings(Result<const IStringMap*>* outResult, const IStr
 
         *outResult = settings.getErrorMessages().releasePtr();
     }
+    catch (const Exception& exception)
+    {
+        *outResult = exception.toSdkError();
+    }
     catch (const std::exception& exception)
     {
-        *outResult = toSdkError(exception);
+        *outResult = error(ErrorCode::internalError, exception.what());
     }
 }
 
@@ -104,9 +108,13 @@ void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* outRes
         auto errorMessages = settings.getErrorMessages();
         *outResult = new SettingsResponse(std::move(values), std::move(errorMessages));
     }
+    catch (const Exception& exception)
+    {
+        *outResult = exception.toSdkError();
+    }
     catch (const std::exception& exception)
     {
-        *outResult = toSdkError(exception);
+        *outResult = error(ErrorCode::internalError, exception.what());
     }
 }
 
@@ -135,9 +143,13 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 
         *outResult = new sdk::String(unparseJson(manifest).toStdString());
     }
+    catch (const Exception& exception)
+    {
+        *outResult = exception.toSdkError();
+    }
     catch (const std::exception& exception)
     {
-        *outResult = toSdkError(exception);
+        *outResult = error(ErrorCode::internalError, exception.what());
     }
 }
 
@@ -154,7 +166,7 @@ void DeviceAgent::setHandler(IHandler* handler)
     catch (const std::exception& exception)
     {
         vivotek::emitDiagnostic(handler, IPluginDiagnosticEvent::Level::error,
-            "Failed to set device agent handler", collectNestedMessages(exception));
+            "Failed to set device agent handler", exception.what());
     }
 }
 
@@ -166,9 +178,13 @@ void DeviceAgent::doSetNeededMetadataTypes(
         m_serverWantsMetadata = !neededMetadataTypes->isEmpty();
         updateMetadataStreaming();
     }
+    catch (const Exception& exception)
+    {
+        *outResult = exception.toSdkError();
+    }
     catch (const std::exception& exception)
     {
-        *outResult = toSdkError(exception);
+        *outResult = error(ErrorCode::internalError, exception.what());
     }
 }
 
@@ -206,13 +222,18 @@ cf::future<cf::unit> DeviceAgent::restartMetadataStreamingLater()
     return m_restartDelayer->start(kRestartDelay)
         .then_unwrap([this](auto&&) { return startMetadataStreaming(); })
         .catch_(
+            [](const std::system_error& exception)
+            {
+                if (exception.code() != std::errc::operation_canceled)
+                    throw;
+
+                return cf::unit();
+            })
+        .catch_(
             [this](const std::exception& exception)
             {
-                if (nestedContains(exception, std::errc::operation_canceled))
-                    return cf::make_ready_future(cf::unit());
-
                 emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
-                    "Failed to restart metadata streaming", collectNestedMessages(exception));
+                    "Failed to restart metadata streaming", exception.what());
 
                 return restartMetadataStreamingLater();
             });
@@ -238,7 +259,7 @@ cf::future<cf::unit> DeviceAgent::streamMetadataPackets()
                         [this](const std::exception& exception)
                         {
                             emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
-                                "Metadata streaming failed", collectNestedMessages(exception));
+                                "Metadata streaming failed", exception.what());
 
                             return restartMetadataStreamingLater();
                         });
@@ -246,12 +267,12 @@ cf::future<cf::unit> DeviceAgent::streamMetadataPackets()
                 return cf::unit();
             })
         .catch_(
-            [](const std::exception& exception)
+            [](const std::system_error& exception)
             {
-                if (nestedContains(exception, std::errc::operation_canceled))
-                    return cf::unit();
+                if (exception.code() != std::errc::operation_canceled)
+                    throw;
 
-                throw;
+                return cf::unit();
             });
 }
 

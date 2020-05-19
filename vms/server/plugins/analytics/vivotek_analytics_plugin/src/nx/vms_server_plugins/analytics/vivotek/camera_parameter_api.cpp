@@ -1,14 +1,12 @@
 #include "camera_parameter_api.h"
 
-#include <stdexcept>
-
 #include <nx/utils/log/log_message.h>
 
 #include <QtCore/QRegularExpression>
 #include <QtCore/QUrlQuery>
 
 #include "http_client.h"
-#include "exception_utils.h"
+#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -24,19 +22,19 @@ std::map<QString, QString> parse(const QString& responseBody)
     {
         const auto equalsIndex = line.indexOf('=');
         if (equalsIndex == -1)
-            throw std::runtime_error("No '=' between parameter name and value");
+            throw Exception("No '=' between parameter name and value");
 
         const auto name = line.left(equalsIndex).trimmed();
         if (name.isEmpty())
-            throw std::runtime_error("No parameter name");
+            throw Exception("No parameter name");
 
         const auto quotedValue = line.right(line.length() - equalsIndex - 1).trimmed();
         if (quotedValue.isEmpty())
-            throw std::runtime_error("No parameter value");
+            throw Exception("No parameter value");
         if (quotedValue.length() < 2
             || !quotedValue.startsWith('\'') || !quotedValue.endsWith('\''))
         {
-            throw std::runtime_error("Malformed parameter value");
+            throw Exception("Malformed parameter value");
         }
         const auto value = quotedValue.mid(1, quotedValue.length() - 2);
 
@@ -68,9 +66,11 @@ std::map<QString, QString> CameraParameterApi::fetch(
         const auto responseBody = HttpClient().get(url).get();
         return parse(QString::fromUtf8(responseBody));
     }
-    catch (const std::exception&)
+    catch (Exception& exception)
     {
-        rethrowWithContext("Failed to fetch parameters from camera at %1", withoutUserInfo(m_url));
+        exception.addContext("Failed to fetch parameters from camera at %1",
+            withoutUserInfo(m_url));
+        throw;
     }
 }
 
@@ -89,9 +89,11 @@ void CameraParameterApi::store(const std::map<QString, QString>& parameters)
 
         HttpClient().get(url).get();
     }
-    catch (const std::exception&)
+    catch (Exception& exception)
     {
-        rethrowWithContext("Failed to store parameters to camera at %1", withoutUserInfo(m_url));
+        exception.addContext("Failed to store parameters to camera at %1",
+            withoutUserInfo(m_url));
+        throw;
     }
 }
 
