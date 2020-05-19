@@ -221,7 +221,8 @@ bool PushManager::send(const vms::event::AbstractActionPtr& action)
     return true; //< TODO: Find out the way to report actual result async.
 }
 
-PushPayload PushManager::makePayload(const vms::event::EventParameters& event, bool isCamera) const
+PushPayload PushManager::makePayload(
+    const vms::event::EventParameters& event, const QnVirtualCameraResource* camera) const
 {
     const auto settings = serverModule()->commonModule()->globalSettings();
     url::Builder url = url::Builder()
@@ -231,14 +232,14 @@ PushPayload PushManager::makePayload(const vms::event::EventParameters& event, b
         .addQueryItem("timestamp", event.eventTimestampUsec / 1000);
 
     url::Builder imageUrl;
-    if (isCamera)
+    if (camera)
     {
-        url.addQueryItem("resources", event.eventResourceId.toSimpleString());
+        url.addQueryItem("resources", camera->getId().toSimpleString());
         imageUrl = url::Builder()
             .setScheme(http::kSecureUrlSchemeName)
             .setEndpoint(settings->cloudSystemId())
             .setPath("ec2/cameraThumbnail")
-            .addQueryItem("cameraId", event.eventResourceId.toSimpleString())
+            .addQueryItem("cameraId", camera->getId().toSimpleString())
             .addQueryItem("time", event.eventTimestampUsec / 1000)
             .addQueryItem("height", kPushThumbnailHeight);
     }
@@ -252,14 +253,23 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
     const auto params = action->getParams();
     const auto event = action->getRuntimeParams();
     const auto common = serverModule()->commonModule();
-    const auto resource = resourcePool()->getResourceById(event.eventResourceId);
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto resource =
+        [&]()
+        {
+            for (const auto& id: event.metadata.cameraRefs)
+            {
+                if (const auto r = resourcePool()->getResourceById(QnUuid::fromStringSafe(id)))
+                    return r;
+            }
+            return resourcePool()->getResourceById(event.eventResourceId);
+        }();
 
     const auto language = common->globalSettings()->pushNotificationsLanguage();
     NX_VERBOSE(this, "Translate notification to %1", language.isEmpty() ? "NONE" : language);
     QnTranslationManager::LocaleRollback localeGuard(
         serverModule()->findInstance<QnTranslationManager>(), language);
 
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     vms::event::StringsHelper strings(common);
     const auto caption = params.sayText.isEmpty() //< Used to store custom caption text.
         ? strings.notificationCaption(event, camera, /*useHtml*/ false)
@@ -284,7 +294,7 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
     return {
         (icon.isEmpty() ? QString() : (icon + " ")) + caption,
         description + (addNewLine ? "\n" : "") + resourceText,
-        makePayload(event, camera),
+        makePayload(event, camera.get()),
         options,
     };
 }

@@ -72,18 +72,33 @@ public:
         }
     }
 
+    enum GenerateOptions
+    {
+        noOptions = 0,
+        addSource = 1 << 0,
+        cameraRef = 1 << 1,
+    };
+
     void generateEvent(
         EventType type,
         QnUuid resource = {},
         const std::string& users = "",
         QString caption = {},
         QString body = {},
-        bool addSource = true)
+        GenerateOptions options = addSource)
     {
         EventParameters event;
         event.eventType = type;
         event.eventTimestampUsec = 111222333444555;
-        event.eventResourceId = std::move(resource);
+        if (options & cameraRef)
+        {
+            event.eventResourceId = serverId;
+            event.metadata.cameraRefs.push_back(resource.toString());
+        }
+        else
+        {
+            event.eventResourceId = std::move(resource);
+        }
 
         ActionParameters action;
         if (users.empty())
@@ -97,7 +112,7 @@ public:
         }
         action.sayText = std::move(caption);
         action.text = std::move(body);
-        action.useSource = addSource;
+        action.useSource = bool(options & addSource);
 
         AbstractActionPtr actionPtr(new CommonAction(ActionType::pushNotificationAction, event));
         actionPtr->setParams(action);
@@ -117,9 +132,9 @@ public:
         const std::string& users = "",
         QString caption = {},
         QString body = {},
-        bool addSource = true)
+        GenerateOptions options = addSource)
     {
-        generateEvent(type, resource, users, caption, body, addSource);
+        generateEvent(type, resource, users, caption, body, options);
         return getRequestFromServer();
     }
 
@@ -184,7 +199,7 @@ TEST_F(PushManagerTest, MessageCaption)
 {
     // Default.
     {
-        const auto sent = testEvent(EventType::userDefinedEvent);
+        const auto sent = testEvent(EventType::userDefinedEvent, {}, {}, "", "", noOptions);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
@@ -195,14 +210,25 @@ TEST_F(PushManagerTest, MessageCaption)
     }
     // User defined.
     {
-        const auto sent = testEvent(EventType::userDefinedEvent, {}, {}, "My Special Generic Event");
+        const auto sent = testEvent(EventType::userDefinedEvent, {}, {}, "Special Event", "", noOptions);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
-        EXPECT_EQ(sent->notification.title, "My Special Generic Event");
+        EXPECT_EQ(sent->notification.title, "Special Event");
         EXPECT_EQ(sent->notification.body, "");
         EXPECT_EQ(sent->notification.payload.url, openUrl());
         EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl());
+    }
+    // User defined with camera ref.
+    {
+        const auto sent = testEvent(EventType::userDefinedEvent, cameraId, {}, "Special Event", "", cameraRef);
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
+        EXPECT_EQ(sent->systemId, systemId);
+        EXPECT_EQ(sent->notification.title, "Special Event");
+        EXPECT_EQ(sent->notification.body, "");
+        EXPECT_EQ(sent->notification.payload.url, openUrl(cameraId));
+        EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl(cameraId));
     }
 }
 
@@ -236,7 +262,7 @@ TEST_F(PushManagerTest, AddSource)
 {
     // With default message body.
     {
-        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, {}, {}, {}, /*addSource*/ false);
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, {}, {}, {}, noOptions);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
@@ -247,7 +273,7 @@ TEST_F(PushManagerTest, AddSource)
     }
     // With user defined message body.
     {
-        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, {}, {}, "WTF!", /*addSource*/ false);
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, {}, {}, "WTF!", noOptions);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);

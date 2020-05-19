@@ -9,6 +9,8 @@
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/network/retry_timer.h>
 
+class QnVirtualCameraResource;
+
 namespace nx::vms::server::event {
 
 struct PushPayload
@@ -56,7 +58,9 @@ public:
     bool send(const vms::event::AbstractActionPtr& action);
 
 private:
-    PushPayload makePayload(const vms::event::EventParameters& event, bool isCamera) const;
+    PushPayload makePayload(
+        const vms::event::EventParameters& event,
+        const QnVirtualCameraResource* camera) const;
     PushNotification makeNotification(const vms::event::AbstractActionPtr& action) const;
     std::set<QString> cloudUsers(const vms::event::AbstractActionPtr& action) const;
 
