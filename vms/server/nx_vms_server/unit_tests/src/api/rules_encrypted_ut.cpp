@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/rule_manager.h>
 
 #include "test_api_requests.h"
 

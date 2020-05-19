@@ -476,13 +476,13 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
     result.eventTypeIds = nx::analytics::supportedEventTypeIdsFromManifest(*deviceAgentManifest);
     result.objectTypeIds = nx::analytics::supportedObjectTypeIdsFromManifest(*deviceAgentManifest);
 
-    const auto neededEventTypes = ruleWatcher->watchedEventsForResource(m_device->getId());
+    const std::set<QString> neededEventTypes = ruleWatcher->watchedEventsForDevice(m_device);
     NX_DEBUG(this, "Needed event types for the Device %1 (%2) from RuleWatcher: %3",
-        m_device->getUserDefinedName(), m_device->getId(), neededEventTypes);
+        m_device->getUserDefinedName(), m_device->getId(), containerString(neededEventTypes));
 
     for (auto it = result.eventTypeIds.begin(); it != result.eventTypeIds.end();)
     {
-        if (!neededEventTypes.contains(*it))
+        if (neededEventTypes.find(*it) == neededEventTypes.cend())
             it = result.eventTypeIds.erase(it);
         else
             ++it;

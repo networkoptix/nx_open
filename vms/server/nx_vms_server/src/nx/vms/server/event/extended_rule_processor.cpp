@@ -4,6 +4,7 @@
 
 #include <QtCore/QList>
 
+#include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/event/events/ip_conflict_event.h>
 #include <nx/vms/event/events/server_conflict_event.h>

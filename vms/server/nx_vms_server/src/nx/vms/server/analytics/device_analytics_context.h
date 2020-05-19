@@ -73,7 +73,7 @@ private:
     void at_deviceStatusChanged(const QnResourcePtr& resource);
     void at_deviceUpdated(const QnResourcePtr& resource);
     void at_devicePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
-    void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
+    void at_rulesUpdated();
 
 private:
     void subscribeToDeviceChanges();

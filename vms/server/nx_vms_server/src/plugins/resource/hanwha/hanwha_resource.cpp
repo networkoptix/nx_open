@@ -850,10 +850,12 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
     return true;
 }
 
-bool HanwhaResource::isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const
+QString HanwhaResource::vmsToAnalyticsEventTypeId(nx::vms::api::EventType eventType) const
 {
-    return base_type::isAnalyticsDriverEvent(eventType)
-        || eventType == nx::vms::api::EventType::cameraInputEvent;
+    if (eventType == nx::vms::api::EventType::cameraInputEvent)
+        return kHanwhaInputPortEventTypeId;
+
+    return QString();
 }
 
 SessionContextPtr HanwhaResource::session(

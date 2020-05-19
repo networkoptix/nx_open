@@ -1490,9 +1490,9 @@ bool QnSecurityCamResource::captureEvent(const nx::vms::event::AbstractEventPtr&
     return false;
 }
 
-bool QnSecurityCamResource::isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const
+QString QnSecurityCamResource::vmsToAnalyticsEventTypeId(nx::vms::api::EventType eventType) const
 {
-    return eventType == nx::vms::api::EventType::analyticsSdkEvent;
+    return QString();
 }
 
 Qn::ConnectionRole QnSecurityCamResource::toConnectionRole(StreamIndex index)

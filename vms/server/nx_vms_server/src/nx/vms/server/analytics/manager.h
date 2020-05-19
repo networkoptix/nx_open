@@ -16,7 +16,6 @@
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/types.h>
 #include <nx/vms/server/analytics/settings.h>
-#include <nx/vms/server/analytics/rule_holder.h>
 #include <nx/vms/server/metrics/plugin_resource_binding_info_provider.h>
 
 #include <nx/utils/log/log.h>

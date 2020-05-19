@@ -346,7 +346,9 @@ QnMediaServerModule::QnMediaServerModule(
     m_eventRuleProcessor = store(new nx::vms::server::event::ExtendedRuleProcessor(this));
     m_eventConnector = store(new nx::vms::server::event::EventConnector(this));
 
-    m_analyticsEventRuleWatcher = store(new nx::vms::server::analytics::EventRuleWatcher(this));
+    m_analyticsEventRuleWatcher = store(new nx::vms::server::analytics::EventRuleWatcher(
+        commonModule()->eventRuleManager()));
+
     m_analyticsManager = store(new nx::vms::server::analytics::Manager(this));
 
     m_sharedContextPool = store(new nx::vms::server::resource::SharedContextPool(this));

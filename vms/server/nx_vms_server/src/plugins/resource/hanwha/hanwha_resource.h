@@ -64,8 +64,7 @@ public:
     virtual void stopInputPortStatesMonitoring() override;
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event) override;
-
-    virtual bool isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const override;
+    virtual QString vmsToAnalyticsEventTypeId(nx::vms::api::EventType eventType) const override;
 
     QnTimePeriodList getDtsTimePeriods(
         qint64 startTimeMs,

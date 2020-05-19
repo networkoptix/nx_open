@@ -339,10 +339,15 @@ public:
     /**
      * All events emitted by analytics driver bound to the resource can be captured within
      * this method.
-     * @return true if event has been captured, false otherwise.
+     * @return True if event has been captured, false otherwise.
      */
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
-    virtual bool isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const;
+
+    /**
+     * @return Id of the analytics Event type that corresponds to eventType if Events of eventType
+     *     are obtained via Analytics Plugin, empty string otherwise.
+     */
+    virtual QString vmsToAnalyticsEventTypeId(nx::vms::api::EventType eventType) const;
 
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
 

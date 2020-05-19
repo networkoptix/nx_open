@@ -1,10 +1,8 @@
 #include "event_rule_watcher.h"
 
 #include <nx/vms/event/rule.h>
-#include <nx/vms/server/analytics/event_type_mapping.h>
-#include <media_server/media_server_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/vms/event/rule_manager.h>
+#include <core/resource/camera_resource.h>
 
 namespace nx {
 namespace vms::server {
@@ -12,64 +10,113 @@ namespace analytics {
 
 using namespace nx::vms::event;
 
-EventRuleWatcher::EventRuleWatcher(QnMediaServerModule* serverModule):
-    Connective<QObject>(serverModule),
-    ServerModuleAware(serverModule),
-    m_ruleHolder(serverModule->commonModule())
+EventRuleWatcher::EventRuleWatcher(RuleManager* ruleManager):
+    m_ruleManager(ruleManager)
 {
-    auto ruleManager = serverModule->commonModule()->eventRuleManager();
-
-    auto resourcePool = serverModule
-        ->commonModule()
-        ->resourcePool();
-
     connect(
-        ruleManager, &RuleManager::rulesReset,
+        m_ruleManager, &RuleManager::rulesReset,
         this, &EventRuleWatcher::at_rulesReset);
 
     connect(
-        ruleManager, &RuleManager::ruleAddedOrUpdated,
+        m_ruleManager, &RuleManager::ruleAddedOrUpdated,
         this, &EventRuleWatcher::at_ruleAddedOrUpdated);
 
     connect(
-        ruleManager, &RuleManager::ruleRemoved,
+        m_ruleManager, &RuleManager::ruleRemoved,
         this, &EventRuleWatcher::at_ruleRemoved);
-
-    connect(
-        resourcePool, &QnResourcePool::resourceAdded,
-        this, &EventRuleWatcher::at_resourceAdded);
 }
 
 EventRuleWatcher::~EventRuleWatcher()
 {
 }
 
-void EventRuleWatcher::at_rulesReset(const RuleList& rules)
+void EventRuleWatcher::at_rulesReset(const RuleList& /*rules*/)
 {
-    emit rulesUpdated(m_ruleHolder.resetRules(rules));
+    if (recalculateWatchedEventTypes())
+        emit watchedEventTypesChanged();
 }
 
-void EventRuleWatcher::at_ruleAddedOrUpdated(const RulePtr& rule, bool added)
+void EventRuleWatcher::at_ruleAddedOrUpdated(const RulePtr& /*rule*/, bool /*added*/)
 {
-    if (added)
-        emit rulesUpdated(m_ruleHolder.addRule(rule));
-    else
-        emit rulesUpdated(m_ruleHolder.updateRule(rule));
+    if (recalculateWatchedEventTypes())
+        emit watchedEventTypesChanged();
 }
 
-void EventRuleWatcher::at_ruleRemoved(const QnUuid& ruleId)
+void EventRuleWatcher::at_ruleRemoved(const QnUuid& /*ruleId*/)
 {
-    emit rulesUpdated(m_ruleHolder.removeRule(ruleId));
+    if (recalculateWatchedEventTypes())
+        emit watchedEventTypesChanged();
 }
 
-void EventRuleWatcher::at_resourceAdded(const QnResourcePtr& resource)
+std::set<QString> EventRuleWatcher::watchedEventsForDevice(
+    const QnVirtualCameraResourcePtr& device) const
 {
-    emit rulesUpdated(m_ruleHolder.addResource(resource));
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    std::set<QString> result;
+
+    for (const auto& deviceId: {device->getId(), QnUuid()})
+    {
+        const auto it = m_watchedEventTypesByDevice.find(deviceId);
+        if (it == m_watchedEventTypesByDevice.cend())
+            continue;
+
+        const WatchedEventTypes& watchedEventTypes = it->second;
+        result.insert(
+            watchedEventTypes.analyticsEventTypes.begin(),
+            watchedEventTypes.analyticsEventTypes.end());
+
+        for (nx::vms::api::EventType eventType: watchedEventTypes.regularEventTypes)
+        {
+            const QString analyticsEventType = device->vmsToAnalyticsEventTypeId(eventType);
+            if (!analyticsEventType.isEmpty())
+                result.insert(analyticsEventType);
+        }
+    }
+
+    return result;
 }
 
-QSet<QString> EventRuleWatcher::watchedEventsForResource(const QnUuid& resourceId) const
+bool EventRuleWatcher::recalculateWatchedEventTypes()
 {
-    return m_ruleHolder.watchedEvents(resourceId);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    std::map<QnUuid, WatchedEventTypes> watchedEventTypesByDevice;
+
+    const RuleList rules = m_ruleManager->rules();
+
+    for (const RulePtr& rule: rules)
+    {
+        if (rule->isDisabled())
+            continue;
+
+        const nx::vms::api::EventType ruleEventType = rule->eventType();
+        QVector<QnUuid> ruleResourceIds = rule->eventResources();
+        if (ruleResourceIds.empty())
+            ruleResourceIds.push_back(QnUuid());
+
+        for (const QnUuid& resourceId: ruleResourceIds)
+        {
+            WatchedEventTypes& watchedEventTypes = watchedEventTypesByDevice[resourceId];
+            if (ruleEventType == nx::vms::api::EventType::analyticsSdkEvent)
+            {
+                watchedEventTypes.analyticsEventTypes.insert(
+                    rule->eventParams().getAnalyticsEventTypeId());
+            }
+            else
+            {
+                watchedEventTypes.regularEventTypes.insert(ruleEventType);
+            }
+        }
+    }
+
+    if (watchedEventTypesByDevice != m_watchedEventTypesByDevice)
+    {
+        m_watchedEventTypesByDevice = std::move(watchedEventTypesByDevice);
+        return true;
+    }
+
+    return false;
 }
 
 } // namespace analytics
