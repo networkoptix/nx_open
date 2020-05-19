@@ -66,8 +66,9 @@ public:
             QnUserResourcePtr user(new QnUserResource(QnUserType::Cloud));
             user->setIdUnsafe(QnUuid::createUuid());
             user->setName(u + kMailSuffix);
+            user->setRawPermissions(vms::api::GlobalPermission::adminPermissions);
             m_serverModule.commonModule()->resourcePool()->addResource(user);
-            m_users[u] = user->getId();
+            m_users[u] = user;
         }
     }
 
@@ -92,7 +93,7 @@ public:
         else
         {
             for (const auto u: users)
-                action.additionalResources.push_back(m_users[QString(u)]);
+                action.additionalResources.push_back(m_users[QString(u)]->getId());
         }
         action.sayText = std::move(caption);
         action.text = std::move(body);
@@ -146,6 +147,14 @@ public:
             systemId, resource.toSimpleString());
     }
 
+    void setUserPermissions(
+        const std::string& users,
+        vms::api::GlobalPermission permissions = vms::api::GlobalPermission::adminPermissions)
+    {
+        for (const auto u: users)
+            m_users[QString(u)]->setRawPermissions(permissions);
+    }
+
 private:
     http::StatusCode::Value processCloudRequest(const http::Request& request)
     {
@@ -161,7 +170,7 @@ private:
 private:
     QnMediaServerModule m_serverModule;
     PushManager m_pushManager;
-    std::map<QString, QnUuid> m_users;
+    std::map<QString, QnUserResourcePtr> m_users;
 
     http::TestHttpServer m_cloudService;
     nx::utils::SyncQueue<Buffer> m_cloudRequests;
@@ -279,6 +288,31 @@ TEST_F(PushManagerTest, CaptionIcon)
     }
 }
 
+TEST_F(PushManagerTest, Permissions)
+{
+    setUserPermissions("ab", vms::api::GlobalPermission::none);
+    {
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId);
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"c@xxx.com"}));
+        EXPECT_EQ(sent->notification.title, "Motion on Cameras");
+    }
+    setUserPermissions("bc", vms::api::GlobalPermission::viewerPermissions);
+    {
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId);
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"b@xxx.com", "c@xxx.com"}));
+        EXPECT_EQ(sent->notification.title, "Motion on Cameras");
+    }
+    setUserPermissions("abc");
+    {
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId);
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"a@xxx.com", "b@xxx.com", "c@xxx.com"}));
+        EXPECT_EQ(sent->notification.title, "Motion on Cameras");
+    }
+}
+
 TEST_F(PushManagerTest, Errors)
 {
     EXPECT_TRUE(testEvent(EventType::userDefinedEvent));
@@ -304,11 +338,11 @@ public:
 
 TEST_F(PushManagerRetryTest, Retransmissions)
 {
-    generateEvent(EventType::serverStartEvent);
+    generateEvent(EventType::serverStartEvent, serverId);
     ASSERT_TRUE(getRequestFromServer()) << "Normal operation";
 
     setCloudState(http::StatusCode::serviceUnavailable);
-    generateEvent(EventType::serverStartEvent);
+    generateEvent(EventType::serverStartEvent, serverId);
     ASSERT_FALSE(getRequestFromServer()) << "Server error";
 
     setCloudState(http::StatusCode::created);
@@ -316,14 +350,14 @@ TEST_F(PushManagerRetryTest, Retransmissions)
     ASSERT_TRUE(getRequestFromServer()) << "Retransmission";
 
     setCloudState(http::StatusCode::serviceUnavailable);
-    generateEvent(EventType::serverStartEvent);
+    generateEvent(EventType::serverStartEvent, serverId);
     ASSERT_FALSE(getRequestFromServer()) << "Server error";
 
     std::this_thread::sleep_for(kQueueTimeout);
     ASSERT_FALSE(getRequestFromServer()) << "Server error on retransmission";
 
     setCloudState(http::StatusCode::created);
-    generateEvent(EventType::serverStartEvent);
+    generateEvent(EventType::serverStartEvent, serverId);
     ASSERT_TRUE(getRequestFromServer()) << "Normal operation";
 }
 

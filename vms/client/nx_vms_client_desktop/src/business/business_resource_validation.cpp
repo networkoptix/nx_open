@@ -485,40 +485,6 @@ bool actionAllowedForUser(const nx::vms::event::AbstractActionPtr& action,
     return std::find(subjects.cbegin(), subjects.cend(), roleId) != subjects.cend();
 }
 
-bool hasAccessToSource(const nx::vms::event::EventParameters& params,
-    const QnUserResourcePtr& user)
-{
-    if (!user || !user->commonModule())
-        return false;
-
-    const auto context = user->commonModule();
-
-    const auto eventType = params.eventType;
-
-    const auto resource = context->resourcePool()->getResourceById(params.eventResourceId);
-    const bool hasViewPermission = resource && context->resourceAccessManager()->hasPermission(
-        user,
-        resource,
-        Qn::ViewContentPermission);
-
-    if (nx::vms::event::isSourceCameraRequired(eventType))
-    {
-        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-        NX_ASSERT(camera, "Event has occurred without its camera");
-        return camera && hasViewPermission;
-    }
-
-    if (nx::vms::event::isSourceServerRequired(eventType))
-    {
-        const auto server = resource.dynamicCast<QnMediaServerResource>();
-        NX_ASSERT(server, "Event has occurred without its server");
-        /* Only admins should see notifications with servers. */
-        return server && hasViewPermission;
-    }
-
-    return true;
-}
-
 } // namespace QnBusiness
 
 //-------------------------------------------------------------------------------------------------

@@ -202,7 +202,7 @@ bool PushManager::send(const vms::event::AbstractActionPtr& action)
         return false;
     }
 
-    auto targets = cloudUsers(action->getParams());
+    auto targets = cloudUsers(action);
     if (targets.empty())
     {
         NX_DEBUG(this, "Not sending notification, no targets found");
@@ -289,10 +289,11 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
     };
 }
 
-std::set<QString> PushManager::cloudUsers(const vms::event::ActionParameters& params) const
+std::set<QString> PushManager::cloudUsers(const vms::event::AbstractActionPtr& action) const
 {
+    const auto actionParams = action->getParams();
     QnUserResourceList userList;
-    if (params.allUsers)
+    if (actionParams.allUsers)
     {
         userList = serverModule()->resourcePool()->getResources<QnUserResource>();
         NX_VERBOSE(this, "Looking for all cloud users in list of %1", userList.size());
@@ -300,9 +301,9 @@ std::set<QString> PushManager::cloudUsers(const vms::event::ActionParameters& pa
     else
     {
         QList<QnUuid> userRoles;
-        userRolesManager()->usersAndRoles(params.additionalResources, userList, userRoles);
+        userRolesManager()->usersAndRoles(actionParams.additionalResources, userList, userRoles);
         NX_VERBOSE(this, "Looking for cloud users %1 in list of %2 and roles of %3",
-            containerString(params.additionalResources), userList.size(), userRoles.size());
+            containerString(actionParams.additionalResources), userList.size(), userRoles.size());
 
         for (const auto& role: userRoles)
         {
@@ -311,10 +312,11 @@ std::set<QString> PushManager::cloudUsers(const vms::event::ActionParameters& pa
         }
     }
 
+    const auto eventParams = action->getRuntimeParams();
     std::set<QString> names;
     for (const auto& user: userList)
     {
-        if (user->isEnabled() && user->isCloud())
+        if (user->isEnabled() && user->isCloud() && vms::event::hasAccessToSource(eventParams, user))
             names.insert(user->getName());
     }
 

@@ -22,9 +22,6 @@ bool actionAllowedForUser(
     const nx::vms::event::AbstractActionPtr& action,
     const QnUserResourcePtr& user);
 
-bool hasAccessToSource(const nx::vms::event::EventParameters& params,
-    const QnUserResourcePtr& user);
-
 } // namespace QnBusiness
 
 class QnCameraInputPolicy

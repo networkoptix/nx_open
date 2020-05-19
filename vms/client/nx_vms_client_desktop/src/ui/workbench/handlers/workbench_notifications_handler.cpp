@@ -342,7 +342,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     if (!QnBusiness::actionAllowedForUser(action, context()->user()))
         return;
 
-    if (!QnBusiness::hasAccessToSource(action->getRuntimeParams(), context()->user()))
+    if (!vms::event::hasAccessToSource(action->getRuntimeParams(), context()->user()))
         return;
 
     switch (action->actionType())

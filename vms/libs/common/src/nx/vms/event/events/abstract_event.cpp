@@ -4,9 +4,13 @@
 #include "core/resource/resource.h"
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
-
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/analytics/descriptor_manager.h>
 
@@ -239,6 +243,37 @@ bool isSourceServerRequired(EventType eventType)
         default:
             return requiresServerResource(eventType);
     }
+}
+
+bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& user)
+{
+    if (!user || !user->commonModule())
+        return false;
+
+    const auto context = user->commonModule();
+
+    const auto eventType = params.eventType;
+
+    const auto resource = context->resourcePool()->getResourceById(params.eventResourceId);
+    const bool hasViewPermission = resource && context->resourceAccessManager()->hasPermission(
+        user, resource, Qn::ViewContentPermission);
+
+    if (isSourceCameraRequired(eventType))
+    {
+        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        NX_ASSERT(camera, "Event has occurred without its camera %1", params.eventResourceId);
+        return camera && hasViewPermission;
+    }
+
+    if (isSourceServerRequired(eventType))
+    {
+        const auto server = resource.dynamicCast<QnMediaServerResource>();
+        NX_ASSERT(server, "Event has occurred without its server %1", params.eventResourceId);
+        /* Only admins should see notifications with servers. */
+        return server && hasViewPermission;
+    }
+
+    return true;
 }
 
 AbstractEvent::AbstractEvent(

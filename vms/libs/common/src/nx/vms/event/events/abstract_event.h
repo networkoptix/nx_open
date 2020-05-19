@@ -47,6 +47,9 @@ bool isSourceCameraRequired(EventType eventType);
 /** Check if server required for this event to OCCUR. Always includes requiresServerResource(). */
 bool isSourceServerRequired(EventType eventType);
 
+/** Checks if the user has an access to this event. */
+bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& user);
+
 /**
  * @brief The AbstractEvent class
  *                              Base class for business events. Contains parameters of the
