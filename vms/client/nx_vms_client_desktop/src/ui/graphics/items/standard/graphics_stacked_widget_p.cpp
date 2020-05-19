@@ -27,15 +27,15 @@ QnGraphicsStackedWidgetPrivate::QnGraphicsStackedWidgetPrivate(QnGraphicsStacked
         [this]()
         {
             Q_Q(QnGraphicsStackedWidget);
-            q->updateGeometry();
-            updateGeometries();
+            updateGeometries(); //< Change children geometry.
+            q->updateGeometry(); //< Notify the layout.
         });
 
     installEventHandler(main, QEvent::ContentsRectChange,
         this, &QnGraphicsStackedWidgetPrivate::updateGeometries);
 
     connect(main, &QnGraphicsStackedWidget::geometryChanged,
-        this, &QnGraphicsStackedWidgetPrivate::updateGeometries);
+        this, &QnGraphicsStackedWidgetPrivate::updateGeometries, Qt::QueuedConnection);
 }
 
 QnGraphicsStackedWidgetPrivate::~QnGraphicsStackedWidgetPrivate()
