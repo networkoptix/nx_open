@@ -22,7 +22,7 @@ bool SystemMergeFixture::initializeSingleServerSystems(int count)
     for (int i = 0; i < count; ++i)
     {
         m_servers.emplace_back(
-            std::make_unique<PeerWrapper>(lm("%1/peer_%2")
+            std::make_unique<PeerWrapper>(lm("%1/%2")
                 .args(m_baseDirectory, m_servers.size())));
         for (const auto& nameAndValue: m_settings)
             m_servers.back()->addSetting(nameAndValue.first, nameAndValue.second);

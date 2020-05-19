@@ -186,7 +186,7 @@ Cloud& CloudSystemFixture::cloud()
 
 std::unique_ptr<VmsSystem> CloudSystemFixture::createVmsSystem(int serverCount)
 {
-    ::ec2::test::SystemMergeFixture systemMergeFixture(m_baseDir + "/vms_peers/");
+    ::ec2::test::SystemMergeFixture systemMergeFixture(m_baseDir + "/peers/");
 
     systemMergeFixture.addSetting(
         "-cloudIntegration/cloudDbUrl",

@@ -116,7 +116,7 @@ TestOptions::TemporaryDirectory::TemporaryDirectory()
 {
     const auto kModuleSubdirectory =
         QString("nx_unit_tests/%1").arg(QnUuid::createUuid().toSimpleString());
-    
+
     const auto root = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
     m_path = root.absoluteFilePath(kModuleSubdirectory);
 }

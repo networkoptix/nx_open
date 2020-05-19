@@ -16,7 +16,7 @@ QString calculateTestDirectory(const QString& moduleName, const QString& tmpDir)
     if (!tmpDir.isEmpty())
         return tmpDir;
 
-    const QString moduleSuffix = QString("/%1_ut.data").arg(moduleName);
+    const QString moduleSuffix = QString("/%1.tst").arg(moduleName);
 
     // Global temp dir is used if available. Module name is used as a subfolder.
     if (auto globalTmpDir = TestOptions::temporaryDirectoryPath(); !globalTmpDir.isEmpty())
