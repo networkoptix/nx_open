@@ -26,12 +26,30 @@ public:
         nx::Buffer* const buffer,
         IoCompletionHandler handler) = 0;
 
+    /**
+     * Future-based wrapper for readSomeAsync.
+     * 
+     * @returns Count of bytes transferred (i.e. second parameter of readSomeAsync handler).
+     * @throws std::system_error with error code (i.e. first parameter of readSomeAsync) and
+     * std::system_category() when operation fails.
+     * @throws std::system_error with std::errc::operation_canceled error code when operation is
+     * canceled.
+     */
     virtual cf::future<std::size_t> readSome(nx::Buffer* buffer);
 
     virtual void sendAsync(
         const nx::Buffer& buffer,
         IoCompletionHandler handler) = 0;
 
+    /**
+     * Future-based wrapper for sendAsync.
+     * 
+     * @returns Count of bytes transferred (i.e. second parameter of sendAsync handler).
+     * @throws std::system_error with error code (i.e. first parameter of sendAsync) and
+     * std::system_category() when operation fails.
+     * @throws std::system_error with std::errc::operation_canceled error code when operation is
+     * canceled.
+     */
     virtual cf::future<std::size_t> send(const nx::Buffer& buffer);
 
     /**
@@ -42,6 +60,9 @@ public:
         nx::network::aio::EventType eventType,
         nx::utils::MoveOnlyFunc<void()> handler) final;
 
+    /**
+     * Future-based wrapper for cancelIOAsync.
+     */
     cf::future<cf::unit> cancelIO(nx::network::aio::EventType eventType);
 
     /**

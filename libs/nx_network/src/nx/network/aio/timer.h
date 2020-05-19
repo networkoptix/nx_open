@@ -35,12 +35,21 @@ public:
         std::chrono::milliseconds timeout,
         TimerEventHandler timerFunc);
 
+    /**
+     * Future-based wrapper for start.
+     *
+     * @throws std::system_error with std::errc::operation_canceled error code when operation is
+     * canceled.
+     */
     cf::future<cf::unit> start(std::chrono::milliseconds timeout);
 
     boost::optional<std::chrono::nanoseconds> timeToEvent() const;
 
     void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
 
+    /**
+     * Future-based wrapper for cancelAsync.
+     */
     cf::future<cf::unit> cancel();
 
     /**
