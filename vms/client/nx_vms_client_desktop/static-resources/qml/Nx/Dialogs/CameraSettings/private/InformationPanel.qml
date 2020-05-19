@@ -14,6 +14,7 @@ Control
     property bool checkable: true
     property bool checked: false
     property bool refreshing: false
+    property bool refreshable: checked || !checkable
 
     property alias streamSelectorVisible: streamSelection.visible
     property alias streamSelectorEnabled: streamSelection.enabled
@@ -87,7 +88,7 @@ Control
 
                     text: qsTr("Refresh")
                     icon.source: "qrc:///skin/text_buttons/refresh.png"
-                    visible: informationPanel.checked && !informationPanel.refreshing
+                    visible: informationPanel.refreshable && !informationPanel.refreshing
 
                     onClicked:
                         informationPanel.refreshButtonClicked()
@@ -98,7 +99,7 @@ Control
                     id: refreshingIndicator
 
                     spacing: 2
-                    visible: informationPanel.checked && informationPanel.refreshing
+                    visible: informationPanel.refreshable && informationPanel.refreshing
 
                     AnimatedImage
                     {
