@@ -38,7 +38,6 @@ private:
     void sendJsonResponse(const QString& errorString);
     void processPositionRequest(
         const QnResourcePtr& resource, qint64 timeUSec, const QByteArray& callback);
-    QByteArray buildSignature();
 
 private:
     Q_DECLARE_PRIVATE(ProgressiveDownloadingServer);

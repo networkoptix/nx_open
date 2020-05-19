@@ -393,9 +393,10 @@ void ProgressiveDownloadingServer::run()
     }
 
     bool audioOnly = decodedUrlQuery.hasQueryItem("audio_only");
+    bool addSignature = decodedUrlQuery.hasQueryItem("signature");
 
     QnFfmpegTranscoder::Config config;
-    config.computeSignature = true;
+    config.computeSignature = addSignature;
     d->transcoder = std::make_unique<QnFfmpegTranscoder>(config, commonModule()->metrics());
 
     QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
@@ -618,8 +619,11 @@ void ProgressiveDownloadingServer::run()
 
     dataConsumer.pleaseStop();
 
-    auto signature = d->transcoder->getSignature(licensePool());
-    sendChunk(QnSignHelper::buildSignatureFileEnd(signature));
+    if (addSignature)
+    {
+        auto signature = d->transcoder->getSignature(licensePool());
+        sendChunk(QnSignHelper::buildSignatureFileEnd(signature));
+    }
 
     QnByteArray emptyChunk((unsigned)0,0);
     sendChunk(emptyChunk);
