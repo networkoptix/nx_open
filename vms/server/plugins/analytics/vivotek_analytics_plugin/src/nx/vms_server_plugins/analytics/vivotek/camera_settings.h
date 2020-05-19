@@ -31,7 +31,6 @@ public:
             m_state.template emplace<nothingIndex>();
         }
 
-
         bool hasValue() const
         {
             return m_state.index() == valueIndex;
@@ -47,7 +46,6 @@ public:
         {
             return m_state.template emplace<valueIndex>(std::forward<Args>(args)...);
         }
-
 
         bool hasError() const
         {

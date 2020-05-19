@@ -45,17 +45,21 @@ ErrorCode translateToSdk(std::error_code errorCode)
         return ErrorCode::noError;
 
     if (errorCode == std::errc::connection_aborted
-     || errorCode == std::errc::connection_refused
-     || errorCode == std::errc::connection_reset
-     || errorCode == std::errc::host_unreachable
-     || errorCode == std::errc::network_down
-     || errorCode == std::errc::network_reset
-     || errorCode == std::errc::network_unreachable)
+        || errorCode == std::errc::connection_refused
+        || errorCode == std::errc::connection_reset
+        || errorCode == std::errc::host_unreachable
+        || errorCode == std::errc::network_down
+        || errorCode == std::errc::network_reset
+        || errorCode == std::errc::network_unreachable)
+    {
         return ErrorCode::networkError;
+    }
 
     if (errorCode == std::errc::operation_not_permitted
-     || errorCode == std::errc::permission_denied)
+        || errorCode == std::errc::permission_denied)
+    {
         return ErrorCode::unauthorized;
+    }
 
     return ErrorCode::otherError;
 }

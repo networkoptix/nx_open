@@ -84,7 +84,7 @@ void DeviceAgent::doSetSettings(Result<const IStringMap*>* outResult, const IStr
 
 void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const
 {
-    // this is a temporary workaround until server is fixed to not call this method concurrently
+    // This is a temporary workaround until server is fixed to not call this method concurrently.
     static std::mutex mutex;
     std::lock_guard lockGuard(mutex);
     // ---
