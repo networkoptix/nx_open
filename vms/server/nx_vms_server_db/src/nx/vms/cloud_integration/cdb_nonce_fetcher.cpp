@@ -254,8 +254,8 @@ void CdbNonceFetcher::gotNonce(
 
     if (resCode != nx::cloud::db::api::ResultCode::ok)
     {
-        NX_WARNING(this, lit("Failed to fetch nonce from cdb: %1").
-            arg(static_cast<int>(resCode)));
+        NX_WARNING(this, "Failed to fetch nonce from cdb: %1",
+            nx::cloud::db::api::toString(resCode));
         m_cloudConnectionManager->processCloudErrorCode(resCode);
         m_timer.start(
             kGetNonceRetryTimeout,
