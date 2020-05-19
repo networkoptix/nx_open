@@ -988,7 +988,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>이 서버에 연결</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -1488,7 +1488,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional support</source>
-      <translation type="unfinished">Regional support</translation>
+      <translation>지역 지원</translation>
     </message>
   </context>
   <context>
@@ -2083,7 +2083,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>서버 선택</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
@@ -3596,15 +3596,15 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>일반</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>기능</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>허용 된 화면</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
@@ -6833,7 +6833,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>라이센스 활성화...</translation>
     </message>
   </context>
   <context>
@@ -7428,8 +7428,8 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n 값</numerusform>
       </translation>
     </message>
   </context>
@@ -8945,11 +8945,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>연결 끊김</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>연결됨</translation>
     </message>
     <message>
       <source>Powered</source>
@@ -8957,7 +8957,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>예기치 않은</translation>
     </message>
     <message>
       <source>Empty</source>
@@ -8979,7 +8979,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>소비</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9015,7 +9015,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 설정</translation>
     </message>
   </context>
   <context>
