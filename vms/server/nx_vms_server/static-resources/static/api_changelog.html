@@ -43,6 +43,11 @@ supported for a while, when noted below.
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>
 <p>
+In method <strong><code>GET /media</code></strong>, added
+the <strong><code><i>signature</i></code></strong> parameter which allows to add a signature to the
+exported multimedia data. By default, the signature will not be added to the media data.
+</p>
+<p>
 In method <strong><code>GET /ec2/analyticsLookupObjectTracks</code></strong>, parameter
 <strong><code><i>maxObjectTrackSize</i></code></strong> changed to
 <strong><code><b>needFullTrack</b></code></strong>. Previously this parameter was used to limit the
