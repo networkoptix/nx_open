@@ -19,16 +19,28 @@ namespace {
 
 std::map<QString, QString> parse(const QString& responseBody)
 {
-    static const QRegularExpression globalNameValueRe(
-        R"REGEX(^\s*(?P<name>[^=]+)\s*=\s*'(?P<value>[^']*)'\s*$)REGEX",
-        QRegularExpression::MultilineOption);
-    const auto nameValueRe = globalNameValueRe;
-
     std::map<QString, QString> parameters;
-    for (auto matchIter = nameValueRe.globalMatch(responseBody); matchIter.hasNext(); )
+    for (const auto line: responseBody.splitRef('\n', QString::SkipEmptyParts))
     {
-        auto match = matchIter.next();
-        parameters.emplace(match.captured("name"), match.captured("value"));
+        const auto equalsIndex = line.indexOf('=');
+        if (equalsIndex == -1)
+            throw std::runtime_error("No '=' between parameter name and value");
+
+        const auto name = line.left(equalsIndex).trimmed();
+        if (name.isEmpty())
+            throw std::runtime_error("No parameter name");
+
+        const auto quotedValue = line.right(line.length() - equalsIndex - 1).trimmed();
+        if (quotedValue.isEmpty())
+            throw std::runtime_error("No parameter value");
+        if (quotedValue.length() < 2
+            || !quotedValue.startsWith('\'') || !quotedValue.endsWith('\''))
+        {
+            throw std::runtime_error("Malformed parameter value");
+        }
+        const auto value = quotedValue.mid(1, quotedValue.length() - 2);
+
+        parameters.emplace(name.toString(), value.toString());
     }
     return parameters;
 }
