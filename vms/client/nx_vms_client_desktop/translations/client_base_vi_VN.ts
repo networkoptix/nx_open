@@ -5199,7 +5199,7 @@ to %1</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5700,7 +5700,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>hiện nay</translation>
     </message>
   </context>
   <context>
@@ -5791,7 +5791,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>smb</source>
-      <translation type="unfinished">smb</translation>
+      <translation>smb</translation>
     </message>
   </context>
   <context>

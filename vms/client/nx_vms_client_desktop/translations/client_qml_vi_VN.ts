@@ -216,11 +216,11 @@
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>Tối đa</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>Tối thiểu</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
