@@ -54,7 +54,7 @@ public:
 private:
     const int m_fps;
     double m_streamingTimeMs = 0;
-    QTime m_frameIntervalTimer;
+    QElapsedTimer m_frameIntervalTimer;
 };
 
 Camera::Camera(

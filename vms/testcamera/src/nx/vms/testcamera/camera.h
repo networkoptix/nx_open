@@ -72,8 +72,8 @@ private:
     // State for supporting 'offline' parameter.
     mutable nx::Mutex m_offlineMutex;
     std::atomic<bool> m_isEnabled = true;
-    QTime m_offlineTimer;
-    QTime m_checkTimer;
+    QElapsedTimer m_offlineTimer;
+    QElapsedTimer m_checkTimer;
     int m_offlineDurationMs = 0;
 };
 
