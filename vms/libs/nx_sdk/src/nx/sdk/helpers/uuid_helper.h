@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include <string>
+#include <iostream>
 
 #include <nx/sdk/uuid.h>
 
