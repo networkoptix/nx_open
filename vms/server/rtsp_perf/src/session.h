@@ -16,6 +16,7 @@ public:
         QString password;
         bool printTimestamps = false;
         bool ignoreSequenceNumberErrors = false;
+        std::chrono::milliseconds archivePosition{-1}; //< -1 - use random value
         std::chrono::milliseconds timeout{5000};
         std::chrono::microseconds maxTimestampDiff{0};
         std::chrono::microseconds minTimestampDiff{0};
