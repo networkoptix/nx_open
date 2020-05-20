@@ -125,6 +125,10 @@ void CameraRequestProcessor::run()
     if (overridingFps)
         fps = *overridingFps;
 
+    m_cameraPool->increaseActiveStreamCount();
+    nx::utils::ScopeGuard activeStreamCounter(
+        [cameraPool = m_cameraPool]() { cameraPool->decreaseActiveStreamCount(); });
+
     camera->performStreaming(d->socket.get(), streamIndex, fps);
 }
 
