@@ -438,7 +438,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                 NX_DEBUG(this, "%1: %2", m_logName, m_lastErrorMessage);
                 clearKeyData(track.logicalChannelNum);
                 m_demuxedData[rtpChannelNum]->clear();
-                if (++errorRetryCnt > m_maxRtpRetryCount || 1)
+                if (++errorRetryCnt > m_maxRtpRetryCount)
                 {
                     NX_WARNING(this, "%1: Too many RTP errors. Report a network issue", m_logName);
                     return QnAbstractMediaDataPtr(0);
