@@ -20,6 +20,9 @@ public:
     using NameValueList = QList<QPair<QString, QString>>;
 
     NameValueList content() const;
+
+    // Warning! Calling setContent during update of a backing store of some OpenGL-backed window
+    // must be avoided as OpenGL context switching at that moment can cause bugs at some systems.
     void setContent(const NameValueList& value);
 
     virtual QSize sizeHint() const override;

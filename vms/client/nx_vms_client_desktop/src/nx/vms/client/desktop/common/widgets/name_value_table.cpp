@@ -16,6 +16,7 @@
 #include <client_core/client_core_module.h>
 
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/pending_operation.h>
 
 namespace nx::vms::client::desktop {
 
@@ -116,10 +117,14 @@ struct NameValueTable::Private
     QScopedPointer<QOpenGLFramebufferObject> fbo;
 
     QPixmap pixmap;
+    nx::utils::PendingOperation updateOp;
 
     Private(NameValueTable* q):
         q(q)
     {
+        updateOp.setIntervalMs(1);
+        updateOp.setCallback([this]() { updateImage(); });
+        updateOp.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
     }
 
     virtual ~Private()
@@ -238,7 +243,7 @@ bool NameValueTable::event(QEvent* event)
         case QEvent::FontChange:
         case QEvent::PaletteChange:
         case QEvent::ScreenChangeInternal:
-            d->updateImage();
+            d->updateOp.requestOperation();
             break;
 
         default:
