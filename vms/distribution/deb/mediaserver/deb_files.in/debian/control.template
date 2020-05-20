@@ -5,6 +5,7 @@ Architecture: @target.arch@
 Maintainer: @customization.companyName@ <@supportEmail@>
 Pre-Depends: debconf
 Depends: @deb_dependencies@
+Recommends: @recommended_dependencies@
 Section: database
 Priority: optional
 Homepage: @customization.contact.companyUrl@

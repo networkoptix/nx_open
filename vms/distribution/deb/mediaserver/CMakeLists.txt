@@ -7,15 +7,19 @@ set(depends
 set(deb_dependencies_list
     "zlib1g (>= 1:1.1.4)"
     "debconf (>= 0.5) | debconf-2.0"
-    "psmisc"
     "systemd (>= 229)"
     "cifs-utils"
     "net-tools"
     "libcap2-bin"
+    "libglib2.0-0"
     "libldap-2.4-2"
 )
-
 list(JOIN deb_dependencies_list ", " deb_dependencies)
+
+set(recommended_dependencies_list
+    "gdb"
+)
+list(JOIN recommended_dependencies_list ", " recommended_dependencies)
 
 if(withRootTool)
     list(APPEND depends root_tool)
