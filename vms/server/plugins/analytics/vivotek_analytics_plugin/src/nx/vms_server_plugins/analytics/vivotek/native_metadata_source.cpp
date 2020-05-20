@@ -38,7 +38,7 @@ void NativeMetadataSource::close()
 
 cf::future<cf::unit> NativeMetadataSource::enableDetailMetadata(Url url)
 {
-    m_vcaParameterApi.emplace(std::move(url));
+    m_vcaParameterApi.emplace(std::move(url), "Config/AE");
     return m_vcaParameterApi->fetch()
         .then_unwrap(
             [this](auto parameters)

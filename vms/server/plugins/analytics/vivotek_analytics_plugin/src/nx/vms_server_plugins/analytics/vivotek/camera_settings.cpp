@@ -122,7 +122,10 @@ void fetchFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
 
     try
     {
-        const auto parameters = CameraVcaParameterApi(cameraUrl).fetch().get();
+        CameraVcaParameterApi api(cameraUrl, "Config/AE");
+
+        const auto parameters = api.fetch().get();
+
         enumerateVcaEntries(vca,
             [&](auto* entry, const QString& propertyName)
             {
@@ -256,7 +259,7 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
 
     try
     {
-        CameraVcaParameterApi api(cameraUrl);
+        CameraVcaParameterApi api(cameraUrl, "Config/AE");
 
         auto parameters = api.fetch().get();
 
