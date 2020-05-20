@@ -25,16 +25,25 @@ QString generateFreeText()
 
 void AttributeDictionary::initialize(int attributeCount, int valuesPerAttribute)
 {
-    m_words.resize(attributeCount * valuesPerAttribute);
-    for (auto& word: m_words)
-        word = QString::fromLatin1(nx::utils::random::generateName(7));
+    for (int i = 0; i < attributeCount; ++i)
+    {
+        const auto name = nx::utils::random::generateName(7);
+        for (int j = 0; j < valuesPerAttribute; ++j)
+        {
+            const auto value = nx::utils::random::generateName(7);
+            m_attributes.emplace_back(name, value);
+        }
+    }
+}
+
+void AttributeDictionary::initialize(std::vector<common::metadata::Attribute> attributes)
+{
+    m_attributes = std::move(attributes);
 }
 
 common::metadata::Attribute AttributeDictionary::getRandomAttribute() const
 {
-    return common::metadata::Attribute{
-        nx::utils::random::choice(m_words),
-        nx::utils::random::choice(m_words)};
+    return nx::utils::random::choice(m_attributes);
 }
 
 QString AttributeDictionary::getRandomText() const
@@ -42,7 +51,7 @@ QString AttributeDictionary::getRandomText() const
     const int elementsToConcat = nx::utils::random::number<int>(1, 2);
     QStringList result;
     for (int i = 0; i < elementsToConcat; ++i)
-        result.push_back(nx::utils::random::choice(m_words));
+        result.push_back(nx::utils::random::choice(m_attributes).value);
     return result.join(L' ');
 }
 

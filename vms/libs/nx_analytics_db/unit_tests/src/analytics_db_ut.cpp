@@ -268,7 +268,7 @@ protected:
         return m_allowedTimeRange;
     }
 
-    const AttributeDictionary& attributeDictionary() const
+    AttributeDictionary& attributeDictionary()
     {
         return m_attributeDictionary;
     }
@@ -782,7 +782,7 @@ TEST_F(AnalyticsDbMovingToNewPath, moving_during_concurrent_lookups)
 //-------------------------------------------------------------------------------------------------
 // Basic Lookup condition.
 
-class AnalyticsDbLookup:
+class AnalyticsDbLookupBase:
     public AnalyticsDb
 {
     using base_type = AnalyticsDb;
@@ -794,8 +794,6 @@ protected:
 
         if (HasFatalFailure())
             return;
-
-        generateVariousEvents();
 
         m_filter = buildEmptyFilter();
     }
@@ -1130,19 +1128,6 @@ protected:
         return m_filter;
     }
 
-private:
-    /**
-     * Always used to build expected result set.
-     * If m_effectiveLookupFilter is not defined, then it is also used to query the DB.
-     */
-    Filter m_filter;
-
-    /** If present, then this filter is used to query the Analytics DB. */
-    std::optional<Filter> m_effectiveLookupFilter;
-
-    QnUuid m_specificObjectTrackId;
-    QnTimePeriod m_specificObjectTrackTimePeriod;
-
     void generateVariousEvents()
     {
         std::vector<QnUuid> deviceIds;
@@ -1156,6 +1141,19 @@ private:
 
         saveAnalyticsDataPackets(generateEventsByCriteria());
     }
+
+private:
+    /**
+     * Always used to build expected result set.
+     * If m_effectiveLookupFilter is not defined, then it is also used to query the DB.
+     */
+    Filter m_filter;
+
+    /** If present, then this filter is used to query the Analytics DB. */
+    std::optional<Filter> m_effectiveLookupFilter;
+
+    QnUuid m_specificObjectTrackId;
+    QnTimePeriod m_specificObjectTrackTimePeriod;
 
     std::vector<common::metadata::ObjectMetadataPacketPtr> generateObjectWithLongTrackPackets()
     {
@@ -1192,6 +1190,20 @@ private:
             duration_cast<milliseconds>(microseconds(objectTrackEndTime - objectTrackStartTime)));
 
         return analyticsDataPackets;
+    }
+};
+
+class AnalyticsDbLookup:
+    public AnalyticsDbLookupBase
+{
+    using base_type = AnalyticsDbLookupBase;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        generateVariousEvents();
     }
 };
 
@@ -1283,42 +1295,6 @@ TEST_F(AnalyticsDbLookup, lookup_historic_attribute_value)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbLookup, full_text_search_by_unknown_text_produces_no_objects)
-{
-    addRandomUnknownText();
-    whenLookupObjectTracks();
-    thenResultMatchesExpectations();
-}
-
-TEST_F(AnalyticsDbLookup, full_text_search_case_insensitive)
-{
-    addRandomTextFoundInDataToFilter();
-    invertTextFilterCase();
-    whenLookupObjectTracks();
-
-    thenResultMatchesExpectations();
-}
-
-TEST_F(AnalyticsDbLookup, full_text_search_by_specific_param_value)
-{
-    const auto [name, value] = getAnyAttributePresentInData();
-    addTextToFilter(name + ":" + value);
-
-    whenLookupObjectTracks();
-
-    thenResultMatchesExpectations();
-}
-
-TEST_F(AnalyticsDbLookup, full_text_search_by_attribute_presence)
-{
-    const auto [name, value] = getAnyAttributePresentInData();
-    addTextToFilter("$" + name);
-
-    whenLookupObjectTracks();
-
-    thenResultMatchesExpectations();
-}
-
 TEST_F(AnalyticsDbLookup, lookup_by_bounding_box)
 {
     whenLookupByRandomBoundingBox();
@@ -1363,6 +1339,72 @@ TEST_F(AnalyticsDbLookup, quering_data_from_multiple_cameras)
 {
     givenRandomFilterWithMultipleDeviceIds();
     whenLookupObjectTracks();
+    thenResultMatchesExpectations();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class AnalyticsDbLookupFullText:
+    public AnalyticsDbLookupBase
+{
+    using base_type = AnalyticsDbLookupBase;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+    }
+
+    void setAttributeDictionary(
+        std::vector<common::metadata::Attribute> attributes)
+    {
+        attributeDictionary().initialize(std::move(attributes));
+    }
+};
+
+TEST_F(AnalyticsDbLookupFullText, unknown_text_produces_no_objects)
+{
+    generateVariousEvents();
+
+    addRandomUnknownText();
+    whenLookupObjectTracks();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookupFullText, search_case_insensitive)
+{
+    generateVariousEvents();
+
+    addRandomTextFoundInDataToFilter();
+    invertTextFilterCase();
+    whenLookupObjectTracks();
+
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookupFullText, search_by_specific_param_value)
+{
+    setAttributeDictionary({{"param1", "value1"}, {"param1", "value2"}});
+    generateVariousEvents();
+
+    //const auto [name, value] = getAnyAttributePresentInData();
+    //addTextToFilter(name + ":" + value);
+    addTextToFilter("param1:value1");
+
+    whenLookupObjectTracks();
+
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookup, search_by_attribute_presence)
+{
+    generateVariousEvents();
+
+    const auto [name, value] = getAnyAttributePresentInData();
+    addTextToFilter("$" + name);
+
+    whenLookupObjectTracks();
+
     thenResultMatchesExpectations();
 }
 

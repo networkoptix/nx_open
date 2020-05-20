@@ -8,11 +8,13 @@ class AttributeDictionary
 {
 public:
     void initialize(int attributeCount, int valuesPerAttribute);
+    void initialize(std::vector<common::metadata::Attribute> attributes);
+
     common::metadata::Attribute getRandomAttribute() const;
     QString getRandomText() const;
 
 private:
-    std::vector<QString> m_words;
+    std::vector<common::metadata::Attribute> m_attributes;
 };
 
 Filter generateRandomFilter(const AttributeDictionary* attributeDictionary = nullptr);
