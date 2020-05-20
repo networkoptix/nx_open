@@ -157,11 +157,17 @@ bool HevcParser::processRtpHeader(
 {
     NX_ASSERT(outPayload && *outPayload, "Incorrect payload.");
     if (!outPayload || !*outPayload)
+    {
+        setLastError(NX_FMT("Failed to parse RTP packet, Incorrect payload"));
         return false;
+    }
 
     NX_ASSERT(outPayloadLength, "Incorrect payload length.");
     if (!outPayloadLength)
+    {
+        setLastError(NX_FMT("Failed to parse RTP packet, Incorrect payload length"));
         return false;
+    }
 
     auto& payload = *outPayload;
     auto& payloadLength = *outPayloadLength;
@@ -170,17 +176,24 @@ bool HevcParser::processRtpHeader(
         *outIsFatalError = true;
 
     if (payloadLength < RtpHeader::kSize + 1)
+    {
+        setLastError(NX_FMT("Failed to parse RTP packet, payload length %1 less that RTP header", payloadLength));
         return false;
+    }
 
     auto rtpHeaderSize = calculateFullRtpHeaderSize(payload, payloadLength);
     if (rtpHeaderSize < RtpHeader::kSize)
+    {
+        setLastError(NX_FMT("Failed to parse RTP packet, Incorrect rtp header size %1", rtpHeaderSize));
         return false;
+    }
 
     auto rtpHeader = (RtpHeader*)(payload);
     if (!isApropriatePayloadType(rtpHeader))
     {
         if (outIsFatalError)
             *outIsFatalError = false;
+        setLastError(NX_FMT("Failed to parse RTP packet, Incorrect payload type"));
         return false;
     }
 
@@ -199,7 +212,10 @@ bool HevcParser::processRtpHeader(
     payloadLength -= rtpHeaderSize;
 
     if (payloadLength < 1)
+    {
+        setLastError(NX_FMT("Failed to parse RTP packet, Payload length is too small"));
         return false;
+    }
 
     if (rtpHeader->marker)
         m_gotMarkerBit = true;
@@ -259,7 +275,8 @@ bool HevcParser::handlePacketLoss(
     int previousSequenceNumber,
     int currentSequenceNumber)
 {
-    emit packetLostDetected(previousSequenceNumber, currentSequenceNumber);
+    setLastError(NX_FMT("Packet loss detected. Previous sequence %1, next sequence %2", 
+        previousSequenceNumber, currentSequenceNumber));
     return reset();
 }
 
@@ -271,11 +288,17 @@ bool HevcParser::isApropriatePayloadType(const RtpHeader* rtpHeader) const
 bool HevcParser::handlePayload(const uint8_t* payload, int payloadLength)
 {
     if (payloadLength <= 0)
+    {
+        setLastError(NX_FMT("Not enough data in RTP payload"));
         return false;
+    }
 
     hevc::NalUnitHeader packetHeader;
     if (!packetHeader.decode(payload, payloadLength))
+    {
+        setLastError(NX_FMT("Can't decode packet header"));
         return false;
+    }
 
     updateNalFlags(packetHeader.unitType, payload, payloadLength);
     skipPayloadHeader(&payload, &payloadLength);
@@ -292,6 +315,7 @@ bool HevcParser::handlePayload(const uint8_t* payload, int payloadLength)
         case hevc::PacketType::paciPacket:
             return handlePaciPacket(&packetHeader, payload, payloadLength);
         default:
+            setLastError(NX_FMT("Unknown packet type %1", (int) packetType));
             return false;
     }
 }
@@ -312,7 +336,10 @@ bool HevcParser::handleSingleNalUnitPacket(
     bool skipped = skipDonIfNeeded(&payload, &payloadLength);
 
     if (payloadLength < 0)
+    {
+        setLastError(NX_FMT("Not enough data in RTP packet"));
         return false;
+    }
 
     if (skipped)
     {
@@ -356,11 +383,17 @@ bool HevcParser::handleAggregationPacket(
         payloadLength -= 2;
 
         if (payloadLength < nalSize || nalSize < hevc::NalUnitHeader::kTotalLength)
+        {
+            setLastError(NX_FMT("Invalid payload length %1", payloadLength));
             return false;
+        }
 
         hevc::NalUnitHeader nalHeader;
         if (!nalHeader.decode(payload, payloadLength))
+        {
+            setLastError(NX_FMT("Can't decode nal header"));
             return false;
+        }
 
         updateNalFlags(nalHeader.unitType, payload, payloadLength);
 
@@ -369,6 +402,9 @@ bool HevcParser::handleAggregationPacket(
         payload += nalSize;
         payloadLength -= nalSize;
     }
+
+    if (payloadLength)
+        setLastError(NX_FMT("Unexpected payload rest in %1 byte(s) at the end of RTP packet", payloadLength));
 
     return payloadLength == 0;
 }
@@ -380,16 +416,25 @@ bool HevcParser::handleFragmentationPacket(
 {
     hevc::FuHeader fuHeader;
     if(!fuHeader.decode(payload, payloadLength))
+    {
+        setLastError(NX_FMT("Can't decode FU header"));
         return false;
+    }
 
     if (fuHeader.startFlag && fuHeader.endFlag)
+    {
+        setLastError(NX_FMT("Invalid flags in FU header"));
         return false;
+    }
 
     skipFuHeader(&payload, &payloadLength);
     skipDonIfNeeded(&payload, &payloadLength);
 
     if (payloadLength < 0)
+    {
+        setLastError(NX_FMT("Not enough data in RTP packet"));
         return false;
+    }
 
     if (fuHeader.startFlag)
     {

@@ -101,7 +101,6 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_gotSomeFrame(false),
     m_role(Qn::CR_Default),
     m_gotData(false),
-    m_rtpStarted(false),
     m_prefferedAuthScheme(nx::network::http::header::AuthScheme::digest),
     m_rtpTransport(nx::vms::api::RtpTransportType::automatic)
 {
@@ -231,17 +230,26 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         return result; // if no frame received yet do not report network issue error
     }
 
-    bool isRtpFail = !m_RtpSession.isOpened() && m_rtpStarted;
     int elapsed = m_dataTimer.elapsed();
     QString reasonParamsEncoded;
     vms::api::EventReason reason;
 
-    if (!isRtpFail)
+    if (m_RtpSession.isOpened())
     {
-        reason = vms::api::EventReason::networkNoFrame;
-        reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
-        NX_WARNING(this, "Can not read RTP frame for camera %1 during %2 ms, m_role=%3",
-            getResource(), elapsed, m_role);
+        if (!m_lastErrorMessage.isEmpty())
+        {
+            reason = vms::api::EventReason::networkRtpParserError;
+            const auto streamIndex = (m_role != Qn::CR_SecondaryLiveVideo)
+                ? "(primary stream)" : "(secondary stream)";
+            reasonParamsEncoded = NX_FMT("RTP error: %1 %2", m_lastErrorMessage, streamIndex);
+        }
+        else
+        {
+            reason = vms::api::EventReason::networkNoFrame;
+            reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
+            NX_WARNING(this, "Can not read RTP frame for camera %1 during %2 ms, m_role=%3",
+                getResource(), elapsed, m_role);
+        }
     }
     else
     {
@@ -423,14 +431,16 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             const int length = bytesRead - kInterleavedRtpOverTcpPrefixLength;
             uint8_t* rtpPacketData = (uint8_t*)m_demuxedData[rtpChannelNum]->data();
             updateOnvifTime(rtpPacketData + offset, length, track);
+            m_lastErrorMessage.clear();
             if (!track.parser->processData(rtpPacketData, offset, length, m_gotData))
             {
+                m_lastErrorMessage = track.parser->lastError();
+                NX_DEBUG(this, "%1: %2", m_logName, m_lastErrorMessage);
                 clearKeyData(track.logicalChannelNum);
                 m_demuxedData[rtpChannelNum]->clear();
-                if (++errorRetryCnt > m_maxRtpRetryCount)
+                if (++errorRetryCnt > m_maxRtpRetryCount || 1)
                 {
-                    NX_WARNING(this, "%1: Too many RTP errors. Reopen stream", m_logName);
-                    closeStream();
+                    NX_WARNING(this, "%1: Too many RTP errors. Report a network issue", m_logName);
                     return QnAbstractMediaDataPtr(0);
                 }
             }
@@ -546,7 +556,7 @@ nx::streaming::rtp::StreamParser* QnMulticodecRtpReader::createParser(const QStr
     if (codecName.isEmpty())
         return 0;
     else if (codecName == QLatin1String("H264"))
-        result = new nx::streaming::rtp::H264Parser(m_logName);
+        result = new nx::streaming::rtp::H264Parser();
     else if (codecName == QLatin1String("H265"))
         result = new nx::streaming::rtp::HevcParser();
     else if (codecName == QLatin1String("JPEG"))
@@ -608,9 +618,6 @@ nx::streaming::rtp::StreamParser* QnMulticodecRtpReader::createParser(const QStr
             result = customParser.release();
     }
 
-    if (result)
-        Qn::directConnect(result, &nx::streaming::rtp::StreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost);
-
     return result;
 }
 
@@ -631,26 +638,6 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
 
     if (key == ResourcePropertyKey::kTrustCameraTime && m_role != Qn::ConnectionRole::CR_Archive)
         m_timeHelper.setTimePolicy(getTimePolicy(m_resource));
-}
-
-void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
-{
-    const QnResourcePtr& resource = getResource();
-    NX_VERBOSE(this, "%1: Packet loss detected, prev seq %2, next seq %3", m_logName, prev, next);
-
-    if (const auto camera = dynamic_cast<QnVirtualCameraResource*>(resource.data()))
-        camera->issueOccured();
-
-    const auto now = std::chrono::steady_clock::now();
-    if (!m_packetLossReportTime || *m_packetLossReportTime + PACKET_LOSS_WARNING_TIME < now)
-    {
-        m_packetLossReportTime = now;
-        NX_WARNING(this, "%1: Packet loss detected", m_logName);
-    }
-
-    emit networkIssue(
-        resource, qnSyncTime->currentUSecsSinceEpoch(),
-        vms::api::EventReason::networkRtpPacketLoss, QString());
 }
 
 nx::vms::api::RtpTransportType QnMulticodecRtpReader::getRtpTransport() const
@@ -691,7 +678,6 @@ void QnMulticodecRtpReader::setCustomTrackParserFactory(
 CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 {
     m_pleaseStop = false;
-    m_rtpStarted = false;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
     //m_timeHelper.reset();
@@ -814,7 +800,6 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         m_openStreamResult = CameraDiagnostics::NoMediaTrackResult(m_currentStreamUrl);
         return m_openStreamResult;
     }
-    m_rtpStarted = true;
     m_openStreamResult = CameraDiagnostics::NoErrorResult();
     return CameraDiagnostics::NoErrorResult();
 }
@@ -870,7 +855,6 @@ void QnMulticodecRtpReader::createTrackParsers()
 
 void QnMulticodecRtpReader::closeStream()
 {
-    m_rtpStarted = false;
     if (m_RtpSession.isOpened())
         m_RtpSession.sendTeardown();
     m_RtpSession.stop();
@@ -900,7 +884,6 @@ QnConstResourceAudioLayoutPtr QnMulticodecRtpReader::getAudioLayout() const
 void QnMulticodecRtpReader::pleaseStop()
 {
     m_pleaseStop = true;
-    m_rtpStarted = false;
     m_RtpSession.shutdown();
 }
 

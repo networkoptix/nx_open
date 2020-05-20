@@ -31,6 +31,7 @@ enum class EventReason
     networkCameraTimeBackToNormal = 21,
     networkMulticastAddressConflict = 22,
     networkMulticastAddressIsInvalid = 23,
+    networkRtpParserError = 24,
 
     // Server Failure event
     serverTerminated = 4,

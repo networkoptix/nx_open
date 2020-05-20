@@ -138,7 +138,6 @@ private:
     bool isFormatSupported(const nx::streaming::Sdp::Media media) const;
 
 private slots:
-    void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr& res, const QString& key);
     void createTrackParsers();
 
@@ -165,7 +164,6 @@ private:
     QnConstResourceAudioLayoutPtr m_audioLayout;
     bool m_gotData;
     QElapsedTimer m_dataTimer;
-    bool m_rtpStarted;
     nx::network::http::header::AuthScheme::Value m_prefferedAuthScheme;
     nx::utils::Url m_currentStreamUrl;
     nx::vms::api::RtpTransportType m_rtpTransport;
@@ -211,6 +209,7 @@ private:
         m_registeredMulticastAddresses;
 
     std::unique_ptr<nx::streaming::rtp::IRtpParserFactory> m_customTrackParserFactory;
+    QString m_lastErrorMessage;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

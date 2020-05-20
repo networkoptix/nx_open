@@ -37,13 +37,14 @@ public:
 
     int getFrequency() { return m_frequency; };
 
-signals:
-    void packetLostDetected(quint32 prev, quint32 next);
+    QString lastError() const { return m_lastError; }
+    void setLastError(const QString& message) { m_lastError = message; }
 protected:
     void setFrequency(int frequency) { m_frequency = frequency; }
 
 private:
     int m_frequency = 0;
+    QString m_lastError;
 };
 
 class VideoStreamParser: public StreamParser

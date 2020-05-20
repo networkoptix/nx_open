@@ -483,7 +483,10 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     static quint8 jpeg_end[2] = {0xff, 0xd9};
 
     if (bytesRead < RtpHeader::kSize + 1)
+    {
+        setLastError(NX_FMT("Too small RTP buffer %1 bytes", bytesRead));
         return false;
+    }
 
     RtpHeader* rtpHeader = (RtpHeader*)rtpBuffer;
     const quint8* curPtr = rtpBuffer + RtpHeader::kSize;
@@ -498,7 +501,10 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     if (rtpHeader->extension)
     {
         if (bytesRead < RtpHeader::kSize + 4)
+        {
+            setLastError(NX_FMT("Too small RTP buffer %1 bytes", bytesRead));
             return false;
+        }
 
         int extWords = ((int)curPtr[2] << 8) + curPtr[3];
         const auto extensionsSize = (extWords + 1) * 4;
@@ -508,7 +514,10 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     }
 
     if (bytesLeft < 8)
+    {
+        setLastError(NX_FMT("Not enough bytes left in buffer. %1 bytes", bytesLeft));
         return false;
+    }
 
     // 1. jpeg main header
 
@@ -529,7 +538,10 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     if (jpegType & 0x40)
     {
         if (bytesLeft < 4)
+        {
+            setLastError(NX_FMT("Not enough bytes left in buffer. %1 bytes", bytesLeft));
             return false;
+        }
         dri = (curPtr[0] << 8) + curPtr[1];
 
         curPtr += 4;
@@ -545,7 +557,10 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
         if (jpegQ >= 128)
         {
             if (bytesLeft < 4)
+            {
+                setLastError(NX_FMT("Not enough bytes left in buffer. %1 bytes", bytesLeft));
                 return false;
+            }
             [[maybe_unused]] quint8 MBZ = *curPtr++;
             quint8 Precision = *curPtr++;
             quint16 length = (curPtr[0] << 8) + curPtr[1];
@@ -553,7 +568,11 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
             bytesLeft -= 4;
 
             if (bytesLeft < length)
+            {
+                setLastError(NX_FMT("Not enough bytes left in buffer. "
+                    "%1 bytes, expected at least %2 bytes", bytesLeft, length));
                 return false;
+            }
 
             int lumaSize = (Precision & 1) ? 2 : 1;
             int chromaSize = (Precision & 2) ? 2 : 1;
@@ -572,7 +591,10 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
             {
                 static const int kTableSize = 64;
                 if (length < kTableSize)
+                {
+                    setLastError(NX_FMT("Invalid color table length %1. Expected at least %2", length, kTableSize));
                     return false;
+                }
                 // RFC2435. Same table for each frame, make deep copy of tables.
                 lumaTable = curPtr;
                 chromaTable = curPtr + (length >= kTableSize*2 ? kTableSize : 0);
@@ -604,7 +626,10 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
             else
             {
                 if (!lumaTable || !chromaTable)
+                {
+                    setLastError(NX_FMT("Missing luma or chroma table"));
                     return false;
+                }
                 m_headerLen = makeHeaders(m_hdrBuffer, jpegType, width, height,
                     lumaTable, chromaTable, dri); //< use tables direct pointer
             }
@@ -636,10 +661,9 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     // Check buffer overflow
     if (m_frameSize + bytesLeft > (int) MAX_ALLOWED_FRAME_SIZE)
     {
-        NX_WARNING(this, "RTP parser buffer overflow");
         m_chunks.clear();
         m_frameSize = 0;
-        emit packetLostDetected(0, 0);
+        setLastError(NX_FMT("RTP MJPEG parser buffer overflow"));
         return false;
     }
     m_chunks.push_back(Chunk(curPtr - rtpBufferBase, bytesLeft));
