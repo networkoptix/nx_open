@@ -20,7 +20,7 @@ void showHelp(const char* exeName)
 
     const std::string baseExeName = QFileInfo(exeName).baseName().toStdString();
 
-    std::cout << /*suppress newline*/1 + R"help(
+    std::cout << /*suppress newline*/ 1 + (const char*) R"help(
 Usage:
  )help" + baseExeName + R"help( [<option> | <cameraSet>]...
 
