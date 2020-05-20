@@ -70,13 +70,13 @@ public:
      * Extract information about IVA ROI (as a json object) of a desired type from
      * the json object (that corresponds to some event and channel)
      */
-    static nx::kit::Json  DeviceResponseJsonParser::extractIvaRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
+    static nx::kit::Json  extractIvaRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
 
     /**
      * Extract information about object detection ROI (as a json object) of a desired type from
      * the json object (that corresponds to some event and channel)
      */
-    static nx::kit::Json  DeviceResponseJsonParser::extractOdRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
+    static nx::kit::Json  extractOdRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
 
 };
 
