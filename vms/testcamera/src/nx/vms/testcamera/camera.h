@@ -42,7 +42,8 @@ public:
     nx::utils::MacAddress macAddress() const { return m_macAddress; }
 
     /**
-     * Streams the files for the specified stream in an infinite loop. Exits only on error.
+     * Streams the files for the specified stream in an infinite loop. Exits only on error. Can be
+     * called concurrently from different threads to stream to different Servers.
      */
     void performStreaming(
         nx::network::AbstractStreamSocket* socket, StreamIndex streamIndex, int fps);
