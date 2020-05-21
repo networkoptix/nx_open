@@ -266,4 +266,24 @@ Camera* CameraPool::findCamera(const nx::utils::MacAddress& macAddress) const
     return nullptr;
 }
 
+void CameraPool::increaseActiveStreamCount()
+{
+    ++m_activeStreamCount;
+    NX_DEBUG(this, "Active stream count increased to %1.", m_activeStreamCount);
+}
+
+void CameraPool::decreaseActiveStreamCount()
+{
+    --m_activeStreamCount;
+    NX_DEBUG(this, "Active stream count decreased to %1.", m_activeStreamCount);
+
+    NX_ASSERT(m_activeStreamCount >= 0);
+
+    if (m_activeStreamCount == 0)
+    {
+        // ATTENTION: This message must not be changed because it is parsed by functional tests.
+        NX_INFO(this, "All active streams closed.");
+    }
+}
+
 } // namespace nx::vms::testcamera

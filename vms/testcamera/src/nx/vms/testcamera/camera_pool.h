@@ -58,6 +58,12 @@ public:
     /** @return Null if not found. */
     Camera* findCamera(const nx::utils::MacAddress& macAddress) const;
 
+    /** Used for logging. Must be called when a Camera starts streaming to a socket. */
+    void increaseActiveStreamCount();
+
+    /** Used for logging. Must be called when a Camera finishes streaming to a socket. */
+    void decreaseActiveStreamCount();
+
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
         std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override;
@@ -95,6 +101,8 @@ private:
     const bool m_noSecondaryStream;
     const std::optional<int> m_fpsPrimary;
     const std::optional<int> m_fpsSecondary;
+
+    std::atomic<int> m_activeStreamCount = 0;
 };
 
 } // namespace nx::vms::testcamera

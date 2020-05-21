@@ -20,7 +20,7 @@ CameraRequestProcessor::CameraRequestProcessor(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     bool noSecondaryStream,
     std::optional<int> fpsPrimary,
-        std::optional<int> fpsSecondary)
+    std::optional<int> fpsSecondary)
     :
     QnTCPConnectionProcessor(std::move(socket), /*owner*/ cameraPool),
     m_logger(new Logger(lm("CameraRequestProcessor(%1)").args(getForeignAddress()))),
@@ -29,11 +29,14 @@ CameraRequestProcessor::CameraRequestProcessor(
     m_fpsPrimary(fpsPrimary),
     m_fpsSecondary(fpsSecondary)
 {
+    NX_LOGGER_DEBUG(m_logger, "Created; noSecondaryStream %1, fpsPrimary %2, fpsSecondary %3.",
+        m_noSecondaryStream ? "true" : "false", m_fpsPrimary, m_fpsSecondary);
 }
 
 CameraRequestProcessor::~CameraRequestProcessor()
 {
     stop();
+    NX_LOGGER_DEBUG(m_logger, "Destroyed.");
 }
 
 QByteArray CameraRequestProcessor::receiveCameraUrl()
@@ -87,8 +90,8 @@ void CameraRequestProcessor::run()
         return;
     }
 
-    auto* const camera = m_cameraPool->findCamera(macAddress);
-    if (camera == nullptr)
+    Camera* const camera = m_cameraPool->findCamera(macAddress);
+    if (!camera)
     {
         NX_LOGGER_VERBOSE(m_logger, "No Camera found with MAC %1.", macAddressString);
         return;
@@ -121,6 +124,10 @@ void CameraRequestProcessor::run()
         (streamIndex == StreamIndex::secondary) ? m_fpsSecondary : m_fpsPrimary;
     if (overridingFps)
         fps = *overridingFps;
+
+    m_cameraPool->increaseActiveStreamCount();
+    nx::utils::ScopeGuard activeStreamCounter(
+        [cameraPool = m_cameraPool]() { cameraPool->decreaseActiveStreamCount(); });
 
     camera->performStreaming(d->socket.get(), streamIndex, fps);
 }

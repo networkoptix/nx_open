@@ -97,7 +97,7 @@ bool Camera::performStreamingFile(
         {
             QnSleep::msleep(100);
             NX_LOGGER_INFO(logger,
-                "The camera was disabled as per 'offline' parameter; stop streaming.");
+                "Stop streaming: The camera was disabled as per 'offline' parameter.");
             return false;
         }
 
@@ -106,7 +106,7 @@ bool Camera::performStreamingFile(
             if (ini().stopStreamingOnErrors)
             {
                 NX_LOGGER_INFO(logger,
-                    "Frame sending failed due to the above reason; stop streaming.");
+                    "Stop streaming: Frame sending failed due to the above reason.");
                 return false;
             }
         }
@@ -139,9 +139,9 @@ void Camera::performStreaming(
 
     FrameScheduler frameScheduler(fps);
 
-    for (;;) //< Stream all files in the list infinitely, unless an error occurs.
+    for (;;) //< Stream all the files in the list infinitely, until an error occurs.
     {
-        for (const QString filename: filenames)
+        for (const QString& filename: filenames)
         {
             const auto& file = m_fileCache->getFile(filename);
 
