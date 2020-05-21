@@ -2,14 +2,17 @@
 
 #include <atomic>
 
+#include <QtCore/QElapsedTimer>
+
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/mac_address.h>
 
 #include <nx/vms/api/types/motion_types.h> //< For StreamIndex.
+#include "camera_options.h"
+
 using nx::vms::api::StreamIndex;
 
-#include "camera_options.h"
 
 namespace nx::network { class AbstractStreamSocket; }
 class QnCompressedVideoData; //< private
