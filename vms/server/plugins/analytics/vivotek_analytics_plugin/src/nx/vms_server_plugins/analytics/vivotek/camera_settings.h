@@ -11,6 +11,7 @@
 #include <QtCore/QJsonValue>
 
 #include "camera_features.h"
+#include "named_polygon.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -96,6 +97,17 @@ public:
             NX_CAMERA_SETTINGS_ENTRY(Vca.Installation, TiltAngle, int) tiltAngle;
             NX_CAMERA_SETTINGS_ENTRY(Vca.Installation, RollAngle, int) rollAngle;
         } installation;
+
+        struct IntrusionDetection
+        {
+            struct Rule
+            {
+                NX_CAMERA_SETTINGS_ENTRY(Vca.IntrusionDetection.Rule#, Region, NamedPolygon) region;
+                NX_CAMERA_SETTINGS_ENTRY(Vca.IntrusionDetection.Rule#, Inverted, bool) inverted;
+            };
+            std::vector<Rule> rules;
+        };
+        std::optional<IntrusionDetection> intrusionDetection;
     };
     std::optional<Vca> vca;
 

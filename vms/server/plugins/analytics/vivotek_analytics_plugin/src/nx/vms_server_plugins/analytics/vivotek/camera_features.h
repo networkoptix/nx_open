@@ -9,13 +9,13 @@ class CameraFeatures
 public:
     struct Vca
     {
-        bool crowd = false;
-        bool loitering = false;
-        bool intrusion = false;
-        bool lineCrossing = false;
-        bool missingObject = false;
-        bool unattendedObject = false;
-        bool face = false;
+        bool crowdDetection = false;
+        bool loiteringDetection = false;
+        bool intrusionDetection = false;
+        bool lineCrossingDetection = false;
+        bool missingObjectDetection = false;
+        bool unattendedObjectDetection = false;
+        bool faceDetection = false;
     };
     std::optional<Vca> vca;
 

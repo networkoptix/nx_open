@@ -22,13 +22,13 @@ void fetchFromCamera(CameraFeatures::Vca* vca, const Url& cameraUrl)
     {
         const auto function = get<QString>("$.Functions", functions, i);
         
-        vca->crowd |= function.contains("CrowdDetection");
-        vca->loitering |= function.contains("LoiteringDetection");
-        vca->intrusion |= function.contains("IntrusionDetection");
-        vca->lineCrossing |= function.contains("LineCrossingDetection");
-        vca->missingObject |= function.contains("MissingObjectDetection");
-        vca->unattendedObject |= function.contains("UnattendedObjectDetection");
-        vca->face |= function.contains("FaceDetection");
+        vca->crowdDetection |= function.contains("CrowdDetection");
+        vca->loiteringDetection |= function.contains("LoiteringDetection");
+        vca->intrusionDetection |= function.contains("IntrusionDetection");
+        vca->lineCrossingDetection |= function.contains("LineCrossingDetection");
+        vca->missingObjectDetection |= function.contains("MissingObjectDetection");
+        vca->unattendedObjectDetection |= function.contains("UnattendedObjectDetection");
+        vca->faceDetection |= function.contains("FaceDetection");
     }
 }
 

@@ -26,6 +26,8 @@ using namespace nx::network;
 
 namespace {
 
+const auto kMaxDetectionRuleCount = 5u; // Defined in user manual.
+
 class VadpModuleInfo
 {
 public:
@@ -290,18 +292,43 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
 template <typename Settings, typename Visitor>
 void enumerateEntries(Settings* settings, Visitor visit)
 {
-    if (settings->vca)
+    const auto uniqueVisit =
+        [&](auto* entry)
+        {
+            visit(QString(entry->name), entry);
+        };
+
+    const auto repeatedVisit =
+        [&](std::size_t index, auto* entry)
+        {
+            visit(QString(entry->name).replace("#", "%1").arg(index + 1), entry);
+        };
+
+    if (auto& vca = settings->vca)
     {
-        visit(&settings->vca->enabled);
-        visit(&settings->vca->sensitivity);
-        visit(&settings->vca->installation.height);
-        visit(&settings->vca->installation.tiltAngle);
-        visit(&settings->vca->installation.rollAngle);
+        uniqueVisit(&vca->enabled);
+        uniqueVisit(&vca->sensitivity);
+        uniqueVisit(&vca->installation.height);
+        uniqueVisit(&vca->installation.tiltAngle);
+        uniqueVisit(&vca->installation.rollAngle);
+
+        if (auto& intrusionDetection = vca->intrusionDetection)
+        {
+            auto& rules = intrusionDetection->rules;
+            for (std::size_t i = 0; i < rules.size(); ++i)
+            {
+                auto& rule = rules[i];
+
+                repeatedVisit(i, &rule.region);
+                repeatedVisit(i, &rule.inverted);
+            }
+        }
     }
 }
 
 
-void parseEntryFromServer(const QString& /*name*/, CameraSettings::Entry<bool>* entry, const QString& unparsedValue)
+void parseEntryFromServer(const QString& /*name*/,
+    CameraSettings::Entry<bool>* entry, const QString& unparsedValue)
 {
     if (unparsedValue == "false")
         entry->emplaceValue(false);
@@ -311,32 +338,101 @@ void parseEntryFromServer(const QString& /*name*/, CameraSettings::Entry<bool>* 
         throw Exception("Failed to parse boolean");
 }
 
-void parseEntryFromServer(const QString& name, CameraSettings::Entry<int>* entry, const QString& unparsedValue)
+void parseEntryFromServer(const QString& /*name*/,
+    CameraSettings::Vca::Sensitivity* entry, const QString& unparsedValue)
 {
-    // Some integer settings are in `TextField`s because SpinBoxes can't represent empty state,
-    // which we need to work around camera not returning settings for disabled functionality.
-    const auto parseIntFromTextField =
-        [&](int low, int high)
-        {
-            entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), low, high));
-        };
-
-    if (unparsedValue.isEmpty() && name.startsWith("Vca."))
+    if (unparsedValue.isEmpty())
+    {
         entry->emplaceNothing();
-    else if (name == CameraSettings::Vca::Sensitivity::name)
-        parseIntFromTextField(1, 10);
-    else if (name == CameraSettings::Vca::Installation::Height::name)
-        parseIntFromTextField(0, 2000);
-    else if (name == CameraSettings::Vca::Installation::TiltAngle::name)
-        parseIntFromTextField(0, 179);
-    else if (name == CameraSettings::Vca::Installation::RollAngle::name)
-        parseIntFromTextField(-74, +74);
-    else
-        entry->emplaceValue(toInt(unparsedValue));
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 1, 10));
+}
+
+void parseEntryFromServer(const QString& /*name*/,
+    CameraSettings::Vca::Installation::Height* entry, const QString& unparsedValue)
+{
+    if (unparsedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 2000));
+}
+
+void parseEntryFromServer(const QString& /*name*/,
+    CameraSettings::Vca::Installation::TiltAngle* entry, const QString& unparsedValue)
+{
+    if (unparsedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 179));
+}
+
+void parseEntryFromServer(const QString& /*name*/,
+    CameraSettings::Vca::Installation::RollAngle* entry, const QString& unparsedValue)
+{
+    if (unparsedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), -74, +74));
+}
+
+void parseEntryFromServer(const QString& /*name*/,
+    CameraSettings::Entry<int>* entry, const QString& unparsedValue)
+{
+    entry->emplaceValue(toInt(unparsedValue));
+}
+
+bool parseFromServer(NamedPointSequence* points, const QJsonValue& json)
+{
+    const auto figure = get<QJsonValue>(json, "figure");
+    if (figure.isNull())
+        return false;
+
+    points->name = get<QString>(json, "label");
+    if (points->name.isEmpty())
+        throw Exception("Empty label");
+
+    const auto jsonPoints = get<QJsonArray>("$.figure", figure, "points");
+    for (int i = 0; i < jsonPoints.count(); ++i)
+    {
+        const auto point = get<QJsonArray>("$.figure.points", jsonPoints, i);
+        const QString path = NX_FMT("$.figure.points[%1]", i);
+        points->emplace_back(
+            get<double>(path, point, 0),
+            get<double>(path, point, 1));
+    }
+    
+    return true;
+}
+
+void parseEntryFromServer(const QString& /*name*/,
+    CameraSettings::Entry<NamedPolygon>* entry, const QString& unparsedValue)
+{
+    const auto json = parseJson(unparsedValue.toUtf8());
+
+    NamedPolygon polygon;
+    if (!parseFromServer(&polygon, json))
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::move(polygon));
 }
 
 
-std::optional<QString> unparseEntryToServer(const QString& /*name*/, const CameraSettings::Entry<bool>& entry)
+std::optional<QString> unparseEntryToServer(
+    const QString& /*name*/, const CameraSettings::Entry<bool>& entry)
 {
     if (!entry.hasValue())
         return std::nullopt;
@@ -344,17 +440,87 @@ std::optional<QString> unparseEntryToServer(const QString& /*name*/, const Camer
     return entry.value() ? "true" : "false";
 }
 
-std::optional<QString> unparseEntryToServer(const QString& name, const CameraSettings::Entry<int>& entry)
+std::optional<QString> unparseEntryToServer(const QString& /*name*/,
+    const CameraSettings::Vca::Sensitivity& entry)
 {
     if (!entry.hasValue())
-    {
-        if (name.startsWith("Vca."))
-            return "";
-
-        return std::nullopt;
-    }
+        return "";
 
     return QString::number(entry.value());
+}
+
+std::optional<QString> unparseEntryToServer(const QString& /*name*/,
+    const CameraSettings::Vca::Installation::Height& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> unparseEntryToServer(const QString& /*name*/,
+    const CameraSettings::Vca::Installation::TiltAngle& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> unparseEntryToServer(const QString& /*name*/,
+    const CameraSettings::Vca::Installation::RollAngle& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> unparseEntryToServer(
+    const QString& /*name*/, const CameraSettings::Entry<int>& entry)
+{
+    if (!entry.hasValue())
+        return std::nullopt;
+
+    return QString::number(entry.value());
+}
+
+QJsonValue unparseToServer(const NamedPointSequence* points)
+{
+    if (!points)
+    {
+        return QJsonObject{
+            {"label", ""},
+            {"figure", QJsonValue::Null},
+        };
+    }
+
+    return QJsonObject{
+        {"label", points->name},
+        {"figure", QJsonObject{
+            {"points",
+                [&]()
+                {
+                    QJsonArray jsonPoints;
+
+                    for (const auto& point: *points)
+                        jsonPoints.push_back(QJsonArray{point.x, point.y});
+
+                    return jsonPoints;
+                }(),
+            },
+        }},
+    };
+}
+
+std::optional<QString> unparseEntryToServer(const QString& /*name*/,
+    const CameraSettings::Entry<NamedPolygon>& entry)
+{
+    const NamedPolygon* polygon = nullptr;
+    if (entry.hasValue())
+        polygon = &entry.value();
+
+    return unparseJson(unparseToServer(polygon));
 }
 
 
@@ -363,7 +529,7 @@ QJsonValue getVcaInstallationModelForManifest()
     using Installation = CameraSettings::Vca::Installation;
     return QJsonObject{
         {"type", "GroupBox"},
-        {"caption", "Camera installation"},
+        {"caption", "Camera Installation"},
         {"items", QJsonArray{
             QJsonObject{
                 {"name", Installation::Height::name},
@@ -393,10 +559,53 @@ QJsonValue getVcaInstallationModelForManifest()
     };
 }
 
-QJsonValue getVcaModelForManifest()
+QJsonValue getVcaIntrusionDetectionModelForManifest()
+{
+    using Rule = CameraSettings::Vca::IntrusionDetection::Rule;
+    return QJsonObject{
+        {"name", "IntrusionDetection"},
+        {"type", "Section"},
+        {"caption", "Intrusion Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) kMaxDetectionRuleCount},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{Rule::Region::name}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", Rule::Region::name},
+                            {"type", "PolygonFigure"},
+                            {"caption", "Detection area"},
+                            {"minPoints", 3},
+                            {"maxPoints", 20}, // Defined in user guide.
+                        },
+                        QJsonObject{
+                            {"name", Rule::Inverted::name},
+                            {"type", "ComboBox"},
+                            {"caption", "Direction"},
+                            {"description", "Movement direction which causes the event"},
+                            {"range", QJsonArray{"false", "true"}},
+                            {"itemCaptions", QJsonObject{
+                                {"false", "In"},
+                                {"true", "Out"},
+                            }},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
+QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
 {
     using Vca = CameraSettings::Vca;
     return QJsonObject{
+        {"name", "Vca"},
         {"type", "Section"},
         {"caption", "Deep Learning VCA"},
         {"items", QJsonArray{
@@ -415,6 +624,17 @@ QJsonValue getVcaModelForManifest()
             },
             getVcaInstallationModelForManifest(),
         }},
+        {"sections",
+            [&]()
+            {
+                QJsonArray sections;
+
+                if (features.intrusionDetection)
+                    sections.push_back(getVcaIntrusionDetectionModelForManifest());
+
+                return sections;
+            }(),
+        },
     };
 }
 
@@ -423,7 +643,15 @@ QJsonValue getVcaModelForManifest()
 CameraSettings::CameraSettings(const CameraFeatures& features)
 {
     if (features.vca)
+    {
         vca.emplace();
+
+        if (features.vca->intrusionDetection)
+        {
+            auto& instrusionDetection = vca->intrusionDetection.emplace();
+            instrusionDetection.rules.resize(kMaxDetectionRuleCount);
+        }
+    }
 }
 
 void CameraSettings::fetchFrom(const Url& cameraUrl)
@@ -441,18 +669,18 @@ void CameraSettings::storeTo(const Url& cameraUrl)
 void CameraSettings::parseFromServer(const IStringMap& values)
 {
     enumerateEntries(this,
-        [&](auto* entry)
+        [&](const QString& name, auto* entry)
         {
             try
             {
-                const char* unparsedValue = values.value(entry->name);
+                const char* unparsedValue = values.value(name.toStdString().data());
                 if (!unparsedValue)
                 {
                     entry->emplaceNothing();
                     return;
                 }
 
-                parseEntryFromServer(entry->name, entry, unparsedValue);
+                parseEntryFromServer(name, entry, unparsedValue);
             }
             catch (const std::exception& exception)
             {
@@ -466,12 +694,12 @@ Ptr<StringMap> CameraSettings::unparseToServer()
     auto values = makePtr<StringMap>();
 
     enumerateEntries(this,
-        [&](auto* entry)
+        [&](const QString& name, auto* entry)
         {
             try
             {
-                if (const auto unparsedValue = unparseEntryToServer(entry->name, *entry))
-                    values->setItem(entry->name, unparsedValue->toStdString());
+                if (const auto unparsedValue = unparseEntryToServer(name, *entry))
+                    values->setItem(name.toStdString(), unparsedValue->toStdString());
             }
             catch (const std::exception& exception)
             {
@@ -487,12 +715,12 @@ Ptr<StringMap> CameraSettings::getErrorMessages() const
     auto errorMessages = makePtr<StringMap>();
 
     enumerateEntries(this,
-        [&](const auto* entry)
+        [&](const QString& name, const auto* entry)
         {
             if (!entry->hasError())
                 return;
 
-            errorMessages->setItem(entry->name, entry->errorMessage().toStdString());
+            errorMessages->setItem(name.toStdString(), entry->errorMessage().toStdString());
         });
 
     return errorMessages;
@@ -507,7 +735,7 @@ QJsonValue CameraSettings::getModelForManifest(const CameraFeatures& features)
                 QJsonArray sections;
 
                 if (features.vca)
-                    sections.push_back(getVcaModelForManifest());
+                    sections.push_back(getVcaModelForManifest(*features.vca));
 
                 return sections;
             }(),
