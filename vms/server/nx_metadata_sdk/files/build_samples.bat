@@ -36,7 +36,7 @@ if [%BUILD_TYPE%] == [Release] (
 )
 
 echo on
-    rmdir /S /Q "%BUILD_DIR%/" 2>NUL
+    rmdir /S /Q "%BUILD_DIR%" 2>NUL
 @echo off
 
 for /d %%S in (%BASE_DIR%\samples\*) do (
