@@ -209,7 +209,7 @@ private:
         m_registeredMulticastAddresses;
 
     std::unique_ptr<nx::streaming::rtp::IRtpParserFactory> m_customTrackParserFactory;
-    QString m_lastErrorMessage;
+    nx::streaming::rtp::StreamParser::Result m_lastRtpParseResult;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

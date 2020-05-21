@@ -462,7 +462,12 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         }
         case EventReason::networkRtpParserError:
         {
-            result = reasonParamsEncoded;
+            QString message;
+            bool isPrimaryStream = NetworkIssueEvent::decodePrimaryStream(
+                reasonParamsEncoded, true, &message);
+            result = isPrimaryStream
+                ? tr("RTP error in primary stream (%1)").arg(message)
+                : tr("RTP error in secondary stream (%1)").arg(message);
             break;
         }
         case EventReason::networkConnectionClosed:

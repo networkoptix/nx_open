@@ -17,7 +17,7 @@ public:
     H264Parser();
     virtual void setSdpInfo(const Sdp::Media& sdp) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
+    virtual Result processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
 
 private:
     QMap <int, QByteArray> m_allNonSliceNal;

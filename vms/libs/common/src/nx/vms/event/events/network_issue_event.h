@@ -29,6 +29,9 @@ public:
 
     static bool decodePrimaryStream(const QString& encoded, const bool defaultValue);
     static QString encodePrimaryStream(bool isPrimary);
+    
+    static QString encodePrimaryStream(bool isPrimary, const QString& message);
+    static bool decodePrimaryStream(const QString& encoded, const bool defaultValue, QString* outMessage);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(NetworkIssueEvent::MulticastAddressConflictParameters, (json))

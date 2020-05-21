@@ -834,8 +834,12 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     }
     nx::streaming::rtp::QnNxRtpParserPtr parser = itr.value();
     bool gotData = false;
-    if (!parser->processData(data, 0, dataSize, gotData))
+    const auto parseResult = parser->processData(data, 0, dataSize, gotData);
+    if (!parseResult.success)
+    {
+        NX_DEBUG(this, "RTP parser error: %1", parseResult.errorMessage);
         return QnAbstractDataPacketPtr(); //< Report error to reopen connection.
+    }
     *parserPosition = parser->position();
     if (gotData) {
         result = parser->nextData();

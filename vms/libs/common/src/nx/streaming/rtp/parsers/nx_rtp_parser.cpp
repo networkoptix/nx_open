@@ -60,23 +60,18 @@ void QnNxRtpParser::logMediaData(const QnAbstractMediaDataPtr& data)
         logger->pushData(data);
 }
 
-bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, bool& gotData)
+StreamParser::Result QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, bool& gotData)
 {
     gotData = false;
     if (dataSize < RtpHeader::kSize)
     {
-        NX_WARNING(this,
-            lm("Invalid RTP packet size=%1. size < RTP header size. Ignored.").arg(dataSize));
-        return false;
+        return {false, NX_FMT("Invalid RTP packet size=%1. size < RTP header size. Ignored.", dataSize)};
     }
     const quint8* data = rtpBufferBase + bufferOffset;
     RtpHeader* rtpHeader = (RtpHeader*) data;
 
     if (rtpHeader->CSRCCount != 0 || rtpHeader->version != 2)
-    {
-        NX_WARNING(this, "Got malformed RTP packet header. Ignored.");
-        return false;
-    }
+        return {false, "Got malformed RTP packet header. Ignored."};
 
     const quint8* payload = data + RtpHeader::kSize;
     dataSize -= RtpHeader::kSize;
@@ -94,12 +89,15 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
         if (rtpHeader->padding)
             dataSize -= qFromBigEndian(rtpHeader->padding);
         if (dataSize < 1)
-            return false;
+            return {false, NX_FMT("Unexpected data size %1", dataSize)};
 
         if (!m_nextDataPacket)
         {
             if (dataSize < RTSP_FFMPEG_GENERIC_HEADER_SIZE)
-                return false;
+            {
+                return {false, NX_FMT("Unexpected data size %1. "
+                    "Expected at least %2 bytes)", dataSize, RTSP_FFMPEG_GENERIC_HEADER_SIZE)};
+            }
 
             const QnAbstractMediaData::DataType dataType =
                 (QnAbstractMediaData::DataType) *(payload++);
@@ -118,11 +116,8 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 m_nextDataPacketBuffer = &emptyMediaData->m_data;
                 if (dataSize != 0)
                 {
-                    NX_WARNING(
-                        this,
-                        lm("Unexpected data size for EOF/BOF packet. Got %1 expected %2 bytes.")
-                        .arg(dataSize).arg(0));
-                    return false;
+                    return {false, NX_FMT("Unexpected data size for EOF/BOF packet. "
+                        "Got %1 expected %2 bytes.", dataSize, 0)};
                 }
             }
             else if (dataType == QnAbstractMediaData::META_V1
@@ -131,14 +126,16 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 if (dataType == QnAbstractMediaData::META_V1
                     && dataSize != Qn::kMotionGridWidth*Qn::kMotionGridHeight/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
                 {
-                    NX_WARNING(
-                        this,
-                        lm("Unexpected data size for metadata packet. Got %1 expected %2 bytes.")
-                        .arg(dataSize).arg(Qn::kMotionGridWidth*Qn::kMotionGridHeight / 8));
-                    return false;
+                    return { false, NX_FMT("Unexpected data size for metadata packet. "
+                        "Got %1 expected %2 bytes.",
+                        dataSize, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8)};
                 }
                 if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)
-                    return false;
+                {
+                    return { false, NX_FMT("Unexpected data size for metadata packet. "
+                        "Got %1 expected %2 bytes.",
+                        dataSize, RTSP_FFMPEG_METADATA_HEADER_SIZE)};
+                }
 
                 const auto duration = qFromBigEndian(*((quint32*) payload)) * 1000;
                 const auto metadataType = (MetadataType) qFromBigEndian(*((quint32*) (payload) + 1));
@@ -168,7 +165,11 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             else if (context && context->getCodecType() == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
             {
                 if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
-                    return false;
+                {
+                    return { false, NX_FMT("Unexpected data size for video packet. "
+                        "Got %1 expected %2 bytes.",
+                        dataSize, RTSP_FFMPEG_VIDEO_HEADER_SIZE)};
+                }
 
                 const quint32 fullPayloadLen = (payload[0] << 16) + (payload[1] << 8) + payload[2];
 
@@ -209,11 +210,11 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 {
                     NX_WARNING(this, lm("Unsupported or unknown packet"));
                 }
-                return false;
+                return {false, NX_FMT("Unexpected packet type %1", dataType)};
             }
 
             if (!NX_ASSERT(m_nextDataPacket))
-                return false;
+                return {false, "Internal parser error. Next packet is expected"};
 
             m_nextDataPacket->opaque = cseq;
             m_nextDataPacket->flags = static_cast<QnAbstractMediaData::MediaFlags>(flags);
@@ -263,7 +264,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             m_nextDataPacketBuffer = nullptr;
         }
     }
-    return true;
+    return { true };
 }
 
 void QnNxRtpParser::setAudioEnabled(bool value)

@@ -53,7 +53,7 @@ void SimpleAudioParser::setSdpInfo(const Sdp::Media& sdp)
     m_audioLayout->setAudioTrackInfo(track);
 }
 
-bool SimpleAudioParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, bool& gotData)
+StreamParser::Result SimpleAudioParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
@@ -64,19 +64,19 @@ bool SimpleAudioParser::processData(quint8* rtpBufferBase, int bufferOffset, int
     if (rtpHeader->extension)
     {
         if (bufferSize < RtpHeader::kSize + 4)
-            return false;
+            return {false, NX_FMT("Malformed audio packet. Buffer size %1 is too small. "
+                "Expected at least %2 bytes", bufferSize, RtpHeader::kSize + 4)};
 
         int extWords = ((int(curPtr[2]) << 8) + curPtr[3]);
         curPtr += extWords*4 + 4;
     }
     const quint8* end = rtpBuffer + bufferSize;
     if (curPtr >= end)
-        return false;
+        return {false, "Malformed audio packet"};
     if (rtpHeader->padding)
         end -= end[-1];
     if (curPtr >= end)
-        return false;
-
+        return {false, "Malformed audio packet. Invalid padding"};
 
     QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
     audioData->compressionType = !m_context? AV_CODEC_ID_NONE : m_context->getCodecId();
@@ -85,7 +85,7 @@ bool SimpleAudioParser::processData(quint8* rtpBufferBase, int bufferOffset, int
     audioData->m_data.write((const char*)curPtr, end - curPtr);
     m_audioData.push_back(audioData);
     gotData = true;
-    return true;
+    return {true};
 }
 
 QnConstResourceAudioLayoutPtr SimpleAudioParser::getAudioLayout()

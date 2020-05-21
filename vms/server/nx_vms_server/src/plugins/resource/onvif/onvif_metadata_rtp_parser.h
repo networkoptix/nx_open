@@ -17,14 +17,14 @@ public:
 
     virtual QnAbstractMediaDataPtr nextData() override;
 
-    virtual bool processData(
+    virtual Result processData(
         quint8* rtpBufferBase,
         int bufferOffset,
         int bytesRead,
         bool& gotData) override;
 
 private:
-    bool cleanUpOnError();
+    void cleanUpOnError();
 
     QnCompressedMetadataPtr makeCompressedMetadata();
 

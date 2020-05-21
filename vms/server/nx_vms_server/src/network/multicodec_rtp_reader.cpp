@@ -236,12 +236,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     if (m_RtpSession.isOpened())
     {
-        if (!m_lastErrorMessage.isEmpty())
+        if (!m_lastRtpParseResult.success)
         {
             reason = vms::api::EventReason::networkRtpParserError;
-            const auto streamIndex = (m_role != Qn::CR_SecondaryLiveVideo)
-                ? "(primary stream)" : "(secondary stream)";
-            reasonParamsEncoded = NX_FMT("RTP error: %1 %2", m_lastErrorMessage, streamIndex);
+            reasonParamsEncoded = nx::vms::event::NetworkIssueEvent::encodePrimaryStream(
+                m_role != Qn::CR_SecondaryLiveVideo, m_lastRtpParseResult.errorMessage);
         }
         else
         {
@@ -431,11 +430,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             const int length = bytesRead - kInterleavedRtpOverTcpPrefixLength;
             uint8_t* rtpPacketData = (uint8_t*)m_demuxedData[rtpChannelNum]->data();
             updateOnvifTime(rtpPacketData + offset, length, track);
-            m_lastErrorMessage.clear();
-            if (!track.parser->processData(rtpPacketData, offset, length, m_gotData))
+            m_lastRtpParseResult = 
+                track.parser->processData(rtpPacketData, offset, length, m_gotData);
+            if (!m_lastRtpParseResult.success)
             {
-                m_lastErrorMessage = track.parser->lastError();
-                NX_DEBUG(this, "%1: %2", m_logName, m_lastErrorMessage);
+                NX_DEBUG(this, "%1: %2", m_logName, m_lastRtpParseResult.errorMessage);
                 clearKeyData(track.logicalChannelNum);
                 m_demuxedData[rtpChannelNum]->clear();
                 if (++errorRetryCnt > m_maxRtpRetryCount)
@@ -523,17 +522,19 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                 quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
 
                 updateOnvifTime(rtpBuffer, bytesRead, track);
-                if (!track.parser->processData(
-                        bufferBase,
-                        rtpBuffer - bufferBase,
-                        bytesRead,
-                        gotData))
+                m_lastRtpParseResult = track.parser->processData(
+                    bufferBase,
+                    rtpBuffer - bufferBase,
+                    bytesRead,
+                    gotData);
+                if (!m_lastRtpParseResult.success)
                 {
+                    NX_DEBUG(this, "%1: %2", m_logName, m_lastRtpParseResult.errorMessage);
                     clearKeyData(track.logicalChannelNum);
                     m_demuxedData[rtpChannelNum]->clear();
-                    if (++errorRetryCount > m_maxRtpRetryCount) {
-                        NX_WARNING(this, "%1: Too many RTP errors. Reopen stream", m_logName);
-                        closeStream();
+                    if (++errorRetryCount > m_maxRtpRetryCount) 
+                    {
+                        NX_WARNING(this, "%1: Too many RTP errors. Report a network issue", m_logName);
                         return QnAbstractMediaDataPtr(0);
                     }
                 }

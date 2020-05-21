@@ -41,7 +41,7 @@ public:
     HevcParser();
 
     // Implementation of StreamParser::processData
-    virtual bool processData(
+    virtual Result processData(
         quint8* rtpBufferBase,
         int bufferOffset,
         int bytesRead,
@@ -56,7 +56,7 @@ private:
     // is undefined and we can ignore it. If this method has returned false and
     // value of outIsFatalError is false we can just skip the data,
     // otherwise we must reset the parser.
-    bool processRtpHeader(
+    Result processRtpHeader(
         uint8_t** outPayload,
         int* outPayloadLength,
         bool* outIsFatalError,
@@ -70,27 +70,27 @@ private:
     bool detectPacketLoss(
         const RtpHeader* rtpHeader);
 
-    bool handlePacketLoss(
+    Result handlePacketLoss(
         int previousSequenceNumber,
         int currentSequenceNumber);
 
     bool isApropriatePayloadType(const RtpHeader* rtpHeader) const;
 
-    bool handlePayload(const uint8_t* payload, int payloadLength);
+    Result handlePayload(const uint8_t* payload, int payloadLength);
 
-    bool handleSingleNalUnitPacket(
+    Result handleSingleNalUnitPacket(
         const nx::media_utils::hevc::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
-    bool handleAggregationPacket(
+    Result handleAggregationPacket(
         const nx::media_utils::hevc::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
-    bool handleFragmentationPacket(
+    Result handleFragmentationPacket(
         const nx::media_utils::hevc::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
-    bool handlePaciPacket(
+    Result handlePaciPacket(
         const nx::media_utils::hevc::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
@@ -125,7 +125,7 @@ private:
     bool extractPictureDimensionsFromSps(const nx::Buffer& rawSps);
     bool extractPictureDimensionsFromSps(const uint8_t* buffer, int bufferLength);
 
-    bool reset(bool softReset = false); //< Always returns false
+    void reset(bool softReset = false); //< Always returns false
     void addChunk(int bufferOffset, int payloadLength, bool hasStartCode);
 private:
     HevcContext m_context;

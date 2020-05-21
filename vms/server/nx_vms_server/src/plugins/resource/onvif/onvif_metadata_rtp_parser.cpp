@@ -37,7 +37,7 @@ QnAbstractMediaDataPtr OnvifMetadataRtpParser::nextData()
     return result;
 }
 
-bool OnvifMetadataRtpParser::processData(
+StreamParser::Result OnvifMetadataRtpParser::processData(
     quint8* rtpBufferBase,
     int bufferOffset,
     int bytesRead,
@@ -52,17 +52,16 @@ bool OnvifMetadataRtpParser::processData(
 
     if (!fullRtpHeaderSize)
     {
-        NX_VERBOSE(this, "Unable to calculate header size");
-        return cleanUpOnError();
+        cleanUpOnError();
+        return {false, "Unable to calculate header size"};
     }
 
     if (bytesRead < fullRtpHeaderSize)
     {
-        NX_VERBOSE(this,
+        cleanUpOnError();
+        return {false, NX_FMT(
             "Provided buffer size (%1 bytes) is less than calculated RTP header size (%2 bytes)",
-            bytesRead, fullRtpHeaderSize);
-
-        return cleanUpOnError();
+            bytesRead, fullRtpHeaderSize)};
     }
 
     const auto* const rtpHeader = (RtpHeader*)(currentRtpPacketBuffer);
@@ -80,13 +79,12 @@ bool OnvifMetadataRtpParser::processData(
             gotData = true;
     }
 
-    return true;
+    return {true};
 }
 
-bool OnvifMetadataRtpParser::cleanUpOnError()
+void OnvifMetadataRtpParser::cleanUpOnError()
 {
     m_buffer.clear();
-    return false;
 }
 
 QnCompressedMetadataPtr OnvifMetadataRtpParser::makeCompressedMetadata()

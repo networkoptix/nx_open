@@ -10,6 +10,8 @@ namespace nx {
 namespace vms {
 namespace event {
 
+static const QChar kMessageSeparator(L':');
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkIssueEvent::MulticastAddressConflictParameters, (json),
     MulticastAddressConflictParameters_Fields, (brief, true))
 
@@ -46,8 +48,26 @@ bool NetworkIssueEvent::decodePrimaryStream(const QString& encoded, const bool d
     return result;
 }
 
-QString NetworkIssueEvent::encodePrimaryStream(bool isPrimary) {
+QString NetworkIssueEvent::encodePrimaryStream(bool isPrimary) 
+{
     return QString::number(isPrimary);
+}
+
+QString NetworkIssueEvent::encodePrimaryStream(bool isPrimary, const QString& message)
+{
+    return encodePrimaryStream(isPrimary) + kMessageSeparator + message;
+}
+
+bool NetworkIssueEvent::decodePrimaryStream(
+    const QString& encoded, const bool defaultValue, QString* outMessage)
+{
+    outMessage->clear();
+    const auto delimeterPos = encoded.indexOf(kMessageSeparator);
+    if (delimeterPos == -1)
+        return decodePrimaryStream(encoded, defaultValue);
+    
+    *outMessage = encoded.mid(delimeterPos + 1);
+    return decodePrimaryStream(encoded.left(delimeterPos), defaultValue);
 }
 
 } // namespace event

@@ -474,7 +474,7 @@ void MjpegParser::fixResolution(int* width, int* height)
     }
 }
 
-bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytesRead, bool& gotData)
+StreamParser::Result MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytesRead, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
@@ -483,10 +483,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     static quint8 jpeg_end[2] = {0xff, 0xd9};
 
     if (bytesRead < RtpHeader::kSize + 1)
-    {
-        setLastError(NX_FMT("Too small RTP buffer %1 bytes", bytesRead));
-        return false;
-    }
+        return {false, NX_FMT("Too small RTP buffer %1 bytes", bytesRead)};
 
     RtpHeader* rtpHeader = (RtpHeader*)rtpBuffer;
     const quint8* curPtr = rtpBuffer + RtpHeader::kSize;
@@ -501,10 +498,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     if (rtpHeader->extension)
     {
         if (bytesRead < RtpHeader::kSize + 4)
-        {
-            setLastError(NX_FMT("Too small RTP buffer %1 bytes", bytesRead));
-            return false;
-        }
+            return {false, NX_FMT("Too small RTP buffer %1 bytes", bytesRead)};
 
         int extWords = ((int)curPtr[2] << 8) + curPtr[3];
         const auto extensionsSize = (extWords + 1) * 4;
@@ -514,10 +508,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     }
 
     if (bytesLeft < 8)
-    {
-        setLastError(NX_FMT("Not enough bytes left in buffer. %1 bytes", bytesLeft));
-        return false;
-    }
+        return {false, NX_FMT("Not enough bytes left in buffer. %1 bytes", bytesLeft)};
 
     // 1. jpeg main header
 
@@ -538,10 +529,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     if (jpegType & 0x40)
     {
         if (bytesLeft < 4)
-        {
-            setLastError(NX_FMT("Not enough bytes left in buffer. %1 bytes", bytesLeft));
-            return false;
-        }
+            return {false, NX_FMT("Not enough bytes left in buffer. %1 bytes", bytesLeft)};
         dri = (curPtr[0] << 8) + curPtr[1];
 
         curPtr += 4;
@@ -557,10 +545,8 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
         if (jpegQ >= 128)
         {
             if (bytesLeft < 4)
-            {
-                setLastError(NX_FMT("Not enough bytes left in buffer. %1 bytes", bytesLeft));
-                return false;
-            }
+                return {false, NX_FMT("Not enough bytes left in buffer. %1 bytes", bytesLeft)};
+
             [[maybe_unused]] quint8 MBZ = *curPtr++;
             quint8 Precision = *curPtr++;
             quint16 length = (curPtr[0] << 8) + curPtr[1];
@@ -569,9 +555,8 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
 
             if (bytesLeft < length)
             {
-                setLastError(NX_FMT("Not enough bytes left in buffer. "
-                    "%1 bytes, expected at least %2 bytes", bytesLeft, length));
-                return false;
+                return {false, NX_FMT("Not enough bytes left in buffer. "
+                    "%1 bytes, expected at least %2 bytes", bytesLeft, length)};
             }
 
             int lumaSize = (Precision & 1) ? 2 : 1;
@@ -584,7 +569,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
                     mjpeg16BitWarningLogged = true;
                     NX_DEBUG(this, lit("16-bit MJPEG is not supported"));
                 }
-                return false; //< Only 8-bit MJPEG is supported.
+                return {false, "Only 8-bit MJPEG is supported"};
             }
 
             if (length > 0)
@@ -592,8 +577,8 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
                 static const int kTableSize = 64;
                 if (length < kTableSize)
                 {
-                    setLastError(NX_FMT("Invalid color table length %1. Expected at least %2", length, kTableSize));
-                    return false;
+                    return {false, NX_FMT("Invalid color table length %1. "
+                        "Expected at least %2", length, kTableSize)};
                 }
                 // RFC2435. Same table for each frame, make deep copy of tables.
                 lumaTable = curPtr;
@@ -626,10 +611,8 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
             else
             {
                 if (!lumaTable || !chromaTable)
-                {
-                    setLastError(NX_FMT("Missing luma or chroma table"));
-                    return false;
-                }
+                    return {false, NX_FMT("Missing luma or chroma table")};
+
                 m_headerLen = makeHeaders(m_hdrBuffer, jpegType, width, height,
                     lumaTable, chromaTable, dri); //< use tables direct pointer
             }
@@ -663,8 +646,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     {
         m_chunks.clear();
         m_frameSize = 0;
-        setLastError(NX_FMT("RTP MJPEG parser buffer overflow"));
-        return false;
+        return {false, "RTP MJPEG parser buffer overflow"};
     }
     m_chunks.push_back(Chunk(curPtr - rtpBufferBase, bytesLeft));
     m_frameSize += bytesLeft;
@@ -704,7 +686,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
         videoData->timestamp = qFromBigEndian(rtpHeader->timestamp);
         gotData = true;
     }
-    return true;
+    return {true};
 }
 
 } // namespace nx::streaming::rtp

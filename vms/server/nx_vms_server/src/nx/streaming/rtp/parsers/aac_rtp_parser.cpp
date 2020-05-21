@@ -100,7 +100,7 @@ void AacParser::setSdpInfo(const Sdp::Media& sdp)
 
 }
 
-bool AacParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, bool& gotData)
+StreamParser::Result AacParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
@@ -116,29 +116,36 @@ bool AacParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferS
     if (rtpHeader->extension)
     {
         if (bufferSize < RtpHeader::kSize + 4)
-            return false;
+        {
+            return {false, NX_FMT("Insufficient buffer size %1. Expected at least %2 bytes",
+                bufferSize, RtpHeader::kSize + 4)};
+        }
 
         int extWords = ((int(curPtr[2]) << 8) + curPtr[3]);
         curPtr += extWords*4 + 4;
     }
 
     if (curPtr >= end)
-        return false;
+        return {false, "Malformed AAC packet"};
+
     if (rtpHeader->padding)
         end -= end[-1];
     if (curPtr >= end)
-        return false;
+        return {false, "Malformed AAC packet. Wrong padding."};
 
     try
     {
         if (m_auHeaderExists)
         {
             if (end - curPtr < 2)
-                return false;
+                return {false, "Malformed AAC packet. Not enough data to parse buffer"};
             unsigned auHeaderLen = (curPtr[0] << 8) + curPtr[1];
             curPtr += 2;
             if (curPtr + auHeaderLen > end)
-                return false;
+            {
+                return {false, NX_FMT(
+                    "Malformed AAC packet. Invalid au header length %1", auHeaderLen)};
+            }
             BitStreamReader reader(curPtr, curPtr + auHeaderLen);
             while(reader.getBitsCount() < auHeaderLen)
             {
@@ -172,7 +179,7 @@ bool AacParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferS
     }
     catch (const BitStreamException&)
     {
-        return false;
+        return {false, "Malformed AAC packet. Bitstream parser error."};
     }
 
     quint32 rtpTime = ntohl(rtpHeader->timestamp);
@@ -182,11 +189,16 @@ bool AacParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferS
         if (!m_constantSize)
         {
             if (auSize.size() <= i)
-                return false;
+            {
+                return {false, NX_FMT("Malformed AAC packet. Invalid auSize header. "
+                    "auSize %1, expected at least %2", auSize.size(), i + 1)};
+            }
             unitSize = auSize[i];
         }
         if (curPtr + unitSize > end)
-            return false;
+        {
+            return {false, NX_FMT("Malformed AAC packet. Invalid unit size %1 bytes.", unitSize)};
+        }
 
         int rtpTimeOffset = 0;
         if (auIndex.size() > i)
@@ -203,7 +215,7 @@ bool AacParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferS
         m_audioData.push_back(audioData);
     }
 
-    return true;
+    return {true};
 }
 
 QnConstResourceAudioLayoutPtr AacParser::getAudioLayout()

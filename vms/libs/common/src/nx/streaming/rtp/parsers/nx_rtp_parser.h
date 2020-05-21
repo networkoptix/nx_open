@@ -17,7 +17,7 @@ public:
     QnNxRtpParser(QnUuid deviceId);
 
     virtual void setSdpInfo(const Sdp::Media& /*sdp*/) override {};
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
+    virtual StreamParser::Result processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
 
     qint64 position() const { return m_position; }
     QnConstMediaContextPtr mediaContext() const { return m_context; }

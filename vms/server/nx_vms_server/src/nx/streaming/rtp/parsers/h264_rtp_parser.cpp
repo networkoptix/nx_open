@@ -290,7 +290,7 @@ bool H264Parser::isPacketStartsNewFrame(
     return true;
 }
 
-bool H264Parser::processData(
+StreamParser::Result H264Parser::processData(
     quint8* rtpBufferBase,
     int bufferOffset,
     int bytesRead,
@@ -304,10 +304,9 @@ bool H264Parser::processData(
 
     if (bytesRead < RtpHeader::kSize + 1)
     {
-        setLastError(NX_FMT("Failed to parse RTP packet, invalid rtp packet size %1",
-            bytesRead));
         clearInternalBuffer();
-        return false;
+        return {false,
+            NX_FMT("Failed to parse RTP packet, invalid rtp packet size %1", bytesRead)};
     }
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
@@ -316,11 +315,10 @@ bool H264Parser::processData(
     {
         if (bytesRead < RtpHeader::kSize + 4)
         {
-            setLastError(NX_FMT(
-                "Failed to parse RTP packet, invalid rtp packet size with extesnion: %1",
-                bytesRead));
             clearInternalBuffer();
-            return false;
+            return {false,
+                NX_FMT("Failed to parse RTP packet, invalid rtp packet size with extesnion: %1",
+                bytesRead)};
         }
 
         int extWords = ((int(curPtr[2]) << 8) + curPtr[3]);
@@ -332,34 +330,33 @@ bool H264Parser::processData(
 
     if (curPtr >= bufferEnd)
     {
-        setLastError(NX_FMT("Failed to parse RTP packet, invalid rtp packet header"));
         clearInternalBuffer();
-        return false;
+        return {false, NX_FMT("Failed to parse RTP packet, invalid rtp packet header")};
     }
 
     if (rtpHeader->payloadType != m_rtpChannel)
-        return true; //< Skip data.
+        return {true}; //< Skip data.
 
     bool isPacketLost =
         m_prevSequenceNum != -1 &&
         quint16(m_prevSequenceNum) != quint16(sequenceNum-1) &&
         m_prevSequenceNum != sequenceNum; // Some cameras send duplicate packets, ignore it
 
-    if (m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
-    {
-        setLastError(NX_FMT("Too large RTP/H.264 frame. Truncate video buffer"));
-        clearInternalBuffer();
-        isPacketLost = true;
-    }
 
     const auto prevSequenceNum = m_prevSequenceNum;
     m_prevSequenceNum = sequenceNum;
+
+    if (m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
+    {
+        clearInternalBuffer();
+        return {false, "Too large RTP/H.264 frame. Truncate video buffer"};
+    }
+
     if (isPacketLost)
     {
-        setLastError(NX_FMT("Packet loss detected. Previous sequence %1, next sequence %2",
-            prevSequenceNum, sequenceNum));
         // TODO clear buffer?
-        return false;
+        return {false, NX_FMT("Packet loss detected. Previous sequence %1, next sequence %2",
+            prevSequenceNum, sequenceNum)};
     }
 
     if (rtpHeader->padding)
@@ -369,9 +366,7 @@ bool H264Parser::processData(
         if (curPtr >= bufferEnd)
         {
             clearInternalBuffer();
-            setLastError(NX_FMT("Failed to parse RTP packet, invalid padding: %1",
-                paddingSize));
-            return false;
+            return {false, NX_FMT("Failed to parse RTP packet, invalid padding: %1", paddingSize)};
         }
     }
 
@@ -394,9 +389,8 @@ bool H264Parser::processData(
         {
             if (bufferEnd-curPtr < 2)
             {
-                setLastError(NX_FMT("Failed to parse RTP packet, invalid STAP_B_PACKET"));
                 clearInternalBuffer();
-                return false;
+                return {false, NX_FMT("Failed to parse RTP packet, invalid STAP_B_PACKET")};
             }
             curPtr += 2;
             // TODO: #lbusygin fallthrough here, is it deliberately?
@@ -407,18 +401,16 @@ bool H264Parser::processData(
             {
                 if (bufferEnd-curPtr < 2)
                 {
-                    setLastError(NX_FMT("Failed to parse RTP packet, invalid STAP_A_PACKET"));
                     clearInternalBuffer();
-                    return false;
+                    return {false, NX_FMT("Failed to parse RTP packet, invalid STAP_A_PACKET")};
                 }
                 nalUnitLen = (curPtr[0] << 8) + curPtr[1];
                 curPtr += 2;
                 if (bufferEnd-curPtr < nalUnitLen)
                 {
-                    setLastError(NX_FMT(
-                        "Failed to parse RTP packet, invalid NAL unit length in STAP_A_PACKET"));
                     clearInternalBuffer();
-                    return false;
+                    return {false, NX_FMT(
+                        "Failed to parse RTP packet, invalid NAL unit length in STAP_A_PACKET")};
                 }
 
                 nalUnitType = *curPtr & 0x1f;
@@ -434,9 +426,8 @@ bool H264Parser::processData(
         {
             if (bufferEnd-curPtr < 1)
             {
-                setLastError(NX_FMT("Failed to parse RTP packet, invalid FU_A_PACKET"));
                 clearInternalBuffer();
-                return false;
+                return {false, NX_FMT("Failed to parse RTP packet, invalid FU_A_PACKET")};
             }
             nalUnitType = *curPtr & 0x1f;
             updateNalFlags(curPtr, bufferEnd - curPtr);
@@ -458,11 +449,9 @@ bool H264Parser::processData(
                 // FU_A last packet
                 if (quint16(sequenceNum - m_firstSeqNum) != m_packetPerNal)
                 {
-                    setLastError(NX_FMT(
-                        "Failed to parse RTP packet, invalid packets per NAL: %1, first: %2, current: %3",
-                        m_packetPerNal, m_firstSeqNum, sequenceNum));
                     clearInternalBuffer();
-                    return false;
+                    return {false, NX_FMT("Failed to parse RTP packet, invalid packets per NAL: "
+                        "%1, first: %2, current: %3", m_packetPerNal, m_firstSeqNum, sequenceNum)};
                 }
             }
 
@@ -471,9 +460,8 @@ bool H264Parser::processData(
             {
                 if (bufferEnd-curPtr < 2)
                 {
-                    setLastError(NX_FMT("Failed to parse RTP packet, invalid FU_B_PACKET"));
                     clearInternalBuffer();
-                    return false;
+                    return {false, "Failed to parse RTP packet, invalid FU_B_PACKET"};
                 }
                 curPtr += 2;
 
@@ -495,9 +483,8 @@ bool H264Parser::processData(
         case MTAP24_PACKET:
         {
             // Not implemented
-            setLastError(NX_FMT("Got MTAP packet. Not implemented yet"));
             clearInternalBuffer();
-            return false;
+            return {false, "Got MTAP packet. Not implemented yet"};
         }
         default:
         {
@@ -514,8 +501,7 @@ bool H264Parser::processData(
     if (isPacketLost && !m_keyDataExists)
     {
         clearInternalBuffer();
-        setLastError(NX_FMT("Failed to parse RTP packet, key frame data not found"));
-        return false;
+        return {false, "Failed to parse RTP packet, key frame data not found"};
     }
 
     if (rtpHeader->marker && m_frameExists && !gotData)
@@ -530,12 +516,11 @@ bool H264Parser::processData(
     }
     else if (isBufferOverflow())
     {
-        setLastError(NX_FMT("RTP parser buffer overflow"));
         clearInternalBuffer();
-        return false;
+        return {false, "RTP parser buffer overflow"};
     }
-
-    return true;
+    
+    return {true};
 }
 
 } // namespace nx::streaming::rtp

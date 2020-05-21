@@ -14,7 +14,7 @@ public:
     MjpegParser();
     virtual void setSdpInfo(const Sdp::Media& sdp) override;
 
-    virtual bool processData(
+    virtual Result processData(
         quint8* rtpBufferBase, int bufferOffset, int bytesRead, bool& gotData) override;
 
     // Resolution that was configured using the camera API.

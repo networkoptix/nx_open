@@ -25,26 +25,28 @@ class StreamParser: public QObject
     Q_OBJECT
 
 public:
+    struct Result
+    {
+        bool success = false;
+        QString errorMessage;
+    };
+
     virtual ~StreamParser() {};
 
     virtual void setSdpInfo(const Sdp::Media& sdp) = 0;
     virtual QnAbstractMediaDataPtr nextData() = 0;
-    virtual bool processData(
+    virtual Result processData(
         quint8* rtpBufferBase,
         int bufferOffset,
         int bytesRead,
         bool& gotData) = 0;
 
     int getFrequency() { return m_frequency; };
-
-    QString lastError() const { return m_lastError; }
-    void setLastError(const QString& message) { m_lastError = message; }
 protected:
     void setFrequency(int frequency) { m_frequency = frequency; }
 
 private:
     int m_frequency = 0;
-    QString m_lastError;
 };
 
 class VideoStreamParser: public StreamParser

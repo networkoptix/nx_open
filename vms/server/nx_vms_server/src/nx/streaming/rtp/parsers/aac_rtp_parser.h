@@ -11,7 +11,7 @@ class AacParser: public AudioStreamParser
 public:
     AacParser();
     virtual void setSdpInfo(const Sdp::Media& sdp) override;
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
+    virtual Result processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 private:
     int m_sizeLength = 0; // 0 if constant size. see RFC3640
