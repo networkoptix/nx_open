@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <boost/optional.hpp>
 
 #include <QtCore/QUrl>

@@ -1,5 +1,7 @@
 #include "cloud_module_url_provider.h"
 
+#include <stdexcept>
+
 #include <QtCore/QFile>
 
 namespace nx::cloud::db {
