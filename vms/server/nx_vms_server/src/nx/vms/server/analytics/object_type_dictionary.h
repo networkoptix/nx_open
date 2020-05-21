@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/analytics/db/abstract_object_type_dictionary.h>
+#include <analytics/db/abstract_object_type_dictionary.h>
 #include <nx/analytics/object_type_descriptor_manager.h>
 
 namespace nx::vms::server::analytics {

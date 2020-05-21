@@ -21,7 +21,7 @@ public:
     static constexpr char kNameValueSeparator = ' ';
     static constexpr char kParamNamePrefix[] = "000";
 
-    AttributesDao(AbstractObjectTypeDictionary* objectTypeDictionary);
+    AttributesDao(const AbstractObjectTypeDictionary& objectTypeDictionary);
 
     /**
      * Saves attributes and makes them available for the full-text search.
@@ -56,7 +56,7 @@ public:
 private:
     QCache<QByteArray /*md5*/, int64_t /*id*/> m_attributesCache;
     QCache<std::set<int64_t> /*attributesIds*/, int64_t /*id*/> m_combinedAttrsCache;
-    AbstractObjectTypeDictionary* m_objectTypeDictionary = nullptr;
+    const AbstractObjectTypeDictionary& m_objectTypeDictionary;
 
     /**
      * @return Attributes set id.

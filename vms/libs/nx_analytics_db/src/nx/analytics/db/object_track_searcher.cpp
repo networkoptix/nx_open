@@ -4,6 +4,7 @@
 #include <nx/utils/match/wildcard.h>
 #include <nx/utils/std/algorithm.h>
 
+#include <analytics/db/abstract_object_type_dictionary.h>
 #include <analytics/db/config.h>
 
 #include "analytics_archive_directory.h"
@@ -17,12 +18,14 @@ static constexpr int kMaxObjectLookupIterations = kMaxObjectLookupResultSet;
 ObjectTrackSearcher::ObjectTrackSearcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
+    const AbstractObjectTypeDictionary& objectTypeDictionary,
     AttributesDao* attributesDao,
     AnalyticsArchiveDirectory* analyticsArchive,
     Filter filter)
     :
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
+    m_objectTypeDictionary(objectTypeDictionary),
     m_attributesDao(attributesDao),
     m_analyticsArchive(analyticsArchive),
     m_filter(std::move(filter))
@@ -39,7 +42,7 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* qu
         if (!track)
             return {};
 
-        NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(*track));
+        NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(*track, m_objectTypeDictionary));
         return {std::move(*track)};
     }
     else
@@ -292,7 +295,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
             query,
             [this, filterOptions](const auto& track)
             {
-                return m_filter.acceptsTrack(track, filterOptions);
+                return m_filter.acceptsTrack(track, m_objectTypeDictionary, filterOptions);
             });
 
         if (!track)

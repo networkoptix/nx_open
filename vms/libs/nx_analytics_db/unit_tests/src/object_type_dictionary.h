@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/analytics/db/abstract_object_type_dictionary.h>
+#include <analytics/db/abstract_object_type_dictionary.h>
 
 namespace nx::analytics::db::test {
 

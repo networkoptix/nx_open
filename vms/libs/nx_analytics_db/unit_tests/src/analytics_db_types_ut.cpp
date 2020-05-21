@@ -5,6 +5,7 @@
 #include <analytics/db/analytics_db_types.h>
 
 #include "attribute_dictionary.h"
+#include "object_type_dictionary.h"
 
 namespace nx::analytics::db::test {
 
@@ -106,6 +107,9 @@ class FilterByUserInputTest:
 protected:
 	std::string userInput() const { return GetParam().first; }
     bool expectedResult() const { return GetParam().second; }
+
+protected:
+    ObjectTypeDictionary m_objectTypeDictionary;
 };
 
 TEST_P(FilterByUserInputTest, metadata)
@@ -119,7 +123,7 @@ TEST_P(FilterByUserInputTest, track)
 {
     Filter filter;
     filter.loadUserInputToFreeText(QString::fromStdString(userInput()));
-    ASSERT_EQ(filter.acceptsTrack(sampleTrack()), expectedResult());
+    ASSERT_EQ(filter.acceptsTrack(sampleTrack(), m_objectTypeDictionary), expectedResult());
 }
 
 static std::vector<FreeTextAndExpectedResult> kUserInputAndExpectedResults{

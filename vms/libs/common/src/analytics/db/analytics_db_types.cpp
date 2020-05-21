@@ -152,25 +152,32 @@ bool Filter::acceptsMetadata(const ObjectMetadata& metadata, bool checkBoundingB
         && acceptsAttributes(metadata.attributes);
 }
 
-bool Filter::acceptsTrack(const ObjectTrack& track, Options options) const
+bool Filter::acceptsTrack(
+    const ObjectTrack& track,
+    const AbstractObjectTypeDictionary& objectTypeDictionary,
+    Options options) const
 {
-    return acceptsTrackInternal(track, options);
+    return acceptsTrackInternal(track, objectTypeDictionary, options);
 }
 
-bool Filter::acceptsTrackEx(const ObjectTrackEx& track, Options options) const
+bool Filter::acceptsTrackEx(
+    const ObjectTrackEx& track,
+    const AbstractObjectTypeDictionary& objectTypeDictionary,
+    Options options) const
 {
-    return acceptsTrackInternal(track, options);
+    return acceptsTrackInternal(track, objectTypeDictionary, options);
 }
 
 template <typename ObjectTrackType>
-bool Filter::acceptsTrackInternal(const ObjectTrackType& track, Options options) const
+bool Filter::acceptsTrackInternal(
+    const ObjectTrackType& track,
+    const AbstractObjectTypeDictionary& objectTypeDictionary,
+    Options options) const
 {
-     using namespace std::chrono;
+    using namespace std::chrono;
 
     if (!objectTrackId.isNull() && track.id != objectTrackId)
-    {
         return false;
-    }
 
     if (!(microseconds(track.lastAppearanceTimeUs) >= timePeriod.startTime() &&
           (timePeriod.isInfinite() ||
@@ -196,7 +203,7 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track, Options options)
     {
         TextMatchContext textFilter;
         textFilter.parse(freeText);
-        if (!matchText(&textFilter, track))
+        if (!matchText(&textFilter, track, objectTypeDictionary))
         {
             if constexpr (std::is_same<decltype(track), const ObjectTrackEx&>::value)
             {
@@ -227,9 +234,14 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track, Options options)
     return true;
 }
 
-bool Filter::matchText(TextMatchContext* textFilter, const ObjectTrack& track) const
+bool Filter::matchText(
+    TextMatchContext* textFilter,
+    const ObjectTrack& track,
+    const AbstractObjectTypeDictionary& objectTypeDictionary) const
 {
-    // TODO: Matching object type.
+    const auto objectTypeName = objectTypeDictionary.idToName(track.objectTypeId);
+    if (objectTypeName)
+        textFilter->matchText(*objectTypeName);
 
     textFilter->matchAttributes(track.attributes);
 
@@ -313,6 +325,12 @@ void Filter::TextMatchContext::matchAttributes(const nx::common::metadata::Attri
     matchAttributeValues(attributes);
 }
 
+void Filter::TextMatchContext::matchText(const QString& text)
+{
+    for (std::size_t i = 0; i < m_tokens.size(); ++i)
+        m_tokensMatched[i] = m_tokensMatched[i] || text.startsWith(m_tokens[i], Qt::CaseInsensitive);
+}
+
 bool Filter::TextMatchContext::matched() const
 {
     auto notMatched = [](auto val) { return !val; };
@@ -364,7 +382,7 @@ void Filter::TextMatchContext::matchExactAttributes(
             }
         }
 
-        m_exactAttrsMatched[i] = matched;
+        m_exactAttrsMatched[i] = m_exactAttrsMatched[i] || matched;
     }
 }
 
@@ -394,9 +412,10 @@ void Filter::TextMatchContext::checkAttributesPresence(
     {
         const auto& name = m_attributeToFindNames[i];
 
-        m_attributeToFindNamesMatched[i] = std::any_of(
-            attributes.begin(), attributes.end(),
-            [&name](const auto& attr) { return attr.name.startsWith(name); });
+        m_attributeToFindNamesMatched[i] = m_attributeToFindNamesMatched[i] ||
+            std::any_of(
+                attributes.begin(), attributes.end(),
+                [&name](const auto& attr) { return attr.name.startsWith(name); });
     }
 }
 
@@ -404,7 +423,7 @@ void Filter::TextMatchContext::matchAttributeValues(
     const nx::common::metadata::Attributes& attributes)
 {
     for (std::size_t i = 0; i < m_tokens.size(); ++i)
-        m_tokensMatched[i] = wordMatchAnyOfAttributes(m_tokens[i], attributes);
+        m_tokensMatched[i] = m_tokensMatched[i] || wordMatchAnyOfAttributes(m_tokens[i], attributes);
 }
 
 bool Filter::TextMatchContext::wordMatchAnyOfAttributes(

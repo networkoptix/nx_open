@@ -15,11 +15,13 @@ namespace nx::analytics::db {
 TimePeriodFetcher::TimePeriodFetcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
+    const AbstractObjectTypeDictionary& objectTypeDictionary,
     AttributesDao* attributesDao,
     AnalyticsArchiveDirectory* analyticsArchive)
     :
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
+    m_objectTypeDictionary(objectTypeDictionary),
     m_attributesDao(attributesDao),
     m_analyticsArchive(analyticsArchive)
 {
@@ -47,7 +49,12 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsByObject(
     using namespace std::chrono;
 
     ObjectTrackSearcher objectTrackSearcher(
-        m_deviceDao, m_objectTypeDao, m_attributesDao, m_analyticsArchive, filter);
+        m_deviceDao,
+        m_objectTypeDao,
+        m_objectTypeDictionary,
+        m_attributesDao,
+        m_analyticsArchive,
+        filter);
 
     const auto tracks = objectTrackSearcher.lookup(queryContext);
 

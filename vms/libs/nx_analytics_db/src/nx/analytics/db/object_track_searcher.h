@@ -17,6 +17,7 @@ namespace nx::analytics::db {
 
 class AttributesDao;
 class AnalyticsArchiveDirectory;
+class AbstractObjectTypeDictionary;
 
 struct TimeRangeFields
 {
@@ -40,6 +41,7 @@ public:
     ObjectTrackSearcher(
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
+        const AbstractObjectTypeDictionary& objectTypeDictionary,
         AttributesDao* attributesDao,
         AnalyticsArchiveDirectory* analyticsArchive,
         Filter filter);
@@ -76,6 +78,7 @@ private:
 
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
+    const AbstractObjectTypeDictionary& m_objectTypeDictionary;
     AttributesDao* m_attributesDao = nullptr;
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
     Filter m_filter;

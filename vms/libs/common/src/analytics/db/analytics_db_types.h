@@ -15,6 +15,8 @@
 #include <utils/common/request_param.h>
 #include <utils/common/byte_array.h>
 
+#include "abstract_object_type_dictionary.h"
+
 class QnResourcePool;
 
 namespace nx::analytics::db {
@@ -151,8 +153,16 @@ struct Filter
     bool acceptsAttributes(const nx::common::metadata::Attributes& attributes) const;
     bool acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata,
         bool checkBoundingBox = true) const;
-    bool acceptsTrack(const ObjectTrack& track, Options options = Option::none) const;
-    bool acceptsTrackEx(const ObjectTrackEx& track, Options options = Option::none) const;
+
+    bool acceptsTrack(
+        const ObjectTrack& track,
+        const AbstractObjectTypeDictionary& objectTypeDictionary,
+        Options options = Option::none) const;
+
+    bool acceptsTrackEx(
+        const ObjectTrackEx& track,
+        const AbstractObjectTypeDictionary& objectTypeDictionary,
+        Options options = Option::none) const;
 
     /**
      * Search is implemented by attribute values only. SqLite fts4 syntax supports only full match
@@ -189,6 +199,7 @@ private:
         bool empty() const;
 
         void matchAttributes(const nx::common::metadata::Attributes& attributes);
+        void matchText(const QString& text);
 
         /**
          * @return true If all tokens of the filter were matched
@@ -228,9 +239,15 @@ private:
     };
 
     template <typename ObjectTrackType>
-    bool acceptsTrackInternal(const ObjectTrackType& track, Options options) const;
+    bool acceptsTrackInternal(
+        const ObjectTrackType& track,
+        const AbstractObjectTypeDictionary& objectTypeDictionary,
+        Options options) const;
 
-    bool matchText(TextMatchContext* textFilter, const ObjectTrack& track) const;
+    bool matchText(
+        TextMatchContext* textFilter,
+        const ObjectTrack& track,
+        const AbstractObjectTypeDictionary& objectTypeDictionary) const;
 };
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params);

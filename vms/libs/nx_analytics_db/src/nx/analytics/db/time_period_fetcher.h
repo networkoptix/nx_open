@@ -5,6 +5,7 @@
 
 #include <recording/time_period_list.h>
 
+#include <analytics/db/abstract_object_type_dictionary.h>
 #include <analytics/db/analytics_db_types.h>
 
 #include "analytics_archive_directory.h"
@@ -13,6 +14,7 @@ namespace nx::analytics::db {
 
 class DeviceDao;
 class ObjectTypeDao;
+class AbstractObjectTypeDictionary;
 class AttributesDao;
 class AnalyticsArchiveDirectory;
 
@@ -22,6 +24,7 @@ public:
     TimePeriodFetcher(
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
+        const AbstractObjectTypeDictionary& objectTypeDictionary,
         AttributesDao* attributesDao,
         AnalyticsArchiveDirectory* analyticsArchive);
 
@@ -34,6 +37,7 @@ public:
 private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
+    const AbstractObjectTypeDictionary& m_objectTypeDictionary;
     AttributesDao* m_attributesDao = nullptr;
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
 

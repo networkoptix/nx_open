@@ -2,9 +2,11 @@
 
 #include <optional>
 
+#include <QtCore/QString>
+
 namespace nx::analytics::db {
 
-class NX_ANALYTICS_DB_API AbstractObjectTypeDictionary
+class AbstractObjectTypeDictionary
 {
 public:
     virtual ~AbstractObjectTypeDictionary() = default;

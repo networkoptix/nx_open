@@ -165,7 +165,7 @@ protected:
     {
         for (auto trackIter = tracks.begin(); trackIter != tracks.end();)
         {
-            if (!filter.acceptsTrackEx(*trackIter))
+            if (!filter.acceptsTrackEx(*trackIter, objectTypeDictionary()))
                 trackIter = tracks.erase(trackIter);
             else
                 ++trackIter;

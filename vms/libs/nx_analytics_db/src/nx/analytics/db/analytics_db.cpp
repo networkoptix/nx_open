@@ -12,9 +12,9 @@
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
+#include <analytics/db/abstract_object_type_dictionary.h>
 #include <analytics/db/config.h>
 
-#include "abstract_object_type_dictionary.h"
 #include "cleaner.h"
 #include "object_track_searcher.h"
 #include "movable_analytics_db.h"
@@ -50,7 +50,8 @@ EventsStorage::EventsStorage(
     :
     m_commonModule(commonModule),
     m_iframeSearchHelper(iframeSearchHelper),
-    m_attributesDao(objectTypeDictionary),
+    m_objectTypeDictionary(*objectTypeDictionary),
+    m_attributesDao(*objectTypeDictionary),
     m_trackAggregator(
         kTrackSearchResolutionX,
         kTrackSearchResolutionY,
@@ -250,6 +251,7 @@ void EventsStorage::lookup(
             ObjectTrackSearcher objectSearcher(
                 m_deviceDao,
                 m_objectTypeDao,
+                m_objectTypeDictionary,
                 &m_attributesDao,
                 m_analyticsArchiveDirectory.get(),
                 std::move(filter));
@@ -288,6 +290,7 @@ void EventsStorage::lookupTimePeriods(
             TimePeriodFetcher timePeriodFetcher(
                 m_deviceDao,
                 m_objectTypeDao,
+                m_objectTypeDictionary,
                 &m_attributesDao,
                 m_analyticsArchiveDirectory.get());
             return timePeriodFetcher.selectTimePeriods(

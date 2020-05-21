@@ -4,9 +4,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <analytics/db/abstract_object_type_dictionary.h>
 #include <analytics/db/config.h>
-
-#include "abstract_object_type_dictionary.h"
 
 namespace std {
 
@@ -26,7 +25,7 @@ namespace nx::analytics::db {
 
 static constexpr int kAttributesCacheSize = 10001;
 
-AttributesDao::AttributesDao(AbstractObjectTypeDictionary* objectTypeDictionary):
+AttributesDao::AttributesDao(const AbstractObjectTypeDictionary& objectTypeDictionary):
     m_objectTypeDictionary(objectTypeDictionary)
 {
     m_attributesCache.setMaxCost(kAttributesCacheSize);
@@ -38,7 +37,7 @@ int64_t AttributesDao::insertOrFetchAttributes(
     const QString& objectTypeId,
     const std::vector<common::metadata::Attribute>& attributes)
 {
-    const auto objectTypeName = m_objectTypeDictionary->idToName(objectTypeId);
+    const auto objectTypeName = m_objectTypeDictionary.idToName(objectTypeId);
     const auto content = serialize(objectTypeName, attributes);
 
     auto attributesId = findAttributesIdInCache(content);
