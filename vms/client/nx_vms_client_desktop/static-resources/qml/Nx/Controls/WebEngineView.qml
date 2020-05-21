@@ -47,7 +47,16 @@ WebEngineView
     onAuthenticationDialogRequested: workbench.requestAuthenticationDialog(request)
     onFileDialogRequested: workbench.requestFileDialog(request)
     onColorDialogRequested: workbench.requestColorDialog(request)
-    profile.onDownloadRequested: workbench.requestDownload(download)
+
+    profile: WebEngineProfile
+    {
+        // Store cache and cookies only in memory to avoid unauthorized access to websites opened
+        // during another login session.
+        offTheRecord: true
+
+        onDownloadRequested: workbench.requestDownload(download)
+    }
+
     onContextMenuRequested: function(request) { request.accepted = true }
     onNewViewRequested: function(request) { url = request.requestedUrl }
 
