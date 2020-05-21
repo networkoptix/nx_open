@@ -1554,7 +1554,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>警告！这是一个实验性选项，虽然可以节省CPU，但可能会影响影像。</translation>
     </message>
   </context>
   <context>
@@ -2088,7 +2088,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>源服务器和%1</translation>
     </message>
   </context>
   <context>
@@ -2627,7 +2627,7 @@ to %1</source>
     <message>
       <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
       <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
+      <translation>%2 所选用户中的%1 不是 %3 用户，因此不会收到手机通知。</translation>
     </message>
   </context>
   <context>
@@ -3922,12 +3922,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+      <translation>请将授权码及硬体 ID提供给您的区域支持以取得离线激活档.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
+      <translation>请将授权码及硬体 ID提供给您的区域支持 (%1) 以取得离线激活档.</translation>
     </message>
   </context>
   <context>
@@ -5698,11 +5698,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>服务器不可用.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>现在</translation>
     </message>
   </context>
   <context>
@@ -7429,8 +7429,8 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n 值</numerusform>
       </translation>
     </message>
   </context>
@@ -9011,12 +9011,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>系统未连接到 %1。仅当系统连接到 %1时，手机通知才起作用。</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1设置</translation>
     </message>
   </context>
   <context>

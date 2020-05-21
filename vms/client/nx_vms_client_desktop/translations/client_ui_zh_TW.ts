@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>限制幀率以節省CPU</translation>
     </message>
   </context>
   <context>
@@ -2280,12 +2280,12 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</source>
-      <translation type="unfinished">The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</translation>
+      <translation>系統未連接到Nx雲。僅當系統連接到Nx雲時，手機通知才能作用。</translation>
     </message>
     <message>
       <location/>
       <source>Nx Cloud Settings</source>
-      <translation type="unfinished">Nx Cloud Settings</translation>
+      <translation>Nx雲端設定</translation>
     </message>
     <message>
       <location/>
@@ -2295,12 +2295,12 @@
     <message>
       <location/>
       <source>Set Language</source>
-      <translation type="unfinished">Set Language</translation>
+      <translation>設定語言</translation>
     </message>
     <message>
       <location/>
       <source>Add custom text:</source>
-      <translation type="unfinished">Add custom text:</translation>
+      <translation>增加自訂文字：</translation>
     </message>
   </context>
   <context>
@@ -3373,12 +3373,12 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>忽略上傳檔案的時區</translation>
     </message>
   </context>
   <context>
