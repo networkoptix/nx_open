@@ -223,17 +223,23 @@ int QnSessionManager::sendAsyncRequest(
     if (!proxyList.isEmpty())
     {
         QNetworkProxy proxy = proxyList[0];
-        if (proxy.type() == QNetworkProxy::HttpProxy)
+        switch (proxy.type())
         {
-            url.setHost(proxy.hostName());
-            url.setPort(proxy.port());
-            url.setUserName(proxy.user());
-            url.setPassword(proxy.password());
-        }
-        else if (proxy.type() != QNetworkProxy::NoProxy)
-        {
-            NX_ASSERT(0, "Not implemented!");
-            return -1;
+            case QNetworkProxy::HttpProxy:
+                // This mechanism is only for proxying requests to other servers,
+                // so avoid sending requests through localhost vms gateway proxy.
+                if (QHostAddress(proxy.hostName()).isLoopback())
+                    break;
+                url.setHost(proxy.hostName());
+                url.setPort(proxy.port());
+                url.setUserName(proxy.user());
+                url.setPassword(proxy.password());
+                break;
+            case QNetworkProxy::NoProxy:
+                break;
+            default:
+                NX_ASSERT(0, "Not implemented!");
+                return -1;
         }
     }
 
