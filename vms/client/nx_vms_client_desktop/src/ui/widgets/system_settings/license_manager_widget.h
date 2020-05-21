@@ -41,13 +41,6 @@ public:
 protected:
     virtual void showEvent(QShowEvent *event) override;
 
-private:
-    enum class CopyToClipboardButton
-    {
-        Hide,
-        Show
-    };
-
 private slots:
     void updateLicenses();
     void updateButtons();
@@ -60,18 +53,6 @@ private slots:
     void licenseDetailsRequested(const QModelIndex& index);
 
     void at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license);
-
-    void showMessage(
-        QnMessageBoxIcon icon,
-        const QString& text,
-        const QString& extras,
-        CopyToClipboardButton button);
-
-    void showMessageLater(
-        QnMessageBoxIcon icon,
-        const QString& text,
-        const QString& extras,
-        CopyToClipboardButton button);
 
 private:
     void updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url);
@@ -97,33 +78,13 @@ private:
 
     bool confirmDeactivation(const QnLicenseList& licenses);
 
-    using DeactivationErrors = nx::vms::client::desktop::license::Deactivator::LicenseErrorHash;
     void showDeactivationErrorsDialog(
         const QnLicenseList& licenses,
-        const DeactivationErrors& errors);
-
-    QString getDeactivationErrorCaption(
-        int licensesCount,
-        int errorsCount) const;
-
-    QString getDeactivationErrorMessage(
-        const QnLicenseList& licenses,
-        const DeactivationErrors& errors) const;
+        const nx::vms::client::desktop::license::DeactivationErrors& errors);
 
     void exportLicenses();
 
-    static QString networkErrorText();
-    static QString networkErrorExtras();
-    static QString getContactSupportMessage();
-    static QString getProblemPersistMessage();
-
-    void showFailedToActivateLicenseLater(QnLicenseErrorCode errorCode);
-    void showFailedToActivateLicenseLater(const QString& extras);
-    void showIncompatibleLicenceMessageLater();
-    void showActivationMessageLater(const QJsonObject& errorMessage);
-    void showAlreadyActivatedLater(
-        const QString& hwid,
-        const QString& time = QString());
+    void showActivationErrorMessage(QJsonObject errorMessage);
 
 private:
     Q_DISABLE_COPY(QnLicenseManagerWidget)

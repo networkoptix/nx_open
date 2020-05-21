@@ -70,6 +70,8 @@ public:
     static QString errorDescription(ErrorCode error);
 };
 
+using DeactivationErrors = Deactivator::LicenseErrorHash;
+
 } // namespace license
 } // namespace nx::vms::client::desktop
 
