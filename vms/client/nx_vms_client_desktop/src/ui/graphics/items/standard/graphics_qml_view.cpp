@@ -20,8 +20,8 @@
 #include <QtGui/QOpenGLVertexArrayObject>
 #include <QtGui/QOpenGLBuffer>
 
-#include <QtCore/QTimer>
 #include <QtCore/QtMath>
+#include <QtCore/QElapsedTimer>
 
 #include <client_core/client_core_module.h>
 #include <memory>
@@ -29,9 +29,11 @@
 #include <opengl_renderer.h>
 #include <ui/graphics/shaders/texture_color_shader_program.h>
 
+using namespace std::chrono;
+
 namespace {
 
-const auto kResizeTimeout = std::chrono::milliseconds(200);
+const auto kFboResizeTimeout = 50ms;
 constexpr auto kQuadVertexCount = 4;
 constexpr auto kCoordPerVertex = 2; //< x, y
 constexpr auto kQuadArrayLength = kQuadVertexCount * kCoordPerVertex;
@@ -226,9 +228,9 @@ struct GraphicsQmlView::Private
     QScopedPointer<QOffscreenSurface> offscreenSurface;
     QScopedPointer<QOpenGLContext> openglContext;
     QScopedPointer<QOpenGLFramebufferObject> fbo;
+    QElapsedTimer fboTimer;
     QScopedPointer<QQmlComponent> qmlComponent;
     QQmlEngine* qmlEngine = nullptr;
-    QTimer* resizeTimer = nullptr;
 
     QOpenGLVertexArrayObject vertices;
     QOpenGLBuffer positionBuffer;
@@ -265,11 +267,6 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
     d->quickWindow.reset(new QQuickWindow(d->renderControl.data()));
     d->quickWindow->setTitle(QString::fromLatin1("Offscreen"));
     d->quickWindow->setGeometry(0, 0, 640, 480); //< Will be resized later.
-
-    d->resizeTimer = new QTimer(this);
-    d->resizeTimer->setSingleShot(true);
-    d->resizeTimer->setInterval(kResizeTimeout);
-    connect(d->resizeTimer, &QTimer::timeout, this, [this](){ d->updateSizes(); });
 
     d->qmlEngine = qnClientCoreModule->mainQmlEngine();
 
@@ -338,7 +335,8 @@ QList<QQmlError> GraphicsQmlView::errors() const
 
 void GraphicsQmlView::Private::scheduleUpdateSizes()
 {
-    resizeTimer->start();
+    fboTimer.restart();
+    updateSizes();
 }
 
 void GraphicsQmlView::updateWindowGeometry()
@@ -361,6 +359,13 @@ void GraphicsQmlView::Private::tryInitializeFbo()
     if (fbo && fbo->size() == requiredSize)
         return;
 
+    if (!fboTimer.isValid())
+        fboTimer.start();
+
+    // Avoid frequent re-creation of FrameBuffer objects because it's time consuming.
+    if (fbo && !fboTimer.hasExpired(duration_cast<milliseconds>(kFboResizeTimeout).count()))
+        return;
+
     QScopedPointer<QOpenGLFramebufferObject> newFbo(
         new QOpenGLFramebufferObject(
             requiredSize, QOpenGLFramebufferObject::CombinedDepthStencil));
@@ -370,6 +375,8 @@ void GraphicsQmlView::Private::tryInitializeFbo()
 
     fbo.swap(newFbo);
     quickWindow->setRenderTarget(fbo.data());
+
+    fboTimer.invalidate();
 }
 
 bool GraphicsQmlView::event(QEvent* event)
@@ -628,7 +635,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     functions->glActiveTexture(GL_TEXTURE0);
     functions->glBindTexture(GL_TEXTURE_2D, d->fbo->texture());
 
-    const auto filter = d->resizeTimer->isActive() ? GL_LINEAR : GL_NEAREST;
+    const auto filter = d->fboTimer.isValid() ? GL_LINEAR : GL_NEAREST;
     functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
     functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
