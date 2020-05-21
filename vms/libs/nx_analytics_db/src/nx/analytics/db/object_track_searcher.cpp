@@ -226,8 +226,7 @@ void ObjectTrackSearcher::fetchTracksFromDb(
 
     auto tracks = loadTracks(
         query.get(),
-        m_filter.maxObjectTracksToSelect,
-        Filter::Option::ignoreAttributes);
+        m_filter.maxObjectTracksToSelect);
 
     if (m_filter.sortOrder == Qt::AscendingOrder)
         std::reverse(tracks.begin(), tracks.end());

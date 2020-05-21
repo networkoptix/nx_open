@@ -23,34 +23,6 @@ static const int kGridDataSizeBytes = Qn::kMotionGridWidth * Qn::kMotionGridHeig
 
 namespace nx::analytics::db {
 
-namespace {
-
-bool wordMatchAnyOfAttributes(const QString& word, const Attributes& attributes)
-{
-    std::function<bool(const Attribute&)> wordMatchesAttribute;
-    if (word.endsWith('*'))
-    {
-        const QStringRef prefix = word.leftRef(word.length() - 1);
-        wordMatchesAttribute =
-            [prefix](const Attribute& attribute)
-            {
-                return attribute.value.startsWith(prefix, Qt::CaseInsensitive);
-            };
-    }
-    else
-    {
-        wordMatchesAttribute =
-            [&word](const Attribute& attribute)
-            {
-                return QString::compare(word, attribute.value, Qt::CaseInsensitive) == 0;
-            };
-    }
-    return std::any_of(attributes.cbegin(), attributes.cend(), wordMatchesAttribute);
-}
-
-} // namespace
-
-
 void ObjectRegion::add(const QRectF& rect)
 {
     if (boundingBoxGrid.size() == 0)
@@ -167,19 +139,10 @@ bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
 
 bool Filter::acceptsAttributes(const Attributes& attributes) const
 {
-    auto filterText = freeText.trimmed();
-    if (attributes.empty())
-        return filterText.isEmpty();
-
-    const auto attributesToMatch = takeExactAttrMatchFiltersFromText(&filterText);
-    if (!attributesToMatch.empty() && !matchExactAttributes(attributesToMatch, attributes))
-        return false;
-
-    const auto attributeToFindNames = takeAttributeToFindNamesFromText(&filterText);
-    if (!attributeToFindNames.empty() && !checkAttributesPresence(attributeToFindNames, attributes))
-        return false;
-
-    return matchAttributeValues(filterText, attributes);
+    TextMatchContext textFilter;
+    textFilter.parse(freeText);
+    textFilter.matchAttributes(attributes);
+    return textFilter.matched();
 }
 
 bool Filter::acceptsMetadata(const ObjectMetadata& metadata, bool checkBoundingBox) const
@@ -229,25 +192,31 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track, Options options)
         return false;
     }
 
-    if (!options.testFlag(Option::ignoreAttributes) && !acceptsAttributes(track.attributes))
+    if (!options.testFlag(Option::ignoreTextFilter))
     {
-        if constexpr (std::is_same<decltype(track), const ObjectTrackEx&>::value)
+        TextMatchContext textFilter;
+        textFilter.parse(freeText);
+        if (!matchText(&textFilter, track))
         {
-            // Checking the track attributes.
-            if (!std::any_of(
-                track.objectPositionSequence.cbegin(),
-                track.objectPositionSequence.cend(),
-                [this](const ObjectPosition& position)
+            if constexpr (std::is_same<decltype(track), const ObjectTrackEx&>::value)
             {
-                return acceptsAttributes(position.attributes);
-            }))
+                // Checking the track attributes.
+                if (!std::any_of(
+                        track.objectPositionSequence.cbegin(),
+                        track.objectPositionSequence.cend(),
+                        [this, &textFilter](const ObjectPosition& position)
+                        {
+                            textFilter.matchAttributes(position.attributes);
+                            return textFilter.matched();
+                        }))
+                {
+                    return false;
+                }
+            }
+            else
             {
                 return false;
             }
-        }
-        else
-        {
-            return false;
         }
     }
 
@@ -256,6 +225,15 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track, Options options)
         return false;
 
     return true;
+}
+
+bool Filter::matchText(TextMatchContext* textFilter, const ObjectTrack& track) const
+{
+    // TODO: Matching object type.
+
+    textFilter->matchAttributes(track.attributes);
+
+    return textFilter->matched();
 }
 
 void Filter::loadUserInputToFreeText(const QString& userInput)
@@ -298,7 +276,53 @@ bool Filter::operator!=(const Filter& right) const
     return !(*this == right);
 }
 
-nx::common::metadata::Attributes Filter::takeExactAttrMatchFiltersFromText(
+//-------------------------------------------------------------------------------------------------
+// Filter::TextMatchContext.
+
+void Filter::TextMatchContext::parse(const QString& text)
+{
+    auto filterText = text.trimmed();
+
+    m_exactAttrsToMatch = takeExactAttrMatchFiltersFromText(&filterText);
+    m_exactAttrsMatched.clear();
+    m_exactAttrsMatched.resize(m_exactAttrsToMatch.size(), false);
+
+    m_attributeToFindNames = takeAttributeToFindNamesFromText(&filterText);
+    m_attributeToFindNamesMatched.clear();
+    m_attributeToFindNamesMatched.resize(m_attributeToFindNames.size(), false);
+
+    m_tokens = filterText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
+    m_tokensMatched.clear();
+    m_tokensMatched.resize(m_tokens.size(), false);
+}
+
+bool Filter::TextMatchContext::empty() const
+{
+    return m_exactAttrsToMatch.empty()
+        && m_attributeToFindNames.empty()
+        && m_tokens.empty();
+}
+
+void Filter::TextMatchContext::matchAttributes(const nx::common::metadata::Attributes& attributes)
+{
+    if (attributes.empty())
+        return;
+
+    matchExactAttributes(attributes);
+    checkAttributesPresence(attributes);
+    matchAttributeValues(attributes);
+}
+
+bool Filter::TextMatchContext::matched() const
+{
+    auto notMatched = [](auto val) { return !val; };
+
+    return !std::any_of(m_exactAttrsMatched.begin(), m_exactAttrsMatched.end(), notMatched)
+        && !std::any_of(m_attributeToFindNamesMatched.begin(), m_attributeToFindNamesMatched.end(), notMatched)
+        && !std::any_of(m_tokensMatched.begin(), m_tokensMatched.end(), notMatched);
+}
+
+nx::common::metadata::Attributes Filter::TextMatchContext::takeExactAttrMatchFiltersFromText(
     QString* textFilter)
 {
     nx::common::metadata::Attributes attributesToMatch;
@@ -323,30 +347,28 @@ nx::common::metadata::Attributes Filter::takeExactAttrMatchFiltersFromText(
     return attributesToMatch;
 }
 
-bool Filter::matchExactAttributes(
-    const nx::common::metadata::Attributes& attributesToMatch,
-    const nx::common::metadata::Attributes& attributes) const
+void Filter::TextMatchContext::matchExactAttributes(
+    const nx::common::metadata::Attributes& attributes)
 {
-    for (const auto& attrToMatch: attributesToMatch)
+    for (std::size_t i = 0; i < m_exactAttrsToMatch.size(); ++i)
     {
+        const auto& attrToMatch = m_exactAttrsToMatch[i];
+
         bool matched = false;
         for (const auto& attr: attributes)
         {
-            if (attr.name.startsWith(attrToMatch.name) &&
-                attr.value.startsWith(attrToMatch.value))
+            if (attr.name.startsWith(attrToMatch.name, Qt::CaseInsensitive) &&
+                attr.value.startsWith(attrToMatch.value, Qt::CaseInsensitive))
             {
                 matched = true;
             }
         }
 
-        if (!matched)
-            return false;
+        m_exactAttrsMatched[i] = matched;
     }
-
-    return true;
 }
 
-std::vector<QString> Filter::takeAttributeToFindNamesFromText(QString* textFilter)
+std::vector<QString> Filter::TextMatchContext::takeAttributeToFindNamesFromText(QString* textFilter)
 {
     std::vector<QString> names;
 
@@ -365,34 +387,52 @@ std::vector<QString> Filter::takeAttributeToFindNamesFromText(QString* textFilte
     return names;
 }
 
-bool Filter::checkAttributesPresence(
-    const std::vector<QString>& names,
-    const nx::common::metadata::Attributes& attributes) const
+void Filter::TextMatchContext::checkAttributesPresence(
+    const nx::common::metadata::Attributes& attributes)
 {
-    for (const auto& name: names)
+    for (std::size_t i = 0; i < m_attributeToFindNames.size(); ++i)
     {
-        const auto found = std::any_of(
+        const auto& name = m_attributeToFindNames[i];
+
+        m_attributeToFindNamesMatched[i] = std::any_of(
             attributes.begin(), attributes.end(),
             [&name](const auto& attr) { return attr.name.startsWith(name); });
-        if (!found)
-            return false;
     }
-
-    return true;
 }
 
-bool Filter::matchAttributeValues(
-    const QString& filterText,
-    const nx::common::metadata::Attributes& attributes) const
+void Filter::TextMatchContext::matchAttributeValues(
+    const nx::common::metadata::Attributes& attributes)
 {
-    auto filterWords = filterText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
-    return std::all_of(
-        filterWords.cbegin(), filterWords.cend(),
-        [&attributes](const QString& filterWord)
-        {
-            return wordMatchAnyOfAttributes(filterWord, attributes);
-        });
+    for (std::size_t i = 0; i < m_tokens.size(); ++i)
+        m_tokensMatched[i] = wordMatchAnyOfAttributes(m_tokens[i], attributes);
 }
+
+bool Filter::TextMatchContext::wordMatchAnyOfAttributes(
+    const QString& word,
+    const nx::common::metadata::Attributes& attributes)
+{
+    std::function<bool(const Attribute&)> wordMatchesAttribute;
+    if (word.endsWith('*'))
+    {
+        const QStringRef prefix = word.leftRef(word.length() - 1);
+        wordMatchesAttribute =
+            [prefix](const Attribute& attribute)
+            {
+                return attribute.value.startsWith(prefix, Qt::CaseInsensitive);
+            };
+    }
+    else
+    {
+        wordMatchesAttribute =
+            [&word](const Attribute& attribute)
+            {
+                return QString::compare(word, attribute.value, Qt::CaseInsensitive) == 0;
+            };
+    }
+    return std::any_of(attributes.cbegin(), attributes.cend(), wordMatchesAttribute);
+}
+
+//-------------------------------------------------------------------------------------------------
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params)
 {

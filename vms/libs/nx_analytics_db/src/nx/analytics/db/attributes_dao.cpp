@@ -112,7 +112,8 @@ std::set<int64_t> AttributesDao::lookupCombinedAttributes(
         WHERE content MATCH ?
     )sql");
 
-    query->addBindValue(convertTextFilterToSqliteFtsExpression(text));
+    const auto filterExpression = convertTextFilterToSqliteFtsExpression(text);
+    query->addBindValue(filterExpression);
     query->exec();
 
     std::set<int64_t> attributesIds;

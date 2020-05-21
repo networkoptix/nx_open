@@ -1387,9 +1387,7 @@ TEST_F(AnalyticsDbLookupFullText, search_by_specific_param_value)
     setAttributeDictionary({{"param1", "value1"}, {"param1", "value2"}});
     generateVariousEvents();
 
-    //const auto [name, value] = getAnyAttributePresentInData();
-    //addTextToFilter(name + ":" + value);
-    addTextToFilter("param1:value1");
+    addTextToFilter("Param1:Value1");
 
     whenLookupObjectTracks();
 

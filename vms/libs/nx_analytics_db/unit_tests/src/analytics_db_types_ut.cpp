@@ -62,6 +62,8 @@ TEST_F(AnalyticsStorageTypesFilter, freeText_does_not_contain_spaces_after_seria
     assertSerializedFreeTextDoesNotContainSpaces();
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class FilterTest: public ::testing::Test
 {
 protected:
@@ -132,6 +134,8 @@ static std::vector<FreeTextAndExpectedResult> kUserInputAndExpectedResults{
     {"Brand Mazda", false}, //< AND logic is applied. Negative case.
     {"Mazda Truck", true}, //< Order is not important.
     {"MA TR", true}, //< Each word is prefixed.
+    {"type:tru", true},
+    {"Type:Truck", true},
 };
 
 INSTANTIATE_TEST_CASE_P(AnalyticsDbFilter,
