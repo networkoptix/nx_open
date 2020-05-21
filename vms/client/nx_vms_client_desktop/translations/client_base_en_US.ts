@@ -1246,7 +1246,7 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>LicenseActivationMessages</name>
+    <name>LicenseActivationDialogs</name>
     <message>
         <source>Incompatible license</source>
         <translation type="unfinished"></translation>
@@ -1256,7 +1256,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please contact customer support to report the issue.</source>
+        <source>To report the issue please contact %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1308,7 +1308,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please contact Customer Support to activate License Key manually.</source>
+        <source>To activate License Key manually please contact %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1325,7 +1325,7 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>LicenseDeactivationMessages</name>
+    <name>LicenseDeactivationDialogs</name>
     <message numerus="yes">
         <source>Failed to deactivate %n licenses</source>
         <translation type="unfinished">
@@ -1385,15 +1385,7 @@ to view more bookmarks</source>
 <context>
     <name>LicenseManagementMessagesPrivate</name>
     <message>
-        <source>Please contact customer support to get a valid License Key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>To get a valid License Key please contact your regional support agent:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If the problem persists, please contact customer support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1408,11 +1400,19 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message>
-        <source>Please contact customer support.</source>
+        <source>Please contact your regional support agent:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please contact your regional support agent:</source>
+        <source>To get a valid License Key please contact %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the problem persists, please contact %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contact %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9736,6 +9736,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>We are preparing files for the export process. Please wait for a few seconds.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Transcoding is required. Export session restarted.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

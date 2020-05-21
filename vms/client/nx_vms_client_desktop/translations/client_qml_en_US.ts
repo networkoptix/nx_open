@@ -92,6 +92,14 @@
         <source>Select video stream from the camera for analysis</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refreshing...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LabeledItem</name>
