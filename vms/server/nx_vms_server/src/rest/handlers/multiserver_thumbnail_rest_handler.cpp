@@ -55,12 +55,19 @@ int QnMultiserverThumbnailRestHandler::executeGet(
             QThread::currentThread()->setPriority(QThread::NormalPriority);
         });
 
-
-    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(
+    const auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(
         processor->commonModule()->resourcePool(), params);
+
+    if (!request.request.camera)
+    {
+        QnJsonRestResult::writeError(
+            &result, QnRestResult::InvalidParameter, "Parameter cameraId is missing or invalid");
+        return nx::network::http::StatusCode::unprocessableEntity;
+    }
+
     const auto& imageRequest = request.request;
 
-    auto requiredPermission =
+    const auto requiredPermission =
         nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.usecSinceEpoch)
         ? Qn::Permission::ViewLivePermission
         : Qn::Permission::ViewFootagePermission;
@@ -75,7 +82,7 @@ int QnMultiserverThumbnailRestHandler::executeGet(
 
     const auto ownerPort = processor->owner()->getPort();
     qint64 frameTimestampUsec = 0;
-    auto httpResult = getScreenshot(processor->commonModule(), request, result, contentType,
+    const auto httpResult = getScreenshot(processor->commonModule(), request, result, contentType,
         ownerPort, &frameTimestampUsec);
 
     if (httpResult == nx::network::http::StatusCode::ok)
