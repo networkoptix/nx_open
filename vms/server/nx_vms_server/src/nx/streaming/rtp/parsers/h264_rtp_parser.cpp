@@ -506,6 +506,12 @@ StreamParser::Result H264Parser::processData(
 
     if (rtpHeader->marker && m_frameExists && !gotData)
     {
+        if (m_videoFrameSize <= 0)
+        {
+            NX_WARNING(this, "%1: Got zero size packet.", m_logName);
+            clearInternalBuffer();
+            return false;
+        }
         m_mediaData = createVideoData(rtpBufferBase, m_lastRtpTime); // last packet
         gotData = true;
     }
