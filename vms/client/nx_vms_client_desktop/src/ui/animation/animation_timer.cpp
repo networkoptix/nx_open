@@ -174,9 +174,6 @@ void AnimationTimer::removeListener(AnimationTimerListener *listener) {
     if(listener->m_timer != this)
         return; /* Removing a listener that is not there is OK. */
 
-    NX_ASSERT(m_listeners.count(nullptr) < 1000, "Null listeners while isActive %1",
-        isActive());
-
     if(listener->isListening())
         listenerStoppedListening(listener);
     m_listeners[m_listeners.indexOf(listener)] = NULL;
