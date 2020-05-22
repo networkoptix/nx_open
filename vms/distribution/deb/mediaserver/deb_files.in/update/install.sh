@@ -28,7 +28,7 @@ osMajorVersion() {
     echo "${VERSION%%.*}"
 }
 
-installDeb()
+doInstallDeb()
 {
     local -r DEB="$1"
 
@@ -44,6 +44,35 @@ installDeb()
     else
         dpkg -i "$DEB"
     fi
+}
+
+installDeb()
+{
+    local -r TOTAL_ATTEMPTS=20
+    local -r RETRY_INTERVAL=30
+
+    # Here we work-around an issue when this script is called when apt is installing updates.
+    # Since 1.19 apt is able to wait for dpkg lock released, but this script should work on
+    # Debian 8 / Ubuntu 16.04 which have older apt so we can't rely on it.
+    # The code below does simple retries until package is installed. It does another attempt when
+    # dpkg exits with code "2". This code covers some other situations but dpkg does not provide
+    # any other flags but an error message in stderr. It would be a bit stange to parse
+    # human-readable error messages, so we just rely on "2" exit code what works in the most of
+    # cases.
+    local -r DPKG_LOCKED_EXIT_CODE=2
+
+    local ATTEMPT=1
+    while [ $ATTEMPT -le $TOTAL_ATTEMPTS ]
+    do
+        doInstallDeb "$1"
+
+        [ $? -ne $DPKG_LOCKED_EXIT_CODE ] && return
+
+        echo "DEB installation failed. Attempt $ATTEMPT of $TOTAL_ATTEMPTS."
+        echo "Retrying in $RETRY_INTERVAL seconds..."
+        sleep $RETRY_INTERVAL
+        ATTEMPT=$((ATTEMPT + 1))
+    done
 }
 
 deleteObsoleteFiles()

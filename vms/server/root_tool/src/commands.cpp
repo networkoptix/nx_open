@@ -129,7 +129,7 @@ std::string CommandsFactory::help() const
         << " and is called directly in some cases." << std::endl << std::endl
         << "Supported socket commands:" << std::endl;
 
-    int firstColumnWidth = 0;
+    size_t firstColumnWidth = 0;
     for (const auto& p: m_commands)
     {
         if (p.first.size() > firstColumnWidth)
@@ -163,7 +163,7 @@ std::string CommandsFactory::help() const
  * Executes the given command context functor and reports result via socket if the context contains
  * a valid socket descriptor.
  */
-Result execute(const ExecutableCommandContextPtr& command)
+int execute(const ExecutableCommandContextPtr& command)
 {
     auto result = command->action(
         command->commandString,

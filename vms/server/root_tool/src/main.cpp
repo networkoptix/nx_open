@@ -15,7 +15,6 @@
 #include <condition_variable>
 #include <functional>
 #include <iostream>
-#include <iomanip>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/types.h>
@@ -28,15 +27,22 @@
 
 using namespace nx::system_commands::domain_socket;
 
+namespace Result
+{
+    constexpr int ok = 0;
+    constexpr int invalidArg = -1;
+    constexpr int execFailed = -2;
+};
+
 void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemCommands)
 {
     using namespace std::placeholders;
 
     auto oneArgAction =
-        [systemCommands](auto action)
+        [](auto action)
         {
             return
-                [systemCommands, action](const std::string& command, int transportFd)
+                [action](const std::string& command, int transportFd)
                 {
                     std::string commandArg;
                     if (!parseCommand(command, &commandArg))
@@ -48,14 +54,11 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                 };
         };
 
-    factory.reg(
-        {"mkdir"}, {"path"},
-        oneArgAction(std::bind(&nx::SystemCommands::makeDirectory, systemCommands, _1)))
-    .reg(
-        {"rm"}, {"path"},
-        oneArgAction(std::bind(&nx::SystemCommands::removePath, systemCommands, _1)))
-    .reg(
-        {"chown"}, {"path", "uid", "gid", "opt_recursive"},
+    factory.reg({"mkdir"}, {"path"}, oneArgAction(
+        [systemCommands](const std::string& path) { return systemCommands->makeDirectory(path); }))
+    .reg({"rm"}, {"path"}, oneArgAction(
+        [systemCommands](const std::string& path) { return systemCommands->removePath(path); }))
+    .reg({"chown"}, {"path", "uid", "gid", "opt_recursive"},
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string path, uid, gid;
@@ -69,9 +72,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             sendInt64(transportFd, result);
             return result ? Result::ok : Result::execFailed;
         })
-    .reg(
-        {"makeReadable"}, {"path"},
-        oneArgAction(std::bind(&nx::SystemCommands::makeReadable, systemCommands, _1)))
+    .reg({"makeReadable"}, {"path"}, oneArgAction(
+        [systemCommands](const std::string& path) { return systemCommands->makeReadable(path); }))
     .reg(
         {"mount"}, {"url", "path", "opt_user", "opt_password"},
         [systemCommands](const std::string& command, int transportFd)
@@ -216,23 +218,20 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             return result == nx::SystemCommands::UnmountCode::ok ? Result::ok : Result::execFailed;
         })
     .reg({"install"}, {"deb_path", "force"},
-         [systemCommands](const std::string& command, int /*transportFd*/)
+         [](const std::string& command, int /*transportFd*/)
          {
              std::string debPath;
-             std::optional<std::string> force;
-             if (!parseCommand(command, &debPath, &force))
+             if (!parseCommand(command, &debPath))
                  return Result::invalidArg;
 
-             std::stringstream commandStream;
-             commandStream << "dpkg -i";
-             if (force && *force == "force-conflicts")
-                commandStream << " --auto-deconfigure --force-conflicts";
-             commandStream << " '" << debPath << "'";
-             int result = ::system(commandStream.str().c_str());
-             return result == 0 ? Result::ok : Result::execFailed;
+             const std::string& commandStr = "dpkg -i '" + debPath + "'";
+             int result = ::system(commandStr.c_str());
+             if (!WIFEXITED(result))
+                 return Result::execFailed;
+             return WEXITSTATUS(result);
          }, true)
     .reg({"help"}, {},
-         [&factory](const std::string& command, int /*transportFd*/)
+         [&factory](const std::string& /*command*/, int /*transportFd*/)
          {
              std::cout << factory.help() << std::endl;
              return Result::ok;
@@ -427,18 +426,9 @@ static int executeCommand(
 
     auto result = execute(command);
     if (!isDirect(command))
-        std::fprintf(stdout, "%s --> %s\n", commandString.c_str(), toString(result).c_str());
+        std::fprintf(stdout, "%s --> %d\n", commandString.c_str(), result);
 
-    switch (result)
-    {
-        case Result::execFailed:
-        case Result::invalidArg:
-            return -1;
-        case Result::ok:
-            return 0;
-    }
-
-    return -1;
+    return result;
 }
 
 /**

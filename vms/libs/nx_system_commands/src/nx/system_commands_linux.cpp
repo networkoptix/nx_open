@@ -609,7 +609,7 @@ std::string SystemCommands::serializedDmiInfo()
         "/usr/sbin/dmidecode -t17",
         [&values, &prefixes, trim](const char* line)
         {
-            for (int index = 0; index < prefixes.size(); index++)
+            for (size_t index = 0; index < prefixes.size(); index++)
             {
                 const char* ptr = strstr(line, prefixes[index]);
                 if (ptr)

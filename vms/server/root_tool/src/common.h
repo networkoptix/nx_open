@@ -4,27 +4,7 @@
 #include <string>
 #include <assert.h>
 
-enum class Result
-{
-    ok,
-    invalidArg,
-    execFailed
-};
-
-inline std::string toString(Result result)
-{
-    switch (result)
-    {
-        case Result::ok: return "ok";
-        case Result::invalidArg: return "invalid arguments";
-        case Result::execFailed: return "execution failed";
-    }
-
-    assert(false);
-    return "";
-}
-
-using Action = std::function<Result(const std::string&, int)>;
+using Action = std::function<int(const std::string&, int)>;
 
 inline bool isNotSpace(char c) { return !isspace(c); }
 inline bool isNotQuote(char c) { return c != '\''; }

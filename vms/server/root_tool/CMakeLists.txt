@@ -5,7 +5,7 @@ if(LINUX)
 endif()
 
 nx_add_target(root_tool EXECUTABLE
-    PUBLIC_LIBS boost nx_system_commands pthread
+    PUBLIC_LIBS nx_system_commands pthread
     FOLDER utils)
 
 if(LINUX)

@@ -32,5 +32,5 @@ private:
     std::unordered_map<std::string, std::shared_ptr<CommandContext>> m_commands;
 };
 
-Result execute(const ExecutableCommandContextPtr& command);
+int execute(const ExecutableCommandContextPtr& command);
 bool isDirect(const ExecutableCommandContextPtr& command);
