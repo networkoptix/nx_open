@@ -238,7 +238,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     {
         if (!m_lastRtpParseResult.success)
         {
-            reason = vms::api::EventReason::networkRtpParserError;
+            reason = vms::api::EventReason::networkRtpStreamError;
             reasonParamsEncoded = nx::vms::event::NetworkIssueEvent::encodePrimaryStream(
                 m_role != Qn::CR_SecondaryLiveVideo, m_lastRtpParseResult.errorMessage);
         }

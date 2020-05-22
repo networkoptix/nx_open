@@ -460,7 +460,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             result = tr("No data received during last %n seconds.", "", msecs / 1000);
             break;
         }
-        case EventReason::networkRtpParserError:
+        case EventReason::networkRtpStreamError:
         {
             QString message;
             bool isPrimaryStream = NetworkIssueEvent::decodePrimaryStream(
