@@ -25,19 +25,32 @@ static const char* streamTypeToString(uint16_t flags)
 void Session::run(const QString& url, const Config& config, bool live)
 {
     static const int kTcpPrefixLength = 4;
-    int64_t position = DATETIME_NOW;
+    m_config = config;
+
+    m_prevTimestampUs = -1;
+    m_prevSequence = (uint16_t) -1; //< The sequence number of the first packet will be 0.
+    m_newPacket = true;
+    m_lastFrameTime.reset();
+    int64_t positionUs = DATETIME_NOW;
     if (!live)
     {
-        nx::utils::random::QtDevice rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(60, 3600);
-        position = QDateTime::currentMSecsSinceEpoch() * 1000 - dis(gen) * 1000000ll;
+        if (m_config.archivePosition != std::chrono::milliseconds(-1))
+        {
+            positionUs = std::chrono::duration_cast<std::chrono::microseconds>(
+                m_config.archivePosition).count();
+        }
+        else
+        {
+            nx::utils::random::QtDevice rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> dis(60, 3600);
+            positionUs = QDateTime::currentMSecsSinceEpoch() * 1000 - dis(gen) * 1000000ll;
+        }
     }
     NX_INFO(this, "Start test rtsp session: %1 %2",
         url,
-        live ? "live" : "archive, from position: " + QString::number(position / 1000000));
+        live ? "live" : "archive, from position: " + QString::number(positionUs / 1000) + "ms");
 
-    m_config = config;
     QAuthenticator auth;
     auth.setUser(config.user);
     auth.setPassword(config.password);
@@ -59,13 +72,12 @@ void Session::run(const QString& url, const Config& config, bool live)
         ++failedCount;
         return;
     }
-    rtspClient.play(position, AV_NOPTS_VALUE, 1.0);
+    rtspClient.play(positionUs, AV_NOPTS_VALUE, 1.0);
     int channel = -1;
     std::vector<QnByteArray*> dataArrays;
-    m_lastFrameTime = std::chrono::system_clock::now();
-    while (true)
+    for (;;)
     {
-        int bytesRead = rtspClient.readBinaryResponce(dataArrays, channel);
+        const int bytesRead = rtspClient.readBinaryResponce(dataArrays, channel);
         if (channel >= 0 && (int)dataArrays.size() > channel && dataArrays[channel])
         {
             if (bytesRead > 0)
@@ -111,7 +123,7 @@ void Session::checkDiff(std::chrono::microseconds diff, int64_t timestampUs, con
 
 bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
 {
-    const auto nowTime = std::chrono::system_clock::now();
+    const auto nowTime = std::chrono::steady_clock::now();
     Packet packet;
     if (parsePacket(data, size, packet, url))
     {
@@ -129,16 +141,18 @@ bool Session::processPacket(const uint8_t* data, int64_t size, const char* url)
         }
         m_prevTimestampUs = packet.timestampUs;
         m_lastFrameTime = nowTime;
-
     }
     else
     {
-        std::chrono::duration<double> timeFromLastFrame = nowTime - m_lastFrameTime;
-        if (timeFromLastFrame > m_config.timeout)
+        if (m_lastFrameTime)
         {
-            report("WARNING: Camera %1: Video frame was not received for %2 s.",
-                url, timeFromLastFrame.count());
-            return false;
+            const std::chrono::duration<double> timeFromLastFrame = nowTime - *m_lastFrameTime;
+            if (timeFromLastFrame > m_config.timeout)
+            {
+                report("WARNING: Camera %1: Video frame was not received for %2 s.",
+                    url, timeFromLastFrame.count());
+                return false;
+            }
         }
     }
     return true;

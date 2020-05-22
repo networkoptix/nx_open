@@ -111,6 +111,10 @@ static std::optional<RtspPerf::Config> makeConfig(const QCoreApplication& app)
         "Disable sequential number error warnings");
     parser.addOption(ignoreSequenceNumberErrors);
 
+    QCommandLineOption archivePositionOption(QStringList() << "archive-position",
+        "Position in utc msec for all archive sessions", "archive-position", "-1");
+    parser.addOption(archivePositionOption);
+
     parser.process(app);
 
     RtspPerf::Config config;
@@ -128,10 +132,11 @@ static std::optional<RtspPerf::Config> makeConfig(const QCoreApplication& app)
     config.sessionConfig.printTimestamps = parser.isSet(timestampsOption);
     config.sessionConfig.ignoreSequenceNumberErrors = parser.isSet(ignoreSequenceNumberErrors);
     config.sessionConfig.maxTimestampDiff =
-        std::chrono::microseconds(parser.value(maxTimestampDiffUs).toInt());
+        std::chrono::microseconds(parser.value(maxTimestampDiffUs).toLongLong());
     config.sessionConfig.minTimestampDiff =
-        std::chrono::microseconds(parser.value(minTimestampDiffUs).toInt());
-
+        std::chrono::microseconds(parser.value(minTimestampDiffUs).toLongLong());
+    config.sessionConfig.archivePosition =
+        std::chrono::milliseconds(parser.value(archivePositionOption).toLongLong());
 
     if (parser.isSet(logLevelOption))
     {

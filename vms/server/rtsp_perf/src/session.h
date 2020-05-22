@@ -3,6 +3,7 @@
 #include <atomic>
 #include <thread>
 #include <chrono>
+#include <optional>
 
 #include <QtCore/QString>
 
@@ -15,6 +16,7 @@ public:
         QString password;
         bool printTimestamps = false;
         bool ignoreSequenceNumberErrors = false;
+        std::chrono::milliseconds archivePosition{-1}; //< -1 - use random value
         std::chrono::milliseconds timeout{5000};
         std::chrono::microseconds maxTimestampDiff{0};
         std::chrono::microseconds minTimestampDiff{0};
@@ -42,5 +44,5 @@ private:
     uint16_t m_prevSequence = (uint16_t) -1; //< The sequence number of the first packet will be 0.
     Config m_config;
     bool m_newPacket = true;
-    std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime;
+    std::optional<std::chrono::time_point<std::chrono::steady_clock>> m_lastFrameTime;
 };
