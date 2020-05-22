@@ -38,8 +38,8 @@ WebViewPageStatus statusFromProgress(int progress)
 
 void jsConfirm(QWidget* parent, QObject* request, const QString& title, const QString& message)
 {
-    const auto button =
-        QMessageBox::information(parent, title, message, QMessageBox::Ok | QMessageBox::Cancel);
+    const auto button = QMessageBox::information(
+        parent, title, message.toHtmlEscaped(), QMessageBox::Ok | QMessageBox::Cancel);
 
     if (button == QMessageBox::Ok)
         QMetaObject::invokeMethod(request, "dialogAccept");
@@ -273,7 +273,7 @@ void GraphicsWebEngineView::requestJavaScriptDialog(QObject* request, QWidget* p
             QMessageBox::information(
                 parent,
                 request->property("title").toString(),
-                request->property("message").toString());
+                request->property("message").toString().toHtmlEscaped());
             QMetaObject::invokeMethod(request, "dialogAccept");
             return;
         case DialogTypeConfirm:
@@ -299,7 +299,7 @@ void GraphicsWebEngineView::requestJavaScriptDialog(QObject* request, QWidget* p
             const QString text = QInputDialog::getText(
                 parent,
                 request->property("title").toString(),
-                request->property("message").toString(),
+                request->property("message").toString().toHtmlEscaped(),
                 QLineEdit::Normal,
                 request->property("defaultText").toString(),
                 &ok);
