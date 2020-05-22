@@ -36,6 +36,17 @@ WebViewPageStatus statusFromProgress(int progress)
     }
 }
 
+void jsConfirm(QWidget* parent, QObject* request, const QString& title, const QString& message)
+{
+    const auto button =
+        QMessageBox::information(parent, title, message, QMessageBox::Ok | QMessageBox::Cancel);
+
+    if (button == QMessageBox::Ok)
+        QMetaObject::invokeMethod(request, "dialogAccept");
+    else
+        QMetaObject::invokeMethod(request, "dialogReject");
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -266,18 +277,20 @@ void GraphicsWebEngineView::requestJavaScriptDialog(QObject* request, QWidget* p
             QMetaObject::invokeMethod(request, "dialogAccept");
             return;
         case DialogTypeConfirm:
+            jsConfirm(
+                parent,
+                request,
+                request->property("title").toString(),
+                request->property("message").toString());
+            return;
         case DialogTypeBeforeUnload:
         {
-            const auto button = QMessageBox::information(
-                parent,
-                request->property("title").toString(),
-                request->property("message").toString(),
-                QMessageBox::Ok | QMessageBox::Cancel);
-
-            if (button == QMessageBox::Ok)
-                QMetaObject::invokeMethod(request, "dialogAccept");
-            else
-                QMetaObject::invokeMethod(request, "dialogReject");
+            // Match the string with translated string in QWebEnginePagePrivate.
+            // The same string is passed to default QWebEnginePage::javaScriptConfirm().
+            auto message = QCoreApplication::translate(
+                "QWebEnginePage",
+                "Are you sure you want to leave this page? Changes that you made may not be saved.");
+            jsConfirm(parent, request, request->property("title").toString(), message);
             return;
         }
         case DialogTypePrompt:
