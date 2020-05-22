@@ -38,7 +38,7 @@ namespace kit {
  *
  *     struct Ini: nx::kit::IniConfig
  *     {
- *         // NOTE: Omit "reload();" if load-on-start is not needed.
+ *         // NOTE: Omit `reload();` if load-on-start is not needed.
  *         Ini(): IniConfig("my_module.ini") { reload(); }
  *
  *         NX_INI_FLAG(0, myFlag, "Here 0 stands for 'false' as the default value.");
@@ -58,6 +58,11 @@ namespace kit {
  *
  * In the code, use ini().<param-name> to access the values. Call ini().reload() when needed, e.g.
  * when certain activity starts or at regular intervals.
+ *
+ * ATTENTION: Inline functions with static variables are safe to use only when the header is local
+ * to a single dynamic library or executable. Otherwise (if the header is included into more than
+ * one dynamic library or executable), due to compiler/linker limitations, such variables may have
+ * duplicate instances, thus, the function definition must be moved to a .cpp.
  */
 class NX_KIT_API IniConfig
 {
