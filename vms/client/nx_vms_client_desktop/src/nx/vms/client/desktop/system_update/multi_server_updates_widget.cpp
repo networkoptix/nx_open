@@ -1303,111 +1303,106 @@ void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QStrin
 
 void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QString& error)
 {
-    if (m_widgetState == WidgetUpdateState::finishingInstall)
+    if (!NX_ASSERT(m_widgetState == WidgetUpdateState::finishingInstall))
+        return;
+
+    if (success)
     {
-        if (success)
+        m_stateTracker->processInstallTaskSet();
+        QSet<QnUuid> peersComplete = m_stateTracker->peersComplete();
+        QSet<QnUuid> peersFailed = m_stateTracker->peersFailed();
+
+        if (!peersComplete.empty() && peersComplete != QSet<QnUuid>{clientPeerId()})
         {
-            m_stateTracker->processInstallTaskSet();
-            auto peersComplete = m_stateTracker->peersComplete();
-            auto peersFailed = m_stateTracker->peersFailed();
+            NX_INFO(this, "atFinishUpdateComplete() - installation is complete");
+            setTargetState(WidgetUpdateState::complete, peersComplete);
+            // Forcing UI to redraw before we show a dialog.
+            loadDataToUi();
 
-            if (!peersComplete.empty())
+            auto complete = peersComplete;
+            QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
+            // 1. Everything is complete
+            messageBox->setIcon(QnMessageBoxIcon::Success);
+
+            if (peersFailed.empty())
             {
-                NX_INFO(this, "atFinishUpdateComplete() - installation is complete");
-                setTargetState(WidgetUpdateState::complete, peersComplete);
-                // Forcing UI to redraw before we show a dialog.
-                loadDataToUi();
-
-                auto complete = peersComplete;
-                QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
-                // 1. Everything is complete
-                messageBox->setIcon(QnMessageBoxIcon::Success);
-
-                if (peersFailed.empty())
-                {
-                    messageBox->setText(tr("Update completed"));
-                }
-                else
-                {
-                    NX_ERROR(this,
-                        "atFinishUpdateComplete() - peers %1 have failed to install update",
-                        peersFailed);
-                    messageBox->setText(
-                        tr("Update completed, but some components have failed an update"));
-                    injectResourceList(*messageBox, resourcePool()->getResourcesByIds(peersFailed));
-                }
-
-                QStringList informativeText;
-                if (m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion()))
-                {
-                    QString appName = QnClientAppInfo::applicationDisplayName();
-                    if (peersFailed.contains(clientPeerId()))
-                    {
-                        informativeText += tr(
-                            "Please update %1 manually using an installation package.").arg(appName);
-                    }
-                    else
-                    {
-                        informativeText += tr("%1 will be restarted to the updated version.").arg(
-                            appName);
-                    }
-                }
-
-                if (!informativeText.isEmpty())
-                    messageBox->setInformativeText(informativeText.join("\n"));
-
-                messageBox->addButton(tr("OK"),
-                    QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-                messageBox->exec();
-
-                bool shouldRestartClient = m_clientUpdateTool->hasUpdate()
-                    && m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion());
-
-                completeClientInstallation(shouldRestartClient);
-            }
-            // No servers have installed updates
-            else if (peersComplete.empty() && !peersFailed.empty())
-            {
-                NX_ERROR(this, "atFinishUpdateComplete() - installation has failed completely");
-                QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-                // 1. Everything is complete
-                messageBox->setIcon(QnMessageBoxIcon::Critical);
-                messageBox->setText(tr("There was an error while installing updates:"));
-
-                PeerStateTracker::ErrorReport report;
-                m_stateTracker->getErrorReport(report);
-
-                injectResourceList(*messageBox, resourcePool()->getResourcesByIds(report.peers));
-                QString text =  htmlParagraph(report.message);
-                text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
-                messageBox->setInformativeText(text);
-                auto installNow = messageBox->addButton(tr("OK"),
-                    QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-                messageBox->setEscapeButton(installNow);
-                messageBox->exec();
-                setTargetState(WidgetUpdateState::initial);
-                setUpdateSourceMode(UpdateSourceType::internet);
-                loadDataToUi();
+                messageBox->setText(tr("Update completed"));
             }
             else
             {
-                NX_ERROR(this, "atFinishUpdateComplete() - unhandled state");
+                NX_ERROR(this,
+                    "atFinishUpdateComplete() - peers %1 have failed to install update",
+                    peersFailed);
+                messageBox->setText(
+                    tr("Update completed, but some components have failed an update"));
+                injectResourceList(*messageBox, resourcePool()->getResourcesByIds(peersFailed));
             }
+
+            QStringList informativeText;
+            if (m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion()))
+            {
+                QString appName = QnClientAppInfo::applicationDisplayName();
+                if (peersFailed.contains(clientPeerId()))
+                {
+                    informativeText += tr(
+                        "Please update %1 manually using an installation package.").arg(appName);
+                }
+                else
+                {
+                    informativeText += tr("%1 will be restarted to the updated version.").arg(
+                        appName);
+                }
+            }
+
+            if (!informativeText.isEmpty())
+                messageBox->setInformativeText(informativeText.join("\n"));
+
+            messageBox->addButton(tr("OK"),
+                QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            messageBox->exec();
+
+            bool shouldRestartClient = m_clientUpdateTool->hasUpdate()
+                && m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion());
+
+            completeClientInstallation(shouldRestartClient);
+        }
+        // No servers have installed updates
+        else if (!peersFailed.empty())
+        {
+            NX_ERROR(this, "atFinishUpdateComplete() - installation has failed completely");
+            QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+            // 1. Everything is complete
+            messageBox->setIcon(QnMessageBoxIcon::Critical);
+            messageBox->setText(tr("There was an error while installing updates:"));
+
+            PeerStateTracker::ErrorReport report;
+            m_stateTracker->getErrorReport(report);
+
+            injectResourceList(*messageBox, resourcePool()->getResourcesByIds(report.peers));
+            QString text =  htmlParagraph(report.message);
+            text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
+            messageBox->setInformativeText(text);
+            auto installNow = messageBox->addButton(tr("OK"),
+                QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            messageBox->setEscapeButton(installNow);
+            messageBox->exec();
+            setTargetState(WidgetUpdateState::initial);
+            setUpdateSourceMode(UpdateSourceType::internet);
+            loadDataToUi();
         }
         else
         {
-            NX_ERROR(this, "atFinishUpdateComplete(%1) - %2", success, error);
-            auto targets = m_stateTracker->peersIssued() + m_stateTracker->peersInstalling();
-            setTargetState(WidgetUpdateState::installingStalled, targets);
+            NX_ERROR(this, "atFinishUpdateComplete() - unhandled state");
         }
-
-        qnClientMessageProcessor->setHoldConnection(false);
     }
     else
     {
-        // We should not be here.
-        NX_ASSERT(false);
+        NX_ERROR(this, "atFinishUpdateComplete(%1) - %2", success, error);
+        auto targets = m_stateTracker->peersIssued() + m_stateTracker->peersInstalling();
+        setTargetState(WidgetUpdateState::installingStalled, targets);
     }
+
+    qnClientMessageProcessor->setHoldConnection(false);
 
     if (hasPendingUiChanges())
         loadDataToUi();
@@ -1420,7 +1415,7 @@ void MultiServerUpdatesWidget::repeatUpdateValidation()
         NX_INFO(this, "repeatUpdateValidation() - recalculating update report");
         auto installedVersions = m_clientUpdateTool->getInstalledClientVersions();
         if (m_updateInfo.error != nx::update::InformationError::httpError
-            || m_updateInfo.error != nx::update::InformationError::networkError)
+            && m_updateInfo.error != nx::update::InformationError::networkError)
         {
             m_updateInfo.error = nx::update::InformationError::noError;
         }

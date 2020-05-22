@@ -29,6 +29,7 @@ public:
         stopped,
         busy,
         installing,
+        installationFailed,
         cleanTemporaryFilesError,
         updateContentsError,
         unknownError,
@@ -72,6 +73,8 @@ private:
     mutable qint64 m_freeSpaceRequiredToUpdate = 0;
     mutable State m_state = State::idle;
     std::unique_ptr<QTimer> m_installationTimer;
+    qint64 m_installationProcessPid = -1;
+    std::unique_ptr<QTimer> m_installationCheckTimer;
 };
 
 } // namespace nx::vms::server

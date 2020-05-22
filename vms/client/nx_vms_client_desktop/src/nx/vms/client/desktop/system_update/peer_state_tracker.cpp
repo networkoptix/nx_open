@@ -392,6 +392,13 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
                     if (item->errorCode == nx::update::Status::ErrorCode::noError)
                         changed |= compareAndSet(nx::update::Status::ErrorCode::unknownError, item->errorCode);
                     changed |= compareAndSet(errorString(status.second.errorCode), item->statusMessage);
+
+                    if (item->errorCode == nx::update::Status::ErrorCode::installationError)
+                    {
+                        NX_INFO(this, "Installation failed for %1", item->id);
+                        item->installing = false;
+                        changed = true;
+                    }
                 }
 
                 if (item->state == StatusCode::latestUpdateInstalled && item->installing)
@@ -1109,6 +1116,8 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
             return tr("Internal server error.");
         case Code::applauncherError:
             return tr("Internal client error.");
+        case Code::installationError:
+            return tr("Update installation failed.");
         case Code::unknownError:
             return tr("Unknown error.");
     }

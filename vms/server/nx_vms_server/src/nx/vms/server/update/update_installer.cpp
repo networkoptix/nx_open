@@ -1,5 +1,7 @@
 #include "update_installer.h"
 
+#include <chrono>
+
 #include <QtCore/QCoreApplication>
 
 #include <nx/utils/log/log.h>
@@ -16,6 +18,8 @@
 #include <media_server/settings.h>
 #include <nx/vms/server/root_fs.h>
 #include <nx_vms_server_ini.h>
+
+using namespace std::chrono;
 
 namespace nx::vms::server {
 
@@ -46,11 +50,27 @@ update::PackageInformation updateInformation(const QString& path)
 
 UpdateInstaller::UpdateInstaller(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
-    m_installationTimer(new QTimer())
+    m_installationTimer(new QTimer()),
+    m_installationCheckTimer(new QTimer())
 {
     m_installationTimer->setInterval(ini().autoUpdateInstallationDelayMs);
     QObject::connect(m_installationTimer.get(), &QTimer::timeout,
         [this]() { install(QnAuthSession()); });
+
+    m_installationCheckTimer->setInterval(30s);
+    QObject::connect(m_installationCheckTimer.get(), &QTimer::timeout,
+        [this]()
+        {
+            // Installation process must restart the server. If it didn't happen and the installer
+            // process is finished, something went wrong.
+            if (!checkProcessExists(m_installationProcessPid))
+            {
+                NX_ERROR(this, "Failed to install update. "
+                    "Installation process exited, but server is still running.");
+                setStateLocked(State::installationFailed);
+                m_installationCheckTimer->stop();
+            }
+        });
 }
 
 UpdateInstaller::~UpdateInstaller()
@@ -153,7 +173,9 @@ void UpdateInstaller::install(const QnAuthSession& authInfo)
     }
 
     QString installerPath = QDir(workDir()).absoluteFilePath(m_executable);
-    SystemError::ErrorCode error = startProcessDetached(installerPath, arguments, installerDir);
+    SystemError::ErrorCode error =
+        startProcessDetached(installerPath, arguments, installerDir, &m_installationProcessPid);
+
     if (error != SystemError::noError)
     {
         NX_ERROR(this, "Failed to launch the update script. %1", SystemError::toString(error));
@@ -164,6 +186,8 @@ void UpdateInstaller::install(const QnAuthSession& authInfo)
 
     NX_INFO(this, "Update has been started. file=\"%1\", args=[%2]",
         installerPath, arguments.join(", "));
+
+    QTimer::singleShot(0, m_installationCheckTimer.get(), qOverload<>(&QTimer::start));
 }
 
 void UpdateInstaller::installDelayed()

@@ -185,6 +185,7 @@ public:
         internalError,
         unknownError,
         applauncherError,
+        installationError,
     };
     Q_ENUM(ErrorCode)
 

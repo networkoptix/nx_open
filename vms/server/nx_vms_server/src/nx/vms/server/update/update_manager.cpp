@@ -540,6 +540,13 @@ bool UpdateManager::installerState(update::Status* outUpdateStatus, const QnUuid
             update::Status::ErrorCode::extractionError);
             outUpdateStatus->message = "Installer is busy";
         return true;
+    case UpdateInstaller::State::installationFailed:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            update::Status::ErrorCode::installationError);
+        outUpdateStatus->message = "Installation script failed";
+        return true;
     case UpdateInstaller::State::unknownError:
         *outUpdateStatus = update::Status(
             peerId,
