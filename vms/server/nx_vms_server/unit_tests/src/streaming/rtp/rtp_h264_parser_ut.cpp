@@ -11,6 +11,6 @@ TEST (H264RtpParser, ZeroPacketSize)
 
     nx::streaming::rtp::H264Parser parser;
     bool gotData;
-    auto result = parser.processData(rtpData, 0, 14, gotData);
+    auto result = parser.processData(rtpData, /*offset*/ 0, /*bytesRead*/ 14, gotData);
     ASSERT_EQ(result.success, true);
 }
