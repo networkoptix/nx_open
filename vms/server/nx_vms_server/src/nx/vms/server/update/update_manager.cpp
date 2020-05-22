@@ -133,6 +133,7 @@ void UpdateManager::retry(bool forceRedownload)
         case ErrorCode::unknownError:
         case ErrorCode::applauncherError:
         case ErrorCode::invalidUpdateContents:
+        case ErrorCode::installationError:
             // We can do nothing with these cases.
             break;
 
