@@ -431,7 +431,7 @@ StreamParser::Result H264Parser::processData(
             }
             nalUnitType = *curPtr & 0x1f;
             updateNalFlags(curPtr, bufferEnd - curPtr);
-            if (*curPtr  & 0x80) // FU_A first packet
+            if (*curPtr & 0x80) // FU_A first packet
             {
                 m_firstSeqNum = sequenceNum;
                 m_packetPerNal = 0;
@@ -444,7 +444,7 @@ StreamParser::Result H264Parser::processData(
                 isPacketLost = false;
             }
 
-            if (*curPtr  & 0x40)
+            if (*curPtr & 0x40)
             {
                 // FU_A last packet
                 if (quint16(sequenceNum - m_firstSeqNum) != m_packetPerNal)
@@ -506,12 +506,6 @@ StreamParser::Result H264Parser::processData(
 
     if (rtpHeader->marker && m_frameExists && !gotData)
     {
-        if (m_videoFrameSize <= 0)
-        {
-            NX_WARNING(this, "%1: Got zero size packet.", m_logName);
-            clearInternalBuffer();
-            return false;
-        }
         m_mediaData = createVideoData(rtpBufferBase, m_lastRtpTime); // last packet
         gotData = true;
     }
