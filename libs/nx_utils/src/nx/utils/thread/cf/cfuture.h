@@ -1258,4 +1258,9 @@ constexpr auto translate_broken_promise_to_operation_canceled = [](auto f) {
   }
 };
 
+constexpr auto discard_value = [](auto f) {
+  f.get();
+  return cf::unit();
+};
+
 } // namespace cf

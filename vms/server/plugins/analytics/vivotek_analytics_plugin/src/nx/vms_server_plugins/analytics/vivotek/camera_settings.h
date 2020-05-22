@@ -18,9 +18,12 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 class CameraSettings
 {
 public:
-    template <typename Type>
+    template <typename Value_>
     class Entry
     {
+    public:
+        using Value = Value_;
+
     public:
         bool hasNothing() const
         {
@@ -37,13 +40,13 @@ public:
             return m_state.index() == valueIndex;
         }
 
-        const Type& value() const
+        const Value& value() const
         {
             return std::get<valueIndex>(m_state);
         }
 
         template <typename... Args>
-        Type& emplaceValue(Args&&... args)
+        Value& emplaceValue(Args&&... args)
         {
             return m_state.template emplace<valueIndex>(std::forward<Args>(args)...);
         }
@@ -68,7 +71,7 @@ public:
         static constexpr std::size_t nothingIndex = 0;
         static constexpr std::size_t valueIndex = 1;
         static constexpr std::size_t errorIndex = 2;
-        std::variant<std::monostate, Type, QString> m_state;
+        std::variant<std::monostate, Value, QString> m_state;
     };
 
 public:
@@ -79,8 +82,6 @@ public:
             \
             using Base::Base; \
             using Base::operator=; \
-            \
-            using Type = __VA_ARGS__; \
             \
             static constexpr char name[] = #NAME_PREFIX "." #NAME; \
         }

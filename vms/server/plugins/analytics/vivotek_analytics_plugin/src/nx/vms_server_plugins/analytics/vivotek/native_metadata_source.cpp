@@ -38,8 +38,8 @@ void NativeMetadataSource::close()
 
 cf::future<cf::unit> NativeMetadataSource::enableDetailMetadata(Url url)
 {
-    m_vcaParameterApi.emplace(std::move(url), "Config/AE");
-    return m_vcaParameterApi->fetch()
+    m_vcaParameterApi.emplace(std::move(url));
+    return m_vcaParameterApi->fetch("Config/AE")
         .then_unwrap(
             [this](auto parameters)
             {
@@ -48,8 +48,9 @@ cf::future<cf::unit> NativeMetadataSource::enableDetailMetadata(Url url)
 
                 set(&parameters, "WebSocket", "DetailMetadata", true);
 
-                return m_vcaParameterApi->store(parameters);
+                return m_vcaParameterApi->store("Config/AE", parameters);
             })
+        .then_unwrap([this](auto&&) { return m_vcaParameterApi->reloadConfig(); })
         .then(addExceptionContextAndRethrow("Failed to enable detail metadata"));
 }
 

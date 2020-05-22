@@ -69,10 +69,9 @@ private:
 };
 
 
-template <typename Vca, typename Visitor>
-void enumerateVcaEntries(Vca* vca, Visitor visit)
+template <typename Visitor>
+void enumerateAeEntries(CameraSettings::Vca* vca, Visitor visit)
 {
-    // intentionaly skip vca->enabled, since it's processed separately
     visit(&vca->sensitivity, "Sensitivity");
     visit(&vca->installation.height, "CamHeight");
     visit(&vca->installation.tiltAngle, "TiltAngle");
@@ -94,46 +93,37 @@ void fetchFromCamera(CameraSettings::Vca::Enabled* enabled, const Url& cameraUrl
 }
 
 
-template <typename Entry>
-void parseVcaEntryFromCamera(Entry* entry,
-    const QJsonValue& parameters, const QString& propertyName)
+template <typename... Keys>
+void parseAeFromCamera(CameraSettings::Vca::Installation::Height* entry,
+    const QJsonValue& parameters, const Keys&... keys)
 {
-    auto& value = entry->emplaceValue();
-    get(&value, parameters, propertyName);
+    using Value = CameraSettings::Vca::Installation::Height::Value;
+    // API uses millimeters, while web UI uses centimeters.
+    entry->emplaceValue(get<Value>(parameters, keys...) / 10);
+}
 
-    using Type = typename Entry::Type;
-    if constexpr (std::is_same_v<Type, int>)
-    {
-        if (!std::strcmp(Entry::name, CameraSettings::Vca::Installation::Height::name))
-            value /= 10; // API uses millimeters, while web UI uses centimeters
-    }
+template <typename Value, typename... Keys>
+void parseAeFromCamera(CameraSettings::Entry<Value>* entry,
+    const QJsonValue& parameters, const Keys&... keys)
+{
+    entry->emplaceValue(get<Value>(parameters, keys...));
 }
 
 
-void fetchFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
+void fetchAeFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
 {
-    auto& enabled = vca->enabled;
-    fetchFromCamera(&enabled, cameraUrl);
-
-    if (!enabled.hasValue() || !enabled.value())
-    {
-        enumerateVcaEntries(vca,
-            [&](auto* entry, auto&&) { entry->emplaceNothing(); });
-        return;
-    }
-
     try
     {
-        CameraVcaParameterApi api(cameraUrl, "Config/AE");
+        CameraVcaParameterApi api(cameraUrl);
 
-        const auto parameters = api.fetch().get();
+        const auto parameters = api.fetch("Config/AE").get();
 
-        enumerateVcaEntries(vca,
-            [&](auto* entry, const QString& propertyName)
+        enumerateAeEntries(vca,
+            [&](auto* entry, const auto&... keys)
             {
                 try
                 {
-                    parseVcaEntryFromCamera(entry, parameters, propertyName);
+                    parseAeFromCamera(entry, parameters, keys...);
                 }
                 catch (const std::exception& exception)
                 {
@@ -144,9 +134,140 @@ void fetchFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
     catch (const std::exception& exception)
     {
         const QString message = exception.what();
-        enumerateVcaEntries(vca,
-            [&](auto* entry, auto&&) { entry->emplaceErrorMessage(message); });
+        enumerateAeEntries(vca,
+            [&](auto* entry, auto&&...) { entry->emplaceErrorMessage(message); });
     }
+}
+
+void parseReFromCamera(CameraSettings::Vca::IntrusionDetection::Rule::Region* region,
+    const QJsonValue& rule, const QString& ruleName, const QString& path)
+{
+    try
+    {
+        auto& value = region->emplaceValue();
+
+        value.name = ruleName;
+
+        // That last 0 is intentional. For some reason, camera returns each region as an array of
+        // a single array of points.
+        const auto field = get<QJsonArray>(path, rule, "Field", 0);
+        for (int i = 0; i < field.size(); ++i)
+        {
+            value.push_back(CameraVcaParameterApi::parsePoint(
+                field[i], NX_FMT("%1.Field[%2]", path, i)));
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        region->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::IntrusionDetection::Rule::Inverted* inverted,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        const auto walkingDirection = get<QString>(path, rule, "WalkingDirection");
+        if (walkingDirection == "OutToIn")
+            inverted->emplaceValue(false);
+        else if (walkingDirection == "InToOut")
+            inverted->emplaceValue(true);
+        else
+        {
+            throw Exception("%1.WalkingDirection has unexpected value: %2",
+                path, walkingDirection);
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        inverted->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
+    const QJsonValue& parameters)
+{
+    const auto jsonRules = get<QJsonObject>(parameters, "IntrusionDetection");
+    const auto ruleNames = jsonRules.keys();
+
+    auto& rules = intrusionDetection->rules;
+    for (std::size_t i = 0; i < rules.size(); ++i)
+    {
+        auto& rule = rules[i];
+        if (i >= (std::size_t) ruleNames.size())
+        {
+            rule.region.emplaceNothing();
+            rule.inverted.emplaceNothing();
+            continue;
+        }
+
+        const auto& ruleName = ruleNames[i];
+        const auto& jsonRule = jsonRules[ruleName];
+
+        const QString path = NX_FMT("$.IntrusionDetection.%1", ruleName);
+
+        parseReFromCamera(&rule.region, jsonRule, ruleName, path);
+        parseReFromCamera(&rule.inverted, jsonRule, path);
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
+{
+    if (auto& intrusionDetection = vca->intrusionDetection)
+        parseReFromCamera(&*intrusionDetection, parameters);
+}
+
+
+template <typename Value>
+void fillReErrorsFromCamera(CameraSettings::Entry<Value>* entry,
+    const QString& message)
+{
+    entry->emplaceErrorMessage(message);
+}
+
+void fillReErrorsFromCamera(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
+    const QString& message)
+{
+    for (auto& rule: intrusionDetection->rules)
+    {
+        fillReErrorsFromCamera(&rule.region, message);
+        fillReErrorsFromCamera(&rule.inverted, message);
+    }
+}
+
+void fillReErrorsFromCamera(CameraSettings::Vca* vca, const QString& message)
+{
+    if (auto& intrusionDetection = vca->intrusionDetection)
+        fillReErrorsFromCamera(&*intrusionDetection, message);
+}
+
+
+void fetchReFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
+{
+    try
+    {
+        CameraVcaParameterApi api(cameraUrl);
+
+        const auto parameters = api.fetch("Config/RE").get();
+
+        parseReFromCamera(vca, parameters);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrorsFromCamera(vca, exception.what());
+    }
+}
+
+void fetchFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
+{
+    auto& enabled = vca->enabled;
+    fetchFromCamera(&enabled, cameraUrl);
+    if (!enabled.hasValue() || !enabled.value())
+        return;
+
+    fetchAeFromCamera(vca, cameraUrl);
+    fetchReFromCamera(vca, cameraUrl);
 }
 
 
@@ -209,7 +330,7 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca::Enabled* enabled)
         url.setPath("/cgi-bin/admin/vadpctrl.cgi");
         url.setQuery(query);
 
-        // work around camera not inserting \r\n between response headers and body
+        // Work around camera not inserting \r\n between response headers and body.
         const auto response = getRaw(url);
 
         const auto successPattern =
@@ -227,50 +348,35 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca::Enabled* enabled)
 }
 
 
-template <typename Entry>
-void unparseVcaEntryToCamera(QJsonValue* parameters, const QString& propertyName,
-    const Entry& entry)
+auto unparseAeToCamera(const CameraSettings::Vca::Installation::Height& entry)
 {
-    if (!entry.hasValue())
-        return;
+    return entry.value() * 10; // API uses millimeters, while web UI uses centimeters.
+}
 
-    auto value = entry.value();
-
-    using Type = typename Entry::Type;
-    if constexpr (std::is_same_v<Type, int>)
-    {
-        if (!std::strcmp(Entry::name, CameraSettings::Vca::Installation::Height::name))
-            value *= 10; // API uses millimeters, while web UI uses centimeters
-    }
-
-    set(parameters, propertyName, value);
+template <typename Value>
+auto unparseAeToCamera(const CameraSettings::Entry<Value>& entry)
+{
+    return entry.value();
 }
 
 
-void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
+void storeAeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
 {
-    auto& enabled = vca->enabled;
-    storeToCamera(cameraUrl, &enabled);
-
-    if (!enabled.hasValue() || !enabled.value())
-    {
-        enumerateVcaEntries(vca,
-            [&](auto* entry, auto&&) { entry->emplaceNothing(); });
-        return;
-    }
-
     try
     {
-        CameraVcaParameterApi api(cameraUrl, "Config/AE");
+        CameraVcaParameterApi api(cameraUrl);
 
-        auto parameters = api.fetch().get();
+        auto parameters = api.fetch("Config/AE").get();
 
-        enumerateVcaEntries(vca,
-            [&](auto* entry, const QString& propertyName)
+        enumerateAeEntries(vca,
+            [&](auto* entry, const auto&... keys)
             {
                 try
                 {
-                    unparseVcaEntryToCamera(&parameters, propertyName, *entry);
+                    if (!entry->hasValue())
+                        return;
+
+                    set(&parameters, keys..., unparseAeToCamera(*entry));
                 }
                 catch (const std::exception& exception)
                 {
@@ -278,14 +384,27 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
                 }
             });
 
-        api.store(parameters).get();
+        api.store("Config/AE", parameters).get();
+
+        api.reloadConfig().get();
     }
     catch (const std::exception& exception)
     {
         const QString message = exception.what();
-        enumerateVcaEntries(vca,
-            [&](auto* entry, auto&&) { entry->emplaceErrorMessage(message); });
+        enumerateAeEntries(vca,
+            [&](auto* entry, auto&&...) { entry->emplaceErrorMessage(message); });
     }
+}
+
+
+void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
+{
+    auto& enabled = vca->enabled;
+    storeToCamera(cameraUrl, &enabled);
+    if (!enabled.hasValue() || !enabled.value())
+        return;
+
+    storeAeToCamera(cameraUrl, vca);
 }
 
 
@@ -327,7 +446,20 @@ void enumerateEntries(Settings* settings, Visitor visit)
 }
 
 
-void parseEntryFromServer(const QString& /*name*/,
+void parseEntryFromServer(
+    CameraSettings::Vca::IntrusionDetection::Rule::Inverted* entry, const QString& unparsedValue)
+{
+    if (unparsedValue == "")
+        entry->emplaceNothing();
+    else if (unparsedValue == "false")
+        entry->emplaceValue(false);
+    else if (unparsedValue == "true")
+        entry->emplaceValue(true);
+    else
+        throw Exception("Failed to parse boolean");
+}
+
+void parseEntryFromServer(
     CameraSettings::Entry<bool>* entry, const QString& unparsedValue)
 {
     if (unparsedValue == "false")
@@ -338,7 +470,7 @@ void parseEntryFromServer(const QString& /*name*/,
         throw Exception("Failed to parse boolean");
 }
 
-void parseEntryFromServer(const QString& /*name*/,
+void parseEntryFromServer(
     CameraSettings::Vca::Sensitivity* entry, const QString& unparsedValue)
 {
     if (unparsedValue.isEmpty())
@@ -350,7 +482,7 @@ void parseEntryFromServer(const QString& /*name*/,
     entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 1, 10));
 }
 
-void parseEntryFromServer(const QString& /*name*/,
+void parseEntryFromServer(
     CameraSettings::Vca::Installation::Height* entry, const QString& unparsedValue)
 {
     if (unparsedValue.isEmpty())
@@ -362,7 +494,7 @@ void parseEntryFromServer(const QString& /*name*/,
     entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 2000));
 }
 
-void parseEntryFromServer(const QString& /*name*/,
+void parseEntryFromServer(
     CameraSettings::Vca::Installation::TiltAngle* entry, const QString& unparsedValue)
 {
     if (unparsedValue.isEmpty())
@@ -374,7 +506,7 @@ void parseEntryFromServer(const QString& /*name*/,
     entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 179));
 }
 
-void parseEntryFromServer(const QString& /*name*/,
+void parseEntryFromServer(
     CameraSettings::Vca::Installation::RollAngle* entry, const QString& unparsedValue)
 {
     if (unparsedValue.isEmpty())
@@ -386,8 +518,7 @@ void parseEntryFromServer(const QString& /*name*/,
     entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), -74, +74));
 }
 
-void parseEntryFromServer(const QString& /*name*/,
-    CameraSettings::Entry<int>* entry, const QString& unparsedValue)
+void parseEntryFromServer(CameraSettings::Entry<int>* entry, const QString& unparsedValue)
 {
     entry->emplaceValue(toInt(unparsedValue));
 }
@@ -415,7 +546,7 @@ bool parseFromServer(NamedPointSequence* points, const QJsonValue& json)
     return true;
 }
 
-void parseEntryFromServer(const QString& /*name*/,
+void parseEntryFromServer(
     CameraSettings::Entry<NamedPolygon>* entry, const QString& unparsedValue)
 {
     const auto json = parseJson(unparsedValue.toUtf8());
@@ -432,7 +563,15 @@ void parseEntryFromServer(const QString& /*name*/,
 
 
 std::optional<QString> unparseEntryToServer(
-    const QString& /*name*/, const CameraSettings::Entry<bool>& entry)
+    const CameraSettings::Vca::IntrusionDetection::Rule::Inverted& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return entry.value() ? "true" : "false";
+}
+
+std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<bool>& entry)
 {
     if (!entry.hasValue())
         return std::nullopt;
@@ -440,35 +579,7 @@ std::optional<QString> unparseEntryToServer(
     return entry.value() ? "true" : "false";
 }
 
-std::optional<QString> unparseEntryToServer(const QString& /*name*/,
-    const CameraSettings::Vca::Sensitivity& entry)
-{
-    if (!entry.hasValue())
-        return "";
-
-    return QString::number(entry.value());
-}
-
-std::optional<QString> unparseEntryToServer(const QString& /*name*/,
-    const CameraSettings::Vca::Installation::Height& entry)
-{
-    if (!entry.hasValue())
-        return "";
-
-    return QString::number(entry.value());
-}
-
-std::optional<QString> unparseEntryToServer(const QString& /*name*/,
-    const CameraSettings::Vca::Installation::TiltAngle& entry)
-{
-    if (!entry.hasValue())
-        return "";
-
-    return QString::number(entry.value());
-}
-
-std::optional<QString> unparseEntryToServer(const QString& /*name*/,
-    const CameraSettings::Vca::Installation::RollAngle& entry)
+std::optional<QString> unparseEntryToServer(const CameraSettings::Vca::Sensitivity& entry)
 {
     if (!entry.hasValue())
         return "";
@@ -477,7 +588,33 @@ std::optional<QString> unparseEntryToServer(const QString& /*name*/,
 }
 
 std::optional<QString> unparseEntryToServer(
-    const QString& /*name*/, const CameraSettings::Entry<int>& entry)
+    const CameraSettings::Vca::Installation::Height& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> unparseEntryToServer(
+    const CameraSettings::Vca::Installation::TiltAngle& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> unparseEntryToServer(
+    const CameraSettings::Vca::Installation::RollAngle& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<int>& entry)
 {
     if (!entry.hasValue())
         return std::nullopt;
@@ -513,8 +650,7 @@ QJsonValue unparseToServer(const NamedPointSequence* points)
     };
 }
 
-std::optional<QString> unparseEntryToServer(const QString& /*name*/,
-    const CameraSettings::Entry<NamedPolygon>& entry)
+std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<NamedPolygon>& entry)
 {
     const NamedPolygon* polygon = nullptr;
     if (entry.hasValue())
@@ -588,8 +724,15 @@ QJsonValue getVcaIntrusionDetectionModelForManifest()
                             {"type", "ComboBox"},
                             {"caption", "Direction"},
                             {"description", "Movement direction which causes the event"},
-                            {"range", QJsonArray{"false", "true"}},
+                            {"range", QJsonArray{
+                                // Need empty state to work around camera not returning settings
+                                // for disabled functionality.
+                                "",
+                                "false",
+                                "true",
+                            }},
                             {"itemCaptions", QJsonObject{
+                                {"", ""},
                                 {"false", "In"},
                                 {"true", "Out"},
                             }},
@@ -648,8 +791,8 @@ CameraSettings::CameraSettings(const CameraFeatures& features)
 
         if (features.vca->intrusionDetection)
         {
-            auto& instrusionDetection = vca->intrusionDetection.emplace();
-            instrusionDetection.rules.resize(kMaxDetectionRuleCount);
+            auto& intrusionDetection = vca->intrusionDetection.emplace();
+            intrusionDetection.rules.resize(kMaxDetectionRuleCount);
         }
     }
 }
@@ -680,7 +823,7 @@ void CameraSettings::parseFromServer(const IStringMap& values)
                     return;
                 }
 
-                parseEntryFromServer(name, entry, unparsedValue);
+                parseEntryFromServer(entry, unparsedValue);
             }
             catch (const std::exception& exception)
             {
@@ -698,7 +841,7 @@ Ptr<StringMap> CameraSettings::unparseToServer()
         {
             try
             {
-                if (const auto unparsedValue = unparseEntryToServer(name, *entry))
+                if (const auto unparsedValue = unparseEntryToServer(*entry))
                     values->setItem(name.toStdString(), unparsedValue->toStdString());
             }
             catch (const std::exception& exception)

@@ -9,6 +9,7 @@
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/utils/log/log_message.h>
 
+#include "camera_vca_parameter_api.h"
 #include "object_types.h"
 #include "json_utils.h"
 #include "exception.h"
@@ -36,27 +37,6 @@ Uuid parseTrackId(int id)
     return uuid;
 }
 
-Point parsePoint(const QString& path, const QJsonObject& point)
-{
-    auto parseCoord =
-        [&](const QString& key)
-        {
-            // coordinates are normalized to [0; 10000]x[0; 10000]
-            constexpr double kDomain = 10000;
-
-            const auto value = get<double>(path, point, key);
-            if (value < 0 || value > kDomain)
-            {
-                throw Exception("%1.%2 = %3 is outside of expected range of [0; 10000]",
-                    path, key, value);
-            }
-
-            return value / kDomain;
-        };
-
-    return Point(parseCoord("x"), parseCoord("y"));
-}
-
 Rect parseBoundingBox(const QString& path, const QJsonArray& pos2d)
 {
     if (pos2d.isEmpty())
@@ -66,7 +46,8 @@ Rect parseBoundingBox(const QString& path, const QJsonArray& pos2d)
     Point max = {0, 0};
     for (int i = 0; i < pos2d.count(); ++i)
     {
-        const auto point = parsePoint(NX_FMT("%1[%2]", path, i), get<QJsonObject>(path, pos2d, i));
+        const auto point = CameraVcaParameterApi::parsePoint(
+            get<QJsonObject>(path, pos2d, i), NX_FMT("%1[%2]", path, i));
 
         min.x = std::min(min.x, point.x);
         min.y = std::min(min.y, point.y);

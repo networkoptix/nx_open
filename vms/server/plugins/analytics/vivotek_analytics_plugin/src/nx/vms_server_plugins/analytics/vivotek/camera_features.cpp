@@ -16,8 +16,10 @@ namespace {
 
 void fetchFromCamera(CameraFeatures::Vca* vca, const Url& cameraUrl)
 {
-    CameraVcaParameterApi api(cameraUrl, "Functions");
-    const auto functions = get<QJsonArray>(api.fetch().get());
+    CameraVcaParameterApi api(cameraUrl);
+
+    const auto functions = get<QJsonArray>(api.fetch("Functions").get());
+
     for (int i = 0; i < functions.count(); ++i)
     {
         const auto function = get<QString>("$.Functions", functions, i);

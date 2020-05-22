@@ -9,37 +9,64 @@
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
+using namespace nx::sdk::analytics;
 using namespace nx::utils;
 
-CameraVcaParameterApi::CameraVcaParameterApi(Url url, const QString& scope):
+CameraVcaParameterApi::CameraVcaParameterApi(Url url):
     m_url(std::move(url))
 {
-    m_url.setPath(NX_FMT("/VCA/%1", scope));
 }
 
-cf::future<QJsonValue> CameraVcaParameterApi::fetch()
+cf::future<QJsonValue> CameraVcaParameterApi::fetch(const QString& scope)
 {
-    return m_httpClient.get(m_url)
+    auto url = m_url;
+    url.setPath(NX_FMT("/VCA/%1", scope));
+    return m_httpClient.get(url)
         .then_unwrap(NX_WRAP_FUNC_TO_LAMBDA(parseJson))
         .then(addExceptionContextAndRethrow(
-            "Failed to fetch VCA parameters from %1", withoutUserInfo(m_url)));
+            "Failed to fetch %1 VCA parameters from %2", scope, withoutUserInfo(m_url)));
 }
 
-cf::future<cf::unit> CameraVcaParameterApi::store(const QJsonValue& parameters)
+cf::future<cf::unit> CameraVcaParameterApi::store(
+    const QString& scope, const QJsonValue& parameters)
 {
-    return m_httpClient.post(m_url, "application/json", unparseJson(parameters))
-        .then_unwrap(
-            [this](auto&&)
-            {
-                NX_ASSERT(m_url.path().startsWith("/VCA/Config/"));
-
-                auto url = m_url;
-                url.setPath("/VCA/Config/Reload");
-                return m_httpClient.get(url);
-            })
-        .then_unwrap([](auto&&) { return cf::unit(); })
+    auto url = m_url;
+    url.setPath(NX_FMT("/VCA/%1", scope));
+    return m_httpClient.post(url, "application/json", unparseJson(parameters))
+        .then(cf::discard_value)
         .then(addExceptionContextAndRethrow(
-            "Failed to store VCA parameters to %1", withoutUserInfo(m_url)));
+            "Failed to store %1 VCA parameters to %2", scope, withoutUserInfo(m_url)));
+}
+
+cf::future<cf::unit> CameraVcaParameterApi::reloadConfig()
+{
+    auto url = m_url;
+    url.setPath("/VCA/Config/Reload");
+    return m_httpClient.get(url)
+        .then(cf::discard_value)
+        .then(addExceptionContextAndRethrow(
+            "Failed to reload VCA config on %1", withoutUserInfo(m_url)));
+}
+
+Point CameraVcaParameterApi::parsePoint(const QJsonValue& json, const QString& path)
+{
+    auto parseCoord =
+        [&](const QString& key)
+        {
+            // coordinates are normalized to [0; 10000]x[0; 10000]
+            constexpr double kDomain = 10000;
+
+            const auto value = get<double>(path, json, key);
+            if (value < 0 || value > kDomain)
+            {
+                throw Exception("%1.%2 = %3 is outside of expected range of [0; 10000]",
+                    path, key, value);
+            }
+
+            return value / kDomain;
+        };
+
+    return Point(parseCoord("x"), parseCoord("y"));
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek
