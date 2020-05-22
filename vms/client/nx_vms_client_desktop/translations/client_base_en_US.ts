@@ -9085,6 +9085,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>This OS version is no longer supported.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Update installation failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>

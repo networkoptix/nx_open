@@ -1851,6 +1851,14 @@
         <source>I/O Module was disconnected</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>RTP error in primary stream (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTP error in secondary stream (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>utils::QnCameraNamesWatcher</name>
