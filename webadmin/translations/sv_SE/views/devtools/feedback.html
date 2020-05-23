@@ -1,9 +1,11 @@
 <uib-alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
-    <p><b>Är du utvecklare? Ge oss feedback!</b></p>
+    <p><b>Är du utvecklare?</b></p>
     <p>Vårt dev team är ständigt intresserad av feedback från utvecklare som skapar integrationer med hjälp av vår SDK och API.
-        Om du har några förslag på hur du förbättrar utvecklarens upplevelse - eller bara vill säga hej till laget -
-        fyll i vårt feedbackformulär!
+        Om du har några förslag på hur man kan förbättra utvecklarupplevelsen - eller bara vill säga hej till teamet -
+        vänligen gå med i vårt utvecklarforum! Eller så kan du kolla in vår kunskapsbas online för att hitta mer information,
+        bästa praxis, och tips & tricks
     </p>
-    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Lämna feedback</a></p>
+    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Forum för utvecklare</a></p>
+    <p class="text-right" ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Kunskapsbas för utveckling</a></p>
 </uib-alert>

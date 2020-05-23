@@ -1,9 +1,11 @@
 <uib-alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
-    <p><b>您是開發人員嗎? 請提供我們建議!</b></p>
+    <p><b>您是開發人員嗎?</b></p>
     <p>我們的開發團隊一直都對開發人員使用我們的SDK和API進行整合的回饋意見很感興趣.
-        如果您有任何關於如何改善開發人員體驗的建議, 或者只是想向我們的團隊打聲招呼 - 
-        請填寫我們的回饋意見表單！
+        If you have any suggestions on how to improve the developer experience - or just want to say hi to the team -
+        please join our developer forum! Or you can check out our online knowledge base to find more information,
+        best practices, and tips&tricks
     </p>
-    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">給予回饋意見</a></p>
+    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Developer forum</a></p>
+    <p class="text-right" ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Development knowledge base</a></p>
 </uib-alert>

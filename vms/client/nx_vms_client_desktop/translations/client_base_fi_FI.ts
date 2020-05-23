@@ -1247,6 +1247,177 @@ nähdäksesi lisää kirjanmerkkejä</translation>
     </message>
   </context>
   <context>
+    <name>LicenseActivationDialogs</name>
+    <message>
+      <source>Incompatible license</source>
+      <translation>Yhteensopimaton lisenssi</translation>
+    </message>
+    <message>
+      <source>License you are trying to activate is incompatible with your software.</source>
+      <translation>Lisenssi, jonka yrität aktivoida, ei ole yhteensopiva ohjelmiston kanssa.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact %1.</source>
+      <translation type="unfinished">To report the issue please contact %1.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your regional support agent:</source>
+      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Failed to activate license</source>
+      <translation>Lisenssin aktivointi epäonnistui</translation>
+    </message>
+    <message>
+      <source>Invalid data received.</source>
+      <translation type="unfinished">Invalid data received.</translation>
+    </message>
+    <message>
+      <source>Database error occurred.</source>
+      <translation>Tapahtui tietokantavirhe.</translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>Virheellinen lisenssiavain</translation>
+    </message>
+    <message>
+      <source>Please make sure it is entered correctly.</source>
+      <translation>Varmista, että se on kirjoitettu oikein.</translation>
+    </message>
+    <message>
+      <source>Invalid activation key file</source>
+      <translation>Virheellinen aktivointitiedosto</translation>
+    </message>
+    <message>
+      <source>Select a valid activation key file to continue.</source>
+      <translation>Valitse voimassa oleva aktivointitiedosto jatkaaksesi.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Tämä lisenssi on jo aktivoitu ja liitetty laitteiston tunnukseen %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Tämä lisenssi on jo aktivoitu ja yhdistetty laitteiston tunnukseen %1 on %2</translation>
+    </message>
+    <message>
+      <source>License already activated on another server</source>
+      <translation>Lisenssi on jo aktivoitu toisessa palvelimessa</translation>
+    </message>
+    <message>
+      <source>You already activated this license</source>
+      <translation>Olet jo aktivoinut tämän lisenssin</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact %1.</source>
+      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your regional support agent:</source>
+      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Verkkovirhe</translation>
+    </message>
+    <message>
+      <source>License activated</source>
+      <translation>Lisenssi aktivoitu</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseDeactivationDialogs</name>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation>
+        <numerusform>%n lisenssien deaktivointi ei onnistunut</numerusform>
+        <numerusform>%n lisenssien poistaminen käytöstä ei onnistunut</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation>
+        <numerusform>%1: sta %n lisensseistä ei voitu deaktivoida</numerusform>
+        <numerusform>%1: sta %n lisensseistä ei voi poistaa käytöstä</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation>
+        <numerusform>Deaktivoi %n Muu</numerusform>
+        <numerusform>Deaktivoi %n Muu</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation>
+        <numerusform>Lisenssejä ei voitu deaktivoida</numerusform>
+        <numerusform>Lisenssejä ei voi poistaa käytöstä</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please try again later.</source>
+      <translation type="unfinished">Please try again later.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation>Lisenssipalvelimeen ei voi muodostaa yhteyttä</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation>Varmista, että palvelimella on aktiivinen Internet-yhteys tai tarkista palomuuriasetukset.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation>Lisenssipalvelimen virhe</translation>
+    </message>
+    <message>
+      <source>Failed to remove license from Server</source>
+      <translation>Lisenssin poistaminen palvelimelta epäonnistui</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation>
+        <numerusform>%n lisenssiä deaktivoitu</numerusform>
+        <numerusform>%n lisenssiä deaktivoitu</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseManagementMessagesPrivate</name>
+    <message>
+      <source>To get a valid License Key please contact your regional support agent:</source>
+      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your regional support agent:</source>
+      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n kanavaa.</numerusform>
+        <numerusform>%n kanavaa.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact your regional support agent:</source>
+      <translation type="unfinished">Please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact %1.</source>
+      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact %1.</source>
+      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+    </message>
+    <message>
+      <source>Please contact %1.</source>
+      <translation type="unfinished">Please contact %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -3754,119 +3925,11 @@ to %1</source>
       <source>Export licenses to a file</source>
       <translation>Vie lisenssit tiedostoon</translation>
     </message>
-    <message>
-      <source>Copy To Clipboard</source>
-      <translation>Kopioi leikepöydälle</translation>
-    </message>
-    <message>
-      <source>Incompatible license</source>
-      <translation>Yhteensopimaton lisenssi</translation>
-    </message>
-    <message>
-      <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>Lisenssi, jonka yrität aktivoida, ei ole yhteensopiva ohjelmiston kanssa.</translation>
-    </message>
-    <message>
-      <source>You already activated this license</source>
-      <translation>Olet jo aktivoinut tämän lisenssin</translation>
-    </message>
-    <message>
-      <source>License activated</source>
-      <translation>Lisenssi aktivoitu</translation>
-    </message>
-    <message>
-      <source>Failed to remove license from Server</source>
-      <translation>Lisenssin poistaminen palvelimelta epäonnistui</translation>
-    </message>
-    <message>
-      <source>Invalid activation key file</source>
-      <translation>Virheellinen aktivointitiedosto</translation>
-    </message>
-    <message>
-      <source>Select a valid activation key file to continue.</source>
-      <translation>Valitse voimassa oleva aktivointitiedosto jatkaaksesi.</translation>
-    </message>
-    <message>
-      <source>Database error occurred.</source>
-      <translation>Tapahtui tietokantavirhe.</translation>
-    </message>
-    <message>
-      <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation>Virheelliset tiedot vastaanotettu. Ilmoita ongelmasta ottamalla yhteyttä asiakastukeen.</translation>
-    </message>
-    <message>
-      <source>Failed to activate license</source>
-      <translation>Lisenssin aktivointi epäonnistui</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Verkkovirhe</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Jos ongelma jatkuu, ota yhteyttä asiakastukeen.</translation>
-    </message>
-    <message>
-      <source>License already activated on another server</source>
-      <translation>Lisenssi on jo aktivoitu toisessa palvelimessa</translation>
-    </message>
-    <message>
-      <source>Please make sure it is entered correctly.</source>
-      <translation>Varmista, että se on kirjoitettu oikein.</translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
         <numerusform>Deaktivoi lisenssit?</numerusform>
         <numerusform>Poista lisenssit käytöstä?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to deactivate license</source>
-      <translation>Lisenssin poistaminen käytöstä ei onnistunut</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>%n lisenssien deaktivointi ei onnistunut</numerusform>
-        <numerusform>%n lisenssien poistaminen käytöstä ei onnistunut</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%1: sta %n lisensseistä ei voitu deaktivoida</numerusform>
-        <numerusform>%1: sta %n lisensseistä ei voi poistaa käytöstä</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Lisenssejä ei voitu deaktivoida</numerusform>
-        <numerusform>Lisenssejä ei voi poistaa käytöstä</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Cannot connect to the License Server</source>
-      <translation>Lisenssipalvelimeen ei voi muodostaa yhteyttä</translation>
-    </message>
-    <message>
-      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Varmista, että palvelimella on aktiivinen Internet-yhteys tai tarkista palomuuriasetukset.</translation>
-    </message>
-    <message>
-      <source>License Server error</source>
-      <translation>Lisenssipalvelimen virhe</translation>
-    </message>
-    <message>
-      <source>License deactivated</source>
-      <translation>Lisenssi deaktivoitu</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n lisenssiä deaktivoitu</numerusform>
-        <numerusform>%n lisenssiä deaktivoitu</numerusform>
       </translation>
     </message>
     <message>
@@ -3883,45 +3946,6 @@ to %1</source>
         <numerusform>%n kanavaa.</numerusform>
         <numerusform>%n kanavaa.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support.</source>
-      <translation>Ota yhteyttä asiakastukeen.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Deaktivoi %n Muu</numerusform>
-        <numerusform>Deaktivoi %n Muu</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid License Key</source>
-      <translation>Virheellinen lisenssiavain</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>Ota yhteyttä asiakastukeen saadaksesi kelvollisen lisenssiavaimen.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>Ota yhteyttä asiakastukeen aktivoidaksesi lisenssiavain manuaalisesti.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>Ota yhteyttä asiakastukeen saadaksesi kelvollisen lisenssiavaimen.</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Jos ongelma jatkuu, ota yhteyttä asiakastukeen.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Tämä lisenssi on jo aktivoitu ja liitetty laitteiston tunnukseen %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Tämä lisenssi on jo aktivoitu ja yhdistetty laitteiston tunnukseen %1 on %2</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -8224,6 +8248,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <source>Internal error</source>
       <translation>Sisäinen virhe</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
@@ -9061,6 +9089,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <source>This OS version is no longer supported.</source>
       <translation>Tätä käyttöjärjestelmän versiota ei enää tueta.</translation>
     </message>
+    <message>
+      <source>Update installation failed.</source>
+      <translation type="unfinished">Update installation failed.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
@@ -9712,6 +9744,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Valmistelemme tiedostoja vientiprosessille. Odota muutama sekunti.</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>

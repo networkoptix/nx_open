@@ -40,16 +40,16 @@
   <context>
     <name>Figure</name>
     <message>
-      <source>Display on camera</source>
-      <translation>Visa på kamera</translation>
-    </message>
-    <message>
       <source>Figure</source>
       <translation>Figur</translation>
     </message>
     <message>
       <source>Click to add</source>
       <translation>Klicka för att lägga till</translation>
+    </message>
+    <message>
+      <source>Display on video</source>
+      <translation>Visa på video</translation>
     </message>
   </context>
   <context>
@@ -91,6 +91,14 @@
     <message>
       <source>Select video stream from the camera for analysis</source>
       <translation>Välj videoström från kameran för analys</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>Uppdatera</translation>
+    </message>
+    <message>
+      <source>Refreshing...</source>
+      <translation>Uppdaterar...</translation>
     </message>
   </context>
   <context>

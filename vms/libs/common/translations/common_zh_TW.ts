@@ -971,6 +971,10 @@
       <source>No data exported.</source>
       <translation>未匯出任何資料.</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>QnTimeStrings</name>
@@ -1786,6 +1790,14 @@
     <message>
       <source>I/O Module was disconnected</source>
       <translation>I/O 模組已斷線</translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1)</source>
+      <translation type="unfinished">RTP error in primary stream (%1)</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1)</source>
+      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
     </message>
   </context>
   <context>

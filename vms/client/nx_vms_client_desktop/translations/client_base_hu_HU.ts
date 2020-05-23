@@ -1247,6 +1247,177 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
+    <name>LicenseActivationDialogs</name>
+    <message>
+      <source>Incompatible license</source>
+      <translation>Nem kompatibilis licenc</translation>
+    </message>
+    <message>
+      <source>License you are trying to activate is incompatible with your software.</source>
+      <translation>A licenc amit aktiválni próbál nem kompatibilis a szoftverével.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact %1.</source>
+      <translation type="unfinished">To report the issue please contact %1.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your regional support agent:</source>
+      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Failed to activate license</source>
+      <translation>Licenc aktiválása nem sikerült</translation>
+    </message>
+    <message>
+      <source>Invalid data received.</source>
+      <translation type="unfinished">Invalid data received.</translation>
+    </message>
+    <message>
+      <source>Database error occurred.</source>
+      <translation>Adatbázishiba történt.</translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>Érvénytelen licenckulcs</translation>
+    </message>
+    <message>
+      <source>Please make sure it is entered correctly.</source>
+      <translation>Ellenőrizze, hogy helyesen adta meg a licencet.</translation>
+    </message>
+    <message>
+      <source>Invalid activation key file</source>
+      <translation>Érvénytelen aktivációs kulcs</translation>
+    </message>
+    <message>
+      <source>Select a valid activation key file to continue.</source>
+      <translation>Válasszon ki egy érvényes aktiváló kulcsot a folytatáshoz.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Ez a licenc már aktiválva van %1 Hardver ID-hoz</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Ez a licenc már aktiválva van %1 Hardver ID-hoz (%2)</translation>
+    </message>
+    <message>
+      <source>License already activated on another server</source>
+      <translation>A licenc már aktiválva van egy másik szerveren</translation>
+    </message>
+    <message>
+      <source>You already activated this license</source>
+      <translation>Már aktiválta ezt a licencet</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact %1.</source>
+      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your regional support agent:</source>
+      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Hálózati hiba</translation>
+    </message>
+    <message>
+      <source>License activated</source>
+      <translation>Licenc aktiválva</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseDeactivationDialogs</name>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation>
+        <numerusform>%n licenc deaktiválása sikertelen</numerusform>
+        <numerusform>%n licenc deaktiválása sikertelen</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation>
+        <numerusform>%1 a %n licencből ne deaktiválható</numerusform>
+        <numerusform>%1 a %n licencből ne deaktiválható</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation>
+        <numerusform>Még %n deaktiválása</numerusform>
+        <numerusform>Még %n deaktiválása</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation>
+        <numerusform>A licencek nem deaktiválhatók</numerusform>
+        <numerusform>A licencek nem deaktiválhatók</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please try again later.</source>
+      <translation type="unfinished">Please try again later.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation>Nem lehet csatlakozni a licenc szerverhez</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation>Győződjön meg róla, hogy rendelkezik aktív Internet kapcsolattal vagy ellenőrizze a tűzfal beállításait.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation>Licenc szerver hiba</translation>
+    </message>
+    <message>
+      <source>Failed to remove license from Server</source>
+      <translation>Nem sikerült eltávolítani a licencet szerverről</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation>
+        <numerusform>%n licenc deaktiválva</numerusform>
+        <numerusform>%n licenc deaktiválva</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseManagementMessagesPrivate</name>
+    <message>
+      <source>To get a valid License Key please contact your regional support agent:</source>
+      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your regional support agent:</source>
+      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n csatorna.</numerusform>
+        <numerusform>%n csatorna.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact your regional support agent:</source>
+      <translation type="unfinished">Please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact %1.</source>
+      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact %1.</source>
+      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+    </message>
+    <message>
+      <source>Please contact %1.</source>
+      <translation type="unfinished">Please contact %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -3755,119 +3926,11 @@ to %1</source>
       <source>Export licenses to a file</source>
       <translation>Licencek exportálása fájlba</translation>
     </message>
-    <message>
-      <source>Copy To Clipboard</source>
-      <translation>Másolás vágólapra</translation>
-    </message>
-    <message>
-      <source>Incompatible license</source>
-      <translation>Nem kompatibilis licenc</translation>
-    </message>
-    <message>
-      <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>A licenc amit aktiválni próbál nem kompatibilis a szoftverével.</translation>
-    </message>
-    <message>
-      <source>You already activated this license</source>
-      <translation>Már aktiválta ezt a licencet</translation>
-    </message>
-    <message>
-      <source>License activated</source>
-      <translation>Licenc aktiválva</translation>
-    </message>
-    <message>
-      <source>Failed to remove license from Server</source>
-      <translation>Nem sikerült eltávolítani a licencet szerverről</translation>
-    </message>
-    <message>
-      <source>Invalid activation key file</source>
-      <translation>Érvénytelen aktivációs kulcs</translation>
-    </message>
-    <message>
-      <source>Select a valid activation key file to continue.</source>
-      <translation>Válasszon ki egy érvényes aktiváló kulcsot a folytatáshoz.</translation>
-    </message>
-    <message>
-      <source>Database error occurred.</source>
-      <translation>Adatbázishiba történt.</translation>
-    </message>
-    <message>
-      <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation>Érvénytelen adatot érkezett. Forduljon az ügyfélszolgálathoz a probléma bejelentésével.</translation>
-    </message>
-    <message>
-      <source>Failed to activate license</source>
-      <translation>Licenc aktiválása nem sikerült</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Hálózati hiba</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Ha a probléma továbbra is fennáll, kérjük, forduljon az ügyfélszolgálathoz.</translation>
-    </message>
-    <message>
-      <source>License already activated on another server</source>
-      <translation>A licenc már aktiválva van egy másik szerveren</translation>
-    </message>
-    <message>
-      <source>Please make sure it is entered correctly.</source>
-      <translation>Ellenőrizze, hogy helyesen adta meg a licencet.</translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
         <numerusform>Licenc deaktiválása?</numerusform>
         <numerusform>Licenc deaktiválása?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to deactivate license</source>
-      <translation>Licenc deaktiválása nem sikerült</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>%n licenc deaktiválása sikertelen</numerusform>
-        <numerusform>%n licenc deaktiválása sikertelen</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%1 a %n licencből ne deaktiválható</numerusform>
-        <numerusform>%1 a %n licencből ne deaktiválható</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>A licencek nem deaktiválhatók</numerusform>
-        <numerusform>A licencek nem deaktiválhatók</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Cannot connect to the License Server</source>
-      <translation>Nem lehet csatlakozni a licenc szerverhez</translation>
-    </message>
-    <message>
-      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Győződjön meg róla, hogy rendelkezik aktív Internet kapcsolattal vagy ellenőrizze a tűzfal beállításait.</translation>
-    </message>
-    <message>
-      <source>License Server error</source>
-      <translation>Licenc szerver hiba</translation>
-    </message>
-    <message>
-      <source>License deactivated</source>
-      <translation>Licenc deaktiválva</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n licenc deaktiválva</numerusform>
-        <numerusform>%n licenc deaktiválva</numerusform>
       </translation>
     </message>
     <message>
@@ -3884,45 +3947,6 @@ to %1</source>
         <numerusform>%n csatorna.</numerusform>
         <numerusform>%n csatorna.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support.</source>
-      <translation>Kérjük forduljon az ügyfélszolgálathoz.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Még %n deaktiválása</numerusform>
-        <numerusform>Még %n deaktiválása</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid License Key</source>
-      <translation>Érvénytelen licenckulcs</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>Kérjük, forduljon az ügyfélszolgálathoz egy érvényes licenckulcs beszerzéséért.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>Kérjük, forduljon az ügyfélszolgálathoz licenckulcs kézi aktiválásáért.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>Kérjük, forduljon az ügyfélszolgálathoz egy érvényes licenckulcs beszerzéséért.</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Ha a probléma továbbra is fennáll, kérjük, forduljon az ügyfélszolgálathoz.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Ez a licenc már aktiválva van %1 Hardver ID-hoz</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Ez a licenc már aktiválva van %1 Hardver ID-hoz (%2)</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -8225,6 +8249,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>Internal error</source>
       <translation>Belső hiba</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
@@ -9062,6 +9090,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>This OS version is no longer supported.</source>
       <translation>Ez az operációs rendszer verziója már nem támogatott.</translation>
     </message>
+    <message>
+      <source>Update installation failed.</source>
+      <translation type="unfinished">Update installation failed.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
@@ -9713,6 +9745,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Fájlokat készítünk az exportálási folyamathoz. Várjon néhány másodpercet.</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>

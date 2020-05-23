@@ -1,9 +1,11 @@
 <uib-alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
-    <p><b>Oletko kehittäjä? Lähetä meille palautetta!</b></p>
+    <p><b>Oletko kehittäjä?</b></p>
     <p>Kehitys-tiimimme on jatkuvasti kiinnostunut kehittäjien palautteista, jotka luovat integrointeja SDK: n ja API: n avulla.
-        Jos sinulla on ehdotuksia kehittäjäkokemuksen parantamiseksi - tai haluat vain antaa muuten palautetta -
-        täytä palautelomake!
+        If you have any suggestions on how to improve the developer experience - or just want to say hi to the team -
+        please join our developer forum! Or you can check out our online knowledge base to find more information,
+        best practices, and tips&tricks
     </p>
-    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Anna palautetta</a></p>
+    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Developer forum</a></p>
+    <p class="text-right" ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Development knowledge base</a></p>
 </uib-alert>

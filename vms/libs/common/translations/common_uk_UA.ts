@@ -1091,6 +1091,10 @@
       <source>No data exported.</source>
       <translation>Немає даних для експорту.</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>QnTimeStrings</name>
@@ -1966,6 +1970,14 @@
     <message>
       <source>I/O Module was disconnected</source>
       <translation>Модуль Вводу/Виводу був відключений</translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1)</source>
+      <translation type="unfinished">RTP error in primary stream (%1)</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1)</source>
+      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
     </message>
   </context>
   <context>

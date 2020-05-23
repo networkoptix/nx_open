@@ -1246,6 +1246,177 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LicenseActivationDialogs</name>
+    <message>
+      <source>Incompatible license</source>
+      <translation>Incompatibele licentie</translation>
+    </message>
+    <message>
+      <source>License you are trying to activate is incompatible with your software.</source>
+      <translation>Licentie die u probeert te activeren is niet compatibel met uw software.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact %1.</source>
+      <translation type="unfinished">To report the issue please contact %1.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your regional support agent:</source>
+      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Failed to activate license</source>
+      <translation>Het activeren van de licentie is mislukt</translation>
+    </message>
+    <message>
+      <source>Invalid data received.</source>
+      <translation type="unfinished">Invalid data received.</translation>
+    </message>
+    <message>
+      <source>Database error occurred.</source>
+      <translation>Er is een databasefout opgetreden.</translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>Ongeldige licentiesleutel</translation>
+    </message>
+    <message>
+      <source>Please make sure it is entered correctly.</source>
+      <translation>Controleer of dat het correct is ingevoerd.</translation>
+    </message>
+    <message>
+      <source>Invalid activation key file</source>
+      <translation>Ongeldig activatiebestand</translation>
+    </message>
+    <message>
+      <source>Select a valid activation key file to continue.</source>
+      <translation>Selecteer een geldig activatiebestand om door te gaan.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
+    </message>
+    <message>
+      <source>License already activated on another server</source>
+      <translation>Licentie is al geactiveerd op een andere server</translation>
+    </message>
+    <message>
+      <source>You already activated this license</source>
+      <translation>U heeft deze licentie al geactiveerd</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact %1.</source>
+      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your regional support agent:</source>
+      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Netwerkfout</translation>
+    </message>
+    <message>
+      <source>License activated</source>
+      <translation>Licentie geactiveerd</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseDeactivationDialogs</name>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation>
+        <numerusform>Het deactiveren van %n licenties is mislukt</numerusform>
+        <numerusform>Het deactiveren van %n licenties is mislukt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation>
+        <numerusform>%1 van %n licenties kunnen niet worden gedeactiveerd</numerusform>
+        <numerusform>%1 van %n licenties kunnen niet worden gedeactiveerd</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation>
+        <numerusform>Deactiveren %n overige</numerusform>
+        <numerusform>Deactiveren %n overige</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation>
+        <numerusform>Het deactiveren van de licenties is mislukt</numerusform>
+        <numerusform>Het deactiveren van de licenties is mislukt</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please try again later.</source>
+      <translation type="unfinished">Please try again later.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation>Kan geen verbinding maken met de Licentieserver</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation>Zorg ervoor dat uw server actieve internetverbinding heeft en/of controleer de firewall instellingen.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation>Licentie Server fout</translation>
+    </message>
+    <message>
+      <source>Failed to remove license from Server</source>
+      <translation>Licentie niet verwijderen van de server</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation>
+        <numerusform>%n licenties gedeactiveerd</numerusform>
+        <numerusform>%n licenties gedeactiveerd</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseManagementMessagesPrivate</name>
+    <message>
+      <source>To get a valid License Key please contact your regional support agent:</source>
+      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your regional support agent:</source>
+      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n kanalen.</numerusform>
+        <numerusform>%n kanalen.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact your regional support agent:</source>
+      <translation type="unfinished">Please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact %1.</source>
+      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact %1.</source>
+      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+    </message>
+    <message>
+      <source>Please contact %1.</source>
+      <translation type="unfinished">Please contact %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -3752,119 +3923,11 @@ to %1</source>
       <source>Export licenses to a file</source>
       <translation>Licenties naar een bestand exporteren</translation>
     </message>
-    <message>
-      <source>Copy To Clipboard</source>
-      <translation>Kopiëren naar klembord</translation>
-    </message>
-    <message>
-      <source>Incompatible license</source>
-      <translation>Incompatibele licentie</translation>
-    </message>
-    <message>
-      <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>Licentie die u probeert te activeren is niet compatibel met uw software.</translation>
-    </message>
-    <message>
-      <source>You already activated this license</source>
-      <translation>U heeft deze licentie al geactiveerd</translation>
-    </message>
-    <message>
-      <source>License activated</source>
-      <translation>Licentie geactiveerd</translation>
-    </message>
-    <message>
-      <source>Failed to remove license from Server</source>
-      <translation>Licentie niet verwijderen van de server</translation>
-    </message>
-    <message>
-      <source>Invalid activation key file</source>
-      <translation>Ongeldig activatiebestand</translation>
-    </message>
-    <message>
-      <source>Select a valid activation key file to continue.</source>
-      <translation>Selecteer een geldig activatiebestand om door te gaan.</translation>
-    </message>
-    <message>
-      <source>Database error occurred.</source>
-      <translation>Er is een databasefout opgetreden.</translation>
-    </message>
-    <message>
-      <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation>Ongeldige gegevens ontvangen. Neem contact op met customer support om het probleem te rapporteren.</translation>
-    </message>
-    <message>
-      <source>Failed to activate license</source>
-      <translation>Het activeren van de licentie is mislukt</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Netwerkfout</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Als het probleem aanhoudt, neem contact op met customer support.</translation>
-    </message>
-    <message>
-      <source>License already activated on another server</source>
-      <translation>Licentie is al geactiveerd op een andere server</translation>
-    </message>
-    <message>
-      <source>Please make sure it is entered correctly.</source>
-      <translation>Controleer of dat het correct is ingevoerd.</translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
         <numerusform>Licenties deactiveren?</numerusform>
         <numerusform>Licenties deactiveren?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to deactivate license</source>
-      <translation>Het deactiveren van de licentie is mislukt</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>Het deactiveren van %n licenties is mislukt</numerusform>
-        <numerusform>Het deactiveren van %n licenties is mislukt</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%1 van %n licenties kunnen niet worden gedeactiveerd</numerusform>
-        <numerusform>%1 van %n licenties kunnen niet worden gedeactiveerd</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Het deactiveren van de licenties is mislukt</numerusform>
-        <numerusform>Het deactiveren van de licenties is mislukt</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Cannot connect to the License Server</source>
-      <translation>Kan geen verbinding maken met de Licentieserver</translation>
-    </message>
-    <message>
-      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Zorg ervoor dat uw server actieve internetverbinding heeft en/of controleer de firewall instellingen.</translation>
-    </message>
-    <message>
-      <source>License Server error</source>
-      <translation>Licentie Server fout</translation>
-    </message>
-    <message>
-      <source>License deactivated</source>
-      <translation>Licentie gedeactiveerd</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n licenties gedeactiveerd</numerusform>
-        <numerusform>%n licenties gedeactiveerd</numerusform>
       </translation>
     </message>
     <message>
@@ -3881,45 +3944,6 @@ to %1</source>
         <numerusform>%n kanalen.</numerusform>
         <numerusform>%n kanalen.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support.</source>
-      <translation>Neem contact op met Customer Support.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Deactiveren %n overige</numerusform>
-        <numerusform>Deactiveren %n overige</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid License Key</source>
-      <translation>Ongeldige licentiesleutel</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>Neem contact op met customer support om een ​​geldige licentiecode te verkrijgen.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>Neem contact op met customer support om de licentiecode handmatig te activeren.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>Neem contact op met customer support om een ​​geldige licentiecode te verkrijgen.</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Als het probleem aanhoudt, neem dan contact op met customer support.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -8222,6 +8246,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Internal error</source>
       <translation>Interne fout</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
@@ -9059,6 +9087,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>This OS version is no longer supported.</source>
       <translation>Deze OS-versie wordt niet langer ondersteund.</translation>
     </message>
+    <message>
+      <source>Update installation failed.</source>
+      <translation type="unfinished">Update installation failed.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
@@ -9710,6 +9742,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>We bereiden bestanden voor op het exportproces. Wacht een paar seconden.</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>

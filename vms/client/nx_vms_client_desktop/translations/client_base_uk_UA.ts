@@ -1250,6 +1250,189 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LicenseActivationDialogs</name>
+    <message>
+      <source>Incompatible license</source>
+      <translation>Несумісна ліцензія</translation>
+    </message>
+    <message>
+      <source>License you are trying to activate is incompatible with your software.</source>
+      <translation>Ліцензія, яку ви намагаєтеся активувати, несумісна з вашим програмним забезпеченням.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact %1.</source>
+      <translation type="unfinished">To report the issue please contact %1.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your regional support agent:</source>
+      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Failed to activate license</source>
+      <translation>Не вдалося активувати ліцензію</translation>
+    </message>
+    <message>
+      <source>Invalid data received.</source>
+      <translation type="unfinished">Invalid data received.</translation>
+    </message>
+    <message>
+      <source>Database error occurred.</source>
+      <translation>Помилка бази даних.</translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>Недійсний Ліцензійний Ключ</translation>
+    </message>
+    <message>
+      <source>Please make sure it is entered correctly.</source>
+      <translation>Будь ласка, переконайтеся, що він введений правильно.</translation>
+    </message>
+    <message>
+      <source>Invalid activation key file</source>
+      <translation>Недійсний ключ активації</translation>
+    </message>
+    <message>
+      <source>Select a valid activation key file to continue.</source>
+      <translation>Виберіть правильний ключ активації для продовження.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Ця ліцензія вже активована і пов'язана з Hardware ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Ця ліцензія вже активована і пов'язана з апаратним Hardware ID%1 на %2</translation>
+    </message>
+    <message>
+      <source>License already activated on another server</source>
+      <translation>Ліцензія вже активована на іншому сервері</translation>
+    </message>
+    <message>
+      <source>You already activated this license</source>
+      <translation>Ви вже активували цю ліцензію</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact %1.</source>
+      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your regional support agent:</source>
+      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Помилка мережі</translation>
+    </message>
+    <message>
+      <source>License activated</source>
+      <translation>Ліцензія активована</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseDeactivationDialogs</name>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation>
+        <numerusform>Не вдалося деактивувати %n ліцензію</numerusform>
+        <numerusform>Не вдалося деактивувати %n ліцензії</numerusform>
+        <numerusform>Не вдалося деактивувати %n ліцензії</numerusform>
+        <numerusform>Не вдалося деактивувати %n ліцензії</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation>
+        <numerusform>%1 з %n ліцензій не можна бути деактивована</numerusform>
+        <numerusform>%1 з %n ліцензій не можуть бути деактивовані</numerusform>
+        <numerusform>%1 з %n ліцензій не можуть бути деактивовані</numerusform>
+        <numerusform>%1 з %n ліцензій не можуть бути деактивовані</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation>
+        <numerusform>Деактивувати ще %n</numerusform>
+        <numerusform>Деактивувати ще %n</numerusform>
+        <numerusform>Деактивувати ще %n</numerusform>
+        <numerusform>Деактивувати ще %n</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation>
+        <numerusform>Не вдалося деактивувати ліцензію</numerusform>
+        <numerusform>Не вдалося деактивувати ліцензії</numerusform>
+        <numerusform>Не вдалося деактивувати ліцензії</numerusform>
+        <numerusform>Не вдалося деактивувати ліцензії</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please try again later.</source>
+      <translation type="unfinished">Please try again later.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation>Не вдається підключитися до Сервера Ліцензій</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation>Будь ласка, переконайтесь, що ваш сервер підключений до Інтернету або перевірте параметри firewall.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation>Помилка Cервера Ліцензій</translation>
+    </message>
+    <message>
+      <source>Failed to remove license from Server</source>
+      <translation>Не вдалося видалити ліцензію з Сервера</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation>
+        <numerusform>%n ліцензія деактивована</numerusform>
+        <numerusform>%n ліцензії деактивовані</numerusform>
+        <numerusform>%n ліцензії деактивовані</numerusform>
+        <numerusform>%n ліцензії деактивовані</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseManagementMessagesPrivate</name>
+    <message>
+      <source>To get a valid License Key please contact your regional support agent:</source>
+      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your regional support agent:</source>
+      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n канал.</numerusform>
+        <numerusform>%n каналів.</numerusform>
+        <numerusform>%n каналів.</numerusform>
+        <numerusform>%n каналів.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact your regional support agent:</source>
+      <translation type="unfinished">Please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact %1.</source>
+      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact %1.</source>
+      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+    </message>
+    <message>
+      <source>Please contact %1.</source>
+      <translation type="unfinished">Please contact %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -3832,66 +4015,6 @@ to %1</source>
       <source>Export licenses to a file</source>
       <translation>Експорт ліцензій у файл</translation>
     </message>
-    <message>
-      <source>Copy To Clipboard</source>
-      <translation>Копіювати у Буфер Обміну</translation>
-    </message>
-    <message>
-      <source>Incompatible license</source>
-      <translation>Несумісна ліцензія</translation>
-    </message>
-    <message>
-      <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>Ліцензія, яку ви намагаєтеся активувати, несумісна з вашим програмним забезпеченням.</translation>
-    </message>
-    <message>
-      <source>You already activated this license</source>
-      <translation>Ви вже активували цю ліцензію</translation>
-    </message>
-    <message>
-      <source>License activated</source>
-      <translation>Ліцензія активована</translation>
-    </message>
-    <message>
-      <source>Failed to remove license from Server</source>
-      <translation>Не вдалося видалити ліцензію з Сервера</translation>
-    </message>
-    <message>
-      <source>Invalid activation key file</source>
-      <translation>Недійсний ключ активації</translation>
-    </message>
-    <message>
-      <source>Select a valid activation key file to continue.</source>
-      <translation>Виберіть правильний ключ активації для продовження.</translation>
-    </message>
-    <message>
-      <source>Database error occurred.</source>
-      <translation>Помилка бази даних.</translation>
-    </message>
-    <message>
-      <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation>Отримано недійсні дані. Будь ласка, зв'яжіться з службою підтримки, щоб повідомити про помилку.</translation>
-    </message>
-    <message>
-      <source>Failed to activate license</source>
-      <translation>Не вдалося активувати ліцензію</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Помилка мережі</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Якщо проблема залишається невирішеною, зверніться в Службу Підтримки.</translation>
-    </message>
-    <message>
-      <source>License already activated on another server</source>
-      <translation>Ліцензія вже активована на іншому сервері</translation>
-    </message>
-    <message>
-      <source>Please make sure it is entered correctly.</source>
-      <translation>Будь ласка, переконайтеся, що він введений правильно.</translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
@@ -3899,62 +4022,6 @@ to %1</source>
         <numerusform>Деактивувати ліцензії?</numerusform>
         <numerusform>Деактивувати ліцензії?</numerusform>
         <numerusform>Деактивувати ліцензії?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to deactivate license</source>
-      <translation>Не вдалося деактивувати ліцензію</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>Не вдалося деактивувати %n ліцензію</numerusform>
-        <numerusform>Не вдалося деактивувати %n ліцензії</numerusform>
-        <numerusform>Не вдалося деактивувати %n ліцензії</numerusform>
-        <numerusform>Не вдалося деактивувати %n ліцензії</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%1 з %n ліцензій не можна бути деактивована</numerusform>
-        <numerusform>%1 з %n ліцензій не можуть бути деактивовані</numerusform>
-        <numerusform>%1 з %n ліцензій не можуть бути деактивовані</numerusform>
-        <numerusform>%1 з %n ліцензій не можуть бути деактивовані</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Не вдалося деактивувати ліцензію</numerusform>
-        <numerusform>Не вдалося деактивувати ліцензії</numerusform>
-        <numerusform>Не вдалося деактивувати ліцензії</numerusform>
-        <numerusform>Не вдалося деактивувати ліцензії</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Cannot connect to the License Server</source>
-      <translation>Не вдається підключитися до Сервера Ліцензій</translation>
-    </message>
-    <message>
-      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Будь ласка, переконайтесь, що ваш сервер підключений до Інтернету або перевірте параметри firewall.</translation>
-    </message>
-    <message>
-      <source>License Server error</source>
-      <translation>Помилка Cервера Ліцензій</translation>
-    </message>
-    <message>
-      <source>License deactivated</source>
-      <translation>Ліцензію деактивовано</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n ліцензія деактивована</numerusform>
-        <numerusform>%n ліцензії деактивовані</numerusform>
-        <numerusform>%n ліцензії деактивовані</numerusform>
-        <numerusform>%n ліцензії деактивовані</numerusform>
       </translation>
     </message>
     <message>
@@ -3973,47 +4040,6 @@ to %1</source>
         <numerusform>%n каналів.</numerusform>
         <numerusform>%n каналів.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support.</source>
-      <translation>Будь ласка, зверніться до Команди Підтримки.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Деактивувати ще %n</numerusform>
-        <numerusform>Деактивувати ще %n</numerusform>
-        <numerusform>Деактивувати ще %n</numerusform>
-        <numerusform>Деактивувати ще %n</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid License Key</source>
-      <translation>Недійсний Ліцензійний Ключ</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>Будь ласка, зв'яжіться з Службою Підтримки, щоб отримати дійсний Ліцензійний Ключ.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>Будь ласка, зв'яжіться з Службою Підтримки, щоб активувати Ліцензійний Ключ вручну.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>Будь ласка, зв'яжіться з Службою Підтримки, щоб отримати дійсний Ліцензійний Ключ.</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Якщо проблема залишається невирішеною, зверніться в службу підтримки.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Ця ліцензія вже активована і пов'язана з Hardware ID %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Ця ліцензія вже активована і пов'язана з апаратним Hardware ID%1 на %2</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -8456,6 +8482,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Internal error</source>
       <translation>Внутрішня помилка</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
@@ -9301,6 +9331,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This OS version is no longer supported.</source>
       <translation>Ця версія ОС більше не підтримується.</translation>
     </message>
+    <message>
+      <source>Update installation failed.</source>
+      <translation type="unfinished">Update installation failed.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
@@ -9966,6 +10000,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Ми готуємо файли для процесу експорту. Будь ласка, зачекайте кілька секунд.</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>

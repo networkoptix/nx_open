@@ -1245,6 +1245,171 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LicenseActivationDialogs</name>
+    <message>
+      <source>Incompatible license</source>
+      <translation>不兼容的授权</translation>
+    </message>
+    <message>
+      <source>License you are trying to activate is incompatible with your software.</source>
+      <translation>试图激活授权与您的软件不兼容。</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact %1.</source>
+      <translation type="unfinished">To report the issue please contact %1.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your regional support agent:</source>
+      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Failed to activate license</source>
+      <translation>未能激活许可证</translation>
+    </message>
+    <message>
+      <source>Invalid data received.</source>
+      <translation type="unfinished">Invalid data received.</translation>
+    </message>
+    <message>
+      <source>Database error occurred.</source>
+      <translation>出现数据库错误。</translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>无效授权</translation>
+    </message>
+    <message>
+      <source>Please make sure it is entered correctly.</source>
+      <translation>请确保输入正确。</translation>
+    </message>
+    <message>
+      <source>Invalid activation key file</source>
+      <translation>无效的激活密钥文件</translation>
+    </message>
+    <message>
+      <source>Select a valid activation key file to continue.</source>
+      <translation>选择一个有效的激活密钥文件以继续。</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>本授权已经激活并链接到硬件 ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>本授权已经激活并链接到硬件 ID %1 於 %2</translation>
+    </message>
+    <message>
+      <source>License already activated on another server</source>
+      <translation>如果问题仍然存在，请与技术支持联系。</translation>
+    </message>
+    <message>
+      <source>You already activated this license</source>
+      <translation>您已经激活此授权</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact %1.</source>
+      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your regional support agent:</source>
+      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>网络错误</translation>
+    </message>
+    <message>
+      <source>License activated</source>
+      <translation>授权已激活</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseDeactivationDialogs</name>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation>
+        <numerusform>重置 %n 个授权失败</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation>
+        <numerusform>%n 个授权中有 %1 个授权无法重置</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation>
+        <numerusform>重置 %n 个其他授权</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation>
+        <numerusform>无法重置授权</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please try again later.</source>
+      <translation type="unfinished">Please try again later.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation>无法连接到授权服务器</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation>请确保您的服务器可连网或检查防火墙设置。</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation>授权服务器错误</translation>
+    </message>
+    <message>
+      <source>Failed to remove license from Server</source>
+      <translation>无法从服务器删除授权失败</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation>
+        <numerusform>%n 个授权已重置</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseManagementMessagesPrivate</name>
+    <message>
+      <source>To get a valid License Key please contact your regional support agent:</source>
+      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your regional support agent:</source>
+      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n 个授權。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact your regional support agent:</source>
+      <translation type="unfinished">Please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact %1.</source>
+      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact %1.</source>
+      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+    </message>
+    <message>
+      <source>Please contact %1.</source>
+      <translation type="unfinished">Please contact %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -3715,114 +3880,10 @@ to %1</source>
       <source>Export licenses to a file</source>
       <translation>导出授权文件</translation>
     </message>
-    <message>
-      <source>Copy To Clipboard</source>
-      <translation>复制到剪贴板</translation>
-    </message>
-    <message>
-      <source>Incompatible license</source>
-      <translation>不兼容的授权</translation>
-    </message>
-    <message>
-      <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>试图激活授权与您的软件不兼容。</translation>
-    </message>
-    <message>
-      <source>You already activated this license</source>
-      <translation>您已经激活此授权</translation>
-    </message>
-    <message>
-      <source>License activated</source>
-      <translation>授权已激活</translation>
-    </message>
-    <message>
-      <source>Failed to remove license from Server</source>
-      <translation>无法从服务器删除授权失败</translation>
-    </message>
-    <message>
-      <source>Invalid activation key file</source>
-      <translation>无效的激活密钥文件</translation>
-    </message>
-    <message>
-      <source>Select a valid activation key file to continue.</source>
-      <translation>选择一个有效的激活密钥文件以继续。</translation>
-    </message>
-    <message>
-      <source>Database error occurred.</source>
-      <translation>出现数据库错误。</translation>
-    </message>
-    <message>
-      <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation>收到的数据无效。请联系客户支持，报告此问题。</translation>
-    </message>
-    <message>
-      <source>Failed to activate license</source>
-      <translation>未能激活许可证</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>网络错误</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact Customer Support.</source>
-      <translation>如果问题仍然存在，请与客户支持联系。</translation>
-    </message>
-    <message>
-      <source>License already activated on another server</source>
-      <translation>如果问题仍然存在，请与技术支持联系。</translation>
-    </message>
-    <message>
-      <source>Please make sure it is entered correctly.</source>
-      <translation>请确保输入正确。</translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
         <numerusform>重置授权?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to deactivate license</source>
-      <translation>重置授权失败</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>重置 %n 个授权失败</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%n 个授权中有 %1 个授权无法重置</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>无法重置授权</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Cannot connect to the License Server</source>
-      <translation>无法连接到授权服务器</translation>
-    </message>
-    <message>
-      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>请确保您的服务器可连网或检查防火墙设置。</translation>
-    </message>
-    <message>
-      <source>License Server error</source>
-      <translation>授权服务器错误</translation>
-    </message>
-    <message>
-      <source>License deactivated</source>
-      <translation>授权已重置</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n 个授权已重置</numerusform>
       </translation>
     </message>
     <message>
@@ -3838,44 +3899,6 @@ to %1</source>
       <translation>
         <numerusform>%n 个授權。</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support.</source>
-      <translation>请联系客服。</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>重置 %n 个其他授权</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid License Key</source>
-      <translation>无效授权</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>请联系客服以获取有效的授权。</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>请联系客服以手动激活授权。</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>请联系客服以获取有效的授权。</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>如果问题仍然存在，请与客户支持联系。</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>本授权已经激活并链接到硬件 ID %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>本授权已经激活并链接到硬件 ID %1 於 %2</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -8108,6 +8131,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Internal error</source>
       <translation>内部错误</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
@@ -8941,6 +8968,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This OS version is no longer supported.</source>
       <translation>不再支持此操作系统版本.</translation>
     </message>
+    <message>
+      <source>Update installation failed.</source>
+      <translation type="unfinished">Update installation failed.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
@@ -9585,6 +9616,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>正在为导出过程准备文件。请稍等。</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>

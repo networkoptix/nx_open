@@ -130,7 +130,8 @@
         "maxWebMTranscoders": "Maksymalna liczba połączeń WEBM do serwera. Chrome jednocześnie otwiera 2 połączenia, a następnie zamyka pierwsze z nich, dlatego zaleca się ustawienie wartości >= 2.",
         "maxEventLogRecords": "Maksymalna liczba wpisów do dziennika zdarzeń przechowywanego w bazie danych. Rzeczywista ilość rekordów może być nawet o 20% wyższa niż podana wartość.",
         "forceLiveCacheForPrimaryStream": "Czy buforować niektóre ramki dla strumienia głównego. Wartości: „tak” - zawsze włączone (może zużywać dużo pamięci RAM), „nie” - zawsze wyłączone, chyba że wymaga tego odtwarzanie (np. HLS), „auto” - podobne do „nie”, ale włączone, gdy poprawia to wrażenia użytkownika (np. w niektórych wtyczkach analizy wideo).",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected."
+        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
+        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
     },
     "info": {
         "tabs": {

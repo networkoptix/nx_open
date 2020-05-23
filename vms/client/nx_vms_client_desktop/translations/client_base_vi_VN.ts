@@ -1244,6 +1244,171 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LicenseActivationDialogs</name>
+    <message>
+      <source>Incompatible license</source>
+      <translation>Bản quyền không tương thích</translation>
+    </message>
+    <message>
+      <source>License you are trying to activate is incompatible with your software.</source>
+      <translation>Bạn đang cố gắng để kích hoạt bản quyền không tương thích với phần mềm.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact %1.</source>
+      <translation type="unfinished">To report the issue please contact %1.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your regional support agent:</source>
+      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Failed to activate license</source>
+      <translation>Không thể kích hoạt bản quyền</translation>
+    </message>
+    <message>
+      <source>Invalid data received.</source>
+      <translation type="unfinished">Invalid data received.</translation>
+    </message>
+    <message>
+      <source>Database error occurred.</source>
+      <translation>Đã xảy ra lỗi cơ sở dữ liệu.</translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>Key bản quyền Không hợp lệ</translation>
+    </message>
+    <message>
+      <source>Please make sure it is entered correctly.</source>
+      <translation>Hãy chắc chắn rằng nó được nhập chính xác.</translation>
+    </message>
+    <message>
+      <source>Invalid activation key file</source>
+      <translation>Key kích hoạt không hợp lệ</translation>
+    </message>
+    <message>
+      <source>Select a valid activation key file to continue.</source>
+      <translation>Chọn key kích hoạt khác để tiếp tục.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Bản quyền này đã được kích hoạt trên một máy khác %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Bản quyền này đã được kích hoạt trên một máy khác %1 vào %2</translation>
+    </message>
+    <message>
+      <source>License already activated on another server</source>
+      <translation>Giấy phép đã được kích hoạt trên một máy chủ khác</translation>
+    </message>
+    <message>
+      <source>You already activated this license</source>
+      <translation>Bạn đã sẵn sàng kích hoạt bản quyền này</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact %1.</source>
+      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your regional support agent:</source>
+      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Lỗi mạng</translation>
+    </message>
+    <message>
+      <source>License activated</source>
+      <translation>Bản quyền được kích hoạt</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseDeactivationDialogs</name>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation>
+        <numerusform>%n Cấp bản quyền lỗi</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation>
+        <numerusform>%1 trong số %n giấy phép không kích hoạt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation>
+        <numerusform>Hủy kích hoạt %n Khác</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation>
+        <numerusform>Không thể hủy kích hoạt bản quyền</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please try again later.</source>
+      <translation type="unfinished">Please try again later.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation>Không thể kết nối với Máy chủ cấp bản quyền</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation>Hãy đảm bảo máy chủ của bạn có kết nối Internet hoặc kiểm tra cài đặt tường lửa.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation>Lỗi cấp bản quyền Máy chủ</translation>
+    </message>
+    <message>
+      <source>Failed to remove license from Server</source>
+      <translation>Lỗi bỏ bản quyền từ Máy chủ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation>
+        <numerusform>%n Bản quyền ngừng hoạt động</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseManagementMessagesPrivate</name>
+    <message>
+      <source>To get a valid License Key please contact your regional support agent:</source>
+      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your regional support agent:</source>
+      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n kênh.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact your regional support agent:</source>
+      <translation type="unfinished">Please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact %1.</source>
+      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact %1.</source>
+      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+    </message>
+    <message>
+      <source>Please contact %1.</source>
+      <translation type="unfinished">Please contact %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -3714,114 +3879,10 @@ to %1</source>
       <source>Export licenses to a file</source>
       <translation>Xuất bản quyền vào một tệp tin</translation>
     </message>
-    <message>
-      <source>Copy To Clipboard</source>
-      <translation>Sao chép vào Clipboard</translation>
-    </message>
-    <message>
-      <source>Incompatible license</source>
-      <translation>Bản quyền không tương thích</translation>
-    </message>
-    <message>
-      <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>Bạn đang cố gắng để kích hoạt bản quyền không tương thích với phần mềm.</translation>
-    </message>
-    <message>
-      <source>You already activated this license</source>
-      <translation>Bạn đã sẵn sàng kích hoạt bản quyền này</translation>
-    </message>
-    <message>
-      <source>License activated</source>
-      <translation>Bản quyền được kích hoạt</translation>
-    </message>
-    <message>
-      <source>Failed to remove license from Server</source>
-      <translation>Lỗi bỏ bản quyền từ Máy chủ</translation>
-    </message>
-    <message>
-      <source>Invalid activation key file</source>
-      <translation>Key kích hoạt không hợp lệ</translation>
-    </message>
-    <message>
-      <source>Select a valid activation key file to continue.</source>
-      <translation>Chọn key kích hoạt khác để tiếp tục.</translation>
-    </message>
-    <message>
-      <source>Database error occurred.</source>
-      <translation>Đã xảy ra lỗi cơ sở dữ liệu.</translation>
-    </message>
-    <message>
-      <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation>Nhận dữ liệu không hợp lệ. Vui lòng liên hệ Hỗ trợ khách hàng để thông báo vấn đề này.</translation>
-    </message>
-    <message>
-      <source>Failed to activate license</source>
-      <translation>Không thể kích hoạt bản quyền</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Lỗi mạng</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Nếu vấn đề kích hoạt lỗi, xin vui lòng liên hệ với hỗ trợ khách hàng.</translation>
-    </message>
-    <message>
-      <source>License already activated on another server</source>
-      <translation>Giấy phép đã được kích hoạt trên một máy chủ khác</translation>
-    </message>
-    <message>
-      <source>Please make sure it is entered correctly.</source>
-      <translation>Hãy chắc chắn rằng nó được nhập chính xác.</translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
         <numerusform>Hủy kích hoạt giấy phép?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to deactivate license</source>
-      <translation>Cấp bản quyền lỗi</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>%n Cấp bản quyền lỗi</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%1 trong số %n giấy phép không kích hoạt</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Không thể hủy kích hoạt bản quyền</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Cannot connect to the License Server</source>
-      <translation>Không thể kết nối với Máy chủ cấp bản quyền</translation>
-    </message>
-    <message>
-      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Hãy đảm bảo máy chủ của bạn có kết nối Internet hoặc kiểm tra cài đặt tường lửa.</translation>
-    </message>
-    <message>
-      <source>License Server error</source>
-      <translation>Lỗi cấp bản quyền Máy chủ</translation>
-    </message>
-    <message>
-      <source>License deactivated</source>
-      <translation>Bản quyền ngừng hoạt động</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n Bản quyền ngừng hoạt động</numerusform>
       </translation>
     </message>
     <message>
@@ -3837,44 +3898,6 @@ to %1</source>
       <translation>
         <numerusform>%n kênh.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support.</source>
-      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Hủy kích hoạt %n Khác</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid License Key</source>
-      <translation>Key bản quyền Không hợp lệ</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng để có được key bản quyền.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>Xin vui lòng liên hệ với hỗ trợ khách hàng để kích hoạt giấy phép khóa theo cách thủ công.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng để có được bản quyên hợp lệ.</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Nếu sự cố vẫn tiếp diễn, vui lòng liên hệ Hỗ trợ Khách hàng.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Bản quyền này đã được kích hoạt trên một máy khác %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Bản quyền này đã được kích hoạt trên một máy khác %1 vào %2</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -8106,6 +8129,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Internal error</source>
       <translation>Lỗi bên trong</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
@@ -8939,6 +8966,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>This OS version is no longer supported.</source>
       <translation>Phiên bản HĐH này không còn được hỗ trợ.</translation>
     </message>
+    <message>
+      <source>Update installation failed.</source>
+      <translation type="unfinished">Update installation failed.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
@@ -9583,6 +9614,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Chúng tôi đang chuẩn bị các tập tin cho quá trình xuất khẩu. Xin vui lòng chờ trong vài giây.</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>

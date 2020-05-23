@@ -2289,18 +2289,43 @@
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation>till</translation>
+      <source>To</source>
+      <translation>Till</translation>
     </message>
     <message>
       <location/>
-      <source>Set Language</source>
-      <translation>Ställ in språk</translation>
+      <source>Language Settings</source>
+      <translation>Inställningar för språk</translation>
     </message>
     <message>
       <location/>
-      <source>Add custom text:</source>
-      <translation>Lägg till anpassad text:</translation>
+      <source>Custom notification content</source>
+      <translation>Anpassat aviseringsinnehåll</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Header</source>
+      <translation>Rubrik</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default notification title will be used if left empty</source>
+      <translation>Standardtitel för aviseringar kommer att användas om den lämnas tom</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Body</source>
+      <translation>Kropp</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default text will be used if this field is empty</source>
+      <translation>Standardtexten kommer att användas om detta fält är tomt</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Add source device name in body</source>
+      <translation>Lägg till källenhetsnamn i kroppen</translation>
     </message>
   </context>
   <context>
@@ -3207,6 +3232,11 @@
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Varning! Detta gör att inställningarna för kvalitet och bildfrekvens (FPS) i inspelningsschemat är irrelevanta.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Custom language for mobile notifications</source>
+      <translation>Anpassat språk för mobilaviseringar</translation>
     </message>
   </context>
   <context>

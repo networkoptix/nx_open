@@ -2289,18 +2289,43 @@
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation>到</translation>
+      <source>To</source>
+      <translation type="unfinished">To</translation>
     </message>
     <message>
       <location/>
-      <source>Set Language</source>
-      <translation>选择语言</translation>
+      <source>Language Settings</source>
+      <translation type="unfinished">Language Settings</translation>
     </message>
     <message>
       <location/>
-      <source>Add custom text:</source>
-      <translation>添加自定义文本:</translation>
+      <source>Custom notification content</source>
+      <translation type="unfinished">Custom notification content</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Header</source>
+      <translation type="unfinished">Header</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default notification title will be used if left empty</source>
+      <translation type="unfinished">Default notification title will be used if left empty</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Body</source>
+      <translation type="unfinished">Body</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default text will be used if this field is empty</source>
+      <translation type="unfinished">Default text will be used if this field is empty</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Add source device name in body</source>
+      <translation type="unfinished">Add source device name in body</translation>
     </message>
   </context>
   <context>
@@ -3207,6 +3232,11 @@
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>注意！若勾选以上设置当前视频质量和帧率将无法与录像计划中的录像设置同步.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Custom language for mobile notifications</source>
+      <translation type="unfinished">Custom language for mobile notifications</translation>
     </message>
   </context>
   <context>

@@ -130,7 +130,8 @@
         "maxWebMTranscoders": "จำนวนการเชื่อมต่อ WEBM สูงสุดสำหรับเซิร์ฟเวอร์ Chrome เปิดการเชื่อมต่อ 2 ครั้งพร้อมกันจากนั้นปิดการเชื่อมต่อแรก ดังนั้นจึงขอแนะนำให้ตั้งค่า> = 2 เป็นพารามิเตอร์นี้",
         "maxEventLogRecords": "บันทึกเหตุการณ์สูงสุดที่จะเก็บไว้ในฐานข้อมูล จำนวนเรคคอร์ดที่ไม่ถูกลบจริงอาจสูงกว่าค่าที่ระบุได้ถึง 20%",
         "forceLiveCacheForPrimaryStream": "กำหนดว่าจะแคชบางเฟรมสำหรับสตรีมหลักหรือไม่ ค่า: \"ใช่\" - เปิดใช้งานเสมอ (อาจใช้ RAM จำนวนมาก), \"ไม่\" - ปิดใช้งานเสมอยกเว้นเมื่อต้องการโดยการเล่น (เช่น HLS), \"อัตโนมัติ\" - คล้ายกับ \"ไม่\" แต่เปิดเมื่อปรับปรุง ประสบการณ์ผู้ใช้ (เช่นเมื่อปลั๊กอิน Analytics บางตัวทำงานบนกล้อง)",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected."
+        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
+        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
     },
     "info": {
         "tabs": {

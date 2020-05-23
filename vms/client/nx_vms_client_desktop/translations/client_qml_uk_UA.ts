@@ -40,16 +40,16 @@
   <context>
     <name>Figure</name>
     <message>
-      <source>Display on camera</source>
-      <translation>Показувати на камері</translation>
-    </message>
-    <message>
       <source>Figure</source>
       <translation>Малюнок</translation>
     </message>
     <message>
       <source>Click to add</source>
       <translation>Натисніть, щоб додати</translation>
+    </message>
+    <message>
+      <source>Display on video</source>
+      <translation type="unfinished">Display on video</translation>
     </message>
   </context>
   <context>
@@ -91,6 +91,14 @@
     <message>
       <source>Select video stream from the camera for analysis</source>
       <translation>Виберіть відеопотік з камери для аналізу</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation type="unfinished">Refresh</translation>
+    </message>
+    <message>
+      <source>Refreshing...</source>
+      <translation type="unfinished">Refreshing...</translation>
     </message>
   </context>
   <context>

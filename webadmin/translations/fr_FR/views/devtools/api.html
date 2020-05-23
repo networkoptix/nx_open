@@ -46,7 +46,7 @@
                                     <h3>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></h3>
                                     <p>{{group.groupDescription}}</p>
                                     <ul>
-                                        <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
+                                        <li ng-repeat="function in group.functions | orderBy:'name' | filter: { name: searchFunc }"
                                             ng-if="!function.proprietary || allowProprietary">
                                             <span class="label label-danger" ng-if="function.proprietary">propriétaire</span>
                                             <a ng-click="setActiveFunction(group,function,$event)"

@@ -1247,6 +1247,177 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LicenseActivationDialogs</name>
+    <message>
+      <source>Incompatible license</source>
+      <translation>Inkompatibel lisens</translation>
+    </message>
+    <message>
+      <source>License you are trying to activate is incompatible with your software.</source>
+      <translation>Lisensen du prøver å aktivere er inkompatibel med programvaren din.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact %1.</source>
+      <translation type="unfinished">To report the issue please contact %1.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your regional support agent:</source>
+      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Failed to activate license</source>
+      <translation>Kunne ikke aktivere lisensen</translation>
+    </message>
+    <message>
+      <source>Invalid data received.</source>
+      <translation type="unfinished">Invalid data received.</translation>
+    </message>
+    <message>
+      <source>Database error occurred.</source>
+      <translation>Datafeil oppstod.</translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>Ugyldig lisensnøkkel</translation>
+    </message>
+    <message>
+      <source>Please make sure it is entered correctly.</source>
+      <translation>Forsikre deg om at den er skrevet riktig.</translation>
+    </message>
+    <message>
+      <source>Invalid activation key file</source>
+      <translation>Ugyldig aktiveringsnøkkelfil</translation>
+    </message>
+    <message>
+      <source>Select a valid activation key file to continue.</source>
+      <translation>Velg en gyldig aktiveringsnøkkelfil for å fortsette.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Denne lisensen er allerede aktivert og koblet til Maskinvare-ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Denne lisensen er allerede aktivert og koblet til Hardware ID %1 på %2</translation>
+    </message>
+    <message>
+      <source>License already activated on another server</source>
+      <translation>Lisensen er allerede aktivert på en annen server</translation>
+    </message>
+    <message>
+      <source>You already activated this license</source>
+      <translation>Du har allerede aktivert denne lisensen</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact %1.</source>
+      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your regional support agent:</source>
+      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Nettverksfeil</translation>
+    </message>
+    <message>
+      <source>License activated</source>
+      <translation>Lisens aktivert</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseDeactivationDialogs</name>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation>
+        <numerusform>Kunne ikke deaktivere %n lisenser</numerusform>
+        <numerusform>Kunne ikke deaktivere %n lisenser</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation>
+        <numerusform>%1 av %n lisenser kan ikke deaktiveres</numerusform>
+        <numerusform>%1 av %n lisenser kan ikke deaktiveres</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation>
+        <numerusform>Deaktiver %n Annet</numerusform>
+        <numerusform>Deaktiver %n Annet</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation>
+        <numerusform>Kan ikke deaktivere lisenser</numerusform>
+        <numerusform>Kan ikke deaktivere lisenser</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please try again later.</source>
+      <translation type="unfinished">Please try again later.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation>Kan ikke koble til lisensserveren</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation>Forsikre deg om at serveren din har aktiv Internett-tilkobling, eller sjekk brannmurinnstillinger.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation>Lisensserverfeil</translation>
+    </message>
+    <message>
+      <source>Failed to remove license from Server</source>
+      <translation>Kunne ikke fjerne lisensen fra serveren</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation>
+        <numerusform>%n lisenser deaktivert</numerusform>
+        <numerusform>%n lisenser deaktivert</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseManagementMessagesPrivate</name>
+    <message>
+      <source>To get a valid License Key please contact your regional support agent:</source>
+      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your regional support agent:</source>
+      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n kanaler.</numerusform>
+        <numerusform>%n kanaler.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact your regional support agent:</source>
+      <translation type="unfinished">Please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact %1.</source>
+      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact %1.</source>
+      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+    </message>
+    <message>
+      <source>Please contact %1.</source>
+      <translation type="unfinished">Please contact %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -3757,119 +3928,11 @@ til %1</translation>
       <source>Export licenses to a file</source>
       <translation>Eksporter lisenser til en fil</translation>
     </message>
-    <message>
-      <source>Copy To Clipboard</source>
-      <translation>Kopier til utklippstavle</translation>
-    </message>
-    <message>
-      <source>Incompatible license</source>
-      <translation>Inkompatibel lisens</translation>
-    </message>
-    <message>
-      <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>Lisensen du prøver å aktivere er inkompatibel med programvaren din.</translation>
-    </message>
-    <message>
-      <source>You already activated this license</source>
-      <translation>Du har allerede aktivert denne lisensen</translation>
-    </message>
-    <message>
-      <source>License activated</source>
-      <translation>Lisens aktivert</translation>
-    </message>
-    <message>
-      <source>Failed to remove license from Server</source>
-      <translation>Kunne ikke fjerne lisensen fra serveren</translation>
-    </message>
-    <message>
-      <source>Invalid activation key file</source>
-      <translation>Ugyldig aktiveringsnøkkelfil</translation>
-    </message>
-    <message>
-      <source>Select a valid activation key file to continue.</source>
-      <translation>Velg en gyldig aktiveringsnøkkelfil for å fortsette.</translation>
-    </message>
-    <message>
-      <source>Database error occurred.</source>
-      <translation>Datafeil oppstod.</translation>
-    </message>
-    <message>
-      <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation>Ugyldige data mottatt. Kontakt kundestøtte for å rapportere problemet.</translation>
-    </message>
-    <message>
-      <source>Failed to activate license</source>
-      <translation>Kunne ikke aktivere lisensen</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Nettverksfeil</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Hvis problemet vedvarer, kan du kontakte kundestøtte.</translation>
-    </message>
-    <message>
-      <source>License already activated on another server</source>
-      <translation>Lisensen er allerede aktivert på en annen server</translation>
-    </message>
-    <message>
-      <source>Please make sure it is entered correctly.</source>
-      <translation>Forsikre deg om at den er skrevet riktig.</translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
         <numerusform>Deaktivere lisens?</numerusform>
         <numerusform>Deaktivere lisenser?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to deactivate license</source>
-      <translation>Kunne ikke deaktivere lisensen</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>Kunne ikke deaktivere %n lisenser</numerusform>
-        <numerusform>Kunne ikke deaktivere %n lisenser</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%1 av %n lisenser kan ikke deaktiveres</numerusform>
-        <numerusform>%1 av %n lisenser kan ikke deaktiveres</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Kan ikke deaktivere lisenser</numerusform>
-        <numerusform>Kan ikke deaktivere lisenser</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Cannot connect to the License Server</source>
-      <translation>Kan ikke koble til lisensserveren</translation>
-    </message>
-    <message>
-      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Forsikre deg om at serveren din har aktiv Internett-tilkobling, eller sjekk brannmurinnstillinger.</translation>
-    </message>
-    <message>
-      <source>License Server error</source>
-      <translation>Lisensserverfeil</translation>
-    </message>
-    <message>
-      <source>License deactivated</source>
-      <translation>Lisens deaktivert</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n lisenser deaktivert</numerusform>
-        <numerusform>%n lisenser deaktivert</numerusform>
       </translation>
     </message>
     <message>
@@ -3886,45 +3949,6 @@ til %1</translation>
         <numerusform>%n kanaler.</numerusform>
         <numerusform>%n kanaler.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support.</source>
-      <translation>Ta kontakt med kundesupport.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Deaktiver %n Annet</numerusform>
-        <numerusform>Deaktiver %n Annet</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid License Key</source>
-      <translation>Ugyldig lisensnøkkel</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>Kontakt kundestøtte for å få en gyldig lisensnøkkel.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>Kontakt kundestøtte for å aktivere lisensnøkkel manuelt.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>Kontakt kundestøtte for å få en gyldig lisensnøkkel.</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Hvis problemet vedvarer, kan du kontakte kundestøtte.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Denne lisensen er allerede aktivert og koblet til Maskinvare-ID %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Denne lisensen er allerede aktivert og koblet til Hardware ID %1 på %2</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -8227,6 +8251,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>Internal error</source>
       <translation>Intern feil</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
@@ -9064,6 +9092,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>This OS version is no longer supported.</source>
       <translation>Denne OS-versjonen støttes ikke lenger.</translation>
     </message>
+    <message>
+      <source>Update installation failed.</source>
+      <translation type="unfinished">Update installation failed.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
@@ -9715,6 +9747,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Vi forbereder filer for eksportprosessen. Vent noen sekunder.</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>

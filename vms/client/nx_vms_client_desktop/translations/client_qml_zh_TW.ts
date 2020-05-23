@@ -40,16 +40,16 @@
   <context>
     <name>Figure</name>
     <message>
-      <source>Display on camera</source>
-      <translation>在攝影機上顯示</translation>
-    </message>
-    <message>
       <source>Figure</source>
       <translation>圖形</translation>
     </message>
     <message>
       <source>Click to add</source>
       <translation>點選新增</translation>
+    </message>
+    <message>
+      <source>Display on video</source>
+      <translation type="unfinished">Display on video</translation>
     </message>
   </context>
   <context>
@@ -91,6 +91,14 @@
     <message>
       <source>Select video stream from the camera for analysis</source>
       <translation>從攝影機中選擇影片串流進行分析</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation type="unfinished">Refresh</translation>
+    </message>
+    <message>
+      <source>Refreshing...</source>
+      <translation type="unfinished">Refreshing...</translation>
     </message>
   </context>
   <context>

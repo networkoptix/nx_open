@@ -1,8 +1,11 @@
 <uib-alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
-    <p><b>Bạn có phải là nhà phát triển? Gửi cho chúng tôi phản hồi của bạn!</b></p>
+    <p><b>Bạn có phải là nhà phát triển?</b></p>
     <p>Nhóm phát triển của chúng tôi rất quan tâm đến những phản hổi từ các nhà phát triển tích hợp hệ thống dựa trên nền tảng SDK và API của chúng tôi.
-        Nếu bạn có bất cứ đề nghị về làm thế nào để cải thiện kinh nghiệm phát triển - hoặc chỉ muốn gửi lời chào tới chúng tôi - xin vui lòng điền vào mẫu phản hồi của chúng tôi!
+        If you have any suggestions on how to improve the developer experience - or just want to say hi to the team -
+        please join our developer forum! Or you can check out our online knowledge base to find more information,
+        best practices, and tips&tricks
     </p>
-    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Để lại phản hồi</a></p>
+    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Developer forum</a></p>
+    <p class="text-right" ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Development knowledge base</a></p>
 </uib-alert>

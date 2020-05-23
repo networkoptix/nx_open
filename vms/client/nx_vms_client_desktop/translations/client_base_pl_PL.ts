@@ -1250,6 +1250,189 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LicenseActivationDialogs</name>
+    <message>
+      <source>Incompatible license</source>
+      <translation>Niezgodna licencja</translation>
+    </message>
+    <message>
+      <source>License you are trying to activate is incompatible with your software.</source>
+      <translation>Licencja, którą próbujesz aktywować, jest niezgodna z tym oprogramowaniem.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact %1.</source>
+      <translation type="unfinished">To report the issue please contact %1.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your regional support agent:</source>
+      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Failed to activate license</source>
+      <translation>Nie udało się aktywować licencji</translation>
+    </message>
+    <message>
+      <source>Invalid data received.</source>
+      <translation type="unfinished">Invalid data received.</translation>
+    </message>
+    <message>
+      <source>Database error occurred.</source>
+      <translation>Wystąpił błąd bazy danych.</translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>Nieprawidłowy klucz licencyjny</translation>
+    </message>
+    <message>
+      <source>Please make sure it is entered correctly.</source>
+      <translation>Upewnij się, że jest prawidłowo wprowadzony.</translation>
+    </message>
+    <message>
+      <source>Invalid activation key file</source>
+      <translation>Nieprawidłowy kod aktywacyjny w pliku</translation>
+    </message>
+    <message>
+      <source>Select a valid activation key file to continue.</source>
+      <translation>Wybierz plik z prawidłowym kodem aktywacyjnym, aby kontynuować.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Ta licencja jest już aktywna dla ID sprzętu %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Ta licencja jest już aktywna dla ID sprzętu %1 na %2</translation>
+    </message>
+    <message>
+      <source>License already activated on another server</source>
+      <translation>Licencja została już aktywowana na innym serwerze</translation>
+    </message>
+    <message>
+      <source>You already activated this license</source>
+      <translation>Ta licencja została już aktywowana</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact %1.</source>
+      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your regional support agent:</source>
+      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Błąd połączenia z siecią</translation>
+    </message>
+    <message>
+      <source>License activated</source>
+      <translation>Licencja aktywna</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseDeactivationDialogs</name>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation>
+        <numerusform>Nie udało się dezaktywować %n licencji</numerusform>
+        <numerusform>Nie udało się dezaktywować %n licencji</numerusform>
+        <numerusform>Nie udało się dezaktywować %n licencji</numerusform>
+        <numerusform>Nie udało się dezaktywować %n licencji</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation>
+        <numerusform>Nie można dezaktywować %1 z %n licencji</numerusform>
+        <numerusform>Nie można dezaktywować %1 z %n licencji</numerusform>
+        <numerusform>Nie można dezaktywować %1 z %n licencji</numerusform>
+        <numerusform>Nie można dezaktywować %1 z %n licencji</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation>
+        <numerusform>Dezaktywuj %n inny</numerusform>
+        <numerusform>Dezaktywuj %n inne</numerusform>
+        <numerusform>Dezaktywuj %n innych</numerusform>
+        <numerusform>Dezaktywuj %n innych</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation>
+        <numerusform>Nie udało się dezaktywować licencji</numerusform>
+        <numerusform>Nie udało się dezaktywować licencji</numerusform>
+        <numerusform>Nie udało się dezaktywować licencji</numerusform>
+        <numerusform>Nie udało się dezaktywować licencji</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please try again later.</source>
+      <translation type="unfinished">Please try again later.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation>Nie można połączyć się z serwerem licencji</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation>Upewnij się, że serwer ma aktywne połączenie internetowe lub sprawdź ustawienia zapory.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation>Błąd serwera licencji</translation>
+    </message>
+    <message>
+      <source>Failed to remove license from Server</source>
+      <translation>Nie udało się usunąć licencji z serwera</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation>
+        <numerusform>%n zdezaktywowana licencja</numerusform>
+        <numerusform>%n zdezaktywowane licencje</numerusform>
+        <numerusform>%n zdezaktywowanych licencji</numerusform>
+        <numerusform>%n zdezaktywowanych licencji</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseManagementMessagesPrivate</name>
+    <message>
+      <source>To get a valid License Key please contact your regional support agent:</source>
+      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your regional support agent:</source>
+      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n kanał.</numerusform>
+        <numerusform>%n kanały.</numerusform>
+        <numerusform>%n kanałów.</numerusform>
+        <numerusform>%n kanałów.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact your regional support agent:</source>
+      <translation type="unfinished">Please contact your regional support agent:</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact %1.</source>
+      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact %1.</source>
+      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+    </message>
+    <message>
+      <source>Please contact %1.</source>
+      <translation type="unfinished">Please contact %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -3828,66 +4011,6 @@ to %1</source>
       <source>Export licenses to a file</source>
       <translation>Eksportuj licencje do pliku</translation>
     </message>
-    <message>
-      <source>Copy To Clipboard</source>
-      <translation>Kopiuj do schowka</translation>
-    </message>
-    <message>
-      <source>Incompatible license</source>
-      <translation>Niezgodna licencja</translation>
-    </message>
-    <message>
-      <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>Licencja, którą próbujesz aktywować, jest niezgodna z tym oprogramowaniem.</translation>
-    </message>
-    <message>
-      <source>You already activated this license</source>
-      <translation>Ta licencja została już aktywowana</translation>
-    </message>
-    <message>
-      <source>License activated</source>
-      <translation>Licencja aktywna</translation>
-    </message>
-    <message>
-      <source>Failed to remove license from Server</source>
-      <translation>Nie udało się usunąć licencji z serwera</translation>
-    </message>
-    <message>
-      <source>Invalid activation key file</source>
-      <translation>Nieprawidłowy kod aktywacyjny w pliku</translation>
-    </message>
-    <message>
-      <source>Select a valid activation key file to continue.</source>
-      <translation>Wybierz plik z prawidłowym kodem aktywacyjnym, aby kontynuować.</translation>
-    </message>
-    <message>
-      <source>Database error occurred.</source>
-      <translation>Wystąpił błąd bazy danych.</translation>
-    </message>
-    <message>
-      <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation>Otrzymano nieprawidłowe dane. Aby zgłosić problem, skontaktuj się z działem obsługi klienta.</translation>
-    </message>
-    <message>
-      <source>Failed to activate license</source>
-      <translation>Nie udało się aktywować licencji</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Błąd połączenia z siecią</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Jeśli problem nie ustąpi, skontaktuj się z działem obsługi klienta.</translation>
-    </message>
-    <message>
-      <source>License already activated on another server</source>
-      <translation>Licencja została już aktywowana na innym serwerze</translation>
-    </message>
-    <message>
-      <source>Please make sure it is entered correctly.</source>
-      <translation>Upewnij się, że jest prawidłowo wprowadzony.</translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
@@ -3895,62 +4018,6 @@ to %1</source>
         <numerusform>Dezaktywować licencje?</numerusform>
         <numerusform>Dezaktywować licencje?</numerusform>
         <numerusform>Dezaktywować licencje?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to deactivate license</source>
-      <translation>Nie udało się dezaktywować licencji</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>Nie udało się dezaktywować %n licencji</numerusform>
-        <numerusform>Nie udało się dezaktywować %n licencji</numerusform>
-        <numerusform>Nie udało się dezaktywować %n licencji</numerusform>
-        <numerusform>Nie udało się dezaktywować %n licencji</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>Nie można dezaktywować %1 z %n licencji</numerusform>
-        <numerusform>Nie można dezaktywować %1 z %n licencji</numerusform>
-        <numerusform>Nie można dezaktywować %1 z %n licencji</numerusform>
-        <numerusform>Nie można dezaktywować %1 z %n licencji</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Nie udało się dezaktywować licencji</numerusform>
-        <numerusform>Nie udało się dezaktywować licencji</numerusform>
-        <numerusform>Nie udało się dezaktywować licencji</numerusform>
-        <numerusform>Nie udało się dezaktywować licencji</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Cannot connect to the License Server</source>
-      <translation>Nie można połączyć się z serwerem licencji</translation>
-    </message>
-    <message>
-      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Upewnij się, że serwer ma aktywne połączenie internetowe lub sprawdź ustawienia zapory.</translation>
-    </message>
-    <message>
-      <source>License Server error</source>
-      <translation>Błąd serwera licencji</translation>
-    </message>
-    <message>
-      <source>License deactivated</source>
-      <translation>Licencja dezaktywowana</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n zdezaktywowana licencja</numerusform>
-        <numerusform>%n zdezaktywowane licencje</numerusform>
-        <numerusform>%n zdezaktywowanych licencji</numerusform>
-        <numerusform>%n zdezaktywowanych licencji</numerusform>
       </translation>
     </message>
     <message>
@@ -3969,47 +4036,6 @@ to %1</source>
         <numerusform>%n kanałów.</numerusform>
         <numerusform>%n kanałów.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support.</source>
-      <translation>Skontaktuj się z działem obsługi klienta.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Dezaktywuj %n inny</numerusform>
-        <numerusform>Dezaktywuj %n inne</numerusform>
-        <numerusform>Dezaktywuj %n innych</numerusform>
-        <numerusform>Dezaktywuj %n innych</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid License Key</source>
-      <translation>Nieprawidłowy klucz licencyjny</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>Skontaktuj się z działem obsługi klienta, aby uzyskać prawidłowy klucz licencyjny.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>Skontaktuj się z działem obsługi klienta, aby ręcznie aktywować klucz licencyjny.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>Skontaktuj się z działem obsługi klienta, aby uzyskać prawidłowy klucz licencyjny.</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Jeśli problem nie ustąpi, skontaktuj się z działem obsługi klienta.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Ta licencja jest już aktywna dla ID sprzętu %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Ta licencja jest już aktywna dla ID sprzętu %1 na %2</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -8451,6 +8477,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Internal error</source>
       <translation>Błąd wewnętrzny</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
@@ -9296,6 +9326,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This OS version is no longer supported.</source>
       <translation>Ta wersja systemu operacyjnego nie jest już obsługiwana.</translation>
     </message>
+    <message>
+      <source>Update installation failed.</source>
+      <translation type="unfinished">Update installation failed.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
@@ -9961,6 +9995,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Przygotowujemy pliki do eksportu. Proszę zaczekać kilka sekund.</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>

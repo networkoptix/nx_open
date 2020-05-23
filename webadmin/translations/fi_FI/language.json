@@ -130,7 +130,8 @@
         "maxWebMTranscoders": "Palvelimen WEBM-yhteyksien enimmäismäärä. Chrome avaa 2 yhteyttä yhdellä kertaa ja sulkee sitten ensimmäisen. Niinpä on suositeltavaa asettaa arvo> = 2 tähän parametriin.",
         "maxEventLogRecords": "Tapahtumalokitietueiden maksimimäärä tietokannassa. Palautettujen tietueiden todellinen määrä voi olla jopa 20% korkeampi kuin määritetty arvo.",
         "forceLiveCacheForPrimaryStream": "Onko välimuistissa joitakin kuvia ensisijaiselle streamille. Arvot: \"kyllä\" - aina käytössä (voi käyttää paljon RAM-muistia), \"ei\" - aina pois käytöstä, paitsi jos toisto vaatii (esim. HLS), \"auto\" - samanlainen kuin \"ei\", mutta on päällä, kun se parantaa käyttökokemusta (esim. kun jokin Analytics-laajennus toimii kamerassa).",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected."
+        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
+        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
     },
     "info": {
         "tabs": {

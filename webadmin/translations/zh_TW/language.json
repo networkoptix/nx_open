@@ -130,7 +130,8 @@
         "maxWebMTranscoders": "伺服器最大的WEBM連線數。Chrome會立刻開啟2個連接，然後關閉第一個連接。因此建議將參數值設置為> = 2。",
         "maxEventLogRecords": "要保留最多筆在資料庫中的事件日誌記錄。實際未刪除記錄的數量可能比預定高出20％。",
         "forceLiveCacheForPrimaryStream": "是否為主串流緩存一些幀數。數值：“是” - 一直啟用（可能占用大量RAM），“否” - 一直停用，除非回放需要（例如HLS），“自動” - 類似於“否”，但會在開啟時改進使用者體驗（例如當某些分析插件在攝影機上作用時）。",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected."
+        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
+        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
     },
     "info": {
         "tabs": {

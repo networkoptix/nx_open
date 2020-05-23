@@ -1,8 +1,11 @@
 <uib-alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
-    <p><b>Bist du Entwickler? Gib uns dein Feedback!</b></p>
+    <p><b>Bist du Entwickler?</b></p>
     <p>Unser Entwicklerteam ist ständig an Feedback von Entwicklern interessiert, die Integrationen mit unseren SDK's und APIs erstellen.
-        Wenn Sie Vorschläge haben, wie Sie das Entwicklererlebnis verbessern können - oder einfach nur "Hallo" sagen möchten - füllen Sie bitte unser Feedbackformular aus!
+        If you have any suggestions on how to improve the developer experience - or just want to say hi to the team -
+        please join our developer forum! Or you can check out our online knowledge base to find more information,
+        best practices, and tips&tricks
     </p>
-    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Feedback hinterlassen</a></p>
+    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Developer forum</a></p>
+    <p class="text-right" ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Development knowledge base</a></p>
 </uib-alert>

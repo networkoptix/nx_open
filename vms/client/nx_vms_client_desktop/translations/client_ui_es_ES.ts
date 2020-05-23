@@ -2289,18 +2289,43 @@
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation>a</translation>
+      <source>To</source>
+      <translation type="unfinished">To</translation>
     </message>
     <message>
       <location/>
-      <source>Set Language</source>
-      <translation>Definir Idioma</translation>
+      <source>Language Settings</source>
+      <translation type="unfinished">Language Settings</translation>
     </message>
     <message>
       <location/>
-      <source>Add custom text:</source>
-      <translation>Añadir texto personalizado:</translation>
+      <source>Custom notification content</source>
+      <translation type="unfinished">Custom notification content</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Header</source>
+      <translation type="unfinished">Header</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default notification title will be used if left empty</source>
+      <translation type="unfinished">Default notification title will be used if left empty</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Body</source>
+      <translation type="unfinished">Body</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default text will be used if this field is empty</source>
+      <translation type="unfinished">Default text will be used if this field is empty</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Add source device name in body</source>
+      <translation type="unfinished">Add source device name in body</translation>
     </message>
   </context>
   <context>
@@ -3207,6 +3232,11 @@
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>¡ ADVERTENCIA! Esto hará que los ajustes de calidad y marco de velocidad (FPS) en el horario de grabación irrelevante.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Custom language for mobile notifications</source>
+      <translation type="unfinished">Custom language for mobile notifications</translation>
     </message>
   </context>
   <context>

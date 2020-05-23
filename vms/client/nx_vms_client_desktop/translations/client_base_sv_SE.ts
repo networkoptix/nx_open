@@ -1247,6 +1247,177 @@ om du vill visa fler bokmärken</translation>
     </message>
   </context>
   <context>
+    <name>LicenseActivationDialogs</name>
+    <message>
+      <source>Incompatible license</source>
+      <translation>Inkompatibel licens</translation>
+    </message>
+    <message>
+      <source>License you are trying to activate is incompatible with your software.</source>
+      <translation>Licensen du försöker aktivera är inkompatibel med din programvara.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact %1.</source>
+      <translation>Kontakta %1 för att rapportera ärendet.</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your regional support agent:</source>
+      <translation>För att rapportera problemet kontakta din regionala supportagent:</translation>
+    </message>
+    <message>
+      <source>Failed to activate license</source>
+      <translation>Misslyckades med att aktivera licens</translation>
+    </message>
+    <message>
+      <source>Invalid data received.</source>
+      <translation>Ogiltig data mottagen.</translation>
+    </message>
+    <message>
+      <source>Database error occurred.</source>
+      <translation>Ett databasfel har inträffat.</translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>Ogiltig licensnyckel</translation>
+    </message>
+    <message>
+      <source>Please make sure it is entered correctly.</source>
+      <translation>Se till att det har skrivits in korrekt.</translation>
+    </message>
+    <message>
+      <source>Invalid activation key file</source>
+      <translation>Ogiltig aktiverings fil</translation>
+    </message>
+    <message>
+      <source>Select a valid activation key file to continue.</source>
+      <translation>Välj en giltig aktiveringsnyckelfil för att fortsätta.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Denna licens är redan aktiverat och kopplade till maskinvaru-ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Licensen är redan aktiverad och kopplad till maskinvaru ID %1 på %2</translation>
+    </message>
+    <message>
+      <source>License already activated on another server</source>
+      <translation>Licensen är redan aktiverad på en annan server</translation>
+    </message>
+    <message>
+      <source>You already activated this license</source>
+      <translation>Du har redan aktiverat den här licensen</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact %1.</source>
+      <translation>För att aktivera licensnyckel manuellt kontakta %1.</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your regional support agent:</source>
+      <translation>För att aktivera licensnyckel manuellt kontakta din regionala supportagent:</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Nätverksfel</translation>
+    </message>
+    <message>
+      <source>License activated</source>
+      <translation>Licensen aktiverad</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseDeactivationDialogs</name>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation>
+        <numerusform>Misslyckades att avaktivera %n licenser</numerusform>
+        <numerusform>Misslyckades att avaktivera %n licenser</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation>
+        <numerusform>%1 av %n licenser kan inte avaktiveras</numerusform>
+        <numerusform>%1 av %n licenser kan inte avaktiveras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation>
+        <numerusform>Inaktivera %n Annan</numerusform>
+        <numerusform>Inaktivera %n Annan</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation>
+        <numerusform>Kan inte avaktivera licenser</numerusform>
+        <numerusform>Kan inte avaktivera licenser</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please try again later.</source>
+      <translation>Försök igen senare.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation>Kan inte ansluta till licensservern</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation>Se till att din server har aktiv Internetanslutning eller kontrollera brandväggsinställningar.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation>Licensserverfel</translation>
+    </message>
+    <message>
+      <source>Failed to remove license from Server</source>
+      <translation>Misslyckades med att ta bort licens från Server</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation>
+        <numerusform>%n licenser avaktiverade</numerusform>
+        <numerusform>%n licenser avaktiverade</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseManagementMessagesPrivate</name>
+    <message>
+      <source>To get a valid License Key please contact your regional support agent:</source>
+      <translation>För att få en giltig licensnyckel kontakta din regionala supportagent:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your regional support agent:</source>
+      <translation>Om problemet kvarstår, kontakta din regionala supportagent:</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n kanaler.</numerusform>
+        <numerusform>%n kanaler.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact your regional support agent:</source>
+      <translation>Kontakta din regionala supportagent:</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact %1.</source>
+      <translation>Kontakta %1 för att få en giltig licensnyckel.</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact %1.</source>
+      <translation>Om problemet kvarstår, kontakta %1.</translation>
+    </message>
+    <message>
+      <source>Please contact %1.</source>
+      <translation>Kontakta %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -3757,119 +3928,11 @@ till %1</translation>
       <source>Export licenses to a file</source>
       <translation>Exportera licenser till en fil</translation>
     </message>
-    <message>
-      <source>Copy To Clipboard</source>
-      <translation>Kopiera till urklipp</translation>
-    </message>
-    <message>
-      <source>Incompatible license</source>
-      <translation>Inkompatibel licens</translation>
-    </message>
-    <message>
-      <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>Licensen du försöker aktivera är inkompatibel med din programvara.</translation>
-    </message>
-    <message>
-      <source>You already activated this license</source>
-      <translation>Du har redan aktiverat den här licensen</translation>
-    </message>
-    <message>
-      <source>License activated</source>
-      <translation>Licensen aktiverad</translation>
-    </message>
-    <message>
-      <source>Failed to remove license from Server</source>
-      <translation>Misslyckades med att ta bort licens från Server</translation>
-    </message>
-    <message>
-      <source>Invalid activation key file</source>
-      <translation>Ogiltig aktiverings fil</translation>
-    </message>
-    <message>
-      <source>Select a valid activation key file to continue.</source>
-      <translation>Välj en giltig aktiveringsnyckelfil för att fortsätta.</translation>
-    </message>
-    <message>
-      <source>Database error occurred.</source>
-      <translation>Ett databasfel har inträffat.</translation>
-    </message>
-    <message>
-      <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation>Ogiltiga data mottagna. Kontakta kundsupport för att rapportera problemet.</translation>
-    </message>
-    <message>
-      <source>Failed to activate license</source>
-      <translation>Misslyckades med att aktivera licens</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Nätverksfel</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Om problemet kvarstår vänligen kontakta kundsupport.</translation>
-    </message>
-    <message>
-      <source>License already activated on another server</source>
-      <translation>Licensen är redan aktiverad på en annan server</translation>
-    </message>
-    <message>
-      <source>Please make sure it is entered correctly.</source>
-      <translation>Se till att det har skrivits in korrekt.</translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
         <numerusform>Avaktivera licenser?</numerusform>
         <numerusform>Avaktivera licenser?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to deactivate license</source>
-      <translation>Misslyckades att avaktivera licens</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>Misslyckades att avaktivera %n licenser</numerusform>
-        <numerusform>Misslyckades att avaktivera %n licenser</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%1 av %n licenser kan inte avaktiveras</numerusform>
-        <numerusform>%1 av %n licenser kan inte avaktiveras</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Kan inte avaktivera licenser</numerusform>
-        <numerusform>Kan inte avaktivera licenser</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Cannot connect to the License Server</source>
-      <translation>Kan inte ansluta till licensservern</translation>
-    </message>
-    <message>
-      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Se till att din server har aktiv Internetanslutning eller kontrollera brandväggsinställningar.</translation>
-    </message>
-    <message>
-      <source>License Server error</source>
-      <translation>Licensserverfel</translation>
-    </message>
-    <message>
-      <source>License deactivated</source>
-      <translation>Licens avaktiverad</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n licenser avaktiverade</numerusform>
-        <numerusform>%n licenser avaktiverade</numerusform>
       </translation>
     </message>
     <message>
@@ -3886,45 +3949,6 @@ till %1</translation>
         <numerusform>%n kanaler.</numerusform>
         <numerusform>%n kanaler.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support.</source>
-      <translation>Var vänlig kontakta support.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Inaktivera %n Annan</numerusform>
-        <numerusform>Inaktivera %n Annan</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid License Key</source>
-      <translation>Ogiltig licensnyckel</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>Vänligen kontakta kundsupport för att få en giltig licensnyckel.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>Vänligen kontakta kundsupport för att aktivera licensnyckel manuellt.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>Vänligen kontakta kundsupport för att få en giltig licensnyckel.</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Om problemet kvarstår vänligen kontakta kundsupport.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Denna licens är redan aktiverat och kopplade till maskinvaru-ID %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Licensen är redan aktiverad och kopplad till maskinvaru ID %1 på %2</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -8227,6 +8251,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Internal error</source>
       <translation>Internt fel</translation>
     </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Omkodning av video krävs.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
@@ -9064,6 +9092,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>This OS version is no longer supported.</source>
       <translation>Den här OS-versionen stöds inte längre.</translation>
     </message>
+    <message>
+      <source>Update installation failed.</source>
+      <translation>Installationen av uppdateringen misslyckades.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
@@ -9715,6 +9747,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Vi förbereder filer för exportprocessen. Vänta några sekunder.</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation>Omkodning krävs. Exportera sessionen startas om.</translation>
     </message>
   </context>
   <context>
