@@ -55,4 +55,10 @@ qint64 StorageResource::nxOccupedSpace() const
         m_serverModule->fileDeletor()->postponedFileSize(getId());
 }
 
+bool StorageResource::removeFile(const QString& url)
+{
+    m_metrics->deletetions++;
+    return doRemoveFile(url);
+}
+
 } // namespace nx::vms::server

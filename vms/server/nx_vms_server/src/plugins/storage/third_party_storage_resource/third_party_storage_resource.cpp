@@ -293,7 +293,7 @@ Qn::StorageInitResult QnThirdPartyStorageResource::initOrUpdate()
     return m_storage->isAvailable() ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
 }
 
-bool QnThirdPartyStorageResource::removeFile(const QString& url)
+bool QnThirdPartyStorageResource::doRemoveFile(const QString& url)
 {
     if (!m_valid)
         return false;

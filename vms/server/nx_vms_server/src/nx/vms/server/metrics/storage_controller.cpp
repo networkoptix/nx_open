@@ -145,6 +145,10 @@ static auto activityGroupProvider()
             utils::metrics::makeLocalValueProvider<Resource>(
                 "transactionsPerSecond",
                 [](const auto& r) { return transactionsPerSecond(r); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "fileDeletions",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::deletetions); }
             )
         );
 }

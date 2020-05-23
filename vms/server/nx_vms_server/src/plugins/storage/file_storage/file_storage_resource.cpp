@@ -731,7 +731,7 @@ QString QnFileStorageResource::tempFolderName()
     return nx::utils::AppInfo::brand() + "_temp_folder_";
 }
 
-bool QnFileStorageResource::removeFile(const QString& url)
+bool QnFileStorageResource::doRemoveFile(const QString& url)
 {
     if (!isValid())
         return false;

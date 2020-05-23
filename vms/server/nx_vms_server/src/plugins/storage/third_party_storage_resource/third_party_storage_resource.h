@@ -35,7 +35,6 @@ public: // Inherited interface overrides.
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace()const override;
     virtual Qn::StorageInitResult initOrUpdate() override;
-    virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool isFileExists(const QString& url) override;
@@ -52,4 +51,6 @@ private:
     mutable QnMutex m_mutex;
     bool m_valid;
     const nx::vms::server::Settings* m_settings = nullptr;
+
+    virtual bool doRemoveFile(const QString& url) override;
 };
