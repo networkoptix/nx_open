@@ -78,8 +78,14 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     indicatorDelegate->setCustomPaint(
         [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
         {
-            option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
-                &option, painter, option.widget);
+            // TreeView item background drawing looks a bit complex.
+            // At first, TreeView itself draws row background, then selected items draw selection.
+            // When the widget is disabled, selection should not be drawn.
+            if (option.state.testFlag(QStyle::State_Enabled))
+            {
+                option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
+                    &option, painter, option.widget);
+            }
             QnScopedPainterOpacityRollback opacityRollback(painter);
             const bool selected = option.state.testFlag(QStyle::State_Selected);
             if (selected)
