@@ -2290,7 +2290,7 @@
     <message>
       <location/>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>A</translation>
     </message>
     <message>
       <location/>

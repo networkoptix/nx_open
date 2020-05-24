@@ -1257,11 +1257,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>Para informar el problema, comuníquese con %1.</translation>
     </message>
     <message>
       <source>To report the issue please contact your regional support agent:</source>
-      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+      <translation>Para informar el problema, comuníquese con su agente de soporte regional:</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1269,7 +1269,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Datos recibidos no válidos.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1309,11 +1309,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>Para activar la clave de licencia manualmente, comuníquese con %1.</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+      <translation>Para activar la clave de licencia manualmente, comuníquese con su agente de soporte regional:</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1356,7 +1356,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Por favor, inténtelo de nuevo más tarde.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1386,11 +1386,11 @@ to view more bookmarks</source>
     <name>LicenseManagementMessagesPrivate</name>
     <message>
       <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+      <translation>Para obtener una clave de licencia válida, comuníquese con su agente de soporte regional:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your regional support agent:</source>
-      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+      <translation>Si el problema persiste, comuníquese con su agente de soporte regional:</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
@@ -1401,19 +1401,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please contact your regional support agent:</source>
-      <translation type="unfinished">Please contact your regional support agent:</translation>
+      <translation>Póngase en contacto con su agente de soporte regional:</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Para obtener una clave de licencia válida, comuníquese con %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Si el problema persiste, comuníquese con %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Por favor, póngase en contacto con %1.</translation>
     </message>
   </context>
   <context>
@@ -8250,7 +8250,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Se requiere transcodificación de video.</translation>
     </message>
   </context>
   <context>
@@ -9091,7 +9091,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>La instalación de la actualización ha fallado.</translation>
     </message>
   </context>
   <context>
@@ -9747,7 +9747,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>Se requiere transcodificación. Sesión de exportación reiniciada.</translation>
     </message>
   </context>
   <context>

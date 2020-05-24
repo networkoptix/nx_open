@@ -988,11 +988,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>Kết nối với máy chủ này</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Ghim</translation>
     </message>
   </context>
   <context>
@@ -1255,11 +1255,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>Để báo cáo vấn đề xin vui lòng liên hệ %1.</translation>
     </message>
     <message>
       <source>To report the issue please contact your regional support agent:</source>
-      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+      <translation>Để báo cáo vấn đề xin vui lòng liên hệ với đại lý hỗ trợ khu vực của bạn:</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1267,7 +1267,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Dữ liệu không hợp lệ nhận được.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1307,11 +1307,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>Để kích hoạt Khóa cấp phép theo cách thủ công, vui lòng liên hệ %1.</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+      <translation>Để kích hoạt Khóa cấp phép theo cách thủ công, vui lòng liên hệ với đại lý hỗ trợ khu vực của bạn:</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1350,7 +1350,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1379,11 +1379,11 @@ to view more bookmarks</source>
     <name>LicenseManagementMessagesPrivate</name>
     <message>
       <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+      <translation>Để có được Giấy phép khóa hợp lệ, vui lòng liên hệ với đại lý hỗ trợ khu vực của bạn:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your regional support agent:</source>
-      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+      <translation>Nếu vấn đề vẫn còn, vui lòng liên hệ với đại lý hỗ trợ khu vực của bạn:</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
@@ -1393,19 +1393,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please contact your regional support agent:</source>
-      <translation type="unfinished">Please contact your regional support agent:</translation>
+      <translation>Vui lòng liên hệ với đại lý hỗ trợ khu vực của bạn:</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Để có được Mã bản quyền hợp lệ, vui lòng liên hệ %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Nếu vấn đề vẫn còn, vui lòng liên hệ %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Vui lòng liên hệ %1.</translation>
     </message>
   </context>
   <context>
@@ -1653,7 +1653,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional support</source>
-      <translation type="unfinished">Regional support</translation>
+      <translation>Hỗ trợ khu vực</translation>
     </message>
   </context>
   <context>
@@ -1718,7 +1718,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Cảnh báo! Đây là một tùy chọn thử nghiệm giúp tiết kiệm CPU nhưng có thể ảnh hưởng đến hoạt hình.</translation>
     </message>
   </context>
   <context>
@@ -2226,33 +2226,33 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Máy chủ nguồn</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Camera nguồn</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Nguồn và %n máy ảnh khác</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Chọn ít nhất một thiết bị</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Chọn ít nhất một Camera</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Chọn máy chủ</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Máy chủ nguồn và %1</translation>
     </message>
   </context>
   <context>
@@ -2382,7 +2382,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>Máy chủ hỗ trợ buzzer</translation>
     </message>
   </context>
   <context>
@@ -2791,7 +2791,7 @@ to %1</source>
     <message>
       <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
       <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
+      <translation>%1 trên %2 người dùng được chọn không phải là %3 người dùng và sẽ không nhận được thông báo di động.</translation>
     </message>
   </context>
   <context>
@@ -3428,7 +3428,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Máy chủ hỗ trợ chẩn đoán quạt</translation>
     </message>
   </context>
   <context>
@@ -3761,27 +3761,27 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Chung</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Đặc trưng</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Màn hình được phép</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Kiểm soát phiên được phép</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Lưu trữ luồng được phép</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Vô hiệu hóa còn lại</translation>
     </message>
   </context>
   <context>
@@ -3915,8 +3915,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>%n hủy kích hoạt còn lại.</numerusform>
       </translation>
     </message>
   </context>
@@ -3940,16 +3940,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Để có được tệp Khóa kích hoạt, vui lòng gửi Mã bản quyền và ID phần cứng được cung cấp về %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+      <translation>Vui lòng gửi Mã bản quyền và ID phần cứng được cung cấp cho bộ phận hỗ trợ khu vực của bạn để có được tệp Khóa kích hoạt.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
+      <translation>Vui lòng gửi Mã bản quyền và ID phần cứng được cung cấp tới bộ phận hỗ trợ khu vực của bạn (%1) để có được tệp Khóa kích hoạt.</translation>
     </message>
   </context>
   <context>
@@ -4502,7 +4502,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Máy chủ hỗ trợ giám sát PoE</translation>
     </message>
   </context>
   <context>
@@ -5719,7 +5719,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>Máy chủ không khả dụng.</translation>
     </message>
     <message>
       <source>now</source>
@@ -6591,7 +6591,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>Không thể kết nối với máy chủ được chọn</translation>
     </message>
   </context>
   <context>
@@ -6855,7 +6855,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Kích hoạt Giấy phép...</translation>
     </message>
   </context>
   <context>
@@ -7450,8 +7450,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n giá trị</numerusform>
       </translation>
     </message>
   </context>
@@ -8131,7 +8131,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Yêu cầu chuyển mã video.</translation>
     </message>
   </context>
   <context>
@@ -8336,11 +8336,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>Proxy %1 yêu cầu tên người dùng và mật khẩu.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Chọn thư mục để tải lên</translation>
     </message>
   </context>
   <context>
@@ -8434,7 +8434,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>ID này đã được sử dụng trong Hệ thống. Sử dụng nút Tạo để tìm ID miễn phí.</translation>
     </message>
   </context>
   <context>
@@ -8865,7 +8865,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>Đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -8968,36 +8968,36 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>Cập nhật cài đặt thất bại.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>Ngắt kết nối</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>Đã kết nối</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>Cung cấp</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>Bất ngờ</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>Trống</translation>
     </message>
     <message>
       <source>&lt; Unknown device %1 &gt;</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">&lt; Unknown device %1 &gt;</translation>
+      <translation>&lt; Thiết bị không xác định %1 &gt;</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9009,7 +9009,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Tiêu dùng</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9017,11 +9017,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>Quyền lực</translation>
     </message>
     <message>
       <source>&lt; Unknown device &gt;</source>
-      <translation type="unfinished">&lt; Unknown device &gt;</translation>
+      <translation>&lt; Thiết bị không xác định &gt;</translation>
     </message>
   </context>
   <context>
@@ -9040,12 +9040,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>Hệ thống không được kết nối với %1. Thông báo di động chỉ hoạt động khi hệ thống được kết nối với %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 Cài đặt</translation>
     </message>
   </context>
   <context>
@@ -9179,7 +9179,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>Chỉ lưu lượng video máy khách-máy chủ có thể được mã hóa</translation>
     </message>
   </context>
   <context>
@@ -9192,7 +9192,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>Không có máy chủ tương thích</translation>
     </message>
   </context>
   <context>
@@ -9617,7 +9617,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>Chuyển mã là bắt buộc. Phiên xuất lại được khởi động lại.</translation>
     </message>
   </context>
   <context>
@@ -9824,12 +9824,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Vui lòng hoàn thành các bước sau để hủy kích hoạt giấy phép</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Lưu ý rằng mỗi khóa giấy phép có thể bị vô hiệu hóa tối đa %n lần.</numerusform>
       </translation>
     </message>
   </context>

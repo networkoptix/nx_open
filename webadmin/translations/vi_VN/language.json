@@ -77,8 +77,8 @@
         "emailSignature": "Chữ ký email",
         "emailSupportEmail": "Hỗ trợ Email",
         "enableEdgeRecording": "Cho phép ghi âm",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "Cho phép WEB sockets",
+        "maxP2pAllClientsSizeBytes": "Kích thước bộ đệm tối đa để gửi dữ liệu p2p cho tất cả khách hàng",
         "eventLogPeriodDays": "Chu kỳ đăng nhập sự kiện (ngày)",
         "ldapAdminDn": "LDAP quản trị DN",
         "ldapSearchBase": "Cơ sở tìm kiếm LDAP",
@@ -87,7 +87,7 @@
         "localSystemId": "ID hệ thống cục bộ",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Tối đa khác biệt giữa thời gian đồng bộ và Internet (mili giây)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Tối đa khác biệt giữa thời gian đồng bộ và Internet (mili giây)",
-        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
+        "maxP2pQueueSizeBytes": "Kích thước hàng đợi P2P tối đa (byte)",
         "maxRecordQueueSizeBytes": "Kích thước hàng đợi của bản ghi tối đa (byte)",
         "maxRecordQueueSizeElements": "Kích thước hàng đợi của bản ghi tối đa (byte)",
         "maxRemoteArchiveSynchronizationThreads": "Tệp đồng bộ hoá lưu trữ từ xa tối đa",
@@ -116,8 +116,8 @@
         "timeSynchronizationEnabled": "Đồng bộ hóa thời gian kích hoạt",
         "primaryTimeServer": "Máy chủ đồng bộ hóa thời gian chính",
         "osTimeChangeCheckPeriodMs": "Thời gian kiểm tra thay đổi thời gian của hệ điều hành",
-        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
-        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
+        "syncTimeExchangePeriod": "Đồng bộ hóa khoảng thời gian đồng bộ hóa cho các yêu cầu mạng",
+        "syncTimeEpsilon": "Đồng bộ hóa thời gian epsilon. Giá trị mới không được áp dụng nếu thời gian delta nhỏ hơn epsilon",
         "maxWearableArchiveSynchronizationThreads": "Chủ đề đồng bộ hóa máy ảnh có thể đeo tối đa",
         "updateNotificationsEnabled": "Đã bật thông báo cập nhật",
         "upnpPortMappingEnabled": "Ánh xạ cổng UPNP được kích hoạt",
@@ -130,12 +130,12 @@
         "maxWebMTranscoders": "Số lượng kết nối WEBM tối đa cho máy chủ. Chrome mở 2 kết nối cùng một lúc, sau đó đóng kết nối đầu tiên. Vì vậy, nên đặt giá trị> = 2 cho tham số này.",
         "maxEventLogRecords": "Bản ghi nhật ký sự kiện tối đa để giữ vào cơ sở dữ liệu. Số lượng thực của các bản ghi chưa được xóa có thể cao hơn tới 20% so với giá trị được chỉ định.",
         "forceLiveCacheForPrimaryStream": "Có nên lưu trữ một số khung cho luồng chính. Giá trị: \"có\" - luôn được bật (có thể sử dụng nhiều RAM), \"không\" - luôn bị tắt trừ khi được yêu cầu phát lại (ví dụ: HLS), \"tự động\" - tương tự như \"không\", nhưng được bật khi cải thiện trải nghiệm người dùng (ví dụ: khi một số plugin Analytics hoạt động trên máy ảnh).",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "additionalLocalFsTypes": "Các loại hệ thống tệp bổ sung cần xem xét trong khi quyết định xem một phân vùng nhất định có phù hợp để lưu trữ máy chủ hay không. Danh sách tên hệ thống tệp được phân tách bằng dấu phẩy khi chúng được liệt kê trong / Proc / mounts được mong đợi.",
+        "rtspBufferSizeKb": "Kích thước bộ đệm RTSP phía máy chủ tính bằng KB. Giá trị lớn hơn cho phép sử dụng internet hiệu quả hơn với giá trị trễ chuyến đi khứ hồi cao nhưng làm chậm quá trình chuyển đổi chất lượng tự động và phản ứng với hoạt động tìm kiếm RTSP."
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "Đồ thị",
             "storage": "Lưu trữ",
             "log": "Bản ghi"
         }
