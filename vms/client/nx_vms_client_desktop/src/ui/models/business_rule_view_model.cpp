@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource/resource_display_info.h>
 
 // TODO: #vkutin Move these to proper locations and namespaces
@@ -1253,6 +1254,27 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         && !url.isEmpty()
                         && (url.scheme().isEmpty() || nx::network::http::isUrlSheme(url.scheme()))
                         && !url.host().isEmpty();
+                }
+                case ActionType::openLayoutAction:
+                {
+                    const auto layout = resourcePool()->getResourceById<QnLayoutResource>(
+                        m_actionParams.actionResourceId);
+
+                    if (!layout)
+                        return false;
+
+                    if (m_actionParams.allUsers)
+                        return true;
+
+                    QnLayoutAccessValidationPolicy layoutAccessPolicy(commonModule());
+                    layoutAccessPolicy.setLayout(layout);
+
+                    // TODO: use iterator-based constructor after update to Qt 5.14.
+                    QSet<QnUuid> subjects;
+                    for (const auto& v: m_actionParams.additionalResources)
+                        subjects << v;
+
+                    return layoutAccessPolicy.validity(m_actionParams.allUsers, subjects) != QValidator::Invalid;
                 }
                 case ActionType::buzzerAction:
                 {

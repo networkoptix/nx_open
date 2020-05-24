@@ -777,10 +777,24 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& rol
         if (m_layout->isShared())
         {
             // Shared layout. Ask AccessManager for details.
-            return m_accessManager->hasPermission(
-                m_rolesManager->userRole(roleId), m_layout, Qn::ReadPermission)
-                    ? QValidator::Acceptable
-                    : QValidator::Invalid;
+            if (m_accessManager->hasPermission(
+                m_rolesManager->userRole(roleId), m_layout, Qn::ReadPermission))
+            {
+                return QValidator::Acceptable;
+            }
+
+            auto usersInRole = commonModule()->resourceAccessSubjectsCache()->usersInRole(roleId);
+            if (std::any_of(usersInRole.begin(), usersInRole.end(),
+                [this](const auto& subject)
+                {
+                    const auto& user = resourcePool()->getResourceById<QnUserResource>(subject.id());
+                    return user->isEnabled() && userValidity(user);
+                }))
+            {
+                return QValidator::Intermediate;
+            }
+
+            return QValidator::Invalid;
         }
         else
         {
