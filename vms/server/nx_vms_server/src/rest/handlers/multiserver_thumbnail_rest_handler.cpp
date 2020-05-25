@@ -27,10 +27,23 @@
 #include <nx/utils/scope_guard.h>
 #include <media_server/media_server_module.h>
 #include <nx/metrics/metrics_storage.h>
+#include <nx/utils/switch.h>
 
 namespace {
 
 static QString urlPath;
+
+using namespace nx::api;
+
+static QByteArray toMimeSubtype(ImageRequest::ThumbnailFormat format, AVPixelFormat pixelFormat)
+{
+    return nx::utils::switch_(format,
+        ImageRequest::ThumbnailFormat::jpg, [] { return "jpg"; },
+        ImageRequest::ThumbnailFormat::tif, [] { return "tiff"; },
+        ImageRequest::ThumbnailFormat::png, [] { return "png"; },
+        ImageRequest::ThumbnailFormat::raw, [&] { return toString(pixelFormat).toUtf8(); }
+    );
+}
 
 } // namespace
 
@@ -172,45 +185,44 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal(
     if(frameTimestampUsec)
         *frameTimestampUsec = static_cast<qint64>(outFrame.data()->pkt_dts);
 
-    QByteArray imageFormat = QnLexical::serialized<nx::api::CameraImageRequest::ThumbnailFormat>(
-        request.request.imageFormat).toUtf8();
+    const QByteArray mimeSubtype =
+        toMimeSubtype(request.request.imageFormat, (AVPixelFormat) outFrame->format);
 
     if (request.request.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::jpg)
     {
         serverModule()->commonModule()->metrics()->thumbnails()++;
-        QByteArray encodedData = helper.encodeImage(outFrame, imageFormat);
+        QByteArray encodedData = helper.encodeImage(outFrame, mimeSubtype);
         result.append(encodedData);
     }
     else if (request.request.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::raw)
     {
-        NX_ASSERT(false, "Method is not implemented");
-        // TODO: #rvasilenko implement me!!!
+        result = outFrame->rawData();
     }
     else
     {
         // Prepare image using Qt.
         QImage image = outFrame->toImage();
         QBuffer output(&result);
-        image.save(&output, imageFormat);
+        image.save(&output, mimeSubtype);
     }
 
     if (result.isEmpty())
     {
         NX_WARNING(this, lm("Can't encode image to '%1' format. Image size: %2x%3")
-            .arg(QString::fromUtf8(imageFormat))
+            .arg(QString::fromUtf8(mimeSubtype))
             .arg(outFrame->width)
             .arg(outFrame->height));
 
         return makeError(
             nx::network::http::StatusCode::unsupportedMediaType
-            , lit("Unsupported image format '%1'").arg(QString::fromUtf8(imageFormat))
+            , lit("Unsupported image format '%1'").arg(QString::fromUtf8(mimeSubtype))
             , &result
             , &contentType
             , request.format
             , request.extraFormatting);
     }
 
-    contentType = QByteArray("image/") + imageFormat;
+    contentType = QByteArray("image/") + mimeSubtype;
     return nx::network::http::StatusCode::ok;
 }
 

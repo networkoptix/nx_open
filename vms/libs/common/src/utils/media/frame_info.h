@@ -203,6 +203,12 @@ public:
 
     static AVPixelFormat fixDeprecatedPixelFormat(AVPixelFormat original);
 
+    /**
+     * Return raw data of the image data.
+     * @return All planes without padding.
+     */
+    QByteArray rawData() const;
+
 public:
     QSharedPointer<QnAbstractPictureDataRef> picData;
 

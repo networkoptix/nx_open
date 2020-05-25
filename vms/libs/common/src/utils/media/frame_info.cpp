@@ -400,6 +400,32 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
         data, linesize, AV_PIX_FMT_YUV420P, /*logTag*/ this);
 }
 
+QByteArray CLVideoDecoderOutput::rawData() const
+{
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
+    if (!descr)
+    {
+        NX_WARNING(this, NX_FMT("Failed to get raw data, invalid pixel format: %1", format));
+        return QByteArray();
+    }
+
+    QByteArray result;
+    for (int i = 0; i < descr->nb_components && data[i]; ++i)
+    {
+        int h = height;
+        int w = width;
+        if (i > 0) 
+        {
+            h >>= descr->log2_chroma_h;
+            w >>= descr->log2_chroma_w;
+        }
+        result.resize(result.size() + h * w);
+        quint8* dst = (quint8*) result.data() + result.size() - h * w;
+        copyPlane(dst, data[i], w, /*dstStride*/ w, linesize[i], h);
+    }
+    return result;
+}
+
 QImage CLVideoDecoderOutput::toImage() const
 {
     // TODO: Investigate if the below mentioned bug is still present.
