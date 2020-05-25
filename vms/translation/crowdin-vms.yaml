@@ -33,6 +33,10 @@ files:
     source:      '/vms/client/nx_vms_client_desktop/translations/client_ui_en_US.ts'
     translation: '/vms/client/nx_vms_client_desktop/translations/client_ui_%locale_with_underscore%.ts'
   -
+    dest: '/Client/qtwebengine.ts'
+    source:      '/vms/client/nx_vms_client_desktop/translations/qtwebengine_en_US.ts'
+    translation: '/vms/client/nx_vms_client_desktop/translations/qtwebengine_%locale_with_underscore%.ts'
+  -
     dest: '/Installer/OptixTheme.wxl'
     source:      '/vms/distribution/wix/translations/strings_en_US.wxl'
     translation: '/vms/distribution/wix/translations/strings_%locale_with_underscore%.wxl'
