@@ -3,7 +3,7 @@
 COMPANY_NAME="@customization.companyId@"
 TARGET_DEVICE="@targetDevice@"
 
-VMS_DIR=$(dirname $(dirname "${BASH_SOURCE[0]}"))
+VMS_DIR=$(dirname $(dirname $(readlink -m "${BASH_SOURCE[0]}")))
 
 EXE="$VMS_DIR/bin/mediaserver-bin"
 ARGS="-e"
