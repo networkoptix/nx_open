@@ -157,7 +157,7 @@ void UncompressedVideoFrame::acceptAvFrame(const AVFrame* avFrame)
 
         int planeHeight = avFrame->height;
         if (QnFfmpegHelper::isChromaPlane(plane, m_avPixFmtDescriptor))
-            planeHeight >>= avPixFmtDescriptor->log2_chroma_h;
+            planeHeight >>= m_avPixFmtDescriptor->log2_chroma_h;
         m_dataSize[plane] = avFrame->linesize[plane] * planeHeight;
     }
 

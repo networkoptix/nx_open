@@ -138,8 +138,8 @@ void CLVideoDecoderOutput::copyDataOnlyFrom(const AVFrame* src)
     if (data[0] == nullptr || src->width != width || src->height != height || dstFormat != format)
         reallocate(src->width, src->height, dstFormat);
 
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get(dstFormat);
-    if (!descr)
+    const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get(dstFormat);
+    if (!descriptor)
     {
         NX_ERROR(this, lm("Failed to copy frame, invalid pixel format: %1").arg(dstFormat));
         return;
@@ -148,10 +148,10 @@ void CLVideoDecoderOutput::copyDataOnlyFrom(const AVFrame* src)
     {
         int h = src->height;
         int w = src->width;
-        if (QnFfmpegHelper::isChromaPlane(i, descr))
+        if (QnFfmpegHelper::isChromaPlane(i, descriptor))
         {
-            h >>= descr->log2_chroma_h;
-            w >>= descr->log2_chroma_w;
+            h >>= descriptor->log2_chroma_h;
+            w >>= descriptor->log2_chroma_w;
         }
         copyPlane(data[i], src->data[i], w, linesize[i], src->linesize[i], h);
     }
@@ -179,15 +179,15 @@ void CLVideoDecoderOutput::fillRightEdge()
 {
     if (format == -1)
         return;
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
-    if (descr == nullptr)
+    const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat) format);
+    if (descriptor == nullptr)
         return;
     quint32 filler = 0;
     int w = width;
     int h = height;
     for (int i = 0; i < AV_NUM_DATA_POINTERS && data[i]; ++i)
     {
-        int bpp = descr->comp[i].step;
+        int bpp = descriptor->comp[i].step;
         int fillLen = linesize[i] - w*bpp;
         if (fillLen >= 4)
         {
@@ -201,8 +201,8 @@ void CLVideoDecoderOutput::fillRightEdge()
         if (i == 0)
         {
             filler = 0x80808080;
-            w >>= descr->log2_chroma_w;
-            h >>= descr->log2_chroma_h;
+            w >>= descriptor->log2_chroma_w;
+            h >>= descriptor->log2_chroma_h;
         }
     }
 }
@@ -220,15 +220,15 @@ AVPixelFormat CLVideoDecoderOutput::fixDeprecatedPixelFormat(AVPixelFormat origi
 
 void CLVideoDecoderOutput::memZero()
 {
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
+    const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat) format);
     for (int i = 0; i < AV_NUM_DATA_POINTERS && data[i]; ++i)
     {
         int w = linesize[i];
         int h = height;
-        if (QnFfmpegHelper::isChromaPlane(i, descr))
-            h >>= descr->log2_chroma_h;
+        if (QnFfmpegHelper::isChromaPlane(i, descriptor))
+            h >>= descriptor->log2_chroma_h;
 
-        int bpp = descr->comp[i].step;
+        int bpp = descriptor->comp[i].step;
         int fillLen = h*w*bpp;
         memset(data[i], i == 0 ? 0 : 0x80, fillLen);
     }
@@ -403,8 +403,8 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 
 QByteArray CLVideoDecoderOutput::rawData() const
 {
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
-    if (!descr)
+    const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat) format);
+    if (!descriptor)
     {
         NX_WARNING(this, NX_FMT("Failed to get raw data, invalid pixel format: %1", format));
         return QByteArray();
@@ -415,10 +415,10 @@ QByteArray CLVideoDecoderOutput::rawData() const
     {
         int h = height;
         int w = width;
-        if (QnFfmpegHelper::isChromaPlane(plane, descr))
+        if (QnFfmpegHelper::isChromaPlane(plane, descriptor))
         {
-            h >>= descr->log2_chroma_h;
-            w >>= descr->log2_chroma_w;
+            h >>= descriptor->log2_chroma_h;
+            w >>= descriptor->log2_chroma_w;
         }
         result.resize(result.size() + h * w);
         quint8* dst = (quint8*) result.data() + result.size() - h * w;
@@ -605,14 +605,14 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle) const
     dstPict->reallocate(dstWidth, dstHeight, format);
     dstPict->assignMiscData(this);
 
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
+    const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat) format);
     for (int i = 0; i < AV_NUM_DATA_POINTERS && data[i]; ++i)
     {
         int filler = (i == 0 ? 0x0 : 0x80);
         int numButes = dstPict->linesize[i] * dstHeight;
-        const bool isChromaPlane = QnFfmpegHelper::isChromaPlane(i, descr);
+        const bool isChromaPlane = QnFfmpegHelper::isChromaPlane(i, descriptor);
         if (isChromaPlane)
-            numButes >>= descr->log2_chroma_h;
+            numButes >>= descriptor->log2_chroma_h;
         memset(dstPict->data[i], filler, numButes);
 
         int w = width;
@@ -620,8 +620,8 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle) const
 
         if (isChromaPlane && !transposeChroma) 
         {
-            w >>= descr->log2_chroma_w;
-            h >>= descr->log2_chroma_h;
+            w >>= descriptor->log2_chroma_w;
+            h >>= descriptor->log2_chroma_h;
         }
 
         if (angle == 90)
