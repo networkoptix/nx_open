@@ -205,7 +205,18 @@ void DeviceAgent::setSupportedEventCategoties()
 {
     const auto response = new nx::sdk::SettingsResponse();
 
-    m_settingsProcessor.writeSettingsToServer(response);
+    {
+        // This is legal and this function should never have been const anyway.
+        auto& self = *const_cast<DeviceAgent*>(this);
+
+        // This is a temporary workaround until the server is fixed to not call this function
+        // concurrently.
+        std::lock_guard lockGuard(self.m_settingsMutex);
+
+        self.m_settingsProcessor.loadAndHoldSettingsFromDevice();
+
+        m_settingsProcessor.writeSettingsToServer(response);
+    }
 
     *outResult = response;
 }

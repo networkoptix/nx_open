@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <mutex>
 #include <string_view>
 
 #include <QtCore/QString>
@@ -88,6 +89,7 @@ private:
     FrameSize m_frameSize;
     Settings m_settings;
     SettingsProcessor m_settingsProcessor;
+    std::mutex m_settingsMutex;
     bool m_serverHasSentInitialSettings = false;
 
     ObjectMetadataXmlParser m_objectMetadataXmlParser;
