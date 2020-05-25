@@ -162,6 +162,7 @@ QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
     translationManager->addPrefix("client_ui");
     translationManager->addPrefix("client_core");
     translationManager->addPrefix("client_qml");
+    translationManager->addPrefix("qtwebengine");
 
     QnTranslation translation;
     if (translation.isEmpty()) /* By path. */
