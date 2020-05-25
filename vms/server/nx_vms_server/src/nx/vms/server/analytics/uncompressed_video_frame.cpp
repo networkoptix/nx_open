@@ -4,6 +4,7 @@
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/conversion_utils.h>
 #include <nx/vms/server/analytics/motion_metadata_packet.h>
+#include <utils/media/ffmpeg_helper.h>
 
 namespace nx::vms::server::analytics {
 
@@ -111,26 +112,6 @@ static int deducePlaneCount(
 }
 
 /**
- * Ffmpeg does not store the number of lines per plane in a frame explicitly, thus, deducing it.
- */
-static int deducePlaneLineCount(
-    int plane, const AVPixFmtDescriptor* avPixFmtDescriptor, const AVFrame* avFrame)
-{
-    // See the doc for AVComponentDescriptor (AVPixFmtDescriptor::comp).
-
-    if (avPixFmtDescriptor->nb_components >= 3
-        && !(avFrame->flags & AV_PIX_FMT_FLAG_RGB))
-	{
-        // Plane 0 is luma, planes 1 and 2 are chroma.
-        if (plane == 1 || plane == 2) //< A chroma plane, can have a reduced vertical resolution.
-            return avFrame->height >> avPixFmtDescriptor->log2_chroma_h;
-	}
-
-    // The plane is non-chroma (presumably, Y, RGB or A) - the plane's height equals the frame's.
-	return avFrame->height;
-}
-
-/**
  * Called at the end of constructors. Assigns m_avFrame with avFrame on success.
  */
 void UncompressedVideoFrame::acceptAvFrame(const AVFrame* avFrame)
@@ -174,8 +155,10 @@ void UncompressedVideoFrame::acceptAvFrame(const AVFrame* avFrame)
             return;
         }
 
-        m_dataSize[plane] = avFrame->linesize[plane]
-            * deducePlaneLineCount(plane, m_avPixFmtDescriptor, avFrame);
+        int planeHeight = avFrame->height;
+        if (QnFfmpegHelper::isChromaPlane(plane, m_avPixFmtDescriptor))
+            planeHeight >>= avPixFmtDescriptor->log2_chroma_h;
+        m_dataSize[plane] = avFrame->linesize[plane] * planeHeight;
     }
 
     m_avFrame = avFrame;

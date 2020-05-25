@@ -89,6 +89,10 @@ public:
 
     static int getDefaultFrameSize(AVCodecContext* context);
 
+    /**
+     * @return true if plane is a chroma plane.
+     */
+    static bool isChromaPlane(int plane, const AVPixFmtDescriptor* avPixFmtDescriptor);
 private:
     static void copyMediaContextFieldsToAvCodecContext(
         AVCodecContext* av, const QnConstMediaContextPtr& media);

@@ -36,6 +36,22 @@ void QnFfmpegHelper::copyAvCodecContextField(void** fieldPtr, const void* data, 
     }
 }
 
+bool QnFfmpegHelper::isChromaPlane(int plane, const AVPixFmtDescriptor* avPixFmtDescriptor)
+{
+    // See the doc for AVComponentDescriptor (AVPixFmtDescriptor::comp).
+
+    if (avPixFmtDescriptor->nb_components >= 3 
+        && !(avPixFmtDescriptor->flags & AV_PIX_FMT_FLAG_RGB))
+    {
+        // Plane 0 is luma, planes 1 and 2 are chroma.
+        if (plane == 1 || plane == 2) //< A chroma plane, can have a reduced vertical resolution.
+            return true;
+    }
+
+    // The plane is non-chroma (presumably, Y, RGB or A) - the plane's height equals the frame's.
+    return false;
+}
+
 void QnFfmpegHelper::mediaContextToAvCodecContext(
     AVCodecContext* av, const QnConstMediaContextPtr& media)
 {
