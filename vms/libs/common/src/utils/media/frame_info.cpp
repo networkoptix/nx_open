@@ -410,18 +410,18 @@ QByteArray CLVideoDecoderOutput::rawData() const
     }
 
     QByteArray result;
-    for (int i = 0; i < descr->nb_components && data[i]; ++i)
+    for (int component = 0; component < descr->nb_components && data[component]; ++component)
     {
         int h = height;
         int w = width;
-        if (i > 0) 
+        if (component > 0) 
         {
             h >>= descr->log2_chroma_h;
             w >>= descr->log2_chroma_w;
         }
         result.resize(result.size() + h * w);
         quint8* dst = (quint8*) result.data() + result.size() - h * w;
-        copyPlane(dst, data[i], w, /*dstStride*/ w, linesize[i], h);
+        copyPlane(dst, data[component], w, /*dstStride*/ w, linesize[component], h);
     }
     return result;
 }
