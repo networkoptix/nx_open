@@ -53,6 +53,13 @@
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/analytics/utils.h>
 
+#include <analytics/db/analytics_db_types.h>
+#include <api/server_rest_connection.h>
+#include <client/client_module.h>
+#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/utils/pending_operation.h>
+
 using namespace nx;
 using namespace nx::vms::client::desktop;
 
@@ -241,7 +248,6 @@ namespace
 
     const qint64 kMinDeltaForMessageMs = 1000ll * 3600 * 24;
     const qint64 kUpdateStatusTimeoutMs = 5 * 1000;
-
 } // anonymous namespace
 
 using boost::algorithm::any_of;
@@ -250,6 +256,201 @@ QnStorageConfigWidget::StoragePool::StoragePool() :
     rebuildCancelled(false)
 {
 }
+
+class QnStorageConfigWidget::MetadataWatcher: public QObject
+{
+    const std::chrono::milliseconds kUpdateDelay = std::chrono::milliseconds(100);
+
+public:
+    MetadataWatcher(QnCommonModule* commonModule, QObject* parent = nullptr):
+        QObject(parent),
+        m_commonModule(commonModule),
+        m_updateEngines([this]{ updateEnginesFromServer(); }, kUpdateDelay, this)
+    {
+        m_updateEngines.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
+
+        connect(
+            commonModule->resourcePool(),
+            &QnResourcePool::resourceAdded,
+            this,
+            &MetadataWatcher::handleResourceAdded);
+
+        connect(
+            commonModule->resourcePool(),
+            &QnResourcePool::resourceRemoved,
+            this,
+            &MetadataWatcher::handleResourceRemoved);
+
+        for (const auto& camera: commonModule->resourcePool()->getAllCameras())
+            handleResourceAdded(camera);
+
+        connect(
+            qnClientModule->serverRuntimeEventConnector(),
+            &ServerRuntimeEventConnector::analyticsStorageParametersChanged,
+            this,
+            [this](const QnUuid& serverId)
+            {
+                if (m_server && serverId == m_server->getId())
+                    requestMetadataFromServer();
+            });
+    }
+
+    bool metadataMayExist() const
+    {
+        return m_server && !m_server->metadataStorageId().isNull()
+            && (m_metadataExists || m_enginesEnabled);
+    }
+
+    void setServer(const QnMediaServerResourcePtr& server)
+    {
+        if (m_server == server)
+            return;
+
+        if (m_server)
+            m_server->disconnect(this);
+
+        m_server = server;
+        if (m_server.isNull())
+            return;
+
+        // Check if we have enabled analytics engines.
+        m_enginesEnabled = nx::analytics::serverHasActiveObjectEngines(m_commonModule, m_server->getId());
+
+        connect(
+            m_server.get(),
+            &QnResource::propertyChanged,
+            this,
+            [this](const QnResourcePtr& resource, const QString& key)
+            {
+                if (key == QnMediaServerResource::kMetadataStorageIdKey)
+                {
+                    // Assume that we have metadata while the database is being loaded.
+                    m_metadataExists = true;
+                }
+            });
+        requestMetadataFromServer();
+    }
+
+    void requestMetadataFromServer()
+    {
+        if (!m_server)
+        {
+            m_metadataExists = false;
+            return;
+        }
+
+        // Assume that we have stored data until we receive response from server.
+        m_metadataExists = true;
+
+        nx::analytics::db::Filter filter;
+        filter.maxObjectTracksToSelect = 1;
+        filter.timePeriod = {QnTimePeriod::kMinTimeValue, QnTimePeriod::kMaxTimeValue};
+
+        auto callback = nx::utils::guarded(this,
+            [this, originalServer = m_server->getId()](
+                bool success,
+                rest::Handle /*handle*/,
+                analytics::db::LookupResult&& result)
+            {
+                if (success && m_server && originalServer == m_server->getId())
+                    m_metadataExists = !result.empty();
+            });
+
+        const auto connection = m_server->restConnection();
+        if (!NX_ASSERT(connection))
+            return;
+        connection->lookupObjectTracks(filter, /*isLocal*/ true, callback, this->thread());
+    }
+
+    // This method is called for the newly added cameras.
+    // May only set m_enginesEnabled to true.
+    void updateEnginesFromNewCamera(const QnVirtualCameraResourcePtr& camera)
+    {
+        if (m_enginesEnabled)
+            return;
+
+        if (!m_server || camera->getParentId() != m_server->getId())
+            return;
+
+        m_enginesEnabled = nx::analytics::cameraHasActiveObjectEngines(m_commonModule, camera->getId());
+    }
+
+    // This method is called when analytics is enabled or disabled on some camera.
+    // May set m_enginesEnabled to true or schedule its recalculation.
+    void updateEnginesFromExistingCamera(const QnVirtualCameraResourcePtr& camera)
+    {
+        if (!m_server || camera->getParentId() != m_server->getId())
+            return;
+
+        bool cameraEnginesEnabled = nx::analytics::cameraHasActiveObjectEngines(
+            m_commonModule,
+            camera->getId());
+
+        if (m_enginesEnabled != cameraEnginesEnabled)
+        {
+            if (!cameraEnginesEnabled) // Perhaps that was the last camera with enabled analytics.
+                m_updateEngines.requestOperation();
+            else
+                m_enginesEnabled = true;
+        }
+    }
+
+    // Checks if the current server has enabled analytics, stores the result in m_enginesEnabled.
+    // That's the only place except setServer() where m_enginesEnabled may turn from true to false.
+    // This method should not be called direclty, it's wrapped by m_updateEngines PendingOperation,
+    // which avoids unnecessary calls of this method in the case of mass camera deletion.
+    void updateEnginesFromServer()
+    {
+        if (!m_server)
+            return;
+
+        bool enginesEnabled = nx::analytics::serverHasActiveObjectEngines(m_commonModule, m_server->getId());
+
+        if (m_enginesEnabled && !enginesEnabled)
+        {
+            // It's possible that user has enabled and than disabled analytics engines.
+            // We need to check if some metadata was stored during this period.
+            requestMetadataFromServer();
+        }
+
+        m_enginesEnabled = enginesEnabled;
+    }
+
+    void handleResourceAdded(const QnResourcePtr& resource)
+    {
+        if (const auto camera = resource.objectCast<QnVirtualCameraResource>())
+        {
+            connect(
+                camera.get(),
+                &QnVirtualCameraResource::compatibleObjectTypesMaybeChanged,
+                this,
+                &MetadataWatcher::updateEnginesFromExistingCamera);
+            connect(
+                camera.get(),
+                &QnVirtualCameraResource::parentIdChanged,
+                this,
+                [this]{ m_updateEngines.requestOperation(); });
+
+            updateEnginesFromNewCamera(camera);
+        }
+    }
+
+    void handleResourceRemoved(const QnResourcePtr& resource)
+    {
+        if (const auto camera = resource.objectCast<QnVirtualCameraResource>())
+        {
+            camera->disconnect(this);
+            m_updateEngines.requestOperation();
+        }
+    }
+
+private:
+    QnCommonModule* m_commonModule;
+    QnMediaServerResourcePtr m_server;
+    bool m_enginesEnabled = false;
+    bool m_metadataExists = false;
+    nx::utils::PendingOperation m_updateEngines;
+};
 
 QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     base_type(parent),
@@ -448,6 +649,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
                     return;
             }
         });
+
+    m_metadataWatcher.reset(new MetadataWatcher(commonModule(), this));
 }
 
 QnStorageConfigWidget::~QnStorageConfigWidget()
@@ -633,6 +836,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
         m_server->disconnect(this);
 
     m_server = server;
+    m_metadataWatcher->setServer(server);
     m_model->setServer(server);
     restoreCamerasToBackup();
 
@@ -1078,7 +1282,7 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
                 });
         };
 
-    if (nx::analytics::hasActiveObjectEngines(commonModule(), m_server->getId()))
+    if (m_metadataWatcher->metadataMayExist())
     {
         // Metadata storage has been changed, we need to do something with database.
 

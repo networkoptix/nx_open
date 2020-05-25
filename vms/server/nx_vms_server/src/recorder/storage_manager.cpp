@@ -1752,7 +1752,7 @@ void QnStorageManager::checkMetadataStorageSpace()
             hasAnalyticsEngine = true;
         }
     }
-    if (!nx::analytics::hasActiveObjectEngines(
+    if (!nx::analytics::serverHasActiveObjectEngines(
         serverModule()->commonModule(),
         serverModule()->commonModule()->moduleGUID()))
     {

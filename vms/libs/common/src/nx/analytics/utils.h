@@ -80,6 +80,11 @@ std::set<EventTypeId> supportedObjectTypeIdsFromManifest(
 /*
  * Return true if at least one analytics engine with objects detection is activated for server.
  */
-bool hasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& serverId);
+bool serverHasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& serverId);
+
+/*
+ * Return true if at least one analytics engine with objects detection is activated for camera.
+ */
+bool cameraHasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& cameraId);
 
 } // namespace nx::analytics

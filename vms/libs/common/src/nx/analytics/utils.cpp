@@ -5,6 +5,25 @@ namespace nx::analytics {
 
 using namespace nx::vms::api::analytics;
 
+namespace {
+
+bool cameraHasActiveObjectEngines(const QnVirtualCameraResourcePtr& camera)
+{
+    if (!camera)
+        return false;
+
+    QSet<QnUuid> objectEngines;
+    for (const auto& objectType : camera->supportedObjectTypes())
+    {
+        if (!objectType.second.empty())
+            objectEngines.insert(objectType.first);
+    }
+    const auto usedObjectEngines = camera->enabledAnalyticsEngines().intersect(objectEngines);
+    return !usedObjectEngines.empty();
+}
+
+} // namespace
+
 std::set<QString> supportedEventTypeIdsFromManifest(const DeviceAgentManifest& manifest)
 {
     std::set<QString> result(
@@ -29,7 +48,7 @@ std::set<QString> supportedObjectTypeIdsFromManifest(const DeviceAgentManifest& 
     return result;
 }
 
-bool hasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& serverId)
+bool serverHasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& serverId)
 {
     auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(serverId);
     if (!server)
@@ -38,17 +57,16 @@ bool hasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& serverId
     auto cameras = commonModule->resourcePool()->getAllCameras(server);
     for (const auto& camera : cameras)
     {
-        QSet<QnUuid> objectEngines;
-        for (const auto& objectType : camera->supportedObjectTypes())
-        {
-            if (!objectType.second.empty())
-                objectEngines.insert(objectType.first);
-        }
-        auto usedObjectEngines = camera->enabledAnalyticsEngines().intersect(objectEngines);
-        if (!usedObjectEngines.empty())
+        if (cameraHasActiveObjectEngines(camera))
             return true;
     }
     return false;
+}
+
+bool cameraHasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& cameraId)
+{
+    return cameraHasActiveObjectEngines(
+        commonModule->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId));
 }
 
 } // namespace nx::analytics

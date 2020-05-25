@@ -1468,7 +1468,7 @@ void MediaServerProcess::at_checkAnalyticsUsed()
     if (!m_oldAnalyticsStoragePath.isEmpty())
         return; //< Analytics already initialized.
 
-    if (!nx::analytics::hasActiveObjectEngines(commonModule(), m_mediaServer->getId()))
+    if (!nx::analytics::serverHasActiveObjectEngines(commonModule(), m_mediaServer->getId()))
         return;
 
     if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))

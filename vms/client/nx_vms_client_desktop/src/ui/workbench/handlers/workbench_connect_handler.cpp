@@ -697,7 +697,7 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
         [this](const auto& server)
         {
             return server->metadataStorageId().isNull()
-                && nx::analytics::hasActiveObjectEngines(commonModule(), server->getId());
+                && nx::analytics::serverHasActiveObjectEngines(commonModule(), server->getId());
         }))
     {
         menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);

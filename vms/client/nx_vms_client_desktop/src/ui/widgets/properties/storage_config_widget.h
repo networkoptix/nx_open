@@ -145,6 +145,9 @@ private:
 
     QScopedPointer<QMovie> m_realtimeBackupMovie;
 
+    class MetadataWatcher;
+    QScopedPointer<MetadataWatcher> m_metadataWatcher;
+
 private:
     void applyStoragesChanges(QnStorageResourceList& result,
         const QnStorageModelInfoList& storages) const;
