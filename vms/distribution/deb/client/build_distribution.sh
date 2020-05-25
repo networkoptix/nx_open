@@ -86,51 +86,56 @@ copyLibs()
 
     mkdir -p "$STAGE_LIB"
 
-    local LIB
-    local LIB_BASENAME
-    local BLACKLIST_ITEM
-    local SKIP_LIBRARY
-
-    local -r LIB_BLACKLIST=(
-        'libQt5*'
-        'libEnginio.so*'
-        'libqgsttools_p.*'
-        'libtegra_video.*'
-        'libnx_vms_server*'
-        'libcloud_db.*'
-        'libnx_cassandra*'
-        'libnx_relaying*'
-        'libconnection_mediator*'
-        'libnx_clusterdb*'
-        'libnx_discovery_api_client*'
-        'libtraffic_relay*'
-        'libnx_analytics_db.so'
+    local -r NX_LIBS=(
+        appserver2
+        cloud_db_client
+        common
+        nx_audio
+        nx_fusion
+        nx_kit
+        nx_media
+        nx_network
+        nx_vms_api
+        nx_vms_applauncher_api
+        nx_vms_client_core
+        nx_vms_client_desktop
+        nx_vms_utils
+        nx_utils
+        nx_update
+        nx_speech_synthesizer
+        nx_sql
+        udt
+        vms_gateway_core
     )
 
-    for LIB in "$BUILD_DIR/lib"/*.so*
+    local LIB
+    local FILE
+
+    for LIB in "${NX_LIBS[@]}"
     do
-        LIB_BASENAME=$(basename "$LIB")
-
-        SKIP_LIBRARY=0
-
-        for BLACKLIST_ITEM in "${LIB_BLACKLIST[@]}"
-        do
-            if [[ $LIB_BASENAME == $BLACKLIST_ITEM ]]
-            then
-                SKIP_LIBRARY=1
-                break
-            fi
-        done
-
-        (( $SKIP_LIBRARY == 1 )) && continue
-
-        echo "  Copying $LIB_BASENAME"
-        cp -P "$LIB" "$STAGE_LIB/"
+        FILE="lib$LIB.so"
+        echo "  Copying $FILE"
+        install -m 755 "$BUILD_DIR/lib/$FILE" "$STAGE_LIB/"
     done
 
-    # TODO: #mshevchenko: Why .debug files are not deleted for mediaserver .deb?
-    echo "  Deleting .debug files (if any)"
-    rm -f "$STAGE_LIB"/*.debug
+    echo ""
+    echo "  Copying 3rd-party libs"
+
+    local -r THIRD_PARTY_LIBS=(
+        libavcodec.so.57
+        libavformat.so.57
+        libavutil.so.55
+        libswscale.so.4
+        libswresample.so.2
+
+        libcrypto.so.1.0.0
+        libssl.so.1.0.0
+
+        libqtkeychain.so.0.9.0
+        libqthttpserver.so
+        libquazip.so
+    )
+    distrib_copySystemLibs "$STAGE_LIB" "${THIRD_PARTY_LIBS[@]}"
 
     echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
     local -r STDCPP_LIBS_PATH="$STAGE_LIB/stdcpp"
