@@ -93,6 +93,7 @@ public:
      * @return Whether the plane with the specified index is a chroma plane.
      */
     static bool isChromaPlane(int plane, const AVPixFmtDescriptor* avPixFmtDescriptor);
+
 private:
     static void copyMediaContextFieldsToAvCodecContext(
         AVCodecContext* av, const QnConstMediaContextPtr& media);
