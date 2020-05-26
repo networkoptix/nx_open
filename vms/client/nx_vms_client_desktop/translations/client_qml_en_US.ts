@@ -12,7 +12,7 @@
     <name>ContextHintButton</name>
     <message>
         <source>Click to read more</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -45,11 +45,11 @@
     </message>
     <message>
         <source>Click to add</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Display on video</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -71,41 +71,41 @@
     <name>FigureView</name>
     <message>
         <source>NO PREVIEW</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>InformationPanel</name>
     <message>
         <source>Version</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Vendor</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera stream</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select video stream from the camera for analysis</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Refreshing...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>LabeledItem</name>
     <message>
         <source>Default value:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -116,25 +116,25 @@
     </message>
     <message numerus="yes">
         <source>This line requires at least %n points.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This line requires at least %n point.</numerusform>
+            <numerusform>This line requires at least %n points.</numerusform>
         </translation>
     </message>
     <message>
         <source>Click on the last point to finish drawing the line.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>The maximum number of points has been reached (%n points).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>The maximum number of points has been reached (%n point).</numerusform>
+            <numerusform>The maximum number of points has been reached (%n points).</numerusform>
         </translation>
     </message>
     <message>
         <source>Click on each arrow to toggle the desired direction.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -171,7 +171,7 @@
     <name>ObjectSizeConstraints</name>
     <message>
         <source>Size Constraints</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -200,20 +200,20 @@
     </message>
     <message numerus="yes">
         <source>This polygon requires at least %n points.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This polygon requires at least %n point.</numerusform>
+            <numerusform>This polygon requires at least %n points.</numerusform>
         </translation>
     </message>
     <message>
         <source>Click on the last point to finish drawing the polygon.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>The maximum number of points has been reached (%n points).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>The maximum number of points has been reached (%n point).</numerusform>
+            <numerusform>The maximum number of points has been reached (%n points).</numerusform>
         </translation>
     </message>
 </context>
@@ -221,26 +221,26 @@
     <name>Repeater</name>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>SizeConstraints</name>
     <message>
         <source>MAX</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>MIN</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Set minimum and maximum object size.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Minimum object size cannot be greater than maximum.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

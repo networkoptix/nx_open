@@ -1249,134 +1249,134 @@ to view more bookmarks</source>
     <name>LicenseActivationDialogs</name>
     <message>
         <source>Incompatible license</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>License you are trying to activate is incompatible with your software.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To report the issue please contact %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To report the issue please contact your regional support agent:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to activate license</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Invalid data received.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Database error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Invalid License Key</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Please make sure it is entered correctly.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Invalid activation key file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select a valid activation key file to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This license is already activated and linked to Hardware ID %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>License already activated on another server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You already activated this license</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To activate License Key manually please contact %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To activate License Key manually please contact your regional support agent:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>License activated</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>LicenseDeactivationDialogs</name>
     <message numerus="yes">
         <source>Failed to deactivate %n licenses</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Failed to deactivate license</numerusform>
             <numerusform>Failed to deactivate %n licenses</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n licenses cannot be deactivated</source>
-        <translation type="unfinished">
-            <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <translation>
+            <numerusform>License cannot be deactivated</numerusform>
             <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Deactivate %n Other</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Deactivate %n Other</numerusform>
             <numerusform>Deactivate %n Other</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot deactivate licenses</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Cannot deactivate license</numerusform>
             <numerusform>Cannot deactivate licenses</numerusform>
         </translation>
     </message>
     <message>
         <source>Please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cannot connect to the License Server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>License Server error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to remove license from Server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n licenses deactivated</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n license deactivated</numerusform>
             <numerusform>%n licenses deactivated</numerusform>
         </translation>
@@ -1386,34 +1386,34 @@ to view more bookmarks</source>
     <name>LicenseManagementMessagesPrivate</name>
     <message>
         <source>To get a valid License Key please contact your regional support agent:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>If the problem persists, please contact your regional support agent:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n channels.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n channel.</numerusform>
             <numerusform>%n channels.</numerusform>
         </translation>
     </message>
     <message>
         <source>Please contact your regional support agent:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To get a valid License Key please contact %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>If the problem persists, please contact %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Please contact %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1740,7 +1740,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2288,7 +2288,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Source Server and %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2833,7 +2833,7 @@ to %1</source>
     <message>
         <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
         <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4000,12 +4000,12 @@ to %1</source>
     </message>
     <message>
         <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
         <comment>%1 will be substituted by a list of contacts</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5789,11 +5789,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Server is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>now</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7556,7 +7556,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
         <source>+%n values</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>+%n value</numerusform>
             <numerusform>+%n values</numerusform>
         </translation>
@@ -8253,7 +8253,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Video transcoding required.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9094,7 +9094,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Update installation failed.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9121,11 +9121,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>&lt; Unknown device %1 &gt;</source>
-        <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Port</source>
         <translation></translation>
     </message>
@@ -9146,8 +9141,13 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>&lt; Unknown device &gt;</source>
-        <translation></translation>
+        <source>Unknown device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown device %1</source>
+        <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9166,12 +9166,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
         <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 Settings</source>
         <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9237,8 +9237,8 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Motion + Low-Res</source>
-        <translation></translation>
+        <source>Motion + Lo-Res</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9750,7 +9750,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Transcoding is required. Export session restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9867,7 +9867,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>%1 users</source>
         <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

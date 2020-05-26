@@ -71,12 +71,14 @@ Qt::CheckState getPowerStatusCheckedState(const NetworkPortState& port)
 
 QString uknownDeviceString(const QString& macAddress)
 {
-    static const QString kUnknownDeviceText = PoeSettingsTableView::tr("< Unknown device >");
+    auto braced = [](const QString& source) { return "< " + source + " >"; };
+
+    static const QString kUnknownDeviceText = PoeSettingsTableView::tr("Unknown device");
     static const QString kUnknownDeviceWithMacText =
-        PoeSettingsTableView::tr("< Unknown device %1 >", "In meaning 'Unknown device', %1 is system info");
+        PoeSettingsTableView::tr("Unknown device %1", "In meaning 'Unknown device', %1 is system info");
     return nx::utils::MacAddress(macAddress).isNull()
-        ? kUnknownDeviceText
-        : kUnknownDeviceWithMacText.arg(macAddress);
+        ? braced(kUnknownDeviceText)
+        : braced(kUnknownDeviceWithMacText.arg(macAddress));
 }
 
 ViewNodeData wrongResourceNodeData(const QString& macAddress, bool connected)
