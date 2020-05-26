@@ -76,8 +76,6 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     if (shouldNotStartMonitoring)
         return false;
 
-    m_debouncedValues.clear();
-
     m_monitoringIsInProgress = true;
 
     QUrl url(m_resource->getUrl());
@@ -169,7 +167,8 @@ QnIOPortDataList QnAdamModbusIOManager::getOutputPortList() const
 
 QnIOStateDataList QnAdamModbusIOManager::getPortStates() const
 {
-    return getDebouncedStates();
+    QnMutexLocker lock(&m_mutex);
+    return m_ioStates;
 }
 
 nx_io_managment::IOPortState QnAdamModbusIOManager::getPortDefaultState(const QString& portId) const
@@ -384,27 +383,6 @@ void QnAdamModbusIOManager::setDebounceForPort(const QString& portId, bool portS
     DebouncedValue value;
     value.debouncedValue = portState;
     value.lifetimeCounter = kDebounceIterationCount;
-
-    m_debouncedValues[portId] = value;
-}
-
-QnIOStateDataList QnAdamModbusIOManager::getDebouncedStates() const
-{
-    QnMutexLocker lock(&m_mutex);
-
-    auto debouncedStates = m_ioStates;
-
-    for (auto& state : debouncedStates)
-    {
-        if (m_debouncedValues.find(state.id) != m_debouncedValues.end())
-        {
-            state.isActive = m_debouncedValues[state.id].debouncedValue;
-            if (!--m_debouncedValues[state.id].lifetimeCounter)
-                m_debouncedValues.erase(state.id);
-        }
-    }
-
-    return debouncedStates;
 }
 
 bool QnAdamModbusIOManager::getBitValue(const QByteArray& bytes, quint64 bitIndex) const

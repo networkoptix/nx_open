@@ -76,7 +76,6 @@ private:
     void processAllPortStatesResponse(const nx::modbus::ModbusMessage& response);
     PortStateChangeInfo updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
     void setDebounceForPort(const QString& portId, bool portState);
-    QnIOStateDataList getDebouncedStates() const;
 
     bool getBitValue(const QByteArray& bytes, quint64 bitIndex) const;
     quint32 getPortCoil(const QString& ioPortId, bool& success) const;
@@ -110,8 +109,6 @@ private:
     std::atomic<int> m_networkFaultsCounter;
 
     QMap<QString, nx_io_managment::IOPortState> m_defaultPortStates;
-
-    mutable std::map<QString, DebouncedValue> m_debouncedValues;
 };
 
 #endif //< ENABLE_ADVANTECH
