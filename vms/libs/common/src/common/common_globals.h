@@ -410,7 +410,12 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     enum LicenseType
     {
+        /**
+         * Includes free license, which each user can activate once, and demo licenses, which are
+         * provided by the support team on user's request.
+         */
         LC_Trial,
+
         LC_Analog,
         LC_Professional,
         LC_Edge,

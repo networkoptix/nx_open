@@ -462,21 +462,26 @@ qint64 QnLicense::expirationTime() const
 
 Qn::LicenseType QnLicense::type() const
 {
+    // Trial license, which each user can activate once.
     if (key() == QnAppInfo::freeLicenseKey().toLatin1())
         return Qn::LC_Trial;
 
     if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_VideoWall].className)
         return Qn::LC_VideoWall;
 
+    // Saas licenses are supported.
+    // Expiring non-saas licenses are demo licenses, which support provides by request.
     if (!expiration().isEmpty() && !isSaas())
         return Qn::LC_Trial;
 
-    for (int i = 0; i < Qn::LC_Count; ++i) {
+    for (int i = 0; i < Qn::LC_Count; ++i)
+    {
         if (xclass().toLower().toUtf8() == ::licenseTypeInfo[i].className)
             return ::licenseTypeInfo[i].licenseType;
     }
 
-    return Qn::LC_Invalid; // default value
+    // Default value.
+    return Qn::LC_Invalid;
 }
 
 void QnLicense::parseLicenseBlock(

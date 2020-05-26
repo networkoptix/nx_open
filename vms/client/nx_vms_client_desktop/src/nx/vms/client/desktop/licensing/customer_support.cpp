@@ -54,6 +54,34 @@ QString makeHref(ContactAddress::Channel channel, const QString& address)
     return address;
 }
 
+std::vector<CustomerSupport::Contact> getRegionalContactsForLicenses(
+    const QnLicenseList& licenses,
+    bool* hasLicensesWithoutSupport = nullptr)
+{
+    if (hasLicensesWithoutSupport)
+        *hasLicensesWithoutSupport = false;
+
+    std::set<QnLicense::RegionalSupport> licenseRegionalContacts;
+    for (const QnLicensePtr& license: licenses)
+    {
+        // Ignore unsupported licenses, e.g. demo licenses, provided by the support team.
+        if (license->type() == Qn::LC_Trial)
+            continue;
+
+        const QnLicense::RegionalSupport regionalSupport = license->regionalSupport();
+        if (regionalSupport.isValid())
+            licenseRegionalContacts.insert(regionalSupport);
+        else if (hasLicensesWithoutSupport)
+            *hasLicensesWithoutSupport = true;
+    }
+
+    std::vector<CustomerSupport::Contact> result;
+    for (const auto& contact: licenseRegionalContacts)
+        result.push_back({contact.company, contact.address});
+
+    return result;
+}
+
 } // namespace
 
 ContactAddress::ContactAddress(const QString& address):
@@ -64,27 +92,34 @@ ContactAddress::ContactAddress(const QString& address):
 }
 
 CustomerSupport::CustomerSupport(QnCommonModule* commonModule):
-    systemContact{
-        nx::utils::AppInfo::organizationName(),
-        commonModule->globalSettings()->emailSettings().supportEmail},
-    licensingContact{
-        nx::utils::AppInfo::organizationName(),
-        nx::utils::AppInfo::licensingAddress()}
+    CustomerSupport(
+        commonModule->globalSettings()->emailSettings().supportEmail,
+        commonModule->licensePool()->getLicenses())
 {
-    std::set<QnLicense::RegionalSupport> licenseRegionalContacts;
+}
 
-    for (const QnLicensePtr& license: commonModule->licensePool()->getLicenses())
-    {
-        if (license->type() == Qn::LC_Trial)
-            continue;
+CustomerSupport::CustomerSupport(
+    const QString& supportContact,
+    const QnLicenseList& systemLicenses)
+    :
+    systemContact{nx::utils::AppInfo::organizationName(), supportContact},
+    licensingContact{nx::utils::AppInfo::organizationName(), nx::utils::AppInfo::licensingAddress()},
+    regionalContacts(getRegionalContactsForLicenses(systemLicenses))
+{
+}
 
-        const QnLicense::RegionalSupport regionalSupport = license->regionalSupport();
-        if (regionalSupport.isValid())
-            licenseRegionalContacts.insert(regionalSupport);
-    }
+std::vector<CustomerSupport::Contact> CustomerSupport::regionalContactsForLicenses(
+    const QnLicenseList& licenses) const
+{
+    bool hasLicensesWithoutSupport = false;
+    std::vector<CustomerSupport::Contact> result = getRegionalContactsForLicenses(
+        licenses,
+        &hasLicensesWithoutSupport);
 
-    for (const auto& contact: licenseRegionalContacts)
-        regionalContacts.push_back({contact.company, contact.address});
+    if (hasLicensesWithoutSupport)
+        return regionalContacts;
+
+    return result;
 }
 
 CustomerSupport::Contact::Contact(const QString& company, const QString& address):
