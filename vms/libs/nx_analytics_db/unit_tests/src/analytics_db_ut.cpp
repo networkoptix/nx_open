@@ -147,6 +147,11 @@ protected:
         ASSERT_EQ(expected, m_prevLookupResult->tracksFound);
     }
 
+    void andLookupResultIsNotEmpty()
+    {
+        ASSERT_FALSE(m_prevLookupResult->tracksFound.empty());
+    }
+
     std::vector<ObjectTrackEx> toObjectTracks(
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& objectMetadataPackets) const
     {
@@ -898,15 +903,20 @@ protected:
         m_filter.freeText = QnUuid::createUuid().toSimpleString();
     }
 
+    QString invertCase(const QString& str)
+    {
+        QString result = str;
+        for (auto& ch: result)
+            ch = ch.isUpper() ? ch.toLower() : ch.toUpper();
+        return result;
+    }
+
     void invertTextFilterCase()
     {
         if (!m_effectiveLookupFilter)
             m_effectiveLookupFilter = m_filter;
 
-        if (m_effectiveLookupFilter->freeText.front().isLower())
-            m_effectiveLookupFilter->freeText = m_effectiveLookupFilter->freeText.toUpper();
-        else
-            m_effectiveLookupFilter->freeText = m_effectiveLookupFilter->freeText.toLower();
+        m_effectiveLookupFilter->freeText = invertCase(m_effectiveLookupFilter->freeText);
     }
 
     void addRandomBoundingBoxToFilter()
@@ -1399,11 +1409,12 @@ TEST_F(AnalyticsDbLookup, search_by_attribute_presence)
     generateVariousEvents();
 
     const auto [name, value] = getAnyAttributePresentInData();
-    addTextToFilter("$" + name);
+    addTextToFilter("$" + invertCase(name));
 
     whenLookupObjectTracks();
 
     thenResultMatchesExpectations();
+    andLookupResultIsNotEmpty();
 }
 
 //-------------------------------------------------------------------------------------------------

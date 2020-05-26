@@ -415,7 +415,7 @@ void Filter::TextMatchContext::checkAttributesPresence(
         m_attributeToFindNamesMatched[i] = m_attributeToFindNamesMatched[i] ||
             std::any_of(
                 attributes.begin(), attributes.end(),
-                [&name](const auto& attr) { return attr.name.startsWith(name); });
+                [&name](const auto& attr) { return attr.name.startsWith(name, Qt::CaseInsensitive); });
     }
 }
 
