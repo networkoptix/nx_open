@@ -1637,6 +1637,13 @@ om du vill visa fler bokmärken</translation>
     </message>
   </context>
   <context>
+    <name>QWebEnginePage</name>
+    <message>
+      <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
+      <translation>Är du säker på att du vill lämna denna sida? Ändringar som du gjort kanske inte sparas.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnAboutDialog</name>
     <message>
       <source>%1 uses the following external libraries:</source>
@@ -8668,10 +8675,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Du har redan installerat den här versionen.</translation>
     </message>
     <message>
-      <source>Unable to check updates on the internet</source>
-      <translation>Det gick inte att kontrollera uppdateringar på internet</translation>
-    </message>
-    <message>
       <source>Build not found</source>
       <translation>Uppdateringen hittades inte</translation>
     </message>
@@ -8927,6 +8930,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Update from mediaservers</source>
       <translation>Uppdatering från mediaservers</translation>
     </message>
+    <message>
+      <source>Unable to check updates on the Internet</source>
+      <translation type="unfinished">Unable to check updates on the Internet</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9121,11 +9128,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Tom</translation>
     </message>
     <message>
-      <source>&lt; Unknown device %1 &gt;</source>
-      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation>&lt; Okänd enhet %1 &gt;</translation>
-    </message>
-    <message>
       <source>Port</source>
       <translation>Port</translation>
     </message>
@@ -9146,8 +9148,13 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Ström</translation>
     </message>
     <message>
-      <source>&lt; Unknown device &gt;</source>
-      <translation>&lt; Okänd enhet &gt;</translation>
+      <source>Unknown device</source>
+      <translation>Okänd enhet</translation>
+    </message>
+    <message>
+      <source>Unknown device %1</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation>Okänd enhet %1</translation>
     </message>
   </context>
   <context>
@@ -9237,7 +9244,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Endast rörelse</translation>
     </message>
     <message>
-      <source>Motion + Low-Res</source>
+      <source>Motion + Lo-Res</source>
       <translation>Rörelse + Låg uppl</translation>
     </message>
   </context>

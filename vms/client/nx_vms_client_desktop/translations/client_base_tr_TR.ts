@@ -1636,6 +1636,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QWebEnginePage</name>
+    <message>
+      <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
+      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnAboutDialog</name>
     <message>
       <source>%1 uses the following external libraries:</source>
@@ -8662,10 +8669,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Bu sürüm zaten yüklü.</translation>
     </message>
     <message>
-      <source>Unable to check updates on the internet</source>
-      <translation>İnternet üzerinden güncelleme kontrol edilemedi</translation>
-    </message>
-    <message>
       <source>Build not found</source>
       <translation>Yapı bulunamadı</translation>
     </message>
@@ -8921,6 +8924,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Update from mediaservers</source>
       <translation>Mediaserverdan güncelleme</translation>
     </message>
+    <message>
+      <source>Unable to check updates on the Internet</source>
+      <translation type="unfinished">Unable to check updates on the Internet</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9115,11 +9122,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Boş</translation>
     </message>
     <message>
-      <source>&lt; Unknown device %1 &gt;</source>
-      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation>&lt; Bilinmeyen cihaz %1 &gt;</translation>
-    </message>
-    <message>
       <source>Port</source>
       <translation>Port</translation>
     </message>
@@ -9140,8 +9142,13 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Güç</translation>
     </message>
     <message>
-      <source>&lt; Unknown device &gt;</source>
-      <translation>&lt; Bilinmeyen cihaz &gt;</translation>
+      <source>Unknown device</source>
+      <translation type="unfinished">Unknown device</translation>
+    </message>
+    <message>
+      <source>Unknown device %1</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation type="unfinished">Unknown device %1</translation>
     </message>
   </context>
   <context>
@@ -9231,8 +9238,8 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Sadece Hareket</translation>
     </message>
     <message>
-      <source>Motion + Low-Res</source>
-      <translation>Hareket + Düşük-Çözünürlük</translation>
+      <source>Motion + Lo-Res</source>
+      <translation type="unfinished">Motion + Lo-Res</translation>
     </message>
   </context>
   <context>

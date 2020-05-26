@@ -1636,6 +1636,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QWebEnginePage</name>
+    <message>
+      <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
+      <translation>Möchten Sie diese Seite wirklich verlassen? Von Ihnen vorgenommene Änderungen könnten verlorengehen.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnAboutDialog</name>
     <message>
       <source>%1 uses the following external libraries:</source>
@@ -8663,10 +8670,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Sie haben diese Version bereits installiert.</translation>
     </message>
     <message>
-      <source>Unable to check updates on the internet</source>
-      <translation>Updates können nicht im Internet abgerufen werden</translation>
-    </message>
-    <message>
       <source>Build not found</source>
       <translation>Build nicht gefunden</translation>
     </message>
@@ -8922,6 +8925,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Update from mediaservers</source>
       <translation>Update von Medienservern</translation>
     </message>
+    <message>
+      <source>Unable to check updates on the Internet</source>
+      <translation type="unfinished">Unable to check updates on the Internet</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9116,11 +9123,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Leer</translation>
     </message>
     <message>
-      <source>&lt; Unknown device %1 &gt;</source>
-      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation>&lt; Unbekanntes Gerät %1 &gt;</translation>
-    </message>
-    <message>
       <source>Port</source>
       <translation>Port</translation>
     </message>
@@ -9141,8 +9143,13 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Power</translation>
     </message>
     <message>
-      <source>&lt; Unknown device &gt;</source>
-      <translation>&lt; Unbekanntes Gerät &gt;</translation>
+      <source>Unknown device</source>
+      <translation>Unbekanntes Gerät</translation>
+    </message>
+    <message>
+      <source>Unknown device %1</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation>Unbekanntes Gerät %1</translation>
     </message>
   </context>
   <context>
@@ -9232,8 +9239,8 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Nur bei Bewegung</translation>
     </message>
     <message>
-      <source>Motion + Low-Res</source>
-      <translation>Bewegung + Low-Res</translation>
+      <source>Motion + Lo-Res</source>
+      <translation>Bewegung + Lo-Res</translation>
     </message>
   </context>
   <context>

@@ -1637,6 +1637,13 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
+    <name>QWebEnginePage</name>
+    <message>
+      <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
+      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnAboutDialog</name>
     <message>
       <source>%1 uses the following external libraries:</source>
@@ -8666,10 +8673,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Már telepítette ezt a verziót.</translation>
     </message>
     <message>
-      <source>Unable to check updates on the internet</source>
-      <translation>Frissítések ellenőrzése az interneten nem lehetséges</translation>
-    </message>
-    <message>
       <source>Build not found</source>
       <translation type="unfinished">Build not found</translation>
     </message>
@@ -8925,6 +8928,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>Update from mediaservers</source>
       <translation>Frissítés a médiaszerverekről</translation>
     </message>
+    <message>
+      <source>Unable to check updates on the Internet</source>
+      <translation type="unfinished">Unable to check updates on the Internet</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9119,11 +9126,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation type="unfinished">Empty</translation>
     </message>
     <message>
-      <source>&lt; Unknown device %1 &gt;</source>
-      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">&lt; Unknown device %1 &gt;</translation>
-    </message>
-    <message>
       <source>Port</source>
       <translation>Port</translation>
     </message>
@@ -9144,8 +9146,13 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation type="unfinished">Power</translation>
     </message>
     <message>
-      <source>&lt; Unknown device &gt;</source>
-      <translation type="unfinished">&lt; Unknown device &gt;</translation>
+      <source>Unknown device</source>
+      <translation type="unfinished">Unknown device</translation>
+    </message>
+    <message>
+      <source>Unknown device %1</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation type="unfinished">Unknown device %1</translation>
     </message>
   </context>
   <context>
@@ -9235,8 +9242,8 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Csak mozgás esetén</translation>
     </message>
     <message>
-      <source>Motion + Low-Res</source>
-      <translation>Mozgás + alacsony felbontás</translation>
+      <source>Motion + Lo-Res</source>
+      <translation type="unfinished">Motion + Lo-Res</translation>
     </message>
   </context>
   <context>
