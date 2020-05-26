@@ -2290,42 +2290,42 @@
     <message>
       <location/>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Aan</translation>
     </message>
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>Taalinstellingen</translation>
     </message>
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>Aangepaste inhoud van meldingen</translation>
     </message>
     <message>
       <location/>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Koptekst</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>Standaard notificatie titel zal gebruikt worden als het leeg gelaten wordt</translation>
     </message>
     <message>
       <location/>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Berichttekst</translation>
     </message>
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>Standaardtekst wordt gebruikt als dit veld leeg is</translation>
     </message>
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Voeg de naam van het bronapparaat toe aan de berichttekst</translation>
     </message>
   </context>
   <context>
@@ -3236,7 +3236,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation type="unfinished">Custom language for mobile notifications</translation>
+      <translation>Aangepaste taal voor mobiele meldingen</translation>
     </message>
   </context>
   <context>

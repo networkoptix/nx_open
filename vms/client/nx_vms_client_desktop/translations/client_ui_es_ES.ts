@@ -2295,7 +2295,7 @@
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>Configuración de idiomas</translation>
     </message>
     <message>
       <location/>

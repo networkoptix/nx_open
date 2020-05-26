@@ -1748,7 +1748,7 @@
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation type="unfinished">PoE over Budget</translation>
+      <translation>Quá tải PoE</translation>
     </message>
     <message>
       <source>Fan Error</source>
@@ -1756,7 +1756,7 @@
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation type="unfinished">PoE over budget at %1</translation>
+      <translation>Quá tải PoE ở %1</translation>
     </message>
     <message>
       <source>Fan error at %1</source>

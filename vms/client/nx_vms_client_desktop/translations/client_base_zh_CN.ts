@@ -1256,11 +1256,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>请联系%1以回报此问题。</translation>
     </message>
     <message>
       <source>To report the issue please contact your regional support agent:</source>
-      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+      <translation>请联系您所在地区的技术支持以回报此问题：</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1268,7 +1268,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>收到无效数据</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1308,11 +1308,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>请联系%1以手动启用授权：</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+      <translation>请联系您所在地区的技术支持以手动启用授权：</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1351,7 +1351,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>请稍后重试。</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1380,11 +1380,11 @@ to view more bookmarks</source>
     <name>LicenseManagementMessagesPrivate</name>
     <message>
       <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+      <translation>请联系您所在地区的技术支持以取得有效授权：</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your regional support agent:</source>
-      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+      <translation>如果问题仍然存在，请联系您所在区域的技术支持：</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
@@ -1394,19 +1394,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please contact your regional support agent:</source>
-      <translation type="unfinished">Please contact your regional support agent:</translation>
+      <translation>请联系您所在地区的技术支持：</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>请联系%1以取得有效授权。</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>如果问题仍然存在，请联系%1。</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>请联系 %1。</translation>
     </message>
   </context>
   <context>
@@ -8133,7 +8133,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>需要视频转码。</translation>
     </message>
   </context>
   <context>
@@ -8970,7 +8970,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>更新失败。</translation>
     </message>
   </context>
   <context>
@@ -9619,7 +9619,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>需重新编码。已重启导出。</translation>
     </message>
   </context>
   <context>

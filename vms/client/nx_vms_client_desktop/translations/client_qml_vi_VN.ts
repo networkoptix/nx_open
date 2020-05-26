@@ -41,7 +41,7 @@
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Đồ họa</translation>
     </message>
     <message>
       <source>Click to add</source>

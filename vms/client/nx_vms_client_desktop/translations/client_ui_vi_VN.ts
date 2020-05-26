@@ -2280,7 +2280,7 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</source>
-      <translation>Hệ thống không được kết nối với Nx Cloud. Thúc đẩy thông báo chỉ hoạt động khi hệ thống được kết nối với Nx Cloud.</translation>
+      <translation>Hệ thống không được kết nối với Nx Cloud. Thông báo đẩy chỉ hoạt động khi hệ thống được kết nối với Nx Cloud.</translation>
     </message>
     <message>
       <location/>

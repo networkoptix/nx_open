@@ -9040,7 +9040,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Hệ thống không được kết nối với %1. Thông báo di động chỉ hoạt động khi hệ thống được kết nối với %1.</translation>
+      <translation>Hệ thống không được kết nối với %1. Thông báo đẩy chỉ hoạt động khi hệ thống được kết nối với %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>

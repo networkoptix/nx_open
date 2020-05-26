@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>Anzeige auf Video</translation>
     </message>
   </context>
   <context>
@@ -94,11 +94,11 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Aktualisieren</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>Aktualisieren...</translation>
     </message>
   </context>
   <context>

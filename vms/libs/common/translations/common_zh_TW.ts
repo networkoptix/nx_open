@@ -973,7 +973,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>影片需要重新編碼。</translation>
     </message>
   </context>
   <context>
@@ -1793,11 +1793,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation type="unfinished">RTP error in primary stream (%1)</translation>
+      <translation>主碼流的RTP錯誤（%1）</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
+      <translation>次碼流的RTP錯誤（%1）</translation>
     </message>
   </context>
   <context>

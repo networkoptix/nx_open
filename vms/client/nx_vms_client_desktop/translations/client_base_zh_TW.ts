@@ -1256,11 +1256,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>請聯繫 %1以回報此問題。</translation>
     </message>
     <message>
       <source>To report the issue please contact your regional support agent:</source>
-      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+      <translation>請聯繫您所在地區的技術支援以回報此問題：</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1268,7 +1268,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>接收到無效數據</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1308,11 +1308,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>請聯繫%1以手動啟用授權：</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+      <translation>請聯繫您所在地區的技術支援以手動啟用授權：</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1351,7 +1351,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>請稍後再試。</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1380,11 +1380,11 @@ to view more bookmarks</source>
     <name>LicenseManagementMessagesPrivate</name>
     <message>
       <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+      <translation>請聯繫您所在地區的技術支援以取得有效授權：</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your regional support agent:</source>
-      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+      <translation>如果問題仍然存在, 請聯繫您所在區域的技術支援:</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
@@ -1394,19 +1394,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please contact your regional support agent:</source>
-      <translation type="unfinished">Please contact your regional support agent:</translation>
+      <translation>請聯繫您所在地區的技術支援：</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>請聯繫 %1以取得有效授權。</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>如果問題仍然存在, 請聯繫%1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>請聯繫 %1。</translation>
     </message>
   </context>
   <context>
@@ -3949,12 +3949,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation>請將授權碼及硬體 ID提供給您的區域支援以取得離線授權檔.</translation>
+      <translation>請將授權碼及硬體 ID提供給您所在地區的技術支援以取得離線授權檔.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>請將授權碼及硬體 ID提供給您的區域支援 (%1) 以取得離線授權檔.</translation>
+      <translation>請將授權碼及硬體 ID提供給您所在地區的技術支援 (%1) 以取得離線授權檔.</translation>
     </message>
   </context>
   <context>
@@ -8137,7 +8137,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>影片需要重新編碼。</translation>
     </message>
   </context>
   <context>
@@ -8974,7 +8974,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>更新失敗。</translation>
     </message>
   </context>
   <context>
@@ -9623,7 +9623,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>需要重新編碼。已重啟匯出。</translation>
     </message>
   </context>
   <context>

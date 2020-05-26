@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>在视频上显示</translation>
     </message>
   </context>
   <context>
@@ -94,11 +94,11 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>刷新</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>正在刷新...</translation>
     </message>
   </context>
   <context>
