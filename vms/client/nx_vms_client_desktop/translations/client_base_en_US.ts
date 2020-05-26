@@ -1636,6 +1636,13 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QWebEnginePage</name>
+    <message>
+        <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnAboutDialog</name>
     <message>
         <source>%1 uses the following external libraries:</source>
