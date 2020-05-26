@@ -116,11 +116,11 @@
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Грати/пауза</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Без звуку</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Зняти віділення</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
@@ -183,27 +183,27 @@
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Стор</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>Перезавантажити оминаючи кеш</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Грати/пауза</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Без звуку</translation>
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>Закрити сторінку</translation>
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Зняти віділення</translation>
     </message>
     <message>
       <source>Open link in this window</source>
@@ -267,19 +267,19 @@
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation type="unfinished">&amp;Back</translation>
+      <translation>&amp;Назад</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation type="unfinished">&amp;Forward</translation>
+      <translation>&amp;Вперед</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
-      <translation type="unfinished">&amp;Reload</translation>
+      <translation>Пере&amp;завантажити</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Виберіть теку для завантаження</translation>
     </message>
   </context>
   <context>
@@ -389,11 +389,11 @@
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation type="unfinished">Connect to proxy &quot;%1&quot; using:</translation>
+      <translation>Підключення до проксі &quot;%1&quot; з використанням:</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation type="unfinished">Enter username and password for &quot;%1&quot; at %2://%3</translation>
+      <translation>Введіть ім&apos;я користувача та пароль для &quot;%1&quot; на %2://%3</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>

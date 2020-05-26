@@ -5,47 +5,47 @@
     <name>DownloadInterruptReason</name>
     <message>
       <source>Unknown reason or not interrupted</source>
-      <translation type="unfinished">Unknown reason or not interrupted</translation>
+      <translation>Razón desconocida o no interrumpida</translation>
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation type="unfinished">General file operation failure</translation>
+      <translation>Fallo en la operación general del archivo</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
-      <translation type="unfinished">The file cannot be written locally, due to access restrictions</translation>
+      <translation>El archivo no se puede escribir localmente, debido a restricciones de acceso</translation>
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
-      <translation type="unfinished">Insufficient space on the target drive</translation>
+      <translation>Espacio insuficiente en la unidad de destino</translation>
     </message>
     <message>
       <source>The directory or file name is too long</source>
-      <translation type="unfinished">The directory or file name is too long</translation>
+      <translation>El nombre del directorio o archivo es demasiado largo</translation>
     </message>
     <message>
       <source>The file size exceeds the file system limitation</source>
-      <translation type="unfinished">The file size exceeds the file system limitation</translation>
+      <translation>El tamaño del archivo excede la limitación del sistema de archivos</translation>
     </message>
     <message>
       <source>The file is infected with a virus</source>
-      <translation type="unfinished">The file is infected with a virus</translation>
+      <translation>El archivo está infectado con un virus</translation>
     </message>
     <message>
       <source>Temporary problem (for example file in use, or too many open files)</source>
-      <translation type="unfinished">Temporary problem (for example file in use, or too many open files)</translation>
+      <translation>Problema temporal (por ejemplo archivo en uso o demasiados archivos abiertos)</translation>
     </message>
     <message>
       <source>The file was blocked due to local policy</source>
-      <translation type="unfinished">The file was blocked due to local policy</translation>
+      <translation>El archivo fue bloqueado debido a la política local</translation>
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>
-      <translation type="unfinished">Checking the safety of the download failed due to unexpected reasons</translation>
+      <translation>No se pudo verificar la seguridad de la descarga debido a razones inesperadas</translation>
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
-      <translation type="unfinished">File seek past the end of a file (resuming previously interrupted download)</translation>
+      <translation>Búsqueda de archivos paso el final de un archivo (reanudando la descarga interrumpida previamente)</translation>
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
@@ -116,11 +116,11 @@
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Alternar reproducir/parar</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Alternar silencio</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -183,23 +183,23 @@
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Parar</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>Recargar e ignorar la caché</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Alternar reproducir/pausar</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Alternar silencio</translation>
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>Cerrar página</translation>
     </message>
     <message>
       <source>Unselect</source>
@@ -267,19 +267,19 @@
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation type="unfinished">&amp;Back</translation>
+      <translation>&amp;Atrás</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation type="unfinished">&amp;Forward</translation>
+      <translation>A&amp;delante</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
-      <translation type="unfinished">&amp;Reload</translation>
+      <translation>&amp;Recargar</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Seleccionar una carpeta para subir</translation>
     </message>
   </context>
   <context>
@@ -389,11 +389,11 @@
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation type="unfinished">Connect to proxy &quot;%1&quot; using:</translation>
+      <translation>Conectar al proxy «%1» usando:</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation type="unfinished">Enter username and password for &quot;%1&quot; at %2://%3</translation>
+      <translation>Introduzca el nombre de usuario y contraseña para «%1» en %2://%3</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>

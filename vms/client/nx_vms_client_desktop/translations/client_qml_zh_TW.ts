@@ -82,7 +82,7 @@
     </message>
     <message>
       <source>Vendor</source>
-      <translation>供應商</translation>
+      <translation>廠商</translation>
     </message>
     <message>
       <source>Camera stream</source>

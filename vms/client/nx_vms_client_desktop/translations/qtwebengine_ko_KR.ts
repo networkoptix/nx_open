@@ -116,11 +116,11 @@
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>재생/일시 정지 전환</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>음소거 전환</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>선택 해제</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
@@ -183,27 +183,27 @@
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>정지</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>캐시 무시하고 새로 고침</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>재생/일시 정지 전환</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>음소거 전환</translation>
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>페이지 닫기</translation>
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>선택 해제</translation>
     </message>
     <message>
       <source>Open link in this window</source>
@@ -267,19 +267,19 @@
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation type="unfinished">&amp;Back</translation>
+      <translation>뒤로(&amp;B)</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation type="unfinished">&amp;Forward</translation>
+      <translation>앞으로(&amp;F)</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
-      <translation type="unfinished">&amp;Reload</translation>
+      <translation>새로 고침(&amp;R)</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>업로드할 폴더 선택</translation>
     </message>
   </context>
   <context>
@@ -389,11 +389,11 @@
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation type="unfinished">Connect to proxy &quot;%1&quot; using:</translation>
+      <translation>다음을 사용하여 프록시 &quot;%1&quot;에 연결:</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation type="unfinished">Enter username and password for &quot;%1&quot; at %2://%3</translation>
+      <translation>%2://%3의 &quot;%1&quot; 사용자 이름과 암호 입력</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>

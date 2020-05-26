@@ -116,11 +116,11 @@
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Przełącz: odtwarzanie / pauza</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Przełącz wyciszenie głosu</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Cofnij zaznaczenie</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
@@ -187,23 +187,23 @@
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>Przeładuj i omiń cache</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Przełącz: odtwarzanie / pauza</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Przełącz wyciszenie głosu</translation>
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>Zamknij stronę</translation>
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Cofnij zaznaczenie</translation>
     </message>
     <message>
       <source>Open link in this window</source>
@@ -267,19 +267,19 @@
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation type="unfinished">&amp;Back</translation>
+      <translation>&amp;Wstecz</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation type="unfinished">&amp;Forward</translation>
+      <translation>W &amp;przód</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
-      <translation type="unfinished">&amp;Reload</translation>
+      <translation>P&amp;rzeładuj</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Wybierz katalog do wysłania</translation>
     </message>
   </context>
   <context>
@@ -389,11 +389,11 @@
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation type="unfinished">Connect to proxy &quot;%1&quot; using:</translation>
+      <translation>Połączenie z pośrednikiem &quot;%1&quot; przy użyciu:</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation type="unfinished">Enter username and password for &quot;%1&quot; at %2://%3</translation>
+      <translation>Podaj nazwę użytkownika i hasło dla &quot;%1&quot; w %2://%3</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>

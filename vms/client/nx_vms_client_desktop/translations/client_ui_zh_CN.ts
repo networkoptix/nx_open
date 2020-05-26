@@ -3144,7 +3144,7 @@
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>将停止录影到停用的储存装置上, 而且旧的录影资料将继续被删除.</translation>
+      <translation>将停止录像到停用的存储装置上, 而且旧的录像资料将继续被删除.</translation>
     </message>
     <message>
       <location/>
