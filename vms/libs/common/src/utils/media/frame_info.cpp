@@ -609,11 +609,11 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle) const
     for (int i = 0; i < AV_NUM_DATA_POINTERS && data[i]; ++i)
     {
         int filler = (i == 0 ? 0x0 : 0x80);
-        int numButes = dstPict->linesize[i] * dstHeight;
+        int numBytes = dstPict->linesize[i] * dstHeight;
         const bool isChromaPlane = QnFfmpegHelper::isChromaPlane(i, descriptor);
         if (isChromaPlane)
-            numButes >>= descriptor->log2_chroma_h;
-        memset(dstPict->data[i], filler, numButes);
+            numBytes >>= descriptor->log2_chroma_h;
+        memset(dstPict->data[i], filler, numBytes);
 
         int w = width;
         int h = height;
