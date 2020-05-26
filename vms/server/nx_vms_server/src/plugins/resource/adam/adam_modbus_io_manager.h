@@ -75,7 +75,6 @@ private:
 
     void processAllPortStatesResponse(const nx::modbus::ModbusMessage& response);
     PortStateChangeInfo updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
-    void setDebounceForPort(const QString& portId, bool portState);
 
     bool getBitValue(const QByteArray& bytes, quint64 bitIndex) const;
     quint32 getPortCoil(const QString& ioPortId, bool& success) const;

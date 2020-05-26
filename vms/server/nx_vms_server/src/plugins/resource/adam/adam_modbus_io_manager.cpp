@@ -143,8 +143,6 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
     if (response.isException() || !status)
         return false;
 
-    setDebounceForPort(outputId, isActive);
-
     return true;
 }
 
@@ -374,15 +372,6 @@ QnAdamModbusIOManager::PortStateChangeInfo QnAdamModbusIOManager::updatePortStat
     m_ioStates[portIndex].timestamp = qnSyncTime->currentMSecsSinceEpoch();
 
     return PortStateChangeInfo(currentState, stateChanged);
-}
-
-void QnAdamModbusIOManager::setDebounceForPort(const QString& portId, bool portState)
-{
-    QnMutexLocker lock(&m_mutex);
-
-    DebouncedValue value;
-    value.debouncedValue = portState;
-    value.lifetimeCounter = kDebounceIterationCount;
 }
 
 bool QnAdamModbusIOManager::getBitValue(const QByteArray& bytes, quint64 bitIndex) const
