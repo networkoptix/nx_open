@@ -624,7 +624,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                 break;
             case Error::networkError:
                 // Unable to check update from the internet.
-                report.statusMessages << tr("Unable to check updates on the internet");
+                report.statusMessages << tr("Unable to check updates on the Internet");
                 report.versionMode = VersionReport::VersionMode::empty;
                 report.versionHighlight = VersionReport::HighlightMode::regular;
                 break;
@@ -638,7 +638,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                 else
                 {
                     report.versionMode = VersionReport::VersionMode::empty;
-                    report.statusMessages << tr("Unable to check updates on the internet");
+                    report.statusMessages << tr("Unable to check updates on the Internet");
                 }
                 break;
             case Error::incompatibleParser:

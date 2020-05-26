@@ -240,7 +240,7 @@ TEST_F(UpdateVerificationTest, testFailedUpdateChechk)
     contents.changeset = "29681";
     auto clientData = makeClientData(Version("4.0.0.29679"));
 
-    // "Unable to check updates on the internet"
+    // "Unable to check updates on the Internet"
     contents.error = nx::update::InformationError::networkError;
     auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
         contents, clientData.clientId);

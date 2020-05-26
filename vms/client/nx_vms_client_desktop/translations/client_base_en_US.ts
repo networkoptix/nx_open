@@ -1639,7 +1639,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
         <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8668,10 +8668,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Unable to check updates on the internet</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Build not found</source>
         <translation></translation>
     </message>
@@ -8927,6 +8923,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Update from mediaservers</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Unable to check updates on the Internet</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9142,12 +9142,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Unknown device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown device %1</source>
         <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9238,7 +9238,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Motion + Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
