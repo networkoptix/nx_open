@@ -1,4 +1,5 @@
 #include "device_agent.h"
+#include "nx/vms_server_plugins/analytics/hanwha/settings_processor.h"
 
 #include <chrono>
 #include <sstream>
@@ -205,15 +206,15 @@ void DeviceAgent::setSupportedEventCategoties()
 {
     const auto response = new nx::sdk::SettingsResponse();
 
+    // This is temporary. Settings cache should probably be removed entirely.
     {
-        // This is legal and this function should never have been const anyway.
-        auto& self = *const_cast<DeviceAgent*>(this);
-
         // This is a temporary workaround until the server is fixed to not call this function
         // concurrently.
-        std::lock_guard lockGuard(self.m_settingsMutex);
+        std::lock_guard lockGuard(m_settingsMutex);
 
-        self.m_settingsProcessor.loadAndHoldSettingsFromDevice();
+        // This is fine. The object is not declared const and concurrent access is disallowed.
+        auto& settingsProcessor = const_cast<SettingsProcessor&>(m_settingsProcessor);
+        settingsProcessor.loadAndHoldSettingsFromDevice();
 
         m_settingsProcessor.writeSettingsToServer(response);
     }
