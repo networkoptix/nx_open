@@ -40,6 +40,17 @@ TEST(NalUnits, decodeNal)
     }
 }
 
+TEST(NalUnits, h264SPSWrongResolution)
+{
+    SPSUnit sps;
+    uint8_t data[] =
+        {0x27, 0xf4, 0x00, 0x34, 0xac, 0x56, 0x80, 0x50, 0x05, 0xba, 0x6e, 0x04, 0x04, 0x04, 0x04};
+    sps.decodeBuffer(data, data + sizeof(data));
+    ASSERT_EQ(sps.deserialize(), 0);
+    ASSERT_EQ(sps.getWidth(), 1280);
+    ASSERT_EQ(sps.getHeight(), 720);
+}
+
 TEST(NalUnits, hevcDecodeSpsNoCrash)
 {
     static const std::map<SourcePayload, ParsingResult> kEncodedSps = {
