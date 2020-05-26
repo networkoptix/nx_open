@@ -510,7 +510,9 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                 if (bytesRead < 1)
                 {
                     auto errorCode = SystemError::getLastOSErrorCode();
-                    if (errorCode != SystemError::timedOut && errorCode != SystemError::again)
+                    if (errorCode != SystemError::timedOut &&
+                        errorCode != SystemError::again &&
+                        errorCode != SystemError::wouldBlock)
                     {
                         NX_DEBUG(this, "%1: Failed to read from UDP socket, OS code %2: %3",
                             m_logName, errorCode, SystemError::toString(errorCode));
