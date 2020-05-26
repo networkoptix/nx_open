@@ -26,12 +26,6 @@ class QnAdamModbusIOManager:
         bool isChanged;
     };
 
-    struct DebouncedValue
-    {
-        bool debouncedValue;
-        int lifetimeCounter;
-    };
-
 public:
 
     // Resource is not owned by IO manager. Maybe weak pointer would be better.
