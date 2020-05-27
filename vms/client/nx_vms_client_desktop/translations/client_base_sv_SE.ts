@@ -8932,7 +8932,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Det går inte att kontrollera uppdateringar på Internet</translation>
     </message>
   </context>
   <context>
