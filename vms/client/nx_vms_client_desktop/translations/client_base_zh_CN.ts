@@ -4689,7 +4689,7 @@ to %1</source>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation>没有预测数据</translation>
+      <translation>无预测数据</translation>
     </message>
   </context>
   <context>
@@ -5493,7 +5493,7 @@ to %1</source>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation>预测功能仅适用于已启用录影的摄像机。</translation>
+      <translation>预测功能仅适用于已启用录像的摄像机。</translation>
     </message>
   </context>
   <context>
@@ -6898,7 +6898,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation>开启虚拟摄像机录影功能...</translation>
+      <translation>开启虚拟摄像机录像功能...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>

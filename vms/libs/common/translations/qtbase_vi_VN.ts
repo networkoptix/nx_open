@@ -238,7 +238,7 @@
     <name>QColorDialog</name>
     <message>
       <source>Hu&amp;e:</source>
-      <translation>Hu &amp; e:</translation>
+      <translation>Hu&amp;e:</translation>
     </message>
     <message>
       <source>&amp;Sat:</source>
@@ -246,15 +246,15 @@
     </message>
     <message>
       <source>&amp;Val:</source>
-      <translation>&amp; Val:</translation>
+      <translation>&amp;Val:</translation>
     </message>
     <message>
       <source>&amp;Red:</source>
-      <translation>&amp; Đỏ:</translation>
+      <translation>&amp;Red:</translation>
     </message>
     <message>
       <source>&amp;Green:</source>
-      <translation>Xanh lá:</translation>
+      <translation>&amp;Xanh lá:</translation>
     </message>
     <message>
       <source>Bl&amp;ue:</source>
@@ -262,7 +262,7 @@
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
-      <translation>Kênh A &amp; Lpha:</translation>
+      <translation>Kênh A&amp;lpha:</translation>
     </message>
     <message>
       <source>&amp;HTML:</source>
@@ -275,7 +275,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
-      <translation>&amp; Chọn màu màn hình</translation>
+      <translation>&amp;Chọn màu màn hình</translation>
     </message>
     <message>
       <source>Select Color</source>
@@ -332,7 +332,7 @@ Press ESC to cancel</source>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>What&apos;s Điều này là gì?</translation>
+      <translation>What&apos;s This?</translation>
     </message>
   </context>
   <context>
@@ -490,19 +490,19 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>File &amp;name:</source>
-      <translation>File &amp; tên:</translation>
+      <translation>&amp;Tên tập tin:</translation>
     </message>
     <message>
       <source>&amp;Open</source>
-      <translation>&amp; Mở</translation>
+      <translation>&amp;Mở</translation>
     </message>
     <message>
       <source>&amp;Choose</source>
-      <translation>&amp;chọn</translation>
+      <translation>&amp;Chọn</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;tiết kiệm</translation>
+      <translation>&amp;Tiết kiệm</translation>
     </message>
     <message>
       <source>All Files (*)</source>
@@ -522,7 +522,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation>Hiện tập tin ẩn</translation>
+      <translation>Hiện &amp;tập tin ẩn</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
@@ -849,7 +849,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation>Cu &amp; t</translation>
+      <translation>Cu&amp;t</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
@@ -911,7 +911,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation>Có Cho Tất cả</translation>
+      <translation>Có Cho &amp;Tất cả</translation>
     </message>
     <message>
       <source>&amp;No</source>
@@ -1136,7 +1136,7 @@ Do you want to delete it anyway?</source>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>What&apos;s Điều này là gì?</translation>
+      <translation>What&apos;s This?</translation>
     </message>
   </context>
   <context>
@@ -1151,7 +1151,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation>Cu &amp; t</translation>
+      <translation>Cu&amp;t</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
