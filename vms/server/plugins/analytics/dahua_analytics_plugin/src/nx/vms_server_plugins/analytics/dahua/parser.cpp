@@ -7,6 +7,7 @@
 
 #include "string_helper.h"
 #include "parser.h"
+#include <QtCore/QJsonDocument>
 
 namespace nx::vms_server_plugins::analytics::dahua {
 
@@ -39,67 +40,90 @@ std::vector<QString> Parser::parseSupportedEventsMessage(const QByteArray& conte
     return result;
 }
 
+static QMap<QByteArray, QByteArray> splitMessage(const QByteArray& content)
+{
+    QMap<QByteArray, QByteArray> result;
+    for (const auto& param: content.split(';'))
+    {
+        if (int pos = param.indexOf('='); pos > 0)
+            result.insert(param.left(pos).trimmed(), param.mid(pos + 1).trimmed());
+    }
+    return result;
+}
+
 std::optional<Event> Parser::parseEventMessage(const QByteArray& content,
     const EngineManifest& engineManifest)
 {
-    using std::nullopt;
+    #if 0
+    // Content example.
+    QByteArray content =
+        R"json(
+            Code=StayDetection;action=start;index=0;
+            data=
+            {
+                "Object": { "BoundingBox": [2992,1136,4960,5192] },
+                "Objects": [ 
+                { "BoundingBox": [2992,1136,4960,5192] },
+                { "BoundingBox": [4392,4136,6960,6512] }
+                ],
+                "DetectRegion": [ [1292,3469], [6535,3373]],
+                "AreaID" : 2
+            }
+        )json";
+    #endif
 
-    QString contentAsString(content);
-    contentAsString.replace("\r\n", "\n");
-    const QStringList lines = contentAsString.split('\n');
-
-    NX_VERBOSE(typeid(Parser),
-        kParseOkMessage + "content string = " + contentAsString);
-
-    if (lines.isEmpty())
-    {
-        NX_DEBUG(typeid(Parser),
-            kParseErrorMessage + "content string has no data");
-        return nullopt;
-    }
-
-    contentAsString = lines[0];
-    // contentAsString should contain something like "Code=NewFile;action=Pulse;index=0;data={"
-
-    const QStringList eventDetails = contentAsString.split(";");
-    if (eventDetails.isEmpty())
-    {
-        NX_DEBUG(typeid(Parser), kParseDetailsErrorMessage, contentAsString);
-        return nullopt;
-    }
-
-    if (eventDetails[0] == kHeartbeat)
+    if (content == kHeartbeat)
     {
         NX_VERBOSE(typeid(Parser), kParseOkMessage + "heartbeat message received");
         return kHeartbeatEvent;
     }
-
-    if (eventDetails.size() < 2)
+    else if (content.isEmpty())
     {
-        // At least two pieces of event information needed: name and action (start/stop/pulse)
-        NX_DEBUG(typeid(Parser), kParseDetailsErrorMessage, contentAsString);
-        return nullopt;
+        NX_DEBUG(typeid(Parser), kParseErrorMessage + "content string has no data");
+        return std::nullopt;
+    }
+    NX_VERBOSE(typeid(Parser), kParseOkMessage + "content string = " + content);
+
+    const QMap<QByteArray, QByteArray> parameters = splitMessage(content);
+    const QByteArray internalName = parameters["Code"];
+    const QByteArray actionType = parameters["action"].toLower();
+    const QByteArray jsonData = parameters["data"];
+
+    if (internalName.isEmpty() || actionType.isEmpty())
+    {
+        NX_DEBUG(typeid(Parser), kParseDetailsErrorMessage, content);
+        return std::nullopt;
     }
 
-    const QStringList code = eventDetails[0].split("=");
-    const QStringList action = eventDetails[1].split("=");
-
-    if (code.size() != 2 || code[0] != "Code" || action.size() != 2 || action[0] != "action")
-    {
-        NX_DEBUG(typeid(Parser), kParseDetailsErrorMessage, contentAsString);
-        return nullopt;
-    }
-
-    NX_VERBOSE(typeid(Parser),
-        kParseOkMessage + "code = %1, action = %2" , code[1], action[1]);
+    NX_VERBOSE(typeid(Parser), kParseOkMessage + "code=%1, action=%2", internalName, actionType);
 
     Event result;
-    const QString internalName = code[1];
     result.typeId = engineManifest.eventTypeByInternalName(internalName);
     if (result.typeId.isEmpty())
-        return nullopt;
+    {
+        NX_DEBUG(typeid(Parser), kParseErrorMessage + "Skip unknown event %1", internalName);
+        return std::nullopt;
+    }
+    
+    if (!jsonData.isEmpty())
+    {
+        QJsonParseError error;
+        const auto json = QJsonDocument::fromJson(jsonData, &error);
+        if (error.error == QJsonParseError::NoError)
+        {
+            const QJsonObject jsonObject = json.object();
+            const auto& areaIdValue = jsonObject["AreaID"];
+            if (!areaIdValue.isNull())
+                result.region = areaIdValue.toInt();
+        }
+        else
+        {
+            NX_DEBUG(typeid(Parser), 
+                kParseErrorMessage + "can't parse json. Error: %2", error.errorString());
+        }
+    }
 
-    result.isActive = (action[1] == "Start" || action[1] == "Pulse");
+    result.isActive = (actionType == "start" || actionType == "pulse");
     result.description = buildDescription(engineManifest, result);
     return result;
 }
