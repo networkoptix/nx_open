@@ -537,6 +537,32 @@ int QnFfmpegHelper::getDefaultFrameSize(AVCodecContext* context)
         : 0;
 }
 
+int QnFfmpegHelper::planeCount(const AVPixFmtDescriptor* avPixFmtDescriptor)
+{
+    // As per the doc for AVComponentDescriptor (AVPixFmtDescriptor::comp), each pixel has 1 to 4
+    // so-called components (e.g. R, G, B, Y, U, V or A), each component resides in a certain plane
+    // (0..3), and a plane can host more than one component (e.g. for RGB24 the only plane #0 hosts
+    // all 3 components).
+
+    // Find the max plane index for all components.
+    int maxPlane = -1;
+    for (int component = 0; component < avPixFmtDescriptor->nb_components; ++component)
+    {
+        const int componentPlane = avPixFmtDescriptor->comp[component].plane;
+        if (!NX_ASSERT(componentPlane >= 0 && componentPlane < AV_NUM_DATA_POINTERS,
+            NX_FMT("AVPixFmtDescriptor reports plane %1 for component %2 of pixel format %3"),
+                componentPlane, component, avPixFmtDescriptor->name))
+        {
+            return 0;
+        }
+
+        if (componentPlane > maxPlane)
+            maxPlane = componentPlane;
+    }
+
+    return maxPlane + 1;
+}
+
 QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContext):
     m_swr(swr_alloc())
 {

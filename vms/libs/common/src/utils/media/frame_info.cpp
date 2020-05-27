@@ -144,7 +144,7 @@ void CLVideoDecoderOutput::copyDataOnlyFrom(const AVFrame* src)
         NX_ERROR(this, lm("Failed to copy frame, invalid pixel format: %1").arg(dstFormat));
         return;
     }
-    for (int i = 0; i < AV_NUM_DATA_POINTERS && src->data[i]; ++i)
+    for (int i = 0; i < QnFfmpegHelper::planeCount(descriptor) && src->data[i]; ++i)
     {
         int h = src->height;
         int w = src->width;
@@ -185,7 +185,7 @@ void CLVideoDecoderOutput::fillRightEdge()
     quint32 filler = 0;
     int w = width;
     int h = height;
-    for (int i = 0; i < AV_NUM_DATA_POINTERS && data[i]; ++i)
+    for (int i = 0; i < QnFfmpegHelper::planeCount(descriptor) && data[i]; ++i)
     {
         int bpp = descriptor->comp[i].step;
         int fillLen = linesize[i] - w*bpp;
@@ -221,7 +221,7 @@ AVPixelFormat CLVideoDecoderOutput::fixDeprecatedPixelFormat(AVPixelFormat origi
 void CLVideoDecoderOutput::memZero()
 {
     const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat) format);
-    for (int i = 0; i < AV_NUM_DATA_POINTERS && data[i]; ++i)
+    for (int i = 0; i < QnFfmpegHelper::planeCount(descriptor) && data[i]; ++i)
     {
         int w = linesize[i];
         int h = height;
@@ -411,7 +411,7 @@ QByteArray CLVideoDecoderOutput::rawData() const
     }
 
     QByteArray result;
-    for (int plane = 0; plane < AV_NUM_DATA_POINTERS && data[plane]; ++plane)
+    for (int plane = 0; plane < QnFfmpegHelper::planeCount(descriptor) && data[plane]; ++plane)
     {
         int h = height;
         int w = width;
@@ -606,7 +606,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle) const
     dstPict->assignMiscData(this);
 
     const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat) format);
-    for (int i = 0; i < AV_NUM_DATA_POINTERS && data[i]; ++i)
+    for (int i = 0; i < QnFfmpegHelper::planeCount(descriptor) && data[i]; ++i)
     {
         int filler = (i == 0 ? 0x0 : 0x80);
         int numBytes = dstPict->linesize[i] * dstHeight;

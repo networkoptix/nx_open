@@ -94,6 +94,12 @@ public:
      */
     static bool isChromaPlane(int plane, const AVPixFmtDescriptor* avPixFmtDescriptor);
 
+    /**
+     * Ffmpeg does not store the number of planes in a frame explicitly, thus, deducing it. On error,
+     * fails an assertion and returns 0.
+     */
+    static int planeCount(const AVPixFmtDescriptor* avPixFmtDescriptor);
+
 private:
     static void copyMediaContextFieldsToAvCodecContext(
         AVCodecContext* av, const QnConstMediaContextPtr& media);

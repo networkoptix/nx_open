@@ -81,37 +81,6 @@ UncompressedVideoFrame::UncompressedVideoFrame(
 }
 
 /**
- * Ffmpeg does not store the number of planes in a frame explicitly, thus, deducing it. On error,
- * fails an assertion and returns 0.
- */
-static int deducePlaneCount(
-    const AVPixFmtDescriptor* avPixFmtDescriptor, AVPixelFormat avPixelFormat)
-{
-    // As per the doc for AVComponentDescriptor (AVPixFmtDescriptor::comp), each pixel has 1 to 4
-    // so-called components (e.g. R, G, B, Y, U, V or A), each component resides in a certain plane
-    // (0..3), and a plane can host more than one component (e.g. for RGB24 the only plane #0 hosts
-    // all 3 components).
-
-    // Find the max plane index for all components.
-    int maxPlane = -1;
-    for (int component = 0; component < avPixFmtDescriptor->nb_components; ++component)
-    {
-        const int componentPlane = avPixFmtDescriptor->comp[component].plane;
-        if (!NX_ASSERT(componentPlane >= 0 && componentPlane < AV_NUM_DATA_POINTERS,
-            lm("AVPixFmtDescriptor reports plane %1 for component %2 of pixel format %3").args(
-                componentPlane, component, avPixelFormat)))
-        {
-            return 0;
-        }
-
-        if (componentPlane > maxPlane)
-            maxPlane = componentPlane;
-    }
-
-    return maxPlane + 1;
-}
-
-/**
  * Called at the end of constructors. Assigns m_avFrame with avFrame on success.
  */
 void UncompressedVideoFrame::acceptAvFrame(const AVFrame* avFrame)
@@ -141,7 +110,7 @@ void UncompressedVideoFrame::acceptAvFrame(const AVFrame* avFrame)
         return;
     }
 
-    m_dataSize.resize(deducePlaneCount(m_avPixFmtDescriptor, avPixelFormat));
+    m_dataSize.resize(QnFfmpegHelper::planeCount(m_avPixFmtDescriptor));
     if (m_dataSize.empty())
         return; //< An assertion has already failed.
     for (int plane = 0; plane < (int) m_dataSize.size(); ++plane)
