@@ -1,13 +1,16 @@
 #!/bin/bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 export QT_QPA_PLATFORM=xcb
 
 STDCPP_DIR="$($DIR/choose_newer_stdcpp.sh $DIR/../lib/stdcpp)"
 if [ -n "$STDCPP_DIR" ]
 then
-    export LD_LIBRARY_PATH="$STDCPP_DIR"
+    echo "Using bundled libstdc++."
+    export LD_LIBRARY_PATH="$STDCPP_DIR:$LD_LIBRARY_PATH"
+else
+    echo "Using system libstdc++."
 fi
 
-"$DIR/client-bin" $@
+"$DIR/client-bin" "$@"

@@ -28,7 +28,7 @@ nx_copy(${QT_DIR}/qml DESTINATION ${CMAKE_BINARY_DIR}/bin)
 nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
 
 # Variables used for configuring files.
-set(common_depends
+set(required_dependencies_list
     "zlib1g (>= 1:1.1.4)"
     "libglib2.0-0"
     "libsecret-1-0"
@@ -59,7 +59,12 @@ set(common_depends
     # DEB package dependencies.
     "debconf (>= 0.5) | debconf-2.0"
 )
-string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
+string(JOIN ", " required_dependencies ${required_dependencies_list})
+
+set(recommended_dependencies_list
+    "binutils"
+)
+string(JOIN ", " recommended_dependencies ${recommended_dependencies_list})
 
 nx_configure_directory(
     ${CMAKE_CURRENT_SOURCE_DIR}/deb_files.in

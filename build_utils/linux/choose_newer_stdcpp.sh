@@ -3,8 +3,17 @@
 function get_glibcxx_version
 {
     local -r FILE="$1"
-    # `sed` searches for something like `0000000000000000 A GLIBCXX_3.4.25` and prints `3.4.25`.
-    nm -D "$FILE" | sed -n 's/.* GLIBCXX_//p' | sort -uV | tail -n 1
+
+    # `nm` allows us to certainly know the library version, so trying it first.
+    if command -v nm > /dev/null
+    then
+        # `sed` searches for something like `0000000000000000 A GLIBCXX_3.4.25` and prints `3.4.25`.
+        nm -D "$FILE" | sed -n 's/.* GLIBCXX_//p' | sort -uV | tail -n 1
+    else
+        # If `nm` is not present, guess the version by the library file name.
+        # `sed` cuts everything but version part.
+        realpath "$FILE" | sed 's/.*\.so\.//'
+    fi
 }
 
 LOCAL_STDCPP_DIR="$1"
