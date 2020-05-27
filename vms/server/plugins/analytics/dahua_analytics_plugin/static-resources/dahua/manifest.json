@@ -194,9 +194,7 @@
             "negativeState": "has ended",
             "flags": "stateDependent",
             "groupId": "nx.dahua.group.AlarmEvents"
-        }
-    ],
-    "ignoredEventTypes": [
+        },
         {
             "id": "nx.dahua.CrowdDetection",
             "name": "Crowd detection (Crowd density overrun detection)",
@@ -242,6 +240,17 @@
             "name": "Wander detection (Loitering detection)",
             "internalName": "WanderDetection",
             "description": "Loitering %1 %2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region #%1",
+            "groupId": "nx.dahua.group.ComplexAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.StayDetection",
+            "name": "Stay detection",
+            "internalName": "StayDetection",
+            "description": "Stay %1 %2",
             "positiveState": "has been detected",
             "negativeState": "has ended",
             "flags": "regionDependent | stateDependent",
