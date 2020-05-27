@@ -226,7 +226,7 @@ QString QnLicenseWidget::calculateManualActivationLinkText() const
 
         // Backup string, this must never happen.
         return tr("Please send the provided License Key and Hardware ID "
-            "to your Regional support to obtain an Activation Key file.");
+            "to your Regional / License support to obtain an Activation Key file.");
     }
 
     QStringList contactsList;
@@ -234,7 +234,7 @@ QString QnLicenseWidget::calculateManualActivationLinkText() const
         contactsList.push_back(contact.company + ": " + contact.address.href);
 
     return tr("Please send the provided License Key and Hardware ID "
-        "to your Regional support (%1) to obtain an Activation Key file.",
+        "to your Regional / License support (%1) to obtain an Activation Key file.",
         "%1 will be substituted by a list of contacts").arg(contactsList.join("; "));
 }
 

@@ -201,7 +201,7 @@ void QnAboutDialog::retranslateUi()
     for (const CustomerSupport::Contact& contact: customerSupport.regionalContacts)
     {
         const QString text = contact.company + "<br>" + contact.address.href;
-        ui->supportLayout->addWidget(new QLabel(tr("Regional support")), row, /*column*/ 0);
+        ui->supportLayout->addWidget(new QLabel(tr("Regional / License support")), row, /*column*/ 0);
         ui->supportLayout->addWidget(new QLabel(text), row, /*column*/ 1);
         ++row;
     }

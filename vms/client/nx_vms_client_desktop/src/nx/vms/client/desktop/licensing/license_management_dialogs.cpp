@@ -127,7 +127,7 @@ public:
             }
 
             // Backup string, this must never happen.
-            return genericString.arg("your Regional support");
+            return genericString.arg("your Regional / License support");
         }
 
         QStringList regionalSupport;
@@ -143,7 +143,7 @@ public:
         return customerSupportMessage(
             parent,
             tr("To get a valid License Key please contact %1."),
-            tr("To get a valid License Key please contact your regional support agent:"));
+            tr("To get a valid License Key please contact your Regional / License support:"));
     }
 
     static QString whatIfProblemPersistsMessage(QWidget* parent, const QnLicenseList& licenses = {})
@@ -151,7 +151,7 @@ public:
         return customerSupportMessage(
             parent,
             tr("If the problem persists, please contact %1."),
-            tr("If the problem persists, please contact your regional support agent:"),
+            tr("If the problem persists, please contact your Regional / License support:"),
             licenses);
     }
 
@@ -200,7 +200,7 @@ public:
         const auto contactCustomerSupportText = customerSupportMessage(
             parent,
             tr("Please contact %1."),
-            tr("Please contact your regional support agent:"),
+            tr("Please contact your Regional / License support:"),
             licensesWithErrors);
 
         const QString licensesBlock = result.join(kMessageDelimiter);
@@ -235,7 +235,7 @@ void LicenseActivationDialogs::invalidDataReceived(QWidget* parent)
     const QString supportContactString = Private::customerSupportMessage(
         parent,
         tr("To report the issue please contact %1."),
-        tr("To report the issue please contact your regional support agent:"));
+        tr("To report the issue please contact your Regional / License support:"));
 
     Private::showMessage(
         parent,
@@ -330,7 +330,7 @@ void LicenseActivationDialogs::networkError(QWidget* parent)
     const QString supportContactString = Private::customerSupportMessage(
         parent,
         tr("To activate License Key manually please contact %1."),
-        tr("To activate License Key manually please contact your regional support agent:"));
+        tr("To activate License Key manually please contact your Regional / License support:"));
 
     Private::showMessage(
         parent,

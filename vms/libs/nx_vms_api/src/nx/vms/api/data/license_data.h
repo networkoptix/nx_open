@@ -86,10 +86,10 @@ struct NX_VMS_API DetailedLicenseData: Data
     /**%apidoc[proprietary]*/
     QString orderType;
 
-    /** Regional support data: company name. */
+    /** Regional / License support data: company name. */
     QString company;
 
-    /** Regional support data: contact address. */
+    /** Regional / License support data: contact address. */
     QString support;
 
     int deactivations = 0;
