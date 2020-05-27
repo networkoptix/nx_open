@@ -158,6 +158,31 @@ std::string SettingsProcessor::makeEventTypeReadingRequest(const char* eventType
 
 //-------------------------------------------------------------------------------------------------
 
+void SettingsProcessor::updateAnalyticsModeOnDevice() const
+{
+    const int channelNumber = m_valueTransformer->transformChannelNumber(m_cameraChannelNumber);
+    AnalyticsMode currentAnalyticsMode;
+    std::string sunapiReply = makeEventTypeReadingRequest("videoanalysis2");
+    SettingGroup::readFromDeviceReply(
+        sunapiReply, &currentAnalyticsMode, m_frameSize, channelNumber);
+
+    AnalyticsMode desiredAnalyticsMode = (m_settings.IntelligentVideoIsActive())
+        ? currentAnalyticsMode.addIntelligentVideoMode()
+        : currentAnalyticsMode.removeIntelligentVideoMode();
+
+    if (desiredAnalyticsMode != currentAnalyticsMode)
+    {
+        const std::string query =
+            desiredAnalyticsMode.buildDeviceWritingQuery(m_frameSize, m_cameraChannelNumber);
+        const std::string error = makeWritingRequestToDeviceSync(query);
+        if (!error.empty())
+            NX_DEBUG(this, NX_FMT("Request failed. Url = %1", query));
+    }
+
+}
+
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Used for NVRs only. Get the event types, supported directly by the device, not by NVR channel.
  */
@@ -188,31 +213,6 @@ std::string SettingsProcessor::loadFirmwareVersionFromDevice() const
     if (firmwareVersion)
         result = *firmwareVersion;
     return result;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-void SettingsProcessor::updateAnalyticsModeOnDevice() const
-{
-    const int channelNumber = m_valueTransformer->transformChannelNumber(m_cameraChannelNumber);
-    AnalyticsMode currentAnalyticsMode;
-    std::string sunapiReply = makeEventTypeReadingRequest("videoanalysis2");
-    SettingGroup::readFromDeviceReply(
-        sunapiReply, &currentAnalyticsMode, m_frameSize, channelNumber);
-
-    AnalyticsMode desiredAnalyticsMode = (m_settings.IntelligentVideoIsActive())
-        ? currentAnalyticsMode.addIntelligentVideoMode()
-        : currentAnalyticsMode.removeIntelligentVideoMode();
-
-    if (desiredAnalyticsMode != currentAnalyticsMode)
-    {
-        const std::string query =
-            desiredAnalyticsMode.buildDeviceWritingQuery(m_frameSize, m_cameraChannelNumber);
-        const std::string error = makeWritingRequestToDeviceSync(query);
-        if (!error.empty())
-            NX_DEBUG(this, NX_FMT("Request failed. Url = %1", query));
-    }
-
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -334,8 +334,11 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
 
 //-------------------------------------------------------------------------------------------------
 
-void SettingsProcessor::writeSettingsToServer(nx::sdk::SettingsResponse* response) const
+void SettingsProcessor::transferAndHoldSettingsFromDeviceToServer(
+    nx::sdk::SettingsResponse* response)
 {
+    loadAndHoldSettingsFromDevice();
+
     if (m_settings.analyticsCategories[motionDetection])
     {
 #if 0

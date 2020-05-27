@@ -88,7 +88,7 @@ private:
 
     FrameSize m_frameSize;
     Settings m_settings;
-    SettingsProcessor m_settingsProcessor;
+    mutable SettingsProcessor m_settingsProcessor;
     mutable std::mutex m_settingsMutex;
     bool m_serverHasSentInitialSettings = false;
 

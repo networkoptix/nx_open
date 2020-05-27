@@ -51,29 +51,25 @@ public:
         setFrameSize(frameSize);
     }
 
-    // Low level operations.
-
+private:
     std::string makeReadingRequestToDeviceSync(const char* domain, const char* submenu,
         const char* action, bool useChannel = true) const;
 
     std::string makeWritingRequestToDeviceSync(const std::string& query) const;
 
-    // Mid level operations.
-
     std::string makeEventTypeReadingRequest(const char* eventTypeInternalName) const;
 
-    // Hi level operations.
+    void updateAnalyticsModeOnDevice() const;
 
+public:
     std::optional<QSet<QString>> loadSupportedEventTypes() const;
 
     std::optional<FrameSize> loadFrameSizeFromDevice() const;
     std::string loadFirmwareVersionFromDevice() const;
 
-    void updateAnalyticsModeOnDevice() const;
-
     void loadAndHoldSettingsFromDevice();
 
-    void writeSettingsToServer(nx::sdk::SettingsResponse* response) const;
+    void transferAndHoldSettingsFromDeviceToServer(nx::sdk::SettingsResponse* response);
 
     void transferAndHoldSettingsFromServerToDevice(
         nx::sdk::StringMap* errorMap, const nx::sdk::IStringMap* sourceMap);

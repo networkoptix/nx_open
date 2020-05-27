@@ -212,11 +212,7 @@ void DeviceAgent::setSupportedEventCategoties()
         // concurrently.
         std::lock_guard lockGuard(m_settingsMutex);
 
-        // This is fine. The object is not declared const and concurrent access is disallowed.
-        auto& settingsProcessor = const_cast<SettingsProcessor&>(m_settingsProcessor);
-        settingsProcessor.loadAndHoldSettingsFromDevice();
-
-        m_settingsProcessor.writeSettingsToServer(response);
+        m_settingsProcessor.transferAndHoldSettingsFromDeviceToServer(response);
     }
 
     *outResult = response;
