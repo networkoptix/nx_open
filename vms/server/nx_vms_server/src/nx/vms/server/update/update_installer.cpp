@@ -48,6 +48,33 @@ update::PackageInformation updateInformation(const QString& path)
 
 } // namespace
 
+static QString toString(UpdateInstaller::State state)
+{
+    using State = UpdateInstaller::State;
+
+    switch (state)
+    {
+        case State::idle: return "idle";
+        case State::ok: return "ok";
+        case State::inProgress: return "inProgress";
+        case State::noFreeSpace: return "noFreeSpace";
+        case State::noFreeSpaceToInstall: return "noFreeSpaceToInstall";
+        case State::brokenZip: return "brokenZip";
+        case State::wrongDir: return "wrongDir";
+        case State::cantOpenFile: return "cantOpenFile";
+        case State::otherError: return "otherError";
+        case State::stopped: return "stopped";
+        case State::busy: return "busy";
+        case State::installing: return "installing";
+        case State::installationFailed: return "installationFailed";
+        case State::cleanTemporaryFilesError: return "cleanTemporaryFilesError";
+        case State::updateContentsError: return "updateContentsError";
+        case State::unknownError: return "unknownError";
+    }
+
+    return QString();
+}
+
 UpdateInstaller::UpdateInstaller(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     m_installationTimer(new QTimer()),
@@ -82,6 +109,8 @@ void UpdateInstaller::prepareAsync(const QString& path)
     if (!serverModule()->rootFileSystem()->changeOwner(workDir()))
         NX_WARNING(this, "Unable to chown %1", workDir());
 
+    NX_DEBUG(this, "Preparing to update installation...");
+
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         if (m_state == State::inProgress)
@@ -101,9 +130,9 @@ void UpdateInstaller::prepareAsync(const QString& path)
             return setState(State::noFreeSpace);
     }
 
-    m_extractor.extractAsync(
-        path,
-        workDir(),
+    const QString outputDir = workDir();
+    NX_DEBUG(this, "Start update file extraction: %1 to %2", path, outputDir);
+    m_extractor.extractAsync(path, outputDir,
         [this](QnZipExtractor::Error errorCode, const QString& outputPath, qint64 bytesExtracted)
         {
             auto cleanupGuard = nx::utils::makeScopeGuard(
@@ -206,6 +235,8 @@ void UpdateInstaller::installDelayed()
 
 void UpdateInstaller::stopSync(bool clearAndReset)
 {
+    NX_DEBUG(this, "Stopping...");
+
     stopInstallationTimerAsync();
 
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -310,9 +341,9 @@ bool UpdateInstaller::initializeUpdateLog(
 
     QByteArray preface;
     preface.append("====================\n");
-    preface.append(lm(" [%1] Starting system update:\n").arg(QDateTime::currentDateTime()));
-    preface.append(lm("    Current version: %1\n").arg(currentVersion));
-    preface.append(lm("    Target version: %1\n").arg(targetVersion));
+    preface.append(nx::format(" [%1] Starting system update:\n", QDateTime::currentDateTime()));
+    preface.append(nx::format("    Current version: %1\n", currentVersion));
+    preface.append(nx::format("    Target version: %1\n", targetVersion));
     preface.append("--------------------\n");
 
     logFile.write(preface);
@@ -325,17 +356,18 @@ bool UpdateInstaller::initializeUpdateLog(
 
 void UpdateInstaller::setState(UpdateInstaller::State state)
 {
+    if (m_state == state)
+        return;
+
     m_state = state;
+    NX_DEBUG(this, "State changed: %1", state);
 }
 
 void UpdateInstaller::setStateLocked(UpdateInstaller::State state)
 {
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        if (m_state == state)
-            return;
-
-        m_state = state;
+        setState(state);
     }
 
     if (state != State::ok)

@@ -172,6 +172,8 @@ int QnInstallUpdateRestHandler::executePost(
         const auto ifParticipantPredicate = detail::makeIfParticipantPredicate(
             serverModule()->updateManager(), peers);
 
+        NX_DEBUG(this, "Got installation request. Peers: [%1]", peers);
+
         makeSureParticipantsAreReadyForInstall(ifParticipantPredicate, processor, serverModule());
         QnMultiserverRequestContext<QnEmptyRequestData> context(
             request,
@@ -223,5 +225,6 @@ void QnInstallUpdateRestHandler::afterExecute(
     if (result.error != QnRestResult::NoError)
         return;
 
+    NX_DEBUG(this, "Calling updateManager()->install()");
     serverModule()->updateManager()->install(owner->authSession());
 }

@@ -98,6 +98,8 @@ void UpdateManager::retry(bool forceRedownload)
 {
     if (forceRedownload)
     {
+        NX_VERBOSE(this, "Retrying update with forced re-download.");
+
         nx::update::Package package;
         if (findPackage(&package) == update::FindPackageResult::ok)
             downloader()->deleteFile(package.file);
@@ -107,6 +109,7 @@ void UpdateManager::retry(bool forceRedownload)
     }
 
     const update::Status status = this->status();
+    NX_VERBOSE(this, "Retrying update. Status: %1, error: %2", status.code, status.errorCode);
 
     if (status.code == update::Status::Code::readyToInstall)
     {
@@ -158,6 +161,7 @@ void UpdateManager::retry(bool forceRedownload)
 
 void UpdateManager::startUpdate(const QByteArray& content)
 {
+    NX_INFO(this, "Starting update...");
     const auto& info = QJson::deserialized<update::Information>(content);
     setTargetUpdateInformation(info);
 }
@@ -167,10 +171,14 @@ bool UpdateManager::startUpdateInstallation(const QList<QnUuid>& participants)
     if (!m_targetUpdateInfo.isValid())
         return false;
 
+    NX_INFO(this, "Starting update installation to %1 participant(s)...", participants.size());
+    NX_VERBOSE(this, "Requested installation to participants: %1", participants);
+
     update::Information info = m_targetUpdateInfo;
     info.participants = participants;
     info.lastInstallationRequestTime = qnSyncTime->currentMSecsSinceEpoch();
     setTargetUpdateInformation(info);
+
     return true;
 }
 
@@ -211,6 +219,7 @@ std::optional<update::Information> UpdateManager::updateInformation(
 
 void UpdateManager::finish()
 {
+    NX_INFO(this, "Finishing update...");
     globalSettings()->setInstalledUpdateInformation(globalSettings()->targetUpdateInformation());
     globalSettings()->setTargetUpdateInformation({});
     globalSettings()->synchronizeNow();
@@ -225,6 +234,8 @@ void UpdateManager::onGlobalUpdateSettingChanged()
 
 void UpdateManager::onDownloaderFailed(const QString& fileName)
 {
+    NX_DEBUG(this, "Download failed for file %1", fileName);
+
     if (!m_targetUpdateInfo.isValid())
         return;
 
@@ -238,6 +249,8 @@ void UpdateManager::onDownloaderFailed(const QString& fileName)
 
 void UpdateManager::onDownloaderFinished(const QString& fileName)
 {
+    NX_DEBUG(this, "Download finished for file %1", fileName);
+
     if (!m_targetUpdateInfo.isValid())
         return;
 
@@ -267,6 +280,9 @@ void UpdateManager::processFoundEndpoint(const discovery::ModuleEndpoint& endpoi
     if (!server)
         return;
 
+    NX_VERBOSE(this, "Checking update status of server: %1 (%2:%3)...",
+        endpoint.id, endpoint.endpoint, endpoint.port);
+
     checkUpdateInfo(server, InformationCategory::target);
     checkUpdateInfo(server, InformationCategory::installed);
 }
@@ -276,8 +292,8 @@ update::FindPackageResult UpdateManager::findPackage(
 {
     const auto result = update::findPackage(
         *serverModule()->commonModule(), outPackage, outMessage);
-    NX_DEBUG(this, "Find package called. Result: %1, message: %2",
-        (int) result, outMessage == nullptr ? "" : *outMessage);
+    NX_DEBUG(this, "findPackage(). Result: %1, message: %2",
+        (int) result, !outMessage ? "" : *outMessage);
     return result;
 }
 
@@ -286,7 +302,7 @@ void UpdateManager::detectStartedInstallation()
     if (m_installationDetected)
         return;
 
-    NX_VERBOSE(this, "Started installation detection requested.");
+    NX_VERBOSE(this, "Detecting started installation...");
 
     if (m_targetUpdateInfo.isValid() && m_targetUpdateInfo.lastInstallationRequestTime > 0)
     {
@@ -320,6 +336,8 @@ void UpdateManager::extract()
     nx::update::Package package;
     if (findPackage(&package) != update::FindPackageResult::ok)
         return;
+
+    NX_INFO(this, "Extracting update package...");
 
     m_installer.prepareAsync(downloader()->filePath(package.file));
     detectStartedInstallation();
