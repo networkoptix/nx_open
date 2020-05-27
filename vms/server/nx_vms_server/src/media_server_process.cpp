@@ -3292,23 +3292,74 @@ void MediaServerProcess::registerRestHandlers(
 
     if (const auto controller = m_metricsController.get())
     {
-        /**%apidoc[proprietary] TODO /api/metrics/
-         * %// TODO: Write apidoc comment.
+        /**%apidoc[proprietary] GET /api/metrics/
+         * Returns the same values as GET /ec2/metrics/ but without multiserver aggregation.
+         * See metrics.md for details.
          */
         reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(controller), kAdmin);
 
         /**%apidoc GET /ec2/metrics/manifest
-         * %return:object Metrics parameter manifest. See metrics.md for details.
+         * Returns the manifest for GET /ec2/metrics/alarms and GET /ec2/metrics/values visualization.
+         * %return:object JSON object with an error code, error string, and the reply on success.
+         *      %param:string error Error code, "0" means no error.
+         *      %param:string errorString Error message in English, or an empty string.
+         *      %param:array reply
+         *          %param:string reply[].id Resource group id.
+         *          %param:string reply[].name Resource group name.
+         *          %param:string reply[].resource Resource label.
+         *          %param:array reply[].values Resource group manifest.
+         *              %param:string reply[].values[].id Parameter group id.
+         *              %param:string reply[].values[].name Parameter group name.
+         *              %param:array reply[].values[].values Parameter group manifest.
+         *                  %param:string reply[].values[].values[].id Parameter id.
+         *                  %param:string reply[].values[].values[].name Parameter name.
+         *                  %param:string reply[].values[].values[].description Parameter description.
+         *                  %param:string reply[].values[].values[].format Parameter format or units.
+         *                  %param:string reply[].values[].values[].display Display type.
          *
          * %apidoc GET /ec2/metrics/values
-         * %return:object Metrics parameter values according to manifest. See metrics.md for details.
+         * Returns the current state of the values.
+         * %param:string formatted Apply format like in /ec2/metrics/alarms.
+         * %return:object JSON object with an error code, error string, and the reply on success.
+         *      %param:string error Error code, "0" means no error.
+         *      %param:string errorString Error message in English, or an empty string.
+         *      %param:object reply
+         *          %param:object reply.{resourceGroupId}
+         *              Resource group values. Possible {resourceGroupId} values match reply[].id
+         *              from manifest.
+         *              %param:object reply.{resourceGroupId}.{resourceId}
+         *                  Resource group values. Possible {resourceId} values indicate VMS resources.
+         *                  %param:object reply.{resourceGroupId}.{resourceId}.{groupId}
+         *                      Parameter group values. Possible {groupId} values match
+         *                      reply[].values[].id from manifest.
+         *                      %param reply.{resourceGroupId}.{resourceId}.{groupId}.{parameterId}
+         *                          Parameter value. Possible {parameterId} values match
+         *                          reply[].values[].values[].id from manifest.
          *
          * %apidoc GET /ec2/metrics/alarms
-         * %return:object Metrics parameter alarms with parameter links. See metrics.md for details.
+         * Returns the currently active alarms.
+         * %return:object JSON object with an error code, error string, and the reply on success.
+         *      %param:string error Error code, "0" means no error.
+         *      %param:string errorString Error message in English, or an empty string.
+         *      %param:object reply
+         *          %param:object reply.{resourceGroupId}
+         *              Resource group alarms. Possible {resourceGroupId} values match reply[].id
+         *              from manifest.
+         *              %param:object reply.{resourceGroupId}.{resourceId}
+         *                  Resource group alarms. Possible {resourceId} values indicate VMS resources.
+         *                  %param:object reply.{resourceGroupId}.{resourceId}.{groupId}
+         *                      Parameter group alarms. Possible {groupId} values match
+         *                      reply[].values[].id from manifest.
+         *                      %param reply.{resourceGroupId}.{resourceId}.{groupId}.{parameterId}
+         *                          Parameter alarm. Possible {parameterId} values match
+         *                          reply[].values[].values[].id from manifest.
+         *                      %param:string reply.{resourceGroupId}.{resourceId}.{groupId}.{parameterId}.level
+         *                          Alarm level.
+         *                      %param:string reply.{resourceGroupId}.{resourceId}.{groupId}.{parameterId}.text
+         *                          Alarm text.
          *
-         * %apidoc GET /ec2/metrics/rules
-         * %return:object Metric rules, which are currently in use in the system. See metrics.md
-         * for details.
+         * %apidoc[proprietary] GET /ec2/metrics/rules
+         * The rules to calculate the final manifest and raise alarms. See metrics.md for details.
          */
         reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
             controller, serverModule(), m_ec2ConnectionFactory->serverConnector()), kAdmin);
