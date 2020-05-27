@@ -1,13 +1,18 @@
 #include "engine.h"
 
 #include <string_view>
+#include <exception>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
-#include <nx/kit/json.h>
+#include <nx/sdk/helpers/error.h>
+
+#include <QtCore/QJsonObject>
 
 #include "ini.h"
 #include "device_agent.h"
+#include "exception.h"
+#include "json_utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -29,12 +34,23 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 std::string Engine::manifestString() const
 {
-    return Json(Json::object{}).dump();
+    return unparseJson(QJsonObject{}).toStdString();
 }
 
 void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
-    *outResult = new DeviceAgent(deviceInfo);
+    try
+    {
+        *outResult = new DeviceAgent(deviceInfo);
+    }
+    catch (const Exception& exception)
+    {
+        *outResult = exception.toSdkError();
+    }
+    catch (const std::exception& exception)
+    {
+        *outResult = error(ErrorCode::internalError, exception.what());
+    }
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

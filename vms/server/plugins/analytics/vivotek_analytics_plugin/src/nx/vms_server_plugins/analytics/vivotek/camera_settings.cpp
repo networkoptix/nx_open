@@ -79,6 +79,31 @@ void enumerateAeEntries(CameraSettings::Vca* vca, Visitor visit)
 }
 
 
+template <typename Value>
+void fillReErrors(CameraSettings::Entry<Value>* entry,
+    const QString& message)
+{
+    entry->emplaceErrorMessage(message);
+}
+
+void fillReErrors(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
+    const QString& message)
+{
+    for (auto& rule: intrusionDetection->rules)
+    {
+        fillReErrors(&rule.region, message);
+        fillReErrors(&rule.inverted, message);
+    }
+}
+
+
+void fillReErrors(CameraSettings::Vca* vca, const QString& message)
+{
+    if (auto& intrusionDetection = vca->intrusionDetection)
+        fillReErrors(&*intrusionDetection, message);
+}
+
+
 void fetchFromCamera(CameraSettings::Vca::Enabled* enabled, const Url& cameraUrl)
 {
     try
@@ -188,27 +213,37 @@ void parseReFromCamera(CameraSettings::Vca::IntrusionDetection::Rule::Inverted* 
 void parseReFromCamera(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
     const QJsonValue& parameters)
 {
-    const auto jsonRules = get<QJsonObject>(parameters, "IntrusionDetection");
-    const auto ruleNames = jsonRules.keys();
-
-    auto& rules = intrusionDetection->rules;
-    for (std::size_t i = 0; i < rules.size(); ++i)
+    try
     {
-        auto& rule = rules[i];
-        if (i >= (std::size_t) ruleNames.size())
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(parameters, "IntrusionDetection").isUndefined())
+            jsonRules = get<QJsonObject>(parameters, "IntrusionDetection");
+
+        const auto ruleNames = jsonRules.keys();
+
+        auto& rules = intrusionDetection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
         {
-            rule.region.emplaceNothing();
-            rule.inverted.emplaceNothing();
-            continue;
+            auto& rule = rules[i];
+            if (i >= (std::size_t) ruleNames.size())
+            {
+                rule.region.emplaceNothing();
+                rule.inverted.emplaceNothing();
+                continue;
+            }
+
+            const auto& ruleName = ruleNames[i];
+            const auto& jsonRule = jsonRules[ruleName];
+
+            const QString path = NX_FMT("$.IntrusionDetection.%1", ruleName);
+
+            parseReFromCamera(&rule.region, jsonRule, ruleName, path);
+            parseReFromCamera(&rule.inverted, jsonRule, path);
         }
-
-        const auto& ruleName = ruleNames[i];
-        const auto& jsonRule = jsonRules[ruleName];
-
-        const QString path = NX_FMT("$.IntrusionDetection.%1", ruleName);
-
-        parseReFromCamera(&rule.region, jsonRule, ruleName, path);
-        parseReFromCamera(&rule.inverted, jsonRule, path);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(intrusionDetection, exception.what());
     }
 }
 
@@ -216,30 +251,6 @@ void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
 {
     if (auto& intrusionDetection = vca->intrusionDetection)
         parseReFromCamera(&*intrusionDetection, parameters);
-}
-
-
-template <typename Value>
-void fillReErrorsFromCamera(CameraSettings::Entry<Value>* entry,
-    const QString& message)
-{
-    entry->emplaceErrorMessage(message);
-}
-
-void fillReErrorsFromCamera(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
-    const QString& message)
-{
-    for (auto& rule: intrusionDetection->rules)
-    {
-        fillReErrorsFromCamera(&rule.region, message);
-        fillReErrorsFromCamera(&rule.inverted, message);
-    }
-}
-
-void fillReErrorsFromCamera(CameraSettings::Vca* vca, const QString& message)
-{
-    if (auto& intrusionDetection = vca->intrusionDetection)
-        fillReErrorsFromCamera(&*intrusionDetection, message);
 }
 
 
@@ -255,7 +266,7 @@ void fetchReFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
     }
     catch (const std::exception& exception)
     {
-        fillReErrorsFromCamera(vca, exception.what());
+        fillReErrors(vca, exception.what());
     }
 }
 
@@ -397,6 +408,144 @@ void storeAeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
 }
 
 
+std::optional<QString> getName(const CameraSettings::Entry<NamedPolygon>& entry)
+{
+    if (!entry.hasValue())
+        return std::nullopt;
+
+    const auto& region = entry.value();
+    return region.name;
+}
+
+std::optional<QString> getName(const CameraSettings::Vca::IntrusionDetection::Rule& rule)
+{
+    return getName(rule.region);
+}
+
+
+void unparseReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::IntrusionDetection::Rule::Region* region)
+{
+    try
+    {
+        if (!region->hasValue())
+            return;
+
+        set(jsonRule, "Field3D", QJsonValue::Undefined);
+
+        QJsonArray field;
+        for (const auto& point: region->value())
+            field.push_back(CameraVcaParameterApi::unparse(point));
+
+        // Wrapping in another array is intentional. For some reason, camera expects each region
+        // as an array of a single array of points.
+        set(jsonRule, "Field", QJsonArray{field});
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(region, exception.what());
+    }
+}
+
+void unparseReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::IntrusionDetection::Rule::Inverted* inverted)
+{
+    try
+    {
+        // If new rule, set default like in web UI.
+        if (inverted->hasNothing()
+            && get<QJsonValue>(*jsonRule, "WalkingDirection").isUndefined())
+        {
+            inverted->emplaceValue(false);
+        }
+
+        if (!inverted->hasValue())
+            return;
+
+        set(jsonRule, "WalkingDirection", inverted->value() ? "InToOut" : "OutToIn");
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(inverted, exception.what());
+    }
+}
+
+void unparseReToCamera(QJsonValue* parameters,
+    CameraSettings::Vca::IntrusionDetection* intrusionDetection)
+{
+    try
+    {
+        auto& rules = intrusionDetection->rules;
+
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(*parameters, "IntrusionDetection").isUndefined())
+        {
+            jsonRules = get<QJsonObject>(*parameters, "IntrusionDetection");
+
+            std::set<QString> ruleNames;
+            for (const auto& rule: rules)
+            {
+                if (auto name = getName(rule))
+                    ruleNames.insert(*name);
+            }
+            for (const auto& oldName: jsonRules.keys())
+            {
+                if (!ruleNames.count(oldName))
+                    jsonRules.remove(oldName);
+            }
+        }
+
+        for (auto& rule: rules)
+        {
+            if (auto name = getName(rule))
+            {
+                QJsonValue jsonRule = jsonRules[*name];
+                if (jsonRule.isUndefined() || jsonRule.isNull())
+                    jsonRule = QJsonObject{};
+
+                unparseReToCamera(&jsonRule, &rule.region);
+                unparseReToCamera(&jsonRule, &rule.inverted);
+
+                jsonRules[*name] = jsonRule;
+            }
+        }
+
+        set(parameters, "IntrusionDetection", jsonRules);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(intrusionDetection, exception.what());
+    }
+}
+
+void unparseReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
+{
+    if (auto& intrusionDetection = vca->intrusionDetection)
+        unparseReToCamera(parameters, &*intrusionDetection);
+}
+
+
+void storeReToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
+{
+    try
+    {
+        CameraVcaParameterApi api(cameraUrl);
+
+        auto parameters = api.fetch("Config/RE").get();
+
+        unparseReToCamera(&parameters, vca);
+
+        api.store("Config/RE", parameters).get();
+
+        api.reloadConfig().get();
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(vca, exception.what());
+    }
+}
+
+
 void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
 {
     auto& enabled = vca->enabled;
@@ -405,6 +554,7 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
         return;
 
     storeAeToCamera(cameraUrl, vca);
+    storeReToCamera(cameraUrl, vca);
 }
 
 

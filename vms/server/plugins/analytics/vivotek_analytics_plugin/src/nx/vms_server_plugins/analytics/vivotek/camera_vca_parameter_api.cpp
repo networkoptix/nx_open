@@ -1,5 +1,7 @@
 #include "camera_vca_parameter_api.h"
 
+#include <cmath>
+
 #include <nx/utils/general_macros.h>
 #include <nx/utils/log/log_message.h>
 
@@ -11,6 +13,13 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace nx::sdk::analytics;
 using namespace nx::utils;
+
+namespace {
+
+// Coordinates are normalized to [0; 10000]x[0; 10000].
+constexpr double kCoordDomain = 10000;
+
+} // namespace
 
 CameraVcaParameterApi::CameraVcaParameterApi(Url url):
     m_url(std::move(url))
@@ -50,23 +59,34 @@ cf::future<cf::unit> CameraVcaParameterApi::reloadConfig()
 
 Point CameraVcaParameterApi::parsePoint(const QJsonValue& json, const QString& path)
 {
-    auto parseCoord =
+    const auto parseCoord =
         [&](const QString& key)
         {
-            // coordinates are normalized to [0; 10000]x[0; 10000]
-            constexpr double kDomain = 10000;
-
             const auto value = get<double>(path, json, key);
-            if (value < 0 || value > kDomain)
+            if (value < 0 || value > kCoordDomain)
             {
                 throw Exception("%1.%2 = %3 is outside of expected range of [0; 10000]",
                     path, key, value);
             }
 
-            return value / kDomain;
+            return value / kCoordDomain;
         };
 
     return Point(parseCoord("x"), parseCoord("y"));
+}
+
+QJsonObject CameraVcaParameterApi::unparse(const Point& point)
+{
+    const auto unparseCoord =
+        [&](float value)
+        {
+            return (int) std::round(value * kCoordDomain);
+        };
+
+    return QJsonObject{
+        {"x", unparseCoord(point.x)},
+        {"y", unparseCoord(point.y)},
+    };
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

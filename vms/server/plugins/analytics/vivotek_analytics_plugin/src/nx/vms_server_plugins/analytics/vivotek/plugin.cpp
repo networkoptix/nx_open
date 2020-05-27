@@ -2,9 +2,11 @@
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
-#include <nx/kit/json.h>
+
+#include <QtCore/QJsonObject>
 
 #include "engine.h"
+#include "json_utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -19,13 +21,13 @@ Result<IEngine*> Plugin::doObtainEngine()
 
 std::string Plugin::manifestString() const
 {
-    return Json(Json::object{
+    return unparseJson(QJsonObject{
         {"id", "nx.vivotek"},
         {"name", "Vivotek analytics plugin"},
         {"description", "Supports analytics on Vivotek cameras."},
         {"version", "0.0.0"},
         {"vendor", "Network Optix"},
-    }).dump();
+    }).toStdString();
 }
 
 extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()

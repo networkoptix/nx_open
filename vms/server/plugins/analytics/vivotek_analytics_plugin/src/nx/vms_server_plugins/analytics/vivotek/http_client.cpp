@@ -18,7 +18,7 @@ using namespace nx::network;
 
 HttpClient::HttpClient()
 {
-    setAuthType(http::AuthType::authBasic);
+    setAuthType(http::AuthType::authDigest);
 
     // masquarade as curl since vivotek rejects requests with default user agent on some endpoints
     addAdditionalHeader("User-Agent", "curl/7.69.1");
