@@ -309,7 +309,7 @@ QString AttributesDao::prepareAttributeTokens(
         // So, inserting additional separator for the following case:
         // name1 foo name2 yahoo.
         // Search "name2: foo" is not expected to find the string, but it will by default.
-        // Modifying string to the following: name1 foo 000 name2 yahoo
+        // Modifying the string to the following: name1 foo 000 name2 yahoo
 
         if (!text.isEmpty())
         {
