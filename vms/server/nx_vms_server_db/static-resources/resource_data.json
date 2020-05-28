@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.265",
+    "version": "1.0.1.267",
     "data": [
         {
             "keys": [
@@ -4249,6 +4249,16 @@
                     }
                 }
            }
+        },
+        {
+            "keys": [
+                "IC_Realtime|ICIP-PANO-A007",
+                "ICIP-PANO-A007|IC_Realtime",
+                "ICIP-T802-I|IC_Realtime",
+                "IC_Realtime|ICIP-T802-I"
+            ],
+            "fixWrongUri": true,
+            "alternativeSecondStreamSorter": true
         }
     ]
 }
