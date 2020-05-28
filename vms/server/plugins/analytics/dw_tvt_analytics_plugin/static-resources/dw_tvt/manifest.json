@@ -66,7 +66,7 @@
 
         {
             "id": "nx.dw_tvt.AOIENTRY",
-            "name": "_Entering Object Detection [exclusive]",
+            "name": "Entering Object Detection [exclusive]",
             "flags": "stateDependent",
             "internalName": "AOIENTRY",
             "alarmName": "aoientryAlarm",
@@ -74,7 +74,7 @@
         },
         {
             "id": "nx.dw_tvt.AOILEAVE",
-            "name": "_Leaving Object Detection [exclusive]",
+            "name": "Leaving Object Detection [exclusive]",
             "flags": "stateDependent",
             "internalName": "AOILEAVE",
             "alarmName": "aoileaveAlarm",
@@ -82,7 +82,7 @@
         },
         {
             "id": "nx.dw_tvt.PASSLINECOUNT",
-            "name": "_Line Crossing Object Counting [exclusive]",
+            "name": "Line Crossing Object Counting [exclusive]",
             "flags": "stateDependent",
             "internalName": "PASSLINECOUNT",
             "alarmName": "passlinecountAlarm",
