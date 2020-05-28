@@ -24,7 +24,6 @@ namespace nx::vms::server::event {
 using namespace nx::network;
 
 static const QString kPushApiPath = "api/notifications/push_notification";
-static const size_t kPushThumbnailHeight = 480;
 
 const RetryPolicy PushManager::kDefaultRetryPolicy(
     /*maxRetryCount*/ 5,
@@ -235,13 +234,23 @@ PushPayload PushManager::makePayload(
     if (camera)
     {
         url.addQueryItem("resources", camera->getId().toSimpleString());
+
         imageUrl = url::Builder()
             .setScheme(http::kSecureUrlSchemeName)
             .setEndpoint(settings->cloudSystemId())
-            .setPath("ec2/cameraThumbnail")
-            .addQueryItem("cameraId", camera->getId().toSimpleString())
-            .addQueryItem("time", event.eventTimestampUsec / 1000)
-            .addQueryItem("height", kPushThumbnailHeight);
+            .setPath("ec2/cameraThumbnail");
+        if (const QString options(ini().pushNotifyImageUrlOptions); options.isEmpty())
+        {
+            imageUrl.addQueryItem("height", 480);
+            imageUrl.addQueryItem("streamSelectionMode", "forcedSecondary"); //< For performanse.
+            imageUrl.addQueryItem("method", "precise"); //< Should be fine for secondary stream.
+        }
+        else
+        {
+            imageUrl.setQuery(options);
+        }
+        imageUrl.addQueryItem("cameraId", camera->getId().toSimpleString());
+        imageUrl.addQueryItem("time", event.eventTimestampUsec / 1000);
     }
 
     const QString imageUrlOverride(ini().pushNotifyImageUrl);
@@ -293,7 +302,7 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
 
     return {
         ((icon.isEmpty() ? QString() : (icon + " ")) + caption).left(100),
-        (description + (addNewLine ? "\n" : "") + resourceText).left(500),
+        description.left(500) + (addNewLine ? "\n" : "") + resourceText.left(100),
         makePayload(event, camera.get()),
         options,
     };

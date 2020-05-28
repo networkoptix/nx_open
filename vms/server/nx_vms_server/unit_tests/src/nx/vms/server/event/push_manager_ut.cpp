@@ -158,8 +158,10 @@ public:
     {
         if (resource.isNull())
             return QString();
-        return NX_FMT("https://%1/ec2/cameraThumbnail?cameraId=%2&time=111222333444&height=480",
-            systemId, resource.toSimpleString());
+        return NX_FMT("https://%1/ec2/cameraThumbnail?%2&cameraId=%3&time=111222333444",
+            systemId,
+            "height=480&streamSelectionMode=forcedSecondary&method=precise",
+            resource.toSimpleString());
     }
 
     void setUserPermissions(
