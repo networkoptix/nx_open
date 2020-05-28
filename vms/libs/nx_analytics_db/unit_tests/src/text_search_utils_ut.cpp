@@ -7,7 +7,7 @@ namespace nx::analytics::db {
 
 std::ostream& operator<<(std::ostream& os, const TextSearchCondition& val)
 {
-    os << (int)val.type << ". ";
+    os << (int) val.type << ". ";
 
     switch (val.type)
     {
