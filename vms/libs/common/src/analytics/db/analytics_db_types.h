@@ -245,7 +245,7 @@ private:
         Options options) const;
 
     bool matchText(
-        TextMatcher* textFilter,
+        TextMatcher* textMatcher,
         const ObjectTrack& track,
         const AbstractObjectTypeDictionary& objectTypeDictionary) const;
 };

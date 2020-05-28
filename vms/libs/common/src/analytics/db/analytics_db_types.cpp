@@ -139,10 +139,10 @@ bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
 
 bool Filter::acceptsAttributes(const Attributes& attributes) const
 {
-    TextMatcher textFilter;
-    textFilter.parse(freeText);
-    textFilter.matchAttributes(attributes);
-    return textFilter.matched();
+    TextMatcher textMatcher;
+    textMatcher.parse(freeText);
+    textMatcher.matchAttributes(attributes);
+    return textMatcher.matched();
 }
 
 bool Filter::acceptsMetadata(const ObjectMetadata& metadata, bool checkBoundingBox) const
@@ -201,9 +201,9 @@ bool Filter::acceptsTrackInternal(
 
     if (!options.testFlag(Option::ignoreTextFilter))
     {
-        TextMatcher textFilter;
-        textFilter.parse(freeText);
-        if (!matchText(&textFilter, track, objectTypeDictionary))
+        TextMatcher textMatcher;
+        textMatcher.parse(freeText);
+        if (!matchText(&textMatcher, track, objectTypeDictionary))
         {
             if constexpr (std::is_same<decltype(track), const ObjectTrackEx&>::value)
             {
@@ -211,10 +211,10 @@ bool Filter::acceptsTrackInternal(
                 if (!std::any_of(
                         track.objectPositionSequence.cbegin(),
                         track.objectPositionSequence.cend(),
-                        [this, &textFilter](const ObjectPosition& position)
+                        [this, &textMatcher](const ObjectPosition& position)
                         {
-                            textFilter.matchAttributes(position.attributes);
-                            return textFilter.matched();
+                            textMatcher.matchAttributes(position.attributes);
+                            return textMatcher.matched();
                         }))
                 {
                     return false;
@@ -235,17 +235,17 @@ bool Filter::acceptsTrackInternal(
 }
 
 bool Filter::matchText(
-    TextMatcher* textFilter,
+    TextMatcher* textMatcher,
     const ObjectTrack& track,
     const AbstractObjectTypeDictionary& objectTypeDictionary) const
 {
     const auto objectTypeName = objectTypeDictionary.idToName(track.objectTypeId);
     if (objectTypeName)
-        textFilter->matchText(*objectTypeName);
+        textMatcher->matchText(*objectTypeName);
 
-    textFilter->matchAttributes(track.attributes);
+    textMatcher->matchAttributes(track.attributes);
 
-    return textFilter->matched();
+    return textMatcher->matched();
 }
 
 void Filter::loadUserInputToFreeText(const QString& userInput)
