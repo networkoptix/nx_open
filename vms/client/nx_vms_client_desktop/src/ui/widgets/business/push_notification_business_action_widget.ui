@@ -49,18 +49,14 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QnWordWrappedLabel" name="notConnectedLabel" native="true">
-         <property name="text" stdset="0">
-          <string>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</string>
-         </property>
-        </widget>
+        <widget class="QnWordWrappedLabel" name="notConnectedLabel" native="true"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="cloudSettingsLayout">
          <item>
           <widget class="QPushButton" name="cloudSettingsButton">
            <property name="text">
-            <string>Nx Cloud Settings</string>
+            <string notr="true">&lt;Nx Cloud Settings&gt;</string>
            </property>
           </widget>
          </item>
