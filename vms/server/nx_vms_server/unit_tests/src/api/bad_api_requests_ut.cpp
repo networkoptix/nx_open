@@ -139,7 +139,7 @@ TEST_F(BadApiRequests, removeCamerasOneByOne)
 
 TEST_F(BadApiRequests, removeSeveralCamerasAtOnce)
 {
-    removeCamerasOneByOne();
+    removeSeveralCamerasAtOnce();
 }
 
 } // namespace test
