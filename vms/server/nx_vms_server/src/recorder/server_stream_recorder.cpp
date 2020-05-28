@@ -580,8 +580,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     if (metaData)
     {
         NX_VERBOSE(this,
-            "%1(): Got motion metadata, returning true; ",
-            "catalog %2, resource %3 (%4) %5",
+            "%1(): Got motion metadata, returning true; catalog %2, resource %3 (%4) %5",
             __func__, m_catalog, m_resource->getName(), m_resource->getId(), m_resource->getUrl());
         return true;
     }
