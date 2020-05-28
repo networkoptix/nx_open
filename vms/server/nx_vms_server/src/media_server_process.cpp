@@ -1914,8 +1914,11 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getRemoteNonce", new QnGetNonceRestHandler("/api/getNonce"));
 
-    /**%apidoc[proprietary] TODO /api/cookieLogin
-     * %// TODO: Write apidoc comment.
+    /**%apidoc POST /api/cookieLogin
+     * Log in to the Server using cookie-based authentication. For usage details, refer to the
+     * <b>"Cookie-based authentication"</b> section of this documentation.
+     * %param:string auth The authentication hash, calculated using a special value "GET" for the
+     *     <i>method</i> parameter of the algorithm.
      */
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
 
@@ -2565,8 +2568,8 @@ void MediaServerProcess::registerRestHandlers(
      * merged with the target Server will be joined if parameter <b>mergeOneServer</b> is set
      * to false. <br/> The method uses digest authentication. Two hashes should be previously
      * calculated: <b>getKey</b> and <b>postKey</b>. Both are mandatory. The calculation
-     * algorithm is described in <b>Calculating authentication hash</b> section (in the bottom
-     * of the page). While calculating hashes, username and password of the target Server are
+     * algorithm is described in the <b>"Calculating authentication hash"</b> section of this
+     * documentation. While calculating hashes, username and password of the target Server are
      * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
      * /api/getNonce</code> call. The lifetime of a nonce is about a few minutes.
      * %permissions Owner.

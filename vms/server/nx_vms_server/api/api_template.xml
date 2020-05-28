@@ -382,7 +382,7 @@
                         It works mostly like sessions, but is a bit more secure because it doesn't send user's password over HTTP.<br/>
                         <ul>
                             <li>To check authentication:
-                            <ol>
+                                <ol>
                                     <li>Call <code>GET /api/getCurrentUser</code>
                                     </li>
                                     <li>You will get 401 (Unauthorised) in case you need authorization</li>
@@ -390,23 +390,28 @@
                                 </ol>
                             </li>
                             <li>To log in:
-                            <ol>
-                                    <li>Call <code>GET /api/getNonce</code>
-                                    </li>
-                                    <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
-                                    <li>Calculate authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
-                                    <li>Call <code>POST /api/cookieLogin</code> and pass the "auth" parameter in the json request body</li>
-                                    <li>Server will check authentication and set session cookies</li>
+                                <ol>
+                                    <li>Call <code>GET /api/getNonce</code></li>
+                                    <li>In response you'll get a JSON object with <i>realm</i> and
+                                        <i>nonce</i> (<i>nonce</i> is a session key for this user)</li>
+                                    <li>Calculate authentication hash <i>auth_digest</i>, using
+                                        <i>realm</i> and <i>nonce</i> (see the algorithm below,
+                                        supplying "GET" for <i>method</i>)</li>
+                                    <li>Call <code>POST /api/cookieLogin</code> and pass the
+                                        <i>auth_digest</i> as the "auth" parameter in the JSON
+                                        request body</li>
+                                    <li>The Server will check the authentication and set the
+                                        session cookies</li>
                                 </ol>
                             </li>
                             <li>Executing requests:
-                            <ol>
+                                <ol>
                                     <li>Session cookie should be supplied with every request, browser does it automatically if cookies are enabled</li>
                                     <li>HTTP header <i>X-Runtime-Guid</i> should contain the key from <i>x-runtime-guid</i> cookie value</li>
                                 </ol>
                             </li>
                             <li>To log out:
-                            <ol>
+                                <ol>
                                     <li>Call <code>POST /api/cookieLogout</code>
                                     </li>
                                     <li>Server will clear the session cookies</li>
@@ -424,12 +429,12 @@
                         <b>This method should only be used if other methods are not applicable, e.g. webm direct link or javascript application with different origin.</b>
                         <br/>
                         Add the "auth" parameter to the URL query section of any HTTP request:
-                        <ul>
+                        <ol>
                             <li>Call <code>/api/getNonce</code> to get <i>realm</i> and <i>nonce</i> from the server (the current server time is used as a nonce value, and the nonce is valid for about 5 minutes)</li>
                             <li>Calculate the authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
                             <li>Specify the authentication hash in the URL parameter: http://127.0.0.1:7001/<i>method</i>?auth=<i>auth_digest</i>&amp;<i>other_params</i>
                             </li>
-                        </ul>
+                        </ol>
                     </description>
                     <method/>
                     <params/>
@@ -437,28 +442,31 @@
                 </function>
                 <function>
                     <name>Calculating authentication hash</name>
-                    <description>For URL-based authentication and cookie-based authentication you need to calculate the hash manually, using the following algorithm:
-                        <ul>
-                            <li>Call <code>GET /api/getNonce</code>
-                            </li>
-                            <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i>
-                            </li>
+                    <description>For URL-based authentication and cookie-based authentication, you
+                        need to calculate the hash manually, using the following algorithm:
+                        <ol>
+                            <li>Call <code>GET /api/getNonce</code></li>
+                            <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i></li>
                             <li>Translate user's <i>username</i> to the lower case</li>
-                            <li>Check the required <i>method</i> ("GET" for HTTP GET requests, "POST" for HTTP POST requests, "PLAY" for RTSP etc)</li>
-                            <li>
-                                <code>digest = md5_hex(user_name + ":" + realm + ":" + password)</code>
+                            <li>Figure out the HTTP <i>method</i> ("GET" for HTTP GET requests,
+                                "POST" for HTTP POST requests, "PLAY" for RTSP, etc.) of the API
+                                call that requires the authentication hash.
+                                <ul>
+                                    <li>ATTENTION: For the backwards compatibility reason, certain
+                                    API calls require to use a special value of <i>method</i>,
+                                    different from the actual HTTP method used in that API call.
+                                    Check it out in the respective API call documentation. For
+                                    example, <code>POST /api/cookieLogin</code> requires to specify
+                                    "GET" for the digest calculation.</li>
+                                </ul>
+                            </li>    
+                            <li><code>digest = md5_hex(user_name + ":" + realm + ":" + password)</code></li>
+                            <li><code>partial_ha2 = md5_hex(method + ":")</code></li>
+                            <li><code>simplified_ha2 = md5_hex(digest + ":" + nonce + ":" + partial_ha2)</code></li>
+                            <li><code>auth_digest = base64(user_name + ":" + nonce + ":" + simplified_ha2)</code>
+                                <ul><li>Here <i>auth_digest</i> is the required authentication hash</li></ul>
                             </li>
-                            <li>
-                                <code>partial_ha2 = md5_hex(method + ":")</code>
-                            </li>
-                            <li>
-                                <code>simplified_ha2 = md5_hex(digest + ":" + nonce + ":" + partial_ha2)</code>
-                            </li>
-                            <li>
-                                <code>auth_digest = base64(user_name + ":" + nonce + ":" + simplified_ha2)</code>
-                            </li>
-                            <li>Here <i>auth_digest</i> is the required authentication hash</li>
-                        </ul>
+                        </ol>
                     </description>
                     <method/>
                     <params/>
