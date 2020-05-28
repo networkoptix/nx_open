@@ -118,7 +118,7 @@
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation>網路錯誤. 請檢查您的網際網路連接然後重試.</translation>
+      <translation>網路錯誤. 請檢查您的網際網路連接, 然後重試.</translation>
     </message>
   </context>
   <context>

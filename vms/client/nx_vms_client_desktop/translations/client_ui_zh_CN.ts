@@ -605,7 +605,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>副码流</translation>
+      <translation>次码流</translation>
     </message>
     <message>
       <location/>
@@ -748,7 +748,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>副码流</translation>
+      <translation>次码流</translation>
     </message>
     <message>
       <location/>

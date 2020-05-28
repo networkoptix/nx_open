@@ -93,7 +93,7 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation>至少有一个具有相同ID的服务器, 所以无法合并系统。请删除此服务器, 然后重试</translation>
+      <translation>相同ID服务器已存在, 所以无法合并系统。请删除此服务器, 然后重试</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>

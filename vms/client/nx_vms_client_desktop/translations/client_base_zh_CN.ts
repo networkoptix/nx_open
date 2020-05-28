@@ -8765,7 +8765,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>本地布局仅对其拥有者显示。</translation>
+      <translation>本地布局仅对其所有者显示。</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
