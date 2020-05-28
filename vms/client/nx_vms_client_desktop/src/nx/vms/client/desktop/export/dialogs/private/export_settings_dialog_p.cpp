@@ -230,7 +230,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         request.resource = m_exportMediaSettings.mediaResource->toResourcePtr();
         request.usecSinceEpoch = std::chrono::microseconds(std::chrono::milliseconds(
             m_exportMediaSettings.period.startTimeMs)).count();
-        request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameBefore;
+        request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameAfter;
         request.rotation = 0;
         request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
 
@@ -356,7 +356,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
     provider->setResourcePool(qnClientCoreModule->commonModule()->resourcePool());
     provider->setItemBackgroundColor(palette.color(QPalette::Window));
     provider->setFontColor(palette.color(QPalette::WindowText));
-    provider->setRequestRoundMethod(nx::api::ResourceImageRequest::RoundMethod::iFrameBefore);
+    provider->setRequestRoundMethod(nx::api::ResourceImageRequest::RoundMethod::iFrameAfter);
     provider->setWatermark(m_exportMediaSettings.transcodingSettings.watermark);
     provider->loadAsync();
 
