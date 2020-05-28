@@ -116,7 +116,7 @@ bool UserTextSearchExpressionParser::parse(const QString& text, Handler handler)
 
     for (int i = 0; i < text.size(); ++i)
     {
-        const auto ch = text[i];
+        const QChar ch = text[i];
 
         switch (state)
         {
