@@ -134,5 +134,19 @@ TEST(replaceStrings, specialCharacters)
         QString("***"));
 }
 
+//-------------------------------------------------------------------------------------------------
+
+TEST(String, unquoteStr)
+{
+    ASSERT_EQ("foo", nx::utils::unquoteStr(QString("\"foo\"")));
+    ASSERT_EQ("foo", nx::utils::unquoteStr(QString("foo")));
+    ASSERT_EQ("foo", nx::utils::unquoteStr(QString("\"foo")));
+    ASSERT_EQ("foo", nx::utils::unquoteStr(QString("foo\"")));
+
+    ASSERT_EQ("", nx::utils::unquoteStr(QString()));
+    ASSERT_EQ("", nx::utils::unquoteStr(QString("\"\"")));
+    ASSERT_EQ("", nx::utils::unquoteStr(QString("\"")));
+}
+
 } // namespace test
 } // namespace nx::utils

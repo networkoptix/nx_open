@@ -1,5 +1,7 @@
 #include "text_search_utils.h"
 
+#include <nx/utils/string.h>
+
 namespace nx::analytics::db {
 
 std::tuple<bool /*success*/, std::vector<TextSearchCondition>>
@@ -14,16 +16,9 @@ std::tuple<bool /*success*/, std::vector<TextSearchCondition>>
 
 void UserTextSearchExpressionParser::saveToken(QStringView token)
 {
+    token = nx::utils::unquoteStr(token, '"');
     if (token.empty())
         return;
-
-    if (token[0] == '"')
-        token = token.mid(1);
-    if (token.empty())
-        return;
-
-    if (token.back() == '"')
-        token = token.mid(0, token.size() - 1);
 
     m_tokens.push_back(token);
 }

@@ -24,7 +24,7 @@ class AbstractObjectTypeDictionary;
  *
  * Function "TEXT toZeroEncoding(TEXT)" replaces all non-alphadigit characters of text with
  * "0" HEX(text char).
- * Function "TEXT encodeZeros(TEXT)" replaces "0" found in the input text with "020".
+ * Function "TEXT encodeZeros(TEXT)" replaces "0" found in the input text with "030".
  *
  * NOTE: Not thread-safe.
  */

@@ -350,6 +350,7 @@ QString AttributesDao::toZeroEncoding(const QChar& ch)
 QString AttributesDao::encodeZeros(const QString& text)
 {
     QString result = text;
+    // 30 is a hex representation of the space character.
     result.replace("0", "030");
     return result;
 }
