@@ -27,6 +27,7 @@ public:
     bool read(const QString& name, QString* const value) const;
     bool read(const QString& name, int* const value) const;
     bool read(const QString& name, size_t* const value) const;
+    bool read(const QString& name, double* const value) const;
 
     template<typename ValueType = QString, typename MainName, typename ... AltNames>
     boost::optional<ValueType> get(MainName mainName, AltNames ... altNames) const;

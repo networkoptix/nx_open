@@ -28,6 +28,16 @@ size_t TestOptions::timeoutMultiplier()
     return s_timeoutMultiplier;
 }
 
+void TestOptions::setLoadFactor(double value)
+{
+    s_loadFactor = value;
+}
+
+double TestOptions::loadFactor()
+{
+    return s_loadFactor;
+}
+
 void TestOptions::disableTimeAsserts(bool areDisabled)
 {
     TEST_OPTIONS_SET_VALUE(s_disableTimeAsserts, areDisabled);
@@ -82,6 +92,9 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 {
     if (const auto value = arguments.get<size_t>("timeout-multiplier"))
         setTimeoutMultiplier(*value);
+
+    if (const auto value = arguments.get<double>("load-factor"))
+        setLoadFactor(*value);
 
     if (arguments.get("disable-time-asserts"))
         disableTimeAsserts();
@@ -146,6 +159,7 @@ void TestOptions::TemporaryDirectory::setPath(const QString& path)
 }
 
 std::atomic<size_t> TestOptions::s_timeoutMultiplier(1);
+std::atomic<double> TestOptions::s_loadFactor(1.0);
 std::atomic<bool> TestOptions::s_disableTimeAsserts(false);
 std::atomic<bool> TestOptions::s_keepTemporaryDirectory(false);
 std::atomic<size_t> TestOptions::s_loadMode(1);

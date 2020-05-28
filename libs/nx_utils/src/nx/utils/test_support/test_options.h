@@ -14,6 +14,13 @@ public:
     static void setTimeoutMultiplier(size_t value);
     static size_t timeoutMultiplier();
 
+    static void setLoadFactor(double value);
+
+    /**
+     * @return Multiplier to be applied by load tests to adjust the load.
+     */
+    static double loadFactor();
+
     static void disableTimeAsserts(bool areDisabled = true);
     static bool areTimeAssertsDisabled();
 
@@ -31,6 +38,7 @@ public:
 
 private:
     static std::atomic<size_t> s_timeoutMultiplier;
+    static std::atomic<double> s_loadFactor;
     static std::atomic<bool> s_disableTimeAsserts;
     static std::atomic<bool> s_keepTemporaryDirectory;
     static std::atomic<size_t> s_loadMode;

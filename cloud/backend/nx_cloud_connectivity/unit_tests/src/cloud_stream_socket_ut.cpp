@@ -16,6 +16,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/test_support/test_options.h>
 #include <nx/utils/test_support/utils.h>
 
 namespace nx {
@@ -212,7 +213,7 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
 {
     const char* tempHostName = "bla.bla";
     const size_t bytesToSendThroughConnection = 128 * 1024;
-    const size_t maxSimultaneousConnections = 1000;
+    const size_t maxSimultaneousConnections = 1000 * nx::utils::TestOptions::loadFactor();
     const std::chrono::seconds testDuration(3);
 
     setCreateStreamSocketFunc(
