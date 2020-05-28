@@ -292,8 +292,8 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
     NX_ASSERT(QJson::deserialize(QByteArray(ini().pushNotifyOptions), &options));
 
     return {
-        (icon.isEmpty() ? QString() : (icon + " ")) + caption,
-        description + (addNewLine ? "\n" : "") + resourceText,
+        ((icon.isEmpty() ? QString() : (icon + " ")) + caption).left(100),
+        (description + (addNewLine ? "\n" : "") + resourceText).left(500),
         makePayload(event, camera.get()),
         options,
     };
