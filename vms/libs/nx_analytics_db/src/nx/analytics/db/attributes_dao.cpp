@@ -6,6 +6,7 @@
 
 #include <analytics/db/abstract_object_type_dictionary.h>
 #include <analytics/db/config.h>
+#include <analytics/db/text_search_utils.h>
 
 namespace std {
 
@@ -156,14 +157,62 @@ std::vector<common::metadata::Attribute> AttributesDao::deserialize(
         QByteArray::fromRawData(data.data() + pos, data.size() - pos));
 }
 
+QString AttributesDao::buildSearchableText(
+    const QString& objectTypeName,
+    const std::vector<common::metadata::Attribute>& attributes)
+{
+    QString text;
+
+    if (!objectTypeName.isEmpty())
+        text += encodeZeros(objectTypeName) + kNameValueSeparator;
+
+    if (!attributes.empty())
+        text += prepareAttributeTokens(attributes);
+
+    return text;
+}
+
 QString AttributesDao::convertTextFilterToSqliteFtsExpression(const QString& text)
 {
-    auto result = text;
-    result.replace(
-        QRegularExpression("([\\w\\d\\-_]+)\\s*:\\s*([\\w\\d\\-_]+)"),
-        kParamNamePrefix + QString("\\1 NEAR/0 \\2"));
-    result.replace("$", kParamNamePrefix);
-    return result;
+    UserTextSearchExpressionParser parser;
+    const auto [success, conditions] = parser.parse(text);
+    // TODO: Check success.
+
+    QString expression;
+    for (const auto& condition: conditions)
+    {
+        if (!expression.isEmpty())
+            expression += " ";
+
+        switch (condition.type)
+        {
+            case ConditionType::attributePresenceCheck:
+                expression += kParamNamePrefix;
+                expression += toZeroEncoding(condition.name) + "*";
+                break;
+
+            case ConditionType::attributeValueMatch:
+            {
+                expression += kParamNamePrefix;
+                expression += toZeroEncoding(condition.name) + "*";
+                expression += " NEAR/0 ";
+
+                // TODO: Check for spaces may be not enough.
+                const auto needQuotes = condition.value.indexOf(' ') != -1;
+                if (needQuotes)
+                    expression += "\"" + encodeZeros(condition.value) + "\"";
+                else
+                    expression += encodeZeros(condition.value) + "*";
+                break;
+            }
+
+            case ConditionType::textMatch:
+                expression += encodeZeros(condition.text) + "*";
+                break;
+        }
+    }
+
+    return expression;
 }
 
 int64_t AttributesDao::insertAttributes(
@@ -180,28 +229,9 @@ int64_t AttributesDao::insertAttributes(
     const auto id = insertContentQuery->impl().lastInsertId().toLongLong();
 
     // Full text search table stores only attribute values.
-    QString contentForTextSearch;
-
-    if (objectTypeName)
-        contentForTextSearch += *objectTypeName + kNameValueSeparator;
-
-    for (const auto& attribute: attributes)
-    {
-        if (!contentForTextSearch.isEmpty())
-            contentForTextSearch += kNameValueSeparator;
-
-        // NOTE: SQLITE fts NEAR term does not support token ordering.
-        // So, inserting additional separator for the following case:
-        // name1 foo name2 yahoo.
-        // Search "name2: foo" is not expected to find the string, but it will by default.
-        // Modifying string to the following: name1 foo 000 name2 yahoo
-
-        contentForTextSearch += kParamNamePrefix;
-        contentForTextSearch += kNameValueSeparator;
-        contentForTextSearch += kParamNamePrefix + attribute.name;
-        contentForTextSearch += kNameValueSeparator;
-        contentForTextSearch += attribute.value;
-    }
+    QString contentForTextSearch = buildSearchableText(
+        objectTypeName ? *objectTypeName : "",
+        attributes);
 
     insertContentQuery = queryContext->connection()->createQuery();
     insertContentQuery->prepare(
@@ -266,6 +296,62 @@ int64_t AttributesDao::saveToDb(
     }
 
     return combinationId;
+}
+
+QString AttributesDao::prepareAttributeTokens(
+    const std::vector<common::metadata::Attribute>& attributes)
+{
+    QString text;
+
+    for (const auto& attribute: attributes)
+    {
+        // NOTE: SQLITE fts NEAR term does not support token ordering.
+        // So, inserting additional separator for the following case:
+        // name1 foo name2 yahoo.
+        // Search "name2: foo" is not expected to find the string, but it will by default.
+        // Modifying string to the following: name1 foo 000 name2 yahoo
+
+        if (!text.isEmpty())
+        {
+            text += kNameValueSeparator;
+            text += kParamNamePrefix;
+            text += kNameValueSeparator;
+        }
+
+        text += kParamNamePrefix + toZeroEncoding(attribute.name);
+        text += kNameValueSeparator;
+        text += encodeZeros(attribute.value);
+    }
+
+    return text;
+}
+
+QString AttributesDao::toZeroEncoding(const QString& text)
+{
+    QString result;
+    result.reserve(text.size());
+    for (const auto& ch: text)
+        result += isLatinLetterOrNumber(ch) ? ch : toZeroEncoding(ch);
+    return result;
+}
+
+bool AttributesDao::isLatinLetterOrNumber(const QChar& ch)
+{
+    return ch.toLatin1() > 0 && ch.isLetterOrNumber();
+}
+
+QString AttributesDao::toZeroEncoding(const QChar& ch)
+{
+    char buf[6];
+    sprintf(buf, "0%X", ch.unicode());
+    return QString::fromLatin1(buf);
+}
+
+QString AttributesDao::encodeZeros(const QString& text)
+{
+    QString result = text;
+    result.replace("0", "030");
+    return result;
 }
 
 } // namespace nx::analytics::db

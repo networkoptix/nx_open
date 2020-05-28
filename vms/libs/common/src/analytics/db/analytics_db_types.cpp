@@ -139,7 +139,7 @@ bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
 
 bool Filter::acceptsAttributes(const Attributes& attributes) const
 {
-    TextMatchContext textFilter;
+    TextMatcher textFilter;
     textFilter.parse(freeText);
     textFilter.matchAttributes(attributes);
     return textFilter.matched();
@@ -201,7 +201,7 @@ bool Filter::acceptsTrackInternal(
 
     if (!options.testFlag(Option::ignoreTextFilter))
     {
-        TextMatchContext textFilter;
+        TextMatcher textFilter;
         textFilter.parse(freeText);
         if (!matchText(&textFilter, track, objectTypeDictionary))
         {
@@ -235,7 +235,7 @@ bool Filter::acceptsTrackInternal(
 }
 
 bool Filter::matchText(
-    TextMatchContext* textFilter,
+    TextMatcher* textFilter,
     const ObjectTrack& track,
     const AbstractObjectTypeDictionary& objectTypeDictionary) const
 {
@@ -289,9 +289,9 @@ bool Filter::operator!=(const Filter& right) const
 }
 
 //-------------------------------------------------------------------------------------------------
-// Filter::TextMatchContext.
+// Filter::TextMatcher.
 
-void Filter::TextMatchContext::parse(const QString& text)
+void Filter::TextMatcher::parse(const QString& text)
 {
     auto filterText = text.trimmed();
 
@@ -308,14 +308,14 @@ void Filter::TextMatchContext::parse(const QString& text)
     m_tokensMatched.resize(m_tokens.size(), false);
 }
 
-bool Filter::TextMatchContext::empty() const
+bool Filter::TextMatcher::empty() const
 {
     return m_exactAttrsToMatch.empty()
         && m_attributeToFindNames.empty()
         && m_tokens.empty();
 }
 
-void Filter::TextMatchContext::matchAttributes(const nx::common::metadata::Attributes& attributes)
+void Filter::TextMatcher::matchAttributes(const nx::common::metadata::Attributes& attributes)
 {
     if (attributes.empty())
         return;
@@ -325,13 +325,13 @@ void Filter::TextMatchContext::matchAttributes(const nx::common::metadata::Attri
     matchAttributeValues(attributes);
 }
 
-void Filter::TextMatchContext::matchText(const QString& text)
+void Filter::TextMatcher::matchText(const QString& text)
 {
     for (std::size_t i = 0; i < m_tokens.size(); ++i)
         m_tokensMatched[i] = m_tokensMatched[i] || text.startsWith(m_tokens[i], Qt::CaseInsensitive);
 }
 
-bool Filter::TextMatchContext::matched() const
+bool Filter::TextMatcher::matched() const
 {
     auto notMatched = [](auto val) { return !val; };
 
@@ -340,7 +340,7 @@ bool Filter::TextMatchContext::matched() const
         && !std::any_of(m_tokensMatched.begin(), m_tokensMatched.end(), notMatched);
 }
 
-nx::common::metadata::Attributes Filter::TextMatchContext::takeExactAttrMatchFiltersFromText(
+nx::common::metadata::Attributes Filter::TextMatcher::takeExactAttrMatchFiltersFromText(
     QString* textFilter)
 {
     nx::common::metadata::Attributes attributesToMatch;
@@ -365,7 +365,7 @@ nx::common::metadata::Attributes Filter::TextMatchContext::takeExactAttrMatchFil
     return attributesToMatch;
 }
 
-void Filter::TextMatchContext::matchExactAttributes(
+void Filter::TextMatcher::matchExactAttributes(
     const nx::common::metadata::Attributes& attributes)
 {
     for (std::size_t i = 0; i < m_exactAttrsToMatch.size(); ++i)
@@ -386,7 +386,7 @@ void Filter::TextMatchContext::matchExactAttributes(
     }
 }
 
-std::vector<QString> Filter::TextMatchContext::takeAttributeToFindNamesFromText(QString* textFilter)
+std::vector<QString> Filter::TextMatcher::takeAttributeToFindNamesFromText(QString* textFilter)
 {
     std::vector<QString> names;
 
@@ -405,7 +405,7 @@ std::vector<QString> Filter::TextMatchContext::takeAttributeToFindNamesFromText(
     return names;
 }
 
-void Filter::TextMatchContext::checkAttributesPresence(
+void Filter::TextMatcher::checkAttributesPresence(
     const nx::common::metadata::Attributes& attributes)
 {
     for (std::size_t i = 0; i < m_attributeToFindNames.size(); ++i)
@@ -419,14 +419,14 @@ void Filter::TextMatchContext::checkAttributesPresence(
     }
 }
 
-void Filter::TextMatchContext::matchAttributeValues(
+void Filter::TextMatcher::matchAttributeValues(
     const nx::common::metadata::Attributes& attributes)
 {
     for (std::size_t i = 0; i < m_tokens.size(); ++i)
         m_tokensMatched[i] = m_tokensMatched[i] || wordMatchAnyOfAttributes(m_tokens[i], attributes);
 }
 
-bool Filter::TextMatchContext::wordMatchAnyOfAttributes(
+bool Filter::TextMatcher::wordMatchAnyOfAttributes(
     const QString& word,
     const nx::common::metadata::Attributes& attributes)
 {

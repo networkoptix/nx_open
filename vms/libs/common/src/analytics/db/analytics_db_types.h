@@ -184,15 +184,15 @@ private:
      * To use this class first parse the text filter.
      * Format description:
      * TextFilter = *matchToken
-     * matchToken = word | attributeName | attributeValue
+     * matchToken = word | attributeName | attributeToken
      * attributeName = "$" word
      * attributeToken = word ":" word
-     * word = 1 * (DIGIT | ALPHA)
+     * word = 1 * (DIGIT | ALPHA) | '"' TEXT '"'
      *
      * Then, invoke matchAttributes() or mathText() and check the match result with matched().
      * matched() reports true only if all tokens were matched
      */
-    class TextMatchContext
+    class TextMatcher
     {
     public:
         void parse(const QString& text);
@@ -245,7 +245,7 @@ private:
         Options options) const;
 
     bool matchText(
-        TextMatchContext* textFilter,
+        TextMatcher* textFilter,
         const ObjectTrack& track,
         const AbstractObjectTypeDictionary& objectTypeDictionary) const;
 };

@@ -13,6 +13,19 @@ namespace nx::analytics::db {
 class AbstractObjectTypeDictionary;
 
 /**
+ * Implements object attributes storing/looking up on top of SQLITE.
+ * SQLITE fts4 text index is used to provide text search functionality.
+ *
+ * Text index format:
+ * textIndexRecord = [ objectTypeToken " " ] [ attributeTokens ]
+ * objectTypeToken = encodeZeros(objectType)
+ * attributeTokens = attributeToken *( "000" attributeToken )
+ * attributeToken = toZeroEncoding(attributeName) " " encodeZeros(attributeValue)
+ *
+ * Function "TEXT toZeroEncoding(TEXT)" replaces all non-alphadigit characters of text with
+ * "0" HEX(text char).
+ * Function "TEXT encodeZeros(TEXT)" replaces "0" found in the input text with "020".
+ *
  * NOTE: Not thread-safe.
  */
 class NX_ANALYTICS_DB_API AttributesDao
@@ -51,6 +64,17 @@ public:
     static std::vector<common::metadata::Attribute> deserialize(
         const QString& attributesStr);
 
+    //---------------------------------------------------------------------------------------------
+
+    static QString buildSearchableText(
+        const QString& objectTypeName,
+        const std::vector<common::metadata::Attribute>& attributes);
+
+    /**
+     * Converts user text search expression into sqlite FTS4 MATCH expression.
+     * @param text See Filter::TextMatchContext for user text format description.
+     * @return See AttributesDao class description for the text index format.
+     */
     static QString convertTextFilterToSqliteFtsExpression(const QString& text);
 
 private:
@@ -74,6 +98,15 @@ private:
     int64_t saveToDb(
         nx::sql::QueryContext* queryContext,
         const std::set<int64_t>& attributesIds);
+
+    static QString prepareAttributeTokens(
+        const std::vector<common::metadata::Attribute>& attributes);
+
+    static QString toZeroEncoding(const QString& text);
+    static bool isLatinLetterOrNumber(const QChar& ch);
+    static QString toZeroEncoding(const QChar& ch);
+
+    static QString encodeZeros(const QString& text);
 };
 
 } // namespace nx::analytics::db
