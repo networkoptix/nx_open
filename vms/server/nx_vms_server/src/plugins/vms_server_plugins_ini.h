@@ -15,7 +15,7 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "Multicast Plugin (the library names on Linux are libusb_camera_plugin.so and\n"
         "libgeneric_multicast_plugin.so, on Windows the libraries are\n"
         "usb_camera_plugin.dll and generic_multicast_plugin.dll.\n"
-        "Set the value of this setting to \"usb_camera_plugin,generic_multicast_plugin\"");
+        "Set the value of this setting to \"usb_camera_plugin,generic_multicast_plugin\".");
 
     NX_INI_STRING("", enabledNxPluginsOptional,
         "Comma-separated list of Nx plugins to load from \"plugins_optional\" dir,\n"
