@@ -307,7 +307,7 @@ QString AttributesDao::prepareAttributeTokens(
     {
         // NOTE: SQLITE fts NEAR term does not support token ordering.
         // So, inserting additional separator for the following case:
-        // name1 foo name2 yahoo.
+        // name1 foo name2 yahoo
         // Search "name2: foo" is not expected to find the string, but it will by default.
         // Modifying the string to the following: name1 foo 000 name2 yahoo
 
