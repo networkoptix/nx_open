@@ -7,6 +7,7 @@
 #include <nx/sdk/analytics/point.h>
 #include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/utils/log/log_message.h>
 
 #include "camera_vca_parameter_api.h"
@@ -78,14 +79,12 @@ Ptr<IObjectMetadata> parseMetadata(const QString& path, const QJsonObject& objec
     metadata->setBoundingBox(parseBoundingBox(
         NX_FMT("%1.Pos2D", path), get<QJsonArray>(path, object, "Pos2D")));
 
-    metadata->setConfidence(1);
-
     return metadata;
 }
 
 } // namespace
 
-Ptr<ObjectMetadataPacket> parseObjectMetadataPacket(const QJsonValue& native)
+Ptr<IObjectMetadataPacket> parseObjectMetadataPacket(const QJsonValue& native)
 {
     if (get<QString>(native, "Tag") != "MetaData")
         return nullptr;

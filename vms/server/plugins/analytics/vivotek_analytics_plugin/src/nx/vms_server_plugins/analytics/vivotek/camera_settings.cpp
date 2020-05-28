@@ -431,6 +431,9 @@ void unparseReToCamera(QJsonValue* jsonRule,
         if (!region->hasValue())
             return;
 
+        set(jsonRule, "RuleName", region->value().name);
+        set(jsonRule, "EventName", region->value().name);
+
         set(jsonRule, "Field3D", QJsonValue::Undefined);
 
         QJsonArray field;

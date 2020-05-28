@@ -14,9 +14,10 @@
 #include <nx/utils/url.h>
 
 #include "ini.h"
-#include "camera_settings.h"
 #include "object_types.h"
+#include "event_types.h"
 #include "parse_object_metadata_packet.h"
+#include "parse_event_metadata_packets.h"
 #include "exception.h"
 #include "json_utils.h"
 #include "utils.h"
@@ -32,12 +33,23 @@ using namespace nx::network;
 
 namespace {
 
+constexpr auto kMetadataStreamingRestartDelay = 10s;
+
 void emitDiagnostic(IDeviceAgent::IHandler* handler,
     IPluginDiagnosticEvent::Level level, const QString& caption, const QString& description)
 {
     const auto event = makePtr<PluginDiagnosticEvent>(level, caption.toStdString(), description.toStdString());
     handler->handlePluginDiagnosticEvent(event.get());
 }
+
+const auto ignoreOperationCanceled =
+    [](const std::system_error& exception)
+    {
+        if (exception.code() != std::errc::operation_canceled)
+            throw;
+
+        return cf::unit();
+    };
 
 } // namespace
 
@@ -65,13 +77,6 @@ void DeviceAgent::doSetSettings(Result<const IStringMap*>* outResult, const IStr
         CameraSettings settings(m_features);
 
         settings.parseFromServer(*values);
-
-        if (settings.vca && settings.vca->enabled.hasValue() && !settings.vca->enabled.value())
-        {
-            m_cameraHasMetadata = false;
-            updateMetadataStreaming();
-        }
-
         settings.storeTo(m_url);
 
         *outResult = settings.getErrorMessages().releasePtr();
@@ -100,9 +105,8 @@ void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* outRes
         settings.fetchFrom(m_url);
 
         auto& self = const_cast<DeviceAgent&>(*this);
-        self.m_cameraHasMetadata =
-            settings.vca && settings.vca->enabled.hasValue() && settings.vca->enabled.value();
-        self.updateMetadataStreaming();
+        self.updateAvailableMetadataTypes(settings);
+        self.refreshMetadataStreaming();
 
         auto values = settings.unparseToServer();
         auto errorMessages = settings.getErrorMessages();
@@ -133,6 +137,24 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
                             {"id", kObjectTypeHuman},
                             {"name", "Human"},
                         });
+                    }
+
+                    return types;
+                }(),
+            },
+            {"eventTypes",
+                [&]{
+                    QJsonArray types;
+
+                    if (m_features.vca)
+                    {
+                        if (m_features.vca->intrusionDetection)
+                        {
+                            types.push_back(QJsonObject{
+                                {"id", kEventTypeIntrusion},
+                                {"name", "Intrusion"},
+                            });
+                        }
                     }
 
                     return types;
@@ -175,8 +197,14 @@ void DeviceAgent::doSetNeededMetadataTypes(
 {
     try
     {
-        m_serverWantsMetadata = !neededMetadataTypes->isEmpty();
-        updateMetadataStreaming();
+        m_neededMetadataTypes = NoNativeMetadataTypes;
+
+        m_neededMetadataTypes.setFlag(
+            ObjectNativeMetadataType, !!neededMetadataTypes->objectTypeIds()->count());
+        m_neededMetadataTypes.setFlag(
+            EventNativeMetadataType, !!neededMetadataTypes->eventTypeIds()->count());
+
+        refreshMetadataStreaming();
     }
     catch (const Exception& exception)
     {
@@ -195,82 +223,96 @@ void DeviceAgent::emitDiagnostic(
         level, std::move(caption), std::move(description));
 }
 
-void DeviceAgent::updateMetadataStreaming()
+void DeviceAgent::updateAvailableMetadataTypes(const CameraSettings& settings)
 {
-    const bool shouldBeStreaming = m_cameraHasMetadata && m_serverWantsMetadata;
+    m_availableMetadataTypes = NoNativeMetadataTypes;
+    if (const auto& vca = settings.vca)
+    {
+        if (const auto& enabled = vca->enabled; enabled.hasValue() && enabled.value())
+        {
+            m_availableMetadataTypes |= ObjectNativeMetadataType;
 
-    if (!shouldBeStreaming && m_streamingMetadata)
-        m_basicPollable->executeInAioThreadSync([&]{ stopMetadataStreaming(); });
-    else if (shouldBeStreaming && !m_streamingMetadata)
-        cf::initiate(*m_basicPollable, [&] { return startMetadataStreaming(); }).get();
-
-    m_streamingMetadata = shouldBeStreaming;
+            const auto regionHasValue = [](const auto& rule){ return rule.region.hasValue(); };
+            if (const auto& intrusionDetection = vca->intrusionDetection)
+            {
+                const auto& rules = intrusionDetection->rules;
+                if (std::any_of(rules.begin(), rules.end(), regionHasValue))
+                    m_availableMetadataTypes |= EventNativeMetadataType;
+            }
+        }
+    }
 }
 
-cf::future<cf::unit> DeviceAgent::startMetadataStreaming()
+void DeviceAgent::refreshMetadataStreaming()
+{
+    const auto shouldBeStreamed = m_availableMetadataTypes & m_neededMetadataTypes;
+    if (shouldBeStreamed != m_streamedMetadataTypes)
+    {
+        m_basicPollable->executeInAioThreadSync([&]{ stopMetadataStreaming(); });
+
+        m_streamedMetadataTypes = shouldBeStreamed;
+
+        if (m_streamedMetadataTypes != NoNativeMetadataTypes)
+            m_basicPollable->executeInAioThreadSync([&]{ startMetadataStreaming(); });
+    }
+}
+
+void DeviceAgent::startMetadataStreaming()
 {
     m_nativeMetadataSource.emplace();
-    return m_nativeMetadataSource->open(m_url)
-        .then_unwrap([this](auto&&) { return streamMetadataPackets(); });
-}
-
-cf::future<cf::unit> DeviceAgent::restartMetadataStreamingLater()
-{
-    constexpr auto kRestartDelay = 10s;
-
-    m_restartDelayer.emplace();
-    return m_restartDelayer->start(kRestartDelay)
-        .then_unwrap([this](auto&&) { return startMetadataStreaming(); })
-        .catch_(
-            [](const std::system_error& exception)
-            {
-                if (exception.code() != std::errc::operation_canceled)
-                    throw;
-
+    m_nativeMetadataSource->open(m_url, m_streamedMetadataTypes)
+        .then_unwrap(
+            [this](auto&&) {
+                streamMetadataPackets();
                 return cf::unit();
             })
+        .catch_(ignoreOperationCanceled)
         .catch_(
             [this](const std::exception& exception)
             {
                 emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
-                    "Failed to restart metadata streaming", exception.what());
+                    "Failed to start metadata streaming", exception.what());
 
-                return restartMetadataStreamingLater();
+                m_timer.emplace();
+                return m_timer->start(kMetadataStreamingRestartDelay)
+                    .then_unwrap(
+                        [this](auto&&) {
+                            startMetadataStreaming();
+                            return cf::unit();
+                        })
+                    .catch_(ignoreOperationCanceled);
             });
 }
 
 void DeviceAgent::stopMetadataStreaming()
 {
-    m_restartDelayer.reset();
+    m_timer.reset();
     m_nativeMetadataSource.reset();
 }
 
-cf::future<cf::unit> DeviceAgent::streamMetadataPackets()
+void DeviceAgent::streamMetadataPackets()
 {
-    return m_nativeMetadataSource->read()
+    m_nativeMetadataSource->read()
         .then_unwrap(
             [this](const auto& nativePacket)
             {
                 if (auto packet = parseObjectMetadataPacket(nativePacket))
                     m_handler->handleMetadata(packet.releasePtr());
+                for (auto& packet: parseEventMetadataPackets(nativePacket))
+                    m_handler->handleMetadata(packet.releasePtr());
 
-                streamMetadataPackets()
-                    .catch_(
-                        [this](const std::exception& exception)
-                        {
-                            emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
-                                "Metadata streaming failed", exception.what());
-
-                            return restartMetadataStreamingLater();
-                        });
+                streamMetadataPackets();
 
                 return cf::unit();
             })
+        .catch_(ignoreOperationCanceled)
         .catch_(
-            [](const std::system_error& exception)
+            [this](const std::exception& exception)
             {
-                if (exception.code() != std::errc::operation_canceled)
-                    throw;
+                emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
+                    "Metadata streaming failed", exception.what());
+
+                startMetadataStreaming();
 
                 return cf::unit();
             });

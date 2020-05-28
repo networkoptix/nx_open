@@ -19,6 +19,7 @@
 
 #include "engine.h"
 #include "camera_features.h"
+#include "camera_settings.h"
 #include "native_metadata_source.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -49,13 +50,14 @@ private:
         nx::sdk::IPluginDiagnosticEvent::Level level,
         const QString& caption, const QString& description);
 
-    void updateMetadataStreaming();
+    void updateAvailableMetadataTypes(const CameraSettings& settings);
 
-    cf::future<cf::unit> startMetadataStreaming();
-    cf::future<cf::unit> restartMetadataStreamingLater();
+    void refreshMetadataStreaming();
+
+    void startMetadataStreaming();
     void stopMetadataStreaming();
 
-    cf::future<cf::unit> streamMetadataPackets();
+    void streamMetadataPackets();
 
 private:
     const std::unique_ptr<nx::network::aio::BasicPollable> m_basicPollable;
@@ -65,11 +67,11 @@ private:
 
     nx::sdk::Ptr<IHandler> m_handler;
 
-    bool m_serverWantsMetadata = false;
-    bool m_cameraHasMetadata = false;
-    bool m_streamingMetadata = false;
+    NativeMetadataTypes m_neededMetadataTypes = NoNativeMetadataTypes;
+    NativeMetadataTypes m_availableMetadataTypes = NoNativeMetadataTypes;
+    NativeMetadataTypes m_streamedMetadataTypes = NoNativeMetadataTypes;
     std::optional<NativeMetadataSource> m_nativeMetadataSource;
-    std::optional<nx::network::aio::Timer> m_restartDelayer;
+    std::optional<nx::network::aio::Timer> m_timer;
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

@@ -2,6 +2,8 @@
 
 #include <nx/utils/general_macros.h>
 
+#include <QtCore/QStringList>
+
 #include "json_utils.h"
 #include "exception.h"
 
@@ -10,14 +12,21 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 using namespace nx::utils;
 using namespace nx::network;
 
-cf::future<cf::unit> NativeMetadataSource::open(const Url& url)
+cf::future<cf::unit> NativeMetadataSource::open(const Url& url, NativeMetadataTypes types)
 {
     return enableDetailMetadata(url)
         .then_unwrap(
-            [this, url = url](auto&&) mutable
+            [this, url = url, types](auto&&) mutable
             {
                 url.setPath("/ws/vca");
-                url.setQuery("data=meta");
+
+                QStringList typeNames;
+                if (types & ObjectNativeMetadataType)
+                    typeNames.append("meta");
+                if (types & EventNativeMetadataType)
+                    typeNames.append("event");
+                url.setQuery("data=" + typeNames.join(","));
+
                 return m_webSocket.open(std::move(url));
             })
         .then(addExceptionContextAndRethrow("Failed to open native metadata source"));
@@ -48,9 +57,12 @@ cf::future<cf::unit> NativeMetadataSource::enableDetailMetadata(Url url)
 
                 set(&parameters, "WebSocket", "DetailMetadata", true);
 
-                return m_vcaParameterApi->store("Config/AE", parameters);
+                return m_vcaParameterApi->store("Config/AE", parameters)
+                    .then_unwrap(
+                        [this](auto&&) {
+                            return m_vcaParameterApi->reloadConfig();
+                        });
             })
-        .then_unwrap([this](auto&&) { return m_vcaParameterApi->reloadConfig(); })
         .then(addExceptionContextAndRethrow("Failed to enable detail metadata"));
 }
 
