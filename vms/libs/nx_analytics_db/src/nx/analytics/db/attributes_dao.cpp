@@ -337,7 +337,7 @@ QString AttributesDao::toZeroEncoding(const QString& text)
 
 bool AttributesDao::isLatinLetterOrNumber(const QChar& ch)
 {
-    return ch.toLatin1() > 0 && ch.isLetterOrNumber();
+    return ch.unicode() <= 126 && ch.isLetterOrNumber();
 }
 
 QString AttributesDao::toZeroEncoding(const QChar& ch)
