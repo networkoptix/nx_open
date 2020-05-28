@@ -4170,6 +4170,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnCameraDataExQuery& query,
     if (!filters.empty())
         filterStr = QString("WHERE %1").arg(filters.join(" AND "));
 
+    static const CameraAttributesData kDefaultUserAttributies;
+
     const QString queryStr = R"sql(
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId,
             coalesce(nullif(cu.camera_name, ""), r.name) as name, r.url,
@@ -4179,32 +4181,37 @@ ErrorCode QnDbManager::doQueryNoLock(const QnCameraDataExQuery& query,
             c.group_id as groupId, c.mac, c.model,
             c.status_flags as statusFlags, c.physical_id as physicalId,
             cu.audio_enabled as audioEnabled,
-            cu.control_enabled as controlEnabled,
+            coalesce(cu.control_enabled, %1) as controlEnabled,
             cu.region as motionMask,
             cu.schedule_enabled as scheduleEnabled,
             cu.motion_type as motionType,
             cu.disable_dual_streaming as disableDualStreaming,
             cu.dewarping_params as dewarpingParams,
-            coalesce(cu.min_archive_days, %1) as minArchiveDays,
-            coalesce(cu.max_archive_days, %2) as maxArchiveDays,
+            coalesce(cu.min_archive_days, %2) as minArchiveDays,
+            coalesce(cu.max_archive_days, %3) as maxArchiveDays,
             cu.preferred_server_id as preferredServerId,
             cu.license_used as licenseUsed,
-            cu.failover_priority as failoverPriority,
-            cu.backup_type as backupType,
+            coalesce(cu.failover_priority, %4) as failoverPriority,
+            coalesce(cu.backup_type, %5) as backupType,
             cu.logical_id as logicalId,
-            cu.record_before_motion_sec as recordBeforeMotionSec,
-            cu.record_after_motion_sec as recordAfterMotionSec
+            coalesce(cu.record_before_motion_sec, %6) as recordBeforeMotionSec,
+            coalesce(cu.record_after_motion_sec, %7) as recordAfterMotionSec
         FROM vms_resource r
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid
         JOIN vms_camera c on c.resource_ptr_id = r.id
         LEFT JOIN vms_camera_user_attributes cu on cu.camera_guid = r.guid
-        %3
+        %8
         ORDER BY r.guid
     )sql";
 
     queryCameras.prepare(queryStr
-      .arg(-kDefaultMinArchiveDays)
-      .arg(-kDefaultMaxArchiveDays)
+      .arg(kDefaultUserAttributies.controlEnabled)
+      .arg(kDefaultUserAttributies.minArchiveDays)
+      .arg(kDefaultUserAttributies.maxArchiveDays)
+      .arg((int) kDefaultUserAttributies.failoverPriority)
+      .arg(kDefaultUserAttributies.backupType)
+      .arg(kDefaultUserAttributies.recordBeforeMotionSec)
+      .arg(kDefaultUserAttributies.recordAfterMotionSec)
       .arg(filterStr));
 
     if (!queryCameras.exec()) {
