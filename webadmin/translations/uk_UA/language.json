@@ -77,8 +77,8 @@
         "emailSignature": "Підпис електронної пошти",
         "emailSupportEmail": "Email підтримки",
         "enableEdgeRecording": "Включити запис на внутрішній носій (edge)",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "Увімкнути WEB-розетки",
+        "maxP2pAllClientsSizeBytes": "Максимальний розмір буферу для надсилання даних p2p для всіх клієнтів",
         "eventLogPeriodDays": "Розмір журналу подій (дні)",
         "ldapAdminDn": "LDAP адміністратор DN",
         "ldapSearchBase": "База пошуку LDAP",
@@ -130,12 +130,12 @@
         "maxWebMTranscoders": "Максимальна кількість WEBM-з'єднань для сервера. Chrome одночасно відкриває 2 з'єднання, потім закриває перше. Отже, рекомендується встановити значення> = 2 для цього параметра.",
         "maxEventLogRecords": "Максимум запису журналу подій для зберігання в базі даних. Реальний обсяг відновлених записів може становити до 20% вище вказаного значення.",
         "forceLiveCacheForPrimaryStream": "Чи потрібно кешувати деякі кадри для первинного потоку. Значення: \"так\" - завжди включений (може використовувати багато оперативної пам'яті), \"ні\" - завжди вимикається, за винятком випадків, коли це вимагається відтворенням (наприклад, HLS), \"авто\" - схожена \"ні\", але увімкнено, коли покращується користувальницький досвід (наприклад, коли деякий плагін Analytics працює на камері).",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "additionalLocalFsTypes": "Додаткові типи файлової системи, які слід враховувати при визначенні секції відповідно до сховища серверів. Відокремлений комами список імен файлової системи, перелічених в /proc/mouns.",
+        "rtspBufferSizeKb": "Розмір буфера RTSP на сервері в КБ. Більше значення дозволяє використовувати більш ефективний Інтернет з високим значенням затримки, але сповільнює перемикання автоматичної якості та реакцію на роботу з RTSP."
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "Графіки",
             "storage": "Сховище",
             "log": "Журнал"
         }

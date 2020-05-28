@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Обмежити частоту кадрів для збереження ЦП</translation>
     </message>
   </context>
   <context>
@@ -952,7 +952,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>З'єднання...</translation>
     </message>
   </context>
   <context>
@@ -2280,52 +2280,52 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</source>
-      <translation type="unfinished">The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</translation>
+      <translation>Система не підключена до Nx Cloud. Мобільні сповіщення працюють лише під час підключення системи до Nx хмари.</translation>
     </message>
     <message>
       <location/>
       <source>Nx Cloud Settings</source>
-      <translation type="unfinished">Nx Cloud Settings</translation>
+      <translation>Налаштування Nx Cloud</translation>
     </message>
     <message>
       <location/>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>До</translation>
     </message>
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>Налаштування мови</translation>
     </message>
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>Особливий вміст сповіщень</translation>
     </message>
     <message>
       <location/>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Заголовок</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>Заголовок сповіщення за замовчуванням буде використаний, якщо його залишити порожнім</translation>
     </message>
     <message>
       <location/>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Тіло</translation>
     </message>
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>Текст за замовчуванням буде використаний, якщо це поле порожнє</translation>
     </message>
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Додайте назву початкового пристрою в тіло</translation>
     </message>
   </context>
   <context>
@@ -3236,7 +3236,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation type="unfinished">Custom language for mobile notifications</translation>
+      <translation>Спеціальна мова для мобільних сповіщень</translation>
     </message>
   </context>
   <context>
@@ -3403,12 +3403,12 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Час</translation>
     </message>
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>Ігноруйте часовий пояс у завантажених файлах</translation>
     </message>
   </context>
   <context>

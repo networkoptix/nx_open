@@ -8927,7 +8927,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Updateprüfung über das Internet nicht möglich</translation>
     </message>
   </context>
   <context>

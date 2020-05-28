@@ -1626,7 +1626,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>确定离开此页面吗？您所做的更改可能不会保存。</translation>
     </message>
   </context>
   <context>
@@ -8809,7 +8809,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>无法联网检查更新。</translation>
     </message>
   </context>
   <context>
@@ -8859,7 +8859,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>本地布局仅对其拥有者显示。</translation>
+      <translation>本地布局仅对其所有者显示。</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
@@ -9025,12 +9025,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>未知设备</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>未知设备%1</translation>
     </message>
   </context>
   <context>
@@ -9120,7 +9120,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>移动+低分辨率</translation>
     </message>
   </context>
   <context>

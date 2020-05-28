@@ -1626,7 +1626,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>確定離開此頁面？您所做的更改可能不會保存。</translation>
     </message>
   </context>
   <context>
@@ -8813,7 +8813,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>無法上網檢查更新</translation>
     </message>
   </context>
   <context>
@@ -9029,12 +9029,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>未知設備</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>未知設備%1</translation>
     </message>
   </context>
   <context>
@@ -9124,7 +9124,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>位移 + 低解析度</translation>
     </message>
   </context>
   <context>

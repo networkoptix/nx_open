@@ -1261,11 +1261,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>Щоб повідомити про проблему, будь ласка, зв'яжіться з %1.</translation>
     </message>
     <message>
       <source>To report the issue please contact your regional support agent:</source>
-      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
+      <translation>Щоб повідомити про проблему, будь ласка, зверніться до вашого регіонального агента підтримки:</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1273,7 +1273,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Отримано недійсні дані.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1313,11 +1313,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>Щоб активувати ліцензійний ключ вручну, зв'яжіться з %1.</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
+      <translation>Щоб активувати ліцензійний ключ вручну, зв'яжіться зі своїм регіональним агентом підтримки:</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1368,7 +1368,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Будь ласка, спробуйте ще раз пізніше.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1400,11 +1400,11 @@ to view more bookmarks</source>
     <name>LicenseManagementMessagesPrivate</name>
     <message>
       <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
+      <translation>Щоб отримати дійсний ліцензійний ключ, будь ласка, зверніться до вашого регіонального агента підтримки:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your regional support agent:</source>
-      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
+      <translation>Якщо проблема залишається, зверніться до вашого регіонального агента підтримки:</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
@@ -1417,19 +1417,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please contact your regional support agent:</source>
-      <translation type="unfinished">Please contact your regional support agent:</translation>
+      <translation>Будь ласка, зверніться до вашого регіонального агента підтримки:</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Для отримання дійсного ліцензійного ключа, будь ласка, зв'яжіться з %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Якщо проблема не зникне, зв'яжіться з %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Будь ласка, зв'яжіться з %1.</translation>
     </message>
   </context>
   <context>
@@ -1667,7 +1667,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Ви впевнені у тому, що хочете залишити цю сторінку? Зміни, які ви зробили не можуть бути збережені.</translation>
     </message>
   </context>
   <context>
@@ -8491,7 +8491,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Необхідне перекодування відео.</translation>
     </message>
   </context>
   <context>
@@ -9169,7 +9169,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Не вдається перевірити оновлення в Інтернеті</translation>
     </message>
   </context>
   <context>
@@ -9340,7 +9340,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>Не вдалося встановити оновлення.</translation>
     </message>
   </context>
   <context>
@@ -9388,12 +9388,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Невідомий пристрій</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Невідомий пристрій %1</translation>
     </message>
   </context>
   <context>
@@ -9417,7 +9417,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 Налаштування</translation>
     </message>
   </context>
   <context>
@@ -9486,7 +9486,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Рух + низк. якість</translation>
     </message>
   </context>
   <context>
@@ -10010,7 +10010,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>Потрібне перекодування. Перезапущено сеанс експорту.</translation>
     </message>
   </context>
   <context>
@@ -10217,15 +10217,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Будь ласка, завершіть дію для деактивації ліцензії</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Зверніть увагу, що кожен ліцензійний ключ може бути відключений максимум %n разів.</numerusform>
+        <numerusform>Зверніть увагу, що кожен ліцензійний ключ може бути відключений максимум %n разів.</numerusform>
+        <numerusform>Зверніть увагу, що кожен ліцензійний ключ може бути відключений максимум %n разів.</numerusform>
+        <numerusform>Зверніть увагу, що кожен ліцензійний ключ може бути відключений максимум %n разів.</numerusform>
       </translation>
     </message>
   </context>
