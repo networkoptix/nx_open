@@ -134,17 +134,11 @@ bool UserTextSearchExpressionParser::parse(const QString& text, Handler handler)
                 if (quoted)
                     continue;
 
-                if (ch.isSpace())
+                if (ch.isSpace() || ch == ':')
                 {
                     saveToken(text.midRef(tokenStart, i - tokenStart));
-                    state = State::waitingTokenStart;
-                }
-                else if (ch == ':')
-                {
-                    // Finishing token just before ':'.
-                    saveToken(text.midRef(tokenStart, i - tokenStart));
-                    // Adding ':' as a separate token.
-                    saveToken(text.midRef(i, 1));
+                    if (ch == ':')
+                        saveToken(text.midRef(i, 1)); //< Adding ':' as a separate token.
                     state = State::waitingTokenStart;
                 }
                 break;
