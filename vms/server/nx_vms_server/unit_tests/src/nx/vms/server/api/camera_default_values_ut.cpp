@@ -16,14 +16,14 @@ TEST(CameraExList, defaultValues)
     auto mediaServerLauncher = std::make_unique<MediaServerLauncher>();
     ASSERT_TRUE(mediaServerLauncher->start());
 
-    // Add camera
+    // Add camera.
     using namespace nx::vms::api;
     CameraDataList cameras;
     CameraData cameraData;
     cameraData.parentId = QnUuid::createUuid();
     cameraData.typeId = qnResTypePool->getResourceTypeByName("Camera")->getId();
     cameraData.vendor = "test vendor";
-    cameraData.physicalId = lit("Some physicalId");
+    cameraData.physicalId = "Some physicalId";
     cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
     cameras.push_back(cameraData);
 
@@ -33,9 +33,9 @@ TEST(CameraExList, defaultValues)
     ASSERT_EQ(ec2::ErrorCode::ok, dbError);
 
     CameraDataExList resultCameras;
-    NX_TEST_API_GET(mediaServerLauncher.get(), lit("/ec2/getCamerasEx"), &resultCameras);
-    ASSERT_EQ(1, resultCameras.size());
+    NX_TEST_API_GET(mediaServerLauncher.get(), "/ec2/getCamerasEx", &resultCameras);
 
+    ASSERT_EQ(1, resultCameras.size());
     ASSERT_EQ(CameraAttributesData(), (CameraAttributesData) resultCameras[0]);
     
 }
