@@ -1402,6 +1402,7 @@ TEST_F(AnalyticsDbLookupFullText, search_by_specific_param_value)
     whenLookupObjectTracks();
 
     thenResultMatchesExpectations();
+    andLookupResultIsNotEmpty();
 }
 
 TEST_F(AnalyticsDbLookup, search_by_attribute_presence)
