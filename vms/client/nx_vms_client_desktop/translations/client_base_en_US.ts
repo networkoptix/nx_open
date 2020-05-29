@@ -1317,11 +1317,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>To report the issue please contact your Regional / License support:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To activate License Key manually please contact your Regional / License support:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1405,15 +1405,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>To get a valid License Key please contact your Regional / License support:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>If the problem persists, please contact your Regional / License support:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Please contact your Regional / License support:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1674,7 +1674,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Regional / License support</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4000,12 +4000,12 @@ to %1</source>
     </message>
     <message>
         <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
         <comment>%1 will be substituted by a list of contacts</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9172,6 +9172,20 @@ If you intended to move analytics data to another storage location, please conta
         <source>%1 Settings</source>
         <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n symbols over</source>
+        <translation>
+            <numerusform>%n symbol over</numerusform>
+            <numerusform>%n symbols over</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n symbols left</source>
+        <translation>
+            <numerusform>%n symbol left</numerusform>
+            <numerusform>%n symbols left</numerusform>
+        </translation>
     </message>
 </context>
 <context>

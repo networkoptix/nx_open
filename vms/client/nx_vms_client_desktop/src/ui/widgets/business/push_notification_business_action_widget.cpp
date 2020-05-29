@@ -238,8 +238,8 @@ void PushNotificationBusinessActionWidget::updateLimitInfo(QWidget *textField)
         ui->maxLengthLabel->show();
         ui->maxLengthLabel->setText(
             current > max
-                ? tr("%n character(s) over", "", current - max)
-                : tr("%n character(s) left", "", max - current));
+                ? tr("%n symbols over", "", current - max)
+                : tr("%n symbols left", "", max - current));
         setWarningStyleOn(ui->maxLengthLabel, current > max);
     }
     else
