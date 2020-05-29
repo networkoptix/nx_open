@@ -1258,10 +1258,6 @@ to view more bookmarks</source>
       <translation>Để báo cáo vấn đề xin vui lòng liên hệ %1.</translation>
     </message>
     <message>
-      <source>To report the issue please contact your regional support agent:</source>
-      <translation>Để báo cáo vấn đề xin vui lòng liên hệ với đại lý hỗ trợ khu vực của bạn:</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>Không thể kích hoạt bản quyền</translation>
     </message>
@@ -1310,16 +1306,20 @@ to view more bookmarks</source>
       <translation>Để kích hoạt Khóa cấp phép theo cách thủ công, vui lòng liên hệ %1.</translation>
     </message>
     <message>
-      <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation>Để kích hoạt Khóa cấp phép theo cách thủ công, vui lòng liên hệ với đại lý hỗ trợ khu vực của bạn:</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>Lỗi mạng</translation>
     </message>
     <message>
       <source>License activated</source>
       <translation>Bản quyền được kích hoạt</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your Regional / License support:</source>
+      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your Regional / License support:</source>
+      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
@@ -1377,23 +1377,11 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>LicenseManagementMessagesPrivate</name>
-    <message>
-      <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation>Để có được Giấy phép khóa hợp lệ, vui lòng liên hệ với đại lý hỗ trợ khu vực của bạn:</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact your regional support agent:</source>
-      <translation>Nếu vấn đề vẫn còn, vui lòng liên hệ với đại lý hỗ trợ khu vực của bạn:</translation>
-    </message>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
         <numerusform>%n kênh.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact your regional support agent:</source>
-      <translation>Vui lòng liên hệ với đại lý hỗ trợ khu vực của bạn:</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
@@ -1406,6 +1394,18 @@ to view more bookmarks</source>
     <message>
       <source>Please contact %1.</source>
       <translation>Vui lòng liên hệ %1.</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact your Regional / License support:</source>
+      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your Regional / License support:</source>
+      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>Please contact your Regional / License support:</source>
+      <translation type="unfinished">Please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
@@ -1659,8 +1659,8 @@ to view more bookmarks</source>
       <translation>Được xây dựng cho%1-%2% với %3.</translation>
     </message>
     <message>
-      <source>Regional support</source>
-      <translation>Hỗ trợ khu vực</translation>
+      <source>Regional / License support</source>
+      <translation type="unfinished">Regional / License support</translation>
     </message>
   </context>
   <context>
@@ -3950,13 +3950,13 @@ to %1</source>
       <translation>Để có được tệp Khóa kích hoạt, vui lòng gửi Mã bản quyền và ID phần cứng được cung cấp về %1.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation>Vui lòng gửi Mã bản quyền và ID phần cứng được cung cấp cho bộ phận hỗ trợ khu vực của bạn để có được tệp Khóa kích hoạt.</translation>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>Vui lòng gửi Mã bản quyền và ID phần cứng được cung cấp tới bộ phận hỗ trợ khu vực của bạn (%1) để có được tệp Khóa kích hoạt.</translation>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>

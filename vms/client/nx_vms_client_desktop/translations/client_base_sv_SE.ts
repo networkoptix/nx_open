@@ -1261,10 +1261,6 @@ om du vill visa fler bokmärken</translation>
       <translation>Kontakta %1 för att rapportera ärendet.</translation>
     </message>
     <message>
-      <source>To report the issue please contact your regional support agent:</source>
-      <translation>För att rapportera problemet kontakta din regionala supportagent:</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>Misslyckades med att aktivera licens</translation>
     </message>
@@ -1313,16 +1309,20 @@ om du vill visa fler bokmärken</translation>
       <translation>För att aktivera licensnyckel manuellt kontakta %1.</translation>
     </message>
     <message>
-      <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation>För att aktivera licensnyckel manuellt kontakta din regionala supportagent:</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>Nätverksfel</translation>
     </message>
     <message>
       <source>License activated</source>
       <translation>Licensen aktiverad</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your Regional / License support:</source>
+      <translation>För att rapportera problemet kontakta din regionala supportagent:</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your Regional / License support:</source>
+      <translation>För att aktivera licensnyckel manuellt kontakta din regionala supportagent:</translation>
     </message>
   </context>
   <context>
@@ -1385,24 +1385,12 @@ om du vill visa fler bokmärken</translation>
   </context>
   <context>
     <name>LicenseManagementMessagesPrivate</name>
-    <message>
-      <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation>För att få en giltig licensnyckel kontakta din regionala supportagent:</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact your regional support agent:</source>
-      <translation>Om problemet kvarstår, kontakta din regionala supportagent:</translation>
-    </message>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
         <numerusform>%n kanaler.</numerusform>
         <numerusform>%n kanaler.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact your regional support agent:</source>
-      <translation>Kontakta din regionala supportagent:</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
@@ -1415,6 +1403,18 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Please contact %1.</source>
       <translation>Kontakta %1.</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact your Regional / License support:</source>
+      <translation>För att aktivera licensnyckel manuellt kontakta din regionala supportagent:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your Regional / License support:</source>
+      <translation>Om problemet kvarstår, kontakta din regionala supportagent:</translation>
+    </message>
+    <message>
+      <source>Please contact your Regional / License support:</source>
+      <translation>Kontakta ditt regionala licensstöd:</translation>
     </message>
   </context>
   <context>
@@ -1674,8 +1674,8 @@ om du vill visa fler bokmärken</translation>
       <translation>Byggd för %1-%2 med %3.</translation>
     </message>
     <message>
-      <source>Regional support</source>
-      <translation>Regionalt stöd</translation>
+      <source>Regional / License support</source>
+      <translation>Regional / Licenssupport</translation>
     </message>
   </context>
   <context>
@@ -4004,13 +4004,13 @@ till %1</translation>
       <translation>För att få en aktiveringsnyckel skicka den medföljande licensnyckeln och maskinvaru-ID till %1.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
       <translation>Skicka den medföljande licensnyckeln och maskinvaru-ID till ditt regionala support för att få en aktiveringsnyckelfil.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>Skicka den medföljande licensnyckeln och maskinvaru-ID till ditt regionala support (%1) för att få en aktiveringsnyckelfil.</translation>
+      <translation>Skicka den medföljande licensnyckeln och maskinvaru-ID till ditt regionala / licensstöd (%1) för att få en aktiveringsnyckelfil.</translation>
     </message>
   </context>
   <context>

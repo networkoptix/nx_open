@@ -2279,16 +2279,6 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
-      <source>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</source>
-      <translation>系统未连接到Nx云。仅当系统连接到Nx云时，手机通知才能作用。</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Nx Cloud Settings</source>
-      <translation>Nx云设置</translation>
-    </message>
-    <message>
-      <location/>
       <source>To</source>
       <translation>发送至</translation>
     </message>

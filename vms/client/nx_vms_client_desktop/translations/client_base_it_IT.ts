@@ -1260,10 +1260,6 @@ to view more bookmarks</source>
       <translation type="unfinished">To report the issue please contact %1.</translation>
     </message>
     <message>
-      <source>To report the issue please contact your regional support agent:</source>
-      <translation type="unfinished">To report the issue please contact your regional support agent:</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>Impossibile attivare la licenza</translation>
     </message>
@@ -1312,16 +1308,20 @@ to view more bookmarks</source>
       <translation type="unfinished">To activate License Key manually please contact %1.</translation>
     </message>
     <message>
-      <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation type="unfinished">To activate License Key manually please contact your regional support agent:</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>Errore di rete</translation>
     </message>
     <message>
       <source>License activated</source>
       <translation>Licenza attivata</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your Regional / License support:</source>
+      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your Regional / License support:</source>
+      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
@@ -1384,24 +1384,12 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>LicenseManagementMessagesPrivate</name>
-    <message>
-      <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation type="unfinished">To get a valid License Key please contact your regional support agent:</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact your regional support agent:</source>
-      <translation type="unfinished">If the problem persists, please contact your regional support agent:</translation>
-    </message>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
         <numerusform>%n canali.</numerusform>
         <numerusform>%n canali.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact your regional support agent:</source>
-      <translation type="unfinished">Please contact your regional support agent:</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
@@ -1414,6 +1402,18 @@ to view more bookmarks</source>
     <message>
       <source>Please contact %1.</source>
       <translation type="unfinished">Please contact %1.</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact your Regional / License support:</source>
+      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your Regional / License support:</source>
+      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>Please contact your Regional / License support:</source>
+      <translation type="unfinished">Please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
@@ -1673,8 +1673,8 @@ to view more bookmarks</source>
       <translation>Costruito per %1-%2 con %3.</translation>
     </message>
     <message>
-      <source>Regional support</source>
-      <translation>Supporto regionale</translation>
+      <source>Regional / License support</source>
+      <translation type="unfinished">Regional / License support</translation>
     </message>
   </context>
   <context>
@@ -4000,13 +4000,13 @@ to %1</source>
       <translation>Per ottenere un file chiave di attivazione, inviare la chiave di licenza e l'ID hardware forniti a %1.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</translation>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</translation>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>

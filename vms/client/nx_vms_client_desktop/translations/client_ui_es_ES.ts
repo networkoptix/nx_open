@@ -2279,16 +2279,6 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
-      <source>The system is not connected to Nx Cloud. Mobile notifications work only when the system is connected to Nx Cloud.</source>
-      <translation>El sistema no está conectado a Nx Cloud. Las notificaciones móviles solo funcionan cuando el sistema está conectado a Nx Cloud.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Nx Cloud Settings</source>
-      <translation>Ajustes de nube de Nx</translation>
-    </message>
-    <message>
-      <location/>
       <source>To</source>
       <translation>A</translation>
     </message>
@@ -2300,32 +2290,32 @@
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>Contenido de notificación personalizada</translation>
     </message>
     <message>
       <location/>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Encabezamiento</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>El título de notificación predeterminado se usará si se deja vacío</translation>
     </message>
     <message>
       <location/>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Cuerpo</translation>
     </message>
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>El texto predeterminado se usará si este campo está vacío</translation>
     </message>
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Añadir nombre del dispositivo de origen en el cuerpo</translation>
     </message>
   </context>
   <context>
@@ -3236,7 +3226,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation type="unfinished">Custom language for mobile notifications</translation>
+      <translation>Idioma personalizado para notificaciones móviles</translation>
     </message>
   </context>
   <context>

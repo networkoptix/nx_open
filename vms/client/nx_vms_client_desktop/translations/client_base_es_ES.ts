@@ -1260,10 +1260,6 @@ to view more bookmarks</source>
       <translation>Para informar el problema, comuníquese con %1.</translation>
     </message>
     <message>
-      <source>To report the issue please contact your regional support agent:</source>
-      <translation>Para informar el problema, comuníquese con su agente de soporte regional:</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>Error al activar la licencia</translation>
     </message>
@@ -1312,16 +1308,20 @@ to view more bookmarks</source>
       <translation>Para activar la clave de licencia manualmente, comuníquese con %1.</translation>
     </message>
     <message>
-      <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation>Para activar la clave de licencia manualmente, comuníquese con su agente de soporte regional:</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>Error de red</translation>
     </message>
     <message>
       <source>License activated</source>
       <translation>Licencia activada</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your Regional / License support:</source>
+      <translation>Para informar el problema, póngase en contacto con su soporte regional / de licencia:</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your Regional / License support:</source>
+      <translation>Para activar la clave de licencia manualmente, comuníquese con su soporte regional / de licencia:</translation>
     </message>
   </context>
   <context>
@@ -1384,24 +1384,12 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>LicenseManagementMessagesPrivate</name>
-    <message>
-      <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation>Para obtener una clave de licencia válida, comuníquese con su agente de soporte regional:</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact your regional support agent:</source>
-      <translation>Si el problema persiste, comuníquese con su agente de soporte regional:</translation>
-    </message>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
         <numerusform>%n canales.</numerusform>
         <numerusform>%n canales.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact your regional support agent:</source>
-      <translation>Póngase en contacto con su agente de soporte regional:</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
@@ -1414,6 +1402,18 @@ to view more bookmarks</source>
     <message>
       <source>Please contact %1.</source>
       <translation>Por favor, póngase en contacto con %1.</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact your Regional / License support:</source>
+      <translation>Para obtener una clave de licencia válida, comuníquese con su soporte regional / de licencia:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your Regional / License support:</source>
+      <translation>Si el problema persiste, comuníquese con su soporte regional / de licencia:</translation>
+    </message>
+    <message>
+      <source>Please contact your Regional / License support:</source>
+      <translation>Póngase en contacto con su soporte regional / de licencia:</translation>
     </message>
   </context>
   <context>
@@ -1639,7 +1639,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>¿Estás seguro de que quieres salir de esta página? Los cambios que hiciste pueden no ser guardados.</translation>
     </message>
   </context>
   <context>
@@ -1673,8 +1673,8 @@ to view more bookmarks</source>
       <translation>Construido para %1-%2 con %3.</translation>
     </message>
     <message>
-      <source>Regional support</source>
-      <translation>Apoyo regional</translation>
+      <source>Regional / License support</source>
+      <translation>Soporte regional / de licencia</translation>
     </message>
   </context>
   <context>
@@ -4002,13 +4002,13 @@ a %1</translation>
       <translation>Para obtener un archivo de clave de activación, envíe la clave de licencia y la identificación de hardware proporcionadas a %1.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation>Por favor, envíe la clave de licencia y el ID de hardware a su soporte regional para obtener un archivo de clave de activación.</translation>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
+      <translation>Envíe la clave de licencia y la identificación de hardware proporcionadas a su soporte regional / de licencia para obtener un archivo de clave de activación.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>Por favor, envíe la clave de licencia y el ID de hardware a su soporte regional (%1) para obtener un archivo de clave de activación.</translation>
+      <translation>Envíe la clave de licencia y la identificación de hardware proporcionadas a su soporte regional / de licencia (%1) para obtener un archivo de clave de activación.</translation>
     </message>
   </context>
   <context>
@@ -8929,7 +8929,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>No se pueden verificar las actualizaciones en Internet</translation>
     </message>
   </context>
   <context>
@@ -9146,12 +9146,12 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Dispositivo desconocido</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Dispositivo desconocido %1</translation>
     </message>
   </context>
   <context>
@@ -9242,7 +9242,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Movimiento + Bajo-Res</translation>
     </message>
   </context>
   <context>

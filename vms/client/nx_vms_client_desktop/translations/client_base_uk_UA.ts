@@ -1264,10 +1264,6 @@ to view more bookmarks</source>
       <translation>Щоб повідомити про проблему, будь ласка, зв'яжіться з %1.</translation>
     </message>
     <message>
-      <source>To report the issue please contact your regional support agent:</source>
-      <translation>Щоб повідомити про проблему, будь ласка, зверніться до вашого регіонального агента підтримки:</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>Не вдалося активувати ліцензію</translation>
     </message>
@@ -1316,16 +1312,20 @@ to view more bookmarks</source>
       <translation>Щоб активувати ліцензійний ключ вручну, зв'яжіться з %1.</translation>
     </message>
     <message>
-      <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation>Щоб активувати ліцензійний ключ вручну, зв'яжіться зі своїм регіональним агентом підтримки:</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>Помилка мережі</translation>
     </message>
     <message>
       <source>License activated</source>
       <translation>Ліцензія активована</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your Regional / License support:</source>
+      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your Regional / License support:</source>
+      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
@@ -1398,14 +1398,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>LicenseManagementMessagesPrivate</name>
-    <message>
-      <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation>Щоб отримати дійсний ліцензійний ключ, будь ласка, зверніться до вашого регіонального агента підтримки:</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact your regional support agent:</source>
-      <translation>Якщо проблема залишається, зверніться до вашого регіонального агента підтримки:</translation>
-    </message>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
@@ -1414,10 +1406,6 @@ to view more bookmarks</source>
         <numerusform>%n каналів.</numerusform>
         <numerusform>%n каналів.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact your regional support agent:</source>
-      <translation>Будь ласка, зверніться до вашого регіонального агента підтримки:</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
@@ -1430,6 +1418,18 @@ to view more bookmarks</source>
     <message>
       <source>Please contact %1.</source>
       <translation>Будь ласка, зв'яжіться з %1.</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact your Regional / License support:</source>
+      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your Regional / License support:</source>
+      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>Please contact your Regional / License support:</source>
+      <translation type="unfinished">Please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
@@ -1701,8 +1701,8 @@ to view more bookmarks</source>
       <translation>Побудовано для %1-%2 з %3.</translation>
     </message>
     <message>
-      <source>Regional support</source>
-      <translation>Регіональна підтримка</translation>
+      <source>Regional / License support</source>
+      <translation type="unfinished">Regional / License support</translation>
     </message>
   </context>
   <context>
@@ -4101,13 +4101,13 @@ to %1</source>
       <translation>Щоб отримати файл з активацією, будь ласка, надішліть наданий ліцензійний ключ та ID апаратного ключа на %1.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation>Будь ласка, надішліть наданий Ліцензійний Ключ і Апаратний ID у вашу підтримку для отримання файлу з ключем активації.</translation>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>Будь ласка, надішліть наданий Ліцензійний ключ та Апаратний ID до вашої регіональної підтримки (%1) для отримання файлу з ключем активації.</translation>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>

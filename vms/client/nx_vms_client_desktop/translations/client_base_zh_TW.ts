@@ -1259,10 +1259,6 @@ to view more bookmarks</source>
       <translation>請聯繫 %1以回報此問題。</translation>
     </message>
     <message>
-      <source>To report the issue please contact your regional support agent:</source>
-      <translation>請聯繫您所在地區的技術支援以回報此問題：</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>啟動授權失敗</translation>
     </message>
@@ -1311,16 +1307,20 @@ to view more bookmarks</source>
       <translation>請聯繫%1以手動啟用授權：</translation>
     </message>
     <message>
-      <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation>請聯繫您所在地區的技術支援以手動啟用授權：</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>網路問題.</translation>
     </message>
     <message>
       <source>License activated</source>
       <translation>授權已成功啟動</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your Regional / License support:</source>
+      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your Regional / License support:</source>
+      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
@@ -1378,23 +1378,11 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>LicenseManagementMessagesPrivate</name>
-    <message>
-      <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation>請聯繫您所在地區的技術支援以取得有效授權：</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact your regional support agent:</source>
-      <translation>如果問題仍然存在, 請聯繫您所在區域的技術支援:</translation>
-    </message>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
         <numerusform>%n 個授權.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact your regional support agent:</source>
-      <translation>請聯繫您所在地區的技術支援：</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
@@ -1407,6 +1395,18 @@ to view more bookmarks</source>
     <message>
       <source>Please contact %1.</source>
       <translation>請聯繫 %1。</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact your Regional / License support:</source>
+      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your Regional / License support:</source>
+      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>Please contact your Regional / License support:</source>
+      <translation type="unfinished">Please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
@@ -1660,8 +1660,8 @@ to view more bookmarks</source>
       <translation>建立 %1-%2 與 %3.</translation>
     </message>
     <message>
-      <source>Regional support</source>
-      <translation>區域支援</translation>
+      <source>Regional / License support</source>
+      <translation type="unfinished">Regional / License support</translation>
     </message>
   </context>
   <context>
@@ -3955,13 +3955,13 @@ to %1</source>
       <translation>欲取得離線授權檔，請提供授權碼和硬體ID到 %1，</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation>請將授權碼及硬體 ID提供給您所在地區的技術支援以取得離線授權檔.</translation>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>請將授權碼及硬體 ID提供給您所在地區的技術支援 (%1) 以取得離線授權檔.</translation>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>

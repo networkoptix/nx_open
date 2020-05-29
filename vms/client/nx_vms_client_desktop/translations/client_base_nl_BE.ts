@@ -1260,10 +1260,6 @@ to view more bookmarks</source>
       <translation>Neem contact op met %1 om het probleem te rapporteren.</translation>
     </message>
     <message>
-      <source>To report the issue please contact your regional support agent:</source>
-      <translation>Om het probleem te melden, neem contact op met uw lokale wederverkoper:</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>Het activeren van de licentie is mislukt</translation>
     </message>
@@ -1312,16 +1308,20 @@ to view more bookmarks</source>
       <translation>Neem contact op met %1 om de licentiesleutel handmatig te activeren.</translation>
     </message>
     <message>
-      <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation>Neem contact op met uw lokale wederverkoper om de licentiesleutel handmatig te activeren:</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>Netwerkfout</translation>
     </message>
     <message>
       <source>License activated</source>
       <translation>Licentie geactiveerd</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your Regional / License support:</source>
+      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your Regional / License support:</source>
+      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
@@ -1384,24 +1384,12 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>LicenseManagementMessagesPrivate</name>
-    <message>
-      <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation>Neem contact op met uw lokale wederverkoper om een geldige licentiesleutel te krijgen:</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact your regional support agent:</source>
-      <translation>Als het probleem zich blijft voordoen, neem dan contact op met uw lokale wederverkoper:</translation>
-    </message>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
         <numerusform>%n kanalen.</numerusform>
         <numerusform>%n kanalen.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact your regional support agent:</source>
-      <translation>Neem contact op met uw lokale wederverkoper:</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
@@ -1414,6 +1402,18 @@ to view more bookmarks</source>
     <message>
       <source>Please contact %1.</source>
       <translation>Neem contact op met %1.</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact your Regional / License support:</source>
+      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your Regional / License support:</source>
+      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>Please contact your Regional / License support:</source>
+      <translation type="unfinished">Please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
@@ -1673,8 +1673,8 @@ to view more bookmarks</source>
       <translation>Gebouwd voor %1-%2 met %3.</translation>
     </message>
     <message>
-      <source>Regional support</source>
-      <translation>Regionale ondersteuning</translation>
+      <source>Regional / License support</source>
+      <translation type="unfinished">Regional / License support</translation>
     </message>
   </context>
   <context>
@@ -3999,13 +3999,13 @@ to %1</source>
       <translation>Om een activatiesleutel bestand te verkrijgen, stuur de opgegeven licentiesleutel en Hardware ID naar %1.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation>Stuur de meegeleverde licentiesleutel en hardware-ID naar uw lokale leverancier om een activatiebestand te verkrijgen.</translation>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>Stuur de meegeleverde licentiesleutel en hardware-ID naar uw lokale leverancier (%1) om een activatiebestand te verkrijgen.</translation>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>

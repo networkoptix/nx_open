@@ -1260,10 +1260,6 @@ to view more bookmarks</source>
       <translation>Um das Problem zu melden, wenden Sie sich bitte an %1.</translation>
     </message>
     <message>
-      <source>To report the issue please contact your regional support agent:</source>
-      <translation>Um das Problem zu melden, wenden Sie sich bitte an Ihren regionalen Supportmitarbeiter:</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>Fehler beim Aktivieren der Lizenz</translation>
     </message>
@@ -1312,16 +1308,20 @@ to view more bookmarks</source>
       <translation>Um den Lizenzschlüssel manuell zu aktivieren, wenden Sie sich bitte an %1.</translation>
     </message>
     <message>
-      <source>To activate License Key manually please contact your regional support agent:</source>
-      <translation>Um den Lizenzschlüssel manuell zu aktivieren, wenden Sie sich bitte an Ihren regionalen Supportmitarbeiter:</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>Netzwerkfehler.</translation>
     </message>
     <message>
       <source>License activated</source>
       <translation>Lizenz aktiviert</translation>
+    </message>
+    <message>
+      <source>To report the issue please contact your Regional / License support:</source>
+      <translation>Um das Problem zu melden, wenden Sie sich bitte an Ihren Regional- / Lizenzsupport:</translation>
+    </message>
+    <message>
+      <source>To activate License Key manually please contact your Regional / License support:</source>
+      <translation>Um den Lizenzschlüssel manuell zu aktivieren, wenden Sie sich bitte an Ihren Regional- / Lizenzsupport:</translation>
     </message>
   </context>
   <context>
@@ -1384,24 +1384,12 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>LicenseManagementMessagesPrivate</name>
-    <message>
-      <source>To get a valid License Key please contact your regional support agent:</source>
-      <translation>Um einen gültigen Lizenzschlüssel zu erhalten, wenden Sie sich bitte an Ihren regionalen Supportmitarbeiter:</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact your regional support agent:</source>
-      <translation>Wenn das Problem weiterhin besteht, wenden Sie sich bitte an Ihren regionalen Supportmitarbeiter:</translation>
-    </message>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
         <numerusform>%n Kanal.</numerusform>
         <numerusform>%n Kanäle.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Please contact your regional support agent:</source>
-      <translation>Bitte wenden Sie sich an Ihren regionalen Supportmitarbeiter:</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
@@ -1414,6 +1402,18 @@ to view more bookmarks</source>
     <message>
       <source>Please contact %1.</source>
       <translation>Bitte kontaktieren Sie %1.</translation>
+    </message>
+    <message>
+      <source>To get a valid License Key please contact your Regional / License support:</source>
+      <translation>Um einen gültigen Lizenzschlüssel zu erhalten, wenden Sie sich bitte an Ihren Regional- / Lizenzsupport:</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact your Regional / License support:</source>
+      <translation>Wenn das Problem weiterhin besteht, wenden Sie sich an Ihren Regional- / Lizenzsupport:</translation>
+    </message>
+    <message>
+      <source>Please contact your Regional / License support:</source>
+      <translation>Bitte wenden Sie sich an Ihren Regional- / Lizenzsupport:</translation>
     </message>
   </context>
   <context>
@@ -1673,8 +1673,8 @@ to view more bookmarks</source>
       <translation>Kompiliert für %1-%2 mit %3.</translation>
     </message>
     <message>
-      <source>Regional support</source>
-      <translation>Regionale Unterstützung</translation>
+      <source>Regional / License support</source>
+      <translation>Regional- / Lizenzsupport</translation>
     </message>
   </context>
   <context>
@@ -3999,13 +3999,13 @@ to %1</source>
       <translation>Um eine Aktivierungsschlüsseldatei zu erhalten, senden Sie den bereitgestellten Lizenzschlüssel und die Hardware-ID an %1.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support to obtain an Activation Key file.</source>
-      <translation>Bitte senden Sie den bereitgestellten Lizenzschlüssel und die Hardware-ID an Ihren regionalen Support, um eine Aktivierungsschlüsseldatei zu erhalten.</translation>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
+      <translation>Bitte senden Sie den bereitgestellten Lizenzschlüssel und die Hardware-ID an Ihren Regional- / Lizenzsupport, um eine Aktivierungsschlüsseldatei zu erhalten.</translation>
     </message>
     <message>
-      <source>Please send the provided License Key and Hardware ID to your Regional support (%1) to obtain an Activation Key file.</source>
+      <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>Bitte senden Sie den bereitgestellten Lizenzschlüssel und die Hardware-ID an Ihren regionalen Support (%1), um eine Aktivierungsschlüsseldatei zu erhalten.</translation>
+      <translation>Bitte senden Sie den bereitgestellten Lizenzschlüssel und die Hardware-ID an Ihren Regional- / Lizenzsupport (%1), um eine Aktivierungsschlüsseldatei zu erhalten.</translation>
     </message>
   </context>
   <context>
