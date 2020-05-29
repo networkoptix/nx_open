@@ -10,6 +10,7 @@
 #include <api/helpers/chunks_request_data.h>
 #include <api/helpers/bookmark_request_data.h>
 
+#include <common/static_common_module.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -27,6 +28,7 @@
 #include <utils/common/request_param.h>
 
 #include <nx/vms/api/data/email_settings_data.h>
+#include <nx/vms/api/data/peer_data.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
@@ -374,6 +376,13 @@ QnMediaServerConnection::QnMediaServerConnection(
 
 nx::utils::Url QnMediaServerConnection::url() const
 {
+    // This class is deprecated. Currently it's used only by clients.
+    // All requests should be proxied through the currently connected mediaserver.
+    // Actual destination is specified in SERVER_GUID_HEADER_NAME extra header.
+
+    if (NX_ASSERT(nx::vms::api::PeerData::isClient(qnStaticCommon->localPeerType())))
+        return commonModule()->currentUrl();
+
     if (const auto server = m_server.lock())
         return server->getApiUrl();
 
