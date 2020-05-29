@@ -572,6 +572,8 @@ bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr &license) c
     // TODO: add more checks according to specs
     const auto errorCode = m_validator->validate(license);
     const bool activeLicense = errorCode == QnLicenseErrorCode::NoError; // Only active licenses
+
+    // TODO: Make a common helper function to sync with QnLicenseDetailsDialog constructor.
     const bool acceptedLicenseType = (license->type() != Qn::LC_Trial) && !license->isSaas();
 
     const auto serverId = m_validator->serverId(license);
