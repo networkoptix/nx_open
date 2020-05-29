@@ -16,13 +16,29 @@ std::tuple<bool /*success*/, std::vector<TextSearchCondition>>
 
 void UserTextSearchExpressionParser::saveToken(QStringView token)
 {
-    token = nx::utils::unquoteStr(token, '"');
+    if (token.startsWith('\"'))
+        token = token.mid(1);
+    if (token.endsWith('\"') && !token.endsWith(L"\\\""))
+        token.truncate(token.size() - 1);
+
     if (token.endsWith('*'))
         token.truncate(token.size() - 1);
     if (token.empty())
         return;
 
     m_tokens.push_back(token);
+}
+
+QString UserTextSearchExpressionParser::unescape(const QStringView& str)
+{
+    QString result = str.toString();
+    for (int i = 0; i < result.size(); ++i)
+    {
+        if (result[i] == '\\')
+            result.remove(i, 1);
+    }
+
+    return result;
 }
 
 //-------------------------------------------------------------------------------------------------

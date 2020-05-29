@@ -96,6 +96,11 @@ private:
     template<typename Handler>
     bool processTokens(Handler& handler);
 
+    /**
+     * Replaces \CHAR with CHAR. Does NOT replace \n with LF or similar.
+     */
+    QString unescape(const QStringView& str);
+
 private:
     std::vector<QStringView> m_tokens;
 };
@@ -145,13 +150,15 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 template<typename Handler>
-bool UserTextSearchExpressionParser::parse(const QString& text, Handler handler)
+bool UserTextSearchExpressionParser::parse(const QString& userText, Handler handler)
 {
     enum class State
     {
         waitingTokenStart,
         readingToken,
     };
+
+    QString text = userText;
 
     bool quoted = false;
     int tokenStart = 0;
@@ -173,6 +180,13 @@ bool UserTextSearchExpressionParser::parse(const QString& text, Handler handler)
                 break;
 
             case State::readingToken:
+                if (ch == '\\')
+                {
+                    // Not processing the current character.
+                    ++i;
+                    continue;
+                }
+
                 if (ch == '"')
                     quoted = !quoted;
                 if (quoted)
@@ -208,14 +222,14 @@ bool UserTextSearchExpressionParser::processTokens(Handler& handler)
 
         if (token.startsWith('$'))
         {
-            handler(AttributePresenceCheck(token.mid(1).toString()));
+            handler(AttributePresenceCheck(unescape(token.mid(1))));
         }
         else if (token == ':')
         {
             // There MUST be tokens on both sides of ':'.
             if (!previousToken || !nextToken)
                 return false;
-            handler(AttributeValueMatch(previousToken->toString(), nextToken->toString()));
+            handler(AttributeValueMatch(unescape(*previousToken), unescape(*nextToken)));
             // We have already consumed the next token.
             ++i;
         }
@@ -225,7 +239,7 @@ bool UserTextSearchExpressionParser::processTokens(Handler& handler)
         }
         else
         {
-            handler(TextMatch(token.toString()));
+            handler(TextMatch(unescape(token)));
         }
     }
 

@@ -76,4 +76,27 @@ TEST_F(TextSearchExpressionParser, parse)
         parse("car.brand.model : \"Aston Martin\" car.color :red  "));
 }
 
+TEST_F(TextSearchExpressionParser, unescaping)
+{
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            TextMatch("red flag ")}),
+        parse("red\\ flag\\ "));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            TextMatch("$nx.network") }),
+            parse("\\$nx\\.network"));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            TextMatch("color:red") }),
+            parse("color\\:red"));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            TextMatch("\"red\\ flag\"") }),
+            parse("\\\"red\\\\\\ flag\\\""));
+}
+
 } // namespace nx::analytics::db::test
