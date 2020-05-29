@@ -28,6 +28,10 @@ TEST_F(AttributesDao, prepare_searchable_text)
         prepareIndexText("typename0", {{"car.brand.model", "Aston Martin"}}));
 
     ASSERT_EQ(
+        "typename030 000car02Ebrand02Emodel As03Aton03A Martin02A",
+        prepareIndexText("typename0", { {"car.brand.model", "As:ton: Martin*"} }));
+
+    ASSERT_EQ(
         "type name 000Wheel020Size 030030030",
         prepareIndexText("type name", {{"Wheel Size", "000"}}));
 
@@ -71,8 +75,8 @@ TEST_F(AttributesDao, prepare_sqlite_fts_expression_escaping_attribute_name)
         prepareSearchExpression("  Wheel Size: 20"));
 
     ASSERT_EQ(
-        "000car02Ebrand02Emodel* NEAR/0 \"Aston Martin\"",
-        prepareSearchExpression("car.brand.model:  \"Aston Martin\""));
+        "000car02Ebrand02Emodel* NEAR/0 Aston03AMartin02A*",
+        prepareSearchExpression("car.brand.model:  Aston\\:Martin\\*"));
 
     ASSERT_EQ(
         "000car02Ebrand02Emodel* NEAR/0 Aston* red*",

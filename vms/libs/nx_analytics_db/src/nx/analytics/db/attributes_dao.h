@@ -18,13 +18,14 @@ class AbstractObjectTypeDictionary;
  *
  * Text index format:
  * textIndexRecord = [ objectTypeToken " " ] [ attributeTokens ]
- * objectTypeToken = encodeZeros(objectType)
+ * objectTypeToken = encodeZerosAndSpecialFtsSymbols(objectType)
  * attributeTokens = attributeToken *( "000" attributeToken )
- * attributeToken = toZeroEncoding(attributeName) " " encodeZeros(attributeValue)
+ * attributeToken = toZeroEncoding(attributeName) " " encodeZerosAndSpecialFtsSymbols(attributeValue)
  *
  * Function "TEXT toZeroEncoding(TEXT)" replaces all non-alphadigit characters of text with
  * "0" HEX(text char).
- * Function "TEXT encodeZeros(TEXT)" replaces "0" found in the input text with "030".
+ * Function "TEXT encodeZerosAndSpecialFtsSymbols(TEXT)" replaces characters 0"'*:^ with
+ * "0" HEX(text char).
  *
  * NOTE: Not thread-safe.
  */
@@ -106,7 +107,7 @@ private:
     static bool isLatinLetterOrNumber(const QChar& ch);
     static QString toZeroEncoding(const QChar& ch);
 
-    static QString encodeZeros(const QString& text);
+    static QString encodeZerosAndSpecialFtsSymbols(const QString& text);
     static QString encodeTextValue(const QString& text);
 };
 

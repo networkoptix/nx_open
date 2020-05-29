@@ -164,7 +164,7 @@ QString AttributesDao::buildSearchableText(
     QString text;
 
     if (!objectTypeName.isEmpty())
-        text += encodeZeros(objectTypeName) + kNameValueSeparator;
+        text += encodeZerosAndSpecialFtsSymbols(objectTypeName) + kNameValueSeparator;
 
     if (!attributes.empty())
         text += prepareAttributeTokens(attributes);
@@ -314,7 +314,7 @@ QString AttributesDao::prepareAttributeTokens(
 
         text += kParamNamePrefix + toZeroEncoding(attribute.name);
         text += kNameValueSeparator;
-        text += encodeZeros(attribute.value);
+        text += encodeZerosAndSpecialFtsSymbols(attribute.value);
     }
 
     return text;
@@ -341,11 +341,25 @@ QString AttributesDao::toZeroEncoding(const QChar& ch)
     return QString::fromLatin1(buf);
 }
 
-QString AttributesDao::encodeZeros(const QString& text)
+QString AttributesDao::encodeZerosAndSpecialFtsSymbols(const QString& text)
 {
+    static constexpr char kToReplace[] = "0\"'*:^";
+
     QString result = text;
-    // 30 is a hex representation of the space character.
-    result.replace("0", "030");
+    for (int i = 0; i < result.size(); ++i)
+    {
+        if (std::any_of(
+                kToReplace, kToReplace + sizeof(kToReplace),
+                [&result, i](char ch) { return result[i] == ch; }))
+        {
+            // Replacing character with "0" HEX(ch).
+            char buf[6];
+            int len = sprintf(buf, "0%X", result[i].unicode());
+            result.replace(i, 1, buf);
+            i += len - 1;
+        }
+    }
+
     return result;
 }
 
@@ -355,8 +369,8 @@ QString AttributesDao::encodeTextValue(const QString& text)
 
     const auto needQuotes = text.indexOf(' ') != -1;
     return needQuotes
-        ? "\"" + encodeZeros(text) + "\""
-        : encodeZeros(text) + "*";
+        ? "\"" + encodeZerosAndSpecialFtsSymbols(text) + "\""
+        : encodeZerosAndSpecialFtsSymbols(text) + "*";
 }
 
 } // namespace nx::analytics::db

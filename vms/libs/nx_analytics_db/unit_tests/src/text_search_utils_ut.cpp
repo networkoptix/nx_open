@@ -85,6 +85,11 @@ TEST_F(TextSearchExpressionParser, unescaping)
 
     ASSERT_EQ(
         std::vector<TextSearchCondition>({
+            TextMatch("red*") }),
+            parse("red\\*"));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
             TextMatch("$nx.network") }),
             parse("\\$nx\\.network"));
 
