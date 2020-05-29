@@ -41,6 +41,7 @@ TEST_F(AttributesDao, prepare_sqlite_fts_expression)
     ASSERT_EQ("foo*", prepareSearchExpression("foo"));
     ASSERT_EQ("foo030*", prepareSearchExpression("foo0"));
     ASSERT_EQ("foo* hoo030*", prepareSearchExpression("foo hoo0"));
+    ASSERT_EQ("\"foo hoo030\"", prepareSearchExpression("\"foo hoo0\""));
 
     ASSERT_EQ(
         "000name1* NEAR/0 val1*",
@@ -76,6 +77,10 @@ TEST_F(AttributesDao, prepare_sqlite_fts_expression_escaping_attribute_name)
     ASSERT_EQ(
         "000car02Ebrand02Emodel* NEAR/0 Aston* red*",
         prepareSearchExpression("car.brand.model:  Aston red  "));
+
+    ASSERT_EQ(
+        "000car02Ebrand02Emodel* NEAR/0 Aston* \"grey metallic\"",
+        prepareSearchExpression("car.brand.model:  Aston \"grey metallic\"  "));
 
     ASSERT_EQ(
         "000car02Ebrand02Emodel* NEAR/0 \"Aston Martin\" 000car02Ecolor* NEAR/0 red*",

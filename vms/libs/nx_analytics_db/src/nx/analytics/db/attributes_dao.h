@@ -107,6 +107,7 @@ private:
     static QString toZeroEncoding(const QChar& ch);
 
     static QString encodeZeros(const QString& text);
+    static QString encodeTextValue(const QString& text);
 };
 
 } // namespace nx::analytics::db

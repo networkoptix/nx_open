@@ -196,18 +196,12 @@ QString AttributesDao::convertTextFilterToSqliteFtsExpression(const QString& tex
                 expression += kParamNamePrefix;
                 expression += toZeroEncoding(condition.name) + "*";
                 expression += " NEAR/0 ";
-
-                // TODO: Check for spaces may be not enough.
-                const auto needQuotes = condition.value.indexOf(' ') != -1;
-                if (needQuotes)
-                    expression += "\"" + encodeZeros(condition.value) + "\"";
-                else
-                    expression += encodeZeros(condition.value) + "*";
+                expression += encodeTextValue(condition.value);
                 break;
             }
 
             case ConditionType::textMatch:
-                expression += encodeZeros(condition.text) + "*";
+                expression += encodeTextValue(condition.text);
                 break;
         }
     }
@@ -353,6 +347,16 @@ QString AttributesDao::encodeZeros(const QString& text)
     // 30 is a hex representation of the space character.
     result.replace("0", "030");
     return result;
+}
+
+QString AttributesDao::encodeTextValue(const QString& text)
+{
+    // TODO: Check for spaces may be not enough.
+
+    const auto needQuotes = text.indexOf(' ') != -1;
+    return needQuotes
+        ? "\"" + encodeZeros(text) + "\""
+        : encodeZeros(text) + "*";
 }
 
 } // namespace nx::analytics::db
