@@ -16,6 +16,7 @@
 #include <utils/common/byte_array.h>
 
 #include "abstract_object_type_dictionary.h"
+#include "text_search_utils.h"
 
 class QnResourcePool;
 
@@ -180,64 +181,6 @@ struct Filter
     bool operator!=(const Filter& right) const;
 
 private:
-    /**
-     * To use this class first parse the text filter.
-     * Format description:
-     * TextFilter = *matchToken
-     * matchToken = word | attributeName | attributeToken
-     * attributeName = "$" word
-     * attributeToken = word ":" word
-     * word = 1 * (DIGIT | ALPHA) | '"' TEXT '"'
-     *
-     * Then, invoke matchAttributes() or mathText() and check the match result with matched().
-     * matched() reports true only if all tokens were matched
-     */
-    class TextMatcher
-    {
-    public:
-        void parse(const QString& text);
-        bool empty() const;
-
-        void matchAttributes(const nx::common::metadata::Attributes& attributes);
-        void matchText(const QString& text);
-
-        /**
-         * @return true If all tokens of the filter were matched
-         * by calls to matchAttributes or matchText().
-         */
-        bool matched() const;
-
-    private:
-        static nx::common::metadata::Attributes takeExactAttrMatchFiltersFromText(
-            QString* textFilter);
-
-        void matchExactAttributes(
-            const nx::common::metadata::Attributes& attributes);
-
-        static std::vector<QString> takeAttributeToFindNamesFromText(QString* textFilter);
-
-        void checkAttributesPresence(
-            const nx::common::metadata::Attributes& attributes);
-
-        void matchAttributeValues(
-            const nx::common::metadata::Attributes& attributes);
-
-        bool wordMatchAnyOfAttributes(
-            const QString& word,
-            const nx::common::metadata::Attributes& attributes);
-
-    private:
-        nx::common::metadata::Attributes m_exactAttrsToMatch;
-        /** Each element is set to true when corresponding element of m_exactAttrsToMatch was matched. */
-        std::vector<bool> m_exactAttrsMatched;
-
-        std::vector<QString> m_attributeToFindNames;
-        std::vector<bool> m_attributeToFindNamesMatched;
-
-        QStringList m_tokens;
-        std::vector<bool> m_tokensMatched;
-    };
-
     template <typename ObjectTrackType>
     bool acceptsTrackInternal(
         const ObjectTrackType& track,

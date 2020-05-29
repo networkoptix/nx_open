@@ -46,6 +46,11 @@ TEST_F(TextSearchExpressionParser, parse)
 {
     ASSERT_EQ(
         std::vector<TextSearchCondition>({
+            TextMatch("red")}),
+        parse("red*"));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
             AttributeValueMatch("Wheel Size", "20")}),
         parse("\"Wheel Size\": 20"));
 

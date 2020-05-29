@@ -6,6 +6,8 @@
 
 #include <QtCore/QString>
 
+#include <analytics/common/object_metadata.h>
+
 namespace nx::analytics::db {
 
 enum class ConditionType
@@ -96,6 +98,48 @@ private:
 
 private:
     std::vector<QStringView> m_tokens;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Matches given attributes against search expression defined by UserTextSearchExpressionParser.
+ */
+class TextMatcher
+{
+public:
+    /**
+     * Uses UserTextSearchExpressionParser to parse text.
+     */
+    bool parse(const QString& text);
+    bool empty() const;
+
+    void matchAttributes(const nx::common::metadata::Attributes& attributes);
+    void matchText(const QString& text);
+
+    /**
+     * @return true If all tokens of the filter were matched
+     * by calls to matchAttributes or matchText().
+     */
+    bool matched() const;
+
+private:
+    void matchExactAttributes(
+        const nx::common::metadata::Attributes& attributes);
+
+    void checkAttributesPresence(
+        const nx::common::metadata::Attributes& attributes);
+
+    void matchAttributeValues(
+        const nx::common::metadata::Attributes& attributes);
+
+    bool wordMatchAnyOfAttributes(
+        const QString& word,
+        const nx::common::metadata::Attributes& attributes);
+
+private:
+    std::vector<TextSearchCondition> m_conditions;
+    std::vector<bool> m_conditionsMatched;
 };
 
 //-------------------------------------------------------------------------------------------------

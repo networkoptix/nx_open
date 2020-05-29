@@ -5,17 +5,17 @@
 #include <cmath>
 #include <sstream>
 
+#include <api/helpers/camera_id_helper.h>
 #include <common/common_globals.h>
 #include <utils/math/math.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/std/algorithm.h>
-
-#include "config.h"
-#include "analytics_db_utils.h"
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log_main.h>
-#include <api/helpers/camera_id_helper.h>
+#include <nx/utils/std/algorithm.h>
+
+#include "analytics_db_utils.h"
+#include "config.h"
 
 using namespace nx::common::metadata;
 
@@ -286,169 +286,6 @@ bool Filter::operator==(const Filter& right) const
 bool Filter::operator!=(const Filter& right) const
 {
     return !(*this == right);
-}
-
-//-------------------------------------------------------------------------------------------------
-// Filter::TextMatcher.
-
-void Filter::TextMatcher::parse(const QString& text)
-{
-    auto filterText = text.trimmed();
-
-    m_exactAttrsToMatch = takeExactAttrMatchFiltersFromText(&filterText);
-    m_exactAttrsMatched.clear();
-    m_exactAttrsMatched.resize(m_exactAttrsToMatch.size(), false);
-
-    m_attributeToFindNames = takeAttributeToFindNamesFromText(&filterText);
-    m_attributeToFindNamesMatched.clear();
-    m_attributeToFindNamesMatched.resize(m_attributeToFindNames.size(), false);
-
-    m_tokens = filterText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
-    m_tokensMatched.clear();
-    m_tokensMatched.resize(m_tokens.size(), false);
-}
-
-bool Filter::TextMatcher::empty() const
-{
-    return m_exactAttrsToMatch.empty()
-        && m_attributeToFindNames.empty()
-        && m_tokens.empty();
-}
-
-void Filter::TextMatcher::matchAttributes(const nx::common::metadata::Attributes& attributes)
-{
-    if (attributes.empty())
-        return;
-
-    matchExactAttributes(attributes);
-    checkAttributesPresence(attributes);
-    matchAttributeValues(attributes);
-}
-
-void Filter::TextMatcher::matchText(const QString& text)
-{
-    for (std::size_t i = 0; i < m_tokens.size(); ++i)
-        m_tokensMatched[i] = m_tokensMatched[i] || text.startsWith(m_tokens[i], Qt::CaseInsensitive);
-}
-
-bool Filter::TextMatcher::matched() const
-{
-    auto notMatched = [](auto val) { return !val; };
-
-    return !std::any_of(m_exactAttrsMatched.begin(), m_exactAttrsMatched.end(), notMatched)
-        && !std::any_of(m_attributeToFindNamesMatched.begin(), m_attributeToFindNamesMatched.end(), notMatched)
-        && !std::any_of(m_tokensMatched.begin(), m_tokensMatched.end(), notMatched);
-}
-
-nx::common::metadata::Attributes Filter::TextMatcher::takeExactAttrMatchFiltersFromText(
-    QString* textFilter)
-{
-    nx::common::metadata::Attributes attributesToMatch;
-
-    QRegularExpression attrRegexp("[\\w\\d\\-_.]+\\s*:\\s*[\\w\\d\\-_.]+");
-    for (;;)
-    {
-        QRegularExpressionMatch match;
-        auto pos = textFilter->indexOf(attrRegexp, 0, &match);
-        if (pos == -1)
-            break;
-
-        auto paramExpr = match.captured();
-        textFilter->remove(pos, match.capturedLength());
-
-        const auto tokens = paramExpr.split(":");
-        attributesToMatch.push_back(nx::common::metadata::Attribute(
-            tokens[0].trimmed(),
-            tokens[1].trimmed()));
-    }
-
-    return attributesToMatch;
-}
-
-void Filter::TextMatcher::matchExactAttributes(
-    const nx::common::metadata::Attributes& attributes)
-{
-    for (std::size_t i = 0; i < m_exactAttrsToMatch.size(); ++i)
-    {
-        const auto& attrToMatch = m_exactAttrsToMatch[i];
-
-        bool matched = false;
-        for (const auto& attr: attributes)
-        {
-            if (attr.name.startsWith(attrToMatch.name, Qt::CaseInsensitive) &&
-                attr.value.startsWith(attrToMatch.value, Qt::CaseInsensitive))
-            {
-                matched = true;
-            }
-        }
-
-        m_exactAttrsMatched[i] = m_exactAttrsMatched[i] || matched;
-    }
-}
-
-std::vector<QString> Filter::TextMatcher::takeAttributeToFindNamesFromText(QString* textFilter)
-{
-    std::vector<QString> names;
-
-    QRegularExpression attrPresenseRegexp("\\$[\\w\\d\\-_.]+");
-    for (;;)
-    {
-        QRegularExpressionMatch match;
-        auto pos = textFilter->indexOf(attrPresenseRegexp, 0, &match);
-        if (pos == -1)
-            break;
-
-        names.push_back(match.captured().mid(1)); //< Omitting $.
-        textFilter->remove(pos, match.capturedLength());
-    }
-
-    return names;
-}
-
-void Filter::TextMatcher::checkAttributesPresence(
-    const nx::common::metadata::Attributes& attributes)
-{
-    for (std::size_t i = 0; i < m_attributeToFindNames.size(); ++i)
-    {
-        const auto& name = m_attributeToFindNames[i];
-
-        m_attributeToFindNamesMatched[i] = m_attributeToFindNamesMatched[i] ||
-            std::any_of(
-                attributes.begin(), attributes.end(),
-                [&name](const auto& attr) { return attr.name.startsWith(name, Qt::CaseInsensitive); });
-    }
-}
-
-void Filter::TextMatcher::matchAttributeValues(
-    const nx::common::metadata::Attributes& attributes)
-{
-    for (std::size_t i = 0; i < m_tokens.size(); ++i)
-        m_tokensMatched[i] = m_tokensMatched[i] || wordMatchAnyOfAttributes(m_tokens[i], attributes);
-}
-
-bool Filter::TextMatcher::wordMatchAnyOfAttributes(
-    const QString& word,
-    const nx::common::metadata::Attributes& attributes)
-{
-    std::function<bool(const Attribute&)> wordMatchesAttribute;
-    if (word.endsWith('*'))
-    {
-        const QStringRef prefix = word.leftRef(word.length() - 1);
-        wordMatchesAttribute =
-            [prefix](const Attribute& attribute)
-            {
-                return attribute.value.startsWith(prefix, Qt::CaseInsensitive);
-            };
-    }
-    else
-    {
-        wordMatchesAttribute =
-            [&word](const Attribute& attribute)
-            {
-                return QString::compare(word, attribute.value, Qt::CaseInsensitive) == 0;
-            };
-    }
-    return std::any_of(attributes.cbegin(), attributes.cend(), wordMatchesAttribute);
 }
 
 //-------------------------------------------------------------------------------------------------
