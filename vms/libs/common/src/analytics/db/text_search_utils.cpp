@@ -18,10 +18,10 @@ void UserTextSearchExpressionParser::saveToken(QStringView token)
 {
     if (token.startsWith('\"'))
         token = token.mid(1);
-    if (token.endsWith('\"') && !token.endsWith(L"\\\""))
+    if (token.endsWith(L'\"') && !token.endsWith(QLatin1String("\\\"")))
         token.truncate(token.size() - 1);
 
-    if (token.endsWith('*') && !token.endsWith(L"\\*"))
+    if (token.endsWith(L'*') && !token.endsWith(QLatin1String("\\*")))
         token.truncate(token.size() - 1);
     if (token.empty())
         return;

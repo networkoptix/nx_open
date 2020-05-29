@@ -12,7 +12,6 @@ namespace nx::analytics::db {
 
 enum class ConditionType
 {
-    none,
     attributePresenceCheck,
     attributeValueMatch,
     textMatch,
@@ -212,11 +211,11 @@ bool UserTextSearchExpressionParser::parse(const QString& userText, Handler hand
 template<typename Handler>
 bool UserTextSearchExpressionParser::processTokens(Handler& handler)
 {
-    for (int i = 0; i < m_tokens.size(); ++i)
+    for (int i = 0; i < (int) m_tokens.size(); ++i)
     {
         const auto& token = m_tokens[i];
         const std::optional<QStringView> nextToken =
-            (i+1) < m_tokens.size() ? std::make_optional(m_tokens[i+1]) : std::nullopt;
+            (i+1) < (int) m_tokens.size() ? std::make_optional(m_tokens[i+1]) : std::nullopt;
         const std::optional<QStringView> previousToken =
             i > 0 ? std::make_optional(m_tokens[i - 1]) : std::nullopt;
 
