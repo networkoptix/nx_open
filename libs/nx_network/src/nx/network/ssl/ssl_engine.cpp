@@ -2,6 +2,8 @@
 
 #ifdef ENABLE_SSL
 
+#include <openssl/x509v3.h>
+
 #include <QtCore/QDir>
 
 #include <nx/utils/log/log.h>
@@ -16,8 +18,10 @@ namespace ssl {
 
 const size_t Engine::kBufferSize = 1024 * 10;
 const int Engine::kRsaLength = 2048;
+
+// https://cabforum.org/2017/03/17/ballot-193-825-day-certificate-lifetimes/
 const std::chrono::seconds Engine::kCertExpiration =
-    std::chrono::hours(5 * 365 * 24); // 5 years
+    std::chrono::hours(825 * 24); //< ~2.26 years
 
 String Engine::makeCertificateAndKey(
     const String& common, const String& country, const String& company)
@@ -48,6 +52,7 @@ String Engine::makeCertificateAndKey(
 
     auto x509 = utils::wrapUnique(X509_new(), &X509_free);
     if (!x509
+        || !X509_set_version(x509.get(), 2) //< x509.v3
         || !ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), serialNumber)
         || !X509_gmtime_adj(X509_get_notBefore(x509.get()), 0)
         || !X509_gmtime_adj(X509_get_notAfter(x509.get()), kCertExpiration.count())
@@ -65,9 +70,27 @@ String Engine::makeCertificateAndKey(
             name, field, MBSTRING_UTF8, vptr, -1, -1, 0);
     };
 
+    // Apple requirement for TLS server certificates in iOS 13 and macOS 10.15:
+    // TLS server certificates must contain an ExtendedKeyUsage (EKU) extension containing
+    // the id-kp-serverAuth OID.
+    X509V3_CTX ctx;
+    X509V3_set_ctx_nodb(&ctx);
+    X509V3_set_ctx(&ctx, x509.get(), x509.get(), nullptr, nullptr, 0);
+
+    const auto addExt =
+        [&ctx, &x509](int nid, const char* value) -> bool
+        {
+            auto ex = utils::wrapUnique(
+                X509V3_EXT_conf_nid(nullptr, &ctx, nid, const_cast<char*>(value)),
+                &X509_EXTENSION_free);
+            return ex && X509_add_ext(x509.get(), ex.get(), -1);
+        };
+
     if (!name
         || !nameSet("C", country) || !nameSet("O", company) || !nameSet("CN", common)
         || !X509_set_issuer_name(x509.get(), name)
+        || !addExt(NID_key_usage, "digitalSignature")
+        || !addExt(NID_ext_key_usage, "serverAuth")
         || !X509_sign(x509.get(), pkey.get(), EVP_sha256()))
     {
         NX_WARNING(typeid(Engine), "Unable to sign X509 cert");
