@@ -273,6 +273,13 @@
               </property>
              </spacer>
             </item>
+            <item>
+             <widget class="QLabel" name="maxLengthLabel">
+              <property name="text">
+               <string notr="true">&lt; 0/500 &gt;</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
          </layout>

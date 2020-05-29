@@ -25,30 +25,41 @@
 #include <nx/network/app_info.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <ui/style/custom_style.h>
+
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
-class Filter: public QObject
+const int kMaxHeaderLength = 100;
+const int kMaxBodyLength = 500;
+const double kWarningThreshold = 0.8; //< Warning is shown when text length exceeds Max*Threshold.
+
+// FocusWatcher calls eventReceiver() function when a watched widget takes focus.
+// This widget is passed as a parameter. When focus is lost, eventReceiver(nullptr) is called.
+class FocusWatcher: public QObject
 {
 public:
-    Filter(const std::function<void()>& action, QObject* parent = nullptr):
+    FocusWatcher(const std::function<void(QWidget*)>& eventReceiver, QObject* parent = nullptr):
         QObject(parent),
-        m_action(action)
+        m_receiver(eventReceiver)
     {
     }
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override
     {
-        if (event->type() == QEvent::MouseButtonRelease)
-            m_action();
+        if (event->type() == QEvent::FocusIn)
+            m_receiver(qobject_cast<QWidget*>(watched));
+
+        if (event->type() == QEvent::FocusOut)
+            m_receiver(nullptr);
 
         return false;
     }
 
 private:
-    const std::function<void()> m_action;
+    const std::function<void(QWidget*)> m_receiver;
 };
 
 } // namespace
@@ -118,6 +129,25 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
         this, &PushNotificationBusinessActionWidget::parametersChanged);
     connect(ui->addSourceNameCheckBox, &QCheckBox::clicked,
         this, &PushNotificationBusinessActionWidget::parametersChanged);
+
+    auto filter = new FocusWatcher([this](QWidget *widget){ updateLimitInfo(widget); }, this);
+    ui->headerText->installEventFilter(filter);
+    ui->bodyText->installEventFilter(filter);
+
+    connect(ui->headerText, &QLineEdit::textChanged, this,
+        [this]()
+        {
+            setWarningStyleOn(ui->headerText, ui->headerText->text().length() > kMaxHeaderLength);
+            updateLimitInfo(ui->headerText);
+        });
+    connect(ui->bodyText, &QPlainTextEdit::textChanged, this,
+        [this]()
+        {
+            setWarningStyleOn(ui->bodyText, ui->bodyText->toPlainText().length() > kMaxBodyLength);
+            updateLimitInfo(ui->bodyText);
+        });
+
+    updateLimitInfo(nullptr); //< Hide label.
 }
 
 PushNotificationBusinessActionWidget::~PushNotificationBusinessActionWidget()
@@ -141,6 +171,8 @@ void PushNotificationBusinessActionWidget::at_model_dataChanged(Fields fields)
         ui->bodyText->setPlainText(params.text);
         ui->addSourceNameCheckBox->setChecked(params.useSource);
         ui->customContentCheckBox->setChecked(useCustomContent);
+
+        updateLimitInfo(nullptr);
     }
 
     base_type::at_model_dataChanged(fields);
@@ -167,8 +199,8 @@ void PushNotificationBusinessActionWidget::parametersChanged()
 
     const bool useCustomContent = ui->customContentCheckBox->isChecked();
 
-    params.sayText = useCustomContent ? ui->headerText->text() : QString();
-    params.text = useCustomContent ? ui->bodyText->toPlainText() : QString();
+    params.sayText = useCustomContent ? ui->headerText->text().left(kMaxHeaderLength) : QString();
+    params.text = useCustomContent ? ui->bodyText->toPlainText().left(kMaxBodyLength) : QString();
     params.useSource = useCustomContent ? ui->addSourceNameCheckBox->isChecked() : true;
     model()->setActionParams(params);
 
@@ -179,6 +211,41 @@ void PushNotificationBusinessActionWidget::updateCurrentTab()
 {
     ui->stackedWidget->setCurrentIndex(
         base_type::qnGlobalSettings->cloudSystemId().isEmpty() ? 0 : 1);
+}
+
+void PushNotificationBusinessActionWidget::updateLimitInfo(QWidget *textField)
+{
+    int current = 0, max = 0;
+
+    if (textField == ui->headerText)
+    {
+        current = ui->headerText->text().length();
+        max = kMaxHeaderLength;
+    }
+    else if (textField == ui->bodyText)
+    {
+        current = ui->bodyText->toPlainText().length();
+        max = kMaxBodyLength;
+    }
+    else
+    {
+        ui->maxLengthLabel->hide();
+        return;
+    }
+
+    if (current >= kWarningThreshold * max)
+    {
+        ui->maxLengthLabel->show();
+        ui->maxLengthLabel->setText(
+            current > max
+                ? tr("%n character(s) over", "", current - max)
+                : tr("%n character(s) left", "", max - current));
+        setWarningStyleOn(ui->maxLengthLabel, current > max);
+    }
+    else
+    {
+        ui->maxLengthLabel->hide();
+    }
 }
 
 } // namespace nx::vms::client::desktop

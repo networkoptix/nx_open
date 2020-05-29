@@ -29,6 +29,7 @@ protected slots:
 private:
     void parametersChanged();
     void updateCurrentTab();
+    void updateLimitInfo(QWidget* textField);
 
 private:
     QScopedPointer<Ui::PushNotificationBusinessActionWidget> ui;
