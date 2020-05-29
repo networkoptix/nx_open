@@ -136,16 +136,16 @@ TEST(replaceStrings, specialCharacters)
 
 //-------------------------------------------------------------------------------------------------
 
-TEST(String, unquoteStr)
+TEST(String, trimAndUnquote)
 {
-    ASSERT_EQ("foo", nx::utils::unquoteStr(QString("\"foo\"")));
-    ASSERT_EQ("foo", nx::utils::unquoteStr(QString("foo")));
-    ASSERT_EQ("foo", nx::utils::unquoteStr(QString("\"foo")));
-    ASSERT_EQ("foo", nx::utils::unquoteStr(QString("foo\"")));
+    ASSERT_EQ("foo", nx::utils::trimAndUnquote(QString("\"foo\"")));
+    ASSERT_EQ("foo", nx::utils::trimAndUnquote(QString("foo")));
+    ASSERT_EQ("foo", nx::utils::trimAndUnquote(QString("\"foo")));
+    ASSERT_EQ("foo", nx::utils::trimAndUnquote(QString("foo\"")));
 
-    ASSERT_EQ("", nx::utils::unquoteStr(QString()));
-    ASSERT_EQ("", nx::utils::unquoteStr(QString("\"\"")));
-    ASSERT_EQ("", nx::utils::unquoteStr(QString("\"")));
+    ASSERT_EQ("", nx::utils::trimAndUnquote(QString()));
+    ASSERT_EQ("", nx::utils::trimAndUnquote(QString("\"\"")));
+    ASSERT_EQ("", nx::utils::trimAndUnquote(QString("\"")));
 }
 
 } // namespace test

@@ -218,17 +218,22 @@ NX_UTILS_API QStringList smartSplit(
     QString::SplitBehavior splitBehavior = QString::KeepEmptyParts);
 
 template <class T, class T2>
-T unquoteStr(const T& v, T2 quoteChar)
+T unquote(const T& str, T2 quoteChar)
 {
-    T value = v.trimmed();
-    int pos1 = value.startsWith(quoteChar) ? 1 : 0;
-    int pos2 = value.endsWith(quoteChar) ? 1 : 0;
-    return value.mid(pos1, value.length() - pos1 - pos2);
+    int pos1 = str.startsWith(quoteChar) ? 1 : 0;
+    int pos2 = str.endsWith(quoteChar) ? 1 : 0;
+    return str.mid(pos1, str.length() - pos1 - pos2);
 }
 
-NX_UTILS_API QByteArray unquoteStr(const QByteArray& v);
+template <class T, class T2>
+T trimAndUnquote(const T& str, T2 quoteChar)
+{
+    return unquote(str.trimmed(), quoteChar);
+}
 
-NX_UTILS_API QString unquoteStr(const QString& v);
+NX_UTILS_API QByteArray trimAndUnquote(const QByteArray& v);
+
+NX_UTILS_API QString trimAndUnquote(const QString& v);
 
 static const size_t BufferNpos = size_t(-1);
 

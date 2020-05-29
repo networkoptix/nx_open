@@ -19,7 +19,7 @@ QMap<QByteArray, QByteArray> parseAuthData(const QByteArray& authData, char deli
             return QMap<QByteArray, QByteArray>();
 
         QByteArray key = data.left(pos);
-        QByteArray value = nx::utils::unquoteStr(data.mid(pos+1));
+        QByteArray value = nx::utils::trimAndUnquote(data.mid(pos+1));
 
         result[key] = value;
     }

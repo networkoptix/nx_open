@@ -7,7 +7,7 @@ namespace nx {
 namespace rest {
 
 QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter);
-QByteArray unquoteStr(const QByteArray& v);
+QByteArray trimAndUnquote(const QByteArray& v);
 QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char delimiter);
 
 } // namespace rest

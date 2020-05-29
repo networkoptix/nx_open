@@ -301,7 +301,7 @@ int launchFile(const wstring& executePath)
     }
 }
 
-wstring unquoteStr(std::wstring str)
+wstring trimAndUnquote(std::wstring str)
 {
     if (str.empty())
         return str;
@@ -348,7 +348,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        launchFile(unquoteStr(cmdLine));
+        launchFile(trimAndUnquote(cmdLine));
     }*/
 
     LocalFree(szArglist);

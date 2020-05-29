@@ -149,7 +149,7 @@ QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
     return QSize(params[0].trimmed().toInt(), params[1].trimmed().toInt());
 }
 
-QByteArray QnActiResource::unquoteStr(const QByteArray& v)
+QByteArray QnActiResource::trimAndUnquote(const QByteArray& v)
 {
     QByteArray value = v.trimmed();
     int pos1 = value.startsWith('\'') ? 1 : 0;
@@ -228,7 +228,7 @@ nx::network::http::StatusCode::Value QnActiResource::makeActiRequestByUrl(
     }
 
     if (!keepAllData)
-        *msgBody = unquoteStr(msgBody->mid(msgBody->indexOf('=')+1).trimmed());
+        *msgBody = trimAndUnquote(msgBody->mid(msgBody->indexOf('=')+1).trimmed());
     return static_cast<nx::network::http::StatusCode::Value>(statusCode);
 }
 

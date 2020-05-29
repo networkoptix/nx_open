@@ -83,7 +83,7 @@ public:
         QByteArray* const msgBody,
         QString* const localAddress = nullptr);
 
-    static QByteArray unquoteStr(const QByteArray& value);
+    static QByteArray trimAndUnquote(const QByteArray& value);
     static ActiSystemInfo parseSystemInfo(const QByteArray& report);
 
     //!Called by http server on receiving message from camera

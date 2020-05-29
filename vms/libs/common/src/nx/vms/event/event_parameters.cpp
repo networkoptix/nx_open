@@ -92,7 +92,7 @@ bool checkForKeywords(const QString& value, const QString& keywords)
 
     for (const auto& keyword: nx::utils::smartSplit(keywords, L' ', QString::SkipEmptyParts))
     {
-        if (value.contains(nx::utils::unquoteStr(keyword)))
+        if (value.contains(nx::utils::trimAndUnquote(keyword)))
             return true;
     }
 

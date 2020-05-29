@@ -40,7 +40,7 @@ QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
     return rez;
 }
 
-QByteArray unquoteStr(const QByteArray& v)
+QByteArray trimAndUnquote(const QByteArray& v)
 {
     QByteArray value = v.trimmed();
     int pos1 = value.startsWith('\"') ? 1 : 0;
@@ -61,7 +61,7 @@ QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char deli
             return QMap<QByteArray, QByteArray>();
 
         QByteArray key = data.left(pos);
-        QByteArray value = unquoteStr(data.mid(pos+1));
+        QByteArray value = trimAndUnquote(data.mid(pos+1));
 
         result[key] = value;
     }
