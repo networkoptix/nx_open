@@ -1288,11 +1288,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>這授權已啟動且綁定在硬體 ID %1 上</translation>
+      <translation>授權已啟用且綁定在硬體 ID %1 上</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>這授權已啟動且綁定在硬體 ID %1 上於 %2</translation>
+      <translation>授權已啟用且綁定在%2的硬體ID %1 上</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
@@ -1304,7 +1304,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation>請聯繫%1以手動啟用授權：</translation>
+      <translation>請聯繫%1以離線啟用授權：</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1316,11 +1316,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>請聯繫您的所在地區/授權支援以回報此問題：</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>請聯繫您的所在地區/授權支援以離線啟用授權：</translation>
     </message>
   </context>
   <context>
@@ -1398,15 +1398,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>請聯繫您的所在地區/授權支援以取得有效授權：</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>如果問題仍然存在, 請聯繫您的所在地區/授權支援:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>請聯繫您的所在地區/授權支援：</translation>
     </message>
   </context>
   <context>
@@ -1661,7 +1661,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>所在地區/授權支援</translation>
     </message>
   </context>
   <context>
@@ -2009,7 +2009,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation>事件規則重置為初始預設</translation>
+      <translation>事件規則還原預設值</translation>
     </message>
   </context>
   <context>
@@ -2755,7 +2755,7 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation>未找到該帳戶</translation>
+      <translation>該帳號不存在</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
@@ -2803,7 +2803,7 @@ to %1</source>
     <message>
       <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
       <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%2 所選用戶中的%1 不是 %3 用戶，因此不會收到手機通知。</translation>
+      <translation>%2 所選用戶中的%1 不是 %3使用者，因此不會收到手機通知。</translation>
     </message>
   </context>
   <context>
@@ -3956,12 +3956,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>請將授權碼及硬體 ID提供給您的所在地區/授權支援以取得離線授權.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>請將授權碼及硬體 ID提供給您的所在地區/授權支援(%1), 以取得離線授權.</translation>
     </message>
   </context>
   <context>
@@ -4147,7 +4147,7 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>當啟動巡航, 調整影像在螢幕上顯示的時間長度</translation>
+      <translation>當啟用巡航, 調整影像在螢幕上顯示的時間長度</translation>
     </message>
   </context>
   <context>
@@ -6239,7 +6239,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>使用者資訊可由 LDAP 伺服器匯入。但 LDAP 伺服器必須保持連線並且該帳戶狀態為啟用中, 才能夠登錄。</translation>
+      <translation>使用者資訊可由 LDAP 伺服器匯入。但 LDAP 伺服器須保持連線並且該帳號狀態為啟用中, 才能夠登錄。</translation>
     </message>
   </context>
   <context>
@@ -6429,7 +6429,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1使用該電子郵件用戶已經存在</translation>
+      <translation>%1電子信箱已被使用</translation>
     </message>
     <message>
       <source>Local users</source>
@@ -7936,7 +7936,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation>某些選定的攝影機需要設置密碼以進行設定.</translation>
+      <translation>某些選定攝影機需設定密碼以進行安裝.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -8315,7 +8315,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::FisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation>如果相機未完全垂直或水平安裝，請使用此設置來補償失真。</translation>
+      <translation>如果攝影機未完全垂直或水平安裝，請使用此設定來補償失真。</translation>
     </message>
   </context>
   <context>
@@ -8496,7 +8496,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation>無法啟動搜尋功能</translation>
+      <translation>無法啟用搜尋功能</translation>
     </message>
   </context>
   <context>
@@ -8633,7 +8633,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation>啟動更新失敗。</translation>
+      <translation>更新失敗</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
@@ -8641,7 +8641,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation>無法啟動安裝</translation>
+      <translation>安裝失敗</translation>
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
@@ -8859,11 +8859,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>在 &quot;列表中選擇單個用戶, 然後顯示本機佈局到&quot;</translation>
+      <translation>在 &quot;列表中選擇單個使用者, 然後顯示本機佈局到&quot;</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>本機佈局僅對其擁有者顯示。</translation>
+      <translation>本機佈局僅對其所有者顯示。</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
@@ -8901,7 +8901,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation>準備重新啟動到新版本</translation>
+      <translation>準備重啟到新版本</translation>
     </message>
     <message>
       <source>Installing update</source>
@@ -9060,6 +9060,18 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>%1 設定</translation>
     </message>
+    <message numerus="yes">
+      <source>%n symbols over</source>
+      <translation type="unfinished">
+        <numerusform>%n symbols over</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols left</source>
+      <translation type="unfinished">
+        <numerusform>%n symbols left</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
@@ -9084,7 +9096,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation>將佈局解析度設置為 &quot;自動&quot; 以提高效能.</translation>
+      <translation>將佈局解析度設定為 &quot;自動&quot; 以提高效能.</translation>
     </message>
   </context>
   <context>
@@ -9380,7 +9392,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation>
-        <numerusform>使用者 %n 的Email地址尚未設定</numerusform>
+        <numerusform>使用者 %n 的Email尚未設定</numerusform>
       </translation>
     </message>
     <message>

@@ -9180,6 +9180,20 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>%1 Inställningar</translation>
     </message>
+    <message numerus="yes">
+      <source>%n symbols over</source>
+      <translation>
+        <numerusform>%n symboler över</numerusform>
+        <numerusform>%n symboler över</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols left</source>
+      <translation>
+        <numerusform>%n symboler kvar</numerusform>
+        <numerusform>%n symboler kvar</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>

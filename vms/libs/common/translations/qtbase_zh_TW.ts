@@ -808,7 +808,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation>設備未設置</translation>
+      <translation>設備未設定</translation>
     </message>
     <message>
       <source>Device not writable</source>

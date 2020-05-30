@@ -1321,7 +1321,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>Щоб повідомити про проблему, зверніться до регіональної / Ліцензійної служби підтримки:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
@@ -9418,6 +9418,24 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>%1 Налаштування</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols over</source>
+      <translation type="unfinished">
+        <numerusform>%n symbols over</numerusform>
+        <numerusform>%n symbols over</numerusform>
+        <numerusform>%n symbols over</numerusform>
+        <numerusform>%n symbols over</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols left</source>
+      <translation type="unfinished">
+        <numerusform>%n symbols left</numerusform>
+        <numerusform>%n symbols left</numerusform>
+        <numerusform>%n symbols left</numerusform>
+        <numerusform>%n symbols left</numerusform>
+      </translation>
     </message>
   </context>
   <context>

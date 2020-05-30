@@ -1651,7 +1651,7 @@
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>在 &quot;列表中選擇單個用戶, 然後顯示本地佈局到&quot;</translation>
+      <translation>在 &quot;列表中選擇單個使用者, 然後顯示本地佈局到&quot;</translation>
     </message>
   </context>
   <context>

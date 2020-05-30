@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation>本帳號未啟動. 請檢查您的 email.</translation>
+      <translation>本帳號未啟用. 請檢查您的 email.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
@@ -51,7 +51,7 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>擁有者: %1</translation>
+      <translation>所有者: %1</translation>
     </message>
     <message>
       <source>Your System</source>
@@ -108,7 +108,7 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>擁有者: %1</translation>
+      <translation>所有者: %1</translation>
     </message>
     <message>
       <source>Your System</source>

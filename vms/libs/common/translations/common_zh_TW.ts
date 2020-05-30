@@ -183,7 +183,7 @@
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>雲系統屬於不同的擁有者, 所以不允許合併。</translation>
+      <translation>雲系統分屬不同的所有者, 所以不允許合併。</translation>
     </message>
   </context>
   <context>
@@ -643,7 +643,7 @@
     <message numerus="yes">
       <source>%n Start Licenses</source>
       <translation>
-        <numerusform>%n 啟動授權</numerusform>
+        <numerusform>%n 啟用授權</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -728,7 +728,7 @@
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 啟動授權</numerusform>
+        <numerusform>%n/%1 啟用授權</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -770,7 +770,7 @@
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
-        <numerusform>再啟動 %n 個 %1.</numerusform>
+        <numerusform>再啟用 %n 個 %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1138,7 +1138,7 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation>擁有者</translation>
+      <translation>所有者</translation>
     </message>
     <message>
       <source>Administrator</source>

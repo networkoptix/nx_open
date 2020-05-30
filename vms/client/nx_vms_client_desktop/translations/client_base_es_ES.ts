@@ -9177,6 +9177,20 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>%1 Ajustes</translation>
     </message>
+    <message numerus="yes">
+      <source>%n symbols over</source>
+      <translation type="unfinished">
+        <numerusform>%n symbols over</numerusform>
+        <numerusform>%n symbols over</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols left</source>
+      <translation type="unfinished">
+        <numerusform>%n symbols left</numerusform>
+        <numerusform>%n symbols left</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>

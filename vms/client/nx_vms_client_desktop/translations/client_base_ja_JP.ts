@@ -9055,6 +9055,18 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation type="unfinished">%1 Settings</translation>
     </message>
+    <message numerus="yes">
+      <source>%n symbols over</source>
+      <translation type="unfinished">
+        <numerusform>%n symbols over</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols left</source>
+      <translation type="unfinished">
+        <numerusform>%n symbols left</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>

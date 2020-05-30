@@ -1304,7 +1304,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation>请联系%1以手动启用授权：</translation>
+      <translation>请联系%1以离线启用授权：</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1316,11 +1316,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>请联系您的所在地区/授权支持以回报此问题：</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>请联系您的所在地区/授权支持以离线启用授权：</translation>
     </message>
   </context>
   <context>
@@ -1398,15 +1398,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>请联系您的所在地区/授权支持以取得有效授权：</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>如果问题仍然存在，请联系您的所在地区/授权支持：</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>请联系您的所在地区/授权支持：</translation>
     </message>
   </context>
   <context>
@@ -1661,7 +1661,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>所在地区/授权支持</translation>
     </message>
   </context>
   <context>
@@ -3952,12 +3952,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>请将授权码及硬件ID提供给您的所在地区/授权支持以取得离线激活档.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>请将授权码及硬件ID提供给您的所在地区/授权支持(%1) 以取得离线激活档.</translation>
     </message>
   </context>
   <context>
@@ -6425,7 +6425,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1该邮箱地址已被注册过</translation>
+      <translation>%1该邮箱地址已被注册</translation>
     </message>
     <message>
       <source>Local users</source>
@@ -9055,6 +9055,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>%1设置</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols over</source>
+      <translation type="unfinished">
+        <numerusform>%n symbols over</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols left</source>
+      <translation type="unfinished">
+        <numerusform>%n symbols left</numerusform>
+      </translation>
     </message>
   </context>
   <context>

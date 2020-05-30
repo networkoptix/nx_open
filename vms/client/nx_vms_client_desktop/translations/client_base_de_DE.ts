@@ -9175,6 +9175,20 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>%1 Einstellungen</translation>
     </message>
+    <message numerus="yes">
+      <source>%n symbols over</source>
+      <translation>
+        <numerusform>%n Symbol über</numerusform>
+        <numerusform>%n Symbole über</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols left</source>
+      <translation>
+        <numerusform>%n Symbol übrig</numerusform>
+        <numerusform>%n Symbole übrig</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
