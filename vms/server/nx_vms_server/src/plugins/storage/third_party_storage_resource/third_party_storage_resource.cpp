@@ -326,7 +326,7 @@ bool QnThirdPartyStorageResource::renameFile(const QString& oldName, const QStri
     return errorCode == nx_spl::error::NoError;
 }
 
-QnAbstractStorageResource::FileInfoList QnThirdPartyStorageResource::getFileList(
+QnAbstractStorageResource::FileInfoList QnThirdPartyStorageResource::doGetFileList(
     const QString& dirName)
 {
     if (!m_valid)

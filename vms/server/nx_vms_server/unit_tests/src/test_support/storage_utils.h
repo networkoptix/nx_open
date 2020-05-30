@@ -50,7 +50,6 @@ public:
     }
 
     virtual QIODevice* openInternal(const QString&, QIODevice::OpenMode ) override { return nullptr; }
-    virtual FileInfoList getFileList(const QString&) override { return FileInfoList(); }
     virtual qint64 getFileSize(const QString&) const override { return -1LL; }
 
     virtual bool removeDir(const QString&) override { return true; }
@@ -79,6 +78,8 @@ private:
         removeCallCount++;
         return true;
     }
+
+    virtual FileInfoList doGetFileList(const QString&) override { return FileInfoList(); }
 };
 
 class StorageManagerStub: public QnStorageManager

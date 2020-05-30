@@ -43,7 +43,6 @@ public:
 
     virtual float getAvarageWritingUsage() const override;
 
-    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     virtual qint64 getFileSize(const QString& url) const override;
     virtual bool removeDir(const QString& url) override;
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
@@ -123,6 +122,7 @@ private:
     bool isValid() const;
 
     virtual bool doRemoveFile(const QString& url) override;
+    virtual QnAbstractStorageResource::FileInfoList doGetFileList(const QString& url) override;
 
 public:
     // Try to remove old temporary dirs if any.

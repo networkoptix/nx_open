@@ -40,7 +40,6 @@ public: // Inherited interface overrides.
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFileSize(const QString& url) const override;
-    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
 protected:
     virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override;
 private:
@@ -53,4 +52,5 @@ private:
     const nx::vms::server::Settings* m_settings = nullptr;
 
     virtual bool doRemoveFile(const QString& url) override;
+    virtual QnAbstractStorageResource::FileInfoList doGetFileList(const QString& dirName) override;
 };

@@ -32,16 +32,44 @@ QIODevice* StorageResource::wrapIoDevice(std::unique_ptr<QIODevice> ioDevice)
 
     std::weak_ptr<Metrics> statistics = m_metrics;
     result->setOnWriteCallback(
-        [statistics](qint64 size)
+        [this, statistics](qint64 size, std::chrono::milliseconds elapsed)
         {
-            if (auto strongRef = statistics.lock(); size > 0 && strongRef)
-                strongRef->bytesWritten += size;
+            if (auto strongRef = statistics.lock())
+            {
+                if (size > 0)
+                    strongRef->bytesWritten += size;
+
+                if (elapsed > serverModule()->settings().ioOperationTimeTreshold())
+                    strongRef->timedOutWrites++;
+
+                strongRef->writes++;
+            }
         });
+
     result->setOnReadCallback(
-        [statistics](qint64 size)
+        [this, statistics](qint64 size, std::chrono::milliseconds elapsed)
         {
-            if (auto strongRef = statistics.lock(); size > 0 && strongRef)
-                strongRef->bytesRead += size;
+            if (auto strongRef = statistics.lock())
+            {
+                if (size > 0)
+                    strongRef->bytesRead += size;
+
+                if (elapsed > serverModule()->settings().ioOperationTimeTreshold())
+                    strongRef->timedOutReads++;
+
+                strongRef->reads++;
+            }
+        });
+
+    result->setOnSeekCallback(
+        [this, statistics](qint64 result, std::chrono::milliseconds elapsed)
+        {
+            if (auto strongRef = statistics.lock())
+            {
+                strongRef->seeks++;
+                if (elapsed > serverModule()->settings().ioOperationTimeTreshold())
+                    strongRef->timedOutSeeks++;
+            }
         });
 
     return result;
@@ -57,8 +85,25 @@ qint64 StorageResource::nxOccupedSpace() const
 
 bool StorageResource::removeFile(const QString& url)
 {
-    m_metrics->deletetions++;
-    return doRemoveFile(url);
+    m_metrics->deletions++;
+    std::chrono::milliseconds elapsed = std::chrono::milliseconds(0);
+    const bool result = nx::utils::measure(
+        [this, &url]() { return doRemoveFile(url); }, &elapsed);
+    if (elapsed > serverModule()->settings().ioOperationTimeTreshold())
+        m_metrics->timedOutDeletions++;
+    return result;
+}
+
+QnAbstractStorageResource::FileInfoList StorageResource::getFileList(
+    const QString& url)
+{
+    m_metrics->directoryLists++;
+    std::chrono::milliseconds elapsed = std::chrono::milliseconds(0);
+    const auto result = nx::utils::measure(
+        [this, &url]() { return doGetFileList(url); }, &elapsed);
+    if (elapsed > serverModule()->settings().ioOperationTimeTreshold())
+        m_metrics->timedOutDirectoryLists++;
+    return result;
 }
 
 } // namespace nx::vms::server

@@ -806,14 +806,14 @@ qint64 QnFileStorageResource::getTotalSpace() const
     return m_cachedTotalSpace;
 }
 
-QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const QString& dirName)
+QnAbstractStorageResource::FileInfoList QnFileStorageResource::doGetFileList(const QString& url)
 {
     if (!isValid())
         return QnAbstractStorageResource::FileInfoList();
 
     QnAbstractStorageResource::FileInfoList ret;
 
-    QString path = translateUrlToLocal(dirName);
+    QString path = translateUrlToLocal(url);
     QDir dir(path);
     if (!dir.exists())
     {

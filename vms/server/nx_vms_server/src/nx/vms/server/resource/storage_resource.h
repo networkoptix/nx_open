@@ -20,13 +20,24 @@ public:
         QIODevice::OpenMode openMode) override final;
 
     virtual bool removeFile(const QString& url) override final;
+    virtual QnAbstractStorageResource::FileInfoList getFileList(
+        const QString& url) override final;
 
     struct Metrics
     {
         std::atomic<qint64> bytesRead{0};
         std::atomic<qint64> bytesWritten{0};
         std::atomic<qint64> issues{0};
-        std::atomic<qint64> deletetions{0};
+        std::atomic<qint64> deletions{0};
+        std::atomic<qint64> directoryLists{0};
+        std::atomic<qint64> reads{0};
+        std::atomic<qint64> writes{0};
+        std::atomic<qint64> seeks{0};
+        std::atomic<qint64> timedOutDeletions{0};
+        std::atomic<qint64> timedOutWrites{0};
+        std::atomic<qint64> timedOutReads{0};
+        std::atomic<qint64> timedOutSeeks{0};
+        std::atomic<qint64> timedOutDirectoryLists{0};
     };
 
     qint64 getMetric(std::atomic<qint64> Metrics::* parameter);
@@ -42,6 +53,8 @@ private:
     std::shared_ptr<Metrics> m_metrics;
 
     virtual bool doRemoveFile(const QString& url) = 0;
+    virtual QnAbstractStorageResource::FileInfoList doGetFileList(
+        const QString& url) = 0;
 };
 
 using StorageResourcePtr = QnSharedResourcePointer<StorageResource>;

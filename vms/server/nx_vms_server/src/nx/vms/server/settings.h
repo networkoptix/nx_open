@@ -464,6 +464,11 @@ public:
         "Toggles recording on/off for system storage."
     };
 
+    Option<std::chrono::seconds> ioOperationTimeTreshold{ this, "ioOperationTimeTreshold",
+        kDefaultIoOperationTimeTreshold,
+        "If IO operation (read/write/remove/list) takes time longer than this value it will be reported in server metrics."
+    };
+
 #if defined(__arm__)
     static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB
     static constexpr unsigned int kDefaultHlsMaxChunkBufferSize = 2 * 1024 * 1024;
@@ -476,6 +481,7 @@ public:
     static constexpr std::chrono::hours kDbBackupPeriodHrs{24 * 7};
     static constexpr int kDefaultHlsRemovedLiveChunksToKeep = -1;
     static constexpr std::chrono::seconds kDefaultVacuumIntervalSecacuumIntervalSec{3600 * 24};
+    static constexpr std::chrono::seconds kDefaultIoOperationTimeTreshold{5};
 
 #ifdef __arm__
     static constexpr qint64 kMinSystemStorageFreeSpace = 500 * 1000 * 1000LL;
