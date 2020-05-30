@@ -11,6 +11,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/media/av_codec_helper.h>
+#include "vivotek_stream_reader.h"
 
 namespace nx {
 namespace vms::server {
@@ -26,7 +27,6 @@ const QString kHevcCodecString = lit("h265");
 const QString kGeneralCodecCapability = lit("capability_videoin_codec");
 // codec capability per stream
 const QString kStreamCodecCapabilities = lit("capability_videoin_streamcodec");
-const QString kStreamCodecParameterTemplate = lit("videoin_c%1_s%2_codectype");
 
 const std::chrono::milliseconds kHttpTimeout(5000);
 
@@ -89,20 +89,8 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(
 CameraDiagnostics::Result VivotekResource::customStreamConfiguration(
     Qn::ConnectionRole role, const QnLiveStreamParams& params)
 {
-    bool success = true;
     if (streamSupportsHevc(role) && params.codec.toLower() == kHevcCodecString)
-        success = setHevcForStream(role);
-
-    if (!success)
-    {
-        return CameraDiagnostics::RequestFailedResult(
-            lit("Set HEVC for stream %1")
-            .arg(role == Qn::ConnectionRole::CR_LiveVideo
-                ? lit("primary")
-                : lit("secondary")),
-            lit("Request failed."));
-    }
-
+        return setHevcForStream(role);
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -140,20 +128,10 @@ bool VivotekResource::streamSupportsHevc(Qn::ConnectionRole role) const
         && m_streamCodecCapabilities[streamIndex].testFlag(StreamCodecCapability::h264);
 }
 
-bool VivotekResource::setHevcForStream(Qn::ConnectionRole role)
+CameraDiagnostics::Result VivotekResource::setHevcForStream(Qn::ConnectionRole role)
 {
-    const auto setUpHevcForStreamParameterName = kStreamCodecParameterTemplate
-        .arg(getChannel())
-        .arg(role == Qn::ConnectionRole::CR_LiveVideo ? 0 : 1);
-
-    bool result = setVivotekParameter(
-        setUpHevcForStreamParameterName,
-        kHevcCodecString);
-
-    if (!result)
-        return false;
-
-    return true;
+    return setVivotekParameter(
+        "codectype", kHevcCodecString, role == Qn::ConnectionRole::CR_LiveVideo);
 }
 
 bool VivotekResource::parseStreamCodecCapabilities(
@@ -253,12 +231,16 @@ boost::optional<QString> VivotekResource::getVivotekParameter(const QString& par
     return parameterValue;
 }
 
-bool VivotekResource::setVivotekParameter(
+CameraDiagnostics::Result VivotekResource::setVivotekParameter(
     const QString& parameterName,
-    const QString& parameterValue) const
+    const QString& parameterValue,
+    bool isPrimary) const
 {
+    const QString fullParameterName =
+        NX_FMT("videoin_c%1_s%2_%3", getChannel(), (isPrimary ? 0 : 1), parameterName);
+
     auto url = nx::utils::Url(getUrl());
-    auto query = QUrlQuery(parameterName + lit("=") + parameterValue);
+    auto query = QUrlQuery(fullParameterName + lit("=") + parameterValue);
     url.setPath(kSetParameterPath);
     url.setQuery(query);
 
@@ -266,9 +248,14 @@ bool VivotekResource::setVivotekParameter(
     QString dummyParameterValue;
 
     if (!doVivotekRequest(url, &dummyParameterName, &dummyParameterValue))
-        return false;
-
-    return true;
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            NX_FMT("Can't configure parameter %1 for stream %2", 
+                parameterName,
+                isPrimary ? "primary" : "secondary"),
+            "Request failed.");
+    }
+    return CameraDiagnostics::NoErrorResult();
 }
 
 nx::vms::server::resource::StreamCapabilityMap VivotekResource::getStreamCapabilityMapFromDriver(
@@ -294,6 +281,11 @@ nx::vms::server::resource::StreamCapabilityMap VivotekResource::getStreamCapabil
         }
     }
     return result;
+}
+
+QnAbstractStreamDataProvider* VivotekResource::createLiveDataProvider()
+{
+    return new VivotekStreamReader(toSharedPointer(this));
 }
 
 } // namespace plugins
