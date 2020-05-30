@@ -12,9 +12,9 @@
 /norestart   - suppress any attempts to restart. By default UI will prompt before restart.
 /log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
   <String Id="ConfirmCancelMessage">確定要取消？</String>
-  <String Id="ClientAndServer">用戶端和伺服器</String>
-  <String Id="ClientOnly">僅用戶端</String>
-  <String Id="ClientOnlyDesc">用戶端程式用來瀏覽影像以及管理系統</String>
+  <String Id="ClientAndServer">客戶端和伺服器</String>
+  <String Id="ClientOnly">僅客戶端</String>
+  <String Id="ClientOnlyDesc">客戶端程式用來瀏覽影像以及管理系統</String>
   <String Id="ServerOnly">僅伺服器</String>
   <String Id="ServerOnlyDesc">伺服器程式用來儲存系統資訊和影像</String>
   <String Id="HelpHeader">安裝程式説明</String>

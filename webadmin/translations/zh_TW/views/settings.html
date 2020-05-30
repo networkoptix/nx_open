@@ -40,14 +40,14 @@
                     <div>
                         <h3>重置伺服器</h3>
                         <p>此操作將把此伺服器恢復為預設值 (清除資料庫並還原設定).
-                            此伺服器將卸離當前系統. 影像資料將保持完好.</p>
+                            當前系統將卸載伺服器. 影像資料將保持完好.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">恢復出廠預設值</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>將伺服器從系統中卸離</h3>
-                        <p>此操作將把伺服器從系統中卸離, 但仍保存資料庫、本機使用者和設定.
+                        <h3>將伺服器從系統中卸載</h3>
+                        <p>此操作將從系統中卸載伺服器, 但仍保存資料庫、本機使用者和設定.
                             影像資料將保持完好 <b>雲端上的使用者將被刪除.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">從系統中卸離</button></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">從系統中卸載</button></p>
                     </div>
                     <div>
                         <h3>重新啟動</h3>
@@ -96,7 +96,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>此系統連結到 {{Config.cloud.productName}}, 系統擁有者: <b>{{cloudAccountName}}</b></p>
+                            <p>此系統連結到 {{Config.cloud.productName}}, 系統所有者: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">從 {{Config.cloud.productName}} 斷線</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -198,9 +198,9 @@
                             <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">還原除了網路以外的設定</button></p>
                     </div>
                     <div ng-if="canRunClient || canStopClient">
-                        <h3>在伺服器上執行用戶端應用程式</h3>
-                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">執行用戶端</button>
-                            <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">停止用戶端</button></p>
+                        <h3>在伺服器上執行客戶端應用程式</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">執行客戶端</button>
+                            <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">停用客戶端</button></p>
                         <p>使用鍵盤/滑鼠或行動應用程式來控制它.</p>
                     </div>
                 </uib-tab>

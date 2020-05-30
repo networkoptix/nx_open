@@ -6319,7 +6319,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1该邮箱地址已被注册过</translation>
+      <translation>%1该邮箱地址已被注册</translation>
     </message>
     <message>
       <source>Local users</source>
