@@ -135,13 +135,11 @@ void parseAeFromCamera(CameraSettings::Entry<Value>* entry,
 }
 
 
-void fetchAeFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
+void fetchAeFromCamera(CameraSettings::Vca* vca, CameraVcaParameterApi* api)
 {
     try
     {
-        CameraVcaParameterApi api(cameraUrl);
-
-        const auto parameters = api.fetch("Config/AE").get();
+        const auto parameters = api->fetch("Config/AE").get();
 
         enumerateAeEntries(vca,
             [&](auto* entry, const auto&... keys)
@@ -254,13 +252,11 @@ void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
 }
 
 
-void fetchReFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
+void fetchReFromCamera(CameraSettings::Vca* vca, CameraVcaParameterApi* api)
 {
     try
     {
-        CameraVcaParameterApi api(cameraUrl);
-
-        const auto parameters = api.fetch("Config/RE").get();
+        const auto parameters = api->fetch("Config/RE").get();
 
         parseReFromCamera(vca, parameters);
     }
@@ -277,8 +273,10 @@ void fetchFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
     if (!enabled.hasValue() || !enabled.value())
         return;
 
-    fetchAeFromCamera(vca, cameraUrl);
-    fetchReFromCamera(vca, cameraUrl);
+    CameraVcaParameterApi api(cameraUrl);
+
+    fetchAeFromCamera(vca, &api);
+    fetchReFromCamera(vca, &api);
 }
 
 
@@ -371,13 +369,11 @@ auto unparseAeToCamera(const CameraSettings::Entry<Value>& entry)
 }
 
 
-void storeAeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
+void storeAeToCamera(CameraVcaParameterApi* api, CameraSettings::Vca* vca)
 {
     try
     {
-        CameraVcaParameterApi api(cameraUrl);
-
-        auto parameters = api.fetch("Config/AE").get();
+        auto parameters = api->fetch("Config/AE").get();
 
         enumerateAeEntries(vca,
             [&](auto* entry, const auto&... keys)
@@ -395,9 +391,7 @@ void storeAeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
                 }
             });
 
-        api.store("Config/AE", parameters).get();
-
-        api.reloadConfig().get();
+        api->store("Config/AE", parameters).get();
     }
     catch (const std::exception& exception)
     {
@@ -528,19 +522,15 @@ void unparseReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
 }
 
 
-void storeReToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
+void storeReToCamera(CameraVcaParameterApi* api, CameraSettings::Vca* vca)
 {
     try
     {
-        CameraVcaParameterApi api(cameraUrl);
-
-        auto parameters = api.fetch("Config/RE").get();
+        auto parameters = api->fetch("Config/RE").get();
 
         unparseReToCamera(&parameters, vca);
 
-        api.store("Config/RE", parameters).get();
-
-        api.reloadConfig().get();
+        api->store("Config/RE", parameters).get();
     }
     catch (const std::exception& exception)
     {
@@ -556,8 +546,12 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca* vca)
     if (!enabled.hasValue() || !enabled.value())
         return;
 
-    storeAeToCamera(cameraUrl, vca);
-    storeReToCamera(cameraUrl, vca);
+    CameraVcaParameterApi api(cameraUrl);
+
+    storeAeToCamera(&api, vca);
+    storeReToCamera(&api, vca);
+
+    api.reloadConfig().get();
 }
 
 
