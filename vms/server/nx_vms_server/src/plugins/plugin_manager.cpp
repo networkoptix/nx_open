@@ -130,7 +130,7 @@ void PluginManager::setIsActive(const IRefCountable* plugin, bool isActive)
         if (pluginContext.pluginInfo->isActive == isActive)
             return;
 
-        pluginContext.pluginInfo->isActive = isActive;        
+        pluginContext.pluginInfo->isActive = isActive;
         return;
     }
 }
