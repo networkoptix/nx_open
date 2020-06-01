@@ -43,6 +43,8 @@ public:
     std::optional<ManifestType> manifest(
         std::unique_ptr<StringBuilder>* outStringBuilder = nullptr) const
     {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
         sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::manifest);
 
         if (!NX_ASSERT(m_mainSdkObject))
@@ -180,6 +182,9 @@ private:
 
         return returnValue;
     }
+
+protected:
+    mutable nx::Mutex m_mutex;
 
 private:
     sdk::Ptr<MainSdkObject> m_mainSdkObject;

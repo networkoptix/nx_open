@@ -39,6 +39,8 @@ Plugin::Plugin(
 
 wrappers::EnginePtr Plugin::createEngine(const resource::AnalyticsEngineResourcePtr engineResource)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::createEngine);
 
     const auto sdkPlugin = sdkObject();

@@ -31,6 +31,8 @@ public:
 
     std::optional<sdk_support::ErrorMap> setSettings(const sdk_support::SettingMap& settings)
     {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
         sdk_support::TimedGuard guard = base_type::makeTimedGuard(SdkMethod::setSettings);
 
         SettingsProcessor settingsProcessor(
@@ -46,6 +48,8 @@ public:
 
     std::optional<sdk_support::SettingsResponse> pluginSideSettings() const
     {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
         sdk_support::TimedGuard guard = base_type::makeTimedGuard(SdkMethod::pluginSideSettings);
 
         DebugSettings settings = makeSettingsProcessorSettings();
