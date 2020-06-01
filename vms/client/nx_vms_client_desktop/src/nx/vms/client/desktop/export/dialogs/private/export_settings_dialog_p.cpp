@@ -232,6 +232,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
             m_exportMediaSettings.period.startTimeMs)).count();
         request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameAfter;
         request.rotation = 0;
+        request.tolerant = true;
         request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
 
         m_mediaRawImageProvider.reset(new ResourceThumbnailProvider(request, this));
@@ -357,6 +358,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
     provider->setItemBackgroundColor(palette.color(QPalette::Window));
     provider->setFontColor(palette.color(QPalette::WindowText));
     provider->setRequestRoundMethod(nx::api::ResourceImageRequest::RoundMethod::iFrameAfter);
+    provider->setTolerant(true);
     provider->setWatermark(m_exportMediaSettings.transcodingSettings.watermark);
     provider->loadAsync();
 

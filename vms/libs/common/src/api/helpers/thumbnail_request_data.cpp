@@ -16,7 +16,7 @@ static const QString kDeprecatedPhysicalIdParam = "physicalId";
 static const QString kDeprecatedMacParam = "mac";
 static const QString kCameraIdParam = "cameraId";
 static const QString kTimeParam = "time";
-static const QString kIgnoreExternalArchive = "ignoreExternalArchive";
+static const QString kIgnoreExternalArchiveParam = "ignoreExternalArchive";
 static const QString kRotateParam = "rotate";
 static const QString kCropParam = "crop";
 static const QString kHeightParam = "height";
@@ -26,6 +26,7 @@ static const QString kImageFormatParam = "imageFormat";
 static const QString kRoundMethodParam = "method";
 static const QString kAspectRatioParam = "aspectRatio";
 static const QString kStreamSelectionModeParam = "streamSelectionMode";
+static const QString kTolerantParam = "tolerant";
 
 static const QString kLatestTimeValue = "latest";
 
@@ -51,8 +52,11 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
         else
             request.usecSinceEpoch = nx::utils::parseDateTime(timeValue);
 
-        if (params.contains(kIgnoreExternalArchive))
+        if (params.contains(kIgnoreExternalArchiveParam))
             request.ignoreExternalArchive = true;
+
+        if (params.contains(kTolerantParam))
+            request.tolerant = true;
     }
 
     request.rotation = QnLexical::deserialized<int>(params.value(kRotateParam), request.rotation);
@@ -86,7 +90,9 @@ QnRequestParamList QnThumbnailRequestData::toParams() const
         ? kLatestTimeValue
         : QnLexical::serialized(request.usecSinceEpoch));
     if (request.ignoreExternalArchive)
-        result.insert(kIgnoreExternalArchive, "");
+        result.insert(kIgnoreExternalArchiveParam, "");
+    if (request.tolerant)
+        result.insert(kTolerantParam, "");
     result.insert(kRotateParam, QnLexical::serialized(request.rotation));
     if (!request.crop.isNull())
         result.insert(kCropParam, QnLexical::serialized(request.crop));
@@ -115,7 +121,7 @@ boost::optional<QString> QnThumbnailRequestData::getError() const
         && request.usecSinceEpoch != DATETIME_NOW)
     {
         return QString("'%1' applies only for \"latest\" timestamp")
-            .arg(kIgnoreExternalArchive);
+            .arg(kIgnoreExternalArchiveParam);
     }
 
     const auto& size = request.size;

@@ -379,8 +379,8 @@ struct LayoutThumbnailLoader::Private
     // Items to be loaded.
     QList<ItemPtr> items;
 
-
     nx::api::ImageRequest::RoundMethod roundMethod = nx::api::ImageRequest::RoundMethod::precise;
+    bool tolerant = false; //< See nx::api::ImageRequest::tolerant.
 
     // We need this widgets to draw special states, like 'NoData'.
     QScopedPointer<AutoscaledPlainText> noDataWidget;
@@ -448,6 +448,11 @@ void LayoutThumbnailLoader::setItemBackgroundColor(const QColor& value)
 void LayoutThumbnailLoader::setRequestRoundMethod(nx::api::ImageRequest::RoundMethod roundMethod)
 {
     d->roundMethod = roundMethod;
+}
+
+void LayoutThumbnailLoader::setTolerant(bool value)
+{
+    d->tolerant = value;
 }
 
 QColor LayoutThumbnailLoader::fontColor() const
@@ -636,7 +641,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         request.rotation = 0;
         // server still should provide most recent frame when we request request.msecSinceEpoch = -1
         request.roundMethod = d->roundMethod;
-
+        request.tolerant = d->tolerant;
 
         ImageProvider* provider = nullptr;
         if (d->watermark.visible())

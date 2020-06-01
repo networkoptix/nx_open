@@ -40,6 +40,12 @@ public:
     void setItemBackgroundColor(const QColor& value);
     void setRequestRoundMethod(nx::api::ImageRequest::RoundMethod roundMethod);
 
+    /**
+     * Whether to use tolerant mode when fetching camera thumbnails, i.e. allow fetching
+     * the nearest available frame when there's no archive at the requested time.
+     */
+    void setTolerant(bool value);
+
     void setResourcePool(QnResourcePool* pool);
 
     QColor fontColor() const;

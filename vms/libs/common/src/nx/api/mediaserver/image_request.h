@@ -74,6 +74,12 @@ struct ImageRequest
 
     AspectRatio aspectRatio = AspectRatio::auto_;
 
+    /**
+     * Whether it's allowed to get the closest available frame if there's no archive
+     * at the requested time.
+     */
+    bool tolerant = false;
+
     /** Crop image. Values in range [0..1] */
     QRectF crop;
 };
