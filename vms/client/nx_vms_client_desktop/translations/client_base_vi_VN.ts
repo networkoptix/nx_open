@@ -1031,7 +1031,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation>ID phần cứng của Máy chủ không khớp với mã kích hoạt của giấy phép này.</translation>
+      <translation>ID phần cứng của máy chủ có giấy phép này không khớp với ID phần cứng mà giấy phép được kích hoạt.</translation>
     </message>
   </context>
   <context>
@@ -1271,7 +1271,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Key bản quyền Không hợp lệ</translation>
+      <translation>Mã bản quyền Không hợp lệ</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
@@ -1287,11 +1287,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Bản quyền này đã được kích hoạt trên một máy khác %1</translation>
+      <translation>Mã bản quyền này đã được kích hoạt và liên kết với ID Phần cứng %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Bản quyền này đã được kích hoạt trên một máy khác %1 vào %2</translation>
+      <translation>Mã bản quyền này đã được kích hoạt và liên kết với ID Phần cứng %1 vào %2</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
@@ -1303,7 +1303,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation>Để kích hoạt Khóa cấp phép theo cách thủ công, vui lòng liên hệ %1.</translation>
+      <translation>Để kích hoạt mã bản quyền theo cách thủ công, vui lòng liên hệ với %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1315,11 +1315,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>Để báo cáo vấn đề, vui lòng liên hệ với bộ phận hỗ trợ khu vực / Hỗ trợ giấy phép:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>Để kích hoạt mã bản quyền theo cách thủ công, vui lòng liên hệ với bộ phận hỗ trợ khu vực / Hỗ trợ mã bản quyền:</translation>
     </message>
   </context>
   <context>
@@ -1397,15 +1397,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Để có được Mã bản quyền hợp lệ, vui lòng liên hệ với bộ phận hỗ trợ khu vực / Hỗ trợ giấy phép:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Nếu sự cố vẫn còn, vui lòng liên hệ với bộ phận hỗ trợ khu vực / Hỗ trợ giấy phép:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Vui lòng liên hệ với bộ phận hỗ trợ khu vực / Hỗ trợ giấy phép:</translation>
     </message>
   </context>
   <context>
@@ -1625,7 +1625,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Bạn có chắc chắn muốn rời khỏi trang này? Những thay đổi mà bạn thực hiện có thể không được lưu.</translation>
     </message>
   </context>
   <context>
@@ -1660,7 +1660,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Khu vực / Hỗ trợ giấy phép</translation>
     </message>
   </context>
   <context>
@@ -3760,7 +3760,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Key bản quyền</translation>
+      <translation>Mã bản quyền</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
@@ -3799,7 +3799,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Key bản quyền</translation>
+      <translation>Mã bản quyền</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3951,12 +3951,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Vui lòng gửi Mã bản quyền và ID Phần cứng tới bộ phận hỗ trợ Khu vực / Hỗ trợ giấy phép để nhận một tệp Khóa kích hoạt.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Vui lòng gửi Mã bản quyền và ID Phần cứng tới bộ phận hỗ trợ Khu vực / Hỗ trợ giấy phép (%1) để nhận một tệp Khóa kích hoạt.</translation>
     </message>
   </context>
   <context>
@@ -8807,7 +8807,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Không thể kiểm tra cập nhật trên Internet</translation>
     </message>
   </context>
   <context>
@@ -9023,12 +9023,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Thiết bị không xác định</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Thiết bị không xác định %1</translation>
     </message>
   </context>
   <context>
@@ -9056,14 +9056,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>%n biểu tượng trên</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>%n biểu tượng còn lại</numerusform>
       </translation>
     </message>
   </context>
@@ -9130,7 +9130,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Chuyển động + Lo-Res</translation>
     </message>
   </context>
   <context>
@@ -9848,7 +9848,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation>
-        <numerusform>Lưu ý rằng mỗi khóa giấy phép có thể bị vô hiệu hóa tối đa %n lần.</numerusform>
+        <numerusform>Lưu ý rằng mỗi khóa mã bản quyền có thể bị vô hiệu hóa tối đa %n lần.</numerusform>
       </translation>
     </message>
   </context>

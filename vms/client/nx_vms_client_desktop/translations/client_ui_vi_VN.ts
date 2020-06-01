@@ -1834,7 +1834,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>Khóa bản quyền không hợp lệ</translation>
+      <translation>Mã bản quyền không hợp lệ</translation>
     </message>
     <message>
       <location/>
