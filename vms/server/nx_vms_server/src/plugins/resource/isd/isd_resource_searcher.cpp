@@ -206,7 +206,10 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         }
     }
 
-    if (name.isEmpty() || (vendor != kIsdFullVendorName))
+    QnResourceData resourceData = dataPool()->data(vendor, name);
+    const bool isDW = resourceData.value<bool>(ResourceDataKey::kIsdDwCam);
+
+    if (name.isEmpty() || (vendor != kIsdFullVendorName && !isDW))
         return QList<QnResourcePtr>();
 
     if (shouldStop())
@@ -249,15 +252,12 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         }
     }
 
-    QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
     {
         NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacturer(), name));
         return QList<QnResourcePtr>();
     }
-
     QnPlIsdResourcePtr resource (new QnPlIsdResource(serverModule()));
-    auto isDW = resourceData.value<bool>(ResourceDataKey::kIsdDwCam);
 
     vendor = isDW ? kDwFullVendorName : vendor;
     name = vendor == kIsdFullVendorName ?
