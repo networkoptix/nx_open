@@ -96,11 +96,24 @@ void fillReErrors(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
     }
 }
 
+void fillReErrors(CameraSettings::Vca::CrowdDetection* crowdDetection,
+    const QString& message)
+{
+    for (auto& rule: crowdDetection->rules)
+    {
+        fillReErrors(&rule.region, message);
+        fillReErrors(&rule.sizeThreshold, message);
+        fillReErrors(&rule.enterDelay, message);
+        fillReErrors(&rule.exitDelay, message);
+    }
+}
 
 void fillReErrors(CameraSettings::Vca* vca, const QString& message)
 {
     if (auto& intrusionDetection = vca->intrusionDetection)
         fillReErrors(&*intrusionDetection, message);
+    if (auto& crowdDetection = vca->crowdDetection)
+        fillReErrors(&*crowdDetection, message);
 }
 
 
@@ -162,7 +175,7 @@ void fetchAeFromCamera(CameraSettings::Vca* vca, CameraVcaParameterApi* api)
     }
 }
 
-void parseReFromCamera(CameraSettings::Vca::IntrusionDetection::Rule::Region* region,
+void parseReFromCamera(CameraSettings::Entry<NamedPolygon>* region,
     const QJsonValue& rule, const QString& ruleName, const QString& path)
 {
     try
@@ -245,10 +258,92 @@ void parseReFromCamera(CameraSettings::Vca::IntrusionDetection* intrusionDetecti
     }
 }
 
+void parseReFromCamera(CameraSettings::Vca::CrowdDetection::Rule::SizeThreshold* sizeThreshold,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        sizeThreshold->emplaceValue(get<int>(path, rule, "PeopleNumber"));
+    }
+    catch (const std::exception& exception)
+    {
+        sizeThreshold->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::CrowdDetection::Rule::EnterDelay* enterDelay,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        enterDelay->emplaceValue(get<int>(path, rule, "EnterDelay"));
+    }
+    catch (const std::exception& exception)
+    {
+        enterDelay->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::CrowdDetection::Rule::ExitDelay* exitDelay,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        exitDelay->emplaceValue(get<int>(path, rule, "LeaveDelay"));
+    }
+    catch (const std::exception& exception)
+    {
+        exitDelay->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::CrowdDetection* crowdDetection,
+    const QJsonValue& parameters)
+{
+    try
+    {
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(parameters, "CrowdDetection").isUndefined())
+            jsonRules = get<QJsonObject>(parameters, "CrowdDetection");
+
+        const auto ruleNames = jsonRules.keys();
+
+        auto& rules = crowdDetection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+            if (i >= (std::size_t) ruleNames.size())
+            {
+                rule.region.emplaceNothing();
+                rule.sizeThreshold.emplaceNothing();
+                rule.enterDelay.emplaceNothing();
+                rule.exitDelay.emplaceNothing();
+                continue;
+            }
+
+            const auto& ruleName = ruleNames[i];
+            const auto& jsonRule = jsonRules[ruleName];
+
+            const QString path = NX_FMT("$.CrowdDetection.%1", ruleName);
+
+            parseReFromCamera(&rule.region, jsonRule, ruleName, path);
+            parseReFromCamera(&rule.sizeThreshold, jsonRule, path);
+            parseReFromCamera(&rule.enterDelay, jsonRule, path);
+            parseReFromCamera(&rule.exitDelay, jsonRule, path);
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(crowdDetection, exception.what());
+    }
+}
+
 void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
 {
     if (auto& intrusionDetection = vca->intrusionDetection)
         parseReFromCamera(&*intrusionDetection, parameters);
+    if (auto& crowdDetection = vca->crowdDetection)
+        parseReFromCamera(&*crowdDetection, parameters);
 }
 
 
@@ -411,14 +506,9 @@ std::optional<QString> getName(const CameraSettings::Entry<NamedPolygon>& entry)
     return region.name;
 }
 
-std::optional<QString> getName(const CameraSettings::Vca::IntrusionDetection::Rule& rule)
-{
-    return getName(rule.region);
-}
-
 
 void unparseReToCamera(QJsonValue* jsonRule,
-    CameraSettings::Vca::IntrusionDetection::Rule::Region* region)
+    CameraSettings::Entry<NamedPolygon>* region)
 {
     try
     {
@@ -482,7 +572,7 @@ void unparseReToCamera(QJsonValue* parameters,
             std::set<QString> ruleNames;
             for (const auto& rule: rules)
             {
-                if (auto name = getName(rule))
+                if (auto name = getName(rule.region))
                     ruleNames.insert(*name);
             }
             for (const auto& oldName: jsonRules.keys())
@@ -494,7 +584,7 @@ void unparseReToCamera(QJsonValue* parameters,
 
         for (auto& rule: rules)
         {
-            if (auto name = getName(rule))
+            if (auto name = getName(rule.region))
             {
                 QJsonValue jsonRule = jsonRules[*name];
                 if (jsonRule.isUndefined() || jsonRule.isNull())
@@ -515,10 +605,124 @@ void unparseReToCamera(QJsonValue* parameters,
     }
 }
 
+void unparseReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::CrowdDetection::Rule::SizeThreshold* sizeThreshold)
+{
+    try
+    {
+        // If new rule, set default like in web UI.
+        if (sizeThreshold->hasNothing()
+            && get<QJsonValue>(*jsonRule, "PeopleNumber").isUndefined())
+        {
+            sizeThreshold->emplaceValue(2);
+        }
+
+        if (!sizeThreshold->hasValue())
+            return;
+
+        set(jsonRule, "PeopleNumber", sizeThreshold->value());
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(sizeThreshold, exception.what());
+    }
+}
+
+void unparseReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::CrowdDetection::Rule::EnterDelay* enterDelay)
+{
+    try
+    {
+        if (!enterDelay->hasValue())
+            return;
+
+        set(jsonRule, "EnterDelay", enterDelay->value());
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(enterDelay, exception.what());
+    }
+}
+
+void unparseReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::CrowdDetection::Rule::ExitDelay* exitDelay)
+{
+    try
+    {
+        // If new rule, set default like in web UI.
+        if (exitDelay->hasNothing()
+            && get<QJsonValue>(*jsonRule, "LeaveDelay").isUndefined())
+        {
+            exitDelay->emplaceValue(1);
+        }
+
+        if (!exitDelay->hasValue())
+            return;
+
+        set(jsonRule, "LeaveDelay", exitDelay->value());
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(exitDelay, exception.what());
+    }
+}
+
+void unparseReToCamera(QJsonValue* parameters,
+    CameraSettings::Vca::CrowdDetection* crowdDetection)
+{
+    try
+    {
+        auto& rules = crowdDetection->rules;
+
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(*parameters, "CrowdDetection").isUndefined())
+        {
+            jsonRules = get<QJsonObject>(*parameters, "CrowdDetection");
+
+            std::set<QString> ruleNames;
+            for (const auto& rule: rules)
+            {
+                if (auto name = getName(rule.region))
+                    ruleNames.insert(*name);
+            }
+            for (const auto& oldName: jsonRules.keys())
+            {
+                if (!ruleNames.count(oldName))
+                    jsonRules.remove(oldName);
+            }
+        }
+
+        for (auto& rule: rules)
+        {
+            if (auto name = getName(rule.region))
+            {
+                QJsonValue jsonRule = jsonRules[*name];
+                if (jsonRule.isUndefined() || jsonRule.isNull())
+                    jsonRule = QJsonObject{};
+
+                unparseReToCamera(&jsonRule, &rule.region);
+                unparseReToCamera(&jsonRule, &rule.sizeThreshold);
+                unparseReToCamera(&jsonRule, &rule.enterDelay);
+                unparseReToCamera(&jsonRule, &rule.exitDelay);
+
+                jsonRules[*name] = jsonRule;
+            }
+        }
+
+        set(parameters, "CrowdDetection", jsonRules);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(crowdDetection, exception.what());
+    }
+}
+
 void unparseReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
 {
     if (auto& intrusionDetection = vca->intrusionDetection)
         unparseReToCamera(parameters, &*intrusionDetection);
+    if (auto& crowdDetection = vca->crowdDetection)
+        unparseReToCamera(parameters, &*crowdDetection);
 }
 
 
@@ -587,6 +791,20 @@ void enumerateEntries(Settings* settings, Visitor visit)
 
                 repeatedVisit(i, &rule.region);
                 repeatedVisit(i, &rule.inverted);
+            }
+        }
+
+        if (auto& crowdDetection = vca->crowdDetection)
+        {
+            auto& rules = crowdDetection->rules;
+            for (std::size_t i = 0; i < rules.size(); ++i)
+            {
+                auto& rule = rules[i];
+
+                repeatedVisit(i, &rule.region);
+                repeatedVisit(i, &rule.sizeThreshold);
+                repeatedVisit(i, &rule.enterDelay);
+                repeatedVisit(i, &rule.exitDelay);
             }
         }
     }
@@ -665,6 +883,42 @@ void parseEntryFromServer(
     entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), -74, +74));
 }
 
+void parseEntryFromServer(
+    CameraSettings::Vca::CrowdDetection::Rule::SizeThreshold* entry, const QString& unparsedValue)
+{
+    if (unparsedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 20));
+}
+
+void parseEntryFromServer(
+    CameraSettings::Vca::CrowdDetection::Rule::EnterDelay* entry, const QString& unparsedValue)
+{
+    if (unparsedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 999));
+}
+
+void parseEntryFromServer(
+    CameraSettings::Vca::CrowdDetection::Rule::ExitDelay* entry, const QString& unparsedValue)
+{
+    if (unparsedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 999));
+}
+
 void parseEntryFromServer(CameraSettings::Entry<int>* entry, const QString& unparsedValue)
 {
     entry->emplaceValue(toInt(unparsedValue));
@@ -678,7 +932,7 @@ bool parseFromServer(NamedPointSequence* points, const QJsonValue& json)
 
     points->name = get<QString>(json, "label");
     if (points->name.isEmpty())
-        throw Exception("Empty label");
+        throw Exception("Empty name");
 
     const auto jsonPoints = get<QJsonArray>("$.figure", figure, "points");
     for (int i = 0; i < jsonPoints.count(); ++i)
@@ -754,6 +1008,33 @@ std::optional<QString> unparseEntryToServer(
 
 std::optional<QString> unparseEntryToServer(
     const CameraSettings::Vca::Installation::RollAngle& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> unparseEntryToServer(
+    const CameraSettings::Vca::CrowdDetection::Rule::SizeThreshold& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> unparseEntryToServer(
+    const CameraSettings::Vca::CrowdDetection::Rule::EnterDelay& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> unparseEntryToServer(
+    const CameraSettings::Vca::CrowdDetection::Rule::ExitDelay& entry)
 {
     if (!entry.hasValue())
         return "";
@@ -862,7 +1143,7 @@ QJsonValue getVcaIntrusionDetectionModelForManifest()
                         QJsonObject{
                             {"name", Rule::Region::name},
                             {"type", "PolygonFigure"},
-                            {"caption", "Detection area"},
+                            {"caption", "Name"},
                             {"minPoints", 3},
                             {"maxPoints", 20}, // Defined in user guide.
                         },
@@ -883,6 +1164,61 @@ QJsonValue getVcaIntrusionDetectionModelForManifest()
                                 {"false", "In"},
                                 {"true", "Out"},
                             }},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
+QJsonValue getVcaCrowdDetectionModelForManifest()
+{
+    using Rule = CameraSettings::Vca::CrowdDetection::Rule;
+    return QJsonObject{
+        {"name", "CrowdDetection"},
+        {"type", "Section"},
+        {"caption", "Crowd Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) kMaxDetectionRuleCount},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{Rule::Region::name}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", Rule::Region::name},
+                            {"type", "PolygonFigure"},
+                            {"caption", "Name"},
+                            {"minPoints", 3},
+                            {"maxPoints", 20}, // Defined in user guide.
+                        },
+                        QJsonObject{
+                            {"name", Rule::SizeThreshold::name},
+                            // Should really be SpinBox, but need empty state to work around camera not
+                            // returning settings for disabled functionality.
+                            {"type", "TextField"},
+                            {"caption", "Size threshold"},
+                            {"description", "At least this many people must be in the area to be considered a crowd"},
+                        },
+                        QJsonObject{
+                            {"name", Rule::EnterDelay::name},
+                            // Should really be SpinBox, but need empty state to work around camera not
+                            // returning settings for disabled functionality.
+                            {"type", "TextField"},
+                            {"caption", "Entrance delay (s)"},
+                            {"description", "The event is only generated if the person stays in the area for at least this long"},
+                        },
+                        QJsonObject{
+                            {"name", Rule::ExitDelay::name},
+                            // Should really be SpinBox, but need empty state to work around camera not
+                            // returning settings for disabled functionality.
+                            {"type", "TextField"},
+                            {"caption", "Exit delay (s)"},
+                            {"description", "The event is only generated if the person stays out of the area for at least this long"},
                         },
                     }},
                 }},
@@ -921,6 +1257,8 @@ QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
 
                 if (features.intrusionDetection)
                     sections.push_back(getVcaIntrusionDetectionModelForManifest());
+                if (features.crowdDetection)
+                    sections.push_back(getVcaCrowdDetectionModelForManifest());
 
                 return sections;
             }(),
@@ -940,6 +1278,12 @@ CameraSettings::CameraSettings(const CameraFeatures& features)
         {
             auto& intrusionDetection = vca->intrusionDetection.emplace();
             intrusionDetection.rules.resize(kMaxDetectionRuleCount);
+        }
+
+        if (features.vca->crowdDetection)
+        {
+            auto& crowdDetection = vca->crowdDetection.emplace();
+            crowdDetection.rules.resize(kMaxDetectionRuleCount);
         }
     }
 }

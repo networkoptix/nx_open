@@ -109,6 +109,19 @@ public:
             std::vector<Rule> rules;
         };
         std::optional<IntrusionDetection> intrusionDetection;
+
+        struct CrowdDetection
+        {
+            struct Rule
+            {
+                NX_CAMERA_SETTINGS_ENTRY(Vca.CrowdDetection.Rule#, Region, NamedPolygon) region;
+                NX_CAMERA_SETTINGS_ENTRY(Vca.CrowdDetection.Rule#, SizeThreshold, int) sizeThreshold;
+                NX_CAMERA_SETTINGS_ENTRY(Vca.CrowdDetection.Rule#, EnterDelay, int) enterDelay;
+                NX_CAMERA_SETTINGS_ENTRY(Vca.CrowdDetection.Rule#, ExitDelay, int) exitDelay;
+            };
+            std::vector<Rule> rules;
+        };
+        std::optional<CrowdDetection> crowdDetection;
     };
     std::optional<Vca> vca;
 

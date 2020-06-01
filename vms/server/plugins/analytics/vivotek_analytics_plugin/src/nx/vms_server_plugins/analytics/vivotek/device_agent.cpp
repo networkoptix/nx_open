@@ -155,6 +155,13 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
                                 {"name", "Intrusion"},
                             });
                         }
+                        if (m_features.vca->crowdDetection)
+                        {
+                            types.push_back(QJsonObject{
+                                {"id", kEventTypeCrowd},
+                                {"name", "Crowd"},
+                            });
+                        }
                     }
 
                     return types;
@@ -236,6 +243,12 @@ void DeviceAgent::updateAvailableMetadataTypes(const CameraSettings& settings)
             if (const auto& intrusionDetection = vca->intrusionDetection)
             {
                 const auto& rules = intrusionDetection->rules;
+                if (std::any_of(rules.begin(), rules.end(), regionHasValue))
+                    m_availableMetadataTypes |= EventNativeMetadataType;
+            }
+            if (const auto& crownDetection = vca->crowdDetection)
+            {
+                const auto& rules = crownDetection->rules;
                 if (std::any_of(rules.begin(), rules.end(), regionHasValue))
                     m_availableMetadataTypes |= EventNativeMetadataType;
             }

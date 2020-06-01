@@ -8,8 +8,6 @@
 #include "utils.h"
 #include "exception.h"
 
-#include <iostream>
-
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace nx::sdk;
@@ -21,6 +19,8 @@ std::optional<QString> parseTypeId(const QString& type)
 {
     if (type == "IntrusionDetection")
         return kEventTypeIntrusion;
+    if (type == "CrowdDetection")
+        return kEventTypeCrowd;
 
     return std::nullopt;
 }
