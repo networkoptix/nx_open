@@ -465,7 +465,7 @@
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation>類比編碼器授權</translation>
+      <translation>類比授權</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
@@ -540,7 +540,7 @@
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
       <translation>
-        <numerusform>%n 類比編碼器授權</numerusform>
+        <numerusform>%n 類比授權</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -622,7 +622,7 @@
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 類比編碼器授權</numerusform>
+        <numerusform>%n/%1 類比授權</numerusform>
       </translation>
     </message>
     <message numerus="yes">

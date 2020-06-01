@@ -1023,7 +1023,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation>ID phần cứng của Máy chủ không khớp với mã kích hoạt của giấy phép này.</translation>
+      <translation>ID phần cứng của máy chủ có giấy phép này không khớp với ID phần cứng mà giấy phép được kích hoạt.</translation>
     </message>
   </context>
   <context>
@@ -3546,7 +3546,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Key bản quyền</translation>
+      <translation>Mã bản quyền</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -3565,7 +3565,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Key bản quyền</translation>
+      <translation>Mã bản quyền</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3788,19 +3788,19 @@ to %1</source>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Key bản quyền Không hợp lệ</translation>
+      <translation>Mã bản quyền Không hợp lệ</translation>
     </message>
     <message>
       <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng để có được key bản quyền.</translation>
+      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng để có được Mã bản quyền.</translation>
     </message>
     <message>
       <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>Xin vui lòng liên hệ với hỗ trợ khách hàng để kích hoạt giấy phép khóa theo cách thủ công.</translation>
+      <translation>Xin vui lòng liên hệ với hỗ trợ khách hàng để kích hoạt Mã bản quyền khóa theo cách thủ công.</translation>
     </message>
     <message>
       <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng để có được bản quyên hợp lệ.</translation>
+      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng để có được Mã bản quyền hợp lệ.</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -3808,11 +3808,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Bản quyền này đã được kích hoạt trên một máy khác %1</translation>
+      <translation>Mã bản quyền này đã được kích hoạt và liên kết với ID Phần cứng %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Bản quyền này đã được kích hoạt trên một máy khác %1 vào %2</translation>
+      <translation>Mã bản quyền này đã được kích hoạt và liên kết với ID Phần cứng %1 vào %2</translation>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
@@ -3853,11 +3853,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Vui lòng gửi email với key và ID phần cứng %1 đã kích hoạt.</translation>
+      <translation>Vui lòng gửi email với mã bản quyền và ID phần cứng %1 để nhận một tệp Khóa kích hoạt.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Vui lòng gửi email với key và ID phần cứng %1 đã kích hoạt.</translation>
+      <translation>Vui lòng gửi email với mã bản quyền và ID phần cứng %1 để nhận một tệp Khóa kích hoạt.</translation>
     </message>
   </context>
   <context>
