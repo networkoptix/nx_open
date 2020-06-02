@@ -17,10 +17,12 @@ namespace {
 
 std::optional<QString> parseTypeId(const QString& type)
 {
-    if (type == "IntrusionDetection")
-        return kEventTypeIntrusion;
     if (type == "CrowdDetection")
         return kEventTypeCrowd;
+    if (type == "LoiteringDetection")
+        return kEventTypeLoitering;
+    if (type == "IntrusionDetection")
+        return kEventTypeIntrusion;
 
     return std::nullopt;
 }

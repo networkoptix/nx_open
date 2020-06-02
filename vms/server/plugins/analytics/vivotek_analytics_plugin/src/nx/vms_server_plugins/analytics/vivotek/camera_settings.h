@@ -99,17 +99,6 @@ public:
             NX_CAMERA_SETTINGS_ENTRY(Vca.Installation, RollAngle, int) rollAngle;
         } installation;
 
-        struct IntrusionDetection
-        {
-            struct Rule
-            {
-                NX_CAMERA_SETTINGS_ENTRY(Vca.IntrusionDetection.Rule#, Region, NamedPolygon) region;
-                NX_CAMERA_SETTINGS_ENTRY(Vca.IntrusionDetection.Rule#, Inverted, bool) inverted;
-            };
-            std::vector<Rule> rules;
-        };
-        std::optional<IntrusionDetection> intrusionDetection;
-
         struct CrowdDetection
         {
             struct Rule
@@ -122,6 +111,28 @@ public:
             std::vector<Rule> rules;
         };
         std::optional<CrowdDetection> crowdDetection;
+
+        struct LoiteringDetection
+        {
+            struct Rule
+            {
+                NX_CAMERA_SETTINGS_ENTRY(Vca.LoiteringDetection.Rule#, Region, NamedPolygon) region;
+                NX_CAMERA_SETTINGS_ENTRY(Vca.LoiteringDetection.Rule#, Delay, int) delay;
+            };
+            std::vector<Rule> rules;
+        };
+        std::optional<LoiteringDetection> loiteringDetection;
+
+        struct IntrusionDetection
+        {
+            struct Rule
+            {
+                NX_CAMERA_SETTINGS_ENTRY(Vca.IntrusionDetection.Rule#, Region, NamedPolygon) region;
+                NX_CAMERA_SETTINGS_ENTRY(Vca.IntrusionDetection.Rule#, Inverted, bool) inverted;
+            };
+            std::vector<Rule> rules;
+        };
+        std::optional<IntrusionDetection> intrusionDetection;
     };
     std::optional<Vca> vca;
 

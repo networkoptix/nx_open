@@ -148,18 +148,25 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 
                     if (m_features.vca)
                     {
-                        if (m_features.vca->intrusionDetection)
-                        {
-                            types.push_back(QJsonObject{
-                                {"id", kEventTypeIntrusion},
-                                {"name", "Intrusion"},
-                            });
-                        }
                         if (m_features.vca->crowdDetection)
                         {
                             types.push_back(QJsonObject{
                                 {"id", kEventTypeCrowd},
                                 {"name", "Crowd"},
+                            });
+                        }
+                        if (m_features.vca->loiteringDetection)
+                        {
+                            types.push_back(QJsonObject{
+                                {"id", kEventTypeLoitering},
+                                {"name", "Loitering"},
+                            });
+                        }
+                        if (m_features.vca->intrusionDetection)
+                        {
+                            types.push_back(QJsonObject{
+                                {"id", kEventTypeIntrusion},
+                                {"name", "Intrusion"},
                             });
                         }
                     }
@@ -240,15 +247,21 @@ void DeviceAgent::updateAvailableMetadataTypes(const CameraSettings& settings)
             m_availableMetadataTypes |= ObjectNativeMetadataType;
 
             const auto regionHasValue = [](const auto& rule){ return rule.region.hasValue(); };
-            if (const auto& intrusionDetection = vca->intrusionDetection)
+            if (const auto& crowdDetection = vca->crowdDetection)
             {
-                const auto& rules = intrusionDetection->rules;
+                const auto& rules = crowdDetection->rules;
                 if (std::any_of(rules.begin(), rules.end(), regionHasValue))
                     m_availableMetadataTypes |= EventNativeMetadataType;
             }
-            if (const auto& crownDetection = vca->crowdDetection)
+            if (const auto& loiteringDetection = vca->loiteringDetection)
             {
-                const auto& rules = crownDetection->rules;
+                const auto& rules = loiteringDetection->rules;
+                if (std::any_of(rules.begin(), rules.end(), regionHasValue))
+                    m_availableMetadataTypes |= EventNativeMetadataType;
+            }
+            if (const auto& intrusionDetection = vca->intrusionDetection)
+            {
+                const auto& rules = intrusionDetection->rules;
                 if (std::any_of(rules.begin(), rules.end(), regionHasValue))
                     m_availableMetadataTypes |= EventNativeMetadataType;
             }

@@ -86,16 +86,6 @@ void fillReErrors(CameraSettings::Entry<Value>* entry,
     entry->emplaceErrorMessage(message);
 }
 
-void fillReErrors(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
-    const QString& message)
-{
-    for (auto& rule: intrusionDetection->rules)
-    {
-        fillReErrors(&rule.region, message);
-        fillReErrors(&rule.inverted, message);
-    }
-}
-
 void fillReErrors(CameraSettings::Vca::CrowdDetection* crowdDetection,
     const QString& message)
 {
@@ -108,12 +98,34 @@ void fillReErrors(CameraSettings::Vca::CrowdDetection* crowdDetection,
     }
 }
 
+void fillReErrors(CameraSettings::Vca::LoiteringDetection* loiteringDetection,
+    const QString& message)
+{
+    for (auto& rule: loiteringDetection->rules)
+    {
+        fillReErrors(&rule.region, message);
+        fillReErrors(&rule.delay, message);
+    }
+}
+
+void fillReErrors(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
+    const QString& message)
+{
+    for (auto& rule: intrusionDetection->rules)
+    {
+        fillReErrors(&rule.region, message);
+        fillReErrors(&rule.inverted, message);
+    }
+}
+
 void fillReErrors(CameraSettings::Vca* vca, const QString& message)
 {
-    if (auto& intrusionDetection = vca->intrusionDetection)
-        fillReErrors(&*intrusionDetection, message);
     if (auto& crowdDetection = vca->crowdDetection)
         fillReErrors(&*crowdDetection, message);
+    if (auto& loiteringDetection = vca->loiteringDetection)
+        fillReErrors(&*loiteringDetection, message);
+    if (auto& intrusionDetection = vca->intrusionDetection)
+        fillReErrors(&*intrusionDetection, message);
 }
 
 
@@ -199,65 +211,6 @@ void parseReFromCamera(CameraSettings::Entry<NamedPolygon>* region,
     }
 }
 
-void parseReFromCamera(CameraSettings::Vca::IntrusionDetection::Rule::Inverted* inverted,
-    const QJsonValue& rule, const QString& path)
-{
-    try
-    {
-        const auto walkingDirection = get<QString>(path, rule, "WalkingDirection");
-        if (walkingDirection == "OutToIn")
-            inverted->emplaceValue(false);
-        else if (walkingDirection == "InToOut")
-            inverted->emplaceValue(true);
-        else
-        {
-            throw Exception("%1.WalkingDirection has unexpected value: %2",
-                path, walkingDirection);
-        }
-    }
-    catch (const std::exception& exception)
-    {
-        inverted->emplaceErrorMessage(exception.what());
-    }
-}
-
-void parseReFromCamera(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
-    const QJsonValue& parameters)
-{
-    try
-    {
-        QJsonObject jsonRules;
-        if (!get<QJsonValue>(parameters, "IntrusionDetection").isUndefined())
-            jsonRules = get<QJsonObject>(parameters, "IntrusionDetection");
-
-        const auto ruleNames = jsonRules.keys();
-
-        auto& rules = intrusionDetection->rules;
-        for (std::size_t i = 0; i < rules.size(); ++i)
-        {
-            auto& rule = rules[i];
-            if (i >= (std::size_t) ruleNames.size())
-            {
-                rule.region.emplaceNothing();
-                rule.inverted.emplaceNothing();
-                continue;
-            }
-
-            const auto& ruleName = ruleNames[i];
-            const auto& jsonRule = jsonRules[ruleName];
-
-            const QString path = NX_FMT("$.IntrusionDetection.%1", ruleName);
-
-            parseReFromCamera(&rule.region, jsonRule, ruleName, path);
-            parseReFromCamera(&rule.inverted, jsonRule, path);
-        }
-    }
-    catch (const std::exception& exception)
-    {
-        fillReErrors(intrusionDetection, exception.what());
-    }
-}
-
 void parseReFromCamera(CameraSettings::Vca::CrowdDetection::Rule::SizeThreshold* sizeThreshold,
     const QJsonValue& rule, const QString& path)
 {
@@ -338,12 +291,123 @@ void parseReFromCamera(CameraSettings::Vca::CrowdDetection* crowdDetection,
     }
 }
 
+void parseReFromCamera(CameraSettings::Vca::LoiteringDetection::Rule::Delay* delay,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        delay->emplaceValue(get<int>(path, rule, "StayTime"));
+    }
+    catch (const std::exception& exception)
+    {
+        delay->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::LoiteringDetection* loiteringDetection,
+    const QJsonValue& parameters)
+{
+    try
+    {
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(parameters, "LoiteringDetection").isUndefined())
+            jsonRules = get<QJsonObject>(parameters, "LoiteringDetection");
+
+        const auto ruleNames = jsonRules.keys();
+
+        auto& rules = loiteringDetection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+            if (i >= (std::size_t) ruleNames.size())
+            {
+                rule.region.emplaceNothing();
+                rule.delay.emplaceNothing();
+                continue;
+            }
+
+            const auto& ruleName = ruleNames[i];
+            const auto& jsonRule = jsonRules[ruleName];
+
+            const QString path = NX_FMT("$.LoiteringDetection.%1", ruleName);
+
+            parseReFromCamera(&rule.region, jsonRule, ruleName, path);
+            parseReFromCamera(&rule.delay, jsonRule, path);
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(loiteringDetection, exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::IntrusionDetection::Rule::Inverted* inverted,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        const auto walkingDirection = get<QString>(path, rule, "WalkingDirection");
+        if (walkingDirection == "OutToIn")
+            inverted->emplaceValue(false);
+        else if (walkingDirection == "InToOut")
+            inverted->emplaceValue(true);
+        else
+        {
+            throw Exception("%1.WalkingDirection has unexpected value: %2",
+                path, walkingDirection);
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        inverted->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
+    const QJsonValue& parameters)
+{
+    try
+    {
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(parameters, "IntrusionDetection").isUndefined())
+            jsonRules = get<QJsonObject>(parameters, "IntrusionDetection");
+
+        const auto ruleNames = jsonRules.keys();
+
+        auto& rules = intrusionDetection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+            if (i >= (std::size_t) ruleNames.size())
+            {
+                rule.region.emplaceNothing();
+                rule.inverted.emplaceNothing();
+                continue;
+            }
+
+            const auto& ruleName = ruleNames[i];
+            const auto& jsonRule = jsonRules[ruleName];
+
+            const QString path = NX_FMT("$.IntrusionDetection.%1", ruleName);
+
+            parseReFromCamera(&rule.region, jsonRule, ruleName, path);
+            parseReFromCamera(&rule.inverted, jsonRule, path);
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(intrusionDetection, exception.what());
+    }
+}
+
 void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
 {
-    if (auto& intrusionDetection = vca->intrusionDetection)
-        parseReFromCamera(&*intrusionDetection, parameters);
     if (auto& crowdDetection = vca->crowdDetection)
         parseReFromCamera(&*crowdDetection, parameters);
+    if (auto& loiteringDetection = vca->loiteringDetection)
+        parseReFromCamera(&*loiteringDetection, parameters);
+    if (auto& intrusionDetection = vca->intrusionDetection)
+        parseReFromCamera(&*intrusionDetection, parameters);
 }
 
 
@@ -535,77 +599,6 @@ void unparseReToCamera(QJsonValue* jsonRule,
 }
 
 void unparseReToCamera(QJsonValue* jsonRule,
-    CameraSettings::Vca::IntrusionDetection::Rule::Inverted* inverted)
-{
-    try
-    {
-        // If new rule, set default like in web UI.
-        if (inverted->hasNothing()
-            && get<QJsonValue>(*jsonRule, "WalkingDirection").isUndefined())
-        {
-            inverted->emplaceValue(false);
-        }
-
-        if (!inverted->hasValue())
-            return;
-
-        set(jsonRule, "WalkingDirection", inverted->value() ? "InToOut" : "OutToIn");
-    }
-    catch (const std::exception& exception)
-    {
-        fillReErrors(inverted, exception.what());
-    }
-}
-
-void unparseReToCamera(QJsonValue* parameters,
-    CameraSettings::Vca::IntrusionDetection* intrusionDetection)
-{
-    try
-    {
-        auto& rules = intrusionDetection->rules;
-
-        QJsonObject jsonRules;
-        if (!get<QJsonValue>(*parameters, "IntrusionDetection").isUndefined())
-        {
-            jsonRules = get<QJsonObject>(*parameters, "IntrusionDetection");
-
-            std::set<QString> ruleNames;
-            for (const auto& rule: rules)
-            {
-                if (auto name = getName(rule.region))
-                    ruleNames.insert(*name);
-            }
-            for (const auto& oldName: jsonRules.keys())
-            {
-                if (!ruleNames.count(oldName))
-                    jsonRules.remove(oldName);
-            }
-        }
-
-        for (auto& rule: rules)
-        {
-            if (auto name = getName(rule.region))
-            {
-                QJsonValue jsonRule = jsonRules[*name];
-                if (jsonRule.isUndefined() || jsonRule.isNull())
-                    jsonRule = QJsonObject{};
-
-                unparseReToCamera(&jsonRule, &rule.region);
-                unparseReToCamera(&jsonRule, &rule.inverted);
-
-                jsonRules[*name] = jsonRule;
-            }
-        }
-
-        set(parameters, "IntrusionDetection", jsonRules);
-    }
-    catch (const std::exception& exception)
-    {
-        fillReErrors(intrusionDetection, exception.what());
-    }
-}
-
-void unparseReToCamera(QJsonValue* jsonRule,
     CameraSettings::Vca::CrowdDetection::Rule::SizeThreshold* sizeThreshold)
 {
     try
@@ -717,12 +710,156 @@ void unparseReToCamera(QJsonValue* parameters,
     }
 }
 
+void unparseReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::LoiteringDetection::Rule::Delay* delay)
+{
+    try
+    {
+        // If new rule, set default like in web UI.
+        if (delay->hasNothing()
+            && get<QJsonValue>(*jsonRule, "StayTime").isUndefined())
+        {
+            delay->emplaceValue(5);
+        }
+
+        if (!delay->hasValue())
+            return;
+
+        set(jsonRule, "StayTime", delay->value());
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(delay, exception.what());
+    }
+}
+
+void unparseReToCamera(QJsonValue* parameters,
+    CameraSettings::Vca::LoiteringDetection* loiteringDetection)
+{
+    try
+    {
+        auto& rules = loiteringDetection->rules;
+
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(*parameters, "LoiteringDetection").isUndefined())
+        {
+            jsonRules = get<QJsonObject>(*parameters, "LoiteringDetection");
+
+            std::set<QString> ruleNames;
+            for (const auto& rule: rules)
+            {
+                if (auto name = getName(rule.region))
+                    ruleNames.insert(*name);
+            }
+            for (const auto& oldName: jsonRules.keys())
+            {
+                if (!ruleNames.count(oldName))
+                    jsonRules.remove(oldName);
+            }
+        }
+
+        for (auto& rule: rules)
+        {
+            if (auto name = getName(rule.region))
+            {
+                QJsonValue jsonRule = jsonRules[*name];
+                if (jsonRule.isUndefined() || jsonRule.isNull())
+                    jsonRule = QJsonObject{};
+
+                unparseReToCamera(&jsonRule, &rule.region);
+                unparseReToCamera(&jsonRule, &rule.delay);
+
+                jsonRules[*name] = jsonRule;
+            }
+        }
+
+        set(parameters, "LoiteringDetection", jsonRules);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(loiteringDetection, exception.what());
+    }
+}
+
+void unparseReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::IntrusionDetection::Rule::Inverted* inverted)
+{
+    try
+    {
+        // If new rule, set default like in web UI.
+        if (inverted->hasNothing()
+            && get<QJsonValue>(*jsonRule, "WalkingDirection").isUndefined())
+        {
+            inverted->emplaceValue(false);
+        }
+
+        if (!inverted->hasValue())
+            return;
+
+        set(jsonRule, "WalkingDirection", inverted->value() ? "InToOut" : "OutToIn");
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(inverted, exception.what());
+    }
+}
+
+void unparseReToCamera(QJsonValue* parameters,
+    CameraSettings::Vca::IntrusionDetection* intrusionDetection)
+{
+    try
+    {
+        auto& rules = intrusionDetection->rules;
+
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(*parameters, "IntrusionDetection").isUndefined())
+        {
+            jsonRules = get<QJsonObject>(*parameters, "IntrusionDetection");
+
+            std::set<QString> ruleNames;
+            for (const auto& rule: rules)
+            {
+                if (auto name = getName(rule.region))
+                    ruleNames.insert(*name);
+            }
+            for (const auto& oldName: jsonRules.keys())
+            {
+                if (!ruleNames.count(oldName))
+                    jsonRules.remove(oldName);
+            }
+        }
+
+        for (auto& rule: rules)
+        {
+            if (auto name = getName(rule.region))
+            {
+                QJsonValue jsonRule = jsonRules[*name];
+                if (jsonRule.isUndefined() || jsonRule.isNull())
+                    jsonRule = QJsonObject{};
+
+                unparseReToCamera(&jsonRule, &rule.region);
+                unparseReToCamera(&jsonRule, &rule.inverted);
+
+                jsonRules[*name] = jsonRule;
+            }
+        }
+
+        set(parameters, "IntrusionDetection", jsonRules);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(intrusionDetection, exception.what());
+    }
+}
+
 void unparseReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
 {
-    if (auto& intrusionDetection = vca->intrusionDetection)
-        unparseReToCamera(parameters, &*intrusionDetection);
     if (auto& crowdDetection = vca->crowdDetection)
         unparseReToCamera(parameters, &*crowdDetection);
+    if (auto& loiteringDetection = vca->loiteringDetection)
+        unparseReToCamera(parameters, &*loiteringDetection);
+    if (auto& intrusionDetection = vca->intrusionDetection)
+        unparseReToCamera(parameters, &*intrusionDetection);
 }
 
 
@@ -782,18 +919,6 @@ void enumerateEntries(Settings* settings, Visitor visit)
         uniqueVisit(&vca->installation.tiltAngle);
         uniqueVisit(&vca->installation.rollAngle);
 
-        if (auto& intrusionDetection = vca->intrusionDetection)
-        {
-            auto& rules = intrusionDetection->rules;
-            for (std::size_t i = 0; i < rules.size(); ++i)
-            {
-                auto& rule = rules[i];
-
-                repeatedVisit(i, &rule.region);
-                repeatedVisit(i, &rule.inverted);
-            }
-        }
-
         if (auto& crowdDetection = vca->crowdDetection)
         {
             auto& rules = crowdDetection->rules;
@@ -805,6 +930,30 @@ void enumerateEntries(Settings* settings, Visitor visit)
                 repeatedVisit(i, &rule.sizeThreshold);
                 repeatedVisit(i, &rule.enterDelay);
                 repeatedVisit(i, &rule.exitDelay);
+            }
+        }
+
+        if (auto& loiteringDetection = vca->loiteringDetection)
+        {
+            auto& rules = loiteringDetection->rules;
+            for (std::size_t i = 0; i < rules.size(); ++i)
+            {
+                auto& rule = rules[i];
+
+                repeatedVisit(i, &rule.region);
+                repeatedVisit(i, &rule.delay);
+            }
+        }
+
+        if (auto& intrusionDetection = vca->intrusionDetection)
+        {
+            auto& rules = intrusionDetection->rules;
+            for (std::size_t i = 0; i < rules.size(); ++i)
+            {
+                auto& rule = rules[i];
+
+                repeatedVisit(i, &rule.region);
+                repeatedVisit(i, &rule.inverted);
             }
         }
     }
@@ -909,6 +1058,18 @@ void parseEntryFromServer(
 
 void parseEntryFromServer(
     CameraSettings::Vca::CrowdDetection::Rule::ExitDelay* entry, const QString& unparsedValue)
+{
+    if (unparsedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 999));
+}
+
+void parseEntryFromServer(
+    CameraSettings::Vca::LoiteringDetection::Rule::Delay* entry, const QString& unparsedValue)
 {
     if (unparsedValue.isEmpty())
     {
@@ -1042,6 +1203,15 @@ std::optional<QString> unparseEntryToServer(
     return QString::number(entry.value());
 }
 
+std::optional<QString> unparseEntryToServer(
+    const CameraSettings::Vca::LoiteringDetection::Rule::Delay& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
 std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<int>& entry)
 {
     if (!entry.hasValue())
@@ -1123,60 +1293,11 @@ QJsonValue getVcaInstallationModelForManifest()
     };
 }
 
-QJsonValue getVcaIntrusionDetectionModelForManifest()
-{
-    using Rule = CameraSettings::Vca::IntrusionDetection::Rule;
-    return QJsonObject{
-        {"name", "IntrusionDetection"},
-        {"type", "Section"},
-        {"caption", "Intrusion Detection"},
-        {"items", QJsonArray{
-            QJsonObject{
-                {"type", "Repeater"},
-                {"startIndex", 1},
-                {"count", (int) kMaxDetectionRuleCount},
-                {"template", QJsonObject{
-                    {"type", "GroupBox"},
-                    {"caption", "Rule #"},
-                    {"filledCheckItems", QJsonArray{Rule::Region::name}},
-                    {"items", QJsonArray{
-                        QJsonObject{
-                            {"name", Rule::Region::name},
-                            {"type", "PolygonFigure"},
-                            {"caption", "Name"},
-                            {"minPoints", 3},
-                            {"maxPoints", 20}, // Defined in user guide.
-                        },
-                        QJsonObject{
-                            {"name", Rule::Inverted::name},
-                            {"type", "ComboBox"},
-                            {"caption", "Direction"},
-                            {"description", "Movement direction which causes the event"},
-                            {"range", QJsonArray{
-                                // Need empty state to work around camera not returning settings
-                                // for disabled functionality.
-                                "",
-                                "false",
-                                "true",
-                            }},
-                            {"itemCaptions", QJsonObject{
-                                {"", ""},
-                                {"false", "In"},
-                                {"true", "Out"},
-                            }},
-                        },
-                    }},
-                }},
-            },
-        }},
-    };
-}
-
 QJsonValue getVcaCrowdDetectionModelForManifest()
 {
     using Rule = CameraSettings::Vca::CrowdDetection::Rule;
     return QJsonObject{
-        {"name", "CrowdDetection"},
+        {"name", "Vca.CrowdDetection"},
         {"type", "Section"},
         {"caption", "Crowd Detection"},
         {"items", QJsonArray{
@@ -1227,6 +1348,94 @@ QJsonValue getVcaCrowdDetectionModelForManifest()
     };
 }
 
+QJsonValue getVcaLoiteringDetectionModelForManifest()
+{
+    using Rule = CameraSettings::Vca::LoiteringDetection::Rule;
+    return QJsonObject{
+        {"name", "Vca.LoiteringDetection"},
+        {"type", "Section"},
+        {"caption", "Loitering Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) kMaxDetectionRuleCount},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{Rule::Region::name}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", Rule::Region::name},
+                            {"type", "PolygonFigure"},
+                            {"caption", "Name"},
+                            {"minPoints", 3},
+                            {"maxPoints", 20}, // Defined in user guide.
+                        },
+                        QJsonObject{
+                            {"name", Rule::Delay::name},
+                            // Should really be SpinBox, but need empty state to work around camera not
+                            // returning settings for disabled functionality.
+                            {"type", "TextField"},
+                            {"caption", "Delay (s)"},
+                            {"description", "The event is only generated if a person stays in the area for at least this long"},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
+QJsonValue getVcaIntrusionDetectionModelForManifest()
+{
+    using Rule = CameraSettings::Vca::IntrusionDetection::Rule;
+    return QJsonObject{
+        {"name", "Vca.IntrusionDetection"},
+        {"type", "Section"},
+        {"caption", "Intrusion Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) kMaxDetectionRuleCount},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{Rule::Region::name}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", Rule::Region::name},
+                            {"type", "PolygonFigure"},
+                            {"caption", "Name"},
+                            {"minPoints", 3},
+                            {"maxPoints", 20}, // Defined in user guide.
+                        },
+                        QJsonObject{
+                            {"name", Rule::Inverted::name},
+                            {"type", "ComboBox"},
+                            {"caption", "Direction"},
+                            {"description", "Movement direction which causes the event"},
+                            {"range", QJsonArray{
+                                // Need empty state to work around camera not returning settings
+                                // for disabled functionality.
+                                "",
+                                "false",
+                                "true",
+                            }},
+                            {"itemCaptions", QJsonObject{
+                                {"", ""},
+                                {"false", "In"},
+                                {"true", "Out"},
+                            }},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
 QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
 {
     using Vca = CameraSettings::Vca;
@@ -1255,10 +1464,12 @@ QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
             {
                 QJsonArray sections;
 
-                if (features.intrusionDetection)
-                    sections.push_back(getVcaIntrusionDetectionModelForManifest());
                 if (features.crowdDetection)
                     sections.push_back(getVcaCrowdDetectionModelForManifest());
+                if (features.loiteringDetection)
+                    sections.push_back(getVcaLoiteringDetectionModelForManifest());
+                if (features.intrusionDetection)
+                    sections.push_back(getVcaIntrusionDetectionModelForManifest());
 
                 return sections;
             }(),
@@ -1274,16 +1485,20 @@ CameraSettings::CameraSettings(const CameraFeatures& features)
     {
         vca.emplace();
 
-        if (features.vca->intrusionDetection)
-        {
-            auto& intrusionDetection = vca->intrusionDetection.emplace();
-            intrusionDetection.rules.resize(kMaxDetectionRuleCount);
-        }
-
         if (features.vca->crowdDetection)
         {
             auto& crowdDetection = vca->crowdDetection.emplace();
             crowdDetection.rules.resize(kMaxDetectionRuleCount);
+        }
+        if (features.vca->loiteringDetection)
+        {
+            auto& loiteringDetection = vca->loiteringDetection.emplace();
+            loiteringDetection.rules.resize(kMaxDetectionRuleCount);
+        }
+        if (features.vca->intrusionDetection)
+        {
+            auto& intrusionDetection = vca->intrusionDetection.emplace();
+            intrusionDetection.rules.resize(kMaxDetectionRuleCount);
         }
     }
 }
