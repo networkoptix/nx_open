@@ -8,6 +8,10 @@
 #include <utils/media/h263_utils.h>
 #include <utils/math/math.h>
 
+#include <core/resource/camera_resource.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
+
 namespace nx {
 namespace transcoding {
 
@@ -452,35 +456,43 @@ QSize adjustCodecRestrictions(AVCodecID codec, const QSize& source)
     }
 }
 
-QSize normalizeResolution(AVCodecID codec, const QSize& target, const QSize& source)
+QSize normalizeResolution(const QSize& target, const QSize& source)
 {
-    QSize result;
-    if (target.width() < 1 && target.height() < 1)
-    {
-        result = source;
-    }
-    else if (target.width() == 0 && target.height() > 0)
+    if (target.width() == 0 && target.height() > 0)
     {
         if (source.isEmpty())
             return QSize();
 
-        // TODO is it correct?
-        int height = qMin(target.height(), source.height()); // Limit by source size.
-
         // TODO is align needed for all codecs(may be h263 only)?
-        height = qPower2Round(height, kHeightAlign); // Round resolution height.
+        int height = qPower2Round(target.height(), kHeightAlign); // Round resolution height.
 
-        result = downscaleByHeight(source, height);
+        QSize result = downscaleByHeight(source, height);
         result.setWidth(qPower2Round(result.width(), kWidthAlign));
+        return result;
     }
-    else
+    return target;
+}
+
+QSize findMaxSavedResolution(const QnConstCompressedVideoDataPtr& video)
+{
+    if (!video->dataProvider)
+        return QSize();
+
+    QnResourcePtr res = video->dataProvider->getResource();
+    if (!res)
+        return QSize();
+
+    const CameraMediaStreams supportedMediaStreams =
+        QJson::deserialized<CameraMediaStreams>(
+            res->getProperty(ResourcePropertyKey::kMediaStreams).toLatin1());
+
+    QSize result;
+    for(const auto& stream: supportedMediaStreams.streams)
     {
-        result = target;
+        QSize size = stream.getResolution();
+        if (size.height() > result.height())
+            result = size;
     }
-
-    if (codec != AV_CODEC_ID_NONE)
-        result = adjustCodecRestrictions(codec, result);
-
     return result;
 }
 

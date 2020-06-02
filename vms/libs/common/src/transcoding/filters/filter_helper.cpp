@@ -19,7 +19,8 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
     settings.zoomWindow = legacy.zoomWindow;
     settings.watermark = legacy.watermark;
 
-    nx::core::transcoding::FilterChain result(settings);
+    nx::core::transcoding::FilterChain result(
+        settings, legacy.resource->getDewarpingParams(), legacy.resource->getVideoLayout());
     if (legacy.timestampParams.enabled)
     {
         result.addLegacyFilter(QnAbstractImageFilterPtr(new QnTimeImageFilter(

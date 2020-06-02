@@ -80,6 +80,7 @@ public:
     virtual bool existMoreData() const { return false; }
     static QRect roundRect(const QRect& srcRect);
     static QSize roundSize(const QSize& size);
+
 protected:
     QString m_lastErrMessage;
     QnCodecParams::Value m_params;
@@ -94,32 +95,9 @@ class QnVideoTranscoder: public QnCodecTranscoder
 {
 public:
     QnVideoTranscoder(AVCodecID codecId);
-    virtual ~QnVideoTranscoder();
-
-    //!Set picture size (in pixels) of output video stream
-    /*!
-        By default, output stream has the same picture size as input
-        \ param value If (0,0) than input stream picture size is used
-        \ if width=0, width MUST be autodetected (keep source aspect ratio)
-    */
-    virtual void setResolution( const QSize& value );
-    //!Returns picture size (in pixels) of output video stream
-    QSize getResolution() const;
-
     virtual bool open(const QnConstCompressedVideoDataPtr& video) = 0;
-
-    virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList);
-
-protected:
-    QSharedPointer<CLVideoDecoderOutput> processFilterChain(const QSharedPointer<CLVideoDecoderOutput>& decodedFrame);
-    bool adjustDstResolution(AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video);
-
-protected:
-    QSize m_resolution;
-    QSize m_sourceResolution;
-    QList<QnAbstractImageFilterPtr> m_filters;
 };
-typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
+
 
 //!Base class for all audio transcoders
 class QnAudioTranscoder: public QnCodecTranscoder
@@ -162,7 +140,7 @@ public:
     * @return Returns OperationResult::Success if no error or error code otherwise
     * @param codec codec to transcode
     * @param method how to transcode: no transcode, software, GPU e.t.c
-    * @resolution output resolution. Not used if transcode method TM_NoTranscode
+    * @resolution output resolution. If not valid, than source resolution will be used. Not used if transcode method TM_NoTranscode
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected. Not used if transcode method TM_NoTranscode
     * @param addition codec params. Not used if transcode method TM_NoTranscode
     */
@@ -170,7 +148,7 @@ public:
         AVCodecID codec,
         TranscodeMethod method,
         Qn::StreamQuality quality,
-        const QSize& resolution = QSize(1024,768),
+        const QSize& resolution = QSize(),
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value());
 

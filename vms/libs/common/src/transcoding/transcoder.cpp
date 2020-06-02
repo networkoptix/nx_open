@@ -9,16 +9,10 @@
 #include <transcoding/ffmpeg_transcoder.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
-#include <transcoding/transcoding_utils.h>
 
 #include <transcoding/filters/abstract_image_filter.h>
-#include <nx/streaming/media_data_packet.h>
-#include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/config.h>
-#include <core/resource/camera_resource.h>
-#include <nx/fusion/serialization/json.h>
 #include <nx/metrics/metrics_storage.h>
-#include <utils/media/utils.h>
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
@@ -75,99 +69,18 @@ QRect QnCodecTranscoder::roundRect(const QRect& srcRect)
 QSize QnCodecTranscoder::roundSize(const QSize& size)
 {
     int width = qPower2Ceil((unsigned) size.width(), 16);
-    int height = qPower2Ceil((unsigned) size.height(), 2);
+    int height = qPower2Ceil((unsigned) size.height(), 4);
 
     return QSize(width, height);
 }
 
 // --------------------------- QnVideoTranscoder -----------------
-
 QnVideoTranscoder::QnVideoTranscoder(AVCodecID codecId):
     QnCodecTranscoder(codecId)
 {
-
-}
-
-QnVideoTranscoder::~QnVideoTranscoder()
-{
-}
-
-void QnVideoTranscoder::setResolution(const QSize& value)
-{
-    m_resolution = value;
-}
-
-QSize QnVideoTranscoder::getResolution() const
-{
-    return m_resolution;
-}
-
-void QnVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filterList)
-{
-    m_filters = filterList;
-}
-
-CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecoderOutputPtr& decodedFrame)
-{
-    if (m_filters.isEmpty())
-        return decodedFrame;
-    CLVideoDecoderOutputPtr result = decodedFrame;
-    for(QnAbstractImageFilterPtr filter: m_filters)
-    {
-        result = filter->updateImage(result);
-        if (!result)
-            break;
-    }
-    return result;
-}
-
-QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
-{
-    QSize result;
-    if (!video->dataProvider)
-        return result;
-    QnResourcePtr res = video->dataProvider->getResource();
-    if (!res)
-        return result;
-    const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(res->getProperty(ResourcePropertyKey::kMediaStreams).toLatin1() );
-    for(const auto& stream: supportedMediaStreams.streams)
-    {
-        QStringList resolutionInfo = stream.resolution.split(L'x');
-        if (resolutionInfo.size() == 2) {
-            QSize newRes(resolutionInfo[0].toInt(), resolutionInfo[1].toInt());
-            if (newRes.height() > result.height())
-                result = newRes;
-        }
-    }
-    return result;
-}
-bool QnVideoTranscoder::adjustDstResolution(
-    AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video)
-{
-    // TODO Fix it, resolution from data should be used firstly
-    QSize streamResolution = findSavedResolution(video);
-    if (streamResolution.isEmpty())
-        streamResolution = nx::media::getFrameSize(video);
-
-    m_resolution = nx::transcoding::normalizeResolution(
-        dstCodec, m_resolution, streamResolution);
-
-    if (m_resolution.isEmpty())
-    {
-        NX_WARNING(this, "Invalid resolution specified source %1, target %2",
-            streamResolution, m_resolution);
-        return false;
-    }
-
-    m_sourceResolution = m_resolution;
-    for (auto filter: m_filters)
-        m_resolution = filter->updatedResolution(m_resolution);
-
-    return true;
 }
 
 // ---------------------- QnTranscoder -------------------------
-
 QnTranscoder::QnTranscoder(const DecoderConfig& decoderConfig, nx::metrics::Storage* metrics)
     :
     m_decoderConfig(decoderConfig),
@@ -360,16 +273,13 @@ int QnTranscoder::setVideoCodec(
                 m_metrics,
                 codec);
 
-            ffmpegTranscoder->setResolution(resolution);
+            ffmpegTranscoder->setOutputResolutionLimit(resolution);
             ffmpegTranscoder->setBitrate(bitrate);
             ffmpegTranscoder->setParams(params);
             ffmpegTranscoder->setQuality(quality);
             ffmpegTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
-           // m_transcodingSettings.codec = codec;
-            auto filterChain = QnImageFilterHelper::createFilterChain(
-                m_transcodingSettings);
-            filterChain.prepare(m_transcodingSettings.resource, resolution);
-            ffmpegTranscoder->setFilterList(filterChain); //TODO: #GDM #3.2 Update to FilterChain
+            auto filterChain = QnImageFilterHelper::createFilterChain(m_transcodingSettings);
+            ffmpegTranscoder->setFilterChain(filterChain);
 
             if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG) {
                 // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version

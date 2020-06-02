@@ -286,13 +286,12 @@ QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProce
             if (!frame)
                 continue;
 
-            if (!filters.isTranscodingRequired(imageProcessingParams.resource))
+            if (!filters.isTranscodingRequired())
                 return frame->toImage();
 
             if (!filters.isReady())
             {
-                filters.prepare(imageProcessingParams.resource,
-                    QSize(frame->width, frame->height));
+                filters.prepare(QSize(frame->width, frame->height));
             }
             frame = filters.apply(frame);
         }

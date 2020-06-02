@@ -6,6 +6,7 @@
 #include <QtCore/QIODevice>
 
 #include <core/resource/resource_media_layout.h>
+#include <nx/streaming/video_data_packet.h>
 
 extern "C" {
 #include <libavformat/avio.h>
@@ -51,11 +52,12 @@ private:
 
 AVCodecID findEncoderCodecId(const QString& codecName);
 
-QSize normalizeResolution(AVCodecID codec, const QSize& target, const QSize& source);
+QSize normalizeResolution(const QSize& target, const QSize& source);
 QSize adjustCodecRestrictions(AVCodecID codec, const QSize& source);
 QSize cropResolution(const QSize& source, const QSize& max);
 QSize downscaleByHeight(const QSize& source, int newHeight);
 QSize downscaleByWidth(const QSize& source, int newWidth);
+QSize findMaxSavedResolution(const QnConstCompressedVideoDataPtr& video);
 
 inline const char* ffmpegErrorText(const int error)
 {

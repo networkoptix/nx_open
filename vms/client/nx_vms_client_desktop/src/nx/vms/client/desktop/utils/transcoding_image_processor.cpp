@@ -2,6 +2,7 @@
 
 #include <transcoding/filters/abstract_image_filter.h>
 #include <utils/media/frame_info.h>
+#include <core/resource/media_resource.h>
 
 namespace nx::vms::client::desktop {
 
@@ -16,14 +17,21 @@ public:
     void setSettings(const nx::core::transcoding::Settings& settings,
         const QnMediaResourcePtr& resource)
     {
-        m_filters = core::transcoding::FilterChain(settings);
-        m_resource = resource;
+        if (!resource)
+        {
+            m_filters.reset();
+            m_sourceSize = QSize();
+            return;
+        }
+
+        m_filters = core::transcoding::FilterChain(
+            settings, resource->getDewarpingParams(), resource->getVideoLayout());
         m_sourceSize = QSize();
     }
 
     core::transcoding::FilterChain ensureFilters(const QSize& sourceSize)
     {
-        if (m_resource && m_sourceSize != sourceSize)
+        if (m_sourceSize != sourceSize)
         {
             // Additional check if the new state is less 'empty'.
             // Sometimes we change sizes from (-1;-1) to (0;0).
@@ -31,7 +39,7 @@ public:
             {
                 m_filters.reset();
                 // Image is already combined, so video layout must be ignored.
-                m_filters.prepareForImage(m_resource, sourceSize);
+                m_filters.prepareForImage(sourceSize);
                 m_sourceSize = sourceSize;
             }
         }
@@ -40,7 +48,6 @@ public:
     }
 
 private:
-    QnMediaResourcePtr m_resource;
     core::transcoding::FilterChain m_filters;
 
     QSize m_sourceSize;

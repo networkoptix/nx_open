@@ -8,6 +8,7 @@
 #include <nx/core/transcoding/filters/transcoding_settings.h>
 
 #include <transcoding/filters/abstract_image_filter.h>
+#include <core/ptz/media_dewarping_params.h>
 
 struct QnMediaDewarpingParams;
 class CLVideoDecoderOutput;
@@ -23,15 +24,18 @@ public:
     const static QSize kDefaultResolutionLimit;
 
     FilterChain() = default;
-    explicit FilterChain(const Settings& settings);
+
+    explicit FilterChain(const Settings& settings,
+        QnMediaDewarpingParams dewarpingParams, // TODO move it to settings?
+        QnConstResourceVideoLayoutPtr layout);
+
     FilterChain(const FilterChain&) = default;
     FilterChain& operator=(const FilterChain&) = default;
 
     /**
      * Prepare set of filters to apply to video data.
      */
-    void prepare(const QnMediaResourcePtr& resource,
-        const QSize& srcFrameResolution,
+    void prepare(const QSize& srcFrameResolution,
         const QSize& resolutionLimit = kDefaultResolutionLimit);
 
     /**
@@ -39,8 +43,7 @@ public:
      * screenshots do not require tiling (already transcoded), but aspect ratio must be calculated
      * concerning video layout size.
      */
-    void prepareForImage(const QnMediaResourcePtr& resource,
-        const QSize& fullImageResolution,
+    void prepareForImage(const QSize& fullImageResolution,
         const QSize& resolutionLimit = kDefaultResolutionLimit);
 
     /**
@@ -50,7 +53,6 @@ public:
 
     bool isImageTranscodingRequired(const QSize& fullImageResolution,
         const QSize& resolutionLimit = kDefaultResolutionLimit) const;
-    bool isTranscodingRequired(const QnMediaResourcePtr& resource) const;
 
     bool isDownscaleRequired(const QSize& srcResolution) const;
 
@@ -64,9 +66,8 @@ public:
 
 private:
     void prepareVideoArFilter(const QSize& srcFrameResolution);
-    void prepareImageArFilter(const QnMediaResourcePtr& resource,
-        const QSize& fullImageResolution);
-    void prepareDewarpingFilter(const QnMediaResourcePtr& resource);
+    void prepareImageArFilter(const QSize& fullImageResolution);
+    void prepareDewarpingFilter();
     void prepareZoomWindowFilter();
     void prepareImageEnhancementFilter();
     void prepareRotationFilter();
@@ -77,6 +78,8 @@ private:
 private:
     bool m_ready = false;
     Settings m_settings;
+    QnMediaDewarpingParams m_dewarpingParams;
+    QnConstResourceVideoLayoutPtr m_layout;
     QnAbstractImageFilterList m_legacyFilters;
 };
 
