@@ -37,6 +37,7 @@ add_custom_command(
     OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/api.xml
         ${CMAKE_CURRENT_BINARY_DIR}/api.json
+        ${CMAKE_CURRENT_BINARY_DIR}/openapi_legacy.json
     DEPENDS
         ${apidoctool_jar}
         ${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml
@@ -46,8 +47,10 @@ add_custom_command(
         code-to-xml
         -vms-path ${PROJECT_SOURCE_DIR}
         -template-xml ${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml
+        -openapi-template-json ${CMAKE_CURRENT_SOURCE_DIR}/api/legacy/openapi_template.json
         -output-xml ${CMAKE_CURRENT_BINARY_DIR}/api.xml
         -output-json ${CMAKE_CURRENT_BINARY_DIR}/api.json
+        -output-openapi-json ${CMAKE_CURRENT_BINARY_DIR}/openapi_legacy.json
         ${apidoctool_params}
 )
 
@@ -62,6 +65,7 @@ endif()
 set(static_resources
     ${CMAKE_CURRENT_BINARY_DIR}/api.xml
     ${CMAKE_CURRENT_BINARY_DIR}/api.json
+    ${CMAKE_CURRENT_BINARY_DIR}/openapi_legacy.json
     ${customization_dir}/license.html
     ${old_sdk_static_resources}
     ${CMAKE_SOURCE_DIR}/specific_features.txt
@@ -107,6 +111,7 @@ nx_add_target(nx_vms_server LIBRARY
 # Copy certain files to the distribution dir.
 set(files_to_distribution
     ${CMAKE_CURRENT_BINARY_DIR}/api.json
+    ${CMAKE_CURRENT_BINARY_DIR}/openapi_legacy.json
     ${CMAKE_CURRENT_SOURCE_DIR}/static-resources/static/api_changelog.html
 )
 set(files_in_distribution "")

@@ -29,7 +29,6 @@
                         supported for certain cameras).
                         Example:
                         rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p</description>
-                    <method>PLAY</method>
                     <params>
                         <param>
                             <name>pos</name>
