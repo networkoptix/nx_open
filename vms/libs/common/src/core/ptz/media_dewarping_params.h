@@ -2,13 +2,14 @@
 
 #include <QtCore/QMetaType>
 
+#include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 
 // TODO: #Elric doesn't really belong in this folder
 struct QnMediaDewarpingParams
 {
     Q_GADGET
-    Q_ENUMS(ViewMode)
+    Q_ENUMS(ViewMode Qn::FisheyeLensProjection)
 
     Q_PROPERTY(bool enabled MEMBER enabled)
     Q_PROPERTY(ViewMode viewMode MEMBER viewMode)
@@ -17,6 +18,7 @@ struct QnMediaDewarpingParams
     Q_PROPERTY(qreal yCenter MEMBER yCenter)
     Q_PROPERTY(qreal radius MEMBER radius)
     Q_PROPERTY(qreal hStretch MEMBER hStretch)
+    Q_PROPERTY(Qn::FisheyeLensProjection lensProjection MEMBER lensProjection)
 
 public:
     enum ViewMode
@@ -60,12 +62,16 @@ public:
 
     /** Horizontal stretch. Value 1.0 means no stretch */
     qreal hStretch = 1.0;
+
+    /** Lens projection type. */
+    Qn::FisheyeLensProjection lensProjection = Qn::FisheyeLensProjection::defaultProjection;
 };
 
-#define QnMediaDewarpingParams_Fields (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius)(hStretch)
+#define QnMediaDewarpingParams_Fields \
+    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius)(hStretch)(lensProjection)
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnMediaDewarpingParams::ViewMode)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnMediaDewarpingParams::ViewMode, (lexical)(numeric))
+QN_FUSION_DECLARE_FUNCTIONS(QnMediaDewarpingParams::ViewMode, (lexical)(numeric)(metatype))
 
 QN_FUSION_DECLARE_FUNCTIONS(QnMediaDewarpingParams, (json)(metatype))

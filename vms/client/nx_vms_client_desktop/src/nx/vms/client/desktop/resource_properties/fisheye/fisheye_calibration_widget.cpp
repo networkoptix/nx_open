@@ -2,6 +2,8 @@
 #include "ui_fisheye_calibration_widget.h"
 #include "fisheye_calibration_image_widget.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
@@ -15,6 +17,14 @@
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+using namespace std::chrono;
+
+static constexpr auto kPreviewReloadInterval = 5s; //< Preview reload interval in case of no data.
+
+} // namespace
+
 FisheyeCalibrationWidget::FisheyeCalibrationWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::FisheyeCalibrationWidget),
@@ -23,18 +33,36 @@ FisheyeCalibrationWidget::FisheyeCalibrationWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->loadingWidget->setText(tr("Loading preview, please wait..."));
-    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    ui->imageWidget,    &FisheyeCalibrationImageWidget::setCenter);
-    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    ui->imageWidget,    &FisheyeCalibrationImageWidget::setRadius);
-    connect(m_calibrator,       &QnFisheyeCalibrator::stretchChanged,   ui->imageWidget,    &FisheyeCalibrationImageWidget::setStretch);
-    connect(m_calibrator,       &QnFisheyeCalibrator::finished,         this,               &FisheyeCalibrationWidget::at_calibrator_finished);
 
-    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    this,               &FisheyeCalibrationWidget::dataChanged);
-    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    this,               &FisheyeCalibrationWidget::dataChanged);
-    connect(m_calibrator,       &QnFisheyeCalibrator::stretchChanged,   this,               &FisheyeCalibrationWidget::dataChanged);
+    connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,
+        ui->imageWidget, &FisheyeCalibrationImageWidget::setCenter);
 
-    connect(ui->imageWidget,    &FisheyeCalibrationImageWidget::centerModified, this,     &FisheyeCalibrationWidget::setCenter);
-    connect(ui->imageWidget,    &FisheyeCalibrationImageWidget::radiusModified, this,     &FisheyeCalibrationWidget::setRadius);
-    connect(ui->imageWidget,    &FisheyeCalibrationImageWidget::animationFinished, this,  &FisheyeCalibrationWidget::at_image_animationFinished);
+    connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,
+        ui->imageWidget, &FisheyeCalibrationImageWidget::setRadius);
+
+    connect(m_calibrator, &QnFisheyeCalibrator::stretchChanged,
+        ui->imageWidget, &FisheyeCalibrationImageWidget::setStretch);
+
+    connect(m_calibrator, &QnFisheyeCalibrator::finished,
+        this, &FisheyeCalibrationWidget::at_calibrator_finished);
+
+    connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,
+        this, &FisheyeCalibrationWidget::dataChanged);
+
+    connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,
+        this, &FisheyeCalibrationWidget::dataChanged);
+
+    connect(m_calibrator, &QnFisheyeCalibrator::stretchChanged,
+        this, &FisheyeCalibrationWidget::dataChanged);
+
+    connect(ui->imageWidget, &FisheyeCalibrationImageWidget::centerModified,
+        this, &FisheyeCalibrationWidget::setCenter);
+
+    connect(ui->imageWidget, &FisheyeCalibrationImageWidget::radiusModified,
+        this, &FisheyeCalibrationWidget::setRadius);
+
+    connect(ui->imageWidget, &FisheyeCalibrationImageWidget::animationFinished,
+        this, &FisheyeCalibrationWidget::at_image_animationFinished);
 
     init();
 }
@@ -60,24 +88,26 @@ ImageProvider* FisheyeCalibrationWidget::imageProvider() const
 void FisheyeCalibrationWidget::setImageProvider(ImageProvider* provider)
 {
     if (m_imageProvider)
-    {
-        ui->imageWidget->disconnect(m_imageProvider);
         m_imageProvider->disconnect(this);
-    }
 
     m_imageProvider = provider;
 
-    if (!m_imageProvider)
-        return;
+    if (m_imageProvider)
+    {
+        connect(m_imageProvider, &ImageProvider::statusChanged, this,
+            &FisheyeCalibrationWidget::updatePage);
 
-    connect(m_imageProvider, &ImageProvider::imageChanged, ui->imageWidget,
-        &FisheyeCalibrationImageWidget::setImage);
-    connect(m_imageProvider, &ImageProvider::statusChanged, this,
-        &FisheyeCalibrationWidget::updatePage);
-    connect(m_imageProvider, &ImageProvider::imageChanged, this,
-        &FisheyeCalibrationWidget::updatePage);
+        connect(m_imageProvider, &ImageProvider::imageChanged, this,
+            [this](const QImage& image)
+            {
+                ui->imageWidget->setImage(image);
+                updatePage();
+                emit previewImageChanged();
+            });
+    }
 
     updatePage();
+    emit previewImageChanged();
 }
 
 QPointF FisheyeCalibrationWidget::center() const
@@ -174,6 +204,31 @@ void FisheyeCalibrationWidget::autoCalibrate()
 
     ui->imageWidget->beginSearchAnimation();
     m_calibrator->analyseFrameAsync(ui->imageWidget->image());
+}
+
+QImage FisheyeCalibrationWidget::previewImage() const
+{
+    return ui->imageWidget->image();
+}
+
+Qn::FisheyeLensProjection FisheyeCalibrationWidget::projection() const
+{
+    return ui->imageWidget->projection();
+}
+
+void FisheyeCalibrationWidget::setProjection(Qn::FisheyeLensProjection value)
+{
+    ui->imageWidget->setProjection(value);
+}
+
+bool FisheyeCalibrationWidget::isGridShown() const
+{
+    return ui->imageWidget->isGridShown();
+}
+
+void FisheyeCalibrationWidget::setGridShown(bool value)
+{
+    ui->imageWidget->setGridShown(value);
 }
 
 } // namespace nx::vms::client::desktop

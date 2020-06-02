@@ -27,31 +27,37 @@ class ScreenshotInterface;
 class QnHistogramConsumer;
 class QnFisheyePtzController;
 
-class QnGlRendererShaders: public QObject {
-    Q_OBJECT;
+class QnGlRendererShaders: public QObject
+{
+    Q_OBJECT
+
 public:
-    QnGlRendererShaders(QObject *parent = NULL);
+    QnGlRendererShaders(QObject* parent = nullptr);
     virtual ~QnGlRendererShaders();
 
-    QnYv12ToRgbShaderProgram *yv12ToRgb;
-    QnYv12ToRgbWithGammaShaderProgram *yv12ToRgbWithGamma;
+    QnYv12ToRgbShaderProgram* const yv12ToRgb;
+    QnYv12ToRgbWithGammaShaderProgram* const yv12ToRgbWithGamma;
+    QnYv12ToRgbaShaderProgram* const yv12ToRgba;
+    QnNv12ToRgbShaderProgram* const nv12ToRgb;
+    QnBlurShaderProgram* const m_blurShader;
 
-    QnFisheyeRectilinearProgram* fisheyePtzProgram;
-    QnFisheyeRectilinearProgram* fisheyePtzGammaProgram;
+    struct FisheyeShaders
+    {
+        QnFisheyeRectilinearProgram* ptzProgram;
+        QnFisheyeRectilinearProgram* ptzGammaProgram;
 
-    QnFisheyeEquirectangularHProgram* fisheyePanoHProgram;
-    QnFisheyeEquirectangularHProgram* fisheyePanoHGammaProgram;
+        QnFisheyeEquirectangularHProgram* panoHProgram;
+        QnFisheyeEquirectangularHProgram* panoHGammaProgram;
 
-    QnFisheyeEquirectangularVProgram* fisheyePanoVProgram;
-    QnFisheyeEquirectangularVProgram* fisheyePanoVGammaProgram;
+        QnFisheyeEquirectangularVProgram* panoVProgram;
+        QnFisheyeEquirectangularVProgram* panoVGammaProgram;
 
-    QnFisheyeRGBRectilinearProgram* fisheyeRGBPtzProgram;
-    QnFisheyeRGBEquirectangularHProgram* fisheyeRGBPanoHProgram;
-    QnFisheyeRGBEquirectangularVProgram* fisheyeRGBPanoVProgram;
+        QnFisheyeRGBRectilinearProgram* rgbPtzProgram;
+        QnFisheyeRGBEquirectangularHProgram* rgbPanoHProgram;
+        QnFisheyeRGBEquirectangularVProgram* rgbPanoVProgram;
+    };
 
-    QnYv12ToRgbaShaderProgram *yv12ToRgba;
-    QnNv12ToRgbShaderProgram *nv12ToRgb;
-    QnBlurShaderProgram* m_blurShader;
+    const QHash<Qn::FisheyeLensProjection, FisheyeShaders> fisheye;
 };
 
 

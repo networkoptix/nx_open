@@ -35,46 +35,55 @@
 using nx::vms::client::core::Geometry;
 
 namespace {
-    const int ROUND_COEFF = 8;
 
-    int minPow2(int value)
-    {
-        int result = 1;
-        while (value > result)
-            result <<= 1;
+const int ROUND_COEFF = 8;
 
-        return result;
-    }
+int minPow2(int value)
+{
+    int result = 1;
+    while (value > result)
+        result <<= 1;
 
-    static const int kMaxBlurSize = 2048;
+    return result;
+}
 
-} // anonymous namespace
+static const int kMaxBlurSize = 2048;
+
+using LensProjection = Qn::FisheyeLensProjection;
+
+QnGlRendererShaders::FisheyeShaders fisheyeShaders(LensProjection projection, QObject* parent)
+{
+    static const QString kGamma("clamp(pow(max(y + yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)");
+    QnGlRendererShaders::FisheyeShaders fisheye;
+    fisheye.ptzProgram = new QnFisheyeRectilinearProgram(projection, parent);
+    fisheye.ptzGammaProgram =  new QnFisheyeRectilinearProgram(projection, parent, kGamma);
+    fisheye.panoHProgram = new QnFisheyeEquirectangularHProgram(projection, parent);
+    fisheye.panoHGammaProgram = new QnFisheyeEquirectangularHProgram(projection, parent, kGamma);
+    fisheye.panoVProgram = new QnFisheyeEquirectangularVProgram(projection, parent);
+    fisheye.panoVGammaProgram = new QnFisheyeEquirectangularVProgram(projection, parent, kGamma);
+    fisheye.rgbPtzProgram = new QnFisheyeRGBRectilinearProgram(projection, parent);
+    fisheye.rgbPanoHProgram = new QnFisheyeRGBEquirectangularHProgram(projection, parent);
+    fisheye.rgbPanoVProgram = new QnFisheyeRGBEquirectangularVProgram(projection, parent);
+    return fisheye;
+}
+
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnGlRendererShaders
 // -------------------------------------------------------------------------- //
-QnGlRendererShaders::QnGlRendererShaders(QObject *parent): QObject(parent) {
-    yv12ToRgb = new QnYv12ToRgbShaderProgram(this);
-    yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(this);
-    yv12ToRgba = new QnYv12ToRgbaShaderProgram(this);
-    nv12ToRgb = new QnNv12ToRgbShaderProgram(this);
-    m_blurShader = new QnBlurShaderProgram(this);
-
-
-    const QString GAMMA_STRING(lit("clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)"));
-
-    fisheyePtzProgram = new QnFisheyeRectilinearProgram(this);
-    fisheyePtzGammaProgram =  new QnFisheyeRectilinearProgram(this, GAMMA_STRING);
-
-    fisheyePanoHProgram = new QnFisheyeEquirectangularHProgram(this);
-    fisheyePanoHGammaProgram = new QnFisheyeEquirectangularHProgram(this, GAMMA_STRING);
-
-    fisheyePanoVProgram = new QnFisheyeEquirectangularVProgram(this);
-    fisheyePanoVGammaProgram = new QnFisheyeEquirectangularVProgram(this, GAMMA_STRING);
-
-    fisheyeRGBPtzProgram = new QnFisheyeRGBRectilinearProgram(this);
-    fisheyeRGBPanoHProgram = new QnFisheyeRGBEquirectangularHProgram(this);
-    fisheyeRGBPanoVProgram = new QnFisheyeRGBEquirectangularVProgram(this);
+QnGlRendererShaders::QnGlRendererShaders(QObject* parent):
+    QObject(parent),
+    yv12ToRgb(new QnYv12ToRgbShaderProgram(this)),
+    yv12ToRgbWithGamma(new QnYv12ToRgbWithGammaShaderProgram(this)),
+    yv12ToRgba(new QnYv12ToRgbaShaderProgram(this)),
+    nv12ToRgb(new QnNv12ToRgbShaderProgram(this)),
+    m_blurShader(new QnBlurShaderProgram(this)),
+    fisheye({
+        {LensProjection::equidistant, fisheyeShaders(LensProjection::equidistant, this)},
+        {LensProjection::stereographic, fisheyeShaders(LensProjection::stereographic, this)},
+        {LensProjection::equisolid, fisheyeShaders(LensProjection::equisolid, this)}})
+{
 }
 
 QnGlRendererShaders::~QnGlRendererShaders() {
@@ -535,7 +544,9 @@ void QnGLRenderer::drawYV12VideoTexture(
     nx::vms::api::DewarpingData itemParams;
 
     float ar = 1.0;
-    if (m_fisheyeController && m_fisheyeController->mediaDewarpingParams().enabled && m_fisheyeController->itemDewarpingParams().enabled)
+    if (m_fisheyeController
+        && m_fisheyeController->mediaDewarpingParams().enabled
+        && m_fisheyeController->itemDewarpingParams().enabled)
     {
         ar = picLock->width()/(float)picLock->height();
         auto customAR = m_fisheyeController->customAR();
@@ -545,27 +556,29 @@ void QnGLRenderer::drawYV12VideoTexture(
         mediaParams = m_fisheyeController->mediaDewarpingParams();
         itemParams = m_fisheyeController->itemDewarpingParams();
 
+        const auto& fisheye = m_shaders->fisheye.value(mediaParams.lensProjection);
+
         if (itemParams.panoFactor > 1.0)
         {
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal)
             {
                 if (m_imgCorrectParam.enabled)
-                    gammaShader = fisheyeShader = m_shaders->fisheyePanoHGammaProgram;
+                    gammaShader = fisheyeShader = fisheye.panoHGammaProgram;
                 else
-                    fisheyeShader = m_shaders->fisheyePanoHProgram;
+                    fisheyeShader = fisheye.panoHProgram;
             }
             else {
                 if (m_imgCorrectParam.enabled)
-                    gammaShader = fisheyeShader = m_shaders->fisheyePanoVGammaProgram;
+                    gammaShader = fisheyeShader = fisheye.panoVGammaProgram;
                 else
-                    fisheyeShader = m_shaders->fisheyePanoVProgram;
+                    fisheyeShader = fisheye.panoVProgram;
             }
         }
         else {
             if (m_imgCorrectParam.enabled)
-                gammaShader = fisheyeShader = m_shaders->fisheyePtzGammaProgram;
+                gammaShader = fisheyeShader = fisheye.ptzGammaProgram;
             else
-                fisheyeShader = m_shaders->fisheyePtzProgram;
+                fisheyeShader = fisheye.ptzProgram;
         }
         shader = fisheyeShader;
     }
@@ -636,16 +649,18 @@ void QnGLRenderer::drawFisheyeRGBVideoTexture(
 
     const auto mediaParams = m_fisheyeController->mediaDewarpingParams();
     const auto itemParams = m_fisheyeController->itemDewarpingParams();
+    const auto& fisheye = m_shaders->fisheye.value(mediaParams.lensProjection);
 
     if (itemParams.panoFactor > 1.0)
     {
         if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal)
-            fisheyeShader = m_shaders->fisheyeRGBPanoHProgram;
+            fisheyeShader = fisheye.rgbPanoHProgram;
         else
-            fisheyeShader = m_shaders->fisheyeRGBPanoVProgram;
+            fisheyeShader = fisheye.rgbPanoVProgram;
     }
-    else {
-        fisheyeShader = m_shaders->fisheyeRGBPtzProgram;
+    else
+    {
+        fisheyeShader = fisheye.rgbPtzProgram;
     }
 
     fisheyeShader->bind();

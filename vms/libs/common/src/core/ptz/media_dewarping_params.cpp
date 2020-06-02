@@ -4,7 +4,6 @@
 #include <nx/fusion/model_functions.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnMediaDewarpingParams, ViewMode)
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnMediaDewarpingParams), (json)(eq)(debug), _Fields)
 
 namespace {

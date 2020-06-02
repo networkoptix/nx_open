@@ -166,6 +166,8 @@ public:
         // Automatically limit FPS.
         AUTO_FPS_LIMIT,
 
+        SHOW_FISHEYE_CALIBRATION_GRID,
+
         VARIABLE_COUNT
     };
 
@@ -274,6 +276,8 @@ private:
         QN_DECLARE_R_PROPERTY(bool, saveCredentialsAllowed, SAVE_CREDENTIALS_ALLOWED, true)
 
         QN_DECLARE_RW_PROPERTY(bool, isAutoFpsLimit, setAutoFpsLimit, AUTO_FPS_LIMIT, false)
+        QN_DECLARE_RW_PROPERTY(bool, isFisheyeCalibrationGridShown, setFisheyeCalibrationGridShown, SHOW_FISHEYE_CALIBRATION_GRID, false)
+
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

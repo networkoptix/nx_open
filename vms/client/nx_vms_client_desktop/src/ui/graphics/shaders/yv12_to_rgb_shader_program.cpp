@@ -122,10 +122,44 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(QObject *pa
 
 // ============================= QnYv12ToRgbWithFisheyeShaderProgram ==================
 
+QByteArray projectionShaderSource(Qn::FisheyeLensProjection projection)
+{
+    switch (projection)
+    {
+        case Qn::FisheyeLensProjection::equidistant:
+            return QN_SHADER_SOURCE(
+                vec2 lensProject(vec3 pos3d)
+                {
+                    const float kHalfPi = 3.1415926535 / 2.0;
+                    float theta = acos(clamp(pos3d.y, -1.0, 1.0));
+                    return pos3d.xz * (theta / (length(pos3d.xz) * kHalfPi));
+                });
+
+        case Qn::FisheyeLensProjection::stereographic:
+            return QN_SHADER_SOURCE(
+                vec2 lensProject(vec3 pos3d)
+                {
+                    return pos3d.xz / (1.0 + pos3d.y);
+                });
+
+        case Qn::FisheyeLensProjection::equisolid:
+            return QN_SHADER_SOURCE(
+                vec2 lensProject(vec3 pos3d)
+                {
+                    return pos3d.xz / sqrt(1.0 + pos3d.y);
+                });
+    }
+
+    NX_ASSERT(false);
+    return QByteArray();
+}
+
 // ---------------------------- QnFisheyeRectilinearProgram ------------------------------------
 
-QnFisheyeRectilinearProgram::QnFisheyeRectilinearProgram(QObject *parent, const QString& gammaStr):
-    QnFisheyeShaderProgram(parent)
+QnFisheyeRectilinearProgram::QnFisheyeRectilinearProgram(
+    Qn::FisheyeLensProjection projection, QObject* parent, const QString& gammaStr)
+    :
+    QnFisheyeShaderProgram(projection, parent)
 {
     setGammaStr(gammaStr);
 }
@@ -163,6 +197,8 @@ QString QnFisheyeRectilinearProgram::getShaderText()
 
     float kx =  2.0*tan(dstFov/2.0);
 
+    mat2 fovRotMat = mat2(cos(fovRot), -sin(fovRot), sin(fovRot), cos(fovRot));
+
     // avoid function call for better shader compatibility
     vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx;
     vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx / xStretch;
@@ -175,19 +211,15 @@ QString QnFisheyeRectilinearProgram::getShaderText()
     vec2 xy1 = vec2(1.0 / maxX, 1.0 / (maxY*aspectRatio));
     vec2 xy2 = vec2(-0.5,       -yPos/ aspectRatio);
 
-    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy3 = vec2(maxX * radius,  maxY * radius * aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
+    vec2 lensProject(vec3 pos3d);
 
     void main()
     {
         vec3 pos3d = vec3(vTexCoord * xy1 + xy2, 1.0) * to3d; // point on the surface
-
-        float theta = atan(pos3d.z, pos3d.x) + fovRot;            // fisheye angle
-        float r     = acos(pos3d.y / length(pos3d));              // fisheye radius
-
-        vec2 pos = vec2(cos(theta), sin(theta)) * r;
-        pos = pos * xy3 + xy4;
+        vec2 pos = lensProject(pos3d / length(pos3d)) * fovRotMat * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).r;
@@ -210,8 +242,10 @@ QString QnFisheyeRectilinearProgram::getShaderText()
 
 // ------------------------- QnFisheyeEquirectangularHProgram -----------------------------
 
-QnFisheyeEquirectangularHProgram::QnFisheyeEquirectangularHProgram(QObject *parent, const QString& gammaStr)
-    :QnFisheyeShaderProgram(parent)
+QnFisheyeEquirectangularHProgram::QnFisheyeEquirectangularHProgram(
+    Qn::FisheyeLensProjection projection, QObject* parent, const QString& gammaStr)
+    :
+    QnFisheyeShaderProgram(projection, parent)
 {
     setGammaStr(gammaStr);
 }
@@ -254,8 +288,10 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
     vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor ) + vec2(xShift, 0.0);
 
-    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy3 = vec2(maxX * radius,  maxY * radius * aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
+
+    vec2 lensProject(vec3 pos3d);
 
     void main()
     {
@@ -271,15 +307,7 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
             cosPhi * cosTheta,  // only one difference between H and V shaders: this 2 lines in back order
             sin(phi))  * perspectiveMatrix;
 
-        // Calculate fisheye angle and radius
-        float theta   = atan(psph.z, psph.x);
-        float r = acos(psph.y);
-
-        // return from polar coordinates
-        pos = vec2(cos(theta), sin(theta)) * r;
-
-        // AR and non [0..1] range correction
-        pos = pos * xy3 + xy4;
+        pos = lensProject(psph) * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).r;
@@ -302,8 +330,10 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
 
 // ----------------------------------------- QnFisheyeEquirectangularVProgram ---------------------------------------
 
-QnFisheyeEquirectangularVProgram::QnFisheyeEquirectangularVProgram(QObject *parent, const QString& gammaStr)
-    :QnFisheyeShaderProgram(parent)
+QnFisheyeEquirectangularVProgram::QnFisheyeEquirectangularVProgram(
+    Qn::FisheyeLensProjection projection, QObject* parent, const QString& gammaStr)
+    :
+    QnFisheyeShaderProgram(projection, parent)
 {
     setGammaStr(gammaStr);
 }
@@ -349,6 +379,8 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
+    vec2 lensProject(vec3 pos3d);
+
     void main()
     {
         vec2 pos = vTexCoord * xy1 + xy2;
@@ -363,15 +395,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
             sin(phi),  // only one difference between H and V shaders: this 2 lines in back order
             cosPhi * cosTheta)  * perspectiveMatrix;
 
-        // Calculate fisheye angle and radius
-        float theta    = atan(psph.z, psph.x);
-        float r  = acos(psph.y);
-
-        // return from polar coordinates
-        pos = vec2(cos(theta), sin(theta)) * r;
-
-        // AR and non [0..1] range correction
-        pos = pos * xy3 + xy4;
+        pos = lensProject(psph) * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).r;
@@ -426,10 +450,11 @@ bool QnAbstractRGBAShaderProgram::link()
 
 // ---------------------------- QnFisheyeRGBRectilinearProgram ------------------------------------
 
-QnFisheyeRGBRectilinearProgram::QnFisheyeRGBRectilinearProgram(QObject *parent):
-    QnFisheyeShaderProgram(parent)
+QnFisheyeRGBRectilinearProgram::QnFisheyeRGBRectilinearProgram(
+    Qn::FisheyeLensProjection projection, QObject* parent)
+    :
+    QnFisheyeShaderProgram(projection, parent)
 {
-
 }
 
 QString QnFisheyeRGBRectilinearProgram::getShaderText()
@@ -455,6 +480,8 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
 
     float kx =  2.0*tan(dstFov/2.0);
 
+    mat2 fovRotMat = mat2(cos(fovRot), -sin(fovRot), sin(fovRot), cos(fovRot));
+
     // avoid function call for better shader compatibility
     vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx;
     vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx / xStretch;
@@ -467,19 +494,15 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
     vec2 xy1 = vec2(1.0 / maxX, 1.0 / (maxY*aspectRatio));
     vec2 xy2 = vec2(-0.5,       -yPos/ aspectRatio);
 
-    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy3 = vec2(maxX * radius,  maxY * radius * aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
+    vec2 lensProject(vec3 pos3d);
 
     void main()
     {
         vec3 pos3d = vec3(vTexCoord * xy1 + xy2, 1.0) * to3d; // point on the surface
-
-        float theta = atan(pos3d.z, pos3d.x) + fovRot;            // fisheye angle
-        float r     = acos(pos3d.y / length(pos3d));              // fisheye radius
-
-        vec2 pos = vec2(cos(theta), sin(theta)) * r;
-        pos = pos * xy3 + xy4;
+        vec2 pos = lensProject(pos3d / length(pos3d)) * fovRotMat * xy3 + xy4;
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = texture2D(rgbaTexture, pos);
@@ -497,10 +520,11 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
 
 // ------------------------- QnFisheyeRGBEquirectangularHProgram -----------------------------
 
-QnFisheyeRGBEquirectangularHProgram::QnFisheyeRGBEquirectangularHProgram(QObject *parent)
-    :QnFisheyeShaderProgram(parent)
+QnFisheyeRGBEquirectangularHProgram::QnFisheyeRGBEquirectangularHProgram(
+    Qn::FisheyeLensProjection projection, QObject* parent)
+    :
+    QnFisheyeShaderProgram(projection, parent)
 {
-
 }
 
 QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
@@ -532,8 +556,10 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
     vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor) + vec2(xShift, 0.0);
 
-    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy3 = vec2(maxX * radius,  maxY * radius * aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
+
+    vec2 lensProject(vec3 pos3d);
 
     void main()
     {
@@ -549,15 +575,7 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
             cosPhi * cosTheta,  // only one difference between H and V shaders: this 2 lines in back order
             sin(phi))  * perspectiveMatrix;
 
-        // Calculate fisheye angle and radius
-        float theta   = atan(psph.z, psph.x);
-        float r = acos(psph.y);
-
-        // return from polar coordinates
-        pos = vec2(cos(theta), sin(theta)) * r;
-
-        // AR and non [0..1] range correction
-        pos = pos * xy3 + xy4;
+        pos = lensProject(psph) * xy3 + xy4;
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = texture2D(rgbaTexture, pos);
@@ -575,10 +593,11 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
 
 // ----------------------------------------- QnFisheyeRGBEquirectangularVProgram ---------------------------------------
 
-QnFisheyeRGBEquirectangularVProgram::QnFisheyeRGBEquirectangularVProgram(QObject *parent)
-    :QnFisheyeShaderProgram(parent)
+QnFisheyeRGBEquirectangularVProgram::QnFisheyeRGBEquirectangularVProgram(
+    Qn::FisheyeLensProjection projection, QObject* parent)
+    :
+    QnFisheyeShaderProgram(projection, parent)
 {
-
 }
 
 QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
@@ -610,8 +629,10 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
     vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor) + vec2(xShift, 0.0);
 
-    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy3 = vec2(maxX * radius,  maxY * radius * aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
+
+    vec2 lensProject(vec3 pos3d);
 
     void main()
     {
@@ -627,15 +648,7 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
             sin(phi),  // only one difference between H and V shaders: this 2 lines in back order
             cosPhi * cosTheta)  * perspectiveMatrix;
 
-        // Calculate fisheye angle and radius
-        float theta    = atan(psph.z, psph.x);
-        float r  = acos(psph.y);
-
-        // return from polar coordinates
-        pos = vec2(cos(theta), sin(theta)) * r;
-
-        // AR and non [0..1] range correction
-        pos = pos * xy3 + xy4;
+        pos = lensProject(psph) * xy3 + xy4;
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = texture2D(rgbaTexture, pos);

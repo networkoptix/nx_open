@@ -1,3 +1,6 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "fisheye_calibration_image_widget.h"
 
 #include <QtCore/QDateTime>
@@ -22,6 +25,33 @@
 namespace {
 
 const int animDuration = 500;
+
+static constexpr int kLatitudeStepDegrees = 15;
+static constexpr int kLongitudeStepDegrees = 15;
+
+qreal radians(qreal degrees)
+{
+    return degrees / 180.0 * M_PI;
+}
+
+qreal latitudeRadius(qreal degreesFromPole, Qn::FisheyeLensProjection projection)
+{
+    static const qreal kSqrt2 = sqrt(2.0);
+    switch (projection)
+    {
+        case Qn::FisheyeLensProjection::equidistant:
+            return degreesFromPole / 90.0;
+
+        case Qn::FisheyeLensProjection::stereographic:
+            return tan(radians(degreesFromPole) / 2.0);
+
+        case Qn::FisheyeLensProjection::equisolid:
+            return sin(radians(degreesFromPole) / 2.0) * kSqrt2;
+    }
+
+    NX_ASSERT(false);
+    return 0;
+}
 
 } // namespace
 
@@ -141,6 +171,34 @@ void FisheyeCalibrationImageWidget::setLineWidth(int width)
     repaint();
 }
 
+bool FisheyeCalibrationImageWidget::isGridShown() const
+{
+    return m_isGridShown;
+}
+
+void FisheyeCalibrationImageWidget::setGridShown(bool value)
+{
+    if (m_isGridShown == value)
+        return;
+
+    m_isGridShown = value;
+    update();
+}
+
+Qn::FisheyeLensProjection FisheyeCalibrationImageWidget::projection() const
+{
+    return m_projection;
+}
+
+void FisheyeCalibrationImageWidget::setProjection(Qn::FisheyeLensProjection value)
+{
+    if (m_projection == value)
+        return;
+
+    m_projection = value;
+    if (m_isGridShown)
+        update();
+}
 
 void FisheyeCalibrationImageWidget::beginSearchAnimation()
 {
@@ -215,11 +273,15 @@ void FisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect &
     QPointF center(relativeCenter.x() * targetRect.width(), relativeCenter.y() * targetRect.height());
     center += targetRect.topLeft();
 
-    {   /* Drawing circles */
+    {
         QPen pen;
+        QnScopedPainterPenRollback penRollback(painter);
+        QnScopedPainterClipRegionRollback clipRollback(painter, targetRect);
+
+        // Drawing circles.
         pen.setWidth(m_lineWidth);
         pen.setColor(m_lineColor);
-        QnScopedPainterPenRollback penRollback(painter, pen);
+        painter->setPen(pen);
 
         QColor brushColor1(toTransparent(m_lineColor, 0.6));
         QColor brushColor2(toTransparent(m_lineColor, 0.3));
@@ -230,13 +292,34 @@ void FisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect &
 
         QnScopedPainterBrushRollback brushRollback(painter, brush);
 
-        QPainterPath path;
-        path.addEllipse(center, radiusX, radiusY);
-        path.addEllipse(center, m_lineWidth, m_lineWidth);
+        painter->drawEllipse(center, radiusX, radiusY);
+        painter->drawEllipse(center, m_lineWidth, m_lineWidth);
 
-        /* Adjust again to not draw over frame */
-        QnScopedPainterClipRegionRollback clipRollback(painter, targetRect);
-        painter->drawPath(path);
+        if (!m_isGridShown)
+            return;
+
+        // Drawing grid.
+        pen.setWidth(1.0);
+        pen.setColor(m_lineColor);
+        painter->setPen(pen);
+        painter->setBrush(Qt::NoBrush);
+
+        for (int longitude = 0; longitude < 360; longitude += kLongitudeStepDegrees)
+        {
+            const auto angle = radians(longitude);
+            const auto x = cos(angle);
+            const auto y = sin(angle);
+
+            painter->drawLine(
+                center + QPointF(m_lineWidth * x, m_lineWidth * y),
+                center + QPointF(radiusX * x, radiusY * y));
+        }
+
+        for (int latitude = 0; latitude < 90; latitude += kLatitudeStepDegrees)
+        {
+            const qreal radius = latitudeRadius(latitude, m_projection);
+            painter->drawEllipse(center, radiusX * radius, radiusY * radius);
+        }
     }
 }
 

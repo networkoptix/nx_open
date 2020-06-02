@@ -106,25 +106,36 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qt, SortOrder,
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, RebuildAction,
-(Qn::RebuildAction_Start, "start")
-(Qn::RebuildAction_Cancel, "stop")
-(Qn::RebuildAction_ShowProgress, QString())
+    (Qn::RebuildAction_Start, "start")
+    (Qn::RebuildAction_Cancel, "stop")
+    (Qn::RebuildAction_ShowProgress, QString())
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupAction,
-(Qn::BackupAction_Start, "start")
-(Qn::BackupAction_Cancel, "stop")
-(Qn::BackupAction_ShowProgress, QString())
+    (Qn::BackupAction_Start, "start")
+    (Qn::BackupAction_Cancel, "stop")
+    (Qn::BackupAction_ShowProgress, QString())
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, FisheyeLensProjection,
+    (Qn::FisheyeLensProjection::equidistant, "equidistant")
+    (Qn::FisheyeLensProjection::stereographic, "stereographic")
+    (Qn::FisheyeLensProjection::equisolid, "equisolid")
 )
 
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
-    (Qn::Permissions),
+    (Qn::Permissions)(Qn::FisheyeLensProjection),
     (debug)
 )
 
 namespace Qn {
 
 QString toString(AuthResult value)
+{
+    return QnLexical::serialized(value);
+}
+
+QString toString(Qn::FisheyeLensProjection value)
 {
     return QnLexical::serialized(value);
 }

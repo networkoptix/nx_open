@@ -24,7 +24,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent
     StatusChangeReason
-    Permission UserRole ConnectionResult LicenseType
+    Permission UserRole ConnectionResult LicenseType FisheyeLensProjection
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
     ServerFlags IOPortTypes
@@ -739,6 +739,21 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     Q_DECLARE_OPERATORS_FOR_FLAGS(StorageStatuses)
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StorageStatus)
 
+    enum class FisheyeLensProjection
+    {
+        equidistant,
+        stereographic,
+        equisolid,
+
+        defaultProjection = equidistant
+    };
+    QString toString(FisheyeLensProjection value);
+
+    inline uint qHash(FisheyeLensProjection value, uint seed = 0)
+    {
+        return ::qHash(int(value), seed);
+    }
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -810,6 +825,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzDataFields)(Qn::TTHeaderFlags)(Qn::ResourceInfoLevel),
     (metatype)(numeric)
 )
+
+QN_FUSION_DECLARE_FUNCTIONS(Qn::FisheyeLensProjection, (metatype)(lexical)(debug))
 
 /** Debug representation. */
 QString toString(Qn::TimePeriodContent value);

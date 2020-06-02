@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <core/ptz/media_dewarping_params.h>
 
 #include <nx/vms/client/core/graphics/shader_helper.h>
@@ -8,6 +10,8 @@
 #include <nx/vms/api/data/dewarping_data.h>
 
 #include <utils/color_space/image_correction.h>
+
+namespace Qn { enum class FisheyeLensProjection;  }
 
 class QnAbstractYv12ToRgbShaderProgram : public QnGLShaderProgram
 {
@@ -90,13 +94,18 @@ private:
     QString m_gammaStr;
 };
 
-template <class Base>
-class QnFisheyeShaderProgram : public Base {
-    typedef Base base_type;
+QByteArray projectionShaderSource(Qn::FisheyeLensProjection projection);
+
+template <typename Base>
+class QnFisheyeShaderProgram: public Base
+{
+    using base_type = Base;
+    bool m_initialized = false;
+
 public:
-    QnFisheyeShaderProgram(QObject *parent = NULL)
-        : Base(parent, false),
-          m_add_shader(false)
+    QnFisheyeShaderProgram(Qn::FisheyeLensProjection projection, QObject* parent = nullptr):
+        Base(parent, false),
+        m_projection(projection)
     {
     }
 
@@ -104,37 +113,43 @@ public:
     using base_type::setUniformValue;
     using base_type::addShaderFromSourceCode;
 
-    void setDewarpingParams(const QnMediaDewarpingParams &mediaParams,
-                            const nx::vms::api::DewarpingData& itemParams,
-                            float aspectRatio, float maxX, float maxY)
+    void setDewarpingParams(const QnMediaDewarpingParams& mediaParams,
+        const nx::vms::api::DewarpingData& itemParams, float aspectRatio, float maxX, float maxY)
     {
         if (itemParams.panoFactor == 1)
         {
             float fovRot = sin(itemParams.xAngle) * qDegreesToRadians(mediaParams.fovRot);
-            if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
+            if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal)
+            {
                 setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
                 setUniformValue(m_yPos, (float) 0.5);
                 setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
                 setUniformValue(m_fovRotLocation, (float) fovRot);
             }
-            else {
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0 - itemParams.fov/2.0/aspectRatio));
+            else
+            {
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0
+                    - itemParams.fov / 2.0 / aspectRatio));
                 setUniformValue(m_yPos, (float) 1.0);
                 setUniformValue(m_xShiftLocation, (float) fovRot);
                 setUniformValue(m_fovRotLocation, (float) -itemParams.xAngle);
             }
         }
-        else {
+        else
+        {
             setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
             setUniformValue(m_fovRotLocation, (float) qDegreesToRadians(mediaParams.fovRot));
             //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
-            if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
+            if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal)
+            {
                 setUniformValue(m_yPos, (float) 0.5);
                 setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
             }
-            else {
+            else
+            {
                 setUniformValue(m_yPos, (float) 1.0);
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - itemParams.fov/itemParams.panoFactor/2.0));
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle
+                    - itemParams.fov / itemParams.panoFactor / 2.0));
             }
         }
 
@@ -150,14 +165,18 @@ public:
         setUniformValue(m_xStretchLocation, (float) mediaParams.hStretch);
     }
 
-    virtual bool link() override {
-        if ( !m_add_shader )
+    virtual bool link() override
+    {
+        if (!m_initialized)
         {
+            m_initialized = true;
             addShaderFromSourceCode(QOpenGLShader::Fragment, getShaderText());
-            m_add_shader = true;
+            addShaderFromSourceCode(QOpenGLShader::Fragment, projectionShaderSource(m_projection));
         }
+
         bool rez = base_type::link();
-        if (rez) {
+        if (rez)
+        {
             m_xShiftLocation = uniformLocation("xShift");
             m_yShiftLocation = uniformLocation("yShift");
             m_fovRotLocation = uniformLocation("fovRot");
@@ -173,6 +192,7 @@ public:
             m_maxYLocation = uniformLocation("maxY");
             m_xStretchLocation = uniformLocation("xStretch");
         }
+
         return rez;
     }
 
@@ -195,63 +215,73 @@ protected:
     int m_maxXLocation;
     int m_maxYLocation;
     int m_xStretchLocation;
-    bool m_add_shader;
+
+    const Qn::FisheyeLensProjection m_projection;
 };
 
 // --------- fisheye YUV (with optional gamma) ---------------
 
-class QnFisheyeRectilinearProgram : public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
+class QnFisheyeRectilinearProgram: public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
 {
     Q_OBJECT
 public:
-    QnFisheyeRectilinearProgram(QObject *parent = NULL, const QString& gammaStr = lit("y"));
+    QnFisheyeRectilinearProgram(Qn::FisheyeLensProjection projection, QObject* parent = nullptr,
+        const QString& gammaStr = "y");
 protected:
     virtual QString getShaderText() override;
 };
 
-class QnFisheyeEquirectangularHProgram : public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
+class QnFisheyeEquirectangularHProgram:
+    public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
 {
     Q_OBJECT
 public:
-    QnFisheyeEquirectangularHProgram(QObject *parent = NULL, const QString& gammaStr = lit("y"));
+    QnFisheyeEquirectangularHProgram(Qn::FisheyeLensProjection projection,
+        QObject* parent = nullptr, const QString& gammaStr = "y");
 protected:
     virtual QString getShaderText() override;
 };
 
-class QnFisheyeEquirectangularVProgram : public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
+class QnFisheyeEquirectangularVProgram:
+    public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
 {
     Q_OBJECT
 public:
-    QnFisheyeEquirectangularVProgram(QObject *parent = NULL, const QString& gammaStr = lit("y"));
+    QnFisheyeEquirectangularVProgram(Qn::FisheyeLensProjection projection,
+        QObject* parent = nullptr, const QString& gammaStr = "y");
 protected:
     virtual QString getShaderText() override;
 };
 
 // --------- fisheye RGB ---------------
 
-class QnFisheyeRGBRectilinearProgram : public QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>
+class QnFisheyeRGBRectilinearProgram: public QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>
 {
     Q_OBJECT
 public:
-    QnFisheyeRGBRectilinearProgram(QObject *parent = NULL);
+    QnFisheyeRGBRectilinearProgram(Qn::FisheyeLensProjection projection, QObject* parent = nullptr);
 protected:
     virtual QString getShaderText() override;
 };
 
-class QnFisheyeRGBEquirectangularHProgram : public QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>
+class QnFisheyeRGBEquirectangularHProgram:
+    public QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>
 {
     Q_OBJECT
 public:
-    QnFisheyeRGBEquirectangularHProgram(QObject *parent = NULL);
+    QnFisheyeRGBEquirectangularHProgram(Qn::FisheyeLensProjection projection,
+        QObject* parent = nullptr);
 protected:
     virtual QString getShaderText() override;
 };
 
-class QnFisheyeRGBEquirectangularVProgram : public QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>
+class QnFisheyeRGBEquirectangularVProgram:
+    public QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>
 {
     Q_OBJECT
 public:
-    QnFisheyeRGBEquirectangularVProgram(QObject *parent = NULL);
+    QnFisheyeRGBEquirectangularVProgram(Qn::FisheyeLensProjection projection,
+        QObject* parent = nullptr);
 protected:
     virtual QString getShaderText() override;
 };

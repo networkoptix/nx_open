@@ -5,6 +5,7 @@
 
 #include <QtWidgets/QWidget>
 
+#include <common/common_globals.h>
 #include <ui/processors/drag_process_handler.h>
 
 class DragProcessor;
@@ -81,6 +82,12 @@ public:
     int     lineWidth() const;
     Q_SLOT  void setLineWidth(int width);
 
+    bool isGridShown() const;
+    void setGridShown(bool value);
+
+    Qn::FisheyeLensProjection projection() const;
+    void setProjection(Qn::FisheyeLensProjection value);
+
     void    beginSearchAnimation();
     void    endSearchAnimation();
     void    abortSearchAnimation();
@@ -128,6 +135,9 @@ private:
     qreal   m_radius;
     qreal   m_stretch;
     int     m_lineWidth;
+
+    Qn::FisheyeLensProjection m_projection = Qn::FisheyeLensProjection::defaultProjection;
+    bool m_isGridShown = false;
 };
 
 } // namespace nx::vms::client::desktop

@@ -1,6 +1,8 @@
 #include "camera_settings_dialog.h"
 #include "ui_camera_settings_dialog.h"
 
+#include <chrono>
+
 #include <QtCore/QSharedPointer>
 #include <QtWidgets/QPushButton>
 
@@ -56,6 +58,14 @@
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+using namespace std::chrono;
+
+static constexpr auto kPreviewReloadInterval = 5s;
+
+} // namespace
+
 struct CameraSettingsDialog::Private: public QObject
 {
     CameraSettingsDialog* const q;
@@ -73,7 +83,12 @@ struct CameraSettingsDialog::Private: public QObject
     QPointer<DeviceAgentSettingsAdapter> deviceAgentSettingsAdaptor;
     QPointer<FisheyePreviewController> fisheyePreviewController;
 
-    Private(CameraSettingsDialog* q): q(q) {}
+    Private(CameraSettingsDialog* q): q(q)
+    {
+        const auto timer = new QTimer(this);
+        connect(timer, &QTimer::timeout, this, &Private::updatePreviewIfNeeded);
+        timer->start(kPreviewReloadInterval);
+    }
 
     void tryReloadAdvancedSettings()
     {
@@ -255,6 +270,15 @@ struct CameraSettingsDialog::Private: public QObject
         q->ui->defaultPasswordAlert->setUseMultipleForm(cameras.size() > 1);
         q->ui->defaultPasswordAlert->setCameras(troublesomeCameras);
     }
+
+    void updatePreviewIfNeeded()
+    {
+        if (!q->isVisible() || q->currentPage() != int(CameraSettingsTab::fisheye))
+            return;
+
+        if (previewManager->image().isNull())
+            previewManager->refreshSelectedCamera();
+    }
 };
 
 CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
@@ -415,6 +439,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
                 singleCamera,
                 state.singleCameraSettings.fisheyeDewarping());
         });
+
+    connect(ui->tabWidget, &QTabWidget::currentChanged, d, &Private::updatePreviewIfNeeded);
 
     setHelpTopic(this, Qn::CameraSettings_Help);
 }

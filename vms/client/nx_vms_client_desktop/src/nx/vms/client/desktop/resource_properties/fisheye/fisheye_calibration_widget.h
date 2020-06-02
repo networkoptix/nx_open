@@ -5,6 +5,8 @@
 
 #include <utils/common/connective.h>
 
+namespace Qn { enum class FisheyeLensProjection; }
+
 class QTimer;
 class QnFisheyeCalibrator;
 namespace Ui { class FisheyeCalibrationWidget; }
@@ -41,9 +43,18 @@ public:
 
     void autoCalibrate();
 
+    QImage previewImage() const;
+
+    Qn::FisheyeLensProjection projection() const;
+    void setProjection(Qn::FisheyeLensProjection value);
+
+    bool isGridShown() const;
+    void setGridShown(bool value);
+
 signals:
     void autoCalibrationFinished();
     void dataChanged();
+    void previewImageChanged();
 
 private:
     void updatePage();
