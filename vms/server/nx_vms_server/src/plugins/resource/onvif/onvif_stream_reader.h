@@ -47,11 +47,11 @@ protected:
     virtual bool isStreamOpened() const override;
     virtual void setCameraControlDisabled(bool value) override;
 
-    // Returned pointers are valid while response object is living.
-    // (For all functions in the following block.)
     virtual CameraDiagnostics::Result fetchUpdateVideoEncoder(
         CameraInfoParams* outInfo, bool isPrimary, bool isCameraControlRequired,
         const QnLiveStreamParams& params) const;
+    virtual CameraDiagnostics::Result fetchUpdateAudioEncoder(
+        CameraInfoParams* outInfo, bool isPrimary, bool isCameraControlRequired) const;
 private:
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
@@ -65,9 +65,6 @@ private:
     CameraDiagnostics::Result updateCameraAndFetchStreamUrl(
         bool isPrimary, QString* outStreamUrl, bool isCameraControlRequired,
         const QnLiveStreamParams& params) const;
-
-    CameraDiagnostics::Result fetchUpdateAudioEncoder(
-        CameraInfoParams* outInfo, bool isPrimary, bool isCameraControlRequired) const;
 
     CameraDiagnostics::Result fetchUpdateProfile(
         CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
