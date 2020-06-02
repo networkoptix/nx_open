@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/streaming/rtsp_client.h>
 #include <nx/streaming/sdp.h>
 
 using namespace nx::streaming;
@@ -202,4 +203,58 @@ TEST(Sdp, ConnectionAddress)
     ASSERT_EQ("241.0.0.2", sdp.media[0].connectionAddress.toString());
     ASSERT_EQ("241.0.0.2", sdp.media[1].connectionAddress.toString());
     ASSERT_EQ("241.0.0.2", sdp.media[2].connectionAddress.toString());
+}
+
+TEST(Sdp, SetupResponse1)
+{
+    using namespace nx::vms::api;
+    using namespace std::chrono;
+
+    QString value = R"text(
+        RTSP/1.0 200 OK
+        CSeq: 25
+        Session: 13816;timeout=50
+        Transport: RTP/AVP;multicast;destination=239.128.1.100;port=5564-5565;ttl=15;interleaved=2-3;ssrc=1234;
+    )text";
+
+    QnRtspClient rtspClient;
+    QnRtspClient::SDPTrackInfo track;
+    track.ioDevice.reset(new QnRtspIoDevice(&rtspClient, RtpTransportType::multicast));
+    rtspClient.parseSetupResponse(value, &track, 0);
+
+    ASSERT_EQ("239.128.1.100", track.sdpMedia.connectionAddress.toString());
+    ASSERT_EQ(5564, track.ioDevice->mediaAddressInfo().address.port);
+    ASSERT_EQ(5565, track.ioDevice->rtcpAddressInfo().address.port);
+
+    ASSERT_EQ(2, track.interleaved.first);
+    ASSERT_EQ(3, track.interleaved.second);
+
+    ASSERT_EQ(0x1234, track.ioDevice->getSSRC());
+
+    ASSERT_EQ("13816", rtspClient.sessionId());
+    ASSERT_EQ(50s, rtspClient.keepAliveTimeOut());
+}
+
+TEST(Sdp, SetupResponse2)
+{
+    using namespace nx::vms::api;
+    using namespace std::chrono;
+
+    QString value = R"text(
+        RTSP/1.0 200 OK
+        CSeq: 25
+        Session: 13816;timeout=50
+        Transport: RTP/AVP; multicast; estination=239.128.1.100; Server_Port=5564; ttl=15; Interleaved=2
+    )text";
+
+    QnRtspClient rtspClient;
+    QnRtspClient::SDPTrackInfo track;
+    track.ioDevice.reset(new QnRtspIoDevice(&rtspClient, RtpTransportType::multicast));
+    rtspClient.parseSetupResponse(value, &track, 0);
+
+    ASSERT_EQ(2, track.interleaved.first);
+    ASSERT_EQ(3, track.interleaved.second);
+
+    ASSERT_EQ(5564, track.ioDevice->mediaAddressInfo().address.port);
+    ASSERT_EQ(5565, track.ioDevice->rtcpAddressInfo().address.port);
 }
