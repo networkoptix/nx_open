@@ -16,6 +16,8 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QStackedLayout>
 
+#include <client/startup_tile_manager.h>
+
 #include <utils/common/delayed.h>
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
@@ -648,6 +650,8 @@ bool MainWindow::handleOpenFile(const QString &message)
 
     if (resources.isEmpty())
         return false;
+
+    qnStartupTileManager->skipTileAction();
 
     menu()->trigger(action::DropResourcesAction, resources);
     return true;
