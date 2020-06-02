@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.268",
+    "version": "1.0.1.269",
     "data": [
         {
             "keys": [
@@ -4010,7 +4010,7 @@
                     "x": {
                         "extrapolationMode": "PeriodicExtrapolation",
                         "device":  [-1, 1],
-                        "logical": [360, 0]
+                        "logical": [-360, 0]
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
