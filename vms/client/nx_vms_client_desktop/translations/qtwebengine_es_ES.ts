@@ -49,15 +49,15 @@
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
-      <translation type="unfinished">The partial file did not match the expected hash</translation>
+      <translation>El archivo parcial no coincide con el hash esperado</translation>
     </message>
     <message>
       <source>General network failure</source>
-      <translation type="unfinished">General network failure</translation>
+      <translation>Fallo general de la red</translation>
     </message>
     <message>
       <source>The network operation has timed out</source>
-      <translation type="unfinished">The network operation has timed out</translation>
+      <translation>La operación de red ha expirado</translation>
     </message>
     <message>
       <source>The network connection has been terminated</source>

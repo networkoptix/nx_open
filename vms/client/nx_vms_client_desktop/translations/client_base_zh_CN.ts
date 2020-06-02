@@ -9058,14 +9058,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>超过%n 个符号</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>剩余 %n 个符号</numerusform>
       </translation>
     </message>
   </context>

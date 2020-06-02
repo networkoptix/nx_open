@@ -1013,7 +1013,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Video kod dönüştürmesi gerekiyor.</translation>
     </message>
   </context>
   <context>
@@ -1853,11 +1853,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation type="unfinished">RTP error in primary stream (%1)</translation>
+      <translation>Birincil akışta RTP hatası (%1)</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
+      <translation>İkincil akışta RTP hatası (%1)</translation>
     </message>
   </context>
   <context>

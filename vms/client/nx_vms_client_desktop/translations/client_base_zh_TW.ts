@@ -9062,14 +9062,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>超過%n 個符號</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>剩餘%n 個符號</numerusform>
       </translation>
     </message>
   </context>

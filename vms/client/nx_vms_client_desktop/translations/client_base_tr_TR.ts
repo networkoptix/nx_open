@@ -1257,7 +1257,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>Sorunu bildirmek için lütfen %1 iletişime geçin.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1265,7 +1265,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Geçersiz veri alındı.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1305,7 +1305,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>Lisans Anahtarını manuel olarak etkinleştirmek için lütfen %1iletişime geçin %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1317,11 +1317,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>Sorunu bildirmek için lütfen Bölge / Lisans desteğine başvurun:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>Lisans Anahtarını manuel olarak etkinleştirmek için lütfen Bölgesel / Lisans desteğine başvurun:</translation>
     </message>
   </context>
   <context>
@@ -1356,7 +1356,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Lütfen daha sonra tekrar dene.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1393,27 +1393,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Geçerli bir Lisans Anahtarı almak için lütfen %1 ile iletişime geçin.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Eğer problem devam ederse %1 ile iletişime geçin.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Lütfen %1 ile iletişime geçin.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Geçerli bir Lisans Anahtarı almak için lütfen Bölgesel / Lisans desteğine başvurun:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Sorun devam ederse, lütfen Bölgesel / Lisans desteğine başvurun:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Lütfen Bölgesel / Lisans desteğine başvurun:</translation>
     </message>
   </context>
   <context>
@@ -1639,7 +1639,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Bu sayfadan ayrılmak istediğinizden emin misiniz? Yaptığınız değişiklikler kaydedilmeyebilir.</translation>
     </message>
   </context>
   <context>
