@@ -570,6 +570,27 @@ std::optional<QString> getName(const CameraSettings::Entry<NamedPolygon>& entry)
     return region.name;
 }
 
+template <typename Rule>
+std::set<QString> getRegionNames(const std::vector<Rule>& rules)
+{
+    std::set<QString> names;
+    for (const auto& rule: rules)
+    {
+        if (auto name = getName(rule.region))
+            names.insert(*name);
+    }
+    return names;
+}
+
+void removeRulesExcept(QJsonObject* rules, const std::set<QString>& allowedNames)
+{
+    for (const auto& name: rules->keys())
+    {
+        if (!allowedNames.count(name))
+            rules->remove(name);
+    }
+}
+
 
 void unparseReToCamera(QJsonValue* jsonRule,
     CameraSettings::Entry<NamedPolygon>* region)
@@ -671,18 +692,7 @@ void unparseReToCamera(QJsonValue* parameters,
         if (!get<QJsonValue>(*parameters, "CrowdDetection").isUndefined())
         {
             jsonRules = get<QJsonObject>(*parameters, "CrowdDetection");
-
-            std::set<QString> ruleNames;
-            for (const auto& rule: rules)
-            {
-                if (auto name = getName(rule.region))
-                    ruleNames.insert(*name);
-            }
-            for (const auto& oldName: jsonRules.keys())
-            {
-                if (!ruleNames.count(oldName))
-                    jsonRules.remove(oldName);
-            }
+            removeRulesExcept(&jsonRules, getRegionNames(rules));
         }
 
         for (auto& rule: rules)
@@ -744,18 +754,7 @@ void unparseReToCamera(QJsonValue* parameters,
         if (!get<QJsonValue>(*parameters, "LoiteringDetection").isUndefined())
         {
             jsonRules = get<QJsonObject>(*parameters, "LoiteringDetection");
-
-            std::set<QString> ruleNames;
-            for (const auto& rule: rules)
-            {
-                if (auto name = getName(rule.region))
-                    ruleNames.insert(*name);
-            }
-            for (const auto& oldName: jsonRules.keys())
-            {
-                if (!ruleNames.count(oldName))
-                    jsonRules.remove(oldName);
-            }
+            removeRulesExcept(&jsonRules, getRegionNames(rules));
         }
 
         for (auto& rule: rules)
@@ -815,18 +814,7 @@ void unparseReToCamera(QJsonValue* parameters,
         if (!get<QJsonValue>(*parameters, "IntrusionDetection").isUndefined())
         {
             jsonRules = get<QJsonObject>(*parameters, "IntrusionDetection");
-
-            std::set<QString> ruleNames;
-            for (const auto& rule: rules)
-            {
-                if (auto name = getName(rule.region))
-                    ruleNames.insert(*name);
-            }
-            for (const auto& oldName: jsonRules.keys())
-            {
-                if (!ruleNames.count(oldName))
-                    jsonRules.remove(oldName);
-            }
+            removeRulesExcept(&jsonRules, getRegionNames(rules));
         }
 
         for (auto& rule: rules)
