@@ -466,7 +466,14 @@ public:
 
     Option<std::chrono::seconds> ioOperationTimeTreshold{ this, "ioOperationTimeTreshold",
         kDefaultIoOperationTimeTreshold,
-        "If IO operation (read/write/remove/list) takes time longer than this value it will be reported in server metrics."
+        "If IO operation (read/write/remove/list) takes time longer than this value it will be reported in server metrics.",
+        [](const std::chrono::seconds& value)
+        {
+            if (value.count() == 0)
+                return kDefaultIoOperationTimeTreshold;
+
+            return value;
+        }
     };
 
 #if defined(__arm__)
