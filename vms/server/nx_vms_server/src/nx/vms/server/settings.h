@@ -14,9 +14,9 @@
 // Type specific parsers
 namespace nx::utils {
 
+namespace detail {
 template<>
-inline bool nx::utils::Settings::Option<MultiThreadDecodePolicy>::fromQVariant(
-    const QVariant& value, MultiThreadDecodePolicy* result)
+inline bool fromQVariant(const QVariant& value, MultiThreadDecodePolicy* result)
 {
     if (!value.isValid())
         return false;
@@ -32,6 +32,8 @@ inline bool nx::utils::Settings::Option<MultiThreadDecodePolicy>::fromQVariant(
         return false;
     return true;
 }
+
+} // namespace detail
 
 template<>
 inline QVariant Settings::Option<MultiThreadDecodePolicy>::toQVariant(

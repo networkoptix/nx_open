@@ -7,6 +7,8 @@
 
 using namespace nx::utils;
 
+Q_DECLARE_METATYPE(std::chrono::minutes);
+
 TEST(Settings, getSimpleOption)
 {
     const QString kSettingsFilename = TestOptions::temporaryDirectoryPath() + "test.conf";
@@ -36,6 +38,10 @@ TEST(Settings, loadSave)
         Option<int> option2{this, "option2", 7, "Option description"};
         Option<std::chrono::milliseconds> option3{this, "option3",
             std::chrono::milliseconds(7), "Option description"};
+        Option<std::chrono::seconds> option4{this, "option4",
+            std::chrono::seconds(142), "Option description"};
+        Option<std::chrono::minutes> option5{this, "option5",
+            std::chrono::minutes(242), "Option description"};
     };
 
     Settings settings;
@@ -44,12 +50,18 @@ TEST(Settings, loadSave)
     std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
     qSettings->setValue("option1", "loaded value");
     qSettings->setValue("option3", "300");
+    qSettings->setValue("option4", "400");
+    qSettings->setValue("option5", "500");
     settings.attach(qSettings);
     ASSERT_TRUE(settings.option1.present());
     ASSERT_EQ(settings.option1(), QString("loaded value"));
     ASSERT_FALSE(settings.option2.present());
     ASSERT_TRUE(settings.option3.present());
     ASSERT_EQ(settings.option3().count(), 300);
+    ASSERT_TRUE(settings.option4.present());
+    ASSERT_EQ(settings.option4().count(), 400);
+    ASSERT_TRUE(settings.option5.present());
+    ASSERT_EQ(settings.option5().count(), 500);
     settings.option1.set("qqrq");
     ASSERT_EQ(settings.option1(), QString("qqrq"));
     ASSERT_TRUE(qSettings->contains("option1"));

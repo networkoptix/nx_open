@@ -13,6 +13,43 @@
 namespace nx {
 namespace utils {
 
+namespace detail {
+
+template<typename Rep, typename Duration>
+bool fromQVariant(const QVariant& value, std::chrono::duration<Rep, Duration>* result)
+{
+    if (!value.isValid() || !value.canConvert<quint64>())
+        return false;
+
+    *result = std::chrono::duration<Rep, Duration>(value.value<quint64>());
+    return true;
+}
+
+// Override string loader to workaround StringList parsing when input string contains comma
+inline bool fromQVariant(const QVariant& value, QString* result)
+{
+    if (!value.isValid())
+        return false;
+
+    if (value.type() == QVariant::StringList)
+        *result = value.toStringList().join(",");
+    else
+        *result = value.toString();
+    return true;
+}
+
+template<typename T>
+bool fromQVariant(const QVariant& qVariant, T* outValue)
+{
+    if (!qVariant.isValid() || !qVariant.canConvert<T>())
+        return false;
+
+    *outValue = qVariant.value<T>();
+    return true;
+}
+
+} // namespace detail
+
 /**
  * Container that offers declaration, access and changing of settings. Additionally, it
  * keeps description of options to build documentation. Options can be loaded or saved from
@@ -124,7 +161,7 @@ protected:
     private:
         virtual bool load(const QVariant& value) override
         {
-            if (!fromQVariant(value, &m_value))
+            if (!NX_ASSERT(detail::fromQVariant(value, &m_value), "Missing fromQVariant() specialization for your type."))
                 return false;
 
             isPresent = true;
@@ -139,15 +176,6 @@ protected:
         virtual QVariant defaultValueVariant() const override
         {
             return toQVariant(m_defaultValue);
-        }
-
-        static bool fromQVariant(const QVariant& qVariant, T* outValue)
-        {
-            if (!qVariant.isValid() || !qVariant.canConvert<T>())
-                return false;
-
-            *outValue = qVariant.value<T>();
-            return true;
         }
 
         static QVariant toQVariant(const T& value)
@@ -177,31 +205,6 @@ private:
     std::shared_ptr<QSettings> m_qtSettings;
 };
 
-
-// Override string loader to workaround StringList parsing when input string contains comma
-template<>
-inline bool Settings::Option<QString>::fromQVariant(const QVariant& value, QString* result)
-{
-    if (!value.isValid())
-        return false;
-
-    if (value.type() == QVariant::StringList)
-        *result = value.toStringList().join(",");
-    else
-        *result = value.toString();
-    return true;
-}
-
-template<>
-inline bool Settings::Option<std::chrono::milliseconds>::fromQVariant(
-    const QVariant& value, std::chrono::milliseconds* result)
-{
-    if (!value.isValid() || !value.canConvert<quint64>())
-        return false;
-
-    *result = std::chrono::milliseconds(value.value<quint64>());
-    return true;
-}
 
 template<>
 inline QVariant Settings::Option<std::chrono::milliseconds>::toQVariant(
