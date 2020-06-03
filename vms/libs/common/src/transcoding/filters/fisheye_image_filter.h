@@ -3,6 +3,8 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QVector>
+#include <QtGui/QVector2D>
+#include <QtGui/QVector3D>
 
 #include <core/ptz/media_dewarping_params.h>
 #include <utils/media/frame_info.h>
@@ -27,6 +29,8 @@ private:
     static QSize getOptimalSize(
         const QSize& srcResolution,
         const nx::vms::api::DewarpingData& itemDewarpingParams);
+
+    QVector2D lensProject(const QVector3D& pointOnSphere) const;
 
 private:
     static const int MAX_COLOR_PLANES = 4;

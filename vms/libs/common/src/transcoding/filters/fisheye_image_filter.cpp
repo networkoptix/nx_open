@@ -305,15 +305,14 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
         dstDelta = -1;
     }
 
-    QVector2D xy1 = QVector2D(1.0,         1.0 / aspectRatio);
-    QVector2D xy2 = QVector2D(-0.5,        -yPos/ aspectRatio);
+    QVector2D xy1 = QVector2D(1.0, 1.0 / aspectRatio);
+    QVector2D xy2 = QVector2D(-0.5, -yPos/ aspectRatio);
 
-    //QVector2D xy3 = QVector2D(1.0 / M_PI,  aspectRatio / M_PI);
-    //QVector2D xy4 = QVector2D(1.0 / 2.0,   1.0 / 2.0);
-
-    QVector2D xy3 = QVector2D(1.0 / M_PI * radius*2.0,  1.0 / M_PI * radius*2.0*aspectRatio);
+    QVector2D xy3 = QVector2D(1.0 * radius,  1.0 * radius * aspectRatio);
     QVector2D xy4 = QVector2D(xCenter, yCenter);
 
+    const float cosFovRot = cosf(fovRot);
+    const float sinFovRot = sinf(fovRot);
 
     for (int y = 0; y < imageSize.height(); ++y)
     {
@@ -323,12 +322,10 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
             QVector3D pos3d(pos.x(), pos.y(), 1.0);
             pos3d = to3d * pos3d;  // 3d vector on surface, rotate and scale
 
-            qreal theta = atan2(pos3d.z(), pos3d.x()) + fovRot;     // fisheye angle
-            qreal r     = acos(pos3d.y() / pos3d.length());
-            if (qIsNaN(r))
-                r = 0.0;
+            pos = lensProject(pos3d / pos3d.length());
+            pos = QVector2D(pos.x() * cosFovRot - pos.y() * sinFovRot,
+                pos.y() * cosFovRot + pos.x() * sinFovRot);
 
-            pos = QVector2D(cos(theta), sin(theta)) * r;
             pos = pos * xy3 + xy4;
 
             qreal dstX = pos.x() * (imageSize.width()-1);
@@ -383,7 +380,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     QVector2D xy1 = QVector2D(m_itemDewarping.fov, (m_itemDewarping.fov / m_itemDewarping.panoFactor));
     QVector2D xy2 = QVector2D(-0.5,  -yPos)*xy1 + QVector2D(m_itemDewarping.xAngle, 0.0);
 
-    QVector2D xy3 = QVector2D(1.0 / M_PI * radius*2.0,  1.0 / M_PI * radius*2.0*aspectRatio);
+    QVector2D xy3 = QVector2D(1.0 * radius,  1.0 * radius * aspectRatio);
     QVector2D xy4 = QVector2D(xCenter, yCenter);
 
     for (int y = 0; y < imageSize.height(); ++y)
@@ -405,15 +402,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
                 pos3d = QVector3D(cosPhi * sin(pos.x()),    sin(phi),          cosPhi * cosTheta);
             QVector3D psph = perspectiveMatrix * pos3d;
 
-            // Calculate fisheye angle and radius
-            float theta = atan2(psph.z(), psph.x());
-            float r = acos(psph.y());
-            if (qIsNaN(r))
-                r = 0.0;
-
-            // return from polar coordinates
-            pos = QVector2D(cos(theta), sin(theta)) * r;
-            pos = pos * xy3 + xy4;
+            pos = lensProject(psph) * xy3 + xy4;
 
             qreal dstX = pos.x() * (imageSize.width()-1);
             qreal dstY = pos.y() * (imageSize.height()-1);
@@ -425,6 +414,34 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
             dstPos += dstDelta;
         }
     }
+}
+
+QVector2D QnFisheyeImageFilter::lensProject(const QVector3D& pointOnSphere) const
+{
+    const QVector2D xz = QVector2D(pointOnSphere.x(), pointOnSphere.z());
+    const float y = pointOnSphere.y();
+
+    switch (m_mediaDewarping.lensProjection)
+    {
+        case Qn::FisheyeLensProjection::equidistant:
+        {
+            const float theta = acos(std::clamp(y, -1.0f, 1.0f));
+            return xz * (theta / (xz.length() * (M_PI / 2)));
+        }
+
+        case Qn::FisheyeLensProjection::stereographic:
+        {
+            return xz / (1.0 + y);
+        }
+
+        case Qn::FisheyeLensProjection::equisolid:
+        {
+            return xz / sqrt(1.0 + y);
+        }
+    }
+
+    NX_ASSERT(false);
+    return QVector2D();
 }
 
 QSize QnFisheyeImageFilter::getOptimalSize(

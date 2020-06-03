@@ -748,6 +748,7 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
         defaultProjection = equidistant
     };
     QString toString(FisheyeLensProjection value);
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FisheyeLensProjection)
 
     inline uint qHash(FisheyeLensProjection value, uint seed = 0)
     {
