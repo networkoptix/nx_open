@@ -1,5 +1,4 @@
 #include "device_agent.h"
-#include "nx/vms_server_plugins/analytics/vivotek/camera_features.h"
 
 #include <mutex>
 #include <system_error>
@@ -290,6 +289,10 @@ void DeviceAgent::startMetadataStreaming()
         .then_unwrap(
             [this](auto&&) {
                 streamMetadataPackets();
+
+                m_eventProlonger.emplace();
+                streamProlongedEventMetadataPackets();
+
                 return cf::unit();
             })
         .catch_(ignoreOperationCanceled)
@@ -312,6 +315,7 @@ void DeviceAgent::startMetadataStreaming()
 
 void DeviceAgent::stopMetadataStreaming()
 {
+    m_eventProlonger.reset();
     m_timer.reset();
     m_nativeMetadataSource.reset();
 }
@@ -325,7 +329,7 @@ void DeviceAgent::streamMetadataPackets()
                 if (auto packet = parseObjectMetadataPacket(nativePacket))
                     m_handler->handleMetadata(packet.releasePtr());
                 for (auto& packet: parseEventMetadataPackets(nativePacket))
-                    m_handler->handleMetadata(packet.releasePtr());
+                    m_eventProlonger->write(packet);
 
                 streamMetadataPackets();
 
@@ -337,6 +341,31 @@ void DeviceAgent::streamMetadataPackets()
             {
                 emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
                     "Metadata streaming failed", exception.what());
+
+                startMetadataStreaming();
+
+                return cf::unit();
+            });
+}
+
+void DeviceAgent::streamProlongedEventMetadataPackets()
+{
+    m_eventProlonger->read()
+        .then_unwrap(
+            [this](auto packet)
+            {
+                m_handler->handleMetadata(packet.get());
+
+                streamProlongedEventMetadataPackets();
+
+                return cf::unit();
+            })
+        .catch_(ignoreOperationCanceled)
+        .catch_(
+            [this](const std::exception& exception)
+            {
+                emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
+                    "Prolonged event metadata streaming failed", exception.what());
 
                 startMetadataStreaming();
 

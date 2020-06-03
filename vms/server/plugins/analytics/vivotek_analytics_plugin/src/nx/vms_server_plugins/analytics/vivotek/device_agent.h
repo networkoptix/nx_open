@@ -21,6 +21,7 @@
 #include "camera_features.h"
 #include "camera_settings.h"
 #include "native_metadata_source.h"
+#include "event_prolonger.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -58,6 +59,7 @@ private:
     void stopMetadataStreaming();
 
     void streamMetadataPackets();
+    void streamProlongedEventMetadataPackets();
 
 private:
     const std::unique_ptr<nx::network::aio::BasicPollable> m_basicPollable;
@@ -72,6 +74,7 @@ private:
     NativeMetadataTypes m_streamedMetadataTypes = NoNativeMetadataTypes;
     std::optional<NativeMetadataSource> m_nativeMetadataSource;
     std::optional<nx::network::aio::Timer> m_timer;
+    std::optional<EventProlonger> m_eventProlonger;
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek
