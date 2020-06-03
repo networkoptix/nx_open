@@ -104,7 +104,7 @@
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>停止</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
@@ -112,19 +112,19 @@
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>在此視窗開啟連結</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>切換播放/暫停</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>靜音模式切換</translation>
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>關閉頁面</translation>
     </message>
     <message>
       <source>Unselect</source>
@@ -132,74 +132,74 @@
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>＆粗體</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>＆斜體</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>＆加底線</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>＆刪除線</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>靠左對齊</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>置中對齊</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>靠右對齊</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>兩端對齊</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp;縮排</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp;減少縮排</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>插入&amp;編號列表</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>插入&amp;未排序列表</translation>
     </message>
   </context>
   <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>停止</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>重新加載並跳過緩存</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>切換播放/暫停</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>靜音模式切換</translation>
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>關閉頁面</translation>
     </message>
     <message>
       <source>Unselect</source>
@@ -207,7 +207,7 @@
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>在此視窗開啟連結</translation>
     </message>
     <message>
       <source>Open link in new background tab</source>
@@ -215,142 +215,142 @@
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>＆粗體</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>＆斜體</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>＆加底線</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>＆刪除線</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>靠左對齊</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>置中對齊</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>靠右對齊</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>兩端對齊</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp;縮排</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp;減少縮排</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>插入&amp;編號列表</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>插入&amp;未排序列表</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>確定離開此頁面？您所做的更改可能不會保存。</translation>
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation type="unfinished">&amp;Back</translation>
+      <translation>&amp;返回</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation type="unfinished">&amp;Forward</translation>
+      <translation>&amp;下一頁</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
-      <translation type="unfinished">&amp;Reload</translation>
+      <translation>&amp;重新載入</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>請選擇要上傳的資料夾</translation>
     </message>
   </context>
   <context>
     <name>RenderViewContextMenuQt</name>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>返回</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>下一頁</translation>
     </message>
     <message>
       <source>Reload</source>
-      <translation type="unfinished">Reload</translation>
+      <translation>重新載入</translation>
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>剪下</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>複製</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>貼上</translation>
     </message>
     <message>
       <source>Undo</source>
-      <translation type="unfinished">Undo</translation>
+      <translation>復原</translation>
     </message>
     <message>
       <source>Redo</source>
-      <translation type="unfinished">Redo</translation>
+      <translation>重覆動作</translation>
     </message>
     <message>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>選擇全部</translation>
     </message>
     <message>
       <source>Paste and match style</source>
-      <translation type="unfinished">Paste and match style</translation>
+      <translation>貼上並比對樣式</translation>
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation type="unfinished">Open link in new window</translation>
+      <translation>在新視窗開啟連結</translation>
     </message>
     <message>
       <source>Open link in new tab</source>
-      <translation type="unfinished">Open link in new tab</translation>
+      <translation>在新分頁開啟連結</translation>
     </message>
     <message>
       <source>Copy link address</source>
-      <translation type="unfinished">Copy link address</translation>
+      <translation>複製連結網址</translation>
     </message>
     <message>
       <source>Save link</source>
-      <translation type="unfinished">Save link</translation>
+      <translation>儲存連結</translation>
     </message>
     <message>
       <source>Copy image</source>
-      <translation type="unfinished">Copy image</translation>
+      <translation>複製圖片</translation>
     </message>
     <message>
       <source>Copy image address</source>
-      <translation type="unfinished">Copy image address</translation>
+      <translation>複製影像位址</translation>
     </message>
     <message>
       <source>Save image</source>
-      <translation type="unfinished">Save image</translation>
+      <translation>儲存圖片</translation>
     </message>
     <message>
       <source>Copy media address</source>
@@ -358,11 +358,11 @@
     </message>
     <message>
       <source>Show controls</source>
-      <translation type="unfinished">Show controls</translation>
+      <translation>顯示控制列</translation>
     </message>
     <message>
       <source>Loop</source>
-      <translation type="unfinished">Loop</translation>
+      <translation>循環播放</translation>
     </message>
     <message>
       <source>Save media</source>
@@ -370,19 +370,19 @@
     </message>
     <message>
       <source>Inspect</source>
-      <translation type="unfinished">Inspect</translation>
+      <translation>檢查</translation>
     </message>
     <message>
       <source>Exit full screen</source>
-      <translation type="unfinished">Exit full screen</translation>
+      <translation>退出全螢幕</translation>
     </message>
     <message>
       <source>Save page</source>
-      <translation type="unfinished">Save page</translation>
+      <translation>儲存頁面</translation>
     </message>
     <message>
       <source>View page source</source>
-      <translation type="unfinished">View page source</translation>
+      <translation>檢視頁面原始碼</translation>
     </message>
   </context>
   <context>
@@ -397,30 +397,30 @@
     </message>
     <message>
       <source>Javascript Alert - %1</source>
-      <translation type="unfinished">Javascript Alert - %1</translation>
+      <translation>JavaScript 警告 ─ %1</translation>
     </message>
     <message>
       <source>Javascript Confirm - %1</source>
-      <translation type="unfinished">Javascript Confirm - %1</translation>
+      <translation>JavaScript 確認 ─ %1</translation>
     </message>
     <message>
       <source>Javascript Prompt - %1</source>
-      <translation type="unfinished">Javascript Prompt - %1</translation>
+      <translation>JavaScript 提示 ─ %1</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page?</source>
-      <translation type="unfinished">Are you sure you want to leave this page?</translation>
+      <translation>是否確定要離開此頁面？</translation>
     </message>
     <message>
       <source>Changes that you made may not be saved.</source>
-      <translation type="unfinished">Changes that you made may not be saved.</translation>
+      <translation>所做的更改可能不會保存。</translation>
     </message>
   </context>
   <context>
     <name>WebContentsAdapter</name>
     <message>
       <source>HTTP-POST data can only be sent over HTTP(S) protocol</source>
-      <translation type="unfinished">HTTP-POST data can only be sent over HTTP(S) protocol</translation>
+      <translation>HTTP-POST數據只能通過HTTP（S）協議發送</translation>
     </message>
   </context>
 </TS>

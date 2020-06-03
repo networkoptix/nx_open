@@ -51,49 +51,49 @@
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
+      <translation>
+        <numerusform>Octet</numerusform>
+        <numerusform>Octets</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
+      <translation>
+        <numerusform>Kilooctet</numerusform>
+        <numerusform>Kilooctets</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
+      <translation>
+        <numerusform>Mégaoctet</numerusform>
+        <numerusform>Mégaoctets</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
+      <translation>
+        <numerusform>Gigaoctet</numerusform>
+        <numerusform>Gigaoctets</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
+      <translation>
+        <numerusform>Téraoctet</numerusform>
+        <numerusform>Téraoctets</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
+      <translation>
+        <numerusform>Pétaoctet</numerusform>
+        <numerusform>Pétaoctets</numerusform>
       </translation>
     </message>
   </context>
@@ -1013,7 +1013,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Transcodage vidéo requis.</translation>
     </message>
   </context>
   <context>
@@ -1825,39 +1825,39 @@
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Reason: Power limit exceeded (%1)</translation>
+      <translation>Raison : Limite de puissance dépassée (%1)</translation>
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation type="unfinished">Show desktop notification</translation>
+      <translation>Afficher notification bureau</translation>
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation type="unfinished">Send mobile notification</translation>
+      <translation>Envoyer une notification mobile</translation>
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Consommation</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Périphérique a été déconnecté</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Caméra a été déconnectée</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>Module E/S a été déconnecté</translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation type="unfinished">RTP error in primary stream (%1)</translation>
+      <translation>Erreur RTP dans le flux principal (%1)</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
+      <translation>Erreur RTP dans le flux secondaire (%1)</translation>
     </message>
   </context>
   <context>

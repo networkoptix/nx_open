@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
-      <translation type="unfinished">The file cannot be written locally, due to access restrictions</translation>
+      <translation>由于访问限制，无法在本机写入文件</translation>
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
@@ -104,11 +104,11 @@
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>停止</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>重新加载并跳过缓存</translation>
     </message>
     <message>
       <source>Open link in this window</source>
