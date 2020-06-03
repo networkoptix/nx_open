@@ -8,7 +8,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <Qtcore/QString>
+#include <QtCore/QString>
 
 #include <nx/utils/log/log.h>
 #include <nx/network/http/http_types.h>
