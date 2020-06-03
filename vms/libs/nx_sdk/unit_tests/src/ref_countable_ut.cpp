@@ -211,6 +211,30 @@ TEST(RefCountable, queryInterfaceConst)
 }
 
 //-------------------------------------------------------------------------------------------------
+// Test interface id generation for templates.
+
+template<typename IItem>
+class ITemplate: public Interface<ITemplate<IItem>>
+{
+public:
+    static auto interfaceId()
+    {
+        return ITemplate::template makeIdForTemplate<ITemplate<IItem>, IItem>("test::ITemplate");
+    }
+};
+
+class ISomeItem: public Interface<ISomeItem>
+{
+public:
+    static auto interfaceId() { return makeId("test::ISomeItem"); }
+};
+
+TEST(RefCountable, makeIdForTemplate)
+{
+    ASSERT_STREQ("test::ITemplate<test::ISomeItem>", ITemplate<ISomeItem>::interfaceId()->value);
+}
+
+//-------------------------------------------------------------------------------------------------
 // Test the binary compatibility with the old SDK.
 
 /** Defined exactly the same way as in the old SDK (NX_GUID). */

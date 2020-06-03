@@ -11,8 +11,8 @@
 
 #include <cstddef>
 #include <cstring>
+#include <cstdio>
 #include <cstdlib>
-#include <memory>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -59,15 +59,18 @@ NX_KIT_API std::string getProcessName();
 template<typename T>
 std::string toString(T value);
 
+/**
+ * ATTENTION: std::string is not supported as one of `args`, and will cause undefined behavior.
+ */
 template<typename... Args>
 std::string format(const std::string& formatStr, Args... args)
 {
-    const size_t size = snprintf(nullptr, 0, formatStr.c_str(), args...) + /* space for '\0' */ 1;
-    if (size < 0)
+    const int size = snprintf(nullptr, 0, formatStr.c_str(), args...) + /*space for \0*/ 1;
+    if (size <= 0)
         return formatStr; //< No better way to handle out-of-memory-like errors.
     std::string result(size, '\0');
     snprintf(&result[0], size, formatStr.c_str(), args...);
-    result.resize(size - /* trailing '\0' */ 1);
+    result.resize(size - /*terminating \0*/ 1);
     return result;
 }
 
@@ -122,15 +125,15 @@ template<class MallocFunc>
 void* mallocAligned(size_t size, size_t alignment, MallocFunc mallocFunc)
 {
     if (alignment == 0)
-        return 0;
-    void* ptr = mallocFunc(size + alignment + sizeof(alignment));
+        return nullptr;
+    const auto ptr = (char*) mallocFunc(size + alignment + sizeof(alignment));
     if (!ptr) //< allocation error
         return ptr;
 
-    void* aligned_ptr = (char*) ptr + sizeof(alignment); //< Leaving place to save misalignment.
-    const size_t misalignment = alignment - (((uintptr_t) aligned_ptr) % alignment);
-    memcpy((char*) ptr + misalignment, &misalignment, sizeof(misalignment)); //< Save misalignment.
-    return (char*) aligned_ptr + misalignment;
+    char* const alignedPtr = ptr + sizeof(alignment); //< Leaving place to save misalignment.
+    const size_t misalignment = alignment - (uintptr_t) alignedPtr % alignment;
+    memcpy(ptr + misalignment, &misalignment, sizeof(misalignment)); //< Save misalignment.
+    return alignedPtr + misalignment;
 }
 
 /** Calls mallocAligned() passing standard malloc() as mallocFunc. */
