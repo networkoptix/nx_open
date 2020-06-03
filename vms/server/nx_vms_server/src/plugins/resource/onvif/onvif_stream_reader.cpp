@@ -8,6 +8,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <Qtcore/QString>
 
 #include <nx/utils/log/log.h>
 #include <nx/network/http/http_types.h>
@@ -26,6 +27,7 @@
 #include <core/resource/resource_data_structures.h>
 #include <core/resource/param.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/onvif/onvif_config_data.h>
 
 #include <nx/vms/api/types/rtp_types.h>
 
@@ -53,17 +55,54 @@ DefaultProfileInfo nxDefaultProfileInfo(const QnPlOnvifResourcePtr& device)
 
     const auto brand = nx::utils::AppInfo::brand();
 
-    info.primaryProfileName = NX_FMT("%1 Primary", brand);
-    info.secondaryProfileName = NX_FMT("%1 Secondary", brand);
+    const auto forcedOnvifParams =
+        device->resourceData().value<QnOnvifConfigDataPtr>("forcedOnvifParams");
+
+    const int channel = device->getChannel();
+    const bool forcedProfilesAreDefined = forcedOnvifParams
+        && device->getChannel() < forcedOnvifParams->profiles.size();
+
+    if (forcedProfilesAreDefined)
+    {
+        const QStringList forcedProfiles =
+            forcedOnvifParams->profiles[channel].split(',', QString::SkipEmptyParts);
+
+        if (forcedProfiles.size() > 0)
+            info.primaryProfileName = forcedProfiles[0];
+
+        if (forcedProfiles.size() > 1)
+            info.secondaryProfileName = forcedProfiles[1];
+
+        if (forcedProfiles.size() > 2)
+        {
+            NX_WARNING(NX_SCOPE_TAG,
+                "The size of profile list is more than 2, ignoring excessive profiles, Device %1",
+                device);
+        }
+
+        NX_DEBUG(NX_SCOPE_TAG,
+            "Forced profiles with names %1 and %2 are defined for device %3",
+            info.primaryProfileName, info.secondaryProfileName, device);
+    }
+    else
+    {
+        info.primaryProfileName = NX_FMT("%1 Primary", brand);
+        info.secondaryProfileName = NX_FMT("%1 Secondary", brand);
+    }
+
     info.primaryProfileToken = NX_FMT("%1P", brand);
     info.secondaryProfileToken = NX_FMT("%1S", brand);
 
-    const int channel = device->getChannel();
     if (channel > 0)
     {
         QString postfix = NX_FMT("-%1", channel);
-        info.primaryProfileName += postfix;
-        info.secondaryProfileName += postfix;
+
+        if (!forcedProfilesAreDefined)
+        {
+            info.primaryProfileName += postfix;
+            info.secondaryProfileName += postfix;
+        }
+
         info.primaryProfileToken += postfix;
         info.secondaryProfileToken += postfix;
     }
