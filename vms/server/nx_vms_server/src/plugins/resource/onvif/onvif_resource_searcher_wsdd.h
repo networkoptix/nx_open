@@ -99,7 +99,8 @@ private:
     template <class T> QString getEndpointAddress(const T* source) const;
     template <class T> void printProbeMatches(const T* source, const SOAP_ENV__Header* header) const;
     template <class T> void addEndpointToHash(EndpointInfoHash& hash, const T* probeMatches,
-        const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const;
+        const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host,
+        bool macAddressRequired = false) const;
 
 private:
     bool createReadMulticastContext();

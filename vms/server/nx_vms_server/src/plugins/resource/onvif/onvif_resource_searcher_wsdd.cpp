@@ -454,7 +454,8 @@ void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa5__En
 
 template <class T>
 void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const T* source,
-    const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const
+    const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host,
+    bool macAddressRequired) const
 {
     if (!source) {
         return;
@@ -473,6 +474,17 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
         kManufacturerScopePrefixes);
 
     QString mac = getMac(source, header);
+
+    /*
+     * Since version 4.1 we introduce to parse 'hello' messages in addition to regular 'probe' messages.
+     * But some cameras fill some headers in 'probe' messages but keep it empty in 'hello' messages.
+     * It causes some cameras have found twice in case of restart them, because 'mac' can be parsed
+     * from 'probe' message, but can't be parsed from 'hello' message. The good fix is just to remove
+     * trying to fill mac from discovery message, it not need any more. But we can't do it because
+     * of compatibility with previous versions.
+     */
+    if (macAddressRequired && mac.isEmpty())
+        return;
 
     QString endpointId = nx::utils::replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
     QString uniqId = !mac.isEmpty() ? mac : endpointId;
@@ -739,7 +751,8 @@ void OnvifResourceSearcherWsdd::readHelloMessage(ProbeContext* ctx, EndpointInfo
                 hello.wsdd__Hello,
                 ctx->soapWsddProxy.soap->header,
                 QStringList(),
-                QString());
+                QString(),
+                /*macAddressRequired*/ true);
 
             if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug))
             {
