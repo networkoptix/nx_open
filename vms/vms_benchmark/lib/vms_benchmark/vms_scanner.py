@@ -1,3 +1,4 @@
+from re import sub as re_sub
 import logging
 import tempfile
 from pprint import pformat
@@ -14,8 +15,9 @@ class VmsScanner:
     class Vms:
         _tmp_dir_suffix = '-nx_ini'
 
-        def __init__(self, device, linux_distribution, pid, customization, dir, host, port, uid, ini_dir):
+        def __init__(self, device, linux_distribution, pid, customization, service_script, dir, host, port, uid, ini_dir):
             self.customization = customization
+            self.service_script = service_script
             self.dir = dir
             self.host = host
             self.port = port
@@ -36,7 +38,7 @@ class VmsScanner:
             try:
                 if self.linux_distribution.with_systemd:
                     self.device.sh(
-                        f'systemctl {command} {self.customization}-mediaserver',
+                        f'systemctl {command} {self.service_script}',
                         timeout_s=ini_ssh_service_command_timeout_s,
                         su=True,
                         exc=True,
@@ -45,7 +47,7 @@ class VmsScanner:
                     )
                 else:
                     self.device.sh(
-                        f'/etc/init.d/{self.customization}-mediaserver {command}',
+                        f'/etc/init.d/{self.service_script} {command}',
                         timeout_s=ini_ssh_service_command_timeout_s,
                         su=True,
                         exc=True,
@@ -142,9 +144,12 @@ class VmsScanner:
                 return None
 
             customizations = []
+            service_scripts = []
             for line in systemd_scripts.splitlines():
-                [customization, *_] = line.rpartition('-mediaserver.service')
+                [service_script, *_] = line.rpartition(' ')
+                [customization, *_] = service_script.rpartition('-mediaserver.service')
                 if customization:
+                    service_scripts.append(service_script)
                     customizations.append(customization)
         else:
             initd_scripts = device.eval('cd /etc/init.d; ls *-mediaserver', stderr=None)
@@ -153,14 +158,21 @@ class VmsScanner:
                 return None
 
             customizations = []
+            service_scripts = []
+            # An example of the init script name: "S99digitalwatchdog-mediaserver".
+            # To get the customization name, we should remove the right part and strip the prefix.
             for line in initd_scripts.splitlines():
                 [customization, *_] = line.rpartition('-')
                 if customization:
-                    customizations.append(customization)
+                    service_scripts.append(line)
+                    customizations.append(re_sub(r'^(S\d{2})?', '', customization))
 
-        logging.info("Detected services: %s", pformat(customizations))
+        vms_descriptions = [
+            {"service_script": s, "customization": c}
+            for s, c in zip(service_scripts, customizations)
+        ]
 
-        vms_descriptions = [{"customization": customization} for customization in customizations]
+        logging.info("Detected services: %s", pformat(vms_descriptions))
 
         for vms in vms_descriptions:
             vms_dir = f"/opt/{vms['customization']}/mediaserver"
@@ -207,8 +219,15 @@ class VmsScanner:
                 return None
 
             for pid in pids_raw.strip().split():
-                bin_dir = device.eval(f"readlink -m /proc/{pid}/cwd", su=True)
-                if bin_dir == f"{vms_description['dir']}/bin":
+                # `readlink -m` may not work on busybox.
+                bin_dir = device.eval(f"readlink -f /proc/{pid}/cwd", su=True)
+
+                # Server installation directory in /opt/ can be a symlink, so to compare it with
+                # the working directory of the running Server process, we should get the "real"
+                # path first.
+                install_dir = device.eval(f"readlink -f '{vms_description['dir']}/bin'", su=True)
+
+                if bin_dir == install_dir:
                     return int(pid)
             return None
 
@@ -250,6 +269,7 @@ class VmsScanner:
                 device=device,
                 linux_distribution=linux_distribution,
                 customization=description['customization'],
+                service_script=description['service_script'],
                 dir=description['dir'],
                 host=description['host'],
                 port=description['port'],

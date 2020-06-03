@@ -1054,8 +1054,12 @@ def _check_time_diff(box, ini):
     box_time_output = box.eval('date +%s.%N')
     if not box_time_output:
         raise exceptions.BoxCommandError('Unable to get current box time using the `date` command.')
+
+    # Busybox doesn't support "%N" format specifier in the `date` command, so in this case we have
+    # trailing ".%N" in the command output. Strip it and leave seconds-precision value.
+    box_time_string = re.sub(r'\.%N$', '', box_time_output.strip())
     try:
-        box_time = float(box_time_output.strip())
+        box_time = float(box_time_string)
     except ValueError:
         raise exceptions.BoxStateError("Cannot parse output of the `date` command.")
     host_time = time.time()

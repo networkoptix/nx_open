@@ -33,7 +33,7 @@ class BoxPlatform:
                 f"Empty value of param {param!r} in /proc/meminfo at the box.")
 
         try:
-            return int(human_readable_size.human2bytes(value_str))
+            return human_readable_size.meminfo_size_to_bytes(value_str)
         except Exception:
             raise UnableToFetchDataFromBox(
                 f"Incorrect value of param {param!r} in /proc/meminfo at the box: {value_str!r}.")
@@ -166,12 +166,17 @@ class BoxPlatform:
 
         def construct_df_description(line):
             components = line.split()
-            volume = {
-                "device": components[0],
-                "point": components[5],
-                "space_total": components[1],
-                "space_free": components[3]
-            }
+
+            # `df` on busybox doesn't respect "-B1" key, so the return value should be parsed.
+            try:
+                volume = {
+                    "device": components[0],
+                    "point": components[5],
+                    "space_total": human_readable_size.df_size_to_bytes(components[1]),
+                    "space_free": human_readable_size.df_size_to_bytes(components[3])
+                }
+            except (TypeError, LookupError):
+                raise UnableToFetchDataFromBox(f"Can't parse storage volume info string: {line!r}.")
 
             for (_point, storage) in storages_map_filtered.items():
                 if storage['device'] != volume['device']:

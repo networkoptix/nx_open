@@ -65,7 +65,9 @@ class BoxConnection:
         ssh_connection_info = ssh_connection_var_value.strip().split() if ssh_connection_var_value else None
         if not ssh_connection_var_value or len(ssh_connection_info) < 3:
             raise exceptions.BoxCommandError(
-                f'Unable to read SSH connection information. Check boxLogin and boxPassword in vms_benchmark.conf')
+                f'Unable to read SSH connection information. '
+                f'Check boxLogin and boxPassword in vms_benchmark.conf'
+            )
 
         self.ip = ssh_connection_info[2]
         self.local_ip = ssh_connection_info[0]
@@ -74,7 +76,20 @@ class BoxConnection:
         line_form_with_eth_name = self.eval(f'ip a | grep {self.ip}')
         eth_name = line_form_with_eth_name.split()[-1] if line_form_with_eth_name else None
         if not eth_name:
-            raise exceptions.BoxCommandError(f'Unable to detect box network adapter which serves ip {self.ip}.')
+            # Some systems don't have the `ip` command - try to use `ifconfig`.
+            line_form_with_eth_name = self.eval(f'ifconfig | grep -B1 {self.ip} | head -n1')
+            eth_name = line_form_with_eth_name.split()[0] if line_form_with_eth_name else ''
+
+        if not eth_name:
+            raise exceptions.BoxCommandError(
+                f'Unable to detect box network adapter which serves ip {self.ip}.')
+
+        # The colon can appear as the part of the network interface name if it is an alias, or
+        # in the end of the network interface name as a separator. Anyway, we have to remove
+        # everything from the colon to the end of the string to get the interface name
+        # suitable for furhter checks.
+        eth_name = eth_name.split(':', 1)[0]
+        self.eth_name = eth_name
 
         eth_dir = f'/sys/class/net/{eth_name}'
         eth_name_check_result = self.sh(f'test -d "{eth_dir}"')
@@ -84,7 +99,6 @@ class BoxConnection:
                 f'Unable to find box network adapter info dir {eth_dir!r}.'
             )
 
-        self.eth_name = eth_name
         eth_speed = self.eval(f'cat /sys/class/net/{self.eth_name}/speed')
         self.eth_speed = eth_speed.strip() if eth_speed else None
 
