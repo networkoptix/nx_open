@@ -11,7 +11,7 @@
 
 #include <utils/color_space/image_correction.h>
 
-namespace Qn { enum class FisheyeLensProjection;  }
+namespace Qn { enum class FisheyeCameraProjection;  }
 
 class QnAbstractYv12ToRgbShaderProgram : public QnGLShaderProgram
 {
@@ -94,7 +94,7 @@ private:
     QString m_gammaStr;
 };
 
-QByteArray projectionShaderSource(Qn::FisheyeLensProjection projection);
+QByteArray projectionShaderSource(Qn::FisheyeCameraProjection projection);
 
 template <typename Base>
 class QnFisheyeShaderProgram: public Base
@@ -103,7 +103,7 @@ class QnFisheyeShaderProgram: public Base
     bool m_initialized = false;
 
 public:
-    QnFisheyeShaderProgram(Qn::FisheyeLensProjection projection, QObject* parent = nullptr):
+    QnFisheyeShaderProgram(Qn::FisheyeCameraProjection projection, QObject* parent = nullptr):
         Base(parent, false),
         m_projection(projection)
     {
@@ -216,7 +216,7 @@ protected:
     int m_maxYLocation;
     int m_xStretchLocation;
 
-    const Qn::FisheyeLensProjection m_projection;
+    const Qn::FisheyeCameraProjection m_projection;
 };
 
 // --------- fisheye YUV (with optional gamma) ---------------
@@ -225,7 +225,7 @@ class QnFisheyeRectilinearProgram: public QnFisheyeShaderProgram<QnYv12ToRgbWith
 {
     Q_OBJECT
 public:
-    QnFisheyeRectilinearProgram(Qn::FisheyeLensProjection projection, QObject* parent = nullptr,
+    QnFisheyeRectilinearProgram(Qn::FisheyeCameraProjection projection, QObject* parent = nullptr,
         const QString& gammaStr = "y");
 protected:
     virtual QString getShaderText() override;
@@ -236,7 +236,7 @@ class QnFisheyeEquirectangularHProgram:
 {
     Q_OBJECT
 public:
-    QnFisheyeEquirectangularHProgram(Qn::FisheyeLensProjection projection,
+    QnFisheyeEquirectangularHProgram(Qn::FisheyeCameraProjection projection,
         QObject* parent = nullptr, const QString& gammaStr = "y");
 protected:
     virtual QString getShaderText() override;
@@ -247,7 +247,7 @@ class QnFisheyeEquirectangularVProgram:
 {
     Q_OBJECT
 public:
-    QnFisheyeEquirectangularVProgram(Qn::FisheyeLensProjection projection,
+    QnFisheyeEquirectangularVProgram(Qn::FisheyeCameraProjection projection,
         QObject* parent = nullptr, const QString& gammaStr = "y");
 protected:
     virtual QString getShaderText() override;
@@ -259,7 +259,7 @@ class QnFisheyeRGBRectilinearProgram: public QnFisheyeShaderProgram<QnAbstractRG
 {
     Q_OBJECT
 public:
-    QnFisheyeRGBRectilinearProgram(Qn::FisheyeLensProjection projection, QObject* parent = nullptr);
+    QnFisheyeRGBRectilinearProgram(Qn::FisheyeCameraProjection projection, QObject* parent = nullptr);
 protected:
     virtual QString getShaderText() override;
 };
@@ -269,7 +269,7 @@ class QnFisheyeRGBEquirectangularHProgram:
 {
     Q_OBJECT
 public:
-    QnFisheyeRGBEquirectangularHProgram(Qn::FisheyeLensProjection projection,
+    QnFisheyeRGBEquirectangularHProgram(Qn::FisheyeCameraProjection projection,
         QObject* parent = nullptr);
 protected:
     virtual QString getShaderText() override;
@@ -280,7 +280,7 @@ class QnFisheyeRGBEquirectangularVProgram:
 {
     Q_OBJECT
 public:
-    QnFisheyeRGBEquirectangularVProgram(Qn::FisheyeLensProjection projection,
+    QnFisheyeRGBEquirectangularVProgram(Qn::FisheyeCameraProjection projection,
         QObject* parent = nullptr);
 protected:
     virtual QString getShaderText() override;

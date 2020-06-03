@@ -34,18 +34,18 @@ qreal radians(qreal degrees)
     return degrees / 180.0 * M_PI;
 }
 
-qreal latitudeRadius(qreal degreesFromPole, Qn::FisheyeLensProjection projection)
+qreal latitudeRadius(qreal degreesFromPole, Qn::FisheyeCameraProjection projection)
 {
     static const qreal kSqrt2 = sqrt(2.0);
     switch (projection)
     {
-        case Qn::FisheyeLensProjection::equidistant:
+        case Qn::FisheyeCameraProjection::equidistant:
             return degreesFromPole / 90.0;
 
-        case Qn::FisheyeLensProjection::stereographic:
+        case Qn::FisheyeCameraProjection::stereographic:
             return tan(radians(degreesFromPole) / 2.0);
 
-        case Qn::FisheyeLensProjection::equisolid:
+        case Qn::FisheyeCameraProjection::equisolid:
             return sin(radians(degreesFromPole) / 2.0) * kSqrt2;
     }
 
@@ -185,12 +185,12 @@ void FisheyeCalibrationImageWidget::setGridShown(bool value)
     update();
 }
 
-Qn::FisheyeLensProjection FisheyeCalibrationImageWidget::projection() const
+Qn::FisheyeCameraProjection FisheyeCalibrationImageWidget::projection() const
 {
     return m_projection;
 }
 
-void FisheyeCalibrationImageWidget::setProjection(Qn::FisheyeLensProjection value)
+void FisheyeCalibrationImageWidget::setProjection(Qn::FisheyeCameraProjection value)
 {
     if (m_projection == value)
         return;

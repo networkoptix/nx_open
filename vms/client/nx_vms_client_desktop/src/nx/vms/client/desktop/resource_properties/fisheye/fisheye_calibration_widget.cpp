@@ -211,12 +211,12 @@ QImage FisheyeCalibrationWidget::previewImage() const
     return ui->imageWidget->image();
 }
 
-Qn::FisheyeLensProjection FisheyeCalibrationWidget::projection() const
+Qn::FisheyeCameraProjection FisheyeCalibrationWidget::projection() const
 {
     return ui->imageWidget->projection();
 }
 
-void FisheyeCalibrationWidget::setProjection(Qn::FisheyeLensProjection value)
+void FisheyeCalibrationWidget::setProjection(Qn::FisheyeCameraProjection value)
 {
     ui->imageWidget->setProjection(value);
 }

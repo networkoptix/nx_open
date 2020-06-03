@@ -5,7 +5,7 @@
 
 #include <utils/common/connective.h>
 
-namespace Qn { enum class FisheyeLensProjection; }
+namespace Qn { enum class FisheyeCameraProjection; }
 
 class QTimer;
 class QnFisheyeCalibrator;
@@ -45,8 +45,8 @@ public:
 
     QImage previewImage() const;
 
-    Qn::FisheyeLensProjection projection() const;
-    void setProjection(Qn::FisheyeLensProjection value);
+    Qn::FisheyeCameraProjection projection() const;
+    void setProjection(Qn::FisheyeCameraProjection value);
 
     bool isGridShown() const;
     void setGridShown(bool value);

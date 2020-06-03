@@ -421,20 +421,20 @@ QVector2D QnFisheyeImageFilter::lensProject(const QVector3D& pointOnSphere) cons
     const QVector2D xz = QVector2D(pointOnSphere.x(), pointOnSphere.z());
     const float y = pointOnSphere.y();
 
-    switch (m_mediaDewarping.lensProjection)
+    switch (m_mediaDewarping.cameraProjection)
     {
-        case Qn::FisheyeLensProjection::equidistant:
+        case Qn::FisheyeCameraProjection::equidistant:
         {
             const float theta = acos(std::clamp(y, -1.0f, 1.0f));
             return xz * (theta / (xz.length() * (M_PI / 2)));
         }
 
-        case Qn::FisheyeLensProjection::stereographic:
+        case Qn::FisheyeCameraProjection::stereographic:
         {
             return xz / (1.0 + y);
         }
 
-        case Qn::FisheyeLensProjection::equisolid:
+        case Qn::FisheyeCameraProjection::equisolid:
         {
             return xz / sqrt(1.0 + y);
         }

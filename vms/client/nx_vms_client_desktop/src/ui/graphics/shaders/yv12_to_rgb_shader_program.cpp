@@ -122,11 +122,11 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(QObject *pa
 
 // ============================= QnYv12ToRgbWithFisheyeShaderProgram ==================
 
-QByteArray projectionShaderSource(Qn::FisheyeLensProjection projection)
+QByteArray projectionShaderSource(Qn::FisheyeCameraProjection projection)
 {
     switch (projection)
     {
-        case Qn::FisheyeLensProjection::equidistant:
+        case Qn::FisheyeCameraProjection::equidistant:
             return QN_SHADER_SOURCE(
                 vec2 lensProject(vec3 pos3d)
                 {
@@ -135,14 +135,14 @@ QByteArray projectionShaderSource(Qn::FisheyeLensProjection projection)
                     return pos3d.xz * (theta / (length(pos3d.xz) * kHalfPi));
                 });
 
-        case Qn::FisheyeLensProjection::stereographic:
+        case Qn::FisheyeCameraProjection::stereographic:
             return QN_SHADER_SOURCE(
                 vec2 lensProject(vec3 pos3d)
                 {
                     return pos3d.xz / (1.0 + pos3d.y);
                 });
 
-        case Qn::FisheyeLensProjection::equisolid:
+        case Qn::FisheyeCameraProjection::equisolid:
             return QN_SHADER_SOURCE(
                 vec2 lensProject(vec3 pos3d)
                 {
@@ -157,7 +157,7 @@ QByteArray projectionShaderSource(Qn::FisheyeLensProjection projection)
 // ---------------------------- QnFisheyeRectilinearProgram ------------------------------------
 
 QnFisheyeRectilinearProgram::QnFisheyeRectilinearProgram(
-    Qn::FisheyeLensProjection projection, QObject* parent, const QString& gammaStr)
+    Qn::FisheyeCameraProjection projection, QObject* parent, const QString& gammaStr)
     :
     QnFisheyeShaderProgram(projection, parent)
 {
@@ -243,7 +243,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
 // ------------------------- QnFisheyeEquirectangularHProgram -----------------------------
 
 QnFisheyeEquirectangularHProgram::QnFisheyeEquirectangularHProgram(
-    Qn::FisheyeLensProjection projection, QObject* parent, const QString& gammaStr)
+    Qn::FisheyeCameraProjection projection, QObject* parent, const QString& gammaStr)
     :
     QnFisheyeShaderProgram(projection, parent)
 {
@@ -331,7 +331,7 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
 // ----------------------------------------- QnFisheyeEquirectangularVProgram ---------------------------------------
 
 QnFisheyeEquirectangularVProgram::QnFisheyeEquirectangularVProgram(
-    Qn::FisheyeLensProjection projection, QObject* parent, const QString& gammaStr)
+    Qn::FisheyeCameraProjection projection, QObject* parent, const QString& gammaStr)
     :
     QnFisheyeShaderProgram(projection, parent)
 {
@@ -451,7 +451,7 @@ bool QnAbstractRGBAShaderProgram::link()
 // ---------------------------- QnFisheyeRGBRectilinearProgram ------------------------------------
 
 QnFisheyeRGBRectilinearProgram::QnFisheyeRGBRectilinearProgram(
-    Qn::FisheyeLensProjection projection, QObject* parent)
+    Qn::FisheyeCameraProjection projection, QObject* parent)
     :
     QnFisheyeShaderProgram(projection, parent)
 {
@@ -521,7 +521,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
 // ------------------------- QnFisheyeRGBEquirectangularHProgram -----------------------------
 
 QnFisheyeRGBEquirectangularHProgram::QnFisheyeRGBEquirectangularHProgram(
-    Qn::FisheyeLensProjection projection, QObject* parent)
+    Qn::FisheyeCameraProjection projection, QObject* parent)
     :
     QnFisheyeShaderProgram(projection, parent)
 {
@@ -594,7 +594,7 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
 // ----------------------------------------- QnFisheyeRGBEquirectangularVProgram ---------------------------------------
 
 QnFisheyeRGBEquirectangularVProgram::QnFisheyeRGBEquirectangularVProgram(
-    Qn::FisheyeLensProjection projection, QObject* parent)
+    Qn::FisheyeCameraProjection projection, QObject* parent)
     :
     QnFisheyeShaderProgram(projection, parent)
 {

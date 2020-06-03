@@ -117,14 +117,14 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupAction,
     (Qn::BackupAction_ShowProgress, QString())
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, FisheyeLensProjection,
-    (Qn::FisheyeLensProjection::equidistant, "equidistant")
-    (Qn::FisheyeLensProjection::stereographic, "stereographic")
-    (Qn::FisheyeLensProjection::equisolid, "equisolid")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, FisheyeCameraProjection,
+    (Qn::FisheyeCameraProjection::equidistant, "equidistant")
+    (Qn::FisheyeCameraProjection::stereographic, "stereographic")
+    (Qn::FisheyeCameraProjection::equisolid, "equisolid")
 )
 
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
-    (Qn::Permissions)(Qn::FisheyeLensProjection),
+    (Qn::Permissions)(Qn::FisheyeCameraProjection),
     (debug)
 )
 
@@ -135,7 +135,7 @@ QString toString(AuthResult value)
     return QnLexical::serialized(value);
 }
 
-QString toString(Qn::FisheyeLensProjection value)
+QString toString(Qn::FisheyeCameraProjection value)
 {
     return QnLexical::serialized(value);
 }

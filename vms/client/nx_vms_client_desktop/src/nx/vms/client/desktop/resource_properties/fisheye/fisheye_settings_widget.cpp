@@ -115,17 +115,17 @@ FisheyeSettingsWidget::FisheyeSettingsWidget(QWidget* parent):
         });
 
     ui->projectionComboBox->addItem(tr("Equidistant"), QVariant::fromValue(
-        Qn::FisheyeLensProjection::equidistant));
+        Qn::FisheyeCameraProjection::equidistant));
     ui->projectionComboBox->addItem(tr("Stereographic"), QVariant::fromValue(
-        Qn::FisheyeLensProjection::stereographic));
+        Qn::FisheyeCameraProjection::stereographic));
     ui->projectionComboBox->addItem(tr("Equisolid"), QVariant::fromValue(
-        Qn::FisheyeLensProjection::equisolid));
+        Qn::FisheyeCameraProjection::equisolid));
 
     connect(ui->projectionComboBox, QnComboboxCurrentIndexChanged, this,
         [this](int index)
         {
             ui->calibrateWidget->setProjection(ui->projectionComboBox->currentData()
-                .value<Qn::FisheyeLensProjection>());
+                .value<Qn::FisheyeCameraProjection>());
 
             emit dataChanged();
         });
@@ -191,7 +191,7 @@ void FisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams& param
     }
 
     ui->projectionComboBox->setCurrentIndex(ui->projectionComboBox->findData(QVariant::fromValue(
-        params.lensProjection)));
+        params.cameraProjection)));
 
     ui->calibrateWidget->setRadius(params.radius);
     ui->calibrateWidget->setHorizontalStretch(params.hStretch);
@@ -211,8 +211,8 @@ QnMediaDewarpingParams FisheyeSettingsWidget::parameters() const
     result.yCenter = ui->calibrateWidget->center().y();
     result.radius = ui->calibrateWidget->radius();
     result.hStretch = ui->calibrateWidget->horizontalStretch();
-    result.lensProjection = ui->projectionComboBox->currentData()
-        .value<Qn::FisheyeLensProjection>();
+    result.cameraProjection = ui->projectionComboBox->currentData()
+        .value<Qn::FisheyeCameraProjection>();
 
     return result;
 }

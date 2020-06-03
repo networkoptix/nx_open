@@ -57,7 +57,7 @@ public:
         QnFisheyeRGBEquirectangularVProgram* rgbPanoVProgram;
     };
 
-    const QHash<Qn::FisheyeLensProjection, FisheyeShaders> fisheye;
+    const QHash<Qn::FisheyeCameraProjection, FisheyeShaders> fisheye;
 };
 
 

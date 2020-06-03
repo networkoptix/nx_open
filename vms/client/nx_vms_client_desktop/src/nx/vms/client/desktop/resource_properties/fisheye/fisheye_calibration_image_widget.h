@@ -85,8 +85,8 @@ public:
     bool isGridShown() const;
     void setGridShown(bool value);
 
-    Qn::FisheyeLensProjection projection() const;
-    void setProjection(Qn::FisheyeLensProjection value);
+    Qn::FisheyeCameraProjection projection() const;
+    void setProjection(Qn::FisheyeCameraProjection value);
 
     void    beginSearchAnimation();
     void    endSearchAnimation();
@@ -136,7 +136,7 @@ private:
     qreal   m_stretch;
     int     m_lineWidth;
 
-    Qn::FisheyeLensProjection m_projection = Qn::FisheyeLensProjection::defaultProjection;
+    Qn::FisheyeCameraProjection m_projection = Qn::FisheyeCameraProjection::defaultProjection;
     bool m_isGridShown = false;
 };
 

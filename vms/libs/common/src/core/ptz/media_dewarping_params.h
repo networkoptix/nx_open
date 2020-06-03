@@ -9,7 +9,7 @@
 struct QnMediaDewarpingParams
 {
     Q_GADGET
-    Q_ENUMS(ViewMode Qn::FisheyeLensProjection)
+    Q_ENUMS(ViewMode Qn::FisheyeCameraProjection)
 
     Q_PROPERTY(bool enabled MEMBER enabled)
     Q_PROPERTY(ViewMode viewMode MEMBER viewMode)
@@ -18,7 +18,7 @@ struct QnMediaDewarpingParams
     Q_PROPERTY(qreal yCenter MEMBER yCenter)
     Q_PROPERTY(qreal radius MEMBER radius)
     Q_PROPERTY(qreal hStretch MEMBER hStretch)
-    Q_PROPERTY(Qn::FisheyeLensProjection lensProjection MEMBER lensProjection)
+    Q_PROPERTY(Qn::FisheyeCameraProjection cameraProjection MEMBER cameraProjection)
 
 public:
     enum ViewMode
@@ -64,11 +64,11 @@ public:
     qreal hStretch = 1.0;
 
     /** Lens projection type. */
-    Qn::FisheyeLensProjection lensProjection = Qn::FisheyeLensProjection::defaultProjection;
+    Qn::FisheyeCameraProjection cameraProjection = Qn::FisheyeCameraProjection::defaultProjection;
 };
 
 #define QnMediaDewarpingParams_Fields \
-    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius)(hStretch)(lensProjection)
+    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius)(hStretch)(cameraProjection)
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnMediaDewarpingParams::ViewMode)
 

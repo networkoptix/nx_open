@@ -49,9 +49,9 @@ int minPow2(int value)
 
 static const int kMaxBlurSize = 2048;
 
-using LensProjection = Qn::FisheyeLensProjection;
+using CameraProjection = Qn::FisheyeCameraProjection;
 
-QnGlRendererShaders::FisheyeShaders fisheyeShaders(LensProjection projection, QObject* parent)
+QnGlRendererShaders::FisheyeShaders fisheyeShaders(CameraProjection projection, QObject* parent)
 {
     static const QString kGamma("clamp(pow(max(y + yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)");
     QnGlRendererShaders::FisheyeShaders fisheye;
@@ -80,9 +80,9 @@ QnGlRendererShaders::QnGlRendererShaders(QObject* parent):
     nv12ToRgb(new QnNv12ToRgbShaderProgram(this)),
     m_blurShader(new QnBlurShaderProgram(this)),
     fisheye({
-        {LensProjection::equidistant, fisheyeShaders(LensProjection::equidistant, this)},
-        {LensProjection::stereographic, fisheyeShaders(LensProjection::stereographic, this)},
-        {LensProjection::equisolid, fisheyeShaders(LensProjection::equisolid, this)}})
+        {CameraProjection::equidistant, fisheyeShaders(CameraProjection::equidistant, this)},
+        {CameraProjection::stereographic, fisheyeShaders(CameraProjection::stereographic, this)},
+        {CameraProjection::equisolid, fisheyeShaders(CameraProjection::equisolid, this)}})
 {
 }
 
@@ -556,7 +556,7 @@ void QnGLRenderer::drawYV12VideoTexture(
         mediaParams = m_fisheyeController->mediaDewarpingParams();
         itemParams = m_fisheyeController->itemDewarpingParams();
 
-        const auto& fisheye = m_shaders->fisheye.value(mediaParams.lensProjection);
+        const auto& fisheye = m_shaders->fisheye.value(mediaParams.cameraProjection);
 
         if (itemParams.panoFactor > 1.0)
         {
@@ -649,7 +649,7 @@ void QnGLRenderer::drawFisheyeRGBVideoTexture(
 
     const auto mediaParams = m_fisheyeController->mediaDewarpingParams();
     const auto itemParams = m_fisheyeController->itemDewarpingParams();
-    const auto& fisheye = m_shaders->fisheye.value(mediaParams.lensProjection);
+    const auto& fisheye = m_shaders->fisheye.value(mediaParams.cameraProjection);
 
     if (itemParams.panoFactor > 1.0)
     {
