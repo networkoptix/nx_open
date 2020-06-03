@@ -425,6 +425,9 @@ private:
      */
     bool m_showDebugData = false;
 
+    /** Finishing update when a user pressed "Finish update" before installation has finished. */
+    bool m_finishingForcefully = false;
+
     QPointer<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;

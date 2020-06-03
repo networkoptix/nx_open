@@ -771,6 +771,8 @@ void MultiServerUpdatesWidget::setUpdateTarget(
     m_stateTracker->setUpdateTarget(contents.getVersion());
     m_forceUiStateUpdate = true;
     m_updateRemoteStateChanged = true;
+    m_finishingForcefully = false;
+
     // TODO: We should collect all these changes to a separate state-structure.
     // TODO: We should split state flags more consistenly.
 }
@@ -1147,6 +1149,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
 
         if (messageBox->exec() == QDialogButtonBox::Yes)
         {
+            m_finishingForcefully = true;
             setTargetState(WidgetUpdateState::finishingInstall, peersIssued);
             //m_serverUpdateTool->requestFinishUpdate(/*skipActivePeers=*/true);
 
@@ -1312,7 +1315,8 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
         QSet<QnUuid> peersComplete = m_stateTracker->peersComplete();
         QSet<QnUuid> peersFailed = m_stateTracker->peersFailed();
 
-        if (!peersComplete.empty() && peersComplete != QSet<QnUuid>{clientPeerId()})
+        if (!peersComplete.empty()
+            && (m_finishingForcefully || peersComplete != QSet<QnUuid>{clientPeerId()}))
         {
             NX_INFO(this, "atFinishUpdateComplete() - installation is complete");
             setTargetState(WidgetUpdateState::complete, peersComplete);
