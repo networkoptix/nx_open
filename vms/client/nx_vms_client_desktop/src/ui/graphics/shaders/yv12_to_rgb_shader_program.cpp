@@ -376,7 +376,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
     vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor ) + vec2(xShift, 0.0);
 
-    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy3 = vec2(maxX * radius,  maxY * radius * aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
     vec2 lensProject(vec3 pos3d);
