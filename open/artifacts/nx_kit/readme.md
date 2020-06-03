@@ -1,18 +1,20 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-# C++ library `nx_kit` by Network Optix
+# The nx_kit library
 
 ---------------------------------------------------------------------------------------------------
 ## Introduction
 
-`nx_kit` is a kit of pure C99/C++11 platform-agnostic utils used across various projects.
+The nx_kit is a kit of pure C99/C++11 platform-agnostic utilities useful for experimenting and
+debugging.
 
-This kit does not use any non-standard libraries. There is a mention of Qt but only conditional: if
-Qt is used by a project which uses nx_kit, additional convenience (e.g. supporting certain Qt types
-in debug utilities) is provided. Similarly, while being fully cross-platform, if nx_kit detects one
-of the familiar platforms, additional convenience or customized behavior is offered.
+This kit does not use any non-standard libraries. There is a mention of the Qt library, but only
+conditional: if Qt is used by a project which uses nx_kit, additional convenience (e.g.
+supporting certain Qt types in debug utilities) is provided. Similarly, while being fully
+cross-platform, if nx_kit detects one of the familiar platforms, additional convenience or
+customized behavior is offered.
 
-Currently, the following units are included into `nx_kit`:
+Currently, the following units are included into nx_kit:
 
 - `nx::kit::IniConfig` - `nx/kit/ini_config.h`
    A mechanism for configuration variables that can alter the behavior of the code for the purpose
@@ -25,10 +27,10 @@ Currently, the following units are included into `nx_kit`:
 
 - `nx::kit::test` - `nx/kit/test.h`
    A rudimentary standalone unit testing framework designed to mimic Google Test to a certain
-   degree. Used for the unit tests for `ini_config`, `debug` and `utils` units of `nx_kit`.
+   degree. Used for the unit tests for `ini_config`, `debug` and `utils` units of nx_kit.
 
 - `nx::kit::utils` - `nx/kit/utils.h`
-   Simple utilities used by other `nx_kit` units.
+   Simple utilities used by other nx_kit units.
 
 - `nx::kit::Json` - `nx/kit/json11.h`
   Json parser/writer "Json11" originally written by DropBox: https://github.com/dropbox/json11
