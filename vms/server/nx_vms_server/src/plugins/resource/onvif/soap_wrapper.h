@@ -366,6 +366,16 @@ NX_DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
 NX_DECLARE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
 NX_DECLARE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
 NX_DECLARE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, AddVideoSourceConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, AddVideoEncoderConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, AddAudioSourceConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, AddAudioEncoderConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, AddAudioOutputConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, AddAudioDecoderConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, AddMetadataConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, AddVideoAnalyticsConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, AddPTZConfiguration)
+
 NX_DECLARE_RESPONSE_TRAITS(Media, GetProfiles)
 NX_DECLARE_RESPONSE_TRAITS(Media, CreateProfile)
 
@@ -377,6 +387,7 @@ NX_DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
     _onvifMedia2__SetVideoEncoderConfiguration, onvifMedia2__SetConfigurationResponse)
 NX_DECLARE_RESPONSE_TRAITS(Media2, GetProfiles)
 NX_DECLARE_RESPONSE_TRAITS(Media2, CreateProfile)
+NX_DECLARE_RESPONSE_TRAITS(Media2, AddConfiguration)
 NX_DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
     _onvifMedia2__GetStreamUri, _onvifMedia2__GetStreamUriResponse)
 
@@ -600,6 +611,42 @@ namespace Media
         _onvifMedia__SetAudioEncoderConfiguration,
         _onvifMedia__SetAudioEncoderConfigurationResponse>;
 
+    using VideoSourceConfigurationAdder = RequestWrapper<
+        _onvifMedia__AddVideoSourceConfiguration,
+        _onvifMedia__AddVideoSourceConfigurationResponse>;
+
+    using VideoEncoderConfigurationAdder = RequestWrapper<
+        _onvifMedia__AddVideoEncoderConfiguration,
+        _onvifMedia__AddVideoEncoderConfigurationResponse>;
+
+    using AudioSourceConfigurationAdder = RequestWrapper<
+        _onvifMedia__AddAudioSourceConfiguration,
+        _onvifMedia__AddAudioSourceConfigurationResponse>;
+
+    using AudioEncoderConfigurationAdder = RequestWrapper<
+        _onvifMedia__AddAudioEncoderConfiguration,
+        _onvifMedia__AddAudioEncoderConfigurationResponse>;
+
+    using AudioOutputConfigurationAdder = RequestWrapper<
+        _onvifMedia__AddAudioOutputConfiguration,
+        _onvifMedia__AddAudioOutputConfigurationResponse>;
+
+    using AudioDecoderConfigurationAdder = RequestWrapper<
+        _onvifMedia__AddAudioDecoderConfiguration,
+        _onvifMedia__AddAudioDecoderConfigurationResponse>;
+
+    using MetadataConfigurationAdder = RequestWrapper<
+        _onvifMedia__AddMetadataConfiguration,
+        _onvifMedia__AddMetadataConfigurationResponse>;
+
+    using VideoAnalyticsConfigurationAdder = RequestWrapper<
+        _onvifMedia__AddVideoAnalyticsConfiguration,
+        _onvifMedia__AddVideoAnalyticsConfigurationResponse>;
+
+    using PtzConfigurationAdder = RequestWrapper<
+        _onvifMedia__AddPTZConfiguration,
+        _onvifMedia__AddPTZConfigurationResponse>;
+
     using Profiles = RequestWrapper<
         _onvifMedia__GetProfiles,
         _onvifMedia__GetProfilesResponse>;
@@ -634,6 +681,10 @@ namespace Media2
     using StreamUri = RequestWrapper<
         _onvifMedia2__GetStreamUri,
         _onvifMedia2__GetStreamUriResponse>;
+
+    using ConfigurationAdder = RequestWrapper<
+        _onvifMedia2__AddConfiguration,
+        _onvifMedia2__AddConfigurationResponse>;
 }
 // ------------------------------------------------------------------------------------------------
 class DeviceSoapWrapper : public SoapWrapper<DeviceBindingProxy>

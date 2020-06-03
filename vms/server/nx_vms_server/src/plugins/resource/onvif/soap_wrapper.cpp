@@ -127,6 +127,16 @@ NX_DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
 NX_DEFINE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
 NX_DEFINE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
 NX_DEFINE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, AddVideoSourceConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, AddVideoEncoderConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, AddAudioSourceConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, AddAudioEncoderConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, AddAudioOutputConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, AddAudioDecoderConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, AddMetadataConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, AddVideoAnalyticsConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, AddPTZConfiguration)
+
 NX_DEFINE_RESPONSE_TRAITS(Media, GetProfiles)
 NX_DEFINE_RESPONSE_TRAITS(Media, CreateProfile)
 
@@ -138,6 +148,8 @@ NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, SetVideoEncoderConfiguration,
     _onvifMedia2__SetVideoEncoderConfiguration, onvifMedia2__SetConfigurationResponse)
 NX_DEFINE_RESPONSE_TRAITS(Media2, GetProfiles)
 NX_DEFINE_RESPONSE_TRAITS(Media2, CreateProfile)
+NX_DEFINE_RESPONSE_TRAITS(Media2, AddConfiguration)
+
 NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetStreamUri,
     _onvifMedia2__GetStreamUri, _onvifMedia2__GetStreamUriResponse)
 
@@ -293,7 +305,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(
 
     if (calcTimeDrift() != SOAP_OK)
         return false;
-    
+
     for (const auto& credentials : possibleCredentials)
     {
         if (commonModule->isNeedToStop())

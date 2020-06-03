@@ -7,6 +7,7 @@
 #include "network/multicodec_rtp_reader.h"
 #include "soap_wrapper.h"
 #include "onvif_resource.h"
+#include "profile_helper.h"
 
 struct CameraInfoParams;
 struct ProfilePair;
@@ -70,6 +71,10 @@ private:
     CameraDiagnostics::Result fetchUpdateProfile(
         CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
 
+    nx::vms::server::plugins::onvif::ConfigurationSet calculateConfigurationsToUpdate(
+        const CameraInfoParams& desiredParameters,
+        const CameraInfoParams& actualParameters) const;
+
     CameraDiagnostics::Result updateProfileConfigurations(
         const CameraInfoParams& desiredParameters,
         const CameraInfoParams& actualParameters) const;
@@ -97,8 +102,7 @@ private:
     void printProfile(const onvifXsd__Profile& profile, bool isPrimary) const;
 
     bool executePreConfigurationRequests();
-    CameraDiagnostics::Result bindTwoWayAudioToProfile(
-        MediaSoapWrapper& soapWrapper, const std::string& profileToken) const;
+    CameraDiagnostics::Result bindTwoWayAudioToProfile(const std::string& profileToken) const;
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_multiCodec;
