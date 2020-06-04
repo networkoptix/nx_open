@@ -1308,7 +1308,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     namespace Server = ResourcePropertyKey::Server;
     const auto hwInfo = HardwareInformation::instance();
     server->setProperty(Server::kCpuArchitecture, hwInfo.cpuArchitecture);
-    server->setProperty(Server::kCpuModelName, hwInfo.cpuModelName);
+    server->setProperty(Server::kCpuModelName, hwInfo.cpuModelName.trimmed());
     server->setProperty(Server::kPhysicalMemory, QString::number(hwInfo.physicalMemory));
     server->setProperty(Server::kBrand, AppInfo::brand());
     server->setProperty(Server::kFullVersion, AppInfo::applicationFullVersion());
