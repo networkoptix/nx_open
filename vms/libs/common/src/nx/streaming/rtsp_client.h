@@ -148,7 +148,7 @@ public:
         QPair<int, int> interleaved{ -1, -1 };
         std::shared_ptr<QnRtspIoDevice> ioDevice;
     };
-    QnRtspClient(const Config& config = Config());
+    QnRtspClient(const Config& config);
 
     ~QnRtspClient();
 

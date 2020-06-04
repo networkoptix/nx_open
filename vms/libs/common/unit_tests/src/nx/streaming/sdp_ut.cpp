@@ -217,7 +217,7 @@ TEST(Sdp, SetupResponse1)
         Transport: RTP/AVP;multicast;destination=239.128.1.100;port=5564-5565;ttl=15;interleaved=2-3;ssrc=1234;
     )text";
 
-    QnRtspClient rtspClient;
+    QnRtspClient rtspClient(QnRtspClient::Config{});
     QnRtspClient::SDPTrackInfo track;
     track.ioDevice.reset(new QnRtspIoDevice(&rtspClient, RtpTransportType::multicast));
     rtspClient.parseSetupResponse(value, &track, 0);
@@ -247,7 +247,7 @@ TEST(Sdp, SetupResponse2)
         Transport: RTP/AVP; multicast; estination=239.128.1.100; Server_Port=5564; ttl=15; Interleaved=2
     )text";
 
-    QnRtspClient rtspClient;
+    QnRtspClient rtspClient(QnRtspClient::Config{});
     QnRtspClient::SDPTrackInfo track;
     track.ioDevice.reset(new QnRtspIoDevice(&rtspClient, RtpTransportType::multicast));
     rtspClient.parseSetupResponse(value, &track, 0);
