@@ -2,8 +2,36 @@
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-const QString kEventTypeCrowd = "nx.vivotek.Crowd";
-const QString kEventTypeLoitering = "nx.vivotek.Loitering";
-const QString kEventTypeIntrusion = "nx.vivotek.Intrusion";
+const std::vector<EventType> kEventTypes =
+    [](){
+        std::vector<EventType> types;
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "CrowdDetection";
+            type.id = "nx.vivotek.Crowd";
+            type.prettyName = "Crowd";
+            type.isProlonged = true;
+            type.isSupported =
+                [](auto& features) { return features.vca && features.vca->crowdDetection; };
+        }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "LoiteringDetection";
+            type.id = "nx.vivotek.Loitering";
+            type.prettyName = "Loitering";
+            type.isProlonged = true;
+            type.isSupported =
+                [](auto& features) { return features.vca && features.vca->loiteringDetection; };
+        }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "IntrusionDetection";
+            type.id = "nx.vivotek.Intrusion";
+            type.prettyName = "Intrusion";
+            type.isSupported =
+                [](auto& features) { return features.vca && features.vca->intrusionDetection; };
+        }
+        return types;
+    }();
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

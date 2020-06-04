@@ -145,29 +145,19 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
                 [&]{
                     QJsonArray types;
 
-                    if (m_features.vca)
+                    for (const auto& eventType: kEventTypes)
                     {
-                        if (m_features.vca->crowdDetection)
-                        {
-                            types.push_back(QJsonObject{
-                                {"id", kEventTypeCrowd},
-                                {"name", "Crowd"},
-                            });
-                        }
-                        if (m_features.vca->loiteringDetection)
-                        {
-                            types.push_back(QJsonObject{
-                                {"id", kEventTypeLoitering},
-                                {"name", "Loitering"},
-                            });
-                        }
-                        if (m_features.vca->intrusionDetection)
-                        {
-                            types.push_back(QJsonObject{
-                                {"id", kEventTypeIntrusion},
-                                {"name", "Intrusion"},
-                            });
-                        }
+                        if (!eventType.isSupported(m_features))
+                            continue;
+
+                        QJsonObject type = {
+                            {"id", eventType.id},
+                            {"name", eventType.prettyName},
+                        };
+                        if (eventType.isProlonged)
+                            type["flags"] = "stateDependent";
+
+                        types.push_back(std::move(type));
                     }
 
                     return types;
@@ -315,6 +305,13 @@ void DeviceAgent::startMetadataStreaming()
 
 void DeviceAgent::stopMetadataStreaming()
 {
+    if (m_eventProlonger)
+    {
+        m_eventProlonger->flush();
+        while (auto packet = m_eventProlonger->readSync())
+            m_handler->handleMetadata(packet.releasePtr());
+    }
+
     m_eventProlonger.reset();
     m_timer.reset();
     m_nativeMetadataSource.reset();

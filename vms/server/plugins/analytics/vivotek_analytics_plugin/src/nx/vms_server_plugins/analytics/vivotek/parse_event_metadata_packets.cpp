@@ -15,14 +15,13 @@ using namespace nx::sdk::analytics;
 
 namespace {
 
-std::optional<QString> parseTypeId(const QString& type)
+std::optional<QString> parseTypeId(const QString& native)
 {
-    if (type == "CrowdDetection")
-        return kEventTypeCrowd;
-    if (type == "LoiteringDetection")
-        return kEventTypeLoitering;
-    if (type == "IntrusionDetection")
-        return kEventTypeIntrusion;
+    for (const auto& type: kEventTypes)
+    {
+        if (type.nativeId == native)
+            return type.id;
+    }
 
     return std::nullopt;
 }
