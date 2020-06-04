@@ -742,8 +742,8 @@ void QnRtspClient::parseSetupResponse(const QString& response, SDPTrackInfo* tra
     bool isFirstParam = true;
     for (const auto& parameter: sessionParam.split(';', QString::SkipEmptyParts))
     {
-        const auto [key, value] = splitKeyValue(parameter.trimmed().toLower(), '=');
-        if (key == "timeout")
+        const auto [key, value] = splitKeyValue(parameter.trimmed(), '=');
+        if (key.toLower() == "timeout")
         {
             const auto timeoutSec = value.toInt();
             if (timeoutSec > 0 && timeoutSec < 5000)
