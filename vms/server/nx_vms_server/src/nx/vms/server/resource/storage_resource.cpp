@@ -39,7 +39,7 @@ QIODevice* StorageResource::wrapIoDevice(std::unique_ptr<QIODevice> ioDevice)
                 if (size > 0)
                     strongRef->bytesWritten += size;
 
-                if (elapsed > serverModule()->settings().ioOperationTimeTreshold())
+                if (elapsed > serverModule()->settings().ioOperationTimeTresholdSec())
                     strongRef->timedOutWrites++;
 
                 strongRef->writes++;
@@ -54,7 +54,7 @@ QIODevice* StorageResource::wrapIoDevice(std::unique_ptr<QIODevice> ioDevice)
                 if (size > 0)
                     strongRef->bytesRead += size;
 
-                if (elapsed > serverModule()->settings().ioOperationTimeTreshold())
+                if (elapsed > serverModule()->settings().ioOperationTimeTresholdSec())
                     strongRef->timedOutReads++;
 
                 strongRef->reads++;
@@ -67,7 +67,7 @@ QIODevice* StorageResource::wrapIoDevice(std::unique_ptr<QIODevice> ioDevice)
             if (auto strongRef = statistics.lock())
             {
                 strongRef->seeks++;
-                if (elapsed > serverModule()->settings().ioOperationTimeTreshold())
+                if (elapsed > serverModule()->settings().ioOperationTimeTresholdSec())
                     strongRef->timedOutSeeks++;
             }
         });
@@ -89,7 +89,7 @@ bool StorageResource::removeFile(const QString& url)
     std::chrono::milliseconds elapsed = std::chrono::milliseconds(0);
     const bool result = nx::utils::measure(
         [this, &url]() { return doRemoveFile(url); }, &elapsed);
-    if (elapsed > serverModule()->settings().ioOperationTimeTreshold())
+    if (elapsed > serverModule()->settings().ioOperationTimeTresholdSec())
         m_metrics->timedOutDeletions++;
     return result;
 }
@@ -101,7 +101,7 @@ QnAbstractStorageResource::FileInfoList StorageResource::getFileList(
     std::chrono::milliseconds elapsed = std::chrono::milliseconds(0);
     const auto result = nx::utils::measure(
         [this, &url]() { return doGetFileList(url); }, &elapsed);
-    if (elapsed > serverModule()->settings().ioOperationTimeTreshold())
+    if (elapsed > serverModule()->settings().ioOperationTimeTresholdSec())
         m_metrics->timedOutDirectoryLists++;
     return result;
 }
