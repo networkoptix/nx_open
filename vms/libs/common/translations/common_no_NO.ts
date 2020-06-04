@@ -51,15 +51,15 @@
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
+      <translation>
+        <numerusform>Byte (s)</numerusform>
         <numerusform>Byte(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kilobyte(s)</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
       </translation>
@@ -1013,7 +1013,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Videotranskoding kreves.</translation>
     </message>
   </context>
   <context>
@@ -1800,27 +1800,27 @@
     </message>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>Buzzer</translation>
     </message>
     <message>
       <source>Archive Backup Finished</source>
-      <translation type="unfinished">Archive Backup Finished</translation>
+      <translation>Arkiv Sikkerhetskopiering er fullført</translation>
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation type="unfinished">PoE over Budget</translation>
+      <translation>PoE over budsjett</translation>
     </message>
     <message>
       <source>Fan Error</source>
-      <translation type="unfinished">Fan Error</translation>
+      <translation>Viftefeil</translation>
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation type="unfinished">PoE over budget at %1</translation>
+      <translation>PoE over budsjett på %1</translation>
     </message>
     <message>
       <source>Fan error at %1</source>
-      <translation type="unfinished">Fan error at %1</translation>
+      <translation>Viftefeil ved %1</translation>
     </message>
     <message>
       <source>Reason: Power limit exceeded (%1)</source>

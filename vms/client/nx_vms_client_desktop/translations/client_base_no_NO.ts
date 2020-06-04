@@ -1394,23 +1394,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>For å få en gyldig lisensnøkkel må du kontakte %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Hvis problemet vedvarer, kan du kontakte %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Vennligst kontakt %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>For å få en gyldig lisensnøkkel, kontakt din regionale / lisensstøtte:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Hvis problemet vedvarer, kan du kontakte din regionale / lisensstøtte:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
@@ -1640,7 +1640,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Er du sikker på at du vil forlate denne siden? Endringer du har gjort vil kanskje ikke lagres.</translation>
     </message>
   </context>
   <context>
@@ -1741,7 +1741,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Advarsel! Dette er et eksperimentelt alternativ som sparer CPU, men kan påvirke animasjonen.</translation>
     </message>
   </context>
   <context>
@@ -2262,34 +2262,34 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Kildeserver</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Kildekamera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Kilde og %n flere kameraer</numerusform>
         <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Velg minst en enhet</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Velg minst ett kamera</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Velg servere</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Kildeserver og %1</translation>
     </message>
   </context>
   <context>
@@ -2419,7 +2419,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>Servere som støtter buzzer</translation>
     </message>
   </context>
   <context>
@@ -2838,7 +2838,7 @@ til %1</translation>
     <message>
       <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
       <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
+      <translation>%1 av %2 utvalgte brukere er ikke %3 brukere og vil ikke motta mobilvarsler.</translation>
     </message>
   </context>
   <context>
@@ -3820,15 +3820,15 @@ til %1</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Funksjoner</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Tillatte skjermer</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Kontroll økter tillatt</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
@@ -3836,7 +3836,7 @@ til %1</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Deaktiveringer gjenstår</translation>
     </message>
   </context>
   <context>
@@ -3975,9 +3975,9 @@ til %1</translation>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>%n deaktiveringer gjenstår.</numerusform>
+        <numerusform>%n deaktiveringer gjenstår.</numerusform>
       </translation>
     </message>
   </context>

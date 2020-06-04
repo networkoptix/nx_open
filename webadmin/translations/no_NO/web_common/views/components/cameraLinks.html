@@ -7,7 +7,7 @@
         <tr ng-if="debugMode"><td>Spiller av</td><td class="camera-links-info">{{transport}} - {{currentResolution}} med {{player}}</td></tr>
         <tr><td>Navn</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
-            <td>CameraID</td>
+            <td>KameraID</td>
             <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>
                 <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
             </td>
@@ -22,7 +22,7 @@
         <tr>
             <td>Vis</td>
             <td>
-                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'web')}}">Web</a>
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'web')}}"> Web </a>
                 <copy-button copy-data="formatLink(activeCamera, 0, 'web')"></copy-button>
             </td>
         </tr>
