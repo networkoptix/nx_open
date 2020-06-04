@@ -213,7 +213,7 @@ TEST(Sdp, SetupResponse1)
     QString value = R"text(
         RTSP/1.0 200 OK
         CSeq: 25
-        Session: 13816;timeout=50
+        Session: SomeId13816;timeout=50
         Transport: RTP/AVP;multicast;destination=239.128.1.100;port=5564-5565;ttl=15;interleaved=2-3;ssrc=1234;
     )text";
 
@@ -231,7 +231,7 @@ TEST(Sdp, SetupResponse1)
 
     ASSERT_EQ(0x1234, track.ioDevice->getSSRC());
 
-    ASSERT_EQ("13816", rtspClient.sessionId());
+    ASSERT_EQ("SomeId13816", rtspClient.sessionId());
     ASSERT_EQ(50s, rtspClient.keepAliveTimeOut());
 }
 
