@@ -12,9 +12,8 @@
 
 
 // Type specific parsers
-namespace nx::utils {
+namespace nx::utils::detail {
 
-namespace detail {
 template<>
 inline bool fromQVariant(const QVariant& value, MultiThreadDecodePolicy* result)
 {
@@ -33,11 +32,8 @@ inline bool fromQVariant(const QVariant& value, MultiThreadDecodePolicy* result)
     return true;
 }
 
-} // namespace detail
-
 template<>
-inline QVariant Settings::Option<MultiThreadDecodePolicy>::toQVariant(
-    const MultiThreadDecodePolicy& value)
+inline QVariant toQVariant(const MultiThreadDecodePolicy& value)
 {
     QVariant result;
     if (value == MultiThreadDecodePolicy::autoDetect)
@@ -49,7 +45,7 @@ inline QVariant Settings::Option<MultiThreadDecodePolicy>::toQVariant(
     return result;
 }
 
-}
+} // namespace nx::utils::detail
 
 namespace nx::vms::server {
 
@@ -144,7 +140,7 @@ public:
         "disk, since FFmpeg sometimes seeks to the left from current file position to fill in some "
         "media file structure size. Minimal value for adaptive buffer."
     };
-    Option<int> mediaFileDuration{this, "mediaFileDuration", 60, 
+    Option<int> mediaFileDuration{this, "mediaFileDuration", 60,
         "average file duration in seconds for recording"};
     Option<int> hlsInactivityPeriod{this, "hlsInactivityPeriod", 10,
         "If no one uses HLS for thid time period (in seconds), than live media cache is stopped "
@@ -269,7 +265,7 @@ public:
     };
     Option<QString> mediatorAddressUpdate{this, "mediatorAddressUpdate", "", ""};
     Option<bool> disableTranscoding{this, "disableTranscoding", false, ""};
-    Option<bool> allowThirdPartyProxy{this, "allowThirdPartyProxy", false, 
+    Option<bool> allowThirdPartyProxy{this, "allowThirdPartyProxy", false,
         "Allow proxy requests for any sites if value is true. "
         "Allow proxy requests for known servers and cameras only if it is false."};
     Option<bool> noResourceDiscovery{this, "noResourceDiscovery", false, ""};
@@ -457,7 +453,7 @@ public:
     };
 
     Option<qint64> minSystemStorageFreeSpace{
-        this, "minSystemStorageFreeSpace", kMinSystemStorageFreeSpace, 
+        this, "minSystemStorageFreeSpace", kMinSystemStorageFreeSpace,
         "Minimal system storage free space in bytes. If it less, server will generate warning event."};
 
     Option<bool> noOutgoingConnectionsMetric{ this, "noOutgoingConnectionsMetric", false,

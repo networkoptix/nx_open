@@ -15,13 +15,13 @@ namespace utils {
 
 namespace detail {
 
-template<typename Rep, typename Duration>
-bool fromQVariant(const QVariant& value, std::chrono::duration<Rep, Duration>* result)
+template<typename Rep, typename Period>
+bool fromQVariant(const QVariant& value, std::chrono::duration<Rep, Period>* result)
 {
     if (!value.isValid() || !value.canConvert<quint64>())
         return false;
 
-    *result = std::chrono::duration<Rep, Duration>(value.value<quint64>());
+    *result = std::chrono::duration<Rep, Period>(value.value<quint64>());
     return true;
 }
 
@@ -46,6 +46,22 @@ bool fromQVariant(const QVariant& qVariant, T* outValue)
 
     *outValue = qVariant.value<T>();
     return true;
+}
+
+template<typename Rep, typename Period>
+QVariant toQVariant(const std::chrono::duration<Rep, Period>& value)
+{
+    QVariant result;
+    result.setValue(value.count());
+    return result;
+}
+
+template<typename T>
+QVariant toQVariant(const T& value)
+{
+    QVariant result;
+    result.setValue(value);
+    return result;
 }
 
 } // namespace detail
@@ -170,19 +186,12 @@ protected:
 
         virtual QVariant save() const override
         {
-            return toQVariant(m_value);
+            return detail::toQVariant(m_value);
         }
 
         virtual QVariant defaultValueVariant() const override
         {
-            return toQVariant(m_defaultValue);
-        }
-
-        static QVariant toQVariant(const T& value)
-        {
-            QVariant result;
-            result.setValue(value);
-            return result;
+            return detail::toQVariant(m_defaultValue);
         }
 
     private:
@@ -205,15 +214,6 @@ private:
     std::shared_ptr<QSettings> m_qtSettings;
 };
 
-
-template<>
-inline QVariant Settings::Option<std::chrono::milliseconds>::toQVariant(
-    const std::chrono::milliseconds& value)
-{
-    QVariant result;
-    result.setValue(value.count());
-    return result;
-}
 
 } // namespace utils
 } // namespace nx
