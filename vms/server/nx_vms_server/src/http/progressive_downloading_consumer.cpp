@@ -36,10 +36,11 @@ void ProgressiveDownloadingConsumer::setAuditHandle(const AuditHandle& handle)
     m_auditHandle = handle;
 }
 
-void ProgressiveDownloadingConsumer::copyLastGopFromCamera(const QnVideoCameraPtr& camera)
+void ProgressiveDownloadingConsumer::copyLastGopFromCamera(
+    const QnVideoCameraPtr& camera, nx::vms::api::StreamIndex streamIndex)
 {
     camera->copyLastGop(
-        nx::vms::api::StreamIndex::primary,
+        streamIndex,
         /*skipTime*/ 0,
         m_dataQueue,
         /*iFramesOnly*/ false);

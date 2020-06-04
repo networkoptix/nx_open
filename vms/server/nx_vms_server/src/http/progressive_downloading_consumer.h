@@ -26,7 +26,8 @@ public:
     ProgressiveDownloadingConsumer(ProgressiveDownloadingServer* owner, const Config& config);
     ~ProgressiveDownloadingConsumer();
     void setAuditHandle(const AuditHandle& handle);
-    void copyLastGopFromCamera(const QnVideoCameraPtr& camera);
+    void copyLastGopFromCamera(
+        const QnVideoCameraPtr& camera, nx::vms::api::StreamIndex streamIndex);
 
 protected:
     virtual bool canAcceptData() const override;
