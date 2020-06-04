@@ -2,6 +2,17 @@
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-const QString kObjectTypeHuman = "nx.vivotek.Human";
+const std::vector<ObjectType> kObjectTypes =
+    [](){
+        std::vector<ObjectType> types;
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "Human";
+            type.id = "nx.vivotek.Human";
+            type.prettyName = "Human";
+            type.isSupported = [](auto& features) { return !!features.vca; };
+        }
+        return types;
+    }();
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

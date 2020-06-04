@@ -23,10 +23,13 @@ using namespace nx::sdk::analytics;
 
 namespace {
 
-std::optional<QString> parseTypeId(const QString& type)
+std::optional<QString> parseTypeId(const QString& native)
 {
-    if (type == "Human")
-        return kObjectTypeHuman;
+    for (const auto& type: kObjectTypes)
+    {
+        if (type.nativeId == native)
+            return type.id;
+    }
 
     return std::nullopt;
 }

@@ -130,11 +130,14 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
                 [&]{
                     QJsonArray types;
 
-                    if (m_features.vca)
+                    for (const auto& objectType: kObjectTypes)
                     {
+                        if (!objectType.isSupported(m_features))
+                            continue;
+
                         types.push_back(QJsonObject{
-                            {"id", kObjectTypeHuman},
-                            {"name", "Human"},
+                            {"id", objectType.id},
+                            {"name", objectType.prettyName},
                         });
                     }
 
