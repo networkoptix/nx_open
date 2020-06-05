@@ -12,6 +12,8 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/media/av_codec_helper.h>
 #include "vivotek_stream_reader.h"
+#include <nx/utils/log/log_message.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace vms::server {
@@ -168,12 +170,19 @@ bool VivotekResource::parseStreamCodecCapabilities(
 
 void VivotekResource::tuneHttpClient(nx::network::http::HttpClient& httpClient) const
 {
+    // Aviod to send 'Mozila' in user-agent because some firmware block it.
+    static const QString userAgentString = NX_FMT("%1/%2 (%3)",
+        nx::utils::AppInfo::vmsName(),
+        nx::utils::AppInfo::applicationVersion(),
+        nx::utils::AppInfo::organizationName());
+
     auto auth = getAuth();
     httpClient.setSendTimeout(kHttpTimeout);
     httpClient.setMessageBodyReadTimeout(kHttpTimeout);
     httpClient.setResponseReadTimeout(kHttpTimeout);
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
+    httpClient.setUserAgent(userAgentString);
 }
 
 bool VivotekResource::parseResponse(

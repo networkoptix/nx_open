@@ -21,7 +21,7 @@ CameraDiagnostics::Result VivotekStreamReader::fetchUpdateVideoEncoder(
         return result;
 
     const auto vivotekResource = getResource().dynamicCast<VivotekResource>();
-    if (params.codec != "H265" || !vivotekResource)
+    if (params.codec != "H265" || !vivotekResource || !isCameraControlRequired)
         return CameraDiagnostics::NoErrorResult();
 
     // Setup fps and bitrate for H.265 codec via native API.
