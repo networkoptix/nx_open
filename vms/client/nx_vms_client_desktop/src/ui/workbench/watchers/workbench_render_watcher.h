@@ -82,4 +82,8 @@ private:
 
     QHash<QnResourceWidget *, WidgetData> m_dataByWidget;
     QnCounterHash<QnResourceDisplayPtr> m_countByDisplay;
+
+    // Cannot connect to the main window in the constructor because the workbench is created
+    // before the main window.
+    bool m_connectedToMainWindow = false;
 };
