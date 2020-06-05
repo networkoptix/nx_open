@@ -238,24 +238,13 @@ void DeviceAgent::updateAvailableMetadataTypes(const CameraSettings& settings)
         {
             m_availableMetadataTypes |= ObjectNativeMetadataType;
 
-            const auto regionHasValue = [](const auto& rule){ return rule.region.hasValue(); };
-            if (const auto& crowdDetection = vca->crowdDetection)
+            for (auto const& eventType: kEventTypes)
             {
-                const auto& rules = crowdDetection->rules;
-                if (std::any_of(rules.begin(), rules.end(), regionHasValue))
+                if (eventType.isSupported(m_features))
+                {
                     m_availableMetadataTypes |= EventNativeMetadataType;
-            }
-            if (const auto& loiteringDetection = vca->loiteringDetection)
-            {
-                const auto& rules = loiteringDetection->rules;
-                if (std::any_of(rules.begin(), rules.end(), regionHasValue))
-                    m_availableMetadataTypes |= EventNativeMetadataType;
-            }
-            if (const auto& intrusionDetection = vca->intrusionDetection)
-            {
-                const auto& rules = intrusionDetection->rules;
-                if (std::any_of(rules.begin(), rules.end(), regionHasValue))
-                    m_availableMetadataTypes |= EventNativeMetadataType;
+                    break;
+                }
             }
         }
     }

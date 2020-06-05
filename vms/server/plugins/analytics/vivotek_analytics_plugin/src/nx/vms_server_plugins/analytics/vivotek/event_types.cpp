@@ -31,6 +31,14 @@ const std::vector<EventType> kEventTypes =
             type.isSupported =
                 [](auto& features) { return features.vca && features.vca->intrusionDetection; };
         }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "LineCrossingDetection";
+            type.id = "nx.vivotek.LineCrossing";
+            type.prettyName = "Line Crossing";
+            type.isSupported =
+                [](auto& features) { return features.vca && features.vca->lineCrossingDetection; };
+        }
         return types;
     }();
 
