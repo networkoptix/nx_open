@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Begrens bildefrekvens for å lagre CPU</translation>
     </message>
   </context>
   <context>
@@ -503,7 +503,7 @@
     <message>
       <location/>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>Bruk hendelseskildeserver</translation>
     </message>
   </context>
   <context>
@@ -952,7 +952,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Kobler til...</translation>
     </message>
   </context>
   <context>
@@ -2081,7 +2081,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
       <source>Sign in</source>
-      <translation type="unfinished">Sign in</translation>
+      <translation>Logg på</translation>
     </message>
     <message>
       <location/>
@@ -2091,7 +2091,7 @@
     <message>
       <location/>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Brukernavn</translation>
     </message>
   </context>
   <context>
@@ -2165,7 +2165,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
       <source>Attention! Power limit exceeded</source>
-      <translation type="unfinished">Attention! Power limit exceeded</translation>
+      <translation>Merk følgende! Effektgrensen overskredet</translation>
     </message>
   </context>
   <context>
@@ -2280,12 +2280,12 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Til</translation>
     </message>
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>Språkinnstillinger</translation>
     </message>
     <message>
       <location/>
@@ -2295,12 +2295,12 @@
     <message>
       <location/>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Topptekst</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>Standardtittel for varsel vil bli brukt hvis feltet er tomt</translation>
     </message>
     <message>
       <location/>
@@ -2310,7 +2310,7 @@
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>Standardtekst vil bli brukt hvis dette feltet er tomt</translation>
     </message>
     <message>
       <location/>
@@ -3226,7 +3226,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation type="unfinished">Custom language for mobile notifications</translation>
+      <translation>Tilpasset språk for mobilvarsler</translation>
     </message>
   </context>
   <context>
@@ -3393,12 +3393,12 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tid</translation>
     </message>
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>Ignorer tidssone i opplastede filer</translation>
     </message>
   </context>
   <context>

@@ -989,11 +989,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>Koble til denne serveren</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Pin</translation>
     </message>
   </context>
   <context>
@@ -1258,7 +1258,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>For å rapportere problemet vennligst kontakt %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1266,7 +1266,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Ugyldige data mottatt.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1306,7 +1306,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>For å aktivere lisensnøkkel manuelt må du kontakte %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1318,11 +1318,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>For å rapportere problemet, kontakt din regionale / lisensstøtte:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>For å aktivere lisensnøkkel manuelt, kontakt din regionale / lisensstøtte:</translation>
     </message>
   </context>
   <context>
@@ -1357,7 +1357,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Vennligst prøv igjen senere.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -9983,7 +9983,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+        <numerusform>Merk at hver lisensnøkkel kan deaktiveres maksimalt %n ganger.</numerusform>
         <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
       </translation>
     </message>

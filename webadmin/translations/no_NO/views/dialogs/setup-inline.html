@@ -41,8 +41,8 @@
             <span class="text">eller</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
-        <small>(if {{Config.productName}} has been already setup)</small><br>
+        <button class="btn btn-default" ng-click="skip()"> Legg til i det eksisterende systemet </button><br>
+        <small> (hvis {{Config.productName}} allerede er konfigurert) </small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -81,10 +81,10 @@
                        name="{{setting}}" id="{{setting}}">
                 <span class="checkmark">
                         <svg viewBox="0 0 20 16">
-                            <polygon class="box" points="2.5,2.5 2.5,13.5 13.5,13.6 13.5,2.5"></polygon>
-                            <polyline class="box" points="12.5,2.5 2.5,2.5 2.5,13.5 13.5,13.6 13.5,8.5"></polyline>
-                            <polyline class="tick" points="5,7.5 8,10.5 15.5,3"></polyline>
-                            <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
+                            <polygon class="box" points="2.5,2.5 2.5,13.5 13.5,13.6 13.5,2.5"> </polygon>
+                            <polyline class="box" points="12.5,2.5 2.5,2.5 2.5,13.5 13.5,13.6 13.5,8.5"> </polyline>
+                            <polyline class="tick" points="5,7.5 8,10.5 15.5,3"> </polyline>
+                            <line class="tristate" x1="5" y1="8" x2="11" y2="8"> </line>
                         </svg>
                     </span>
                 <span class="text">{{L.settingsConfig[setting]}}</span>
@@ -251,7 +251,7 @@
                                 <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
                             </svg>
                         </span>
-                <span class="text">Save password</span>
+                <span class="text"> Lagre passord </span>
             </label>
         </div>
         <div class="form-group"

@@ -78,7 +78,7 @@
         "emailSupportEmail": "Kundestøtte E-mail",
         "enableEdgeRecording": "Aktiver edge-opptak",
         "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "maxP2pAllClientsSizeBytes": "Maksimal bufferstørrelse for å sende p2p-data til alle klienter",
         "eventLogPeriodDays": "Hendelsesloggperiode (dager)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP-søkebase",
@@ -115,9 +115,9 @@
         "takeCameraOwnershipWithoutLock": "Ta kameraets eierskap uten lås",
         "timeSynchronizationEnabled": "Tidssynkronisering aktivert",
         "primaryTimeServer": "Primær tidssynkroniseringsserver",
-        "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
-        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
+        "osTimeChangeCheckPeriodMs": "OS-tidsendring, sjekk periode",
+        "syncTimeExchangePeriod": "Synkroniser tidssynkroniseringsintervall for nettverksforespørsler",
+        "syncTimeEpsilon": "Synkroniser epsilon. Ny verdi blir ikke brukt hvis tidsavgrensningen er mindre enn epsilon",
         "maxWearableArchiveSynchronizationThreads": "Maksimalt antall synkroniseringstråder i kameraarkiv",
         "updateNotificationsEnabled": "Oppdateringsvarsler aktivert",
         "upnpPortMappingEnabled": "UPNP port kartlegging aktivert",
@@ -135,7 +135,7 @@
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "Grafer",
             "storage": "Lagring",
             "log": "Logg"
         }
