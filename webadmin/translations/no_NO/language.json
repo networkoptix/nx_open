@@ -112,7 +112,7 @@
         "takeCameraOwnershipWithoutLock": "Ta kameraets eierskap uten lås",
         "timeSynchronizationEnabled": "Tidssynkronisering aktivert",
         "primaryTimeServer": "Primær tidssynkroniseringsserver",
-        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "osTimeChangeCheckPeriodMs": "OS-tidsendring, sjekk periode",
         "syncTimeExchangePeriod": "Sync time exchange period",
         "maxWearableArchiveSynchronizationThreads": "Maksimalt antall synkroniseringstråder i kameraarkiv",
         "updateNotificationsEnabled": "Oppdateringsvarsler aktivert",
