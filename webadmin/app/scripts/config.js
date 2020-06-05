@@ -143,7 +143,11 @@
 
             forceLiveCacheForPrimaryStream: {type: 'text'},
             additionalLocalFsTypes: {type: 'text'},
-            rtspBufferSizeKb: {type: 'number'}
+            rtspBufferSizeKb: {type: 'number'},
+            forceAnalyticsDbStoragePermissions: {
+                type: 'checkbox',
+                label: 'Set r-x flags on analytics DB storage mount point (required by SQLite)'
+            },
         },
         webclient: {
             useServerTime: true,

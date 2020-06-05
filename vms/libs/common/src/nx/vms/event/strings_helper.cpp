@@ -564,6 +564,13 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             result = tr("Analytics storage \"%1\" is almost full.").arg(storageUrl);
             break;
         }
+        case EventReason::metadataStoragePermissionDenied:
+        {
+            QString storageUrl = reasonParamsEncoded;
+            result = tr("Analytics storage \"%1\" DB error: File system permissions denied.")
+                .arg(storageUrl);
+            break;
+        }
         case EventReason::raidStorageError:
         {
             result = tr("RAID error. %1.").arg(reasonParamsEncoded);

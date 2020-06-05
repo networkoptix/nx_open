@@ -52,7 +52,7 @@ public:
      * MUST be invoked before any usage.
      * If this method fails then the object cannot be used.
      */
-    virtual bool initialize(const Settings& settings) override;
+    virtual InitResult initialize(const Settings& settings) override;
 
     virtual bool initialized() const override;
 
@@ -96,6 +96,8 @@ protected:
      * @return true if succeeded for all entries.
      */
     virtual bool makeWritable(const std::vector<PathAndMode>& pathAndModeList);
+
+    QnGlobalSettings* globalSettings() const;
 
 private:
     QnCommonModule* m_commonModule = nullptr;

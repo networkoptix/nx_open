@@ -4823,11 +4823,19 @@ bool MediaServerProcess::initializeAnalyticsEvents()
     settings.path = QFileInfo(dbFilePath).absoluteDir().path();
     settings.dbConnectionOptions.dbName = QFileInfo(dbFilePath).fileName();
 
-    if (!this->serverModule()->analyticsEventsStorage()->initialize(settings))
+    using InitResult = nx::analytics::db::AbstractEventsStorage::InitResult;
+    const auto analyticsStorage = serverModule()->analyticsEventsStorage();
+    if (const auto result = analyticsStorage->initialize(settings); result != InitResult::ok)
     {
-        NX_ERROR(this, "Failed to change analytics events storage, initialization error");
+        const auto reason = (result == InitResult::permissionError)
+            ? nx::vms::api::EventReason::metadataStoragePermissionDenied
+            : nx::vms::api::EventReason::metadataStorageOffline;
+        NX_ERROR(this, "Failed to change analytics events storage, initialization error: %1", reason);
+
         serverModule()->serverRuntimeEventManager()->triggerAnalyticsStorageParametersChanged(
             commonModule()->moduleGUID());
+        at_storageManager_storageFailure(
+            commonModule()->resourcePool()->getResourceById(m_mediaServer->metadataStorageId()), reason);
         return false;
     }
 

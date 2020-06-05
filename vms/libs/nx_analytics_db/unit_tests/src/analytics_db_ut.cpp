@@ -49,7 +49,7 @@ public:
 protected:
     virtual void SetUp() override
     {
-        ASSERT_TRUE(initializeStorage());
+        ASSERT_EQ(initializeStorage(), EventsStorage::InitResult::ok);
     }
 
     common::metadata::ObjectMetadataPacketPtr whenSaveEvent()
@@ -93,7 +93,7 @@ protected:
     void whenRestartStorage()
     {
         m_eventsStorage.reset();
-        ASSERT_TRUE(initializeStorage());
+        ASSERT_EQ(initializeStorage(), EventsStorage::InitResult::ok);
     }
 
     void whenLookupObjectTracks(const Filter& filter)
@@ -471,7 +471,7 @@ private:
     AttributeDictionary m_attributeDictionary;
     ObjectTypeDictionary m_objectTypeDictionary;
 
-    bool initializeStorage()
+    EventsStorage::InitResult initializeStorage()
     {
         m_eventsStorage = std::make_unique<db::MovableAnalyticsDb>(
             [this]()
@@ -755,8 +755,7 @@ protected:
         const auto newPath = nx::utils::test::TestWithTemporaryDirectory::testDataDir() + "/2/";
         ASSERT_TRUE(QDir().mkdir(newPath));
         newSettings.path = newPath;
-
-        eventsStorage().initialize(newSettings);
+        ASSERT_EQ(eventsStorage().initialize(newSettings), EventsStorage::InitResult::ok);
     }
 
     void thenDbIsOperational()

@@ -772,6 +772,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
             256, //< Default value.
             this);
 
+    m_forceAnalyticsDbStoragePermissionsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        "forceAnalyticsDbStoragePermissions", false,  this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -1006,7 +1009,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_pushNotificationsLanguageAdaptor
         << m_additionalLocalFsTypesAdaptor
         << m_keepHanwhaIoPortStateIntactOnInitializationAdaptor
-        << m_rtspBufferSizeKbAdaptor;
+        << m_rtspBufferSizeKbAdaptor
+        << m_forceAnalyticsDbStoragePermissionsAdaptor
     ;
 
     return result;
@@ -1903,6 +1907,11 @@ int QnGlobalSettings::rtspBufferSizeKb() const
 void QnGlobalSettings::setRtspBufferSizeKb(int value)
 {
     m_rtspBufferSizeKbAdaptor->setValue(value);
+}
+
+bool QnGlobalSettings::forceAnalyticsDbStoragePermissions() const
+{
+    return m_forceAnalyticsDbStoragePermissionsAdaptor->value();
 }
 
 QString QnGlobalSettings::additionalLocalFsTypes() const

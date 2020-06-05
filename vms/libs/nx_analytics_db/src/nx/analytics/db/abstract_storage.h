@@ -42,10 +42,17 @@ class NX_ANALYTICS_DB_API AbstractEventsStorage:
 public:
     virtual ~AbstractEventsStorage() = default;
 
+    enum class InitResult
+    {
+        ok,
+        permissionError,
+        otherError,
+    };
+
     /**
      * Initializes internal database. MUST be called just after object instantiation.
      */
-    virtual bool initialize(const Settings& settings) = 0;
+    virtual InitResult initialize(const Settings& settings) = 0;
 
     /**
      * @return true after successful initialization.

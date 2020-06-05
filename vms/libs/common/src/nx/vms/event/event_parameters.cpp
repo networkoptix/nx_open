@@ -30,6 +30,7 @@ QnUuid EventParameters::getParamsHash() const
                 || reasonCode == EventReason::systemStorageFull
                 || reasonCode == EventReason::metadataStorageOffline
                 || reasonCode == EventReason::metadataStorageFull
+                || reasonCode == EventReason::metadataStoragePermissionDenied
                 || reasonCode == EventReason::raidStorageError
                 || reasonCode == EventReason::licenseRemoved)
             {

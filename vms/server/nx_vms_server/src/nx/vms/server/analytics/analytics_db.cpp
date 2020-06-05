@@ -2,6 +2,7 @@
 
 #include <nx/vms/server/root_fs.h>
 
+#include <api/global_settings.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
 #include <plugins/resource/server_archive/server_archive_delegate.h>
@@ -105,7 +106,9 @@ bool AnalyticsDb::makeWritable(const std::vector<PathAndMode>& pathAndModeList)
             continue;
         }
 
-        if (mode == ChownMode::mountPoint && !rootFs->makeReadable(path))
+        if (mode == ChownMode::mountPoint
+            && globalSettings()->forceAnalyticsDbStoragePermissions()
+            && !rootFs->makeReadable(path))
         {
             NX_WARNING(this, "Failed to make readable. Mode: %1. Path: %2", mode, path);
             continue;

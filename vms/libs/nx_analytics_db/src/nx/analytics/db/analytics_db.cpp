@@ -98,6 +98,11 @@ bool EventsStorage::makeWritable(
     return true;
 }
 
+QnGlobalSettings* EventsStorage::globalSettings() const
+{
+    return m_commonModule->globalSettings();
+}
+
 std::vector<EventsStorage::PathAndMode> EventsStorage::enumerateSqlFiles(const QString& dbFileName)
 {
     const auto fileInfo = QFileInfo(dbFileName);
@@ -115,13 +120,13 @@ std::vector<EventsStorage::PathAndMode> EventsStorage::enumerateSqlFiles(const Q
     return result;
 }
 
-bool EventsStorage::initialize(const Settings& settings)
+EventsStorage::InitResult EventsStorage::initialize(const Settings& settings)
 {
     NX_INFO(this, "Initialize in %1", settings.path);
     if (m_dbController)
     {
         NX_ASSERT(false, "Reinitializing is not supported by this class.");
-        return false;
+        return InitResult::otherError;
     }
 
     m_objectTrackCache = std::make_unique<ObjectTrackCache>(
@@ -148,7 +153,7 @@ bool EventsStorage::initialize(const Settings& settings)
     {
         m_dbController.reset();
         NX_WARNING(this, "Failed to initialize Analytics DB directories at %1", settings.path);
-        return false;
+        return InitResult::permissionError;
     }
 
     NX_DEBUG(this, "Initializing analytics SQLite DB");
@@ -158,8 +163,15 @@ bool EventsStorage::initialize(const Settings& settings)
         || !loadDictionaries())
     {
         m_dbController.reset();
-        NX_WARNING(this, "Failed to open Analytics DB at %1", settings.path);
-        return false;
+
+        auto error = QFileDevice::OpenError;
+        if (QFile file(settings.path); !file.open(QIODevice::ReadWrite))
+            error = file.error();
+
+        NX_WARNING(this, "Failed to open Analytics DB (%1) at %2", error, settings.path);
+        return error == QFileDevice::PermissionsError
+            ? InitResult::permissionError
+            : InitResult::otherError;
     }
 
     NX_DEBUG(this, "Initializing archive directory at %1", archivePath);
@@ -169,8 +181,7 @@ bool EventsStorage::initialize(const Settings& settings)
         archivePath);
 
     NX_DEBUG(this, "Analytics DB initialized.");
-
-    return true;
+    return InitResult::ok;
 }
 
 bool EventsStorage::initialized() const

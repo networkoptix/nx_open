@@ -17,7 +17,7 @@ public:
 
     MovableAnalyticsDb(ActualAnalyticsDbFactoryFunc func);
 
-    virtual bool initialize(const Settings& settings) override;
+    virtual InitResult initialize(const Settings& settings) override;
 
     virtual bool initialized() const override;
 

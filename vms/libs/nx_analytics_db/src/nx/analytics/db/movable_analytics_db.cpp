@@ -9,13 +9,13 @@ MovableAnalyticsDb::MovableAnalyticsDb(ActualAnalyticsDbFactoryFunc func):
 {
 }
 
-bool MovableAnalyticsDb::initialize(const Settings& settings)
+MovableAnalyticsDb::InitResult MovableAnalyticsDb::initialize(const Settings& settings)
 {
     auto otherDb = std::shared_ptr<AbstractEventsStorage>(m_factoryFunc());
-    bool result = otherDb->initialize(settings);
-    if (!result)
+    const auto result = otherDb->initialize(settings);
+    if (result != InitResult::ok)
     {
-        NX_INFO(this, "Failed to initialize Analytics DB at %1", settings.path);
+        NX_WARNING(this, "Failed to initialize Analytics DB at %1", settings.path);
         otherDb.reset();
     }
 

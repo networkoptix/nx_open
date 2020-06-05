@@ -45,6 +45,7 @@ enum class EventReason
     metadataStorageOffline = 1010,
     metadataStorageFull = 1011,
     raidStorageError = 1012,
+    metadataStoragePermissionDenied = 1013,
 
     // License Issue event
     licenseRemoved = 10,
