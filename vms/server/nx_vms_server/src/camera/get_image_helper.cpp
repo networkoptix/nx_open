@@ -497,7 +497,7 @@ AVPixelFormat updateJpegPixelFormat(AVPixelFormat fmt)
 QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& frame, const QByteArray& format) const
 {
     AVCodec* codec = avcodec_find_encoder_by_name(
-        format == "jpg" || format == "jpeg" ? "mjpeg" : format.constData());
+        (format == "jpg" || format == "jpeg") ? "mjpeg" : format.constData());
     if (!codec)
     {
         NX_WARNING(this, 
