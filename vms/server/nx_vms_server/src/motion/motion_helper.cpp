@@ -98,14 +98,15 @@ QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
                     return region.isNull();
                 });
 
-            for (int i = 0; i < channels && i < motionRegions.size(); ++i)
+            for (int i = 0; i < channels; ++i)
             {
                 auto archive = getArchive(res, i);
-                if (archive && (!motionRegions[i].isNull() || isEmptyFilter))
+                const auto motionRegion = motionRegions.size() > i ? motionRegions[i] : QRegion();
+                if (archive && (!motionRegion.isNull() || isEmptyFilter))
                 {
                     timePeriods.push_back(archive->matchPeriod(
                         {
-                            motionRegions[i],
+                            motionRegion,
                             std::chrono::milliseconds(request.startTimeMs),
                             std::chrono::milliseconds(request.endTimeMs),
                             request.detailLevel,
