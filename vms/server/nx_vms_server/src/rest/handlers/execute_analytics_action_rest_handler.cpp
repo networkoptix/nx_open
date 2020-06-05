@@ -370,8 +370,10 @@ std::optional<ExtendedAnalyticsActionData>
 
     if (needBestShotObjectPosition)
     {
-        extendedAnalyticsActionData.bestShotObjectPosition->timestampUs = bestShot.timestampUs;
-        extendedAnalyticsActionData.bestShotObjectPosition->boundingBox = bestShot.rect;
+        nx::analytics::db::ObjectPosition bestShotObjectPosition;
+        bestShotObjectPosition.timestampUs = bestShot.timestampUs;
+        bestShotObjectPosition.boundingBox = bestShot.rect;
+        extendedAnalyticsActionData.bestShotObjectPosition = std::move(bestShotObjectPosition);
     }
 
     if (needBestShotVideoFrame)
