@@ -24,7 +24,16 @@ CameraDiagnostics::Result VivotekStreamReader::fetchUpdateVideoEncoder(
     if (params.codec != "H265" || !vivotekResource)
         return CameraDiagnostics::NoErrorResult();
 
-    // Setup fps for H.265 codec via native API.
+    // Setup fps and bitrate for H.265 codec via native API.
+
+    if (!qFuzzyIsNull(params.bitrateKbps))
+    {
+        const auto result = vivotekResource->setVivotekParameter(
+            "h265_maxvbrbitrate", QString::number((int) (params.bitrateKbps * 1000)), isPrimary);
+        if (!result)
+            return result;
+    }
+
     return vivotekResource->setVivotekParameter(
         "h265_maxframe", QString::number((int) params.fps), isPrimary);
 }
