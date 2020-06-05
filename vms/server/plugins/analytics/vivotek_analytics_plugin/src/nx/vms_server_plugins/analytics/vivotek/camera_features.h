@@ -16,6 +16,7 @@ public:
         bool missingObjectDetection = false;
         bool unattendedObjectDetection = false;
         bool faceDetection = false;
+        bool runningDetection = false;
     };
     std::optional<Vca> vca;
 

@@ -31,6 +31,7 @@ void fetchFromCamera(CameraFeatures::Vca* vca, const Url& cameraUrl)
         vca->missingObjectDetection |= function.contains("MissingObjectDetection");
         vca->unattendedObjectDetection |= function.contains("UnattendedObjectDetection");
         vca->faceDetection |= function.contains("FaceDetection");
+        vca->runningDetection |= function.contains("RunningDetection");
     }
 }
 
