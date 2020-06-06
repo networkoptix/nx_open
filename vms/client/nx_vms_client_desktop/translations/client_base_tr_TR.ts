@@ -1674,7 +1674,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Bölgesel / Lisans desteği</translation>
     </message>
   </context>
   <context>
