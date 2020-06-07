@@ -1414,7 +1414,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Vennligst kontakt din regionale / Lisens støtte:</translation>
     </message>
   </context>
   <context>
@@ -1675,7 +1675,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Regional / lisenssupport</translation>
     </message>
   </context>
   <context>
@@ -3482,7 +3482,7 @@ til %1</translation>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Servere som støtter vifte diagnostikk</translation>
     </message>
   </context>
   <context>
@@ -3816,7 +3816,7 @@ til %1</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Generisk</translation>
     </message>
     <message>
       <source>Features</source>
@@ -3832,7 +3832,7 @@ til %1</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Arkivstrømmer tillatt</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -4001,16 +4001,16 @@ til %1</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>For å få en Aktiveringsnøkkel-fil, vennligst send den medfølgende lisensnøkkelen og maskinvare-ID til %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Send den medfølgende lisensnøkkelen og maskinvare-IDen til din regionale / lisensstøtte for å få en Aktiveringsnøkkel-fil.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Send den medfølgende lisensnøkkelen og maskinvare-IDen til din regionale / lisenssupport (%1) for å få en aktiveringsnøkkel-fil.</translation>
     </message>
   </context>
   <context>
@@ -4564,7 +4564,7 @@ til %1</translation>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Servere som støtter PoE-overvåking</translation>
     </message>
   </context>
   <context>
@@ -5297,7 +5297,7 @@ til %1</translation>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5796,11 +5796,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>Server er ikke tilgjengelig.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>nå</translation>
     </message>
   </context>
   <context>
@@ -5891,7 +5891,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>smb</source>
-      <translation type="unfinished">smb</translation>
+      <translation>smb</translation>
     </message>
   </context>
   <context>
@@ -6671,7 +6671,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>Kan ikke koble til den angitte serveren</translation>
     </message>
   </context>
   <context>
@@ -6940,7 +6940,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktiver lisens...</translation>
     </message>
   </context>
   <context>
@@ -7563,9 +7563,9 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n verdier</numerusform>
+        <numerusform>+%n verdier</numerusform>
       </translation>
     </message>
   </context>
@@ -8260,7 +8260,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Videotranskoding kreves.</translation>
     </message>
   </context>
   <context>
@@ -8471,7 +8471,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Velg mappe du vil laste opp</translation>
     </message>
   </context>
   <context>
@@ -8565,7 +8565,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>Denne IDen er allerede brukt i systemet. Bruk Generer-knappen for å finne en ledig ID.</translation>
     </message>
   </context>
   <context>
@@ -8932,7 +8932,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Kan ikke sjekke oppdateringer på internett</translation>
     </message>
   </context>
   <context>
@@ -8998,7 +8998,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>Logg på</translation>
     </message>
   </context>
   <context>
@@ -9101,18 +9101,18 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>Oppdateringsinstallasjonen mislyktes.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>Frakoblet</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>Tilkoblet</translation>
     </message>
     <message>
       <source>Powered</source>
@@ -9120,12 +9120,12 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>Uventet</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>Tom</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9137,7 +9137,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Forbruk</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9149,12 +9149,12 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Ukjent enhet</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Ukjent enhet %1</translation>
     </message>
   </context>
   <context>
@@ -9173,24 +9173,24 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>Systemet er ikke koblet til %1. Mobilvarsler fungerer bare når systemet er koblet til %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 Innstillinger</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>%n symboler over</numerusform>
+        <numerusform>%n symboler over</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
       <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
+        <numerusform>%n symboler igjen</numerusform>
         <numerusform>%n symbols left</numerusform>
       </translation>
     </message>
@@ -9259,7 +9259,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Bevegelse + Lavoppløselig</translation>
     </message>
   </context>
   <context>
@@ -9327,7 +9327,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>Kun klient-server videotrafikk kan krypteres</translation>
     </message>
   </context>
   <context>
@@ -9341,7 +9341,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>Det er ingen kompatible servere</translation>
     </message>
   </context>
   <context>
@@ -9771,7 +9771,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>Transkoding er nødvendig. Eksporter økten må startes på nytt.</translation>
     </message>
   </context>
   <context>
@@ -9978,7 +9978,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Vennligst fullfør følgende for deaktivering av lisenser</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>

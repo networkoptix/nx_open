@@ -61,58 +61,58 @@
     </message>
     <message>
       <source>The network connection has been terminated</source>
-      <translation type="unfinished">The network connection has been terminated</translation>
+      <translation>La conexión de red ha finalizado</translation>
     </message>
     <message>
       <source>The server has gone down</source>
-      <translation type="unfinished">The server has gone down</translation>
+      <translation>El servidor se ha caído</translation>
     </message>
     <message>
       <source>The network request was invalid (for example, the URL or scheme is invalid)</source>
-      <translation type="unfinished">The network request was invalid (for example, the URL or scheme is invalid)</translation>
+      <translation>La solicitud de red no era válida (por ejemplo, la URL o el esquema no es válido)</translation>
     </message>
     <message>
       <source>General server failure</source>
-      <translation type="unfinished">General server failure</translation>
+      <translation>Error general del servidor</translation>
     </message>
     <message>
       <source>The server does not have the requested data</source>
-      <translation type="unfinished">The server does not have the requested data</translation>
+      <translation>El servidor no tiene los datos solicitados</translation>
     </message>
     <message>
       <source>The server did not authorize access to the resource</source>
-      <translation type="unfinished">The server did not authorize access to the resource</translation>
+      <translation>El servidor no autorizó el acceso al recurso</translation>
     </message>
     <message>
       <source>A problem with the server certificate occurred</source>
-      <translation type="unfinished">A problem with the server certificate occurred</translation>
+      <translation>Se produjo un problema con el certificado del servidor</translation>
     </message>
     <message>
       <source>Access forbidden by the server</source>
-      <translation type="unfinished">Access forbidden by the server</translation>
+      <translation>Acceso prohibido por el servidor</translation>
     </message>
     <message>
       <source>Unexpected server response</source>
-      <translation type="unfinished">Unexpected server response</translation>
+      <translation>Respuesta inesperada del servidor</translation>
     </message>
     <message>
       <source>Download canceled by the user</source>
-      <translation type="unfinished">Download canceled by the user</translation>
+      <translation>Descarga cancelada por el usuario</translation>
     </message>
   </context>
   <context>
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Detener</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>Recargar y omitir caché</translation>
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>Abrir enlace en esta ventana</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
@@ -124,59 +124,59 @@
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>Cerrar página</translation>
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Deseleccionar</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>&amp;Bold</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>&amp;Italic</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>&amp;Underline</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>&amp;Strikethrough</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>Align &amp;Left</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>Align &amp;Center</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>Align &amp;Right</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>Align &amp;Justified</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp;Indent</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp;Outdent</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>Insert &amp;Ordered List</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>Insert &amp;Unordered List</translation>
     </message>
   </context>
   <context>
@@ -203,67 +203,67 @@
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Deseleccionar</translation>
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>Abrir enlace en esta ventana</translation>
     </message>
     <message>
       <source>Open link in new background tab</source>
-      <translation type="unfinished">Open link in new background tab</translation>
+      <translation>Abrir en una pestaña nueva en segundo plano</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>&amp;Bold</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>&amp;Italic</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>&amp;Underline</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>&amp;Strikethrough</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>Align &amp;Left</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>Align &amp;Center</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>Align &amp;Right</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>Align &amp;Justified</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp;Indent</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp;Outdent</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>Insert &amp;Ordered List</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>Insert &amp;Unordered List</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>¿Estás seguro de que quieres salir de esta página? Los cambios que realizó no se pueden guardar.</translation>
     </message>
     <message>
       <source>&amp;Back</source>
@@ -286,103 +286,103 @@
     <name>RenderViewContextMenuQt</name>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Anterior</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>Siguiente</translation>
     </message>
     <message>
       <source>Reload</source>
-      <translation type="unfinished">Reload</translation>
+      <translation>Recargar</translation>
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Cortar</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copiar</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Pegar</translation>
     </message>
     <message>
       <source>Undo</source>
-      <translation type="unfinished">Undo</translation>
+      <translation>Deshacer</translation>
     </message>
     <message>
       <source>Redo</source>
-      <translation type="unfinished">Redo</translation>
+      <translation>Rehacer</translation>
     </message>
     <message>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>Seleccionar todo</translation>
     </message>
     <message>
       <source>Paste and match style</source>
-      <translation type="unfinished">Paste and match style</translation>
+      <translation>Pegar y coincidir estilo</translation>
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation type="unfinished">Open link in new window</translation>
+      <translation>Abrir enlace en una nueva ventana</translation>
     </message>
     <message>
       <source>Open link in new tab</source>
-      <translation type="unfinished">Open link in new tab</translation>
+      <translation>Abrir enlace en nueva pestaña</translation>
     </message>
     <message>
       <source>Copy link address</source>
-      <translation type="unfinished">Copy link address</translation>
+      <translation>Copiar la dirección del enlace</translation>
     </message>
     <message>
       <source>Save link</source>
-      <translation type="unfinished">Save link</translation>
+      <translation>Guardar enlace</translation>
     </message>
     <message>
       <source>Copy image</source>
-      <translation type="unfinished">Copy image</translation>
+      <translation>Copiar imagen</translation>
     </message>
     <message>
       <source>Copy image address</source>
-      <translation type="unfinished">Copy image address</translation>
+      <translation>Copiar dirección de la imagen</translation>
     </message>
     <message>
       <source>Save image</source>
-      <translation type="unfinished">Save image</translation>
+      <translation>Guardar imagen</translation>
     </message>
     <message>
       <source>Copy media address</source>
-      <translation type="unfinished">Copy media address</translation>
+      <translation>Copiar dirección de medios</translation>
     </message>
     <message>
       <source>Show controls</source>
-      <translation type="unfinished">Show controls</translation>
+      <translation>Mostrar controles</translation>
     </message>
     <message>
       <source>Loop</source>
-      <translation type="unfinished">Loop</translation>
+      <translation>Loop</translation>
     </message>
     <message>
       <source>Save media</source>
-      <translation type="unfinished">Save media</translation>
+      <translation>Guardar medios</translation>
     </message>
     <message>
       <source>Inspect</source>
-      <translation type="unfinished">Inspect</translation>
+      <translation>Examinar</translation>
     </message>
     <message>
       <source>Exit full screen</source>
-      <translation type="unfinished">Exit full screen</translation>
+      <translation>Salir de pantalla completa</translation>
     </message>
     <message>
       <source>Save page</source>
-      <translation type="unfinished">Save page</translation>
+      <translation>Guardar página</translation>
     </message>
     <message>
       <source>View page source</source>
-      <translation type="unfinished">View page source</translation>
+      <translation>Ver código fuente de página</translation>
     </message>
   </context>
   <context>
@@ -397,30 +397,30 @@
     </message>
     <message>
       <source>Javascript Alert - %1</source>
-      <translation type="unfinished">Javascript Alert - %1</translation>
+      <translation>Alerta Javascript - %1</translation>
     </message>
     <message>
       <source>Javascript Confirm - %1</source>
-      <translation type="unfinished">Javascript Confirm - %1</translation>
+      <translation>Javascript Confirmar - %1</translation>
     </message>
     <message>
       <source>Javascript Prompt - %1</source>
-      <translation type="unfinished">Javascript Prompt - %1</translation>
+      <translation>Indicador Javascript - %1</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page?</source>
-      <translation type="unfinished">Are you sure you want to leave this page?</translation>
+      <translation>¿Estás seguro de que quieres salir de esta página?</translation>
     </message>
     <message>
       <source>Changes that you made may not be saved.</source>
-      <translation type="unfinished">Changes that you made may not be saved.</translation>
+      <translation>Los cambios que realizó no se pueden guardar.</translation>
     </message>
   </context>
   <context>
     <name>WebContentsAdapter</name>
     <message>
       <source>HTTP-POST data can only be sent over HTTP(S) protocol</source>
-      <translation type="unfinished">HTTP-POST data can only be sent over HTTP(S) protocol</translation>
+      <translation>Los datos HTTP-POST sólo pueden enviarse a través del protocolo HTTP(S)</translation>
     </message>
   </context>
 </TS>

@@ -134,7 +134,7 @@
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Klikk på hver pil for å veksle mellom ønsket retning.</translation>
     </message>
   </context>
   <context>
@@ -196,7 +196,7 @@
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Polygon er ikke gyldig. Fjern selvkryss for å fortsette.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
