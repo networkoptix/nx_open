@@ -175,8 +175,7 @@ QString AttributesDao::buildSearchableText(
 QString AttributesDao::convertTextFilterToSqliteFtsExpression(const QString& text)
 {
     UserTextSearchExpressionParser parser;
-    const auto [success, conditions] = parser.parse(text);
-    // TODO: Check success.
+    auto conditions = parser.parse(text);
 
     QString expression;
     for (const auto& condition: conditions)

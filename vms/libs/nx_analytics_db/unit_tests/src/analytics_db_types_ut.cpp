@@ -140,6 +140,8 @@ static std::vector<FreeTextAndExpectedResult> kUserInputAndExpectedResults{
     {"MA TR", true}, //< Each word is prefixed.
     {"type:tru", true},
     {"Type:Truck", true},
+    {"$Type", true},
+    {"Type:", true},
 };
 
 INSTANTIATE_TEST_CASE_P(AnalyticsDbFilter,

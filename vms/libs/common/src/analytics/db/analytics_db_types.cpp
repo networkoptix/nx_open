@@ -141,6 +141,7 @@ bool Filter::acceptsAttributes(const Attributes& attributes) const
 {
     TextMatcher textMatcher;
     textMatcher.parse(freeText);
+
     textMatcher.matchAttributes(attributes);
     return textMatcher.matched();
 }
