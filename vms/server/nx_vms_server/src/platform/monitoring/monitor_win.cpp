@@ -26,6 +26,9 @@
 #endif
 
 namespace {
+
+// Parses disk item description returned by PdhGetRawCounterArrayW. String to parse looks
+// like this '1 C: D: E:' in most cases. But sometimes only disk id ('1') might be returned.
 bool parseDiskDescription(LPCWSTR description, int *id, LPCWSTR *partitions) {
     if(!description)
         return false;
