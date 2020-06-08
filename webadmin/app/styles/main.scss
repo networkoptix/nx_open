@@ -713,6 +713,11 @@ iframe.health-monitor {
 }
 
 /* Create a custom checkbox */
+.inline-webadmin .checkmark,
+.master-modal .checkmark {
+  margin-top: unset !important;
+}
+
 .checkmark {
   position   : absolute;
   top        : 0;
