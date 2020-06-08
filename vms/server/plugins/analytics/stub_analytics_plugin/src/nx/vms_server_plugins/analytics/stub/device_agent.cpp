@@ -215,6 +215,10 @@ std::string DeviceAgent::manifestString() const
         {
             "id": ")json" + kBlinkingObjectType + R"json(",
             "name": "Blinking Object"
+        },
+        {
+          "id": ")json" + kCounterObjectType + R"json(",
+          "name": "Counter"
         }
     ])json"
         + (ini().overrideSettingsModelInDeviceAgent ? kOverriddenDeviceAgentSettingsModel : "")
@@ -665,6 +669,25 @@ void DeviceAgent::addFixedObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadat
     objectMetadataPacket->addItem(objectMetadata.get());
 }
 
+void DeviceAgent::addCounterIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
+{
+    if (!m_deviceAgentSettings.generateCounter)
+        return;
+
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    static const Uuid trackId = UuidHelper::randomUuid();
+    objectMetadata->setTypeId(kCounterObjectType);
+    objectMetadata->setTrackId(trackId);
+    objectMetadata->setBoundingBox(Rect(0.05, 0.05, 0.001, 0.001));
+
+    objectMetadata->addAttribute(makePtr<Attribute>(
+        IAttribute::Type::number,
+        "counterValue",
+        std::to_string(m_counterObjectAttributeValue++)));
+
+    objectMetadataPacket->addItem(objectMetadata.get());
+}
+
 std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 {
     std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
@@ -685,6 +708,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
     addBlinkingObjectIfNeeded(metadataTimestampUs, &result, objectMetadataPacket);
     addFixedObjectIfNeeded(objectMetadataPacket);
+    addCounterIfNeeded(objectMetadataPacket);
 
     const microseconds delay(m_lastVideoFrameTimestampUs - metadataTimestampUs);
 
@@ -890,8 +914,6 @@ void DeviceAgent::parseSettings()
             }
         };
 
-    std::string somestuff = settingValue("testPolygon");
-
     m_deviceAgentSettings.generateEvents = toBool(settingValue(kGenerateEventsSetting));
     m_deviceAgentSettings.generateCars = toBool(settingValue(kGenerateCarsSetting));
     m_deviceAgentSettings.generateTrucks = toBool(settingValue(kGenerateTrucksSetting));
@@ -900,6 +922,7 @@ void DeviceAgent::parseSettings()
     m_deviceAgentSettings.generateBicycles = toBool(settingValue(kGenerateBicyclesSetting));
     m_deviceAgentSettings.generateStones = toBool(settingValue(kGenerateStonesSetting));
     m_deviceAgentSettings.generateFixedObject = toBool(settingValue(kGenerateFixedObjectSetting));
+    m_deviceAgentSettings.generateCounter = toBool(settingValue(kGenerateCounterSetting));
 
     assignIntegerSetting(kBlinkingObjectPeriodMsSetting,
         &m_deviceAgentSettings.blinkingObjectPeriodMs);

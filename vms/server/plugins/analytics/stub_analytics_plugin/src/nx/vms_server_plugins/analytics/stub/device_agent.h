@@ -69,6 +69,9 @@ private:
     void addFixedObjectIfNeeded(
         nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
 
+    void addCounterIfNeeded(
+        nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
+
     int64_t usSinceEpoch() const;
 
     void processVideoFrame(const nx::sdk::analytics::IDataPacket* videoFrame, const char* func);
@@ -159,6 +162,7 @@ private:
                 || generateBicycles
                 || generateStones
                 || generateFixedObject
+                || generateCounter
                 || blinkingObjectPeriodMs.load() != std::chrono::milliseconds::zero());
         }
 
@@ -170,6 +174,7 @@ private:
         std::atomic<bool> generateBicycles{true};
         std::atomic<bool> generateStones{false};
         std::atomic<bool> generateFixedObject{false};
+        std::atomic<bool> generateCounter{false};
 
         std::atomic<std::chrono::milliseconds> blinkingObjectPeriodMs{
             std::chrono::milliseconds::zero()};
@@ -232,6 +237,7 @@ private:
     std::mutex m_objectGenerationMutex;
     RandomObjectGenerator m_objectGenerator;
     std::vector<ObjectContext> m_objectContexts;
+    int m_counterObjectAttributeValue = 0;
 };
 
 const std::string kLineCrossingEventType = "nx.stub.lineCrossing";
@@ -243,6 +249,7 @@ const std::string kSuspiciousNoiseEventType = "nx.stub.suspiciousNoise";
 const std::string kSoundRelatedEventGroup = "nx.stub.soundRelatedEvent";
 const std::string kBlinkingObjectType = "nx.stub.blinkingObject";
 const std::string kFixedObjectType = "nx.stub.fixedObject";
+const std::string kCounterObjectType = "nx.stub.counter";
 
 } // namespace stub
 } // namespace analytics
