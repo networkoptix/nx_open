@@ -21,7 +21,7 @@ public:
     cf::future<cf::unit> reloadConfig();
 
     static nx::sdk::analytics::Point parsePoint(const QJsonValue& json, const QString& path = "$");
-    static QJsonObject unparse(const nx::sdk::analytics::Point& point);
+    static QJsonObject serialize(const nx::sdk::analytics::Point& point);
 
 private:
     nx::utils::Url m_url;

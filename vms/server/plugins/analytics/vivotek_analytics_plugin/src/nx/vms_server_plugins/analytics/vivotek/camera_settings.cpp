@@ -58,11 +58,11 @@ public:
     }
 
 private:
-    static bool parseStatus(const QString& unparsedValue)
+    static bool parseStatus(const QString& serializedValue)
     {
-        if (unparsedValue == "off")
+        if (serializedValue == "off")
             return false;
-        if (unparsedValue == "on")
+        if (serializedValue == "on")
             return true;
         throw Exception("Failed to parse module status");
     }
@@ -604,13 +604,13 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca::Enabled* enabled)
 }
 
 
-auto unparseAeToCamera(const CameraSettings::Vca::Installation::Height& entry)
+auto serializeAeToCamera(const CameraSettings::Vca::Installation::Height& entry)
 {
     return entry.value() * 10; // API uses millimeters, while web UI uses centimeters.
 }
 
 template <typename Value>
-auto unparseAeToCamera(const CameraSettings::Entry<Value>& entry)
+auto serializeAeToCamera(const CameraSettings::Entry<Value>& entry)
 {
     return entry.value();
 }
@@ -630,7 +630,7 @@ void storeAeToCamera(CameraVcaParameterApi* api, CameraSettings::Vca* vca)
                     if (!entry->hasValue())
                         return;
 
-                    set(&parameters, keys..., unparseAeToCamera(*entry));
+                    set(&parameters, keys..., serializeAeToCamera(*entry));
                 }
                 catch (const std::exception& exception)
                 {
@@ -693,7 +693,7 @@ void removeRulesExcept(QJsonObject* rules, const std::set<QString>& allowedNames
 }
 
 
-void unparseReToCamera(QJsonValue* jsonRule,
+void serializeReToCamera(QJsonValue* jsonRule,
     CameraSettings::Entry<NamedPolygon>* region)
 {
     try
@@ -708,7 +708,7 @@ void unparseReToCamera(QJsonValue* jsonRule,
 
         QJsonArray field;
         for (const auto& point: region->value())
-            field.push_back(CameraVcaParameterApi::unparse(point));
+            field.push_back(CameraVcaParameterApi::serialize(point));
 
         // Wrapping in another array is intentional. For some reason, camera expects each region
         // as an array of a single array of points.
@@ -720,7 +720,7 @@ void unparseReToCamera(QJsonValue* jsonRule,
     }
 }
 
-void unparseReToCamera(QJsonValue* jsonRule,
+void serializeReToCamera(QJsonValue* jsonRule,
     CameraSettings::Vca::CrowdDetection::Rule::SizeThreshold* sizeThreshold)
 {
     try
@@ -743,7 +743,7 @@ void unparseReToCamera(QJsonValue* jsonRule,
     }
 }
 
-void unparseReToCamera(QJsonValue* jsonRule,
+void serializeReToCamera(QJsonValue* jsonRule,
     CameraSettings::Vca::CrowdDetection::Rule::EnterDelay* enterDelay)
 {
     try
@@ -759,7 +759,7 @@ void unparseReToCamera(QJsonValue* jsonRule,
     }
 }
 
-void unparseReToCamera(QJsonValue* jsonRule,
+void serializeReToCamera(QJsonValue* jsonRule,
     CameraSettings::Vca::CrowdDetection::Rule::ExitDelay* exitDelay)
 {
     try
@@ -782,7 +782,7 @@ void unparseReToCamera(QJsonValue* jsonRule,
     }
 }
 
-void unparseReToCamera(QJsonValue* parameters,
+void serializeReToCamera(QJsonValue* parameters,
     CameraSettings::Vca::CrowdDetection* crowdDetection)
 {
     try
@@ -804,10 +804,10 @@ void unparseReToCamera(QJsonValue* parameters,
                 if (jsonRule.isUndefined() || jsonRule.isNull())
                     jsonRule = QJsonObject{};
 
-                unparseReToCamera(&jsonRule, &rule.region);
-                unparseReToCamera(&jsonRule, &rule.sizeThreshold);
-                unparseReToCamera(&jsonRule, &rule.enterDelay);
-                unparseReToCamera(&jsonRule, &rule.exitDelay);
+                serializeReToCamera(&jsonRule, &rule.region);
+                serializeReToCamera(&jsonRule, &rule.sizeThreshold);
+                serializeReToCamera(&jsonRule, &rule.enterDelay);
+                serializeReToCamera(&jsonRule, &rule.exitDelay);
 
                 jsonRules[*name] = jsonRule;
             }
@@ -821,7 +821,7 @@ void unparseReToCamera(QJsonValue* parameters,
     }
 }
 
-void unparseReToCamera(QJsonValue* jsonRule,
+void serializeReToCamera(QJsonValue* jsonRule,
     CameraSettings::Vca::LoiteringDetection::Rule::Delay* delay)
 {
     try
@@ -844,7 +844,7 @@ void unparseReToCamera(QJsonValue* jsonRule,
     }
 }
 
-void unparseReToCamera(QJsonValue* parameters,
+void serializeReToCamera(QJsonValue* parameters,
     CameraSettings::Vca::LoiteringDetection* loiteringDetection)
 {
     try
@@ -866,8 +866,8 @@ void unparseReToCamera(QJsonValue* parameters,
                 if (jsonRule.isUndefined() || jsonRule.isNull())
                     jsonRule = QJsonObject{};
 
-                unparseReToCamera(&jsonRule, &rule.region);
-                unparseReToCamera(&jsonRule, &rule.delay);
+                serializeReToCamera(&jsonRule, &rule.region);
+                serializeReToCamera(&jsonRule, &rule.delay);
 
                 jsonRules[*name] = jsonRule;
             }
@@ -881,7 +881,7 @@ void unparseReToCamera(QJsonValue* parameters,
     }
 }
 
-void unparseReToCamera(QJsonValue* jsonRule,
+void serializeReToCamera(QJsonValue* jsonRule,
     CameraSettings::Vca::IntrusionDetection::Rule::Inverted* inverted)
 {
     try
@@ -904,7 +904,7 @@ void unparseReToCamera(QJsonValue* jsonRule,
     }
 }
 
-void unparseReToCamera(QJsonValue* parameters,
+void serializeReToCamera(QJsonValue* parameters,
     CameraSettings::Vca::IntrusionDetection* intrusionDetection)
 {
     try
@@ -926,8 +926,8 @@ void unparseReToCamera(QJsonValue* parameters,
                 if (jsonRule.isUndefined() || jsonRule.isNull())
                     jsonRule = QJsonObject{};
 
-                unparseReToCamera(&jsonRule, &rule.region);
-                unparseReToCamera(&jsonRule, &rule.inverted);
+                serializeReToCamera(&jsonRule, &rule.region);
+                serializeReToCamera(&jsonRule, &rule.inverted);
 
                 jsonRules[*name] = jsonRule;
             }
@@ -941,7 +941,7 @@ void unparseReToCamera(QJsonValue* parameters,
     }
 }
 
-QString unparseReToCamera(NamedLine::Direction direction)
+QString serializeReToCamera(NamedLine::Direction direction)
 {
     switch (direction)
     {
@@ -957,7 +957,7 @@ QString unparseReToCamera(NamedLine::Direction direction)
     }
 }
 
-void unparseReToCamera(QJsonValue* jsonRule,
+void serializeReToCamera(QJsonValue* jsonRule,
     CameraSettings::Entry<NamedLine>* line)
 {
     try
@@ -972,13 +972,13 @@ void unparseReToCamera(QJsonValue* jsonRule,
 
         QJsonArray jsonLine;
         for (const auto& point: line->value())
-            jsonLine.push_back(CameraVcaParameterApi::unparse(point));
+            jsonLine.push_back(CameraVcaParameterApi::serialize(point));
 
         // Wrapping in another array is intentional. For some reason, camera expects each line
         // as an array of a single array of points.
         set(jsonRule, "Line", QJsonArray{jsonLine});
 
-        set(jsonRule, "Direction", unparseReToCamera(line->value().direction));
+        set(jsonRule, "Direction", serializeReToCamera(line->value().direction));
     }
     catch (const std::exception& exception)
     {
@@ -986,7 +986,7 @@ void unparseReToCamera(QJsonValue* jsonRule,
     }
 }
 
-void unparseReToCamera(QJsonValue* parameters,
+void serializeReToCamera(QJsonValue* parameters,
     CameraSettings::Vca::LineCrossingDetection* lineCrossingDetection)
 {
     try
@@ -1008,7 +1008,7 @@ void unparseReToCamera(QJsonValue* parameters,
                 if (jsonRule.isUndefined() || jsonRule.isNull())
                     jsonRule = QJsonObject{};
 
-                unparseReToCamera(&jsonRule, &rule.line);
+                serializeReToCamera(&jsonRule, &rule.line);
 
                 jsonRules[*name] = jsonRule;
             }
@@ -1022,16 +1022,16 @@ void unparseReToCamera(QJsonValue* parameters,
     }
 }
 
-void unparseReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
+void serializeReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
 {
     if (auto& crowdDetection = vca->crowdDetection)
-        unparseReToCamera(parameters, &*crowdDetection);
+        serializeReToCamera(parameters, &*crowdDetection);
     if (auto& loiteringDetection = vca->loiteringDetection)
-        unparseReToCamera(parameters, &*loiteringDetection);
+        serializeReToCamera(parameters, &*loiteringDetection);
     if (auto& intrusionDetection = vca->intrusionDetection)
-        unparseReToCamera(parameters, &*intrusionDetection);
+        serializeReToCamera(parameters, &*intrusionDetection);
     if (auto& lineCrossingDetection = vca->lineCrossingDetection)
-        unparseReToCamera(parameters, &*lineCrossingDetection);
+        serializeReToCamera(parameters, &*lineCrossingDetection);
 }
 
 
@@ -1041,7 +1041,7 @@ void storeReToCamera(CameraVcaParameterApi* api, CameraSettings::Vca* vca)
     {
         auto parameters = api->fetch("Config/RE").get();
 
-        unparseReToCamera(&parameters, vca);
+        serializeReToCamera(&parameters, vca);
 
         api->store("Config/RE", parameters).get();
     }
@@ -1144,128 +1144,128 @@ void enumerateEntries(Settings* settings, Visitor visit)
 
 
 void parseEntryFromServer(
-    CameraSettings::Vca::IntrusionDetection::Rule::Inverted* entry, const QString& unparsedValue)
+    CameraSettings::Vca::IntrusionDetection::Rule::Inverted* entry, const QString& serializedValue)
 {
-    if (unparsedValue == "")
+    if (serializedValue == "")
         entry->emplaceNothing();
-    else if (unparsedValue == "false")
+    else if (serializedValue == "false")
         entry->emplaceValue(false);
-    else if (unparsedValue == "true")
+    else if (serializedValue == "true")
         entry->emplaceValue(true);
     else
         throw Exception("Failed to parse boolean");
 }
 
 void parseEntryFromServer(
-    CameraSettings::Entry<bool>* entry, const QString& unparsedValue)
+    CameraSettings::Entry<bool>* entry, const QString& serializedValue)
 {
-    if (unparsedValue == "false")
+    if (serializedValue == "false")
         entry->emplaceValue(false);
-    else if (unparsedValue == "true")
+    else if (serializedValue == "true")
         entry->emplaceValue(true);
     else
         throw Exception("Failed to parse boolean");
 }
 
 void parseEntryFromServer(
-    CameraSettings::Vca::Sensitivity* entry, const QString& unparsedValue)
+    CameraSettings::Vca::Sensitivity* entry, const QString& serializedValue)
 {
-    if (unparsedValue.isEmpty())
+    if (serializedValue.isEmpty())
     {
         entry->emplaceNothing();
         return;
     }
 
-    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 1, 10));
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 1, 10));
 }
 
 void parseEntryFromServer(
-    CameraSettings::Vca::Installation::Height* entry, const QString& unparsedValue)
+    CameraSettings::Vca::Installation::Height* entry, const QString& serializedValue)
 {
-    if (unparsedValue.isEmpty())
+    if (serializedValue.isEmpty())
     {
         entry->emplaceNothing();
         return;
     }
 
-    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 2000));
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 2000));
 }
 
 void parseEntryFromServer(
-    CameraSettings::Vca::Installation::TiltAngle* entry, const QString& unparsedValue)
+    CameraSettings::Vca::Installation::TiltAngle* entry, const QString& serializedValue)
 {
-    if (unparsedValue.isEmpty())
+    if (serializedValue.isEmpty())
     {
         entry->emplaceNothing();
         return;
     }
 
-    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 179));
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 179));
 }
 
 void parseEntryFromServer(
-    CameraSettings::Vca::Installation::RollAngle* entry, const QString& unparsedValue)
+    CameraSettings::Vca::Installation::RollAngle* entry, const QString& serializedValue)
 {
-    if (unparsedValue.isEmpty())
+    if (serializedValue.isEmpty())
     {
         entry->emplaceNothing();
         return;
     }
 
-    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), -74, +74));
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), -74, +74));
 }
 
 void parseEntryFromServer(
-    CameraSettings::Vca::CrowdDetection::Rule::SizeThreshold* entry, const QString& unparsedValue)
+    CameraSettings::Vca::CrowdDetection::Rule::SizeThreshold* entry, const QString& serializedValue)
 {
-    if (unparsedValue.isEmpty())
+    if (serializedValue.isEmpty())
     {
         entry->emplaceNothing();
         return;
     }
 
-    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 20));
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 20));
 }
 
 void parseEntryFromServer(
-    CameraSettings::Vca::CrowdDetection::Rule::EnterDelay* entry, const QString& unparsedValue)
+    CameraSettings::Vca::CrowdDetection::Rule::EnterDelay* entry, const QString& serializedValue)
 {
-    if (unparsedValue.isEmpty())
+    if (serializedValue.isEmpty())
     {
         entry->emplaceNothing();
         return;
     }
 
-    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 999));
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 999));
 }
 
 void parseEntryFromServer(
-    CameraSettings::Vca::CrowdDetection::Rule::ExitDelay* entry, const QString& unparsedValue)
+    CameraSettings::Vca::CrowdDetection::Rule::ExitDelay* entry, const QString& serializedValue)
 {
-    if (unparsedValue.isEmpty())
+    if (serializedValue.isEmpty())
     {
         entry->emplaceNothing();
         return;
     }
 
-    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 999));
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 999));
 }
 
 void parseEntryFromServer(
-    CameraSettings::Vca::LoiteringDetection::Rule::Delay* entry, const QString& unparsedValue)
+    CameraSettings::Vca::LoiteringDetection::Rule::Delay* entry, const QString& serializedValue)
 {
-    if (unparsedValue.isEmpty())
+    if (serializedValue.isEmpty())
     {
         entry->emplaceNothing();
         return;
     }
 
-    entry->emplaceValue(std::clamp((int) toDouble(unparsedValue), 0, 999));
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 999));
 }
 
-void parseEntryFromServer(CameraSettings::Entry<int>* entry, const QString& unparsedValue)
+void parseEntryFromServer(CameraSettings::Entry<int>* entry, const QString& serializedValue)
 {
-    entry->emplaceValue(toInt(unparsedValue));
+    entry->emplaceValue(toInt(serializedValue));
 }
 
 bool parseFromServer(NamedPointSequence* points, const QJsonValue& json)
@@ -1292,9 +1292,9 @@ bool parseFromServer(NamedPointSequence* points, const QJsonValue& json)
 }
 
 void parseEntryFromServer(
-    CameraSettings::Entry<NamedPolygon>* entry, const QString& unparsedValue)
+    CameraSettings::Entry<NamedPolygon>* entry, const QString& serializedValue)
 {
-    const auto json = parseJson(unparsedValue.toUtf8());
+    const auto json = parseJson(serializedValue.toUtf8());
 
     NamedPolygon polygon;
     if (!parseFromServer(&polygon, json))
@@ -1306,22 +1306,22 @@ void parseEntryFromServer(
     entry->emplaceValue(std::move(polygon));
 }
 
-void parseFromServer(NamedLine::Direction* direction, const QString& unparsedValue)
+void parseFromServer(NamedLine::Direction* direction, const QString& serializedValue)
 {
-    if (unparsedValue == "absent")
+    if (serializedValue == "absent")
         *direction = NamedLine::Direction::any;
-    else if (unparsedValue == "right")
+    else if (serializedValue == "right")
         *direction = NamedLine::Direction::leftToRight;
-    else if (unparsedValue == "left")
+    else if (serializedValue == "left")
         *direction = NamedLine::Direction::rightToLeft;
     else
-        throw Exception("Unknown LineFigure direction: %1", unparsedValue);
+        throw Exception("Unknown LineFigure direction: %1", serializedValue);
 }
 
 void parseEntryFromServer(
-    CameraSettings::Entry<NamedLine>* entry, const QString& unparsedValue)
+    CameraSettings::Entry<NamedLine>* entry, const QString& serializedValue)
 {
-    const auto json = parseJson(unparsedValue.toUtf8());
+    const auto json = parseJson(serializedValue.toUtf8());
 
     NamedLine line;
     if (!parseFromServer(&line, json))
@@ -1335,7 +1335,7 @@ void parseEntryFromServer(
     entry->emplaceValue(std::move(line));
 }
 
-std::optional<QString> unparseEntryToServer(
+std::optional<QString> serializeEntryToServer(
     const CameraSettings::Vca::IntrusionDetection::Rule::Inverted& entry)
 {
     if (!entry.hasValue())
@@ -1344,7 +1344,7 @@ std::optional<QString> unparseEntryToServer(
     return entry.value() ? "true" : "false";
 }
 
-std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<bool>& entry)
+std::optional<QString> serializeEntryToServer(const CameraSettings::Entry<bool>& entry)
 {
     if (!entry.hasValue())
         return std::nullopt;
@@ -1352,7 +1352,7 @@ std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<bool>& e
     return entry.value() ? "true" : "false";
 }
 
-std::optional<QString> unparseEntryToServer(const CameraSettings::Vca::Sensitivity& entry)
+std::optional<QString> serializeEntryToServer(const CameraSettings::Vca::Sensitivity& entry)
 {
     if (!entry.hasValue())
         return "";
@@ -1360,7 +1360,7 @@ std::optional<QString> unparseEntryToServer(const CameraSettings::Vca::Sensitivi
     return QString::number(entry.value());
 }
 
-std::optional<QString> unparseEntryToServer(
+std::optional<QString> serializeEntryToServer(
     const CameraSettings::Vca::Installation::Height& entry)
 {
     if (!entry.hasValue())
@@ -1369,7 +1369,7 @@ std::optional<QString> unparseEntryToServer(
     return QString::number(entry.value());
 }
 
-std::optional<QString> unparseEntryToServer(
+std::optional<QString> serializeEntryToServer(
     const CameraSettings::Vca::Installation::TiltAngle& entry)
 {
     if (!entry.hasValue())
@@ -1378,7 +1378,7 @@ std::optional<QString> unparseEntryToServer(
     return QString::number(entry.value());
 }
 
-std::optional<QString> unparseEntryToServer(
+std::optional<QString> serializeEntryToServer(
     const CameraSettings::Vca::Installation::RollAngle& entry)
 {
     if (!entry.hasValue())
@@ -1387,7 +1387,7 @@ std::optional<QString> unparseEntryToServer(
     return QString::number(entry.value());
 }
 
-std::optional<QString> unparseEntryToServer(
+std::optional<QString> serializeEntryToServer(
     const CameraSettings::Vca::CrowdDetection::Rule::SizeThreshold& entry)
 {
     if (!entry.hasValue())
@@ -1396,7 +1396,7 @@ std::optional<QString> unparseEntryToServer(
     return QString::number(entry.value());
 }
 
-std::optional<QString> unparseEntryToServer(
+std::optional<QString> serializeEntryToServer(
     const CameraSettings::Vca::CrowdDetection::Rule::EnterDelay& entry)
 {
     if (!entry.hasValue())
@@ -1405,7 +1405,7 @@ std::optional<QString> unparseEntryToServer(
     return QString::number(entry.value());
 }
 
-std::optional<QString> unparseEntryToServer(
+std::optional<QString> serializeEntryToServer(
     const CameraSettings::Vca::CrowdDetection::Rule::ExitDelay& entry)
 {
     if (!entry.hasValue())
@@ -1414,7 +1414,7 @@ std::optional<QString> unparseEntryToServer(
     return QString::number(entry.value());
 }
 
-std::optional<QString> unparseEntryToServer(
+std::optional<QString> serializeEntryToServer(
     const CameraSettings::Vca::LoiteringDetection::Rule::Delay& entry)
 {
     if (!entry.hasValue())
@@ -1423,7 +1423,7 @@ std::optional<QString> unparseEntryToServer(
     return QString::number(entry.value());
 }
 
-std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<int>& entry)
+std::optional<QString> serializeEntryToServer(const CameraSettings::Entry<int>& entry)
 {
     if (!entry.hasValue())
         return std::nullopt;
@@ -1431,7 +1431,7 @@ std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<int>& en
     return QString::number(entry.value());
 }
 
-QJsonObject unparseToServer(const NamedPointSequence* points)
+QJsonObject serializeToServer(const NamedPointSequence* points)
 {
     if (!points)
     {
@@ -1459,18 +1459,18 @@ QJsonObject unparseToServer(const NamedPointSequence* points)
     };
 }
 
-std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<NamedPolygon>& entry)
+std::optional<QString> serializeEntryToServer(const CameraSettings::Entry<NamedPolygon>& entry)
 {
     const NamedPolygon* polygon = nullptr;
     if (entry.hasValue())
         polygon = &entry.value();
 
-    auto json = unparseToServer(polygon);
+    auto json = serializeToServer(polygon);
 
-    return unparseJson(json);
+    return serializeJson(json);
 }
 
-QString unparseToServer(NamedLine::Direction direction)
+QString serializeToServer(NamedLine::Direction direction)
 {
     switch (direction)
     {
@@ -1486,18 +1486,18 @@ QString unparseToServer(NamedLine::Direction direction)
     }
 }
 
-std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<NamedLine>& entry)
+std::optional<QString> serializeEntryToServer(const CameraSettings::Entry<NamedLine>& entry)
 {
     const NamedLine* line = nullptr;
     if (entry.hasValue())
         line = &entry.value();
 
-    auto json = unparseToServer(line);
+    auto json = serializeToServer(line);
 
     if (line)
-        set(&json, "figure", "direction", unparseToServer(line->direction));
+        set(&json, "figure", "direction", serializeToServer(line->direction));
 
-    return unparseJson(json);
+    return serializeJson(json);
 }
 
 
@@ -1803,14 +1803,14 @@ void CameraSettings::parseFromServer(const IStringMap& values)
         {
             try
             {
-                const char* unparsedValue = values.value(name.toStdString().data());
-                if (!unparsedValue)
+                const char* serializedValue = values.value(name.toStdString().data());
+                if (!serializedValue)
                 {
                     entry->emplaceNothing();
                     return;
                 }
 
-                parseEntryFromServer(entry, unparsedValue);
+                parseEntryFromServer(entry, serializedValue);
             }
             catch (const std::exception& exception)
             {
@@ -1819,7 +1819,7 @@ void CameraSettings::parseFromServer(const IStringMap& values)
         });
 }
 
-Ptr<StringMap> CameraSettings::unparseToServer()
+Ptr<StringMap> CameraSettings::serializeToServer()
 {
     auto values = makePtr<StringMap>();
 
@@ -1828,8 +1828,8 @@ Ptr<StringMap> CameraSettings::unparseToServer()
         {
             try
             {
-                if (const auto unparsedValue = unparseEntryToServer(*entry))
-                    values->setItem(name.toStdString(), unparsedValue->toStdString());
+                if (const auto serializedValue = serializeEntryToServer(*entry))
+                    values->setItem(name.toStdString(), serializedValue->toStdString());
             }
             catch (const std::exception& exception)
             {

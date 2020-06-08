@@ -23,7 +23,7 @@ QJsonValue parseJson(const QByteArray& bytes)
     throw Exception("Failed to parse json: %1", error.errorString());
 }
 
-QByteArray unparseJson(const QJsonValue& json)
+QByteArray serializeJson(const QJsonValue& json)
 {
     QJsonDocument document;
     if (json.isObject())
@@ -31,7 +31,7 @@ QByteArray unparseJson(const QJsonValue& json)
     else if (json.isArray())
         document.setArray(json.toArray());
     else if (!NX_ASSERT(json.isObject() || json.isArray()))
-        throw std::invalid_argument("Can only unparse object or array");
+        throw std::invalid_argument("Can only serialize object or array");
     return document.toJson(QJsonDocument::Compact);
 }
 

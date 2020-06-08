@@ -34,7 +34,7 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 std::string Engine::manifestString() const
 {
-    return unparseJson(QJsonObject{}).toStdString();
+    return serializeJson(QJsonObject{}).toStdString();
 }
 
 void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)

@@ -156,7 +156,7 @@ public:
     void storeTo(const nx::utils::Url& cameraUrl);
 
     void parseFromServer(const nx::sdk::IStringMap& values);
-    nx::sdk::Ptr<nx::sdk::StringMap> unparseToServer();
+    nx::sdk::Ptr<nx::sdk::StringMap> serializeToServer();
 
     nx::sdk::Ptr<nx::sdk::StringMap> getErrorMessages() const;
 

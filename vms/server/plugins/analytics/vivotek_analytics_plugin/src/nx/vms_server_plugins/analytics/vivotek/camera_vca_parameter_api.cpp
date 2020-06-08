@@ -41,7 +41,7 @@ cf::future<cf::unit> CameraVcaParameterApi::store(
 {
     auto url = m_url;
     url.setPath(NX_FMT("/VCA/%1", scope));
-    return m_httpClient.post(url, "application/json", unparseJson(parameters))
+    return m_httpClient.post(url, "application/json", serializeJson(parameters))
         .then(cf::discard_value)
         .then(addExceptionContextAndRethrow(
             "Failed to store %1 VCA parameters to %2", scope, withoutUserInfo(m_url)));
@@ -75,17 +75,17 @@ Point CameraVcaParameterApi::parsePoint(const QJsonValue& json, const QString& p
     return Point(parseCoord("x"), parseCoord("y"));
 }
 
-QJsonObject CameraVcaParameterApi::unparse(const Point& point)
+QJsonObject CameraVcaParameterApi::serialize(const Point& point)
 {
-    const auto unparseCoord =
+    const auto serializeCoord =
         [&](float value)
         {
             return (int) std::round(value * kCoordDomain);
         };
 
     return QJsonObject{
-        {"x", unparseCoord(point.x)},
-        {"y", unparseCoord(point.y)},
+        {"x", serializeCoord(point.x)},
+        {"y", serializeCoord(point.y)},
     };
 }
 

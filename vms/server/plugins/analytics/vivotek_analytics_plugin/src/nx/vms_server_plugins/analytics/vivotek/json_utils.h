@@ -13,7 +13,7 @@
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 QJsonValue parseJson(const QByteArray& bytes);
-QByteArray unparseJson(const QJsonValue& json);
+QByteArray serializeJson(const QJsonValue& json);
 
 namespace json_utils_detail {
 

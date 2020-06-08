@@ -107,7 +107,7 @@ void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* outRes
         self.updateAvailableMetadataTypes(settings);
         self.refreshMetadataStreaming();
 
-        auto values = settings.unparseToServer();
+        auto values = settings.serializeToServer();
         auto errorMessages = settings.getErrorMessages();
         *outResult = new SettingsResponse(std::move(values), std::move(errorMessages));
     }
@@ -169,7 +169,7 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
             {"deviceAgentSettingsModel", CameraSettings::getModelForManifest(m_features)},
         };
 
-        *outResult = new sdk::String(unparseJson(manifest).toStdString());
+        *outResult = new sdk::String(serializeJson(manifest).toStdString());
     }
     catch (const Exception& exception)
     {

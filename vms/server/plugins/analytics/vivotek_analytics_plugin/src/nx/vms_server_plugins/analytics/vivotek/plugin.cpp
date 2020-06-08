@@ -21,7 +21,7 @@ Result<IEngine*> Plugin::doObtainEngine()
 
 std::string Plugin::manifestString() const
 {
-    return unparseJson(QJsonObject{
+    return serializeJson(QJsonObject{
         {"id", "nx.vivotek"},
         {"name", "Vivotek analytics plugin"},
         {"description", "Supports analytics on Vivotek cameras."},
