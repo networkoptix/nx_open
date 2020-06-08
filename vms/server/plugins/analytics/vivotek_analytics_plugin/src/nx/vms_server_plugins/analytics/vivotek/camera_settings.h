@@ -12,6 +12,7 @@
 
 #include "camera_features.h"
 #include "named_polygon.h"
+#include "named_line.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -133,6 +134,16 @@ public:
             std::vector<Rule> rules;
         };
         std::optional<IntrusionDetection> intrusionDetection;
+
+        struct LineCrossingDetection
+        {
+            struct Rule
+            {
+                NX_CAMERA_SETTINGS_ENTRY(Vca.LineCrossingDetection.Rule#, Line, NamedLine) line;
+            };
+            std::vector<Rule> rules;
+        };
+        std::optional<LineCrossingDetection> lineCrossingDetection;
     };
     std::optional<Vca> vca;
 

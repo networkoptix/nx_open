@@ -118,6 +118,15 @@ void fillReErrors(CameraSettings::Vca::IntrusionDetection* intrusionDetection,
     }
 }
 
+void fillReErrors(CameraSettings::Vca::LineCrossingDetection* lineCrossingDetection,
+    const QString& message)
+{
+    for (auto& rule: lineCrossingDetection->rules)
+    {
+        fillReErrors(&rule.line, message);
+    }
+}
+
 void fillReErrors(CameraSettings::Vca* vca, const QString& message)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -126,6 +135,8 @@ void fillReErrors(CameraSettings::Vca* vca, const QString& message)
         fillReErrors(&*loiteringDetection, message);
     if (auto& intrusionDetection = vca->intrusionDetection)
         fillReErrors(&*intrusionDetection, message);
+    if (auto& lineCrossingDetection = vca->lineCrossingDetection)
+        fillReErrors(&*lineCrossingDetection, message);
 }
 
 
@@ -400,6 +411,81 @@ void parseReFromCamera(CameraSettings::Vca::IntrusionDetection* intrusionDetecti
     }
 }
 
+void parseReFromCamera(NamedLine::Direction* direction,
+    const QJsonValue& rule, const QString& path)
+{
+    const auto nativeDirection = get<QString>(path, rule, "Direction");
+    if (nativeDirection == "Any")
+        *direction = NamedLine::Direction::any;
+    else if (nativeDirection == "Out")
+        *direction = NamedLine::Direction::leftToRight;
+    else if (nativeDirection == "In")
+        *direction = NamedLine::Direction::rightToLeft;
+    else
+        throw Exception("Unexpected value of %1.Direction: %2", path, nativeDirection);
+}
+
+void parseReFromCamera(CameraSettings::Entry<NamedLine>* line,
+    const QJsonValue& rule, const QString& ruleName, const QString& path)
+{
+    try
+    {
+        auto& value = line->emplaceValue();
+
+        value.name = ruleName;
+
+        // That last 0 is intentional. For some reason, camera returns each line as an array of
+        // a single array of points.
+        const auto jsonLine = get<QJsonArray>(path, rule, "Line", 0);
+        for (int i = 0; i < jsonLine.size(); ++i)
+        {
+            value.push_back(CameraVcaParameterApi::parsePoint(
+                jsonLine[i], NX_FMT("%1.Line[%2]", path, i)));
+        }
+
+        parseReFromCamera(&value.direction, rule, path);
+    }
+    catch (const std::exception& exception)
+    {
+        line->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::LineCrossingDetection* lineCrossingDetection,
+    const QJsonValue& parameters)
+{
+    try
+    {
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(parameters, "LineCrossingDetection").isUndefined())
+            jsonRules = get<QJsonObject>(parameters, "LineCrossingDetection");
+
+        const auto ruleNames = jsonRules.keys();
+
+        auto& rules = lineCrossingDetection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+            if (i >= (std::size_t) ruleNames.size())
+            {
+                rule.line.emplaceNothing();
+                continue;
+            }
+
+            const auto& ruleName = ruleNames[i];
+            const auto& jsonRule = jsonRules[ruleName];
+
+            const QString path = NX_FMT("$.LineCrossingDetection.%1", ruleName);
+
+            parseReFromCamera(&rule.line, jsonRule, ruleName, path);
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(lineCrossingDetection, exception.what());
+    }
+}
+
 void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -408,6 +494,8 @@ void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
         parseReFromCamera(&*loiteringDetection, parameters);
     if (auto& intrusionDetection = vca->intrusionDetection)
         parseReFromCamera(&*intrusionDetection, parameters);
+    if (auto& lineCrossingDetection = vca->lineCrossingDetection)
+        parseReFromCamera(&*lineCrossingDetection, parameters);
 }
 
 
@@ -561,22 +649,35 @@ void storeAeToCamera(CameraVcaParameterApi* api, CameraSettings::Vca* vca)
 }
 
 
-std::optional<QString> getName(const CameraSettings::Entry<NamedPolygon>& entry)
+template <typename NamedThing>
+std::optional<QString> getName(const CameraSettings::Entry<NamedThing>& entry)
 {
     if (!entry.hasValue())
         return std::nullopt;
 
-    const auto& region = entry.value();
-    return region.name;
+    const auto& thing = entry.value();
+    return thing.name;
 }
 
 template <typename Rule>
-std::set<QString> getRegionNames(const std::vector<Rule>& rules)
+auto getName(const Rule& rule) -> decltype(getName(rule.region))
+{
+    return getName(rule.region);
+}
+
+template <typename Rule>
+auto getName(const Rule& rule) -> decltype(getName(rule.line))
+{
+    return getName(rule.line);
+}
+
+template <typename Rule>
+std::set<QString> getNames(const std::vector<Rule>& rules)
 {
     std::set<QString> names;
     for (const auto& rule: rules)
     {
-        if (auto name = getName(rule.region))
+        if (auto name = getName(rule))
             names.insert(*name);
     }
     return names;
@@ -692,12 +793,12 @@ void unparseReToCamera(QJsonValue* parameters,
         if (!get<QJsonValue>(*parameters, "CrowdDetection").isUndefined())
         {
             jsonRules = get<QJsonObject>(*parameters, "CrowdDetection");
-            removeRulesExcept(&jsonRules, getRegionNames(rules));
+            removeRulesExcept(&jsonRules, getNames(rules));
         }
 
         for (auto& rule: rules)
         {
-            if (auto name = getName(rule.region))
+            if (auto name = getName(rule))
             {
                 QJsonValue jsonRule = jsonRules[*name];
                 if (jsonRule.isUndefined() || jsonRule.isNull())
@@ -754,12 +855,12 @@ void unparseReToCamera(QJsonValue* parameters,
         if (!get<QJsonValue>(*parameters, "LoiteringDetection").isUndefined())
         {
             jsonRules = get<QJsonObject>(*parameters, "LoiteringDetection");
-            removeRulesExcept(&jsonRules, getRegionNames(rules));
+            removeRulesExcept(&jsonRules, getNames(rules));
         }
 
         for (auto& rule: rules)
         {
-            if (auto name = getName(rule.region))
+            if (auto name = getName(rule))
             {
                 QJsonValue jsonRule = jsonRules[*name];
                 if (jsonRule.isUndefined() || jsonRule.isNull())
@@ -814,12 +915,12 @@ void unparseReToCamera(QJsonValue* parameters,
         if (!get<QJsonValue>(*parameters, "IntrusionDetection").isUndefined())
         {
             jsonRules = get<QJsonObject>(*parameters, "IntrusionDetection");
-            removeRulesExcept(&jsonRules, getRegionNames(rules));
+            removeRulesExcept(&jsonRules, getNames(rules));
         }
 
         for (auto& rule: rules)
         {
-            if (auto name = getName(rule.region))
+            if (auto name = getName(rule))
             {
                 QJsonValue jsonRule = jsonRules[*name];
                 if (jsonRule.isUndefined() || jsonRule.isNull())
@@ -840,6 +941,87 @@ void unparseReToCamera(QJsonValue* parameters,
     }
 }
 
+QString unparseReToCamera(NamedLine::Direction direction)
+{
+    switch (direction)
+    {
+        case NamedLine::Direction::any:
+            return "Any";
+        case NamedLine::Direction::leftToRight:
+            return "Out";
+        case NamedLine::Direction::rightToLeft:
+            return "In";
+        default:
+            NX_ASSERT(false, "Unknown NamedLine::Direction value: %1", (int) direction);
+            return "";
+    }
+}
+
+void unparseReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Entry<NamedLine>* line)
+{
+    try
+    {
+        if (!line->hasValue())
+            return;
+
+        set(jsonRule, "RuleName", line->value().name);
+        set(jsonRule, "EventName", line->value().name);
+
+        set(jsonRule, "Line3D", QJsonValue::Undefined);
+
+        QJsonArray jsonLine;
+        for (const auto& point: line->value())
+            jsonLine.push_back(CameraVcaParameterApi::unparse(point));
+
+        // Wrapping in another array is intentional. For some reason, camera expects each line
+        // as an array of a single array of points.
+        set(jsonRule, "Line", QJsonArray{jsonLine});
+
+        set(jsonRule, "Direction", unparseReToCamera(line->value().direction));
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(line, exception.what());
+    }
+}
+
+void unparseReToCamera(QJsonValue* parameters,
+    CameraSettings::Vca::LineCrossingDetection* lineCrossingDetection)
+{
+    try
+    {
+        auto& rules = lineCrossingDetection->rules;
+
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(*parameters, "LineCrossingDetection").isUndefined())
+        {
+            jsonRules = get<QJsonObject>(*parameters, "LineCrossingDetection");
+            removeRulesExcept(&jsonRules, getNames(rules));
+        }
+
+        for (auto& rule: rules)
+        {
+            if (auto name = getName(rule))
+            {
+                QJsonValue jsonRule = jsonRules[*name];
+                if (jsonRule.isUndefined() || jsonRule.isNull())
+                    jsonRule = QJsonObject{};
+
+                unparseReToCamera(&jsonRule, &rule.line);
+
+                jsonRules[*name] = jsonRule;
+            }
+        }
+
+        set(parameters, "LineCrossingDetection", jsonRules);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(lineCrossingDetection, exception.what());
+    }
+}
+
 void unparseReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -848,6 +1030,8 @@ void unparseReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
         unparseReToCamera(parameters, &*loiteringDetection);
     if (auto& intrusionDetection = vca->intrusionDetection)
         unparseReToCamera(parameters, &*intrusionDetection);
+    if (auto& lineCrossingDetection = vca->lineCrossingDetection)
+        unparseReToCamera(parameters, &*lineCrossingDetection);
 }
 
 
@@ -942,6 +1126,17 @@ void enumerateEntries(Settings* settings, Visitor visit)
 
                 repeatedVisit(i, &rule.region);
                 repeatedVisit(i, &rule.inverted);
+            }
+        }
+
+        if (auto& lineCrossingDetection = vca->lineCrossingDetection)
+        {
+            auto& rules = lineCrossingDetection->rules;
+            for (std::size_t i = 0; i < rules.size(); ++i)
+            {
+                auto& rule = rules[i];
+
+                repeatedVisit(i, &rule.line);
             }
         }
     }
@@ -1111,6 +1306,34 @@ void parseEntryFromServer(
     entry->emplaceValue(std::move(polygon));
 }
 
+void parseFromServer(NamedLine::Direction* direction, const QString& unparsedValue)
+{
+    if (unparsedValue == "absent")
+        *direction = NamedLine::Direction::any;
+    else if (unparsedValue == "right")
+        *direction = NamedLine::Direction::leftToRight;
+    else if (unparsedValue == "left")
+        *direction = NamedLine::Direction::rightToLeft;
+    else
+        throw Exception("Unknown LineFigure direction: %1", unparsedValue);
+}
+
+void parseEntryFromServer(
+    CameraSettings::Entry<NamedLine>* entry, const QString& unparsedValue)
+{
+    const auto json = parseJson(unparsedValue.toUtf8());
+
+    NamedLine line;
+    if (!parseFromServer(&line, json))
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    parseFromServer(&line.direction, get<QString>(json, "figure", "direction"));
+
+    entry->emplaceValue(std::move(line));
+}
 
 std::optional<QString> unparseEntryToServer(
     const CameraSettings::Vca::IntrusionDetection::Rule::Inverted& entry)
@@ -1208,7 +1431,7 @@ std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<int>& en
     return QString::number(entry.value());
 }
 
-QJsonValue unparseToServer(const NamedPointSequence* points)
+QJsonObject unparseToServer(const NamedPointSequence* points)
 {
     if (!points)
     {
@@ -1242,7 +1465,39 @@ std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<NamedPol
     if (entry.hasValue())
         polygon = &entry.value();
 
-    return unparseJson(unparseToServer(polygon));
+    auto json = unparseToServer(polygon);
+
+    return unparseJson(json);
+}
+
+QString unparseToServer(NamedLine::Direction direction)
+{
+    switch (direction)
+    {
+        case NamedLine::Direction::any:
+            return "absent";
+        case NamedLine::Direction::leftToRight:
+            return "right";
+        case NamedLine::Direction::rightToLeft:
+            return "left";
+        default:
+            NX_ASSERT(false, "Unknown NamedLine::Direction value: %1", (int) direction);
+            return "";
+    }
+}
+
+std::optional<QString> unparseEntryToServer(const CameraSettings::Entry<NamedLine>& entry)
+{
+    const NamedLine* line = nullptr;
+    if (entry.hasValue())
+        line = &entry.value();
+
+    auto json = unparseToServer(line);
+
+    if (line)
+        set(&json, "figure", "direction", unparseToServer(line->direction));
+
+    return unparseJson(json);
 }
 
 
@@ -1424,6 +1679,37 @@ QJsonValue getVcaIntrusionDetectionModelForManifest()
     };
 }
 
+QJsonValue getVcaLineCrossingDetectionModelForManifest()
+{
+    using Rule = CameraSettings::Vca::LineCrossingDetection::Rule;
+    return QJsonObject{
+        {"name", "Vca.LineCrossingDetection"},
+        {"type", "Section"},
+        {"caption", "Line Crossing Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) kMaxDetectionRuleCount},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{Rule::Line::name}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", Rule::Line::name},
+                            {"type", "LineFigure"},
+                            {"caption", "Name"},
+                            {"minPoints", 3},
+                            {"maxPoints", 3},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
 QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
 {
     using Vca = CameraSettings::Vca;
@@ -1458,6 +1744,8 @@ QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
                     sections.push_back(getVcaLoiteringDetectionModelForManifest());
                 if (features.intrusionDetection)
                     sections.push_back(getVcaIntrusionDetectionModelForManifest());
+                if (features.lineCrossingDetection)
+                    sections.push_back(getVcaLineCrossingDetectionModelForManifest());
 
                 return sections;
             }(),
@@ -1487,6 +1775,11 @@ CameraSettings::CameraSettings(const CameraFeatures& features)
         {
             auto& intrusionDetection = vca->intrusionDetection.emplace();
             intrusionDetection.rules.resize(kMaxDetectionRuleCount);
+        }
+        if (features.vca->lineCrossingDetection)
+        {
+            auto& lineCrossingDetection = vca->lineCrossingDetection.emplace();
+            lineCrossingDetection.rules.resize(kMaxDetectionRuleCount);
         }
     }
 }
