@@ -301,7 +301,7 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     if (!allowMultipleClientInstances)
     {
         QObject::connect(application, &QtSingleApplication::messageReceived, mainWindow.data(),
-            &MainWindow::handleOpenFile);
+            &MainWindow::handleOpenFile, Qt::QueuedConnection);
     }
 
     client.initDesktopCamera(qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));

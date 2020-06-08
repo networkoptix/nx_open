@@ -3,6 +3,7 @@
 #include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <QtCore/QProcess>
+#include <QtCore/QScopedValueRollback>
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImage>
@@ -1269,46 +1270,58 @@ void ActionHandler::at_dropResourcesAction_triggered()
     if (context()->workbench()->currentLayout()->isLayoutTourReview())
         return;
 
-    auto parameters = menu()->currentParameters(sender());
-
-    QnResourceList resources = parameters.resources();
-    QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
-
-    foreach(QnLayoutResourcePtr r, layouts)
-        resources.removeOne(r);
-
-    QnVideoWallResourceList videowalls = resources.filtered<QnVideoWallResource>();
-    foreach(QnVideoWallResourcePtr r, videowalls)
-        resources.removeOne(r);
-
-    if (!workbench()->currentLayout()->resource())
-        menu()->trigger(action::OpenNewTabAction);
-
-    NX_ASSERT(workbench()->currentLayout()->resource());
-
-    if (workbench()->currentLayout()->resource() &&
-        workbench()->currentLayout()->resource()->locked() &&
-        !resources.empty() &&
-        layouts.empty() &&
-        videowalls.empty())
-    {
-        QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed"));
+    // This method can be called only from the GUI thread.
+    // But it can be called from an event processed in some secondary event loop inside.
+    // Therefore we have to guard it against re-entrance and set up a sort of queue.
+    m_queuedDropParameters.push_back(menu()->currentParameters(sender()));
+    if (m_inDropResourcesAction)
         return;
-    }
 
-    if (!resources.empty())
+    const QScopedValueRollback guard(m_inDropResourcesAction, true);
+    do
     {
-        if (parameters.widgets().isEmpty()) //< Triggered by resources tree view
-            parameters.setResources(resources);
-        if (!menu()->triggerIfPossible(action::OpenInCurrentLayoutAction, parameters))
-            menu()->triggerIfPossible(action::OpenInNewTabAction, parameters);
-    }
+        auto parameters = m_queuedDropParameters.takeFirst();
 
-    if (!layouts.empty())
-        menu()->trigger(action::OpenInNewTabAction, layouts);
+        QnResourceList resources = parameters.resources();
+        QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
 
-    for (const auto& videoWall: videowalls)
-        menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
+        foreach (QnLayoutResourcePtr r, layouts)
+            resources.removeOne(r);
+
+        QnVideoWallResourceList videowalls = resources.filtered<QnVideoWallResource>();
+        foreach (QnVideoWallResourcePtr r, videowalls)
+            resources.removeOne(r);
+
+        if (!workbench()->currentLayout()->resource())
+            menu()->trigger(action::OpenNewTabAction);
+
+        NX_ASSERT(workbench()->currentLayout()->resource());
+
+        if (workbench()->currentLayout()->resource() &&
+            workbench()->currentLayout()->resource()->locked() &&
+            !resources.empty() &&
+            layouts.empty() &&
+            videowalls.empty())
+        {
+            QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed"));
+            continue;
+        }
+
+        if (!resources.empty())
+        {
+            if (parameters.widgets().isEmpty()) //< Triggered by resources tree view
+                parameters.setResources(resources);
+            if (!menu()->triggerIfPossible(action::OpenInCurrentLayoutAction, parameters))
+                menu()->triggerIfPossible(action::OpenInNewTabAction, parameters);
+        }
+
+        if (!layouts.empty())
+            menu()->trigger(action::OpenInNewTabAction, layouts);
+
+        for (const auto& videoWall: videowalls)
+            menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
+
+    } while (!m_queuedDropParameters.empty());
 }
 
 void ActionHandler::at_openFileAction_triggered()
