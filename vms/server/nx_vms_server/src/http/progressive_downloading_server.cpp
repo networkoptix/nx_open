@@ -72,7 +72,12 @@ bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFor
     if (streamingFormat == "mpegts")
         return codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_MPEG2VIDEO;
     if (streamingFormat == "mp4" || streamingFormat == "ismv")
-        return codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265 || codec == AV_CODEC_ID_MPEG4;
+    {
+        return codec == AV_CODEC_ID_H264
+            || codec == AV_CODEC_ID_H265
+            || codec == AV_CODEC_ID_MPEG4
+            || codec == AV_CODEC_ID_MJPEG;
+    }
 
     return false;
 }
@@ -528,6 +533,7 @@ void ProgressiveDownloadingServer::run()
     consumerConfig.liveMode = isLive;
     consumerConfig.continuousTimestamps = continuousTimestamps;
     consumerConfig.audioOnly = audioOnly;
+    consumerConfig.streamingFormat = streamingFormat;
     QString endPosition =
         decodedUrlQuery.queryItemValue(StreamingParams::END_POS_PARAM_NAME);
     if (!endPosition.isEmpty())
