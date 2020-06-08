@@ -14,7 +14,7 @@ namespace aio {
 namespace {
 
 template <typename Func, typename Buffer>
-cf::future<std::size_t> futurizeIO(Func func, AbstractAsyncChannel* channel, const Buffer& buffer)
+cf::future<std::size_t> futurizeIo(Func func, AbstractAsyncChannel* channel, const Buffer& buffer)
 {
     cf::promise<std::pair<SystemError::ErrorCode, std::size_t>> promise;
     auto future = promise.get_future();
@@ -43,12 +43,12 @@ cf::future<std::size_t> futurizeIO(Func func, AbstractAsyncChannel* channel, con
 
 cf::future<std::size_t> AbstractAsyncChannel::readSome(Buffer* buffer)
 {
-    return futurizeIO(NX_WRAP_MEM_FUNC_TO_LAMBDA(readSomeAsync), this, buffer);
+    return futurizeIo(NX_WRAP_MEM_FUNC_TO_LAMBDA(readSomeAsync), this, buffer);
 }
 
 cf::future<std::size_t> AbstractAsyncChannel::send(const Buffer& buffer)
 {
-    return futurizeIO(NX_WRAP_MEM_FUNC_TO_LAMBDA(sendAsync), this, buffer);
+    return futurizeIo(NX_WRAP_MEM_FUNC_TO_LAMBDA(sendAsync), this, buffer);
 }
 
 void AbstractAsyncChannel::cancelIOAsync(

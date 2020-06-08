@@ -3,7 +3,8 @@
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 const std::vector<EventType> kEventTypes =
-    [](){
+    []()
+    {
         std::vector<EventType> types;
         {
             auto& type = types.emplace_back();
