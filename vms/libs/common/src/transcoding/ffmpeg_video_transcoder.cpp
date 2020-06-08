@@ -197,7 +197,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->time_base.num = 1;
     m_encoderCtx->time_base.den = m_fixedFrameRate ? m_fixedFrameRate : 60;
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
-    if (m_useMultiThreadEncode)
+    if (m_useMultiThreadEncode && m_codecId != AV_CODEC_ID_MJPEG)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
     AVDictionary* options = nullptr;
