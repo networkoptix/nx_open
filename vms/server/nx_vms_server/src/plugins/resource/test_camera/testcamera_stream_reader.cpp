@@ -8,6 +8,7 @@
 #include <nx/vms/testcamera/packet.h>
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
+#include <nx/vms/event/events/network_issue_event.h>
 
 static constexpr int kTimeoutMs = 10 * 1000;
 
@@ -77,14 +78,30 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
         return result;
     }
 
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
     const auto result = receivePacket();
     if (!result)
     {
-        closeStream();
         NX_VERBOSE(this, "%1() END -> null: receivePacket() failed", __func__);
+        if (!needToStop())
+        {
+            using namespace nx::vms;
+            const auto reasonParamsEncoded = 
+                event::NetworkIssueEvent::encodeTimeoutMsecs(timer.elapsedMs());
+            const auto networkResource = getResource().dynamicCast<QnSecurityCamResource>();
+            if (NX_ASSERT(networkResource))
+            {
+                emit networkResource->networkIssue(
+                    networkResource,
+                    qnSyncTime->currentUSecsSinceEpoch(),
+                    api::EventReason::networkNoFrame,
+                    reasonParamsEncoded);
+            }
+        }
+        closeStream();
         return nullptr;
     }
-
     NX_VERBOSE(this, "%1() END -> MediaData", __func__);
     return result;
 }
