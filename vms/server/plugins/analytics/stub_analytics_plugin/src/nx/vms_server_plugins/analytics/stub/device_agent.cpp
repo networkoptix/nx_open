@@ -115,10 +115,14 @@ DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo)
 
 DeviceAgent::~DeviceAgent()
 {
+    m_terminated = true;
     {
         std::unique_lock<std::mutex> lock(m_pluginDiagnosticEventGenerationLoopMutex);
-        m_terminated = true;
         m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
+    }
+
+    {
+        std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
         m_eventGenerationLoopCondition.notify_all();
     }
 
@@ -411,6 +415,7 @@ void DeviceAgent::doSetNeededMetadataTypes(
 
 void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
+    std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
     NX_OUTPUT << __func__ << "() BEGIN";
     m_eventsNeeded = true;
     m_eventGenerationLoopCondition.notify_all();
@@ -420,6 +425,7 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 
 void DeviceAgent::stopFetchingMetadata()
 {
+    std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
     NX_OUTPUT << __func__ << "() BEGIN";
     m_eventsNeeded = false;
     NX_OUTPUT << __func__ << "() END -> noError";
