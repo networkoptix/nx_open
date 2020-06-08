@@ -427,6 +427,8 @@ void Manager::registerMetadataSink(
         return;
     }
 
+    NX_DEBUG(this, "Registering metadata sink for Device %1", device);
+
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
     MetadataSinkSet metadataSinks;
 
@@ -453,10 +455,12 @@ QWeakPointer<StreamDataReceptor> Manager::registerMediaSource(
     else
         proxySource = QSharedPointer<ProxyStreamDataReceptor>::create();
 
+    NX_DEBUG(this, "Registering media source for Device %1, stream index: %2",
+        deviceId, streamIndex);
+
     proxySource->registerStream(streamIndex);
 
     auto analyticsContext = deviceAnalyticsContextUnsafe(deviceId);
-
     if (analyticsContext)
         proxySource->setProxiedReceptor(analyticsContext);
 

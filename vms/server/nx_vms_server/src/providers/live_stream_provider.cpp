@@ -82,6 +82,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     m_metadataReceptor(new MetadataDataReceptor()),
     m_restartRequested(false)
 {
+    NX_DEBUG(this, "Creating live stream provider, Device: %1", res);
+
     moveToThread(serverModule()->thread()); //< To make sure QueuedConnection works.
 
     QnMotionEstimation::Config config;
@@ -110,6 +112,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, 
         [this](const QnResourcePtr&) 
         {
+            NX_DEBUG(this, "Video layout changed, Device: %1, role: %2", m_cameraRes, getRole());
             m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
             QnMutexLocker lock(&m_liveMutex);
             updateSoftwareMotion();
@@ -120,6 +123,9 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
         Qn::directConnect(m_cameraRes.data(), &QnSecurityCamResource::motionRegionChanged, this,
             [this](const QnResourcePtr&)
             {
+                NX_DEBUG(this, "Motion region changed, Device: %1, role: %2",
+                    m_cameraRes, getRole());
+
                 QnMutexLocker lock(&m_liveMutex);
                 updateSoftwareMotion();
             });
@@ -133,6 +139,10 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
         [this]()
         {
             QnMutexLocker lock(&m_startMutex);
+            NX_DEBUG(this,
+                "Provider thread is about to stop, Device: %1, role: %2, restart is requested: %3",
+                m_cameraRes, getRole(), m_restartRequested);
+
             if (m_restartRequested)
                 startUnsafe();
         }, Qt::QueuedConnection);
@@ -140,6 +150,9 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
 {
+    NX_DEBUG(this, "Destroying live stream provider, Device: %1, role: %2",
+        m_cameraRes, getRole());
+
     {
         QnMutexLocker lock(&m_startMutex);
         m_restartRequested = false;
@@ -163,6 +176,7 @@ QnSharedResourcePointer<QnAbstractVideoCamera> QnLiveStreamProvider::getOwner() 
 
 void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
+    NX_DEBUG(this, "Setting role %1, Device %2", role, m_cameraRes);
     QnAbstractMediaStreamDataProvider::setRole(role);
 }
 
@@ -174,6 +188,10 @@ void QnLiveStreamProvider::beforeRun()
 
     if (NX_ASSERT(serverModule()) && !m_streamDataReceptor)
     {
+        NX_DEBUG(this,
+            "Creating stream data receptor for live stream provider, Device: %1, role: %2",
+            m_cameraRes, getRole());
+
         m_streamDataReceptor = serverModule()->analyticsManager()->registerMediaSource(
             m_cameraRes->getId(), Qn::toStreamIndex(getRole()));
 
@@ -185,6 +203,9 @@ void QnLiveStreamProvider::beforeRun()
 
     if (nx::analytics::loggingIni().isLoggingEnabled() && !m_metadataLogger)
     {
+        NX_DEBUG(this, "Creating metadata logger for live stream provider, Device: %1, role: %2",
+            m_cameraRes, getRole());
+
         m_metadataLogger = std::make_unique<nx::analytics::MetadataLogger>(
             "live_stream_provider_",
             m_cameraRes->getId(),
@@ -432,7 +453,10 @@ void QnLiveStreamProvider::onGotVideoFrame(
 void QnLiveStreamProvider::processMetadata(
     const QnCompressedVideoDataPtr& compressedFrame)
 {
-    NX_VERBOSE(this) << lm("Proceeding with motion detection and/or feeding metadata plugins");
+    NX_VERBOSE(this,
+        "Proceeding with motion detection and/or feeding metadata plugins, "
+        "frame timestamp: %1 us, Device: %2, role: %3",
+        compressedFrame->timestamp, m_cameraRes, getRole());
 
     bool needToAnalyzeMotion = false;
     if (doesStreamSuitMotionAnalysisRequirements())
@@ -464,57 +488,85 @@ void QnLiveStreamProvider::processMetadata(
             getRole(),
             requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo));
 
-        if (motionEstimation->analyzeFrame(
-                compressedFrame,
-                requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo)
-                    ? &uncompressedFrame
-                    : nullptr))
+        const bool motionIsAnalyzed = motionEstimation->analyzeFrame(
+            compressedFrame,
+            requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo)
+                ? &uncompressedFrame
+                : nullptr);
+
+        NX_VERBOSE(this, "analyzeMotion result: %1, Device: %2, role %3",
+            motionIsAnalyzed, m_cameraRes, getRole());
+
+        if (motionIsAnalyzed)
         {
             if (motionEstimation->tryToCreateMotionMetadata())
+            {
                 m_lastMotionMetadata = motionEstimation->getMotion();
+                if (NX_ASSERT(m_lastMotionMetadata,
+                    "Motion metadata is null for Device %1, role: %2", m_cameraRes, getRole()))
+                {
+                    NX_VERBOSE(this,
+                        "Motion metadata has been created for Device %1, "
+                        "role: %2, timestamp: %3 us",
+                        m_cameraRes, getRole(), m_lastMotionMetadata->timestamp);
+                }
+            }
 
             updateStreamResolution(channel, motionEstimation->videoResolution());
         }
     }
     else if (requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo))
     {
-        NX_VERBOSE(this) << lm("Decoding frame for metadata plugins");
+        NX_VERBOSE(this,
+            "Decoding a frame for metadata plugins, frame timestamp: %1 us, Device: %2, role: %3",
+            compressedFrame->timestamp, m_cameraRes, getRole());
+
         uncompressedFrame = motionEstimation->decodeFrame(compressedFrame);
         if (!uncompressedFrame)
         {
             // TODO: #dmishin this logic seems suspicious, investigate it.
             NX_DEBUG(this,
-                "Unable to get decoded frame for metadata plugins, compressed frame timestamp: %1",
-                compressedFrame->timestamp);
+                "Unable to get decoded frame for metadata plugins, "
+                "compressed frame timestamp: %1 us, Device: %2, role: %3",
+                compressedFrame->timestamp, m_cameraRes, getRole());
         }
     }
 
-    if (streamDataReceptor)
+    if (!streamDataReceptor)
     {
-        if (m_lastMotionMetadata && requirements.requiredStreamTypes.testFlag(StreamType::motion))
-        {
-            NX_VERBOSE(this, "Pushing motion metadata to receptor, timestamp: %1 us",
-                m_lastMotionMetadata->timestamp);
+        NX_VERBOSE(this,
+            "No stream data receptor available, skipping metadata, Device: %1, role %2",
+            m_cameraRes, getRole());
 
-            streamDataReceptor->putData(m_lastMotionMetadata);
-        }
+        return;
+    }
 
-        if (requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo)
-            && uncompressedFrame)
-        {
-            NX_VERBOSE(this, "Pushing uncompressed frame to receptor, timestamp: %1 us",
-                compressedFrame->timestamp);
+    if (m_lastMotionMetadata && requirements.requiredStreamTypes.testFlag(StreamType::motion))
+    {
+        NX_VERBOSE(this,
+            "Pushing motion metadata to receptor, timestamp: %1 us, Device %2, role %3",
+            m_lastMotionMetadata->timestamp, m_cameraRes, getRole());
 
-            streamDataReceptor->putData(
-                std::make_shared<nx::streaming::UncompressedVideoPacket>(uncompressedFrame));
-        }
+        streamDataReceptor->putData(m_lastMotionMetadata);
+    }
 
-        if (requirements.requiredStreamTypes.testFlag(StreamType::compressedVideo))
-        {
-            NX_VERBOSE(this, "Pushing compressed frame to receptor, timestamp: %1 us",
-                compressedFrame->timestamp);
-            streamDataReceptor->putData(compressedFrame);
-        }
+    if (requirements.requiredStreamTypes.testFlag(StreamType::uncompressedVideo)
+        && uncompressedFrame)
+    {
+        NX_VERBOSE(this,
+            "Pushing uncompressed frame to receptor, timestamp: %1 us, Device %2, role %3",
+            compressedFrame->timestamp, m_cameraRes, getRole());
+
+        streamDataReceptor->putData(
+            std::make_shared<nx::streaming::UncompressedVideoPacket>(uncompressedFrame));
+    }
+
+    if (requirements.requiredStreamTypes.testFlag(StreamType::compressedVideo))
+    {
+        NX_VERBOSE(this,
+            "Pushing compressed frame to receptor, timestamp: %1 us, Device %2, role %3",
+            compressedFrame->timestamp, m_cameraRes, getRole());
+        streamDataReceptor->putData(compressedFrame);
     }
 }
 
@@ -551,7 +603,8 @@ void QnLiveStreamProvider::onGotInStreamMetadata(
 
         if (requirements.requiredStreamTypes.testFlag(StreamType::metadata))
         {
-            NX_VERBOSE(this, "Pushing in-stream metadata to the plugins");
+            NX_VERBOSE(this, "Pushing in-stream metadata to the plugins, Device: %1, role: %2",
+                m_cameraRes, getRole());
             streamDataReceptor->putData(metadata);
         }
     }
@@ -590,6 +643,9 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
 {
     if (!m_metadataReceptor->metadataQueue.isEmpty())
     {
+        NX_VERBOSE(this, "The queue of the metadata receptor is not empty, Device: %1, role: %2",
+            m_cameraRes, getRole());
+
         QnAbstractCompressedMetadataPtr metadata;
         m_metadataReceptor->metadataQueue.pop(metadata);
 
@@ -605,12 +661,17 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
 
     if (m_lastMotionMetadata && m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
     {
+        NX_VERBOSE(this, "Software motion is present, Device: %1, role: %2",
+            m_cameraRes, getRole());
+
         QnMetaDataV1Ptr motionMetadata = std::move(m_lastMotionMetadata);
         m_lastMotionMetadata.reset();
         return motionMetadata;
     }
     else
     {
+        NX_VERBOSE(this, "Fetching hardware motion from Device %1, role: %2",
+            m_cameraRes, getRole());
         return getCameraMetadata();
     }
 }
@@ -620,8 +681,8 @@ void QnLiveStreamProvider::connectToAnalyticsDbIfNeeded()
     if (getRole() != Qn::ConnectionRole::CR_LiveVideo)
         return;
 
-    NX_DEBUG(this, "Creating Analytics DB connection for Device %1 (%2), stream: %3",
-        m_cameraRes->getUserDefinedName(), m_cameraRes->getId(), getRole());
+    NX_DEBUG(this, "Creating Analytics DB connection for Device %1, role: %3",
+        m_cameraRes, getRole());
 
     const auto analyticsEventReceptor = QnAbstractDataReceptorPtr(
         new nx::analytics::db::AnalyticsEventsReceptor(

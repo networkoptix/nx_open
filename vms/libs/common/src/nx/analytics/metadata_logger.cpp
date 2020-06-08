@@ -285,7 +285,10 @@ void MetadataLogger::logLine(QString lineStr)
         lineStr.append('\n');
 
     if (m_outputFile.isOpen())
+    {
         m_outputFile.write(lineStr.toUtf8());
+        m_outputFile.flush();
+    }
 }
 
 } // namespace nx::analytics

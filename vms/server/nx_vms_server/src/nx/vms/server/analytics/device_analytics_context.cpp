@@ -477,12 +477,18 @@ void DeviceAnalyticsContext::at_deviceStatusChanged(const QnResourcePtr& resourc
     if (!NX_ASSERT(device, "Invalid Device"))
         return;
 
+    NX_DEBUG(this, "Received \"Device status changed\" signal, Device: %1", device);
+
     const Qn::ResourceStatus currentDeviceStatus = device->getStatus();
     const Qn::ResourceStatus previousDeviceStatus =
         m_previousDeviceStatus.exchange(currentDeviceStatus);
 
     if (isAliveStatus(currentDeviceStatus) == isAliveStatus(previousDeviceStatus))
         return;
+
+    NX_DEBUG(this,
+        "Device status changed, Device: %1, previous status: %2, current Device status: %3",
+        device, previousDeviceStatus, currentDeviceStatus);
 
     at_deviceUpdated(resource);
 }
@@ -499,11 +505,13 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
     {
         if (isAlive)
         {
+            NX_DEBUG(this, "Restarting Analytics, Device %1, Engine id: %2", device, engineId);
             binding->restartAnalytics(
                 prepareSettings(engineId, m_device->deviceAgentSettingsValues(engineId)));
         }
         else
         {
+            NX_DEBUG(this, "Stopping Analytics, Device %1, Engine id: %3", device, engineId);
             binding->stopAnalytics();
         }
     }
