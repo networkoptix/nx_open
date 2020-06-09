@@ -2290,7 +2290,7 @@
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>Egendefinert meldingsinnhold</translation>
     </message>
     <message>
       <location/>
@@ -2305,7 +2305,7 @@
     <message>
       <location/>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Kropp</translation>
     </message>
     <message>
       <location/>

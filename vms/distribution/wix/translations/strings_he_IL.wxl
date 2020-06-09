@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1255" Culture="he-il">
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1255" Language="1037" Culture="he-il">
   <String Id="Caption">[WixBundleName] ההתקנה - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>

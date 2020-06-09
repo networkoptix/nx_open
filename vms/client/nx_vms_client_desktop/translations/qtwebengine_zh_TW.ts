@@ -5,11 +5,11 @@
     <name>DownloadInterruptReason</name>
     <message>
       <source>Unknown reason or not interrupted</source>
-      <translation type="unfinished">Unknown reason or not interrupted</translation>
+      <translation>未知原因或未中斷</translation>
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation type="unfinished">General file operation failure</translation>
+      <translation>常規檔案錯誤</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
@@ -25,15 +25,15 @@
     </message>
     <message>
       <source>The file size exceeds the file system limitation</source>
-      <translation type="unfinished">The file size exceeds the file system limitation</translation>
+      <translation>檔案大小超出限制</translation>
     </message>
     <message>
       <source>The file is infected with a virus</source>
-      <translation type="unfinished">The file is infected with a virus</translation>
+      <translation>該檔案已感染病毒</translation>
     </message>
     <message>
       <source>Temporary problem (for example file in use, or too many open files)</source>
-      <translation type="unfinished">Temporary problem (for example file in use, or too many open files)</translation>
+      <translation>暫時性問題（例如檔案為使用中, 或同時開啟過多檔案）</translation>
     </message>
     <message>
       <source>The file was blocked due to local policy</source>
@@ -73,7 +73,7 @@
     </message>
     <message>
       <source>General server failure</source>
-      <translation type="unfinished">General server failure</translation>
+      <translation>常規伺服器錯誤</translation>
     </message>
     <message>
       <source>The server does not have the requested data</source>
@@ -93,11 +93,11 @@
     </message>
     <message>
       <source>Unexpected server response</source>
-      <translation type="unfinished">Unexpected server response</translation>
+      <translation>非預期的伺服器回應</translation>
     </message>
     <message>
       <source>Download canceled by the user</source>
-      <translation type="unfinished">Download canceled by the user</translation>
+      <translation>使用者取消下載</translation>
     </message>
   </context>
   <context>
@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>重新加載並跳過緩存</translation>
     </message>
     <message>
       <source>Open link in this window</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>取消選取</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
@@ -203,7 +203,7 @@
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>取消選取</translation>
     </message>
     <message>
       <source>Open link in this window</source>
@@ -211,7 +211,7 @@
     </message>
     <message>
       <source>Open link in new background tab</source>
-      <translation type="unfinished">Open link in new background tab</translation>
+      <translation>在新的背景分頁中打開連結</translation>
     </message>
     <message>
       <source>&amp;Bold</source>

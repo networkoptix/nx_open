@@ -8467,7 +8467,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>Proxy %1 krever et brukernavn og passord.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
@@ -9116,7 +9116,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>Drevet</translation>
     </message>
     <message>
       <source>Unexpected</source>
@@ -9145,7 +9145,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>Strøm</translation>
     </message>
     <message>
       <source>Unknown device</source>

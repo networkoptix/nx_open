@@ -41,7 +41,7 @@
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Figur</translation>
     </message>
     <message>
       <source>Click to add</source>
@@ -112,7 +112,7 @@
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Linjen er ikke gyldig. Fjern selvkryss for å fortsette.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
@@ -128,7 +128,7 @@
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
       <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>Maksimalt antall poeng er nådd (%n poeng).</numerusform>
         <numerusform>The maximum number of points has been reached (%n points).</numerusform>
       </translation>
     </message>
@@ -207,13 +207,13 @@
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Klikk på det siste punktet for å fullføre tegningen av mangekanten.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
       <translation type="unfinished">
         <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>Maksimalt antall poeng er nådd (%n poeng).</numerusform>
       </translation>
     </message>
   </context>
