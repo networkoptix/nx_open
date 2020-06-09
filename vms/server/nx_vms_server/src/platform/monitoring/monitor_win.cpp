@@ -294,18 +294,21 @@ public:
 
             Hdd hdd(id, QLatin1String("HDD") + QString::number(id), QString::fromWCharArray(partitions));
             // 'partitions' string is unreliable on VirtualBox.
-            if (!hdd.partitions.contains(L':') && driveIndexToPartitions.contains(id))
+            if (!hdd.partitions.contains(L':'))
             {
-                hdd.partitions = driveIndexToPartitions[id];
-            }
-            else
-            {
-                NX_VERBOSE(
-                    this,
-                    "readDiskCounterValues: Disk item '%1' partition '%2' doesn't contain ':'. "
-                    "Using id '%3' instead",
-                    item[i].szName, hdd.partitions, hdd.name);
-                hdd.partitions = hdd.name;
+                if (driveIndexToPartitions.contains(id))
+                {
+                    hdd.partitions = driveIndexToPartitions[id];
+                }
+                else
+                {
+                    NX_VERBOSE(
+                        this,
+                        "readDiskCounterValues: Disk item '%1' partition '%2' doesn't contain ':'. "
+                        "Using id '%3' instead",
+                        item[i].szName, hdd.partitions, hdd.name);
+                    hdd.partitions = hdd.name;
+                }
             }
 
             (*items)[id] = HddItem(hdd,  item[i].RawValue);
