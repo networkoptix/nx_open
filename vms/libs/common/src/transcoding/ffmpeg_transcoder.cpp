@@ -117,6 +117,11 @@ void QnFfmpegTranscoder::closeFfmpegContext()
     }
 }
 
+void QnFfmpegTranscoder::setSourceResolution(const QSize& resolution)
+{
+    m_sourceResolution = resolution;
+}
+
 int QnFfmpegTranscoder::setContainer(const QString& container)
 {
     m_container = container;
@@ -186,6 +191,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
 
         if (m_vTranscoder)
         {
+            m_vTranscoder->setSourceResolution(m_sourceResolution);
             if (!m_vTranscoder->open(video))
             {
                 m_vTranscoder->getLastError().isEmpty();
@@ -202,8 +208,8 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
                     ffmpegVideoTranscoder->getCodecContext());
             }
             else {
-                m_videoEncoderCodecCtx->width = m_vTranscoder->getResolution().width();
-                m_videoEncoderCodecCtx->height = m_vTranscoder->getResolution().height();
+                m_videoEncoderCodecCtx->width = m_vTranscoder->getOutputResolution().width();
+                m_videoEncoderCodecCtx->height = m_vTranscoder->getOutputResolution().height();
             }
             m_videoEncoderCodecCtx->bit_rate = m_vTranscoder->getBitrate();
         }

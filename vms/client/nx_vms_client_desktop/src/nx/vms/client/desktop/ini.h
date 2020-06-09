@@ -146,6 +146,10 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(1, enableAnalyticsPlaybackMask,
         "[Design] Enable playback mode of analytics chunks only.");
 
+    // VMS-18865, VMS-18866
+    NX_INI_FLAG(1, allowMultipleClientInstances,
+        "[Design] Whether client allowed to run in multiple instances (e.g. by desktop shortcut).");
+
     // ---------------------------------------------------------------------------------------------
     // Features section
     // Flags here can be removed when QA approves the feature to be definitely present in the

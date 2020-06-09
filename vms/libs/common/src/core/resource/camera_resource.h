@@ -54,7 +54,13 @@ public:
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
-    virtual int saveAsync();
+
+    /**
+     * Updates resource properties if the resource is present in the resource pool, otherwise does
+     * nothing.
+     */
+    int updateAsync();
+
     void updateDefaultAuthIfEmpty(const QString& login, const QString& password);
 
     //! Camera source URL, commonly - rtsp link.

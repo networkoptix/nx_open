@@ -118,15 +118,18 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     if (!validateLength(settings, durationMs))
         results.set(int(Result::tooLong));
 
-    core::transcoding::FilterChain filters(settings.transcodingSettings);
+    core::transcoding::FilterChain filters(
+        settings.transcodingSettings,
+        settings.mediaResource->getDewarpingParams(),
+        settings.mediaResource->getVideoLayout());
 
-    if (filters.isTranscodingRequired(settings.mediaResource))
+    if (filters.isTranscodingRequired())
     {
         results.set(int(Result::transcoding));
         const auto resolution = estimatedResolution(settings.mediaResource);
         if (!resolution.isEmpty())
         {
-            filters.prepare(settings.mediaResource, resolution, kMaximumResolution);
+            filters.prepare(resolution, kMaximumResolution);
             if (filters.isDownscaleRequired(resolution))
                 results.set(int(Result::downscaling));
         }

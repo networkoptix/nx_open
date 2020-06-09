@@ -32,7 +32,7 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metric
 void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideoSize, AVCodecID dstCodec)
 {
     m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(m_config, m_metrics, dstCodec));
-    m_videoTranscoder->setResolution(dstVideoSize);
+    m_videoTranscoder->setOutputResolutionLimit(dstVideoSize);
 }
 
 void QnRtspFfmpegEncoder::init()

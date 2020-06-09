@@ -513,6 +513,7 @@ int Helper::makeError(
     const QnRestResult::Error& error,
     const QString& errorString)
 {
+    NX_VERBOSE(handler, "Returning error: %1", errorString);
     return handler->makeError(
         httpStatusCode,
         errorString,
@@ -531,26 +532,18 @@ int Helper::makeInvalidParameterError(
 
 int Helper::makeFileError(const QString& fileName, const QString& at)
 {
-    NX_ERROR(handler, "Bad file name: %1", fileName);
     return makeError(
         nx::network::http::StatusCode::badRequest,
         QnRestResult::CantProcessRequest,
-        QString("%1(%2): file does not exist.").arg(at, fileName));
+        nx::format("%1(%2): file does not exist.", at, fileName));
 }
 
 int Helper::makeDownloaderError(ResultCode errorCode)
 {
-    QnJsonRestResult restResult;
-    const auto errorMessage = QString("DistributedFileDownloader returned error: %1").arg(
-        QnLexical::serialized(errorCode));
-    NX_ERROR(handler, "makeDownloaderError: %1", errorMessage);
-    restResult.setError(QnRestResult::CantProcessRequest, errorMessage);
-    restResult.setReply(errorCode);
-
-    QnFusionRestHandlerDetail::serialize(restResult, result, resultContentType, Qn::JsonFormat, false);
-    // It will look like:
-    // {"error":"3","errorString":"DistributedFileDownloader returned error: fileAlreadyExists","reply":"fileAlreadyExists"}
-    return nx::network::http::StatusCode::internalServerError;
+    return makeError(
+        nx::network::http::StatusCode::internalServerError,
+        QnRestResult::CantProcessRequest,
+        nx::format("DistributedFileDownloader returned error: %1", errorCode));
 }
 
 ResultCode Helper::addFile(

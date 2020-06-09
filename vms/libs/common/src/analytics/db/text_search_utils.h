@@ -1,10 +1,11 @@
 #pragma once
 
 #include <optional>
-#include <tuple>
 #include <vector>
 
 #include <QtCore/QString>
+
+#include <nx/utils/scope_guard.h>
 
 #include <analytics/common/object_metadata.h>
 
@@ -85,15 +86,15 @@ public:
      */
     template<typename Handler>
     // requires std::is_invocable_v<Handler, TextSearchCondition>
-    bool parse(const QString& text, Handler handler);
+    void parse(const QString& text, Handler handler);
 
-    std::tuple<bool /*success*/, std::vector<TextSearchCondition>> parse(const QString& text);
+    std::vector<TextSearchCondition> parse(const QString& text);
 
 private:
     void saveToken(QStringView token);
 
     template<typename Handler>
-    bool processTokens(Handler& handler);
+    void processTokens(Handler& handler);
 
     /**
      * Replaces \CHAR with CHAR. Does NOT replace \n with LF or similar.
@@ -115,7 +116,7 @@ public:
     /**
      * Uses UserTextSearchExpressionParser to parse text.
      */
-    bool parse(const QString& text);
+    void parse(const QString& text);
     bool empty() const;
 
     void matchAttributes(const nx::common::metadata::Attributes& attributes);
@@ -149,7 +150,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 template<typename Handler>
-bool UserTextSearchExpressionParser::parse(const QString& userText, Handler handler)
+void UserTextSearchExpressionParser::parse(const QString& userText, Handler handler)
 {
     enum class State
     {
@@ -205,19 +206,23 @@ bool UserTextSearchExpressionParser::parse(const QString& userText, Handler hand
     if (state == State::readingToken)
         saveToken(text.midRef(tokenStart));
 
-    return processTokens(handler);
+    processTokens(handler);
 }
 
 template<typename Handler>
-bool UserTextSearchExpressionParser::processTokens(Handler& handler)
+void UserTextSearchExpressionParser::processTokens(Handler& handler)
 {
+    int lastProcessedTokenIndex = -1;
     for (int i = 0; i < (int) m_tokens.size(); ++i)
     {
         const auto& token = m_tokens[i];
         const std::optional<QStringView> nextToken =
             (i+1) < (int) m_tokens.size() ? std::make_optional(m_tokens[i+1]) : std::nullopt;
         const std::optional<QStringView> previousToken =
-            i > 0 ? std::make_optional(m_tokens[i - 1]) : std::nullopt;
+            (i-1) > lastProcessedTokenIndex ? std::make_optional(m_tokens[i-1]) : std::nullopt;
+
+        auto lastProcessedTokenIndexUpdater = nx::utils::makeScopeGuard(
+            [&lastProcessedTokenIndex, &i]() { lastProcessedTokenIndex = i; });
 
         if (token.startsWith('$'))
         {
@@ -225,9 +230,16 @@ bool UserTextSearchExpressionParser::processTokens(Handler& handler)
         }
         else if (token == ':')
         {
-            // There MUST be tokens on both sides of ':'.
-            if (!previousToken || !nextToken)
-                return false;
+            if (!previousToken)
+                continue; //< Ignoring misplaced ':'.
+
+            if (!nextToken)
+            {
+                // Treating "name:" similar to "$name"
+                handler(AttributePresenceCheck(unescape(*previousToken)));
+                continue;
+            }
+
             handler(AttributeValueMatch(unescape(*previousToken), unescape(*nextToken)));
             // We have already consumed the next token.
             ++i;
@@ -235,14 +247,13 @@ bool UserTextSearchExpressionParser::processTokens(Handler& handler)
         else if (nextToken && nextToken == ':')
         {
             // Skipping token: it will be processed on the next iteration.
+            lastProcessedTokenIndexUpdater.disarm();
         }
         else
         {
             handler(TextMatch(unescape(token)));
         }
     }
-
-    return true;
 }
 
 } // namespace nx::analytics::db::test

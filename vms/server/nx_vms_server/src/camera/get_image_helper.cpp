@@ -479,7 +479,7 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
     return frames;
 }
 
-AVPixelFormat updatePixelFormat(AVPixelFormat fmt)
+AVPixelFormat updateJpegPixelFormat(AVPixelFormat fmt)
 {
     switch (fmt)
     {
@@ -494,36 +494,41 @@ AVPixelFormat updatePixelFormat(AVPixelFormat fmt)
     }
 }
 
-QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame, const QByteArray& format) const
+QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& frame, const QByteArray& format) const
 {
+    AVCodec* codec = avcodec_find_encoder_by_name(
+        (format == "jpg" || format == "jpeg") ? "mjpeg" : format.constData());
+    if (!codec)
+    {
+        NX_WARNING(this, 
+            "Can't initialize ffmpeg encoder to encode image. Unknown format %1", format);
+        return QByteArray();
+    }
+
     QByteArray result;
 
-    AVCodecContext* videoEncoderCodecCtx = avcodec_alloc_context3(0);
-    videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
-    auto codecId = (format == "jpg" || format == "jpeg") ? AV_CODEC_ID_MJPEG : AV_CODEC_ID_PNG;
-    videoEncoderCodecCtx->codec_id = codecId;
-    auto pixelFormat = updatePixelFormat((AVPixelFormat)outFrame->format);
-    videoEncoderCodecCtx->pix_fmt = pixelFormat;
-    videoEncoderCodecCtx->width = outFrame->width;
-    videoEncoderCodecCtx->height = outFrame->height;
-    videoEncoderCodecCtx->bit_rate = outFrame->width * outFrame->height;
-    videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-    videoEncoderCodecCtx->time_base.num = 1;
-    videoEncoderCodecCtx->time_base.den = 30;
+    AVCodecContext* encoderContext = avcodec_alloc_context3(codec);
+    encoderContext->pix_fmt = (AVPixelFormat) frame->format;
+    if (codec->id == AV_CODEC_ID_MJPEG)
+        encoderContext->pix_fmt = updateJpegPixelFormat(encoderContext->pix_fmt);
+    encoderContext->width = frame->width;
+    encoderContext->height = frame->height;
+    encoderContext->bit_rate = frame->width * frame->height;
+    encoderContext->time_base.num = 1;
+    encoderContext->time_base.den = 30;
 
-    AVCodec* codec = avcodec_find_encoder_by_name(format == "jpg" || format == "jpeg" ? "mjpeg" : format.constData());
-    if (avcodec_open2(videoEncoderCodecCtx, codec, NULL) < 0)
+    if (avcodec_open2(encoderContext, codec, NULL) < 0)
     {
         NX_WARNING(this, "Can't initialize ffmpeg encoder to encode image. "
             "codec=%1, pixel format=%2, size=%3x%4",
-            codecId, pixelFormat, outFrame->width, outFrame->height);
+            codec->id, encoderContext->pix_fmt, frame->width, frame->height);
     }
     else
     {
         QnFfmpegAvPacket outPacket;
         int got_packet = 0;
         int encodeResult = avcodec_encode_video2(
-            videoEncoderCodecCtx, &outPacket, outFrame.data(), &got_packet);
+            encoderContext, &outPacket, frame.data(), &got_packet);
 
         if (encodeResult == 0 && got_packet)
         {
@@ -532,12 +537,12 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame
         else
         {
             NX_WARNING(this, "Can't encode image. codec=%1, pixel format=%2, size=%3x%4, errCode=%5",
-                codecId, pixelFormat, outFrame->width, outFrame->height, encodeResult);
+                codec->id, encoderContext->pix_fmt, frame->width, frame->height, encodeResult);
         }
 
     }
 
-    QnFfmpegHelper::deleteAvCodecContext(videoEncoderCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(encoderContext);
     return result;
 }
 

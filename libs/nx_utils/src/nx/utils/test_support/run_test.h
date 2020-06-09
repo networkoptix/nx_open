@@ -18,6 +18,7 @@
 #include <nx/utils/scope_guard.h>
 
 #include "test_options.h"
+#include <nx/utils/nx_utils_ini.h>
 
 namespace nx {
 namespace utils {
@@ -61,7 +62,10 @@ inline int runTest(
     #endif
 
     ArgumentParser args(argc, extendedArgs.data());
+
+    TestOptions::setLoadFactor(nx::utils::Ini().loadFactor);
     TestOptions::applyArguments(args);
+
     nx::utils::log::initializeGlobally(args);
     nx::utils::log::lockConfiguration();
 

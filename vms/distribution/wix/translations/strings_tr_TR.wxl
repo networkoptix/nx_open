@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1254" Culture="tr-tr">
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1254" Language="1055" Culture="tr-tr">
   <String Id="Caption">[WixBundleName] Yükle-[WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>

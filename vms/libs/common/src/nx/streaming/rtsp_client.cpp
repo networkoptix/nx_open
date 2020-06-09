@@ -28,34 +28,21 @@ using namespace std::chrono;
 
 namespace {
 
-const float kKeepAliveGuardInterval = 0.8;
+const float kKeepAliveGuardInterval = 0.8f;
 const QString METADATA_STR(lit("ffmpeg-metadata"));
 constexpr int kSocketBufferSize = 512 * 1024;
 
-struct RtspPorts
+auto splitKeyValue(const QString& nameAndValue, QChar delimiter)
 {
-    quint16 mediaPort = 0;
-    quint16 rtcpPort = 0;
+    QString key = nameAndValue;
+    QString value;
+    if (int position = nameAndValue.indexOf(delimiter); position >= 0)
+    {
+        key = nameAndValue.left(position);
+        value = nameAndValue.mid(position + 1);
+    }
+    return std::make_tuple(key.trimmed(), value.trimmed());
 };
-
-RtspPorts parsePorts(const QString& parameterString)
-{
-    const auto nameAndValue = parameterString.splitRef('=');
-    if (nameAndValue.size() != 2)
-        return {};
-
-    const auto ports = nameAndValue[1].split('-');
-    if (nameAndValue.size() != 2)
-        return {};
-
-    const auto mediaPort = ports[0].toUShort();
-    const auto rtcpPort = ports[1].toUShort();
-
-    if (!mediaPort || !rtcpPort)
-        return {};
-
-    return {mediaPort, rtcpPort};
-}
 
 } // namespace
 
@@ -137,14 +124,12 @@ void QnRtspIoDevice::shutdown()
         m_mediaSocket->shutdown();
 }
 
-void QnRtspIoDevice::updateRemoteMulticastPorts(quint16 mediaPort, quint16 rtcpPort)
+void QnRtspIoDevice::updateRemotePorts(quint16 mediaPort, quint16 rtcpPort)
 {
-    if (m_transport != nx::vms::api::RtpTransportType::multicast)
-        return;
-
     m_remoteMediaPort = mediaPort;
     m_remoteRtcpPort = rtcpPort;
-    updateSockets();
+	if (m_transport == nx::vms::api::RtpTransportType::multicast)
+        updateSockets();
 }
 
 void QnRtspIoDevice::setTransport(nx::vms::api::RtpTransportType rtpTransport)
@@ -701,11 +686,6 @@ bool QnRtspClient::sendSetup()
                 : ";unicast;";
 
             track.ioDevice->setTransport(m_actualTransport);
-            if (m_actualTransport == nx::vms::api::RtpTransportType::multicast)
-            {
-                track.ioDevice->bindToMulticastAddress(track.sdpMedia.connectionAddress,
-                    localAddress);
-            }
 
             if (m_actualTransport != nx::vms::api::RtpTransportType::tcp)
             {
@@ -746,89 +726,74 @@ bool QnRtspClient::sendSetup()
         }
         track.setupSuccess = true;
 
-        QString sessionParam = extractRTSPParam(QLatin1String(response), QLatin1String("Session:"));
-        if (sessionParam.size() > 0)
-        {
-            QStringList tmpList = sessionParam.split(QLatin1Char(';'));
-            m_SessionId = tmpList[0];
+        parseSetupResponse(response, &track, i);
 
-            for (int i = 0; i < tmpList.size(); ++i)
-            {
-                tmpList[i] = tmpList[i].trimmed().toLower();
-                if (tmpList[i].startsWith(QLatin1String("timeout")))
-                {
-                    QStringList tmpParams = tmpList[i].split(QLatin1Char('='));
-                    if (tmpParams.size() > 1)
-                    {
-                        const auto timeoutSec = tmpParams[1].toInt();
-                        if (timeoutSec > 0 && timeoutSec < 5000)
-                        {
-                            m_keepAliveTimeOut = seconds(timeoutSec);
-                        }
-                        else
-                        {
-                            NX_DEBUG(this,
-                                "Invalid session timeout specified: [%1], will used %2 seconds",
-                                tmpParams[1], duration_cast<seconds>(m_keepAliveTimeOut));
-                        }
-                    }
-                }
-            }
-        }
+        if (m_transport == nx::vms::api::RtpTransportType::multicast)
+            track.ioDevice->bindToMulticastAddress(track.sdpMedia.connectionAddress, localAddress);
 
-        QString transportParam = extractRTSPParam(QLatin1String(response), QLatin1String("Transport:"));
-        if (transportParam.size() > 0)
-        {
-            QStringList tmpList = transportParam.split(QLatin1Char(';'));
-            for (int k = 0; k < tmpList.size(); ++k)
-            {
-                tmpList[k] = tmpList[k].trimmed().toLower();
-                if (tmpList[k].startsWith(QLatin1String("ssrc")))
-                {
-                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
-                    if (tmpParams.size() > 1) {
-                        bool ok;
-                        track.ioDevice->setSSRC((quint32)tmpParams[1].toLongLong(&ok, 16));
-                    }
-                }
-                else if (tmpList[k].startsWith(QLatin1String("interleaved"))) {
-                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
-                    if (tmpParams.size() > 1) {
-                        tmpParams = tmpParams[1].split(QLatin1String("-"));
-                        if (tmpParams.size() == 2) {
-                            track.interleaved =
-                                QPair<int,int>(tmpParams[0].toInt(), tmpParams[1].toInt());
-                            registerRTPChannel(track.interleaved.first, track.interleaved.second, i);
-                        }
-                    }
-                }
-                else if (tmpList[k].startsWith(QLatin1String("server_port"))) {
-                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
-                    if (tmpParams.size() > 1) {
-                        tmpParams = tmpParams[1].split(QLatin1String("-"));
-                        if (tmpParams.size() == 2) {
-                            track.setRemoteEndpointRtcpPort(tmpParams[1].toInt());
-                        }
-                    }
-                }
-                else if (m_transport == nx::vms::api::RtpTransportType::multicast
-                    && tmpList[k].startsWith("port"))
-                {
-                    const auto ports = parsePorts(tmpList[k]);
-                    if (ports.mediaPort && ports.rtcpPort)
-                    {
-                        track.ioDevice->updateRemoteMulticastPorts(
-                            ports.mediaPort, ports.rtcpPort);
-
-                        track.ioDevice->bindToMulticastAddress(track.sdpMedia.connectionAddress,
-                            localAddress);
-                    }
-                }
-            }
-        }
         updateTransportHeader(response);
     }
     return true;
+}
+
+void QnRtspClient::parseSetupResponse(const QString& response, SDPTrackInfo* track, int trackIndex)
+{
+    QString sessionParam = extractRTSPParam(response, QLatin1String("Session:"));
+    bool isFirstParam = true;
+    for (const auto& parameter: sessionParam.split(';', QString::SkipEmptyParts))
+    {
+        const auto [key, value] = splitKeyValue(parameter.trimmed(), '=');
+        if (key.toLower() == "timeout")
+        {
+            const auto timeoutSec = value.toInt();
+            if (timeoutSec > 0 && timeoutSec < 5000)
+            {
+                m_keepAliveTimeOut = seconds(timeoutSec);
+            }
+            else
+            {
+                NX_DEBUG(this,
+                    "Invalid session timeout specified: [%1], will used %2 seconds",
+                    value, duration_cast<seconds>(m_keepAliveTimeOut));
+            }
+        }
+        else if (isFirstParam)
+        {
+            m_SessionId = key;
+            isFirstParam = false;
+        }
+    }
+
+    QString transportParam = extractRTSPParam(response, "Transport:");
+
+    for (const auto& parameter: transportParam.split(';', QString::SkipEmptyParts))
+    {
+        const auto [key, value] = splitKeyValue(parameter.trimmed().toLower(), '=');
+        if (key.isEmpty() || value.isEmpty())
+            continue;
+        auto [part1, part2] = splitKeyValue(value, '-'); //< Used for range parameters.
+
+        if (key == "ssrc")
+        {
+            bool ok;
+            track->ioDevice->setSSRC((quint32)value.toLongLong(&ok, 16));
+        }
+        else if (key == "interleaved")
+        {
+            track->interleaved = {part1.toInt(), 
+                part2.isEmpty() ? part1.toInt() + 1 : part2.toInt()};
+            registerRTPChannel(track->interleaved.first, track->interleaved.second, trackIndex);
+        }
+        else if (key == "server_port" || key == "port")
+        {
+            track->ioDevice->updateRemotePorts(part1.toUShort(),
+                part2.isEmpty() ? part1.toUShort() + 1 : part2.toUShort());
+        }
+        else if (key == "destination")
+        {
+            track->sdpMedia.connectionAddress = value;
+        }
+    }
 }
 
 void QnRtspClient::addAdditionAttrs( nx::network::http::Request* const request )

@@ -8,6 +8,8 @@
 
 #include <nx_ec/impl/ec_api_impl.h>
 
+#include <common/common_module.h>
+
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
 #include <utils/common/html.h>
@@ -102,16 +104,21 @@ public:
         QWidget* parent,
         const QString& genericString,
         const QString& regionalSupportString,
-        const QnLicenseList& licenses = {})
+        std::optional<QnLicenseList> limitToLicenses = std::nullopt)
     {
         NX_ASSERT(genericString.contains("%1"));
         auto context = dynamic_cast<QnWorkbenchContextAware*>(parent);
         if (!NX_ASSERT(context))
             return QString();
 
-        CustomerSupport customerSupport(context->commonModule());
+        QnLicenseList licenses = limitToLicenses
+            ? *limitToLicenses
+            : context->commonModule()->licensePool()->getLicenses();
 
-        if (customerSupport.regionalContacts.empty())
+        CustomerSupport customerSupport(context->commonModule());
+        const auto regionalContacts = customerSupport.regionalContactsForLicenses(licenses);
+
+        if (regionalContacts.empty())
         {
             const ContactAddress licensingAddress = customerSupport.licensingContact.address;
             if (NX_ASSERT(licensingAddress.channel != ContactAddress::Channel::empty,
@@ -132,7 +139,7 @@ public:
 
         QStringList regionalSupport;
         regionalSupport.push_back(regionalSupportString);
-        for (const CustomerSupport::Contact& contact: customerSupport.regionalContacts)
+        for (const CustomerSupport::Contact& contact: regionalContacts)
             regionalSupport.push_back(contact.company + kLineBreak + contact.address.href);
         return regionalSupport.join(kEmptyLine);
 

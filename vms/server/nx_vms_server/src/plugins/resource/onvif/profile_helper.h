@@ -2,12 +2,49 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <map>
 #include <string>
 #include <type_traits>
 
 #include <nx/utils/log/assert.h>
 
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
+
 #include <plugins/resource/onvif/soap_wrapper.h>
+
+namespace nx::vms::server::plugins::onvif {
+
+enum class ConfigurationType
+{
+    all,
+    videoSource,
+    videoEncoder,
+    audioSource,
+    audioEncoder,
+    audioOutput,
+    audioDecoder,
+    metadata,
+    analytics,
+    ptz,
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ConfigurationType)
+
+QString toString(ConfigurationType configurationType);
+
+struct ConfigurationSet
+{
+    using ConfigurationToken = std::string;
+
+    std::string profileToken;
+    std::map<ConfigurationType, ConfigurationToken> configurations;
+
+    QString toString() const
+    {
+        return NX_FMT("{profileToken: %1, configurations: %2}",
+            profileToken, containerString(configurations));
+    }
+};
 
 class ProfileHelper
 {
@@ -152,6 +189,18 @@ public:
 
         return std::string();
     }
+
+    static CameraDiagnostics::Result addMediaConfigurations(
+        const QnPlOnvifResourcePtr& device,
+        const ConfigurationSet& configurationSet);
+
+    static CameraDiagnostics::Result addMedia2Configurations(
+        const QnPlOnvifResourcePtr& device,
+        ConfigurationSet configurationSet);
 };
+
+} // namespace nx::vms::server::plugins::onvif
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::server::plugins::onvif::ConfigurationType, (lexical))
 
 #endif // ENABLE_ONVIF

@@ -225,13 +225,19 @@ void QnVirtualCameraResource::updateSourceUrl(const nx::utils::Url& tempUrl,
     }
 }
 
-int QnVirtualCameraResource::saveAsync()
+int QnVirtualCameraResource::updateAsync()
 {
     nx::vms::api::CameraData apiCamera;
     ec2::fromResourceToApi(toSharedPointer(this), apiCamera);
 
-    ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
-    return conn->getCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, []{});
+    const QnResourcePool* const resourcePool = this->resourcePool();
+    if (resourcePool && resourcePool->getResourceById<QnVirtualCameraResource>(apiCamera.id))
+    {
+        ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
+        return conn->getCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, [] {});
+    }
+
+    return (int) ec2::ErrorCode::ok;
 }
 
 void QnVirtualCameraResource::issueOccured() {
@@ -245,7 +251,7 @@ void QnVirtualCameraResource::issueOccured() {
     }
     if (tooManyIssues && !hasStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag)) {
         addStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag);
-        saveAsync();
+        updateAsync();
     }
 }
 
@@ -259,7 +265,7 @@ void QnVirtualCameraResource::cleanCameraIssues() {
     }
     if (hasStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag)) {
         removeStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag);
-        saveAsync();
+        updateAsync();
     }
 }
 

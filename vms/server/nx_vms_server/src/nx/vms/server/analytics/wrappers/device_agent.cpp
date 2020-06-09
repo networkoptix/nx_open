@@ -76,6 +76,8 @@ SdkObjectDescription DeviceAgent::sdkObjectDescription() const
 
 void DeviceAgent::setHandler(Ptr<IDeviceAgent::IHandler> handler)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::setHandler);
 
     Ptr<IDeviceAgent> sdkDeviceAgent = sdkObject();
@@ -87,6 +89,8 @@ void DeviceAgent::setHandler(Ptr<IDeviceAgent::IHandler> handler)
 
 bool DeviceAgent::setNeededMetadataTypes(const MetadataTypes& metadataTypes)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     sdk_support::TimedGuard guard = makeTimedGuard(SdkMethod::setNeededMetadataTypes);
 
     Ptr<IDeviceAgent> sdkDeviceAgent = sdkObject();

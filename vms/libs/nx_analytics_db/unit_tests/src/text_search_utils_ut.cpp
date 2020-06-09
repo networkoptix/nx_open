@@ -38,7 +38,7 @@ protected:
     std::vector<TextSearchCondition> parse(const QString& text)
     {
         db::UserTextSearchExpressionParser parser;
-        return std::get<1>(parser.parse(text));
+        return parser.parse(text);
     }
 };
 
@@ -74,6 +74,37 @@ TEST_F(TextSearchExpressionParser, parse)
             AttributeValueMatch("car.brand.model", "Aston Martin"),
             AttributeValueMatch("car.color", "red")}),
         parse("car.brand.model : \"Aston Martin\" car.color :red  "));
+}
+
+TEST_F(TextSearchExpressionParser, attribute_presence_check)
+{
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            AttributePresenceCheck("foo")}),
+        parse("$foo"));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            AttributePresenceCheck("foo")}),
+        parse("foo:"));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            AttributePresenceCheck("foo") }),
+            parse("foo :  "));
+
+    // Just ignoring misplaced :.
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            TextMatch("text")}),
+            parse(": text"));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            AttributeValueMatch("foo", "car.brand.model"),
+            TextMatch("Aston Martin"),
+            TextMatch("text")}),
+        parse(": foo:  car.brand.model : \"Aston Martin\"  text"));
 }
 
 TEST_F(TextSearchExpressionParser, unescaping)

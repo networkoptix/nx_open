@@ -531,7 +531,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
         // Thumbnail from loader is already merged for panoramic cameras.
         const QSize noDownscale(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
-        filters.prepareForImage(parameters.resource, result.size(), noDownscale);
+        filters.prepareForImage(result.size(), noDownscale);
 
         if (!filters.isEmpty())
         {

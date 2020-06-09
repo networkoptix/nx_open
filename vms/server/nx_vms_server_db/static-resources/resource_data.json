@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.272",
+    "version": "4.1.3.422",
     "data": [
         {
             "keys": [
@@ -136,8 +136,17 @@
             "lowStreamAvailableBitrates": ["2000"]
         },
         {
-            "keys":["*|TN-B3212K2R", "*|TN-D35032R"],
+            "keys":["*|TN-B3212K2R", "*|TN-D35032R", "*|TN-P6236W12", "*|WV-S1110V"],
             "useMedia2ToFetchProfiles": true
+        },
+        {
+            "keys":["*|TN-P6236W12"],
+            "forcedOnvifParams":
+            {
+                "videoEncoders": [
+                    "0_PRIMARY_VIDEO_ENCODER_CONFIG,1_SECONDARY1_VIDEO_ENCODER_CONFIG"
+                ]
+            }
         },
         {
             "keys": [
@@ -2675,6 +2684,12 @@
                     "0,3",
                     "1,4",
                     "2,5"
+                ],
+                "profiles":
+                [
+                    "AVStream1_1,AVStream1_2",
+                    "AVStream2_1,AVStream2_2",
+                    "AVStream3_1,AVStream3_2"
                 ]
             },
             "multiresourceVideoChannelMapping": [
@@ -3431,8 +3446,8 @@
             "axis|axisp3717*", "axis|p3717*",
             "axis|axis p3717*",
             "vivotek|ma9321-ehtv",
-			"VIVOTEK MA9321-EHTV|MA9321-EHTV",
-			"MA9321-EHTV|VIVOTEK MA9321-EHTV",
+            "VIVOTEK MA9321-EHTV|MA9321-EHTV",
+            "MA9321-EHTV|VIVOTEK MA9321-EHTV",
             "avigilon|32c-h4a-4mh-360",
             "dahua|psd81602-a360",
             "dahua|IPC-HDBW4231F*",
@@ -4304,6 +4319,13 @@
             ],
             "fixWrongUri": true,
             "alternativeSecondStreamSorter": true
+        },
+        {
+            "keys": [
+                "TD-*|IPC",
+                "TD-*|TVT"
+            ],
+            "swapVendorAndModel": true
         }
     ]
 }

@@ -26,33 +26,81 @@
 #endif
 
 namespace {
-    bool parseDiskDescription(LPCWSTR description, int *id, LPCWSTR *partitions) {
-        if(!description)
+
+// Parses disk item description returned by PdhGetRawCounterArrayW. String to parse looks
+// like this '1 C: D: E:' in most cases. But sometimes only disk id ('1') might be returned.
+bool parseDiskDescription(LPCWSTR description, int *id, LPCWSTR *partitions) {
+    if(!description)
+        return false;
+
+    LPCWSTR pos = wcschr(description, L' ');
+    bool hasName = (pos != NULL);
+    if (hasName) {
+        while(*pos == L' ')
+            pos++;
+        if(*pos == L'\0')
             return false;
-
-        LPCWSTR pos = wcschr(description, L' ');
-        bool hasName = (pos != NULL);
-        if (hasName) {
-            while(*pos == L' ')
-                pos++;
-            if(*pos == L'\0')
-                return false;
-        }
-
-        int localId = _wtoi(description);
-        if(localId == 0 && description[0] != L'0')
-            return false;
-
-        if(partitions) {
-            if (hasName)
-                *partitions = pos;
-            else
-                *partitions = description;
-        }
-        if(id)
-            *id = localId;
-        return true;
     }
+
+    int localId = _wtoi(description);
+    if(localId == 0 && description[0] != L'0')
+        return false;
+
+    if(partitions) {
+        if (hasName)
+            *partitions = pos;
+        else
+            *partitions = description;
+    }
+    if(id)
+        *id = localId;
+    return true;
+}
+
+static HANDLE getDriveHandle(const QString& driveName)
+{
+    QString driveSysString = lit("\\\\.\\%1:").arg(driveName[0]);
+    return CreateFile(
+        reinterpret_cast<LPCWSTR>(driveSysString.data()),
+        FILE_READ_ATTRIBUTES,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL, OPEN_EXISTING, 0, NULL);
+}
+
+static std::array<WCHAR, 512> prepareDriveNameBuffer()
+{
+    std::array<WCHAR, 512> b;
+    std::fill(b.begin(), b.end(), L'\0');
+    if (!GetLogicalDriveStringsW(static_cast<DWORD>(b.size()), b.data()))
+    {
+        NX_ERROR(typeid(QnWindowsMonitor), "GetLogicalDriveStringsW failed");
+        std::fill(b.begin(), b.end(), L'\0');
+    }
+
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose))
+    {
+        auto out = QString::fromWCharArray(b.data(), (int)b.size());
+        out.replace(L'\0', L' ');
+        NX_VERBOSE(typeid(QnWindowsMonitor), "GetLogicalDriveStringsW returned '%1'", out);
+    }
+
+    return b;
+}
+
+static QStringList getDriveNames()
+{
+    const auto b = prepareDriveNameBuffer();
+    const auto* pb = b.data();
+    QStringList result;
+    while (*pb)
+    {
+        const auto driveName = QString::fromWCharArray(pb);
+        result.append(driveName);
+        pb += (size_t)driveName.size() + 1;
+    }
+
+    return result;
+}
 
 } // anonymous namespace
 
@@ -213,16 +261,44 @@ public:
         if(INVOKE(PdhGetRawCounterArrayW(counter, &bufferSize, &itemCount, item) != ERROR_SUCCESS))
             return;
 
-        for(int i = 0; i < (int) itemCount; i++) {
+        // Populating map {0: "c: d:", 1: "e: f:"}
+        QMap<int, QString> driveIndexToPartitions;
+        for (const auto& driveName : getDriveNames())
+        {
+            const auto handle = getDriveHandle(driveName);
+            DWORD bytesReturned = -1;
+            STORAGE_DEVICE_NUMBER sdn;
+            const auto driveType = GetDriveType(reinterpret_cast<LPCWSTR>(driveName.constData()));
+            if (handle != INVALID_HANDLE_VALUE
+                && (driveType == DRIVE_FIXED || driveType == DRIVE_REMOVABLE)
+                && DeviceIoControl(handle, IOCTL_STORAGE_GET_DEVICE_NUMBER, NULL, 0, &sdn, sizeof(sdn), &bytesReturned, NULL))
+            {
+                if (driveIndexToPartitions.contains(sdn.DeviceNumber))
+                    driveIndexToPartitions[sdn.DeviceNumber] += " " + driveName.left(2); //< " c:"
+                else
+                    driveIndexToPartitions[sdn.DeviceNumber] = driveName.left(2);
+            }
+            else
+            {
+                NX_VERBOSE(this, "readDiskCounterValues: DeviceIoControl failed for drive '%1'", driveName);
+            }
+        }
+
+        // Creating HDD items and populating result.
+        for(int i = 0; i < (int) itemCount; i++)
+        {
             int id;
             LPCWSTR partitions;
             if(!parseDiskDescription(item[i].szName, &id, &partitions))
                 continue; /* A '_Total' entry or something unexpected. */
 
             Hdd hdd(id, QLatin1String("HDD") + QString::number(id), QString::fromWCharArray(partitions));
-
-            /* Fix partitions name for the mounted-into-folder drives. */
-            if (!hdd.partitions.contains(L':'))
+            // 'partitions' string is unreliable on VirtualBox.
+            if (!hdd.partitions.contains(L':') && driveIndexToPartitions.contains(id))
+            {
+                hdd.partitions = driveIndexToPartitions[id];
+            }
+            else
             {
                 NX_VERBOSE(
                     this,
@@ -416,16 +492,6 @@ namespace {
 // It took a lot of time and effort to make those functions work correctly, so while they are not
 // used now, we may decide to use them in future. That's why they are still here.
 #if 0
-    static HANDLE getDriveHandle(const QString& driveName)
-    {
-        QString driveSysString = lit("\\\\.\\%1:").arg(driveName[0]);
-        return CreateFile(
-            reinterpret_cast<LPCWSTR>(driveSysString.data()),
-            FILE_READ_ATTRIBUTES,
-            FILE_SHARE_READ | FILE_SHARE_WRITE,
-            NULL, OPEN_EXISTING, 0, NULL);
-    }
-
     bool isInserted(HANDLE handle)
     {
         DWORD bytesReturned;
@@ -441,43 +507,8 @@ namespace {
             handle, IOCTL_DISK_IS_WRITABLE,
             NULL, 0, NULL, 0, &bytesReturned, NULL);
     }
-
 #endif // if 0
 
-static std::array<WCHAR, 512> prepareDriveNameBuffer()
-{
-    std::array<WCHAR, 512> b;
-    std::fill(b.begin(), b.end(), L'\0');
-    if (!GetLogicalDriveStringsW(static_cast<DWORD>(b.size()), b.data()))
-    {
-        NX_ERROR(typeid(QnWindowsMonitor), "GetLogicalDriveStringsW failed");
-        std::fill(b.begin(), b.end(), L'\0');
-    }
-
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose))
-    {
-        auto out = QString::fromWCharArray(b.data(), (int) b.size());
-        out.replace(L'\0', L' ');
-        NX_VERBOSE(typeid(QnWindowsMonitor), "GetLogicalDriveStringsW returned '%1'", out);
-    }
-
-    return b;
-}
-
-static QStringList getDriveNames()
-{
-    const auto b = prepareDriveNameBuffer();
-    const auto* pb = b.data();
-    QStringList result;
-    while (*pb)
-    {
-        const auto driveName = QString::fromWCharArray(pb);
-        result.append(driveName);
-        pb += (size_t) driveName.size() + 1;
-    }
-
-    return result;
-}
 
 static PlatformMonitor::PartitionType getPartitionType(const QString& driveName)
 {

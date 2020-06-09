@@ -128,11 +128,8 @@ int main(int argc, char* argv[])
 
     QnSystrayWindow window;
 
-    QObject::connect(
-        &app,
-        &QtSingleApplication::messageReceived,
-        &window,
-        &QnSystrayWindow::handleMessage);
+    QObject::connect(&app, &QtSingleApplication::messageReceived,
+        &window, &QnSystrayWindow::handleMessage, Qt::QueuedConnection);
 
     if (!argument.isEmpty())
         window.executeAction(argument);

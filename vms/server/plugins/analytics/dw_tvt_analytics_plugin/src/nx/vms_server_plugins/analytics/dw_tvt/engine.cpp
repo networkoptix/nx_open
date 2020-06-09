@@ -1,5 +1,7 @@
 #include "engine.h"
 
+#include <algorithm>
+
 #include <QtCore/QString>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
@@ -15,11 +17,15 @@ namespace nx::vms_server_plugins::analytics::dw_tvt {
 
 namespace {
 
-static const QString kDwTvtVendor("tvt");
-static const QString kDwTvtTemporaryVendor("customer");
+static const QStringList kDwTvtVendors{
+    "tvt", // vendor name received with manual discovery
+    "ipc", // vendor name received with auto discovery
+    "customer" // temporary enabled vendor name for pre-release devices
+};
+
 // Just for information:
 // DW VCA camera's vendor string is "cap",
-// DW TVT camera's vendor string is "digitalwatchdog" or (temporarily?) "customer"
+// DW TVT camera's vendor string is "tvt" or "ipc" or (temporarily?) "customer"
 
 QString toLowerSpaceless(const QString& name)
 {
@@ -103,7 +109,8 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
     const auto vendor = toLowerSpaceless(QString(deviceInfo->vendor()));
     const auto model = toLowerSpaceless(QString(deviceInfo->model()));
 
-    if (!vendor.startsWith(kDwTvtVendor) && !vendor.startsWith(kDwTvtTemporaryVendor))
+    if (std::none_of(kDwTvtVendors.begin(), kDwTvtVendors.end(),
+        [&vendor](const QString& v) { return vendor.startsWith(v); }))
     {
         NX_PRINT << "Unsupported camera vendor: "
             << nx::kit::utils::toString(deviceInfo->vendor());

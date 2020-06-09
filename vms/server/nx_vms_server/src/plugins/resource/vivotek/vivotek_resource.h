@@ -40,15 +40,20 @@ public:
     virtual CameraDiagnostics::Result customStreamConfiguration(
         Qn::ConnectionRole role,
         const QnLiveStreamParams& params) override;
+
+    CameraDiagnostics::Result setVivotekParameter(
+        const QString& parameterName, const QString& parameterValue, bool isPrimary) const;
 protected:
     virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
         StreamIndex streamIndex) override;
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+
 private:
     bool fetchHevcSupport();
 
     boost::optional<bool> hasHevcSupport() const;
     bool streamSupportsHevc(Qn::ConnectionRole role) const;
-    bool setHevcForStream(Qn::ConnectionRole role);
+    CameraDiagnostics::Result setHevcForStream(Qn::ConnectionRole role);
 
     bool parseStreamCodecCapabilities(
         const QString& codecCapabilitiesString,
@@ -63,7 +68,6 @@ private:
 
     bool doVivotekRequest(const nx::utils::Url& url, QString* outParameterName, QString* outParameterValue) const;
     boost::optional<QString> getVivotekParameter(const QString& param) const;
-    bool setVivotekParameter(const QString& parameterName, const QString& parameterValue) const;
 
 private:
     boost::optional<bool> m_hasHevcSupport;

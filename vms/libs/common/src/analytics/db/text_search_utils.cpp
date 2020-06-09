@@ -4,14 +4,13 @@
 
 namespace nx::analytics::db {
 
-std::tuple<bool /*success*/, std::vector<TextSearchCondition>>
-    UserTextSearchExpressionParser::parse(const QString& text)
+std::vector<TextSearchCondition> UserTextSearchExpressionParser::parse(const QString& text)
 {
     std::vector<TextSearchCondition> result;
-    auto success = parse(
+    parse(
         text,
         [&result](auto expr) { result.push_back(std::move(expr)); });
-    return std::make_tuple(success, std::move(result));
+    return result;
 }
 
 void UserTextSearchExpressionParser::saveToken(QStringView token)
@@ -44,17 +43,12 @@ QString UserTextSearchExpressionParser::unescape(const QStringView& str)
 //-------------------------------------------------------------------------------------------------
 // TextMatcher.
 
-bool TextMatcher::parse(const QString& text)
+void TextMatcher::parse(const QString& text)
 {
     UserTextSearchExpressionParser parser;
-    bool success = false;
-    std::tie(success, m_conditions) = parser.parse(text);
-    if (!success)
-        return false;
-
+    m_conditions = parser.parse(text);
     m_conditionsMatched.clear();
     m_conditionsMatched.resize(m_conditions.size(), false);
-    return true;
 }
 
 bool TextMatcher::empty() const

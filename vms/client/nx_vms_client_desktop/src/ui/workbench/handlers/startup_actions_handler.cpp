@@ -9,6 +9,7 @@
 
 #include <client/client_module.h>
 #include <client/client_settings.h>
+#include <client/startup_tile_manager.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
@@ -237,6 +238,9 @@ void StartupActionsHandler::handleStartupParameters()
 
     connectToCloudIfNeeded(startupParameters);
     const bool connectingToSystem = connectToSystemIfNeeded(startupParameters, haveInputFiles);
+
+    if (!startupParameters.instantDrop.isEmpty() || connectingToSystem)
+        qnStartupTileManager->skipTileAction();
 
     if (!startupParameters.videoWallGuid.isNull())
     {

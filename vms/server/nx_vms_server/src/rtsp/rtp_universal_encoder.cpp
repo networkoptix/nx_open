@@ -67,6 +67,18 @@ std::array<AVRtpPayloadType, 29> kStaticPayloadTypes = {{
     {96, "H265", AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_HEVC, 90000, -1}
 }};
 
+QSize getVideoSize(QnConstAbstractMediaDataPtr media)
+{
+    QnConstCompressedVideoDataPtr videoData =
+        std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
+    if (!videoData)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Invalid media data");
+        return QSize();
+    }
+    return nx::media::getFrameSize(videoData);
+}
+
 quint8 getPayloadType(AVCodecID codec, bool isVideo)
 {
     // static payload type
@@ -239,24 +251,6 @@ void QnUniversalRtpEncoder::buildSdp(
     }
 }
 
-QSize QnUniversalRtpEncoder::getTargetSize(QnConstAbstractMediaDataPtr media, QSize targetSize)
-{
-    QnConstCompressedVideoDataPtr videoData =
-        std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
-    if (!videoData)
-    {
-        NX_WARNING(this, "Invalid media data");
-        return QSize();
-    }
-    QSize sourceSize = nx::media::getFrameSize(videoData);
-    if (sourceSize.isEmpty())
-    {
-        NX_WARNING(this, "Failed to get frame size, codec: %1", media->compressionType);
-        return QSize();
-    }
-    return nx::transcoding::normalizeResolution(m_codec, targetSize, sourceSize);
-}
-
 bool QnUniversalRtpEncoder::open(
     QnConstAbstractMediaDataPtr mediaHigh,
     QnConstAbstractMediaDataPtr mediaLow,
@@ -296,14 +290,15 @@ bool QnUniversalRtpEncoder::open(
     int status = -1;
     if (media->dataType == QnAbstractMediaData::VIDEO)
     {
-        QSize targetSize = getTargetSize(media, videoSize);
-        if (targetSize.isEmpty())
+        QSize sourceSize = getVideoSize(media);
+        if (sourceSize.isEmpty())
         {
-            NX_WARNING(this, "Failed to get target video size %1", videoSize);
+            NX_WARNING(this, "Failed to get frame size, codec: %1", media->compressionType);
             return false;
         }
+        m_transcoder.setSourceResolution(sourceSize);
         m_transcoder.setTranscodingSettings(extraTranscodeParams);
-        m_transcoder.setVideoCodec(m_codec, method, Qn::StreamQuality::normal, targetSize);
+        m_transcoder.setVideoCodec(m_codec, method, Qn::StreamQuality::normal, videoSize);
         status = m_transcoder.open(
             std::dynamic_pointer_cast<const QnCompressedVideoData>(media),
             QnConstCompressedAudioDataPtr());

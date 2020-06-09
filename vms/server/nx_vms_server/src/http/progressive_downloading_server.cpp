@@ -40,6 +40,7 @@
 #include <nx/utils/scope_guard.h>
 #include <api/global_settings.h>
 #include <export/sign_helper.h>
+#include <rtsp/rtsp_utils.h>
 
 #include "progressive_downloading_consumer.h"
 
@@ -71,7 +72,12 @@ bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFor
     if (streamingFormat == "mpegts")
         return codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_MPEG2VIDEO;
     if (streamingFormat == "mp4" || streamingFormat == "ismv")
-        return codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265 || codec == AV_CODEC_ID_MPEG4;
+    {
+        return codec == AV_CODEC_ID_H264
+            || codec == AV_CODEC_ID_H265
+            || codec == AV_CODEC_ID_MPEG4
+            || codec == AV_CODEC_ID_MJPEG;
+    }
 
     return false;
 }
@@ -79,18 +85,29 @@ bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFor
 const std::optional<CameraMediaStreamInfo> findCompatibleStream(
     const std::vector<CameraMediaStreamInfo>& streams,
     const QByteArray& streamingFormat,
-    const QString& requestedResolution)
+    const QSize& requestedSize)
 {
+    QSize maxSize;
+    std::optional<CameraMediaStreamInfo> result;
     for (const auto& streamInfo: streams)
     {
-        if (!streamInfo.transcodingRequired &&
-            isCodecCompatibleWithFormat((AVCodecID)streamInfo.codec, streamingFormat) &&
-            (requestedResolution.isEmpty() || requestedResolution == streamInfo.resolution))
+        if (streamInfo.transcodingRequired ||
+            !isCodecCompatibleWithFormat((AVCodecID)streamInfo.codec, streamingFormat))
         {
+            continue;
+        }
+
+        QSize streamSize = streamInfo.getResolution();
+        if (requestedSize.isValid() && requestedSize.height() == streamSize.height())
             return streamInfo;
+
+        if (streamSize.height() > maxSize.height())
+        {
+            result = streamInfo;
+            maxSize = streamSize;
         }
     }
-    return std::nullopt;
+    return result;
 }
 
 }
@@ -346,23 +363,6 @@ void ProgressiveDownloadingServer::run()
 
     const QUrlQuery decodedUrlQuery(getDecodedUrl().toQUrl());
 
-    QSize videoSize(640,480);
-    QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLatin1().toLower();
-    if (resolutionStr.endsWith('p'))
-        resolutionStr = resolutionStr.left(resolutionStr.length()-1);
-    QList<QByteArray> resolution = resolutionStr.split('x');
-    if (resolution.size() == 1)
-        resolution.insert(0,QByteArray("0"));
-    if (resolution.size() == 2)
-    {
-        videoSize = QSize(resolution[0].trimmed().toInt(), resolution[1].trimmed().toInt());
-        if ((videoSize.width() < 16 && videoSize.width() != 0) || videoSize.height() < 16)
-        {
-            NX_WARNING(this, "Invalid resolution specified for web streaming. Defaulting to 480p");
-            videoSize = QSize(0,480);
-        }
-    }
-
     Qn::StreamQuality quality = Qn::StreamQuality::normal;
     if (decodedUrlQuery.hasQueryItem(QnCodecParams::quality))
         quality = QnLexical::deserialized<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality), Qn::StreamQuality::undefined);
@@ -424,14 +424,22 @@ void ProgressiveDownloadingServer::run()
         sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
         return;
     }
-    const auto requestedResolutionStr = resolutionStr.isEmpty() ?
-        "" :
-        QString("%1x%2").arg(videoSize.width()).arg(videoSize.height());
+    QSize videoSize;
+    QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLatin1().toLower();
+    if (!resolutionStr.isEmpty())
+    {
+        videoSize = nx::rtsp::parseResolution(resolutionStr);
+        if (!videoSize.isValid())
+        {
+            NX_WARNING(this, "Invalid resolution specified for web streaming. Defaulting to 480p");
+            videoSize = QSize(0,480);
+        }
+    }
 
     AVCodecID videoCodec;
     QnServer::ChunksCatalog qualityToUse;
     auto streamInfo = findCompatibleStream(
-        physicalResource->mediaStreams().streams, streamingFormat, requestedResolutionStr);
+        physicalResource->mediaStreams().streams, streamingFormat, videoSize);
 
     bool accurateSeek = decodedUrlQuery.hasQueryItem("accurate_seek");
     if (streamInfo && !accurateSeek)
@@ -444,6 +452,11 @@ void ProgressiveDownloadingServer::run()
     }
     else
     {
+        if (!videoSize.isValid())
+        {
+            videoSize = QSize(0, 480);
+            NX_DEBUG(this, "Resolution not specified, 480p will used");
+        }
         transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
         auto newValue = ++metrics->progressiveDownloadingTranscoders();
         if (newValue > commonModule()->globalSettings()->maxWebMTranscoders())
@@ -520,6 +533,7 @@ void ProgressiveDownloadingServer::run()
     consumerConfig.liveMode = isLive;
     consumerConfig.continuousTimestamps = continuousTimestamps;
     consumerConfig.audioOnly = audioOnly;
+    consumerConfig.streamingFormat = streamingFormat;
     QString endPosition =
         decodedUrlQuery.queryItemValue(StreamingParams::END_POS_PARAM_NAME);
     if (!endPosition.isEmpty())
@@ -551,7 +565,7 @@ void ProgressiveDownloadingServer::run()
         dataProvider = liveReader;
         if (liveReader) {
             if (camera->isSomeActivity() && !audioOnly)
-                dataConsumer.copyLastGopFromCamera(camera); //< Don't copy deprecated gop if camera is not running now
+                dataConsumer.copyLastGopFromCamera(camera, streamInfo->getEncoderIndex()); //< Don't copy deprecated gop if camera is not running now
             liveReader->startIfNotRunning();
             camera->inUse(this);
         }

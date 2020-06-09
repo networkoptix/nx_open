@@ -16,6 +16,7 @@
 #include <common/common_module.h>
 #include <nx/metrics/metrics_storage.h>
 #include <transcoding/transcoding_utils.h>
+#include <utils/media/utils.h>
 
 namespace {
 const static int kMaxEncodedFrameSize = 1024 * 1024 * 5;
@@ -113,11 +114,63 @@ void QnFfmpegVideoTranscoder::close()
     }
 }
 
+void QnFfmpegVideoTranscoder::setOutputResolutionLimit(const QSize& resolution)
+{
+    m_targetResolution = resolution;
+}
+
+void QnFfmpegVideoTranscoder::setSourceResolution(const QSize& resolution)
+{
+    m_sourceResolution = resolution;
+}
+
+bool QnFfmpegVideoTranscoder::prepareFilters(
+    AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video)
+{
+    if (!m_sourceResolution.isValid())
+        m_sourceResolution = nx::transcoding::findMaxSavedResolution(video);
+
+    if (!m_sourceResolution.isValid())
+    {
+        NX_DEBUG(this, "Failed to get max resolution from resource, try to get it from data");
+        m_sourceResolution = nx::media::getFrameSize(video);
+    }
+
+    if (!m_sourceResolution.isValid())
+    {
+        NX_WARNING(this, "Invalid video data, failed to get resolution");
+        return false;
+    }
+
+    if (m_targetResolution.isValid())
+    {
+        m_targetResolution = nx::transcoding::normalizeResolution(
+            m_targetResolution, m_sourceResolution);
+        if (m_targetResolution.isEmpty())
+        {
+            NX_WARNING(this, "Invalid resolution specified source %1, target %2",
+                m_sourceResolution, m_targetResolution);
+            return false;
+        }
+    }
+    else
+    {
+        m_targetResolution = m_sourceResolution;
+    }
+
+    m_targetResolution = nx::transcoding::adjustCodecRestrictions(dstCodec, m_targetResolution);
+    m_filters.prepare(m_sourceResolution, m_targetResolution);
+    m_targetResolution = m_filters.apply(m_targetResolution);
+    NX_DEBUG(this, "Prepare transcoding, output resolution: %1, source resolution: %2",
+        m_targetResolution, m_sourceResolution);
+    return true;
+}
+
 bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
     close();
 
-    if (!adjustDstResolution(m_codecId, video))
+    if (!prepareFilters(m_codecId, video))
         return false;
 
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
@@ -130,8 +183,8 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx = avcodec_alloc_context3(avCodec);
     m_encoderCtx->codec_type = AVMEDIA_TYPE_VIDEO;
     m_encoderCtx->codec_id = m_codecId;
-    m_encoderCtx->width = m_resolution.width();
-    m_encoderCtx->height = m_resolution.height();
+    m_encoderCtx->width = m_targetResolution.width();
+    m_encoderCtx->height = m_targetResolution.height();
     m_encoderCtx->pix_fmt = m_codecId == AV_CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     if (m_bitrate == -1)
@@ -144,7 +197,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->time_base.num = 1;
     m_encoderCtx->time_base.den = m_fixedFrameRate ? m_fixedFrameRate : 60;
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
-    if (m_useMultiThreadEncode)
+    if (m_useMultiThreadEncode && m_codecId != AV_CODEC_ID_MJPEG)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
     AVDictionary* options = nullptr;
@@ -346,9 +399,29 @@ void QnFfmpegVideoTranscoder::setUseMultiThreadDecode(bool value)
     m_config.mtDecodePolicy = value ? MultiThreadDecodePolicy::enabled : MultiThreadDecodePolicy::disabled;
 }
 
-void QnFfmpegVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filters)
+QSize QnFfmpegVideoTranscoder::getOutputResolution() const
 {
-    QnVideoTranscoder::setFilterList(filters);
+    return m_targetResolution;
+}
+
+CLVideoDecoderOutputPtr QnFfmpegVideoTranscoder::processFilterChain(
+    const CLVideoDecoderOutputPtr& decodedFrame)
+{
+    if (m_filters.isEmpty())
+        return decodedFrame;
+    CLVideoDecoderOutputPtr result = decodedFrame;
+    for (QnAbstractImageFilterPtr filter: m_filters)
+    {
+        result = filter->updateImage(result);
+        if (!result)
+            break;
+    }
+    return result;
+}
+
+void QnFfmpegVideoTranscoder::setFilterChain(const nx::core::transcoding::FilterChain& filters)
+{
+    m_filters = filters;
     m_decodedVideoFrame->setUseExternalData(false); // do not modify ffmpeg frame buffer
 }
 

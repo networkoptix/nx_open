@@ -8,6 +8,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QString>
 
 #include <nx/utils/log/log.h>
 #include <nx/network/http/http_types.h>
@@ -20,10 +21,13 @@
 
 #include <common/common_module.h>
 
+#include <nx/fusion/model_functions.h>
+
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/resource_data_structures.h>
 #include <core/resource/param.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/onvif/onvif_config_data.h>
 
 #include <nx/vms/api/types/rtp_types.h>
 
@@ -32,6 +36,8 @@
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif_resource.h"
 #include "profile_helper.h"
+
+using namespace nx::vms::server::plugins::onvif;
 
 static const int MAX_CAHCE_URL_TIME = 1000 * 15;
 
@@ -49,17 +55,54 @@ DefaultProfileInfo nxDefaultProfileInfo(const QnPlOnvifResourcePtr& device)
 
     const auto brand = nx::utils::AppInfo::brand();
 
-    info.primaryProfileName = NX_FMT("%1 Primary", brand);
-    info.secondaryProfileName = NX_FMT("%1 Secondary", brand);
+    const auto forcedOnvifParams =
+        device->resourceData().value<QnOnvifConfigDataPtr>("forcedOnvifParams");
+
+    const int channel = device->getChannel();
+    const bool forcedProfilesAreDefined = forcedOnvifParams
+        && device->getChannel() < forcedOnvifParams->profiles.size();
+
+    if (forcedProfilesAreDefined)
+    {
+        const QStringList forcedProfiles =
+            forcedOnvifParams->profiles[channel].split(',', QString::SkipEmptyParts);
+
+        if (forcedProfiles.size() > 0)
+            info.primaryProfileName = forcedProfiles[0];
+
+        if (forcedProfiles.size() > 1)
+            info.secondaryProfileName = forcedProfiles[1];
+
+        if (forcedProfiles.size() > 2)
+        {
+            NX_WARNING(NX_SCOPE_TAG,
+                "The size of profile list is more than 2, ignoring excessive profiles, Device %1",
+                device);
+        }
+
+        NX_DEBUG(NX_SCOPE_TAG,
+            "Forced profiles with names %1 and %2 are defined for device %3",
+            info.primaryProfileName, info.secondaryProfileName, device);
+    }
+    else
+    {
+        info.primaryProfileName = NX_FMT("%1 Primary", brand);
+        info.secondaryProfileName = NX_FMT("%1 Secondary", brand);
+    }
+
     info.primaryProfileToken = NX_FMT("%1P", brand);
     info.secondaryProfileToken = NX_FMT("%1S", brand);
 
-    const int channel = device->getChannel();
     if (channel > 0)
     {
         QString postfix = NX_FMT("-%1", channel);
-        info.primaryProfileName += postfix;
-        info.secondaryProfileName += postfix;
+
+        if (!forcedProfilesAreDefined)
+        {
+            info.primaryProfileName += postfix;
+            info.secondaryProfileName += postfix;
+        }
+
         info.primaryProfileToken += postfix;
         info.secondaryProfileToken += postfix;
     }
@@ -67,12 +110,32 @@ DefaultProfileInfo nxDefaultProfileInfo(const QnPlOnvifResourcePtr& device)
     return info;
 }
 
-static onvifXsd__StreamType streamTypeFromRtpTransport(nx::vms::api::RtpTransportType rtpTransport)
+static onvifXsd__StreamType streamTypeFromNxRtpTransportType(
+    nx::vms::api::RtpTransportType rtpTransportType)
 {
-    if (rtpTransport == nx::vms::api::RtpTransportType::multicast)
+    if (rtpTransportType == nx::vms::api::RtpTransportType::multicast)
         return onvifXsd__StreamType::RTP_Multicast;
 
     return onvifXsd__StreamType::RTP_Unicast;
+}
+
+static std::string media2TransportProtocolFromNxRtpTransportType(
+    nx::vms::api::RtpTransportType rtpTransportType)
+{
+    if (rtpTransportType == nx::vms::api::RtpTransportType::multicast)
+        return "RtspMulticast";
+
+    if (rtpTransportType == nx::vms::api::RtpTransportType::udp)
+        return "RtspUnicast";
+
+    return "RTSP";
+}
+
+const bool isMedia2UsageForced(const QnPlOnvifResourcePtr& device)
+{
+    const QnResourceData resData = device->resourceData();
+    return resData.value<bool>(ResourceDataKey::kUseMedia2ToFetchProfiles, false)
+        && !device->getMedia2Url().isEmpty();
 }
 
 struct CameraInfoParams
@@ -156,6 +219,7 @@ struct ProfileSelectionResult
 template<typename ProfilesFetcher>
 ProfileSelectionResult tryToChooseExistingProfileInternal(
     const QnPlOnvifResourcePtr& device,
+    const CameraInfoParams& info,
     const bool isPrimary)
 {
     ProfilesFetcher profiles(device);
@@ -163,7 +227,6 @@ ProfileSelectionResult tryToChooseExistingProfileInternal(
     if (!profiles)
         return profiles.requestFailedResult();
 
-    CameraInfoParams info;
     const DefaultProfileInfo defaultProfileInfo = nxDefaultProfileInfo(device);
 
     const auto* profile = selectExistingProfile(
@@ -177,16 +240,13 @@ ProfileSelectionResult tryToChooseExistingProfileInternal(
 
 static ProfileSelectionResult tryToChooseExistingProfile(
     const QnPlOnvifResourcePtr& device,
+    const CameraInfoParams& info,
     bool isPrimary)
 {
-    const auto resData = device->resourceData();
-    const bool useMedia2 = resData.value<bool>(ResourceDataKey::kUseMedia2ToFetchProfiles, false)
-        && !device->getMedia2Url().isEmpty();
+    if (isMedia2UsageForced(device))
+        return tryToChooseExistingProfileInternal<Media2::Profiles>(device, info, isPrimary);
 
-    if (useMedia2)
-        return tryToChooseExistingProfileInternal<Media2::Profiles>(device, isPrimary);
-
-    return tryToChooseExistingProfileInternal<Media::Profiles>(device, isPrimary);
+    return tryToChooseExistingProfileInternal<Media::Profiles>(device, info, isPrimary);
 }
 
 template<typename Profile>
@@ -226,7 +286,7 @@ Profile* selectExistingProfile(
     // profile. (Some cameras doesn't support it. It can be checked via getCompatibleVideoEncoders
     // from profile)
     for (const auto& profile: profiles)
-    {        
+    {
         if (!profile || !availableProfileTokens.contains(QString::fromStdString(profile->token)))
             continue;
 
@@ -668,6 +728,23 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(
 
     Q_UNUSED(isPrimary);
 
+    if (isMedia2UsageForced(m_onvifRes))
+    {
+        Media2::StreamUri streamUriFetcher(m_onvifRes);
+        Media2::StreamUri::Request request;
+
+        request.Protocol = media2TransportProtocolFromNxRtpTransportType(
+            m_onvifRes->preferredRtpTransport());
+        request.ProfileToken = profileToken;
+
+        if (!streamUriFetcher.receiveBySoap(request))
+            return streamUriFetcher.requestFailedResult();
+
+        *mediaUrl = QString::fromStdString(streamUriFetcher.get()->Uri);
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+
     StreamUriResp response;
     StreamUriReq request;
     onvifXsd__StreamSetup streamSetup;
@@ -675,7 +752,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(
 
     request.StreamSetup = &streamSetup;
     request.StreamSetup->Transport = &transport;
-    request.StreamSetup->Stream = streamTypeFromRtpTransport(m_onvifRes->preferredRtpTransport());
+    request.StreamSetup->Stream = streamTypeFromNxRtpTransportType(
+        m_onvifRes->preferredRtpTransport());
     request.StreamSetup->Transport->Tunnel = 0;
     request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol::RTSP;
     request.ProfileToken = profileToken;
@@ -899,7 +977,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
         ResourceDataKey::kUseExistingOnvifProfiles);
 
     const ProfileSelectionResult profileSelectionResult =
-        tryToChooseExistingProfile(m_onvifRes, isPrimary);
+        tryToChooseExistingProfile(m_onvifRes, info, isPrimary);
 
     if (profileSelectionResult.error.errorCode != CameraDiagnostics::ErrorCode::noError)
     {
@@ -975,200 +1053,90 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
     }
 }
 
-
-CameraDiagnostics::Result QnOnvifStreamReader::updateProfileConfigurations(
+ConfigurationSet QnOnvifStreamReader::calculateConfigurationsToUpdate(
     const CameraInfoParams& desiredParameters,
     const CameraInfoParams& actualParameters) const
 {
-    MediaSoapWrapper soapWrapper(m_onvifRes);
+    ConfigurationSet result;
+    result.profileToken = desiredParameters.profileToken;
 
-    NX_DEBUG(this, "Updating profile configurations on the Device %1 (%2), channel %3. "
-        "Current profile parameters: %4, desired profile parameters: %5",
-        m_onvifRes->getUserDefinedName(), m_onvifRes->getId(), m_onvifRes->getChannel(),
-        actualParameters, desiredParameters);
-
-    if (actualParameters.videoSourceToken != desiredParameters.videoSourceToken)
+    if (actualParameters.videoSourceToken != desiredParameters.videoSourceToken);
     {
-        AddVideoSrcConfigReq request;
-        AddVideoSrcConfigResp response;
-
-        request.ProfileToken = desiredParameters.profileToken;
-        request.ConfigurationToken = desiredParameters.videoSourceConfigurationToken;
-
-        NX_DEBUG(this, "Updating video source configuration on the Device %1 (%2), channel %3, "
-            "profile token: %4, configuration tokent: %5",
-            m_onvifRes->getUserDefinedName(), m_onvifRes->getId(), m_onvifRes->getChannel(),
-            request.ProfileToken, request.ConfigurationToken);
-
-        int soapRes = soapWrapper.addVideoSourceConfiguration(request, response);
-        if (soapRes != SOAP_OK)
-        {
-            NX_DEBUG(this,
-                "Device %1 (%2), channel %3: addVideoSourceConfiguration: "
-                "unable to update video source configuration for profile %4."
-                "GSOAP error: %5, description: %6 , URL: %7, videoSourceConfigurationToken: %8",
-                m_onvifRes->getUserDefinedName(), m_onvifRes->getId(), m_onvifRes->getChannel(),
-                desiredParameters.profileToken, soapRes, soapWrapper.getLastErrorDescription(),
-                soapWrapper.endpoint(), desiredParameters.videoSourceConfigurationToken);
-
-            if (m_onvifRes->getMaxChannels() > 1)
-            {
-                return CameraDiagnostics::RequestFailedResult(
-                    QLatin1String("addVideoSourceConfiguration"),
-                    soapWrapper.getLastErrorDescription());
-            }
-        }
+        result.configurations.emplace(
+            ConfigurationType::videoSource,
+            desiredParameters.videoSourceConfigurationToken);
     }
 
-    // Adding video encoder.
     if (actualParameters.videoEncoderConfigurationToken !=
         desiredParameters.videoEncoderConfigurationToken)
     {
-        AddVideoConfigReq request;
-        AddVideoConfigResp response;
-
-        request.ProfileToken = desiredParameters.profileToken;
-        request.ConfigurationToken = desiredParameters.videoEncoderConfigurationToken;
-
-        NX_DEBUG(this, "Updating video encoder configuration on the Device %1 (%2), channel %3, "
-            "profile token: %4, configuration tokent: %5",
-            m_onvifRes->getUserDefinedName(), m_onvifRes->getId(), m_onvifRes->getChannel(),
-            request.ProfileToken, request.ConfigurationToken);
-
-        int soapRes = soapWrapper.addVideoEncoderConfiguration(request, response);
-        if (soapRes != SOAP_OK)
-        {
-            NX_DEBUG(this,
-                "Device %1 (%2), channel %3: addVideoEncoderConfiguration: "
-                "unable to update video encoder configuration for profile %4."
-                "GSOAP error: %5, description: %6 , URL: %7, videoEncoderConfigurationToken: %8",
-                m_onvifRes->getUserDefinedName(), m_onvifRes->getId(), m_onvifRes->getChannel(),
-                desiredParameters.profileToken, soapRes, soapWrapper.getLastErrorDescription(),
-                soapWrapper.endpoint(), desiredParameters.videoEncoderConfigurationToken);
-
-            return CameraDiagnostics::RequestFailedResult(
-                QLatin1String("addVideoEncoderConfiguration"), soapWrapper.getLastErrorDescription());
-        }
+        result.configurations.emplace(
+            ConfigurationType::videoEncoder,
+            desiredParameters.videoEncoderConfigurationToken);
     }
 
-    if (getRole() == Qn::CR_LiveVideo)
+    if (getRole() == Qn::ConnectionRole::CR_LiveVideo
+        && !m_onvifRes->getPtzUrl().isEmpty()
+        && !m_onvifRes->ptzConfigurationToken().empty()
+        && actualParameters.ptzConfigurationToken.empty())
     {
-        if (!m_onvifRes->audioOutputConfigurationToken().empty())
-        {
-            NX_DEBUG(this, "Device %1 (%2), channel %3, binding two-way audio to profile %4",
-                m_onvifRes->getUserDefinedName(), m_onvifRes->getId(), m_onvifRes->getChannel(),
-                desiredParameters.profileToken);
-
-            auto result = bindTwoWayAudioToProfile(soapWrapper, desiredParameters.profileToken);
-            if (!result)
-            {
-                const auto errorMessage = result.toString(m_onvifRes->serverModule()->commonModule()->resourcePool());
-                NX_WARNING(this,
-                    "Error binding two way audio to profile %1 for camera %2. Error: %3",
-                    desiredParameters.profileToken, m_onvifRes->getUrl(), errorMessage);
-            }
-        }
-
-        if (!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->ptzConfigurationToken().empty())
-        {
-            if (actualParameters.ptzConfigurationToken.empty())
-            {
-                AddPTZConfigReq request;
-                AddPTZConfigResp response;
-
-                request.ProfileToken = desiredParameters.profileToken;
-                request.ConfigurationToken = m_onvifRes->ptzConfigurationToken();
-
-                NX_DEBUG(this, "Updating PTZ configuration on the Device %1 (%2), channel %3, "
-                    "profile token: %4, configuration tokent: %5",
-                    m_onvifRes->getUserDefinedName(), m_onvifRes->getId(),
-                    m_onvifRes->getChannel(), request.ProfileToken, request.ConfigurationToken);
-
-                int soapRes = soapWrapper.addPTZConfiguration(request, response);
-                if (soapRes != SOAP_OK)
-                {
-                    NX_DEBUG(this,
-                        "Device %1 (%2), channel %3: addPTZConfiguration: "
-                        "unable to update PTZ configuration for profile %4."
-                        "GSOAP error: %5, description: %6 , URL: %7, "
-                        "PTZConfigurationToken: %8",
-                        m_onvifRes->getUserDefinedName(), m_onvifRes->getId(),
-                        m_onvifRes->getChannel(), desiredParameters.profileToken, soapRes,
-                        soapWrapper.getLastErrorDescription(), soapWrapper.endpoint(),
-                        desiredParameters.ptzConfigurationToken);
-
-                    return CameraDiagnostics::RequestFailedResult(
-                        QLatin1String("addPTZConfiguration"), soapWrapper.getLastErrorDescription());
-                }
-            }
-        }
+        result.configurations.emplace(
+            ConfigurationType::ptz,
+            desiredParameters.ptzConfigurationToken);
     }
 
-    //Adding audio source
     if (!desiredParameters.audioSourceToken.empty()
         && !desiredParameters.audioEncoderConfigurationToken.empty())
     {
         if (actualParameters.audioSourceToken != desiredParameters.audioSourceToken)
         {
-            AddAudioSrcConfigReq request;
-            AddAudioSrcConfigResp response;
-
-            request.ProfileToken = desiredParameters.profileToken;
-            request.ConfigurationToken = desiredParameters.audioSourceConfigurationToken;
-
-            NX_DEBUG(this,
-                "Updating audio source configuration on the Device %1 (%2), channel %3, "
-                "profile token: %4, configuration token: %5",
-                m_onvifRes->getUserDefinedName(), m_onvifRes->getId(),
-                m_onvifRes->getChannel(), request.ProfileToken, request.ConfigurationToken);
-
-            int soapRes = soapWrapper.addAudioSourceConfiguration(request, response);
-            if (soapRes != SOAP_OK)
-            {
-                NX_DEBUG(this,
-                    "Device %1 (%2), channel %3: addAudioSourceConfiguration: "
-                    "unable to update audio source configuration for profile %4."
-                    "GSOAP error: %5, description: %6 , URL: %7, "
-                    "audioSourceConfigurationToken: %8",
-                    m_onvifRes->getUserDefinedName(), m_onvifRes->getId(),
-                    m_onvifRes->getChannel(), desiredParameters.profileToken, soapRes,
-                    soapWrapper.getLastErrorDescription(), soapWrapper.endpoint(),
-                    desiredParameters.audioSourceConfigurationToken);
-                // Ignore audio error and do not return here.
-            }
+            result.configurations.emplace(
+                ConfigurationType::audioSource,
+                desiredParameters.audioSourceConfigurationToken);
         }
 
-        // Adding audio encoder.
         if (actualParameters.audioEncoderConfigurationToken
             != desiredParameters.audioEncoderConfigurationToken)
         {
-            AddAudioConfigReq request;
-            AddAudioConfigResp response;
+            result.configurations.emplace(
+                ConfigurationType::audioEncoder,
+                desiredParameters.audioEncoderConfigurationToken);
+        }
+    }
 
-            request.ProfileToken = desiredParameters.profileToken;
-            request.ConfigurationToken = desiredParameters.audioEncoderConfigurationToken;
+    return result;
+}
+
+CameraDiagnostics::Result QnOnvifStreamReader::updateProfileConfigurations(
+    const CameraInfoParams& desiredParameters,
+    const CameraInfoParams& actualParameters) const
+{
+    ConfigurationSet configurationSet = calculateConfigurationsToUpdate(
+        desiredParameters,
+        actualParameters);
+
+    CameraDiagnostics::Result result = isMedia2UsageForced(m_onvifRes)
+        ? ProfileHelper::addMedia2Configurations(m_onvifRes, std::move(configurationSet))
+        : ProfileHelper::addMediaConfigurations(m_onvifRes, configurationSet);
+
+    if (!result)
+        return result;
+
+    if (!m_onvifRes->audioOutputConfigurationToken().empty())
+    {
+        NX_DEBUG(this, "Device %1 (%2), channel %3, binding two-way audio to profile %4",
+            m_onvifRes->getUserDefinedName(), m_onvifRes->getId(), m_onvifRes->getChannel(),
+            desiredParameters.profileToken);
+
+        const auto result = bindTwoWayAudioToProfile(desiredParameters.profileToken);
+        if (!result)
+        {
+            const auto errorMessage = result.toString(
+                m_onvifRes->serverModule()->commonModule()->resourcePool());
 
             NX_DEBUG(this,
-                "Updating audio encoder configuration on the Device %1 (%2), channel %3, "
-                "profile token: %4, configuration token: %5",
-                m_onvifRes->getUserDefinedName(), m_onvifRes->getId(),
-                m_onvifRes->getChannel(), request.ProfileToken, request.ConfigurationToken);
-
-            int soapRes = soapWrapper.addAudioEncoderConfiguration(request, response);
-            if (soapRes != SOAP_OK)
-            {
-                NX_DEBUG(this,
-                    "Device %1 (%2), channel %3: addAudioEncoderConfiguration: "
-                    "unable to update audio encoder configuration for profile %4."
-                    "GSOAP error: %5, description: %6 , URL: %7, "
-                    "audioEncoderConfigurationToken: %8",
-                    m_onvifRes->getUserDefinedName(), m_onvifRes->getId(),
-                    m_onvifRes->getChannel(), desiredParameters.profileToken, soapRes,
-                    soapWrapper.getLastErrorDescription(), soapWrapper.endpoint(),
-                    desiredParameters.audioEncoderConfigurationToken);
-
-                //result = false; //< Sound can be absent, so ignoring;
-            }
+                "Error binding two way audio to profile %1 for camera %2. Error: %3",
+                desiredParameters.profileToken, m_onvifRes->getUrl(), errorMessage);
         }
     }
 
@@ -1176,8 +1144,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateProfileConfigurations(
 }
 
 CameraDiagnostics::Result QnOnvifStreamReader::bindTwoWayAudioToProfile(
-    MediaSoapWrapper& soapWrapper, const std::string& profileToken) const
+    const std::string& profileToken) const
 {
+    MediaSoapWrapper soapWrapper(m_onvifRes);
+
     AddAudioOutputConfigurationReq addAudioOutputConfigurationRequest;
     AddAudioOutputConfigurationResp addAudioOutputConfigurationResponse;
 

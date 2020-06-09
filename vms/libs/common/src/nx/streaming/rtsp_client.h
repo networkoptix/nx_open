@@ -62,9 +62,7 @@ public:
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
 
-    void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteRtcpPort = rtcpPort;}
-
-    void updateRemoteMulticastPorts(quint16 mediaPort, quint16 rtcpPort);
+    void updateRemotePorts(quint16 mediaPort, quint16 rtcpPort);
     void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
 
@@ -145,8 +143,6 @@ public:
             ioDevice = std::make_shared<QnRtspIoDevice>(owner, transport, serverPort);
             ioDevice->setHostAddress(nx::network::HostAddress(owner->getUrl().host()));
         }
-        void setRemoteEndpointRtcpPort(quint16 rtcpPort) { ioDevice->setRemoteEndpointRtcpPort(rtcpPort); };
-
         bool setupSuccess = false;
         nx::streaming::Sdp::Media sdpMedia;
         QPair<int, int> interleaved{ -1, -1 };
@@ -286,6 +282,9 @@ public:
 
     QElapsedTimer lastReceivedDataTimer() const;
 
+    void parseSetupResponse(const QString& response, SDPTrackInfo* outTrack, int trackIndex);
+    std::chrono::milliseconds keepAliveTimeOut() const { return m_keepAliveTimeOut; }
+    QString sessionId() const { return m_SessionId; }
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();

@@ -1308,7 +1308,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     namespace Server = ResourcePropertyKey::Server;
     const auto hwInfo = HardwareInformation::instance();
     server->setProperty(Server::kCpuArchitecture, hwInfo.cpuArchitecture);
-    server->setProperty(Server::kCpuModelName, hwInfo.cpuModelName);
+    server->setProperty(Server::kCpuModelName, hwInfo.cpuModelName.trimmed());
     server->setProperty(Server::kPhysicalMemory, QString::number(hwInfo.physicalMemory));
     server->setProperty(Server::kBrand, AppInfo::brand());
     server->setProperty(Server::kFullVersion, AppInfo::applicationFullVersion());
@@ -5641,11 +5641,20 @@ void MediaServerProcess::updateSpecificFeatures() const
     std::map<QString, int> values;
     for (const auto& line: file.readAll().split('\n'))
     {
-        const auto parts = line.split('=');
+        const auto lineTrimmed = line.trimmed();
+        if (lineTrimmed == "")
+            continue;
+
+        const auto parts = lineTrimmed.split('=');
         if (parts.size() == 2)
-            values[parts[0].trimmed()] = parts[1].trimmed().toInt();
-        else
-            NX_WARNING(this, "Syntax error in %1 on line: %2", file.fileName(), line);
+        {
+            bool isOk = false;
+            values[parts[0].trimmed()] = parts[1].trimmed().toInt(&isOk);
+            if (isOk)
+                continue;
+        }
+
+        NX_WARNING(this, "Syntax error in %1 on line: %2", file.fileName(), line);
     }
 
     if (values.empty())

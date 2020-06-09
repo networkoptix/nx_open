@@ -475,9 +475,6 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
 
             const QSize videoSize = QSize(video->width, video->height);
             QSize dstResolution = transcodeParams.pictureSizePixels();
-            if (!dstResolution.isValid())
-                dstResolution = videoSize;
-
             QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
             if (video->compressionType != dstCodecId || videoSize != dstResolution)
             {

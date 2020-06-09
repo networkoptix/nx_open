@@ -32,32 +32,28 @@ namespace transcoding {
 
 const QSize FilterChain::kDefaultResolutionLimit(8192 - 16, 8192 - 16);
 
-FilterChain::FilterChain(const Settings& settings):
-    m_settings(settings)
+FilterChain::FilterChain(const Settings& settings,
+    QnMediaDewarpingParams dewarpingParams,
+    QnConstResourceVideoLayoutPtr layout)
+    :
+    m_settings(settings),
+    m_dewarpingParams(dewarpingParams),
+    m_layout(layout)
 {
 }
 
-void FilterChain::prepare(const QnMediaResourcePtr& resource,
-    const QSize& srcFrameResolution,
-    const QSize& resolutionLimit)
+void FilterChain::prepare(const QSize& srcFrameResolution, const QSize& resolutionLimit)
 {
-    NX_ASSERT(resource);
-    if (!resource)
-        return;
-
-    const auto videoLayout = resource->getVideoLayout();
-
     NX_ASSERT(!isReady(), "Double initialization");
-    //NX_ASSERT(isTranscodingRequired(videoLayout));
 
     prepareVideoArFilter(srcFrameResolution);
 
-    const auto isPanoramicCamera = videoLayout && videoLayout->channelCount() > 1;
+    const auto isPanoramicCamera = m_layout && m_layout->channelCount() > 1;
     if (isPanoramicCamera)
-        push_back(QnAbstractImageFilterPtr(new QnTiledImageFilter(videoLayout)));
+        push_back(QnAbstractImageFilterPtr(new QnTiledImageFilter(m_layout)));
 
     prepareZoomWindowFilter();
-    prepareDewarpingFilter(resource);
+    prepareDewarpingFilter();
     prepareImageEnhancementFilter();
     prepareRotationFilter();
     prepareDownscaleFilter(srcFrameResolution, resolutionLimit);
@@ -68,22 +64,16 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
 }
 
 
-void FilterChain::prepareForImage(const QnMediaResourcePtr& resource,
-    const QSize& fullImageResolution,
-    const QSize& resolutionLimit)
+void FilterChain::prepareForImage(const QSize& fullImageResolution, const QSize& resolutionLimit)
 {
-    NX_ASSERT(resource);
-    if (!resource)
-        return;
-
     NX_ASSERT(!isReady(), "Double initialization");
 
     if (!isImageTranscodingRequired(fullImageResolution, resolutionLimit))
         return;
 
-    prepareImageArFilter(resource, fullImageResolution);
+    prepareImageArFilter(fullImageResolution);
     prepareZoomWindowFilter();
-    prepareDewarpingFilter(resource);
+    prepareDewarpingFilter();
     prepareImageEnhancementFilter();
     prepareRotationFilter();
     prepareDownscaleFilter(fullImageResolution, resolutionLimit);
@@ -105,6 +95,9 @@ bool FilterChain::isImageTranscodingRequired(const QSize& fullImageResolution,
 
 bool FilterChain::isTranscodingRequired() const
 {
+    if (m_layout && m_layout->channelCount() > 1)
+        return true;
+
     //TODO: #GDM #3.2 Remove when legacy will gone.
     if (!m_legacyFilters.empty())
         return true;
@@ -131,16 +124,6 @@ bool FilterChain::isTranscodingRequired() const
         return true;
 
     return !m_settings.overlays.isEmpty();
-}
-
-bool FilterChain::isTranscodingRequired(const QnMediaResourcePtr& resource) const
-{
-    NX_ASSERT(resource);
-
-    QnConstResourceVideoLayoutPtr layout = resource ? resource->getVideoLayout() : QnConstResourceVideoLayoutPtr();
-    if (layout && layout->channelCount() > 1)
-        return true;
-    return isTranscodingRequired();
 }
 
 bool FilterChain::isDownscaleRequired(const QSize& srcResolution) const
@@ -199,8 +182,7 @@ void FilterChain::prepareVideoArFilter(const QSize& srcFrameResolution)
     }
 }
 
-void FilterChain::prepareImageArFilter(const QnMediaResourcePtr& resource,
-    const QSize& fullImageResolution)
+void FilterChain::prepareImageArFilter(const QSize& fullImageResolution)
 {
     if (m_settings.aspectRatio.isValid())
     {
@@ -208,8 +190,8 @@ void FilterChain::prepareImageArFilter(const QnMediaResourcePtr& resource,
         newSize.setHeight(fullImageResolution.height());
 
         auto aspectRatio = m_settings.aspectRatio.toFloat();
-        if (const auto layout = resource->getVideoLayout())
-            aspectRatio *= QnAspectRatio(layout->size()).toFloat();
+        if (m_layout)
+            aspectRatio *= QnAspectRatio(m_layout->size()).toFloat();
 
         newSize.setWidth(fullImageResolution.height() * aspectRatio + 0.5);
 
@@ -221,12 +203,12 @@ void FilterChain::prepareImageArFilter(const QnMediaResourcePtr& resource,
     }
 }
 
-void FilterChain::prepareDewarpingFilter(const QnMediaResourcePtr& resource)
+void FilterChain::prepareDewarpingFilter()
 {
     if (m_settings.dewarping.enabled)
     {
         push_back(QnAbstractImageFilterPtr(new QnFisheyeImageFilter(
-            resource->getDewarpingParams(), m_settings.dewarping)));
+            m_dewarpingParams, m_settings.dewarping)));
     }
 }
 

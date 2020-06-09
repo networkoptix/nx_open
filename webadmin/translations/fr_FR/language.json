@@ -77,8 +77,8 @@
         "emailSignature": "Signature Courriel",
         "emailSupportEmail": "Support Courriel",
         "enableEdgeRecording": "Activer l'enregistrement Edge",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "Activer les sockets WEB",
+        "maxP2pAllClientsSizeBytes": "Taille maximale du tampon pour envoyer des données p2p à tous les clients",
         "eventLogPeriodDays": "Période du journal d'événements (jours)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP Base de recherche",
@@ -130,12 +130,12 @@
         "maxWebMTranscoders": "Nombre maximal de connexions WEBM pour le serveur. Chrome ouvre 2 connexions à la fois, puis ferme la première. Il est donc recommandé de définir la valeur> = 2 sur ce paramètre.",
         "maxEventLogRecords": "Nombre maximal d'enregistrements du journal des événements à conserver dans la base de données. La quantité réelle d'enregistrements non supprimés peut dépasser de 20% la valeur spécifiée.",
         "forceLiveCacheForPrimaryStream": "S'il faut mettre certaines images en cache pour le flux principal. Valeurs: \"oui\" - toujours activé (peut utiliser beaucoup de RAM), \"non\" - toujours désactivé sauf lorsque requis par la lecture (par exemple, HLS), \"auto\" - similaire à \"non\", mais activé lorsque l'amélioration de l'expérience utilisateur (par exemple, lorsqu'un plug-in Analytics fonctionne sur la caméra).",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "additionalLocalFsTypes": "Types de systèmes de fichiers supplémentaires à prendre en compte pour décider si une partition donnée convient comme stockage de serveur. Une liste de noms de système de fichiers séparés par des virgules, tels qu'ils figurent dans /proc/mounts, est attendue.",
+        "rtspBufferSizeKb": "Taille du tampon RTSP côté serveur en Ko. Une valeur plus élevée permet d'utiliser une connexion Internet plus efficace avec une valeur de retard aller-retour élevée, mais ralentit la commutation automatique de la qualité et la réaction à l'opération de recherche RTSP."
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "Graphiques",
             "storage": "Stockage",
             "log": "Journal"
         }

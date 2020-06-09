@@ -115,10 +115,14 @@ DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo)
 
 DeviceAgent::~DeviceAgent()
 {
+    m_terminated = true;
     {
         std::unique_lock<std::mutex> lock(m_pluginDiagnosticEventGenerationLoopMutex);
-        m_terminated = true;
         m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
+    }
+
+    {
+        std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
         m_eventGenerationLoopCondition.notify_all();
     }
 
@@ -215,6 +219,10 @@ std::string DeviceAgent::manifestString() const
         {
             "id": ")json" + kBlinkingObjectType + R"json(",
             "name": "Blinking Object"
+        },
+        {
+          "id": ")json" + kCounterObjectType + R"json(",
+          "name": "Counter"
         }
     ])json"
         + (ini().overrideSettingsModelInDeviceAgent ? kOverriddenDeviceAgentSettingsModel : "")
@@ -407,6 +415,7 @@ void DeviceAgent::doSetNeededMetadataTypes(
 
 void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
+    std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
     NX_OUTPUT << __func__ << "() BEGIN";
     m_eventsNeeded = true;
     m_eventGenerationLoopCondition.notify_all();
@@ -416,6 +425,7 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 
 void DeviceAgent::stopFetchingMetadata()
 {
+    std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
     NX_OUTPUT << __func__ << "() BEGIN";
     m_eventsNeeded = false;
     NX_OUTPUT << __func__ << "() END -> noError";
@@ -665,6 +675,25 @@ void DeviceAgent::addFixedObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadat
     objectMetadataPacket->addItem(objectMetadata.get());
 }
 
+void DeviceAgent::addCounterIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
+{
+    if (!m_deviceAgentSettings.generateCounter)
+        return;
+
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    static const Uuid trackId = UuidHelper::randomUuid();
+    objectMetadata->setTypeId(kCounterObjectType);
+    objectMetadata->setTrackId(trackId);
+    objectMetadata->setBoundingBox(Rect(0.05, 0.05, 0.001, 0.001));
+
+    objectMetadata->addAttribute(makePtr<Attribute>(
+        IAttribute::Type::number,
+        "counterValue",
+        std::to_string(m_counterObjectAttributeValue++)));
+
+    objectMetadataPacket->addItem(objectMetadata.get());
+}
+
 std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 {
     std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
@@ -685,6 +714,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
     addBlinkingObjectIfNeeded(metadataTimestampUs, &result, objectMetadataPacket);
     addFixedObjectIfNeeded(objectMetadataPacket);
+    addCounterIfNeeded(objectMetadataPacket);
 
     const microseconds delay(m_lastVideoFrameTimestampUs - metadataTimestampUs);
 
@@ -890,8 +920,6 @@ void DeviceAgent::parseSettings()
             }
         };
 
-    std::string somestuff = settingValue("testPolygon");
-
     m_deviceAgentSettings.generateEvents = toBool(settingValue(kGenerateEventsSetting));
     m_deviceAgentSettings.generateCars = toBool(settingValue(kGenerateCarsSetting));
     m_deviceAgentSettings.generateTrucks = toBool(settingValue(kGenerateTrucksSetting));
@@ -900,6 +928,7 @@ void DeviceAgent::parseSettings()
     m_deviceAgentSettings.generateBicycles = toBool(settingValue(kGenerateBicyclesSetting));
     m_deviceAgentSettings.generateStones = toBool(settingValue(kGenerateStonesSetting));
     m_deviceAgentSettings.generateFixedObject = toBool(settingValue(kGenerateFixedObjectSetting));
+    m_deviceAgentSettings.generateCounter = toBool(settingValue(kGenerateCounterSetting));
 
     assignIntegerSetting(kBlinkingObjectPeriodMsSetting,
         &m_deviceAgentSettings.blinkingObjectPeriodMs);

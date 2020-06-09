@@ -7,6 +7,7 @@
 #include "network/multicodec_rtp_reader.h"
 #include "soap_wrapper.h"
 #include "onvif_resource.h"
+#include "profile_helper.h"
 
 struct CameraInfoParams;
 struct ProfilePair;
@@ -45,6 +46,12 @@ protected:
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
     virtual void setCameraControlDisabled(bool value) override;
+
+    virtual CameraDiagnostics::Result fetchUpdateVideoEncoder(
+        CameraInfoParams* outInfo, bool isPrimary, bool isCameraControlRequired,
+        const QnLiveStreamParams& params) const;
+    virtual CameraDiagnostics::Result fetchUpdateAudioEncoder(
+        CameraInfoParams* outInfo, bool isPrimary, bool isCameraControlRequired) const;
 private:
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
@@ -59,16 +66,12 @@ private:
         bool isPrimary, QString* outStreamUrl, bool isCameraControlRequired,
         const QnLiveStreamParams& params) const;
 
-    // Returned pointers are valid while response object is living.
-    // (For all functions in the following block.)
-    CameraDiagnostics::Result fetchUpdateVideoEncoder(
-        CameraInfoParams* outInfo, bool isPrimary, bool isCameraControlRequired,
-        const QnLiveStreamParams& params) const;
-    CameraDiagnostics::Result fetchUpdateAudioEncoder(
-        CameraInfoParams* outInfo, bool isPrimary, bool isCameraControlRequired) const;
-
     CameraDiagnostics::Result fetchUpdateProfile(
         CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
+
+    nx::vms::server::plugins::onvif::ConfigurationSet calculateConfigurationsToUpdate(
+        const CameraInfoParams& desiredParameters,
+        const CameraInfoParams& actualParameters) const;
 
     CameraDiagnostics::Result updateProfileConfigurations(
         const CameraInfoParams& desiredParameters,
@@ -97,8 +100,7 @@ private:
     void printProfile(const onvifXsd__Profile& profile, bool isPrimary) const;
 
     bool executePreConfigurationRequests();
-    CameraDiagnostics::Result bindTwoWayAudioToProfile(
-        MediaSoapWrapper& soapWrapper, const std::string& profileToken) const;
+    CameraDiagnostics::Result bindTwoWayAudioToProfile(const std::string& profileToken) const;
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_multiCodec;

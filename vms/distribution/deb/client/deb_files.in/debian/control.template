@@ -5,9 +5,8 @@ Installed-Size: INSTALLED_SIZE
 Architecture: @target.arch@
 Maintainer: @customization.companyName@ <@supportEmail@>
 Pre-Depends: debconf
-Depends: @common.depends@@arch.depends@
-Recommends:
-Suggests:
+Depends: @required_dependencies@
+Recommends: @recommended_dependencies@
 Conflicts: @customization.companyId@-client-1.2 (<< VERSION)
 Replaces: @customization.companyId@-client-1.2 (<< VERSION)
 Provides: @customization.companyId@-client

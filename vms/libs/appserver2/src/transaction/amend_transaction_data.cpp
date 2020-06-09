@@ -68,6 +68,17 @@ bool amendOutputDataIfNeeded(
     return true;
 }
 
+bool amendOutputDataIfNeeded(
+    const Qn::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    nx::vms::api::MediaServerDataEx* mediaServerDataEx)
+{
+    bool result = false;
+    for (auto& storage: mediaServerDataEx->storages)
+        result |= amendOutputDataIfNeeded(accessData, accessManager, &storage);
+    return result;
+}
+
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::EventRuleData* rule)

@@ -1,0 +1,12 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Nx VMS legacy API",
+    "version": "0.0.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ]
+}

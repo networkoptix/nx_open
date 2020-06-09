@@ -27,6 +27,9 @@ public:
     QnFfmpegVideoTranscoder(const DecoderConfig& config, nx::metrics::Storage* metrics, AVCodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
+    // Should call before open
+    void setFilterChain(const nx::core::transcoding::FilterChain& filters);
+
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
     virtual bool open(const QnConstCompressedVideoDataPtr& video) override;
     void close();
@@ -36,15 +39,26 @@ public:
     void setUseMultiThreadEncode(bool value);
     void setUseMultiThreadDecode(bool value);
     void setUseRealTimeOptimization(bool value);
-    virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList) override;
-
     void setFixedFrameRate(int value);
+    //!Returns picture size (in pixels) of output video stream
+    QSize getOutputResolution() const;
+
+    void setOutputResolutionLimit(const QSize& resolution);
+    // Force to use this source resolution, instead of max stream resolution from resource streams
+    void setSourceResolution(const QSize& resolution);
+
 private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
+    QSharedPointer<CLVideoDecoderOutput> processFilterChain(
+        const QSharedPointer<CLVideoDecoderOutput>& decodedFrame);
+    bool prepareFilters(AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video);
 
 private:
     DecoderConfig m_config;
     QVector<QnFfmpegVideoDecoder*> m_videoDecoders;
+    nx::core::transcoding::FilterChain m_filters;
+    QSize m_targetResolution;
+    QSize m_sourceResolution;
     CLVideoDecoderOutputPtr m_decodedVideoFrame;
 
     quint8* m_videoEncodingBuffer;

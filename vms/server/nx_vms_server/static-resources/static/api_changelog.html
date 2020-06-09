@@ -44,8 +44,9 @@ supported for a while, when noted below.
 <h3>Breaking compatibility</h3>
 <p>
 In method <strong><code>GET /media</code></strong>, added
-the <strong><code><i>signature</i></code></strong> parameter which allows to add a signature to the
-exported multimedia data. By default, the signature will not be added to the media data.
+the <strong><code><b>signature</b></code></strong> parameter which adds a signature to the
+exported multimedia data. Previously, the signature had been added unconditionally, but now it is
+not added if the new parameter is not specified.
 </p>
 <p>
 In method <strong><code>GET /ec2/analyticsLookupObjectTracks</code></strong>, parameter

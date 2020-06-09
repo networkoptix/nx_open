@@ -278,7 +278,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
             if (index.column() != IndicatorColumn)
                 return base_type::data(index, role);
 
-            return isIndirectlyChecked(index)
+            return !m_allUsers && isIndirectlyChecked(index)
                 ? QVariant(qnSkin->icon(lit("tree/users.png")))
                 : QVariant();
         }

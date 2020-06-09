@@ -47,6 +47,11 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
 
     NX_INI_DOUBLE(1, valueHistoryAgeDelimiter,
         "Reduces max age of all ValueHistory storage and requests.");
+
+    NX_INI_DOUBLE(1.0, loadFactor,
+        "Load factor for unit tests, in range (0..1]. The smaller this value is, the less amount\n"
+        "of testing is performed by certain unit tests, which leads to faster test execution and\n"
+        "less system load. For details, see the usages in the C++ code.");
 };
 
 NX_UTILS_API Ini& ini();

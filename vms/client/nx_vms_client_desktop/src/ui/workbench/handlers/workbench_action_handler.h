@@ -275,6 +275,9 @@ private:
 
     std::multimap<nx::utils::Url, ServerRequest> m_serverRequests;
     QPointer<QnGraphicsMessageBox> m_layoutIsFullMessage;
+
+    QList<action::Parameters> m_queuedDropParameters;
+    bool m_inDropResourcesAction = false;
 };
 
 } // namespace workbench

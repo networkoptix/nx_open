@@ -1,7 +1,4 @@
 {{&event}}
-
-{{&source}} ({{&sourceIp}}) 
-
 {{#aggregated}}
-{{&timestampDate}} {{&timestampTime}}
+{{&source}} ({{&sourceIp}}) {{&timestampDate}} {{&timestampTime}}
 {{/aggregated}}

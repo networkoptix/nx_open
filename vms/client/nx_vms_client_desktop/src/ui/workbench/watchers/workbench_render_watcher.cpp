@@ -1,17 +1,15 @@
 #include "workbench_render_watcher.h"
 
-#include <utils/common/warnings.h>
-#include <utils/common/checked_cast.h>
-
 #include <camera/abstract_renderer.h>
-
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
-
+#include <utils/common/checked_cast.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/warnings.h>
 
 QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QObject *parent):
     QObject(parent),
@@ -84,10 +82,23 @@ void QnWorkbenchRenderWatcher::registerWidget(QnResourceWidget *widget)
     if (m_dataByWidget.contains(widget))
         return;
 
-    connect(widget, &QnResourceWidget::painted, this, [this, widget]
+    connect(widget, &QnResourceWidget::painted, this,
+        [this, widget]
         {
             m_dataByWidget[widget].newDisplaying = true;
         });
+
+    if (!m_connectedToMainWindow)
+    {
+        installEventHandler(mainWindowWidget(), QEvent::Hide, this,
+            [this]()
+            {
+                for (auto pos = m_dataByWidget.begin(); pos != m_dataByWidget.end(); ++pos)
+                    setDisplaying(pos.key(), false);
+            });
+
+        m_connectedToMainWindow = true;
+    }
 
     QnResourceDisplayPtr display;
     if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
@@ -123,8 +134,6 @@ void QnWorkbenchRenderWatcher::unregisterWidget(QnResourceWidget *widget)
     if (data.display && data.displaying)
         m_countByDisplay.remove(data.display);
 }
-
-
 
 // -------------------------------------------------------------------------- //
 // Handlers

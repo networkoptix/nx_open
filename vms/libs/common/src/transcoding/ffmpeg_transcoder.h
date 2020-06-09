@@ -36,6 +36,8 @@ public:
 
     int setContainer(const QString& value);
     void setFormatOption(const QString& option, const QString& value);
+    // Force to use this source resolution, instead of max stream resolution from resource streams
+    void setSourceResolution(const QSize& resolution);
     bool isCodecSupported(AVCodecID id) const;
 
     AVCodecContext* getVideoCodecContext() const;
@@ -72,6 +74,7 @@ private:
 
 private:
     Config m_config;
+    QSize m_sourceResolution;
     MediaSigner m_mediaSigner;
     AVCodecContext* m_videoEncoderCodecCtx;
     AVCodecContext* m_audioEncoderCodecCtx;

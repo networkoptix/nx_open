@@ -92,7 +92,10 @@ struct ExportMediaTool::Private
                 dataProvider->pleaseStop();
             });
 
-        nx::core::transcoding::FilterChain filters(settings.transcodingSettings);
+        nx::core::transcoding::FilterChain filters(
+            settings.transcodingSettings,
+            settings.mediaResource->getDewarpingParams(),
+            settings.mediaResource->getVideoLayout());
         exportRecorder->setTranscodeFilters(filters);
 
         connect(exportRecorder, &QnStreamRecorder::recordingProgress, q,

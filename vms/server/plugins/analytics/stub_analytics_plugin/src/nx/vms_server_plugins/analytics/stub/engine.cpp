@@ -318,6 +318,13 @@ std::string Engine::manifestString() const
                                 "defaultValue": false
                             },
                             {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateCounterSetting + R"json(",
+                                "caption": "Generate counter",
+                                "description": "Generates a counter",
+                                "defaultValue": false
+                            },
+                            {
                                 "type": "SpinBox",
                                 "name": ")json" + kBlinkingObjectPeriodMsSetting + R"json(",
                                 "caption": "Generate 1-frame BlinkingObject every N ms (if not 0)",

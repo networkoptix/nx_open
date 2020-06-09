@@ -36,10 +36,11 @@ void ProgressiveDownloadingConsumer::setAuditHandle(const AuditHandle& handle)
     m_auditHandle = handle;
 }
 
-void ProgressiveDownloadingConsumer::copyLastGopFromCamera(const QnVideoCameraPtr& camera)
+void ProgressiveDownloadingConsumer::copyLastGopFromCamera(
+    const QnVideoCameraPtr& camera, nx::vms::api::StreamIndex streamIndex)
 {
     camera->copyLastGop(
-        nx::vms::api::StreamIndex::primary,
+        streamIndex,
         /*skipTime*/ 0,
         m_dataQueue,
         /*iFramesOnly*/ false);
@@ -149,7 +150,7 @@ void ProgressiveDownloadingConsumer::sendFrame(qint64 timestamp, const QnByteArr
     //TODO shared chunked buffer and socket::writev is wanted very much here
     QByteArray outPacket;
     const auto context = m_owner->getTranscoder()->getVideoCodecContext();
-    if (context && context->codec_id == AV_CODEC_ID_MJPEG)
+    if (context && context->codec_id == AV_CODEC_ID_MJPEG && m_config.streamingFormat == "mpjpeg")
     {
         //preparing timestamp header
         QByteArray timestampHeader;

@@ -372,6 +372,9 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
     if (resType && resType->getManufacturer() == lit("NetworkOptix"))
         return Qn::LC_Free;
 
+    if (getVendor() == "HTTP_URL_PLUGIN" && !getGroupId().isEmpty())
+        return Qn::LC_AnalogEncoder; //< Multichannel general HTTP link.
+
     /**
      * AnalogEncoder should have priority over Analog type because of analog type is deprecated
      * (DW-CP04 has both analog and analogEncoder params)

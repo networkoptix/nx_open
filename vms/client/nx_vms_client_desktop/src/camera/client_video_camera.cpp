@@ -226,7 +226,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     m_exportRecorder->setContainer(format);
     m_exportRecorder->setNeedCalcSignature(true);
 
-    nx::core::transcoding::FilterChain filters(transcodingSettings);
+    nx::core::transcoding::FilterChain filters(
+        transcodingSettings, m_resource->getDewarpingParams(), m_resource->getVideoLayout());
     m_exportRecorder->setTranscodeFilters(filters);
 
     m_exportReader->addDataProcessor(m_exportRecorder);

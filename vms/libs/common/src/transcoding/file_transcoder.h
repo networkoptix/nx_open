@@ -67,7 +67,7 @@ public:
     /*!
         \param codec codec to transcode to. Ignored if \a transcodeMethod == \a TM_NoTranscode
         \param transcodeMethod Underlying transcoder to use
-        \param resolution output resolution. If \a QSize(0,0), then original resolution is used. Not used if transcode method \a TM_NoTranscode
+        \param resolution output resolution. If \a QSize(-1,-1), then original resolution is used. Not used if transcode method \a TM_NoTranscode
         \param bitrate Bitrate after transcode. By default bitrate is autodetected. Not used if transcode method \a TM_NoTranscode
         \param params codec params. Not used if transcode method \a TM_NoTranscode
         \return Returns \a true on success
@@ -76,7 +76,7 @@ public:
         AVCodecID codec,
         QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_FfmpegTranscode,
         Qn::StreamQuality quality = Qn::StreamQuality::highest,
-        const QSize& resolution = QSize(0,0),
+        const QSize& resolution = QSize(),
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value() );
     //!Set ffmpeg audio codec
