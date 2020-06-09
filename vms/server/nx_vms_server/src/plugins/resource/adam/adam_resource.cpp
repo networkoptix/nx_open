@@ -169,12 +169,33 @@ QnIOStateDataList QnAdamResource::ioPortStates() const
     return QnIOStateDataList();
 }
 
+QString QnAdamResource::getDefaultOutputIdUnsafe() const
+{
+    for (const auto [name, portType]: m_portTypes)
+    {
+        if (portType == Qn::PT_Output)
+            return name;
+    }
+    return QString();
+}
+
 bool QnAdamResource::setOutputPortState(
-    const QString& outputId,
+    const QString& portId,
     bool newState,
     unsigned int autoResetTimeoutMs)
 {
     QnMutexLocker lock(&m_mutex);
+    QString outputId = portId;
+    if (outputId.isEmpty())
+    {
+        outputId = getDefaultOutputIdUnsafe();
+        if (outputId.isEmpty())
+        {
+            NX_VERBOSE(this, "The device %1 hasn't output ports. Ignore setOutput port command", this);
+            return false;
+        }
+        NX_VERBOSE(this, "Device %1. Auto select outport port %2", this, outputId);
+    }
 
     NX_VERBOSE(this, "Setting port [%1] state to [%2], auto reset timeout [%3]",
         outputId, newState, autoResetTimeoutMs);
