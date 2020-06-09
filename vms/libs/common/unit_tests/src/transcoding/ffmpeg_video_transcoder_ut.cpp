@@ -112,4 +112,13 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(640, 480));
     }
+    {
+        // Tartget should not upscale
+        QSize maxResourceResolution = QSize(640, 480);
+        auto provider = getProvider(maxResourceResolution);
+        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H264);
+        transcoder.setOutputResolutionLimit(QSize(1280, 960));
+        ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
+        ASSERT_EQ(transcoder.getOutputResolution(), QSize(640, 480));
+    }
 }

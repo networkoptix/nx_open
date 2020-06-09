@@ -160,7 +160,7 @@ bool QnFfmpegVideoTranscoder::prepareFilters(
 
     m_targetResolution = nx::transcoding::adjustCodecRestrictions(dstCodec, m_targetResolution);
     m_filters.prepare(m_sourceResolution, m_targetResolution);
-    m_targetResolution = m_filters.apply(m_targetResolution);
+    m_targetResolution = m_filters.apply(m_sourceResolution);
     NX_DEBUG(this, "Prepare transcoding, output resolution: %1, source resolution: %2",
         m_targetResolution, m_sourceResolution);
     return true;
