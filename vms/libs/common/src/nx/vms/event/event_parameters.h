@@ -65,7 +65,7 @@ struct EventParameters
     /** Used for ReasonedEvent business events as reason code. */
     EventReason reasonCode;
 
-    // TODO: Refactor: inputPortId should not be used for analytics event id.
+    // TODO: Refactor: inputPortId should not be used for analytics event type id.
     /** Used for Input events only. Identifies the input port. */
     QString inputPortId;
 
