@@ -152,7 +152,8 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
 {
     const bool allowMultipleClientInstances = startupParams.allowMultipleClientInstances
         || !startupParams.customUri.isNull()
-        || !startupParams.videoWallGuid.isNull();
+        || !startupParams.videoWallGuid.isNull()
+        || ini().allowMultipleClientInstances;
 
     if (!allowMultipleClientInstances)
     {
