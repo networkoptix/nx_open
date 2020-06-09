@@ -605,6 +605,16 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     if (w && w->handleKeyPress(e->key()))
         return;
 
+    const auto showNavigationMessage =
+        [this]()
+        {
+            if (m_cameraSwitchKeysMessageBox)
+                return;
+
+            m_cameraSwitchKeysMessageBox.reset(QnGraphicsMessageBox::information(
+                tr("To switch between cameras press Shift + Arrow")));
+        };
+
     switch (e->key())
     {
         case Qt::Key_Enter:
@@ -617,32 +627,40 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         {
             if (e->modifiers() & Qt::AltModifier)
                 m_handScrollInstrument->emulate(QPoint(0, -15));
-            else
+            else if (e->modifiers() & Qt::ShiftModifier)
                 moveCursor(QPoint(0, -1), QPoint(-1, 0));
+            else if (!startContinuousPtz(Direction::tilt, -1.0))
+                showNavigationMessage();
             break;
         }
         case Qt::Key_Down:
         {
             if (e->modifiers() & Qt::AltModifier)
                 m_handScrollInstrument->emulate(QPoint(0, 15));
-            else
+            else if (e->modifiers() & Qt::ShiftModifier)
                 moveCursor(QPoint(0, 1), QPoint(1, 0));
+            else if (!startContinuousPtz(Direction::tilt, 1.0))
+                showNavigationMessage();
             break;
         }
         case Qt::Key_Left:
         {
             if (e->modifiers() & Qt::AltModifier)
                 m_handScrollInstrument->emulate(QPoint(-15, 0));
-            else
+            else if (e->modifiers() & Qt::ShiftModifier)
                 moveCursor(QPoint(-1, 0), QPoint(0, -1));
+            else if (!startContinuousPtz(Direction::pan, -1.0))
+                showNavigationMessage();
             break;
         }
         case Qt::Key_Right:
         {
             if (e->modifiers() & Qt::AltModifier)
                 m_handScrollInstrument->emulate(QPoint(15, 0));
-            else
+            else if (e->modifiers() & Qt::ShiftModifier)
                 moveCursor(QPoint(1, 0), QPoint(0, 1));
+            else if (!startContinuousPtz(Direction::pan, 1.0))
+                showNavigationMessage();
             break;
         }
         case Qt::Key_Plus:
@@ -1535,4 +1553,14 @@ void QnWorkbenchController::toggleCurrentItemMaximizationState()
     {
         menu()->triggerIfPossible(action::MaximizeItemAction, widget);
     }
+}
+
+bool QnWorkbenchController::startContinuousPtz(Direction direction, qreal speed)
+{
+    // TODO: #vkutin Implement me!
+    return false;
+};
+
+void QnWorkbenchController::stopContinuousPtz(Direction direction)
+{
 }

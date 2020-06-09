@@ -7,6 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 
 #include <client/client_globals.h>
@@ -50,7 +51,6 @@ class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
-class QnGraphicsMessageBox;
 
 class WeakGraphicsItemPointerList;
 
@@ -172,6 +172,17 @@ protected slots:
 private:
     void toggleCurrentItemMaximizationState();
 
+    enum class Direction
+    {
+        pan,
+        tilt,
+        zoom,
+        focus
+    };
+
+    bool startContinuousPtz(Direction direction, qreal speed);
+    void stopContinuousPtz(Direction direction);
+
 private:
     /* Global state. */
 
@@ -269,4 +280,6 @@ private:
     QList<QRect> m_dragGeometries;
 
     bool m_menuEnabled;
+
+    nx::vms::client::desktop::VolatileUniquePtr<QObject> m_cameraSwitchKeysMessageBox;
 };
