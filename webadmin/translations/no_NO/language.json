@@ -113,7 +113,7 @@
         "timeSynchronizationEnabled": "Tidssynkronisering aktivert",
         "primaryTimeServer": "Primær tidssynkroniseringsserver",
         "osTimeChangeCheckPeriodMs": "OS-tidsendring, sjekk periode",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "syncTimeExchangePeriod": "Synkroniser tidsutvekslingsperiode",
         "maxWearableArchiveSynchronizationThreads": "Maksimalt antall synkroniseringstråder i kameraarkiv",
         "updateNotificationsEnabled": "Oppdateringsvarsler aktivert",
         "upnpPortMappingEnabled": "UPNP port kartlegging aktivert",

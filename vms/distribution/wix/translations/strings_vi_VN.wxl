@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1258" Culture="vi-vn">
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1258" Language="1066" Culture="vi-vn">
   <String Id="Caption">Thiết lập [WixBundleName] - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
