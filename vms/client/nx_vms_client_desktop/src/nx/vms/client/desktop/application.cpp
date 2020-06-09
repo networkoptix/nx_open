@@ -94,9 +94,9 @@
 #include <plugins/io_device/joystick/joystick_manager.h>
 
 #include <nx/utils/app_info.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #if defined(Q_OS_WIN)
-    #include <nx/vms/client/desktop/ini.h>
     #include <nx/gdi_tracer/gdi_handle_tracer.h>
     #include <nx/vms/client/desktop/debug_utils/instruments/widget_profiler.h>
     #include <QtPlatformHeaders/QWindowsWindowFunctions>
