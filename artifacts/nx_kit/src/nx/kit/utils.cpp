@@ -108,15 +108,27 @@ bool fileExists(const char* filename)
     return static_cast<bool>(std::ifstream(filename));
 }
 
-template<int sizeOfChar> struct HexEscapeString {};
-template<> struct HexEscapeString<1> { static constexpr const char* value = "\\x%02X"; };
-template<> struct HexEscapeString<2> { static constexpr const char* value = "\\u%04X"; };
-template<> struct HexEscapeString<4> { static constexpr const char* value = "\\U%08X"; };
+template<int sizeOfChar> struct HexEscapeFmt {};
+template<> struct HexEscapeFmt<1> { static constexpr const char* value = "\\x%02X"; };
+template<> struct HexEscapeFmt<2> { static constexpr const char* value = "\\u%04X"; };
+template<> struct HexEscapeFmt<4> { static constexpr const char* value = "\\U%08X"; };
 
 template<typename Char>
-static std::string hexEscapeString()
+static std::string hexEscapeFmtForChar()
 {
-    return HexEscapeString<sizeof(Char)>::value;
+    return HexEscapeFmt<sizeof(Char)>::value;
+}
+
+template<typename Char>
+static std::string hexEscapeFmtForString()
+{
+    std::string value = HexEscapeFmt<sizeof(Char)>::value;
+
+    // Empty quotes after `\x` are needed to limit the hex sequence if a digit follows it.
+    if (value[0] == '\\' && value[1] == 'x')
+        return value + "\"\"";
+
+    return value;
 }
 
 template<typename Char>
@@ -128,11 +140,30 @@ static std::string toStringFromChar(Char c)
     // NOTE: If the char is not a printable ASCII, we escape it via `\x` instead of specialized
     // escape sequences like `\r` because it looks more clear and universal.
     if (!isAsciiPrintable(c))
-        return format("'" + hexEscapeString<Char>() + "'", (Unsigned<Char>) c);
+        return format("'" + hexEscapeFmtForChar<Char>() + "'", (Unsigned<Char>) c);
     if (c == '\'')
         return "'\\''";
 
     return std::string("'") + (char) c + "'";
+}
+
+template<typename Char>
+static std::string escapeCharInString(Char c)
+{
+    switch (c)
+    {
+        case '\0': return "\\000"; // Three octal digits are needed to limit the octal sequence.
+        case '\\': case '"': return std::string("\\") + (char) c;
+        case '\n': return "\\n";
+        case '\r': return "\\r";
+        case '\t': return "\\t";
+        // NOTE: Escape sequences `\a`, `\b`, `\f`, `\v` are not generated above: they are
+        // rarely used, and their representation via `\x` is more clear.
+        default:
+            if (!isAsciiPrintable(c))
+                return format(hexEscapeFmtForString<Char>(), (Unsigned<Char>) c);
+            return std::string(1, (char) c);
+    }
 }
 
 template<typename Char>
@@ -147,22 +178,27 @@ std::string toStringFromPtr(const Char* s)
     {
         result = "\"";
         for (const Char* p = s; *p != '\0'; ++p)
-        {
-            if (*p == '\\' || *p == '"')
-                (result += '\\') += (char) *p;
-            else if (*p == '\n')
-                result += "\\n";
-            else if (*p == '\r')
-                result += "\\r";
-            else if (*p == '\t')
-                result += "\\t";
-            else if (!isAsciiPrintable(*p))
-                result += format(hexEscapeString<Char>() + "\"\"", (Unsigned<Char>) *p);
-            else
-                result += (char) *p;
-        }
+            result += escapeCharInString(*p);
         result += "\"";
     }
+    return result;
+}
+
+std::string toString(const std::string& s)
+{
+    std::string result = "\"";
+    for (char c: s)
+        result += escapeCharInString(c);
+    result += "\"";
+    return result;
+}
+
+std::string toString(const std::wstring& w)
+{
+    std::string result = "\"";
+    for (wchar_t c: w)
+        result += escapeCharInString(c);
+    result += "\"";
     return result;
 }
 
