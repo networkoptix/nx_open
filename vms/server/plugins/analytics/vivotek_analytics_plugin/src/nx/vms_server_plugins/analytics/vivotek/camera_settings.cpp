@@ -282,7 +282,7 @@ void parseReFromCamera(CameraSettings::Vca::CrowdDetection* crowdDetection,
     {
         QJsonObject jsonRules;
         if (!get<QJsonValue>(parameters, "CrowdDetection").isUndefined())
-            jsonRules = get<QJsonObject>(parameters, "CrowdDetection");
+            get(&jsonRules, parameters, "CrowdDetection");
 
         const auto ruleNames = jsonRules.keys();
 
@@ -336,7 +336,7 @@ void parseReFromCamera(CameraSettings::Vca::LoiteringDetection* loiteringDetecti
     {
         QJsonObject jsonRules;
         if (!get<QJsonValue>(parameters, "LoiteringDetection").isUndefined())
-            jsonRules = get<QJsonObject>(parameters, "LoiteringDetection");
+            get(&jsonRules, parameters, "LoiteringDetection");
 
         const auto ruleNames = jsonRules.keys();
 
@@ -395,7 +395,7 @@ void parseReFromCamera(CameraSettings::Vca::IntrusionDetection* intrusionDetecti
     {
         QJsonObject jsonRules;
         if (!get<QJsonValue>(parameters, "IntrusionDetection").isUndefined())
-            jsonRules = get<QJsonObject>(parameters, "IntrusionDetection");
+            get(&jsonRules, parameters, "IntrusionDetection");
 
         const auto ruleNames = jsonRules.keys();
 
@@ -472,7 +472,7 @@ void parseReFromCamera(CameraSettings::Vca::LineCrossingDetection* lineCrossingD
     {
         QJsonObject jsonRules;
         if (!get<QJsonValue>(parameters, "LineCrossingDetection").isUndefined())
-            jsonRules = get<QJsonObject>(parameters, "LineCrossingDetection");
+            get(&jsonRules, parameters, "LineCrossingDetection");
 
         const auto ruleNames = jsonRules.keys();
 
@@ -580,7 +580,7 @@ void parseReFromCamera(CameraSettings::Vca::MissingObjectDetection* missingObjec
     {
         QJsonObject jsonRules;
         if (!get<QJsonValue>(parameters, "MissingObjectDetection").isUndefined())
-            jsonRules = get<QJsonObject>(parameters, "MissingObjectDetection");
+            get(&jsonRules, parameters, "MissingObjectDetection");
 
         const auto ruleNames = jsonRules.keys();
 
