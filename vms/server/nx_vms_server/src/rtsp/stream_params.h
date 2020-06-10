@@ -16,6 +16,7 @@ public:
     MediaQuality quality() { return m_quality; }
     AVCodecID videoCodec() { return m_codec; }
     bool onvifReplay() { return m_onvifReplay; }
+    bool disableFastChannelZapping() { return m_disableFastChannelZapping; }
 
 private:
     bool parseCodec(const network::http::HttpHeaders& headers, const UrlParams& urlParams);
@@ -23,6 +24,8 @@ private:
     bool parseQuality(const network::http::HttpHeaders& headers, const UrlParams& urlParams);
     bool parseResolution(const network::http::HttpHeaders& headers, const UrlParams& urlParams);
     bool parseOnvifReplay(const network::http::HttpHeaders& headers, const UrlParams& urlParams);
+    bool parseDisableFastChannelZapping(
+        const network::http::HttpHeaders& headers, const UrlParams& urlParams);
 
 private:
     int64_t m_position = DATETIME_NOW;
@@ -31,6 +34,7 @@ private:
     AVCodecID m_codec = AV_CODEC_ID_NONE;
     QSize m_resolution;
     bool m_onvifReplay = false;
+    bool m_disableFastChannelZapping = false;
 
 private:
     UrlParams m_urlParams;
