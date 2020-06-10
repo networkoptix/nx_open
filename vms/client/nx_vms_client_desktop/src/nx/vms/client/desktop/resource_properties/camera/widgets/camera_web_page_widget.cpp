@@ -271,7 +271,7 @@ void CameraWebPageWidget::Private::createNewPage()
             (function() {
                 XMLHttpRequest.prototype.realOpen = XMLHttpRequest.prototype.open;
                 var newOpen = function(method, url, async, user, password) {
-                    var newUrl = url.replace(/(https?:\/\/)?(%1)(:\d+)?(.*)/g, '$1' + '%2:%3' + '$4');
+                    var newUrl = url.replace(/^(https?:\/\/)?(%1)(:\d+)?(.*)/g, '$1' + '%2:%3' + '$4');
                     this.realOpen(method, newUrl, async, user, password);
                 };
                 XMLHttpRequest.prototype.open = newOpen;
