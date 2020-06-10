@@ -62,8 +62,7 @@ void assertStrEq(
     if (expectedValue == nullptr)
     {
         throw TestFailure(file, line, actualLine,
-            std::string("    INTERNAL ERROR: Expected string is null: [")
-                + toString(expectedExpr) + "]\n");
+            std::string("    INTERNAL ERROR: Expected string is null (") + expectedExpr + ")\n");
     }
 
     if (actualValue == nullptr || strcmp(expectedValue, actualValue) != 0)
@@ -76,11 +75,6 @@ void assertStrEq(
     }
 }
 
-static std::string boolToString(bool value)
-{
-    return value ? "true" : "false";
-}
-
 void assertBool(
     bool expected, bool condition, const char* conditionStr,
     const char* file, int line, int actualLine /*= -1*/)
@@ -88,7 +82,8 @@ void assertBool(
     if (expected != condition)
     {
         throw TestFailure(file, line, actualLine,
-            "    Expected " + boolToString(expected) + ", but is " + boolToString(condition)
+            "    Expected " + nx::kit::utils::toString(expected)
+            + ", but is " + nx::kit::utils::toString(condition)
             + ": " + conditionStr);
     }
 }
@@ -212,7 +207,7 @@ static const ParsedCmdLineArgs& parsedCmdLineArgs()
     if (arg(1) == tmpOption)
     {
         if (args.size() < 3)
-            fatalError("Invalid command line args: no param for --tmp; run with \"--help\".");
+            fatalError("Invalid command line args: no param for --tmp; run with --help.");
         parsedArgs->explicitBaseTempDir = arg(2);
     }
     else if (arg(1).compare(0, tmpOptionEq.size(), tmpOptionEq) == 0) //< Starts with tmpOptionEq.
@@ -221,7 +216,8 @@ static const ParsedCmdLineArgs& parsedCmdLineArgs()
     }
     else
     {
-        fatalError("Unknown command line arg [%s]; run with \"--help\".", arg(1).c_str());
+        fatalError("Unknown command line arg %s; run with --help.",
+            nx::kit::utils::toString(arg(i)).c_str());
     }
 
     return *parsedArgs;
@@ -283,7 +279,7 @@ static void createDir(const std::string& dir)
         const int resultCode = mkdir(dir.c_str(), /*octal*/ 0777);
     #endif
     if (resultCode != 0)
-        fatalError("Unable to create dir: [%s]", dir.c_str());
+        fatalError("Unable to create dir: %s", dir.c_str());
 }
 
 static std::string randAsString()
@@ -359,7 +355,7 @@ const char* tempDir()
         createDir(test->tempDir);
 
         if (verbose)
-            printNote("Created temp dir: [%s]", test->tempDir.c_str());
+            printNote("Created temp dir: %s", test->tempDir.c_str());
     }
 
     return test->tempDir.c_str();
@@ -378,7 +374,7 @@ const char* staticTempDir()
     createDir(staticTempDir);
 
     if (verbose)
-        printNote("Created temp dir for static tests: [%s]", staticTempDir.c_str());
+        printNote("Created temp dir for static tests: %s", staticTempDir.c_str());
 
     return staticTempDir.c_str();
 }
@@ -464,17 +460,17 @@ int runAllTests(const char *testSuiteName)
     return 0;
 }
 
-void createFile(const char* filename, const char* content)
+void createFile(const std::string& filename, const std::string& content)
 {
     std::ofstream s(filename);
     if (!s)
-        fatalError("Unable to create temp file: [%s]", filename);
+        fatalError("Unable to create temp file: %s", filename.c_str());
 
     if (!(s << content))
-        fatalError("Unable to write to temp file: [%s]", filename);
+        fatalError("Unable to write to temp file: %s", filename.c_str());
 
     if (verbose)
-        printNote("Created temp file: [%s]", filename);
+        printNote("Created temp file: %s", filename.c_str());
 }
 
 } // namespace test

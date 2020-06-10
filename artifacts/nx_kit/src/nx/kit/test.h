@@ -114,19 +114,16 @@ NX_KIT_API const char* staticTempDir();
  */
 NX_KIT_API int runAllTests(const char *testSuiteName);
 
-NX_KIT_API void createFile(const char* filename, const char* content);
+NX_KIT_API void createFile(const std::string& filename, const std::string& content);
 
 //-------------------------------------------------------------------------------------------------
 // Implementation
 
-#if defined(NX_KIT_TEST_KEEP_TEMP_FILES)
-    namespace
-    {
-        static const nx::kit::test::TempFile::KeepFilesInitializer tempFileKeepFilesInitializer;
-    }
-#endif
-
 namespace detail {
+
+#if defined(NX_KIT_TEST_KEEP_TEMP_FILES)
+    static const nx::kit::test::TempFile::KeepFilesInitializer tempFileKeepFilesInitializer;
+#endif
 
 NX_KIT_API void failEq(
     const char* expectedValue, const char* expectedExpr,

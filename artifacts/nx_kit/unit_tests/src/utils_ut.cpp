@@ -137,14 +137,12 @@ TEST(utils, toString_char_ptr)
     char nonConstChars[] = "str";
     ASSERT_STREQ(R"("str")", toString(nonConstChars));
 
-    // `R"(` is not used here because `\"` does not compile in MSVC 2017.
+    // NOTE: `R"(` is not used here because `\"` does not compile in MSVC.
     ASSERT_STREQ("\"str\\\"with_quote\"", toString("str\"with_quote"));
 
     ASSERT_STREQ(R"("str\\with_backslash")", toString("str\\with_backslash"));
     ASSERT_STREQ(R"("str\twith_tab")", toString("str\twith_tab"));
     ASSERT_STREQ(R"("str\nwith_newline")", toString("str\nwith_newline"));
-    ASSERT_STREQ(R"("str\nwith_newline")", toString("str\nwith_newline"));
-    ASSERT_STREQ(R"("str\rwith_cr")", toString("str\rwith_cr"));
     ASSERT_STREQ(R"("str\rwith_cr")", toString("str\rwith_cr"));
     ASSERT_STREQ(R"("str\x7F""with_127")", toString("str\x7Fwith_127"));
     ASSERT_STREQ(R"("str\x1F""with_31")", toString("str\x1Fwith_31"));

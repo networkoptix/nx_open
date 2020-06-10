@@ -29,22 +29,22 @@ struct TestIni: IniConfig
     NX_INI_STRING("\" string with leading quote", str2, "String with leading quote.");
     NX_INI_STRING("string with trailing quote \"", str3, "String with trailing quote.");
     NX_INI_STRING("\"enquoted string\"", str4, "Enquoted string.");
-    NX_INI_STRING("simple string", str5, "Simple string.");
-    NX_INI_INT(113, number, "Test number.");
+    NX_INI_STRING("plain string", str5, "Plain string.");
+    NX_INI_INT(113, intNumber, "Test int number.");
     NX_INI_FLOAT(310.55f, floatNumber ,"Test float number.");
     NX_INI_DOUBLE(-0.45, doubleNumber, "Test double number.");
 };
 
 static const TestIni defaultIni; //< Source of default values for comparison.
 
-// Using a static instance just to test this possibility.
+/** Using a static instance just to test this possibility. */
 static TestIni& ini()
 {
     static TestIni ini;
     return ini;
 }
 
-// Intended to be saved to the same file as TestIni, but not to be loaded from file.
+/** Intended to be saved to the same file as TestIni, but not to be loaded from file. */
 struct SavedIni: IniConfig
 {
     SavedIni(): IniConfig(ini().iniFile()) {}
@@ -54,12 +54,12 @@ struct SavedIni: IniConfig
     NX_INI_FLAG(1, enableOutput, "Enable Output.");
     NX_INI_FLAG(0, enableTime, "Enable Time.");
     NX_INI_FLAG(0, enableFps, "Enable Fps.");
-    NX_INI_STRING("Another string with middle \" quote", str1, "String with middle quote.");
-    NX_INI_STRING("\" Another string with leading quote", str2, "String with leading quote.");
-    NX_INI_STRING("Another string with trailing quote \"", str3, "String with trailing quote.");
-    NX_INI_STRING("\"Another enquoted string\"", str4, "Enquoted string.");
-    NX_INI_STRING("Another simple string", str5, "Simple string.");
-    NX_INI_INT(777, number, "Test number.");
+    NX_INI_STRING("another string with middle \" quote", str1, "String with middle quote.");
+    NX_INI_STRING("\" another string with leading quote", str2, "String with leading quote.");
+    NX_INI_STRING("another string with trailing quote \"", str3, "String with trailing quote.");
+    NX_INI_STRING("\"another enquoted string\"", str4, "Enquoted string.");
+    NX_INI_STRING("another plain string", str5, "Plain string.");
+    NX_INI_INT(777, intNumber, "Test int number.");
     NX_INI_FLOAT(0.432f, floatNumber ,"Test float number.");
     NX_INI_DOUBLE(34.45, doubleNumber, "Test double number.");
 };
@@ -78,7 +78,7 @@ static void assertIniEquals(int line, const ExpectedIni& expected, const ActualI
     ASSERT_INI_PARAM_STREQ(str3);
     ASSERT_INI_PARAM_STREQ(str4);
     ASSERT_INI_PARAM_STREQ(str5);
-    ASSERT_INI_PARAM_EQ(number);
+    ASSERT_INI_PARAM_EQ(intNumber);
     ASSERT_INI_PARAM_EQ(floatNumber);
     ASSERT_INI_PARAM_EQ(doubleNumber);
 
@@ -89,7 +89,7 @@ static void assertIniEquals(int line, const ExpectedIni& expected, const ActualI
 /**
  * Create a .ini file with the contents from the supplied IniConfig object.
  */
-void generateIniFile(const SavedIni& ini)
+static void generateIniFile(const SavedIni& ini)
 {
     std::ostringstream content;
 
@@ -115,7 +115,7 @@ void generateIniFile(const SavedIni& ini)
     GENERATE_INI_PARAM_STR(str3);
     GENERATE_INI_PARAM_STR(str4);
     GENERATE_INI_PARAM_STR(str5);
-    GENERATE_INI_PARAM_VAL(number);
+    GENERATE_INI_PARAM_VAL(intNumber);
     GENERATE_INI_PARAM_VAL(floatNumber);
     GENERATE_INI_PARAM_VAL(doubleNumber);
 
