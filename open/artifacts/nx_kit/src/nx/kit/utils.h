@@ -41,17 +41,6 @@ inline bool isAsciiPrintable(int c)
 }
 
 /**
- * @return Last path component: text after the last path separator. On Windows, possible `<drive>:`
- * prefix is excluded and both `/` and `\` are supported. If path is empty, the result is empty.
- */
-NX_KIT_API std::string baseName(std::string path);
-
-/**
- * @return Process name, without .exe in Windows.
- */
-NX_KIT_API std::string getProcessName();
-
-/**
  * Convert a value to its report-friendly text representation, e.g. a quoted and escaped string.
  * Non-printable chars in a string are represented as hex escape sequences like `\xFF""` - note
  * that the two quotes after it are inserted to indicate the end of the hex number, as in C/C++.
@@ -78,17 +67,30 @@ NX_KIT_API bool fromString(const std::string& s, int* value);
 NX_KIT_API bool fromString(const std::string& s, double* value);
 NX_KIT_API bool fromString(const std::string& s, float* value);
 
-void NX_KIT_API stringReplaceAllChars(std::string* s, char sample, char replacement);
-void NX_KIT_API stringInsertAfterEach(std::string* s, char sample, const char* insertion);
+NX_KIT_API void stringReplaceAllChars(std::string* s, char sample, char replacement);
+NX_KIT_API void stringInsertAfterEach(std::string* s, char sample, const char* insertion);
 
 //-------------------------------------------------------------------------------------------------
 // OS support.
+
+/**
+ * @return Last path component: text after the last path separator. On Windows, possible `<drive>:`
+ * prefix is excluded and both `/` and `\` are supported. If path is empty, the result is empty.
+ */
+NX_KIT_API std::string baseName(std::string path);
+
+/**
+ * @return Process name, without .exe in Windows.
+ */
+NX_KIT_API std::string getProcessName();
 
 /**
  * @return Command line arguments of the process, cached after the first call. If arguments are
  *     not available, then returns a single empty string.
  */
 NX_KIT_API const std::vector<std::string>& getProcessCmdLineArgs();
+
+NX_KIT_API bool fileExists(const char* filename);
 
 //-------------------------------------------------------------------------------------------------
 // Aligned allocation.
