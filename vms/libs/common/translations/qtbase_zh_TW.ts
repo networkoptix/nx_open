@@ -439,7 +439,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Parent Directory</source>
-      <translation>父目錄</translation>
+      <translation>主目錄</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>

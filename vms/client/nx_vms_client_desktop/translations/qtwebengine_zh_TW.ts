@@ -9,19 +9,19 @@
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation>常規檔案錯誤</translation>
+      <translation>一般檔案錯誤</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
-      <translation type="unfinished">The file cannot be written locally, due to access restrictions</translation>
+      <translation>由於登入限制，無法在本機端寫入檔案</translation>
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
-      <translation type="unfinished">Insufficient space on the target drive</translation>
+      <translation>裝置空間不足。</translation>
     </message>
     <message>
       <source>The directory or file name is too long</source>
-      <translation type="unfinished">The directory or file name is too long</translation>
+      <translation>目錄或檔案名稱太長</translation>
     </message>
     <message>
       <source>The file size exceeds the file system limitation</source>
@@ -37,11 +37,11 @@
     </message>
     <message>
       <source>The file was blocked due to local policy</source>
-      <translation type="unfinished">The file was blocked due to local policy</translation>
+      <translation>該檔案因當地政策而被封鎖</translation>
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>
-      <translation type="unfinished">Checking the safety of the download failed due to unexpected reasons</translation>
+      <translation>由於非預期原因，無法檢查下載資訊的安全性</translation>
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
@@ -49,47 +49,47 @@
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
-      <translation type="unfinished">The partial file did not match the expected hash</translation>
+      <translation>部分檔案與預期的Hash值不匹配</translation>
     </message>
     <message>
       <source>General network failure</source>
-      <translation type="unfinished">General network failure</translation>
+      <translation>一般網路錯誤</translation>
     </message>
     <message>
       <source>The network operation has timed out</source>
-      <translation type="unfinished">The network operation has timed out</translation>
+      <translation>網路操作逾時</translation>
     </message>
     <message>
       <source>The network connection has been terminated</source>
-      <translation type="unfinished">The network connection has been terminated</translation>
+      <translation>網路連接已終止</translation>
     </message>
     <message>
       <source>The server has gone down</source>
-      <translation type="unfinished">The server has gone down</translation>
+      <translation>伺服器已關閉</translation>
     </message>
     <message>
       <source>The network request was invalid (for example, the URL or scheme is invalid)</source>
-      <translation type="unfinished">The network request was invalid (for example, the URL or scheme is invalid)</translation>
+      <translation>網絡請求無效（例如URL或方案無效）</translation>
     </message>
     <message>
       <source>General server failure</source>
-      <translation>常規伺服器錯誤</translation>
+      <translation>一般伺服器錯誤</translation>
     </message>
     <message>
       <source>The server does not have the requested data</source>
-      <translation type="unfinished">The server does not have the requested data</translation>
+      <translation>伺服器沒有請求的數據</translation>
     </message>
     <message>
       <source>The server did not authorize access to the resource</source>
-      <translation type="unfinished">The server did not authorize access to the resource</translation>
+      <translation>伺服器未授權登入</translation>
     </message>
     <message>
       <source>A problem with the server certificate occurred</source>
-      <translation type="unfinished">A problem with the server certificate occurred</translation>
+      <translation>伺服器憑證發生問題</translation>
     </message>
     <message>
       <source>Access forbidden by the server</source>
-      <translation type="unfinished">Access forbidden by the server</translation>
+      <translation>伺服器禁止登入</translation>
     </message>
     <message>
       <source>Unexpected server response</source>
@@ -366,7 +366,7 @@
     </message>
     <message>
       <source>Save media</source>
-      <translation type="unfinished">Save media</translation>
+      <translation>儲存媒體</translation>
     </message>
     <message>
       <source>Inspect</source>
