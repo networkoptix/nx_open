@@ -2,12 +2,13 @@
 
 #include "utils.h"
 
-#include <vector>
-#include <string>
 #include <algorithm>
 #include <climits>
 #include <cerrno>
+#include <fstream>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 #if defined(_WIN32)
     #define NOMINMAX //< Needed to prevent windows.h define macros min() and max().
@@ -102,6 +103,11 @@ const std::vector<std::string>& getProcessCmdLineArgs()
     return args;
 }
 
+bool fileExists(const char* filename)
+{
+    return static_cast<bool>(std::ifstream(filename));
+}
+
 template<int sizeOfChar> struct HexEscapeString {};
 template<> struct HexEscapeString<1> { static constexpr const char* value = "\\x%02X"; };
 template<> struct HexEscapeString<2> { static constexpr const char* value = "\\u%04X"; };
@@ -119,6 +125,8 @@ using Unsigned = typename std::make_unsigned<Char>::type;
 template<typename Char>
 static std::string toStringFromChar(Char c)
 {
+    // NOTE: If the char is not a printable ASCII, we escape it via `\x` instead of specialized
+    // escape sequences like `\r` because it looks more clear and universal.
     if (!isAsciiPrintable(c))
         return format("'" + hexEscapeString<Char>() + "'", (Unsigned<Char>) c);
     if (c == '\'')

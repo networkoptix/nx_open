@@ -2,8 +2,6 @@
 
 #include "ini_config.h"
 
-#include "utils.h"
-
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -12,6 +10,8 @@
 #include <sstream>
 #include <string>
 #include <unordered_set>
+
+#include "utils.h"
 
 namespace nx {
 namespace kit {
@@ -28,11 +28,6 @@ namespace {
 
 //-------------------------------------------------------------------------------------------------
 // Utils
-
-static bool fileExists(const char* filename)
-{
-    return static_cast<bool>(std::ifstream(filename));
-}
 
 static bool isWhitespace(char c)
 {
@@ -184,12 +179,12 @@ struct AbstractParam
         const Value& value,
         const char* valueNameSeparator,
         const char* error,
-        bool eqDefault) const
+        bool equalsDefault) const
     {
         if (output)
         {
             std::stringstream s;
-            s << ((error[0] != '\0') ? "  ! " : (eqDefault ? "    " : "  * "));
+            s << ((error[0] != '\0') ? "  ! " : (equalsDefault ? "    " : "  * "));
             s << value << valueNameSeparator << name << error << "\n";
             *output << s.str(); //< Output in one piece to minimize multi-threaded races.
         }
@@ -547,7 +542,7 @@ void IniConfig::Impl::reload()
     if (!isEnabled())
         return;
 
-    const bool iniFileExists = fileExists(iniFilePath());
+    const bool iniFileExists = nx::kit::utils::fileExists(iniFilePath());
     if (iniFileExists)
         m_iniFileEverExisted = true;
     if (!m_firstTimeReload && !m_iniFileEverExisted)
