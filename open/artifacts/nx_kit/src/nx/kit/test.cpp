@@ -42,36 +42,79 @@ struct TestFailure: std::exception
     virtual const char* what() const noexcept override { return message.c_str(); }
 };
 
-void failEq(
-    const char* expectedValue, const char* expectedExpr,
-    const char* actualValue, const char* actualExpr,
+static void failOnNullExpectedValue(
+    const char* const expectedValue, const char* const expectedExpr,
     const char* const file, int line, int actualLine /*= -1*/)
 {
-    throw TestFailure(file, line, actualLine,
-        std::string("    Expected: [") + expectedValue + "] (" + expectedExpr + ")\n" +
-        std::string("    Actual:   [") + actualValue + "] (" + actualExpr + ")");
-}
-
-void assertStrEq(
-    const char* expectedValue, const char* expectedExpr,
-    const char* actualValue, const char* actualExpr,
-    const char* file, int line, int actualLine /*= -1*/)
-{
-    using nx::kit::utils::toString;
-
     if (expectedValue == nullptr)
     {
         throw TestFailure(file, line, actualLine,
             std::string("    INTERNAL ERROR: Expected string is null (") + expectedExpr + ")\n");
     }
+}
+
+void failEq(
+    const std::string& expectedValue, const char* const expectedExpr,
+    const std::string& actualValue, const char* const actualExpr,
+    const char* const file, int line, int actualLine /*= -1*/)
+{
+    throw TestFailure(file, line, actualLine,
+        "    Expected: [" + expectedValue + "] (" + expectedExpr + ")\n" +
+        "    Actual:   [" + actualValue + "] (" + actualExpr + ")");
+}
+
+void assertStrEq(
+    const std::string& expectedValue, const char* expectedExpr,
+    const std::string& actualValue, const char* actualExpr,
+    const char* file, int line, int actualLine)
+{
+    if (expectedValue != actualValue)
+    {
+        failEq(
+            nx::kit::utils::toString(expectedValue), expectedExpr,
+            nx::kit::utils::toString(actualValue), actualExpr,
+            file, line, actualLine);
+    }
+}
+
+void assertStrEq(
+    const char* expectedValue, const char* expectedExpr,
+    const char* actualValue, const char* actualExpr,
+    const char* file, int line, int actualLine)
+{
+    failOnNullExpectedValue(expectedValue, expectedExpr, file, line, actualLine);
 
     if (actualValue == nullptr || strcmp(expectedValue, actualValue) != 0)
     {
-        throw TestFailure(file, line, actualLine, nx::kit::utils::format(
-            "    Expected: [%s] (%s)\n"
-            "    Actual:   [%s] (%s)",
-            toString(expectedValue).c_str(), expectedExpr,
-            toString(actualValue).c_str(), actualExpr));
+        failEq(
+            nx::kit::utils::toString(expectedValue), expectedExpr,
+            nx::kit::utils::toString(actualValue), actualExpr,
+            file, line, actualLine);
+    }
+}
+
+void assertStrEq(
+    const char* expectedValue, const char* expectedExpr,
+    const std::string& actualValue, const char* actualExpr,
+    const char* file, int line, int actualLine)
+{
+    failOnNullExpectedValue(expectedValue, expectedExpr, file, line, actualLine);
+
+    assertStrEq(std::string(expectedValue), expectedExpr, actualValue, actualExpr,
+        file, line, actualLine);
+}
+
+void assertStrEq(
+    const std::string& expectedValue, const char* expectedExpr,
+    const char* actualValue, const char* actualExpr,
+    const char* file, int line, int actualLine)
+{
+    if (actualValue == nullptr || expectedValue != actualValue)
+    {
+        failEq(
+            nx::kit::utils::toString(expectedValue), expectedExpr,
+            nx::kit::utils::toString(actualValue), actualExpr,
+            file, line, actualLine);
     }
 }
 

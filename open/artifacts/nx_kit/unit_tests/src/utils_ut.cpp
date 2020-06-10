@@ -74,6 +74,25 @@ TEST(utils, toString_string)
 
     const std::string constString = "abc";
     ASSERT_STREQ("\"abc\"", toString(constString));
+
+    std::string strWithNulInside = "_Z_";
+    strWithNulInside[1] = '\0';
+    ASSERT_STREQ("\"_\\000_\"", toString(strWithNulInside));
+}
+
+TEST(utils, toString_wstring)
+{
+    ASSERT_STREQ("\"abc\"", toString(/*rvalue*/ std::wstring(L"abc")));
+
+    std::wstring nonConstWstring = L"abc";
+    ASSERT_STREQ("\"abc\"", toString(nonConstWstring));
+
+    const std::wstring constWstring = L"abc";
+    ASSERT_STREQ("\"abc\"", toString(constWstring));
+
+    std::wstring strWithNulInside = L"_Z_";
+    strWithNulInside[1] = '\0';
+    ASSERT_STREQ("\"_\\000_\"", toString(strWithNulInside));
 }
 
 TEST(utils, toString_ptr)
@@ -137,6 +156,8 @@ TEST(utils, toString_char_ptr)
     char nonConstChars[] = "str";
     ASSERT_STREQ(R"("str")", toString(nonConstChars));
 
+    ASSERT_STREQ(R"("")", toString(""));
+
     // NOTE: `R"(` is not used here because `\"` does not compile in MSVC.
     ASSERT_STREQ("\"str\\\"with_quote\"", toString("str\"with_quote"));
 
@@ -156,16 +177,11 @@ TEST(utils, toString_wchar_ptr)
     wchar_t nonConstWchars[] = L"str";
     ASSERT_STREQ(R"("str")", toString(nonConstWchars));
 
+    // NOTE: Unicode code point 041B is the Cyrillic capital "L".
     if (kWcharSize == 2) //< MSVC
-    {
-        // `R"(` is not used here because `\uABCD` does not compile in MSVC 2017.
-        ASSERT_STREQ("\"-\\uABCD\"\"-\"", toString(L"-\uABCD-"));
-    }
+        ASSERT_STREQ(R"("-\u041B-")", toString(L"-\u041B-"));
     else if (kWcharSize == 4) //< Linux
-    {
-        // `R"(` is not used here because `\uABCD` does not compile in MSVC 2017.
-        ASSERT_STREQ("\"-\\U0000ABCD\"\"-\"", toString(L"-\U0000ABCD-"));
-    }
+        ASSERT_STREQ(R"("-\U0000041B-")", toString(L"-\U0000041B-"));
 }
 
 TEST(utils, fromString_int)

@@ -188,11 +188,13 @@ inline std::string toString(int8_t i) { return toString((int) i); } //< Avoid ma
 NX_KIT_API std::string toString(char c);
 NX_KIT_API std::string toString(const char* s);
 inline std::string toString(char* s) { return toString(const_cast<const char*>(s)); }
-inline std::string toString(const std::string& s) { return toString(s.c_str()); }
 NX_KIT_API std::string toString(wchar_t c);
 NX_KIT_API std::string toString(const wchar_t* w);
 inline std::string toString(wchar_t* w) { return toString(const_cast<const wchar_t*>(w)); }
-inline std::string toString(const std::wstring& w) { return toString(w.c_str()); }
+
+// std::string can contain '\0' inside, hence a dedicated implementation.
+NX_KIT_API std::string toString(const std::string& s);
+NX_KIT_API std::string toString(const std::wstring& w);
 
 // For unknown types, use their operator<<().
 template<typename T>
