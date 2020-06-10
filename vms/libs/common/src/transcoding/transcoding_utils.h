@@ -52,6 +52,8 @@ private:
 
 AVCodecID findEncoderCodecId(const QString& codecName);
 
+QSize alignSize(QSize source, int heightAlign, int widthAlign);
+QSize maxResolution(AVCodecID codec);
 QSize normalizeResolution(const QSize& target, const QSize& source);
 QSize adjustCodecRestrictions(AVCodecID codec, const QSize& source);
 QSize cropResolution(const QSize& source, const QSize& max);

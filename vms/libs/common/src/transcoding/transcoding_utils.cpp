@@ -375,6 +375,14 @@ Error remux(QIODevice* inputMedia, QIODevice* outputMedia, const QString& dstCon
     return cleanUp(Error::noError);
 }
 
+QSize alignSize(QSize source, int heightAlign, int widthAlign)
+{
+    int width = qPower2Round(source.width(), widthAlign);
+    int height = qPower2Round(source.height(), heightAlign);
+
+    return QSize(width, height);
+}
+
 QSize downscaleByHeight(const QSize& source, int newHeight)
 {
     float ar = source.width() / (float)source.height();
@@ -399,7 +407,6 @@ QSize cropResolution(const QSize& source, const QSize& max)
     return result;
 }
 
-
 QSize maxResolution(AVCodecID codec)
 {
     using namespace nx::media_utils;
@@ -411,6 +418,7 @@ QSize maxResolution(AVCodecID codec)
     static const CodecMaxSize maxSizes[] =
     {
         { AV_CODEC_ID_H263P, QSize(h263::kMaxWidth, h263::kMaxHeight)},
+        { AV_CODEC_ID_MPEG2VIDEO, QSize(4092, 4092) }, // Temporary limit mpeg2video to simplify code, will fix it in 4.2.
         { AV_CODEC_ID_MJPEG, QSize(2032, 2032)},
     };
 
@@ -419,7 +427,7 @@ QSize maxResolution(AVCodecID codec)
         if (size.codec == codec)
             return size.maxSize;
     }
-    return QSize(8192, 8192);
+    return QSize(8192 - 16, 8192 - 16);
 }
 
 QSize adjustCodecRestrictions(AVCodecID codec, const QSize& source)
@@ -463,11 +471,7 @@ QSize normalizeResolution(const QSize& target, const QSize& source)
         if (source.isEmpty())
             return QSize();
 
-        // TODO is align needed for all codecs(may be h263 only)?
-        int height = qPower2Round(target.height(), kHeightAlign); // Round resolution height.
-
-        QSize result = downscaleByHeight(source, height);
-        result.setWidth(qPower2Round(result.width(), kWidthAlign));
+        QSize result = downscaleByHeight(source, target.height());
         return result;
     }
     return target;
