@@ -178,6 +178,7 @@ struct ParsedCmdLineArgs
 {
     bool showHelp = false;
     std::string explicitBaseTempDir;
+    bool stopOnFirstFailure = false;
 };
 
 static const ParsedCmdLineArgs& parsedCmdLineArgs()
@@ -202,22 +203,29 @@ static const ParsedCmdLineArgs& parsedCmdLineArgs()
         return *parsedArgs;
     }
 
-    const std::string tmpOption = "--tmp";
-    const std::string tmpOptionEq = "--tmp=";
-    if (arg(1) == tmpOption)
+    for (int i = /*skip argv[0]*/ 1; i < (int) args.size(); ++i)
     {
-        if (args.size() < 3)
-            fatalError("Invalid command line args: no param for --tmp; run with --help.");
-        parsedArgs->explicitBaseTempDir = arg(2);
-    }
-    else if (arg(1).compare(0, tmpOptionEq.size(), tmpOptionEq) == 0) //< Starts with tmpOptionEq.
-    {
-        parsedArgs->explicitBaseTempDir = arg(1).substr(tmpOptionEq.size());
-    }
-    else
-    {
-        fatalError("Unknown command line arg %s; run with --help.",
-            nx::kit::utils::toString(arg(i)).c_str());
+        const std::string tmpOption = "--tmp";
+        const std::string tmpOptionEq = "--tmp=";
+        if (arg(i) == tmpOption)
+        {
+            parsedArgs->explicitBaseTempDir = arg(++i);
+            if (parsedArgs->explicitBaseTempDir.empty())
+                fatalError("Invalid command line args: no param for --tmp; run with --help.");
+        }
+        else if (arg(i).compare(0, tmpOptionEq.size(), tmpOptionEq) == 0) //< starts with
+        {
+            parsedArgs->explicitBaseTempDir = arg(i).substr(tmpOptionEq.size());
+        }
+        else if (arg(i) == "--stop-on-failure")
+        {
+            parsedArgs->stopOnFirstFailure = true;
+        }
+        else
+        {
+            fatalError("Unknown command line arg %s; run with --help.",
+                nx::kit::utils::toString(arg(i)).c_str());
+        }
     }
 
     return *parsedArgs;
@@ -336,7 +344,10 @@ static void printHelp(const std::string& argv0)
         "  -h|--help\n" <<
         "    Show usage help.\n" <<
         "\n" <<
-        "  --tmp=<temp-dir>\n" <<
+        "  --stop-on-failure\n" <<
+        "    Stop on first test failure.\n" <<
+        "\n" <<
+        "  --tmp[=]<temp-dir>\n" <<
         "    Use <temp-dir> for temp files instead of a random dir in the system temp dir.\n" <<
         "";
 }
@@ -434,7 +445,11 @@ int runAllTests(const char *testSuiteName)
     for (int i = 1; i <= (int) allTests().size(); ++i)
     {
         if (!runTest(allTests()[i - 1], i))
+        {
+            if (parsedCmdLineArgs().stopOnFirstFailure)
+                exit(1);
             failedTests.push_back(i);
+        }
     }
 
     if (failedTests.size() == allTests().size())
