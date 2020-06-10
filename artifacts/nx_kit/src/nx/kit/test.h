@@ -74,13 +74,11 @@ extern bool NX_KIT_API verbose; //< Use to control additional output of the unit
 
 #define ASSERT_STREQ(EXPECTED, ACTUAL) \
     ::nx::kit::test::detail::assertStrEq( \
-        ::nx::kit::test::detail::toCStr(EXPECTED), #EXPECTED, \
-        ::nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, __LINE__)
+        EXPECTED, #EXPECTED, ACTUAL, #ACTUAL, __FILE__, __LINE__)
 
 #define ASSERT_STREQ_AT_LINE(LINE, EXPECTED, ACTUAL) \
     ::nx::kit::test::detail::assertStrEq( \
-        ::nx::kit::test::detail::toCStr(EXPECTED), #EXPECTED, \
-        ::nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, LINE, __LINE__)
+        EXPECTED, #EXPECTED, ACTUAL, #ACTUAL, __FILE__, LINE, __LINE__)
 
 /**
  * Should be called for regular tests, from the TEST() body.
@@ -114,6 +112,7 @@ NX_KIT_API const char* staticTempDir();
  */
 NX_KIT_API int runAllTests(const char *testSuiteName);
 
+/** Allows zero bytes in the content. */
 NX_KIT_API void createFile(const std::string& filename, const std::string& content);
 
 //-------------------------------------------------------------------------------------------------
@@ -124,11 +123,6 @@ namespace detail {
 #if defined(NX_KIT_TEST_KEEP_TEMP_FILES)
     static const nx::kit::test::TempFile::KeepFilesInitializer tempFileKeepFilesInitializer;
 #endif
-
-NX_KIT_API void failEq(
-    const char* expectedValue, const char* expectedExpr,
-    const char* actualValue, const char* actualExpr,
-    const char* file, int line, int actualLine = -1);
 
 typedef std::function<void()> TestFunc;
 
@@ -143,6 +137,11 @@ struct Test
 
 NX_KIT_API int regTest(const Test& test);
 
+NX_KIT_API void failEq(
+    const std::string& expectedValue, const char* expectedExpr,
+    const std::string& actualValue, const char* actualExpr,
+    const char* file, int line, int actualLine = -1);
+
 NX_KIT_API void assertBool(
     bool expected, bool condition, const char* conditionStr,
     const char* file, int line, int actualLine = -1);
@@ -156,26 +155,33 @@ void assertEq(
     if (!(expected == actual)) //< Require only operator==().
     {
         detail::failEq(
-            utils::toString(expected).c_str(), expectedExpr,
-            utils::toString(actual).c_str(), actualExpr,
+            nx::kit::utils::toString(expected), expectedExpr,
+            nx::kit::utils::toString(actual), actualExpr,
             file, line, actualLine);
     }
 }
+
+// The overloads below are needed to support null `char*`, as well as std::string with '\0' inside.
+
+NX_KIT_API void assertStrEq(
+    const std::string& expectedValue, const char* expectedExpr,
+    const std::string& actualValue, const char* actualExpr,
+    const char* file, int line, int actualLine = -1);
 
 NX_KIT_API void assertStrEq(
     const char* expectedValue, const char* expectedExpr,
     const char* actualValue, const char* actualExpr,
     const char* file, int line, int actualLine = -1);
 
-inline const char* toCStr(const std::string& s)
-{
-    return s.c_str();
-}
+NX_KIT_API void assertStrEq(
+    const char* expectedValue, const char* expectedExpr,
+    const std::string& actualValue, const char* actualExpr,
+    const char* file, int line, int actualLine = -1);
 
-inline const char* toCStr(const char* s)
-{
-    return s;
-}
+NX_KIT_API void assertStrEq(
+    const std::string& expectedValue, const char* expectedExpr,
+    const char* actualValue, const char* actualExpr,
+    const char* file, int line, int actualLine = -1);
 
 } // namespace detail
 
