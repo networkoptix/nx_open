@@ -17,7 +17,7 @@ using namespace nx::utils;
 namespace {
 
 // Coordinates are normalized to [0; 10000]x[0; 10000].
-constexpr double kCoordDomain = 10000;
+constexpr double kCoordinateDomain = 10000;
 
 } // namespace
 
@@ -57,35 +57,38 @@ cf::future<cf::unit> CameraVcaParameterApi::reloadConfig()
             "Failed to reload VCA config on %1", withoutUserInfo(m_url)));
 }
 
+float CameraVcaParameterApi::parseCoordinate(const QJsonValue& json, const QString& path)
+{
+    const auto value = get<double>(path, json);
+    if (value < 0 || value > kCoordinateDomain)
+        throw Exception("%1 = %2 is outside of expected range of [0; 10000]", path, value);
+
+    return value / kCoordinateDomain;
+}
+
+QJsonValue CameraVcaParameterApi::serializeCoordinate(float value)
+{
+    return (int) std::round(value * kCoordinateDomain);
+}
+
 Point CameraVcaParameterApi::parsePoint(const QJsonValue& json, const QString& path)
 {
-    const auto parseCoord =
+    const auto parseCoordinate =
         [&](const QString& key)
         {
-            const auto value = get<double>(path, json, key);
-            if (value < 0 || value > kCoordDomain)
-            {
-                throw Exception("%1.%2 = %3 is outside of expected range of [0; 10000]",
-                    path, key, value);
-            }
-
-            return value / kCoordDomain;
+            return CameraVcaParameterApi::parseCoordinate(
+                get<QJsonValue>(path, json, key),
+                NX_FMT("%1.%2", path, key));
         };
 
-    return Point(parseCoord("x"), parseCoord("y"));
+    return Point(parseCoordinate("x"), parseCoordinate("y"));
 }
 
 QJsonObject CameraVcaParameterApi::serialize(const Point& point)
 {
-    const auto serializeCoord =
-        [&](float value)
-        {
-            return (int) std::round(value * kCoordDomain);
-        };
-
     return QJsonObject{
-        {"x", serializeCoord(point.x)},
-        {"y", serializeCoord(point.y)},
+        {"x", serializeCoordinate(point.x)},
+        {"y", serializeCoordinate(point.y)},
     };
 }
 

@@ -21,6 +21,7 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 using namespace std::literals;
 using namespace nx::kit;
 using namespace nx::sdk;
+using namespace nx::sdk::analytics;
 using namespace nx::utils;
 using namespace nx::network;
 
@@ -137,6 +138,19 @@ void fillReErrors(CameraSettings::Vca* vca, const QString& message)
         fillReErrors(&*intrusionDetection, message);
     if (auto& lineCrossingDetection = vca->lineCrossingDetection)
         fillReErrors(&*lineCrossingDetection, message);
+}
+
+void fillReErrors(CameraSettings::Vca::MissingObjectDetection* missingObjectDetection,
+    const QString& message)
+{
+    for (auto& rule: missingObjectDetection->rules)
+    {
+        fillReErrors(&rule.region, message);
+        fillReErrors(&rule.minSize, message);
+        fillReErrors(&rule.maxSize, message);
+        fillReErrors(&rule.delay, message);
+        fillReErrors(&rule.requiresHumanInvolvement, message);
+    }
 }
 
 
@@ -486,6 +500,122 @@ void parseReFromCamera(CameraSettings::Vca::LineCrossingDetection* lineCrossingD
     }
 }
 
+void parseReFromCamera(Rect* rect, const QJsonObject& json, const QString& path)
+{
+    const auto parseCoordinate =
+        [&](const QString& key)
+        {
+            return CameraVcaParameterApi::parseCoordinate(
+                get<QJsonValue>(path, json, key),
+                NX_FMT("%1.%2", path, key));
+        };
+
+    rect->x = parseCoordinate("x");
+    rect->y = parseCoordinate("y");
+    rect->width = parseCoordinate("w");
+    rect->height = parseCoordinate("h");
+}
+
+void parseReFromCamera(CameraSettings::Vca::MissingObjectDetection::Rule::MinSize* minSize,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        parseReFromCamera(&minSize->emplaceValue(),
+            get<QJsonObject>(path, rule, "AreaLimitation", "Minimum"),
+            NX_FMT("%1.AreaLimitation.Minimum", path));
+    }
+    catch (const std::exception& exception)
+    {
+        minSize->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::MissingObjectDetection::Rule::MaxSize* maxSize,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        parseReFromCamera(&maxSize->emplaceValue(),
+            get<QJsonObject>(path, rule, "AreaLimitation", "Maximum"),
+            NX_FMT("%1.AreaLimitation.Maximum", path));
+    }
+    catch (const std::exception& exception)
+    {
+        maxSize->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::MissingObjectDetection::Rule::Delay* delay,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        delay->emplaceValue(get<int>(path, rule, "Duration"));
+    }
+    catch (const std::exception& exception)
+    {
+        delay->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(
+    CameraSettings::Vca::MissingObjectDetection::Rule::RequiresHumanInvolvement* requiresHumanInvolvement,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        requiresHumanInvolvement->emplaceValue(get<bool>(path, rule, "HumanFactor"));
+    }
+    catch (const std::exception& exception)
+    {
+        requiresHumanInvolvement->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::MissingObjectDetection* missingObjectDetection,
+    const QJsonValue& parameters)
+{
+    try
+    {
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(parameters, "MissingObjectDetection").isUndefined())
+            jsonRules = get<QJsonObject>(parameters, "MissingObjectDetection");
+
+        const auto ruleNames = jsonRules.keys();
+
+        auto& rules = missingObjectDetection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+            if (i >= (std::size_t) ruleNames.size())
+            {
+                rule.region.emplaceNothing();
+                rule.minSize.emplaceNothing();
+                rule.maxSize.emplaceNothing();
+                rule.delay.emplaceNothing();
+                rule.requiresHumanInvolvement.emplaceNothing();
+                continue;
+            }
+
+            const auto& ruleName = ruleNames[i];
+            const auto& jsonRule = jsonRules[ruleName];
+
+            const QString path = NX_FMT("$.MissingObjectDetection.%1", ruleName);
+
+            parseReFromCamera(&rule.region, jsonRule, ruleName, path);
+            parseReFromCamera(&rule.minSize, jsonRule, path);
+            parseReFromCamera(&rule.maxSize, jsonRule, path);
+            parseReFromCamera(&rule.delay, jsonRule, path);
+            parseReFromCamera(&rule.requiresHumanInvolvement, jsonRule, path);
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(missingObjectDetection, exception.what());
+    }
+}
+
 void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -496,6 +626,8 @@ void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
         parseReFromCamera(&*intrusionDetection, parameters);
     if (auto& lineCrossingDetection = vca->lineCrossingDetection)
         parseReFromCamera(&*lineCrossingDetection, parameters);
+    if (auto& missingObjectDetection = vca->missingObjectDetection)
+        parseReFromCamera(&*missingObjectDetection, parameters);
 }
 
 
@@ -1022,6 +1154,139 @@ void serializeReToCamera(QJsonValue* parameters,
     }
 }
 
+QJsonObject serializeReToCamera(const Rect& rect)
+{
+    return QJsonObject{
+        {"x", CameraVcaParameterApi::serializeCoordinate(rect.x)},
+        {"y", CameraVcaParameterApi::serializeCoordinate(rect.y)},
+        {"w", CameraVcaParameterApi::serializeCoordinate(rect.width)},
+        {"h", CameraVcaParameterApi::serializeCoordinate(rect.height)},
+    };
+}
+
+void serializeReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::MissingObjectDetection::Rule::MinSize* minSize)
+{
+    try
+    {
+        if (!minSize->hasValue())
+            return;
+
+        QJsonObject areaLimitation;
+        if (!get<QJsonValue>(*jsonRule, "AreaLimitation").isUndefined())
+            get(&areaLimitation, *jsonRule, "AreaLimitation");
+
+        areaLimitation["Minimum"] = serializeReToCamera(minSize->value());
+
+        set(jsonRule, "AreaLimitation", areaLimitation);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(minSize, exception.what());
+    }
+}
+
+void serializeReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::MissingObjectDetection::Rule::MaxSize* maxSize)
+{
+    try
+    {
+        if (!maxSize->hasValue())
+            return;
+
+        QJsonObject areaLimitation;
+        if (!get<QJsonValue>(*jsonRule, "AreaLimitation").isUndefined())
+            get(&areaLimitation, *jsonRule, "AreaLimitation");
+
+        areaLimitation["Maximum"] = serializeReToCamera(maxSize->value());
+
+        set(jsonRule, "AreaLimitation", areaLimitation);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(maxSize, exception.what());
+    }
+}
+
+void serializeReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::MissingObjectDetection::Rule::Delay* delay)
+{
+    try
+    {
+        // If new rule, set default like in web UI.
+        if (delay->hasNothing()
+            && get<QJsonValue>(*jsonRule, "Duration").isUndefined())
+        {
+            delay->emplaceValue(300);
+        }
+
+        if (!delay->hasValue())
+            return;
+
+        set(jsonRule, "Duration", delay->value());
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(delay, exception.what());
+    }
+}
+
+void serializeReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::MissingObjectDetection::Rule::RequiresHumanInvolvement* requiresHumanInvolvement)
+{
+    try
+    {
+        if (!requiresHumanInvolvement->hasValue())
+            return;
+
+        set(jsonRule, "HumanFactor", requiresHumanInvolvement->value());
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(requiresHumanInvolvement, exception.what());
+    }
+}
+
+void serializeReToCamera(QJsonValue* parameters,
+    CameraSettings::Vca::MissingObjectDetection* missingObjectDetection)
+{
+    try
+    {
+        auto& rules = missingObjectDetection->rules;
+
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(*parameters, "MissingObjectDetection").isUndefined())
+        {
+            jsonRules = get<QJsonObject>(*parameters, "MissingObjectDetection");
+            removeRulesExcept(&jsonRules, getNames(rules));
+        }
+
+        for (auto& rule: rules)
+        {
+            if (auto name = getName(rule))
+            {
+                QJsonValue jsonRule = jsonRules[*name];
+                if (jsonRule.isUndefined() || jsonRule.isNull())
+                    jsonRule = QJsonObject{};
+
+                serializeReToCamera(&jsonRule, &rule.region);
+                serializeReToCamera(&jsonRule, &rule.minSize);
+                serializeReToCamera(&jsonRule, &rule.maxSize);
+                serializeReToCamera(&jsonRule, &rule.delay);
+                serializeReToCamera(&jsonRule, &rule.requiresHumanInvolvement);
+
+                jsonRules[*name] = jsonRule;
+            }
+        }
+
+        set(parameters, "MissingObjectDetection", jsonRules);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(missingObjectDetection, exception.what());
+    }
+}
+
 void serializeReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -1032,6 +1297,8 @@ void serializeReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
         serializeReToCamera(parameters, &*intrusionDetection);
     if (auto& lineCrossingDetection = vca->lineCrossingDetection)
         serializeReToCamera(parameters, &*lineCrossingDetection);
+    if (auto& missingObjectDetection = vca->missingObjectDetection)
+        serializeReToCamera(parameters, &*missingObjectDetection);
 }
 
 
@@ -1139,12 +1406,41 @@ void enumerateEntries(Settings* settings, Visitor visit)
                 repeatedVisit(i, &rule.line);
             }
         }
+
+        if (auto& missingObjectDetection = vca->missingObjectDetection)
+        {
+            auto& rules = missingObjectDetection->rules;
+            for (std::size_t i = 0; i < rules.size(); ++i)
+            {
+                auto& rule = rules[i];
+
+                repeatedVisit(i, &rule.region);
+                repeatedVisit(i, &rule.minSize);
+                repeatedVisit(i, &rule.maxSize);
+                repeatedVisit(i, &rule.delay);
+                repeatedVisit(i, &rule.requiresHumanInvolvement);
+            }
+        }
     }
 }
 
 
 void parseEntryFromServer(
     CameraSettings::Vca::IntrusionDetection::Rule::Inverted* entry, const QString& serializedValue)
+{
+    if (serializedValue == "")
+        entry->emplaceNothing();
+    else if (serializedValue == "false")
+        entry->emplaceValue(false);
+    else if (serializedValue == "true")
+        entry->emplaceValue(true);
+    else
+        throw Exception("Failed to parse boolean");
+}
+
+void parseEntryFromServer(
+    CameraSettings::Vca::MissingObjectDetection::Rule::RequiresHumanInvolvement* entry,
+    const QString& serializedValue)
 {
     if (serializedValue == "")
         entry->emplaceNothing();
@@ -1263,6 +1559,18 @@ void parseEntryFromServer(
     entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 999));
 }
 
+void parseEntryFromServer(
+    CameraSettings::Vca::MissingObjectDetection::Rule::Delay* entry, const QString& serializedValue)
+{
+    if (serializedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 999));
+}
+
 void parseEntryFromServer(CameraSettings::Entry<int>* entry, const QString& serializedValue)
 {
     entry->emplaceValue(toInt(serializedValue));
@@ -1335,8 +1643,53 @@ void parseEntryFromServer(
     entry->emplaceValue(std::move(line));
 }
 
+void parseEntryFromServer(
+    CameraSettings::Entry<Rect>* entry, const QString& serializedValue)
+{
+    const auto json = parseJson(serializedValue.toUtf8());
+
+    const auto figure = get<QJsonValue>(json, "figure");
+    if (figure.isNull())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    const auto jsonPoints = get<QJsonArray>("$.figure", figure, "points");
+    if (jsonPoints.count() != 2)
+        throw Exception("Unexpected BoxFigure point count: %1", jsonPoints.count());
+
+    std::vector<Point> points;
+    for (int i = 0; i < jsonPoints.count(); ++i)
+    {
+        const auto point = get<QJsonArray>("$.figure.points", jsonPoints, i);
+        const QString path = NX_FMT("$.figure.points[%1]", i);
+        points.emplace_back(
+            get<double>(path, point, 0),
+            get<double>(path, point, 1));
+    }
+
+    Rect rect;
+    rect.x = points[0].x;
+    rect.y = points[0].y;
+    rect.width = points[1].x - points[0].x;
+    rect.height = points[1].y - points[0].y;
+
+    entry->emplaceValue(rect);
+}
+
+
 std::optional<QString> serializeEntryToServer(
     const CameraSettings::Vca::IntrusionDetection::Rule::Inverted& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return entry.value() ? "true" : "false";
+}
+
+std::optional<QString> serializeEntryToServer(
+    const CameraSettings::Vca::MissingObjectDetection::Rule::RequiresHumanInvolvement& entry)
 {
     if (!entry.hasValue())
         return "";
@@ -1423,6 +1776,15 @@ std::optional<QString> serializeEntryToServer(
     return QString::number(entry.value());
 }
 
+std::optional<QString> serializeEntryToServer(
+    const CameraSettings::Vca::MissingObjectDetection::Rule::Delay& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
 std::optional<QString> serializeEntryToServer(const CameraSettings::Entry<int>& entry)
 {
     if (!entry.hasValue())
@@ -1500,6 +1862,31 @@ std::optional<QString> serializeEntryToServer(const CameraSettings::Entry<NamedL
     return serializeJson(json);
 }
 
+std::optional<QString> serializeEntryToServer(const CameraSettings::Entry<Rect>& entry)
+{
+    if (!entry.hasValue())
+    {
+        return serializeJson(QJsonObject{
+            {"label", ""},
+            {"figure", QJsonValue::Null},
+        });
+    }
+
+    const auto& rect = entry.value();
+    return serializeJson(QJsonObject{
+        {"label", ""},
+        {"figure", QJsonObject{
+            {"points", QJsonArray{
+                QJsonArray{rect.x, rect.y},
+                QJsonArray{
+                    rect.x + rect.width,
+                    rect.y + rect.height,
+                },
+            }},
+        }},
+    });
+}
+
 
 QJsonValue getVcaInstallationModelForManifest()
 {
@@ -1556,7 +1943,7 @@ QJsonValue getVcaCrowdDetectionModelForManifest()
                         QJsonObject{
                             {"name", Rule::Region::name},
                             {"type", "PolygonFigure"},
-                            {"caption", "Name"},
+                            {"caption", "Region"},
                             {"minPoints", 3},
                             {"maxPoints", 20}, // Defined in user guide.
                         },
@@ -1611,7 +1998,7 @@ QJsonValue getVcaLoiteringDetectionModelForManifest()
                         QJsonObject{
                             {"name", Rule::Region::name},
                             {"type", "PolygonFigure"},
-                            {"caption", "Name"},
+                            {"caption", "Region"},
                             {"minPoints", 3},
                             {"maxPoints", 20}, // Defined in user guide.
                         },
@@ -1650,7 +2037,7 @@ QJsonValue getVcaIntrusionDetectionModelForManifest()
                         QJsonObject{
                             {"name", Rule::Region::name},
                             {"type", "PolygonFigure"},
-                            {"caption", "Name"},
+                            {"caption", "Region"},
                             {"minPoints", 3},
                             {"maxPoints", 20}, // Defined in user guide.
                         },
@@ -1699,9 +2086,79 @@ QJsonValue getVcaLineCrossingDetectionModelForManifest()
                         QJsonObject{
                             {"name", Rule::Line::name},
                             {"type", "LineFigure"},
-                            {"caption", "Name"},
+                            {"caption", "Line"},
                             {"minPoints", 3},
                             {"maxPoints", 3},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
+QJsonValue getVcaMissingObjectDetectionModelForManifest()
+{
+    using Rule = CameraSettings::Vca::MissingObjectDetection::Rule;
+    return QJsonObject{
+        {"name", "Vca.MissingObjectDetection"},
+        {"type", "Section"},
+        {"caption", "Missing Object Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) kMaxDetectionRuleCount},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{Rule::Region::name}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", Rule::Region::name},
+                            {"type", "PolygonFigure"},
+                            {"caption", "Region"},
+                            {"minPoints", 3},
+                            {"maxPoints", 20}, // Defined in user guide.
+                        },
+                        // THe following two BoxFigures should really be single
+                        // ObjectSizeConstraints, but need empty state to work around camera not
+                        // returning settings for disabled functionality.
+                        QJsonObject{
+                            {"name", Rule::MinSize::name},
+                            {"type", "BoxFigure"},
+                            {"caption", "Minimum size"},
+                        },
+                        QJsonObject{
+                            {"name", Rule::MaxSize::name},
+                            {"type", "BoxFigure"},
+                            {"caption", "Maximum size"},
+                        },
+                        QJsonObject{
+                            {"name", Rule::Delay::name},
+                            // Should really be SpinBox, but need empty state to work around camera not
+                            // returning settings for disabled functionality.
+                            {"type", "TextField"},
+                            {"caption", "Delay (s)"},
+                            {"description", "The event is only generated if an object is missing for at least this long"},
+                        },
+                        QJsonObject{
+                            {"name", Rule::RequiresHumanInvolvement::name},
+                            {"type", "ComboBox"},
+                            {"caption", "Human involvement"},
+                            {"description", "Whether a human is required to walk by an object prior to it going missing"},
+                            {"range", QJsonArray{
+                                // Need empty state to work around camera not returning settings
+                                // for disabled functionality.
+                                "",
+                                "false",
+                                "true",
+                            }},
+                            {"itemCaptions", QJsonObject{
+                                {"", ""},
+                                {"false", "Not required"},
+                                {"true", "Required"},
+                            }},
                         },
                     }},
                 }},
@@ -1746,6 +2203,8 @@ QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
                     sections.push_back(getVcaIntrusionDetectionModelForManifest());
                 if (features.lineCrossingDetection)
                     sections.push_back(getVcaLineCrossingDetectionModelForManifest());
+                if (features.missingObjectDetection)
+                    sections.push_back(getVcaMissingObjectDetectionModelForManifest());
 
                 return sections;
             }(),
@@ -1780,6 +2239,11 @@ CameraSettings::CameraSettings(const CameraFeatures& features)
         {
             auto& lineCrossingDetection = vca->lineCrossingDetection.emplace();
             lineCrossingDetection.rules.resize(kMaxDetectionRuleCount);
+        }
+        if (features.vca->missingObjectDetection)
+        {
+            auto& missingObjectDetection = vca->missingObjectDetection.emplace();
+            missingObjectDetection.rules.resize(kMaxDetectionRuleCount);
         }
     }
 }

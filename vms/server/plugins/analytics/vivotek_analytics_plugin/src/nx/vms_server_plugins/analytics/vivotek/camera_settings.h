@@ -6,6 +6,7 @@
 
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/analytics/rect.h>
 #include <nx/utils/url.h>
 
 #include <QtCore/QJsonValue>
@@ -105,7 +106,10 @@ public:
             struct Rule
             {
                 NX_CAMERA_SETTINGS_ENTRY(Vca.CrowdDetection.Rule#, Region, NamedPolygon) region;
-                NX_CAMERA_SETTINGS_ENTRY(Vca.CrowdDetection.Rule#, SizeThreshold, int) sizeThreshold;
+
+                NX_CAMERA_SETTINGS_ENTRY(Vca.CrowdDetection.Rule#, SizeThreshold,
+                    int) sizeThreshold;
+
                 NX_CAMERA_SETTINGS_ENTRY(Vca.CrowdDetection.Rule#, EnterDelay, int) enterDelay;
                 NX_CAMERA_SETTINGS_ENTRY(Vca.CrowdDetection.Rule#, ExitDelay, int) exitDelay;
             };
@@ -144,6 +148,29 @@ public:
             std::vector<Rule> rules;
         };
         std::optional<LineCrossingDetection> lineCrossingDetection;
+
+        struct MissingObjectDetection
+        {
+            struct Rule
+            {
+                NX_CAMERA_SETTINGS_ENTRY(Vca.MissingObjectDetection.Rule#, Region,
+                    NamedPolygon) region;
+
+                NX_CAMERA_SETTINGS_ENTRY(Vca.MissingObjectDetection.Rule#, MinSize,
+                    nx::sdk::analytics::Rect) minSize;
+
+                NX_CAMERA_SETTINGS_ENTRY(Vca.MissingObjectDetection.Rule#, MaxSize,
+                    nx::sdk::analytics::Rect) maxSize;
+
+                NX_CAMERA_SETTINGS_ENTRY(Vca.MissingObjectDetection.Rule#, Delay, int) delay;
+
+                NX_CAMERA_SETTINGS_ENTRY(
+                    Vca.MissingObjectDetection.Rule#, RequiresHumanInvolvement,
+                    bool) requiresHumanInvolvement;
+            };
+            std::vector<Rule> rules;
+        };
+        std::optional<MissingObjectDetection> missingObjectDetection;
     };
     std::optional<Vca> vca;
 

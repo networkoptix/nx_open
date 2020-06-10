@@ -40,6 +40,15 @@ const std::vector<EventType> kEventTypes =
             type.isSupported =
                 [](auto& features) { return features.vca && features.vca->lineCrossingDetection; };
         }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "MissingObjectDetection";
+            type.id = "nx.vivotek.MissingObject";
+            type.prettyName = "Missing Object";
+            type.isProlonged = true;
+            type.isSupported =
+                [](auto& features) { return features.vca && features.vca->missingObjectDetection; };
+        }
         return types;
     }();
 

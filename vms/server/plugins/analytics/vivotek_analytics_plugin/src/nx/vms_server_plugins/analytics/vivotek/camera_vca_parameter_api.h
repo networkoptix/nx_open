@@ -20,6 +20,9 @@ public:
     cf::future<cf::unit> store(const QString& scope, const QJsonValue& parameters);
     cf::future<cf::unit> reloadConfig();
 
+    static float parseCoordinate(const QJsonValue& json, const QString& path = "$");
+    static QJsonValue serializeCoordinate(float value);
+
     static nx::sdk::analytics::Point parsePoint(const QJsonValue& json, const QString& path = "$");
     static QJsonObject serialize(const nx::sdk::analytics::Point& point);
 
