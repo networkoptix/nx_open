@@ -1,7 +1,9 @@
 #include "storage_resource.h"
+
 #include <media_server/media_server_module.h>
 #include <recorder/storage_manager.h>
 #include <nx/utils/iodevice_wrapper.h>
+#include <nx/utils/elapsed_timer.h>
 #include <recorder/file_deletor.h>
 
 namespace nx::vms::server {
@@ -86,10 +88,9 @@ qint64 StorageResource::nxOccupedSpace() const
 bool StorageResource::removeFile(const QString& url)
 {
     m_metrics->deletions++;
-    std::chrono::milliseconds elapsed = std::chrono::milliseconds(0);
-    const bool result = nx::utils::measure(
-        [this, &url]() { return doRemoveFile(url); }, &elapsed);
-    if (elapsed > serverModule()->settings().ioOperationTimeTresholdSec())
+    nx::utils::ElapsedTimer timer(true);
+    const bool result = doRemoveFile(url);
+    if (timer.elapsed() > serverModule()->settings().ioOperationTimeTresholdSec())
         m_metrics->timedOutDeletions++;
     return result;
 }
@@ -98,10 +99,9 @@ QnAbstractStorageResource::FileInfoList StorageResource::getFileList(
     const QString& url)
 {
     m_metrics->directoryLists++;
-    std::chrono::milliseconds elapsed = std::chrono::milliseconds(0);
-    const auto result = nx::utils::measure(
-        [this, &url]() { return doGetFileList(url); }, &elapsed);
-    if (elapsed > serverModule()->settings().ioOperationTimeTresholdSec())
+    nx::utils::ElapsedTimer timer(true);
+    const auto result = doGetFileList(url);
+    if (timer.elapsed() > serverModule()->settings().ioOperationTimeTresholdSec())
         m_metrics->timedOutDirectoryLists++;
     return result;
 }
