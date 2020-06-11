@@ -49,7 +49,7 @@ int QnLogRestHandler::executeGet(
 
     if (!logFilePath)
     {
-        result.append(QString("<root>Bad log file id or name</root>\n"));
+        result = "Bad log file id or name";
         return nx::network::http::StatusCode::badRequest;
     }
 
@@ -59,8 +59,8 @@ int QnLogRestHandler::executeGet(
     QFile f(*logFilePath);
     if (!f.open(QFile::ReadOnly))
     {
-        result.append(QString("<root>Can't open log file</root>\n"));
-        return nx::network::http::StatusCode::internalServerError;
+        result = NX_FMT("No log entries in %1 (%2)", *logFilePath, f.errorString()).toUtf8();
+        return nx::network::http::StatusCode::notFound;
     }
     qint64 fileSize = f.size();
 
