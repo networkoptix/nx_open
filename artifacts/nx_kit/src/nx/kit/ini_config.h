@@ -31,6 +31,11 @@ namespace kit {
  * empty, the file is filled with default values and descriptions. The names of .ini files and
  * their values are printed to stderr (configurable), overridden values marked with "*".
  *
+ * The format of a .ini file is as follows: lines beginning with `#` are ignored (treated as
+ * comments); whitespace around the name, the equals sign, and the value is ignored; the value can
+ * be surrounded with quotes (`"`), in which case it is parsed using a C-style-escaping, supporting
+ * concatenation of consecutive enquoted strings, but not supporting `\uXXXX` and `\UXXXXXXXX`.
+ *
  * Usage example:
  * <pre><code>
  *

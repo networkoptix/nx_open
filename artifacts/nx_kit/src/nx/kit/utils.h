@@ -41,9 +41,22 @@ inline bool isAsciiPrintable(int c)
 }
 
 /**
- * Convert a value to its report-friendly text representation, e.g. a quoted and escaped string.
- * Non-printable chars in a string are represented as hex escape sequences like `\xFF""` - note
- * that the two quotes after it are inserted to indicate the end of the hex number, as in C/C++.
+ * Decodes a string encoded using C/C++ string literal rules: enquoted, potentially containing
+ * escape sequences. Supports concatenation of consecutive literals, thus, fully compatible with
+ * strings encoded by nx::kit::utils::toString().
+ *
+ * @param outErrorMessage In case of any error in the encoded string, the function attempts to
+ *     recover using the most obvious way, still producing the result, and reports all such cases
+ *     via this argument if it is not null.
+ */
+NX_KIT_API std::string decodeEscapedString(
+    const std::string& s, std::string* outErrorMessage = nullptr);
+
+/**
+ * Converts a value to its report-friendly text representation; for strings it being a quoted and
+ * C-style-escaped string. Non-printable chars in a string are represented as hex escape sequences
+ * like `\xFF""` - note that the two quotes after it are inserted to indicate the end of the hex
+ * number, because according to the C/C++ standards, `\x` consumes as much hex digits as possible.
  */
 template<typename T>
 std::string toString(T value);
@@ -66,9 +79,12 @@ std::string format(const std::string& formatStr, Args... args)
 NX_KIT_API bool fromString(const std::string& s, int* value);
 NX_KIT_API bool fromString(const std::string& s, double* value);
 NX_KIT_API bool fromString(const std::string& s, float* value);
+NX_KIT_API bool fromString(const std::string& s, bool* value);
 
 NX_KIT_API void stringReplaceAllChars(std::string* s, char sample, char replacement);
 NX_KIT_API void stringInsertAfterEach(std::string* s, char sample, const char* insertion);
+NX_KIT_API void stringReplaceAll(
+    std::string* s, const std::string& sample, const std::string& replacement);
 
 //-------------------------------------------------------------------------------------------------
 // OS support.

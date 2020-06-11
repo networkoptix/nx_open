@@ -81,6 +81,25 @@ extern bool NX_KIT_API verbose; //< Use to control additional output of the unit
         EXPECTED, #EXPECTED, ACTUAL, #ACTUAL, __FILE__, LINE, __LINE__)
 
 /**
+ * Tests that the given string has the expected value, having replaced all occurrences of the given
+ * substring with the given replacement (placeholder) - useful when the string being tested
+ * contains some substring (e.g. a file name) known only at runtime. Zero bytes inside the strings
+ * are supported.
+ *
+ * If the strings are not equal, they are treated as multiline via '\n' - line-by-line exact
+ * comparison is performed, and the different lines are printed. Also for convenience the actual
+ * string is printed as a multiline text with line numbers, non-printable chars as '?', and
+ * trailing spaces as '#'.
+ *
+ * @param actualSubstrToReplace Must be empty if the replacement is not needed.
+ * @param actualSubstrReplacement Must be empty if the replacement is not needed.
+ */
+NX_KIT_API void assertMultilineTextEquals(
+    const char* file, int line, const std::string& testCaseTag,
+    const std::string& expected, const std::string& actual,
+    const std::string actualSubstrToReplace = "", const std::string& actualSubstrReplacement = "");
+
+/**
  * Should be called for regular tests, from the TEST() body.
  * @return Path to the directory to create temp files in, including the trailing path separator:
  *     "base-temp-dir/case.test/", where "base-temp-dir" can be assigned with "--tmp" command line

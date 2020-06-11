@@ -65,6 +65,126 @@ TEST(utils, misalignedPtr)
     ASSERT_TRUE((intptr_t) misaligned % 32 != 0);
 }
 
+static void testDecodeEscapedString(
+    int line,
+    const std::string& expectedErrorMessage,
+    const std::string& expectedResult,
+    const std::string& encodedString)
+{
+    std::string actualErrorMessage;
+    const std::string actualResult = decodeEscapedString(encodedString, &actualErrorMessage);
+
+    // Print the values of interest on failure.
+    if (expectedResult != actualResult || expectedErrorMessage != actualErrorMessage)
+    {
+        std::cerr << "Encoded test string: [" << encodedString << "]" << std::endl;
+        std::cerr << "Actual error message: [" << actualErrorMessage << "]" << std::endl;
+    }
+
+    ASSERT_STREQ_AT_LINE(line, expectedResult, actualResult);
+    ASSERT_STREQ_AT_LINE(line, expectedErrorMessage, actualErrorMessage);
+}
+
+TEST(utils, decodeEscapedStringSuccess)
+{
+    #define TEST_SUCCESS(EXPECTED_RESULT, ENCODED_STRING) \
+        testDecodeEscapedString(__LINE__, /*expectedErrorMessage*/ "", \
+            /* Construct an std::string from a char array possibly containing '\0' inside. */ \
+            std::string(EXPECTED_RESULT, sizeof(EXPECTED_RESULT) - /*terminating \0*/ 1), \
+            ENCODED_STRING)
+
+    TEST_SUCCESS("", R"("")");
+    TEST_SUCCESS("abc", R"("abc")");
+    TEST_SUCCESS("\" quote", R"("\" quote")");
+    TEST_SUCCESS("\\ backslash", R"("\\ backslash")");
+    TEST_SUCCESS("' apostrophe", R"("\' apostrophe")");
+    TEST_SUCCESS("? escaped question mark", R"("\? escaped question mark")");
+    TEST_SUCCESS("? unescaped question mark", R"("? unescaped question mark")");
+    TEST_SUCCESS("\a bel", R"("\a bel")");
+    TEST_SUCCESS("\b bs", R"("\b bs")");
+    TEST_SUCCESS("\f ff", R"("\f ff")");
+    TEST_SUCCESS("\n lf", R"("\n lf")");
+    TEST_SUCCESS("\r cr", R"("\r cr")");
+    TEST_SUCCESS("\t tab", R"("\t tab")");
+    TEST_SUCCESS("\v vt", R"("\v vt")");
+
+    TEST_SUCCESS("octal \0 after nul", R"("octal \0 after nul")");
+    TEST_SUCCESS("\1 octal", R"("\1 octal")");
+    TEST_SUCCESS("\00 octal", R"("\00 octal")");
+    TEST_SUCCESS("\000 octal", R"("\000 octal")");
+    TEST_SUCCESS("w octal", R"("\167 octal")"); //< 0167 (octal) is the ASCII code of `w`.
+    TEST_SUCCESS("\001""234", R"("\001234")"); //< Octal sequence takes up to 3 digits.
+
+    TEST_SUCCESS("hex \0 after nul", R"("hex \x0 after nul")");
+    TEST_SUCCESS("\xFF", R"("\xFF")");
+    TEST_SUCCESS("\xAb", R"("\xAb")");
+    TEST_SUCCESS("@", R"("\x40")"); //< ASCII code of '@' is 0x40.
+    TEST_SUCCESS("\xFF", R"("\x000FF")"); //< Hex sequence takes as much digits as are present.
+    TEST_SUCCESS("pre \xF post", R"("pre \xF post")");
+
+    TEST_SUCCESS("\xFE non-ascii", R"("\xFE"" non-ascii")");
+
+    // Concatenation of consecutive enquoted literals.
+    TEST_SUCCESS("\xFE non-ascii", R"("\xFE"" non-ascii")"); //< No whitespace between the quotes.
+    TEST_SUCCESS("abc123", R"("abc" "123")"); //< A space between the quotes.
+    TEST_SUCCESS("abc123", "\"abc\" \n \"123\""); //< Various whitespace chars between the quotes.
+
+    #undef TEST_SUCCESS
+}
+
+TEST(utils, decodeEscapedStringFailure)
+{
+    #define TEST_FAILURE(EXPECTED_ERROR_MESSAGE, EXPECTED_RESULT, S) \
+        testDecodeEscapedString(__LINE__, EXPECTED_ERROR_MESSAGE, EXPECTED_RESULT, S)
+
+    // NOTE: `R"(` is not used because invalid escape sequences in it do not compile in MSVC.
+
+    TEST_FAILURE("Found non-printable ASCII character '\\x0A'.",
+        "a_\n_b", "\"a_\n_b\"");
+    TEST_FAILURE("The string does not start with a quote.",
+        "", "");
+    TEST_FAILURE("The string does not start with a quote.",
+        "abc\"", "abc\"");
+    TEST_FAILURE("Missing the closing quote.",
+        "", "\"");
+    TEST_FAILURE("Missing the closing quote.",
+        "abc", "\"abc");
+    TEST_FAILURE("Invalid escaped character 'z' after the backslash.",
+        "_z_", "\"_\\z_\"");
+    TEST_FAILURE("Unexpected trailing after the closing quote.",
+        "str_trailing", "\"str\"_trailing");
+
+    // Unicode escape sequences are not supported.
+    TEST_FAILURE("Invalid escaped character 'u' after the backslash.",
+        "_uFFFF_", "\"_\\uFFFF_\"");
+    TEST_FAILURE("Invalid escaped character 'U' after the backslash.",
+        "_Uabcd_", "\"_\\Uabcd_\"");
+
+    // Test accumulating multiple errors, with messages concatenated via a space.
+    TEST_FAILURE(
+        "Missing escaped character after the backslash."
+        " "
+        "Missing the closing quote.",
+        "abc\\", "\"abc\\");
+    TEST_FAILURE(
+        "Invalid escaped character 'z' after the backslash."
+        " "
+        "Found non-printable ASCII character '\\x0D'."
+        " "
+        "Missing the closing quote.",
+        "_z_\r_", "\"_\\z_\r_");
+
+    TEST_FAILURE("Octal escape sequence does not fit in one byte: 511.",
+        "\xFF", "\"\\777\""); //< 0777 (octal) = 0x1FF = 511.
+
+    TEST_FAILURE("Hex escape sequence does not fit in one byte.",
+        "@", "\"\\xEE40\""); //, ASCII code of '@' is 0x40.
+    TEST_FAILURE("Missing hex digits in the hex escape sequence.",
+        "a__b", "\"a_\\x_b\"");
+
+    #undef TEST_FAILURE
+}
+
 TEST(utils, toString_string)
 {
     ASSERT_STREQ("\"abc\"", toString(/*rvalue*/ std::string("abc")));
@@ -245,6 +365,34 @@ TEST(utils, fromString_float)
     ASSERT_FALSE(fromString("", &value));
 }
 
+TEST(utils, fromString_bool)
+{
+    bool value = true;
+
+    ASSERT_TRUE(fromString("false", &value));
+    ASSERT_FALSE(value);
+
+    ASSERT_TRUE(fromString("true", &value));
+    ASSERT_TRUE(value);
+
+    ASSERT_TRUE(fromString("False", &value));
+    ASSERT_FALSE(value);
+
+    ASSERT_TRUE(fromString("True", &value));
+    ASSERT_TRUE(value);
+
+    ASSERT_TRUE(fromString("FALSE", &value));
+    ASSERT_FALSE(value);
+
+    ASSERT_TRUE(fromString("TRUE", &value));
+    ASSERT_TRUE(value);
+
+    ASSERT_FALSE(fromString("tRuE", &value));
+    ASSERT_FALSE(fromString("2", &value));
+    ASSERT_FALSE(fromString("", &value));
+    ASSERT_FALSE(fromString("xxx", &value));
+}
+
 static void testStringReplaceAllChars(
     const std::string& expected, const std::string& source, char sample, char replacement)
 {
@@ -273,6 +421,32 @@ TEST(utils, stringInsertAfterEach)
     testStringInsertAfterEach("", "", 'a', "123");
     testStringInsertAfterEach("a123ba123", "aba", 'a', "123"); //< Insert '123' after each 'a'.
     testStringInsertAfterEach("a\n$", "a\n", '\n', "$"); //< Insert '$' after each '\n'.
+}
+
+static void testStringReplaceAll(
+    const std::string& expected,
+    const std::string& source,
+    const std::string& sample,
+    const std::string& replacement)
+{
+    std::string s = source;
+    stringReplaceAll(&s, sample, replacement);
+    ASSERT_EQ(expected, s);
+}
+
+TEST(utils, stringReplaceAll)
+{
+    testStringReplaceAll("", "", "ab", "123");
+    testStringReplaceAll("a45b45", "a23b23", "23", "45");
+    testStringReplaceAll("45", "23", "23", "45");
+    testStringReplaceAll("x", "x", "23", "45");
+    testStringReplaceAll("xy", "x23y", "23", "");
+    testStringReplaceAll("", "23", "23", "");
+
+    // Test support for '\0' inside the strings.
+    #define STR(LITERAL) std::string(LITERAL, sizeof(LITERAL) - /*terminating \0*/ 1)
+    testStringReplaceAll(STR("ac\0z"), STR("a\0bz"), STR("\0b"), STR("c\0"));
+    #undef STR
 }
 
 } // namespace test
