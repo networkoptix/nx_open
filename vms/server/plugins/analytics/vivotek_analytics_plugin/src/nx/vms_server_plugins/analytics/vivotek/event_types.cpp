@@ -13,7 +13,9 @@ const std::vector<EventType> kEventTypes =
             type.prettyName = "Crowd";
             type.isProlonged = true;
             type.isSupported =
-                [](auto& features) { return features.vca && features.vca->crowdDetection; };
+                [](auto& features) {
+                    return features.vca && features.vca->crowdDetection;
+                };
         }
         {
             auto& type = types.emplace_back();
@@ -22,7 +24,9 @@ const std::vector<EventType> kEventTypes =
             type.prettyName = "Loitering";
             type.isProlonged = true;
             type.isSupported =
-                [](auto& features) { return features.vca && features.vca->loiteringDetection; };
+                [](auto& features) {
+                    return features.vca && features.vca->loiteringDetection;
+                };
         }
         {
             auto& type = types.emplace_back();
@@ -30,7 +34,9 @@ const std::vector<EventType> kEventTypes =
             type.id = "nx.vivotek.Intrusion";
             type.prettyName = "Intrusion";
             type.isSupported =
-                [](auto& features) { return features.vca && features.vca->intrusionDetection; };
+                [](auto& features) {
+                    return features.vca && features.vca->intrusionDetection;
+                };
         }
         {
             auto& type = types.emplace_back();
@@ -38,7 +44,9 @@ const std::vector<EventType> kEventTypes =
             type.id = "nx.vivotek.LineCrossing";
             type.prettyName = "Line Crossing";
             type.isSupported =
-                [](auto& features) { return features.vca && features.vca->lineCrossingDetection; };
+                [](auto& features) {
+                    return features.vca && features.vca->lineCrossingDetection;
+                };
         }
         {
             auto& type = types.emplace_back();
@@ -47,8 +55,22 @@ const std::vector<EventType> kEventTypes =
             type.prettyName = "Missing Object";
             type.isProlonged = true;
             type.isSupported =
-                [](auto& features) { return features.vca && features.vca->missingObjectDetection; };
+                [](auto& features) {
+                    return features.vca && features.vca->missingObjectDetection;
+                };
         }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "UnattendedObjectDetection";
+            type.id = "nx.vivotek.UnattendedObject";
+            type.prettyName = "Unattended Object";
+            type.isProlonged = true;
+            type.isSupported =
+                [](auto& features) {
+                    return features.vca && features.vca->unattendedObjectDetection;
+                };
+        }
+        types.shrink_to_fit();
         return types;
     }();
 

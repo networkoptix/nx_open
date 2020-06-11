@@ -171,6 +171,29 @@ public:
             std::vector<Rule> rules;
         };
         std::optional<MissingObjectDetection> missingObjectDetection;
+
+        struct UnattendedObjectDetection
+        {
+            struct Rule
+            {
+                NX_CAMERA_SETTINGS_ENTRY(Vca.UnattendedObjectDetection.Rule#, Region,
+                    NamedPolygon) region;
+
+                NX_CAMERA_SETTINGS_ENTRY(Vca.UnattendedObjectDetection.Rule#, MinSize,
+                    nx::sdk::analytics::Rect) minSize;
+
+                NX_CAMERA_SETTINGS_ENTRY(Vca.UnattendedObjectDetection.Rule#, MaxSize,
+                    nx::sdk::analytics::Rect) maxSize;
+
+                NX_CAMERA_SETTINGS_ENTRY(Vca.UnattendedObjectDetection.Rule#, Delay, int) delay;
+
+                NX_CAMERA_SETTINGS_ENTRY(
+                    Vca.UnattendedObjectDetection.Rule#, RequiresHumanInvolvement,
+                    bool) requiresHumanInvolvement;
+            };
+            std::vector<Rule> rules;
+        };
+        std::optional<UnattendedObjectDetection> unattendedObjectDetection;
     };
     std::optional<Vca> vca;
 
