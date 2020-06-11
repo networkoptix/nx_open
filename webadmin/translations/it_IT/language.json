@@ -77,8 +77,8 @@
         "emailSignature": "Firma e-mail",
         "emailSupportEmail": "Email di supporto",
         "enableEdgeRecording": "Abilitazione della registrazione a bordo",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "Abilita socket WEB",
+        "maxP2pAllClientsSizeBytes": "Dimensione massima del buffer per inviare dati p2p a tutti i client",
         "eventLogPeriodDays": "Periodo del registro eventi (giorni)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "Base di ricerca LDAP",
@@ -130,12 +130,12 @@
         "maxWebMTranscoders": "Quantità massima di connessioni WEBM per il server. Chrome apre due connessioni contemporaneamente, quindi chiude la prima. Pertanto, si consiglia di impostare il valore> = 2 su questo parametro.",
         "maxEventLogRecords": "Numero massimo di record del registro degli eventi da conservare nel database. La quantità reale di record non eliminati può essere maggiore del 20% rispetto al valore specificato.",
         "forceLiveCacheForPrimaryStream": "Indica se memorizzare nella cache alcuni frame per lo stream principale. Valori: \"sì\" - sempre abilitato (può utilizzare molta RAM), \"no\" - sempre disabilitato tranne quando richiesto dalla riproduzione (ad es. HLS), \"auto\" - simile a \"no\", ma attivo quando si migliora l'esperienza dell'utente (ad esempio quando alcuni plug-in di Analytics funzionano sulla videocamera).",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "additionalLocalFsTypes": "Ulteriori tipi di file di file system da considerare quando si decide se una determinata partizione è adatta per essere una posizione di archiviazione del server. È previsto l'elenco separato da virgole di nomi di file system in / proc / mounts.",
+        "rtspBufferSizeKb": "Dimensione buffer RTSP lato server in KB. Un valore maggiore consente di utilizzare Internet in modo più efficiente con un elevato valore di ritardo di andata e ritorno ma rallenta la commutazione automatica della qualità e la reazione alle operazioni di ricerca RTSP."
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "Grafici",
             "storage": "Archiviazione",
             "log": "Registro"
         }
