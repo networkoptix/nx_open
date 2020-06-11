@@ -40,7 +40,8 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(
     QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTimeUs)
 {
     QnCompressedVideoDataPtr video;
-    for (int i = 0; i < 20 && !video; ++i)
+    static const int kMaxIterationsToFindVideo = 50;
+    for (int i = 0; i < kMaxIterationsToFindVideo && !video; ++i)
     {
         QnAbstractMediaDataPtr media = archiveDelegate->getNextData();
         if (!media || media->timestamp == DATETIME_NOW)
