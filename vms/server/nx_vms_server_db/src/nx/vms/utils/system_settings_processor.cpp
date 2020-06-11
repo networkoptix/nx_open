@@ -44,7 +44,8 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
     const Qn::UserAccessData& accessRights,
     const QnAuthSession& authSession,
     const QnRequestParams& params,
-    QnJsonRestResult* result)
+    QnJsonRestResult* result,
+    bool setRecommendedSettings)
 {
     QnSystemSettingsReply reply;
 
@@ -93,6 +94,12 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
 
         if (readAllowed && !ignoredKeys.contains(setting->key()))
             reply.settings.insert(setting->key(), setting->serializedValue());
+    }
+
+    if (setRecommendedSettings)
+    {
+        commonModule()->globalSettings()->setTrafficEncriptionForced(true);
+        dirty = true;
     }
 
     if (dirty)

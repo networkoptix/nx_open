@@ -161,7 +161,8 @@ nx::network::http::StatusCode::Value VmsCloudConnectionProcessor::setupCloudSyst
             Qn::kSystemAccess,
             authSession,
             data.systemSettings,
-            result))
+            result,
+            /*setRecommendedSettings*/ true))
     {
         NX_WARNING(this, lm("Failed to write system settings"));
     }

@@ -110,7 +110,8 @@ nx::network::http::StatusCode::Value SetupSystemProcessor::setupLocalSystem(
         Qn::kSystemAccess,
         authSession,
         data.systemSettings,
-        result);
+        result,
+        /*setRecommendedSettings*/ true);
     if (resultCode != nx::network::http::StatusCode::ok)
     {
         NX_WARNING(this, lm("Failed to write system settings. %1")

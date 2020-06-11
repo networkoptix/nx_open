@@ -66,6 +66,7 @@ bool QnSystemSettingsHandler::updateSettings(
     const QnAuthSession& authSession)
 {
     SystemSettingsProcessor systemSettingsProcessor(commonModule, authSession);
-    return systemSettingsProcessor.updateSettings(accessRights, authSession, params, &result) ==
-        nx::network::http::StatusCode::ok;
+    return systemSettingsProcessor.updateSettings(
+        accessRights, authSession, params, &result, /*setRecommendedSettings*/ false)
+            == nx::network::http::StatusCode::ok;
 }

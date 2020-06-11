@@ -32,7 +32,8 @@ public:
         const Qn::UserAccessData& accessRights,
         const QnAuthSession& authSession,
         const QnRequestParams& params,
-        QnJsonRestResult* result);
+        QnJsonRestResult* result,
+        bool setRecommendedSettings);
 
 private:
     BeforeUpdatingSettingValueHandler m_onBeforeUpdatingSettingValue;
