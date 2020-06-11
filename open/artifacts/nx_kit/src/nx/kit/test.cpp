@@ -274,7 +274,118 @@ static const ParsedCmdLineArgs& parsedCmdLineArgs()
     return *parsedArgs;
 }
 
+/** NOTE: The trailing '\n' in a string (if any) is treated as an empty line. */
+static std::vector<std::string> splitMultilineText(const std::string& text)
+{
+    std::vector<std::string> result;
+    std::string lineText;
+    std::istringstream stream(text);
+
+    bool missingFinalNewline = true;
+    while (std::getline(stream, lineText, '\n'))
+    {
+        result.push_back(lineText);
+        missingFinalNewline = stream.eof();
+    }
+    if (!missingFinalNewline)
+        result.push_back("");
+
+    return result;
+}
+
+static void printMultilineText(
+    const std::vector<std::string>& lines,
+    const std::string& tag,
+    const std::string substrToReplace,
+    const std::string& substrReplacement)
+{
+    std::cerr << "\n" << tag << " (shown with line numbers, final '\\n' (if any) as empty line,\n"
+        << (!substrToReplace.empty()
+            ? ("substring " + nx::kit::utils::toString(substrToReplace) + "\n"
+                + "replaced with " + nx::kit::utils::toString(substrReplacement) + ",\n")
+            : "")
+        << "non-printable chars as '?', trailing spaces as '#'):\n\n";
+
+    if (lines.empty())
+    {
+        std::cerr << "  (" << tag << " is empty.)\n";
+        return;
+    }
+
+    for (int lineIndex = 0; lineIndex < (int) lines.size(); ++lineIndex)
+    {
+        std::string printable = lines[lineIndex];
+
+        // Replace non-printable chars with '?'.
+        for (int i = 0; i < (int) printable.size(); ++i)
+        {
+            if (!nx::kit::utils::isAsciiPrintable(printable[i]))
+                printable[i] = '?';
+        }
+
+        // Replace trailing spaces with '#'.
+        for (int i = (int) printable.size() - 1; i >= 0 && printable[i] == ' '; --i)
+            printable[i] = '#';
+
+        // Print with line number as `cat -n` does: 6 digits (space-padded), then two spaces.
+        std::cerr << nx::kit::utils::format("%6d  ", /* 1-based line number*/ lineIndex + 1)
+            << printable << "\n";
+    }
+}
+
 } using namespace detail;
+
+void assertMultilineTextEquals(
+    const char* file, int line, const std::string& testCaseTag,
+    const std::string& expected, const std::string& actual,
+    const std::string actualSubstrToReplace, const std::string& actualSubstrReplacement)
+{
+    std::string actualToCompare = actual;
+
+    if (!actualSubstrToReplace.empty())
+    {
+        ASSERT_FALSE(actualSubstrReplacement.empty()); //< internal error
+        nx::kit::utils::stringReplaceAll(
+            &actualToCompare, actualSubstrToReplace, actualSubstrReplacement);
+    }
+
+    if (expected == actualToCompare)
+        return;
+
+    std::cerr << "\nFAILURE DETAILS for test case \"" << testCaseTag << "\":\n";
+
+    const std::vector<std::string> expectedLines = splitMultilineText(expected);
+    const std::vector<std::string> actualLines = splitMultilineText(actualToCompare);
+
+    printMultilineText(actualLines, "Actual text", actualSubstrToReplace, actualSubstrReplacement);
+
+    for (int i = 0; i < (int) actualLines.size(); ++i)
+    {
+        if (i >= (int) expectedLines.size())
+        {
+            std::cerr << "\nActual text is " << actualLines.size() - expectedLines.size()
+                << " line(s) longer than expected (" << expectedLines.size() << " lines).\n";
+            break;
+        }
+
+        if (expectedLines[i] != actualLines[i])
+        {
+            std::cerr << "\nExpected line " << i + 1 << ": "
+                << nx::kit::utils::toString(expectedLines[i]) << "\n";
+            std::cerr << "  Actual line " << i + 1 << ": "
+                << nx::kit::utils::toString(actualLines[i]) << "\n";
+        }
+    }
+
+    if (actualLines.size() < expectedLines.size())
+    {
+        std::cerr << "\nActual text is " << expectedLines.size() - actualLines.size()
+            << " line(s) shorter than expected.\n";
+    }
+
+    throw TestFailure(file, line, /*actualLine*/ -1,
+        "The text in test case \"" + testCaseTag + "\" is not as expected; see details above.");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Temp dir.

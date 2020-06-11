@@ -108,6 +108,199 @@ bool fileExists(const char* filename)
     return static_cast<bool>(std::ifstream(filename));
 }
 
+/**
+ * Appends an error message to std::string* errorMessage, concatenating via a space if
+ * *errorMessage was not empty. Does nothing if errorMessage is null.
+ *
+ * NOTE: This is a macro to avoid composing the error message if errorMessage is null.
+ */
+#define ADD_ERROR_MESSAGE(ERROR_MESSAGE) do \
+{ \
+    if (errorMessage) \
+    { \
+        if (!errorMessage->empty()) \
+            *errorMessage += " "; \
+        *errorMessage += (ERROR_MESSAGE); \
+    } \
+} while (0)
+
+/**
+ * Parses the octal escape sequence at the given position.
+ * @param p Pointer to a position right after the backslash; must contain an octal digit. After the
+ *     call, the pointer is moved to the position after the escape sequence.
+ * @param errorMessage A string which the error message, if any, will be appended to, if not null.
+ * @return Whether the given position represents an octal escape sequence.
+ */
+static std::string decodeOctalEscapeSequence(const char** pp, std::string* errorMessage)
+{
+    // According to the C and C++ standards, up to three octal digits are recognized.
+    // If the resulting number is greater than 255, it has been decided to consider it an error
+    // rather than a Unicode character (the standard leaves it to the implementation).
+
+    int code = 0;
+    int digitCount = 0;
+    while (**pp >= '0' && **pp <= '7')
+    {
+        ++digitCount;
+        if (digitCount > 3)
+            break;
+        code = (code << 3) + (**pp - '0');
+        ++(*pp);
+    }
+
+    if (code > 255 && errorMessage)
+    {
+        ADD_ERROR_MESSAGE(nx::kit::utils::format(
+            "Octal escape sequence does not fit in one byte: %d.", code));
+    }
+
+    return std::string(1, (char) code);
+}
+
+/**
+ * @return -1 if the char is not a hex digit.
+ */
+static int toHexDigit(char c)
+{
+    if (c >= '0' && c <= '9')
+        return c - '0';
+    if (c >= 'a' && c <= 'f')
+        return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F')
+        return c - 'A' + 10;
+    return -1;
+}
+
+/**
+ * Parses the "\x" escape sequence.
+ * @param p Pointer to a position right after "\x". After the call, the pointer is moved to the
+ *     position after the escape sequence.
+ * @param errorMessage A string which the error message, if any, will be appended to, if not null.
+ */
+static std::string decodeHexEscapeSequence(const char** pp, std::string* errorMessage)
+{
+    // According to the C and C++ standards, as much hex digits are part of the sequence as can be
+    // found, and if the resulting number does not fit into char, it's an implementation decision -
+    // we have decided to produce an error rather than a Unicode character.
+
+    uint8_t code = 0;
+    bool fitsInByte = true;
+
+    int hexDigit = toHexDigit(**pp);
+
+    if (hexDigit < 0)
+    {
+        ADD_ERROR_MESSAGE("Missing hex digits in the hex escape sequence.");
+        return "";
+    }
+
+    while (hexDigit >= 0)
+    {
+        if (code > 0x0F)
+            fitsInByte = false;
+        code = (code << 4) + (uint8_t) hexDigit;
+        ++(*pp);
+        hexDigit = toHexDigit(**pp);
+    }
+
+    if (!fitsInByte)
+        ADD_ERROR_MESSAGE("Hex escape sequence does not fit in one byte.");
+
+    return std::string(1, (char) code);
+}
+
+/**
+ * Parses the "\x" escape sequence.
+ * @param p Pointer to a position right after "\". After the call, the pointer is moved to the
+ *     position after the escape sequence.
+ * @param errorMessage A string which the error message, if any, will be appended to, if not null.
+ */
+static std::string decodeEscapeSequence(const char** pp, std::string* errorMessage)
+{
+    const char escaped = **pp;
+
+    if (escaped >= '0' && escaped <= '7')
+        return decodeOctalEscapeSequence(pp, errorMessage);
+    ++(*pp); //< Now points after the first char after the backslash.
+
+    switch (escaped)
+    {
+        case '\'': case '\"': case '\?': case '\\': return std::string(1, escaped);
+        case 'a': return "\a";
+        case 'b': return "\b";
+        case 'f': return "\f";
+        case 'n': return "\n";
+        case 'r': return "\r";
+        case 't': return "\t";
+        case 'v': return "\v";
+        case 'x': return decodeHexEscapeSequence(pp, errorMessage);
+        // NOTE: Unicode escape sequences `\u` and `\U` are not supported because they
+        // would require generating UTF-8 sequences.
+        case '\0':
+            --(*pp); //< Move back to point to '\0'.
+            ADD_ERROR_MESSAGE("Missing escaped character after the backslash.");
+            return "\\";
+        default:
+            ADD_ERROR_MESSAGE(
+                "Invalid escaped character " + toString(escaped) + " after the backslash.");
+            return std::string(1, escaped);
+    }
+}
+
+NX_KIT_API std::string decodeEscapedString(const std::string& s, std::string* errorMessage)
+{
+    if (errorMessage)
+        *errorMessage = "";
+
+    std::string result;
+    result.reserve(s.size()); //< Most likely, the result will have almost the size of the source.
+
+    const char* p = s.c_str();
+    if (*p != '"')
+    {
+        ADD_ERROR_MESSAGE("The string does not start with a quote.");
+        return s; //< Return the input string as-is.
+    }
+    ++p;
+
+    for (;;)
+    {
+        const char c = *p;
+        switch (c)
+        {
+            case '\0':
+                ADD_ERROR_MESSAGE("Missing the closing quote.");
+                return result;
+            case '"': //< Support C-style concatenation of consecutive enquoted strings.
+                ++p;
+                while (*p > 0 && *p <= 32) //< Skip all whitespace between the quotes.
+                    ++p;
+                if (*p == '\0')
+                    return result;
+                if (*p != '"')
+                {
+                    ADD_ERROR_MESSAGE("Unexpected trailing after the closing quote.");
+                    result += p; //< Append the unexpected trailing to the result as is.
+                    return result;
+                }
+                ++p; //< Skip the quote.
+                break;
+            case '\\':
+            {
+                ++p;
+                result += decodeEscapeSequence(&p, errorMessage);
+                break;
+            }
+            default:
+                if (/*allow non-ASCII characters*/ (unsigned char) c < 128 && !isAsciiPrintable(c))
+                    ADD_ERROR_MESSAGE("Found non-printable ASCII character " + toString(c) + ".");
+                result += c;
+                ++p;
+                break;
+        }
+    }
+}
+
 template<int sizeOfChar> struct HexEscapeFmt {};
 template<> struct HexEscapeFmt<1> { static constexpr const char* value = "\\x%02X"; };
 template<> struct HexEscapeFmt<2> { static constexpr const char* value = "\\u%04X"; };
@@ -282,6 +475,17 @@ bool fromString(const std::string& s, float* value)
     return true;
 }
 
+bool fromString(const std::string& s, bool* value)
+{
+    if (s == "true" || s == "True" || s == "TRUE" || s == "1")
+        *value = true;
+    else if (s == "false" || s == "False" || s == "FALSE" || s == "0")
+        *value = false;
+    else
+        return false;
+    return true;
+}
+
 void stringReplaceAllChars(std::string* s, char sample, char replacement)
 {
     std::transform(s->cbegin(), s->cend(), s->begin(),
@@ -294,6 +498,16 @@ void stringInsertAfterEach(std::string* s, char sample, const char* const insert
     {
         if ((*s)[i] == sample)
             s->insert((size_t) (i + 1), insertion);
+    }
+}
+
+void stringReplaceAll(std::string* s, const std::string& sample, const std::string& replacement)
+{
+    size_t pos = 0;
+    while ((pos = s->find(sample, pos)) != std::string::npos)
+    {
+         s->replace(pos, sample.size(), replacement);
+         pos += replacement.size();
     }
 }
 
