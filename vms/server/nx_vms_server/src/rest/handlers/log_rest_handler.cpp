@@ -31,39 +31,47 @@ int QnLogRestHandler::executeGet(
         }
     }
 
-    std::optional<QString> logFilePath;
+    std::shared_ptr<nx::utils::log::AbstractLogger> logger;
     {
         const auto name = params.value(lit("name"));
         if (!name.isEmpty())
         {
-            if (auto logger = QnLogs::getLogger(name))
-                logFilePath = logger->filePath();
+            logger = QnLogs::getLogger(name);
         }
         else
         {
-            const auto id = params.value(lit("id")).toInt();
-            if (auto logger = QnLogs::getLogger(id))
-                logFilePath = logger->filePath();
+            bool isOk = false;
+            const auto id = params.value(lit("id")).toInt(&isOk);
+            if (isOk)
+                logger = QnLogs::getLogger(id);
         }
     }
 
-    if (!logFilePath)
+    if (!logger)
     {
         result = "Bad log file id or name";
+        return nx::network::http::StatusCode::badRequest;
+    }
+
+    const auto logPath = logger->filePath();
+    if (!logPath)
+    {
+        result = "Selected logger is not assigned to a file";
         return nx::network::http::StatusCode::badRequest;
     }
 
     if (linesToRead == 0ll)
         linesToRead = 1000000ll;
 
-    QFile f(*logFilePath);
+    QFile f(*logPath);
     if (!f.open(QFile::ReadOnly))
     {
-        result = NX_FMT("No log entries in %1 (%2)", *logFilePath, f.errorString()).toUtf8();
+        result = NX_FMT("No log entries in '%1' are applicable to the desired log level '%2' (%3)",
+            logPath, logger->maxLevel(), f.errorString()).toUtf8();
         return nx::network::http::StatusCode::notFound;
     }
-    qint64 fileSize = f.size();
 
+    qint64 fileSize = f.size();
     qint64 currentOffset = qMax(0ll, fileSize - kReadBlockSize);
     qint64 readedLines = 0;
     qint64 totalSize = 0;
