@@ -5,384 +5,384 @@
     <name>DownloadInterruptReason</name>
     <message>
       <source>Unknown reason or not interrupted</source>
-      <translation type="unfinished">Unknown reason or not interrupted</translation>
+      <translation>Motivo sconosciuto o non interrotto</translation>
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation type="unfinished">General file operation failure</translation>
+      <translation>Errore generale di funzionamento del file</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
-      <translation type="unfinished">The file cannot be written locally, due to access restrictions</translation>
+      <translation>Il file non può essere scritto localmente, a causa delle restrizioni di accesso</translation>
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
-      <translation type="unfinished">Insufficient space on the target drive</translation>
+      <translation>Spazio insufficiente sull'unità di destinazione</translation>
     </message>
     <message>
       <source>The directory or file name is too long</source>
-      <translation type="unfinished">The directory or file name is too long</translation>
+      <translation>La directory o il nome del file è troppo lungo</translation>
     </message>
     <message>
       <source>The file size exceeds the file system limitation</source>
-      <translation type="unfinished">The file size exceeds the file system limitation</translation>
+      <translation>La dimensione del file supera la limitazione del file system</translation>
     </message>
     <message>
       <source>The file is infected with a virus</source>
-      <translation type="unfinished">The file is infected with a virus</translation>
+      <translation>Il file è stato infettato da un virus</translation>
     </message>
     <message>
       <source>Temporary problem (for example file in use, or too many open files)</source>
-      <translation type="unfinished">Temporary problem (for example file in use, or too many open files)</translation>
+      <translation>Problema temporaneo (ad esempio file in uso, o troppi file aperti)</translation>
     </message>
     <message>
       <source>The file was blocked due to local policy</source>
-      <translation type="unfinished">The file was blocked due to local policy</translation>
+      <translation>Il file è stato bloccato a causa di criteri locali</translation>
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>
-      <translation type="unfinished">Checking the safety of the download failed due to unexpected reasons</translation>
+      <translation>Controllo della sicurezza del download non riuscito a causa di motivi imprevisti</translation>
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
-      <translation type="unfinished">File seek past the end of a file (resuming previously interrupted download)</translation>
+      <translation>Ricerca file oltre la fine di un file (ripresa del download precedentemente interrotto)</translation>
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
-      <translation type="unfinished">The partial file did not match the expected hash</translation>
+      <translation>Il file parziale non corrisponde all'hash atteso</translation>
     </message>
     <message>
       <source>General network failure</source>
-      <translation type="unfinished">General network failure</translation>
+      <translation>Errore generale di rete</translation>
     </message>
     <message>
       <source>The network operation has timed out</source>
-      <translation type="unfinished">The network operation has timed out</translation>
+      <translation>L'operazione di rete è scaduta</translation>
     </message>
     <message>
       <source>The network connection has been terminated</source>
-      <translation type="unfinished">The network connection has been terminated</translation>
+      <translation>La connessione di rete è stata terminata</translation>
     </message>
     <message>
       <source>The server has gone down</source>
-      <translation type="unfinished">The server has gone down</translation>
+      <translation>Il server si è fermato</translation>
     </message>
     <message>
       <source>The network request was invalid (for example, the URL or scheme is invalid)</source>
-      <translation type="unfinished">The network request was invalid (for example, the URL or scheme is invalid)</translation>
+      <translation>La richiesta di rete non è valida (ad esempio, l'URL o lo schema non è valido)</translation>
     </message>
     <message>
       <source>General server failure</source>
-      <translation type="unfinished">General server failure</translation>
+      <translation>Errore generale del server</translation>
     </message>
     <message>
       <source>The server does not have the requested data</source>
-      <translation type="unfinished">The server does not have the requested data</translation>
+      <translation>Il server non ha i dati richiesti</translation>
     </message>
     <message>
       <source>The server did not authorize access to the resource</source>
-      <translation type="unfinished">The server did not authorize access to the resource</translation>
+      <translation>Il server non ha autorizzato l'accesso alla risorsa</translation>
     </message>
     <message>
       <source>A problem with the server certificate occurred</source>
-      <translation type="unfinished">A problem with the server certificate occurred</translation>
+      <translation>Si è verificato un problema con il certificato del server</translation>
     </message>
     <message>
       <source>Access forbidden by the server</source>
-      <translation type="unfinished">Access forbidden by the server</translation>
+      <translation>Accesso vietato dal server</translation>
     </message>
     <message>
       <source>Unexpected server response</source>
-      <translation type="unfinished">Unexpected server response</translation>
+      <translation>Risposta server inattesa</translation>
     </message>
     <message>
       <source>Download canceled by the user</source>
-      <translation type="unfinished">Download canceled by the user</translation>
+      <translation>Download annullato dall'utente</translation>
     </message>
   </context>
   <context>
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>Ricarica e bypassa la cache</translation>
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>Apri il link in questa finestra</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Attiva/Disattiva Riproduzione/Pausa</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Attiva / disattiva l'audio</translation>
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>Chiudi pagina</translation>
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Non selezionato</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>&amp;Grassetto</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>&amp;Corsivo</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>&amp;Sottolineatura</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>&amp;Barrato</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>Allineare a sinistra</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>Centrato</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>Allineamento a destra</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>Allinea e giustificato</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp; Rientro</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp; Rientro negativo</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>Inserisci &amp; Elenco ordinato</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>Inserisci &amp; Elenco non ordinato</translation>
     </message>
   </context>
   <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>Ricarica e ignora cache</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Attiva / disattiva riproduzione</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Attiva / disattiva l'audio</translation>
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>Chiudi pagina</translation>
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Deseleziona</translation>
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>Apri il link in questa finestra</translation>
     </message>
     <message>
       <source>Open link in new background tab</source>
-      <translation type="unfinished">Open link in new background tab</translation>
+      <translation>Apri il collegamento in una nuova scheda di sfondo</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>&amp;Grassetto</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>&amp;Corsivo</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>&amp;Sottolineatura</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>&amp; Barrato</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>Allineare a sinistra</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>Centrato</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>Allineamento a destra</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>Allinea e giustificato</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp; Rientro</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp; Rientro negativo</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>Inserisci &amp; Elenco ordinato</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>Inserisci &amp; Elenco non ordinato</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Sei sicuro di voler lasciare questa pagina? Le modifiche apportate potrebbero non essere salvate.</translation>
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation type="unfinished">&amp;Back</translation>
+      <translation>&amp;Indietro</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation type="unfinished">&amp;Forward</translation>
+      <translation>&amp;Avanti</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
-      <translation type="unfinished">&amp;Reload</translation>
+      <translation>&amp;Ricaricare</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Seleziona la cartella da caricare</translation>
     </message>
   </context>
   <context>
     <name>RenderViewContextMenuQt</name>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Indietro</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>Avanti</translation>
     </message>
     <message>
       <source>Reload</source>
-      <translation type="unfinished">Reload</translation>
+      <translation>Ricaricare</translation>
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Taglia</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copia</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Incolla</translation>
     </message>
     <message>
       <source>Undo</source>
-      <translation type="unfinished">Undo</translation>
+      <translation>Annulla</translation>
     </message>
     <message>
       <source>Redo</source>
-      <translation type="unfinished">Redo</translation>
+      <translation>Ripeti</translation>
     </message>
     <message>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>Seleziona tutto</translation>
     </message>
     <message>
       <source>Paste and match style</source>
-      <translation type="unfinished">Paste and match style</translation>
+      <translation>Incolla e abbina lo stile</translation>
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation type="unfinished">Open link in new window</translation>
+      <translation>Apri il collegamento in una nuova finestra</translation>
     </message>
     <message>
       <source>Open link in new tab</source>
-      <translation type="unfinished">Open link in new tab</translation>
+      <translation>Apri il link in una nuova scheda</translation>
     </message>
     <message>
       <source>Copy link address</source>
-      <translation type="unfinished">Copy link address</translation>
+      <translation>Copia indirizzo collegamento</translation>
     </message>
     <message>
       <source>Save link</source>
-      <translation type="unfinished">Save link</translation>
+      <translation>Salva il collegamento</translation>
     </message>
     <message>
       <source>Copy image</source>
-      <translation type="unfinished">Copy image</translation>
+      <translation>Copia immagine</translation>
     </message>
     <message>
       <source>Copy image address</source>
-      <translation type="unfinished">Copy image address</translation>
+      <translation>Copia l'indirizzo dell'immagine</translation>
     </message>
     <message>
       <source>Save image</source>
-      <translation type="unfinished">Save image</translation>
+      <translation>Salva immagine</translation>
     </message>
     <message>
       <source>Copy media address</source>
-      <translation type="unfinished">Copy media address</translation>
+      <translation>Copia l'indirizzo multimediale</translation>
     </message>
     <message>
       <source>Show controls</source>
-      <translation type="unfinished">Show controls</translation>
+      <translation>Mostra i controlli</translation>
     </message>
     <message>
       <source>Loop</source>
-      <translation type="unfinished">Loop</translation>
+      <translation>Ciclo continuo</translation>
     </message>
     <message>
       <source>Save media</source>
-      <translation type="unfinished">Save media</translation>
+      <translation>Salva media</translation>
     </message>
     <message>
       <source>Inspect</source>
-      <translation type="unfinished">Inspect</translation>
+      <translation>Esamina</translation>
     </message>
     <message>
       <source>Exit full screen</source>
-      <translation type="unfinished">Exit full screen</translation>
+      <translation>Esci dallo schermo intero</translation>
     </message>
     <message>
       <source>Save page</source>
-      <translation type="unfinished">Save page</translation>
+      <translation>Salva pagina</translation>
     </message>
     <message>
       <source>View page source</source>
-      <translation type="unfinished">View page source</translation>
+      <translation>Visualizza sorgente pagina</translation>
     </message>
   </context>
   <context>
@@ -397,30 +397,30 @@
     </message>
     <message>
       <source>Javascript Alert - %1</source>
-      <translation type="unfinished">Javascript Alert - %1</translation>
+      <translation>Avviso JavaScript - %1</translation>
     </message>
     <message>
       <source>Javascript Confirm - %1</source>
-      <translation type="unfinished">Javascript Confirm - %1</translation>
+      <translation>Javascript Conferma - %1</translation>
     </message>
     <message>
       <source>Javascript Prompt - %1</source>
-      <translation type="unfinished">Javascript Prompt - %1</translation>
+      <translation>Prompt Javascript - %1</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page?</source>
-      <translation type="unfinished">Are you sure you want to leave this page?</translation>
+      <translation>Sei sicuro di voler lasciare questa pagina?</translation>
     </message>
     <message>
       <source>Changes that you made may not be saved.</source>
-      <translation type="unfinished">Changes that you made may not be saved.</translation>
+      <translation>Le modifiche apportate potrebbero non essere salvate.</translation>
     </message>
   </context>
   <context>
     <name>WebContentsAdapter</name>
     <message>
       <source>HTTP-POST data can only be sent over HTTP(S) protocol</source>
-      <translation type="unfinished">HTTP-POST data can only be sent over HTTP(S) protocol</translation>
+      <translation>I dati HTTP-POST possono essere inviati solo tramite protocollo HTTP (S)</translation>
     </message>
   </context>
 </TS>

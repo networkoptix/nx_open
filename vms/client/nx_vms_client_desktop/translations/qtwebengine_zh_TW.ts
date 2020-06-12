@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
-      <translation type="unfinished">File seek past the end of a file (resuming previously interrupted download)</translation>
+      <translation>檔案搜索超過末尾（恢復先前中斷的下載）</translation>
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
@@ -354,7 +354,7 @@
     </message>
     <message>
       <source>Copy media address</source>
-      <translation type="unfinished">Copy media address</translation>
+      <translation>複製媒體位址</translation>
     </message>
     <message>
       <source>Show controls</source>

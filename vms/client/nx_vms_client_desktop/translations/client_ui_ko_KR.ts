@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>CPU 사용량을 줄이기 위해 프레임 속도 제한</translation>
     </message>
   </context>
   <context>
@@ -503,7 +503,7 @@
     <message>
       <location/>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>이벤트 소스 서버 사용</translation>
     </message>
   </context>
   <context>
@@ -952,7 +952,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>연결중...</translation>
     </message>
   </context>
   <context>
@@ -2081,7 +2081,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
       <source>Sign in</source>
-      <translation type="unfinished">Sign in</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <location/>
@@ -2165,7 +2165,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
       <source>Attention! Power limit exceeded</source>
-      <translation type="unfinished">Attention! Power limit exceeded</translation>
+      <translation>주의! 전력 한도 초과</translation>
     </message>
   </context>
   <context>
@@ -2280,42 +2280,42 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>에게</translation>
     </message>
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>언어 설정</translation>
     </message>
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>사용자 지정 알림 내용</translation>
     </message>
     <message>
       <location/>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>머리글</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>비워두면 기본 알림 제목이 사용됩니다.</translation>
     </message>
     <message>
       <location/>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>본문</translation>
     </message>
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>이 필드가 비어 있으면 기본 텍스트가 사용됩니다</translation>
     </message>
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>본문에 소스 장치 이름 추가</translation>
     </message>
   </context>
   <context>
@@ -3226,7 +3226,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation type="unfinished">Custom language for mobile notifications</translation>
+      <translation>모바일 알림을위한 사용자 지정 언어</translation>
     </message>
   </context>
   <context>
@@ -3393,12 +3393,12 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>시간</translation>
     </message>
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>업로드 된 파일에서 시간대 무시</translation>
     </message>
   </context>
   <context>

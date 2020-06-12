@@ -5,43 +5,43 @@
     <name>DownloadInterruptReason</name>
     <message>
       <source>Unknown reason or not interrupted</source>
-      <translation type="unfinished">Unknown reason or not interrupted</translation>
+      <translation>알 수없는 이유 또는 중단되지 않음</translation>
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation type="unfinished">General file operation failure</translation>
+      <translation>일반적인 파일 작업 실패</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
-      <translation type="unfinished">The file cannot be written locally, due to access restrictions</translation>
+      <translation>액세스 제한으로 인해 파일을 로컬로 쓸 수 없습니다</translation>
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
-      <translation type="unfinished">Insufficient space on the target drive</translation>
+      <translation>대상 드라이브의 공간이 부족합니다</translation>
     </message>
     <message>
       <source>The directory or file name is too long</source>
-      <translation type="unfinished">The directory or file name is too long</translation>
+      <translation>디렉토리 또는 파일 이름이 너무 깁니다</translation>
     </message>
     <message>
       <source>The file size exceeds the file system limitation</source>
-      <translation type="unfinished">The file size exceeds the file system limitation</translation>
+      <translation>파일 크기가 파일 시스템 제한을 초과합니다</translation>
     </message>
     <message>
       <source>The file is infected with a virus</source>
-      <translation type="unfinished">The file is infected with a virus</translation>
+      <translation>파일이 바이러스에 감염되었습니다</translation>
     </message>
     <message>
       <source>Temporary problem (for example file in use, or too many open files)</source>
-      <translation type="unfinished">Temporary problem (for example file in use, or too many open files)</translation>
+      <translation>일시적인 문제 (예로 사용중인 파일 또는 너무 많은 열린 파일)</translation>
     </message>
     <message>
       <source>The file was blocked due to local policy</source>
-      <translation type="unfinished">The file was blocked due to local policy</translation>
+      <translation>로컬 정책으로 인해 파일이 차단되었습니다</translation>
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>
-      <translation type="unfinished">Checking the safety of the download failed due to unexpected reasons</translation>
+      <translation>예상치 못한 이유로 인해 다운로드 안전성 확인에 실패했습니다</translation>
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
@@ -49,70 +49,70 @@
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
-      <translation type="unfinished">The partial file did not match the expected hash</translation>
+      <translation>부분 파일이 예상 된 해시와 일치하지 않습니다</translation>
     </message>
     <message>
       <source>General network failure</source>
-      <translation type="unfinished">General network failure</translation>
+      <translation>일반적인 네트워크 오류</translation>
     </message>
     <message>
       <source>The network operation has timed out</source>
-      <translation type="unfinished">The network operation has timed out</translation>
+      <translation>네트워크 작동 시간이 초과되었습니다</translation>
     </message>
     <message>
       <source>The network connection has been terminated</source>
-      <translation type="unfinished">The network connection has been terminated</translation>
+      <translation>네트워크 연결이 종료되었습니다</translation>
     </message>
     <message>
       <source>The server has gone down</source>
-      <translation type="unfinished">The server has gone down</translation>
+      <translation>서버가 다운되었습니다</translation>
     </message>
     <message>
       <source>The network request was invalid (for example, the URL or scheme is invalid)</source>
-      <translation type="unfinished">The network request was invalid (for example, the URL or scheme is invalid)</translation>
+      <translation>네트워크 요청이 유효하지 않습니다 (예로, URL 또는 scheme이 유효하지 않음)</translation>
     </message>
     <message>
       <source>General server failure</source>
-      <translation type="unfinished">General server failure</translation>
+      <translation>일반적인 서버 오류</translation>
     </message>
     <message>
       <source>The server does not have the requested data</source>
-      <translation type="unfinished">The server does not have the requested data</translation>
+      <translation>서버에 요청 한 데이터가 없습니다</translation>
     </message>
     <message>
       <source>The server did not authorize access to the resource</source>
-      <translation type="unfinished">The server did not authorize access to the resource</translation>
+      <translation>서버가 리소스에 접근을 허용하지 않았습니다</translation>
     </message>
     <message>
       <source>A problem with the server certificate occurred</source>
-      <translation type="unfinished">A problem with the server certificate occurred</translation>
+      <translation>서버 인증서에 문제가 발생했습니다</translation>
     </message>
     <message>
       <source>Access forbidden by the server</source>
-      <translation type="unfinished">Access forbidden by the server</translation>
+      <translation>서버에 의해 금지 된 접근</translation>
     </message>
     <message>
       <source>Unexpected server response</source>
-      <translation type="unfinished">Unexpected server response</translation>
+      <translation>예기치 않은 서버 응답</translation>
     </message>
     <message>
       <source>Download canceled by the user</source>
-      <translation type="unfinished">Download canceled by the user</translation>
+      <translation>사용자가 다운로드를 취소했습니다</translation>
     </message>
   </context>
   <context>
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>정지</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>캐시 무시하고 새로고침</translation>
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>새 창에서 링크 열기</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>페이지 닫기</translation>
     </message>
     <message>
       <source>Unselect</source>
@@ -132,43 +132,43 @@
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>&amp;굵게</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>&amp;이탤릭체</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>&amp;밑줄</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>&amp;취소선</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>&amp;왼쪽 정렬</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>&amp;가운데 정렬</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>&amp;오른쪽 정렬</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>&amp;양쪽 맞춤</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp;들여쓰기</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp;내어쓰기</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
@@ -207,51 +207,51 @@
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>새 창에서 링크 열기</translation>
     </message>
     <message>
       <source>Open link in new background tab</source>
-      <translation type="unfinished">Open link in new background tab</translation>
+      <translation>새로운 백그라운드 탭에서 열기</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>&amp;굵게</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>&amp;이탤릭체</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>&amp;밑줄</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>&amp;취소선</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>&amp;왼쪽 정렬</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>&amp;가운데 정렬</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>&amp;오른쪽 정렬</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>&amp;양쪽 맞춤</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp;들여쓰기</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp;내어쓰기</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>이 페이지를 떠나시겠습니까? 변경 한 내용이 저장되지 않을 수 있습니다.</translation>
     </message>
     <message>
       <source>&amp;Back</source>
@@ -286,103 +286,103 @@
     <name>RenderViewContextMenuQt</name>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>뒤로</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>앞으로</translation>
     </message>
     <message>
       <source>Reload</source>
-      <translation type="unfinished">Reload</translation>
+      <translation>재실행</translation>
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>잘라내기</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>복사</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>붙여넣기</translation>
     </message>
     <message>
       <source>Undo</source>
-      <translation type="unfinished">Undo</translation>
+      <translation>되돌리기</translation>
     </message>
     <message>
       <source>Redo</source>
-      <translation type="unfinished">Redo</translation>
+      <translation>다시 하기</translation>
     </message>
     <message>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>전체 선택</translation>
     </message>
     <message>
       <source>Paste and match style</source>
-      <translation type="unfinished">Paste and match style</translation>
+      <translation>붙여넣어 스타일 맞춤</translation>
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation type="unfinished">Open link in new window</translation>
+      <translation>새 창에서 링크 열기</translation>
     </message>
     <message>
       <source>Open link in new tab</source>
-      <translation type="unfinished">Open link in new tab</translation>
+      <translation>새 탭에서 링크 열기</translation>
     </message>
     <message>
       <source>Copy link address</source>
-      <translation type="unfinished">Copy link address</translation>
+      <translation>링크 주소 복사</translation>
     </message>
     <message>
       <source>Save link</source>
-      <translation type="unfinished">Save link</translation>
+      <translation>링크 저장</translation>
     </message>
     <message>
       <source>Copy image</source>
-      <translation type="unfinished">Copy image</translation>
+      <translation>이미지 복사</translation>
     </message>
     <message>
       <source>Copy image address</source>
-      <translation type="unfinished">Copy image address</translation>
+      <translation>이메일 주소 복사</translation>
     </message>
     <message>
       <source>Save image</source>
-      <translation type="unfinished">Save image</translation>
+      <translation>이미지 저장</translation>
     </message>
     <message>
       <source>Copy media address</source>
-      <translation type="unfinished">Copy media address</translation>
+      <translation>미디어 주소 복사</translation>
     </message>
     <message>
       <source>Show controls</source>
-      <translation type="unfinished">Show controls</translation>
+      <translation>제어도구 보이기</translation>
     </message>
     <message>
       <source>Loop</source>
-      <translation type="unfinished">Loop</translation>
+      <translation>반복</translation>
     </message>
     <message>
       <source>Save media</source>
-      <translation type="unfinished">Save media</translation>
+      <translation>미디어 저장</translation>
     </message>
     <message>
       <source>Inspect</source>
-      <translation type="unfinished">Inspect</translation>
+      <translation>검사</translation>
     </message>
     <message>
       <source>Exit full screen</source>
-      <translation type="unfinished">Exit full screen</translation>
+      <translation>전체 화면 종료</translation>
     </message>
     <message>
       <source>Save page</source>
-      <translation type="unfinished">Save page</translation>
+      <translation>페이지 저장</translation>
     </message>
     <message>
       <source>View page source</source>
-      <translation type="unfinished">View page source</translation>
+      <translation>페이지 소스 보기</translation>
     </message>
   </context>
   <context>
@@ -397,30 +397,30 @@
     </message>
     <message>
       <source>Javascript Alert - %1</source>
-      <translation type="unfinished">Javascript Alert - %1</translation>
+      <translation>자바 스크립트 경고-%1</translation>
     </message>
     <message>
       <source>Javascript Confirm - %1</source>
-      <translation type="unfinished">Javascript Confirm - %1</translation>
+      <translation>자바 스크립트 확인-%1</translation>
     </message>
     <message>
       <source>Javascript Prompt - %1</source>
-      <translation type="unfinished">Javascript Prompt - %1</translation>
+      <translation>자바 스크립트 프롬프트-%1</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page?</source>
-      <translation type="unfinished">Are you sure you want to leave this page?</translation>
+      <translation>이 페이지를 나가 시겠습니까?</translation>
     </message>
     <message>
       <source>Changes that you made may not be saved.</source>
-      <translation type="unfinished">Changes that you made may not be saved.</translation>
+      <translation>변경 한 내용이 저장되지 않을 수 있습니다.</translation>
     </message>
   </context>
   <context>
     <name>WebContentsAdapter</name>
     <message>
       <source>HTTP-POST data can only be sent over HTTP(S) protocol</source>
-      <translation type="unfinished">HTTP-POST data can only be sent over HTTP(S) protocol</translation>
+      <translation>HTTP-POST 데이터는 HTTP (S) 프로토콜을 통해서만 보낼 수 있습니다</translation>
     </message>
   </context>
 </TS>

@@ -1317,11 +1317,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>Om het probleem te melden, neem contact op met uw lokale verdeler:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>Neem contact op met uw lokale verdeler om de licentiesleutel handmatig te activeren:</translation>
     </message>
   </context>
   <context>
@@ -1405,15 +1405,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Om een geldige licentiesleutel te krijgen, neem contact op met uw regionale / licentieondersteuning:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Als het probleem zich blijft voordoen, neem dan contact op met uw lokale verdeler:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Neem contact op met uw regionale / licentieondersteuning:</translation>
     </message>
   </context>
   <context>
@@ -1639,7 +1639,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Wilt u deze website verlaten? Wijzigingen die u hebt aangebracht worden mogelijk niet opgeslagen.</translation>
     </message>
   </context>
   <context>
@@ -1674,7 +1674,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Regionale / licentieondersteuning</translation>
     </message>
   </context>
   <context>
@@ -4000,12 +4000,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Stuur de meegeleverde licentiesleutel en hardware-ID naar uw lokale leverancier om een activatiebestand te verkrijgen.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Stuur de geleverde licentiesleutel en hardware-ID naar uw lokale leverancier (%1) om een activatiebestand te verkrijgen.</translation>
     </message>
   </context>
   <context>
@@ -8927,7 +8927,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Kan updates niet controleren op internet</translation>
     </message>
   </context>
   <context>
@@ -9144,12 +9144,12 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Onbekend apparaat</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Onbekend apparaat %1</translation>
     </message>
   </context>
   <context>
@@ -9177,16 +9177,16 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>%n symbolen over</numerusform>
+        <numerusform>%n symbolen over</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>%n symbolen over</numerusform>
+        <numerusform>%n symbolen over</numerusform>
       </translation>
     </message>
   </context>
@@ -9254,7 +9254,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Beweging + Lo-Res</translation>
     </message>
   </context>
   <context>

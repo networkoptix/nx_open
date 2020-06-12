@@ -1263,7 +1263,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>잘못된 데이터가 수신되었습니다.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1393,7 +1393,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>%1에 연락하십시오.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
@@ -2233,11 +2233,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>소스 서버</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>소스 카메라</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
@@ -2259,7 +2259,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>소스 서버와 %1</translation>
     </message>
   </context>
   <context>
@@ -5727,7 +5727,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>서버를 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>now</source>
@@ -8348,7 +8348,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>업로드 할 폴더를 선택하십시오</translation>
     </message>
   </context>
   <context>
@@ -8991,7 +8991,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>전력 공급중</translation>
     </message>
     <message>
       <source>Unexpected</source>
@@ -9024,12 +9024,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>알 수 없는 기기</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>알 수없는 기기 %1</translation>
     </message>
   </context>
   <context>
@@ -9057,14 +9057,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>%n기호 초과</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>%n 기호 남음</numerusform>
       </translation>
     </message>
   </context>
@@ -9131,7 +9131,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>움직임 + 저해상도</translation>
     </message>
   </context>
   <context>
