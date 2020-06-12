@@ -86,10 +86,13 @@ String Engine::makeCertificateAndKey(
             return ex && X509_add_ext(x509.get(), ex.get(), -1);
         };
 
+    static const auto kKeyUsage =
+        "digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment,keyAgreement,keyCertSign";
+
     if (!name
         || !nameSet("C", country) || !nameSet("O", company) || !nameSet("CN", common)
         || !X509_set_issuer_name(x509.get(), name)
-        || !addExt(NID_key_usage, "digitalSignature")
+        || !addExt(NID_key_usage, kKeyUsage)
         || !addExt(NID_ext_key_usage, "serverAuth")
         || !X509_sign(x509.get(), pkey.get(), EVP_sha256()))
     {

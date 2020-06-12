@@ -116,7 +116,7 @@ void QnFfmpegVideoTranscoder::close()
 
 void QnFfmpegVideoTranscoder::setOutputResolutionLimit(const QSize& resolution)
 {
-    m_targetResolution = resolution;
+    m_outputResolutionLimit = resolution;
 }
 
 void QnFfmpegVideoTranscoder::setSourceResolution(const QSize& resolution)
@@ -142,25 +142,24 @@ bool QnFfmpegVideoTranscoder::prepareFilters(
         return false;
     }
 
-    if (m_targetResolution.isValid())
+    if (m_outputResolutionLimit.isValid())
     {
-        m_targetResolution = nx::transcoding::normalizeResolution(
-            m_targetResolution, m_sourceResolution);
-        if (m_targetResolution.isEmpty())
+        m_outputResolutionLimit = nx::transcoding::normalizeResolution(
+            m_outputResolutionLimit, m_sourceResolution);
+        if (m_outputResolutionLimit.isEmpty())
         {
             NX_WARNING(this, "Invalid resolution specified source %1, target %2",
-                m_sourceResolution, m_targetResolution);
+                m_sourceResolution, m_outputResolutionLimit);
             return false;
         }
-    }
-    else
-    {
-        m_targetResolution = m_sourceResolution;
-    }
+        m_outputResolutionLimit = nx::transcoding::alignSize(m_outputResolutionLimit, 16, 4);
 
-    m_targetResolution = nx::transcoding::adjustCodecRestrictions(dstCodec, m_targetResolution);
-    m_filters.prepare(m_sourceResolution, m_targetResolution);
-    m_targetResolution = m_filters.apply(m_targetResolution);
+        // Use user resolution if it less as a source before filters.
+        if (m_outputResolutionLimit.height() < m_sourceResolution.height())
+            m_sourceResolution = m_outputResolutionLimit;
+    }
+    m_filters.prepare(m_sourceResolution, nx::transcoding::maxResolution(dstCodec));
+    m_targetResolution = m_filters.apply(m_sourceResolution);
     NX_DEBUG(this, "Prepare transcoding, output resolution: %1, source resolution: %2",
         m_targetResolution, m_sourceResolution);
     return true;
@@ -294,9 +293,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
 
     // Second stream must be upscaled to the first stream resolution before the filters apply.
-    if (decodedFrame->width != m_sourceResolution.width()
-        || decodedFrame->height != m_sourceResolution.height()
-        || decodedFrame->format != AV_PIX_FMT_YUV420P)
+    if (decodedFrame->size() != m_sourceResolution || decodedFrame->format != AV_PIX_FMT_YUV420P)
     {
         decodedFrame = CLVideoDecoderOutputPtr(
             decodedFrame->scaled(m_sourceResolution, AV_PIX_FMT_YUV420P));

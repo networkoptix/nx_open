@@ -49,6 +49,7 @@ protected:
 
 private:
     void setPortDefaultStates();
+    QString getDefaultOutputIdUnsafe() const;
 
     Qn::IOPortType portType(const QString& portId) const;
 

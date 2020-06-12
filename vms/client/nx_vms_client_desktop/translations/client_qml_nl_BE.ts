@@ -94,11 +94,11 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation>Verversen</translation>
+      <translation>Vernieuwen</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation>Verversen...</translation>
+      <translation>Vernieuwen...</translation>
     </message>
   </context>
   <context>

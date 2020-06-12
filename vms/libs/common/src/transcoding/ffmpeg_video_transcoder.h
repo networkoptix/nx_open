@@ -57,6 +57,7 @@ private:
     DecoderConfig m_config;
     QVector<QnFfmpegVideoDecoder*> m_videoDecoders;
     nx::core::transcoding::FilterChain m_filters;
+    QSize m_outputResolutionLimit;
     QSize m_targetResolution;
     QSize m_sourceResolution;
     CLVideoDecoderOutputPtr m_decodedVideoFrame;

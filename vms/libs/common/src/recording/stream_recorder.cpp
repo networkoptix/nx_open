@@ -952,10 +952,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     m_videoTranscoder->setParams(
                         QnTranscoder::suggestMediaStreamParams(m_dstVideoCodec, m_transcodeQuality));
 
-                    m_videoTranscoder->open(videoData);
                     m_videoTranscoder->setFilterChain(*m_transcodeFilters);
                     m_videoTranscoder->setQuality(Qn::StreamQuality::highest);
-                    m_videoTranscoder->open(videoData); // reopen again for new size
+                    m_videoTranscoder->open(videoData);
                     QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());
                 }
                 else if (mediaData->context && mediaData->context->getWidth() > 0

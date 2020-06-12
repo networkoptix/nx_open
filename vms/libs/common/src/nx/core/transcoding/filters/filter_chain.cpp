@@ -301,6 +301,9 @@ void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,
         prevResizeRatio = resizeRatio;
 
         // Adjusting scale filter.
+        // Due to size ceiled, some more iteration can be needed.
+        // TODO refact this -> use floor instead ceil or select new one by subtracting of alignment
+        // value?
         const auto resizeToSize = QnCodecTranscoder::roundSize(
             QSize(srcFrameResolution.width() * resizeRatio,
                 srcFrameResolution.height() * resizeRatio));

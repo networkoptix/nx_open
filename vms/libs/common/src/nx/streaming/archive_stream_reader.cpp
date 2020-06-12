@@ -232,6 +232,8 @@ bool QnArchiveStreamReader::init()
         {
             jumpTime = requiredJumpTime;
             m_requiredJumpTime = AV_NOPTS_VALUE;
+            m_skipFramesToTime = m_tmpSkipFramesToTime;
+            m_tmpSkipFramesToTime = 0;
         }
         else if (speed < 0)
         {

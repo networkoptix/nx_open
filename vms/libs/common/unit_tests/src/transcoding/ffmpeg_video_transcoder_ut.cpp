@@ -92,6 +92,18 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(2048, 1152));
     }
     {
+        // Rotation
+        QSize maxResourceResolution = QSize(4096, 2160);
+        auto provider = getProvider(maxResourceResolution);
+        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H264);
+        nx::core::transcoding::Settings settings;
+        settings.rotation = 90;
+        nx::core::transcoding::FilterChain filters(settings, QnMediaDewarpingParams(), nullptr);
+        transcoder.setFilterChain(filters);
+        ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
+        ASSERT_EQ(transcoder.getOutputResolution(), QSize(2160, 4096));
+    }
+    {
         // Use rotation and codec resctriction after rotation.
         QSize maxResourceResolution = QSize(3820, 2160);
         auto provider = getProvider(maxResourceResolution);
@@ -104,11 +116,29 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(652, 1152));
     }
     {
-        // Resolution rounding. //TODO fix filter chain to correctly round resoluiton up(#639x480)
+        // Resolution rounding down.
         QSize maxResourceResolution = QSize(1280, 960);
         auto provider = getProvider(maxResourceResolution);
         QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H263P);
         transcoder.setOutputResolutionLimit(QSize(641, 480));
+        ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
+        ASSERT_EQ(transcoder.getOutputResolution(), QSize(640, 480));
+    }
+    {
+        // Resolution rounding up and down.
+        QSize maxResourceResolution = QSize(1280, 960);
+        auto provider = getProvider(maxResourceResolution);
+        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H263P);
+        transcoder.setOutputResolutionLimit(QSize(639, 482));
+        ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
+        ASSERT_EQ(transcoder.getOutputResolution(), QSize(640, 480));
+    }
+    {
+        // Target should not upscale
+        QSize maxResourceResolution = QSize(640, 480);
+        auto provider = getProvider(maxResourceResolution);
+        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H264);
+        transcoder.setOutputResolutionLimit(QSize(1280, 960));
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(640, 480));
     }

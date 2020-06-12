@@ -55,7 +55,7 @@ public:
     virtual void setEngineInfo(const IEngineInfo* engineInfo) = 0;
 
     /**
-     * Called after `setEngineInfo()` and before all other methods. Server provides the set of
+     * Called after setEngineInfo() and before all other methods. Server provides the set of
      * settings stored in its database, combined with the values received from the plugin via
      * pluginSideSettings() (if any), for this Engine instance.
      *

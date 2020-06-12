@@ -44,10 +44,6 @@ TEST(TranscodingUtils, normalizeResolution)
     ASSERT_EQ(nx::transcoding::normalizeResolution(QSize(0, 1080), QSize(6400, 4800)), QSize(1440, 1080));
     ASSERT_EQ(nx::transcoding::normalizeResolution(QSize(0, 480), QSize(6400, 4800)), QSize(640, 480));
 
-    // Align of incorrect target.
-    ASSERT_EQ(nx::transcoding::normalizeResolution(QSize(0, 483), QSize(6400, 4800)), QSize(640, 484));
-    ASSERT_EQ(nx::transcoding::normalizeResolution(QSize(0, 479), QSize(6400, 4800)), QSize(640, 480));
-
     // Target resolution specified.
     ASSERT_EQ(nx::transcoding::normalizeResolution(QSize(1920, 1080), QSize(640, 480)), QSize(1920, 1080));
 }
