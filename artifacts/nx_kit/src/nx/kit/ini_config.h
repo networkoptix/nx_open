@@ -38,7 +38,7 @@ namespace kit {
  *
  *     struct Ini: nx::kit::IniConfig
  *     {
- *         // NOTE: Omit "reload();" if load-on-start is not needed.
+ *         // NOTE: Omit `reload();` if load-on-start is not needed.
  *         Ini(): IniConfig("my_module.ini") { reload(); }
  *
  *         NX_INI_FLAG(0, myFlag, "Here 0 stands for 'false' as the default value.");
