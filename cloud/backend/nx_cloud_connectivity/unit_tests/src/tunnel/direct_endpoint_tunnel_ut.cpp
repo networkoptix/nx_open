@@ -154,7 +154,7 @@ TEST_F(TcpTunnel, cancellation)
     }
 }
 
-TEST_F(TcpTunnel, target_peer_has_disappeared)
+TEST_F(TcpTunnel, DISABLED_tunnel_is_broken_when_target_peer_disappears)
 {
     givenOpenedTcpTunnelToRemotePeer();
     whenRemotePeerHasDisappeared();

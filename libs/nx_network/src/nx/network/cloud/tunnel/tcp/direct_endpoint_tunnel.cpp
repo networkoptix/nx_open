@@ -16,12 +16,12 @@ DirectTcpEndpointTunnel::DirectTcpEndpointTunnel(
     aio::AbstractAioThread* aioThread,
     std::string connectSessionId,
     SocketAddress targetEndpoint,
-    std::unique_ptr<AbstractStreamSocket> connection)
+    std::unique_ptr<AbstractStreamSocket> /*connection*/)
     :
     AbstractOutgoingTunnelConnection(aioThread),
     m_connectSessionId(std::move(connectSessionId)),
-    m_targetEndpoint(std::move(targetEndpoint)),
-    m_controlConnection(std::move(connection))
+    m_targetEndpoint(std::move(targetEndpoint))/*,
+    m_controlConnection(std::move(connection))*/
 {
     if (aioThread && m_controlConnection)
         m_controlConnection->bindToAioThread(aioThread);
