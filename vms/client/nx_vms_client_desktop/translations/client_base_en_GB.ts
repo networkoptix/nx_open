@@ -9128,7 +9128,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>hours</translation>
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>

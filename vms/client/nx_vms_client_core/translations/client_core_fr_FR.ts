@@ -14,7 +14,7 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">B</translation>
+      <translation>O</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
@@ -79,7 +79,7 @@
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation type="unfinished">PB</translation>
+      <translation>Po</translation>
     </message>
   </context>
   <context>
