@@ -952,7 +952,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>接続中...</translation>
     </message>
   </context>
   <context>
@@ -2280,7 +2280,7 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>宛先</translation>
     </message>
     <message>
       <location/>
@@ -3393,7 +3393,7 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <location/>

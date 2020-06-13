@@ -2280,7 +2280,7 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Kime</translation>
     </message>
     <message>
       <location/>

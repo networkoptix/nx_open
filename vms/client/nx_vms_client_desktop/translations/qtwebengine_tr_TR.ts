@@ -104,7 +104,7 @@
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Durdur</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Kapat</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -183,7 +183,7 @@
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Durdur</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Kapat</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -263,15 +263,15 @@
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Bu sayfadan ayrılmak istediğinizden emin misiniz? Yaptığınız değişiklikler kaydedilmeyebilir.</translation>
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation type="unfinished">&amp;Back</translation>
+      <translation>&amp;Geri</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation type="unfinished">&amp;Forward</translation>
+      <translation>&amp;İleri</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
@@ -279,18 +279,18 @@
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Yüklemek için dosyalar seçin</translation>
     </message>
   </context>
   <context>
     <name>RenderViewContextMenuQt</name>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Geri</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>İleri</translation>
     </message>
     <message>
       <source>Reload</source>
@@ -298,27 +298,27 @@
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Kes</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopyala</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Yapıştır</translation>
     </message>
     <message>
       <source>Undo</source>
-      <translation type="unfinished">Undo</translation>
+      <translation>Geri Al</translation>
     </message>
     <message>
       <source>Redo</source>
-      <translation type="unfinished">Redo</translation>
+      <translation>Tekrarla</translation>
     </message>
     <message>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>Tümünü Seç</translation>
     </message>
     <message>
       <source>Paste and match style</source>

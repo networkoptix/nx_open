@@ -1266,7 +1266,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Recebidos dados inválidos.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -3816,23 +3816,23 @@ a %1</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Genérico</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Funções</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Ecrâs Permitidos</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Sessões de controlo Permitidas</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Streams de gravação Permitidos</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -6940,7 +6940,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Ativar Licença...</translation>
     </message>
   </context>
   <context>
@@ -8932,7 +8932,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Não foi possível verificar atualizações na Internet</translation>
     </message>
   </context>
   <context>
@@ -9259,7 +9259,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Movimento + Lo-Res</translation>
     </message>
   </context>
   <context>

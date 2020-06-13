@@ -1625,7 +1625,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>이 페이지를 떠나시겠습니까? 변경 한 내용이 저장되지 않을 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -3780,11 +3780,11 @@ to %1</source>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>제어 세션 허용</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>저장 스트림 허용</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -8139,7 +8139,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>비디오 트랜스코딩이 필요합니다.</translation>
     </message>
   </context>
   <context>
@@ -8808,7 +8808,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>인터넷에서 업데이트를 확인할 수 없습니다</translation>
     </message>
   </context>
   <context>

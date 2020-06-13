@@ -127,9 +127,9 @@
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Maksimalt antall poeng er nådd (%n poeng).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>Maksimalt antall poeng er nådd (%n poeng).</numerusform>
       </translation>
     </message>
     <message>
@@ -211,8 +211,8 @@
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Maksimalt antall poeng er nådd (%n poeng).</numerusform>
         <numerusform>Maksimalt antall poeng er nådd (%n poeng).</numerusform>
       </translation>
     </message>

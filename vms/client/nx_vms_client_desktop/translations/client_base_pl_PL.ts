@@ -1269,7 +1269,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Otrzymano nieprawidłowe dane.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -7757,11 +7757,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n wartości</numerusform>
+        <numerusform>+%n wartości</numerusform>
+        <numerusform>+%n wartości</numerusform>
+        <numerusform>+%n wartości</numerusform>
       </translation>
     </message>
   </context>
@@ -9164,7 +9164,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Nie można sprawdzić aktualizacji w Internecie</translation>
     </message>
   </context>
   <context>
@@ -9499,7 +9499,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Ruch + Niska rozdzielczość</translation>
     </message>
   </context>
   <context>

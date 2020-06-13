@@ -2280,7 +2280,7 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Do</translation>
     </message>
     <message>
       <location/>
@@ -3393,7 +3393,7 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Czas</translation>
     </message>
     <message>
       <location/>

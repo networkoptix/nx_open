@@ -82,7 +82,7 @@
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Vendor</translation>
     </message>
     <message>
       <source>Camera stream</source>
@@ -94,7 +94,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Refresh</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -221,7 +221,7 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Add</translation>
     </message>
   </context>
   <context>

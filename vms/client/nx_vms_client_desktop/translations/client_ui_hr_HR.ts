@@ -3393,7 +3393,7 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Time</translation>
     </message>
     <message>
       <location/>

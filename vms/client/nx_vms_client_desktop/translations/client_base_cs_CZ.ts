@@ -1269,7 +1269,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Byla přijata neplatná data.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -3899,23 +3899,23 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Obecný</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Vlastnosti</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Povolené obrazovky</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Povolené řídicí relace</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Povolené archivace streamů</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -7081,7 +7081,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivovat licenci...</translation>
     </message>
   </context>
   <context>
@@ -9167,7 +9167,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Nelze ověřit aktualizace na Internetu</translation>
     </message>
   </context>
   <context>
@@ -9502,7 +9502,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Pohyb + nízké rozlišení</translation>
     </message>
   </context>
   <context>

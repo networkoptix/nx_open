@@ -12,7 +12,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>Clique para ler mais</translation>
     </message>
   </context>
   <context>
@@ -82,7 +82,7 @@
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Fabricante:</translation>
     </message>
     <message>
       <source>Camera stream</source>
@@ -94,7 +94,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Actualizar</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -221,7 +221,7 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Adicionar</translation>
     </message>
   </context>
   <context>

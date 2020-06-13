@@ -8254,7 +8254,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Video kod dönüştürmesi gerekiyor.</translation>
     </message>
   </context>
   <context>
@@ -8926,7 +8926,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>İnternet üzerinden güncelleştirme alınamadı</translation>
     </message>
   </context>
   <context>
@@ -9253,7 +9253,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Hareket + Düşük Kalite</translation>
     </message>
   </context>
   <context>

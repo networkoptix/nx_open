@@ -1781,15 +1781,15 @@
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>デバイスが切断されました</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>カメラの接続が切断されました</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>I / Oモジュールが切断されました</translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>

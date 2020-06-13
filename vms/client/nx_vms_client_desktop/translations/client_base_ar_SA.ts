@@ -3988,23 +3988,23 @@ to %1</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Generic</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Features</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Screens Allowed</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Control Sessions Allowed</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Archive Streams Allowed</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -7228,7 +7228,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Activate License...</translation>
     </message>
   </context>
   <context>
@@ -9408,7 +9408,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Unable to check updates on the Internet</translation>
     </message>
   </context>
   <context>
@@ -9751,7 +9751,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Motion + Lo-Res</translation>
     </message>
   </context>
   <context>
