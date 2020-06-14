@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Ogranicz liczbę klatek na sekundę, aby oszczędzać użycie CPU</translation>
     </message>
   </context>
   <context>
@@ -2285,37 +2285,37 @@
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>Ustawienia językowe</translation>
     </message>
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>Niestandardowa treść powiadomienia</translation>
     </message>
     <message>
       <location/>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Nagłówek</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>Jeśli pozostanie pusty, zostanie użyty domyślny tytuł powiadomienia</translation>
     </message>
     <message>
       <location/>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Treść</translation>
     </message>
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>Jeśli to pole pozostanie puste, zostanie użyty tekst domyślny</translation>
     </message>
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Dodaj w treści nazwę urządzenia źródłowego</translation>
     </message>
   </context>
   <context>
@@ -3226,7 +3226,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation type="unfinished">Custom language for mobile notifications</translation>
+      <translation>Niestandardowy język powiadomień mobilnych</translation>
     </message>
   </context>
   <context>
@@ -3398,7 +3398,7 @@
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>Ignoruj strefę czasową w przesłanych plikach</translation>
     </message>
   </context>
   <context>

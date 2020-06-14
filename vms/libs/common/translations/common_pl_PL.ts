@@ -1093,7 +1093,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Wymagane transkodowanie wideo.</translation>
     </message>
   </context>
   <context>
@@ -1953,7 +1953,7 @@
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation>Wyślij mobilne powiadomienie</translation>
+      <translation>Wyślij powiadomienie mobilne</translation>
     </message>
     <message>
       <source>Consumption</source>
@@ -1973,11 +1973,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation type="unfinished">RTP error in primary stream (%1)</translation>
+      <translation>Błąd RTP w pierwszym strumieniu (%1)</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
+      <translation>Błąd RTP w drugim strumieniu (%1)</translation>
     </message>
   </context>
   <context>

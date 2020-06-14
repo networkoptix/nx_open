@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>Wyświetl na wideo</translation>
     </message>
   </context>
   <context>
@@ -71,7 +71,7 @@
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>BRAK PODGLĄDU</translation>
     </message>
   </context>
   <context>
@@ -98,14 +98,14 @@
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>Odświeżanie...</translation>
     </message>
   </context>
   <context>
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Wartość domyślna:</translation>
     </message>
   </context>
   <context>
@@ -125,20 +125,20 @@
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Kliknij ostatni punkt, aby zakończyć rysowanie linii.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punkt).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punkty).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Kliknij strzałkę, aby przełączyć na jej pożądany kierunek.</translation>
     </message>
   </context>
   <context>
@@ -175,7 +175,7 @@
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Ograniczenia rozmiarów</translation>
     </message>
   </context>
   <context>
@@ -213,15 +213,15 @@
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Kliknij ostatni punkt, aby zakończyć rysowanie wielokąta.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punkt).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punkty).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
+        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
       </translation>
     </message>
   </context>
@@ -236,19 +236,19 @@
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>MAX</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>MIN</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Ustaw minimalny i maksymalny rozmiar obiektu.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>Minimalny rozmiar obiektu nie może być większy niż maksymalny.</translation>
     </message>
   </context>
   <context>
