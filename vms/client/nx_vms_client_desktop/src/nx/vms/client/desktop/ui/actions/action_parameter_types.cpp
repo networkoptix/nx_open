@@ -407,6 +407,43 @@ QnResourceWidgetList ParameterTypes::widgets(const QList<QGraphicsItem*>& items)
     return result;
 }
 
+QString ParameterTypes::toString(const QVariant& items)
+{
+    using namespace ParameterMetaType;
+
+    QStringList result;
+
+    switch (qn_actionMetaTypeMap()->value(items.userType()))
+    {
+        case ResourcePtr:
+            return lm("QnResourcePtr %1").arg(items.value<QnResourcePtr>());
+        case UserResourcePtr:
+            return lm("QnUserResourcePtr %1").arg(items.value<QnUserResourcePtr>());
+        case LayoutResourcePtr:
+            return lm("QnLayoutResourcePtr %1").arg(items.value<QnLayoutResourcePtr>());
+        case MediaServerResourcePtr:
+            return lm("QnMediaServerResourcePtr %1").arg(items.value<QnMediaServerResourcePtr>());
+        case ResourceList:
+            return lm("QnResourceList %1").container(items.value<QnResourceList>());
+        case ResourceWidget:
+            return lm("QnResourceWidget %1").arg(items.value<QnResourceWidget*>());
+        case ResourceWidgetList:
+            return lm("QnResourceWidgetList %1").container(items.value<QnResourceWidgetList>());
+        case LayoutItemIndexList:
+            return lm("QnLayoutItemIndexList %1").container(items.value<QnLayoutItemIndexList>());
+        case VideoWallItemIndexList:
+            return lm("QnVideoWallItemIndexList %1").container(items.value<QnVideoWallItemIndexList>());
+        case VideoWallMatrixIndexList:
+            return lm("QnVideoWallMatrixIndexList %1").container(items.value<QnVideoWallMatrixIndexList>());
+        case WorkbenchLayout:
+            return lm("QnWorkbenchLayout* %1").arg(items.value<QnWorkbenchLayout*>());
+        case WorkbenchLayoutList:
+            return lm("QnWorkbenchLayoutList %1").container(items.value<QnWorkbenchLayoutList>());
+        default:
+            return lm("Invalid type");
+    }
+}
+
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop

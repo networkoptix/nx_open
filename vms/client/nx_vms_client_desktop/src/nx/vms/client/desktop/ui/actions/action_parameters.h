@@ -168,6 +168,8 @@ public:
     ActionScopes scope() const;
     void setScope(ActionScopes scope);
 
+    QString toString() const;
+
 private:
     void init(const QVariant& items, const ArgumentHash& arguments);
 

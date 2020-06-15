@@ -997,3 +997,8 @@ bool QnWorkbenchLayout::isLayoutTourReview() const
 {
     return data().contains(Qn::LayoutTourUuidRole);
 }
+
+QString QnWorkbenchLayout::toString() const
+{
+    return lm("QnWorkbenchLayout %1 (%2)").args(m_name, resource());
+}

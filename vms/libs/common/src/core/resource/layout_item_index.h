@@ -13,37 +13,19 @@
 class QnLayoutItemIndex
 {
 public:
-    QnLayoutItemIndex() {}
+    QnLayoutItemIndex();
+    QnLayoutItemIndex(const QnLayoutResourcePtr& layout, const QnUuid& uuid);
 
-    QnLayoutItemIndex(const QnLayoutResourcePtr& layout, const QnUuid& uuid):
-        m_layout(layout), m_uuid(uuid)
-    {
-    }
+    const QnLayoutResourcePtr& layout() const;
+    void setLayout(const QnLayoutResourcePtr& layout);
 
-    const QnLayoutResourcePtr& layout() const
-    {
-        return m_layout;
-    }
+    const QnUuid& uuid() const;
+    void setUuid(const QnUuid& uuid);
 
-    void setLayout(const QnLayoutResourcePtr& layout)
-    {
-        m_layout = layout;
-    }
+    bool isNull() const;
 
-    const QnUuid& uuid() const
-    {
-        return m_uuid;
-    }
-
-    void setUuid(const QnUuid& uuid)
-    {
-        m_uuid = uuid;
-    }
-
-    bool isNull() const
-    {
-        return m_layout.isNull() || m_uuid.isNull();
-    }
+    /** Debug string representation. */
+    QString toString() const;
 
 private:
     QnLayoutResourcePtr m_layout;

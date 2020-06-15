@@ -50,6 +50,9 @@ public:
     static QnLayoutItemIndexList layoutItems(const QnResourceWidgetList& widgets);
     static QnLayoutItemIndexList layoutItems(QnResourceWidget* widget);
     static QnResourceWidgetList widgets(const QList<QGraphicsItem*>& items);
+
+    /** Debug string representation of the action parameter items. */
+    static QString toString(const QVariant& items);
 };
 
 } // namespace action

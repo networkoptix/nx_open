@@ -1942,6 +1942,11 @@ void initialize(Manager* manager, Action* root)
     // -- Developer mode actions end. Please do not add real actions afterwards.
 }
 
+QString toString(IDType id)
+{
+    return QnLexical::serialized(id);
+}
+
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop

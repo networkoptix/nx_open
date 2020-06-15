@@ -343,6 +343,9 @@ public:
      */
     bool isLayoutTourReview() const;
 
+    /** Debug string representation. */
+    QString toString() const;
+
 signals:
     void flagsChanged();
 

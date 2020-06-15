@@ -2,29 +2,48 @@
 
 #include <core/resource/videowall_resource.h>
 
-QnVideoWallItemIndex::QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QnUuid &uuid) :
-    m_videowall(videowall), m_uuid(uuid)
+QnVideoWallItemIndex::QnVideoWallItemIndex()
 {
 }
 
-QnVideoWallResourcePtr QnVideoWallItemIndex::videowall() const {
+QnVideoWallItemIndex::QnVideoWallItemIndex(
+    const QnVideoWallResourcePtr& videowall,
+    const QnUuid& uuid)
+    :
+    m_videowall(videowall),
+    m_uuid(uuid)
+{
+}
+
+QnVideoWallResourcePtr QnVideoWallItemIndex::videowall() const
+{
     return m_videowall;
 }
 
-QnUuid QnVideoWallItemIndex::uuid() const {
+QnUuid QnVideoWallItemIndex::uuid() const
+{
     return m_uuid;
 }
 
-bool QnVideoWallItemIndex::isNull() const {
+bool QnVideoWallItemIndex::isNull() const
+{
     return m_videowall.isNull() && m_uuid.isNull();
 }
 
-bool QnVideoWallItemIndex::isValid() const {
+bool QnVideoWallItemIndex::isValid() const
+{
     return !isNull() && m_videowall->items()->hasItem(m_uuid);
 }
 
-QnVideoWallItem QnVideoWallItemIndex::item() const {
+QnVideoWallItem QnVideoWallItemIndex::item() const
+{
     if (!isValid())
         return QnVideoWallItem();
+
     return m_videowall->items()->getItem(m_uuid);
+}
+
+QString QnVideoWallItemIndex::toString() const
+{
+    return lm("QnVideoWallItemIndex %1 - %2").args(m_videowall, m_uuid);
 }
