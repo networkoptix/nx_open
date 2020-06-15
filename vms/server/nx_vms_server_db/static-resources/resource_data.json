@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.288",
+    "version": "1.0.1.289",
     "data": [
         {
             "keys": [
@@ -4097,7 +4097,9 @@
         {
             "_comment": "Calibration for camera fw ver. 2.2.45-PTZ_H_6314_Release",
             "keys": [
-                "DW|DWC-MPTZ36X"
+                "DW|DWC-MPTZ36*",
+                "DW|DWC-MPTZ336*",
+                "DW|DWC-MPTZ830*"
             ],
             "ptzMapper": {
                 "fromCamera": {
