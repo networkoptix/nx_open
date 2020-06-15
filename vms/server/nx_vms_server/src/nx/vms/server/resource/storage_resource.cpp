@@ -64,7 +64,7 @@ QIODevice* StorageResource::wrapIoDevice(std::unique_ptr<QIODevice> ioDevice)
         });
 
     result->setOnSeekCallback(
-        [this, statistics](qint64 result, std::chrono::milliseconds elapsed)
+        [this, statistics](qint64 /*result*/, std::chrono::milliseconds elapsed)
         {
             if (auto strongRef = statistics.lock())
             {
@@ -88,9 +88,9 @@ qint64 StorageResource::nxOccupedSpace() const
 bool StorageResource::removeFile(const QString& url)
 {
     m_metrics->deletions++;
-    nx::utils::ElapsedTimer timer(true);
+    nx::utils::ElapsedTimer timer(/*started*/true);
     const bool result = doRemoveFile(url);
-    if (timer.elapsed() > serverModule()->settings().ioOperationTimeTresholdSec())
+    if (timer.hasExpired(serverModule()->settings().ioOperationTimeTresholdSec()))
         m_metrics->timedOutDeletions++;
     return result;
 }
@@ -99,9 +99,9 @@ QnAbstractStorageResource::FileInfoList StorageResource::getFileList(
     const QString& url)
 {
     m_metrics->directoryLists++;
-    nx::utils::ElapsedTimer timer(true);
+    nx::utils::ElapsedTimer timer(/*started*/true);
     const auto result = doGetFileList(url);
-    if (timer.elapsed() > serverModule()->settings().ioOperationTimeTresholdSec())
+    if (timer.hasExpired(serverModule()->settings().ioOperationTimeTresholdSec()))
         m_metrics->timedOutDirectoryLists++;
     return result;
 }

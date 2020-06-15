@@ -20,7 +20,7 @@ bool IoDeviceWrapper::open(QIODevice::OpenMode mode)
 
 bool IoDeviceWrapper::seek(qint64 pos)
 {
-    nx::utils::ElapsedTimer timer(true);
+    nx::utils::ElapsedTimer timer(/*started*/true);
     const auto result = m_source->seek(pos);
     if (m_seekCallback)
         m_seekCallback(result, timer.elapsed());
@@ -29,7 +29,7 @@ bool IoDeviceWrapper::seek(qint64 pos)
 
 qint64 IoDeviceWrapper::writeData(const char * data, qint64 len)
 {
-    nx::utils::ElapsedTimer timer(true);
+    nx::utils::ElapsedTimer timer(/*started*/true);
     const auto result = m_source->write(data, len);
     if (m_writeCallback)
         m_writeCallback(result, timer.elapsed());
@@ -38,7 +38,7 @@ qint64 IoDeviceWrapper::writeData(const char * data, qint64 len)
 
 qint64 IoDeviceWrapper::readData(char * data, qint64 len)
 {
-    nx::utils::ElapsedTimer timer(true);
+    nx::utils::ElapsedTimer timer(/*started*/true);
     const auto result = m_source->read(data, len);
     if (m_readCallback)
         m_readCallback(result, timer.elapsed());
