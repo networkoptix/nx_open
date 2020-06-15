@@ -143,14 +143,17 @@ void TextMatcher::matchAttributeValues(
 }
 
 bool TextMatcher::wordMatchAnyOfAttributes(
-    const QString& word,
+    const QString& token,
     const nx::common::metadata::Attributes& attributes)
 {
     return std::any_of(
         attributes.cbegin(), attributes.cend(),
-        [&word](const nx::common::metadata::Attribute& attribute)
+        [&token](const nx::common::metadata::Attribute& attribute)
         {
-            return attribute.value.startsWith(word, Qt::CaseInsensitive);
+            const auto words = attribute.value.splitRef(L' ', QString::SkipEmptyParts);
+            return std::any_of(
+                words.cbegin(), words.cend(),
+                [&token](auto& word) { return word.startsWith(token, Qt::CaseInsensitive); });
         });
 }
 

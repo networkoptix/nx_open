@@ -76,7 +76,7 @@ protected:
         sample.boundingBox = QRectF(0, 0, 1, 1);
         sample.typeId = "nx.Car";
         sample.attributes.emplace_back("Type", "Truck");
-        sample.attributes.emplace_back("Brand", "Mazda");
+        sample.attributes.emplace_back("Brand", "Mazda car");
         return sample;
     }
 
@@ -93,7 +93,7 @@ protected:
         sample.objectPosition.add(samplePosition.boundingBox);
         sample.objectTypeId = "nx.Car";
         sample.attributes.emplace_back("Type", "Truck");
-        sample.attributes.emplace_back("Brand", "Mazda");
+        sample.attributes.emplace_back("Brand", "Mazda car");
         return sample;
     }
 };
@@ -137,6 +137,7 @@ static std::vector<FreeTextAndExpectedResult> kUserInputAndExpectedResults{
     {"Truck Mazda", true}, //< AND logic is applied. Positive case.
     {"Brand Mazda", false}, //< AND logic is applied. Negative case.
     {"Mazda Truck", true}, //< Order is not important.
+    {"Mazda car", true},
     {"MA TR", true}, //< Each word is prefixed.
     {"type:tru", true},
     {"Type:Truck", true},
