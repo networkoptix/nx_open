@@ -154,6 +154,15 @@ void fillReErrors(CameraSettings::Vca::UnattendedObjectDetection* unattendedObje
     }
 }
 
+void fillReErrors(CameraSettings::Vca::FaceDetection* faceDetection,
+    const QString& message)
+{
+    for (auto& rule: faceDetection->rules)
+    {
+        fillReErrors(&rule.region, message);
+    }
+}
+
 void fillReErrors(CameraSettings::Vca* vca, const QString& message)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -166,6 +175,8 @@ void fillReErrors(CameraSettings::Vca* vca, const QString& message)
         fillReErrors(&*lineCrossingDetection, message);
     if (auto& unattendedObjectDetection = vca->unattendedObjectDetection)
         fillReErrors(&*unattendedObjectDetection, message);
+    if (auto& faceDetection = vca->faceDetection)
+        fillReErrors(&*faceDetection, message);
 }
 
 
@@ -731,6 +742,41 @@ void parseReFromCamera(CameraSettings::Vca::UnattendedObjectDetection* unattende
     }
 }
 
+void parseReFromCamera(CameraSettings::Vca::FaceDetection* faceDetection,
+    const QJsonValue& parameters)
+{
+    try
+    {
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(parameters, "FaceDetection").isUndefined())
+            get(&jsonRules, parameters, "FaceDetection");
+
+        const auto ruleNames = jsonRules.keys();
+
+        auto& rules = faceDetection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+            if (i >= (std::size_t) ruleNames.size())
+            {
+                rule.region.emplaceNothing();
+                continue;
+            }
+
+            const auto& ruleName = ruleNames[i];
+            const auto& jsonRule = jsonRules[ruleName];
+
+            const QString path = NX_FMT("$.FaceDetection.%1", ruleName);
+
+            parseReFromCamera(&rule.region, jsonRule, ruleName, path);
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(faceDetection, exception.what());
+    }
+}
+
 void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -745,6 +791,8 @@ void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
         parseReFromCamera(&*missingObjectDetection, parameters);
     if (auto& unattendedObjectDetection = vca->unattendedObjectDetection)
         parseReFromCamera(&*unattendedObjectDetection, parameters);
+    if (auto& faceDetection = vca->faceDetection)
+        parseReFromCamera(&*faceDetection, parameters);
 }
 
 
@@ -1527,6 +1575,42 @@ void serializeReToCamera(QJsonValue* parameters,
     }
 }
 
+void serializeReToCamera(QJsonValue* parameters,
+    CameraSettings::Vca::FaceDetection* faceDetection)
+{
+    try
+    {
+        auto& rules = faceDetection->rules;
+
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(*parameters, "FaceDetection").isUndefined())
+        {
+            jsonRules = get<QJsonObject>(*parameters, "FaceDetection");
+            removeRulesExcept(&jsonRules, getNames(rules));
+        }
+
+        for (auto& rule: rules)
+        {
+            if (auto name = getName(rule))
+            {
+                QJsonValue jsonRule = jsonRules[*name];
+                if (jsonRule.isUndefined() || jsonRule.isNull())
+                    jsonRule = QJsonObject{};
+
+                serializeReToCamera(&jsonRule, &rule.region);
+
+                jsonRules[*name] = jsonRule;
+            }
+        }
+
+        set(parameters, "FaceDetection", jsonRules);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(faceDetection, exception.what());
+    }
+}
+
 void serializeReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -1541,6 +1625,8 @@ void serializeReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
         serializeReToCamera(parameters, &*missingObjectDetection);
     if (auto& unattendedObjectDetection = vca->unattendedObjectDetection)
         serializeReToCamera(parameters, &*unattendedObjectDetection);
+    if (auto& faceDetection = vca->faceDetection)
+        serializeReToCamera(parameters, &*faceDetection);
 }
 
 
@@ -1676,6 +1762,17 @@ void enumerateEntries(Settings* settings, Visitor visit)
                 repeatedVisit(i, &rule.maxSize);
                 repeatedVisit(i, &rule.delay);
                 repeatedVisit(i, &rule.requiresHumanInvolvement);
+            }
+        }
+
+        if (auto& faceDetection = vca->faceDetection)
+        {
+            auto& rules = faceDetection->rules;
+            for (std::size_t i = 0; i < rules.size(); ++i)
+            {
+                auto& rule = rules[i];
+
+                repeatedVisit(i, &rule.region);
             }
         }
     }
@@ -2538,6 +2635,37 @@ QJsonValue getVcaUnattendedObjectDetectionModelForManifest()
     };
 }
 
+QJsonValue getVcaFaceDetectionModelForManifest()
+{
+    using Rule = CameraSettings::Vca::FaceDetection::Rule;
+    return QJsonObject{
+        {"name", "Vca.FaceDetection"},
+        {"type", "Section"},
+        {"caption", "Face Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) kMaxDetectionRuleCount},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{Rule::Region::name}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", Rule::Region::name},
+                            {"type", "PolygonFigure"},
+                            {"caption", "Region"},
+                            {"minPoints", 3},
+                            {"maxPoints", 20}, // Defined in user guide.
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
 QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
 {
     using Vca = CameraSettings::Vca;
@@ -2578,6 +2706,8 @@ QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
                     sections.push_back(getVcaMissingObjectDetectionModelForManifest());
                 if (features.unattendedObjectDetection)
                     sections.push_back(getVcaUnattendedObjectDetectionModelForManifest());
+                if (features.faceDetection)
+                    sections.push_back(getVcaFaceDetectionModelForManifest());
 
                 return sections;
             }(),
@@ -2622,6 +2752,11 @@ CameraSettings::CameraSettings(const CameraFeatures& features)
         {
             auto& unattendedObjectDetection = vca->unattendedObjectDetection.emplace();
             unattendedObjectDetection.rules.resize(kMaxDetectionRuleCount);
+        }
+        if (features.vca->faceDetection)
+        {
+            auto& faceDetection = vca->faceDetection.emplace();
+            faceDetection.rules.resize(kMaxDetectionRuleCount);
         }
     }
 }

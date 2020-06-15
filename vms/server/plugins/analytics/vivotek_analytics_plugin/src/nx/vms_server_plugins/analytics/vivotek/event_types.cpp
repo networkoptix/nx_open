@@ -70,6 +70,17 @@ const std::vector<EventType> kEventTypes =
                     return features.vca && features.vca->unattendedObjectDetection;
                 };
         }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "FaceDetection";
+            type.id = "nx.vivotek.Face";
+            type.prettyName = "Face";
+            type.isProlonged = true;
+            type.isSupported =
+                [](auto& features) {
+                    return features.vca && features.vca->faceDetection;
+                };
+        }
         types.shrink_to_fit();
         return types;
     }();
