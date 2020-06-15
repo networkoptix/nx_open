@@ -311,6 +311,9 @@ def main():
     parser.add_argument("-o", "--overrides", nargs="*", default=[],
         help="Package version or location overrides (e.g. -o ffmpeg=4.0)")
     parser.add_argument("-O", "--options", nargs="*", default=[], help="Additional options")
+    parser.add_argument("-f", "--force", action="store_true",
+        help="Force running rsync even if package timestamp is up to date")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
     args = parser.parse_args()
 
@@ -331,7 +334,10 @@ def main():
     )
     syncher.versions.update(version_overrides)
     syncher.locations = location_overrides
-    syncher.use_local = args.use_local
+    syncher.rdep.force = args.force
+    syncher.rdep.verbose = args.verbose
+    syncher.rdep.fast_check = not args.force
+    syncher.use_local = args.use_local and not args.force
 
     sync_dependencies(syncher, platform, arch, box, args.release_version, options)
 

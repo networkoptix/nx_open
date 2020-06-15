@@ -1,5 +1,7 @@
 set(rdepOverrides "" CACHE STRING "RDep package version or location overrides")
-mark_as_advanced(rdepOverrides)
+option(rdepForce "Force RDep to run rsync even if package timestamp is up to date" OFF)
+option(rdepVerbose "Enable RDep verbose output" OFF)
+mark_as_advanced(rdepOverrides rdepForce rdepVerbose)
 
 # TODO: Remove this variable because its goal can be achieved with rdepOverrides.
 set(customWebAdminPackageDirectory "" CACHE STRING
@@ -23,6 +25,14 @@ set(sync_command ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
 
 if(NOT rdepSync)
     list(APPEND sync_command "--use-local")
+endif()
+
+if(rdepForce)
+    list(APPEND sync_command "--force")
+endif()
+
+if(rdepVerbose)
+    list(APPEND sync_command "--verbose")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
