@@ -275,7 +275,7 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
     if (!selectedObjectType.isEmpty())
         m_filter.objectTypeId.push_back(selectedObjectType);
 
-    m_filter.loadUserInputToFreeText(m_analyticsSearchWidget->textFilter());
+    m_filter.freeText = m_analyticsSearchWidget->textFilter();
 
     for (const auto widget: display()->widgets())
     {

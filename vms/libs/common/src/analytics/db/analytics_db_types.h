@@ -165,18 +165,6 @@ struct Filter
         const AbstractObjectTypeDictionary& objectTypeDictionary,
         Options options = Option::none) const;
 
-    /**
-     * Search is implemented by attribute values only. SqLite fts4 syntax supports only full match
-     * or prefix match, so we append `*` to each word of the user input to enable prefix lookup.
-     */
-    void loadUserInputToFreeText(const QString& userInput);
-
-    /**
-     * Search is implemented by attribute values only. SqLite fts4 syntax supports only full match
-     * or prefix match, so we append `*` to each word of the user input to enable prefix lookup.
-     */
-    static QString userInputToFreeText(const QString& userInput);
-
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;
 

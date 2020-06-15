@@ -252,7 +252,7 @@ QString AnalyticsSearchListModel::Private::filterText() const
 void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
 {
     // Check is user input parsed to the same filter request.
-    if (Filter::userInputToFreeText(m_filterText) == Filter::userInputToFreeText(value))
+    if (m_filterText == value)
         return;
 
     q->clear();
@@ -428,7 +428,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
 
     request.timePeriod = period;
     request.maxObjectTracksToSelect = limit;
-    request.loadUserInputToFreeText(m_filterText);
+    request.freeText = m_filterText;
 
     if (!m_selectedObjectType.isEmpty())
         request.objectTypeId = {m_selectedObjectType};
@@ -629,7 +629,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
         };
 
     nx::analytics::db::Filter filter;
-    filter.loadUserInputToFreeText(m_filterText);
+    filter.freeText = m_filterText;
     if (m_filterRect.isValid())
         filter.boundingBox = m_filterRect;
     if (!m_selectedObjectType.isEmpty())

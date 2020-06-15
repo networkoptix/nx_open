@@ -75,8 +75,7 @@ protected:
         sample.bestShot = false;
         sample.boundingBox = QRectF(0, 0, 1, 1);
         sample.typeId = "nx.Car";
-        sample.attributes.emplace_back("Type", "Truck");
-        sample.attributes.emplace_back("Brand", "Mazda car");
+        addAttributes(&sample.attributes);
         return sample;
     }
 
@@ -92,9 +91,15 @@ protected:
         sample.lastAppearanceTimeUs = std::numeric_limits<qint64>::max();
         sample.objectPosition.add(samplePosition.boundingBox);
         sample.objectTypeId = "nx.Car";
-        sample.attributes.emplace_back("Type", "Truck");
-        sample.attributes.emplace_back("Brand", "Mazda car");
+        addAttributes(&sample.attributes);
         return sample;
+    }
+
+    static void addAttributes(nx::common::metadata::Attributes* attributes)
+    {
+        attributes->emplace_back("Type", "Truck");
+        attributes->emplace_back("Brand", "Mazda car");
+        attributes->emplace_back("Wheel Size", "15");
     }
 };
 
@@ -115,14 +120,14 @@ protected:
 TEST_P(FilterByUserInputTest, metadata)
 {
     Filter filter;
-    filter.loadUserInputToFreeText(QString::fromStdString(userInput()));
+    filter.freeText = QString::fromStdString(userInput());
     ASSERT_EQ(filter.acceptsMetadata(sampleMetadata()), expectedResult());
 }
 
 TEST_P(FilterByUserInputTest, track)
 {
     Filter filter;
-    filter.loadUserInputToFreeText(QString::fromStdString(userInput()));
+    filter.freeText = QString::fromStdString(userInput());
     ASSERT_EQ(filter.acceptsTrack(sampleTrack(), m_objectTypeDictionary), expectedResult());
 }
 
@@ -142,6 +147,9 @@ static std::vector<FreeTextAndExpectedResult> kUserInputAndExpectedResults{
     {"type:tru", true},
     {"Type:Truck", true},
     {"$Type", true},
+    {"$Wheel\\ Size", true},
+    {"\"Wheel Size\":15", true},
+    {"\"Wheel Size\":17", false},
     {"Type:", true},
 };
 
