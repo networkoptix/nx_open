@@ -256,6 +256,17 @@
             "flags": "regionDependent | stateDependent",
             "regionDescription": "in the region #%1",
             "groupId": "nx.dahua.group.ComplexAnalyticsEvents"
+        },
+        {
+            "id": "nx.dahua.QueueStayDetection",
+            "name": "Queue stay detection",
+            "internalName": "QueueStayDetection",
+            "description": "Queue stay %1 %2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "in the region #%1",
+            "groupId": "nx.dahua.group.ComplexAnalyticsEvents"
         }
     ],
     "groups": [

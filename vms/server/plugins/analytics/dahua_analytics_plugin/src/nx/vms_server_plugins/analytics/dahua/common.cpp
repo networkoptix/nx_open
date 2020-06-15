@@ -25,7 +25,7 @@ QString EngineManifest::eventTypeByInternalName(const QString& value) const
         const auto possibleInternalNames = eventTypeDescriptor.internalName.toLower().split(L',');
         for (const auto& name: possibleInternalNames)
         {
-            if (internalEventName.contains(name))
+            if (internalEventName == name)
             {
                 m_eventTypeIdByInternalName.insert(internalEventName, eventTypeDescriptor.id);
                 return eventTypeDescriptor.id;
