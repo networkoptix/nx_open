@@ -2898,6 +2898,10 @@ void QnWorkbenchVideoWallHandler::syncTimelinePosition(bool silent)
     if (navigator()->positionUsec() == qint64(AV_NOPTS_VALUE))
         return;
 
+    // No need to send playback command for non-playable widgets.
+    if (!navigator()->currentMediaWidget())
+        return;
+
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPositionChanged);
     message[kPositionUsecKey] = QnLexical::serialized(navigator()->positionUsec());
     message[kSilentKey] = QnLexical::serialized(silent);
@@ -2912,6 +2916,10 @@ void QnWorkbenchVideoWallHandler::at_navigator_playingChanged()
     if (display()->isChangingLayout())
         return;
 
+    // No need to send playback command for non-playable widgets.
+    if (!navigator()->currentMediaWidget())
+        return;
+
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPlayingChanged);
     message[valueKey] = QnLexical::serialized(navigator()->isPlaying());
     sendMessage(message);
@@ -2923,6 +2931,10 @@ void QnWorkbenchVideoWallHandler::at_navigator_speedChanged()
         return;
 
     if (display()->isChangingLayout())
+        return;
+
+    // No need to send playback command for non-playable widgets.
+    if (!navigator()->currentMediaWidget())
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorSpeedChanged);
