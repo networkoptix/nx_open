@@ -1,10 +1,10 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <nx/utils/singleton.h>
+
 #include <network/base_system_description.h>
 
-class QnStartupTileManager: public QObject, public Singleton<QnStartupTileManager>
+class QnStartupTileManager: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -38,5 +38,3 @@ private:
 private:
     bool m_actionEmitted;
 };
-
-#define qnStartupTileManager QnStartupTileManager::instance()

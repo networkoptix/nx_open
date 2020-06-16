@@ -40,7 +40,6 @@
 #include <client/desktop_client_message_processor.h>
 #include <client/system_weights_manager.h>
 #include <client/forgotten_systems_manager.h>
-#include <client/startup_tile_manager.h>
 #include <client/client_settings_watcher.h>
 #include <client/client_show_once_settings.h>
 #include <client/client_autorun_watcher.h>
@@ -635,7 +634,6 @@ void QnClientModule::initNetwork()
     commonModule->store(new QnForgottenSystemsManager());
 
     // Depends on qnSystemsFinder
-    commonModule->store(new QnStartupTileManager());
     commonModule->instance<QnServerInterfaceWatcher>();
 }
 

@@ -425,13 +425,7 @@ Parameters Manager::currentParameters(Action* action) const
     if (m_shortcutAction == action)
         return m_parametersByMenu.value(nullptr);
 
-    if (!m_parametersByMenu.contains(m_lastClickedMenu))
-    {
-        NX_ASSERT(false, "No active menu, no target exists.");
-        return Parameters();
-    }
-
-    return m_parametersByMenu.value(m_lastClickedMenu);
+    return m_parametersByMenu.value(m_lastClickedMenu, Parameters());
 }
 
 Parameters Manager::currentParameters(QObject* sender) const

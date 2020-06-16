@@ -9,7 +9,6 @@
 
 #include <client/client_module.h>
 #include <client/client_settings.h>
-#include <client/startup_tile_manager.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
@@ -233,14 +232,21 @@ void StartupActionsHandler::handleStartupParameters()
         }
     }
 
-    if (const auto welcomeScreen = mainWindow()->welcomeScreen())
+    QnWorkbenchWelcomeScreen* const welcomeScreen = mainWindow()->welcomeScreen();
+    if (welcomeScreen)
         welcomeScreen->setVisibleControls(true);
 
     connectToCloudIfNeeded(startupParameters);
     const bool connectingToSystem = connectToSystemIfNeeded(startupParameters, haveInputFiles);
 
-    if (!startupParameters.instantDrop.isEmpty() || connectingToSystem)
-        qnStartupTileManager->skipTileAction();
+    // Welcome screen will auto-connect to the system or just expand the tile if needed.
+    if (startupParameters.instantDrop.isEmpty()
+        && !connectingToSystem
+        && !haveInputFiles
+        && welcomeScreen)
+    {
+        welcomeScreen->initializeStartupTilesHandling();
+    }
 
     if (!startupParameters.videoWallGuid.isNull())
     {
@@ -368,7 +374,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
 
     auto systemUrl = nx::utils::Url::fromUserInput(systemId);
     systemUrl.setScheme("https");
-    NX_DEBUG(this, "Custom URI: Connecting to the system %1", systemUrl.toString());
+    NX_DEBUG(this, "Custom URI: Connecting to the system %1", systemUrl);
 
     systemUrl.setUserName(auth.user);
     systemUrl.setPassword(auth.password);
@@ -398,6 +404,8 @@ bool StartupActionsHandler::connectUsingCommandLineAuth(
 
     if (!serverUrl.isValid())
         return false;
+
+    NX_DEBUG(this, "Connecting to %1 using commmand line auth", serverUrl);
 
     LogonParameters parameters(serverUrl);
     parameters.force = true;
@@ -429,10 +437,13 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
         return true;
 
     // Attempt auto-login, if needed.
-    if (qnSettings->autoLogin() && qnSettings->saveCredentialsAllowed()
-        && qnSettings->lastUsedConnection().url.isValid()
-        && !qnSettings->lastUsedConnection().localId.isNull())
+    const QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    if (qnSettings->autoLogin()
+        && qnSettings->saveCredentialsAllowed()
+        && lastUsedConnection.url.isValid()
+        && !lastUsedConnection.localId.isNull())
     {
+        NX_DEBUG(this, "Auto-connect to the last saved system %1", lastUsedConnection.url);
         menu()->trigger(ConnectAction,
             Parameters().withArgument(Qn::LogonParametersRole, LogonParameters()));
         return true;
