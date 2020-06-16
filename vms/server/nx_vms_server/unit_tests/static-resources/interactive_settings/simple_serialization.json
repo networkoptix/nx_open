@@ -8,6 +8,7 @@
             "caption": "Text Field",
             "description": "A text field",
             "defaultValue": "a text",
+            "enabled": false,
             "validationRegex": "",
             "validationRegexFlags": "",
             "validationErrorMessage": ""
@@ -17,7 +18,8 @@
             "name": "textArea",
             "caption": "Text Area",
             "description": "A text area",
-            "defaultValue": "a text"
+            "defaultValue": "a text",
+            "visible": false
         },
         {
             "type": "GroupBox",

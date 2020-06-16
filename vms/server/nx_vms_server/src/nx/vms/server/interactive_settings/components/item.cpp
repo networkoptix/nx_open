@@ -56,13 +56,17 @@ AbstractEngine* Item::engine() const
 QJsonObject Item::serializeModel() const
 {
     QJsonObject result;
-    result[QLatin1String("type")] = m_type;
+    result["type"] = m_type;
     if (!m_name.isEmpty())
-        result[QLatin1String("name")] = m_name;
+        result["name"] = m_name;
     if (!m_caption.isEmpty())
-        result[QLatin1String("caption")] = m_caption;
+        result["caption"] = m_caption;
     if (!m_description.isEmpty())
-        result[QLatin1String("description")] = m_description;
+        result["description"] = m_description;
+    if (!m_visible)
+        result["visible"] = m_visible;
+    if (!m_enabled)
+        result["enabled"] = m_enabled;
     return result;
 }
 
