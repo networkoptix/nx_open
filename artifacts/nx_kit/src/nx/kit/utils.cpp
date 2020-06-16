@@ -170,7 +170,7 @@ std::string toString(const void* ptr)
 
 std::string toString(char c)
 {
-    return toStringFromChar<unsigned char>(c);
+    return toStringFromChar(c);
 }
 
 std::string toString(const char* s)
