@@ -3,6 +3,7 @@ import platform
 import subprocess
 import sys
 from io import StringIO
+from pathlib import Path
 
 from vms_benchmark import exceptions
 
@@ -136,17 +137,19 @@ class BoxConnection:
             f"    stderr:\n"
             f"        {'        '.join(run.stderr.decode(errors='backslashreplace').splitlines(keepends=True))}")
 
-        if self.ssh_args[0] == 'plink':
+        ssh_executable_path = Path(self.ssh_args[0])
+        if ssh_executable_path.stem == 'plink':
+            error_message = run.stderr.decode().strip().lower()
             if run.returncode == 0:  # Yes, exit status is 0 if access has been denied.
-                if run.stderr.strip().lower() == 'access denied':
+                if error_message == 'access denied':
                     raise exceptions.BoxCommandError("SSH auth failed, check credentials")
             if run.returncode == 1:
-                if run.stderr.strip().lower() == 'fatal error: network error: connection timed out':
+                if error_message == 'fatal error: network error: connection timed out':
                     raise exceptions.BoxCommandError(
                         "Connection timed out, "
                         "check boxHostnameOrIp configuration setting and "
                         "make sure that the box address is accessible")
-                if run.stderr.strip().lower() == 'fatal error: network error: connection refused':
+                if error_message == 'fatal error: network error: connection refused':
                     raise exceptions.BoxCommandError(
                         "Cannot connect via SSH, "
                         "check that SSH service is running "
