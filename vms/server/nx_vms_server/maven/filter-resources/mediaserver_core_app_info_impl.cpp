@@ -17,3 +17,8 @@ QString QnServerAppInfo::serviceName()
 {
     return QStringLiteral("${mediaserver_service_name}");
 }
+
+QString QnServerAppInfo::nxSdkVersion()
+{
+    return QStringLiteral("${nxSdkVersion}");
+}

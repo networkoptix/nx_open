@@ -40,5 +40,15 @@ LibContext& libContext()
     return &libContext();
 }
 
+/*extern "C"*/ const char* nxSdkVersion()
+{
+    static constexpr char str[] =
+        #include <nx_sdk_version.inc>
+    ;
+
+    static_assert(sizeof(str) > 1, "nx_sdk_version.inc must contain a non-empty string literal.");
+    return str;
+}
+
 } // namespace sdk
 } // namespace nx

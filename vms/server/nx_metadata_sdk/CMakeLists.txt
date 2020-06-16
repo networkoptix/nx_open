@@ -6,6 +6,15 @@ include(find_doxygen)
 
 set(depends mediaserver server_plugins) #< Not required technically, but useful to prevent errors.
 
+# Prepare the file nx_sdk_version.inc to be included into nx/sdk/helpers/lib_context.cpp.
+set(nx_sdk_version_file ${CMAKE_CURRENT_BINARY_DIR}/nx_sdk_version.inc)
+string(CONCAT nx_sdk_version_file_content
+    "// This file is generated on SDK build; to be included into nx/sdk/helpers/lib_context.cpp.\n"
+    "// It contains the SDK version which Plugins report to the Server via nxSdkVersion().\n"
+    "\"${nxSdkVersion}\"\n"
+)    
+file(WRITE ${nx_sdk_version_file} ${nx_sdk_version_file_content})
+
 message(STATUS "Generating files for Metadata SDK")
 
 set(sdk_name metadata_sdk)

@@ -65,9 +65,6 @@ private:
  */
 LibContext& libContext();
 
-static constexpr const char* kNxLibContextFuncName = "nxLibContext";
-typedef ILibContext* (*NxLibContextFunc)();
-
 #if !defined(NX_SDK_API)
     #if !defined(NX_PLUGIN_API)
         #error "Either NX_SDK_API or NX_PLUGIN_API macro should be defined to export a function."
@@ -83,6 +80,24 @@ typedef ILibContext* (*NxLibContextFunc)();
  * runtime linking algorithm.
  */
 extern "C" NX_SDK_API ILibContext* nxLibContext();
+static constexpr const char* kNxLibContextFuncName = "nxLibContext";
+typedef ILibContext* (*NxLibContextFunc)();
+
+/**
+ * Informs the Server about the version of the SDK which was used to build the particular Plugin.
+ * The return value is residing in a C++ source file which is the part of the SDK but is generated
+ * by the build system when the SDK is being built.
+ *
+ * Should be called only by the Server via resolving by name in a loaded plugin dynamic library.
+ * The implementation residing in the Server is considered to be a stub and must not be called.
+ *
+ * ATTENTION: If called directly from a C++ code, a random instance of this function will be
+ * actually called (possibly belonging to a different plugin) because of the dynamic library
+ * runtime linking algorithm.
+ */
+extern "C" NX_SDK_API const char* nxSdkVersion();
+static constexpr const char* kNxSdkVersionFuncName = "nxSdkVersion";
+typedef const char* (*NxSdkVersionFunc)();
 
 } // namespace sdk
 } // namespace nx
