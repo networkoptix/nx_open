@@ -10,9 +10,14 @@ namespace sdk {
 
 void LibContext::setName(const char* name)
 {
-    NX_KIT_ASSERT(name);
-    NX_KIT_ASSERT(name[0] != '\0');
     std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (!NX_KIT_ASSERT(name) || !NX_KIT_ASSERT(name[0] != '\0'))
+    {
+        m_name = "incorrectly_named_lib_context";
+        return;
+    }
+
     m_name = name;
 }
 

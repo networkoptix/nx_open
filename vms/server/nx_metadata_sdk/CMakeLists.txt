@@ -30,7 +30,6 @@ file(GLOB_RECURSE copied_nx_sdk_src_nx_files ${copied_nx_sdk_src_nx_origin}/*)
 set(copied_nx_sdk_unit_tests_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/unit_tests)
 file(GLOB_RECURSE copied_nx_sdk_unit_tests_files ${copied_nx_sdk_unit_tests_origin}/*)
 
-
 set(copied_samples_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics)
 
 # Collect source files for the sample 1 - Sample Analytics Plugin.

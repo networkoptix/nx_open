@@ -217,13 +217,13 @@ void PluginManager::storeInternalErrorPluginInfo(
     if (pluginInfo)
     {
         originalPluginInfoDescription =
-            lm("Original PluginInfo fields: errorCode [%1], statusMessage %2.").args(
+            lm("Original PluginInfo fields: errorCode [%1], statusMessage %2").args(
                 pluginInfo->errorCode, nx::kit::utils::toString(pluginInfo->statusMessage));
     }
     else
     {
         pluginInfo.reset(new PluginInfo);
-        originalPluginInfoDescription = "Original PluginInfo is null.";
+        originalPluginInfoDescription = "Original PluginInfo is null";
     }
 
     NX_ASSERT(!errorMessage.isEmpty());
@@ -250,7 +250,7 @@ bool PluginManager::storeNotLoadedPluginInfo(
     )
     {
         storeInternalErrorPluginInfo(pluginInfo, /*plugin*/ nullptr,
-            "Server Plugin was not loaded and an assertion has failed - see the Server log.");
+            "Server Plugin was not loaded and an assertion has failed - see the Server log");
         return false;
     }
 
@@ -287,7 +287,7 @@ bool PluginManager::storeLoadedPluginInfo(
     )
     {
         storeInternalErrorPluginInfo(pluginInfo, plugin,
-            "Server Plugin was loaded but an assertion has failed - see the Server log.");
+            "Server Plugin was loaded but an assertion has failed - see the Server log");
         return true;
     }
 
@@ -314,7 +314,10 @@ bool PluginManager::processPluginEntryPointForNewSdk(
 
     const auto plugin = toPtr(entryPointFunc());
     if (!plugin)
-        return error("Entry point function returned null");
+    {
+        return error(
+            lm("Entry point function %1() returned null").args(IPlugin::kEntryPointFuncName));
+    }
 
     if (!plugin->queryInterface<IPlugin>())
         return error("Interface nx::sdk::IPlugin is not supported");
@@ -365,7 +368,9 @@ bool PluginManager::processPluginEntryPointForOldSdk(
     if (!plugin)
     {
         return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
-            Error::libraryFailure, "Old SDK entry point function returned null");
+            Error::libraryFailure,
+            lm("Old SDK entry point function %1() returned null").args(
+                nxpl::Plugin::kEntryPointFuncName));
     }
 
     pluginInfo->mainInterface = MainInterface::nxpl_PluginInterface;
