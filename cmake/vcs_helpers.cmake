@@ -1,37 +1,36 @@
 function(nx_vcs_changeset dir var)
-    # hg yields such changeset if .hg dir exists but hg does not detect a repo there.
-    set(_unknown_changeset "000000000000")
-
-    set(${var} ${unknown_changeset})
+    set(_changeset "")
     set(_reason "")
 
     if(EXISTS ${dir}/.hg/)
-        _hg_changeset(${dir} ${var})
+        _hg_changeset(${dir} _changeset)
     elseif(EXISTS ${dir}/.git)
-        _git_changeset(${dir} ${var})
+        _git_changeset(${dir} _changeset)
     else()
         set(_reason "VCS not detected")
     endif()
 
-    if(_reason STREQUAL "")
+    if(_changeset STREQUAL "")
         set(_reason "Failed quering repository")
-    endif()
-
-    set(_changeset_file ${dir}/changeset.txt)
-    if(${var} STREQUAL ${_unknown_changeset} AND EXISTS ${_changeset_file})
-        file(READ ${_changeset_file} ${var}) #< On error, ${var} retains _unknown_changeset.
-        if(${var} STREQUAL ${_unknown_changeset})
-            set(_reason "Failed to read ${_changeset_file}")
-        else()
-            message(STATUS "ATTENTION: Using changeset from ${_changeset_file}: ${${var}}")
+        
+        set(_changeset_file ${dir}/changeset.txt)
+        if(_changeset STREQUAL "" AND EXISTS ${_changeset_file})
+            set(${var} "")
+            file(READ ${_changeset_file} _changeset) #< On error, _changeset remains empty.
+            string(STRIP ${_changeset} _changeset)
+            if(_changeset STREQUAL "")
+                set(_reason "Failed to read ${_changeset_file}")
+            else()
+                message(STATUS "ATTENTION: Using changeset from ${_changeset_file}: ${_changeset}")
+            endif()
         endif()
     endif()
-
-    if(${var} STREQUAL ${_unknown_changeset})
-        message(WARNING "Can't get changeset: ${_reason}; assuming ${${var}}.")
+    
+    if(_changeset STREQUAL "")
+        message(WARNING "Can't get changeset: ${_reason}; settings ${var} to an empty string.")
     endif()
 
-    set(${var} ${${var}} PARENT_SCOPE)
+    set(${var} ${_changeset} PARENT_SCOPE)
 endfunction()
 
 function(nx_vcs_branch dir var)
@@ -42,7 +41,7 @@ function(nx_vcs_branch dir var)
     else()
         message(WARNING "Can't get current branch: not found any VCS: ${dir}")
     endif()
-    set(${var} ${${var}} PARENT_SCOPE)
+    set(${var} ${changeset} PARENT_SCOPE)
 endfunction()
 
 function(nx_vcs_current_refs dir var)
@@ -51,7 +50,7 @@ function(nx_vcs_current_refs dir var)
     else()
         message(WARNING "Can't get current refs: not found any VCS: ${dir}")
     endif()
-    set(${var} ${${var}} PARENT_SCOPE)
+    set(${var} "${changeset}" PARENT_SCOPE)
 endfunction()
 
 function(_hg_changeset dir var)
@@ -60,7 +59,11 @@ function(_hg_changeset dir var)
         OUTPUT_VARIABLE changeset
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    set(${var} ${changeset} PARENT_SCOPE)
+    if(changeset STREQUAL "000000000000")
+        # hg yields such changeset if .hg dir exists but hg does not detect a repo there.
+        set(changeset "")
+    endif()
+    set(${var} "${changeset}" PARENT_SCOPE)
 endfunction()
 
 function(_hg_branch dir var)
@@ -78,7 +81,7 @@ function(_git_changeset dir var)
         OUTPUT_VARIABLE changeset
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    set(${var} ${changeset} PARENT_SCOPE)
+    set(${var} "${changeset}" PARENT_SCOPE)
 endfunction()
 
 function(_git_branch dir var)
