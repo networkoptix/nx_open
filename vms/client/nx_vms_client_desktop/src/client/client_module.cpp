@@ -293,9 +293,9 @@ void QnClientModule::initApplication()
     QApplication::setApplicationName(QnClientAppInfo::applicationName());
     QApplication::setApplicationDisplayName(QnClientAppInfo::applicationDisplayName());
 
-    const QString applicationVersion = QnClientAppInfo::metaVersion().isEmpty()
+    const QString applicationVersion = QnClientAppInfo::usedMetaVersion().isEmpty()
         ? AppInfo::applicationVersion()
-        : QString("%1 %2").arg(AppInfo::applicationVersion(), QnClientAppInfo::metaVersion());
+        : QString("%1 %2").arg(AppInfo::applicationVersion(), QnClientAppInfo::usedMetaVersion());
 
     QApplication::setApplicationVersion(applicationVersion);
     QApplication::setStartDragDistance(20);

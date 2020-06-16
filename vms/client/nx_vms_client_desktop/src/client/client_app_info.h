@@ -34,6 +34,6 @@ struct QnClientAppInfo
 
     /** Version of the EULA. */
     static int eulaVersion();
-    /** Additional MetaVMS version. */
-    static QString metaVersion();
+    /** Addition to the version string for MetaVMS, or an empty string for non-MetaVMS builds. */
+    static QString usedMetaVersion();
 };
