@@ -303,7 +303,7 @@ endfunction()
 
 # Intended for debug. Prints all arguments as strings.
 function(nx_print_args)
-    set(output "####### print_args(): ${ARGC} argument(s) (using C escaping):\n")
+    set(output "####### nx_print_args(): ${ARGC} argument(s) (using C escaping):\n")
     string(APPEND output "{\n")
     if(${ARGC}) #< If ARGC is not zero.
         math(EXPR last_arg_index "${ARGC} - 1")
@@ -319,25 +319,40 @@ endfunction()
 
 # Intended for debug. Prints the variable contents both as a string and as a list.
 function(nx_print_var some_var)
-    list(LENGTH ${some_var} list_length)
-    
-    if(NOT ${list_length}) #< If list_length is zero.
-        message("####### print_var(${some_var}): Zero length list.")
+    if(NOT DEFINED ${some_var})
+        message("####### nx_print_var(${some_var}): not defined")
         return()
+    endif()
+
+    list(LENGTH ${some_var} list_length)
+    if(NOT DEFINED list_length OR NOT "${list_length}" MATCHES "^[0-9]+$")
+        message(FATAL_ERROR "INTERNAL ERROR: list(LENGTH) failed for ${some_var}.")
     endif()
     
     string(LENGTH "${${some_var}}" string_length)
-    set(output "####### print_var(${some_var}) (using C escaping):\n")
+    if(NOT DEFINED string_length OR NOT "${string_length}" MATCHES "^[0-9]+$")
+        message(FATAL_ERROR "INTERNAL ERROR: string(LENGTH) failed for ${some_var}.")
+        return()
+    endif()
+
+    if(list_length EQUAL 0 AND string_length EQUAL 0 AND "${${some_var}}" STREQUAL "")
+        message("####### nx_print_var(${some_var}): empty")
+        return()
+    endif()
+
+    set(output "####### nx_print_var(${some_var}) (using C escaping):\n")
     nx_c_escape_string("${${some_var}}" c_escaped_value)
     string(APPEND output "    As string of length ${string_length}: ${c_escaped_value}\n")
     string(APPEND output "    As list of length ${list_length}:\n")
     string(APPEND output "    {\n")
-    math(EXPR last_list_item_index "${list_length} - 1")
-    foreach(list_item_index RANGE 0 ${last_list_item_index})
-        list(GET ${some_var} ${list_item_index} list_item)
-        nx_c_escape_string("${list_item}" c_escaped_list_item)
-        string(APPEND output "        ${c_escaped_list_item}\n")
-    endforeach()
+    if(list_length GREATER 0)
+        math(EXPR last_list_item_index "${list_length} - 1")
+        foreach(list_item_index RANGE 0 ${last_list_item_index})
+            list(GET ${some_var} ${list_item_index} list_item)
+            nx_c_escape_string("${list_item}" c_escaped_list_item)
+            string(APPEND output "        ${c_escaped_list_item}\n")
+        endforeach()
+    endif()
     string(APPEND output "    }\n")
     
     message("${output}")
