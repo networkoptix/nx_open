@@ -50,7 +50,6 @@ private:
         kEventLogButton,
         kCameraListButton,
         kAuditLogButton,
-        kHealthMonitorButton,
         kBookmarksButton,
 
         kButtonCount

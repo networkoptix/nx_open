@@ -98,7 +98,6 @@ QN_HELP_TOPIC(SystemSettings_Cloud_Help,                        "connecting_syst
 
 QN_HELP_TOPIC(Administration_Help,                              "system-wide_configurations.htm")
 QN_HELP_TOPIC(Administration_General_CamerasList_Help,          "viewing_full_cameras_list.htm")
-QN_HELP_TOPIC(Administration_General_HealthMonitoring_Help,     "monitoring_media_servers.htm")
 QN_HELP_TOPIC(Administration_Update_Help,                       "Upgrading_VMS.htm")
 QN_HELP_TOPIC(Administration_RoutingManagement_Help,            "configuring_routing_within_mul.htm")
 QN_HELP_TOPIC(Administration_TimeSynchronization_Help,          "configuring_time_synchronizati.htm")

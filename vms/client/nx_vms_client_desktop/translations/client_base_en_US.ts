@@ -3562,10 +3562,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Health Monitoring</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Bookmarks</source>
         <translation></translation>
     </message>
@@ -3583,10 +3579,6 @@ to %1</source>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Monitor All Servers on a Single Layout</source>
         <translation></translation>
     </message>
     <message>
