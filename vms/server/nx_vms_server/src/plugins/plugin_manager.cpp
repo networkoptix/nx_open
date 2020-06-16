@@ -5,7 +5,6 @@
 #include <utility>
 
 #include <QtCore/QAtomicPointer>
-#include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 
@@ -37,7 +36,6 @@
 using namespace nx::sdk;
 using nx::vms::server::sdk_support::RefCountableRegistry;
 using nx::vms::api::PluginInfo;
-using nx::vms::api::PluginResourceBindingInfo;
 using namespace nx::vms::server::analytics;
 using namespace nx::vms::server::metrics;
 
