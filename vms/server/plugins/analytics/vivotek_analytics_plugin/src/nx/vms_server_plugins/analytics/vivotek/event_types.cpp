@@ -81,6 +81,17 @@ const std::vector<EventType> kEventTypes =
                     return features.vca && features.vca->faceDetection;
                 };
         }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "RunningDetection";
+            type.id = "nx.vivotek.Running";
+            type.prettyName = "Running";
+            type.isProlonged = true;
+            type.isSupported =
+                [](auto& features) {
+                    return features.vca && features.vca->runningDetection;
+                };
+        }
         types.shrink_to_fit();
         return types;
     }();

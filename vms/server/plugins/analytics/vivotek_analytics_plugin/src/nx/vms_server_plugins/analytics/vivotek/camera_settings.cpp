@@ -163,6 +163,18 @@ void fillReErrors(CameraSettings::Vca::FaceDetection* faceDetection,
     }
 }
 
+void fillReErrors(CameraSettings::Vca::RunningDetection* runningDetection,
+    const QString& message)
+{
+    for (auto& rule: runningDetection->rules)
+    {
+        fillReErrors(&rule.name, message);
+        fillReErrors(&rule.minCount, message);
+        fillReErrors(&rule.minSpeed, message);
+        fillReErrors(&rule.delay, message);
+    }
+}
+
 void fillReErrors(CameraSettings::Vca* vca, const QString& message)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -177,6 +189,8 @@ void fillReErrors(CameraSettings::Vca* vca, const QString& message)
         fillReErrors(&*unattendedObjectDetection, message);
     if (auto& faceDetection = vca->faceDetection)
         fillReErrors(&*faceDetection, message);
+    if (auto& runningDetection = vca->runningDetection)
+        fillReErrors(&*runningDetection, message);
 }
 
 
@@ -777,6 +791,86 @@ void parseReFromCamera(CameraSettings::Vca::FaceDetection* faceDetection,
     }
 }
 
+void parseReFromCamera(CameraSettings::Vca::RunningDetection::Rule::MinCount* minCount,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        minCount->emplaceValue(get<int>(path, rule, "PeopleNumber"));
+    }
+    catch (const std::exception& exception)
+    {
+        minCount->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::RunningDetection::Rule::MinSpeed* minSpeed,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        minSpeed->emplaceValue(get<int>(path, rule, "SpeedLevel"));
+    }
+    catch (const std::exception& exception)
+    {
+        minSpeed->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::RunningDetection::Rule::Delay* delay,
+    const QJsonValue& rule, const QString& path)
+{
+    try
+    {
+        delay->emplaceValue(get<int>(path, rule, "MinActivityDuration"));
+    }
+    catch (const std::exception& exception)
+    {
+        delay->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::RunningDetection* runningDetection,
+    const QJsonValue& parameters)
+{
+    try
+    {
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(parameters, "RunningDetection").isUndefined())
+            get(&jsonRules, parameters, "RunningDetection");
+
+        const auto ruleNames = jsonRules.keys();
+
+        auto& rules = runningDetection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+            if (i >= (std::size_t) ruleNames.size())
+            {
+                rule.name.emplaceNothing();
+                rule.minCount.emplaceNothing();
+                rule.minSpeed.emplaceNothing();
+                rule.delay.emplaceNothing();
+                continue;
+            }
+
+            const auto& ruleName = ruleNames[i];
+            const auto& jsonRule = jsonRules[ruleName];
+
+            const QString path = NX_FMT("$.RunningDetection.%1", ruleName);
+
+            rule.name.emplaceValue(ruleName);
+            parseReFromCamera(&rule.minCount, jsonRule, path);
+            parseReFromCamera(&rule.minSpeed, jsonRule, path);
+            parseReFromCamera(&rule.delay, jsonRule, path);
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(runningDetection, exception.what());
+    }
+}
+
 void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -793,6 +887,8 @@ void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
         parseReFromCamera(&*unattendedObjectDetection, parameters);
     if (auto& faceDetection = vca->faceDetection)
         parseReFromCamera(&*faceDetection, parameters);
+    if (auto& runningDetection = vca->runningDetection)
+        parseReFromCamera(&*runningDetection, parameters);
 }
 
 
@@ -954,6 +1050,15 @@ std::optional<QString> getName(const CameraSettings::Entry<NamedThing>& entry)
 
     const auto& thing = entry.value();
     return thing.name;
+}
+
+template <typename Rule>
+auto getName(const Rule& rule) -> decltype(rule.name.value(), void(), std::optional<QString>())
+{
+    if (!rule.name.hasValue())
+        return std::nullopt;
+
+    return rule.name.value();
 }
 
 template <typename Rule>
@@ -1611,6 +1716,113 @@ void serializeReToCamera(QJsonValue* parameters,
     }
 }
 
+void serializeReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::RunningDetection::Rule::MinCount* minCount)
+{
+    try
+    {
+        // If new rule, set default like in web UI.
+        if (minCount->hasNothing()
+            && get<QJsonValue>(*jsonRule, "PeopleNumber").isUndefined())
+        {
+            minCount->emplaceValue(1);
+        }
+
+        if (!minCount->hasValue())
+            return;
+
+        set(jsonRule, "PeopleNumber", minCount->value());
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(minCount, exception.what());
+    }
+}
+
+void serializeReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::RunningDetection::Rule::MinSpeed* minSpeed)
+{
+    try
+    {
+        // If new rule, set default like in web UI.
+        if (minSpeed->hasNothing()
+            && get<QJsonValue>(*jsonRule, "SpeedLevel").isUndefined())
+        {
+            minSpeed->emplaceValue(3);
+        }
+
+        if (!minSpeed->hasValue())
+            return;
+
+        set(jsonRule, "SpeedLevel", minSpeed->value());
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(minSpeed, exception.what());
+    }
+}
+
+void serializeReToCamera(QJsonValue* jsonRule,
+    CameraSettings::Vca::RunningDetection::Rule::Delay* delay)
+{
+    try
+    {
+        // If new rule, set default like in web UI.
+        if (delay->hasNothing()
+            && get<QJsonValue>(*jsonRule, "MinActivityDuration").isUndefined())
+        {
+            delay->emplaceValue(1);
+        }
+
+        if (!delay->hasValue())
+            return;
+
+        set(jsonRule, "MinActivityDuration", delay->value());
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(delay, exception.what());
+    }
+}
+
+void serializeReToCamera(QJsonValue* parameters,
+    CameraSettings::Vca::RunningDetection* runningDetection)
+{
+    try
+    {
+        auto& rules = runningDetection->rules;
+
+        QJsonObject jsonRules;
+        if (!get<QJsonValue>(*parameters, "RunningDetection").isUndefined())
+        {
+            jsonRules = get<QJsonObject>(*parameters, "RunningDetection");
+            removeRulesExcept(&jsonRules, getNames(rules));
+        }
+
+        for (auto& rule: rules)
+        {
+            if (auto name = getName(rule))
+            {
+                QJsonValue jsonRule = jsonRules[*name];
+                if (jsonRule.isUndefined() || jsonRule.isNull())
+                    jsonRule = QJsonObject{};
+
+                //serializeReToCamera(&jsonRule, &rule.minCount);
+                serializeReToCamera(&jsonRule, &rule.minSpeed);
+                serializeReToCamera(&jsonRule, &rule.delay);
+
+                jsonRules[*name] = jsonRule;
+            }
+        }
+
+        set(parameters, "RunningDetection", jsonRules);
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(runningDetection, exception.what());
+    }
+}
+
 void serializeReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
 {
     if (auto& crowdDetection = vca->crowdDetection)
@@ -1627,6 +1839,8 @@ void serializeReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
         serializeReToCamera(parameters, &*unattendedObjectDetection);
     if (auto& faceDetection = vca->faceDetection)
         serializeReToCamera(parameters, &*faceDetection);
+    if (auto& runningDetection = vca->runningDetection)
+        serializeReToCamera(parameters, &*runningDetection);
 }
 
 
@@ -1773,6 +1987,20 @@ void enumerateEntries(Settings* settings, Visitor visit)
                 auto& rule = rules[i];
 
                 repeatedVisit(i, &rule.region);
+            }
+        }
+
+        if (auto& runningDetection = vca->runningDetection)
+        {
+            auto& rules = runningDetection->rules;
+            for (std::size_t i = 0; i < rules.size(); ++i)
+            {
+                auto& rule = rules[i];
+
+                repeatedVisit(i, &rule.name);
+                repeatedVisit(i, &rule.minCount);
+                repeatedVisit(i, &rule.minSpeed);
+                repeatedVisit(i, &rule.delay);
             }
         }
     }
@@ -1951,9 +2179,57 @@ void parseEntryFromServer(
     entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 999));
 }
 
+void parseEntryFromServer(
+    CameraSettings::Vca::RunningDetection::Rule::MinCount* entry, const QString& serializedValue)
+{
+    if (serializedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 1, 3));
+}
+
+void parseEntryFromServer(
+    CameraSettings::Vca::RunningDetection::Rule::MinSpeed* entry, const QString& serializedValue)
+{
+    if (serializedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 6));
+}
+
+void parseEntryFromServer(
+    CameraSettings::Vca::RunningDetection::Rule::Delay* entry, const QString& serializedValue)
+{
+    if (serializedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::clamp((int) toDouble(serializedValue), 0, 999));
+}
+
 void parseEntryFromServer(CameraSettings::Entry<int>* entry, const QString& serializedValue)
 {
     entry->emplaceValue(toInt(serializedValue));
+}
+
+void parseEntryFromServer(CameraSettings::Vca::RunningDetection::Rule::Name* entry,
+    const QString& serializedValue)
+{
+    if (serializedValue.isEmpty())
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(serializedValue);
 }
 
 bool parseFromServer(NamedPointSequence* points, const QJsonValue& json)
@@ -2183,12 +2459,47 @@ std::optional<QString> serializeEntryToServer(
     return QString::number(entry.value());
 }
 
+std::optional<QString> serializeEntryToServer(
+    const CameraSettings::Vca::RunningDetection::Rule::MinCount& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> serializeEntryToServer(
+    const CameraSettings::Vca::RunningDetection::Rule::MinSpeed& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
+std::optional<QString> serializeEntryToServer(
+    const CameraSettings::Vca::RunningDetection::Rule::Delay& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return QString::number(entry.value());
+}
+
 std::optional<QString> serializeEntryToServer(const CameraSettings::Entry<int>& entry)
 {
     if (!entry.hasValue())
         return std::nullopt;
 
     return QString::number(entry.value());
+}
+
+std::optional<QString> serializeEntryToServer(const CameraSettings::Vca::RunningDetection::Rule::Name& entry)
+{
+    if (!entry.hasValue())
+        return "";
+
+    return entry.value();
 }
 
 QJsonObject serializeToServer(const NamedPointSequence* points)
@@ -2666,6 +2977,62 @@ QJsonValue getVcaFaceDetectionModelForManifest()
     };
 }
 
+QJsonValue getVcaRunningDetectionModelForManifest()
+{
+    using Rule = CameraSettings::Vca::RunningDetection::Rule;
+    return QJsonObject{
+        {"name", "Vca.RunningDetection"},
+        {"type", "Section"},
+        {"caption", "Running Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) kMaxDetectionRuleCount},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{Rule::Name::name}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", Rule::Name::name},
+                            // Should really be SpinBox, but need empty state to work around camera not
+                            // returning settings for disabled functionality.
+                            {"type", "TextField"},
+                            {"caption", "Name"},
+                            {"description", "Name of this rule"},
+                        },
+                        QJsonObject{
+                            {"name", Rule::MinCount::name},
+                            // Should really be SpinBox, but need empty state to work around camera not
+                            // returning settings for disabled functionality.
+                            {"type", "TextField"},
+                            {"caption", "Minimum runner count"},
+                            {"description", "The event is only generated if there is at least this many people running simultaneously"},
+                        },
+                        QJsonObject{
+                            {"name", Rule::MinSpeed::name},
+                            // Should really be SpinBox, but need empty state to work around camera not
+                            // returning settings for disabled functionality.
+                            {"type", "TextField"},
+                            {"caption", "Minimum runnining speed"},
+                            {"description", "The event is only generated if people run at least this fast"},
+                        },
+                        QJsonObject{
+                            {"name", Rule::Delay::name},
+                            // Should really be SpinBox, but need empty state to work around camera not
+                            // returning settings for disabled functionality.
+                            {"type", "TextField"},
+                            {"caption", "Delay (s)"},
+                            {"description", "The event is only generated if people run for at least this long"},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
 QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
 {
     using Vca = CameraSettings::Vca;
@@ -2708,6 +3075,8 @@ QJsonValue getVcaModelForManifest(const CameraFeatures::Vca& features)
                     sections.push_back(getVcaUnattendedObjectDetectionModelForManifest());
                 if (features.faceDetection)
                     sections.push_back(getVcaFaceDetectionModelForManifest());
+                if (features.runningDetection)
+                    sections.push_back(getVcaRunningDetectionModelForManifest());
 
                 return sections;
             }(),
@@ -2757,6 +3126,11 @@ CameraSettings::CameraSettings(const CameraFeatures& features)
         {
             auto& faceDetection = vca->faceDetection.emplace();
             faceDetection.rules.resize(kMaxDetectionRuleCount);
+        }
+        if (features.vca->runningDetection)
+        {
+            auto& runningDetection = vca->runningDetection.emplace();
+            runningDetection.rules.resize(kMaxDetectionRuleCount);
         }
     }
 }
