@@ -131,7 +131,7 @@
         "maxEventLogRecords": "Veritabanında tutulacak maksimum olay günlüğü kaydı. Silinmemiş kayıtların gerçek miktarı belirtilen değerden %20 daha yüksek olabilir.",
         "forceLiveCacheForPrimaryStream": "Birincil akış için bazı karelerin önbellekte saklanıp saklanmayacağı. Değer:\"evet\" - her zaman etkin ( çok fazla RAM kullanılabilir), \"hayır\" - geri oynatma işleminin gerektirdiği durumlar dışında devre dışı (örn. HLS), \"auto\" hayır'a benzer ancak etkinleştirildiğinde kullanıcı deneyimini arttırır (örneğin, bazı Analitik eklentileri kamera üzerinde çalışırken).",
         "additionalLocalFsTypes": "Belirli bir bölümün sunucu depolama alanı için uygun olup olmadığına karar verirken dikkate alınması gereken ek dosya sistemi türleri. / Proc / mount'larda listelendikleri gibi virgülle ayrılmış dosya sistemi adlarının listesi beklenir.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "rtspBufferSizeKb": "KB cinsinden sunucu tarafı RTSP arabellek boyutu. Daha büyük değer, yüksek gidiş-dönüş gecikme değeri ile daha verimli internetin kullanılmasına izin verir, ancak otomatik kalite geçişini ve RTSP arama işlemine tepkiyi yavaşlatır."
     },
     "info": {
         "tabs": {

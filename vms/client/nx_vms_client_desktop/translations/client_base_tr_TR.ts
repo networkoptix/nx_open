@@ -4000,12 +4000,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Bir Etkinleştirme Anahtarı dosyası edinmek için lütfen sağlanan Lisans Anahtarı ve Donanım Kimliğini Bölgesel desteğinize gönderin.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Bir Etkinleştirme Anahtarı dosyası edinmek için lütfen verilen Lisans Anahtarı ve Donanım Kimliğini Bölgesel / Lisans desteğinize (%1) gönderin.</translation>
     </message>
   </context>
   <context>
@@ -9095,7 +9095,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>Güncelleme yüklemesi başarısız oldu.</translation>
     </message>
   </context>
   <context>
@@ -9143,12 +9143,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Bilinmeyen cihaz</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Bilinmeyen Cihaz %1</translation>
     </message>
   </context>
   <context>
@@ -9176,16 +9176,16 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>%n sembol bitti</numerusform>
+        <numerusform>%n sembol bitti</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>%n sembol kaldı</numerusform>
+        <numerusform>%n sembol kaldı</numerusform>
       </translation>
     </message>
   </context>
@@ -9765,7 +9765,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>Kod dönüştürme gerekli. Dışa aktarma oturumu yeniden başlatıldı.</translation>
     </message>
   </context>
   <context>

@@ -2315,7 +2315,7 @@
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Legg til kildeenhetens navn i body</translation>
     </message>
   </context>
   <context>
