@@ -144,6 +144,8 @@ public:
      */
     QnPtzControllerPtr ptzController() const;
 
+    bool canControlPtz() const;
+
     QnMediaDewarpingParams dewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams& params);
 

@@ -391,9 +391,11 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
     if (!widget)
         return;
 
+    const auto parameters = menu()->currentParameters(sender());
+
     // Joystick-controlled action must occur only if ptz is active.
     const bool ptzActive = widget->options().testFlag(QnResourceWidget::ControlPtz);
-    if (!ptzActive)
+    if (!ptzActive && !parameters.argument(Qn::ItemDataRole::ForceRole).toBool())
         return;
 
     const auto controller = widget->ptzController();
@@ -402,8 +404,7 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
     if (!item || !controller)
         return;
 
-    auto speed = menu()->currentParameters(sender())
-        .argument<QVector3D>(Qn::ItemDataRole::PtzSpeedRole);
+    auto speed = parameters.argument<QVector3D>(Qn::ItemDataRole::PtzSpeedRole);
 
     const auto rotation = item->rotation()
         + (item->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);

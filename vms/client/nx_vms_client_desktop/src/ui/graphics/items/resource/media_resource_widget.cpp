@@ -1817,6 +1817,11 @@ QnPtzControllerPtr QnMediaResourceWidget::ptzController() const
     return m_ptzController;
 }
 
+bool QnMediaResourceWidget::canControlPtz() const
+{
+    return d->canControlPtz();
+}
+
 QnMediaDewarpingParams QnMediaResourceWidget::dewarpingParams() const
 {
     return m_dewarpingParams;

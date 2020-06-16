@@ -32,6 +32,23 @@ public:
     PtzInstrument(QObject* parent = nullptr);
     virtual ~PtzInstrument() override;
 
+    // This instrument operates PTZ via mouse interaction with PTZ overlay.
+
+    // Also, continuous PTZ can be controlled externally using the following function.
+
+    enum class DirectionFlag
+    {
+        panLeft = 0x01,
+        panRight = 0x02,
+        tiltUp = 0x04,
+        tiltDown = 0x08,
+        zoomIn = 0x10,
+        zoomOut = 0x20
+    };
+    Q_DECLARE_FLAGS(DirectionFlags, DirectionFlag)
+
+    void toggleContinuousPtz(DirectionFlag direction, bool on);
+
 signals:
     void ptzProcessStarted(QnMediaResourceWidget* widget);
     void ptzStarted(QnMediaResourceWidget* widget);
@@ -79,6 +96,8 @@ private slots:
     void at_focusButton_activated(qreal speed);
 
     void at_focusAutoButton_clicked();
+
+    void at_display_widgetAboutToBeChanged(Qn::ItemRole role);
 
     void resetIfTargetIsInvisible();
 
@@ -199,4 +218,6 @@ private:
     QScopedPointer<MovementFilter> m_movementFilter;
 
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
+
+    DirectionFlags m_externalPtzDirections;
 };

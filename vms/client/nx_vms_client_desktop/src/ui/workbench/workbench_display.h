@@ -319,6 +319,7 @@ signals:
     void widgetAdded(QnResourceWidget *widget);
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(Qn::ItemRole role);
+    void widgetAboutToBeChanged(Qn::ItemRole role);
 
     void zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
     void zoomLinkAboutToBeRemoved(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);

@@ -832,6 +832,9 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
     QnResourceWidget *newWidget = widget;
     if (oldWidget == newWidget)
         return;
+
+    emit widgetAboutToBeChanged(role);
+
     m_widgetByRole[role] = widget;
 
     switch (role)

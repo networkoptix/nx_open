@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <QtGui/QVector3D>
 
 #include <core/resource/resource_fwd.h>
 
@@ -34,6 +35,7 @@ class RubberBandInstrument;
 class ResizingInstrument;
 class DropInstrument;
 class DragInstrument;
+class PtzInstrument;
 class RotationInstrument;
 class MotionSelectionInstrument;
 class ForwardingInstrument;
@@ -132,7 +134,9 @@ protected slots:
     void at_scene_leftClicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_doubleClicked(QGraphicsView *view, const ClickInfo &info);
+    void at_scene_keyPressedOrReleased(QGraphicsScene *scene, QEvent *event);
     void at_scene_keyPressed(QGraphicsScene *scene, QEvent *event);
+    void at_scene_keyReleased(QGraphicsScene *scene, QEvent *event);
     void at_scene_focusIn(QGraphicsScene *scene, QEvent *event);
 
     void at_display_widgetAdded(QnResourceWidget *widget);
@@ -171,17 +175,6 @@ protected slots:
 
 private:
     void toggleCurrentItemMaximizationState();
-
-    enum class Direction
-    {
-        pan,
-        tilt,
-        zoom,
-        focus
-    };
-
-    bool startContinuousPtz(Direction direction, qreal speed);
-    void stopContinuousPtz(Direction direction);
 
 private:
     /* Global state. */
@@ -235,6 +228,8 @@ private:
     ClickInstrument *m_itemLeftClickInstrument;
 
     ClickInstrument* m_sceneClickInstrument = nullptr;
+
+    PtzInstrument* m_ptzInstrument = nullptr;
 
     ZoomWindowInstrument* m_zoomWindowInstrument;
 

@@ -192,11 +192,13 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_gridAdjustmentInstrument->setSpeed(0.25 / 360.0);
     m_gridAdjustmentInstrument->setMaxSpacing(0.15);
 
-    SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::KeyPress), this);
-    SignalingInstrument *sceneFocusSignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::FocusIn), this);
-    PtzInstrument *ptzInstrument = new PtzInstrument(this);
-    m_zoomWindowInstrument = new ZoomWindowInstrument(this);
+    SignalingInstrument* sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene,
+        Instrument::makeSet(QEvent::KeyPress, QEvent::KeyRelease), this);
+    SignalingInstrument* sceneFocusSignalingInstrument = new SignalingInstrument(Instrument::Scene,
+        Instrument::makeSet(QEvent::FocusIn), this);
 
+    m_ptzInstrument = new PtzInstrument(this);
+    m_zoomWindowInstrument = new ZoomWindowInstrument(this);
 
     m_motionSelectionInstrument->setBrush(subColor(qnGlobals->mrsColor(), qnGlobals->selectionOpacityDelta()));
     m_motionSelectionInstrument->setPen(subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));
@@ -273,14 +275,14 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
     m_manager->installInstrument(m_zoomWindowInstrument);
-    m_manager->installInstrument(ptzInstrument);
+    m_manager->installInstrument(m_ptzInstrument);
 
     display()->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::BackLayer);
 
     connect(m_itemLeftClickInstrument,  SIGNAL(pressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftPressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(ptzInstrument,              SIGNAL(doubleClicked(QnMediaResourceWidget *)),                                             this,                           SLOT(at_item_doubleClicked(QnMediaResourceWidget *)));
+    connect(m_ptzInstrument,            SIGNAL(doubleClicked(QnMediaResourceWidget *)),                                             this,                           SLOT(at_item_doubleClicked(QnMediaResourceWidget *)));
     connect(m_itemRightClickInstrument, SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_sceneClickInstrument,     SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
@@ -296,7 +298,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 this,                           SLOT(at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)));
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)),     this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)));
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                     this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)));
-    connect(sceneKeySignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                             this,                           SLOT(at_scene_keyPressed(QGraphicsScene *, QEvent *)));
+    connect(sceneKeySignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                             this,                           SLOT(at_scene_keyPressedOrReleased(QGraphicsScene *, QEvent *)));
     connect(sceneFocusSignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                           this,                           SLOT(at_scene_focusIn(QGraphicsScene *, QEvent *)));
     connect(m_zoomWindowInstrument,       SIGNAL(zoomRectChanged(QnMediaResourceWidget *, const QRectF &)),                           this,                           SLOT(at_zoomRectChanged(QnMediaResourceWidget *, const QRectF &)));
     connect(m_zoomWindowInstrument,       SIGNAL(zoomRectCreated(QnMediaResourceWidget *, const QColor &, const QRectF &)),           this,                           SLOT(at_zoomRectCreated(QnMediaResourceWidget *, const QColor &, const QRectF &)));
@@ -329,8 +331,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        m_dragInstrument,               SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),         m_rubberBandInstrument,         SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        m_rubberBandInstrument,         SLOT(recursiveEnable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),         ptzInstrument,                  SLOT(recursiveDisable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        ptzInstrument,                  SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),         m_ptzInstrument,                SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        m_ptzInstrument,                SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),         m_motionSelectionInstrument,    SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)),        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
 
@@ -344,8 +346,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        m_rubberBandInstrument,         SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                         m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        m_resizingInstrument,           SLOT(recursiveEnable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                         ptzInstrument,                  SLOT(recursiveDisable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        ptzInstrument,                  SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                         m_ptzInstrument,                SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        m_ptzInstrument,                SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                         m_motionSelectionInstrument,    SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                         boundingInstrument,             SLOT(recursiveDisable()));
@@ -362,17 +364,17 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, &MotionSelectionInstrument::selectionProcessFinished,
         m_resizingInstrument, &ResizingInstrument::recursiveEnable);
 
-    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_handScrollInstrument, &Instrument::recursiveDisable);
-    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_handScrollInstrument, &Instrument::recursiveEnable);
-    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_moveInstrument, &Instrument::recursiveDisable);
-    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_moveInstrument, &Instrument::recursiveEnable);
-    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_motionSelectionInstrument, &Instrument::recursiveDisable);
-    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_motionSelectionInstrument, &Instrument::recursiveEnable);
-    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_itemLeftClickInstrument, &Instrument::recursiveDisable);
-    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_itemLeftClickInstrument, &Instrument::recursiveEnable);
-    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_resizingInstrument, &Instrument::recursiveDisable);
-    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_resizingInstrument, &Instrument::recursiveEnable);
-    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, this, &QnWorkbenchController::at_ptzProcessStarted);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessStarted, m_handScrollInstrument, &Instrument::recursiveDisable);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessFinished, m_handScrollInstrument, &Instrument::recursiveEnable);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessStarted, m_moveInstrument, &Instrument::recursiveDisable);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessFinished, m_moveInstrument, &Instrument::recursiveEnable);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessStarted, m_motionSelectionInstrument, &Instrument::recursiveDisable);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessFinished, m_motionSelectionInstrument, &Instrument::recursiveEnable);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessStarted, m_itemLeftClickInstrument, &Instrument::recursiveDisable);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessFinished, m_itemLeftClickInstrument, &Instrument::recursiveEnable);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessStarted, m_resizingInstrument, &Instrument::recursiveDisable);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessFinished, m_resizingInstrument, &Instrument::recursiveEnable);
+    connect(m_ptzInstrument, &PtzInstrument::ptzProcessStarted, this, &QnWorkbenchController::at_ptzProcessStarted);
 
     connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_handScrollInstrument,         SLOT(recursiveEnable()));
@@ -382,8 +384,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_motionSelectionInstrument,    SLOT(recursiveEnable()));
     connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_itemLeftClickInstrument,      SLOT(recursiveDisable()));
     connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_itemLeftClickInstrument,      SLOT(recursiveEnable()));
-    connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  ptzInstrument,                  SLOT(recursiveDisable()));
-    connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 ptzInstrument,                  SLOT(recursiveEnable()));
+    connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_ptzInstrument,                SLOT(recursiveDisable()));
+    connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_ptzInstrument,                SLOT(recursiveEnable()));
     connect(m_zoomWindowInstrument, &ZoomWindowInstrument::zoomWindowProcessStarted,
         m_resizingInstrument, &ResizingInstrument::recursiveDisable);
     connect(m_zoomWindowInstrument, &ZoomWindowInstrument::zoomWindowProcessFinished,
@@ -591,9 +593,27 @@ void QnWorkbenchController::updateDraggedItems()
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
+void QnWorkbenchController::at_scene_keyPressedOrReleased(QGraphicsScene* scene, QEvent* event)
 {
-    if (event->type() != QEvent::KeyPress)
+    switch (event->type())
+    {
+        case QEvent::KeyPress:
+            at_scene_keyPressed(scene, event);
+            break;
+
+        case QEvent::KeyRelease:
+            at_scene_keyReleased(scene, event);
+            break;
+
+        default:
+            NX_ASSERT(false);
+            break;
+    }
+}
+
+void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEvent* event)
+{
+    if (!NX_ASSERT(event->type() == QEvent::KeyPress))
         return;
 
     event->accept(); /* Accept by default. */
@@ -615,6 +635,19 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
                 tr("To switch between cameras press Shift + Arrow")));
         };
 
+    const auto tryStartPtz =
+        [this](PtzInstrument::DirectionFlag direction) -> bool
+        {
+            const auto widget = qobject_cast<QnMediaResourceWidget*>(
+                display()->widget(Qn::CentralRole));
+
+            if (!widget || !widget->canControlPtz())
+                return false;
+
+            m_ptzInstrument->toggleContinuousPtz(direction, true);
+            return true;
+        };
+
     switch (e->key())
     {
         case Qt::Key_Enter:
@@ -629,7 +662,9 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
                 m_handScrollInstrument->emulate(QPoint(0, -15));
             else if (e->modifiers() & Qt::ShiftModifier)
                 moveCursor(QPoint(0, -1), QPoint(-1, 0));
-            else if (!startContinuousPtz(Direction::tilt, -1.0))
+            else if (e->isAutoRepeat())
+                break;
+            else if (!tryStartPtz(PtzInstrument::DirectionFlag::tiltUp))
                 showNavigationMessage();
             break;
         }
@@ -639,7 +674,9 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
                 m_handScrollInstrument->emulate(QPoint(0, 15));
             else if (e->modifiers() & Qt::ShiftModifier)
                 moveCursor(QPoint(0, 1), QPoint(1, 0));
-            else if (!startContinuousPtz(Direction::tilt, 1.0))
+            else if (e->isAutoRepeat())
+                break;
+            else if (!tryStartPtz(PtzInstrument::DirectionFlag::tiltDown))
                 showNavigationMessage();
             break;
         }
@@ -649,7 +686,9 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
                 m_handScrollInstrument->emulate(QPoint(-15, 0));
             else if (e->modifiers() & Qt::ShiftModifier)
                 moveCursor(QPoint(-1, 0), QPoint(0, -1));
-            else if (!startContinuousPtz(Direction::pan, -1.0))
+            else if (e->isAutoRepeat())
+                break;
+            else if (!tryStartPtz(PtzInstrument::DirectionFlag::panLeft))
                 showNavigationMessage();
             break;
         }
@@ -659,16 +698,28 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
                 m_handScrollInstrument->emulate(QPoint(15, 0));
             else if (e->modifiers() & Qt::ShiftModifier)
                 moveCursor(QPoint(1, 0), QPoint(0, 1));
-            else if (!startContinuousPtz(Direction::pan, 1.0))
+            else if (e->isAutoRepeat())
+                break;
+            else if (!tryStartPtz(PtzInstrument::DirectionFlag::panRight))
                 showNavigationMessage();
             break;
         }
         case Qt::Key_Plus:
         case Qt::Key_Equal:
-            m_wheelZoomInstrument->emulate(30);
+            if (e->modifiers() & Qt::AltModifier)
+                m_wheelZoomInstrument->emulate(30);
+            else if (e->isAutoRepeat())
+                break;
+            else
+                tryStartPtz(PtzInstrument::DirectionFlag::zoomIn);
             break;
         case Qt::Key_Minus:
-            m_wheelZoomInstrument->emulate(-30);
+            if (e->modifiers() & Qt::AltModifier)
+                m_wheelZoomInstrument->emulate(-30);
+            else if (e->isAutoRepeat())
+                break;
+            else
+                tryStartPtz(PtzInstrument::DirectionFlag::zoomOut);
             break;
         case Qt::Key_PageUp:
         case Qt::Key_PageDown:
@@ -719,6 +770,48 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         }
         default:
             event->ignore(); /* Wasn't recognized? Ignore. */
+            break;
+    }
+}
+
+void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEvent* event)
+{
+    if (!NX_ASSERT(event->type() == QEvent::KeyRelease))
+        return;
+
+    event->accept();
+
+    const auto e = static_cast<QKeyEvent*>(event);
+    if (e->isAutoRepeat())
+        return;
+
+    switch (e->key())
+    {
+        case Qt::Key_Up:
+            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::tiltUp, false);
+            break;
+
+        case Qt::Key_Down:
+            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::tiltDown, false);
+            break;
+
+        case Qt::Key_Left:
+            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::panLeft, false);
+            break;
+
+        case Qt::Key_Right:
+            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::panRight, false);
+            break;
+
+        case Qt::Key_Plus:
+            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::zoomIn, false);
+            break;
+
+        case Qt::Key_Minus:
+            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::zoomOut, false);
+            break;
+
+        default:
             break;
     }
 }
@@ -1553,14 +1646,4 @@ void QnWorkbenchController::toggleCurrentItemMaximizationState()
     {
         menu()->triggerIfPossible(action::MaximizeItemAction, widget);
     }
-}
-
-bool QnWorkbenchController::startContinuousPtz(Direction direction, qreal speed)
-{
-    // TODO: #vkutin Implement me!
-    return false;
-};
-
-void QnWorkbenchController::stopContinuousPtz(Direction direction)
-{
 }

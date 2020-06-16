@@ -42,6 +42,8 @@ using namespace nx::vms::client::desktop;
 
 namespace {
 
+static const QVector3D kKeyboardPtzSensitivity(/*pan*/ 0.1, /*tilt*/ 0.1, /*zoom*/ 1.0);
+
 const qreal instantSpeedUpdateThreshold = 0.1;
 const qreal speedUpdateThreshold = 0.001;
 const int speedUpdateIntervalMSec = 500;
@@ -76,6 +78,56 @@ Qt::Orientations capabilitiesToMode(Ptz::Capabilities capabilities)
         result |= Qt::Vertical;
 
     return result;
+}
+
+PtzInstrument::DirectionFlag oppositeDirection(PtzInstrument::DirectionFlag direction)
+{
+    switch (direction)
+    {
+        case PtzInstrument::DirectionFlag::panLeft:
+            return PtzInstrument::DirectionFlag::panRight;
+        case PtzInstrument::DirectionFlag::panRight:
+            return PtzInstrument::DirectionFlag::panLeft;
+        case PtzInstrument::DirectionFlag::tiltUp:
+            return PtzInstrument::DirectionFlag::tiltDown;
+        case PtzInstrument::DirectionFlag::tiltDown:
+            return PtzInstrument::DirectionFlag::tiltUp;
+        case PtzInstrument::DirectionFlag::zoomIn:
+            return PtzInstrument::DirectionFlag::zoomOut;
+        case PtzInstrument::DirectionFlag::zoomOut:
+            return PtzInstrument::DirectionFlag::zoomIn;
+    };
+
+    NX_ASSERT(false);
+    return {};
+};
+
+// TODO: Remove code duplication with QnWorkbenchPtzHandler.
+QVector3D applyRotation(const QVector3D& speed, qreal rotation)
+{
+    QVector3D transformedSpeed = speed;
+
+    rotation = static_cast<qint64>(rotation >= 0 ? rotation + 0.5 : rotation - 0.5) % 360;
+    if (rotation < 0)
+        rotation += 360;
+
+    if (rotation >= 45 && rotation < 135)
+    {
+        transformedSpeed.setX(-speed.y());
+        transformedSpeed.setY(speed.x());
+    }
+    else if (rotation >= 135 && rotation < 225)
+    {
+        transformedSpeed.setX(-speed.x());
+        transformedSpeed.setY(-speed.y());
+    }
+    else if (rotation >= 225 && rotation < 315)
+    {
+        transformedSpeed.setX(speed.y());
+        transformedSpeed.setY(-speed.x());
+    }
+
+    return transformedSpeed;
 }
 
 } // namespace
@@ -205,6 +257,9 @@ PtzInstrument::PtzInstrument(QObject *parent):
                 }
             }
         });
+
+    connect(display(), &QnWorkbenchDisplay::widgetAboutToBeChanged,
+        this, &PtzInstrument::at_display_widgetAboutToBeChanged);
 }
 
 PtzInstrument::~PtzInstrument()
@@ -917,6 +972,9 @@ void PtzInstrument::dragMove(DragInfo* info)
     {
         case ContinuousMovement:
         {
+            if (m_externalPtzDirections != 0)
+                break;
+
             QPointF mouseItemPos = info->mouseItemPos();
             QPointF itemCenter = target()->rect().center();
 
@@ -1168,4 +1226,50 @@ void PtzInstrument::at_focusAutoButton_clicked()
 bool PtzInstrument::PtzData::hasCapabilities(Ptz::Capabilities value) const
 {
     return (capabilities & value) == value;
+}
+
+void PtzInstrument::toggleContinuousPtz(DirectionFlag direction, bool on)
+{
+    if (dragProcessor()->isRunning())
+        return;
+
+    const auto widget = qobject_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
+    if (!widget || m_externalPtzDirections.testFlag(direction) == on)
+        return;
+
+    setTarget(widget);
+
+    // Stop PTZ before setting a new speed. Otherwise it works unexpectedly.
+    ptzMove(widget, {}, true);
+
+    m_externalPtzDirections.setFlag(direction, on);
+
+    if (on)
+        m_externalPtzDirections.setFlag(oppositeDirection(direction), false);
+
+    const QVector3D directionMultiplier(
+        -int(m_externalPtzDirections.testFlag(DirectionFlag::panRight))
+            + int(m_externalPtzDirections.testFlag(DirectionFlag::panLeft)),
+        -int(m_externalPtzDirections.testFlag(DirectionFlag::tiltUp))
+            + int(m_externalPtzDirections.testFlag(DirectionFlag::tiltDown)),
+        -int(m_externalPtzDirections.testFlag(DirectionFlag::zoomOut))
+            + int(m_externalPtzDirections.testFlag(DirectionFlag::zoomIn)));
+
+    const auto rotation = widget->item()->rotation()
+       + (widget->item()->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
+
+    const auto speed = applyRotation(kKeyboardPtzSensitivity * directionMultiplier, rotation);
+    ptzMove(widget, {speed.x(), speed.y(), 0, speed.z()}, true);
+}
+
+void PtzInstrument::at_display_widgetAboutToBeChanged(Qn::ItemRole role)
+{
+    if (role != Qn::CentralRole)
+        return;
+
+    m_externalPtzDirections = {};
+
+    menu()->triggerIfPossible(ui::action::PtzContinuousMoveAction, ui::action::Parameters()
+        .withArgument(Qn::ItemDataRole::PtzSpeedRole, QVariant::fromValue(QVector3D()))
+        .withArgument(Qn::ItemDataRole::ForceRole, true));
 }
