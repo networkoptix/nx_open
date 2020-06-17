@@ -114,7 +114,7 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "Maximum duration of the `IDeviceAgent::setNeededMetadataTypes` method execution in\n"
         "seconds.");
 
-    NX_INI_INT(1, pushDataPacketSdkMethodTimeoutS,
+    NX_INI_INT(5, pushDataPacketSdkMethodTimeoutS,
         "Maximum duration of the `IDeviceAgent::pushDataPacket` method execution in seconds.");
 };
 
