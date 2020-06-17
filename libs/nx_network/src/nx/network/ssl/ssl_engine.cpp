@@ -16,15 +16,87 @@ namespace nx {
 namespace network {
 namespace ssl {
 
-const size_t Engine::kBufferSize = 1024 * 10;
-const int Engine::kRsaLength = 2048;
+static const size_t kBufferSize = 1024 * 10;
+static const int kRsaLength = 2048;
 
 // https://cabforum.org/2017/03/17/ballot-193-825-day-certificate-lifetimes/
-const std::chrono::seconds Engine::kCertExpiration =
-    std::chrono::hours(825 * 24); //< ~2.26 years
+// https://support.apple.com/en-us/HT211025
+static const long kCertMaxDurationS = (long) std::chrono::seconds(std::chrono::hours(24) * 297).count();
 
-String Engine::makeCertificateAndKey(
-    const String& common, const String& country, const String& company)
+static bool setDetails(X509* x509, const Engine::CertDetails& details)
+{
+    const auto name = X509_get_subject_name(x509);
+    const auto setField = [&name](const char* field, const QString& value)
+    {
+        const String utf8value = value.toUtf8();
+        return X509_NAME_add_entry_by_txt(
+            name, field, MBSTRING_UTF8, (unsigned char *) utf8value.data(), -1, -1, 0);
+    };
+
+    return name
+        && setField("C", details.country)
+        && setField("O", details.organization)
+        && setField("CN", details.commonName)
+        && X509_set_issuer_name(x509, name);
+}
+
+static QString rawDetails(X509* x509)
+{
+    auto issuer = utils::wrapUnique(X509_NAME_oneline(
+        X509_get_issuer_name(x509), NULL, 0), [](char* ptr) { free(ptr); });
+
+    if (!issuer || !issuer.get())
+        return String("unable to read details");
+
+    String info(issuer.get() + 1);
+    return info.replace("/", ", ");
+}
+
+static bool isSelfSigned(X509* x509, const Engine::CertDetails& ownDetails)
+{
+    const auto details = rawDetails(x509);
+    return !ownDetails.country.isEmpty() && details.contains("C=" + ownDetails.country)
+        && !ownDetails.organization.isEmpty() && details.contains("O=" + ownDetails.organization)
+        && !ownDetails.commonName.isEmpty() && details.contains("CN=" + ownDetails.commonName);
+}
+
+static bool isExpired(X509* x509)
+{
+    const auto notBefore = X509_get_notBefore(x509);
+    if (!notBefore && X509_cmp_time(notBefore, NULL) < 0)
+    {
+        NX_DEBUG(typeid(Engine), "Certifificate is from the future: %1", rawDetails(x509));
+        return true;
+    }
+
+    const auto notAfter = X509_get_notAfter(x509);
+    if (!notAfter && X509_cmp_time(notAfter, NULL) > 0)
+    {
+        NX_DEBUG(typeid(Engine), "Certifificate is expired: %1", rawDetails(x509));
+        return true;
+    }
+
+    int durationD = 0, durationS = 0;
+    if (!ASN1_TIME_diff(&durationD, &durationS, notBefore, notAfter))
+    {
+        NX_DEBUG(typeid(Engine), "Certifificate has invalid duration: %1", rawDetails(x509));
+        return true;
+    }
+
+    using namespace std::chrono;
+    if (durationD * hours(24) + seconds(durationS) > seconds(kCertMaxDurationS))
+    {
+        NX_DEBUG(typeid(Engine), "Certifificate has incorrect duration %1d %2s > %3s: %4",
+            durationD, durationS, kCertMaxDurationS, rawDetails(x509));
+        return true;
+    }
+
+    NX_DEBUG(typeid(Engine), "Valid certificicate duration %1d %2s: %3",
+        durationD, durationS, rawDetails(x509));
+    return false;
+}
+
+String Engine::makeCertificateAndKey(const CertDetails& details)
 {
     ssl::SslStaticData::instance();
     const int serialNumber = nx::utils::random::number();
@@ -55,20 +127,12 @@ String Engine::makeCertificateAndKey(
         || !X509_set_version(x509.get(), 2) //< x509.v3
         || !ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), serialNumber)
         || !X509_gmtime_adj(X509_get_notBefore(x509.get()), 0)
-        || !X509_gmtime_adj(X509_get_notAfter(x509.get()), kCertExpiration.count())
+        || !X509_gmtime_adj(X509_get_notAfter(x509.get()), kCertMaxDurationS)
         || !X509_set_pubkey(x509.get(), pkey.get()))
     {
         NX_WARNING(typeid(Engine), "Unable to generate X509 cert");
         return String();
     }
-
-    const auto name = X509_get_subject_name(x509.get());
-    const auto nameSet = [&name](const char* field, const String& value)
-    {
-        auto vptr = (unsigned char *)value.data();
-        return X509_NAME_add_entry_by_txt(
-            name, field, MBSTRING_UTF8, vptr, -1, -1, 0);
-    };
 
     // Apple requirement for TLS server certificates in iOS 13 and macOS 10.15:
     // TLS server certificates must contain an ExtendedKeyUsage (EKU) extension containing
@@ -89,9 +153,7 @@ String Engine::makeCertificateAndKey(
     static const auto kKeyUsage =
         "digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment,keyAgreement,keyCertSign";
 
-    if (!name
-        || !nameSet("C", country) || !nameSet("O", company) || !nameSet("CN", common)
-        || !X509_set_issuer_name(x509.get(), name)
+    if (!setDetails(x509.get(), details)
         || !addExt(NID_key_usage, kKeyUsage)
         || !addExt(NID_ext_key_usage, "serverAuth")
         || !X509_sign(x509.get(), pkey.get(), EVP_sha256()))
@@ -114,19 +176,8 @@ String Engine::makeCertificateAndKey(
     return String(writeBuffer);
 }
 
-static String x509info(X509& x509)
-{
-    auto issuer = utils::wrapUnique(X509_NAME_oneline(
-        X509_get_issuer_name(&x509), NULL, 0), [](char* ptr) { free(ptr); });
-
-    if (!issuer || !issuer.get())
-        return String("unavaliable");
-
-    String info(issuer.get() + 1);
-    return info.replace("/", ", ");
-}
-
-static bool x509load(ssl::SslStaticData* sslData, const Buffer& certBytes)
+static bool x509load(
+    ssl::SslStaticData* sslData, const Buffer& certBytes, const Engine::CertDetails& ownDetails)
 {
     const size_t maxChainSize = (size_t)SSL_CTX_get_max_cert_list(sslData->serverContext());
     auto bio = utils::wrapUnique(
@@ -141,14 +192,21 @@ static bool x509load(ssl::SslStaticData* sslData, const Buffer& certBytes)
         return false;
     }
 
-    size_t chainSize = (size_t)certSize;
-    if (!SSL_CTX_use_certificate(sslData->serverContext(), x509.get()))
+    if (isSelfSigned(x509.get(), ownDetails) && isExpired(x509.get()))
     {
-        NX_WARNING(typeid(Engine), lm("Unable to use primary X509: %1").arg(x509info(*x509)));
+        NX_WARNING(typeid(Engine), "Reject to use expired self-signed primary X509: %1",
+            rawDetails(x509.get()));
         return false;
     }
 
-    NX_INFO(typeid(Engine), lm("Primary X509 is loaded: %1").arg(x509info(*x509.get())));
+    size_t chainSize = (size_t)certSize;
+    if (!SSL_CTX_use_certificate(sslData->serverContext(), x509.get()))
+    {
+        NX_WARNING(typeid(Engine), "Unable to use primary X509: %1", rawDetails(x509.get()));
+        return false;
+    }
+
+    NX_INFO(typeid(Engine), "Primary X509 is loaded: %1", rawDetails(x509.get()));
     while (true)
     {
         x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
@@ -165,12 +223,12 @@ static bool x509load(ssl::SslStaticData* sslData, const Buffer& certBytes)
 
         if (SSL_CTX_add_extra_chain_cert(sslData->serverContext(), x509.get()))
         {
-            NX_INFO(typeid(Engine), lm("Chained X509 is loaded: %1").arg(x509info(*x509)));
+            NX_INFO(typeid(Engine), "Chained X509 is loaded: %1", rawDetails(x509.get()));
             x509.release();
         }
         else
         {
-            NX_WARNING(typeid(Engine), lm("Unable to load chained X509: %1").arg(x509info(*x509)));
+            NX_WARNING(typeid(Engine), "Unable to load chained X509: %1", rawDetails(x509.get()));
             return false;
         }
     }
@@ -199,26 +257,21 @@ static bool pKeyLoad(ssl::SslStaticData* sslData, const Buffer& certBytes)
     return true;
 }
 
-bool Engine::useCertificateAndPkey(const String& certData)
+bool Engine::useCertificateAndPkey(const String& certData, const CertDetails& ownDetails)
 {
     const auto sslData = ssl::SslStaticData::instance();
-    return x509load(sslData, certData) && pKeyLoad(sslData, certData);
+    return x509load(sslData, certData, ownDetails) && pKeyLoad(sslData, certData);
 }
 
-bool Engine::useOrCreateCertificate(
-    const QString& filePath,
-    const String& name, const String& country, const String& company)
+bool Engine::useOrCreateCertificate(const QString& filePath, const CertDetails& ownDetails)
 {
-    if (loadCertificateFromFile(filePath))
-    {
-        NX_INFO(typeid(Engine), "Loaded certificate from '%1'", filePath);
+    if (loadCertificateFromFile(filePath, ownDetails))
         return true;
-    }
 
     NX_INFO(typeid(Engine), "Unable to find valid SSL certificate '%1', generate new one",
         filePath);
 
-    const auto certData = makeCertificateAndKey(name, country, company);
+    const auto certData = makeCertificateAndKey(ownDetails);
 
     NX_ASSERT(!certData.isEmpty());
     if (!filePath.isEmpty())
@@ -232,10 +285,10 @@ bool Engine::useOrCreateCertificate(
         }
     }
 
-    return useCertificateAndPkey(certData);
+    return useCertificateAndPkey(certData, ownDetails);
 }
 
-bool Engine::loadCertificateFromFile(const QString& filePath)
+bool Engine::loadCertificateFromFile(const QString& filePath, const CertDetails& ownDetails)
 {
     if (filePath.isEmpty())
     {
@@ -254,7 +307,7 @@ bool Engine::loadCertificateFromFile(const QString& filePath)
     certData = file.readAll();
 
     NX_INFO(typeid(Engine), "Loaded certificate from '%1'", filePath);
-    if (!useCertificateAndPkey(certData))
+    if (!useCertificateAndPkey(certData, ownDetails))
     {
         NX_INFO(typeid(Engine), "Failed to load certificate from '%1'", filePath);
         return false;
@@ -266,9 +319,7 @@ bool Engine::loadCertificateFromFile(const QString& filePath)
 
 void Engine::useRandomCertificate(const String& module)
 {
-    const auto sslCert = makeCertificateAndKey(
-        module, "US", "Network Optix");
-
+    const auto sslCert = makeCertificateAndKey({module, "US", "Network Optix"});
     NX_CRITICAL(!sslCert.isEmpty());
     NX_CRITICAL(useCertificateAndPkey(sslCert));
 }

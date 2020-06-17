@@ -4566,9 +4566,7 @@ void MediaServerProcess::initSsl()
 
     nx::network::ssl::Engine::useOrCreateCertificate(
         serverModule()->settings().sslCertificatePath(),
-        nx::utils::AppInfo::vmsName().toUtf8(),
-        "US",
-        nx::utils::AppInfo::organizationName().toUtf8());
+        {nx::utils::AppInfo::vmsName(), "US", nx::utils::AppInfo::organizationName()});
 
     sslInitialized = true;
 }

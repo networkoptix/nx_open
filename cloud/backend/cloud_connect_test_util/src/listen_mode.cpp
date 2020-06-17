@@ -25,9 +25,9 @@ namespace cctu {
 
 struct Settings
 {
-    nx::network::test::TestTransmissionMode transmissionMode = 
+    nx::network::test::TestTransmissionMode transmissionMode =
         nx::network::test::TestTransmissionMode::spam;
-    
+
     std::chrono::milliseconds rwTimeout =
         nx::network::test::TestConnection::kDefaultRwTimeout;
 
@@ -292,7 +292,7 @@ static std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeSslSer
     }
 
     const auto certificate = network::ssl::Engine::makeCertificateAndKey(
-        "cloud_connect_test_util", "US", "NX");
+        {"cloud_connect_test_util", "US", "NX"});
 
     if (certificate.isEmpty())
         throw std::runtime_error("Could not generate SSL certificate");

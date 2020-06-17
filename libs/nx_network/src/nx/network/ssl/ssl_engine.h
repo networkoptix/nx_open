@@ -14,22 +14,19 @@ namespace ssl {
 
 class NX_NETWORK_API Engine
 {
-    static const size_t kBufferSize;
-    static const int kRsaLength;
-    static const std::chrono::seconds kCertExpiration;
-
 public:
-    static String makeCertificateAndKey(
-        const String& name, const String& country, const String& company);
+    struct CertDetails
+    {
+        QString commonName;
+        QString country;
+        QString organization;
+    };
 
-    static bool useCertificateAndPkey(const String& certData);
+    static String makeCertificateAndKey(const CertDetails& details);
 
-    static bool useOrCreateCertificate(
-        const QString& filePath,
-        const String& name, const String& country, const String& company);
-
-    static bool loadCertificateFromFile(const QString& filePath);
-
+    static bool useCertificateAndPkey(const String& certData, const CertDetails& ownDetails = {});
+    static bool useOrCreateCertificate(const QString& filePath, const CertDetails& ownDetails = {});
+    static bool loadCertificateFromFile(const QString& filePath, const CertDetails& ownDetails = {});
     static void useRandomCertificate(const String& module);
 
     static void setAllowedServerVersions(const String& versions);

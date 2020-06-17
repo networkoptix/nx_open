@@ -102,7 +102,7 @@ void Server::loadSslCertificate()
     else
     {
         nx::network::ssl::Engine::useCertificateAndPkey(
-            nx::network::ssl::Engine::makeCertificateAndKey("nxcloud/mediator", "US", "Nx"));
+            nx::network::ssl::Engine::makeCertificateAndKey({"nxcloud/mediator", "US", "Nx"}));
     }
 }
 

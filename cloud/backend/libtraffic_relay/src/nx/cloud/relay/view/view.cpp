@@ -197,7 +197,7 @@ void View::loadSslCertificate()
     else
     {
         nx::network::ssl::Engine::useCertificateAndPkey(
-            nx::network::ssl::Engine::makeCertificateAndKey("nxcloud/traffic_relay", "US", "Nx"));
+            nx::network::ssl::Engine::makeCertificateAndKey({"nxcloud/traffic_relay", "US", "Nx"}));
     }
 }
 
