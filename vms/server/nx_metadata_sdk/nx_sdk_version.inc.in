@@ -1,0 +1,4 @@
+// This file is generated on SDK build; to be included into nx/sdk/helpers/lib_context.cpp.
+// It contains the SDK version which Plugins report to the Server via nxSdkVersion().
+
+"@nxSdkVersion@"
