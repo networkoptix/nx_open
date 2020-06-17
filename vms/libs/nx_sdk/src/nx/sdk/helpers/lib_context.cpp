@@ -10,9 +10,14 @@ namespace sdk {
 
 void LibContext::setName(const char* name)
 {
-    NX_KIT_ASSERT(name);
-    NX_KIT_ASSERT(name[0] != '\0');
     std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (!NX_KIT_ASSERT(name) || !NX_KIT_ASSERT(name[0] != '\0'))
+    {
+        m_name = "incorrectly_named_lib_context";
+        return;
+    }
+
     m_name = name;
 }
 
@@ -33,6 +38,16 @@ LibContext& libContext()
 /*extern "C"*/ ILibContext* nxLibContext()
 {
     return &libContext();
+}
+
+/*extern "C"*/ const char* nxSdkVersion()
+{
+    static constexpr char str[] =
+        #include <nx_sdk_version.inc>
+    ;
+
+    static_assert(sizeof(str) > 1, "nx_sdk_version.inc must contain a non-empty string literal.");
+    return str;
 }
 
 } // namespace sdk

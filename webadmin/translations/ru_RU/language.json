@@ -77,8 +77,8 @@
         "emailSignature": "Подпись к письму",
         "emailSupportEmail": "Электронная почта поддержки",
         "enableEdgeRecording": "Включить запись на внутренний носитель (edge)",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "Включить WEB сокеты",
+        "maxP2pAllClientsSizeBytes": "Максимальный размер буфера для отправки данных p2p всем клиентам",
         "eventLogPeriodDays": "Размер журнала событий (дни)",
         "ldapAdminDn": "LDAP Администратор DN",
         "ldapSearchBase": "База поиска LDAP",
@@ -87,7 +87,7 @@
         "localSystemId": "Идентификатор локальной системы",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Максимальное различие между синхронизированным и интернет-временем (миллисекунды)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Максимальное различие между синхронизированным и местным временем (миллисекунды)",
-        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
+        "maxP2pQueueSizeBytes": "Максимальный размер P2P очереди (байты)",
         "maxRecordQueueSizeBytes": "Максимальный размер очереди записи (байты)",
         "maxRecordQueueSizeElements": "Максимальный размер очереди записи (элементы)",
         "maxRemoteArchiveSynchronizationThreads": "Максимальное кол-во потоков синхронизации удаленного архива",
@@ -116,7 +116,7 @@
         "timeSynchronizationEnabled": "Синхронизация времени включена",
         "primaryTimeServer": "Основной сервер синхронизации времени",
         "osTimeChangeCheckPeriodMs": "Период проверки изменения времени ОС",
-        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
+        "syncTimeExchangePeriod": "Интервал синхронизации времени для сетевых запросов",
         "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Уведомления об обновлениях включены",
@@ -130,12 +130,12 @@
         "maxWebMTranscoders": "Максимальное количество WEBM-соединений для сервера. Chrome открывает сразу 2 соединения, затем закрывает первое. Поэтому рекомендуется установить значение >= 2 для этого параметра.",
         "maxEventLogRecords": "Максимальное количество записей журнала событий в базе данных. Реальное количество восстановленных записей может быть на 20% выше указанного значения.",
         "forceLiveCacheForPrimaryStream": "Кешировать ли некоторые кадры для основного потока. Значения: «да» - всегда включен (может использовать много оперативной памяти), «нет» - всегда отключен, за исключением случаев, когда это требуется для воспроизведения (например, HLS), «авто» - аналогично «нет», но включается для удобства использования (например, когда какой-то плагин аналитики работает на камере).",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "additionalLocalFsTypes": "Дополнительные типы файловых систем, которые следует учитывать при принятии решения о том, подходит ли данный раздел для хранения на сервере. Ожидается разделенный запятыми список имен файловых систем, как они перечислены в /proc/mounts.",
+        "rtspBufferSizeKb": "Размер буфера RTSP на стороне сервера в КБ. Большее значение позволяет использовать сеть более эффективно с высоким значением задержки в оба конца, но замедляет автоматическое переключение качества и реакцию на операцию поиска RTSP."
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "Графики",
             "storage": "Хранилища",
             "log": "Журнал"
         }

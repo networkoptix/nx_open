@@ -41,15 +41,15 @@
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Фигура</translation>
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Нажмите, чтобы добавить</translation>
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>Показать на видео</translation>
     </message>
   </context>
   <context>
@@ -71,7 +71,7 @@
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>НЕТ ПРЕДПРОСМОТРА</translation>
     </message>
   </context>
   <context>
@@ -86,11 +86,11 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Поток с камеры</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Выберите видеопоток с камеры для анализа</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -98,47 +98,47 @@
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>Обновление...</translation>
     </message>
   </context>
   <context>
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Значение по умолчанию:</translation>
     </message>
   </context>
   <context>
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Линия некорректна. Удалите самопересечения, чтобы продолжить.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Эта линия требует не менее %n точку.</numerusform>
+        <numerusform>Эта линия требует не менее %n точки.</numerusform>
+        <numerusform>Эта линия требует не менее %n точек.</numerusform>
+        <numerusform>Эта линия требует не менее %n точек.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Нажмите на последнюю точку, чтобы закончить рисование линии.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Достигнуто максимальное количество точек (%n).</numerusform>
+        <numerusform>Достигнуто максимальное количество точек (%n).</numerusform>
+        <numerusform>Достигнуто максимальное количество точек (%n).</numerusform>
+        <numerusform>Достигнуто максимальное количество точек (%n).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Нажмите на каждую стрелку, чтобы переключить нужное направление.</translation>
     </message>
   </context>
   <context>
@@ -175,7 +175,7 @@
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Ограничения по размеру</translation>
     </message>
   </context>
   <context>
@@ -200,28 +200,28 @@
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Многоугольник некорректен. Удалите самопересечения, чтобы продолжить.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Этот многоугольник требует как минимум %n точку.</numerusform>
+        <numerusform>Этот многоугольник требует как минимум %n точки.</numerusform>
+        <numerusform>Этот многоугольник требует как минимум %n точек.</numerusform>
+        <numerusform>Этот многоугольник требует как минимум %n точек.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Нажмите на последнюю точку, чтобы закончить рисование многоугольника.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Достигнуто максимальное количество точек (%n).</numerusform>
+        <numerusform>Достигнуто максимальное количество точек (%n).</numerusform>
+        <numerusform>Достигнуто максимальное количество точек (%n).</numerusform>
+        <numerusform>Достигнуто максимальное количество точек (%n).</numerusform>
       </translation>
     </message>
   </context>
@@ -236,19 +236,19 @@
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>МАКС</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>МИН</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Установите минимальный и максимальный размер объекта.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>Минимальный размер объекта не может быть больше максимального.</translation>
     </message>
   </context>
   <context>

@@ -2900,10 +2900,15 @@ to %1</source>
   </context>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
-    <message>
-      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
-      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 z %2 wybranych użytkowników nie są użytkownikami %3 i nie otrzymają powiadomień mobilnych.</translation>
+    <message numerus="yes">
+      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>
+        <numerusform>%n z %1 wybranych użytkowników nie są użytkownikami %2 i nie otrzymają powiadomień mobilnych.</numerusform>
+        <numerusform>%n z %1 wybranych użytkowników nie są użytkownikami %2 i nie otrzymają powiadomień mobilnych.</numerusform>
+        <numerusform>%n z %1 wybranych użytkowników nie są użytkownikami %2 i nie otrzymają powiadomień mobilnych.</numerusform>
+        <numerusform>%n z %1 wybranych użytkowników nie są użytkownikami %2 i nie otrzymają powiadomień mobilnych.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3646,10 +3651,6 @@ to %1</source>
       <translation>Dziennik dostępu</translation>
     </message>
     <message>
-      <source>Health Monitoring</source>
-      <translation>Monitorowanie stanu technicznego</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Zakładki</translation>
     </message>
@@ -3668,10 +3669,6 @@ to %1</source>
     <message>
       <source>Open Audit Trail Log</source>
       <translation>Otwórz dziennik dostępu</translation>
-    </message>
-    <message>
-      <source>Monitor All Servers on a Single Layout</source>
-      <translation>Monitoruj wszystkie serwery na jednym układzie</translation>
     </message>
     <message>
       <source>Open Device List</source>
@@ -6840,14 +6837,6 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>Systemy w chmurze %1 nie mogą zostać złączone</translation>
-    </message>
-    <message>
-      <source>%1 has been successfully configured.</source>
-      <translation>%1 został pomyślnie skonfigurowany.</translation>
-    </message>
-    <message>
-      <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation>Aby zakończyć proces, połącz się za pomocą klienta i zaktualizuj do wersji %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>

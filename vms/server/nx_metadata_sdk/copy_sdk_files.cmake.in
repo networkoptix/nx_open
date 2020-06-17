@@ -4,6 +4,7 @@
 set(sdk_name @sdk_name@)
 set(CMAKE_CURRENT_BINARY_DIR @CMAKE_CURRENT_BINARY_DIR@)
 set(CMAKE_SOURCE_DIR @CMAKE_SOURCE_DIR@)
+set(nx_sdk_version_file @nx_sdk_version_file@)
 set(copied_static_origin @copied_static_origin@)
 set(copied_static_files @copied_static_files@)
 set(copied_nx_kit_origin @copied_nx_kit_origin@)
@@ -25,6 +26,8 @@ set(copied_sample_unit_tests_target @copied_sample_unit_tests_target@)
 include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 
 set(target_dir ${CMAKE_CURRENT_BINARY_DIR}/${sdk_name})
+
+file(COPY ${nx_sdk_version_file} DESTINATION ${target_dir}/src)
 
 nx_copy_always(${copied_static_origin} "${copied_static_files}"
     ${target_dir})

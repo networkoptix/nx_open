@@ -164,6 +164,12 @@ struct NX_VMS_API PluginInfo: Data
      * ever had a DeviceAgent since the Server start.
      */
     bool isActive = true;
+
+    /**%apidoc
+     * Version of the SDK, as reported by plugin's function nxSdkVersion()). Not empty - if the
+     * plugin fails to report the SDK version, this value is set to the description of the reason.
+     */
+    QString nxSdkVersion;
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Optionality)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Status)
@@ -181,7 +187,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
     (statusMessage) \
     (errorCode) \
     (mainInterface) \
-    (isActive)
+    (isActive) \
+    (nxSdkVersion)
 
 NX_VMS_API QString toString(PluginInfo::Optionality value);
 NX_VMS_API QString toString(PluginInfo::Status value);

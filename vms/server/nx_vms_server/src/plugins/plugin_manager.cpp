@@ -193,7 +193,8 @@ static QFileInfoList pluginFileInfoList(const QDir& dirToSearch, bool searchInne
     return filteredEntries;
 }
 
-static QString mainInterfaceMessage(PluginInfo::MainInterface mainInterface)
+static QString additionalStatusMessage(
+    PluginInfo::MainInterface mainInterface, const QString& nxSdkVersion)
 {
     if (mainInterface == PluginInfo::MainInterface::undefined)
         return QString();
@@ -205,9 +206,10 @@ static QString mainInterfaceMessage(PluginInfo::MainInterface mainInterface)
         nx::utils::default_, [] { return false; }
     );
 
-    return lm(" (%1main interface %2)").args(
+    return lm("%1main interface %2, sdk version %3").args(
         isMainInterfaceOldSdk ? "old SDK, " : "",
-        mainInterface);
+        mainInterface,
+        nx::kit::utils::toString(nxSdkVersion));
 }
 
 void PluginManager::storeInternalErrorPluginInfo(
@@ -217,13 +219,13 @@ void PluginManager::storeInternalErrorPluginInfo(
     if (pluginInfo)
     {
         originalPluginInfoDescription =
-            lm("Original PluginInfo fields: errorCode [%1], statusMessage %2.").args(
+            lm("Original PluginInfo fields: errorCode [%1], statusMessage %2").args(
                 pluginInfo->errorCode, nx::kit::utils::toString(pluginInfo->statusMessage));
     }
     else
     {
         pluginInfo.reset(new PluginInfo);
-        originalPluginInfoDescription = "Original PluginInfo is null.";
+        originalPluginInfoDescription = "Original PluginInfo is null";
     }
 
     NX_ASSERT(!errorMessage.isEmpty());
@@ -250,18 +252,18 @@ bool PluginManager::storeNotLoadedPluginInfo(
     )
     {
         storeInternalErrorPluginInfo(pluginInfo, /*plugin*/ nullptr,
-            "Server Plugin was not loaded and an assertion has failed - see the Server log.");
+            "Server Plugin was not loaded and an assertion has failed - see the Server log");
         return false;
     }
 
     pluginInfo->status = status;
     pluginInfo->errorCode = errorCode;
 
-    pluginInfo->statusMessage = lm("%1%2 Server Plugin [%3]%4: %5").args(
+    pluginInfo->statusMessage = lm("%1%2 Server Plugin [%3] (%4): %5").args(
         isOk ? "Skipped loading" : "Failed loading",
         pluginInfo->optionality == Optionality::optional ? " optional" : "",
         pluginInfo->libraryFilename,
-        mainInterfaceMessage(pluginInfo->mainInterface),
+        additionalStatusMessage(pluginInfo->mainInterface, pluginInfo->nxSdkVersion),
         isOk ? reason : QString(lm("[%1]: %2").args(errorCode, reason)));
 
     if (isOk)
@@ -287,14 +289,14 @@ bool PluginManager::storeLoadedPluginInfo(
     )
     {
         storeInternalErrorPluginInfo(pluginInfo, plugin,
-            "Server Plugin was loaded but an assertion has failed - see the Server log.");
+            "Server Plugin was loaded but an assertion has failed - see the Server log");
         return true;
     }
 
-    pluginInfo->statusMessage = lm("Loaded%1 Server plugin [%2]%3").args(
+    pluginInfo->statusMessage = lm("Loaded%1 Server plugin [%2] (%3)").args(
         pluginInfo->optionality == Optionality::optional ? " optional" : "",
         pluginInfo->libraryFilename,
-        mainInterfaceMessage(pluginInfo->mainInterface));
+        additionalStatusMessage(pluginInfo->mainInterface, pluginInfo->nxSdkVersion));
 
     NX_INFO(this, pluginInfo->statusMessage);
 
@@ -314,7 +316,10 @@ bool PluginManager::processPluginEntryPointForNewSdk(
 
     const auto plugin = toPtr(entryPointFunc());
     if (!plugin)
-        return error("Entry point function returned null");
+    {
+        return error(
+            lm("Entry point function %1() returned null").args(IPlugin::kEntryPointFuncName));
+    }
 
     if (!plugin->queryInterface<IPlugin>())
         return error("Interface nx::sdk::IPlugin is not supported");
@@ -365,7 +370,9 @@ bool PluginManager::processPluginEntryPointForOldSdk(
     if (!plugin)
     {
         return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
-            Error::libraryFailure, "Old SDK entry point function returned null");
+            Error::libraryFailure,
+            lm("Old SDK entry point function %1() returned null").args(
+                nxpl::Plugin::kEntryPointFuncName));
     }
 
     pluginInfo->mainInterface = MainInterface::nxpl_PluginInterface;
@@ -401,20 +408,86 @@ bool PluginManager::processPluginEntryPointForOldSdk(
     return true;
 }
 
+bool PluginManager::processLibContext(QLibrary* lib, PluginInfoPtr pluginInfo)
+{
+    const auto nxLibContextFunc = reinterpret_cast<NxLibContextFunc>(
+        lib->resolve(kNxLibContextFuncName));
+
+    if (!nxLibContextFunc) //< This is an old plugin which does not export nxLibContext().
+        return true;
+
+    ILibContext* const pluginLibContext = nxLibContextFunc();
+    if (!pluginLibContext)
+    {
+        return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
+            Error::libraryFailure,
+            lm("Plugin function %1() returned null").args(kNxLibContextFuncName));
+    }
+
+    pluginLibContext->setName(pluginInfo->libName.toStdString().c_str());
+
+    pluginLibContext->setRefCountableRegistry(
+        RefCountableRegistry::createIfEnabled(pluginInfo->libName.toStdString()));
+
+    return true;
+}
+
+bool PluginManager::processSdkVersion(QLibrary* lib, PluginInfoPtr pluginInfo)
+{
+    const auto nxSdkVersionFunc = reinterpret_cast<NxSdkVersionFunc>(
+        lib->resolve(kNxSdkVersionFuncName));
+
+    if (!nxSdkVersionFunc) //< This is an old plugin which does not export nxSdkVersion().
+    {
+        pluginInfo->nxSdkVersion = "<unknown>";
+        return true;
+    }
+
+    const char* const nxSdkVersion = nxSdkVersionFunc();
+    if (!nxSdkVersion)
+    {
+        pluginInfo->nxSdkVersion = "<null>";
+        return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
+            Error::libraryFailure,
+            lm("Plugin function %1() returned null").args(kNxSdkVersionFuncName));
+    }
+
+    const QString trimmedNxSdkVersion = QString::fromLatin1(nxSdkVersion).trimmed();
+
+    // Check for non-ascii-printable characters.
+    for (const QChar c: trimmedNxSdkVersion)
+    {
+        if (!nx::kit::utils::isAsciiPrintable(c.toLatin1()))
+        {
+            pluginInfo->nxSdkVersion = "<invalid>";
+            return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
+                Error::libraryFailure,
+                lm("Plugin function %1() returned a string with invalid character %2").args(
+                    kNxSdkVersionFuncName, nx::kit::utils::toString(c.toLatin1())));
+        }
+    }
+
+    if (trimmedNxSdkVersion.isEmpty())
+    {
+        pluginInfo->nxSdkVersion = "<empty>";
+        return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
+            Error::libraryFailure,
+            lm("Plugin function %1() returned an empty or whitespace-only string").args(
+                kNxSdkVersionFuncName));
+    }
+
+    pluginInfo->nxSdkVersion = trimmedNxSdkVersion;
+    return true;
+}
+
 bool PluginManager::processPluginLib(
     QLibrary* lib, const SettingsHolder& settingsHolder, PluginInfoPtr pluginInfo)
 {
-    if (const auto nxLibContextFunc = reinterpret_cast<NxLibContextFunc>(
-        lib->resolve(kNxLibContextFuncName)))
-    {
-        ILibContext* const pluginLibContext = nxLibContextFunc();
-        if (!NX_ASSERT(pluginLibContext))
-            return false;
+    if (!processLibContext(lib, pluginInfo))
+        return false;
 
-        pluginLibContext->setName(pluginInfo->libName.toStdString().c_str());
-        pluginLibContext->setRefCountableRegistry(
-            RefCountableRegistry::createIfEnabled(pluginInfo->libName.toStdString()));
-    }
+    if (!processSdkVersion(lib, pluginInfo))
+        return false;
 
     if (const auto oldEntryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
         lib->resolve(nxpl::Plugin::kEntryPointFuncName)))

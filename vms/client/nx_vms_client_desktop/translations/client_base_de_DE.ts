@@ -2830,10 +2830,13 @@ to %1</source>
   </context>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
-    <message>
-      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
-      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 von %2 ausgewählten Benutzern sind nicht %3-Benutzer und erhalten keine mobilen Benachrichtigungen.</translation>
+    <message numerus="yes">
+      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>
+        <numerusform>%n von %1 ausgewählten Benutzern ist kein %2-Benutzer und erhält keine mobilen Benachrichtigungen.</numerusform>
+        <numerusform>%n von %1 ausgewählten Benutzern sind keine %2-Benutzer und erhalten keine mobilen Benachrichtigungen.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3562,10 +3565,6 @@ to %1</source>
       <translation>Überwachungsprotokoll</translation>
     </message>
     <message>
-      <source>Health Monitoring</source>
-      <translation>Statusüberwachung</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Lesezeichen</translation>
     </message>
@@ -3584,10 +3583,6 @@ to %1</source>
     <message>
       <source>Open Audit Trail Log</source>
       <translation>Öffne Überwachungsprotokoll</translation>
-    </message>
-    <message>
-      <source>Monitor All Servers on a Single Layout</source>
-      <translation>Zeige alle Server auf einem einzelnen Layout an</translation>
     </message>
     <message>
       <source>Open Device List</source>
@@ -6707,14 +6702,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 systeme können nicht zusammengeführt werden</translation>
-    </message>
-    <message>
-      <source>%1 has been successfully configured.</source>
-      <translation>%1 wurde erfolgreich konfiguriert.</translation>
-    </message>
-    <message>
-      <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation>Um den Vorgang abzuschließen, stellen Sie eine Verbindung zum Client her und führen Sie ein Update auf Version %1 aus.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>

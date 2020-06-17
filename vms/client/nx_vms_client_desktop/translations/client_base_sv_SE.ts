@@ -2835,10 +2835,13 @@ till %1</translation>
   </context>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
-    <message>
-      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
-      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 av %2 utvalda användare är inte %3 användare och får inte mobilaviseringar.</translation>
+    <message numerus="yes">
+      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>
+        <numerusform>%n av %1 utvalda användare är inte %2 användare och får inte mobilaviseringar.</numerusform>
+        <numerusform>%n av %1 utvalda användare är inte %2 användare och får inte mobilaviseringar.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3567,10 +3570,6 @@ till %1</translation>
       <translation>Auditlista</translation>
     </message>
     <message>
-      <source>Health Monitoring</source>
-      <translation>Hälsoövervakning</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Bokmärken</translation>
     </message>
@@ -3589,10 +3588,6 @@ till %1</translation>
     <message>
       <source>Open Audit Trail Log</source>
       <translation>Open Audit Trail Log</translation>
-    </message>
-    <message>
-      <source>Monitor All Servers on a Single Layout</source>
-      <translation>Övervaka alla servrar i en enda vy</translation>
     </message>
     <message>
       <source>Open Device List</source>
@@ -6712,14 +6707,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 System kan inte slås samman</translation>
-    </message>
-    <message>
-      <source>%1 has been successfully configured.</source>
-      <translation>%1 har lyckats konfigureras.</translation>
-    </message>
-    <message>
-      <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation>För att slutföra processen, vänligen anslut till den med en klient och uppdatera till version %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>

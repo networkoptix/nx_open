@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Ограничение частоты кадров для сохранения ЦПУ</translation>
     </message>
   </context>
   <context>
@@ -503,7 +503,7 @@
     <message>
       <location/>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>Использовать исходный сервер событий</translation>
     </message>
   </context>
   <context>
@@ -2081,7 +2081,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
       <source>Sign in</source>
-      <translation type="unfinished">Sign in</translation>
+      <translation>Войти</translation>
     </message>
     <message>
       <location/>
@@ -2165,7 +2165,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
       <source>Attention! Power limit exceeded</source>
-      <translation type="unfinished">Attention! Power limit exceeded</translation>
+      <translation>Внимание! Превышен предел мощности</translation>
     </message>
   </context>
   <context>
@@ -2285,37 +2285,37 @@
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>Настройки языка</translation>
     </message>
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>Особый контент уведомлений</translation>
     </message>
     <message>
       <location/>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Заголовок</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>Будет использоваться заголовок уведомления по умолчанию, если оставить его пустым</translation>
     </message>
     <message>
       <location/>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Тело</translation>
     </message>
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>Будет использоваться текст по умолчанию, если оставить поле пустым</translation>
     </message>
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Добавить имя исходного устройства в тело</translation>
     </message>
   </context>
   <context>
@@ -3226,7 +3226,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation type="unfinished">Custom language for mobile notifications</translation>
+      <translation>Пользовательский язык для мобильных уведомлений</translation>
     </message>
   </context>
   <context>
@@ -3398,7 +3398,7 @@
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>Игнорировать часовой пояс в загруженных файлах</translation>
     </message>
   </context>
   <context>

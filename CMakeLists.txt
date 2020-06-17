@@ -109,8 +109,22 @@ include(strip_target)
 include(vms_protocol_version)
 include(customization_package)
 
+set(metaVersion R7)
 if(customization.advanced.useMetaVersion)
-    set(metaVersion R7)
+    # Set meta-version to be shown in MetaVMS builds - in the Client, etc.
+    set(usedMetaVersion ${metaVersion})
+endif()
+
+# Construct nxSdkVersion.
+set(nxSdkVersion "${releaseVersion} ${metaVersion}")
+if(nxSdkVersion MATCHES "^ " OR nxSdkVersion MATCHES " $")
+    message(FATAL_ERROR "INTERNAL ERROR: Either releaseVersion or metaVersion not set.")
+endif()
+if(developerBuild)
+    string(APPEND nxSdkVersion " dev")
+    if (NOT "${changeSet}" STREQUAL "")
+        string(APPEND nxSdkVersion " ${changeSet}")
+    endif()
 endif()
 
 include(properties)

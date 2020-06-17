@@ -137,6 +137,10 @@ private:
         const SettingsHolder& settingsHolder,
         PluginInfoPtr pluginInfo);
 
+    bool processLibContext(QLibrary* lib, PluginInfoPtr pluginInfo);
+
+    bool processSdkVersion(QLibrary* lib, PluginInfoPtr pluginInfo);
+
     bool processPluginLib(
         QLibrary* lib, const SettingsHolder& settingsHolder, PluginInfoPtr pluginInfo);
 
