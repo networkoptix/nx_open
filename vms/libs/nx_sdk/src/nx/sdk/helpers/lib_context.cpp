@@ -12,6 +12,13 @@ void LibContext::setName(const char* name)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
+    if (!NX_KIT_ASSERT(m_name == kDefaultName,
+        nx::kit::utils::format("Attempt to change LibContext name from %s to %s.",
+            nx::kit::utils::toString(m_name).c_str(), nx::kit::utils::toString(name).c_str())))
+    {
+        return;
+    }
+
     if (!NX_KIT_ASSERT(name) || !NX_KIT_ASSERT(name[0] != '\0'))
     {
         m_name = "incorrectly_named_lib_context";
@@ -24,6 +31,13 @@ void LibContext::setName(const char* name)
 void LibContext::setRefCountableRegistry(IRefCountableRegistry* refCountableRegistry)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (!NX_KIT_ASSERT(!m_refCountableRegistry,
+        nx::kit::utils::format("LibContext refCountableRegistry has already been set.")))
+    {
+        return;
+    }
+
     m_refCountableRegistry.reset(refCountableRegistry);
 }
 
