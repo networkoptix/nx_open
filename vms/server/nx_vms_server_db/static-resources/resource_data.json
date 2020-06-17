@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.270",
+    "version": "1.0.1.275",
     "data": [
         {
             "keys": [
@@ -1032,7 +1032,7 @@
                 "ds-7608ni*|*",
                 "general|dr-tw1516e",
                 "dahua|dhi-nvr616d-128-4ks2",
-                "dw-en4k16|dw-en4k16",
+                "*|dw-en4k16",
                 "itse0804-gn5b-d|general",
                 "hrgx81|embedded_net_dvr",
                 "interlogix|tve-420",
