@@ -1255,7 +1255,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>문제를보고하려면 %1에 연락하십시오.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1303,7 +1303,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>라이센스 키를 수동으로 활성화하려면 %1에 연락하십시오.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1315,11 +1315,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>문제를보고하려면 지역 / 라이센스 지원 부서에 연락하십시오.</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>라이센스 키를 수동으로 활성화하려면 지역 / 라이센스 지원 부서에 연락하십시오.</translation>
     </message>
   </context>
   <context>
@@ -1350,7 +1350,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>나중에 다시 시도하십시오.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1385,11 +1385,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>유효한 라이센스 키를 얻으려면 %1에 연락하십시오.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>문제가 지속되면 %1에 연락하십시오.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
@@ -1397,15 +1397,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>유효한 라이센스 키를 얻으려면 지역 / 라이센스 지원에 연락십시오.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>문제를보고하려면 지역 / 라이센스 지원 부서에 연락하십시오.</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>지역 / 라이센스 지원에 연락하십시오:</translation>
     </message>
   </context>
   <context>
@@ -1660,7 +1660,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>지역 / 라이센스 지원</translation>
     </message>
   </context>
   <context>
@@ -1725,7 +1725,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>경고! 이것은 CPU를 절약하지만 애니메이션에 영향을 줄 수있는 실험적인 옵션입니다.</translation>
     </message>
   </context>
   <context>
@@ -2241,17 +2241,17 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>소스 와 %n 개 카메라 더</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>하나 이상의 장치를 선택하십시오</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>카메라를 하나 이상 선택하십시오</translation>
     </message>
     <message>
       <source>Select Server</source>
@@ -2389,7 +2389,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>버저를 지원하는 서버</translation>
     </message>
   </context>
   <context>
@@ -3435,7 +3435,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>팬 진단을 지원하는 서버</translation>
     </message>
   </context>
   <context>
@@ -3788,7 +3788,7 @@ to %1</source>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>남아있는 비활성화</translation>
     </message>
   </context>
   <context>
@@ -3922,8 +3922,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>비활성화 %n개 남음</numerusform>
       </translation>
     </message>
   </context>
@@ -3947,16 +3947,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>활성화 키 파일을 얻으려면 제공된 라이센스 키와 하드웨어 ID를 %1에 보내십시오.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>활성화 키 파일을 얻으려면 제공된 라이센스 키 및 하드웨어 ID를 지역 / 라이센스 지원 부서로 보내십시오.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>활성화 키 파일을 얻으려면 제공된 라이센스 키와 하드웨어 ID를 지역 / 라이센스 지원 부서(%1) 로 보내십시오.</translation>
     </message>
   </context>
   <context>
@@ -4509,7 +4509,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>PoE 모니터링을 지원하는 서버</translation>
     </message>
   </context>
   <context>
@@ -6599,7 +6599,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>선택한 서버에 연결이 실패했습니다</translation>
     </message>
   </context>
   <context>
@@ -8344,7 +8344,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>프록시 %1 은 사용자 이름과 패스워드가 필요합니다.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
@@ -8442,7 +8442,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>이 ID는 이미 시스템에서 사용 중입니다. 사용가능한 아이디를 찾으려면 생성 버튼을 사용하십시오.</translation>
     </message>
   </context>
   <context>
@@ -8976,7 +8976,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>업데이트 설치에 실패했습니다.</translation>
     </message>
   </context>
   <context>
@@ -9048,7 +9048,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>시스템이 %1에 연결되어 있지 않습니다. 모바일 알림은 시스템이 %1에 연결된 경우에만 작동합니다.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
@@ -9199,7 +9199,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>클라이언트-서버 비디오 트래픽 만 암호화 할 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -9212,7 +9212,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>호환되는 서버가 없습니다</translation>
     </message>
   </context>
   <context>
@@ -9637,7 +9637,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>트랜스 코딩이 필요합니다. 내보내기 세션이 다시 시작되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -9844,12 +9844,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>라이센스 비활성화를 위해 다음을 완료하십시오</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>각 라이센스 키는 최대 %n 번 비활성화 할 수 있음을 유의하십시요.</numerusform>
       </translation>
     </message>
   </context>

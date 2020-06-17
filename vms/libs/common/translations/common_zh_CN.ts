@@ -518,7 +518,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>电视墙</translation>
+      <translation>大屏</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -554,7 +554,7 @@
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation>电视墙授权</translation>
+      <translation>大屏授权</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
@@ -631,7 +631,7 @@
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
       <translation>
-        <numerusform>%n 电视墙授权</numerusform>
+        <numerusform>%n 大屏授权</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -714,7 +714,7 @@
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 电视墙授权</numerusform>
+        <numerusform>%n/%1 大屏授权</numerusform>
       </translation>
     </message>
     <message numerus="yes">

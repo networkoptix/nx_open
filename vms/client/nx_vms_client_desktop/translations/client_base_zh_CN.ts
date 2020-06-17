@@ -4867,7 +4867,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation>电视墙</translation>
+      <translation>大屏</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -4964,7 +4964,7 @@ to %1</source>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation>视频墙</translation>
+      <translation>大屏</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
@@ -6596,7 +6596,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>将在服务器上删除视频墙, 并将其关闭</translation>
+      <translation>将在服务器上删除大屏, 并将其关闭</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
