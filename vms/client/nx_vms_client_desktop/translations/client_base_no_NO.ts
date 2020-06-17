@@ -2270,9 +2270,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kilde og %n flere kameraer</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Kilde og %n kameraer til</numerusform>
       </translation>
     </message>
     <message>
@@ -9189,9 +9189,9 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n symboler igjen</numerusform>
-        <numerusform>%n symbols left</numerusform>
+        <numerusform>%n symboler igjen</numerusform>
       </translation>
     </message>
   </context>
@@ -9982,9 +9982,9 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Merk at hver lisensnøkkel kan deaktiveres maksimalt %n ganger.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+        <numerusform>Merk at hver lisensnøkkel kan deaktiveres maksimalt %n ganger.</numerusform>
       </translation>
     </message>
   </context>

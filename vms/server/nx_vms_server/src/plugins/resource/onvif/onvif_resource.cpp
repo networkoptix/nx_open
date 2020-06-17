@@ -1573,7 +1573,7 @@ void QnPlOnvifResource::onRelayInputStateChangeThreadUnsafe(const QString& name,
     {
         for (size_t i = 0; i < aliasesCount; i++)
         {
-            if (m_portAliases[i] == name)
+            if (m_portAliases[i].compare(name, Qt::CaseInsensitive) == 0)
             {
                 portId = lit("%1").arg(i + 1);
                 break;

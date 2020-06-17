@@ -2077,7 +2077,7 @@
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>استهلاك</translation>
     </message>
     <message>
       <source>Device was disconnected</source>

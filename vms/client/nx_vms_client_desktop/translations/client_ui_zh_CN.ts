@@ -2541,7 +2541,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation>在视频墙上启用时间轴</translation>
+      <translation>在大屏上启用时间轴</translation>
     </message>
   </context>
   <context>

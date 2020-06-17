@@ -637,11 +637,16 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
 
         if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
-            const bool isHiddenEdgeServer =
-                QnMediaServerResource::isHiddenServer(camera->getParentResource());
-            const bool isServerOnline = camera->getParentResource()->getStatus() == Qn::Online;
-            if (isHiddenEdgeServer && isServerOnline && !camera->hasFlags(Qn::wearable_camera))
+            // Cannot remove edge camera from it's own server when it is offline.
+            // TODO: Use edge server tracker here (4.2).
+            const QnMediaServerResourcePtr parentServer = camera->getParentServer();
+            if (parentServer
+                && QnMediaServerResource::isHiddenServer(parentServer)
+                && parentServer->getStatus() == Qn::Online
+                && !camera->hasFlags(Qn::wearable_camera))
+            {
                 return false;
+            }
         }
 
         /* All other resources can be safely deleted if we have correct permissions. */

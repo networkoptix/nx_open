@@ -599,6 +599,13 @@ void QnResourceWidget::setPlaceholderPixmap(const QPixmap& pixmap)
     emit placeholderPixmapChanged();
 }
 
+QString QnResourceWidget::toString() const
+{
+    return lm("QnResourceWidget %1 (%2)").args(
+        item() ? item()->uuid() : QnUuid(),
+        m_resource);
+}
+
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     QSizeF result;

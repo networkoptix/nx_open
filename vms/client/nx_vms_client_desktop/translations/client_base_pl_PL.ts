@@ -1261,7 +1261,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>Aby zgłosić problem, skontaktuj się z %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1269,7 +1269,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Otrzymano nieprawidłowe dane.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1309,7 +1309,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>Aby ręcznie aktywować klucz licencyjny, skontaktuj się z %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1321,11 +1321,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>Aby zgłosić problem, skontaktuj się ze wsparciem regionalnym / licencyjnym:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>Aby aktywować klucz licencyjny ręcznie, skontaktuj się ze wsparciem regionalnym / licencyjnym:</translation>
     </message>
   </context>
   <context>
@@ -1368,7 +1368,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Proszę spróbować ponownie później.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1409,27 +1409,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Aby uzyskać prawidłowy klucz licencyjny, skontaktuj się z %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Jeśli ten problem będzie się utrzymywał, prosimy o kontakt z %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Proszę skontaktować się z %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Aby uzyskać prawidłowy klucz licencyjny, skontaktuj się ze wsparciem regionalnym / licencyjnym:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Jeśli problem będzie się powtarzał, skontaktuj się ze wsparciem regionalnym / licencyjnym:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Skontaktuj się ze wsparciem regionalnym / licencyjnym:</translation>
     </message>
   </context>
   <context>
@@ -1667,7 +1667,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Czy na pewno chcesz opuścić tę stronę? Wprowadzone zmiany mogą nie zostać zapisane.</translation>
     </message>
   </context>
   <context>
@@ -1702,7 +1702,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Wsparcie regionalne / licencyjne</translation>
     </message>
   </context>
   <context>
@@ -1770,7 +1770,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Uwaga! Jest to opcja eksperymentalna, która zmniejsza zużycie CPU, ale może wpływać na animację.</translation>
     </message>
   </context>
   <context>
@@ -2346,7 +2346,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Serwer źródłowy i %1</translation>
     </message>
   </context>
   <context>
@@ -2903,7 +2903,7 @@ to %1</source>
     <message>
       <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
       <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
+      <translation>%1 z %2 wybranych użytkowników nie są użytkownikami %3 i nie otrzymają powiadomień mobilnych.</translation>
     </message>
   </context>
   <context>
@@ -4098,12 +4098,12 @@ to %1</source>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Prosimy o wysłanie dostarczonego klucza licencyjnego i identyfikatora sprzętu do wsparcia regionalnego / licencyjnego w celu uzyskania pliku klucza aktywacyjnego.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Prosimy o wysłanie dostarczonego klucza licencyjnego i identyfikatora sprzętu do wsparcia regionalnego / licencyjnego (%1) w celu uzyskania pliku klucza aktywacyjnego.</translation>
     </message>
   </context>
   <context>
@@ -5918,11 +5918,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>Serwer jest niedostępny.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>teraz</translation>
     </message>
   </context>
   <context>
@@ -7757,11 +7757,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n wartości</numerusform>
+        <numerusform>+%n wartości</numerusform>
+        <numerusform>+%n wartości</numerusform>
+        <numerusform>+%n wartości</numerusform>
       </translation>
     </message>
   </context>
@@ -8486,7 +8486,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Wymagane transkodowanie wideo.</translation>
     </message>
   </context>
   <context>
@@ -9164,7 +9164,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Nie można sprawdzić aktualizacji w Internecie</translation>
     </message>
   </context>
   <context>
@@ -9335,7 +9335,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>Instalacja aktualizacji nie powiodła się.</translation>
     </message>
   </context>
   <context>
@@ -9383,12 +9383,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Nieznane urządzenie</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Nieznane urządzenie %1</translation>
     </message>
   </context>
   <context>
@@ -9407,29 +9407,29 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>System nie jest podłączony do %1. Powiadomienia mobilne działają tylko wtedy, gdy system jest podłączony do %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>Ustawienia %1</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>%n symbol</numerusform>
+        <numerusform>%n symbole</numerusform>
+        <numerusform>%n symboli</numerusform>
+        <numerusform>%n symboli</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>%n symbol pozostał</numerusform>
+        <numerusform>%n symbole pozostały</numerusform>
+        <numerusform>%n symboli pozostało</numerusform>
+        <numerusform>%n symboli pozostało</numerusform>
       </translation>
     </message>
   </context>
@@ -9499,7 +9499,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Ruch + Niska rozdzielczość</translation>
     </message>
   </context>
   <context>
@@ -10023,7 +10023,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>Transkodowanie jest wymagane. Sesja eksportu została zrestartowana.</translation>
     </message>
   </context>
   <context>

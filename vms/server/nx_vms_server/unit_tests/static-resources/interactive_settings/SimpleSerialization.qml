@@ -13,6 +13,7 @@ Settings
                 "caption": "Text Field",
                 "description": "A text field",
                 "defaultValue": "a text",
+                "enabled": false,
                 "validationRegex": "",
                 "validationRegexFlags": "",
                 "validationErrorMessage": ""
@@ -22,7 +23,8 @@ Settings
                 "name": "textArea",
                 "caption": "Text Area",
                 "description": "A text area",
-                "defaultValue": "a text"
+                "defaultValue": "a text",
+                "visible": false
             },
             {
                 "type": "GroupBox",
@@ -107,6 +109,7 @@ Settings
         caption: "Text Field"
         description: "A text field"
         defaultValue: "a text"
+        enabled: false
     }
 
     TextArea
@@ -115,6 +118,7 @@ Settings
         caption: "Text Area"
         description: "A text area"
         defaultValue: "a text"
+        visible: false
     }
 
     GroupBox

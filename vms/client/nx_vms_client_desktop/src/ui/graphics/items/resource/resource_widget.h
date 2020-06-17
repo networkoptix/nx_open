@@ -274,6 +274,9 @@ public:
 
     using base_type::mapRectToScene;
 
+    /** Debug string representation. */
+    QString toString() const;
+
 signals:
     void painted();
     void aspectRatioChanged();

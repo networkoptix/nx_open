@@ -5,7 +5,6 @@
 #include <nx/sdk/interface.h>
 
 #include <nx/sdk/analytics/i_metadata_packet.h>
-#include <nx/sdk/analytics/i_media_context.h>
 
 namespace nx {
 namespace sdk {

@@ -145,7 +145,6 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     m_buttons[kEventLogButton     ]->setIcon(qnSkin->icon("system_settings/event_log.png"));
     m_buttons[kCameraListButton   ]->setIcon(qnSkin->icon("system_settings/cameras_list.png"));
     m_buttons[kAuditLogButton     ]->setIcon(qnSkin->icon("system_settings/audit_trail.png"));
-    m_buttons[kHealthMonitorButton]->setIcon(qnSkin->icon("system_settings/health_monitoring.png"));
     m_buttons[kBookmarksButton    ]->setIcon(qnSkin->icon("system_settings/bookmarks.png"));
 
     retranslateUi();
@@ -154,7 +153,6 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(m_buttons[kEventLogButton     ], Qn::EventLog_Help);
     setHelpTopic(m_buttons[kCameraListButton   ], Qn::Administration_General_CamerasList_Help);
     setHelpTopic(m_buttons[kAuditLogButton     ], Qn::AuditTrail_Help);
-    setHelpTopic(m_buttons[kHealthMonitorButton], Qn::Administration_General_HealthMonitoring_Help);
     setHelpTopic(m_buttons[kBookmarksButton    ], Qn::Bookmarks_Usage_Help);
 
     auto backupHint = nx::vms::client::desktop::HintButton::hintThat(ui->backupGroupBox);
@@ -173,9 +171,6 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     connect(m_buttons[kEventLogButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(ui::action::OpenBusinessLogAction); });
-
-    connect(m_buttons[kHealthMonitorButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(ui::action::OpenInNewTabAction, resourcePool()->getResourcesWithFlag(Qn::server)); });
 
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(ui::action::OpenBookmarksSearchAction); });
@@ -228,7 +223,6 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     m_buttons[kBusinessRulesButton]->setText(tr("Event Rules"));
     m_buttons[kEventLogButton     ]->setText(tr("Event Log"));
     m_buttons[kAuditLogButton     ]->setText(tr("Audit Trail"));
-    m_buttons[kHealthMonitorButton]->setText(tr("Health Monitoring"));
     m_buttons[kBookmarksButton    ]->setText(tr("Bookmarks"));
     m_buttons[kCameraListButton   ]->setText(
         QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(), tr("Device List"), tr("Camera List")));
@@ -254,9 +248,6 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
 
     m_buttons[kBookmarksButton]->setToolTip(shortcutString(ui::action::OpenBookmarksSearchAction,
         tr("Open Bookmarks List")));
-
-    m_buttons[kHealthMonitorButton]->setToolTip(
-        tr("Monitor All Servers on a Single Layout"));
 
     m_buttons[kCameraListButton]->setToolTip(shortcutString(ui::action::CameraListAction,
         QnDeviceDependentStrings::getDefaultNameFromSet(

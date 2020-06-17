@@ -24,6 +24,7 @@ struct UrlParams
     std::optional<QSize> resolution;
     std::optional<MediaQuality> quality;
     std::optional<bool> onvifReplay;
+    std::optional<bool> disableFastChannelZapping;
     //TODO std::optional<int> rotation;
     //TODO std::optional<QString> speed;
     //TODO bool multiplePayloadTypes = false;

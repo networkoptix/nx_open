@@ -249,22 +249,6 @@ bool Filter::matchText(
     return textMatcher->matched();
 }
 
-void Filter::loadUserInputToFreeText(const QString& userInput)
-{
-    freeText = userInputToFreeText(userInput);
-}
-
-QString Filter::userInputToFreeText(const QString& userInput)
-{
-    auto filterWords = userInput.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
-    for (auto& word: filterWords)
-    {
-        if (!word.endsWith('*'))
-            word = word + '*';
-    }
-    return filterWords.join(' ');
-}
-
 bool Filter::operator==(const Filter& right) const
 {
     if (boundingBox.has_value() != right.boundingBox.has_value())

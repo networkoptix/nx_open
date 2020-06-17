@@ -77,6 +77,9 @@ bool UrlParams::parse(const QUrlQuery& query)
     if (query.hasQueryItem("onvif_replay"))
         onvifReplay = true;
 
+    if (query.hasQueryItem("disable_fast_channel_zapping"))
+        disableFastChannelZapping = true;
+
     return true;
 }
 

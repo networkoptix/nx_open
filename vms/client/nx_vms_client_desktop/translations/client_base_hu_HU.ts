@@ -1266,7 +1266,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Érvénytelen adat érkezett.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -3814,23 +3814,23 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Általános</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Jellemzők</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Engedélyezett képernyők</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Munkafolyamat vezérlés engedélyezett</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Archív streamek engedélyezve</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -6938,7 +6938,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Licenc aktiválása...</translation>
     </message>
   </context>
   <context>
@@ -8930,7 +8930,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Frissítések ellenőrzése az Interneten nem lehetséges</translation>
     </message>
   </context>
   <context>
@@ -9257,7 +9257,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Mozgás és alacsony felmontás</translation>
     </message>
   </context>
   <context>

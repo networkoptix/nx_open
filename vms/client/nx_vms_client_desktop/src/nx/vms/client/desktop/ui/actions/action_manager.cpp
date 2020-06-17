@@ -118,6 +118,14 @@ void Manager::registerAction(Action* action)
     m_actionById[action->id()] = action;
     m_idByAction[action] = action->id();
 
+    connect(action, &QAction::triggered, this,
+        [this, id = action->id()]
+        {
+            NX_DEBUG(this, "Triggered action %1 with parameters %2",
+                id,
+                currentParameters(sender()));
+        });
+
     emit actionRegistered(action->id());
 }
 
@@ -173,9 +181,10 @@ void Manager::trigger(IDType id, const Parameters& parameters)
     if (triggerIfPossible(id, parameters))
         return;
 
-    qWarning()
-        << "Action was triggered with a parameter that does not meet the action's requirements."
-        <<  QnLexical::serialized(id);
+    NX_DEBUG(this,
+        "Action %1 was triggered with a parameter that does not meet its requirements:\n%2",
+        id,
+        parameters);
 }
 
 bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)
@@ -416,13 +425,7 @@ Parameters Manager::currentParameters(Action* action) const
     if (m_shortcutAction == action)
         return m_parametersByMenu.value(nullptr);
 
-    if (!m_parametersByMenu.contains(m_lastClickedMenu))
-    {
-        NX_ASSERT(false, "No active menu, no target exists.");
-        return Parameters();
-    }
-
-    return m_parametersByMenu.value(m_lastClickedMenu);
+    return m_parametersByMenu.value(m_lastClickedMenu, Parameters());
 }
 
 Parameters Manager::currentParameters(QObject* sender) const

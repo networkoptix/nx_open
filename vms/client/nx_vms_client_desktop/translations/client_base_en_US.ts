@@ -2830,10 +2830,13 @@ to %1</source>
 </context>
 <context>
     <name>QnCloudUsersValidationPolicy</name>
-    <message>
-        <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
-        <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-        <translation></translation>
+    <message numerus="yes">
+        <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+        <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+        <translation>
+            <numerusform>%n of %1 selected users is not %2 user and will not get mobile notifications.</numerusform>
+            <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3562,10 +3565,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Health Monitoring</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Bookmarks</source>
         <translation></translation>
     </message>
@@ -3583,10 +3582,6 @@ to %1</source>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Monitor All Servers on a Single Layout</source>
         <translation></translation>
     </message>
     <message>
@@ -6704,14 +6699,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>%1 Systems cannot be merged</source>
         <comment>%1 is the short cloud name (like Cloud)</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 has been successfully configured.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To complete the process, please connect to it with Client and update to version %1.</source>
         <translation></translation>
     </message>
     <message>

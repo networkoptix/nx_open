@@ -21,6 +21,7 @@ public:
     enum ErrorCode
     {
         NoError,
+        ServerProtocolIncompatible,
         MergeFailed,
         UpdateFailed,
         Canceled
@@ -38,7 +39,6 @@ public:
     QString mergeErrorMessage() const;
     QnUuid getTargetId() const;
     QnUuid getOriginalId() const;
-    bool wasServerIncompatible() const;
     nx::utils::SoftwareVersion getServerVersion() const;
     /** Get name of the server being merged. */
     QString getServerName() const;
@@ -63,7 +63,6 @@ private:
     QString m_adminPassword;
     QString m_serverName;
     nx::utils::SoftwareVersion m_serverVersion;
-    bool m_wasIncompatible = false;
 
     QPointer<QnMergeSystemsTool> m_mergeTool;
     MergeSystemsStatusValue m_mergeError = MergeSystemsStatusValue::ok;

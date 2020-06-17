@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="874" Culture="th-th">
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="874" Language="1054" Culture="th-th">
   <String Id="Caption">[WixBundleName] การตั้งค่า - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] การตั้งค่า - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>

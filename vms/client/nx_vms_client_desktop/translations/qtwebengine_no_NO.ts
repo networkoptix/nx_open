@@ -9,15 +9,15 @@
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation type="unfinished">General file operation failure</translation>
+      <translation>Generell filoperasjonssvikt</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
-      <translation type="unfinished">The file cannot be written locally, due to access restrictions</translation>
+      <translation>Filen kan ikke skrives lokalt på grunn av tilgangsrestriksjoner</translation>
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
-      <translation type="unfinished">Insufficient space on the target drive</translation>
+      <translation>Utilstrekkelig plass på målstasjonen</translation>
     </message>
     <message>
       <source>The directory or file name is too long</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>The file size exceeds the file system limitation</source>
-      <translation type="unfinished">The file size exceeds the file system limitation</translation>
+      <translation>Filstørrelsen overskrider filsystemets begrensning</translation>
     </message>
     <message>
       <source>The file is infected with a virus</source>
@@ -37,7 +37,7 @@
     </message>
     <message>
       <source>The file was blocked due to local policy</source>
-      <translation type="unfinished">The file was blocked due to local policy</translation>
+      <translation>Filen ble blokkert på grunn av lokal policy</translation>
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>
@@ -45,23 +45,23 @@
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
-      <translation type="unfinished">File seek past the end of a file (resuming previously interrupted download)</translation>
+      <translation>Fil søk etter slutten av en fil (gjenopptatt tidligere avbrutt nedlasting)</translation>
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
-      <translation type="unfinished">The partial file did not match the expected hash</translation>
+      <translation>Delvis fil samsvarte ikke med den forventede hashen</translation>
     </message>
     <message>
       <source>General network failure</source>
-      <translation type="unfinished">General network failure</translation>
+      <translation>Generell nettverkssvikt</translation>
     </message>
     <message>
       <source>The network operation has timed out</source>
-      <translation type="unfinished">The network operation has timed out</translation>
+      <translation>Nettverksoperasjonen har gått ut på tid</translation>
     </message>
     <message>
       <source>The network connection has been terminated</source>
-      <translation type="unfinished">The network connection has been terminated</translation>
+      <translation>Nettverkstilkoblingen har blitt avsluttet</translation>
     </message>
     <message>
       <source>The server has gone down</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>The server did not authorize access to the resource</source>
-      <translation type="unfinished">The server did not authorize access to the resource</translation>
+      <translation>Serveren autoriserte ikke tilgang til ressursen</translation>
     </message>
     <message>
       <source>A problem with the server certificate occurred</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>Last inn på nytt og omgå hurtigbufferen</translation>
     </message>
     <message>
       <source>Open link in this window</source>
@@ -187,7 +187,7 @@
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>Last inn på nytt og omgå hurtigbufferen</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>

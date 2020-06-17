@@ -952,7 +952,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>جارٍ الاتصال...</translation>
     </message>
   </context>
   <context>
@@ -3393,7 +3393,7 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Time</translation>
     </message>
     <message>
       <location/>

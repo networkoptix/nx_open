@@ -1270,7 +1270,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Получены недопустимые данные.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1668,7 +1668,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Покинуть страницу? Сделанные изменения могут быть утеряны.</translation>
     </message>
   </context>
   <context>
@@ -3902,23 +3902,23 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Общее</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Особенности</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Разрешённое число экранов</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Разрешённое число управляемых подключений</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Разрешённое число потоков записи</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -7084,7 +7084,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Активировать лицензию...</translation>
     </message>
   </context>
   <context>
@@ -8707,7 +8707,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Выберите каталог для передачи</translation>
     </message>
   </context>
   <context>
@@ -9170,7 +9170,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Не удаётся проверить обновления в Интернете</translation>
     </message>
   </context>
   <context>
@@ -9505,7 +9505,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Дд + Низ</translation>
     </message>
   </context>
   <context>
@@ -9573,7 +9573,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>Можно зашифровать только видеотрафик между клиентом и сервером</translation>
     </message>
   </context>
   <context>

@@ -12,7 +12,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>クリックして詳細を表示</translation>
     </message>
   </context>
   <context>
@@ -78,11 +78,11 @@
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>バージョン</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>ベンダー:</translation>
     </message>
     <message>
       <source>Camera stream</source>
@@ -94,7 +94,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>リフレッシュ</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -217,7 +217,7 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>追加</translation>
     </message>
   </context>
   <context>

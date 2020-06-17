@@ -903,9 +903,9 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
 
     if (nonCloudCount != 0)
     {
-        return tr("%1 of %2 selected users are not %3 users and will not get mobile notifications.",
-            "%3 here will be substituted with short cloud name e.g. 'Cloud'.")
-            .arg(nonCloudCount)
+        return tr("%n of %1 selected users are not %2 users and will not get mobile notifications.",
+            "%2 here will be substituted with short cloud name e.g. 'Cloud'.",
+            nonCloudCount)
             .arg(totalCount)
             .arg(nx::network::AppInfo::shortCloudName());
     }

@@ -11,6 +11,8 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <nx/utils/range_adapters.h>
+
 namespace nx::vms::client::desktop {
 namespace ui {
 namespace action {
@@ -171,6 +173,27 @@ void Parameters::init(const QVariant& items, const ArgumentHash& arguments)
 {
     setArguments(arguments);
     setItems(items);
+}
+
+QString Parameters::toString() const
+{
+    QStringList arguments;
+    if (m_arguments.contains(-1) && ParameterTypes::size(items()) > 0)
+    {
+        arguments.push_back("Items: [");
+        arguments.push_back("    " + ParameterTypes::toString(items()));
+        arguments.push_back("]");
+    }
+
+    for (auto [key, value]: nx::utils::constKeyValueRange(m_arguments))
+    {
+        if (key == -1)
+            continue;
+
+        arguments.push_back(lm("%1: [%2]").args(key, m_arguments[key]));
+    }
+
+    return arguments.empty() ? "[]" : arguments.join('\n');
 }
 
 } // namespace action

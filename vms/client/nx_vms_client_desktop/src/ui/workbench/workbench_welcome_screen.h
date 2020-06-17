@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -10,6 +12,8 @@
 
 namespace nx::vms::common { struct Credentials; }
 namespace nx::utils { class Url; }
+
+class QnStartupTileManager;
 
 class QnWorkbenchWelcomeScreen: public Connective<QQuickWidget>, public QnWorkbenchContextAware
 {
@@ -69,6 +73,17 @@ public: // Properties
     QString message() const;
 
     int tileHideOptions() const;
+
+    /**
+     * If user never connected or disconnected manually, and there is only one system, initialize
+     * connection to this system automatically.
+     */
+    void initializeStartupTilesHandling();
+
+    /**
+     * Stop auto-connection to the first found system if user explicitly did something.
+     */
+    void skipStartupTilesHandling();
 
 public:
     void setupFactorySystem(const QString& serverUrl);
@@ -153,4 +168,5 @@ private:
     bool m_visibleControls = false;
     QString m_connectingSystemName;
     QString m_message;
+    std::unique_ptr<QnStartupTileManager> m_startupTileManager;
 };

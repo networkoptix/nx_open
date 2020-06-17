@@ -1,24 +1,20 @@
-#ifndef VIDEOWALL_ITEM_INDEX_H
-#define VIDEOWALL_ITEM_INDEX_H
+#pragma once
 
-#include <QtCore/QMetaType>
-#include <nx/utils/uuid.h>
 #include <QtCore/QList>
+#include <QtCore/QMetaType>
 
 #include <core/resource/resource_fwd.h>
 
-#ifndef Q_MOC_RUN
-#include <boost/operators.hpp>
-#endif
+#include <nx/utils/uuid.h>
 
 /**
  * This class contains all the necessary information to look up a videowall item.
  */
-class QnVideoWallItemIndex: public boost::equality_comparable1<QnVideoWallItemIndex>  {
+class QnVideoWallItemIndex
+{
 public:
-    QnVideoWallItemIndex() {}
-
-    QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QnUuid &uuid);
+    QnVideoWallItemIndex();
+    QnVideoWallItemIndex(const QnVideoWallResourcePtr& videowall, const QnUuid& uuid);
 
     QnVideoWallResourcePtr videowall() const;
     QnVideoWallItem item() const;
@@ -30,9 +26,19 @@ public:
     /** \return true if the index contains valid videowall item data. */
     bool isValid() const;
 
-    friend bool operator==(const QnVideoWallItemIndex &l, const QnVideoWallItemIndex &r) {
+    /** Debug string representation. */
+    QString toString() const;
+
+    friend bool operator==(const QnVideoWallItemIndex& l, const QnVideoWallItemIndex& r)
+    {
         return l.m_videowall == r.m_videowall && l.m_uuid == r.m_uuid;
     }
+
+    friend bool operator!=(const QnVideoWallItemIndex& l, const QnVideoWallItemIndex& r)
+    {
+        return !(l == r);
+    }
+
 private:
     QnVideoWallResourcePtr m_videowall;
     QnUuid m_uuid;
@@ -40,6 +46,3 @@ private:
 
 Q_DECLARE_METATYPE(QnVideoWallItemIndex)
 Q_DECLARE_METATYPE(QnVideoWallItemIndexList)
-
-
-#endif // VIDEOWALL_ITEM_INDEX_H

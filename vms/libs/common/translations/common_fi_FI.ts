@@ -1841,15 +1841,15 @@
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Yhteys laitteeseen katkaistu</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Yhteys kameraan katkaistu</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>Yhteys I/O-moduuliin katkaistu</translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>

@@ -116,9 +116,9 @@
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>Denne linjen krever minst %n poeng.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Denne polygonen krever minst %n punkter.</numerusform>
+        <numerusform>Denne polygonen krever minst %n punkter.</numerusform>
       </translation>
     </message>
     <message>
@@ -127,9 +127,9 @@
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Maksimalt antall poeng er nådd (%n poeng).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>Maksimalt antall poeng er nådd (%n poeng).</numerusform>
       </translation>
     </message>
     <message>
@@ -200,9 +200,9 @@
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Denne polygonen krever minst %n punkter.</numerusform>
+        <numerusform>Denne polygonen krever minst %n punkter.</numerusform>
       </translation>
     </message>
     <message>
@@ -211,8 +211,8 @@
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Maksimalt antall poeng er nådd (%n poeng).</numerusform>
         <numerusform>Maksimalt antall poeng er nådd (%n poeng).</numerusform>
       </translation>
     </message>

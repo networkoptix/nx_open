@@ -1081,7 +1081,7 @@
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>days</translation>
     </message>
     <message>
       <source>wks</source>

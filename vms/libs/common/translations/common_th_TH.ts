@@ -1781,15 +1781,15 @@
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>อุปกรณ์ถูกตัดการเชื่อมต่อ</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>กล้องถูกตัดการเชื่อมต่อ</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>โมดูล I / O ถูกตัดการเชื่อมต่อ</translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>

@@ -1263,7 +1263,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>ได้รับข้อมูลที่ไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -3768,11 +3768,11 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>ทั่วไป</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>คุณสมบัติ</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
@@ -3780,11 +3780,11 @@ to %1</source>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>ควบคุมเซสชั่นที่ได้รับอนุญาต</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>เก็บสตรีมที่ได้รับอนุญาต</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -6862,7 +6862,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>เปิดใช้งานใบอนุญาต...</translation>
     </message>
   </context>
   <context>
@@ -9131,7 +9131,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>การเคลื่อนไหว + Lo-Res</translation>
     </message>
   </context>
   <context>

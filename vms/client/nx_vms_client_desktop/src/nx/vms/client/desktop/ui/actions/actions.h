@@ -1212,6 +1212,8 @@ enum IDType
 
 void initialize(Manager* manager, Action* root);
 
+QString toString(IDType id);
+
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop

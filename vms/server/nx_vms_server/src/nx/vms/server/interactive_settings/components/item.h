@@ -21,6 +21,8 @@ class Item: public QObject
     Q_PROPERTY(QString name MEMBER m_name FINAL)
     Q_PROPERTY(QString caption MEMBER m_caption FINAL)
     Q_PROPERTY(QString description MEMBER m_description FINAL)
+    Q_PROPERTY(bool visible MEMBER m_visible FINAL)
+    Q_PROPERTY(bool enabled MEMBER m_enabled FINAL)
 
 public:
     static QString kInterativeSettingsEngineProperty;
@@ -32,6 +34,8 @@ public:
     QString name() const { return m_name; }
     QString caption() const { return m_caption; }
     QString description() const { return m_description; }
+    bool visible() const { return m_visible; }
+    bool enabled() const { return m_enabled; }
 
     virtual QJsonObject serializeModel() const;
 
@@ -49,6 +53,8 @@ private:
     QString m_name;
     QString m_caption;
     QString m_description;
+    bool m_visible = true;
+    bool m_enabled = true;
 };
 
 } // namespace nx::vms::server::interactive_settings::components

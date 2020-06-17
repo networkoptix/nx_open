@@ -3,8 +3,7 @@
 #pragma once
 
 #include <cstring>
-#include <cstdarg>
-#include <cassert>
+#include <string>
 #include <type_traits>
 
 #include <nx/sdk/ptr.h>
@@ -77,7 +76,7 @@ protected:
     template<int len>
     static constexpr const InterfaceId* makeId(const char (&charArray)[len])
     {
-        static_assert(len + /*terminating zero*/ 1 >= InterfaceId::minSize(),
+        static_assert(len + /*terminating \0*/ 1 >= InterfaceId::minSize(),
             "Interface id is too short");
 
         return reinterpret_cast<const InterfaceId*>(charArray);
@@ -103,30 +102,17 @@ protected:
     template<class TemplateInstance, class TemplateArg, int len>
     static const InterfaceId* makeIdForTemplate(const char (&baseIdCharArray)[len])
     {
-        static constexpr int kMaxStaticInterfaceIdSize = 256;
-
-        static_assert(len >= 1, "baseIdCharArray should not be empty");
+        static_assert(len + /*angle brackets*/ 2 + /*terminating \0*/ 1 >= InterfaceId::minSize(),
+            "Base part of interface id is too short");
         static_assert(std::is_base_of<IRefCountable, TemplateInstance>::value,
-            "TemplateInstance should be inherited from IRefCountable");
+            "TemplateInstance must be inherited from IRefCountable");
         static_assert(std::is_base_of<IRefCountable, TemplateArg>::value,
-            "TemplateArg should be inherited from IRefCountable");
+            "TemplateArg must be inherited from IRefCountable");
 
-        // The id is stored in a static array because it is unique for the given template args.
-        static char id[kMaxStaticInterfaceIdSize];
-        assert(id[0] == '\0'); //< Assert that the static id has not been initialized yet.
+        static const std::string id =
+            std::string(&baseIdCharArray[0]) + "<" + &TemplateArg::interfaceId()->value[0] + ">";
 
-        const int result = snprintf(
-            id,
-            kMaxStaticInterfaceIdSize,
-            "%s<%s>",
-            baseIdCharArray,
-            TemplateArg::interfaceId()->value);
-
-        /*unused*/ (void) result; //< If assert() is wiped out in Release, `result` will be unused.
-        assert(result >= InterfaceId::minSize() - 1);
-        assert(result < kMaxStaticInterfaceIdSize);
-
-        return reinterpret_cast<const InterfaceId*>(id);
+        return reinterpret_cast<const InterfaceId*>(id.c_str());
     }
 
     /**

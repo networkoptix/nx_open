@@ -82,7 +82,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
         NX_CRITICAL(false, "Welcome screen loading failed.");
     }
 
-    NX_CRITICAL(qnStartupTileManager, "Startup tile manager does not exists");
     NX_CRITICAL(qnCloudStatusWatcher, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
         this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
@@ -98,9 +97,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
         if (valueId == QnClientSettings::AUTO_LOGIN)
             emit resetAutoLogin();
     });
-
-    connect(qnStartupTileManager, &QnStartupTileManager::tileActionRequested,
-        this, &QnWorkbenchWelcomeScreen::handleStartupTileAction);
 }
 
 void QnWorkbenchWelcomeScreen::resizeEvent(QResizeEvent* event)
@@ -198,7 +194,7 @@ void QnWorkbenchWelcomeScreen::hideEvent(QHideEvent* event)
     base_type::hideEvent(event);
 
     setGlobalPreloaderVisible(false); //< Auto toggle off preloader
-    qnStartupTileManager->skipTileAction(); //< available only on first show
+    skipStartupTilesHandling(); //< available only on first show
 
     action(action::EscapeHotkeyAction)->setEnabled(true);
 }
@@ -324,6 +320,22 @@ int QnWorkbenchWelcomeScreen::tileHideOptions() const
     return ini().tileHideOptions;
 }
 
+void QnWorkbenchWelcomeScreen::initializeStartupTilesHandling()
+{
+    if (!qnClientCoreSettings->skipStartupTilesManagement())
+    {
+        m_startupTileManager = std::make_unique<QnStartupTileManager>();
+        connect(m_startupTileManager.get(), &QnStartupTileManager::tileActionRequested,
+            this, &QnWorkbenchWelcomeScreen::handleStartupTileAction);
+    }
+}
+
+void QnWorkbenchWelcomeScreen::skipStartupTilesHandling()
+{
+    if (m_startupTileManager)
+        m_startupTileManager->skipTileAction();
+}
+
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
 {
     return !extractResources(urls).isEmpty();
@@ -406,6 +418,8 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     if (!connectingToSystem().isEmpty())
         return; //< Connection process is in progress
 
+    NX_DEBUG(this, "Delayed connect to the system %1 after click on tile", serverUrl);
+
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
     const auto connectFunction =
@@ -419,6 +433,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             if (!credentials.user.isEmpty())
                 url.setUserName(credentials.user);
 
+            NX_DEBUG(this, "Connecting to the system %1 after click on tile", url);
             LogonParameters parameters(url);
             parameters.autoLogin = autoLogin;
             parameters.storePassword = storePassword;
