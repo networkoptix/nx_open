@@ -14,6 +14,8 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/skin.h>
 
+#include <nx/vms/client/desktop/ini.h>
+
 #include "selection_item.h"
 
 using nx::vms::client::core::Geometry;
@@ -358,7 +360,8 @@ private:
         return qMin(rect.width(), rect.height()) / 32;
     }
 
-    void updateLayout() {
+    void updateLayout()
+    {
         /* We're doing manual layout of child items as this is an overlay widget and
          * we don't want layouts to mess up widget's size constraints. */
 
@@ -373,16 +376,40 @@ private:
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
         m_modeButton->setGeometry(QRectF(left + xStep - yStep * 1.5, 3.0 * size));
 
-        m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
-        m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));
+        if (nx::vms::client::desktop::ini().oldPtzAimOverlay)
+        {
 
-        if(m_focusAutoButton->isVisible()) {
-            m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 2.25, 1.5 * size));
-            m_focusAutoButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 0.75, 1.5 * size));
-            m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.75, 1.5 * size));
-        } else {
-            m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 1.5, 1.5 * size));
-            m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.0, 1.5 * size));
+            m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
+            m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));
+
+            if (m_focusAutoButton->isVisible())
+            {
+                m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 2.25, 1.5 * size));
+                m_focusAutoButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 0.75, 1.5 * size));
+                m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.75, 1.5 * size));
+            }
+            else
+            {
+                m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 1.5, 1.5 * size));
+                m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.0, 1.5 * size));
+            }
+        }
+        else
+        {
+            m_zoomInButton->setGeometry(QRectF(left + xStep * 0.5 - yStep * 2.0, 1.5 * size));
+            m_zoomOutButton->setGeometry(QRectF(left + xStep * 0.5 + yStep * 0.5, 1.5 * size));
+
+            if (m_focusAutoButton->isVisible())
+            {
+                m_focusInButton->setGeometry(QRectF(right - xStep * 2.0 - yStep * 2.25, 1.5 * size));
+                m_focusAutoButton->setGeometry(QRectF(right - xStep * 2.0 - yStep * 0.75, 1.5 * size));
+                m_focusOutButton->setGeometry(QRectF(right - xStep * 2.0 + yStep * 0.75, 1.5 * size));
+            }
+            else
+            {
+                m_focusInButton->setGeometry(QRectF(right - xStep * 2.0 - yStep * 1.5, 1.5 * size));
+                m_focusOutButton->setGeometry(QRectF(right - xStep * 2.0 + yStep * 0.0, 1.5 * size));
+            }
         }
     }
 
@@ -398,6 +425,83 @@ private:
     QPen m_pen;
 };
 
+// -----------------------------------------------------------------------------------------------
+// PtzNewArrowItem
+// -----------------------------------------------------------------------------------------------
+class PtzNewArrowItem: public Customized<QGraphicsWidget>
+{
+    Q_OBJECT
+    using base_type = Customized<QGraphicsWidget>;
+
+public:
+    PtzNewArrowItem(QGraphicsWidget* parent = nullptr): base_type(parent) {}
+    virtual ~PtzNewArrowItem() override = default;
+
+    // Sized direction.
+    QPointF direction() const { return m_direction; }
+
+    void setDirection(const QPointF& value)
+    {
+        static constexpr qreal kArrowLength = 5.0;
+        static constexpr qreal kHalfArrowWidth = 5.5;
+        static constexpr qreal kHalfShaftWidth = 2.5;
+        static constexpr qreal kMaximumLength = 200.0;
+
+        m_direction = value;
+        m_length = qMin(qSqrt(QPointF::dotProduct(m_direction, m_direction)), kMaximumLength);
+        m_angle = qRadiansToDegrees(qAtan2(m_direction.y(), m_direction.x()));
+
+        const auto arrowX = qMax(kArrowLength, m_length - kArrowLength);
+
+        m_arrowPath = QPainterPath();
+        m_arrowPath.moveTo(0.0, kHalfShaftWidth);
+        m_arrowPath.lineTo(arrowX, kHalfShaftWidth);
+        m_arrowPath.lineTo(arrowX, kHalfArrowWidth);
+        m_arrowPath.lineTo(arrowX + kArrowLength, 0.0);
+        m_arrowPath.lineTo(arrowX, -kHalfArrowWidth);
+        m_arrowPath.lineTo(arrowX, -kHalfShaftWidth);
+        m_arrowPath.lineTo(0.0, -kHalfShaftWidth);
+        m_arrowPath.closeSubpath();
+
+        update();
+    }
+
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/,
+        QWidget* /*widget*/) override
+    {
+        if (m_direction.isNull())
+            return;
+
+        static constexpr qreal kBigRadius = 8.5;
+        static constexpr qreal kSmallRadius = 2.5;
+        static constexpr qreal kMinimumLength = 10.0;
+
+        QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
+        QnScopedPainterBrushRollback brushRollback(painter, palette().dark());
+        QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+
+        painter->drawEllipse(QPointF(0, 0), kBigRadius, kBigRadius);
+
+        if (m_length >= kMinimumLength)
+        {
+            QnScopedPainterTransformRollback transformRollback(painter);
+            painter->rotate(m_angle);
+            painter->setBrush(palette().midlight());
+            painter->setPen({palette().shadow(), 1.0, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin});
+            painter->drawPath(m_arrowPath);
+        }
+
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(palette().light());
+        painter->drawEllipse(QPointF(0, 0), kSmallRadius, kSmallRadius);
+    }
+
+private:
+    QPointF m_direction;
+    qreal m_length = 0.0;
+    qreal m_angle = 0.0;
+    QPainterPath m_arrowPath;
+};
 
 // -------------------------------------------------------------------------- //
 // PtzElementsWidget
@@ -408,22 +512,22 @@ class PtzElementsWidget: public QnGuiElementsWidget {
 
 public:
     PtzElementsWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
-        base_type(parent, windowFlags)
+        base_type(parent, windowFlags),
+        m_arrowItem(new PtzArrowItem(this)),
+        m_newArrowItem(new PtzNewArrowItem(this))
     {
         setAcceptedMouseButtons(0);
-
-        m_arrowItem = new PtzArrowItem(this);
         m_arrowItem->setOpacity(0.0);
+        m_newArrowItem->setOpacity(0.0);
     }
 
-    PtzArrowItem *arrowItem() const {
-        return m_arrowItem;
-    }
+    PtzArrowItem* arrowItem() const { return m_arrowItem; }
+    PtzNewArrowItem* newArrowItem() const { return m_newArrowItem; }
 
 private:
-    PtzArrowItem *m_arrowItem;
+    PtzArrowItem* const m_arrowItem;
+    PtzNewArrowItem* const m_newArrowItem;
 };
-
 
 // -------------------------------------------------------------------------- //
 // PtzSplashItem

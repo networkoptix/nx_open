@@ -762,6 +762,17 @@
         "pen": { "color": "ptz.setAlpha(192)" }
     },
 
+    "PtzNewArrowItem": {
+        "palette": { 
+            "default": { 
+                "dark": "dark5.setAlpha(102)",
+                "midlight": "light1.setAlpha(153)",
+                "light": "light1",
+                "shadow": "dark5.setAlpha(51)"
+            } 
+        }
+    },
+
     "PtzSplashItem": {
         "color": "ptz.setAlpha(128)"
     },

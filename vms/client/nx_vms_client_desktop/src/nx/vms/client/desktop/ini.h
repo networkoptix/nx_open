@@ -262,6 +262,9 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, delayRightPanelLiveAnalytics,
         "Prohibits showing right panel live analytics before corresponding frame appears on\n"
         "the camera if the camera is playing live");
+
+    NX_INI_FLAG(0, oldPtzAimOverlay,
+        "Use old-style circular aim overlay to operate PTZ pan and tilt.");
 };
 
 inline Ini& ini()

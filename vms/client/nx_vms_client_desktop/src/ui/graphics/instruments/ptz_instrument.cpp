@@ -35,6 +35,8 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_layout.h>
 
+#include <nx/vms/client/desktop/ini.h>
+
 using nx::vms::client::core::Geometry;
 
 using namespace nx::core;
@@ -342,7 +344,10 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
     overlay->focusAutoButton()->setTarget(widget);
     overlay->modeButton()->setTarget(widget);
     overlay->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
-    overlay->setMarkersMode(capabilitiesToMode(data.capabilities));
+
+    overlay->setMarkersMode(ini().oldPtzAimOverlay
+        ? capabilitiesToMode(data.capabilities)
+        : Qt::Orientations());
 
     data.overlayWidget = overlay;
 
@@ -469,12 +474,6 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
     if (manipulator)
     {
         m_movement = ContinuousMovement;
-
-        m_movementOrientations = 0;
-        if (data.hasCapabilities(Ptz::ContinuousPanCapability))
-            m_movementOrientations |= Qt::Horizontal;
-        if (data.hasCapabilities(Ptz::ContinuousTiltCapability))
-            m_movementOrientations |= Qt::Vertical;
     }
     else
     {
@@ -488,11 +487,25 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
         {
             m_movement = ViewportMovement;
         }
+        else if (!ini().oldPtzAimOverlay && (data.hasCapabilities(Ptz::ContinuousPanCapability)
+            || data.hasCapabilities(Ptz::ContinuousTiltCapability)))
+        {
+            m_movement = ContinuousMovement;
+        }
         else
         {
             m_movement = NoMovement;
             return false;
         }
+    }
+
+    if (m_movement == ContinuousMovement)
+    {
+        m_movementOrientations = 0;
+        if (data.hasCapabilities(Ptz::ContinuousPanCapability))
+            m_movementOrientations |= Qt::Horizontal;
+        if (data.hasCapabilities(Ptz::ContinuousTiltCapability))
+            m_movementOrientations |= Qt::Vertical;
     }
 
     m_skipNextAction = false;
@@ -588,12 +601,21 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         const bool hasZoom = data.hasCapabilities(Ptz::ContinuousZoomCapability);
         const bool hasFocus = data.hasCapabilities(Ptz::ContinuousFocusCapability);
         const bool hasAutoFocus = data.traits.contains(Ptz::ManualAutoFocusPtzTrait);
+        const bool hasViewportMode = data.hasCapabilities(Ptz::ViewportPtzCapability);
+        const bool showManipulator = canMove && ini().oldPtzAimOverlay;
 
-        overlayWidget->manipulatorWidget()->setVisible(canMove);
+        overlayWidget->manipulatorWidget()->setVisible(showManipulator);
         overlayWidget->zoomInButton()->setVisible(hasZoom);
         overlayWidget->zoomOutButton()->setVisible(hasZoom);
         overlayWidget->focusInButton()->setVisible(hasFocus);
         overlayWidget->focusOutButton()->setVisible(hasFocus);
+
+        if (hasViewportMode)
+            overlayWidget->setCursor(Qt::CrossCursor);
+        else if (canMove && !showManipulator )
+            overlayWidget->setCursor(Qt::SizeAllCursor);
+        else
+            overlayWidget->unsetCursor();
 
         const bool autoFocusWasVisible = overlayWidget->focusAutoButton()->isVisible();
         overlayWidget->focusAutoButton()->setVisible(hasAutoFocus);
@@ -605,8 +627,11 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
                 : 90;
             overlayWidget->modeButton()->setText(QString::number(panoAngle));
         }
+
         overlayWidget->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
-        overlayWidget->setMarkersMode(capabilitiesToMode(data.capabilities));
+        overlayWidget->setMarkersMode(ini().oldPtzAimOverlay
+            ? capabilitiesToMode(data.capabilities)
+            : Qt::Orientations());
 
         if (autoFocusWasVisible != hasAutoFocus)
             overlayWidget->forceUpdateLayout();
@@ -915,7 +940,7 @@ void PtzInstrument::startDragProcess(DragInfo* /*info*/)
     emit ptzProcessStarted(target());
 }
 
-void PtzInstrument::startDrag(DragInfo* /*info*/)
+void PtzInstrument::startDrag(DragInfo* info)
 {
     m_isClick = false;
     m_isDoubleClick = false;
@@ -940,8 +965,22 @@ void PtzInstrument::startDrag(DragInfo* /*info*/)
             target()->setCursor(Qt::BlankCursor);
 
             ensureElementsWidget();
-            opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
+
+            if (ini().oldPtzAimOverlay)
+            {
+                opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
+            }
+            else
+            {
+                elementsWidget()->newArrowItem()->setDirection({});
+                elementsWidget()->newArrowItem()->setPos(elementsWidget()->mapFromItem(target(),
+                    info->mouseItemPos()));
+
+                opacityAnimator(elementsWidget()->newArrowItem())->animateTo(1.0);
+            }
+
             break;
+
         case ViewportMovement:
             ensureSelectionItem();
             selectionItem()->setParentItem(target());
@@ -992,11 +1031,20 @@ void PtzInstrument::dragMove(DragInfo* info)
             qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
 
             ensureElementsWidget();
-            auto arrowItem = elementsWidget()->arrowItem();
 
-            arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()),
-                elementsWidget()->mapFromItem(target(), mouseItemPos));
-            arrowItem->setSize(QSizeF(arrowSize, arrowSize));
+            if (ini().oldPtzAimOverlay)
+            {
+                auto arrowItem = elementsWidget()->arrowItem();
+                arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()),
+                    elementsWidget()->mapFromItem(target(), mouseItemPos));
+                arrowItem->setSize(QSizeF(arrowSize, arrowSize));
+            }
+            else
+            {
+                elementsWidget()->newArrowItem()->setDirection((
+                    elementsWidget()->mapFromItem(target(), info->mouseItemPos())
+                        - elementsWidget()->newArrowItem()->pos()) / 2.0);
+            }
 
             if (m_movementFilter)
                 m_movementFilter->updateFilteringSpeed(nx::core::ptz::Vector(speed));
@@ -1055,8 +1103,8 @@ void PtzInstrument::finishDrag(DragInfo* /*info*/)
             case VirtualMovement:
                 targetManipulator()->setCursor(Qt::SizeAllCursor);
                 target()->unsetCursor();
-
                 ensureElementsWidget();
+                opacityAnimator(elementsWidget()->newArrowItem())->animateTo(0.0);
                 opacityAnimator(elementsWidget()->arrowItem())->animateTo(0.0);
                 break;
 
