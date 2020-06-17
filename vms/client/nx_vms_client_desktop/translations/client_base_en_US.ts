@@ -2830,10 +2830,13 @@ to %1</source>
 </context>
 <context>
     <name>QnCloudUsersValidationPolicy</name>
-    <message>
-        <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
-        <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-        <translation></translation>
+    <message numerus="yes">
+        <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+        <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+        <translation>
+            <numerusform>%n of %1 selected users is not %2 user and will not get mobile notifications.</numerusform>
+            <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+        </translation>
     </message>
 </context>
 <context>
