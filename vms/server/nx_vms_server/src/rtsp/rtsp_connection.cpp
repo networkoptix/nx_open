@@ -1395,11 +1395,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
             return nx::network::http::StatusCode::notFound;
         }
 
-        auto fczHeader =
-            nx::network::http::getHeaderValue(d->request.headers, "x-fast-channel-zapping");
-        bool useFastChannelZapping = fczHeader.isNull() || fczHeader != "false";
-
-        if (useFastChannelZapping)
+        if (!d->params.disableFastChannelZapping())
         {
             QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
             int copySize = 0;

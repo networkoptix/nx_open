@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
+#include <memory>
 
 #if defined(_WIN32)
     #include <direct.h> //< For mkdir().

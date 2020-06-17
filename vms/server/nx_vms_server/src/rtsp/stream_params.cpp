@@ -94,6 +94,20 @@ bool StreamParams::parseOnvifReplay(
     return true;
 }
 
+bool StreamParams::parseDisableFastChannelZapping(
+    const network::http::HttpHeaders& headers, const UrlParams& urlParams)
+{
+    m_disableFastChannelZapping = false;
+    auto fczHeader = network::http::getHeaderValue(headers, "x-fast-channel-zapping");
+    if (!fczHeader.isEmpty() && fczHeader == "false")
+        m_disableFastChannelZapping = true;
+
+    if (urlParams.disableFastChannelZapping && urlParams.disableFastChannelZapping.value())
+        m_disableFastChannelZapping = true;
+
+    return true;
+}
+
 bool StreamParams::parseRequest(
     const network::http::Request& request, const QString& defaultVideoCodec)
 {
@@ -119,6 +133,8 @@ bool StreamParams::parseRequest(
         if (!parseResolution(request.headers, m_urlParams))
             return false;
         if (!parseOnvifReplay(request.headers, m_urlParams))
+            return false;
+        if (!parseDisableFastChannelZapping(request.headers, m_urlParams))
             return false;
 
         // Setup codec if resolution configured

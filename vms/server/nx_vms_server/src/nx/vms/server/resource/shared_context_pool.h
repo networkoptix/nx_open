@@ -14,6 +14,8 @@
 #include <nx/vms/server/server_module_aware.h>
 #include <media_server/media_server_module.h>
 
+#include <media_server/media_server_module.h>
+
 namespace nx {
 namespace vms::server {
 namespace resource {

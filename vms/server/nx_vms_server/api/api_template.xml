@@ -99,6 +99,11 @@
                             <description>Insert ONVIF header extension that contains absolute timestamp (See: ONVIF Streaming Specification Ver. 17.06, 6.3 RTP header extension)</description>
                             <optional>true</optional>
                         </param>
+                        <param>
+                            <name>disable_fast_channel_zapping</name>
+                            <description>Disable fast channel zapping, the stream will wait before starting, until the next key frame from the camera is received</description>
+                            <optional>true</optional>
+                        </param>
                     </params>
                     <result>
                         <caption>RTSP video stream.</caption>
