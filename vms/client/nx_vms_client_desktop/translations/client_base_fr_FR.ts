@@ -2835,10 +2835,13 @@ to %1</source>
   </context>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
-    <message>
-      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
-      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 des %2 utilisateurs sélectionnés ne sont pas %3 utilisateurs et ne recevront pas de notifications mobiles.</translation>
+    <message numerus="yes">
+      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>
+        <numerusform>%n des %1 utilisateurs sélectionnés n'est pas un utilisateur %2 et ne recevra pas de notifications mobiles.</numerusform>
+        <numerusform>%n des %1 utilisateurs sélectionnés ne sont pas des utilisateurs %2 et ne recevront pas de notifications mobiles.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3567,10 +3570,6 @@ to %1</source>
       <translation>Piste d’audit</translation>
     </message>
     <message>
-      <source>Health Monitoring</source>
-      <translation>Moniteur de santé</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Signets</translation>
     </message>
@@ -3589,10 +3588,6 @@ to %1</source>
     <message>
       <source>Open Audit Trail Log</source>
       <translation>Ouvrir journal de trace d'audit</translation>
-    </message>
-    <message>
-      <source>Monitor All Servers on a Single Layout</source>
-      <translation>Surveiller tous les serveurs sur même mise en page</translation>
     </message>
     <message>
       <source>Open Device List</source>
@@ -6712,14 +6707,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 Systèmes ne peuvent pas être fusionnées</translation>
-    </message>
-    <message>
-      <source>%1 has been successfully configured.</source>
-      <translation>%1 configuré avec succès.</translation>
-    </message>
-    <message>
-      <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation>Pour terminer le processus, veuillez vous connecter avec le client et mettre à jour vers la version %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>

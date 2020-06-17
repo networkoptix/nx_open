@@ -989,11 +989,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>Подключиться к этому серверу</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Закрепить</translation>
     </message>
   </context>
   <context>
@@ -1262,7 +1262,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>Чтобы сообщить о проблеме, пожалуйста, свяжитесь с %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1310,7 +1310,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>Чтобы активировать лицензионный ключ вручную, пожалуйста, свяжитесь с %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1322,11 +1322,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>Чтобы сообщить о проблеме, обратитесь в региональную / лицензионную службу поддержки:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>Чтобы активировать лицензионный ключ вручную, обратитесь в региональную / лицензионную службу поддержки:</translation>
     </message>
   </context>
   <context>
@@ -1369,7 +1369,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Повторите попытку позже.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1410,27 +1410,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Чтобы получить действительный лицензионный ключ, пожалуйста, свяжитесь с %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Если проблема сохраняется, пожалуйста, свяжитесь с %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Пожалуйста, свяжитесь с %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Чтобы получить действующий лицензионный ключ, обратитесь в региональную / лицензионную службу поддержки:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Если проблема не устранена, обратитесь в региональную / лицензионную службу поддержки:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Пожалуйста, обратитесь в региональную / лицензионную службу поддержки:</translation>
     </message>
   </context>
   <context>
@@ -1703,7 +1703,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Региональная / лицензионная служба поддержки</translation>
     </message>
   </context>
   <context>
@@ -1771,7 +1771,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Предупреждение! Это экспериментальная опция, которая экономит процессор, но может повлиять на анимацию.</translation>
     </message>
   </context>
   <context>
@@ -2318,36 +2318,36 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Исходный сервер</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Исходная камера</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Исходная камера и ещё %n камера</numerusform>
+        <numerusform>Исходная камера и ещё %n камеры</numerusform>
+        <numerusform>Исходная камера и ещё %n камер</numerusform>
+        <numerusform>Исходная камера и ещё %n камер</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Выберите хотя бы одно устройство</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Выберите хотя бы одну камеру</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Выберите сервер</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Исходный сервер и %1</translation>
     </message>
   </context>
   <context>
@@ -2477,7 +2477,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>Серверы, поддерживающие зуммер</translation>
     </message>
   </context>
   <context>
@@ -2905,10 +2905,15 @@ to %1</source>
   </context>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
-    <message>
-      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
-      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 of %2 selected users are not %3 users and will not get mobile notifications.</translation>
+    <message numerus="yes">
+      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3566,7 +3571,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Серверы, которые поддерживают диагностику вентиляторов</translation>
     </message>
   </context>
   <context>
@@ -3651,10 +3656,6 @@ to %1</source>
       <translation>Аудит</translation>
     </message>
     <message>
-      <source>Health Monitoring</source>
-      <translation>Мониторинг ресурсов</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Закладки</translation>
     </message>
@@ -3673,10 +3674,6 @@ to %1</source>
     <message>
       <source>Open Audit Trail Log</source>
       <translation>Открыть журнал аудита</translation>
-    </message>
-    <message>
-      <source>Monitor All Servers on a Single Layout</source>
-      <translation>Мониторинг всех серверов на одной раскладке</translation>
     </message>
     <message>
       <source>Open Device List</source>
@@ -3922,7 +3919,7 @@ to %1</source>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Оставшиеся деактивации</translation>
     </message>
   </context>
   <context>
@@ -4071,11 +4068,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>Осталось %n деактивация.</numerusform>
+        <numerusform>Осталось %n деактивации.</numerusform>
+        <numerusform>Осталось %n деактиваций.</numerusform>
+        <numerusform>Осталось %n деактиваций.</numerusform>
       </translation>
     </message>
   </context>
@@ -4099,16 +4096,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Чтобы получить файл с ключом активации, отправьте предоставленный лицензионный ключ и аппаратный ID на %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Пожалуйста, отправьте предоставленный лицензионный ключ и идентификатор оборудования в региональную / лицензионную службу поддержки для получения файла ключа активации.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Пожалуйста, отправьте предоставленный лицензионный ключ и идентификатор оборудования в региональную / лицензионную службу поддержки (%1) для получения файла ключа активации.</translation>
     </message>
   </context>
   <context>
@@ -4664,7 +4661,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Серверы, поддерживающие PoE мониторинг</translation>
     </message>
   </context>
   <context>
@@ -5423,7 +5420,7 @@ to %1</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5924,11 +5921,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>Сервер недоступен.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>сейчас</translation>
     </message>
   </context>
   <context>
@@ -6805,7 +6802,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>Не удалось подключиться к выбранному серверу</translation>
     </message>
   </context>
   <context>
@@ -6846,14 +6843,6 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 системы не могут быть объединены</translation>
-    </message>
-    <message>
-      <source>%1 has been successfully configured.</source>
-      <translation>%1 успешно настроен.</translation>
-    </message>
-    <message>
-      <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation>Для завершения процесса, пожалуйста, подключитесь к нему клиентом и обновите версию %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
@@ -7763,11 +7752,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n значение</numerusform>
+        <numerusform>+%n значения</numerusform>
+        <numerusform>+%n значений</numerusform>
+        <numerusform>+%n значений</numerusform>
       </translation>
     </message>
   </context>
@@ -8492,7 +8481,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Требуется транскодирование видео.</translation>
     </message>
   </context>
   <context>
@@ -8703,7 +8692,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>Прокси %1 требует имя пользователя и пароль.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
@@ -8801,7 +8790,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>Этот ID уже используется в системе. Используйте кнопку Сгенерировать, чтобы найти свободный ID.</translation>
     </message>
   </context>
   <context>
@@ -9238,7 +9227,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>Войти</translation>
     </message>
   </context>
   <context>
@@ -9341,31 +9330,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>Установка обновления не удалась.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>Отключено</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>Подключено</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>Запитано</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>Неожиданно</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>Пусто</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9377,7 +9366,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Потребление</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9385,16 +9374,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>Питание</translation>
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Неизвестное устройство</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Неизвестное устройство %1</translation>
     </message>
   </context>
   <context>
@@ -9413,29 +9402,29 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>Система не подключена к %1. Мобильные уведомления работают только при подключении системы к %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>Настройки %1</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>Более %n символа</numerusform>
+        <numerusform>Более %n символов</numerusform>
+        <numerusform>Более %n символов</numerusform>
+        <numerusform>Более %n символов</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>Остался %n символ</numerusform>
+        <numerusform>Осталось %n символа</numerusform>
+        <numerusform>Осталось %n символов</numerusform>
+        <numerusform>Осталось %n символов</numerusform>
       </translation>
     </message>
   </context>
@@ -9589,7 +9578,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>Нет совместимых серверов</translation>
     </message>
   </context>
   <context>
@@ -10029,7 +10018,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>Требуется транскодирование. Экспорт перезапущен.</translation>
     </message>
   </context>
   <context>
@@ -10236,15 +10225,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Пожалуйста, выполните следующее для деактивации лицензии</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Обратите внимание, что каждый лицензионный ключ может быть деактивирован максимум %n раз.</numerusform>
+        <numerusform>Обратите внимание, что каждый лицензионный ключ может быть деактивирован максимум %n раза.</numerusform>
+        <numerusform>Обратите внимание, что каждый лицензионный ключ может быть деактивирован максимум %n раз.</numerusform>
+        <numerusform>Обратите внимание, что каждый лицензионный ключ может быть деактивирован максимум %n раз.</numerusform>
       </translation>
     </message>
   </context>

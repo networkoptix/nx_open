@@ -2795,10 +2795,12 @@ to %1</source>
   </context>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
-    <message>
-      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
-      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 trên %2 người dùng được chọn không phải là %3 người dùng và sẽ không nhận được thông báo di động.</translation>
+    <message numerus="yes">
+      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3520,10 +3522,6 @@ to %1</source>
       <translation>Đường mòn kiểm toán</translation>
     </message>
     <message>
-      <source>Health Monitoring</source>
-      <translation>Theo dõi tài nguyên hệ thống</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Bookmarks</translation>
     </message>
@@ -3542,10 +3540,6 @@ to %1</source>
     <message>
       <source>Open Audit Trail Log</source>
       <translation>Mở nhật ký hoạt động hệ thống</translation>
-    </message>
-    <message>
-      <source>Monitor All Servers on a Single Layout</source>
-      <translation>Theo dõi tất cả các máy chủ trên một Layout</translation>
     </message>
     <message>
       <source>Open Device List</source>
@@ -6639,14 +6633,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>Không thể hợp nhất %1 Hệ thống</translation>
-    </message>
-    <message>
-      <source>%1 has been successfully configured.</source>
-      <translation>%1 đã được cấu hình thành công.</translation>
-    </message>
-    <message>
-      <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation>Để hoàn tất quy trình, vui lòng kết nối với Máy khách và cập nhật lên phiên bản %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>

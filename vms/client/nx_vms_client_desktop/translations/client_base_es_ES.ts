@@ -2833,10 +2833,13 @@ a %1</translation>
   </context>
   <context>
     <name>QnCloudUsersValidationPolicy</name>
-    <message>
-      <source>%1 of %2 selected users are not %3 users and will not get mobile notifications.</source>
-      <comment>%3 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 de %2 usuarios seleccionados no son %3 usuarios y no recibirán notificaciones móviles.</translation>
+    <message numerus="yes">
+      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>
+        <numerusform>%n de %1 usuarios seleccionados no son usuarios %2 y no recibirán notificaciones móviles.</numerusform>
+        <numerusform>%n de %1 usuarios seleccionados no son %2 usuarios y no recibirán notificaciones móviles.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3565,10 +3568,6 @@ a %1</translation>
       <translation>Registro de auditoría</translation>
     </message>
     <message>
-      <source>Health Monitoring</source>
-      <translation>Monitoreo de Salud</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Marcadores</translation>
     </message>
@@ -3587,10 +3586,6 @@ a %1</translation>
     <message>
       <source>Open Audit Trail Log</source>
       <translation>Abrir el registro de auditoría</translation>
-    </message>
-    <message>
-      <source>Monitor All Servers on a Single Layout</source>
-      <translation>Supervisar todos los servidores en un único diseño</translation>
     </message>
     <message>
       <source>Open Device List</source>
@@ -6709,14 +6704,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 Sistemas no se pueden fusionar</translation>
-    </message>
-    <message>
-      <source>%1 has been successfully configured.</source>
-      <translation>%1 ha sido configurado con éxito.</translation>
-    </message>
-    <message>
-      <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation>Para completar el proceso, conéctese con el Cliente y actualice a la versión %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>

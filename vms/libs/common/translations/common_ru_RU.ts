@@ -1093,7 +1093,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Требуется транскодирование видео.</translation>
     </message>
   </context>
   <context>
@@ -1920,7 +1920,7 @@
     </message>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>Зуммер</translation>
     </message>
     <message>
       <source>Archive Backup Finished</source>
@@ -1936,28 +1936,28 @@
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation type="unfinished">PoE over budget at %1</translation>
+      <translation>Превышение PoE мощности на %1</translation>
     </message>
     <message>
       <source>Fan error at %1</source>
-      <translation type="unfinished">Fan error at %1</translation>
+      <translation>Ошибка вентилятора на %1</translation>
     </message>
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Reason: Power limit exceeded (%1)</translation>
+      <translation>Причина: превышен предел мощности (%1)</translation>
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation type="unfinished">Show desktop notification</translation>
+      <translation>Показать уведомление на рабочем столе</translation>
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation type="unfinished">Send mobile notification</translation>
+      <translation>Отправить мобильное уведомление</translation>
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Потребление</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
@@ -1973,11 +1973,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation type="unfinished">RTP error in primary stream (%1)</translation>
+      <translation>Ошибка RTP в первичном потоке (%1)</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
+      <translation>Ошибка RTP во вторичном потоке (%1)</translation>
     </message>
   </context>
   <context>
