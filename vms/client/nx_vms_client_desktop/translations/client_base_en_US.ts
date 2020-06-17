@@ -6702,14 +6702,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>%1 has been successfully configured.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To complete the process, please connect to it with Client and update to version %1.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Failed to merge %1 to our system.</source>
         <translation></translation>
     </message>

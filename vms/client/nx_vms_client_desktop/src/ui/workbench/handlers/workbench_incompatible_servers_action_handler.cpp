@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
 #include <licensing/remote_licenses.h>
+#include <network/connection_validator.h>
 #include <network/system_helpers.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/common/input_dialog.h>
@@ -110,6 +111,16 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
     if (!validateStartLicenses(server, password))
         return;
 
+    if (QnConnectionValidator::validateConnection(moduleInformation) !=
+        Qn::SuccessConnectionResult)
+    {
+        QnMessageBox::critical(mainWindowWidget(),
+            utils::MergeSystemsStatus::getErrorMessage(
+                utils::MergeSystemsStatus::incompatibleVersion,
+                moduleInformation));
+        return;
+    }
+
     m_connectTool = new ConnectToCurrentSystemTool(this);
 
     auto progressDialog = new QnProgressDialog(mainWindowWidget());
@@ -159,21 +170,14 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
         case ConnectToCurrentSystemTool::NoError:
-            if (m_connectTool->wasServerIncompatible())
-            {
-                auto currentVersion = QnAppInfo::applicationVersion();
-                auto serverName = m_connectTool->getServerName();
-                QnMessageBox::information(mainWindowWidget(),
-                    tr("%1 has been successfully configured.").arg(serverName),
-                    tr("To complete the process, please connect to it with Client and update to version %1.").arg(
-                        currentVersion));
-            }
-            else
-            {
-                QnMessageBox::success(mainWindowWidget(),
-                    tr("Server will be connected to System shortly"),
-                    tr("It will appear in the resource tree when the database synchronization is finished."));
-            }
+            QnMessageBox::success(mainWindowWidget(),
+                tr("Server will be connected to System shortly"),
+                tr("It will appear in the resource tree when the database synchronization"
+                    " is finished."));
+            break;
+
+        case ConnectToCurrentSystemTool::ServerProtocolIncompatible:
+            NX_ASSERT(false, "Compatibility should be checked before m_connectTool->start()");
             break;
 
         case ConnectToCurrentSystemTool::UpdateFailed:

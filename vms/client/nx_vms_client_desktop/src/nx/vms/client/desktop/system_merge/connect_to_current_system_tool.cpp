@@ -85,7 +85,11 @@ void ConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& pa
     auto serverInformation = server->getModuleInformation();
     m_serverName = server->getName();
     m_serverVersion = serverInformation.version;
-    m_wasIncompatible = serverInformation.protoVersion != nx::vms::api::protocolVersion();
+    if (serverInformation.protoVersion != nx::vms::api::protocolVersion())
+    {
+        finish(ServerProtocolIncompatible);
+        return;
+    }
 
     NX_INFO(this, lm("Start connecting server %1 (id=%2, url=%3").args(
         m_serverName, m_originalTargetId, server->getApiUrl()));
@@ -112,11 +116,6 @@ QnUuid ConnectToCurrentSystemTool::getTargetId() const
 QnUuid ConnectToCurrentSystemTool::getOriginalId() const
 {
     return m_originalTargetId;
-}
-
-bool ConnectToCurrentSystemTool::wasServerIncompatible() const
-{
-    return m_wasIncompatible;
 }
 
 nx::utils::SoftwareVersion ConnectToCurrentSystemTool::getServerVersion() const
