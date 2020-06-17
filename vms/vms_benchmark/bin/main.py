@@ -98,9 +98,9 @@ ini_definition = {
     "archiveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 0.2},
     "streamingTestDurationMinutes": {"type": "int", "range": [1, None], "default": 4 * 60},
     "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
-    "testcameraBin": {"type": "str", "default": "./testcamera/testcamera"},
-    "rtspPerfBin": {"type": "str", "default": "./testcamera/rtsp_perf"},
-    "plinkBin": {"type": "str", "default": "./plink"},
+    "testcameraBin": {"type": "str", "default": "./tools/bin/testcamera"},
+    "rtspPerfBin": {"type": "str", "default": "./tools/bin/rtsp_perf"},
+    "plinkBin": {"type": "str", "default": "./tools/bin/plink"},
     "testFileHighResolution": {"type": "str", "default": "./high.ts"},
     "testFileHighPeriodUs": {"type": "int", "range": [1, None], "default": 10033334},
     "testFileLowResolution": {"type": "str", "default": "./low.ts"},
@@ -510,7 +510,7 @@ class _StreamTypeStats:
         if self._min_lag_us > 0:
             logging.warning(f"INTERNAL ERROR: _min_lag_us > 0: {self._min_lag_us}")
             self._min_lag_us = 0
-  
+
         # If _min_lag_us < 0, it means that the latency of the first frame is not less than
         # abs(_min_lag_us), and thus we can consider the actual maximum lag to be greater than
         # _max_lag_us by that value.

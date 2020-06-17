@@ -70,15 +70,8 @@ def stream_reader_running(
         output_fd = open(ini_rtsp_perf_stderr_file, 'wb')
         opts['stderr'] = output_fd
 
-    ld_library_path = None
-    if platform.system() == 'Linux':
-        ld_library_path = os.path.dirname(ini_rtsp_perf_bin)
-        opts['env'] = {'LD_LIBRARY_PATH': ld_library_path}
-
     # NOTE: The first arg is the command itself.
     log_message = 'Running rtsp_perf with the following command and args:\n'
-    if ld_library_path:
-        log_message += f'    LD_LIBRARY_PATH={ld_library_path}\n'
     for arg in args:
         log_message += f'    {arg}\n'
     logging.info(log_message)
