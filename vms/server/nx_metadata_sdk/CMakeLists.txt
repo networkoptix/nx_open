@@ -20,7 +20,7 @@ set(zip_log ${logs_dir}/${sdk_name}_zip.log)
 set(copied_nx_sdk_version_origin ${CMAKE_CURRENT_BINARY_DIR})
 set(copied_nx_sdk_version_file ${copied_nx_sdk_version_origin}/nx_sdk_version.inc)
 nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nx_sdk_version.inc.in
-    ${copied_nx_sdk_version_file} @ONLY)
+    ${copied_nx_sdk_version_file} @ONLY NEWLINE_STYLE UNIX)
 
 # Collect source files for statically prepared files.
 set(copied_static_origin ${CMAKE_CURRENT_SOURCE_DIR}/files)
