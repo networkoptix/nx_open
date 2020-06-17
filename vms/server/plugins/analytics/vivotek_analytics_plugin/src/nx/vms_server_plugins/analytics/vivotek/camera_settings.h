@@ -99,6 +99,12 @@ public:
             NX_CAMERA_SETTINGS_ENTRY(Vca.Installation, Height, int) height;
             NX_CAMERA_SETTINGS_ENTRY(Vca.Installation, TiltAngle, int) tiltAngle;
             NX_CAMERA_SETTINGS_ENTRY(Vca.Installation, RollAngle, int) rollAngle;
+
+            struct Exclusion
+            {
+                NX_CAMERA_SETTINGS_ENTRY(Vca.Installation.Exclusion#, Region, NamedPolygon) region;
+            };
+            std::vector<Exclusion> exclusions;
         } installation;
 
         struct CrowdDetection

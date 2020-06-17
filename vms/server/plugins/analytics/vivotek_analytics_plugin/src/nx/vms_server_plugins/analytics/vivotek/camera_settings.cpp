@@ -28,6 +28,7 @@ using namespace nx::network;
 namespace {
 
 const auto kMaxDetectionRuleCount = 5u; // Defined in user manual.
+const auto kMaxExclusionCount = 50u; // Doesn't appear to be preactically limited.
 
 class VadpModuleInfo
 {
@@ -85,6 +86,15 @@ void fillReErrors(CameraSettings::Entry<Value>* entry,
     const QString& message)
 {
     entry->emplaceErrorMessage(message);
+}
+
+void fillReErrors(CameraSettings::Vca::Installation* installation,
+    const QString& message)
+{
+    for (auto& exclusion: installation->exclusions)
+    {
+        fillReErrors(&exclusion.region, message);
+    }
 }
 
 void fillReErrors(CameraSettings::Vca::CrowdDetection* crowdDetection,
@@ -177,6 +187,7 @@ void fillReErrors(CameraSettings::Vca::RunningDetection* runningDetection,
 
 void fillReErrors(CameraSettings::Vca* vca, const QString& message)
 {
+    fillReErrors(&vca->installation, message);
     if (auto& crowdDetection = vca->crowdDetection)
         fillReErrors(&*crowdDetection, message);
     if (auto& loiteringDetection = vca->loiteringDetection)
@@ -273,6 +284,41 @@ void parseReFromCamera(CameraSettings::Entry<NamedPolygon>* region,
     catch (const std::exception& exception)
     {
         region->emplaceErrorMessage(exception.what());
+    }
+}
+
+void parseReFromCamera(CameraSettings::Vca::Installation* installation,
+    const QJsonValue& parameters)
+{
+    try
+    {
+        auto& exclusions = installation->exclusions;
+        for (auto& exclusion: exclusions)
+            exclusion.region.emplaceNothing();
+
+        if (get<QJsonValue>(parameters, "ExclusiveArea").isUndefined())
+            return;
+
+        auto field = get<QJsonArray>(parameters, "ExclusiveArea", "Field");
+        while ((std::size_t) field.count() > exclusions.size())
+            field.pop_back();
+        const QString path = "$.ExclusiveArea.Field";
+        for (int i = 0; i < field.count(); ++i)
+        {
+            const auto subField = get<QJsonArray>(path, field, i);
+
+            auto& region = exclusions[i].region.emplaceValue();
+
+            for (int j = 0; j < subField.count(); ++j)
+            {
+                region.push_back(CameraVcaParameterApi::parsePoint(
+                    subField[j], NX_FMT("%1[%2][%3]", path, i, j)));
+            }
+        }
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(installation, exception.what());
     }
 }
 
@@ -873,6 +919,7 @@ void parseReFromCamera(CameraSettings::Vca::RunningDetection* runningDetection,
 
 void parseReFromCamera(CameraSettings::Vca* vca, const QJsonValue& parameters)
 {
+    parseReFromCamera(&vca->installation, parameters);
     if (auto& crowdDetection = vca->crowdDetection)
         parseReFromCamera(&*crowdDetection, parameters);
     if (auto& loiteringDetection = vca->loiteringDetection)
@@ -1094,6 +1141,34 @@ void removeRulesExcept(QJsonObject* rules, const std::set<QString>& allowedNames
     }
 }
 
+
+void serializeReToCamera(QJsonValue* parameters,
+    CameraSettings::Vca::Installation* installation)
+{
+    try
+    {
+        QJsonArray field;
+        for (const auto& exclusion: installation->exclusions)
+        {
+            const auto& region = exclusion.region;
+            if (!region.hasValue())
+                continue;
+
+            QJsonArray subField;
+            for (const auto& point: region.value())
+                subField.push_back(CameraVcaParameterApi::serialize(point));
+
+            field.push_back(std::move(subField));
+        }
+        set(parameters, "ExclusiveArea", QJsonObject{
+            {"Field", field},
+        });
+    }
+    catch (const std::exception& exception)
+    {
+        fillReErrors(installation, exception.what());
+    }
+}
 
 void serializeReToCamera(QJsonValue* jsonRule,
     CameraSettings::Entry<NamedPolygon>* region)
@@ -1807,7 +1882,7 @@ void serializeReToCamera(QJsonValue* parameters,
                 if (jsonRule.isUndefined() || jsonRule.isNull())
                     jsonRule = QJsonObject{};
 
-                //serializeReToCamera(&jsonRule, &rule.minCount);
+                serializeReToCamera(&jsonRule, &rule.minCount);
                 serializeReToCamera(&jsonRule, &rule.minSpeed);
                 serializeReToCamera(&jsonRule, &rule.delay);
 
@@ -1825,6 +1900,7 @@ void serializeReToCamera(QJsonValue* parameters,
 
 void serializeReToCamera(QJsonValue* parameters, CameraSettings::Vca* vca)
 {
+    serializeReToCamera(parameters, &vca->installation);
     if (auto& crowdDetection = vca->crowdDetection)
         serializeReToCamera(parameters, &*crowdDetection);
     if (auto& loiteringDetection = vca->loiteringDetection)
@@ -1896,9 +1972,18 @@ void enumerateEntries(Settings* settings, Visitor visit)
     {
         uniqueVisit(&vca->enabled);
         uniqueVisit(&vca->sensitivity);
-        uniqueVisit(&vca->installation.height);
-        uniqueVisit(&vca->installation.tiltAngle);
-        uniqueVisit(&vca->installation.rollAngle);
+
+        auto& installation = vca->installation;
+        uniqueVisit(&installation.height);
+        uniqueVisit(&installation.tiltAngle);
+        uniqueVisit(&installation.rollAngle);
+        auto& exclusions = installation.exclusions;
+        for (std::size_t i = 0; i < exclusions.size(); ++i)
+        {
+            auto& exclusion = exclusions[i];
+
+            repeatedVisit(i, &exclusion.region);
+        }
 
         if (auto& crowdDetection = vca->crowdDetection)
         {
@@ -2232,15 +2317,11 @@ void parseEntryFromServer(CameraSettings::Vca::RunningDetection::Rule::Name* ent
     entry->emplaceValue(serializedValue);
 }
 
-bool parseFromServer(NamedPointSequence* points, const QJsonValue& json)
+bool parseFromServer(std::vector<Point>* points, const QJsonValue& json)
 {
     const auto figure = get<QJsonValue>(json, "figure");
-    if (figure.isNull())
+    if (figure.isNull() || figure.isUndefined())
         return false;
-
-    points->name = get<QString>(json, "label");
-    if (points->name.isEmpty())
-        throw Exception("Empty name");
 
     const auto jsonPoints = get<QJsonArray>("$.figure", figure, "points");
     for (int i = 0; i < jsonPoints.count(); ++i)
@@ -2256,6 +2337,21 @@ bool parseFromServer(NamedPointSequence* points, const QJsonValue& json)
 }
 
 void parseEntryFromServer(
+    CameraSettings::Vca::Installation::Exclusion::Region* entry, const QString& serializedValue)
+{
+    const auto json = parseJson(serializedValue.toUtf8());
+
+    NamedPolygon polygon;
+    if (!parseFromServer(&polygon, json))
+    {
+        entry->emplaceNothing();
+        return;
+    }
+
+    entry->emplaceValue(std::move(polygon));
+}
+
+void parseEntryFromServer(
     CameraSettings::Entry<NamedPolygon>* entry, const QString& serializedValue)
 {
     const auto json = parseJson(serializedValue.toUtf8());
@@ -2266,6 +2362,10 @@ void parseEntryFromServer(
         entry->emplaceNothing();
         return;
     }
+
+    polygon.name = get<QString>(json, "label");
+    if (polygon.name.isEmpty())
+        throw Exception("Empty name");
 
     entry->emplaceValue(std::move(polygon));
 }
@@ -2293,6 +2393,10 @@ void parseEntryFromServer(
         entry->emplaceNothing();
         return;
     }
+
+    line.name = get<QString>(json, "label");
+    if (line.name.isEmpty())
+        throw Exception("Empty name");
 
     parseFromServer(&line.direction, get<QString>(json, "figure", "direction"));
 
@@ -2627,6 +2731,18 @@ QJsonValue getVcaInstallationModelForManifest()
                 {"type", "TextField"},
                 {"caption", "Roll angle (°)"},
                 {"description", "Angle of camera rotation around direction axis"},
+            },
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) kMaxExclusionCount},
+                {"template", QJsonObject{
+                    {"name", Installation::Exclusion::Region::name},
+                    {"type", "PolygonFigure"},
+                    {"caption", "Exclusion region #"},
+                    {"minPoints", 3},
+                    {"maxPoints", 20}, // Defined in user guide.
+                }},
             },
         }},
     };
@@ -3091,6 +3207,8 @@ CameraSettings::CameraSettings(const CameraFeatures& features)
     if (features.vca)
     {
         vca.emplace();
+
+        vca->installation.exclusions.resize(kMaxExclusionCount);
 
         if (features.vca->crowdDetection)
         {
