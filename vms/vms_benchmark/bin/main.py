@@ -1129,7 +1129,8 @@ def _connect_to_box(conf):
                 " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)."
                 f"Details for the error: {res.formatted_message()}"
             )
-    box = BoxConnection(
+
+    box = BoxConnection.create_box_connection_object(
         host=conf['boxHostnameOrIp'],
         login=conf['boxLogin'],
         password=password,
