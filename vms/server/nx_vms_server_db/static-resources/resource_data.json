@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.275",
+    "version": "1.0.1.276",
     "data": [
         {
             "keys": [
@@ -4273,6 +4273,34 @@
                         "device":  [0, 0.59, 1.00],
                         "logical": [1, 21.3, 31.3],
                         "logicalMultiplier": 22,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapping for firmware: 41.7.0.74-r1",
+            "keys": [
+                "Milesight*|MS-C2942-RB"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [ 0, 360 ]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [0, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0.033, 0.10 , 1.00],
+                        "logical": [1.00 , 2.27 , 22.0],
+                        "logicalMultiplier": 35,
                         "space": "35MmEquiv"
                     }
                 }
