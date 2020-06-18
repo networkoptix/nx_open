@@ -18,6 +18,7 @@
 #endif
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QCollator>
 
 #include "aio/aio_service.h"
 #include "aio/async_socket_helper.h"
@@ -25,29 +26,30 @@
 #include "address_resolver.h"
 
 #ifdef _WIN32
-/* Check that the typedef in AbstractSocket is correct. */
-static_assert(
-    boost::is_same<nx::network::AbstractSocket::SOCKET_HANDLE, SOCKET>::value,
-    "Invalid socket type is used in AbstractSocket.");
-typedef char raw_type;       // Type used for raw data on this platform
+    /* Check that the typedef in AbstractSocket is correct. */
+    static_assert(
+        boost::is_same<nx::network::AbstractSocket::SOCKET_HANDLE, SOCKET>::value,
+        "Invalid socket type is used in AbstractSocket.");
+    typedef char raw_type;       // Type used for raw data on this platform
 #else
-#include <sys/types.h>       // For data types
-#include <sys/socket.h>      // For socket(), connect(), send(), and recv()
-#include <netdb.h>           // For getaddrinfo()
-#include <arpa/inet.h>       // For inet_addr()
-#include <unistd.h>          // For close()
-#include <netinet/in.h>      // For sockaddr_in
-#include <netinet/tcp.h>      // For TCP_NODELAY
-#include <fcntl.h>
-typedef void raw_type;       // Type used for raw data on this platform
+    #include <sys/types.h>       // For data types
+    #include <sys/socket.h>      // For socket(), connect(), send(), and recv()
+    #include <netdb.h>           // For getaddrinfo()
+    #include <arpa/inet.h>       // For inet_addr()
+    #include <unistd.h>          // For close()
+    #include <netinet/in.h>      // For sockaddr_in
+    #include <netinet/tcp.h>      // For TCP_NODELAY
+    #include <fcntl.h>
+    typedef void raw_type;       // Type used for raw data on this platform
 #endif
 
 #ifndef SOCKET_ERROR
-#define SOCKET_ERROR (-1)
+    #define SOCKET_ERROR (-1)
 #endif
 
 // Needed only for bpi build, that use old C Library headers.
 #ifdef __linux__
+    #include <sys/utsname.h>
     #ifndef IP_MULTICAST_ALL
         #define IP_MULTICAST_ALL 49
     #endif
@@ -61,6 +63,37 @@ namespace network {
 #else
     static std::atomic<qint64> m_totalSocketBytesSent;
     qint64 totalSocketBytesSent() { return m_totalSocketBytesSent; }
+#endif
+
+#ifdef SO_REUSEPORT
+    static bool isReusePortSupported()
+    {
+        static const bool value =
+        #ifdef __linux__
+            []
+            {
+                utsname kernel;
+                if (uname(&kernel) != 0)
+                {
+                    NX_WARNING(NX_SCOPE_TAG, "Unable to get kernel info");
+                    return false;
+                }
+
+                QCollator collator;
+                collator.setNumericMode(true);
+
+                // https://stackoverflow.com/questions/3261965/so-reuseport-on-linux
+                const bool isSupported = collator.compare(QString(kernel.release), "3.9") >= 0;
+                NX_INFO(NX_SCOPE_TAG, "Reuse port %1 supported on Linux kernel %2",
+                    isSupported ? "IS": "IS NOT ", kernel.release);
+
+                return isSupported;
+            }();
+        #else
+            true;
+        #endif
+        return value;
+    }
 #endif
 
 //-------------------------------------------------------------------------------------------------
@@ -216,32 +249,33 @@ bool Socket<SocketInterfaceToImplement>::getReuseAddrFlag(bool* val) const
 template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::setReusePortFlag(bool value)
 {
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
-    const int on = value ? 1 : 0;
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)))
-        return false;
-
-    return true;
-#else
+    #ifdef SO_REUSEPORT
+        if (isReusePortSupported())
+        {
+            const int on = value ? 1 : 0;
+            return ::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on));
+        }
+    #endif
     return setReuseAddrFlag(value);
-#endif
 }
 
 template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::getReusePortFlag(bool* value) const
 {
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
-    int reuseAddrVal = 0;
-    socklen_t optLen = sizeof(reuseAddrVal);
+    #ifdef SO_REUSEPORT
+        if (isReusePortSupported())
+        {
+            int reuseAddrVal = 0;
+            socklen_t optLen = sizeof(reuseAddrVal);
 
-    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*)&reuseAddrVal, &optLen))
-        return false;
+            if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*)&reuseAddrVal, &optLen))
+                return false;
 
-    *value = reuseAddrVal > 0;
-    return true;
-#else
+            *value = reuseAddrVal > 0;
+            return true;
+        }
+    #endif
     return getReuseAddrFlag(value);
-#endif
 }
 
 template<typename SocketInterfaceToImplement>
