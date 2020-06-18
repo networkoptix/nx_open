@@ -966,44 +966,24 @@ void fetchFromCamera(CameraSettings::Vca* vca, const Url& cameraUrl)
     fetchReFromCamera(vca, &api);
 }
 
-
-QByteArray getRaw(const Url& url)
+QString getFirmwareVersion(const Url& cameraUrl)
 {
-    HttpClient httpClient;
-
-    std::promise<std::unique_ptr<AbstractStreamSocket>> promise;
-    httpClient.setOnDone(
-        [&]
-        {
-            NX_ASSERT(httpClient.failed());
-            promise.set_exception(std::make_exception_ptr(
-                std::system_error(httpClient.lastSysErrorCode(), std::system_category())));
-        });
-    httpClient.setOnRequestHasBeenSent(
-        [&](auto&&)
-        {
-            promise.set_value(httpClient.takeSocket());
-        });
-    httpClient.doGet(url);
-    const auto socket = promise.get_future().get();
-
-    socket->setNonBlockingMode(false);
-
-    constexpr static auto kReceiveTimeout = 10s;
-    socket->setRecvTimeout(kReceiveTimeout);
-
-    constexpr static auto kMaxResponseSize = 16 * 1024;
-    QByteArray response(kMaxResponseSize, Qt::Uninitialized);
-    for (int offset = 0;; )
+    try 
     {
-        int addedLength = socket->recv(response.data() + offset, response.length() - offset);
-        if (addedLength == -1 || addedLength == 0)
-        {
-            response.chop(offset);
-            return response;
-        }
+        CameraParameterApi api(cameraUrl);
 
-        offset += addedLength;
+        static const QString key = "system_info_firmwareversion";
+        const auto version = at(api.fetch({key}), key);
+        const auto versionParts = version.split("-");
+        if (versionParts.count() < 3)
+            throw Exception("Malformed firmware version: %1", version);
+
+        return versionParts[2];
+    }
+    catch (Exception& exception)
+    {
+        exception.addContext("Failed to fetch firmware version");
+        throw;
     }
 }
 
@@ -1026,15 +1006,35 @@ void storeToCamera(const Url& cameraUrl, CameraSettings::Vca::Enabled* enabled)
         url.setPath("/cgi-bin/admin/vadpctrl.cgi");
         url.setQuery(query);
 
-        // Work around camera not inserting \r\n between response headers and body.
-        const auto response = getRaw(url);
+        QByteArray responseBody;
+        try
+        {
+            responseBody = HttpClient().get(url).get();
+        }
+        catch (const std::system_error& exception)
+        {
+            // Firmware versions before 0121 return malformed HTTP response. From here it looks as
+            // if it resets the connection before the response could be parsed.
+            if (exception.code() != std::errc::connection_reset)
+                throw;
+
+            static const QString firstFixedVersion = "0121";
+            const auto version = getFirmwareVersion(cameraUrl);
+            if (version >= firstFixedVersion)
+                throw;
+
+            enabled->emplaceErrorMessage(NX_FMT(
+                "The camera is running firmware version %1, which contains some bugs, please "
+                "update it to at least version %2", version, firstFixedVersion));
+            return;
+        }
 
         const auto successPattern =
             NX_FMT("'VCA is %1'", enabled->value() ? "started" : "stopped").toUtf8();
-        if (!response.contains(successPattern))
+        if (!responseBody.contains(successPattern))
         {
             throw Exception(
-                "HTTP response doesn't contain expected pattern indicating success");
+                "HTTP response body doesn't contain expected pattern indicating success");
         }
     }
     catch (const std::exception& exception)

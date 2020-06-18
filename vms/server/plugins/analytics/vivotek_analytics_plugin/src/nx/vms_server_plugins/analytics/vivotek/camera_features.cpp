@@ -18,6 +18,8 @@ void fetchFromCamera(CameraFeatures::Vca* vca, const Url& cameraUrl)
 {
     CameraVcaParameterApi api(cameraUrl);
 
+    // TODO: This is not allowed when VCA is disabled. Should probably
+    // merge features into settings when settings model supports schema updates.
     const auto functions = get<QJsonArray>(api.fetch("Functions").get());
 
     for (int i = 0; i < functions.count(); ++i)

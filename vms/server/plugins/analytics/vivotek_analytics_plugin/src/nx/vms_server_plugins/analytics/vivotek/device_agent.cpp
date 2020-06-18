@@ -41,11 +41,14 @@ void emitDiagnostic(IDeviceAgent::IHandler* handler,
     handler->handlePluginDiagnosticEvent(event.get());
 }
 
-const auto ignoreOperationCanceled =
+const auto ignoreCancellation =
     [](const std::system_error& exception)
     {
-        if (exception.code() != std::errc::operation_canceled)
+        if (exception.code() != std::errc::operation_canceled &&
+            exception.code() != std::errc::connection_aborted)
+        {
             throw;
+        }
 
         return cf::unit();
     };
@@ -277,7 +280,7 @@ void DeviceAgent::startMetadataStreaming()
 
                 return cf::unit();
             })
-        .catch_(ignoreOperationCanceled)
+        .catch_(ignoreCancellation)
         .catch_(
             [this](const std::exception& exception)
             {
@@ -291,7 +294,7 @@ void DeviceAgent::startMetadataStreaming()
                             startMetadataStreaming();
                             return cf::unit();
                         })
-                    .catch_(ignoreOperationCanceled);
+                    .catch_(ignoreCancellation);
             });
 }
 
@@ -324,7 +327,7 @@ void DeviceAgent::streamMetadataPackets()
 
                 return cf::unit();
             })
-        .catch_(ignoreOperationCanceled)
+        .catch_(ignoreCancellation)
         .catch_(
             [this](const std::exception& exception)
             {
@@ -349,7 +352,7 @@ void DeviceAgent::streamProlongedEventMetadataPackets()
 
                 return cf::unit();
             })
-        .catch_(ignoreOperationCanceled)
+        .catch_(ignoreCancellation)
         .catch_(
             [this](const std::exception& exception)
             {
