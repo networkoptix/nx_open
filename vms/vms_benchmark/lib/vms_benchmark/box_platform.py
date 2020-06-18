@@ -5,7 +5,7 @@ from typing import Dict
 from vms_benchmark.exceptions import BoxFileContentError, UnableToFetchDataFromBox
 from vms_benchmark.utils import human_readable_size
 
-ini_ssh_get_proc_meminfo_timeout_s: int
+ini_box_get_proc_meminfo_timeout_s: int
 
 
 class BoxPlatform:

@@ -86,7 +86,9 @@ conf_definition = {
     "boxLogin": {"type": "str", "default": ""},
     "boxPassword": {"type": "str", "default": ""},
     "boxSshPort": {"type": "int", "range": [1, 65535], "default": 22},
+    "boxTelnetPort": {"type": "int", "range": [1, 65535], "default": 23},
     "boxSshKey": {"type": "str", "default": ""},
+    "boxConnectByTelnet": {"type": "bool", "default": False},
     "vmsUser": {"type": "str"},
     "vmsPassword": {"type": "str"},
     "archiveDeletingTimeoutSeconds": {"type": "int", "range": [0, None], "default": 60},
@@ -121,10 +123,10 @@ ini_definition = {
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
     "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
     "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
-    "sshCommandTimeoutS": {"type": "int", "range": [1, None], "default": 15},
-    "sshServiceCommandTimeoutS": {"type": "int", "range": [1, None], "default": 30},
-    "sshGetFileContentTimeoutS": {"type": "int", "range": [1, None], "default": 30},
-    "sshGetProcMeminfoTimeoutS": {"type": "int", "range": [1, None], "default": 10},
+    "boxCommandTimeoutS": {"type": "int", "range": [1, None], "default": 15},
+    "boxServiceCommandTimeoutS": {"type": "int", "range": [1, None], "default": 30},
+    "boxGetFileContentTimeoutS": {"type": "int", "range": [1, None], "default": 30},
+    "boxGetProcMeminfoTimeoutS": {"type": "int", "range": [1, None], "default": 10},
     "rtspPerfLinesOutputFile": {"type": "str", "default": ""},
     "rtspPerfStderrFile": {"type": "str", "default": ""},
     "archiveReadingPosS": {"type": "int", "range": [0, None], "default": 15},
@@ -202,10 +204,10 @@ def load_configs(conf_file, ini_file):
     stream_reader_runner.ini_rtsp_perf_bin = path_from_config(ini['rtspPerfBin'])
     stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
     box_connection.ini_plink_bin = path_from_config(ini['plinkBin'])
-    box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
-    box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
-    vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
-    box_platform.ini_ssh_get_proc_meminfo_timeout_s = ini['sshGetProcMeminfoTimeoutS']
+    box_connection.ini_box_command_timeout_s = ini['boxCommandTimeoutS']
+    box_connection.ini_box_get_file_content_timeout_s = ini['boxGetFileContentTimeoutS']
+    vms_scanner.ini_box_service_command_timeout_s = ini['boxServiceCommandTimeoutS']
+    box_platform.ini_box_get_proc_meminfo_timeout_s = ini['boxGetProcMeminfoTimeoutS']
 
     if ini.OPTIONS_FROM_FILE is not None:
         report(f"\nOverriding default options via {ini.filepath!r}:")
@@ -1119,8 +1121,13 @@ def _override_ini_config(vms, ini):
 
 
 def _connect_to_box(conf):
+    if conf['boxConnectByTelnet']:
+        connection_type, connection_port = BoxConnection.ConnectionType.TELNET, conf['boxTelnetPort']
+    else:
+        connection_type, connection_port = BoxConnection.ConnectionType.SSH, conf['boxSshPort']
+
     password = conf.get('boxPassword', None)
-    if password and platform.system() == 'Linux':
+    if connection_type == BoxConnection.ConnectionType.SSH and password and platform.system() == 'Linux':
         res = host_tests.SshPassInstalled.call()
 
         if not res.success:
@@ -1131,13 +1138,14 @@ def _connect_to_box(conf):
             )
 
     box = BoxConnection.create_box_connection_object(
+        connection_type = connection_type,
         host=conf['boxHostnameOrIp'],
         login=conf['boxLogin'],
         password=password,
         ssh_key=conf['boxSshKey'],
-        port=conf['boxSshPort'],
+        port=connection_port,
     )
-    if platform.system() == 'Windows':
+    if connection_type == BoxConnection.ConnectionType.SSH and platform.system() == 'Windows':
         try:
             host_key = service_objects.SshHostKeyObtainer(box, conf).call()
         except exceptions.SshHostKeyObtainingFailed as exception:
@@ -1148,12 +1156,12 @@ def _connect_to_box(conf):
         box.supply_host_key(host_key)
 
     try:
-        box.sh('true', exc=True)
+        box.sh('true', throw_timeout_exception=True)
     except exceptions.BoxCommandError as e:
-        raise exceptions.SshConnectionError(
+        raise exceptions.BoxConnectionError(
             (
-                "Can't connect to the box via SSH: " +
-                "check SSH configuration settings (host, login, password and so on)."
+                "Can't connect to the box: " +
+                "check box configuration settings (host, login, password and so on)."
             ),
             original_exception=e,
         )
@@ -1286,7 +1294,7 @@ def _clear_storages(box, storages: List[Storage], conf):
             f"'{storage.url}/hi_quality' "
             f"'{storage.url}/low_quality' "
             f"'{storage.url}/'*_media.nxdb",
-            timeout_s=conf['archiveDeletingTimeoutSeconds'], su=True, exc=True)
+            timeout_s=conf['archiveDeletingTimeoutSeconds'], su=True, throw_timeout_exception=True)
     report('Server video archives deleted.')
 
 

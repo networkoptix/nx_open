@@ -57,7 +57,8 @@ class BoxConnectionSSH(BoxConnection):
         self.local_ip = ssh_connection_info[0]
 
     def sh(self, command, timeout_s=None,
-           su=False, exc=False, stdout=sys.stdout, stderr=None, stdin=None, verbose=False):
+            su=False, throw_timeout_exception=False, stdout=sys.stdout, stderr=None, stdin=None,
+            verbose=False):
         command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
 
         logging.info(
@@ -66,7 +67,7 @@ class BoxConnectionSSH(BoxConnection):
             f"    stdin:\n"
             f"        {'        '.join(stdin.splitlines(keepends=True)) if stdin else 'N/A'}")
 
-        actual_timeout_s = timeout_s or box_connection.ini_ssh_command_timeout_s
+        actual_timeout_s = timeout_s or box_connection.ini_box_command_timeout_s
 
         run_args = [*self.ssh_args]
         if verbose:
@@ -83,7 +84,7 @@ class BoxConnectionSSH(BoxConnection):
             )
         except subprocess.TimeoutExpired:
             message = f'Unable to execute remote command via ssh: timeout of {actual_timeout_s} seconds expired.'
-            if exc:
+            if throw_timeout_exception:
                 raise exceptions.BoxCommandError(message=message)
             else:
                 return self.BoxConnectionResult(None, message, command=command_wrapped)

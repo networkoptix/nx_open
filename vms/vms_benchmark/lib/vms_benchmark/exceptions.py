@@ -71,7 +71,7 @@ class BoxPrerequisiteFailed(VmsBenchmarkError):
     pass
 
 
-class SshConnectionError(VmsBenchmarkError):
+class BoxConnectionError(VmsBenchmarkError):
     pass
 
 class SshHostKeyObtainingFailed(VmsBenchmarkError):

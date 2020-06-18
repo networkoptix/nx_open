@@ -1,11 +1,12 @@
 import sys
 from io import StringIO
+from enum import Enum
 
 from vms_benchmark import exceptions
 
 ini_plink_bin: str
-ini_ssh_command_timeout_s: int
-ini_ssh_get_file_content_timeout_s: int
+ini_box_command_timeout_s: int
+ini_box_get_file_content_timeout_s: int
 
 
 class BoxConnection:
@@ -21,12 +22,18 @@ class BoxConnection:
         def message(self):
             return self.message
 
+    class ConnectionType(Enum):
+        TELNET = 1
+        SSH = 2
+
     @classmethod
     def create_box_connection_object(cls,
-        host, port, login, password, connection_type='SSH', ssh_key=None):
+        host, port, login, password, connection_type=ConnectionType.SSH, ssh_key=None):
 
-        if connection_type == 'SSH':
+        if connection_type == cls.ConnectionType.SSH:
             return BoxConnectionSSH(host, port, login, password, ssh_key)
+        elif connection_type == cls.ConnectionType.TELNET:
+            return BoxConnectionTelnet(host, port, login, password)
 
         return None
 
@@ -70,7 +77,8 @@ class BoxConnection:
         self.eth_speed = eth_speed.strip() if eth_speed else None
 
     def sh(self, command, timeout_s=None,
-           su=False, exc=False, stdout=sys.stdout, stderr=None, stdin=None, verbose=False):
+            su=False, throw_timeout_exception=False, stdout=sys.stdout, stderr=None, stdin=None,
+            verbose=False):
         """ Should be overridden in subclass """
         raise NotImplementedError('You have to define "sh" method!')
 
@@ -89,7 +97,8 @@ class BoxConnection:
     def get_file_content(self, path, su=False, stderr=None, stdin=None, timeout_s=None):
         return self.eval(
             f'cat "{path}"', su=su, stderr=stderr, stdin=stdin,
-            timeout_s=timeout_s or ini_ssh_get_file_content_timeout_s)
+            timeout_s=timeout_s or ini_box_get_file_content_timeout_s)
 
 
 from .ssh import BoxConnectionSSH
+from .telnet import BoxConnectionTelnet
