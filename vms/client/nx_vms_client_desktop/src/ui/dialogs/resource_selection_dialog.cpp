@@ -3,6 +3,7 @@
 
 #include <QtCore/QIdentityProxyModel>
 #include <QtGui/QKeyEvent>
+#include <QtWidgets/QAbstractScrollArea>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QTreeView>
 
@@ -20,6 +21,7 @@
 #include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/resource_tree_widget.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
@@ -101,6 +103,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget* parent):
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesWidget->treeView()->setVerticalScrollBar(scrollBar->proxyScrollBar());
     ui->resourcesWidget->treeView()->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    ui->resourcesWidget->treeView()->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
 
     installEventHandler(scrollBar, { QEvent::Show, QEvent::Hide }, this,
         [this](QObject* watched, QEvent* event)
