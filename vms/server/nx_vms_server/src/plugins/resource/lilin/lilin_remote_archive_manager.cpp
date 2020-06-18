@@ -105,7 +105,8 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
         }
         else
         {
-            firstEntryStartTime.addSecs(-duration_cast<seconds>(directoryTimeShift).count());
+            firstEntryStartTime = firstEntryStartTime.addSecs(
+                -duration_cast<seconds>(directoryTimeShift).count());
         }
 
         const milliseconds firstEntryDuration =
