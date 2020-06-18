@@ -145,6 +145,46 @@ static auto activityGroupProvider()
             utils::metrics::makeLocalValueProvider<Resource>(
                 "transactionsPerSecond",
                 [](const auto& r) { return transactionsPerSecond(r); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "fileDeletions",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::deletions); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "timedOutDeletions",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::timedOutDeletions); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "directoryLists",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::directoryLists); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "timedOutDirectoryLists",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::timedOutDirectoryLists); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "reads",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::reads); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "timedOutReads",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::timedOutReads); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "writes",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::writes); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "timedOutWrites",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::timedOutWrites); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "seeks",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::seeks); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "timedOutSeeks",
+                [](const auto& r) { return r->getMetric(&StorageResource::Metrics::timedOutSeeks); }
             )
         );
 }

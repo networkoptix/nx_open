@@ -1,7 +1,9 @@
 #include "storage_resource.h"
+
 #include <media_server/media_server_module.h>
 #include <recorder/storage_manager.h>
 #include <nx/utils/iodevice_wrapper.h>
+#include <nx/utils/elapsed_timer.h>
 #include <recorder/file_deletor.h>
 
 namespace nx::vms::server {
@@ -32,16 +34,44 @@ QIODevice* StorageResource::wrapIoDevice(std::unique_ptr<QIODevice> ioDevice)
 
     std::weak_ptr<Metrics> statistics = m_metrics;
     result->setOnWriteCallback(
-        [statistics](qint64 size)
+        [this, statistics](qint64 size, std::chrono::milliseconds elapsed)
         {
-            if (auto strongRef = statistics.lock(); size > 0 && strongRef)
-                strongRef->bytesWritten += size;
+            if (auto strongRef = statistics.lock())
+            {
+                if (size > 0)
+                    strongRef->bytesWritten += size;
+
+                if (elapsed > serverModule()->settings().ioOperationTimeTresholdSec())
+                    strongRef->timedOutWrites++;
+
+                strongRef->writes++;
+            }
         });
+
     result->setOnReadCallback(
-        [statistics](qint64 size)
+        [this, statistics](qint64 size, std::chrono::milliseconds elapsed)
         {
-            if (auto strongRef = statistics.lock(); size > 0 && strongRef)
-                strongRef->bytesRead += size;
+            if (auto strongRef = statistics.lock())
+            {
+                if (size > 0)
+                    strongRef->bytesRead += size;
+
+                if (elapsed > serverModule()->settings().ioOperationTimeTresholdSec())
+                    strongRef->timedOutReads++;
+
+                strongRef->reads++;
+            }
+        });
+
+    result->setOnSeekCallback(
+        [this, statistics](qint64 /*result*/, std::chrono::milliseconds elapsed)
+        {
+            if (auto strongRef = statistics.lock())
+            {
+                strongRef->seeks++;
+                if (elapsed > serverModule()->settings().ioOperationTimeTresholdSec())
+                    strongRef->timedOutSeeks++;
+            }
         });
 
     return result;
@@ -53,6 +83,27 @@ qint64 StorageResource::nxOccupedSpace() const
     return m_serverModule->normalStorageManager()->nxOccupiedSpace(ptr) +
         m_serverModule->backupStorageManager()->nxOccupiedSpace(ptr) +
         m_serverModule->fileDeletor()->postponedFileSize(getId());
+}
+
+bool StorageResource::removeFile(const QString& url)
+{
+    m_metrics->deletions++;
+    nx::utils::ElapsedTimer timer(/*started*/true);
+    const bool result = doRemoveFile(url);
+    if (timer.hasExpired(serverModule()->settings().ioOperationTimeTresholdSec()))
+        m_metrics->timedOutDeletions++;
+    return result;
+}
+
+QnAbstractStorageResource::FileInfoList StorageResource::getFileList(
+    const QString& url)
+{
+    m_metrics->directoryLists++;
+    nx::utils::ElapsedTimer timer(/*started*/true);
+    const auto result = doGetFileList(url);
+    if (timer.hasExpired(serverModule()->settings().ioOperationTimeTresholdSec()))
+        m_metrics->timedOutDirectoryLists++;
+    return result;
 }
 
 } // namespace nx::vms::server

@@ -293,7 +293,7 @@ Qn::StorageInitResult QnThirdPartyStorageResource::initOrUpdate()
     return m_storage->isAvailable() ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
 }
 
-bool QnThirdPartyStorageResource::removeFile(const QString& url)
+bool QnThirdPartyStorageResource::doRemoveFile(const QString& url)
 {
     if (!m_valid)
         return false;
@@ -326,7 +326,7 @@ bool QnThirdPartyStorageResource::renameFile(const QString& oldName, const QStri
     return errorCode == nx_spl::error::NoError;
 }
 
-QnAbstractStorageResource::FileInfoList QnThirdPartyStorageResource::getFileList(
+QnAbstractStorageResource::FileInfoList QnThirdPartyStorageResource::doGetFileList(
     const QString& dirName)
 {
     if (!m_valid)

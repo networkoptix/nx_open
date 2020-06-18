@@ -35,13 +35,11 @@ public: // Inherited interface overrides.
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace()const override;
     virtual Qn::StorageInitResult initOrUpdate() override;
-    virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFileSize(const QString& url) const override;
-    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
 protected:
     virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override;
 private:
@@ -52,4 +50,7 @@ private:
     mutable QnMutex m_mutex;
     bool m_valid;
     const nx::vms::server::Settings* m_settings = nullptr;
+
+    virtual bool doRemoveFile(const QString& url) override;
+    virtual QnAbstractStorageResource::FileInfoList doGetFileList(const QString& dirName) override;
 };
