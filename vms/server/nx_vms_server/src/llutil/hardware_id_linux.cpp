@@ -9,6 +9,7 @@
 #include <QtCore/QList>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
+#include <QtCore/QRegularExpression>
 
 #if defined(__arm__) || defined(__aarch64__)
     #include <sys/types.h>
@@ -81,7 +82,7 @@ void findMacAddresses(QnMacAndDeviceClassList& devices) {
             continue;
 
         QString mac = QString(addressFile.readAll()).trimmed().toUpper();
-        if (mac.isEmpty() || mac == lit("00:00:00:00:00:00"))
+        if (mac.remove(QRegularExpression("[:0]+")).isEmpty())
             continue;
 
         QFileInfo subsystemFileInfo(interfacesDir, interface + "/device/subsystem");
