@@ -2,6 +2,7 @@
 
 #include <QtCore/QBasicTimer>
 #include <QtCore/QVector>
+#include <QtCore/QTimer>
 #include <QtGui/QVector3D>
 
 #include <common/common_globals.h>
@@ -21,6 +22,7 @@ class PtzManipulatorWidget;
 
 class QnSplashItem;
 class QnMediaResourceWidget;
+class QnResourceWidget;
 
 class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware
 {
@@ -77,6 +79,8 @@ protected:
     virtual void dragMove(DragInfo* info) override;
     virtual void finishDrag(DragInfo* info) override;
     virtual void finishDragProcess(DragInfo* info) override;
+
+    virtual bool wheelEvent(QGraphicsScene* scene, QGraphicsSceneWheelEvent* event) override;
 
 private slots:
     void at_splashItem_destroyed();
@@ -147,6 +151,9 @@ private:
     void processPtzClick(const QPointF& pos);
     void processPtzDrag(const QRectF& rect);
     void processPtzDoubleClick();
+
+    QnResourceWidget* findPtzWidget(const QPointF& scenePos) const;
+    void updateExternalPtzSpeed();
 
 private:
     struct PtzData
@@ -220,4 +227,7 @@ private:
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
 
     DirectionFlags m_externalPtzDirections;
+
+    int m_wheelZoomDirection = 0;
+    QTimer* const m_wheelZoomTimer;
 };

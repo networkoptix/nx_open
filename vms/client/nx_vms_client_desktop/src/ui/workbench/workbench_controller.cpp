@@ -58,6 +58,7 @@
 #include <ui/graphics/instruments/rotation_instrument.h>
 #include <ui/graphics/instruments/click_instrument.h>
 #include <ui/graphics/instruments/bounding_instrument.h>
+#include <ui/graphics/instruments/redirecting_instrument.h>
 #include <ui/graphics/instruments/stop_instrument.h>
 #include <ui/graphics/instruments/stop_accepted_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
@@ -265,6 +266,9 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, keyEventTypes, this));
 
     m_manager->installInstrument(sceneFocusSignalingInstrument);
+
+    m_manager->installInstrument(new RedirectingInstrument(Instrument::Scene, wheelEventTypes,
+        m_ptzInstrument, this));
 
     /* View/viewport instruments. */
     m_manager->installInstrument(m_rotationInstrument);

@@ -1,6 +1,8 @@
 #include "ptz_instrument.h"
 #include "ptz_instrument_p.h"
 
+#include <chrono>
+
 #include <QtCore/QVariant>
 
 #include <QtWidgets/QGraphicsSceneMouseEvent>
@@ -39,6 +41,7 @@
 
 using nx::vms::client::core::Geometry;
 
+using namespace std::chrono;
 using namespace nx::core;
 using namespace nx::vms::client::desktop;
 
@@ -233,7 +236,8 @@ PtzInstrument::PtzInstrument(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0),
-    m_movement(NoMovement)
+    m_movement(NoMovement),
+    m_wheelZoomTimer(new QTimer(this))
 {
     connect(resourcePool(), &QnResourcePool::statusChanged, this,
         [this](const QnResourcePtr& resource, Qn::StatusChangeReason /*reason*/)
@@ -262,6 +266,14 @@ PtzInstrument::PtzInstrument(QObject *parent):
 
     connect(display(), &QnWorkbenchDisplay::widgetAboutToBeChanged,
         this, &PtzInstrument::at_display_widgetAboutToBeChanged);
+
+    m_wheelZoomTimer->setSingleShot(true);
+    connect(m_wheelZoomTimer, &QTimer::timeout, this,
+        [this]()
+        {
+            m_wheelZoomDirection = 0;
+            updateExternalPtzSpeed();
+        });
 }
 
 PtzInstrument::~PtzInstrument()
@@ -1287,27 +1299,17 @@ void PtzInstrument::toggleContinuousPtz(DirectionFlag direction, bool on)
 
     setTarget(widget);
 
-    // Stop PTZ before setting a new speed. Otherwise it works unexpectedly.
-    ptzMove(widget, {}, true);
-
     m_externalPtzDirections.setFlag(direction, on);
-
     if (on)
         m_externalPtzDirections.setFlag(oppositeDirection(direction), false);
 
-    const QVector3D directionMultiplier(
-        -int(m_externalPtzDirections.testFlag(DirectionFlag::panRight))
-            + int(m_externalPtzDirections.testFlag(DirectionFlag::panLeft)),
-        -int(m_externalPtzDirections.testFlag(DirectionFlag::tiltUp))
-            + int(m_externalPtzDirections.testFlag(DirectionFlag::tiltDown)),
-        -int(m_externalPtzDirections.testFlag(DirectionFlag::zoomOut))
-            + int(m_externalPtzDirections.testFlag(DirectionFlag::zoomIn)));
+    if (direction == DirectionFlag::zoomIn || direction == DirectionFlag::zoomOut)
+    {
+        m_wheelZoomDirection = 0;
+        m_wheelZoomTimer->stop();
+    }
 
-    const auto rotation = widget->item()->rotation()
-       + (widget->item()->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
-
-    const auto speed = applyRotation(kKeyboardPtzSensitivity * directionMultiplier, rotation);
-    ptzMove(widget, {speed.x(), speed.y(), 0, speed.z()}, true);
+    updateExternalPtzSpeed();
 }
 
 void PtzInstrument::at_display_widgetAboutToBeChanged(Qn::ItemRole role)
@@ -1320,4 +1322,78 @@ void PtzInstrument::at_display_widgetAboutToBeChanged(Qn::ItemRole role)
     menu()->triggerIfPossible(ui::action::PtzContinuousMoveAction, ui::action::Parameters()
         .withArgument(Qn::ItemDataRole::PtzSpeedRole, QVariant::fromValue(QVector3D()))
         .withArgument(Qn::ItemDataRole::ForceRole, true));
+}
+
+void PtzInstrument::updateExternalPtzSpeed()
+{
+    if (!target() || !target()->item())
+        return;
+
+    const QVector3D directionMultiplier(
+        -int(m_externalPtzDirections.testFlag(DirectionFlag::panRight))
+        + int(m_externalPtzDirections.testFlag(DirectionFlag::panLeft)),
+        -int(m_externalPtzDirections.testFlag(DirectionFlag::tiltUp))
+        + int(m_externalPtzDirections.testFlag(DirectionFlag::tiltDown)),
+        -int(m_externalPtzDirections.testFlag(DirectionFlag::zoomOut))
+        + int(m_externalPtzDirections.testFlag(DirectionFlag::zoomIn)));
+
+    const auto rotation = target()->item()->rotation()
+        + (target()->item()->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
+
+    const auto speed = applyRotation(kKeyboardPtzSensitivity * directionMultiplier, rotation);
+
+    static constexpr qreal kWheelZoomSpeedFactor = 1.0;
+    const auto wheelZoomSpeed = m_wheelZoomDirection * kWheelZoomSpeedFactor;
+
+    // Stop PTZ before setting a new speed. Otherwise it works unexpectedly.
+    ptzMove(target(), {}, true);
+
+    ptzMove(target(), {speed.x(), speed.y(), 0, speed.z() + wheelZoomSpeed}, true);
+}
+
+QnResourceWidget* PtzInstrument::findPtzWidget(const QPointF& scenePos) const
+{
+    const auto isSuitableWidget =
+        [scenePos](QnResourceWidget* widget) -> bool
+        {
+            return widget->options().testFlag(QnResourceWidget::Option::ControlPtz)
+                && widget->rect().contains(widget->mapFromScene(scenePos));
+        };
+
+    auto widget = display()->widget(Qn::ZoomedRole);
+    if (widget)
+        return isSuitableWidget(widget) ? widget : nullptr;
+
+    widget = display()->widget(Qn::RaisedRole);
+    if (widget && widget->rect().contains(widget->mapFromScene(scenePos)))
+        return widget->options().testFlag(QnResourceWidget::Option::ControlPtz) ? widget : nullptr;
+
+    const auto widgets = display()->widgets();
+    const auto iter = std::find_if(widgets.cbegin(), widgets.cend(), isSuitableWidget);
+    return iter != widgets.cend() ? *iter : nullptr;
+}
+
+bool PtzInstrument::wheelEvent(QGraphicsScene* /*scene*/, QGraphicsSceneWheelEvent* event)
+{
+    const auto widget = qobject_cast<QnMediaResourceWidget*>(findPtzWidget(event->scenePos()));
+    if (!widget)
+        return false;
+
+    widget->selectThisWidget();
+    setTarget(widget);
+
+    const auto remainingTime = m_wheelZoomTimer->isActive()
+        ? m_wheelZoomTimer->remainingTimeAsDuration()
+        : 0ms;
+
+    static constexpr auto kMaxWheelDuration = 1000ms;
+    m_wheelZoomTimer->start(qMin(remainingTime + 200ms, milliseconds(kMaxWheelDuration)));
+
+    const int newDirection = (event->delta() > 0) ? 1 : -1;
+    if (m_wheelZoomDirection == newDirection)
+        return true;
+
+    m_wheelZoomDirection = newDirection;
+    updateExternalPtzSpeed();
+    return true;
 }
