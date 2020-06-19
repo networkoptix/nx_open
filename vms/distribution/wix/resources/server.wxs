@@ -79,6 +79,7 @@
                 <Directory Id="platforms" Name="platforms"/>
                 <Directory Id="vox" Name="vox"/>
                 <Directory Id="sqldrivers" Name="sqldrivers"/>
+                <Directory Id="imageformats" Name="imageformats"/>
 
                 <?if $(var.vmax) = true?>
                 <Directory Id="$(var.customization)VmaxDir" Name="VmaxProxy">
@@ -132,6 +133,7 @@
             <ComponentGroupRef Id="shared_ucrt_libraries"/>
             <ComponentGroupRef Id="shared_vcrt_libraries"/>
             <ComponentGroupRef Id="server_qt_libraries"/>
+            <ComponentGroupRef Id="server_qt_imageformats"/>
             <ComponentGroupRef Id="server_qt_sqldrivers"/>
             <ComponentGroupRef Id="server_misc_libraries"/>
             <ComponentGroupRef Id="server_plugins"/>
