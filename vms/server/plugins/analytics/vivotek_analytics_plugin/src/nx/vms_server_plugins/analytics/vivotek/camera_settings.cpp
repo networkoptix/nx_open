@@ -2409,7 +2409,7 @@ void parseEntryFromServer(
     const auto json = parseJson(serializedValue.toUtf8());
 
     const auto figure = get<QJsonValue>(json, "figure");
-    if (figure.isNull())
+    if (figure.isNull() || figure.isUndefined())
     {
         entry->emplaceNothing();
         return;
