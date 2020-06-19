@@ -40,12 +40,17 @@ void DirectEndpointConnector::connect(
     std::chrono::milliseconds timeout,
     ConnectCompletionHandler handler)
 {
-    using namespace std::placeholders;
+    NX_VERBOSE(this, "cross-nat %1. Connecting to %2 with timeout %3",
+        m_connectSessionId, m_targetHostAddress, timeout);
 
     NX_ASSERT(!response.forwardedTcpEndpointList.empty());
     if (!s_needVerification)
     {
         auto endpoint = std::move(response.forwardedTcpEndpointList.front());
+
+        NX_VERBOSE(this, "cross-nat %1. Verification is disabled. Reporting endpoint %2",
+            m_connectSessionId, endpoint);
+
         return post(
             [this, endpoint = std::move(endpoint), handler = std::move(handler)]() mutable
             {
@@ -130,8 +135,8 @@ void DirectEndpointConnector::launchVerificators(
 
     for (const SocketAddress& endpoint: endpoints)
     {
-        NX_VERBOSE(this, lm("cross-nat %1. Verifying host %2")
-            .arg(m_connectSessionId).arg(endpoint));
+        NX_VERBOSE(this, "cross-nat %1. Verifying host %2",
+            m_connectSessionId, endpoint);
 
         m_verificators.push_back(
             EndpointVerificatorFactory::instance().create(m_connectSessionId));
@@ -192,8 +197,8 @@ void DirectEndpointConnector::reportSuccessfulVerificationResult(
     SocketAddress endpoint,
     std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
-    NX_VERBOSE(this, lm("cross-nat %1. Reporting successful connection to %2")
-        .arg(m_connectSessionId).arg(endpoint));
+    NX_VERBOSE(this, "cross-nat %1. Reporting successful connection to %2",
+        m_connectSessionId, endpoint);
 
     m_verificators.clear();
 
