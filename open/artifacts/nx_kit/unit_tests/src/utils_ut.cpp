@@ -297,11 +297,11 @@ TEST(utils, toString_wchar_ptr)
     wchar_t nonConstWchars[] = L"str";
     ASSERT_STREQ(R"("str")", toString(nonConstWchars));
 
-    // NOTE: Unicode code point 041B is the Cyrillic capital "L".
+    // NOTE: For '\u' and '\U', a code point is required other than a printable ASCII.
     if (kWcharSize == 2) //< MSVC
-        ASSERT_STREQ(R"("-\u041B-")", toString(L"-\u041B-"));
+        ASSERT_STREQ(R"("-\u007F-")", toString(L"-\u007F-"));
     else if (kWcharSize == 4) //< Linux
-        ASSERT_STREQ(R"("-\U0000041B-")", toString(L"-\U0000041B-"));
+        ASSERT_STREQ(R"("-\U0000007F-")", toString(L"-\U0000007F-"));
 }
 
 TEST(utils, fromString_int)
