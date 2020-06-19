@@ -253,7 +253,7 @@ bool Socket<SocketInterfaceToImplement>::setReusePortFlag(bool value)
         if (isReusePortSupported())
         {
             const int on = value ? 1 : 0;
-            return ::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on));
+            return ::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)) == 0;
         }
     #endif
     return setReuseAddrFlag(value);
