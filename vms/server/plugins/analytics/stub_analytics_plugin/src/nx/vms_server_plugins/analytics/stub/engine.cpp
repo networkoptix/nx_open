@@ -501,6 +501,23 @@ std::string Engine::manifestString() const
                         "caption": "Device Agent CheckBox",
                         "name": "testCheckBox",
                         "defaultValue": true
+                    },
+                    {
+                        "type": "Separator"
+                    },
+                    {
+                        "type": "CheckBox",
+                        "caption": "Disabled Device Agent CheckBox",
+                        "name": "disabledTestCheckBox",
+                        "defaultValue": false,
+                        "enabled": false
+                    },
+                    {
+                        "type": "CheckBox",
+                        "caption": "Hidden Device Agent CheckBox",
+                        "name": "hiddenTestCheckBox",
+                        "defaultValue": false,
+                        "visible": false
                     }
                 ]
             }
