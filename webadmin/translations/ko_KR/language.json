@@ -77,8 +77,8 @@
         "emailSignature": "이메일 서명",
         "emailSupportEmail": "지원 이메일",
         "enableEdgeRecording": "오디오 녹음을 사용",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "웹 소켓 활성화",
+        "maxP2pAllClientsSizeBytes": "p2p 데이터를 모든 클라이언트에 전송하기위한 최대 버퍼 크기",
         "eventLogPeriodDays": "이벤트 로그 기간(일)",
         "ldapAdminDn": "LDAP 관리자 DN",
         "ldapSearchBase": "LDAP 검색 기준",
@@ -87,7 +87,7 @@
         "localSystemId": "내부 시스템 ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "최대 인터넷시간과의 동기화 차이 (1/1000초)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "최대 내부시간 과의 동기화 차이 (1/1000초)",
-        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
+        "maxP2pQueueSizeBytes": "최대 P2P 대기열 크기 (bytes)",
         "maxRecordQueueSizeBytes": "최대 기록 용량 (byte)",
         "maxRecordQueueSizeElements": "최대 기록 용량 (elements)",
         "maxRemoteArchiveSynchronizationThreads": "최대 원격 보관 동기화 스레드",
@@ -116,8 +116,8 @@
         "timeSynchronizationEnabled": "시간 동기화 활성화",
         "primaryTimeServer": "Primary time synchronization server",
         "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
-        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
+        "syncTimeExchangePeriod": "네트워크 요청에 대한 시간 동기화 간격 동기화",
+        "syncTimeEpsilon": "엡실론 시간 동기화.  시간 델타가 엡실론보다 작 으면 새로운 값이 적용되지 않습니다",
         "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "업데이트 알림 활성화",
         "upnpPortMappingEnabled": "UPNP 포트 매핑 사용",
@@ -135,7 +135,7 @@
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "그래프",
             "storage": "저장공간",
             "log": "기록"
         }
