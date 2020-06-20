@@ -114,7 +114,7 @@
         "primaryTimeServer": "Основной сервер синхронизации времени",
         "osTimeChangeCheckPeriodMs": "Период проверки изменения времени ОС",
         "syncTimeExchangePeriod": "Период синхронизации времени",
-        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
+        "maxWearableArchiveSynchronizationThreads": "Максимальное количество потоков синхронизации архива для виртуальных камер",
         "updateNotificationsEnabled": "Уведомления об обновлениях включены",
         "upnpPortMappingEnabled": "Сопоставление портов UPNP включено",
         "useTextEmailFormat": "Отправка писем простым текстом",

@@ -985,7 +985,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Página...</translation>
     </message>
   </context>
   <context>
@@ -1830,15 +1830,15 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Regra de evento alterada</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Regra de evento removida</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation type="unfinished">Event rules reset to default</translation>
+      <translation>Regras do evento redefinidas para o padrão</translation>
     </message>
   </context>
   <context>
@@ -2973,7 +2973,7 @@ a %1</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Não foi possível detectar a resolução de captura</translation>
     </message>
   </context>
   <context>
@@ -5759,23 +5759,23 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>óptico</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>troca</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>rede</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
@@ -6480,7 +6480,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>BAIXANDO&lt;br&gt;INICIADO</translation>
     </message>
   </context>
   <context>
@@ -6625,7 +6625,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Não é possível reconhecer o evento na câmera removida.</translation>
     </message>
   </context>
   <context>
@@ -10059,7 +10059,7 @@ Você pode selecionar outro local de armazenamento na guia &quot;gestão de arma
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Salvar arquivo como...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10067,15 +10067,15 @@ Você pode selecionar outro local de armazenamento na guia &quot;gestão de arma
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Falha ao salvar arquivo</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>A pasta %1 está bloqueada para escrita.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Baixando arquivo...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10083,15 +10083,15 @@ Você pode selecionar outro local de armazenamento na guia &quot;gestão de arma
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Parar download do arquivo?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Arquivo baixado</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Download de arquivo falhou</translation>
     </message>
   </context>
 </TS>
