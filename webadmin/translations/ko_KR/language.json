@@ -131,7 +131,7 @@
         "maxEventLogRecords": "데이터베이스에 보관할 최대 이벤트 로그 레코드. 삭제되지 않은 실제 레코드 양은 지정된 값보다 최대 20 % 더 높을 수 있습니다.",
         "forceLiveCacheForPrimaryStream": "기본 스트림의 일부 프레임을 캐시할지 여부입니다. 값: \"yes\"-항상 활성화 (많은 RAM을 사용할 수 있음), \"no\"-재생에 필요한 경우를 제외하고 항상 비활성화 (예: HLS), \"auto\"- \"no\"와 비슷하지만 사용자 경험치를 향상하기 위해 활성화 (예: 일부 웹 로그 분석 플러그인이 카메라에서 작동하는 경우)",
         "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "rtspBufferSizeKb": "서버 측 RTSP 버퍼 크기 KB 입니다. 값이 클수록 높은 왕복 지연 값으로보다 효율적인 인터넷을 사용할 수 있지만 자동 품질 전환 속도가 느려지고 RTSP 탐색 조작에 대한 반응이 느려집니다."
     },
     "info": {
         "tabs": {
