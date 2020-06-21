@@ -61,11 +61,8 @@ struct CameraOperation : RecordBase
     {}
 
     int getCameraUniqueIdLen() const;
-    void setCameraUniqueIdLen(int len);
-
     int getCameraId() const;
     void setCameraId(int cameraId);
-
     QByteArray getCameraUniqueId() const;
     void setCameraUniqueId(const QByteArray &uniqueId);
 

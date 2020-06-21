@@ -120,7 +120,6 @@ boost::optional<nx::media_db::CameraOperation> QnStorageDb::createCameraOperatio
 
     cameraOperation.setCameraId(cameraId);
     cameraOperation.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
-    cameraOperation.setCameraUniqueIdLen(cameraUniqueId.size());
     cameraOperation.setCameraUniqueId(cameraUniqueId.toUtf8());
 
     return cameraOperation;

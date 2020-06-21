@@ -74,12 +74,6 @@ int CameraOperation::getCameraUniqueIdLen() const
     return (part1 >> 0x2) & getBitMask(0xE);
 }
 
-void CameraOperation::setCameraUniqueIdLen(int len)
-{
-    part1 &= ~(getBitMask(0xe) << 0x2);
-    part1 |= ((quint64)len & getBitMask(0xe)) << 0x2;
-}
-
 int CameraOperation::getCameraId() const
 {
     return (part1 >> 0x10) & getBitMask(0x10);
@@ -96,8 +90,10 @@ QByteArray CameraOperation::getCameraUniqueId() const
     return cameraUniqueId;
 }
 
-void CameraOperation::setCameraUniqueId(const QByteArray &uniqueId)
+void CameraOperation::setCameraUniqueId(const QByteArray& uniqueId)
 {
+    part1 &= ~(getBitMask(0xe) << 0x2);
+    part1 |= ((quint64)uniqueId.size() & getBitMask(0xe)) << 0x2;
     cameraUniqueId = uniqueId;
 }
 

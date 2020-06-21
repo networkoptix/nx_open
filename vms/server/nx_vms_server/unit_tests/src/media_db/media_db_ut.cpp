@@ -159,7 +159,6 @@ nx::media_db::CameraOperation fromTestCameraOperation(
 
     result.setCameraId(testCameraOperation.id);
     result.setCameraUniqueId(testCameraOperation.camUniqueId);
-    result.setCameraUniqueIdLen(testCameraOperation.uuidLen);
     result.setRecordType(nx::media_db::RecordType(testCameraOperation.code));
 
     return result;
@@ -499,7 +498,6 @@ TEST(MediaFileOperations, BitsTwiddling)
 
         cop.setCameraId(tcop.id);
         cop.setCameraUniqueId(tcop.camUniqueId);
-        cop.setCameraUniqueIdLen(tcop.uuidLen);
         cop.setRecordType(nx::media_db::RecordType(tcop.code));
 
         ASSERT_TRUE(cop.getCameraId() == tcop.id);
@@ -555,11 +553,6 @@ TEST(MediaFileOperations, CameraOP_ResetValues)
     quint64 newCameraId = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 16) - 1));
     cop.setCameraId(newCameraId);
     ASSERT_EQ(newCameraId, cop.getCameraId());
-
-    cop.setCameraUniqueIdLen(std::pow(2, 14));
-    quint64 newCameraUniqueIdLen = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 14) - 1));
-    cop.setCameraUniqueIdLen(newCameraUniqueIdLen);
-    ASSERT_EQ(newCameraUniqueIdLen, cop.getCameraUniqueIdLen());
 }
 
 class MediaDbWriteRead: public ::testing::Test
