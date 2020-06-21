@@ -25,7 +25,7 @@ QDateTime parseDateTime(QString stringDate)
     return dateTime;
 }
 
-static QString normalizeInternalName(const QString& rawInternalName)
+QString normalizeInternalName(const QString& rawInternalName)
 {
     static const std::array<QString, 2> kIgnoredPostfixes = { "TriggerCap", "Cap" };
     for (const auto& postfix : kIgnoredPostfixes)
@@ -38,7 +38,7 @@ static QString normalizeInternalName(const QString& rawInternalName)
 
 } // namespace
 
-std::optional<std::vector<QString>> AttributesParser::parseSupportedEventsXml(
+/*static*/ std::optional<std::vector<QString>> AttributesParser::parseSupportedEventsXml(
     const QByteArray& content)
 {
     std::vector<QString> result;
@@ -59,37 +59,40 @@ std::optional<std::vector<QString>> AttributesParser::parseSupportedEventsXml(
     return result;
 }
 
-std::optional<HikvisionEvent> AttributesParser::parseEventXml(
+/*static*/ std::optional<EventWithRegions> AttributesParser::parseEventXml(
     const QByteArray& content,
     const Hikvision::EngineManifest& manifest)
 {
     QString description;
-    HikvisionEvent result;
+    EventWithRegions result;
     QXmlStreamReader reader(content);
 
     if (!reader.readNextStartElement())
-        return std::optional<HikvisionEvent>(); //< Read root element.
+        return {};
     while (reader.readNextStartElement())
     {
         const auto name = reader.name().toString().toLower().trimmed();
         if (name == "channelid")
         {
-            result.channel = reader.readElementText().toInt() - 1; //< Convert to range [0..x].
+            result.event.channel = reader.readElementText().toInt() - 1; //< Convert to range [0..x].
         }
         else if (name == "datetime")
         {
-            result.dateTime = QDateTime::fromString(reader.readElementText(), Qt::ISODate);
+            result.event.dateTime = QDateTime::fromString(reader.readElementText(), Qt::ISODate);
         }
         else if (name == "eventstate")
         {
-            result.isActive = reader.readElementText() == "active";
+            result.event.isActive = reader.readElementText() == "active";
         }
         else if (name == "eventtype")
         {
             const auto internalName = normalizeInternalName(reader.readElementText());
-            result.typeId = manifest.eventTypeByInternalName(internalName);
-            if (result.typeId.isEmpty())
-                NX_WARNING(typeid(AttributesParser), lm("Unknown analytics event name %1").arg(internalName));
+            result.event.typeId = manifest.eventTypeIdByInternalName(internalName);
+            if (result.event.typeId.isEmpty())
+            {
+                NX_WARNING(typeid(AttributesParser),
+                    lm("Unknown analytics event name %1").arg(internalName));
+            }
         }
         else if (name == "eventdescription")
         {
@@ -97,8 +100,7 @@ std::optional<HikvisionEvent> AttributesParser::parseEventXml(
         }
         else if (name == "detectionregionlist")
         {
-            // TODO: parse region number
-            reader.skipCurrentElement();
+            result.regions = parseRegionList(reader);
         }
         else
         {
@@ -106,17 +108,82 @@ std::optional<HikvisionEvent> AttributesParser::parseEventXml(
         }
     }
 
-    result.description = buildDescription(manifest, result);
-
     if (reader.error() != QXmlStreamReader::NoError)
     {
         NX_VERBOSE(typeid(AttributesParser), lm("XML parse error: %1").arg(reader.errorString()));
-        return std::optional<HikvisionEvent>();
+        return {};
     }
     return result;
 }
 
-std::vector<HikvisionEvent> AttributesParser::parseLprXml(
+/*static*/ std::vector<Region> AttributesParser::parseRegionList(QXmlStreamReader& reader)
+{
+    std::vector<Region> result;
+    constexpr int kExpectedRegionCount = 3;
+    result.reserve(kExpectedRegionCount);
+    while (reader.readNextStartElement())
+    {
+        const auto name = reader.name().toString().toLower().trimmed();
+        if (name == "detectionregionentry")
+        {
+            result.push_back(parseRegionEntry(reader));
+        }
+        else
+        {
+            reader.skipCurrentElement();
+        }
+    }
+    return result;
+}
+
+/*static*/ Region AttributesParser::parseRegionEntry(QXmlStreamReader& reader)
+{
+    Region result;
+    while (reader.readNextStartElement())
+    {
+        const auto name = reader.name().toString().toLower().trimmed();
+        if (name == "regionid")
+            result.id = reader.readElementText().toInt(); //< id = 0 if text is not an integer
+        else if (name == "regioncoordinateslist")
+            result.points = parseCoordinatesList(reader);
+        else
+            reader.skipCurrentElement();
+    }
+    return result;
+}
+
+/*static*/ std::vector<Point> AttributesParser::parseCoordinatesList(QXmlStreamReader& reader)
+{
+    std::vector<Point> result;
+    constexpr int kMaxPointCount = 10;
+    result.reserve(kMaxPointCount);
+    while (reader.readNextStartElement())
+    {
+        const auto name = reader.name().toString().toLower().trimmed();
+        if (name == "regioncoordinates")
+        {
+            Point point;
+            while (reader.readNextStartElement())
+            {
+                const auto subname = reader.name().toString().toLower().trimmed();
+                if (subname == "positionx")
+                    point.x = reader.readElementText().toInt(); //< x = 0 if text is not an integer
+                else if (subname == "positiony")
+                    point.y = reader.readElementText().toInt(); //< y = 0 if text is not an integer
+                else
+                    reader.skipCurrentElement();
+            }
+            result.push_back(point);
+        }
+        else
+        {
+            reader.skipCurrentElement();
+        }
+    }
+    return result;
+}
+
+/*static*/ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
     const QByteArray& content,
     const Hikvision::EngineManifest& manifest)
 {
@@ -141,13 +208,13 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
                 continue;
 
             addEvent(hikvisionEvent);
-            const auto descriptor = manifest.eventTypeDescriptorById(hikvisionEvent.typeId);
+            const auto eventType = manifest.eventTypeById(hikvisionEvent.typeId);
         }
     }
     return result;
 }
 
-HikvisionEvent AttributesParser::parsePlateData(
+/*static*/ HikvisionEvent AttributesParser::parsePlateData(
     QXmlStreamReader& reader,
     const Hikvision::EngineManifest& manifest)
 {
@@ -190,7 +257,7 @@ HikvisionEvent AttributesParser::parsePlateData(
         else if (name == "matchingresult")
         {
             const auto internalName = normalizeInternalName(reader.readElementText());
-            eventTypeId = manifest.eventTypeByInternalName(internalName);
+            eventTypeId = manifest.eventTypeIdByInternalName(internalName);
             if (eventTypeId.isEmpty())
             {
                 NX_WARNING(typeid(AttributesParser),

@@ -8,25 +8,25 @@ namespace analytics {
 
 QnMutex Hikvision::EngineManifest::m_cachedIdMutex;
 QMap<QString, QString> Hikvision::EngineManifest::m_eventTypeIdByInternalName;
-QMap<QString, Hikvision::EventType> Hikvision::EngineManifest::m_eventTypeDescriptorById;
+QMap<QString, Hikvision::EventType> Hikvision::EngineManifest::m_eventTypeById;
 
-QString Hikvision::EngineManifest::eventTypeByInternalName(const QString& value) const
+QString Hikvision::EngineManifest::eventTypeIdByInternalName(const QString& value) const
 {
-    const auto internalEventName = value.toLower();
+    const QString internalEventName = value.toLower();
     QnMutexLocker lock(&m_cachedIdMutex);
     const QString result = m_eventTypeIdByInternalName.value(internalEventName);
     if (!result.isEmpty())
         return result;
 
-    for (const auto& eventTypeDescriptor: eventTypes)
+    for (const EventType& eventType: eventTypes)
     {
-        const auto possibleInternalNames = eventTypeDescriptor.internalName.toLower().split(L',');
+        const auto possibleInternalNames = eventType.internalName.toLower().split(L',');
         for (const auto& name: possibleInternalNames)
         {
             if (internalEventName.contains(name))
             {
-                m_eventTypeIdByInternalName.insert(internalEventName, eventTypeDescriptor.id);
-                return eventTypeDescriptor.id;
+                m_eventTypeIdByInternalName.insert(internalEventName, eventType.id);
+                return eventType.id;
             }
         }
     }
@@ -34,30 +34,30 @@ QString Hikvision::EngineManifest::eventTypeByInternalName(const QString& value)
     return QString();
 }
 
-const Hikvision::EventType& Hikvision::EngineManifest::eventTypeDescriptorById(
-    const QString& id) const
+const Hikvision::EventType& Hikvision::EngineManifest::eventTypeById(const QString& id) const
 {
     QnMutexLocker lock(&m_cachedIdMutex);
-    auto it = m_eventTypeDescriptorById.find(id);
-    if (it != m_eventTypeDescriptorById.end())
+    auto it = m_eventTypeById.find(id);
+    if (it != m_eventTypeById.end())
         return it.value();
-    for (const auto& eventTypeDescriptor: eventTypes)
+
+    for (const EventType& eventType: eventTypes)
     {
-        if (eventTypeDescriptor.id == id)
+        if (eventType.id == id)
         {
-            it = m_eventTypeDescriptorById.insert(id, eventTypeDescriptor);
+            it = m_eventTypeById.insert(id, eventType);
             return it.value();
         }
     }
 
-    static const Hikvision::EventType kEmptyDescriptor;
-    return kEmptyDescriptor;
+    static const Hikvision::EventType kEmptyEventType;
+    return kEmptyEventType;
 }
 
-Hikvision::EventType Hikvision::EngineManifest::eventTypeDescriptorByInternalName(
+const Hikvision::EventType& Hikvision::EngineManifest::eventTypeByInternalName(
     const QString& internalName) const
 {
-    return eventTypeDescriptorById(eventTypeByInternalName(internalName));
+    return eventTypeById(eventTypeIdByInternalName(internalName));
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::EventType, (json), \

@@ -103,7 +103,7 @@ nx::utils::Url HikvisionMetadataMonitor::buildMonitoringUrl(
     QString eventListIds;
     for (const auto& eventTypeId: eventTypes)
     {
-        const auto name = m_manifest.eventTypeDescriptorById(eventTypeId).internalName;
+        const auto name = m_manifest.eventTypeById(eventTypeId).internalName;
         eventListIds += lit("/%1-%2").arg(name).arg(channel).toLower();
     }
 
@@ -126,7 +126,7 @@ void HikvisionMetadataMonitor::initMonitorUnsafe()
     for (const auto& eventTypeInternalName: { "BlackList", "WhiteList", "otherlist" })
     {
         if (m_deviceManifest.supportedEventTypeIds.contains(
-            m_manifest.eventTypeDescriptorByInternalName(eventTypeInternalName).id))
+            m_manifest.eventTypeByInternalName(eventTypeInternalName).id))
         {
             initLprMonitor();
             break;
@@ -216,7 +216,7 @@ void HikvisionMetadataMonitor::at_LprRequestDone()
     for (const auto& hikvisionEvent : hikvisionEvents)
     {
         if (!isFirstTime)
-            processEvent(hikvisionEvent);
+            processEvent({ hikvisionEvent });
         m_fromDateFilter = hikvisionEvent.picName;
     }
 
@@ -233,7 +233,7 @@ void HikvisionMetadataMonitor::at_monitorSomeBytesAvailable()
     // While processing this empty event HikvisionMetadataMonitor::addExpiredEvents finds
     // expired state-dependent events, which then are sent to server with field `active=false`.
     // This makes new-coming active state-dependent events not to be ignored by server.
-    processEvent(HikvisionEvent());
+    processEvent(EventWithRegions());
 }
 
 std::chrono::milliseconds HikvisionMetadataMonitor::reopenDelay() const
@@ -254,53 +254,79 @@ void HikvisionMetadataMonitor::reopenLprConnection()
     m_lprTimer.start(reopenDelay(), [this]() { initLprMonitor(); });
 }
 
-bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent)
+std::vector<HikvisionEvent> HikvisionMetadataMonitor::makeHikvisionEvents(
+    const EventWithRegions& eventWithRegions)
 {
     std::vector<HikvisionEvent> result;
-
-    if (!hikvisionEvent.typeId.isEmpty())
+    if (!eventWithRegions.event.typeId.isEmpty())
     {
-        if (std::find_if(m_deviceManifest.eventTypes.cbegin(), m_deviceManifest.eventTypes.cend(),
-            [&hikvisionEvent](const auto& eventType)
-            {
-                return eventType.id == hikvisionEvent.typeId;
-            })
-            != m_deviceManifest.eventTypes.cend())
+        if (m_deviceManifest.supportedEventTypeIds.contains(eventWithRegions.event.typeId))
         {
             // Normal case: supported event received.
-            result.push_back(hikvisionEvent);
+            result.push_back(eventWithRegions.event);
+
+            if (eventWithRegions.event.isThermal())
+            {
+                // This is a thermal event, probably it should generate some more thermal events.
+                for (const Region& region: eventWithRegions.regions)
+                {
+                    constexpr int kMaxSupportedRegionCount = 4;
+                    if (region.id <= kMaxSupportedRegionCount)
+                    {
+                        // Add the same event one more time and update it.
+                        result.push_back(eventWithRegions.event);
+                        HikvisionEvent& lastEvent = result.back();
+                        lastEvent.typeId.replace(QString("Any"), QString::number(region.id));
+                        lastEvent.region = region;
+                    }
+                }
+            }
         }
-        else if (m_receivedUnsupportedEventTypes.count(hikvisionEvent.typeId) == 0)
+        else if (m_receivedUnsupportedEventTypes.count(eventWithRegions.event.typeId) == 0)
         {
             // The event is not supported by the current device agent. We should log it,
             // but only once.
             NX_DEBUG(this, NX_FMT("Unsupported event type notification \"%1\" received"
                 " for the Device %2 (%3)",
-                hikvisionEvent.typeId, m_deviceName, m_deviceId));
-            m_receivedUnsupportedEventTypes.insert(hikvisionEvent.typeId);
+                eventWithRegions.event.typeId, m_deviceName, m_deviceId));
+            m_receivedUnsupportedEventTypes.insert(eventWithRegions.event.typeId);
         }
     }
+
+    for (HikvisionEvent& event: result)
+        event.description = buildDescription(m_manifest, event);
+
+    return result;
+}
+
+bool HikvisionMetadataMonitor::processEvent(const EventWithRegions& eventWithRegions)
+{
+    std::vector<HikvisionEvent> result = makeHikvisionEvents(eventWithRegions);
 
     auto getEventKey =
         [](const HikvisionEvent& event)
         {
             QString result = event.typeId;
             if (event.region)
-                result += QString::number(*event.region) + lit("_");
+                result += QString::number(event.region->id) + lit("_");
             if (event.channel)
                 result += QString::number(*event.channel);
             return result;
         };
 
-    auto eventTypeDescriptor = m_manifest.eventTypeDescriptorById(hikvisionEvent.typeId);
-    if (eventTypeDescriptor.flags.testFlag(vms::api::analytics::EventTypeFlag::stateDependent))
+    for (const HikvisionEvent& event: result)
     {
-        const QString key = getEventKey(hikvisionEvent);
-        if (hikvisionEvent.isActive)
-            m_startedEvents[key] = StartedEvent(hikvisionEvent);
-        else
-            m_startedEvents.remove(key);
+        Hikvision::EventType eventType = m_manifest.eventTypeById(event.typeId);
+        if (eventType.flags.testFlag(vms::api::analytics::EventTypeFlag::stateDependent))
+        {
+            const QString key = getEventKey(event);
+            if (event.isActive)
+                m_startedEvents[key] = StartedEvent(event);
+            else
+                m_startedEvents.remove(key);
+        }
     }
+
     addExpiredEvents(result);
 
     if (result.empty())

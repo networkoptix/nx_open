@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "common.h"
+#include "geometry.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -17,7 +18,7 @@ class AttributesParser
 {
 public:
     static std::optional<std::vector<QString>> parseSupportedEventsXml(const QByteArray& content);
-    static std::optional<HikvisionEvent> parseEventXml(
+    static std::optional<EventWithRegions> parseEventXml(
         const QByteArray& content,
         const Hikvision::EngineManifest& manifest);
 
@@ -25,6 +26,10 @@ public:
         const QByteArray& content,
         const Hikvision::EngineManifest& manifest);
 private:
+    static std::vector<Region> parseRegionList(QXmlStreamReader& reader);
+    static Region parseRegionEntry(QXmlStreamReader& reader);
+    static std::vector<Point> parseCoordinatesList(QXmlStreamReader& reader);
+
     static HikvisionEvent parsePlateData(
         QXmlStreamReader& reader,
         const Hikvision::EngineManifest& manifest);

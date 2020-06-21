@@ -125,7 +125,7 @@
             "positiveState": "has been detected",
             "negativeState": "has ended",
             "flags": "stateDependent | regionDependent",
-            "regionDescription": "  in the region #%1"
+            "regionDescription": " in the region #%1"
         },
         {
             "id": "nx.hikvision.UnattendedBaggage",
@@ -182,12 +182,117 @@
             "internalName": "Vehicle",
             "description": "Vehicle detected",
             "flags": "stateDependent"
+        },
+
+        {
+            "id": "nx.hikvision.Alarm1ThermalAny",
+            "name": "Thermal pre-alarm",
+            "internalName": "Thermometry,Alarm1ThermalAny,TMPA",
+            "description": "Thermal pre-alarm %1",
+            "positiveState": "has started",
+            "negativeState": "has ended",
+            "flags": "stateDependent",
+            "dependedEvent": "Alarm2ThermalAny,Alarm1Thermal1,Alarm2Thermal1,Alarm1Thermal2,Alarm2Thermal2,Alarm1Thermal3,Alarm2Thermal3,Alarm1Thermal4,Alarm2Thermal4"
+        },
+        {
+            "id": "nx.hikvision.Alarm2ThermalAny",
+            "name": "Thermal alarm",
+            "internalName": "Alarm2ThermalAny,TMA",
+            "description": "Thermal alarm %1",
+            "positiveState": "has started",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hikvision.Alarm1Thermal1",
+            "name": "Thermal pre-alarm for region 1",
+            "internalName": "Alarm1Thermal1",
+            "description": "Thermal region_1 pre-alarm %1",
+            "positiveState": "has started",
+            "negativeState": "has ended",
+            "groupId": "nx.hikvision.ThermalGroup",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hikvision.Alarm2Thermal1",
+            "name": "Thermal alarm for region 1",
+            "internalName": "Alarm2Thermal1",
+            "description": "Thermal region_1 alarm %1",
+            "positiveState": "has started",
+            "negativeState": "has ended",
+            "groupId": "nx.hikvision.ThermalGroup",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hikvision.Alarm1Thermal2",
+            "name": "Thermal pre-alarm for region 2",
+            "internalName": "Alarm1Thermal2",
+            "description": "Thermal region_2 pre-alarm %1",
+            "positiveState": "has started",
+            "negativeState": "has ended",
+            "groupId": "nx.hikvision.ThermalGroup",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hikvision.Alarm2Thermal2",
+            "name": "Thermal alarm for region 2",
+            "internalName": "Alarm2Thermal2",
+            "description": "Thermal region_2 alarm %1",
+            "positiveState": "has started",
+            "negativeState": "has ended",
+            "groupId": "nx.hikvision.ThermalGroup",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hikvision.Alarm1Thermal3",
+            "name": "Thermal pre-alarm for region 3",
+            "internalName": "Alarm1Thermal3",
+            "description": "Thermal region_3 pre-alarm %1",
+            "positiveState": "has started",
+            "negativeState": "has ended",
+            "groupId": "nx.hikvision.ThermalGroup",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hikvision.Alarm2Thermal3",
+            "name": "Thermal alarm for region 3",
+            "internalName": "Alarm2Thermal3",
+            "description": "Thermal region_3 alarm %1",
+            "positiveState": "has started",
+            "negativeState": "has ended",
+            "groupId": "nx.hikvision.ThermalGroup",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hikvision.Alarm1Thermal4",
+            "name": "Thermal pre-alarm for region 4",
+            "internalName": "Alarm1Thermal4",
+            "description": "Thermal region_4 pre-alarm %1",
+            "positiveState": "has started",
+            "negativeState": "has ended",
+            "groupId": "nx.hikvision.ThermalGroup",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hikvision.Alarm2Thermal4",
+            "name": "Thermal alarm for region 4",
+            "internalName": "Alarm2Thermal4",
+            "description": "Thermal region_4 alarm %1",
+            "positiveState": "has started",
+            "negativeState": "has ended",
+            "groupId": "nx.hikvision.ThermalGroup",
+            "flags": "stateDependent"
         }
     ],
-    "groups": [
+    "groups":
+    [
         {
             "id": "nx.hikvision.LPR",
             "name": "LPR"
+        },
+        {
+            "id": "nx.hikvision.ThermalGroup",
+            "name": "Thermal regions group"
         }
     ]
 }

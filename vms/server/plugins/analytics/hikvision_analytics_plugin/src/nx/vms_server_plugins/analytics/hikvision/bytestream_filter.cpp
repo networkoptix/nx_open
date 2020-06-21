@@ -23,9 +23,9 @@ bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
 {
     NX_VERBOSE(this, lm("Got XML data:\n %1").arg(buffer));
 
-    auto hikvisionEvent = AttributesParser::parseEventXml(buffer, m_manifest);
-    if (hikvisionEvent)
-        m_monitor->processEvent(*hikvisionEvent);
+    auto parsedEvent = AttributesParser::parseEventXml(buffer, m_manifest);
+    if (parsedEvent)
+        m_monitor->processEvent(*parsedEvent);
 
     // MultipartContentParser is not designed to receive false from here.
     // After MultipartContentParser refactoring in 4.1 this function should return void.

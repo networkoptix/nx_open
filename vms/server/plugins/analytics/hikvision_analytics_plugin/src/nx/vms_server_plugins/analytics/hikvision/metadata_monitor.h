@@ -46,7 +46,8 @@ public:
     void removeHandler(const QString& handlerId);
     void clearHandlers();
 
-    bool processEvent(const HikvisionEvent& hikvisionEvent);
+    std::vector<HikvisionEvent> makeHikvisionEvents(const EventWithRegions& eventWithRegions);
+    bool processEvent(const EventWithRegions& event);
 
     void setDeviceInfo(const QString& deviceName, const QString& id);
 private:

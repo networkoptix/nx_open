@@ -9,6 +9,8 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "geometry.h"
+
 namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
@@ -38,15 +40,14 @@ public:
     {
         QList<EventType> eventTypes;
 
-        QString eventTypeByInternalName(const QString& internalEventName) const;
-        const Hikvision::EventType& eventTypeDescriptorById(const QString& id) const;
-        Hikvision::EventType eventTypeDescriptorByInternalName(
-            const QString& internalName) const;
+        QString eventTypeIdByInternalName(const QString& internalEventName) const;
+        const Hikvision::EventType& eventTypeById(const QString& id) const;
+        const Hikvision::EventType& eventTypeByInternalName(const QString& internalName) const;
 
     private:
         static QnMutex m_cachedIdMutex;
         static QMap<QString, QString> m_eventTypeIdByInternalName;
-        static QMap<QString, EventType> m_eventTypeDescriptorById;
+        static QMap<QString, EventType> m_eventTypeById;
 
     };
     #define HikvisionEngineManifest_Fields EngineManifestBase_Fields (eventTypes)
@@ -59,9 +60,16 @@ struct HikvisionEvent
     QString caption;
     QString description;
     std::optional<int> channel;
-    std::optional<int> region;
+    std::optional<hikvision::Region> region;
     bool isActive = false;
     QString picName;
+    bool isThermal() const { return typeId.contains("Thermal"); }
+};
+
+struct EventWithRegions
+{
+    HikvisionEvent event;
+    hikvision::Regions regions;
 };
 
 using HikvisionEventList = std::vector<HikvisionEvent>;

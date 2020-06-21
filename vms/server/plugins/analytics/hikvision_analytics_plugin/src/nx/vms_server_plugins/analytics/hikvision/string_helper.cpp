@@ -11,8 +11,8 @@ QString buildCaption(
     const Hikvision::EngineManifest& manifest,
     const HikvisionEvent& event)
 {
-    const auto descriptor = manifest.eventTypeDescriptorById(event.typeId);
-    return descriptor.name;
+    const auto eventType = manifest.eventTypeById(event.typeId);
+    return eventType.name;
 }
 
 QString buildDescription(
@@ -21,21 +21,21 @@ QString buildDescription(
 {
     using namespace nx::vms::api::analytics;
 
-    const auto descriptor = manifest.eventTypeDescriptorById(event.typeId);
-    auto description = descriptor.description;
+    const auto eventType = manifest.eventTypeById(event.typeId);
+    auto description = eventType.description;
     if (description.isEmpty())
         return QString();
 
-    if (descriptor.flags.testFlag(EventTypeFlag::stateDependent))
+    if (eventType.flags.testFlag(EventTypeFlag::stateDependent))
     {
-        auto stateStr = event.isActive ? descriptor.positiveState : descriptor.negativeState;
+        auto stateStr = event.isActive ? eventType.positiveState : eventType.negativeState;
         if (!stateStr.isEmpty())
             description = description.arg(stateStr);
     }
 
-    if (descriptor.flags.testFlag(EventTypeFlag::regionDependent))
+    if (eventType.flags.testFlag(EventTypeFlag::regionDependent))
     {
-        auto regionStr = descriptor.regionDescription.arg(event.region ? *event.region : 0);
+        auto regionStr = eventType.regionDescription.arg(event.region ? event.region->id : 0);
         description = description.arg(regionStr);
     }
 
