@@ -89,6 +89,5 @@ then
             |xargs rm -f
     fi
 
-    rm -rf "$BASE_DIR/.config/pulseaudio"
-    rmdir "$BASE_DIR/.config" &>/dev/null || true
+    rm -rf "$BASE_DIR/home"
 fi
