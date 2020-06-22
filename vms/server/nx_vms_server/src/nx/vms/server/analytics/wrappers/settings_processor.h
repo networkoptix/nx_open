@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <functional>
 
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/i_settings_response.h>
@@ -23,6 +24,9 @@ namespace nx::vms::server::analytics::wrappers {
 
 class SettingsProcessor
 {
+    using SettingsResponseHolder = const sdk_support::ResultHolder<const sdk::ISettingsResponse*>;
+    using SettingsResponseFetcher = std::function<SettingsResponseHolder()>;
+
 public:
     using SdkErrorHandler = std::function<void(const sdk_support::Error&)>;
 
@@ -38,90 +42,64 @@ public:
     }
 
     template<typename SdkObject>
-    std::optional<sdk_support::SettingsResponse> pluginSideSettings(
+    std::optional<sdk_support::SdkSettingsResponse> pluginSideSettings(
         const SdkObject& sdkObject) const
-    {
-        const sdk_support::ResultHolder<const sdk::ISettingsResponse*> result =
-            sdkObject->pluginSideSettings();
-
-        if (!result.isOk())
-            m_errorHandler(sdk_support::Error::fromResultHolder(result));
-
-        const sdk::Ptr<const sdk::ISettingsResponse> sdkSettingsResponse = result.value();
-        if (!sdkSettingsResponse)
-        {
-            NX_DEBUG(
-                m_debugSettings.logTag,
-                "Got a null settings response while obtaining settings from [%1]",
-                m_sdkObjectDescription.descriptionString());
-
-            return std::nullopt;
-        }
-
-        const auto settingValues = sdkSettingsResponse->values();
-        if (!settingValues)
-        {
-            NX_DEBUG(
-                m_debugSettings.logTag,
-                "Got a null settings value map from [%1]",
-                m_sdkObjectDescription.descriptionString());
-        }
-
-        sdk_support::SettingsResponse settingsResponse{
-            sdk_support::fromSdkStringMap<sdk_support::SettingMap>(settingValues),
-            sdk_support::fromSdkStringMap<sdk_support::ErrorMap>(sdkSettingsResponse->errors())};
-
-        if (!settingsResponse.errors.isEmpty())
-        {
-            m_errorHandler({
-                sdk::ErrorCode::otherError,
-                buildSettingsErrorString(
-                    settingsResponse.errors,
-                    "Errors occurred while applying settings:\n")});
-        }
-
-        return settingsResponse;
-    }
-
-    template<typename SdkObject>
-    std::optional<sdk_support::ErrorMap> setSettings(
-        SdkObject sdkObject,
-        const sdk_support::SettingMap& settings) const
     {
         if (!NX_ASSERT(sdkObject))
             return std::nullopt;
 
-        sdk::Ptr<const sdk::IStringMap> sdkSettings = prepareSettings(settings);
+        return handleSettingsResponse([&sdkObject]() { return sdkObject->pluginSideSettings(); });
+    }
+
+    template<typename SdkObject>
+    std::optional<sdk_support::SdkSettingsResponse> setSettings(
+        SdkObject sdkObject,
+        const sdk_support::SettingsValues& settings) const
+    {
+        if (!NX_ASSERT(sdkObject))
+            return std::nullopt;
+
+        const sdk::Ptr<const sdk::IStringMap> sdkSettings = prepareSettings(settings);
         if (!NX_ASSERT(sdkSettings))
             return std::nullopt;
 
-        const sdk_support::ResultHolder<const sdk::IStringMap*> result =
-            sdkObject->setSettings(sdkSettings.get());
+        sdk_support::SdkSettingsResponse setSettingsResult =
+            handleSettingsResponse(
+                [&sdkObject, sdkSettings]()
+                {
+                    return sdkObject->setSettings(sdkSettings.get());
+                });
 
-        if (!result.isOk())
+        if (!setSettingsResult.values) //< 4.0 plugin that doesn't provide values.
         {
-            m_errorHandler(sdk_support::Error::fromResultHolder(result));
-            return std::nullopt;
+            sdk_support::SdkSettingsResponse pluginSideSettingsResult =
+                handleSettingsResponse(
+                    [&sdkObject]()
+                    {
+                        return sdkObject->pluginSideSettings();
+                    });
+
+            return mergeLegacySettingsResponses(setSettingsResult, pluginSideSettingsResult);
         }
 
-        const auto errorMap = sdk_support::fromSdkStringMap<sdk_support::ErrorMap>(result.value());
-        if (!errorMap.isEmpty())
-        {
-            m_errorHandler({
-                sdk::ErrorCode::otherError,
-                buildSettingsErrorString(
-                    errorMap,
-                    "Errors occurred while retrieving settings:\n")});
-        }
-
-        return sdk_support::fromSdkStringMap<sdk_support::ErrorMap>(result.value());
+        return setSettingsResult;
     }
 
 private:
-    sdk::Ptr<const sdk::IStringMap> prepareSettings(const sdk_support::SettingMap& settings) const;
-    QString buildSettingsErrorString(
-        const sdk_support::ErrorMap& errors,
-        const QString& prefix) const;
+    sdk_support::SdkSettingsResponse handleSettingsResponse(
+        SettingsResponseFetcher responseFetcher) const;
+
+    sdk::Ptr<const sdk::IStringMap> prepareSettings(
+        const sdk_support::SettingsValues& settings) const;
+
+    std::optional<sdk_support::SettingsValues> loadSettingsFromFile() const;
+
+    std::optional<sdk_support::SettingsValues> loadSettingsFromSpecificFile(
+        sdk_support::FilenameGenerationOptions filenameGenerationOptions) const;
+
+    static sdk_support::SdkSettingsResponse mergeLegacySettingsResponses(
+        sdk_support::SdkSettingsResponse first,
+        const sdk_support::SdkSettingsResponse& second);
 
 private:
     DebugSettings m_debugSettings;

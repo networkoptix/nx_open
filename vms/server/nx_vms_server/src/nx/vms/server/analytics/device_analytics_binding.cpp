@@ -33,8 +33,9 @@
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
-#include <nx/vms/server/interactive_settings/json_engine.h>
+#include <nx/vms/server/analytics/settings_engine_wrapper.h>
 #include <nx/vms/server/event/server_runtime_event_manager.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <nx/analytics/analytics_logging_ini.h>
 #include <nx/analytics/frame_info.h>
@@ -54,7 +55,7 @@ using StreamTypes = nx::vms::api::analytics::StreamTypes;
 
 DeviceAnalyticsBinding::DeviceAnalyticsBinding(
     QnMediaServerModule* serverModule,
-    QnVirtualCameraResourcePtr device,
+    resource::CameraPtr device,
     resource::AnalyticsEngineResourcePtr engine)
     :
     base_type(kMaxQueueSize),
@@ -73,10 +74,10 @@ DeviceAnalyticsBinding::~DeviceAnalyticsBinding()
     stopAnalytics();
 }
 
-bool DeviceAnalyticsBinding::startAnalytics(const QJsonObject& settings)
+bool DeviceAnalyticsBinding::startAnalytics()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return startAnalyticsUnsafe(settings);
+    return startAnalyticsUnsafe();
 }
 
 void DeviceAnalyticsBinding::stopAnalytics()
@@ -85,12 +86,12 @@ void DeviceAnalyticsBinding::stopAnalytics()
     stopAnalyticsUnsafe();
 }
 
-bool DeviceAnalyticsBinding::restartAnalytics(const QJsonObject& settings)
+bool DeviceAnalyticsBinding::restartAnalytics()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     stopAnalyticsUnsafe();
     m_deviceAgentContext = DeviceAgentContext();
-    return startAnalyticsUnsafe(settings);
+    return startAnalyticsUnsafe();
 }
 
 bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
@@ -140,7 +141,7 @@ bool DeviceAnalyticsBinding::hasAliveDeviceAgent() const
     return m_started.load();
 }
 
-bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
+bool DeviceAnalyticsBinding::startAnalyticsUnsafe()
 {
     if (!m_deviceAgentContext.deviceAgent)
     {
@@ -186,7 +187,10 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QJsonObject& settings)
         return false;
     }
 
-    setSettingsInternal(settings);
+    const SettingsContext settingsContext = currentSettingsContext();
+    SetSettingsRequest setSettingsRequest{settingsContext.modelId, settingsContext.values};
+
+    setSettingsInternal(setSettingsRequest, /*isInitialSettings*/ true);
 
     // TODO: #dmishin: Investigate why this condition is checked here; should it be NX_ASSERT()?
     if (!m_started)
@@ -214,7 +218,7 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     m_deviceAgentContext.deviceAgent->setNeededMetadataTypes(sdk_support::MetadataTypes());
 }
 
-QJsonObject DeviceAnalyticsBinding::getSettings() const
+SettingsResponse DeviceAnalyticsBinding::getSettings() const
 {
     DeviceAgentContext deviceAgentContext;
     {
@@ -224,27 +228,50 @@ QJsonObject DeviceAnalyticsBinding::getSettings() const
 
     if (!deviceAgentContext.deviceAgent)
     {
-        NX_WARNING(this, "Can't access DeviceAgent for the Device %1 (%2) and the Engine %3 (%4)",
-            m_device->getUserDefinedName(),
-            m_device->getId(),
-            m_engine->getName(),
-            m_engine->getId());
+        NX_WARNING(this, "Unable to access DeviceAgent, Device: %1, Engine: %3",
+            m_device, m_engine);
 
-        return {};
+        return SettingsResponse(
+            SettingsResponse::Error::Code::sdkObjectIsNotAccessible,
+            "DeviceAgent is not accessible");
     }
 
-    const auto settingsResponse = deviceAgentContext.deviceAgent->pluginSideSettings();
-    return settingsResponse ? settingsResponse->settingValues : QJsonObject();
+    const std::optional<sdk_support::SdkSettingsResponse> sdkSettingsResponse =
+        deviceAgentContext.deviceAgent->pluginSideSettings();
+
+    if (!sdkSettingsResponse)
+    {
+        NX_DEBUG(this,
+            "Getting settings, unable to obtain an SDK settings response, Device: %1, Engine: %2",
+            m_device, m_engine);
+
+        return SettingsResponse(SettingsResponse::Error::Code::unableToObtainSettingsResponse);
+    }
+
+    const SettingsContext settingsContext = updateSettingsContext(
+        currentSettingsContext(),
+        api::analytics::SettingsValues(),
+        *sdkSettingsResponse);
+
+    return prepareSettingsResponse(settingsContext, *sdkSettingsResponse);
 }
 
-void DeviceAnalyticsBinding::setSettings(const QJsonObject& settings)
+SettingsResponse DeviceAnalyticsBinding::setSettings(
+    const SetSettingsRequest& settingsRequest)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    setSettingsInternal(settings);
+    return setSettingsInternal(settingsRequest, /*isInitialSettings*/ false);
 }
 
-void DeviceAnalyticsBinding::setSettingsInternal(const QJsonObject& settings)
+SettingsResponse DeviceAnalyticsBinding::setSettingsInternal(
+    const SetSettingsRequest& settingsRequest,
+    bool isInitialSettings)
 {
+    NX_DEBUG(this,
+        "Setting settings, settings values: %1, settings model id: %2, isInitialSettings: %3, "
+        "Device: %4, Engine: %5",
+        settingsRequest.values, settingsRequest.modelId, isInitialSettings, m_device, m_engine);
+
     if (!m_deviceAgentContext.deviceAgent)
     {
         NX_DEBUG(this, "Can't access DeviceAgent for the Device %1 (%2) and the Engine %3 (%4)",
@@ -253,11 +280,46 @@ void DeviceAnalyticsBinding::setSettingsInternal(const QJsonObject& settings)
             m_engine->getName(),
             m_engine->getId());
 
-        return;
+        return SettingsResponse::Error(
+            SettingsResponse::Error::Code::sdkObjectIsNotAccessible,
+            "DeviceAgent is not accessible");
     }
 
-    m_deviceAgentContext.deviceAgent->setSettings(settings);
+    SettingsContext settingsContext = currentSettingsContext();
+
+    if ((settingsContext.modelId != settingsRequest.modelId) && !isInitialSettings)
+    {
+        NX_DEBUG(this,
+            "Setting settings, settings request model id (%1) doesn't match current settings "
+            "model id (%2), Device: %3, Engine %4",
+            settingsRequest.modelId, settingsContext.modelId, m_device, m_engine);
+
+        return SettingsResponse::Error(SettingsResponse::Error::Code::wrongSettingsModel);
+    }
+
+    const std::optional<sdk_support::SdkSettingsResponse> sdkSettingsResponse =
+        m_deviceAgentContext.deviceAgent->setSettings(
+            isInitialSettings
+                ? settingsRequest.values
+                : prepareSettings(settingsContext, settingsRequest.values));
+
+    if (!sdkSettingsResponse)
+    {
+        NX_DEBUG(this,
+            "Settings setttings, unable to obtain an SDK settings response, Device %1, Engine %2",
+            m_device, m_engine);
+
+        return SettingsResponse(SettingsResponse::Error::Code::unableToObtainSettingsResponse);
+    }
+
+    settingsContext = updateSettingsContext(
+        settingsContext,
+        settingsRequest.values,
+        *sdkSettingsResponse);
+
     notifySettingsMaybeChanged();
+
+    return prepareSettingsResponse(settingsContext, *sdkSettingsResponse);
 }
 
 void DeviceAnalyticsBinding::logIncomingFrame(Ptr<IDataPacket> frame)
@@ -377,6 +439,161 @@ void DeviceAnalyticsBinding::notifySettingsMaybeChanged() const
     serverModule()->serverRuntimeEventManager()->triggerDeviceAgentSettingsMaybeChangedEvent(
         m_device->getId(),
         m_engine->getId());
+}
+
+SettingsContext DeviceAnalyticsBinding::currentSettingsContext() const
+{
+    SettingsContext settingsContext;
+
+    if (m_deviceAgentContext.settingsModel)
+    {
+        NX_DEBUG(this,
+            "Fetching current settings context, there is a cached settings model: %1, "
+            "Device: %2, Engine: %3",
+            (m_deviceAgentContext.settingsModel
+                ? toString(*m_deviceAgentContext.settingsModel)
+                : "<null>"),
+            m_device, m_engine);
+
+        settingsContext.model = *m_deviceAgentContext.settingsModel;
+    }
+    else
+    {
+        const std::optional<api::analytics::SettingsModel> modelFromManifests =
+            m_device->deviceAgentSettingsModel(m_engine->getId());
+
+        NX_DEBUG(this,
+            "Fetching current settings context, there is no cached settings model, "
+            "the model from the Device and Engine manfiests: %1. Device: %2, Engine: %3",
+            (modelFromManifests ? toString(*modelFromManifests): "<null>"), m_device, m_engine);
+
+        settingsContext.model = modelFromManifests
+            ? *modelFromManifests
+            : api::analytics::SettingsModel();
+    }
+
+    settingsContext.modelId = calculateModelId(settingsContext.model);
+    settingsContext.values = m_device->deviceAgentSettingsValues(m_engine->getId());
+
+    return settingsContext;
+}
+
+SettingsContext DeviceAnalyticsBinding::updateSettingsContext(
+    const SettingsContext& currentSettingsContext,
+    const api::analytics::SettingsValues& requestValues,
+    const sdk_support::SdkSettingsResponse& sdkSettingsResponse) const
+{
+    NX_DEBUG(this, "Updating settings context, current settings model: %1, "
+        "current settings model id: %2, settings values from the request: %3, "
+        "settings model from the SDK response: %4, settings values from the SDK response: %5 "
+        "Device: %6, Engine: %7",
+        currentSettingsContext.model, currentSettingsContext.modelId, requestValues,
+        (sdkSettingsResponse.model ? toString(*sdkSettingsResponse.model) : "<null>"),
+        (sdkSettingsResponse.values ? toString(*sdkSettingsResponse.values) : "<null>"),
+        m_device, m_engine);
+
+    SettingsContext result = currentSettingsContext;
+    if (sdkSettingsResponse.model)
+    {
+        NX_DEBUG(this,
+            "Updating settings context, updating current settings model from the SDK response, "
+            "Device: %1, Engine: %2",
+            m_device, m_engine);
+
+        result.model = *sdkSettingsResponse.model;
+    }
+
+    result.modelId = calculateModelId(result.model);
+
+    SettingsEngineWrapper settingsEngine(serverModule()->eventConnector(), m_engine, m_device);
+    settingsEngine.loadModelFromJsonObject(result.model);
+
+    // Applying current settings values.
+    settingsEngine.applyValues(currentSettingsContext.values);
+
+    // Applying values from the settings request.
+    settingsEngine.applyValues(requestValues);
+
+    // Overriding values with ones from the SDK response (if any).
+    if (sdkSettingsResponse.values)
+    {
+        NX_DEBUG(this,
+            "Updating settings context, applying settings values from the SDK response, "
+            "Device: %1, Engine: %2",
+            m_device, m_engine);
+
+        settingsEngine.applyStringValues(*sdkSettingsResponse.values);
+    }
+
+    result.values = settingsEngine.values();
+    NX_DEBUG(this, "Updating settings context, resulting settings values: %1, "
+        "Device: %2, Engine: %3",
+        result.values, m_device, m_engine);
+
+    m_deviceAgentContext.settingsModel = result.model;
+    m_device->setDeviceAgentSettingsValues(m_engine->getId(), result.values);
+
+    m_device->saveProperties();
+
+    return result;
+}
+
+api::analytics::SettingsValues DeviceAnalyticsBinding::prepareSettings(
+    const SettingsContext& settingsContext,
+    const api::analytics::SettingsValues& settingsValues) const
+{
+    NX_DEBUG(this,
+        "Preparing settings, settings values: %1, settings values from "
+        "the current settings context %2, settings model from the current settings context: %3, "
+        "Device %4, Engine %5",
+        settingsValues, settingsContext.values, settingsContext.model,  m_device, m_engine);
+
+    // TODO: handle settings engine errors.
+    SettingsEngineWrapper settingsEngine(serverModule()->eventConnector(), m_engine, m_device);
+    settingsEngine.loadModelFromJsonObject(settingsContext.model);
+    settingsEngine.applyValues(settingsContext.values);
+    settingsEngine.applyValues(settingsValues);
+
+    const api::analytics::SettingsValues result = settingsEngine.values();
+    NX_DEBUG(this, "Preparing settings, resulting values: %1, Device: %2, Engine: %3",
+        result, m_device, m_engine);
+
+    return result;
+}
+
+SettingsResponse DeviceAnalyticsBinding::prepareSettingsResponse(
+    const SettingsContext& settingsContext,
+    const sdk_support::SdkSettingsResponse& sdkSettingsResponse) const
+{
+    SettingsResponse result;
+
+    SettingsEngineWrapper settingsEngine(serverModule()->eventConnector(), m_engine, m_device);
+    settingsEngine.loadModelFromJsonObject(settingsContext.model);
+
+    result.model = settingsEngine.serializeModel();
+    result.modelId = settingsContext.modelId;
+    result.values = settingsContext.values;
+    result.errors = sdkSettingsResponse.errors;
+
+    // TODO: stringify SDK error code
+    if (!sdkSettingsResponse.sdkError.isOk())
+    {
+        NX_DEBUG(this,
+            "The SDK response contains an SDK error: %1, message: %2, Device: %3, Engine: %4",
+            sdkSettingsResponse.sdkError.errorCode, sdkSettingsResponse.sdkError.errorMessage,
+            m_device, m_engine);
+
+        result.error = SettingsResponse::Error(
+            SettingsResponse::Error::Code::sdkError,
+            sdkSettingsResponse.sdkError.errorMessage);
+    }
+
+    NX_DEBUG(this,
+        "Resulting settings response, settings model: %1, settings model id: %2, "
+        "settings values: %3, settings errors: %4, Device: %5, Engine: %6",
+        result.model, result.modelId, result.values, result.errors, m_device, m_engine);
+
+    return result;
 }
 
 std::optional<EngineManifest> DeviceAnalyticsBinding::engineManifest() const

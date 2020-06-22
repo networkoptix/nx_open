@@ -10,6 +10,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/plugin_diagnostic_event.h>
 
+#include <nx/vms/server/resource/camera.h>
 #include <nx/vms/server/analytics/wrappers/types.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/sdk_support/error.h>
@@ -24,6 +25,7 @@ namespace nx::vms::server::analytics::wrappers {
 template<typename MainSdkObject, typename ManifestType>
 class SdkObjectWithManifest: public /*mixin*/ ServerModuleAware
 {
+
 public:
     SdkObjectWithManifest(
         QnMediaServerModule* serverModule,
@@ -40,6 +42,7 @@ public:
 
     virtual ~SdkObjectWithManifest() = default;
 
+public:
     std::optional<ManifestType> manifest(
         std::unique_ptr<StringBuilder>* outStringBuilder = nullptr) const
     {
@@ -80,7 +83,10 @@ public:
                 throwPluginEvent(caption, description);
             });
 
-        return manifestProcessor.manifest(m_mainSdkObject);
+        std::optional<ManifestType> sdkObjectManifest =
+            manifestProcessor.manifest(m_mainSdkObject);
+
+        return sdkObjectManifest;
     }
 
     bool isValid() const { return sdkObject(); }

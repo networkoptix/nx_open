@@ -94,7 +94,7 @@ SdkObjectDescription Plugin::sdkObjectDescription() const
     return SdkObjectDescription(
         pluginResource,
         resource::AnalyticsEngineResourcePtr(),
-        QnVirtualCameraResourcePtr());
+        resource::CameraPtr());
 }
 
 resource::AnalyticsPluginResourcePtr Plugin::pluginResource() const

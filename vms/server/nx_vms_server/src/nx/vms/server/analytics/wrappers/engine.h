@@ -38,9 +38,9 @@ public:
 
     void setEngineInfo(sdk::Ptr<const sdk::analytics::IEngineInfo> engineInfo);
 
-    bool isCompatible(QnVirtualCameraResourcePtr device) const;
+    bool isCompatible(resource::CameraPtr device) const;
 
-    std::shared_ptr<DeviceAgent> obtainDeviceAgent(QnVirtualCameraResourcePtr deviceInfo);
+    std::shared_ptr<DeviceAgent> obtainDeviceAgent(resource::CameraPtr deviceInfo);
 
     struct ExecuteActionResult
     {

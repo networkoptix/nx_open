@@ -34,6 +34,7 @@ struct NX_VMS_CLIENT_DESKTOP_API DeviceAgentData
     };
     QJsonObject model;
     QJsonObject values;
+    QnUuid modelId;
     Status status = Status::initial;
 };
 

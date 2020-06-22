@@ -50,16 +50,6 @@ void AnalyticsEngineResource::setManifest(const api::analytics::EngineManifest& 
     setProperty(kEngineManifestProperty, QString::fromUtf8(QJson::serialized(manifest)));
 }
 
-QJsonObject AnalyticsEngineResource::settingsValues() const
-{
-    return QJsonDocument::fromJson(getProperty(kSettingsValuesProperty).toUtf8()).object();
-}
-
-void AnalyticsEngineResource::setSettingsValues(const QJsonObject& values)
-{
-    setProperty(kSettingsValuesProperty, QString::fromUtf8(QJsonDocument(values).toJson()));
-}
-
 QString AnalyticsEngineResource::idForToStringFromPtr() const
 {
     return lm("[%1 %2]").args(getName(), getId());

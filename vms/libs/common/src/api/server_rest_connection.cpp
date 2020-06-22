@@ -1052,7 +1052,7 @@ Handle ServerConnection::getUpdateStatus(
 
 Handle ServerConnection::getEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
+    Result<nx::vms::api::analytics::EngineSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executeGet(
@@ -1067,7 +1067,7 @@ Handle ServerConnection::getEngineAnalyticsSettings(
                 callback(
                     success,
                     requestId,
-                    result.deserialized<nx::vms::api::analytics::SettingsResponse>());
+                    result.deserialized<nx::vms::api::analytics::EngineSettingsResponse>());
             }),
         targetThread);
 }
@@ -1075,7 +1075,7 @@ Handle ServerConnection::getEngineAnalyticsSettings(
 Handle ServerConnection::setEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
+    Result<nx::vms::api::analytics::EngineSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executePost<QnJsonRestResult>(
@@ -1091,7 +1091,7 @@ Handle ServerConnection::setEngineAnalyticsSettings(
             callback(
                 success,
                 requestId,
-                result.deserialized<nx::vms::api::analytics::SettingsResponse>());
+                result.deserialized<nx::vms::api::analytics::EngineSettingsResponse>());
         },
         targetThread);
 }
@@ -1125,11 +1125,13 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
+    const QnUuid& settingsModelId,
     Result<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     nx::vms::api::analytics::DeviceAnalyticsSettingsRequest request;
     request.settingsValues = settings;
+    request.settingsModelId = settingsModelId;
     request.analyticsEngineId = engine->getId();
     request.deviceId = device->getId().toString();
 

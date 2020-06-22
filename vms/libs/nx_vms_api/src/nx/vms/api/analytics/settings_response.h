@@ -2,17 +2,25 @@
 
 #include <QtCore/QJsonObject>
 
+#include <nx/utils/uuid.h>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx::vms::api::analytics {
 
-struct SettingsResponse
+NX_VMS_API struct EngineSettingsResponse
 {
-    QJsonObject values;
-    QJsonObject model;
+    QJsonObject settingsValues;
+    QJsonObject settingsModel;
+    QnUuid settingsModelId;
+    QJsonObject settingsErrors;
 };
-#define nx_vms_api_analytics_SettingsResponse_Fields (values)(model)
+#define nx_vms_api_analytics_EngineSettingsResponse_Fields \
+    (settingsValues) \
+    (settingsModel) \
+    (settingsModelId) \
+    (settingsErrors)
 
-QN_FUSION_DECLARE_FUNCTIONS(SettingsResponse, (json)(eq), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(EngineSettingsResponse, (json)(eq), NX_VMS_API)
 
 } // namespace nx::vms::api::analytics

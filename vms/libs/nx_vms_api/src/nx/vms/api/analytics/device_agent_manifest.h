@@ -21,7 +21,7 @@ struct NX_VMS_API DeviceAgentManifest
     enum Capability
     {
         noCapabilities = 0,
-        disableStreamSelection = 1 << 0,
+        disableStreamSelection = 1 << 0,        
     };
     Q_DECLARE_FLAGS(Capabilities, Capability);
 

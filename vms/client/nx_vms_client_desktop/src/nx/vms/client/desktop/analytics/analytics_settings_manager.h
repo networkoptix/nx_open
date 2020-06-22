@@ -35,6 +35,7 @@ public:
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
+        const QnUuid& settingsModelId,
         AnalyticsSettingsCallback callback) = 0;
 };
 using AnalyticsSettingsServerInterfacePtr = std::shared_ptr<AnalyticsSettingsServerInterface>;

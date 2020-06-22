@@ -29,8 +29,6 @@ public:
     api::analytics::EngineManifest manifest() const;
     void setManifest(const api::analytics::EngineManifest& manifest);
 
-    virtual QJsonObject settingsValues() const;
-    virtual void setSettingsValues(const QJsonObject& values);
     virtual QString idForToStringFromPtr() const override;
 
     AnalyticsPluginResourcePtr plugin() const;

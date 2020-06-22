@@ -42,7 +42,7 @@ using namespace nx::vms::server::metrics;
 
 static bool isEngineCompatibleWithDevice(
     const wrappers::EnginePtr& engine,
-    const QnVirtualCameraResourcePtr& device)
+    const resource::CameraPtr& device)
 {
     if (!NX_ASSERT(engine))
         return false;
@@ -97,9 +97,8 @@ void Manager::initExistingResources()
 {
     NX_INFO(this, "Initializing existing resources");
     const auto mediaServer = resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
-    const auto devices = resourcePool()->getAllCameras(
-        /*any server*/QnResourcePtr(),
-        /*ignoreDesktopCamera*/ true);
+    const auto devices = resourcePool()->getResources<resource::Camera>(
+        [](const resource::CameraPtr& device) { return !device->hasFlags(Qn::desktop_camera); });
 
     for (const auto& device: devices)
     {
@@ -135,7 +134,7 @@ QSharedPointer<DeviceAnalyticsContext> Manager::deviceAnalyticsContextUnsafe(
 }
 
 QSharedPointer<DeviceAnalyticsContext> Manager::deviceAnalyticsContextUnsafe(
-    const QnVirtualCameraResourcePtr& device) const
+    const resource::CameraPtr& device) const
 {
     return deviceAnalyticsContextUnsafe(device->getId());
 }
@@ -154,7 +153,7 @@ void Manager::at_resourceAdded(const QnResourcePtr& resource)
         return;
     }
 
-    auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    auto device = resource.dynamicCast<resource::Camera>();
     if (device && !device->hasFlags(Qn::desktop_camera))
     {
         NX_DEBUG(
@@ -178,7 +177,7 @@ void Manager::at_resourceRemoved(const QnResourcePtr& resource)
 
     resource->disconnect(this);
 
-    const auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto device = resource.dynamicCast<resource::Camera>();
     if (device)
     {
         NX_DEBUG(this, "The Device %1 (%2) has been removed",
@@ -202,7 +201,7 @@ void Manager::at_resourceRemoved(const QnResourcePtr& resource)
 
 void Manager::at_resourceParentIdChanged(const QnResourcePtr& resource)
 {
-    auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    auto device = resource.dynamicCast<resource::Camera>();
     if (!NX_ASSERT(device))
         return;
 
@@ -220,7 +219,7 @@ void Manager::at_resourcePropertyChanged(
     at_enginePropertyChanged(engine, propertyName);
 }
 
-void Manager::at_deviceAdded(const QnVirtualCameraResourcePtr& device)
+void Manager::at_deviceAdded(const resource::CameraPtr& device)
 {
     NX_DEBUG(this, "Handling new device, %1 (%2)", device->getUserDefinedName(), device->getId());
     connect(
@@ -235,7 +234,7 @@ void Manager::at_deviceAdded(const QnVirtualCameraResourcePtr& device)
         handleDeviceArrivalToServer(device);
 }
 
-void Manager::at_deviceRemoved(const QnVirtualCameraResourcePtr& device)
+void Manager::at_deviceRemoved(const resource::CameraPtr& device)
 {
     NX_DEBUG(this, "Handling device removal, %1 (%2)",
         device->getUserDefinedName(), device->getId());
@@ -243,7 +242,7 @@ void Manager::at_deviceRemoved(const QnVirtualCameraResourcePtr& device)
     handleDeviceRemovalFromServer(device);
 }
 
-void Manager::at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device)
+void Manager::at_deviceParentIdChanged(const resource::CameraPtr& device)
 {
     if (isLocalDevice(device))
     {
@@ -260,14 +259,16 @@ void Manager::at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device)
     }
 }
 
-void Manager::at_deviceUserEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& device)
+void Manager::at_deviceUserEnabledAnalyticsEnginesChanged(
+    const QnVirtualCameraResourcePtr& device)
 {
-    updateEnabledAnalyticsEngines(device);
+    if (const auto serverCamera = device.dynamicCast<resource::Camera>())
+        updateEnabledAnalyticsEngines(serverCamera);
 }
 
 void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
 {
-    const auto device = deviceResource.dynamicCast<QnVirtualCameraResource>();
+    const auto device = deviceResource.dynamicCast<resource::Camera>();
     if (!NX_ASSERT(device))
         return;
 
@@ -278,30 +279,29 @@ void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
     }
 }
 
-void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device)
-{
-    auto camera = device.objectCast<resource::Camera>();
-    if (!NX_ASSERT(camera))
+void Manager::handleDeviceArrivalToServer(const resource::CameraPtr& device)
+{    
+    if (!NX_ASSERT(device))
         return;
 
-    updateCompatibilityWithEngines(camera);
+    updateCompatibilityWithEngines(device);
     connect(
-        camera, &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged,
+        device.get(), &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged,
         this, &Manager::at_deviceUserEnabledAnalyticsEnginesChanged);
 
-    auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), camera);
+    auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), device);
     context->setEnabledAnalyticsEngines(
-        camera->enabledAnalyticsEngineResources().filtered<resource::AnalyticsEngineResource>());
-    context->setMetadataSinks(metadataSinksUnsafe(camera->getId()));
+        device->enabledAnalyticsEngineResources().filtered<resource::AnalyticsEngineResource>());
+    context->setMetadataSinks(metadataSinksUnsafe(device->getId()));
 
-    if (auto source = mediaSourceUnsafe(camera->getId()).toStrongRef())
+    if (auto source = mediaSourceUnsafe(device->getId()).toStrongRef())
         source->setProxiedReceptor(context);
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_deviceAnalyticsContexts.emplace(camera->getId(), context);
+    m_deviceAnalyticsContexts.emplace(device->getId(), context);
 }
 
-void Manager::handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& device)
+void Manager::handleDeviceRemovalFromServer(const resource::CameraPtr& device)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -349,7 +349,7 @@ void Manager::at_enginePropertyChanged(
         return;
 
     if (propertyName == AnalyticsEngineResource::kSettingsValuesProperty)
-        engine->sendSettingsToSdkEngine();
+        engine->setSettings();
 }
 
 void Manager::at_engineInitializationStateChanged(const AnalyticsEngineResourcePtr& engine)
@@ -370,7 +370,7 @@ std::unique_ptr<metrics::PluginResourceBindingInfoHolder> Manager::bindingInfoHo
 
     for (const auto& [deviceId, context]: m_deviceAnalyticsContexts)
     {
-        const auto device = resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
+        const auto device = resourcePool()->getResourceById<resource::Camera>(deviceId);
         if (!device || !isLocalDevice(device))
         {
             NX_DEBUG(this,
@@ -418,7 +418,7 @@ void Manager::registerMetadataSink(
     const QnResourcePtr& deviceResource,
     MetadataSinkPtr metadataSink)
 {
-    auto device = deviceResource.dynamicCast<QnVirtualCameraResource>();
+    auto device = deviceResource.dynamicCast<resource::Camera>();
     if (!device)
     {
         NX_ERROR(this,
@@ -468,10 +468,10 @@ QWeakPointer<StreamDataReceptor> Manager::registerMediaSource(
     return proxySource;
 }
 
-void Manager::setSettings(
+SettingsResponse Manager::setSettings(
     const QString& deviceId,
     const QString& engineId,
-    const QJsonObject& deviceAgentSettings)
+    const SetSettingsRequest& deviceAgentSettings)
 {
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
     {
@@ -480,12 +480,16 @@ void Manager::setSettings(
     }
 
     if (!NX_ASSERT(analyticsContext, lm("Device %1").arg(deviceId)))
-        return;
+    {
+        return SettingsResponse(
+            SettingsResponse::Error::Code::sdkObjectIsNotAccessible,
+            "Unable to find Device context");
+    }
 
-    analyticsContext->setSettingsValues(engineId, deviceAgentSettings);
+    return analyticsContext->setSettings(engineId, deviceAgentSettings);
 }
 
-std::optional<Settings> Manager::getSettings(
+SettingsResponse Manager::getSettings(
     const QString& deviceId, const QString& engineId) const
 {
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
@@ -495,31 +499,44 @@ std::optional<Settings> Manager::getSettings(
     }
 
     if (!analyticsContext)
-        return {};
+    {
+        return SettingsResponse(
+            SettingsResponse::Error::Code::sdkObjectIsNotAccessible,
+            "Unable to find Device context");
+    }
 
     return analyticsContext->getSettings(engineId);
 }
 
-void Manager::setSettings(const QString& engineId, const QJsonObject& engineSettings)
+SettingsResponse Manager::setSettings(
+    const QString& engineId, const SetSettingsRequest& engineSettings)
 {
     auto engine = sdk_support::find<AnalyticsEngineResource>(serverModule(), engineId);
 
     if (!NX_ASSERT(engine, lm("Engine %1").arg(engineId)))
-        return;
+    {
+        return SettingsResponse(
+            SettingsResponse::Error::Code::sdkObjectIsNotAccessible,
+            "Unable to find Engine");
+    }
 
     NX_DEBUG(this, "Setting settings for the Engine %1 (%2)", engine->getName(), engine->getId());
-    engine->setSettingsValues(engineSettings);
+    return engine->setSettings(engineSettings);
 }
 
-QJsonObject Manager::getSettings(const QString& engineId) const
+SettingsResponse Manager::getSettings(const QString& engineId) const
 {
     auto engine = sdk_support::find<AnalyticsEngineResource>(serverModule(), engineId);
 
     if (!NX_ASSERT(engine, lm("Engine %1").arg(engineId)))
-        return {};
+    {
+        return SettingsResponse(
+            SettingsResponse::Error::Code::sdkObjectIsNotAccessible,
+            "Unable to find Engine");
+    }
 
     NX_DEBUG(this, "Getting settings for the Engine %1 (%2)", engine->getName(), engine->getId());
-    return engine->settingsValues();
+    return engine->getSettings();
 }
 
 MetadataSinkSet Manager::metadataSinksUnsafe(
@@ -548,19 +565,23 @@ nx::vms::server::resource::AnalyticsEngineResourceList Manager::localEngines() c
         [](const AnalyticsEngineResourcePtr& engine) { return !!engine->sdkEngine(); });
 }
 
-QnVirtualCameraResourceList Manager::localDevices() const
+resource::CameraList Manager::localDevices() const
 {
-    return resourcePool()->getAllCameras(
-        serverModule()->commonModule()->currentServer(),
-        /*ignoreDesktopCamera*/ true);
+    const QnUuid currentServerId = serverModule()->commonModule()->currentServer()->getId();
+    return resourcePool()->getResources<resource::Camera>(
+        [currentServerId](const resource::CameraPtr& device)
+        {
+            return !device->hasFlags(Qn::desktop_camera)
+                && device->getParentId() == currentServerId;
+        });
 }
 
-bool Manager::isLocalDevice(const QnVirtualCameraResourcePtr& device) const
+bool Manager::isLocalDevice(const resource::CameraPtr& device) const
 {
     return device->getParentId() == moduleGUID();
 }
 
-QSet<QnUuid> Manager::compatibleEngineIds(const QnVirtualCameraResourcePtr& device) const
+QSet<QnUuid> Manager::compatibleEngineIds(const resource::CameraPtr& device) const
 {
     QSet<QnUuid> result;
     if (!NX_ASSERT(device))
@@ -579,7 +600,7 @@ QSet<QnUuid> Manager::compatibleEngineIds(const QnVirtualCameraResourcePtr& devi
     return result;
 }
 
-void Manager::updateCompatibilityWithEngines(const QnVirtualCameraResourcePtr& device)
+void Manager::updateCompatibilityWithEngines(const resource::CameraPtr& device)
 {
     device->setCompatibleAnalyticsEngines(compatibleEngineIds(device));
     device->savePropertiesAsync();
@@ -596,9 +617,8 @@ void Manager::updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& e
     }
 
     const auto engineId = engine->getId();
-    auto devices = resourcePool()->getAllCameras(
-        /*any server*/ QnResourcePtr(),
-        /*ignoreDesktopCamera*/ true);
+    resource::CameraList devices = resourcePool()->getResources<resource::Camera>(
+        [](const resource::CameraPtr& device) { return !device->hasFlags(Qn::desktop_camera); });
 
     for (auto& device: devices)
     {
@@ -613,7 +633,7 @@ void Manager::updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& e
     }
 }
 
-void Manager::updateEnabledAnalyticsEngines(const QnVirtualCameraResourcePtr& device)
+void Manager::updateEnabledAnalyticsEngines(const resource::CameraPtr& device)
 {
     QSharedPointer<DeviceAnalyticsContext> analyticsContext;
     {

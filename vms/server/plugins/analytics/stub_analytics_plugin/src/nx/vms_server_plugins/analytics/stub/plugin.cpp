@@ -1,8 +1,9 @@
+
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "plugin.h"
-
 #include "engine.h"
+#include "settings_model.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -47,6 +48,13 @@ std::string Plugin::manifestString() const
                         "description": "If true, the stream selection control will be hidden for newly created DeviceAgents",
                         "defaultValue": false,
                         "value": false
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kUsePluginAsSettingsOriginForDeviceAgents + R"json(",
+                        "caption": "Use Plugin as settings origin for DeviceAgents",
+                        "description": "If set, newly created Device Agents will declare the \"usePluginSettingsAsOrigin\" capability in its manifest",
+                        "defaultValue": false
                     }
                 ]
             },

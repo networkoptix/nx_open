@@ -18,6 +18,7 @@
 #include <nx/vms/server/analytics/settings.h>
 #include <nx/vms/server/analytics/stream_data_receptor.h>
 #include <nx/vms/server/sdk_support/file_utils.h>
+#include <nx/vms/server/sdk_support/types.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 
 #include <nx/sdk/ptr.h>
@@ -54,8 +55,11 @@ public:
     void removeEngine(const resource::AnalyticsEngineResourcePtr& engine);
 
     void setMetadataSinks(MetadataSinkSet metadataSink);
-    void setSettingsValues(const QString& engineId, const QJsonObject& settings);
-    std::optional<Settings> getSettings(const QString& engineId) const;
+
+    SettingsResponse setSettings(
+        const QString& engineId, const SetSettingsRequest& settingsRequest);
+
+    SettingsResponse getSettings(const QString& engineId) const;
 
     // @return map Engine id -> has alive DeviceAgent
     std::map<QnUuid, bool> bindingStatuses() const;

@@ -67,7 +67,7 @@ struct NX_VMS_API EngineManifest
         needUncompressedVideoFrames_rgb = 1 << 5,
         needUncompressedVideoFrames_bgr = 1 << 6,
         deviceDependent = 1 << 7,
-        keepObjectBoundingBoxRotation = 1 << 8,
+        keepObjectBoundingBoxRotation = 1 << 8,        
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
@@ -86,7 +86,7 @@ struct NX_VMS_API EngineManifest
     /** Groups that are used to group Object and Event types declared by this manifest. */
     QList<Group> groups;
 
-    QList<ObjectAction> objectActions;
+    QList<ObjectAction> objectActions;    
 
     QJsonObject deviceAgentSettingsModel;
 };
@@ -97,8 +97,8 @@ struct NX_VMS_API EngineManifest
     (eventTypes) \
     (objectTypes) \
     (objectActions) \
-    (groups) \
-    (deviceAgentSettingsModel)
+    (deviceAgentSettingsModel) \
+    (groups)
 
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json), NX_VMS_API)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EngineManifest::Capabilities)

@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include <core/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/server_module_aware.h>
@@ -33,7 +33,7 @@ public:
     DeviceAgent(
         QnMediaServerModule* serverModule,
         QWeakPointer<resource::AnalyticsEngineResource> engine,
-        QWeakPointer<QnVirtualCameraResource> device,
+        QWeakPointer<resource::Camera> device,
         sdk::Ptr<sdk::analytics::IDeviceAgent> sdkDeviceAgent,
         QString libraryName);
 
@@ -55,11 +55,11 @@ private:
 
     resource::AnalyticsPluginResourcePtr pluginResource() const;
 
-    QnVirtualCameraResourcePtr device() const;
+    resource::CameraPtr device() const;
 
 private:
     QWeakPointer<resource::AnalyticsEngineResource> m_engineResource;
-    QWeakPointer<QnVirtualCameraResource> m_device;
+    QWeakPointer<resource::Camera> m_device;
 
     sdk::Ptr<sdk::analytics::IConsumingDeviceAgent> m_consumingDeviceAgent;
 };

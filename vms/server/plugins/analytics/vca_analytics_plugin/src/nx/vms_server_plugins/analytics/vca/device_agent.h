@@ -79,7 +79,7 @@ public:
 
 protected:
     virtual void doSetSettings(
-        nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
         const nx::sdk::IStringMap* settings) override;
     virtual void getPluginSideSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;

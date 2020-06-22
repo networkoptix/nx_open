@@ -5,9 +5,9 @@
 namespace nx::vms::api::analytics {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    SettingsResponse,
+    EngineSettingsResponse,
     (json)(eq),
-    nx_vms_api_analytics_SettingsResponse_Fields,
+    nx_vms_api_analytics_EngineSettingsResponse_Fields,
     (brief, true))
 
 } // namespace nx::vms::api::analytics

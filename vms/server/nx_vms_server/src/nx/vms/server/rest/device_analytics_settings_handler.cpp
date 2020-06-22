@@ -7,8 +7,9 @@
 #include <media_server/media_server_module.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/vms/server/rest/parameter_names.h>
+
 #include <nx/vms/server/rest/utils.h>
+#include <nx/vms/server/rest/parameter_names.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
@@ -23,6 +24,8 @@ using namespace nx::network;
 using DeviceAnalyticsSettingsRequest = nx::vms::api::analytics::DeviceAnalyticsSettingsRequest;
 using DeviceAnalyticsSettingsResponse = nx::vms::api::analytics::DeviceAnalyticsSettingsResponse;
 using DeviceAgentManfiest = nx::vms::api::analytics::DeviceAgentManifest;
+using SettingsResponse = nx::vms::server::analytics::SettingsResponse;
+using SetSettingsRequest = nx::vms::server::analytics::SetSettingsRequest;
 
 using ParameterMap = std::map<QString, QString>;
 
@@ -91,7 +94,11 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executeGet(const JsonRestReques
         return makeResponse(QnRestResult::InternalServerError, message);
     }
 
-    return makeSettingsResponse(analyticsManager, commonRequestEntities);
+    const SettingsResponse settingsResponse = analyticsManager->getSettings(
+        commonRequestParameters.at(kDeviceIdParameter),
+        commonRequestParameters.at(kAnalyticsEngineIdParameter));
+
+    return makeApiResponse(settingsResponse, commonRequestEntities);
 }
 
 JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
@@ -143,12 +150,16 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
         commonRequestEntities.device->saveProperties();
     }
 
-    analyticsManager->setSettings(
+    SetSettingsRequest setSettingsRequest;
+    setSettingsRequest.modelId = settingsRequest.settingsModelId;
+    setSettingsRequest.values = settingsRequest.settingsValues;
+
+    const SettingsResponse settingsResponse = analyticsManager->setSettings(
         commonRequestParameters.at(kDeviceIdParameter),
         commonRequestParameters.at(kAnalyticsEngineIdParameter),
-        settingsRequest.settingsValues);
+        setSettingsRequest);
 
-    return makeSettingsResponse(analyticsManager, commonRequestEntities);
+    return makeApiResponse(settingsResponse, commonRequestEntities);
 }
 
 DeviceAnalyticsSettingsHandler::CommonRequestEntities
@@ -224,29 +235,14 @@ DeviceAnalyticsSettingsHandler::CommonRequestEntities
     return result;
 }
 
-JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
-    const nx::vms::server::analytics::Manager* analyticsManager,
+JsonRestResponse DeviceAnalyticsSettingsHandler::makeApiResponse(
+    const SettingsResponse& settingsResponse,
     const CommonRequestEntities& commonRequestEntities) const
 {
-    NX_ASSERT(analyticsManager);
-    if (!analyticsManager)
-    {
-        return makeResponse(
-            QnRestResult::InternalServerError,
-            "Unable to access an analytics manager");
-    }
-
     JsonRestResponse result(http::StatusCode::ok);
     nx::vms::api::analytics::DeviceAnalyticsSettingsResponse response;
 
-    const QnUuid deviceId = commonRequestEntities.device->getId();
     const QnUuid engineId = commonRequestEntities.engine->getId();
-
-    const std::optional<analytics::Settings>& settings = analyticsManager->getSettings(
-        deviceId.toString(), engineId.toString());
-
-    response.analyzedStreamIndex =
-        commonRequestEntities.device->analyzedStreamIndex(engineId);
 
     const std::optional<DeviceAgentManfiest> deviceAgentManifest =
         commonRequestEntities.device->deviceAgentManifest(engineId);
@@ -258,17 +254,13 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
                 DeviceAgentManfiest::Capability::disableStreamSelection);
     }
 
-    if (settings)
-    {
-        response.settingsModel = settings->model;
-        response.settingsValues = settings->values;
-    }
-    else
-    {
-        const auto message =
-            lm("Unable to load DeviceAgent settings for the Engine with id %1").args(engineId);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
-    }
+    response.analyzedStreamIndex =
+        commonRequestEntities.device->analyzedStreamIndex(engineId);
+
+    response.settingsModel = settingsResponse.model;
+    response.settingsModelId = settingsResponse.modelId;
+    response.settingsValues = settingsResponse.values;
+    response.settingsErrors = analytics::toJsonObject(settingsResponse.errors);
 
     result.json.setReply(response);
 

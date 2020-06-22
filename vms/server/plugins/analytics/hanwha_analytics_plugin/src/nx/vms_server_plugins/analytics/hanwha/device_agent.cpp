@@ -176,7 +176,7 @@ void DeviceAgent::setSupportedEventCategoties()
  * if a setting is written successfully, corresponding deviceAgest setting is updated.
 */
 /*virtual*/ void DeviceAgent::doSetSettings(
-    Result<const IStringMap*>* outResult, const IStringMap* sourceMap) /*override*/
+    Result<const ISettingsResponse*>* outResult, const IStringMap* sourceMap) /*override*/
 {
     if (!m_serverHasSentInitialSettings)
     {
@@ -190,10 +190,12 @@ void DeviceAgent::setSupportedEventCategoties()
         settingsCount));
 
     auto errorMap = makePtr<nx::sdk::StringMap>();
-
     m_settingsProcessor.transferAndHoldSettingsFromServerToDevice(errorMap.get(), sourceMap);
 
-    *outResult = errorMap.releasePtr();
+    auto settingsResponse = makePtr<nx::sdk::SettingsResponse>();
+    settingsResponse->setErrors(std::move(errorMap));
+
+    *outResult = settingsResponse.releasePtr();
 }
 
 //-------------------------------------------------------------------------------------------------
