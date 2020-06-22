@@ -141,6 +141,7 @@ QnSecurityCamResourcePtr MultisensorDataProvider::initSubChannelResource(quint32
     resource->setCommonModule(m_resource->commonModule());
     resource->setForceUseLocalProperties(true);
     resource->setRole(nx::vms::server::resource::Camera::Role::subchannel);
+    resource->setParentId(m_cameraResource->getId());
 
     resource->setIdUnsafe(params.resID);
     resource->setUrl(params.url);
@@ -173,6 +174,12 @@ QList<QnResourceChannelMapping> MultisensorDataProvider::getVideoChannelMapping(
 void MultisensorDataProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
+}
+
+void MultisensorDataProvider::updateSoftwareMotion()
+{
+    CLServerPushStreamReader::updateSoftwareMotion();
+    m_dataSource.updateSoftwareMotion();
 }
 
 } // namespace utils

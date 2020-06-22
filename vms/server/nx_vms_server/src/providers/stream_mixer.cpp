@@ -24,6 +24,16 @@ QnStreamMixer::~QnStreamMixer()
     NX_VERBOSE(this, "Delete");
 }
 
+void QnStreamMixer::updateSoftwareMotion()
+{
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& dataSource: m_sourceMap.values())
+    {
+        if (auto liveProvider = dataSource.provider.dynamicCast<QnLiveStreamProvider>())
+            liveProvider->updateSoftwareMotion();
+    }
+}
+
 void QnStreamMixer::addDataSource(QnAbstractStreamDataProviderPtr& source)
 {
     QnMutexLocker lock(&m_mutex);

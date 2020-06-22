@@ -75,7 +75,7 @@ public:
     bool isStreamOpened() const;
 
     void resetSources();
-
+    void updateSoftwareMotion();
 private:
     void handlePacket(QnAbstractMediaDataPtr& data);
 

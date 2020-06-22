@@ -835,6 +835,14 @@ bool Camera::fixMulticastParametersIfNeeded(
     return somethingIsFixed;
 }
 
+QnCameraUserAttributePool::ScopedLock Camera::userAttributies() const
+{
+    const auto id = getRole() == nx::vms::server::resource::Camera::Role::subchannel
+        ? getParentId() : getId();
+    return QnCameraUserAttributePool::ScopedLock(userAttributesPool(), id);
+}
+
+
 } // namespace resource
 } // namespace vms::server
 } // namespace nx
