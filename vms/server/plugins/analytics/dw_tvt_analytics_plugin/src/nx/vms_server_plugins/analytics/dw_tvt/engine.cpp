@@ -20,7 +20,8 @@ namespace {
 static const QStringList kDwTvtVendors{
     "tvt", // vendor name received with manual discovery
     "ipc", // vendor name received with auto discovery
-    "customer" // temporary enabled vendor name for pre-release devices
+    "customer", // temporary enabled vendor name for pre-release devices
+    "digitalwatchdog"
 };
 
 // Just for information:
