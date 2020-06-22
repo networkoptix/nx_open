@@ -670,7 +670,7 @@ void DeviceAgent::addFixedObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadat
     static const Uuid trackId = UuidHelper::randomUuid();
     objectMetadata->setTypeId(kFixedObjectType);
     objectMetadata->setTrackId(trackId);
-    objectMetadata->setBoundingBox(Rect(0.1, 0.1, 0.25, 0.25));
+    objectMetadata->setBoundingBox(Rect(0.1F, 0.1F, 0.25F, 0.25F));
 
     objectMetadataPacket->addItem(objectMetadata.get());
 }
@@ -684,7 +684,7 @@ void DeviceAgent::addCounterIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPac
     static const Uuid trackId = UuidHelper::randomUuid();
     objectMetadata->setTypeId(kCounterObjectType);
     objectMetadata->setTrackId(trackId);
-    objectMetadata->setBoundingBox(Rect(0.05, 0.05, 0.001, 0.001));
+    objectMetadata->setBoundingBox(Rect(0.05F, 0.05F, 0.001F, 0.001F));
 
     objectMetadata->addAttribute(makePtr<Attribute>(
         IAttribute::Type::number,

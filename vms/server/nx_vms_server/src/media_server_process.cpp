@@ -5174,8 +5174,10 @@ void MediaServerProcess::run()
         initializeLogging(serverSettings.get());
 
     // This must be done before QnCommonModule instantiation.
-    nx::utils::OsInfo::currentVariantOverride = ini().currentOsVariantOverride;
-    nx::utils::OsInfo::currentVariantVersionOverride = ini().currentOsVariantVersionOverride;
+    nx::utils::OsInfo::currentVariantOverride =
+        serverSettings->settings().currentOsVariantOverride();
+    nx::utils::OsInfo::currentVariantVersionOverride =
+        serverSettings->settings().currentOsVariantVersionOverride();
 
     if (m_cmdLineArguments.vmsProtocolVersion > 0)
     {

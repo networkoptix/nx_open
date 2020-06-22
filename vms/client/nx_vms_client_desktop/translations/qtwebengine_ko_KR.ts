@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
-      <translation type="unfinished">File seek past the end of a file (resuming previously interrupted download)</translation>
+      <translation>파일 찾기가 파일끝을 지났습니다. (이전에 중단 된 다운로드로 재개)</translation>
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
@@ -172,11 +172,11 @@
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>정렬된 목록 삽입</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>정렬안된 목록 삽입</translation>
     </message>
   </context>
   <context>
@@ -255,11 +255,11 @@
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>정렬된 목록 삽입</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>정렬안된 목록 삽입</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>

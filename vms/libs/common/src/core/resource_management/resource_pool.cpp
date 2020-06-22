@@ -96,8 +96,6 @@ void QnResourcePool::addNewResources(const QnResourceList& resources, AddResourc
 
 void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFlags flags)
 {
-    NX_WRITE_LOCKER resourcesLock(&m_resourcesMutex);
-
     for (const auto& resource: resources)
     {
         // Getting an NX_ASSERT here? Did you forget to use QnSharedResourcePointer?
@@ -107,6 +105,8 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         resource->setResourcePool(this);
         resource->moveToThread(thread());
     }
+
+    NX_WRITE_LOCKER resourcesLock(&m_resourcesMutex);
 
     QMap<QnUuid, QnResourcePtr> newResources; // sort by id
     std::vector<std::function<void()>> updateExistingResources;

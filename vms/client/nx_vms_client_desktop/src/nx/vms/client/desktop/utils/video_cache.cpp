@@ -104,12 +104,11 @@ void VideoCache::add(const QnUuid& resourceId, const CLVideoDecoderOutputPtr& fr
         queue.empty() ? 0 : frame->pkt_dts - queue.front()->pkt_dts,
         queue.size());
 
+    // Copying the frame, since QnVideoStreamDisplay does not guarantee that the frame ptr will
+    // remain unchanged
     CLVideoDecoderOutputPtr frameToAdd(frame);
-    if (frame->isExternalData())
-    {
-        frameToAdd.reset(new CLVideoDecoderOutput());
-        frameToAdd->copyFrom(frame.get());
-    }
+    frameToAdd.reset(new CLVideoDecoderOutput());
+    frameToAdd->copyFrom(frame.get());
 
     auto posItr = std::upper_bound(queue.begin(), queue.end(),
         frame,

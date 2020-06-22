@@ -52,7 +52,8 @@ public:
     IRefCountableRegistry* refCountableRegistry() const { return m_refCountableRegistry.get(); }
 
 private:
-    std::string m_name = "unnamed_lib_context";
+    static constexpr const char *kDefaultName = "unnamed_lib_context";
+    std::string m_name = kDefaultName;
     std::unique_ptr<IRefCountableRegistry> m_refCountableRegistry;
     std::mutex m_mutex;
 };

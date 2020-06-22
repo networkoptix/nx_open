@@ -37,8 +37,8 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 }
 
 /**
- *  @return JSON with the particular structure. Note that it is possible to fill in the values
- * that are not known at compile time, but should not depend on the Engine settings.
+ * @return JSON with the particular structure. Note that it is possible to fill in the values
+ *     that are not known at compile time, but should not depend on the Engine settings.
  */
 std::string Engine::manifestString() const
 {

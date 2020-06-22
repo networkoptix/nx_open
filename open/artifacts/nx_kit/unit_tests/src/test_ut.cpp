@@ -31,7 +31,7 @@ TEST(test, createFile)
 
     const std::string filename = nx::kit::test::tempDir() + std::string("test.txt");
 
-    nx::kit::test::createFile(filename.c_str(), contents);
+    nx::kit::test::createFile(filename, contents);
 
     std::ifstream inputStream(filename);
     ASSERT_TRUE(inputStream.is_open());

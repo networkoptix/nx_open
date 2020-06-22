@@ -183,6 +183,7 @@ copyQtLibs()
 
     local -r QT_PLUGINS=(
         sqldrivers/libqsqlite.so
+        imageformats/libqtiff.so
     )
 
     for PLUGIN in "${QT_PLUGINS[@]}"

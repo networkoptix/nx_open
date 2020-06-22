@@ -66,15 +66,8 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
         opts['stdout'] = output_fd
         opts['stderr'] = output_fd
 
-    ld_library_path = None
-    if platform.system() == 'Linux':
-        ld_library_path = os.path.dirname(ini_testcamera_bin)
-        opts['env'] = {'LD_LIBRARY_PATH': ld_library_path}
-
     # NOTE: The first arg is the command itself.
     log_message = 'Running testcamera with the following command and args:\n'
-    if ld_library_path:
-        log_message += f'    LD_LIBRARY_PATH={ld_library_path}\n'
     for arg in camera_args:
         log_message += f'    {arg}\n'
     logging.info(log_message)

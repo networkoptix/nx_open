@@ -165,10 +165,10 @@ public:
         "It allows to save CPU for slow ARM devices."
     };
 
-    Option<int> mediaStatisticsWindowSize{ this, "mediaStatisticsWindowSize", 10,
+    Option<int> mediaStatisticsWindowSize{this, "mediaStatisticsWindowSize", 10,
         "Time period in seconds for media stream statistics."
     };
-    Option<int> mediaStatisticsMaxDurationInFrames{ this, "mediaStatisticsMaxDurationInFrames", 0,
+    Option<int> mediaStatisticsMaxDurationInFrames{this, "mediaStatisticsMaxDurationInFrames", 0,
         "Maximum queue size in media frames for media stream statistics."
         "Value 0 means unlimited."
     };
@@ -257,7 +257,7 @@ public:
     Option<int> publicIPEnabled{this, "publicIPEnabled", 1,
         "If true, allow server to discovery its public IP address. Default value is 'true'."
     };
-    Option<int> onlineResourceDataEnabled{ this, "onlineResourceDataEnabled", 1,
+    Option<int> onlineResourceDataEnabled{this, "onlineResourceDataEnabled", 1,
         "If true, allow to update camera configuration file (resource_data.json) online."
     };
     Option<QString> staticPublicIP{this, "staticPublicIP", "",
@@ -337,7 +337,7 @@ public:
         "Multiple thread decoding policy {auto, disabled, enabled}, used for RTSP streaming with "
         "transcoding and motion estimation."
     };
-    Option<bool> allowGlobalLumaFiltering{ this, "allowGlobalLumaFiltering",
+    Option<bool> allowGlobalLumaFiltering{this, "allowGlobalLumaFiltering",
         true,
         "Allow global luminance change detection across whole frame for motion estimation"
     };
@@ -448,23 +448,23 @@ public:
         }
     };
 
-    Option<int> retryCountToMakeCameraOffline{ this, "retryCountToMakeCameraOffline", 3,
+    Option<int> retryCountToMakeCameraOffline{this, "retryCountToMakeCameraOffline", 3,
         "How many discovery loops should pass before mark missed camera offline"
     };
 
-    Option<qint64> minSystemStorageFreeSpace{
-        this, "minSystemStorageFreeSpace", kMinSystemStorageFreeSpace,
+    Option<qint64> minSystemStorageFreeSpace{this,
+        "minSystemStorageFreeSpace", kMinSystemStorageFreeSpace,
         "Minimal system storage free space in bytes. If it less, server will generate warning event."};
 
-    Option<bool> noOutgoingConnectionsMetric{ this, "noOutgoingConnectionsMetric", false,
+    Option<bool> noOutgoingConnectionsMetric{this, "noOutgoingConnectionsMetric", false,
         "Disable metric 'outgoingConnections'. Used for test purpose only."
     };
 
-    Option<bool> allowSystemStorageRecording{ this, "allowSystemStorageRecording", true,
+    Option<bool> allowSystemStorageRecording{this, "allowSystemStorageRecording", true,
         "Toggles recording on/off for system storage."
     };
 
-    Option<std::chrono::seconds> ioOperationTimeTresholdSec{ this, "ioOperationTimeTresholdSec",
+    Option<std::chrono::seconds> ioOperationTimeTresholdSec{this, "ioOperationTimeTresholdSec",
         kDefaultIoOperationTimeTresholdSec,
         "If IO operation (read/write/remove/list) takes time longer than this value it will be reported in server metrics.",
         [](const std::chrono::seconds& value)
@@ -474,6 +474,13 @@ public:
 
             return value;
         }
+    };
+
+    Option<QString> currentOsVariantOverride{this, "currentOsVariantOverride", "",
+        "Overrides the detected OS variant value (e.g. \"ubuntu\")."
+    };
+    Option<QString> currentOsVariantVersionOverride{this, "currentOsVariantVersionOverride", "",
+        "Overrides the detected OS variant version value (e.g. \"16.04\")."
     };
 
 #if defined(__arm__)

@@ -483,12 +483,6 @@ bool PluginManager::processSdkVersion(QLibrary* lib, PluginInfoPtr pluginInfo)
 bool PluginManager::processPluginLib(
     QLibrary* lib, const SettingsHolder& settingsHolder, PluginInfoPtr pluginInfo)
 {
-    if (!processLibContext(lib, pluginInfo))
-        return false;
-
-    if (!processSdkVersion(lib, pluginInfo))
-        return false;
-
     if (const auto oldEntryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
         lib->resolve(nxpl::Plugin::kEntryPointFuncName)))
     {
@@ -501,6 +495,17 @@ bool PluginManager::processPluginLib(
         lib->resolve(IPlugin::kEntryPointFuncName)))
     {
         // New entry point found: currently, this is an Analytics plugin.
+
+        // NOTE: We do not look for these exported functions in old-SDK plugins, because such
+        // plugins do not export these function but may be linked to nx_vms_server library which
+        // exports these functions, and thus QLibrary::resolve() will find them.
+
+        if (!processLibContext(lib, pluginInfo))
+            return false;
+
+        if (!processSdkVersion(lib, pluginInfo))
+            return false;
+
         return processPluginEntryPointForNewSdk(entryPointFunc, pluginInfo);
     }
 

@@ -12,7 +12,7 @@ namespace nx::utils {
  * on each IO operation.
  */
 
-class IoDeviceWrapper: public QIODevice
+class NX_UTILS_API IoDeviceWrapper: public QIODevice
 {
 public:
     using Callback = nx::utils::MoveOnlyFunc<void(qint64, std::chrono::milliseconds)>;

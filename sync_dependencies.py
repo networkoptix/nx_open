@@ -46,7 +46,7 @@ def determine_package_versions(
         "deepstream": "0.2",
         "android-sdk": "28",
         "android-ndk": "r17",
-        "help": customization + "-4.0",
+        "help": customization + "-4.1",
         "server-external": release_version,
         "certificates": customization,
         "customization_pack": f"{customization}_v2",

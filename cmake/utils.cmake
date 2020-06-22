@@ -123,7 +123,11 @@ function(nx_configure_file input output)
     endif()
 
     file(TIMESTAMP "${output}" orig_ts)
+    
+    # TODO: Add `NEWLINE_STYLE UNIX`, because on Windows configure_file() produces CRLF by default.
+    # Then make sure all generated files work correctly, especially MSVC files, .xml and .wxi.
     configure_file(${input} ${output} ${ARGN})
+    
     file(TIMESTAMP "${output}" new_ts)
 
     nx_store_known_file(${output})

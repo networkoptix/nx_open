@@ -16,6 +16,12 @@ set(sample_build_log ${logs_dir}/${sdk_name}_sample_build.log)
 set(doxygen_log ${logs_dir}/${sdk_name}_doxygen.log)
 set(zip_log ${logs_dir}/${sdk_name}_zip.log)
 
+# Substitute nxSdkVersion into nx_sdk_version.inc to be included in nx/sdk/helpers/lib_context.cpp.
+set(copied_nx_sdk_version_origin ${CMAKE_CURRENT_BINARY_DIR})
+set(copied_nx_sdk_version_file ${copied_nx_sdk_version_origin}/nx_sdk_version.inc)
+nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nx_sdk_version.inc.in
+    ${copied_nx_sdk_version_file} @ONLY NEWLINE_STYLE UNIX)
+
 # Collect source files for statically prepared files.
 set(copied_static_origin ${CMAKE_CURRENT_SOURCE_DIR}/files)
 file(GLOB_RECURSE copied_static_files ${copied_static_origin}/*)

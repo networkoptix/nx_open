@@ -21,6 +21,12 @@
             <Component><File Name="qsqlite.dll" KeyPath="yes"/></Component>
         </ComponentGroup>
 
+        <ComponentGroup Id="server_qt_imageformats"
+                Source="$(var.QtPluginsDir)\imageformats"
+                Directory="imageformats">
+            <Component><File Name="qtiff.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
         <ComponentGroup Id="server_plugins"
                 Source="$(var.PluginsDir)"
                 Directory="plugins">

@@ -41,20 +41,22 @@ inline bool isAsciiPrintable(int c)
 }
 
 /**
- * @return Last path component: text after the last path separator. On Windows, possible `<drive>:`
- * prefix is excluded and both `/` and `\` are supported. If path is empty, the result is empty.
+ * Decodes a string encoded using C/C++ string literal rules: enquoted, potentially containing
+ * escape sequences. Supports concatenation of consecutive literals, thus, fully compatible with
+ * strings encoded by nx::kit::utils::toString().
+ *
+ * @param outErrorMessage In case of any error in the encoded string, the function attempts to
+ *     recover using the most obvious way, still producing the result, and reports all such cases
+ *     via this argument if it is not null.
  */
-NX_KIT_API std::string baseName(std::string path);
+NX_KIT_API std::string decodeEscapedString(
+    const std::string& s, std::string* outErrorMessage = nullptr);
 
 /**
- * @return Process name, without .exe in Windows.
- */
-NX_KIT_API std::string getProcessName();
-
-/**
- * Convert a value to its report-friendly text representation, e.g. a quoted and escaped string.
- * Non-printable chars in a string are represented as hex escape sequences like `\xFF""` - note
- * that the two quotes after it are inserted to indicate the end of the hex number, as in C/C++.
+ * Converts a value to its report-friendly text representation; for strings it being a quoted and
+ * C-style-escaped string. Non-printable chars in a string are represented as hex escape sequences
+ * like `\xFF""` - note that the two quotes after it are inserted to indicate the end of the hex
+ * number, because according to the C/C++ standards, `\x` consumes as much hex digits as possible.
  */
 template<typename T>
 std::string toString(T value);
@@ -77,18 +79,34 @@ std::string format(const std::string& formatStr, Args... args)
 NX_KIT_API bool fromString(const std::string& s, int* value);
 NX_KIT_API bool fromString(const std::string& s, double* value);
 NX_KIT_API bool fromString(const std::string& s, float* value);
+NX_KIT_API bool fromString(const std::string& s, bool* value);
 
-void NX_KIT_API stringReplaceAllChars(std::string* s, char sample, char replacement);
-void NX_KIT_API stringInsertAfterEach(std::string* s, char sample, const char* insertion);
+NX_KIT_API void stringReplaceAllChars(std::string* s, char sample, char replacement);
+NX_KIT_API void stringInsertAfterEach(std::string* s, char sample, const char* insertion);
+NX_KIT_API void stringReplaceAll(
+    std::string* s, const std::string& sample, const std::string& replacement);
 
 //-------------------------------------------------------------------------------------------------
 // OS support.
+
+/**
+ * @return Last path component: text after the last path separator. On Windows, possible `<drive>:`
+ * prefix is excluded and both `/` and `\` are supported. If path is empty, the result is empty.
+ */
+NX_KIT_API std::string baseName(std::string path);
+
+/**
+ * @return Process name, without .exe in Windows.
+ */
+NX_KIT_API std::string getProcessName();
 
 /**
  * @return Command line arguments of the process, cached after the first call. If arguments are
  *     not available, then returns a single empty string.
  */
 NX_KIT_API const std::vector<std::string>& getProcessCmdLineArgs();
+
+NX_KIT_API bool fileExists(const char* filename);
 
 //-------------------------------------------------------------------------------------------------
 // Aligned allocation.
@@ -186,11 +204,13 @@ inline std::string toString(int8_t i) { return toString((int) i); } //< Avoid ma
 NX_KIT_API std::string toString(char c);
 NX_KIT_API std::string toString(const char* s);
 inline std::string toString(char* s) { return toString(const_cast<const char*>(s)); }
-inline std::string toString(const std::string& s) { return toString(s.c_str()); }
 NX_KIT_API std::string toString(wchar_t c);
 NX_KIT_API std::string toString(const wchar_t* w);
 inline std::string toString(wchar_t* w) { return toString(const_cast<const wchar_t*>(w)); }
-inline std::string toString(const std::wstring& w) { return toString(w.c_str()); }
+
+// std::string can contain '\0' inside, hence a dedicated implementation.
+NX_KIT_API std::string toString(const std::string& s);
+NX_KIT_API std::string toString(const std::wstring& w);
 
 // For unknown types, use their operator<<().
 template<typename T>
