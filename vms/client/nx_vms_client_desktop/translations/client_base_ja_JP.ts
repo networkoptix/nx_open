@@ -988,11 +988,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>このサーバーに接続</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>ピン留めする</translation>
     </message>
   </context>
   <context>
@@ -1255,7 +1255,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>問題を報告するには、 %1 にお問い合わせください。</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1303,7 +1303,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>ライセンスキーを手動でアクティベートするには、 %1 までご連絡ください。</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1315,11 +1315,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>問題を報告するには、地域/ライセンスサポートにお問い合わせください:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>ライセンスキーを手動でアクティベートするには、地域/ライセンスサポートにお問い合わせください:</translation>
     </message>
   </context>
   <context>
@@ -1350,7 +1350,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>後でもう一度お試しください。</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1385,27 +1385,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>有効なライセンスキーを取得するには、 %1 までご連絡ください。</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>問題が解決しない場合は、 %1 までお問い合わせください。</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>%1 に連絡してください。</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>有効なライセンスキーを入手するには、地域/ライセンスサポートにお問い合わせください:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>問題が解決しない場合は、地域/ライセンスサポートにお問い合わせください:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>地域/ライセンスサポートにお問い合わせください:</translation>
     </message>
   </context>
   <context>
@@ -1625,7 +1625,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>このページから移動してもよろしいですか？変更が保存されない可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -1660,7 +1660,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>地域/ライセンスサポート</translation>
     </message>
   </context>
   <context>
@@ -1725,7 +1725,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>警告！これはCPUを節約する実験的なオプションですが、アニメーションに影響を与える可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -2233,33 +2233,33 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>ソースサーバー</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>ソースカメラ</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>ソースおよびその他 %n 台のカメラ</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>少なくとも 1 つのデバイスを選択してください</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>少なくとも1つのカメラを選択してください</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>サーバーを選択</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>ソースサーバーと %1</translation>
     </message>
   </context>
   <context>
@@ -2389,7 +2389,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>ブザーをサポートするサーバー</translation>
     </message>
   </context>
   <context>
@@ -3437,7 +3437,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>ファン診断をサポートするサーバー</translation>
     </message>
   </context>
   <context>
@@ -3782,7 +3782,7 @@ to %1</source>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>残りの無効化数</translation>
     </message>
   </context>
   <context>
@@ -3916,8 +3916,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>残り無効化回数は %n 回です。</numerusform>
       </translation>
     </message>
   </context>
@@ -3941,16 +3941,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>アクティベーションキーファイルを取得するには、提供されたライセンスキーとハードウェアIDを %1に送信してください。</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>アクティベーションキーファイルを取得するには、提供されたライセンスキーとハードウェアIDを地域/ライセンスサポートに送信してください。</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>アクティベーションキーファイルを取得するには、提供されたライセンスキーとハードウェアIDを地域/ライセンスサポート(%1) に送信してください。</translation>
     </message>
   </context>
   <context>
@@ -4503,7 +4503,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>PoE 監視をサポートするサーバー</translation>
     </message>
   </context>
   <context>
@@ -5223,7 +5223,7 @@ to %1</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5721,11 +5721,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>サーバーは利用できません。</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>今</translation>
     </message>
   </context>
   <context>
@@ -6593,7 +6593,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>選択したサーバーに接続できませんでした</translation>
     </message>
   </context>
   <context>
@@ -7444,8 +7444,8 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n 値</numerusform>
       </translation>
     </message>
   </context>
@@ -8125,7 +8125,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>ビデオのトランスコーディングが必要です。</translation>
     </message>
   </context>
   <context>
@@ -8330,11 +8330,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>プロキシ %1 はユーザー名とパスワードが必要です。</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>アップロードするフォルダを選択</translation>
     </message>
   </context>
   <context>
@@ -8428,7 +8428,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>この ID はシステムで既に使用されています。無料の ID を見つけるには 生成ボタンを使用してください。</translation>
     </message>
   </context>
   <context>
@@ -8794,7 +8794,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>インターネット上でアップデートを確認できません</translation>
     </message>
   </context>
   <context>
@@ -8859,7 +8859,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>サインイン</translation>
     </message>
   </context>
   <context>
@@ -8962,31 +8962,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>更新のインストールに失敗しました。</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>切断されました</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>接続しました</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>作動中</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>予期しない</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>空</translation>
     </message>
     <message>
       <source>Port</source>
@@ -8998,7 +8998,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>消費量</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9006,7 +9006,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>電源</translation>
     </message>
     <message>
       <source>Unknown device</source>
