@@ -246,23 +246,17 @@ case "$1" in
         fi
 
         groupadd --system "$SYSTEM_USER" 2>/dev/null || true
-
-        mkdir -p "$BASE_DIR/home"
-
-        # Allow writing to the home directory of the VMS user.
-        chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR/home"
-
         useradd \
           --no-user-group \
           --system \
-          --home-dir "$BASE_DIR/home" \
+          --home-dir "$BASE_DIR" \
           --gid "$SYSTEM_USER" \
           "$SYSTEM_USER" \
           2>/dev/null || true
 
         # Change the user's home dir for the previously installed VMS.
         # TODO: Remove this after 4.1 + two next releases.
-        usermod -d "$BASE_DIR/home" "$SYSTEM_USER" &>/dev/null
+        usermod -d "$BASE_DIR" "$SYSTEM_USER" &>/dev/null
 
         # Allow core dumps creation.
         chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"
