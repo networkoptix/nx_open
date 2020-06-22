@@ -72,16 +72,20 @@ DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
 {
 }
 
-void DeviceAgent::doSetSettings(Result<const IStringMap*>* outResult, const IStringMap* values)
+void DeviceAgent::doSetSettings(Result<const ISettingsResponse*>* outResult, const IStringMap* values)
 {
     try
     {
+        auto response = makePtr<SettingsResponse>();
+
         CameraSettings settings(m_features);
 
         settings.parseFromServer(*values);
         settings.storeTo(m_url);
 
-        *outResult = settings.getErrorMessages().releasePtr();
+        response->setErrors(settings.getErrorMessages());
+
+        *outResult = response.releasePtr();
     }
     catch (const Exception& exception)
     {

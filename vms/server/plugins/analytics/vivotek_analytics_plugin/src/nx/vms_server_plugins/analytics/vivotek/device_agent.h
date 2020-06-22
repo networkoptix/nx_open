@@ -33,7 +33,7 @@ public:
 
 protected:
     virtual void doSetSettings(
-        nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
         const nx::sdk::IStringMap* values) override;
 
     virtual void getPluginSideSettings(
