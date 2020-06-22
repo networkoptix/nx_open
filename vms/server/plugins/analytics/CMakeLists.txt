@@ -16,6 +16,15 @@ add_subdirectory(ssc_analytics_plugin)
 
 add_subdirectory(dahua_analytics_plugin)
 
+<<<<<<< HEAD
+=======
+add_subdirectory(bosch_analytics_plugin)
+
+if(targetDevice STREQUAL "linux_arm64")
+    add_subdirectory(deepstream_analytics_plugin)
+endif()
+
+>>>>>>> d20e3169329... VMS-19017: crate empty project
 add_subdirectory(vivotek_analytics_plugin)
 
 add_subdirectory(sample_analytics_plugin)
