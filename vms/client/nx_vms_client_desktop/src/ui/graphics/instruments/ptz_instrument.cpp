@@ -689,12 +689,45 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
     const qreal aspectRatio = Geometry::aspectRatio(widget->size());
     const QRectF viewport = Geometry::cwiseDiv(rect, widget->size());
     widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0);
+
+    widget->setActionText(tr("Moving..."));
+    widget->clearActionText(2s);
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget* widget)
 {
     QSizeF size = widget->size() * 100;
     ptzMoveTo(widget, QRectF(widget->rect().center() - Geometry::toPoint(size) / 2, size));
+}
+
+QString PtzInstrument::actionText(QnMediaResourceWidget* widget) const
+{
+    if (!NX_ASSERT(widget))
+        return {};
+
+    const auto data = m_dataByWidget[widget];
+    if (data.requestedSpeed.isNull())
+        return {};
+
+    if (!qFuzzyIsNull(data.requestedSpeed.zoom) != 0
+        && !qFuzzyIsNull(data.requestedSpeed.zoom - data.currentSpeed.zoom))
+    {
+        return data.requestedSpeed.zoom > 0.0 ? tr("Zooming in...") : tr("Zooming out...");
+    }
+
+    return tr("Moving...");
+}
+
+void PtzInstrument::updateActionText(QnMediaResourceWidget* widget)
+{
+    if (!NX_ASSERT(widget))
+        return;
+
+    const auto text = actionText(widget);
+    if (text.isEmpty())
+        widget->clearActionText(2s);
+    else
+        widget->setActionText(text);
 }
 
 void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::Vector& speed, bool instant)
@@ -712,8 +745,8 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::
     if (instant)
     {
         widget->ptzController()->continuousMove(data.requestedSpeed);
+        updateActionText(widget);
         data.currentSpeed = data.requestedSpeed;
-
         m_movementTimer.stop();
     }
     else
@@ -726,6 +759,11 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::
 void PtzInstrument::focusMove(QnMediaResourceWidget* widget, qreal speed)
 {
     widget->ptzController()->continuousFocus(speed);
+
+    if (qFuzzyIsNull(speed))
+        updateActionText(widget);
+    else
+        widget->setActionText(tr("Focusing..."));
 }
 
 void PtzInstrument::focusAuto(QnMediaResourceWidget* widget)
@@ -733,6 +771,9 @@ void PtzInstrument::focusAuto(QnMediaResourceWidget* widget)
     widget->ptzController()->runAuxiliaryCommand(
         Ptz::ManualAutoFocusPtzTrait,
         QString());
+
+    widget->setActionText(tr("Focusing..."));
+    widget->clearActionText(2s);
 }
 
 void PtzInstrument::processPtzClick(const QPointF& pos)

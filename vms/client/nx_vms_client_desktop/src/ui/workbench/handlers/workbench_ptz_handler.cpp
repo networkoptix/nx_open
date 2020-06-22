@@ -1,5 +1,7 @@
 #include "workbench_ptz_handler.h"
 
+#include <chrono>
+
 #include <QtCore/QEventLoop>
 #include <QtCore/QTimer>
 
@@ -33,12 +35,14 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 
+using namespace std::chrono;
 using namespace nx::vms::client::desktop::ui;
 
-namespace
-{
+namespace {
+
 const QString kPtzHotkeysPropertyName = lit("ptzHotkeys");
-}
+
+} // namespace
 
 class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, public QnWorkbenchContextAware
 {
@@ -412,6 +416,13 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
 
     nx::core::ptz::Vector speedVector(speed.x(), speed.y(), 0.0, speed.z());
     controller->continuousMove(speedVector);
+
+    if (speedVector.isNull())
+        widget->clearActionText(2s);
+    else if (!qFuzzyIsNull(speed.z()))
+        widget->setActionText(speed.z() > 0.0 ? tr("Zooming in...") : tr("Zooming out..."));
+    else
+        widget->setActionText(tr("Moving..."));
 }
 
 void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()

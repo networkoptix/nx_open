@@ -4,8 +4,9 @@
 #include <QtCore/QPointer>
 
 #include <ui/customization/customized.h>
-
 #include <ui/graphics/items/controls/html_text_item.h>
+
+#include "action_indicator_item.h"
 
 class QGraphicsWidget;
 class QnViewportBoundWidget;
@@ -32,6 +33,7 @@ public:
     QnHudPositionItem* const position;
     QGraphicsWidget* const left;
     QGraphicsWidget* const right;
+    QnActionIndicatorItem* const actionIndicator;
 
 private:
     void updateLayout();

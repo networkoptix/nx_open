@@ -49,3 +49,21 @@ QGraphicsWidget* QnHudOverlayWidget::right() const
     Q_D(const QnHudOverlayWidget);
     return d->right;
 }
+
+QString QnHudOverlayWidget::actionText() const
+{
+    Q_D(const QnHudOverlayWidget);
+    return d->actionIndicator->text();
+}
+
+void QnHudOverlayWidget::setActionText(const QString& value)
+{
+    Q_D(QnHudOverlayWidget);
+    d->actionIndicator->setText(value);
+}
+
+void QnHudOverlayWidget::clearActionText(std::chrono::milliseconds after)
+{
+    Q_D(QnHudOverlayWidget);
+    d->actionIndicator->clear(after);
+}

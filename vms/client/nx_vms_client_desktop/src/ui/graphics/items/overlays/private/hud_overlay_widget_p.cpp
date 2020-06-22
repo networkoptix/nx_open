@@ -17,12 +17,14 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     details(new QnHudDetailsItem()),
     position(new QnHudPositionItem()),
     left(new QGraphicsWidget(content)),
-    right(new QGraphicsWidget(content))
+    right(new QGraphicsWidget(content)),
+    actionIndicator(new QnActionIndicatorItem(content))
 {
     auto leftLayout = new QGraphicsLinearLayout(Qt::Vertical);
     left->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
     left->setAcceptedMouseButtons(Qt::NoButton);
     leftLayout->addItem(left);
+    leftLayout->addItem(actionIndicator);
     leftLayout->addItem(details);
     leftLayout->setAlignment(details, Qt::AlignLeft | Qt::AlignBottom);
 
@@ -46,10 +48,15 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
 
     connect(main, &QGraphicsWidget::geometryChanged,
         this, &QnHudOverlayWidgetPrivate::updateLayout);
+
     connect(title, &QGraphicsWidget::geometryChanged,
         this, &QnHudOverlayWidgetPrivate::updateLayout);
+
     connect(titleHolder, &QnViewportBoundWidget::scaleChanged,
         this, &QnHudOverlayWidgetPrivate::updateLayout);
+
+    connect(details, &QnHtmlTextItem::opacityChanged, this,
+        [this]() { details->setVisible(!qFuzzyIsNull(details->opacity())); });
 
     static constexpr int kBorderRadius = 2;
 

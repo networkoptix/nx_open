@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 
@@ -36,6 +38,11 @@ public:
 
     /** Right container for additional data (above position). */
     QGraphicsWidget* right() const;
+
+    /** Current action indicator text. When empty, action indication is hidden. */
+    QString actionText() const;
+    void setActionText(const QString& value);
+    void clearActionText(std::chrono::milliseconds after);
 
 private:
     Q_DECLARE_PRIVATE(QnHudOverlayWidget)

@@ -788,6 +788,15 @@
             "invalid": "#401010",
             "warning": "#404010"
         }
+    }, 
+
+    "QnActionIndicatorItem": {
+        "palette": { 
+            "default": { 
+                "window": "dark1.setAlpha(127)",
+                "windowText": "light1"
+            } 
+        }
     },
 
     "QnLicenseListModel": {

@@ -599,6 +599,21 @@ void QnResourceWidget::setPlaceholderPixmap(const QPixmap& pixmap)
     emit placeholderPixmapChanged();
 }
 
+QString QnResourceWidget::actionText() const
+{
+    return m_hudOverlay->actionText();
+}
+
+void QnResourceWidget::setActionText(const QString& value)
+{
+    m_hudOverlay->setActionText(value);
+}
+
+void QnResourceWidget::clearActionText(std::chrono::milliseconds after)
+{
+    m_hudOverlay->clearActionText(after);
+}
+    
 QString QnResourceWidget::toString() const
 {
     return lm("QnResourceWidget %1 (%2)").args(

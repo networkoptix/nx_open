@@ -155,6 +155,9 @@ private:
     QnResourceWidget* findPtzWidget(const QPointF& scenePos) const;
     void updateExternalPtzSpeed();
 
+    QString actionText(QnMediaResourceWidget* widget) const;
+    void updateActionText(QnMediaResourceWidget* widget);
+
 private:
     struct PtzData
     {
@@ -230,4 +233,5 @@ private:
 
     int m_wheelZoomDirection = 0;
     QTimer* const m_wheelZoomTimer;
+    QHash<QnMediaResourceWidget*, QTimer*> m_hideActionTextTimers;
 };

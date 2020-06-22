@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
 #include <QtCore/QPointer>
@@ -271,6 +273,11 @@ public:
 
     QPixmap placeholderPixmap() const;
     void setPlaceholderPixmap(const QPixmap& pixmap);
+
+    /** Current action indicator text. When empty, action indication is hidden. */
+    QString actionText() const;
+    void setActionText(const QString& value);
+    void clearActionText(std::chrono::milliseconds after);
 
     using base_type::mapRectToScene;
 
