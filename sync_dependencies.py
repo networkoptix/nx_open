@@ -49,7 +49,7 @@ def determine_package_versions(
         "help": customization + "-4.0",
         "server-external": release_version,
         "certificates": customization,
-        "customization_pack": customization,
+        "customization_pack": f"{customization}_v2",
     }
 
     # Desktop Linux.

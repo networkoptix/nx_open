@@ -17,7 +17,7 @@ def main():
     syncher = RdepSyncher(args.packages_dir)
     syncher.versions = {
         "paxton_plugin_references": args.dot_net_framework,
-        "customization_pack": args.customization,
+        "customization_pack": f"{args.customization}_v2",
     }
 
     def sync(package, **kwargs):
