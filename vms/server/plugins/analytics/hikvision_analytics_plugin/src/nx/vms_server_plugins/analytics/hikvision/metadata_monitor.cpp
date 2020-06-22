@@ -260,12 +260,7 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
 
     if (!hikvisionEvent.typeId.isEmpty())
     {
-        if (std::find_if(m_deviceManifest.eventTypes.cbegin(), m_deviceManifest.eventTypes.cend(),
-            [&hikvisionEvent](const auto& eventType)
-            {
-                return eventType.id == hikvisionEvent.typeId;
-            })
-            != m_deviceManifest.eventTypes.cend())
+        if (m_deviceManifest.supportedEventTypeIds.contains(hikvisionEvent.typeId))
         {
             // Normal case: supported event received.
             result.push_back(hikvisionEvent);
