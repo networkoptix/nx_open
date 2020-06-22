@@ -303,7 +303,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_objectTypeDictionary = store(
         new nx::vms::server::analytics::ObjectTypeDictionary(
             commonModule()->analyticsObjectTypeDescriptorManager()));
-    
+
     auto analyticsDb = new nx::analytics::db::MovableAnalyticsDb(
         [this, helper = m_analyticsIframeSearchHelper, typeDictionary = m_objectTypeDictionary]()
         {
@@ -405,8 +405,13 @@ QnMediaServerModule::QnMediaServerModule(
     {
         if (!translationManager)
             return;
-        auto locale = QnAppInfo::defaultLanguage();
-        auto defaultTranslation = translationManager->loadTranslation(locale);
+
+        // Translations are used to get the right pluralization form of some strings.
+        // Hardcoded 'en_US' locale is a safe option that ensures readable text for logs,
+        // error messages, etc. on systems with non-english QnAppInfo::defaultLanguage().
+        // Whenever another translation locale is required (e.g. to send user notifications),
+        // it may be accessed using QnTranslationManager::LocaleRollback instance.
+        auto defaultTranslation = translationManager->loadTranslation("en_US");
         QnTranslationManager::installTranslation(defaultTranslation);
     };
     executeDelayed(installProc, kDefaultDelay, qApp->thread());
