@@ -23,6 +23,7 @@
 #include <core/dataprovider/live_stream_params.h>
 #include <core/ptz/ptz_preset.h>
 #include "resource_data.h"
+#include "camera_user_attribute_pool.h"
 
 class QnAbstractArchiveDelegate;
 
@@ -438,7 +439,10 @@ protected:
 
     virtual Qn::LicenseType calculateLicenseType() const;
 
+    virtual QnCameraUserAttributePool::ScopedLock userAttributies() const;
+	
     nx::core::resource::DeviceType enforcedDeviceType() const;
+
 private:
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;

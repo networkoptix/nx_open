@@ -19,6 +19,7 @@ public:
         std::string connectSessionId,
         SocketAddress targetEndpoint,
         std::unique_ptr<AbstractStreamSocket> connection);
+
     virtual ~DirectTcpEndpointTunnel();
 
     virtual void stopWhileInAioThread() override;
@@ -47,6 +48,7 @@ private:
 
     const std::string m_connectSessionId;
     const SocketAddress m_targetEndpoint;
+    const int m_targetEndpointIpVersion;
     std::unique_ptr<AbstractStreamSocket> m_controlConnection;
     std::list<ConnectionContext> m_connections;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectionClosedHandler;

@@ -67,16 +67,13 @@ void CloudMediaServerEndpointVerificator::stopWhileInAioThread()
 
 void CloudMediaServerEndpointVerificator::onHttpRequestDone()
 {
-    NX_VERBOSE(this, lm("cross-nat %1. Finished probing %2")
-        .arg(m_connectSessionId).arg(m_httpClient->url()));
-
     if (m_httpClient->failed() &&
         (m_httpClient->lastSysErrorCode() != SystemError::noError ||
             m_httpClient->response() == nullptr))
     {
-        NX_VERBOSE(this, lm("cross-nat %1. Http connect to %2 has failed: %3")
-            .arg(m_connectSessionId).arg(m_endpointToVerify.toString())
-            .arg(SystemError::toString(m_httpClient->lastSysErrorCode())));
+        NX_VERBOSE(this, "cross-nat %1. Failed to verify %2. Http connect has failed: %3",
+            m_connectSessionId, m_endpointToVerify.toString(),
+                SystemError::toString(m_httpClient->lastSysErrorCode()));
         m_lastSystemErrorCode = m_httpClient->lastSysErrorCode();
         return nx::utils::swapAndCall(
             m_completionHandler,
@@ -86,10 +83,10 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
     if (!nx::network::http::StatusCode::isSuccessCode(
             m_httpClient->response()->statusLine.statusCode))
     {
-        NX_VERBOSE(this, lm("cross-nat %1. Http request to %2 has failed: %3")
-            .arg(m_connectSessionId).arg(m_endpointToVerify.toString())
-            .arg(nx::network::http::StatusCode::toString(
-                m_httpClient->response()->statusLine.statusCode)));
+        NX_VERBOSE(this, "cross-nat %1. Failed to verify %2. Http connect has failed: %3",
+            m_connectSessionId, m_endpointToVerify.toString(),
+            nx::network::http::StatusCode::toString(
+                m_httpClient->response()->statusLine.statusCode));
         return nx::utils::swapAndCall(
             m_completionHandler,
             VerificationResult::notPassed);
@@ -97,10 +94,16 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
 
     if (!verifyHostResponse(m_httpClient))
     {
+        NX_VERBOSE(this, "cross-nat %1. Failed to verify %2",
+            m_connectSessionId, m_httpClient->url());
+
         return nx::utils::swapAndCall(
             m_completionHandler,
             VerificationResult::notPassed);
     }
+
+    NX_VERBOSE(this, "cross-nat %1. URL %2 has been verified. Target server confirmed",
+        m_connectSessionId, m_httpClient->url());
 
     return nx::utils::swapAndCall(
         m_completionHandler,

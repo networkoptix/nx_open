@@ -857,6 +857,13 @@ bool Camera::fixMulticastParametersIfNeeded(
     return somethingIsFixed;
 }
 
+QnCameraUserAttributePool::ScopedLock Camera::userAttributies() const
+{
+    const auto id = getRole() == nx::vms::server::resource::Camera::Role::subchannel
+        ? getParentId() : getId();
+    return QnCameraUserAttributePool::ScopedLock(userAttributesPool(), id);
+}
+
 std::optional<QJsonObject> Camera::deviceAgentSettingsModel(const QnUuid& engineId) const
 {
     const auto manifest = deviceAgentManifest(engineId);

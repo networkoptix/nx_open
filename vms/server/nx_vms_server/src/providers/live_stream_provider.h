@@ -81,8 +81,8 @@ public:
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
     void setDoNotConfigureCamera(bool value) { m_doNotConfigureCamera = value; }
     virtual void pleaseStop() override;
-protected:
     virtual void updateSoftwareMotion();
+protected:
     QnAbstractCompressedMetadataPtr getMetadata();
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
