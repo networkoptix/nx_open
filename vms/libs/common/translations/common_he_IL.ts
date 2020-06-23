@@ -52,9 +52,9 @@
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
       <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
+        <numerusform>בייט(ים)</numerusform>
+        <numerusform>בייט(ים)</numerusform>
+        <numerusform>בייט(ים)</numerusform>
         <numerusform>Byte(s)</numerusform>
       </translation>
     </message>
@@ -62,7 +62,7 @@
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
       <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>קילובייט</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
@@ -72,7 +72,7 @@
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
       <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>מגהבייט</numerusform>
         <numerusform>Megabyte(s)</numerusform>
         <numerusform>Megabyte(s)</numerusform>
         <numerusform>Megabyte(s)</numerusform>
@@ -82,7 +82,7 @@
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
       <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>ג'יגה-בייט</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
@@ -92,7 +92,7 @@
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
       <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>טרה-בייט</numerusform>
         <numerusform>Terabyte(s)</numerusform>
         <numerusform>Terabyte(s)</numerusform>
         <numerusform>Terabyte(s)</numerusform>
@@ -102,7 +102,7 @@
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
       <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>פטאבייט(ים)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
@@ -1093,7 +1093,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>קידוד וידאו נדרש.</translation>
     </message>
   </context>
   <context>
@@ -1920,11 +1920,11 @@
     </message>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>זמזם</translation>
     </message>
     <message>
       <source>Archive Backup Finished</source>
-      <translation type="unfinished">Archive Backup Finished</translation>
+      <translation>גיבוי הארכיון הסתיים</translation>
     </message>
     <message>
       <source>PoE over Budget</source>
