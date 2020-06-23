@@ -109,6 +109,8 @@ void intentionallyCrash(const char* message)
         char messageOnStack[256] = {0};
         if (message)
             snprintf(messageOnStack, sizeof(messageOnStack), "%s", message);
+    #else
+        /*unused*/ (void) message;
     #endif
 
     // Crash the process to let a dump/core be generated.
