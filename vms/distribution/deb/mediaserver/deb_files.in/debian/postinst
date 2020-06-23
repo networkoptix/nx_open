@@ -13,6 +13,7 @@ BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
 
 ETC_DIR="$BASE_DIR/etc"
 BIN_DIR="$BASE_DIR/bin"
+HOME_DIR="$BASE_DIR/home"
 
 CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 RUNTIME_CONFIG_FILE="$ETC_DIR/running_time.conf"
@@ -246,17 +247,23 @@ case "$1" in
         fi
 
         groupadd --system "$SYSTEM_USER" 2>/dev/null || true
+
+        mkdir -p "$HOME_DIR"
+
+        # Allow writing to the home directory of the VMS user.
+        chown "$SYSTEM_USER:$SYSTEM_USER" "$HOME_DIR"
+
         useradd \
           --no-user-group \
           --system \
-          --home-dir "$BASE_DIR" \
+          --home-dir "$HOME_DIR" \
           --gid "$SYSTEM_USER" \
           "$SYSTEM_USER" \
           2>/dev/null || true
 
         # Change the user's home dir for the previously installed VMS.
         # TODO: Remove this after 4.1 + two next releases.
-        usermod -d "$BASE_DIR" "$SYSTEM_USER" &>/dev/null
+        usermod -d "$HOME_DIR" "$SYSTEM_USER" &>/dev/null
 
         # Allow core dumps creation.
         chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"
