@@ -28,14 +28,19 @@ QString buildDescription(
 
     if (eventType.flags.testFlag(EventTypeFlag::stateDependent))
     {
-        auto stateStr = event.isActive ? eventType.positiveState : eventType.negativeState;
+        const QString& stateStr = event.isActive
+            ? eventType.positiveState
+            : eventType.negativeState;
+
         if (!stateStr.isEmpty())
             description = description.arg(stateStr);
     }
 
     if (eventType.flags.testFlag(EventTypeFlag::regionDependent))
     {
-        auto regionStr = eventType.regionDescription.arg(event.region ? event.region->id : 0);
+        const QString regionStr =
+            eventType.regionDescription.arg(event.region ? event.region->id : 0);
+
         description = description.arg(regionStr);
     }
 

@@ -23,7 +23,7 @@ bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
 {
     NX_VERBOSE(this, lm("Got XML data:\n %1").arg(buffer));
 
-    auto parsedEvent = AttributesParser::parseEventXml(buffer, m_manifest);
+    const auto parsedEvent = AttributesParser::parseEventXml(buffer, m_manifest);
     if (parsedEvent)
         m_monitor->processEvent(*parsedEvent);
 

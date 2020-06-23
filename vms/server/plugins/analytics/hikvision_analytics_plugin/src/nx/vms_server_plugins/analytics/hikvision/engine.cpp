@@ -119,10 +119,10 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
         {
             result << eventTypeId;
             const Hikvision::EventType eventType = m_engineManifest.eventTypeById(eventTypeId);
-            for (const auto& dependedName: eventType.dependedEvent.split(','))
+            for (const auto& dependentName: eventType.dependedEvent.split(','))
             {
                 const Hikvision::EventType dependentEventType =
-                    m_engineManifest.eventTypeByInternalName(dependedName);
+                    m_engineManifest.eventTypeByInternalName(dependentName);
 
                 if (!dependentEventType.id.isEmpty())
                     result << dependentEventType.id;

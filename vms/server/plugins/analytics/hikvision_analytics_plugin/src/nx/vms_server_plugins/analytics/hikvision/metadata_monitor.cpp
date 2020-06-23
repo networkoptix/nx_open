@@ -286,9 +286,9 @@ std::vector<HikvisionEvent> HikvisionMetadataMonitor::makeHikvisionEvents(
         {
             // The event is not supported by the current device agent. We should log it,
             // but only once.
-            NX_DEBUG(this, NX_FMT("Unsupported event type notification \"%1\" received"
+            NX_DEBUG(this, "Unsupported event type notification \"%1\" received"
                 " for the Device %2 (%3)",
-                eventWithRegions.event.typeId, m_deviceName, m_deviceId));
+                eventWithRegions.event.typeId, m_deviceName, m_deviceId);
             m_receivedUnsupportedEventTypes.insert(eventWithRegions.event.typeId);
         }
     }
@@ -308,9 +308,9 @@ bool HikvisionMetadataMonitor::processEvent(const EventWithRegions& eventWithReg
         {
             QString result = event.typeId;
             if (event.region)
-                result += QString::number(event.region->id) + lit("_");
+                result += NX_FMT("_%1", event.region->id);
             if (event.channel)
-                result += QString::number(*event.channel);
+                result += NX_FMT("_%1", *event.channel);
             return result;
         };
 
@@ -327,7 +327,7 @@ bool HikvisionMetadataMonitor::processEvent(const EventWithRegions& eventWithReg
         }
     }
 
-    addExpiredEvents(result);
+    addExpiredEvents(&result);
 
     if (result.empty())
         return true;
@@ -342,7 +342,7 @@ bool HikvisionMetadataMonitor::processEvent(const EventWithRegions& eventWithReg
     return true;
 }
 
-void HikvisionMetadataMonitor::addExpiredEvents(std::vector<HikvisionEvent>& result)
+void HikvisionMetadataMonitor::addExpiredEvents(std::vector<HikvisionEvent>* result)
 {
     for (auto itr = m_startedEvents.begin(); itr != m_startedEvents.end();)
     {
@@ -352,7 +352,7 @@ void HikvisionMetadataMonitor::addExpiredEvents(std::vector<HikvisionEvent>& res
             event.isActive = false;
             event.caption = buildCaption(m_manifest, event);
             event.description = buildDescription(m_manifest, event);
-            result.push_back(std::move(itr.value().event));
+            result->push_back(std::move(itr.value().event));
             itr = m_startedEvents.erase(itr);
         }
         else

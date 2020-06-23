@@ -37,15 +37,15 @@ QString Hikvision::EngineManifest::eventTypeIdByInternalName(const QString& valu
 const Hikvision::EventType& Hikvision::EngineManifest::eventTypeById(const QString& id) const
 {
     QnMutexLocker lock(&m_cachedIdMutex);
-    auto it = m_eventTypeById.find(id);
-    if (it != m_eventTypeById.end())
+
+    if (const auto it = m_eventTypeById.find(id); it != m_eventTypeById.end())
         return it.value();
 
     for (const EventType& eventType: eventTypes)
     {
         if (eventType.id == id)
         {
-            it = m_eventTypeById.insert(id, eventType);
+            const auto it = m_eventTypeById.insert(id, eventType);
             return it.value();
         }
     }

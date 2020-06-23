@@ -66,7 +66,7 @@ private:
 
     std::chrono::milliseconds reopenDelay() const;
 
-    void addExpiredEvents(std::vector<HikvisionEvent>& result);
+    void addExpiredEvents(std::vector<HikvisionEvent>* result);
 private:
     void at_monitorResponseReceived();
     void at_monitorSomeBytesAvailable();
