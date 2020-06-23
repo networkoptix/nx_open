@@ -40,7 +40,7 @@ protected:
 
         ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
             certificateFilePath.c_str(),
-            "traffic_relay/https test", "US", "Nx"));
+            {"traffic_relay/https test", "US", "Nx"}));
 
         addRelayInstance({
             "--https/listenOn=0.0.0.0:0",

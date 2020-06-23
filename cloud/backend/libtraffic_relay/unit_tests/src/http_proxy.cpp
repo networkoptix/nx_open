@@ -740,7 +740,7 @@ private:
 
         ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
             certificateFilePath.c_str(),
-            "traffic_relay/https test", "US", "Nx"));
+            {"traffic_relay/https test", "US", "Nx"}));
 
         std::vector<const char*> args;
         args.push_back("--https/listenOn=0.0.0.0:0");
