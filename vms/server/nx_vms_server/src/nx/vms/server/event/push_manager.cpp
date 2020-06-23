@@ -273,8 +273,13 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
             return resourcePool()->getResourceById(event.eventResourceId);
         }();
 
-    const auto language = common->globalSettings()->pushNotificationsLanguage();
-    NX_VERBOSE(this, "Translate notification to %1", language.isEmpty() ? "NONE" : language);
+    auto language = common->globalSettings()->pushNotificationsLanguage();
+    if (language.isEmpty())
+    {
+        NX_VERBOSE(this, "Notification language is not set, customization language will be used");
+        language = QnAppInfo::defaultLanguage();
+    }
+    NX_VERBOSE(this, "Translate notification to %1", language);
     QnTranslationManager::LocaleRollback localeGuard(
         serverModule()->findInstance<QnTranslationManager>(), language);
 
