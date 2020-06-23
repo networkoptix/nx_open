@@ -62,4 +62,7 @@
   <String Id="WixExecFirewallExceptionsUninstall">Deinstallieren der Windows-Firewallkonfiguration</String>
   <String Id="Product_ArchMismatch_x86">Dieses Paket ist für 32-Bit Betriebssysteme konzipiert. Setup wird nun beendet.</String>
   <String Id="Product_ArchMismatch_x64">Dieses Paket ist für 64-Bit Betriebssysteme konzipiert. Setup wird nun beendet.</String>
+
+  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="115"/>
+  <UI Dialog="BalExtension" Control="EulaHyperlink" X="129"/>
 </WixLocalization>
