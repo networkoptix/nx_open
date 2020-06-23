@@ -489,7 +489,7 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     ]
                 }
             ]
-        },
+        },)json" R"json(
         {
             "type": "Section",
             "caption": "ROI",
