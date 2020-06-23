@@ -1067,14 +1067,36 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     int prevIdx = (m_totalFrames-1) % FRAMES_BUFFER_SIZE;
 
     if (!m_decoder->decode(frame, &m_frames[idx]))
+    {
+        if (m_decoder->getLastDecodeResult() < 0)
+        {
+            NX_WARNING(this, "Failure to decode frame. Reset decoder");
+            m_decoder.reset();
+        }
+        else
+        {
+            NX_VERBOSE(this, "Decoder is buffering frame");
+        }
         return false;
+    }
+
     if (outVideoDecoderOutput)
         *outVideoDecoderOutput = m_frames[idx];
     if (m_frames[idx]->width < Qn::kMotionGridWidth
         || m_frames[idx]->height < Qn::kMotionGridHeight)
     {
+        if (m_decoder->getLastDecodeResult() < 0)
+        {
+            NX_WARNING(this, "Invalid frame size %1x%2. Reset decoder", m_frames[idx]->width, m_frames[idx]->height);
+            m_decoder.reset();
+        }
+        else
+        {
+            NX_VERBOSE(this, "Decoder is buffering frame");
+        }
         return false;
     }
+
     m_videoResolution.setWidth(m_frames[idx]->width);
     m_videoResolution.setHeight(m_frames[idx]->height);
     if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))

@@ -65,6 +65,8 @@ public:
     */
     virtual unsigned int getDecoderCaps() const override;
     virtual void setSpeed( float newValue ) override;
+
+    int getLastDecodeResult() const { return m_lastDecodeResult; }
 private:
     static AVCodec* findCodec(AVCodecID codecId);
 
@@ -123,6 +125,7 @@ private:
     MultiThreadDecodePolicy m_mtDecodingPolicy;
     bool m_useMtDecoding;
     bool m_needRecreate;
+    int m_lastDecodeResult = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
