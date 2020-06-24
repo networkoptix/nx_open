@@ -984,7 +984,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Stránka...</translation>
     </message>
   </context>
   <context>
@@ -1863,15 +1863,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Pravidlo události změněno</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Pravidlo události odstraněno</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation type="unfinished">Event rules reset to default</translation>
+      <translation>Pravidla události byla obnovena do výchozího nastavení</translation>
     </message>
   </context>
   <context>
@@ -3028,7 +3028,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Nelze rozpoznat rozlišení zachytávání</translation>
     </message>
   </context>
   <context>
@@ -5880,23 +5880,23 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optický</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>Prohodit</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>síť</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
@@ -6185,7 +6185,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>Pokud je funkce Failover povolena, server může stále žádat o aktualizaci stavu kamery bez ohledu na toto nastavení.</translation>
     </message>
   </context>
   <context>
@@ -6605,7 +6605,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>STAHOVÁNÍ&lt;br&gt;ZAPOČNUTO</translation>
     </message>
   </context>
   <context>
@@ -6752,7 +6752,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Na odebrané kameře nelze událost potvrdit.</translation>
     </message>
   </context>
   <context>
@@ -9406,7 +9406,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>plugin vrátil špatný manifest</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
@@ -10320,7 +10320,7 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Uložit soubor jako ...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10328,15 +10328,15 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Uložení souboru se nezdařilo: </translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>Složka %1 je pro zápis zablokována.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Stahování souborů</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10344,15 +10344,15 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Zastavit stahování souborů?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Soubor stažen</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Stažení souboru se nezdařilo</translation>
     </message>
   </context>
 </TS>

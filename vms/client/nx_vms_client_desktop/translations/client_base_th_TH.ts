@@ -984,7 +984,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>หน้า...</translation>
     </message>
   </context>
   <context>
@@ -2939,7 +2939,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>ไม่สามารถตรวจจับความละเอียดในการจับภาพได้</translation>
     </message>
   </context>
   <context>
@@ -5691,23 +5691,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optical</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>ปรับเปลี่ยน</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>เครือข่าย</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
@@ -6410,7 +6410,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>กำลังดาวน์โหลด&lt;br&gt;เริ่ม</translation>
     </message>
   </context>
   <context>
@@ -6554,7 +6554,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>ไม่สามารถรับทราบเหตุการณ์ในกล้องที่นำออก</translation>
     </message>
   </context>
   <context>
@@ -9922,7 +9922,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>บันทึกไฟล์เป็น </translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -9930,15 +9930,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>ไม่สามารถบันทึกไฟล์</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>%1 โฟลเดอร์ถูกบล็อกเพื่อการเขียน</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>กำลังดาวน์โหลดไฟล์</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -9946,15 +9946,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>หยุดดาวน์โหลดไฟล์หรือไม่</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>ไฟล์ดาวน์โหลดเสร็จเรียบร้อย</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>ไฟล์ดาวน์โหลดล้มเหลว</translation>
     </message>
   </context>
 </TS>
