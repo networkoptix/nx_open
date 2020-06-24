@@ -1070,7 +1070,8 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     {
         if (m_decoder->getLastDecodeResult() < 0)
         {
-            NX_WARNING(this, "Failure to decode frame. Reset decoder");
+            NX_WARNING(this, "Failure to decode frame with error %1. Reset decoder", 
+                m_decoder->getLastDecodeResult());
             m_decoder.reset();
         }
         else
