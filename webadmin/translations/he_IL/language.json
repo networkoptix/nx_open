@@ -77,8 +77,8 @@
         "emailSignature": "חתימת דוא\"ל",
         "emailSupportEmail": "דוא\"ל תמיכה",
         "enableEdgeRecording": "אפשר הקלטות edge",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "אפשר WEB SOCKETS",
+        "maxP2pAllClientsSizeBytes": "גודל Buffer מקסימלי לשליחת נתונים לקליינטים של P2P",
         "eventLogPeriodDays": "תקופת יומן האירועים (ימים)",
         "ldapAdminDn": "מנהל LDAP DN",
         "ldapSearchBase": "בסיס חיפוש LDAP",
@@ -87,7 +87,7 @@
         "localSystemId": "מזהה מערכת מקומי",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "הפרש מקסימלי בין זמן סינכרון לבין זמן אינטרנט (אלפיות השנייה)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "הפרש מקסימלי בין זמן סינכרון לבין זמן אינטרנט (אלפיות השנייה)",
-        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
+        "maxP2pQueueSizeBytes": "גודל תור מקסימלי P2P (בתים)",
         "maxRecordQueueSizeBytes": "גודל תור מרבי של רשומות (בתים)",
         "maxRecordQueueSizeElements": "גודל תור מרבי של רשומות (אלמנטים)",
         "maxRemoteArchiveSynchronizationThreads": "סינכרון מרבי של אשכולות סינכרון מרחוק",
@@ -116,8 +116,8 @@
         "timeSynchronizationEnabled": "סינכרון זמן מאופשר",
         "primaryTimeServer": "שרת סנכרון זמן ראשי",
         "osTimeChangeCheckPeriodMs": "תקופת בדיקת שינוי זמן מערכת הפעלה",
-        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
-        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
+        "syncTimeExchangePeriod": "מרווח סנכרון זמן בבקשות רשת",
+        "syncTimeEpsilon": "סינכרון epsilon זמן. ערך חדש אינו מיושם אם זמן מנותק פחות מאפסילון",
         "maxWearableArchiveSynchronizationThreads": "מספר תהליכי סנכרון ארכיון מקסימלי עבור מצלמת לבישה",
         "updateNotificationsEnabled": "עדכון ההתראות מופעל",
         "upnpPortMappingEnabled": "מיפוי יציאת UPNP מאופשר",
@@ -130,12 +130,12 @@
         "maxWebMTranscoders": "כמות מקסימלית של חיבורי WEBM עבור השרת. Chrome פותח 2 חיבורים בו-זמנית, ולאחר מכן סוגר את הראשון. לכן, מומלץ להגדיר ערך> = 2 לפרמטר זה.",
         "maxEventLogRecords": "המספר המרבי של רשומות יומן האירועים שיש לשמור במסד הנתונים. הכמות האמיתית של רשומות שלא נמחקו עשויה להיות גבוהה בעד 20% מהערך שצוין.",
         "forceLiveCacheForPrimaryStream": "האם לשמור במטמון כמה מסגרות עבור הזרם הראשי. ערכים: \"כן\" - מאופשר תמיד (יכול להשתמש בהרבה RAM), \"לא\" - תמיד מושבת למעט כאשר נדרש על ידי הקלטה(למשל HLS), \"אוטומטי\" - דומה \"לא\", אבל מופעלת כאשר משפרת את חוויית המשתמש (לדוגמה, כאשר תוסף כלשהו של Analytics פועל על המצלמה).",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "additionalLocalFsTypes": "סוגי מערכות קבצים נוספים שיש לקחת בחשבון בעת ההחלטה אם מחיצה נתונה מתאימה לאחסון שרתים. רשימה מופרדת בפסיקים של קבצים כפי שהם מופיעים ב- / proc / mounts.",
+        "rtspBufferSizeKb": "גודל buffer של RTSP בצד של השרת הינו ב KB, ערך גדול יותר מאפשר להשתמש באינטרנט יעיל, אך מאט את השימוש האוטומטי בבחירת רזולוציה אוטומטית והפעלת ה RTSP."
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "גרפים",
             "storage": "אחסון",
             "log": "יומן"
         }

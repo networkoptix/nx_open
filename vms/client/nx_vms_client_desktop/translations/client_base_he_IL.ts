@@ -988,11 +988,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>התחבר לשרת זה</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>נעץ</translation>
     </message>
   </context>
   <context>
@@ -1261,7 +1261,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>לדיווח על הבעיה אנא צרו קשר עם %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1309,7 +1309,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>להפעלת מפתח הרישיון באופן ידני אנא צרו קשר עם %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1321,11 +1321,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>כדי לדווח על הבעיה אנא צור קשר עם התמיכה האזורית / הרישיון שלך:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>כדי להפעיל את הרישיון באופן ידני אנא צור קשר עם שירות הלקוחות:</translation>
     </message>
   </context>
   <context>
@@ -1368,7 +1368,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>נא לנסות שוב מאוחר יותר</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1409,27 +1409,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>לקבלת מפתח רישיון תקף אנא צרו קשר עם %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>אם הבעיה נמשכת, אנא צור קשר עם %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>אנא צרו קשר עם %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>כדי להפעיל את הרישיון באופן ידני אנא צור קשר עם שירות הלקוחות:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>כדי להפעיל את הרישיון באופן ידני אנא צור קשר עם שירות הלקוחות:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>אנא צור קשר עם שירות הלקוחות:</translation>
     </message>
   </context>
   <context>
@@ -1667,7 +1667,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>האם אתה בטוח שברצונך לעזוב את הדף הזה? יתכן כי שינויים שביצעת לא יישמרו.</translation>
     </message>
   </context>
   <context>
@@ -1702,7 +1702,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>שירות לקוחות</translation>
     </message>
   </context>
   <context>
@@ -1770,7 +1770,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>שים לב! זו היא אפשרות ניסיונית אשר חוסכת במעבד אך עלולה להשפיע על האנימציה.</translation>
     </message>
   </context>
   <context>
@@ -2346,7 +2346,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>שרת מקור ו- %1</translation>
     </message>
   </context>
   <context>
@@ -2476,7 +2476,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>שרתים התומכים זמזם</translation>
     </message>
   </context>
   <context>
@@ -2904,11 +2904,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n מתוך %1 משתמשים שנבחרו אינם %2 משתמשים ולא יקבלו התראות לנייד.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+        <numerusform>%n מתוך %1 משתמשים שנבחרו אינם %2 משתמשים ולא יקבלו התראות לנייד.</numerusform>
+        <numerusform>%n מתוך %1 משתמשים שנבחרו אינם %2 משתמשים ולא יקבלו התראות לנייד.</numerusform>
+        <numerusform>%n מתוך %1 משתמשים שנבחרו אינם %2 משתמשים ולא יקבלו התראות לנייד.</numerusform>
       </translation>
     </message>
   </context>
@@ -3567,7 +3567,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>שרתים התומכים באבחון מאוורר</translation>
     </message>
   </context>
   <context>
@@ -3915,7 +3915,7 @@ to %1</source>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>מספר ביטולים שנותר</translation>
     </message>
   </context>
   <context>
@@ -4064,11 +4064,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>נותרו %n ביטולים.</numerusform>
+        <numerusform>נותרו %n ביטולים.</numerusform>
+        <numerusform>נותרו %n ביטולים.</numerusform>
+        <numerusform>נותרו %n ביטולים.</numerusform>
       </translation>
     </message>
   </context>
@@ -4092,16 +4092,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>כדי לקבל קובץ רישיון, אנא שלח את מספר רישיון ומזהה חומרה ל %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>אנא שלח את מספר הרישיון ואת מזהה החומרה שסופקו לשירות הלקוחות בכדי להשיג קובץ רישיון להפעלה ידנית.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>אנא שלח את מספר הרישיון ואת מזהה החומרה שסופקו לשירות הלקוחות (%1) בכדי להשיג קובץ רישיון להפעלה ידנית.</translation>
     </message>
   </context>
   <context>
@@ -4657,7 +4657,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>שרתים התומכים במעקב אחר PoE</translation>
     </message>
   </context>
   <context>
@@ -5416,7 +5416,7 @@ to %1</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5917,11 +5917,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>השרת אינו זמין.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>עכשיו</translation>
     </message>
   </context>
   <context>
@@ -6798,7 +6798,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>התחברות לשרת שנבחר נכשלה</translation>
     </message>
   </context>
   <context>
@@ -7748,11 +7748,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n ערכים</numerusform>
+        <numerusform>+%n ערכים</numerusform>
+        <numerusform>+%n ערכים</numerusform>
+        <numerusform>+%n ערכים</numerusform>
       </translation>
     </message>
   </context>
@@ -8477,7 +8477,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>קידוד וידאו נדרש.</translation>
     </message>
   </context>
   <context>
@@ -8688,11 +8688,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>לפרוקסי %1 דרוש שם משתמש וסיסמא.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>בחר תיקיה להעלאה</translation>
     </message>
   </context>
   <context>
@@ -8786,7 +8786,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>מזהה זה משמש כבר במערכת. השתמש בכפתור צור כדי למצוא מזהה פנוי.</translation>
     </message>
   </context>
   <context>
@@ -9223,7 +9223,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>התחברות</translation>
     </message>
   </context>
   <context>
@@ -9326,31 +9326,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>התקנת העדכון נכשלה.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>מנותק</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>מחובר</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>שואב כוח</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>בלתי צפוי</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>ריק</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9370,16 +9370,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>חשמל</translation>
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>מכשיר לא ידוע</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>מכשיר לא ידוע %1</translation>
     </message>
   </context>
   <context>
@@ -9398,29 +9398,29 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>המערכת אינה מחוברת ל- %1. התראות דחיפה בטלפון פועלות רק כאשר המערכת מחוברת ל- %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>הגדרות %1</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>מעל %n סמלים</numerusform>
+        <numerusform>מעל %n סמלים</numerusform>
+        <numerusform>מעל %n סמלים</numerusform>
+        <numerusform>מעל %n סמלים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>נותרו %n סמלים</numerusform>
+        <numerusform>נותרו %n סמלים</numerusform>
+        <numerusform>נותרו %n סמלים</numerusform>
+        <numerusform>נותרו %n סמלים</numerusform>
       </translation>
     </message>
   </context>
@@ -9574,7 +9574,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>אין שרתים תואמים</translation>
     </message>
   </context>
   <context>
@@ -10014,7 +10014,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>קידוד נדרש. הפעלת הייצוא הופעלה מחדש.</translation>
     </message>
   </context>
   <context>
@@ -10221,15 +10221,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>אנא מלא את הפרטים הבאים לביטול רישיון</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>שים לב כי כל רישיון יכול להתבטל מקסימום %n פעמים.</numerusform>
+        <numerusform>שים לב כי כל מפתח רישיון עשוי להיות מבוטל מקסימום %n פעמים.</numerusform>
+        <numerusform>שים לב כי כל מפתח רישיון עשוי להיות מבוטל מקסימום %n פעמים.</numerusform>
+        <numerusform>שים לב כי כל מפתח רישיון עשוי להיות מבוטל מקסימום %n פעמים.</numerusform>
       </translation>
     </message>
   </context>

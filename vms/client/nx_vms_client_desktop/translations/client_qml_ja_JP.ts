@@ -41,15 +41,15 @@
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>図</translation>
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>クリックして追加</translation>
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>ビデオに表示</translation>
     </message>
   </context>
   <context>
@@ -71,7 +71,7 @@
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>プレビューなし</translation>
     </message>
   </context>
   <context>
@@ -86,11 +86,11 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>カメラストリーム</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>分析のためにカメラからビデオストリームを選択</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -98,41 +98,41 @@
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>更新しています...</translation>
     </message>
   </context>
   <context>
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>デフォルト値：</translation>
     </message>
   </context>
   <context>
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>行が無効です。続行するには自己交差を削除してください。</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>この行は少なくとも %n ポイント必要です。</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>最後のポイントをクリックして、線の描画を終了します。</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>ポイントの最大数に達しました(%n ポイント)。</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>各矢印をクリックして、目的の方向を切り替えます。</translation>
     </message>
   </context>
   <context>
@@ -169,7 +169,7 @@
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>サイズ制限</translation>
     </message>
   </context>
   <context>
@@ -194,22 +194,22 @@
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>多角形は有効ではありません。続行するには自己交差を削除してください。</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>この多角形は少なくとも %n ポイント必要です。</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>多角形を完成させるには、最後の点をクリックします。</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>ポイントの最大数に達しました(%n ポイント)。</numerusform>
       </translation>
     </message>
   </context>
@@ -224,19 +224,19 @@
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>最大</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>最少</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>オブジェクトの最小サイズと最大サイズを設定します。</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>最小オブジェクトサイズは最大値より大きくすることはできません。</translation>
     </message>
   </context>
   <context>

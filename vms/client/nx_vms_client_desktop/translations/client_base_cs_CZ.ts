@@ -9399,29 +9399,29 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>Systém není připojen k %1. Mobilní oznámení fungují, pouze pokud je systém připojen k %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 Nastavení</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>%n symbolů</numerusform>
+        <numerusform>%n symbolů</numerusform>
+        <numerusform>%n symbolů</numerusform>
+        <numerusform>%n symbolů</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>Zbývá %n symbolů</numerusform>
+        <numerusform>Zbývá %n symbolů</numerusform>
+        <numerusform>Zbývá %n symbolů</numerusform>
+        <numerusform>Zbývá %n symbolů</numerusform>
       </translation>
     </message>
   </context>
@@ -9559,7 +9559,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>Šifrovat lze pouze přenos videa mezi klientem a serverem</translation>
     </message>
   </context>
   <context>
@@ -9575,7 +9575,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>Nejsou k dispozici žádné kompatibilní servery</translation>
     </message>
   </context>
   <context>
@@ -10015,7 +10015,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>Je vyžadováno překódování. Export relace restartován.</translation>
     </message>
   </context>
   <context>
@@ -10222,15 +10222,15 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Pro deaktivaci licence prosím vyplňte následující</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Berte ohled na to, že každý licenční klíč může být deaktivován maximálně %n krát.</numerusform>
+        <numerusform>Berte ohled na to, že každý licenční klíč může být deaktivován maximálně %n krát.</numerusform>
+        <numerusform>Berte ohled na to, že každý licenční klíč může být deaktivován maximálně %n krát.</numerusform>
+        <numerusform>Berte ohled na to, že každý licenční klíč může být deaktivován maximálně %n krát.</numerusform>
       </translation>
     </message>
   </context>

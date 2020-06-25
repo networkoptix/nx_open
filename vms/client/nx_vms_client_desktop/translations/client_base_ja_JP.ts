@@ -9010,12 +9010,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>未知のデバイス</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>未知のデバイス%1</translation>
     </message>
   </context>
   <context>
@@ -9034,23 +9034,23 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>システムは %1に接続されていません。モバイル通知はシステムが %1 に接続されている場合にのみ動作します。</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 設定</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>%n 文字以上</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>残り%n 文字</numerusform>
       </translation>
     </message>
   </context>
@@ -9185,7 +9185,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>クライアント・サーバーのビデオ・トラフィックのみ暗号化できます</translation>
     </message>
   </context>
   <context>
@@ -9198,7 +9198,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>互換性のあるサーバーがありません</translation>
     </message>
   </context>
   <context>
@@ -9623,7 +9623,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>トランスコーディングが必要です。エクスポートセッションを再起動しました。</translation>
     </message>
   </context>
   <context>
@@ -9830,12 +9830,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>ライセンスの無効化のために以下を完了してください</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>各ライセンスキーは最大 %n 回無効化されることに注意してください。</numerusform>
       </translation>
     </message>
   </context>
