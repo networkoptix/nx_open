@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
+<?xml version='1.0' encoding='utf-8'?>
 <TS version="2.1" language="pt-PT" sourcelanguage="en">
   <context>
     <name>QObject</name>
@@ -115,7 +114,7 @@
     </message>
     <message>
       <source>Unknown error: %1</source>
-      <translation type="unfinished">Unknown error: %1</translation>
+      <translation>Erro desconhecido: %1</translation>
     </message>
   </context>
 </TS>

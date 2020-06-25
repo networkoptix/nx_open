@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
+<?xml version='1.0' encoding='utf-8'?>
 <TS version="2.1" language="pt-PT" sourcelanguage="en">
   <context>
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Análise da câmera funcionará somente quando a câmera estiver sendo vista. Ative a gravação para fazer funcionar o tempo todo.</translation>
     </message>
   </context>
   <context>
@@ -26,8 +25,8 @@
       <translation>Nenhum servidor encontrado</translation>
     </message>
     <message>
-      <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation>Verifique sua conexão de rede ou pressione &quot;Conectar-se ao servidor&quot; para inserir o endereço de servidor conhecido</translation>
+      <source>Check your network connection or press "Connect to Server" button to enter known server address</source>
+      <translation>Verifique sua conexão de rede ou pressione "Conectar-se ao servidor" para inserir o endereço de servidor conhecido</translation>
     </message>
   </context>
   <context>
@@ -178,7 +177,7 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Nenhum plug-in instalado</translation>
     </message>
     <message>
       <source>Server is offline</source>

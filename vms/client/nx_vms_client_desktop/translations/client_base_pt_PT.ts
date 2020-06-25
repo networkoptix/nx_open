@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
+<?xml version='1.0' encoding='utf-8'?>
 <TS version="2.1" language="pt-PT" sourcelanguage="en">
   <context>
     <name>AnalyticsSearchWidget::Private</name>
@@ -9,11 +8,11 @@
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Selecione a área</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Selecione uma área no vídeo...</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -25,11 +24,11 @@
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Inserir parâmetros</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>Ação requer alguns parâmetros a serem preenchidos.</translation>
     </message>
   </context>
   <context>
@@ -115,15 +114,15 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Obtendo informações de atualização do servidor</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Baixando pacote de atualização</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Instalando</translation>
     </message>
   </context>
   <context>
@@ -893,7 +892,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Esquecer senha</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -905,7 +904,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Configurações do mecanismo Analytics...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -925,11 +924,11 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Câmera virtual...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nova Câmera Virtual...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -953,27 +952,27 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Mudar para aba Notificações</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Mudar para aba Movimento</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Mudar para aba de Favoritos</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Mudar para aba Eventos</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Mudar para aba de objetos</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Objetos e Info...</translation>
     </message>
     <message>
       <source>Pin Calendar</source>
@@ -985,7 +984,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Página...</translation>
     </message>
     <message>
       <source>Connect to this Server</source>
@@ -1039,30 +1038,30 @@ para ver mais favoritos</translation>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Por favor, insira uma senha válida</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>A senha não é válida.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Layout criptografado</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>O arquivo %1 está criptografado. Por favor, digite a senha:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Por favor, re-digite a senha para o layout %1:</translation>
     </message>
   </context>
   <context>
     <name>EventSearchWidget::Private</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Eventos do servidor</translation>
     </message>
     <message>
       <source>Analytics events</source>
@@ -1070,31 +1069,31 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Qualquer evento</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Qualquer problema de dispositivo</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Qualquer problema da câmera</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Qualquer evento do servidor</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Problemas do dispositivo</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Problemas da câmera</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Qualquer evento de análise</translation>
     </message>
   </context>
   <context>
@@ -1420,24 +1419,24 @@ para ver mais favoritos</translation>
   <context>
     <name>LocalFiles</name>
     <message>
-      <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation>O caminho &quot;%1&quot; é inválido. Por favor, tente outro caminho.</translation>
+      <source>Path "%1" is invalid. Please try another path.</source>
+      <translation>O caminho "%1" é inválido. Por favor, tente outro caminho.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation>Arquivo &quot;%1&quot; já existe. Por favor, tente outro nome.</translation>
+      <source>File "%1" already exists. Please try another name.</source>
+      <translation>Arquivo "%1" já existe. Por favor, tente outro nome.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process.</source>
-      <translation>O arquivo &quot;%1&quot; é usado por outro processo.</translation>
+      <source>File "%1" is used by another process.</source>
+      <translation>O arquivo "%1" é usado por outro processo.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation>O arquivo &quot;%1&quot; não pode ser gravado. Por favor, tente outro nome.</translation>
+      <source>File "%1" cannot be written. Please try another name.</source>
+      <translation>O arquivo "%1" não pode ser gravado. Por favor, tente outro nome.</translation>
     </message>
     <message>
-      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>O nome do ficheiro &quot;%1&quot; está reservado pelo sistema operacional. Por favor, tente outro nome.</translation>
+      <source>File name "%1" is reserved by operating system. Please try another name.</source>
+      <translation>O nome do ficheiro "%1" está reservado pelo sistema operacional. Por favor, tente outro nome.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
@@ -1552,8 +1551,8 @@ para ver mais favoritos</translation>
   <context>
     <name>Ptz</name>
     <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation>Não é possível obter a posição atual da câmera &quot;%1&quot;</translation>
+      <source>Cannot get the current position from camera "%1"</source>
+      <translation>Não é possível obter a posição atual da câmera "%1"</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
@@ -1564,8 +1563,8 @@ para ver mais favoritos</translation>
       <translation>Falha ao obter a posição atual</translation>
     </message>
     <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation>Não é possível definir a posição atual para a câmera &quot;%1&quot;</translation>
+      <source>Cannot set the current position for camera "%1"</source>
+      <translation>Não é possível definir a posição atual para a câmera "%1"</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
@@ -1584,7 +1583,7 @@ para ver mais favoritos</translation>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Layout bloqueado</translation>
     </message>
   </context>
   <context>
@@ -1859,17 +1858,17 @@ para ver mais favoritos</translation>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Detalhes para %n sessões de %1</numerusform>
+        <numerusform>Detalhes para %n sessões de %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Detalhes para %n câmeras de %1</numerusform>
+        <numerusform>Detalhes para %n câmeras de %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2013,26 +2012,26 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Atualização instalada</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n ações</numerusform>
+        <numerusform>%n ações</numerusform>
       </translation>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Regra de evento alterada</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Regra de evento removida</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation type="unfinished">Event rules reset to default</translation>
+      <translation>Regras do evento redefinidas para o padrão</translation>
     </message>
   </context>
   <context>
@@ -2092,7 +2091,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>affect all servers in System</source>
-      <comment>Relates to &apos;Global Settings&apos; subject</comment>
+      <comment>Relates to 'Global Settings' subject</comment>
       <translation>afeta todos os servidores no sistema</translation>
     </message>
   </context>
@@ -2296,12 +2295,12 @@ para ver mais favoritos</translation>
     <name>QnBusinessRuleWidget</name>
     <message>
       <source>to</source>
-      <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
+      <extracomment>"to" is from the sentence "Send email _to_:"</extracomment>
       <translation>para</translation>
     </message>
     <message>
       <source>at</source>
-      <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
+      <extracomment>"at" is from the sentence "Display the text _at_ these cameras"</extracomment>
       <translation>nas</translation>
     </message>
     <message>
@@ -2330,7 +2329,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>Forçar reconhecimento só funcionará para eventos Genéricos se os identificadores da câmera forem usados na URL do Evento Genérico</translation>
     </message>
   </context>
   <context>
@@ -2687,7 +2686,7 @@ para ver mais favoritos</translation>
       <translation>A senha deve ter pelo menos 8 símbolos e conter diferentes tipos de caracteres.</translation>
     </message>
     <message>
-      <source>Password should not be equal to camera&apos;s user name</source>
+      <source>Password should not be equal to camera's user name</source>
       <translation>A senha não deve ser igual ao nome de utilizador da câmara</translation>
     </message>
   </context>
@@ -2798,7 +2797,7 @@ a %1</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
-      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <comment>%1 is a cloud site name like "Nx Cloud"</comment>
       <translation>Por favor, faça o login em %1 e siga as instruções fornecidas.</translation>
     </message>
     <message>
@@ -2837,10 +2836,10 @@ a %1</translation>
     <name>QnCloudUsersValidationPolicy</name>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
-      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <comment>%2 here will be substituted with short cloud name e.g. 'Cloud'.</comment>
+      <translation>
+        <numerusform>%n de %1 usuários selecionados não são %2 usuários e não receberão notificações móveis.</numerusform>
+        <numerusform>%n de %1 usuários selecionados não são %2 usuários e não receberão notificações móveis.</numerusform>
       </translation>
     </message>
   </context>
@@ -2891,7 +2890,7 @@ a %1</translation>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Erro interno do servidor. Por favor, tente novamente mais tarde.</translation>
     </message>
   </context>
   <context>
@@ -3045,11 +3044,11 @@ a %1</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download e instalação</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Falha ao inserir o modo de compatibilidade para a versão %1</translation>
     </message>
   </context>
   <context>
@@ -3188,20 +3187,20 @@ a %1</translation>
       <translation>Tamanho do ecrã deve ser um múltiplo de 8.</translation>
     </message>
     <message>
-      <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>Não foi possível encontrar o codificador de áudio &quot;%1&quot;.</translation>
+      <source>Could not find audio encoder "%1".</source>
+      <translation>Não foi possível encontrar o codificador de áudio "%1".</translation>
     </message>
     <message>
-      <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>Não foi possível inicializar o dispositivo de áudio &quot;%1&quot;.</translation>
+      <source>Could not initialize audio device "%1".</source>
+      <translation>Não foi possível inicializar o dispositivo de áudio "%1".</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Formatos de áudio de 44.1 kHz e 48 kHz não são suportados pelo dispositivo de captura de áudio. Por favor, selecione outro dispositivo de áudio ou &quot;nenhum&quot; nas configurações de gravação de tela.</translation>
+      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or "none" in the Screen Recording settings.</source>
+      <translation>Formatos de áudio de 44.1 kHz e 48 kHz não são suportados pelo dispositivo de captura de áudio. Por favor, selecione outro dispositivo de áudio ou "nenhum" nas configurações de gravação de tela.</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Não foi possível detectar a resolução de captura</translation>
     </message>
   </context>
   <context>
@@ -3319,17 +3318,17 @@ a %1</translation>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Registro de eventos para período de %1 para %2 - %n eventos encontrados</numerusform>
+        <numerusform>Registro de eventos para período de %1 para %2 - %n eventos encontrados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
+        <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
       </translation>
     </message>
     <message>
@@ -3411,9 +3410,9 @@ a %1</translation>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n câmeras)</numerusform>
+        <numerusform>%1 (%n câmeras)</numerusform>
       </translation>
     </message>
   </context>
@@ -3503,11 +3502,11 @@ a %1</translation>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Esta câmera não está atualmente no layout selecionado. A ação funcionará se a câmera for adicionada antes de disparar a ação.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Esta câmera não está atualmente em alguns dos layouts selecionados. Ação funcionará se a câmera for adicionada antes de disparar a ação.</translation>
     </message>
   </context>
   <context>
@@ -3544,7 +3543,7 @@ a %1</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3694,7 +3693,7 @@ a %1</translation>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Por favor, insira um valor.</translation>
     </message>
   </context>
   <context>
@@ -3726,8 +3725,8 @@ a %1</translation>
       </translation>
     </message>
     <message>
-      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>A alteração de qualquer definição do LDAP para além do &quot;Filtro de pesquisa&quot; resultará em perda de conectividade para todos os utilizadores sincronizados pelo através do LDAP.</translation>
+      <source>Changing any LDAP settings other than "Search Filter" will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>A alteração de qualquer definição do LDAP para além do "Filtro de pesquisa" resultará em perda de conectividade para todos os utilizadores sincronizados pelo através do LDAP.</translation>
     </message>
   </context>
   <context>
@@ -3954,7 +3953,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <comment>Text like '6 Profesional Licenses' will be substituted</comment>
       <translation>
         <numerusform>%1 está actualmente em uso</numerusform>
         <numerusform>%1 estão actualmente em uso</numerusform>
@@ -3962,7 +3961,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <comment>Text like '6 Profesional Licenses' will be substituted</comment>
       <translation>
         <numerusform>Pelo menos %1 item é necessário</numerusform>
         <numerusform>Pelo menos %1 itens são necessários</numerusform>
@@ -4229,8 +4228,8 @@ a %1</translation>
       <translation>AO VIVO</translation>
     </message>
     <message>
-      <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1 (Tour &quot;%2&quot; está ativo)</translation>
+      <source>%1 (Tour "%2" is active)</source>
+      <translation>%1 (Tour "%2" está ativo)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4266,7 +4265,7 @@ a %1</translation>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Zoom de área</translation>
     </message>
   </context>
   <context>
@@ -4421,15 +4420,15 @@ a %1</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Câmera virtual</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Câmera virtual %1</translation>
     </message>
     <message>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <source>"Virtual Camera" is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>O "Câmera Virtual" é um armazenamento virtual para arquivos de vídeo, que pode ser enviado para qualquer servidor em seu sistema e ser acessado por qualquer usuário.</translation>
     </message>
   </context>
   <context>
@@ -4661,9 +4660,9 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>sobre %n minutos</numerusform>
+        <numerusform>sobre %n minutos</numerusform>
       </translation>
     </message>
   </context>
@@ -4689,12 +4688,12 @@ a %1</translation>
       <translation>Redefinir</translation>
     </message>
     <message>
-      <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation>Hotkey usado por predefinição &quot;%1&quot;</translation>
+      <source>Hotkey used by preset "%1"</source>
+      <translation>Hotkey usado por predefinição "%1"</translation>
     </message>
     <message>
-      <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation>Hotkey usado pelo tour &quot;%1&quot;</translation>
+      <source>Hotkey used by tour "%1"</source>
+      <translation>Hotkey usado pelo tour "%1"</translation>
     </message>
   </context>
   <context>
@@ -4838,7 +4837,7 @@ a %1</translation>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Bitrate atual</translation>
     </message>
   </context>
   <context>
@@ -4884,11 +4883,11 @@ a %1</translation>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Arquivos locais</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Nenhum arquivo local</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4904,7 +4903,7 @@ a %1</translation>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>abrir tudo</translation>
     </message>
     <message>
       <source>All types</source>
@@ -5025,7 +5024,7 @@ a %1</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Mecanismos de análise</translation>
     </message>
   </context>
   <context>
@@ -5288,7 +5287,7 @@ a %1</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
     <message>
       <source>PoE</source>
@@ -5349,11 +5348,11 @@ a %1</translation>
     <name>QnShowTextOverlayActionWidget</name>
     <message>
       <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-      <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+      <comment>Do not translate tags (text between '&lt;' and '&gt;' symbols. Do not remove '
+' sequence</comment>
       <translation>Tags Html podem ser usadas no texto personalizado:
-&lt;h4&gt;Cabeçalhos (h1-h6)&lt;/h4&gt;Também diferentes &lt;font color=&quot;red&quot;&gt;cores&lt;/font&gt; e &lt;font size=&quot;18&quot;&gt;tamanhos&lt;/font&gt; podem ser aplicados. O texto pode ser &lt;s&gt;em&lt;/s&gt;, &lt;u&gt;sublinhado&lt;/u&gt;, &lt;b&gt;negrito&lt;/b&gt; ou &lt;i&gt;em&lt;/i&gt;</translation>
+&lt;h4&gt;Cabeçalhos (h1-h6)&lt;/h4&gt;Também diferentes &lt;font color="red"&gt;cores&lt;/font&gt; e &lt;font size="18"&gt;tamanhos&lt;/font&gt; podem ser aplicados. O texto pode ser &lt;s&gt;em&lt;/s&gt;, &lt;u&gt;sublinhado&lt;/u&gt;, &lt;b&gt;negrito&lt;/b&gt; ou &lt;i&gt;em&lt;/i&gt;</translation>
     </message>
   </context>
   <context>
@@ -5441,8 +5440,8 @@ a %1</translation>
       <translation>Assinatura de Suporte</translation>
     </message>
     <message>
-      <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation>Nenhuma predefinição encontrada. Use a opção &quot;Avançada&quot;.</translation>
+      <source>No preset found. Use "Advanced" option.</source>
+      <translation>Nenhuma predefinição encontrada. Use a opção "Avançada".</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -5638,23 +5637,23 @@ a %1</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Últimos 5 minutos</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Últimos 60 minutos</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Últimas 24 horas</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Período mais longo disponível</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Previsão disponível apenas para câmeras com gravação habilitada.</translation>
     </message>
   </context>
   <context>
@@ -5684,8 +5683,8 @@ a %1</translation>
       <translation>Adicione mais drives para usá-los como armazenamento de backup.</translation>
     </message>
     <message>
-      <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
-      <translation>Altere &quot;Principal&quot; para &quot;Backup&quot; para algum armazenamento acima para ativar o backup.</translation>
+      <source>Change "Main" to "Backup" for some of the storage above to enable backup.</source>
+      <translation>Altere "Principal" para "Backup" para algum armazenamento acima para ativar o backup.</translation>
     </message>
     <message>
       <source>Apply changes to start backup.</source>
@@ -5769,7 +5768,7 @@ a %1</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>O que fazer com os dados de análise atual?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5786,8 +5785,8 @@ a %1</translation>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Os dados atuais de análise não serão movidos automaticamente para outro local e ficarão inacessíveis. Você pode mantê-lo e movê-lo manualmente mais tarde ou excluir permanentemente.
+Se você pretendia transferir dados analíticos para outro local de armazenamento, entre em contato com o suporte antes de continuar.</translation>
     </message>
     <message>
       <source>Server is unavailable.</source>
@@ -5846,11 +5845,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>Use para armazenar dados analíticos</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>Armazena dados de análise</translation>
     </message>
     <message>
       <source>Reserved</source>
@@ -5862,23 +5861,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>óptico</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>troca</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>rede</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -5975,7 +5974,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -6112,27 +6111,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Nenhum servidor tem acesso à internet para sincronização de horário</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>O sistema está em modo seguro</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>O sistema não tem acesso à internet para sincronização de horário</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Nenhum servidor on-line no sistema tem acesso à Internet para sincronização de horário.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>O sistema está sendo executado no modo de segurança.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Erro ocorrido durante a sincronização remota de arquivos</translation>
     </message>
   </context>
   <context>
@@ -6155,19 +6154,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Ativar a descoberta automática de dispositivos e servidores e a verificação automática do status do dispositivo</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Ativar a auto descoberta de câmaras e servidores e a verificação automática do status da câmera</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>Quando ativado, o sistema descobre continuamente novas câmeras e servidores e envia solicitações de descoberta a câmeras para atualização de status.</translation>
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>Se o Falover estiver ativado, o servidor ainda pode solicitar atualizações de status da câmera, independentemente desta configuração.</translation>
     </message>
   </context>
   <context>
@@ -6182,11 +6181,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>Arquivo HTML</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>Arquivo de folha de cálculo (CSV)</translation>
     </message>
   </context>
   <context>
@@ -6502,12 +6501,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
-      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <comment>%1 is local users definition, e.g. 'Local users'</comment>
       <translation>%1 pertencem apenas a este sistema e são totalmente geridos pelos administradores do sistema.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
-      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <comment>%1 is cloud users definition, e.g. 'Cloud users'</comment>
       <translation>%1 pode ter acesso a muitos sistemas. Os administradores podem gerir apenas os seus direitos.</translation>
     </message>
   </context>
@@ -6549,8 +6548,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Exibir %1</translation>
     </message>
     <message>
-      <source>Delete &quot;%1&quot;?</source>
-      <translation>Excluir &quot;%1&quot;?</translation>
+      <source>Delete "%1"?</source>
+      <translation>Excluir "%1"?</translation>
     </message>
   </context>
   <context>
@@ -6710,14 +6709,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>Falha ao mesclar %1 para o nosso sistema.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Não é possível reconhecer o evento na câmera removida.</translation>
     </message>
   </context>
   <context>
@@ -6842,11 +6841,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>Imagem PNG</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>Imagem JPEG</translation>
     </message>
   </context>
   <context>
@@ -6937,8 +6936,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Apenas são suportados ficheiros de vídeo com registo de data e hora correctos.</translation>
     </message>
     <message>
-      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>Não foi possível iniciar o upload, visto que o utilizador &quot;%1&quot; está a fazer o upload de imagens para esta câmara.</translation>
+      <source>Could not start upload as user "%1" is currently uploading footage to this camera.</source>
+      <translation>Não foi possível iniciar o upload, visto que o utilizador "%1" está a fazer o upload de imagens para esta câmara.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
@@ -7061,17 +7060,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>Falha ao adicionar a câmera virtual</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>Abrir Gravações de Câmera Virtual...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Você pode enviar estes arquivos para uma instância diferente de uma câmera virtual.</numerusform>
+        <numerusform>Você pode enviar estes arquivos para uma instância diferente de uma câmera virtual.</numerusform>
       </translation>
     </message>
     <message>
@@ -7298,9 +7297,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Alguns arquivos de vídeo ainda estão sendo enviados para %n câmeras virtuais:</numerusform>
+        <numerusform>Alguns arquivos de vídeo ainda estão sendo enviados para %n câmeras virtuais:</numerusform>
       </translation>
     </message>
   </context>
@@ -7308,18 +7307,18 @@ If you intended to move analytics data to another storage location, please conta
     <name>SessionExpiredDialog</name>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Sua sessão expirou</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+      <translation>O limite de duração da sessão pode ser alterado pelos administradores do sistema</translation>
     </message>
   </context>
   <context>
     <name>SimpleMotionSearchWidget::Private</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>Selecione a área no vídeo para filtrar resultados</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -7331,11 +7330,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Dispositivo selecionado</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>Mídia selecionada</translation>
     </message>
     <message>
       <source>none</source>
@@ -7375,32 +7374,32 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
+      <extracomment>Short for 'Lowest'</extracomment>
       <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
+      <extracomment>Short for 'Low'</extracomment>
       <translation>Lo</translation>
     </message>
     <message>
       <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
+      <extracomment>Short for 'Medium'</extracomment>
       <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
+      <extracomment>Short for 'High'</extracomment>
       <translation>Hi</translation>
     </message>
     <message>
       <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
+      <extracomment>Short for 'Best'</extracomment>
       <translation>Bst</translation>
     </message>
     <message>
       <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
+      <extracomment>Short for 'Preset'</extracomment>
       <translation>Ps</translation>
     </message>
   </context>
@@ -7415,21 +7414,21 @@ If you intended to move analytics data to another storage location, please conta
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Esta plataforma Linux não é mais suportada</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Esta versão do SO não é mais suportada</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Esta versão %1 não é mais suportada</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 não é mais suportado</translation>
     </message>
   </context>
   <context>
@@ -7504,23 +7503,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Dispositivos no layout</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Câmeras no layout</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Qualquer dispositivo</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Qualquer câmera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Dispositivo selecionado</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7531,11 +7530,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>Mostrar sempre</translation>
     </message>
     <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <source>Show Only with "Objects" Tab</source>
+      <translation>Mostrar somente com "Objetos" aba</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7543,7 +7542,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
+      <translation>Não mostrar</translation>
     </message>
   </context>
   <context>
@@ -7560,11 +7559,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>câmera removida</translation>
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Faixa desconhecida</translation>
     </message>
   </context>
   <context>
@@ -7579,9 +7578,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n objetos</numerusform>
+        <numerusform>%n objetos</numerusform>
       </translation>
     </message>
   </context>
@@ -7596,7 +7595,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>câmera removida</translation>
     </message>
   </context>
   <context>
@@ -7692,7 +7691,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Multicast</translation>
     </message>
   </context>
   <context>
@@ -7756,7 +7755,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Fluxo de detecção de movimento está desativado</translation>
     </message>
   </context>
   <context>
@@ -7798,14 +7797,14 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n câmeras</numerusform>
+        <numerusform>%n câmeras</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>Você não tem nenhuma câmera</translation>
     </message>
   </context>
   <context>
@@ -7893,22 +7892,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
     <message>
-      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <source>Motion detection is disabled, all schedule records "Motion" and "Motion + Lo-Res" will be changed to "Always"</source>
+      <translation>A detecção de movimento está desativada, todos os registros de agendamento "Movimento" e "Movimento + Lo-Res" serão alterados para "Sempre"</translation>
     </message>
     <message>
-      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <source>Dual streaming is disabled, all schedule records "Motion + Lo-Res" will be changed to "Always"</source>
+      <translation>O Dual streaming está desativado, todos os registros de agenda "Motion + Lo-Res" serão alterados para "Sempre"</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
     <message numerus="yes">
       <source>%1 are used</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <comment>Text like '5/10 Professional Licenses' will be substituted</comment>
       <translation>
         <numerusform>%1 está em uso</numerusform>
         <numerusform>%1 estão em uso</numerusform>
@@ -7941,35 +7940,35 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Arquivo de atualização não encontrado</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>Pacote de atualização está corrompido</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Falha ao baixar o pacote de atualização: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>Pacote de atualização está corrompido: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Esta atualização já está instalada.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Esta versão não está instalada.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Formato de versão inválido.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Pacote de atualização quebrado.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7977,11 +7976,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Não há espaço suficiente no disco para instalar a atualização do cliente.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>Pacote de instalação foi perdido.</translation>
     </message>
   </context>
   <context>
@@ -8034,7 +8033,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>Algumas câmeras selecionadas requerem a configuração de senha.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -8116,13 +8115,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Todos os dispositivos já foram adicionados</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n dispositivos estão sendo adicionados. Você pode fechar esta caixa de diálogo ou iniciar uma nova pesquisa</numerusform>
+        <numerusform>%n dispositivos estão sendo adicionados. Você pode fechar esta caixa de diálogo ou iniciar uma nova pesquisa</numerusform>
       </translation>
     </message>
     <message>
@@ -8138,18 +8137,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>Campo de endereço não pode estar vazio</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Por favor, reveja e concorde com o %1 para prosseguir</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Para usar o software, você deve concordar com o acordo de licença de usuário final</translation>
     </message>
   </context>
   <context>
@@ -8195,7 +8194,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>Nenhum evento ocorreu</translation>
     </message>
   </context>
   <context>
@@ -8212,7 +8211,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Por favor, insira a senha.</translation>
     </message>
   </context>
   <context>
@@ -8348,8 +8347,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>O formato AVI não é recomendado para exportar uma gravação não contínua com faixa de áudio.</translation>
     </message>
     <message>
-      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation>Recomendamos exportar o vídeo desta câmara como &quot;Multi Video&quot; para evitar downscaling.</translation>
+      <source>We recommend to export video from this camera as "Multi Video" to avoid downscaling.</source>
+      <translation>Recomendamos exportar o vídeo desta câmara como "Multi Video" para evitar downscaling.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
@@ -8365,7 +8364,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>Você está prestes a exportar um vídeo longo. Pode exigir muito espaço de armazenamento e levar tempo significativo.</translation>
     </message>
   </context>
   <context>
@@ -8437,16 +8436,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n novo</numerusform>
+        <numerusform>%n novo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n dispositivos no total</numerusform>
+        <numerusform>%n dispositivos no total</numerusform>
       </translation>
     </message>
   </context>
@@ -8502,7 +8501,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Copiar Local do Link</translation>
     </message>
   </context>
   <context>
@@ -8601,7 +8600,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Não é possível iniciar o processo de pesquisa</translation>
     </message>
   </context>
   <context>
@@ -8612,7 +8611,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>câmera removida</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8627,27 +8626,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>Verificando atualizações automaticamente</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Verificar atualizações</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>Forçar verificação</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>Desativar Verificação Automática</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>Verificar uma vez</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>Verificar automaticamente</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8659,44 +8658,44 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>Você já instalou esta versão.</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Build não encontrada</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>Não é possível atualizar do arquivo selecionado</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>Informação de atualização inválida</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>Downgrade para versões anteriores não é possível</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Arquivo de atualização não encontrado</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>O pacote de atualização está quebrado</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>Falta o pacote de atualização para alguns servidores</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <comment>%1 here will be substituted with cloud name e.g. 'Nx Cloud'.</comment>
       <translation>Instância incompatível %1. Para atualizar o sistema de desconecte de %1 primeiro.</translation>
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>Nenhum pacote de atualização disponível</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8712,50 +8711,50 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>Falta o pacote de atualização para o cliente e %n servidores</numerusform>
+        <numerusform>Falta o pacote de atualização para o cliente e %n servidores</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>Falta o pacote de atualização para o cliente</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>Não há servidores online para atualizar.</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>Cancelar atualização e excluir todos os dados baixados?</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>Versões de SO de alguns componentes não são mais suportadas. Por favor, remova-as do sistema ou atualize seu SO para uma versão suportada.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>A versão do SO do cliente não é mais suportada. Por favor, atualize seu SO para uma versão suportada.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>Falha ao iniciar a atualização</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>Falha ao cancelar a atualização</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>Falha ao iniciar a instalação</translation>
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+      <translation>Alguns servidores não concluíram o processo de atualização. Terminar assim mesmo?</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>Falha ao baixar pacotes de atualização para alguns componentes</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -8775,7 +8774,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+      <translation>Atualização concluída, mas alguns componentes falharam em atualizar</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -8791,7 +8790,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
+      <translation>Ocorreu um erro ao instalar atualizações:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -8799,7 +8798,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>Concluir atualização</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -8807,11 +8806,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>A versão mais recente já está instalada</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>Esta versão já está instalada</translation>
     </message>
     <message>
       <source>Install update</source>
@@ -8819,11 +8818,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>Enviar</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>Carregar e instalar</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8831,15 +8830,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download e instalação</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>Procurar outro arquivo...</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>Selecione outra versão</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8847,11 +8846,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>Carregando atualizações...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>Baixando pacote de cliente...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8859,11 +8858,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>Instalando atualizações de cliente...</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
+      <translation>Iniciando atualização para ...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8875,15 +8874,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>Sistema atualizado para</translation>
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Alguns servidores não têm pacotes de atualização disponíveis.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>Alguns servidores encontraram um erro interno.</translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
@@ -8891,7 +8890,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>Alguns servidores ficaram offline. Por favor, aguarde até que eles se tornem online para continuar.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8915,7 +8914,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>Atualização de mediaservers</translation>
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
@@ -8933,7 +8932,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>Você não tem nenhum layout</translation>
     </message>
   </context>
   <context>
@@ -8965,8 +8964,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Seleccionar layout...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Seleccione um único utilizador na linha &quot;Mostrar a&quot; para exibir os seus layouts locais nesta lista</translation>
+      <source>Select some single user in "Show to" line to display his local layouts in this list</source>
+      <translation>Seleccione um único utilizador na linha "Mostrar a" para exibir os seus layouts locais nesta lista</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
@@ -8974,11 +8973,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Nenhuma das funções de usuário selecionadas contém usuários. A ação não funcionará.</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Alguns usuários não têm acesso ao layout selecionado. A ação não funcionará para eles.</translation>
     </message>
   </context>
   <context>
@@ -8992,47 +8991,47 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>O servidor está demorando muito para responder</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Nenhuma tarefa de atualização</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Pronto para baixar a atualização</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>Baixando atualização</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>Pronto para reiniciar a nova versão</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>Instalando atualização</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Instalado</translation>
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
+      <translation>Falha ao baixar a atualização</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>Esperando por dados de pares</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Não há espaço suficiente para baixar arquivos de atualização.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Não há espaço suficiente para extrair arquivos de atualização.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
@@ -9040,23 +9039,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>O conteúdo da atualização é inválido.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>Arquivo de atualização está corrompido.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>Arquivos de atualização não podem ser extraídos.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>Erro de download interno.</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>Erro interno do cliente.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -9064,15 +9063,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Código de erro inesperado.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Pronto para instalar a atualização</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Pacote de atualização não encontrado.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
@@ -9084,7 +9083,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Esta versão do SO não é mais suportada.</translation>
     </message>
     <message>
       <source>Update installation failed.</source>
@@ -9111,8 +9110,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Empty</source>
-      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <comment>In meaning 'There is no camera physically connected now'</comment>
+      <translation>Vazio</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9140,8 +9139,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown device %1</source>
-      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <comment>In meaning 'Unknown device', %1 is system info</comment>
+      <translation>Dispositivo desconhecido %1</translation>
     </message>
   </context>
   <context>
@@ -9159,13 +9158,13 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <comment>%1 here will be substituted with cloud name e.g. 'Nx Cloud'.</comment>
+      <translation>O sistema não está conectado a %1. As notificações móveis funcionam apenas quando o sistema está conectado a %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <comment>%1 here will be substituted with cloud name e.g. 'Nx Cloud'.</comment>
+      <translation>Configurações de %1</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
@@ -9204,8 +9203,8 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
-      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation>Defina a resolução do layout como &quot;Auto&quot; para aumentar o desempenho.</translation>
+      <source>Set layout resolution to "Auto" to increase performance.</source>
+      <translation>Defina a resolução do layout como "Auto" para aumentar o desempenho.</translation>
     </message>
   </context>
   <context>
@@ -9276,11 +9275,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Detecção de movimento está desativada ou não suportada</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Dual-streaming está desativado ou não suportado</translation>
     </message>
   </context>
   <context>
@@ -9306,11 +9305,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Os usuários serão desconectados automaticamente se sua sessão exceder a duração especificada.</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Marcas d'água serão exibidas em vídeos ao vivo, arquivados e exportados apenas para usuários não administradores. Você e outros administradores não os verão.</translation>
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
@@ -9321,9 +9320,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n câmeras</numerusform>
+        <numerusform>%n câmeras</numerusform>
       </translation>
     </message>
     <message>
@@ -9335,7 +9334,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>Biblioteca</translation>
     </message>
     <message>
       <source>Version</source>
@@ -9347,27 +9346,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>sem erro</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>arquivo de biblioteca não pode ser carregado</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>biblioteca de plugin inválida ou incompatível</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>falha ao inicializar a biblioteca de plugins</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>plugin retornou manifesto ruim</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>versão da API do plugin não é mais suportada</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -9375,15 +9374,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Não carregado</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Carregado</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>plugin está na lista negra</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9391,7 +9390,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>plugin é opcional e não está na lista branca</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -9406,11 +9405,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Instalado</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Instalando...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -9418,14 +9417,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>Esperando que o servidor responda...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Sem conexão com o servidor.</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -9433,7 +9432,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Erro no servidor.</translation>
     </message>
   </context>
   <context>
@@ -9448,7 +9447,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Armazenar Arquivos de Atualização</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9456,11 +9455,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Componente</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>Versão Instalada</translation>
     </message>
   </context>
   <context>
@@ -9503,9 +9502,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>Endereço de e-mail não está definido para %n usuários</numerusform>
+        <numerusform>Endereço de e-mail não está definido para %n usuários</numerusform>
       </translation>
     </message>
     <message>
@@ -9524,14 +9523,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Clique duas vezes para adicionar câmeras ao layout atual ou ctrl+click para abrir em uma nova aba</numerusform>
+        <numerusform>Clique duas vezes para adicionar câmeras ao layout atual ou ctrl+click para abrir em uma nova aba</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Nenhum arquivo disponível</translation>
     </message>
   </context>
   <context>
@@ -9542,7 +9541,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Fuso horário</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9550,42 +9549,42 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Hora do Servidor OS</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Horário do VMS</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Tempo, comum e sincronizado entre todos os servidores. Pode ser diferente com o horário do sistema operacional em qualquer servidor específico.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Sincronizado com a Internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Sincronizado com o tempo local no servidor selecionado</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Não sincronizado. Cada servidor usa sua própria hora local.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Igual ao horário local do servidor</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Sem conexão com a Internet. O tempo não está sendo sincronizado.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Servidor de Tempo offline. O tempo não está sendo sincronizado.</translation>
     </message>
   </context>
   <context>
@@ -9602,16 +9601,16 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
-      <source>Could not open file &quot;%1&quot;</source>
-      <translation>Não foi possível abrir o ficheiro &quot;%1&quot;</translation>
+      <source>Could not open file "%1"</source>
+      <translation>Não foi possível abrir o ficheiro "%1"</translation>
     </message>
     <message>
-      <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation>Não foi possível calcular o md5 para o ficheiro &quot;%1&quot;</translation>
+      <source>Could not calculate md5 for file "%1"</source>
+      <translation>Não foi possível calcular o md5 para o ficheiro "%1"</translation>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Não foi possível criar o upload no lado do servidor: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9626,23 +9625,23 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Ficheiro foi corrompido enquanto estava a ser carregado para o servidor</translation>
     </message>
     <message>
-      <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <source>Remote file "%1" is corrupted</source>
+      <translation>Arquivo remoto "%1" está corrompido</translation>
     </message>
     <message>
-      <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <source>Server already has this file "%1"</source>
+      <translation>O servidor já tem este arquivo "%1"</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Movimento está sendo detectado somente durante o upload de vídeo.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Habilitar ou desativar esta configuração não altera nada no arquivo existente.</translation>
     </message>
   </context>
   <context>
@@ -9734,27 +9733,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Iniciando exportação...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Salvando layout</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>Parar de salvar</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Falha ao salvar</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Começando a salvar...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Estamos preparando arquivos para o processo de exportação. Por favor, aguarde alguns segundos.</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
@@ -9795,7 +9794,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Reconstruir Resolução</translation>
     </message>
   </context>
   <context>
@@ -9836,7 +9835,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Qualquer plugin</translation>
     </message>
   </context>
   <context>
@@ -9874,7 +9873,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 users</source>
-      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <comment>%1 here will be substituted with short cloud name e.g. 'Cloud'.</comment>
       <translation>%1 usuários</translation>
     </message>
   </context>
@@ -9989,7 +9988,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Layout está cheio</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -10017,28 +10016,28 @@ If you intended to move analytics data to another storage location, please conta
       </translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; is not responding.</source>
-      <translation>Servidor &quot;%1&quot; não está respondendo.</translation>
+      <source>Server "%1" is not responding.</source>
+      <translation>Servidor "%1" não está respondendo.</translation>
     </message>
     <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+      <source>Server "%1" cannot access %n devices. Move them anyway?</source>
       <translation>
-        <numerusform>Servidor &quot;%1&quot; não pode acessar %n dispositivos. Mover-os mesmo assim?</numerusform>
-        <numerusform>Servidor &quot;%1&quot; não pode acessar %n dispositivos. Mover-os mesmo assim?</numerusform>
+        <numerusform>Servidor "%1" não pode acessar %n dispositivos. Mover-os mesmo assim?</numerusform>
+        <numerusform>Servidor "%1" não pode acessar %n dispositivos. Mover-os mesmo assim?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+      <source>Server "%1" cannot access %n cameras. Move them anyway?</source>
       <translation>
-        <numerusform>Servidor &quot;%1&quot; não pode acessar %n câmera. Mova-as mesmo assim?</numerusform>
-        <numerusform>Servidor &quot;%1&quot; não pode acessar %n câmeras. Mova-as mesmo assim?</numerusform>
+        <numerusform>Servidor "%1" não pode acessar %n câmera. Mova-as mesmo assim?</numerusform>
+        <numerusform>Servidor "%1" não pode acessar %n câmeras. Mova-as mesmo assim?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+      <source>Server "%1" cannot access %n I/O modules. Move them anyway?</source>
       <translation>
-        <numerusform>O servidor &quot;%1&quot; não pode acessar %n módulo de E/S. Mova-os assim mesmo?</numerusform>
-        <numerusform>O servidor &quot;%1&quot; não pode acessar %n módulos de E/S. Mova-os assim mesmo?</numerusform>
+        <numerusform>O servidor "%1" não pode acessar %n módulo de E/S. Mova-os assim mesmo?</numerusform>
+        <numerusform>O servidor "%1" não pode acessar %n módulos de E/S. Mova-os assim mesmo?</numerusform>
       </translation>
     </message>
     <message>
@@ -10047,7 +10046,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Câmeras virtuais não podem ser movidas entre servidores</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -10059,7 +10058,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Tudo suportado</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -10163,40 +10162,40 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Falha ao alterar a senha em %n câmeras de %1</numerusform>
+        <numerusform>Falha ao alterar a senha em %n câmeras de %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Esta compilação é apenas para fins de teste.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Abrir as configurações do servidor</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <source>Confirm storage location for the analytics data on "%1"</source>
+      <translation>Confirmar localização de armazenamento para os dados de análise em "%1"</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>a maior partição disponível</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+You can select another storage location in the "Storage Management" tab of the Server Settings dialog.</source>
+      <translation>O banco de dados de análise só deve ser armazenado em uma unidade local e pode absorver grandes quantidades de espaço.
+Uma vez que um local para armazenar dados de análise é selecionado, ele não pode ser facilmente alterado sem perder os dados existentes. Recomendamos escolher o local cuidadosamente e evitar usar a partição do sistema, pois pode causar malfuncionamento do sistema grave.
+Por padrão, os dados de análise serão armazenados em %1.
+Você pode selecionar outro local de armazenamento na guia "gestão de armazenamento" da caixa de diálogo de Configurações do servidor.</translation>
     </message>
   </context>
   <context>
@@ -10270,7 +10269,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Salvar arquivo como...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10278,15 +10277,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Falha ao salvar arquivo</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>A pasta %1 está bloqueada para escrita.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Baixando arquivo...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10294,15 +10293,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Parar download do arquivo?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Arquivo baixado</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Download de arquivo falhou</translation>
     </message>
   </context>
 </TS>
