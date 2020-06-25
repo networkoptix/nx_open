@@ -11,10 +11,10 @@
                     aria-expanded="false"
                     ng-click="nav.show = !nav.show">
 
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
+                <span class="sr-only"> สลับการนำทาง </span>
+                <span class="icon-bar"> </span>
+                <span class="icon-bar"> </span>
+                <span class="icon-bar"> </span>
             </button>
         </div>
         <nav ng-if="!noPanel && nav.show" class="visible-xs collapse navbar-collapse" id="navbar-collapse" role="navigation">
@@ -30,7 +30,7 @@
                        ng-click="nav.show = !nav.show" ng-href="#/client/">ไคลเอ็นต์ lite</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
-                       ng-click="nav.show = !nav.show" ng-href="#/info/">Monitoring</a></li>
+                       ng-click="nav.show = !nav.show" ng-href="#/info/">การเฝ้าดู</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-click="nav.show = !nav.show" ng-href="#/developers/">สำหรับนักพัฒนาซอฟต์แวร์</a></li>
@@ -56,14 +56,14 @@
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/view/">ดู</a></li>
                 <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/client/">Lite
-                        Client</a></li>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/client/">ไคลเอ็นต์ Lite
+</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/info/">Monitoring</a>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/info/">การเฝ้าดู</a>
                 </li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/developers/">For
-                        Developers</a></li>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/developers/">สำหรับนักพัฒนา
+</a></li>
                 <li ng-if="user.isOwner || user.isAdmin" ng-class="{active:isActive('/health')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-href="#/health/">ข้อมูล</a></li>

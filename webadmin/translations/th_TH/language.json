@@ -77,8 +77,8 @@
         "emailSignature": "ลายเซ็นอีเมล",
         "emailSupportEmail": "สนับสนุนอีเมล",
         "enableEdgeRecording": "เปิดใช้การบันทึกเสียงสนทนาหรือไม่",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "เปิดใช้งานซ็อกเก็ต WEB",
+        "maxP2pAllClientsSizeBytes": "ขนาดบัฟเฟอร์สูงสุดในการส่งข้อมูล p2p ไปยังไคลเอนต์ทั้งหมด",
         "eventLogPeriodDays": "ระยะเวลาบันทึกเหตุการณ์ (วัน)",
         "ldapAdminDn": "ผู้ดูแล LDAP DN",
         "ldapSearchBase": "ฐานการค้นหา LDAP",
@@ -87,7 +87,7 @@
         "localSystemId": "ระบบภายใน",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "ความแตกต่างสูงสุดระหว่างเวลาที่ซิงโครไนซ์กับอินเทอร์เน็ต (มิลลิวินาที)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "ความแตกต่างระหว่างเวลาซิงโครไนซ์กับเวลาท้องถิ่น (มิลลิวินาที)",
-        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
+        "maxP2pQueueSizeBytes": "ขนาดคิว P2P สูงสุด (ไบต์)",
         "maxRecordQueueSizeBytes": "ขนาดคิวการบันทึกสูงสุด (ไบต์)",
         "maxRecordQueueSizeElements": "ขนาดคิวการบันทึกสูงสุด (ไบต์)",
         "maxRemoteArchiveSynchronizationThreads": "การซิงโครไนซ์ที่เก็บข้อมูลระยะไกล",
@@ -116,8 +116,8 @@
         "timeSynchronizationEnabled": "เปิดใช้งานการซิงโครไนส์เวลา",
         "primaryTimeServer": "เซิร์ฟเวอร์การซิงโครไนซ์เวลาหลัก",
         "osTimeChangeCheckPeriodMs": "ระยะเวลาการตรวจสอบการเปลี่ยนแปลงเวลาระบบปฏิบัติการ",
-        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
-        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
+        "syncTimeExchangePeriod": "ซิงค์ช่วงเวลาการซิงโครไนซ์สำหรับคำขอเครือข่าย",
+        "syncTimeEpsilon": "epsilon ซิงค์เวลา ค่าใหม่จะไม่ถูกใช้หากเวลา detla น้อยกว่า epsilon",
         "maxWearableArchiveSynchronizationThreads": "หัวข้อการซิงค์ไฟล์เก็บถาวรสูงสุดของกล้องได้",
         "updateNotificationsEnabled": "เปิดใช้งานการแจ้งเตือนการปรับปรุง",
         "upnpPortMappingEnabled": "เปิดใช้การแมปพอร์ต UPnP",
@@ -130,12 +130,12 @@
         "maxWebMTranscoders": "จำนวนการเชื่อมต่อ WEBM สูงสุดสำหรับเซิร์ฟเวอร์ Chrome เปิดการเชื่อมต่อ 2 ครั้งพร้อมกันจากนั้นปิดการเชื่อมต่อแรก ดังนั้นจึงขอแนะนำให้ตั้งค่า> = 2 เป็นพารามิเตอร์นี้",
         "maxEventLogRecords": "บันทึกเหตุการณ์สูงสุดที่จะเก็บไว้ในฐานข้อมูล จำนวนเรคคอร์ดที่ไม่ถูกลบจริงอาจสูงกว่าค่าที่ระบุได้ถึง 20%",
         "forceLiveCacheForPrimaryStream": "กำหนดว่าจะแคชบางเฟรมสำหรับสตรีมหลักหรือไม่ ค่า: \"ใช่\" - เปิดใช้งานเสมอ (อาจใช้ RAM จำนวนมาก), \"ไม่\" - ปิดใช้งานเสมอยกเว้นเมื่อต้องการโดยการเล่น (เช่น HLS), \"อัตโนมัติ\" - คล้ายกับ \"ไม่\" แต่เปิดเมื่อปรับปรุง ประสบการณ์ผู้ใช้ (เช่นเมื่อปลั๊กอิน Analytics บางตัวทำงานบนกล้อง)",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "additionalLocalFsTypes": "ชนิดระบบไฟล์เพิ่มเติมที่ต้องพิจารณาขณะตัดสินใจว่าพาร์ติชันที่กำหนดเหมาะสมกับที่เก็บข้อมูลของเซิร์ฟเวอร์หรือไม่ รายการของชื่อระบบไฟล์ที่คั่นด้วยคอมมาตามที่คาดไว้ใน / proc / mounts คาดว่า",
+        "rtspBufferSizeKb": "ขนาดบัฟเฟอร์ของ RTSP ฝั่งเซิร์ฟเวอร์เป็น KB ค่าที่ใหญ่กว่าช่วยให้การใช้อินเทอร์เน็ตมีประสิทธิภาพมากขึ้นด้วยค่าหน่วงเวลาการเดินทางไปกลับสูง แต่ชะลอการเปลี่ยนคุณภาพรถยนต์และการตอบสนองต่อการค้นหา RTSP"
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "กราฟ",
             "storage": "พื้นที่จัดเก็บ",
             "log": "บันทึก"
         }

@@ -41,15 +41,15 @@
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Obrázek</translation>
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Klepnutím přidejte</translation>
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>Zobrazit na videu</translation>
     </message>
   </context>
   <context>
@@ -71,7 +71,7 @@
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>ŽÁDNÝ NÁHLED</translation>
     </message>
   </context>
   <context>
@@ -86,11 +86,11 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Streamování kamery</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Vyberte video stream z kamery pro analýzu</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -98,47 +98,47 @@
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>Obnovuji...</translation>
     </message>
   </context>
   <context>
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Výchozí hodnota:</translation>
     </message>
   </context>
   <context>
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Řádek není platný. Chcete-li pokračovat, odstraňte samoččiné průsečíky.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Tento řádek vyžaduje alespoň %n bodů.</numerusform>
+        <numerusform>Tento řádek vyžaduje alespoň %n bodů.</numerusform>
+        <numerusform>Tento řádek vyžaduje alespoň %n bodů.</numerusform>
+        <numerusform>Tento řádek vyžaduje alespoň %n bodů.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Klikněte na poslední bod pro dokončení nakreslení čáry.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Bylo dosaženo maximálního počtu bodů (%n bodů).</numerusform>
+        <numerusform>Bylo dosaženo maximálního počtu bodů (%n bodů).</numerusform>
+        <numerusform>Bylo dosaženo maximálního počtu bodů (%n bodů).</numerusform>
+        <numerusform>Bylo dosaženo maximálního počtu bodů (%n bodů).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Kliknutím na kteroukoliv šipku přepnete požadovaný směr.</translation>
     </message>
   </context>
   <context>
@@ -175,7 +175,7 @@
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Omezení velikosti</translation>
     </message>
   </context>
   <context>
@@ -200,28 +200,28 @@
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Mnohoúhelník není platný. Chcete-li pokračovat, odstraňte samočinné průnseříky.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Tento mnohoúhelník vyžaduje alespoň %n bodů.</numerusform>
+        <numerusform>Tento mnohoúhelník vyžaduje alespoň %n bodů.</numerusform>
+        <numerusform>Tento mnohoúhelník vyžaduje alespoň %n bodů.</numerusform>
+        <numerusform>Tento mnohoúhelník vyžaduje alespoň %n bodů.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Kliknutím na poslední bod dokončíte kreslení mnohoúhelníku.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Bylo dosaženo maximálního počtu bodů (%n bodů).</numerusform>
+        <numerusform>Bylo dosaženo maximálního počtu bodů (%n bodů).</numerusform>
+        <numerusform>Bylo dosaženo maximálního počtu bodů (%n bodů).</numerusform>
+        <numerusform>Bylo dosaženo maximálního počtu bodů (%n bodů).</numerusform>
       </translation>
     </message>
   </context>
@@ -236,19 +236,19 @@
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>MAX</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>MIN</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Nastavte minimální a maximální velikost objektu.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>Minimální velikost objektu nemůže být větší než maximum.</translation>
     </message>
   </context>
   <context>
