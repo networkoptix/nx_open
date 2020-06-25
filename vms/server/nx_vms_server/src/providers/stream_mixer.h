@@ -19,20 +19,14 @@ class QnStreamMixer: public QnAbstractMediaDataReceptor
     struct QnProviderChannelInfo
     {
         QnAbstractStreamDataProviderPtr provider;
-        std::map<quint32, std::set<quint32>> audioChannelMap;
-        std::map<quint32, std::set<quint32>> videoChannelMap;
+        std::map<quint32, quint32> audioChannelMap;
+        std::map<quint32, quint32> videoChannelMap;
     };
 
     enum class MapType
     {
         Audio,
         Video
-    };
-
-    enum class OperationType
-    {
-        Insert,
-        Remove
     };
 
 public:
@@ -54,16 +48,6 @@ public:
         quint32 audioChannelNumber,
         quint32 mappedAudioChannelNumber);
 
-    void unmapSourceAudioChannel(
-        QnAbstractStreamDataProvider* source,
-        quint32 audioChannelNumber,
-        quint32 mappedAudioChannelNumber);
-
-    void unmapSourceVideoChannel(
-        QnAbstractStreamDataProvider* source,
-        quint32 audioChannelNumber,
-        quint32 mappedAudioChannelNumber);
-
     virtual bool canAcceptData() const override;
     virtual void putData( const QnAbstractDataPacketPtr& data ) override;
     virtual bool needConfigureProvider() const override;
@@ -76,11 +60,12 @@ public:
 
     void resetSources();
     void updateSoftwareMotion();
+    void updateChannel(const QnAbstractMediaDataPtr& data);
 private:
     void handlePacket(QnAbstractMediaDataPtr& data);
 
     void makeChannelMappingOperation(
-        MapType type, OperationType opType,
+        MapType type,
         QnAbstractStreamDataProvider* source,
         quint32 audioChannelNumber,
         quint32 mappedAudioChannelNumber);

@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.276",
+    "version": "1.0.1.278",
     "data": [
         {
             "keys": [
@@ -2431,7 +2431,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [2]
+                            "mappedChannel": 2
                         }
                     ]
                 },
@@ -2440,7 +2440,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [1]
+                            "mappedChannel": 1
                         }
                     ]
                 },
@@ -2449,7 +2449,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [0]
+                            "mappedChannel": 0
                         }
                     ]
                 }
@@ -2468,7 +2468,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [2]
+                            "mappedChannel": 2
                         }
                     ]
                 },
@@ -2477,7 +2477,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [1]
+                            "mappedChannel": 1
                         }
                     ]
                 },
@@ -2486,7 +2486,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [0]
+                            "mappedChannel": 0
                         }
                     ]
                 },
@@ -2495,7 +2495,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [3]
+                            "mappedChannel": 3
                         }
                     ]
                 }
@@ -2515,7 +2515,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [2]
+                            "mappedChannel": 2
                         }
                     ]
                 },
@@ -2524,7 +2524,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [1]
+                            "mappedChannel": 1
                         }
                     ]
                 },
@@ -2533,7 +2533,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [0]
+                            "mappedChannel": 0
                         }
                     ]
                 }
@@ -2664,7 +2664,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [0]
+                            "mappedChannel": 0
                         }
                     ]
                 },
@@ -2673,7 +2673,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [1]
+                            "mappedChannel": 1
                         }
                     ]
                 },
@@ -2682,7 +2682,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [2]
+                            "mappedChannel": 2
                         }
                     ]
                 }
@@ -2959,7 +2959,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [0]
+                            "mappedChannel": 0
                         }
                     ]
                 },
@@ -2968,7 +2968,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [1]
+                            "mappedChannel": 1
                         }
                     ]
                 },
@@ -2977,7 +2977,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [2]
+                            "mappedChannel": 2
                         }
                     ]
                 },
@@ -2986,7 +2986,7 @@
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [3]
+                            "mappedChannel": 3
                         }
                     ]
                 }

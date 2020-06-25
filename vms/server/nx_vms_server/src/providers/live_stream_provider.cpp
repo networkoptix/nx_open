@@ -424,6 +424,9 @@ void QnLiveStreamProvider::onGotVideoFrame(
     if (!NX_ASSERT(compressedFrame))
         return;
 
+    if (m_mediaCallback)
+        m_mediaCallback(compressedFrame);
+
     m_totalVideoFrames++;
     m_framesSinceLastMetaData++;
 
@@ -508,6 +511,9 @@ void QnLiveStreamProvider::processMetadata(
 
 void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audioData)
 {
+    if (m_mediaCallback)
+        m_mediaCallback(audioData);
+
     if (m_totalAudioFrames++ == 0 &&    // only once
         getRole() == Qn::CR_LiveVideo) // only primary stream
     {
@@ -724,6 +730,11 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
 QnConstResourceAudioLayoutPtr QnLiveStreamProvider::getDPAudioLayout() const
 {
     return QnConstResourceAudioLayoutPtr();
+}
+
+void QnLiveStreamProvider::setOnGotMediaDataCallback(nx::utils::MoveOnlyFunc<void(const QnAbstractMediaDataPtr&)> callback)
+{
+    m_mediaCallback = std::move(callback);
 }
 
 #endif // ENABLE_DATA_PROVIDERS

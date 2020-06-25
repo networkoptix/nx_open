@@ -4,8 +4,8 @@
 
 struct QnChannelMapping
 {
-    quint32 originalChannel;
-    QList<quint32> mappedChannels;
+    quint32 originalChannel = 0;
+    quint32 mappedChannel = 0;
 };
 
 struct QnResourceChannelMapping

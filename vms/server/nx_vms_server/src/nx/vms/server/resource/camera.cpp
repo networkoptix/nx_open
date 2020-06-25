@@ -425,7 +425,7 @@ CameraDiagnostics::Result Camera::initInternal()
     nx::utils::ElapsedTimer t;
     t.restart();
     const auto driverResult = initializeCameraDriver();
-    NX_DEBUG(this, 
+    NX_DEBUG(this,
         "Initialising camera driver done. Camera %1. It took %2", getPhysicalId(), t.elapsed());
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;
@@ -840,6 +840,19 @@ QnCameraUserAttributePool::ScopedLock Camera::userAttributies() const
     const auto id = getRole() == nx::vms::server::resource::Camera::Role::subchannel
         ? getParentId() : getId();
     return QnCameraUserAttributePool::ScopedLock(userAttributesPool(), id);
+}
+
+void Camera::issueOccured()
+{
+    if (getRole() == nx::vms::server::resource::Camera::Role::subchannel)
+    {
+        if (const auto& parent = getParentResource().dynamicCast<QnVirtualCameraResource>())
+            parent->issueOccured();
+    }
+    else
+    {
+        base_type::issueOccured();
+    }
 }
 
 
