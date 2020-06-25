@@ -370,11 +370,11 @@ int QnFfmpegVideoDecoder::decodeVideo(
     int *got_picture_ptr,
     const AVPacket *avpkt)
 {
-    int result = avcodec_decode_video2(avctx, picture, got_picture_ptr, avpkt);
-    if (result > 0 && m_metrics)
+    m_lastDecodeResult = avcodec_decode_video2(avctx, picture, got_picture_ptr, avpkt);
+    if (m_lastDecodeResult > 0 && m_metrics)
         m_metrics->decodedPixels() += picture->width * picture->height;
 
-    return result;
+    return m_lastDecodeResult;
 }
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
