@@ -870,7 +870,7 @@
     </message>
     <message>
       <source>FREE License</source>
-      <translation>Ingyenes licence</translation>
+      <translation>Ingyenes licenc</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
