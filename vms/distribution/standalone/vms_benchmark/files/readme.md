@@ -5,7 +5,7 @@
 ---------------------------------------------------------------------------------------------------
 ## Introduction
 
-VMS Benchmark is a command-line tool (called the "Tool" here) which allows a partner/customer to
+VMS Benchmark (called the "Tool" here) is a command-line tool which allows a partner/customer to
 assess the ability to run VMS on a Linux-based device. The Tool runs on a host PC, connects to the
 device, collects system information such as CPU type and RAM size, and then starts the VMS Server,
 feeds it test video streams from virtual cameras, and creates a detailed report about potential
@@ -46,7 +46,7 @@ The following prerequisites must be assured before running the Tool:
     falsely report issues like frame drops and stream lags.
 - Linux Host: If SSH is going to be used to connect to the Box, `ssh` and `sshpass` tools must be
   installed on the Host.
-    * To install these tools, run the command: `sudo apt install ssh sshpass`
+    * To install these tools, run the command: `sudo apt install openssh-client sshpass`
 - Windows Host: Firewall must be disabled completely to enable spawning virtual cameras in the
     isolated network.
 - VMS Server must be installed on the Box and VMS System must be set up via the Setup Wizard
@@ -106,8 +106,8 @@ Do at least the following in the `vms_benchmark.conf` before running the Tool:
         in this case the assessment may fail due to slow command execution. If the Tool suspects a
         slow Telnet connection, it prints a warning and still attempts to run.
         - To fix it, adding the Host IP address to `/etc/hosts` of the Box may help.
-- If using SSH to connect to the box:    
-    - If `ssh <boxHostnameOrIp>` on the Host machine requires to enter credentials, specify them in 
+- If using SSH to connect to the box:
+    - If `ssh <boxHostnameOrIp>` on the Host machine requires to enter credentials, specify them in
         `boxLogin` and `boxPassword` fields, or specify `boxSshKey` field instead.
 - ATTENTION: The provided `vms_benchmark.conf` file has all options listed with their default
     values, but such lines are commented out via putting a `#` sign at the beginning of the line.
@@ -117,7 +117,7 @@ Then simply run the command `vms_benchmark` without arguments, and watch or capt
 In case of a nominal run, the duration of the test is about 4 hours.
 
 If the Tool encounters an error which prevents further testing (like some of the prerequisites is
-not fulfilled, or the connection to the Box cannot be established, or some command at the Box gives 
+not fulfilled, or the connection to the Box cannot be established, or some command at the Box gives
 unexpected result), an ERROR is reported and the Tool aborts execution. In this case it is
 recommended to investigate and fix the error cause, and run the Tool again.
 
