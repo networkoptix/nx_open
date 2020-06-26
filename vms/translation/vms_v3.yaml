@@ -1,0 +1,68 @@
+project_id: 199203
+api_token: 'b979d8e4ac9a01ccd537638c35e110b807f34756b61d88775f4d7ab8d33c18bfb4126a488700affa'
+base_path: ../..
+preserve_hierarchy: true
+
+files: [
+  {
+    dest: '/Common/qtbase.ts',
+    source:      '/vms/libs/common/translations/qtbase.ts',
+    translation: '/vms/libs/common/translations/qtbase_%locale_with_underscore%.ts'
+  },
+  {
+    dest: '/Common/common.ts',
+    source:      '/vms/libs/common/translations/common_en_US.ts',
+    translation: '/vms/libs/common/translations/common_%locale_with_underscore%.ts'
+  },
+  {
+    dest: '/TrayTool/traytool.ts',
+    source:      '/vms/traytool/translations/traytool_en_US.ts',
+    translation: '/vms/traytool/translations/traytool_%locale_with_underscore%.ts'
+  },
+  {
+    dest: '/Client/client_core.ts',
+    source:      '/vms/client/nx_vms_client_core/translations/client_core_en_US.ts',
+    translation: '/vms/client/nx_vms_client_core/translations/client_core_%locale_with_underscore%.ts'
+  },
+  {
+    dest: '/Client/client_qml.ts',
+    source:      '/vms/client/nx_vms_client_desktop/translations/client_qml_en_US.ts',
+    translation: '/vms/client/nx_vms_client_desktop/translations/client_qml_%locale_with_underscore%.ts'
+  },
+  {
+    dest: '/Client/client_base.ts',
+    source:      '/vms/client/nx_vms_client_desktop/translations/client_base_en_US.ts',
+    translation: '/vms/client/nx_vms_client_desktop/translations/client_base_%locale_with_underscore%.ts'
+  },
+  {
+    dest: '/Client/client_ui.ts',
+    source:      '/vms/client/nx_vms_client_desktop/translations/client_ui_en_US.ts',
+    translation: '/vms/client/nx_vms_client_desktop/translations/client_ui_%locale_with_underscore%.ts'
+  },
+  {
+    dest: '/Client/qtwebengine.ts',
+    source:      '/vms/client/nx_vms_client_desktop/translations/qtwebengine_en_US.ts',
+    translation: '/vms/client/nx_vms_client_desktop/translations/qtwebengine_%locale_with_underscore%.ts'
+  },
+  {
+    dest: '/Installer/OptixTheme.wxl',
+    source:      '/vms/distribution/wix/translations/strings_en_US.wxl',
+    translation: '/vms/distribution/wix/translations/strings_%locale_with_underscore%.wxl'
+  },
+  {
+    dest: '/webadmin/app/language.json',
+    source:      '/webadmin/.tmp/language.json',
+    translation: '/webadmin/translations/%locale_with_underscore%/language.json'
+  },
+  {
+    source: '/webadmin/app/views/**/*.*',
+    translation: '/webadmin/translations/%locale_with_underscore%/views/**/%original_file_name%',
+    ignore: [
+        '/webadmin/app/views/debug.html'
+    ]
+  },
+  {
+    source: '/webadmin/app/web_common/views/**/*.*',
+    translation: '/webadmin/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'
+  }
+]
