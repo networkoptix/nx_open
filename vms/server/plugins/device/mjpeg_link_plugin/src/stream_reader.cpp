@@ -270,6 +270,7 @@ void StreamReader::setFps(float fps)
 
 void StreamReader::updateCredentials(const QString& login, const QString& password)
 {
+    QnMutexLocker lock(&m_credentialsMutex);
     m_login = login;
     m_password = password;
 }
@@ -286,8 +287,11 @@ QString StreamReader::idForToStringFromPtr() const
 
 int StreamReader::doRequest(nx::network::http::HttpClient* const httpClient)
 {
-    httpClient->setUserName(m_login);
-    httpClient->setUserPassword(m_password);
+    {
+        QnMutexLocker lock(&m_credentialsMutex);
+        httpClient->setUserName(m_login);
+        httpClient->setUserPassword(m_password);
+    }
 
     const nx::utils::Url url(m_url);
     if (!url.isValid())

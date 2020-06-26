@@ -75,6 +75,7 @@ private:
     bool m_terminated;
     QnWaitCondition m_cond;
     QnMutex m_mutex;
+    mutable QnMutex m_credentialsMutex;
     std::atomic<int> m_isInGetNextData;
     nxpl::TimeProvider* const m_timeProvider;
 
