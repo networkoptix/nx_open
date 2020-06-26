@@ -864,6 +864,19 @@ QnCameraUserAttributePool::ScopedLock Camera::userAttributies() const
     return QnCameraUserAttributePool::ScopedLock(userAttributesPool(), id);
 }
 
+void Camera::issueOccured()
+{
+    if (getRole() == nx::vms::server::resource::Camera::Role::subchannel)
+    {
+        if (const auto& parent = getParentResource().dynamicCast<QnVirtualCameraResource>())
+            parent->issueOccured();
+    }
+    else
+    {
+        base_type::issueOccured();
+    }
+}
+
 std::optional<QJsonObject> Camera::deviceAgentSettingsModel(const QnUuid& engineId) const
 {
     const auto manifest = deviceAgentManifest(engineId);

@@ -187,6 +187,7 @@ public:
     void setRole(Role role) { m_role = role; }
     Role getRole() const { return m_role; }
     virtual QnCameraUserAttributePool::ScopedLock userAttributies() const override;
+    virtual void issueOccured() override;
 
     std::optional<QnLiveStreamParams> targetParams(StreamIndex streamIndex);
     std::optional<QnLiveStreamParams> actualParams(StreamIndex streamIndex);

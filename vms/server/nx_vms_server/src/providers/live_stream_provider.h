@@ -22,6 +22,7 @@
 #include <nx/utils/value_cache.h>
 
 #include <nx/analytics/metadata_logger.h>
+#include <nx/utils/move_only_func.h>
 
 static const int META_FRAME_INTERVAL = 10;
 static const int META_DATA_DURATION_MS = 300;
@@ -56,6 +57,10 @@ public:
     virtual bool needMetadata();
 
     void onStreamReopen();
+
+    /** Addition callback for processing received data*/
+    void setOnGotMediaDataCallback(
+        nx::utils::MoveOnlyFunc<void(const QnAbstractMediaDataPtr&)> callback);
 
     virtual void onGotVideoFrame(
         const QnCompressedVideoDataPtr& videoData,
@@ -151,6 +156,7 @@ private:
     QnMetaDataV1Ptr m_lastMotionMetadata;
     bool m_restartRequested;
     QnMutex m_startMutex;
+    nx::utils::MoveOnlyFunc<void(const QnAbstractMediaDataPtr&)> m_mediaCallback = nullptr;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
