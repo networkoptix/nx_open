@@ -1,4 +1,5 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
 <TS version="2.1" language="pt-PT" sourcelanguage="en">
   <context>
     <name>ArchiveDuration</name>
@@ -50,7 +51,7 @@
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Byte(s)</numerusform>
         <numerusform>Byte(s)</numerusform>
       </translation>
@@ -58,7 +59,7 @@
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Kilobyte(s)</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
       </translation>
@@ -66,7 +67,7 @@
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Megabyte(s)</numerusform>
         <numerusform>Megabyte(s)</numerusform>
       </translation>
@@ -74,7 +75,7 @@
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Gigabyte(s)</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
       </translation>
@@ -82,7 +83,7 @@
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Terabyte(s)</numerusform>
         <numerusform>Terabyte(s)</numerusform>
       </translation>
@@ -90,7 +91,7 @@
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Petabyte(s)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
       </translation>
@@ -230,8 +231,8 @@
       <translation>Verifique que o Servidor está a correr.</translation>
     </message>
     <message>
-      <source>Received bad response from Server %1: "%2".</source>
-      <translation>Recebi uma má resposta do Servidor %1: "%2".</translation>
+      <source>Received bad response from Server %1: &quot;%2&quot;.</source>
+      <translation>Recebi uma má resposta do Servidor %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -254,8 +255,8 @@
       <translation>Por favor contacte o suporte.</translation>
     </message>
     <message>
-      <source>An input/output error has occurred. OS message: "%1".</source>
-      <translation>Ocorreu um erro de entrada/saída. Mensagem do OS: "%1".</translation>
+      <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
+      <translation>Ocorreu um erro de entrada/saída. Mensagem do OS: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -278,12 +279,12 @@
       <translation>Verifique que a câmara está ligada à rede. Tente reiniciar a câmara.</translation>
     </message>
     <message>
-      <source>Device request "%1" failed with error "%2".</source>
-      <translation>Pedido de dispositivo "%1" falhou com erro "%2".</translation>
+      <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+      <translation>Pedido de dispositivo &quot;%1&quot; falhou com erro &quot;%2&quot;.</translation>
     </message>
     <message>
-      <source>Camera request "%1" failed with error "%2".</source>
-      <translation>Pedido de câmara "%1" falhou com erro "%2".</translation>
+      <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+      <translation>Pedido de câmara &quot;%1&quot; falhou com erro &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -318,8 +319,8 @@
       <translation>Verifique que o módulo I/O está ligado à rede. Tente reiniciar o módulo I/O.</translation>
     </message>
     <message>
-      <source>I/O Module request "%1" failed with error "%2".</source>
-      <translation>Pedido de módulo I/O "%1" falhou com erro "%2".</translation>
+      <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+      <translation>Pedido de módulo I/O &quot;%1&quot; falhou com erro &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -398,16 +399,16 @@
       <translation>A câmara foi restaurada do arquivo. Apague a câmara e adicione-a novamente para ver o vídeo ao vivo.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error "%1").</source>
-      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações do dispositivo (erro "%1").</translation>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações do dispositivo (erro &quot;%1&quot;).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error "%1").</source>
-      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações da câmera (erro "%1").</translation>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações da câmera (erro &quot;%1&quot;).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error "%1").</source>
-      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua o fps nas configurações do módulo de E/S (erro "%1").</translation>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua o fps nas configurações do módulo de E/S (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
@@ -1458,8 +1459,8 @@
       <translation>Erro de Rede em %1</translation>
     </message>
     <message>
-      <source>Server "%1" Failure</source>
-      <translation>Falha no servidor "%1"</translation>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation>Falha no servidor &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1472,20 +1473,20 @@
       <translation>Conflito IP da câmara no %1</translation>
     </message>
     <message>
-      <source>Server "%1" Conflict</source>
-      <translation>Conflito no servidor "%1"</translation>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation>Conflito no servidor &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Server "%1" Started</source>
-      <translation>Servidor "%1" Iniciado</translation>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation>Servidor &quot;%1&quot; Iniciado</translation>
     </message>
     <message>
-      <source>Server "%1" has a license problem</source>
-      <translation>O Servidor "%1" tem um problema de licenças</translation>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation>O Servidor &quot;%1&quot; tem um problema de licenças</translation>
     </message>
     <message>
-      <source>Server "%1" has finished an archive backup</source>
-      <translation>O Servidor "%1" terminou um backup de arquivos</translation>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation>O Servidor &quot;%1&quot; terminou um backup de arquivos</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1607,12 +1608,12 @@
       <translation>HDD/SSD sem velocidade suficiente para gravação em %1.</translation>
     </message>
     <message>
-      <source>HDD/SSD disk "%1" is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>Disco HDD / SSD "%1" está cheio. O disco contém muitos dados que não são geridos pelo VMS.</translation>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>Disco HDD / SSD &quot;%1&quot; está cheio. O disco contém muitos dados que não são geridos pelo VMS.</translation>
     </message>
     <message>
-      <source>System disk "%1" is almost full.</source>
-      <translation>O disco do sistema "%1" está quase cheio.</translation>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>O disco do sistema &quot;%1&quot; está quase cheio.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1778,12 +1779,12 @@
       <translation>Endereço de rede %1 não é um endereço multicast</translation>
     </message>
     <message>
-      <source>Analytics storage "%1" is offline.</source>
-      <translation>O armazenamento do Analytics "%1" está offline.</translation>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
     </message>
     <message>
-      <source>Analytics storage "%1" is almost full.</source>
-      <translation>O armazenamento do Analytics "%1" está quase cheio.</translation>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>

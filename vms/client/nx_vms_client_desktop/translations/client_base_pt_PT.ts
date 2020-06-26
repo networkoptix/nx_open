@@ -1,4 +1,5 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
 <TS version="2.1" language="pt-PT" sourcelanguage="en">
   <context>
     <name>AnalyticsSearchWidget::Private</name>
@@ -1419,24 +1420,24 @@ para ver mais favoritos</translation>
   <context>
     <name>LocalFiles</name>
     <message>
-      <source>Path "%1" is invalid. Please try another path.</source>
-      <translation>O caminho "%1" é inválido. Por favor, tente outro caminho.</translation>
+      <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
+      <translation>O caminho &quot;%1&quot; é inválido. Por favor, tente outro caminho.</translation>
     </message>
     <message>
-      <source>File "%1" already exists. Please try another name.</source>
-      <translation>Arquivo "%1" já existe. Por favor, tente outro nome.</translation>
+      <source>File &quot;%1&quot; already exists. Please try another name.</source>
+      <translation>Arquivo &quot;%1&quot; já existe. Por favor, tente outro nome.</translation>
     </message>
     <message>
-      <source>File "%1" is used by another process.</source>
-      <translation>O arquivo "%1" é usado por outro processo.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation>O arquivo &quot;%1&quot; é usado por outro processo.</translation>
     </message>
     <message>
-      <source>File "%1" cannot be written. Please try another name.</source>
-      <translation>O arquivo "%1" não pode ser gravado. Por favor, tente outro nome.</translation>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation>O arquivo &quot;%1&quot; não pode ser gravado. Por favor, tente outro nome.</translation>
     </message>
     <message>
-      <source>File name "%1" is reserved by operating system. Please try another name.</source>
-      <translation>O nome do ficheiro "%1" está reservado pelo sistema operacional. Por favor, tente outro nome.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation>O nome do ficheiro &quot;%1&quot; está reservado pelo sistema operacional. Por favor, tente outro nome.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
@@ -1551,8 +1552,8 @@ para ver mais favoritos</translation>
   <context>
     <name>Ptz</name>
     <message>
-      <source>Cannot get the current position from camera "%1"</source>
-      <translation>Não é possível obter a posição atual da câmera "%1"</translation>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation>Não é possível obter a posição atual da câmera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
@@ -1563,8 +1564,8 @@ para ver mais favoritos</translation>
       <translation>Falha ao obter a posição atual</translation>
     </message>
     <message>
-      <source>Cannot set the current position for camera "%1"</source>
-      <translation>Não é possível definir a posição atual para a câmera "%1"</translation>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation>Não é possível definir a posição atual para a câmera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
@@ -2091,7 +2092,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>affect all servers in System</source>
-      <comment>Relates to 'Global Settings' subject</comment>
+      <comment>Relates to &apos;Global Settings&apos; subject</comment>
       <translation>afeta todos os servidores no sistema</translation>
     </message>
   </context>
@@ -2295,12 +2296,12 @@ para ver mais favoritos</translation>
     <name>QnBusinessRuleWidget</name>
     <message>
       <source>to</source>
-      <extracomment>"to" is from the sentence "Send email _to_:"</extracomment>
+      <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
       <translation>para</translation>
     </message>
     <message>
       <source>at</source>
-      <extracomment>"at" is from the sentence "Display the text _at_ these cameras"</extracomment>
+      <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
       <translation>nas</translation>
     </message>
     <message>
@@ -2686,7 +2687,7 @@ para ver mais favoritos</translation>
       <translation>A senha deve ter pelo menos 8 símbolos e conter diferentes tipos de caracteres.</translation>
     </message>
     <message>
-      <source>Password should not be equal to camera's user name</source>
+      <source>Password should not be equal to camera&apos;s user name</source>
       <translation>A senha não deve ser igual ao nome de utilizador da câmara</translation>
     </message>
   </context>
@@ -2797,7 +2798,7 @@ a %1</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
-      <comment>%1 is a cloud site name like "Nx Cloud"</comment>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
       <translation>Por favor, faça o login em %1 e siga as instruções fornecidas.</translation>
     </message>
     <message>
@@ -2836,10 +2837,10 @@ a %1</translation>
     <name>QnCloudUsersValidationPolicy</name>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
-      <comment>%2 here will be substituted with short cloud name e.g. 'Cloud'.</comment>
-      <translation>
-        <numerusform>%n de %1 usuários selecionados não são %2 usuários e não receberão notificações móveis.</numerusform>
-        <numerusform>%n de %1 usuários selecionados não são %2 usuários e não receberão notificações móveis.</numerusform>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
       </translation>
     </message>
   </context>
@@ -3187,16 +3188,16 @@ a %1</translation>
       <translation>Tamanho do ecrã deve ser um múltiplo de 8.</translation>
     </message>
     <message>
-      <source>Could not find audio encoder "%1".</source>
-      <translation>Não foi possível encontrar o codificador de áudio "%1".</translation>
+      <source>Could not find audio encoder &quot;%1&quot;.</source>
+      <translation>Não foi possível encontrar o codificador de áudio &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>Could not initialize audio device "%1".</source>
-      <translation>Não foi possível inicializar o dispositivo de áudio "%1".</translation>
+      <source>Could not initialize audio device &quot;%1&quot;.</source>
+      <translation>Não foi possível inicializar o dispositivo de áudio &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or "none" in the Screen Recording settings.</source>
-      <translation>Formatos de áudio de 44.1 kHz e 48 kHz não são suportados pelo dispositivo de captura de áudio. Por favor, selecione outro dispositivo de áudio ou "nenhum" nas configurações de gravação de tela.</translation>
+      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>Formatos de áudio de 44.1 kHz e 48 kHz não são suportados pelo dispositivo de captura de áudio. Por favor, selecione outro dispositivo de áudio ou &quot;nenhum&quot; nas configurações de gravação de tela.</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
@@ -3543,7 +3544,7 @@ a %1</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation>Auto (%1)</translation>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3725,8 +3726,8 @@ a %1</translation>
       </translation>
     </message>
     <message>
-      <source>Changing any LDAP settings other than "Search Filter" will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>A alteração de qualquer definição do LDAP para além do "Filtro de pesquisa" resultará em perda de conectividade para todos os utilizadores sincronizados pelo através do LDAP.</translation>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>A alteração de qualquer definição do LDAP para além do &quot;Filtro de pesquisa&quot; resultará em perda de conectividade para todos os utilizadores sincronizados pelo através do LDAP.</translation>
     </message>
   </context>
   <context>
@@ -3953,7 +3954,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
-      <comment>Text like '6 Profesional Licenses' will be substituted</comment>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 está actualmente em uso</numerusform>
         <numerusform>%1 estão actualmente em uso</numerusform>
@@ -3961,7 +3962,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
-      <comment>Text like '6 Profesional Licenses' will be substituted</comment>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>Pelo menos %1 item é necessário</numerusform>
         <numerusform>Pelo menos %1 itens são necessários</numerusform>
@@ -4228,8 +4229,8 @@ a %1</translation>
       <translation>AO VIVO</translation>
     </message>
     <message>
-      <source>%1 (Tour "%2" is active)</source>
-      <translation>%1 (Tour "%2" está ativo)</translation>
+      <source>%1 (Tour &quot;%2&quot; is active)</source>
+      <translation>%1 (Tour &quot;%2&quot; está ativo)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4427,8 +4428,8 @@ a %1</translation>
       <translation>Câmera virtual %1</translation>
     </message>
     <message>
-      <source>"Virtual Camera" is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>O "Câmera Virtual" é um armazenamento virtual para arquivos de vídeo, que pode ser enviado para qualquer servidor em seu sistema e ser acessado por qualquer usuário.</translation>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -4688,12 +4689,12 @@ a %1</translation>
       <translation>Redefinir</translation>
     </message>
     <message>
-      <source>Hotkey used by preset "%1"</source>
-      <translation>Hotkey usado por predefinição "%1"</translation>
+      <source>Hotkey used by preset &quot;%1&quot;</source>
+      <translation>Hotkey usado por predefinição &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Hotkey used by tour "%1"</source>
-      <translation>Hotkey usado pelo tour "%1"</translation>
+      <source>Hotkey used by tour &quot;%1&quot;</source>
+      <translation>Hotkey usado pelo tour &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -5287,7 +5288,7 @@ a %1</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation>Plugins</translation>
+      <translation type="unfinished">Plugins</translation>
     </message>
     <message>
       <source>PoE</source>
@@ -5348,11 +5349,11 @@ a %1</translation>
     <name>QnShowTextOverlayActionWidget</name>
     <message>
       <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-      <comment>Do not translate tags (text between '&lt;' and '&gt;' symbols. Do not remove '
-' sequence</comment>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+      <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
       <translation>Tags Html podem ser usadas no texto personalizado:
-&lt;h4&gt;Cabeçalhos (h1-h6)&lt;/h4&gt;Também diferentes &lt;font color="red"&gt;cores&lt;/font&gt; e &lt;font size="18"&gt;tamanhos&lt;/font&gt; podem ser aplicados. O texto pode ser &lt;s&gt;em&lt;/s&gt;, &lt;u&gt;sublinhado&lt;/u&gt;, &lt;b&gt;negrito&lt;/b&gt; ou &lt;i&gt;em&lt;/i&gt;</translation>
+&lt;h4&gt;Cabeçalhos (h1-h6)&lt;/h4&gt;Também diferentes &lt;font color=&quot;red&quot;&gt;cores&lt;/font&gt; e &lt;font size=&quot;18&quot;&gt;tamanhos&lt;/font&gt; podem ser aplicados. O texto pode ser &lt;s&gt;em&lt;/s&gt;, &lt;u&gt;sublinhado&lt;/u&gt;, &lt;b&gt;negrito&lt;/b&gt; ou &lt;i&gt;em&lt;/i&gt;</translation>
     </message>
   </context>
   <context>
@@ -5440,8 +5441,8 @@ a %1</translation>
       <translation>Assinatura de Suporte</translation>
     </message>
     <message>
-      <source>No preset found. Use "Advanced" option.</source>
-      <translation>Nenhuma predefinição encontrada. Use a opção "Avançada".</translation>
+      <source>No preset found. Use &quot;Advanced&quot; option.</source>
+      <translation>Nenhuma predefinição encontrada. Use a opção &quot;Avançada&quot;.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -5683,8 +5684,8 @@ a %1</translation>
       <translation>Adicione mais drives para usá-los como armazenamento de backup.</translation>
     </message>
     <message>
-      <source>Change "Main" to "Backup" for some of the storage above to enable backup.</source>
-      <translation>Altere "Principal" para "Backup" para algum armazenamento acima para ativar o backup.</translation>
+      <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
+      <translation>Altere &quot;Principal&quot; para &quot;Backup&quot; para algum armazenamento acima para ativar o backup.</translation>
     </message>
     <message>
       <source>Apply changes to start backup.</source>
@@ -5861,7 +5862,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>ram</source>
-      <translation>ram</translation>
+      <translation type="unfinished">ram</translation>
     </message>
     <message>
       <source>optical</source>
@@ -5877,7 +5878,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>usb</source>
-      <translation>usb</translation>
+      <translation type="unfinished">usb</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -5974,7 +5975,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Plugins</source>
-      <translation>Plugins</translation>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -6501,12 +6502,12 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
-      <comment>%1 is local users definition, e.g. 'Local users'</comment>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
       <translation>%1 pertencem apenas a este sistema e são totalmente geridos pelos administradores do sistema.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
-      <comment>%1 is cloud users definition, e.g. 'Cloud users'</comment>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
       <translation>%1 pode ter acesso a muitos sistemas. Os administradores podem gerir apenas os seus direitos.</translation>
     </message>
   </context>
@@ -6548,8 +6549,8 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Exibir %1</translation>
     </message>
     <message>
-      <source>Delete "%1"?</source>
-      <translation>Excluir "%1"?</translation>
+      <source>Delete &quot;%1&quot;?</source>
+      <translation>Excluir &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
@@ -6936,8 +6937,8 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Apenas são suportados ficheiros de vídeo com registo de data e hora correctos.</translation>
     </message>
     <message>
-      <source>Could not start upload as user "%1" is currently uploading footage to this camera.</source>
-      <translation>Não foi possível iniciar o upload, visto que o utilizador "%1" está a fazer o upload de imagens para esta câmara.</translation>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>Não foi possível iniciar o upload, visto que o utilizador &quot;%1&quot; está a fazer o upload de imagens para esta câmara.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
@@ -7374,32 +7375,32 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Lst</source>
-      <extracomment>Short for 'Lowest'</extracomment>
+      <extracomment>Short for &apos;Lowest&apos;</extracomment>
       <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
-      <extracomment>Short for 'Low'</extracomment>
+      <extracomment>Short for &apos;Low&apos;</extracomment>
       <translation>Lo</translation>
     </message>
     <message>
       <source>Me</source>
-      <extracomment>Short for 'Medium'</extracomment>
+      <extracomment>Short for &apos;Medium&apos;</extracomment>
       <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
-      <extracomment>Short for 'High'</extracomment>
+      <extracomment>Short for &apos;High&apos;</extracomment>
       <translation>Hi</translation>
     </message>
     <message>
       <source>Bst</source>
-      <extracomment>Short for 'Best'</extracomment>
+      <extracomment>Short for &apos;Best&apos;</extracomment>
       <translation>Bst</translation>
     </message>
     <message>
       <source>Ps</source>
-      <extracomment>Short for 'Preset'</extracomment>
+      <extracomment>Short for &apos;Preset&apos;</extracomment>
       <translation>Ps</translation>
     </message>
   </context>
@@ -7533,8 +7534,8 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Mostrar sempre</translation>
     </message>
     <message>
-      <source>Show Only with "Objects" Tab</source>
-      <translation>Mostrar somente com "Objetos" aba</translation>
+      <source>Show Only with &quot;Objects&quot; Tab</source>
+      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7691,7 +7692,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Multicast</source>
-      <translation>Multicast</translation>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -7892,22 +7893,22 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Plugins</source>
-      <translation>Plugins</translation>
+      <translation type="unfinished">Plugins</translation>
     </message>
     <message>
-      <source>Motion detection is disabled, all schedule records "Motion" and "Motion + Lo-Res" will be changed to "Always"</source>
-      <translation>A detecção de movimento está desativada, todos os registros de agendamento "Movimento" e "Movimento + Lo-Res" serão alterados para "Sempre"</translation>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
     </message>
     <message>
-      <source>Dual streaming is disabled, all schedule records "Motion + Lo-Res" will be changed to "Always"</source>
-      <translation>O Dual streaming está desativado, todos os registros de agenda "Motion + Lo-Res" serão alterados para "Sempre"</translation>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
     <message numerus="yes">
       <source>%1 are used</source>
-      <comment>Text like '5/10 Professional Licenses' will be substituted</comment>
+      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 está em uso</numerusform>
         <numerusform>%1 estão em uso</numerusform>
@@ -8347,8 +8348,8 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>O formato AVI não é recomendado para exportar uma gravação não contínua com faixa de áudio.</translation>
     </message>
     <message>
-      <source>We recommend to export video from this camera as "Multi Video" to avoid downscaling.</source>
-      <translation>Recomendamos exportar o vídeo desta câmara como "Multi Video" para evitar downscaling.</translation>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>Recomendamos exportar o vídeo desta câmara como &quot;Multi Video&quot; para evitar downscaling.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
@@ -8690,7 +8691,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. 'Nx Cloud'.</comment>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Instância incompatível %1. Para atualizar o sistema de desconecte de %1 primeiro.</translation>
     </message>
     <message>
@@ -8964,8 +8965,8 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Seleccionar layout...</translation>
     </message>
     <message>
-      <source>Select some single user in "Show to" line to display his local layouts in this list</source>
-      <translation>Seleccione um único utilizador na linha "Mostrar a" para exibir os seus layouts locais nesta lista</translation>
+      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+      <translation>Seleccione um único utilizador na linha &quot;Mostrar a&quot; para exibir os seus layouts locais nesta lista</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
@@ -9110,8 +9111,8 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Empty</source>
-      <comment>In meaning 'There is no camera physically connected now'</comment>
-      <translation>Vazio</translation>
+      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+      <translation type="unfinished">Empty</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9139,8 +9140,8 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Unknown device %1</source>
-      <comment>In meaning 'Unknown device', %1 is system info</comment>
-      <translation>Dispositivo desconhecido %1</translation>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation type="unfinished">Unknown device %1</translation>
     </message>
   </context>
   <context>
@@ -9158,13 +9159,13 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. 'Nx Cloud'.</comment>
-      <translation>O sistema não está conectado a %1. As notificações móveis funcionam apenas quando o sistema está conectado a %1.</translation>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
-      <comment>%1 here will be substituted with cloud name e.g. 'Nx Cloud'.</comment>
-      <translation>Configurações de %1</translation>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">%1 Settings</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
@@ -9203,8 +9204,8 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
   <context>
     <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
-      <source>Set layout resolution to "Auto" to increase performance.</source>
-      <translation>Defina a resolução do layout como "Auto" para aumentar o desempenho.</translation>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>Defina a resolução do layout como &quot;Auto&quot; para aumentar o desempenho.</translation>
     </message>
   </context>
   <context>
@@ -9601,12 +9602,12 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
   <context>
     <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
-      <source>Could not open file "%1"</source>
-      <translation>Não foi possível abrir o ficheiro "%1"</translation>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation>Não foi possível abrir o ficheiro &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Could not calculate md5 for file "%1"</source>
-      <translation>Não foi possível calcular o md5 para o ficheiro "%1"</translation>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation>Não foi possível calcular o md5 para o ficheiro &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
@@ -9625,12 +9626,12 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Ficheiro foi corrompido enquanto estava a ser carregado para o servidor</translation>
     </message>
     <message>
-      <source>Remote file "%1" is corrupted</source>
-      <translation>Arquivo remoto "%1" está corrompido</translation>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
     </message>
     <message>
-      <source>Server already has this file "%1"</source>
-      <translation>O servidor já tem este arquivo "%1"</translation>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9873,7 +9874,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>%1 users</source>
-      <comment>%1 here will be substituted with short cloud name e.g. 'Cloud'.</comment>
+      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
       <translation>%1 usuários</translation>
     </message>
   </context>
@@ -10016,28 +10017,28 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       </translation>
     </message>
     <message>
-      <source>Server "%1" is not responding.</source>
-      <translation>Servidor "%1" não está respondendo.</translation>
+      <source>Server &quot;%1&quot; is not responding.</source>
+      <translation>Servidor &quot;%1&quot; não está respondendo.</translation>
     </message>
     <message numerus="yes">
-      <source>Server "%1" cannot access %n devices. Move them anyway?</source>
+      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
       <translation>
-        <numerusform>Servidor "%1" não pode acessar %n dispositivos. Mover-os mesmo assim?</numerusform>
-        <numerusform>Servidor "%1" não pode acessar %n dispositivos. Mover-os mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n dispositivos. Mover-os mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n dispositivos. Mover-os mesmo assim?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Server "%1" cannot access %n cameras. Move them anyway?</source>
+      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
       <translation>
-        <numerusform>Servidor "%1" não pode acessar %n câmera. Mova-as mesmo assim?</numerusform>
-        <numerusform>Servidor "%1" não pode acessar %n câmeras. Mova-as mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n câmera. Mova-as mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n câmeras. Mova-as mesmo assim?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Server "%1" cannot access %n I/O modules. Move them anyway?</source>
+      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
       <translation>
-        <numerusform>O servidor "%1" não pode acessar %n módulo de E/S. Mova-os assim mesmo?</numerusform>
-        <numerusform>O servidor "%1" não pode acessar %n módulos de E/S. Mova-os assim mesmo?</numerusform>
+        <numerusform>O servidor &quot;%1&quot; não pode acessar %n módulo de E/S. Mova-os assim mesmo?</numerusform>
+        <numerusform>O servidor &quot;%1&quot; não pode acessar %n módulos de E/S. Mova-os assim mesmo?</numerusform>
       </translation>
     </message>
     <message>
@@ -10180,8 +10181,8 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location for the analytics data on "%1"</source>
-      <translation>Confirmar localização de armazenamento para os dados de análise em "%1"</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
@@ -10191,11 +10192,11 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
-You can select another storage location in the "Storage Management" tab of the Server Settings dialog.</source>
-      <translation>O banco de dados de análise só deve ser armazenado em uma unidade local e pode absorver grandes quantidades de espaço.
-Uma vez que um local para armazenar dados de análise é selecionado, ele não pode ser facilmente alterado sem perder os dados existentes. Recomendamos escolher o local cuidadosamente e evitar usar a partição do sistema, pois pode causar malfuncionamento do sistema grave.
-Por padrão, os dados de análise serão armazenados em %1.
-Você pode selecionar outro local de armazenamento na guia "gestão de armazenamento" da caixa de diálogo de Configurações do servidor.</translation>
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

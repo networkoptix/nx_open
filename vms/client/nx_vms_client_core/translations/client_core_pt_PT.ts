@@ -1,4 +1,5 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
 <TS version="2.1" language="pt-PT" sourcelanguage="en">
   <context>
     <name>QnCloudResultInfo</name>
@@ -60,8 +61,8 @@
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-      <source>Could not find audio encoder "%1".</source>
-      <translation>Não foi possível encontrar o encoder de áudio "%1".</translation>
+      <source>Could not find audio encoder &quot;%1&quot;.</source>
+      <translation>Não foi possível encontrar o encoder de áudio &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
