@@ -875,6 +875,14 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
         }
 
+        for (const auto& server: commonModule()->beforeRestoreDbData().serversInfo)
+        {
+            QnTransaction<MediaServerData> transaction(ApiCommand::saveMediaServer, commonModule()->moduleGUID());
+            m_tranLog->fillPersistentInfo(transaction);
+            transaction.params = server;
+            executeTransactionNoLock(transaction, QnUbjson::serialized(transaction));
+        }
+
         QSqlQuery queryCameras(m_sdb);
         // Update cameras status
         // select cameras from servers without DB and local cameras
@@ -3779,7 +3787,7 @@ void QnDbManager::loadResourceTypeXML(const QString& fileName, ResourceTypeDataL
     QXmlSimpleReader reader;
     reader.setContentHandler(&parser);
     QXmlInputSource xmlSrc( &xmlData );
-    if(!reader.parse( &xmlSrc )) 
+    if(!reader.parse( &xmlSrc ))
     {
         NX_WARNING(this, "Can't parse XML file '%1' with additional resource types. "
             "Check XML file syntax.", fileName);

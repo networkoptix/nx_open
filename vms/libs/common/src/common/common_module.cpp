@@ -66,9 +66,14 @@ static const QString kAdminPasswordHash = lit("adminMd5Hash");
 static const QString kAdminPasswordDigest = lit("adminMd5Digest");
 static const QString kAdminPasswordCrypt512 = lit("adminCrypt512");
 static const QString kAdminPasswordRealm = lit("adminRealm");
+
 static const QString kLocalSystemId = lit("localSystemId");
 static const QString kLocalSystemName = lit("localSystemName");
+static const QString kCloudSystemId = lit("cloudSystemId");
+static const QString kCloudAuthKey = lit("cloudAuthKey");
+
 static const QString kServerName = lit("serverName");
+static const QString kServersInfo = lit("serversInfo");
 static const QString kStorageInfo = lit("storageInfo");
 
 } // namespace
@@ -79,9 +84,14 @@ void BeforeRestoreDbData::saveToSettings(QSettings* settings)
     settings->setValue(kAdminPasswordDigest, digest);
     settings->setValue(kAdminPasswordCrypt512, cryptSha512Hash);
     settings->setValue(kAdminPasswordRealm, realm);
+
     settings->setValue(kLocalSystemId, localSystemId);
     settings->setValue(kLocalSystemName, localSystemName);
+    settings->setValue(kCloudSystemId, cloudSystemId);
+    settings->setValue(kCloudAuthKey, cloudAuthKey);
+
     settings->setValue(kServerName, serverName);
+    settings->setValue(kServersInfo, QJson::serialized(serversInfo));
     settings->setValue(kStorageInfo, storageInfo);
 }
 
@@ -91,10 +101,15 @@ void BeforeRestoreDbData::loadFromSettings(const QSettings* settings)
     digest = settings->value(kAdminPasswordDigest).toByteArray();
     cryptSha512Hash = settings->value(kAdminPasswordCrypt512).toByteArray();
     realm = settings->value(kAdminPasswordRealm, nx::network::AppInfo::realm()).toByteArray();
+
     localSystemId = settings->value(kLocalSystemId).toByteArray();
     localSystemName = settings->value(kLocalSystemName).toByteArray();
+    cloudSystemId = settings->value(kCloudSystemId).toByteArray();
+    cloudAuthKey = settings->value(kCloudAuthKey).toByteArray();
+
     serverName = settings->value(kServerName).toByteArray();
     storageInfo = settings->value(kStorageInfo).toByteArray();
+    serversInfo = QJson::deserialized<nx::vms::api::MediaServerDataList>(settings->value(kServersInfo).toByteArray());
 }
 
 void BeforeRestoreDbData::clearSettings(QSettings* settings)
@@ -103,10 +118,15 @@ void BeforeRestoreDbData::clearSettings(QSettings* settings)
     settings->remove(kAdminPasswordDigest);
     settings->remove(kAdminPasswordCrypt512);
     settings->remove(kAdminPasswordRealm);
+
     settings->remove(kLocalSystemId);
     settings->remove(kLocalSystemName);
+    settings->remove(kCloudSystemId);
+    settings->remove(kCloudAuthKey);
+
     settings->remove(kServerName);
     settings->remove(kStorageInfo);
+    settings->remove(kServersInfo);
 }
 
 bool BeforeRestoreDbData::isEmpty() const

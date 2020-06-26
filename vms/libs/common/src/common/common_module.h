@@ -71,10 +71,15 @@ struct BeforeRestoreDbData
     QByteArray hash;
     QByteArray cryptSha512Hash;
     QByteArray realm;
+
     QByteArray localSystemId;
     QByteArray localSystemName;
+    QByteArray cloudSystemId;
+    QByteArray cloudAuthKey;
+
     QByteArray serverName;
     QByteArray storageInfo;
+    nx::vms::api::MediaServerDataList serversInfo;
 };
 
 class QnResourceDataPool;

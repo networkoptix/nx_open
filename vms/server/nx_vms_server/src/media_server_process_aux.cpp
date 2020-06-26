@@ -9,10 +9,11 @@
 #include <media_server/media_server_module.h>
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
-#include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx/network/app_info.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
 namespace nx {
@@ -141,25 +142,40 @@ public:
         return globalSettings()->localSystemId();
     }
 
-    virtual void setSystemName(const QString& systemName) override
+    virtual QString cloudSystemId() const override
     {
-        globalSettings()->setSystemName(systemName);
+        return globalSettings()->cloudSystemId();
     }
 
-    virtual void setLocalSystemId(const QnUuid& localSystemId) override
+    virtual QString cloudAuthKey() const override
     {
-        globalSettings()->setLocalSystemId(localSystemId);
+        return globalSettings()->cloudAuthKey();
+    }
+
+    virtual void setSystemName(const QString& value) override
+    {
+        globalSettings()->setSystemName(value);
+    }
+
+    virtual void setLocalSystemId(const QnUuid& value) override
+    {
+        globalSettings()->setLocalSystemId(value);
+    }
+
+    virtual void setCloudSystemId(const QString& value) override
+    {
+        globalSettings()->setCloudSystemId(value);
+    }
+
+    virtual void setCloudAuthKey(const QString& value) override
+    {
+        globalSettings()->setCloudAuthKey(value);
     }
 
     virtual bool isCloudInstanceChanged() const override
     {
         return !globalSettings()->cloudHost().isEmpty() &&
             globalSettings()->cloudHost() != nx::network::SocketGlobals::cloud().cloudHost();
-    }
-
-    virtual bool isConnectedToCloud() const override
-    {
-        return !globalSettings()->cloudSystemId().isEmpty();
     }
 
     virtual bool isSystemIdFromSystemName() const override
@@ -216,6 +232,11 @@ bool setUpSystemIdentity(
     if (settings->localSystemId().isNull())
         settings->setLocalSystemId(systemIdentityHelper.getLocalSystemId());
 
+    if (settings->cloudSystemId().isNull())
+        settings->setCloudSystemId(restoreData.cloudSystemId);
+    if (settings->cloudAuthKey().isNull())
+        settings->setCloudAuthKey(restoreData.cloudAuthKey);
+
     return true;
 }
 
@@ -233,6 +254,18 @@ void saveStoragesInfoToBeforeRestoreData(
     }
 
     beforeRestoreDbData->storageInfo = result;
+}
+
+void saveServersInfoToBeforeRestoreData(
+    BeforeRestoreDbData* beforeRestoreDbData,
+    const QnMediaServerResourceList& servers)
+{
+    for (const auto& server: servers)
+    {
+        nx::vms::api::MediaServerData data;
+        ec2::fromResourceToApi(server, /*out*/ data);
+        beforeRestoreDbData->serversInfo.push_back(data);
+    }
 }
 
 BeforeRestoreDbData savePersistentDataBeforeDbRestore(
@@ -255,10 +288,16 @@ BeforeRestoreDbData savePersistentDataBeforeDbRestore(
 
     data.localSystemId = settingsProxy->localSystemId().toByteArray();
     data.localSystemName = settingsProxy->systemName().toLocal8Bit();
-    if (mediaServer)
-        data.serverName = mediaServer->getName().toLocal8Bit();
+    data.cloudSystemId = settingsProxy->cloudSystemId().toUtf8();
+    data.cloudAuthKey = settingsProxy->cloudAuthKey().toUtf8();
 
+    data.serverName = mediaServer->getName().toLocal8Bit();
     saveStoragesInfoToBeforeRestoreData(&data, mediaServer->getStorages());
+    if (const auto p = mediaServer->resourcePool())
+    {
+        saveServersInfoToBeforeRestoreData(&data, p->getResources<QnMediaServerResource>(
+            [&](const auto& s) { return s != mediaServer; }));
+    }
 
     return data;
 }

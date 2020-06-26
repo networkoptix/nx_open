@@ -86,14 +86,34 @@ public:
         return m_localSystemId;
     }
 
-    virtual void setSystemName(const QString& systemName) override
+    virtual void setSystemName(const QString& value) override
     {
-        m_systemName = systemName;
+        m_systemName = value;
     }
 
-    virtual void setLocalSystemId(const QnUuid& localSystemId) override
+    virtual void setLocalSystemId(const QnUuid& value) override
     {
-        m_localSystemId = localSystemId;
+        m_localSystemId = value;
+    }
+
+    virtual QString cloudSystemId() const override
+    {
+        return m_cloudSystemId;
+    }
+
+    virtual void setCloudSystemId(const QString& value) override
+    {
+        m_cloudSystemId = value;
+    }
+
+    virtual QString cloudAuthKey() const override
+    {
+        return m_cloudAuthKey;
+    }
+
+    virtual void setCloudAuthKey(const QString& value) override
+    {
+        m_cloudAuthKey = value;
     }
 
     virtual bool isCloudInstanceChanged() const override
@@ -101,19 +121,9 @@ public:
         return m_cloudInstanceChanged;
     }
 
-    virtual bool isConnectedToCloud() const override
-    {
-        return m_connectedToCloud;
-    }
-
     void setCloudInstanceChanged(bool value)
     {
         m_cloudInstanceChanged = value;
-    }
-
-    void setConnectedToCloud(bool value)
-    {
-        m_connectedToCloud = value;
     }
 
     virtual bool isSystemIdFromSystemName() const override
@@ -134,6 +144,8 @@ public:
 private:
     QString m_systemName;
     QnUuid m_localSystemId;
+    QString m_cloudSystemId;
+    QString m_cloudAuthKey;
     bool m_cloudInstanceChanged;
     bool m_connectedToCloud;
     bool m_isSystemIdFromSystemName;
@@ -153,6 +165,8 @@ class BaseRestoreDbTest : public testing::Test
 public:
     QString kSystemName;
     QnUuid kLocalSystemId;
+    QString kCloudSystemId;
+    QString kCloudAuthKey;
 
     virtual void SetUp() override
     {
@@ -163,6 +177,8 @@ public:
 
         kSystemName = lit("SYSTEM_NAME");
         kLocalSystemId = QnUuid::createUuid();
+        kCloudSystemId = QnUuid::createUuid().toSimpleString();
+        kCloudAuthKey = QnUuid::createUuid().toSimpleString();
 
         settingsProxy.reset(new detail::TestSettingsProxy);
 
@@ -192,10 +208,11 @@ public:
         restoreData = nx::mserver_aux::savePersistentDataBeforeDbRestore(admin, mediaServer, settingsProxy.get());
     }
 
-    void setConnectedToCloud()
+    void connectSystemToCloud()
     {
+        settingsProxy->setCloudSystemId(kCloudSystemId);
+        settingsProxy->setCloudAuthKey(kCloudAuthKey);
         settingsProxy->setCloudInstanceChanged(false);
-        settingsProxy->setConnectedToCloud(true);
     }
 
     void assertNoAdminAuthDataHasBeenSaved()
@@ -257,6 +274,12 @@ public:
         ASSERT_EQ(restoreData.localSystemName, settingsProxy->systemName());
     }
 
+    void assertCloudconnectStateHaveBeenRestored()
+    {
+        ASSERT_EQ(restoreData.cloudSystemId, settingsProxy->cloudSystemId());
+        ASSERT_EQ(restoreData.cloudAuthKey, settingsProxy->cloudAuthKey());
+    }
+
     void assertNeedToResetSystem(bool isNewServerInstance, bool expectedValue)
     {
         ASSERT_EQ(nx::mserver_aux::needToResetSystem(isNewServerInstance, settingsProxy.get()), expectedValue);
@@ -278,7 +301,7 @@ protected:
     {
         BaseRestoreDbTest::SetUp();
         admin->setEnabled(false);
-        setConnectedToCloud();
+        connectSystemToCloud();
         fillDefaultAdminAuth();
         setDefaultSystemIdentity();
     }
@@ -288,11 +311,12 @@ TEST_F(BackupWhenCloudAndRestoreWhenCloud, main)
 {
     shutdownBeforeRestore();
     restartServer(detail::TestSystemNameProxy::SystemNameInConfig::yes);
-    setConnectedToCloud();
+    connectSystemToCloud();
     useRestoreData();
 
     assertNoAdminAuthDataHasBeenSaved();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
+    assertCloudconnectStateHaveBeenRestored();
     assertNeedToResetSystem(false, false);
 }
 
@@ -320,6 +344,7 @@ TEST_F(BackupWhenLocalAndRestoreWhenLocal, main)
     assertAdminIsEnabled();
     assertAdminAuthDataHasBeenRestored();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
+    assertCloudconnectStateHaveBeenRestored();
     assertNeedToResetSystem(false, false);
 }
 
@@ -336,17 +361,18 @@ protected:
 
 TEST_F(BackupWhenLocalAndRestoreWhenCloud, main)
 {
-    setConnectedToCloud();
+    connectSystemToCloud();
 
     shutdownBeforeRestore();
     assertAdminAuthDataHasBeenSaved();
     restartServer(detail::TestSystemNameProxy::SystemNameInConfig::yes);
-    setConnectedToCloud();
+    connectSystemToCloud();
     useRestoreData();
 
     assertAdminIsEnabled();
     assertAdminAuthDataHasBeenRestored();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
+    assertCloudconnectStateHaveBeenRestored();
     assertNeedToResetSystem(false, false);
 }
 
@@ -370,6 +396,7 @@ TEST_F(BackupWhenCloudAndRestoreWhenLocal, main)
     assertAdminIsEnabled();
     assertAdminAuthDataHasBeenRestored();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
+    assertCloudconnectStateHaveBeenRestored();
     assertNeedToResetSystem(false, false);
 }
 
@@ -392,7 +419,8 @@ protected:
     {
         BaseRestoreDbTest::SetUp();
         settingsProxy->setCloudInstanceChanged(true);
-        settingsProxy->setConnectedToCloud(true);
+        settingsProxy->setCloudSystemId(kCloudSystemId);
+        settingsProxy->setCloudAuthKey(kCloudAuthKey);
         admin->setEnabled(false);
         setDefaultSystemIdentity();
     }

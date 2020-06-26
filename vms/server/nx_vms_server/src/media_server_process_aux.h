@@ -36,11 +36,19 @@ class SettingsProxy
 {
 public:
     virtual QString systemName() const = 0;
+    virtual void setSystemName(const QString& value) = 0;
+
     virtual QnUuid localSystemId() const = 0;
-    virtual void setSystemName(const QString& systemName) = 0;
-    virtual void setLocalSystemId(const QnUuid& localSystemId) = 0;
+    virtual void setLocalSystemId(const QnUuid& value) = 0;
+
+    virtual QString cloudSystemId() const = 0;
+    virtual void setCloudSystemId(const QString& value) = 0;
+    bool isConnectedToCloud() const { return !cloudSystemId().isEmpty(); }
+
+    virtual QString cloudAuthKey() const = 0;
+    virtual void setCloudAuthKey(const QString& value) = 0;
+
     virtual bool isCloudInstanceChanged() const = 0;
-    virtual bool isConnectedToCloud() const = 0;
     virtual bool isSystemIdFromSystemName() const = 0;
     virtual QString getMaxServerKey() const = 0;
 
