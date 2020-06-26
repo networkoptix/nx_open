@@ -2851,15 +2851,15 @@ a %1</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo "source" com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo &quot;source&quot; com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo "caption" com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo &quot;caption&quot; com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo "descrição" com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo &quot;descrição&quot; com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Server API</source>
@@ -4333,7 +4333,7 @@ a %1</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>O &quot;Câmera Virtual&quot; é um armazenamento virtual para arquivos de vídeo, que pode ser enviado para qualquer servidor em seu sistema e ser acessado por qualquer usuário.</translation>
     </message>
   </context>
   <context>
@@ -5236,7 +5236,7 @@ a %1</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Servidores com failover activado irão automaticamente "capturar" câmaras de servidores que estejam offline.</translation>
+      <translation>Servidores com failover activado irão automaticamente &quot;capturar&quot; câmaras de servidores que estejam offline.</translation>
     </message>
   </context>
   <context>
@@ -6606,7 +6606,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Não pode ser feito o "merge" dos Sistemas %1</translation>
+      <translation>Não pode ser feito o &quot;merge&quot; dos Sistemas %1</translation>
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
@@ -7461,7 +7461,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>Mostrar somente com &quot;Objetos&quot; aba</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7813,11 +7813,11 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>A detecção de movimento está desativada, todos os registros de agendamento &quot;Movimento&quot; e &quot;Movimento + Lo-Res&quot; serão alterados para &quot;Sempre&quot;</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>O Dual streaming está desativado, todos os registros de agenda &quot;Motion + Lo-Res&quot; serão alterados para &quot;Sempre&quot;</translation>
     </message>
   </context>
   <context>
@@ -9136,7 +9136,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Marcas d'água serão exibidas em vídeos ao vivo, arquivados e exportados apenas para usuários não administradores. Você e outros administradores não os verão.</translation>
+      <translation>Marcas d&apos;água serão exibidas em vídeos ao vivo, arquivados e exportados apenas para usuários não administradores. Você e outros administradores não os verão.</translation>
     </message>
   </context>
   <context>
@@ -9435,11 +9435,11 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>Arquivo remoto &quot;%1&quot; está corrompido</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>O servidor já tem este arquivo &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9621,7 +9621,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo "caption" com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo &quot;caption&quot; com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
@@ -9971,7 +9971,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Confirmar localização de armazenamento para os dados de análise em &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
@@ -9982,10 +9982,10 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>O banco de dados de análise só deve ser armazenado em uma unidade local e pode absorver grandes quantidades de espaço.
+Uma vez que um local para armazenar dados de análise é selecionado, ele não pode ser facilmente alterado sem perder os dados existentes. Recomendamos escolher o local cuidadosamente e evitar usar a partição do sistema, pois pode causar malfuncionamento do sistema grave.
+Por padrão, os dados de análise serão armazenados em %1.
+Você pode selecionar outro local de armazenamento na guia &quot;gestão de armazenamento&quot; da caixa de diálogo de Configurações do servidor.</translation>
     </message>
   </context>
   <context>

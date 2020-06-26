@@ -2751,12 +2751,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation>Exibir marca d'água com nome do utilizador sobre o vídeo</translation>
+      <translation>Exibir marca d&apos;água com nome do utilizador sobre o vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation>Visualização de marca d'água</translation>
+      <translation>Visualização de marca d&apos;água</translation>
     </message>
     <message>
       <location/>
