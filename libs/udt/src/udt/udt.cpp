@@ -73,18 +73,37 @@ std::string Error::prepareErrorText()
     if (m_osError)
     {
 #if defined(_WIN32)
-        LPTSTR lpMsgBuf = NULL;
-        const auto msgLen = FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            m_osError,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
+        wchar_t msgBuf[1024];
+        memset(msgBuf, 0, sizeof(msgBuf));
 
-        if (lpMsgBuf && msgLen > 0)
+        const size_t msgLen = std::min<std::size_t>(
+            FormatMessage(
+                FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                m_osError,
+                MAKELANGID(LANG_SYSTEM_DEFAULT, SUBLANG_SYS_DEFAULT),
+                (LPTSTR)&msgBuf,
+                sizeof(msgBuf),
+                NULL),
+            sizeof(msgBuf));
+
+        if (msgLen > 0)
         {
-            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-            text = converter.to_bytes(lpMsgBuf, lpMsgBuf + msgLen);
-            LocalFree(lpMsgBuf);
+            std::string text;
+            const auto msgUtf8Len = WideCharToMultiByte(CP_UTF8, 0, msgBuf, msgLen, NULL, 0, NULL, NULL);
+            if (msgUtf8Len > 0)
+            {
+                text.resize(msgUtf8Len);
+                if (WideCharToMultiByte(
+                        CP_UTF8, 0, msgBuf, msgLen, text.data(), text.size(), NULL, NULL) <= 0)
+                {
+                    text = "Win32 API error " + std::to_string(m_osError);
+                }
+            }
+            else
+            {
+                text = "Win32 API error " + std::to_string(m_osError);
+            }
 
             while (!text.empty() && std::isspace(text.back()))
                 text.pop_back();
