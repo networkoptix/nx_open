@@ -2093,22 +2093,27 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:array reply List of objects describing the events.
      *         %param:enum reply[].actionType Type of the action.
-     *             %value UndefinedAction
-     *             %value CameraOutputAction Change camera output state.
-     *             %value BookmarkAction
-     *             %value CameraRecordingAction Start camera recording.
-     *             %value PanicRecordingAction Activate panic recording mode.
-     *             %value SendMailAction Send an email.
-     *             %value DiagnosticsAction Write a record to the server's log.
-     *             %value ShowPopupAction
-     *             %value PlaySoundAction
-     *             %value PlaySoundOnceAction
-     *             %value SayTextAction
-     *             %value ExecutePtzPresetAction Execute given PTZ preset.
-     *             %value ShowTextOverlayAction Show text overlay over the given camera(s).
-     *             %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
-     *             %value ExecHttpRequestAction Send HTTP request as an action.
-     *             %value BuzzerAction Enable an NVR buzzer
+     *             %value undefinedAction
+     *             %value cameraOutputAction Change camera output state.
+     *             %value bookmarkAction
+     *             %value cameraRecordingAction Start camera recording.
+     *             %value panicRecordingAction Activate panic recording mode.
+     *             %value sendMailAction Send an email.
+     *             %value diagnosticsAction Write a record to the server's log.
+     *             %value showPopupAction
+     *             %value playSoundAction
+     *             %value playSoundOnceAction
+     *             %value sayTextAction
+     *             %value executePtzPresetAction Execute given PTZ preset.
+     *             %value showTextOverlayAction Show text overlay over the given camera(s).
+     *             %value showOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
+     *             %value execHttpRequestAction Send HTTP request as an action.
+     *             %value acknowledgeAction Displays event notification for the user, where special 'Acknowledge' button is available.
+     *             %value fullscreenCameraAction Expand given camera to fullscreen if it is displayed on the current layout.
+     *             %value exitFullscreenAction Reset given layout from fullscreen if it is displayed currently.
+     *             %value openLayoutAction Open layout as an action.
+     *             %value buzzerAction Enable an NVR buzzer.
+     *             %value pushNotificationAction Send push notification using cloud.
      *         %param:object reply[].actionParams JSON object with action parameters. Only fields
      *             that are applicable to the particular action are used.
      *             %param:uuid reply[].actionParams.actionResourceId Additional parameter for event
@@ -2154,24 +2159,28 @@ void MediaServerProcess::registerRestHandlers(
      *             %param:string reply[].actionParams.contentType HTTP action.
      *         %param:object reply[].eventParams JSON object with event parameters.
      *             %param:enum reply[].eventParams.eventType Type of the event.
-     *                 %value UndefinedEvent Event type is not defined. Used in rules.
-     *                 %value CameraMotionEvent Motion has occurred on a camera.
-     *                 %value CameraInputEvent Camera input signal is received.
-     *                 %value CameraDisconnectEvent Camera was disconnected.
-     *                 %value StorageFailureEvent Storage read error has occurred.
-     *                 %value NetworkIssueEvent Network issue: packet lost, RTP timeout, etc.
-     *                 %value CameraIpConflictEvent Found some cameras with same IP address.
-     *                 %value ServerFailureEvent Connection to server lost.
-     *                 %value ServerConflictEvent Two or more servers are running.
-     *                 %value ServerStartEvent Server started.
-     *                 %value LicenseIssueEvent Not enough licenses.
-     *                 %value BackupFinishedEvent Archive backup done.
-     *                 %value SystemHealthEvent System health message.
-     *                 %value MaxSystemHealthEvent System health message.
-     *                 %value AnyCameraEvent Event group.
-     *                 %value AnyServerEvent Event group.
-     *                 %value AnyBusinessEvent Event group.
-     *                 %value UserDefinedEvent Base index for the user-defined events.
+     *                 %value undefinedEvent Event type is not defined. Used in rules.
+     *                 %value cameraMotionEvent Motion has occurred on a camera.
+     *                 %value cameraInputEvent Camera input signal is received.
+     *                 %value cameraDisconnectEvent Camera was disconnected.
+     *                 %value storageFailureEvent Storage read error has occurred.
+     *                 %value networkIssueEvent Network issue: packet lost, RTP timeout, etc.
+     *                 %value cameraIpConflictEvent Found some cameras with same IP address.
+     *                 %value serverFailureEvent Connection to server lost.
+     *                 %value serverConflictEvent Two or more servers are running.
+     *                 %value serverStartEvent Server started.
+     *                 %value licenseIssueEvent Not enough licenses.
+     *                 %value backupFinishedEvent Archive backup done.
+     *                 %value softwareTriggerEvent
+     *                 %value analyticsSdkEvent
+     *                 %value pluginDiagnosticEvent
+     *                 %value poeOverBudgetEvent
+     *                 %value fanErrorEvent
+     *                 %value systemHealthEvent System health message.
+     *                 %value anyCameraEvent Event group.
+     *                 %value anyServerEvent Event group.
+     *                 %value anyEvent Event group.
+     *                 %value userDefinedEvent
      *             %param:integer reply[].eventParams.eventTimestampUsec When did the event occur,
      *                 in microseconds.
      *             %param:uuid reply[].eventParams.eventResourceId Event source - camera or server
@@ -2185,25 +2194,35 @@ void MediaServerProcess::registerRestHandlers(
      *                 event.
      *             %param:enum reply[].eventParams.reasonCode Used in Reasoned Events as a reason
      *                 code.
-     *                 %value NoReason
-     *                 %value NetworkNoFrameReason
-     *                 %value NetworkConnectionClosedReason
-     *                 %value NetworkRtpPacketLossReason
-     *                 %value ServerTerminatedReason
-     *                 %value ServerStartedReason
-     *                 %value StorageIoErrorReason
-     *                 %value StorageTooSlowReason
-     *                 %value StorageFullReason
-     *                 %value LicenseRemoved
-     *                 %value BackupFailedNoBackupStorageError
-     *                 %value BackupFailedSourceStorageError
-     *                 %value BackupFailedSourceFileError
-     *                 %value BackupFailedTargetFileError
-     *                 %value BackupFailedChunkError
-     *                 %value BackupEndOfPeriod
-     *                 %value BackupDone
-     *                 %value BackupCancelled
-     *                 %value NetworkNoResponseFromDevice
+     *                 %value none
+     *                 %value backupCancelled
+     *                 %value backupDone
+     *                 %value backupEndOfPeriod
+     *                 %value backupFailedChunkError
+     *                 %value backupFailedNoBackupStorageError
+     *                 %value backupFailedSourceFileError
+     *                 %value backupFailedSourceStorageError
+     *                 %value backupFailedTargetFileError
+     *                 %value licenseRemoved
+     *                 %value metadataStorageFull
+     *                 %value metadataStorageOffline
+     *                 %value metadataStoragePermissionDenied
+     *                 %value networkBadCameraTime
+     *                 %value networkCameraTimeBackToNormal
+     *                 %value networkConnectionClosed
+     *                 %value networkMulticastAddressConflict
+     *                 %value networkMulticastAddressIsInvalid
+     *                 %value networkNoFrame
+     *                 %value networkNoResponseFromDevice
+     *                 %value networkRtpPacketLoss
+     *                 %value networkRtpStreamError
+     *                 %value raidStorageError
+     *                 %value serverStarted
+     *                 %value serverTerminated
+     *                 %value storageFull
+     *                 %value storageIoError
+     *                 %value storageTooSlow
+     *                 %value systemStorageFull
      *             %param:string reply[].eventParams.inputPortId Used for Input events only.
      *             %param:string reply[].eventParams.caption Short event description. Used for
      *                 camera/server conflict as resource name which cause error. Used in generic
@@ -3074,22 +3093,27 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc[proprietary] POST /api/executeEventAction
      * Execute event action.
      * %param:enum actionType Type of the action.
-     *     %value UndefinedAction
-     *     %value CameraOutputAction Change camera output state.
-     *     %value BookmarkAction
-     *     %value CameraRecordingAction Start camera recording.
-     *     %value PanicRecordingAction Activate panic recording mode.
-     *     %value SendMailAction Send an email.
-     *     %value DiagnosticsAction Write a record to the server's log.
-     *     %value ShowPopupAction
-     *     %value PlaySoundAction
-     *     %value PlaySoundOnceAction
-     *     %value SayTextAction
-     *     %value ExecutePtzPresetAction Execute given PTZ preset.
-     *     %value ShowTextOverlayAction Show text overlay over the given camera(s).
-     *     %value ShowOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
-     *     %value ExecHttpRequestAction Send HTTP request as an action.
-     *     %value BuzzerAction Enable an NVR buzzer
+     *     %value undefinedAction
+     *     %value cameraOutputAction Change camera output state.
+     *     %value bookmarkAction
+     *     %value cameraRecordingAction Start camera recording.
+     *     %value panicRecordingAction Activate panic recording mode.
+     *     %value sendMailAction Send an email.
+     *     %value diagnosticsAction Write a record to the server's log.
+     *     %value showPopupAction
+     *     %value playSoundAction
+     *     %value playSoundOnceAction
+     *     %value sayTextAction
+     *     %value executePtzPresetAction Execute given PTZ preset.
+     *     %value showTextOverlayAction Show text overlay over the given camera(s).
+     *     %value showOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
+     *     %value execHttpRequestAction Send HTTP request as an action.
+     *     %value acknowledgeAction Displays event notification for the user, where special 'Acknowledge' button is available.
+     *     %value fullscreenCameraAction Expand given camera to fullscreen if it is displayed on the current layout.
+     *     %value exitFullscreenAction Reset given layout from fullscreen if it is displayed currently.
+     *     %value openLayoutAction Open layout as an action.
+     *     %value buzzerAction Enable an NVR buzzer.
+     *     %value pushNotificationAction Send push notification using cloud.
      * %param[opt]:enum EventState
      *     %value inactive Event has been finished (for prolonged events).
      *     %value active Event has been started (for prolonged events).

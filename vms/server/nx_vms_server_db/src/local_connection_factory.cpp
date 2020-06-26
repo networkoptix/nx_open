@@ -1028,53 +1028,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         depend on eventType. Defines the filter for an event to make the rule applicable.
      *         NOTE: Other fields than the described below can be stored in this object, but they
      *         are not used for event matching.
-     *         %// ATTENTION: Commented-out params are present in the struct but are not used in
-     *             eventCondition. Also, params which are not commented-out may have descriptions
-     *             applicable only to the current usage of the struct.
-     *         %//param eventCondition.eventType (string) Event type. Default: "undefinedEvent".
-     *         %//param eventCondition.eventTimestampUsec (integer) Event timestamp (in
-     *             milliseconds). Default: 0.
-     *         %//param eventCondition.eventResourceId (string) Event source - id of a camera or a
-     *             server. Default: "{00000000-0000-0000-0000-000000000000}".
+     *         %// ATTENTION: Some params are present in the struct but aren't documented here
+     *             because they are not used in eventCondition.
      *         %param eventCondition.resourceName Substring to be found in the name of the resource
      *             (e.g. a camera) which caused the event. Empty string matches any value.
-     *         %//param eventCondition.sourceServerId (string) Id of a server that generated the
-     *             event. Default: "{00000000-0000-0000-0000-000000000000}".
-     *         %//param eventCondition.reasonCode (string, fixed values) Used in certain event
-     *             types. Default: "none".
-     *             %value none
-     *             %value networkNoFrame
-     *             %value networkConnectionClosed
-     *             %value networkRtpPacketLoss
-     *             %value serverTerminated
-     *             %value serverStarted
-     *             %value storageIoError
-     *             %value storageTooSlow
-     *             %value storageFull
-     *             %value systemStorageFull
-     *             %value metadataStorageOffline
-     *             %value metadataStorageFull
-     *             %value licenseRemoved
-     *             %value backupFailedNoBackupStorageError
-     *             %value backupFailedSourceStorageError
-     *             %value backupFailedSourceFileError
-     *             %value backupFailedTargetFileError
-     *             %value backupFailedChunkError
-     *             %value backupEndOfPeriod
-     *             %value backupDone
-     *             %value backupCancelled
-     *             %value networkNoResponseFromDevice
      *         %param eventCondition.inputPortId (string) Used for input events only. Empty string
      *             matches any value.
      *         %param eventCondition.caption Substring to be found in the short event description.
      *             Empty string matches any value.
      *         %param eventCondition.description Substring to be found in the long event
      *             description. Empty string matches any value.
-     *         %//param eventCondition.metadata (object) Imposes filtering based on the event
-     *             metadata fields.
-     *             %//param eventCondition.metadata.cameraRefs cameraRefs (list of strings) Camera
-     *                 id list. Empty means any. Camera id can be obtained from "id", "physicalId"
-     *                 or "logicalId" field via request '/ec2/getCamerasEx'.
      *
      *     %param eventState One of the fixed values.
      *         %value inactive
