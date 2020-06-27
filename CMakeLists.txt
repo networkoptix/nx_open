@@ -196,11 +196,11 @@ find_package(Qt5
         Qml
 )
 
-if(withDesktopClient OR withMobileClient OR withNxTool)
+if(withDesktopClient OR withMobileClient)
     find_package(Qt5 COMPONENTS Quick)
 endif()
 
-if(withDesktopClient OR withNxTool)
+if(withDesktopClient)
     find_package(Qt5 COMPONENTS Widgets)
 endif()
 
@@ -208,7 +208,6 @@ set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
     "${CMAKE_CURRENT_LIST_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml"
     "${CMAKE_CURRENT_LIST_DIR}/vms/client/mobile_client/static-resources/qml"
-    "${CMAKE_CURRENT_LIST_DIR}/nxtool/static-resources/src/qml"
     CACHE STRING "Extra QML import paths")
 
 if(ANDROID)

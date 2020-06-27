@@ -65,8 +65,6 @@ def detect_module(entry):
         return 'build_mobile'  # TODO: #GDM fix in 4.0
     if 'paxton' in entry:
         return 'build_paxton'
-    if 'nxtool' in entry:
-        return 'build_nxtool'
 
 
 def validate_project(customized, project, mandatory_files, skipped_modules, skin_files):

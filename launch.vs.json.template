@@ -34,13 +34,6 @@
     {
       "type": "default",
       "project": "CMakeLists.txt",
-      "projectTarget": "nxtool.exe (bin\\nxtool.exe)",
-      "name": "nxtool.exe (bin\\nxtool.exe)",
-      "env": "Path=${env.qtdir}"
-    },
-    {
-      "type": "default",
-      "project": "CMakeLists.txt",
       "projectTarget": "mobile_client.exe (bin\\mobile_client.exe)",
       "name": "mobile_client.exe (bin\\mobile_client.exe)",
       "env": "Path=${env.qtdir}"

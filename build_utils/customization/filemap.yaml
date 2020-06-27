@@ -25,12 +25,6 @@ desktop: {
     installer_background.png: 'icons/windows/installer_bg.png', # 480x360.
     installer_logo_64x64.png: 'icons/windows/logo-64x64.png', # Rounded.
     installer_logo_102x102.png: 'icons/windows/logo-102x102.png', # Rounded.
-
-    # NxTool.
-    nxtool: {
-      icon.ico: 'icons/windows/nxtool.ico',
-      installer_logo.png: 'icons/windows/nxtool-logo-64x64.png', # 64x64, rounded.
-    }
   },
 
   linux: {
