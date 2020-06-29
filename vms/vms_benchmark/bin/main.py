@@ -138,6 +138,7 @@ ini_definition = {
     "addCamerasManually": {"type": "bool", "default": False},
     "getStoragesMaxAttempts": {"type": "int", "default": 10},
     "getStoragesAttemptIntervalSeconds": {"type": "int", "default": 3},
+    "boxTelnetConnectionWarningThresholdMs": {"type": "int", "default": 1000},
 }
 
 
@@ -1120,7 +1121,7 @@ def _override_ini_config(vms, ini):
     })
 
 
-def _connect_to_box(conf):
+def _connect_to_box(conf, ini):
     if conf['boxConnectByTelnet']:
         connection_type, connection_port = BoxConnection.ConnectionType.TELNET, conf['boxTelnetPort']
     else:
@@ -1156,7 +1157,16 @@ def _connect_to_box(conf):
         box.supply_host_key(host_key)
 
     try:
+        start_time_s = time.time()
         box.sh('true', throw_timeout_exception=True)
+        command_execution_duration_ms = int((time.time() - start_time_s) * 1000)
+        if connection_type == BoxConnection.ConnectionType.TELNET:
+            if command_execution_duration_ms > ini['boxTelnetConnectionWarningThresholdMs']:
+                report('')
+                report(
+                    'WARNING: Telnet connection is very slow, it can affect test results. '
+                    'Consider fixing Box system settings (see readme.md for more info).')
+
     except exceptions.BoxCommandError as e:
         raise exceptions.BoxConnectionError(
             (
@@ -1234,7 +1244,7 @@ def main(conf_file, ini_file, log_file):
         raise InvalidBoxLoginConfigOptionValue(
             f"Config option boxLogin should be set and not empty on Windows.")
 
-    box = _connect_to_box(conf)
+    box = _connect_to_box(conf, ini)
     linux_distribution = LinuxDistributionDetector.detect(box)
     box_platform = _obtain_box_platform(box, linux_distribution)
     _check_time_diff(box, ini)

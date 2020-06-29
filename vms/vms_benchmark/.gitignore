@@ -2,3 +2,5 @@
 /dist/
 /vms_benchmark.spec
 /vms_benchmark.log
+/rtsp_perf_lines.txt
+/testcamera.txt
