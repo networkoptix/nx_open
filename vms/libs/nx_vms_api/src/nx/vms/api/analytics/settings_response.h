@@ -8,7 +8,7 @@
 
 namespace nx::vms::api::analytics {
 
-NX_VMS_API struct EngineSettingsResponse
+struct NX_VMS_API EngineSettingsResponse
 {
     QJsonObject settingsValues;
     QJsonObject settingsModel;
