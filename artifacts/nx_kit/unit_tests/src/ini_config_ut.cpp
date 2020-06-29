@@ -25,26 +25,28 @@ struct TestIni: IniConfig
     NX_INI_FLAG(0, enableOutput, "Enable Output.");
     NX_INI_FLAG(1, enableTime, "Enable Time.");
     NX_INI_FLAG(1, enableFps, "Enable Fps.");
+    NX_INI_STRING(" string with leading space", str0, "String with leading space.");
     NX_INI_STRING("string with middle \" quote", str1, "String with middle quote.");
     NX_INI_STRING("\" string with leading quote", str2, "String with leading quote.");
     NX_INI_STRING("string with trailing quote \"", str3, "String with trailing quote.");
     NX_INI_STRING("\"enquoted string\"", str4, "Enquoted string.");
-    NX_INI_STRING("simple string", str5, "Simple string.");
-    NX_INI_INT(113, number, "Test number.");
+    NX_INI_STRING("plain string", str5, "Plain string.");
+    NX_INI_STRING("plain string with \\ backslash", str6, "Plain string with backslash.");
+    NX_INI_INT(113, intNumber, "Test int number.");
     NX_INI_FLOAT(310.55f, floatNumber ,"Test float number.");
     NX_INI_DOUBLE(-0.45, doubleNumber, "Test double number.");
 };
 
 static const TestIni defaultIni; //< Source of default values for comparison.
 
-// Using a static instance just to test this possibility.
+/** Using a static instance just to test this possibility. */
 static TestIni& ini()
 {
     static TestIni ini;
     return ini;
 }
 
-// Intended to be saved to the same file as TestIni, but not to be loaded from file.
+/** Intended to be saved to the same file as TestIni, but not to be loaded from file. */
 struct SavedIni: IniConfig
 {
     SavedIni(): IniConfig(ini().iniFile()) {}
@@ -54,12 +56,14 @@ struct SavedIni: IniConfig
     NX_INI_FLAG(1, enableOutput, "Enable Output.");
     NX_INI_FLAG(0, enableTime, "Enable Time.");
     NX_INI_FLAG(0, enableFps, "Enable Fps.");
-    NX_INI_STRING("Another string with middle \" quote", str1, "String with middle quote.");
-    NX_INI_STRING("\" Another string with leading quote", str2, "String with leading quote.");
-    NX_INI_STRING("Another string with trailing quote \"", str3, "String with trailing quote.");
-    NX_INI_STRING("\"Another enquoted string\"", str4, "Enquoted string.");
-    NX_INI_STRING("Another simple string", str5, "Simple string.");
-    NX_INI_INT(777, number, "Test number.");
+    NX_INI_STRING(" another string with leading space", str0, "String with leading space.");
+    NX_INI_STRING("another string with middle \" quote", str1, "String with middle quote.");
+    NX_INI_STRING("\" another string with leading quote", str2, "String with leading quote.");
+    NX_INI_STRING("another string with trailing quote \"", str3, "String with trailing quote.");
+    NX_INI_STRING("\"another enquoted string\"", str4, "Enquoted string.");
+    NX_INI_STRING("another plain string", str5, "Plain string.");
+    NX_INI_STRING("another plain string with \\ backslash", str6, "Plain string with backslash.");
+    NX_INI_INT(777, intNumber, "Test int number.");
     NX_INI_FLOAT(0.432f, floatNumber ,"Test float number.");
     NX_INI_DOUBLE(34.45, doubleNumber, "Test double number.");
 };
@@ -73,12 +77,14 @@ static void assertIniEquals(int line, const ExpectedIni& expected, const ActualI
     ASSERT_INI_PARAM_EQ(enableOutput);
     ASSERT_INI_PARAM_EQ(enableTime);
     ASSERT_INI_PARAM_EQ(enableFps);
+    ASSERT_INI_PARAM_STREQ(str0);
     ASSERT_INI_PARAM_STREQ(str1);
     ASSERT_INI_PARAM_STREQ(str2);
     ASSERT_INI_PARAM_STREQ(str3);
     ASSERT_INI_PARAM_STREQ(str4);
     ASSERT_INI_PARAM_STREQ(str5);
-    ASSERT_INI_PARAM_EQ(number);
+    ASSERT_INI_PARAM_STREQ(str6);
+    ASSERT_INI_PARAM_EQ(intNumber);
     ASSERT_INI_PARAM_EQ(floatNumber);
     ASSERT_INI_PARAM_EQ(doubleNumber);
 
@@ -89,33 +95,37 @@ static void assertIniEquals(int line, const ExpectedIni& expected, const ActualI
 /**
  * Create a .ini file with the contents from the supplied IniConfig object.
  */
-void generateIniFile(const SavedIni& ini)
+static void generateIniFile(const SavedIni& ini)
 {
     std::ostringstream content;
 
-    const auto outputStr = //< Enquote the string if and only if it contains any quotes.
+    // C-style-escape the string if and only if it contains a quote or a leading space.
+    const auto outputStr =
         [&content](const char* value, const char* paramName)
         {
             content << paramName << "=";
-            if (strchr(value, '"') != nullptr)
-                content << '"' << value << '"';
+            if (value[0] == ' ' || strchr(value, '"') != nullptr)
+                content << nx::kit::utils::toString(value);
             else
                 content << value;
             content << std::endl;
         };
 
-    #define GENERATE_INI_PARAM_VAL(PARAM) content << #PARAM << "=" << ini.PARAM << std::endl
+    #define GENERATE_INI_PARAM_VAL(PARAM) \
+        content << #PARAM << "=" << nx::kit::utils::toString(ini.PARAM) << std::endl
     #define GENERATE_INI_PARAM_STR(PARAM) outputStr(ini.PARAM, #PARAM)
 
     GENERATE_INI_PARAM_VAL(enableOutput);
     GENERATE_INI_PARAM_VAL(enableTime);
     GENERATE_INI_PARAM_VAL(enableFps);
+    GENERATE_INI_PARAM_STR(str0);
     GENERATE_INI_PARAM_STR(str1);
     GENERATE_INI_PARAM_STR(str2);
     GENERATE_INI_PARAM_STR(str3);
     GENERATE_INI_PARAM_STR(str4);
     GENERATE_INI_PARAM_STR(str5);
-    GENERATE_INI_PARAM_VAL(number);
+    GENERATE_INI_PARAM_STR(str6);
+    GENERATE_INI_PARAM_VAL(intNumber);
     GENERATE_INI_PARAM_VAL(floatNumber);
     GENERATE_INI_PARAM_VAL(doubleNumber);
 
@@ -125,57 +135,45 @@ void generateIniFile(const SavedIni& ini)
     nx::kit::test::createFile(ini.iniFilePath(), content.str().c_str());
 }
 
-enum class Output { silent, verbose };
-
-template<class ExpectedIni>
+template<class Ini, class ExpectedIni>
 static void testReload(
-    int line, Output reloadOutput, const ExpectedIni& expectedIni, const char* caseTitle)
+    int line,
+    const ExpectedIni& expectedIni,
+    Ini* ini,
+    const std::string& testCaseTag,
+    const std::string& expectedOutput)
 {
-    std::cerr << std::endl;
-    if (reloadOutput == Output::silent)
-        std::cerr << "------- BEGIN Silent: " << caseTitle << "." << std::endl;
-    else
-        std::cerr << "+++++++ BEGIN Verbose: " << caseTitle << ":" << std::endl;
-
     std::ostringstream output;
     IniConfig::setOutput(&output);
 
-    ini().reload();
+    ini->reload();
 
     IniConfig::setOutput(&std::cerr); //< Restore global setting.
     const std::string outputStr = output.str();
 
-    std::cerr << outputStr; //< Print what reload() has produced (if anything).
-
-    if (reloadOutput == Output::silent)
+    if (IniConfig::isEnabled())
     {
-        std::cerr << "------- END" << std::endl;
-        ASSERT_TRUE(outputStr.empty());
+        nx::kit::test::assertMultilineTextEquals(__FILE__, line, testCaseTag,
+            expectedOutput, outputStr, ini->iniFilePath(), "{iniFilePath}");
     }
     else
     {
-        std::cerr << "+++++++ END" << std::endl;
-        if (IniConfig::isEnabled())
-            ASSERT_FALSE(outputStr.empty());
-        else
-            ASSERT_TRUE(outputStr.empty()); //< If disabled, there should be no output.
+        ASSERT_TRUE_AT_LINE(line, outputStr.empty()); //< If disabled, there must be no output.
     }
 
     if (IniConfig::isEnabled())
-        assertIniEquals(line, expectedIni, ini());
+        assertIniEquals(line, expectedIni, *ini);
     else
-        assertIniEquals(line, defaultIni, ini()); //< If disabled, values never change.
+        assertIniEquals(line, defaultIni, *ini); //< If disabled, values never change.
 }
 
-#include <nx/kit/debug.h>
-
-TEST(iniConfig, test)
+TEST(iniConfig, testSuccess)
 {
     std::cerr << "IniConfig::isEnabled() -> " << (IniConfig::isEnabled() ? "true" : "false")
         << std::endl;
 
     // Avoiding nx::kit::test::tempDir() for disabled ini_config to avoid dir name conflict.
-    static const char* const tempDir = IniConfig::isEnabled() ? nx::kit::test::tempDir() : "stub";
+    const char* const tempDir = IniConfig::isEnabled() ? nx::kit::test::tempDir() : "stub";
     IniConfig::setIniFilesDir(tempDir);
     ASSERT_STREQ(tempDir, IniConfig::iniFilesDir());
 
@@ -183,13 +181,102 @@ TEST(iniConfig, test)
     ASSERT_STREQ(kIniFile, ini().iniFile());
     ASSERT_STREQ(std::string(IniConfig::iniFilesDir()) + kIniFile, ini().iniFilePath());
 
-    testReload(__LINE__, Output::verbose, defaultIni, "first reload(), .ini file not found");
-    testReload(__LINE__, Output::silent, defaultIni, ".ini file still not found");
+    testReload(__LINE__, defaultIni, &ini(), "first reload(), .ini file not found, verbose",
+        "test.ini (absent) To fill in defaults, touch {iniFilePath}\n");
+
+    testReload(__LINE__, defaultIni, &ini(), ".ini file still not found, silent", "");
 
     // Create/delete ini file with different values.
-    SavedIni savedIni; //< Create on the stack to test this possibility.
+    const SavedIni savedIni; //< Create on the stack to test this possibility.
     if (IniConfig::isEnabled())
         generateIniFile(savedIni);
-    testReload(__LINE__, Output::verbose, savedIni, "values changed");
-    testReload(__LINE__, Output::silent, savedIni, "values not changed");
+
+    testReload(__LINE__, savedIni, &ini(), "values changed, verbose",
+        /*suppress newline*/ 1 + (const char*)
+R"(
+test.ini [{iniFilePath}]
+  * enableOutput=true
+  * enableTime=false
+  * enableFps=false
+  * str0=" another string with leading space"
+  * str1="another string with middle \" quote"
+  * str2="\" another string with leading quote"
+  * str3="another string with trailing quote \""
+  * str4="\"another enquoted string\""
+  * str5="another plain string"
+  * str6="another plain string with \\ backslash"
+  * intNumber=777
+  * floatNumber=0.432
+  * doubleNumber=34.45
+)");
+
+    testReload(__LINE__, savedIni, &ini(), "values not changed, silent", "");
+}
+
+TEST(iniConfig, testParsingErrors)
+{
+    if (!IniConfig::isEnabled())
+    {
+        std::cerr << "IniConfig::isEnabled() -> false" << std::endl;
+        return; //< Nothing to test if IniConfig is disabled at compile time.
+    }
+
+    IniConfig::setIniFilesDir(nx::kit::test::tempDir());
+    TestIni ini;
+
+    std::string content = /*suppress newline*/ 1 + (const char*)
+R"(
+unknownParam=value
+unknownParamWithEmptyValue=
+missingEqualsAfterName
+=EmptyParamName
+nullStr=zero-code character {NUL} inside
+enableOutput=non-bool
+enableTime=2
+enableFps=1.0
+str0="Enquoted string with invalid \* escape sequence"
+str1="Missing closing quote
+str2="Unexpected trailing " after the closing quote
+str3="Non-printable {TAB} character (tab) in an enquoted string"
+str4="Enquoted string with unsupported escape sequence \u"
+str5="Octal escape sequence \666 does not fit in one byte"
+str6="Hex escape sequence \xDEAD does not fit in one byte"
+intNumber=3.14
+floatNumber=non-number
+doubleNumber=0.0.0
+)";
+    nx::kit::utils::stringReplaceAll(&content, "{TAB}", "\x09");
+    nx::kit::utils::stringReplaceAll(&content, "{NUL}", std::string("\0", 1));
+    nx::kit::test::createFile(ini.iniFilePath(), content);
+
+    testReload(__LINE__, defaultIni, &ini, "with errors, verbose",
+        /*suppress newline*/ 1 + (const char*)
+R"(
+test.ini [{iniFilePath}]
+test.ini ERROR: Missing "=" after the name missingEqualsAfterName. Line 3, file {iniFilePath}
+test.ini ERROR: The name part (before "=") is empty. Line 4, file {iniFilePath}
+  ! enableOutput=false [invalid value in file]
+  ! enableTime=true [invalid value in file]
+  ! enableFps=true [invalid value in file]
+  ERROR in the value of str0: Invalid escaped character '*' after the backslash.
+  ! str0=" string with leading space" [invalid value in file]
+  ERROR in the value of str1: Missing the closing quote.
+  ! str1="string with middle \" quote" [invalid value in file]
+  ERROR in the value of str2: Unexpected trailing after the closing quote.
+  ! str2="\" string with leading quote" [invalid value in file]
+  ERROR in the value of str3: Found non-printable ASCII character '\x09'.
+  ! str3="string with trailing quote \"" [invalid value in file]
+  ERROR in the value of str4: Invalid escaped character 'u' after the backslash.
+  ! str4="\"enquoted string\"" [invalid value in file]
+  ERROR in the value of str5: Octal escape sequence does not fit in one byte: 438.
+  ! str5="plain string" [invalid value in file]
+  ERROR in the value of str6: Hex escape sequence does not fit in one byte.
+  ! str6="plain string with \\ backslash" [invalid value in file]
+  ! intNumber=113 [invalid value in file]
+  ! floatNumber=310.55 [invalid value in file]
+  ! doubleNumber=-0.45 [invalid value in file]
+  ! nullStr [unexpected param in file]
+  ! unknownParam [unexpected param in file]
+  ! unknownParamWithEmptyValue [unexpected param in file]
+)");
 }
