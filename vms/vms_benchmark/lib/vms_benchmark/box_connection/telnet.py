@@ -130,4 +130,15 @@ class BoxConnectionTelnet(BoxConnection):
             stdout.write(reply)
             stdout.flush()
 
+        # Since stdout and stderr are not separated in the output of the command executed via
+        # telnet, we copy the same data to "stderr" and "stdout" parameters of the function.
+        # Strictly speaking, it is not a correct behavior, but so far it is enough to process all
+        # our cases correctly.
+        # TODO: Resolve this problem more systematically - either don't use separate stderr and
+        # stdout data in the higher-level functions (for both SSH and Telnet connection methods),
+        # or find a way to collect data from these streams separately when using Telnet connection.
+        if stderr:
+            stderr.write(reply)
+            stderr.flush()
+
         return self.BoxConnectionResult(0, command=command_wrapped)
