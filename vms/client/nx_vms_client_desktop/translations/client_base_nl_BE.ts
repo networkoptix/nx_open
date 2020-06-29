@@ -2833,9 +2833,9 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n van %1 geselecteerde gebruikers zijn niet %2 gebruikers en zullen geen mobiele meldingen ontvangen.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+        <numerusform>%n van %1 geselecteerde gebruikers zijn niet %2 gebruikers en zullen geen mobiele meldingen ontvangen.</numerusform>
       </translation>
     </message>
   </context>

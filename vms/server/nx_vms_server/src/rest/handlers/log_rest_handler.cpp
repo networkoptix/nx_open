@@ -32,24 +32,25 @@ int QnLogRestHandler::executeGet(
     }
 
     std::shared_ptr<nx::utils::log::AbstractLogger> logger;
+    if (const auto nameParam = params.value(lit("name")); !nameParam.isEmpty())
     {
-        const auto name = params.value(lit("name"));
-        if (!name.isEmpty())
-        {
-            logger = QnLogs::getLogger(name);
-        }
-        else
-        {
-            bool isOk = false;
-            const auto id = params.value(lit("id")).toInt(&isOk);
-            if (isOk)
-                logger = QnLogs::getLogger(id);
-        }
+        logger = QnLogs::getLogger(nameParam);
+    }
+    else if (const auto idParam = params.value(lit("id")); !idParam.isEmpty())
+    {
+        bool isOk = false;
+        const auto id = idParam.toInt(&isOk);
+        if (isOk)
+            logger = QnLogs::getLogger(id);
+    }
+    else
+    {
+        logger = nx::utils::log::mainLogger();
     }
 
     if (!logger)
     {
-        result = "Bad log file id or name";
+        result = "Bad log id or name";
         return nx::network::http::StatusCode::badRequest;
     }
 

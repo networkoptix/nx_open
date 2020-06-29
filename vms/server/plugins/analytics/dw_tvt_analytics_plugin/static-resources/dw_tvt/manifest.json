@@ -8,7 +8,16 @@
         "TD-9542E3",
         "TD-9543E3",
         "TD-9544E3",
-        "TD-9545E3"
+        "TD-9545E3",
+
+        "DWC-MB94Wi28T",
+        "DWC-MB94Wi36T",
+        "DWC-MV94Wi28T",
+        "DWC-MV94Wi36T",
+        "DWC-MV94WiAT",
+        "DWC-MT94Wi28T",
+        "DWC-MT94Wi36T",
+        "DWC-MT94WiAT"
     ],
     "eventTypes":
     [

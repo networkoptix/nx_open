@@ -69,8 +69,8 @@ public:
 
     static int issuesTimeoutMs();
 
-    void issueOccured();
-    void cleanCameraIssues();
+    virtual void issueOccured();
+    virtual void cleanCameraIssues();
 
     bool wearableIgnoreTimeZone() const;
     /**

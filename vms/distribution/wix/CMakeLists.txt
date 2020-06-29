@@ -7,7 +7,6 @@ set(project.build.directory "${CMAKE_CURRENT_BINARY_DIR}")
 set(ClientHelpSourceDir "${help_directory}/bin/help")
 set(VoxSourceDir "${bin_source_dir}/vox")
 set(client_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/client_qml")
-set(nxtool_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/nxtool_qml")
 set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
 
@@ -79,41 +78,6 @@ if(withTestCamera)
             "--output" ${distribution_output_dir}
     )
     set_target_properties(generate_testcamera_package PROPERTIES FOLDER distribution)
-endif()
-
-
-if(withNxTool)
-    set(nxtool_qml_root "${CMAKE_SOURCE_DIR}/vms/nxtool/static-resources/src/qml/")
-    set(nxtool_executable "${bin_source_dir}/nxtool.exe")
-
-    add_custom_target(collect_nxtool_qml_dependencies
-        DEPENDS
-            nxtool
-            wix_custom_actions
-        COMMENT "Collecting NxTool QML libraries..."
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build_utils/python
-        COMMAND ${PYTHON_EXECUTABLE} qmldeploy.py
-            "--qml-root" ${nxtool_qml_root}
-            "--qt-root" ${qt.dir}
-            "--output" ${nxtool_qml_dir}
-            "--skip-styles"
-        )
-
-    add_custom_target(create_nxtool_installer ALL
-        COMMENT "Generating NxTool installer..."
-        DEPENDS
-            collect_nxtool_qml_dependencies
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
-        COMMAND ${PYTHON_EXECUTABLE} create_nxtool_installer.py
-            "--config" ${config_file}
-            "--qml-dir" ${nxtool_qml_dir}
-            "--sources-dir" "${CMAKE_CURRENT_BINARY_DIR}"
-            "--output" ${distribution_output_dir}
-    )
-    set_target_properties(
-        collect_nxtool_qml_dependencies
-        create_nxtool_installer
-        PROPERTIES FOLDER distribution)
 endif()
 
 if(withDesktopClient)

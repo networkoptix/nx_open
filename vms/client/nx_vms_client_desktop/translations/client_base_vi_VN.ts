@@ -2798,8 +2798,8 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n trên %1 người dùng được chọn không phải là %2 người dùng và sẽ không nhận được thông báo di động.</numerusform>
       </translation>
     </message>
   </context>

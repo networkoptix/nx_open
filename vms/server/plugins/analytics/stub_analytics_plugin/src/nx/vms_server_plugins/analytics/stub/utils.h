@@ -11,6 +11,18 @@ namespace stub {
 
 bool toBool(std::string str);
 
+template<typename T>
+T clamp(const T& value, const T& lowerBound, const T& upperBound)
+{
+    if (value < lowerBound)
+        return lowerBound;
+
+    if (value > upperBound)
+        return upperBound;
+
+    return value;
+}
+
 } // namespace stub
 } // namespace analytics
 } // namespace vms_server_plugins

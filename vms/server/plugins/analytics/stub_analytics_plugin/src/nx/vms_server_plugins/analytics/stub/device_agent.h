@@ -196,6 +196,10 @@ private:
             std::chrono::milliseconds::zero()};
 
         std::atomic<int> numberOfFramesBeforePreviewGeneration{30};
+
+        std::atomic<float> counterBoundingBoxSideSize{0};
+        std::atomic<float> counterBoundingBoxXOffset{0};
+        std::atomic<float> counterBoundingBoxYOffset{0};
     };
 
     DeviceAgentSettings m_deviceAgentSettings;

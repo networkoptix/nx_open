@@ -984,15 +984,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Stránka...</translation>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>Připojit k serveru</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Pin</translation>
     </message>
   </context>
   <context>
@@ -1261,7 +1261,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>Chcete-li problém nahlásit, kontaktujte %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1309,7 +1309,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>Chcete-li licenční klíč aktivovat ručně, kontaktujte %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1321,11 +1321,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>Chcete-li problém nahlásit, kontaktujte svou regionální / licenční podporu:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>Chcete-li licenční klíč aktivovat ručně, kontaktujte svou regionální / licenční podporu:</translation>
     </message>
   </context>
   <context>
@@ -1368,7 +1368,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Zkuste to prosím znovu později.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1409,27 +1409,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Chcete-li získat platný licenční klíč, kontaktujte prosím %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Pokud problém přetrvává, kontaktujte %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Kontaktujte prosím %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Chcete-li získat platný licenční klíč, kontaktujte svou regionální / licenční podporu:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Pokud problém přetrvává, kontaktujte prosím zákaznickou podporu:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Obraťte se na svou regionální / licenční podporu:</translation>
     </message>
   </context>
   <context>
@@ -1667,7 +1667,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Opravdu chcete opustit tuto stránku? Změny, které jste provedli, nemusí být uloženy.</translation>
     </message>
   </context>
   <context>
@@ -1702,7 +1702,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Regionální / licenční podpora</translation>
     </message>
   </context>
   <context>
@@ -1770,7 +1770,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Varování! Toto je experimentální nastavení, která šetří CPU, ale může ovlivnit animaci.</translation>
     </message>
   </context>
   <context>
@@ -2069,15 +2069,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Pravidlo události změněno</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Pravidlo události odstraněno</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation type="unfinished">Event rules reset to default</translation>
+      <translation>Pravidla události byla obnovena do výchozího nastavení</translation>
     </message>
   </context>
   <context>
@@ -2317,36 +2317,36 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Zdrojový server</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Zdrojová kamera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
         <numerusform>Source and %n more Cameras</numerusform>
         <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Vyberte alespoň jedno zařízení</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Vyberte alespoň jednu kameru</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Vyberte Server</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Zdrojový server a %1</translation>
     </message>
   </context>
   <context>
@@ -2476,7 +2476,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>Servery podporující buzzer</translation>
     </message>
   </context>
   <context>
@@ -2906,7 +2906,7 @@ to %1</source>
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
       <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+        <numerusform>%n z %1 vybraných uživatelů nejsou %2 uživatelé a nebudou dostávat mobilní oznámení.</numerusform>
         <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
         <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
         <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
@@ -3270,7 +3270,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Nelze rozpoznat rozlišení zachytávání</translation>
     </message>
   </context>
   <context>
@@ -3568,7 +3568,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Servery podporující diagnostiku ventilátorů</translation>
     </message>
   </context>
   <context>
@@ -3916,7 +3916,7 @@ to %1</source>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Zbývající deaktivace</translation>
     </message>
   </context>
   <context>
@@ -4066,7 +4066,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
+        <numerusform>Zbývá %n deaktivací.</numerusform>
         <numerusform>%n deactivations remaining.</numerusform>
         <numerusform>%n deactivations remaining.</numerusform>
         <numerusform>%n deactivations remaining.</numerusform>
@@ -4093,16 +4093,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Chcete-li získat soubor aktivačního klíče, zašlete poskytnutý licenční klíč a ID hardwaru na %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Zašlete prosím licenční klíč a ID hardwaru na vaši regionální / licenční podporu pro získání souboru s aktivačním klíčem.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Zašlete prosím licenční klíč a ID hardwaru na vaši regionální / licenční podporu (%1) pro získání souboru s aktivačním klíčem.</translation>
     </message>
   </context>
   <context>
@@ -4658,7 +4658,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Servery, které podporují monitorování PoE</translation>
     </message>
   </context>
   <context>
@@ -5417,7 +5417,7 @@ to %1</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5918,11 +5918,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>Server  není k dispozici.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>nyní</translation>
     </message>
   </context>
   <context>
@@ -5989,23 +5989,23 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optický</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>Prohodit</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>síť</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6294,7 +6294,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>Pokud je funkce Failover povolena, server může stále žádat o aktualizaci stavu kamery bez ohledu na toto nastavení.</translation>
     </message>
   </context>
   <context>
@@ -6799,7 +6799,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>Nelze se připojit k zadanému serveru</translation>
     </message>
   </context>
   <context>
@@ -6850,7 +6850,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Na odebrané kameře nelze událost potvrdit.</translation>
     </message>
   </context>
   <context>
@@ -7750,8 +7750,8 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message numerus="yes">
       <source>+%n values</source>
       <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+        <numerusform>+%n hodnot</numerusform>
+        <numerusform>+%n hodnot</numerusform>
         <numerusform>+%n values</numerusform>
         <numerusform>+%n values</numerusform>
       </translation>
@@ -8478,7 +8478,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Je vyžadováno překódování videa.</translation>
     </message>
   </context>
   <context>
@@ -8689,11 +8689,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>Proxy %1 vyžaduje uživatelské jméno a heslo.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Vyberte soubory k nahrání</translation>
     </message>
   </context>
   <context>
@@ -8787,7 +8787,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>Toto ID je již v systému použito. Použijte tlačítko Generovat pro nalezení volného ID.</translation>
     </message>
   </context>
   <context>
@@ -9224,7 +9224,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>Přihlásit se</translation>
     </message>
   </context>
   <context>
@@ -9327,31 +9327,31 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>Instalace aktualizace se nezdařila.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>Odpojeno</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>Připojeno</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>Napájeno</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>Neočekávané</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>Prázdný</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9363,7 +9363,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Spotřeba</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9371,16 +9371,16 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>Napájení</translation>
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Neznámé zařízení</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Neznámé zařízení %1</translation>
     </message>
   </context>
   <context>
@@ -9399,29 +9399,29 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>Systém není připojen k %1. Mobilní oznámení fungují, pouze pokud je systém připojen k %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 Nastavení</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>%n symbolů</numerusform>
+        <numerusform>%n symbolů</numerusform>
+        <numerusform>%n symbolů</numerusform>
+        <numerusform>%n symbolů</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>Zbývá %n symbolů</numerusform>
+        <numerusform>Zbývá %n symbolů</numerusform>
+        <numerusform>Zbývá %n symbolů</numerusform>
+        <numerusform>Zbývá %n symbolů</numerusform>
       </translation>
     </message>
   </context>
@@ -9559,7 +9559,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>Šifrovat lze pouze přenos videa mezi klientem a serverem</translation>
     </message>
   </context>
   <context>
@@ -9575,7 +9575,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>Nejsou k dispozici žádné kompatibilní servery</translation>
     </message>
   </context>
   <context>
@@ -9610,7 +9610,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>plugin vrátil špatný manifest</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
@@ -10015,7 +10015,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>Je vyžadováno překódování. Export relace restartován.</translation>
     </message>
   </context>
   <context>
@@ -10222,15 +10222,15 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Pro deaktivaci licence prosím vyplňte následující</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Berte ohled na to, že každý licenční klíč může být deaktivován maximálně %n krát.</numerusform>
+        <numerusform>Berte ohled na to, že každý licenční klíč může být deaktivován maximálně %n krát.</numerusform>
+        <numerusform>Berte ohled na to, že každý licenční klíč může být deaktivován maximálně %n krát.</numerusform>
+        <numerusform>Berte ohled na to, že každý licenční klíč může být deaktivován maximálně %n krát.</numerusform>
       </translation>
     </message>
   </context>
@@ -10547,7 +10547,7 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Uložit soubor jako ...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10555,15 +10555,15 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Uložení souboru se nezdařilo: </translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>Složka %1 je pro zápis zablokována.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Stahování souborů</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10571,15 +10571,15 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Zastavit stahování souborů?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Soubor stažen</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Stažení souboru se nezdařilo</translation>
     </message>
   </context>
 </TS>

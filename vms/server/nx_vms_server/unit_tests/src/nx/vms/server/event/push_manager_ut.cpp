@@ -268,7 +268,7 @@ TEST_F(PushManagerTest, AddSource)
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
-        EXPECT_EQ(sent->notification.title, "Motion on Cameras");
+        EXPECT_EQ(sent->notification.title, "Motion on Camera");
         EXPECT_EQ(sent->notification.body, "");
         EXPECT_EQ(sent->notification.payload.url, openUrl(cameraId));
         EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl(cameraId));
@@ -279,7 +279,7 @@ TEST_F(PushManagerTest, AddSource)
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com","b@xxx.com","c@xxx.com"}));
         EXPECT_EQ(sent->systemId, systemId);
-        EXPECT_EQ(sent->notification.title, "Motion on Cameras");
+        EXPECT_EQ(sent->notification.title, "Motion on Camera");
         EXPECT_EQ(sent->notification.body, "WTF!");
         EXPECT_EQ(sent->notification.payload.url, openUrl(cameraId));
         EXPECT_EQ(sent->notification.payload.imageUrl, imageUrl(cameraId));
@@ -323,21 +323,21 @@ TEST_F(PushManagerTest, Permissions)
         const auto sent = testEvent(EventType::cameraMotionEvent, cameraId);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"c@xxx.com"}));
-        EXPECT_EQ(sent->notification.title, "Motion on Cameras");
+        EXPECT_EQ(sent->notification.title, "Motion on Camera");
     }
     setUserPermissions("bc", vms::api::GlobalPermission::viewerPermissions);
     {
         const auto sent = testEvent(EventType::cameraMotionEvent, cameraId);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"b@xxx.com", "c@xxx.com"}));
-        EXPECT_EQ(sent->notification.title, "Motion on Cameras");
+        EXPECT_EQ(sent->notification.title, "Motion on Camera");
     }
     setUserPermissions("abc");
     {
         const auto sent = testEvent(EventType::cameraMotionEvent, cameraId);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com", "b@xxx.com", "c@xxx.com"}));
-        EXPECT_EQ(sent->notification.title, "Motion on Cameras");
+        EXPECT_EQ(sent->notification.title, "Motion on Camera");
     }
 }
 

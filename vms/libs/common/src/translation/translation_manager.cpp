@@ -302,6 +302,7 @@ bool QnTranslationManager::setCurrentThreadTranslationLocale(const QString& loca
     }
     else
     {
+        m_threadLocales.remove(id);
         uninstallUnusedOverlays();
     }
 

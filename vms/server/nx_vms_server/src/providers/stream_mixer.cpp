@@ -24,6 +24,16 @@ QnStreamMixer::~QnStreamMixer()
     NX_VERBOSE(this, "Delete");
 }
 
+void QnStreamMixer::updateSoftwareMotion()
+{
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& dataSource: m_sourceMap.values())
+    {
+        if (auto liveProvider = dataSource.provider.dynamicCast<QnLiveStreamProvider>())
+            liveProvider->updateSoftwareMotion();
+    }
+}
+
 void QnStreamMixer::addDataSource(QnAbstractStreamDataProviderPtr& source)
 {
     QnMutexLocker lock(&m_mutex);
@@ -63,7 +73,6 @@ void QnStreamMixer::setUser(QnAbstractStreamDataProvider* user)
 
 void QnStreamMixer::makeChannelMappingOperation(
     MapType type,
-    OperationType opType,
     QnAbstractStreamDataProvider* source,
     quint32 channelNumber,
     quint32 mappedChannelNumber)
@@ -81,10 +90,7 @@ void QnStreamMixer::makeChannelMappingOperation(
             sourceInfo.videoChannelMap :
             sourceInfo.audioChannelMap;
 
-    if (opType == OperationType::Insert)
-        channelMap[channelNumber].insert(mappedChannelNumber);
-    else if (opType == OperationType::Remove)
-        channelMap[channelNumber].erase(mappedChannelNumber);
+    channelMap[channelNumber] = mappedChannelNumber;
 }
 
 void QnStreamMixer::mapSourceVideoChannel(
@@ -94,7 +100,6 @@ void QnStreamMixer::mapSourceVideoChannel(
 {
     makeChannelMappingOperation(
         MapType::Video,
-        OperationType::Insert,
         source,
         videoChannelNumber,
         mappedVideoChannelNumber);
@@ -107,33 +112,6 @@ void QnStreamMixer::mapSourceAudioChannel(
 {
     makeChannelMappingOperation(
         MapType::Audio,
-        OperationType::Insert,
-        source,
-        audioChannelNumber,
-        mappedAudioChannelNumber);
-}
-
-void QnStreamMixer::unmapSourceVideoChannel(
-    QnAbstractStreamDataProvider* source,
-    quint32 videoChannelNumber,
-    quint32 mappedVideoChannelNumber)
-{
-    makeChannelMappingOperation(
-        MapType::Video,
-        OperationType::Remove,
-        source,
-        videoChannelNumber,
-        mappedVideoChannelNumber);
-}
-
-void QnStreamMixer::unmapSourceAudioChannel(
-    QnAbstractStreamDataProvider* source,
-    quint32 audioChannelNumber,
-    quint32 mappedAudioChannelNumber)
-{
-    makeChannelMappingOperation(
-        MapType::Audio,
-        OperationType::Remove,
         source,
         audioChannelNumber,
         mappedAudioChannelNumber);
@@ -279,40 +257,34 @@ void QnStreamMixer::resetSources()
         source.provider->removeDataProcessor(this);
 }
 
+void QnStreamMixer::updateChannel(const QnAbstractMediaDataPtr& data)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    uintptr_t provider = reinterpret_cast<uintptr_t>(data->dataProvider);
+    if (!m_sourceMap.contains(provider))
+        return;
+
+    if (data->dataType != QnAbstractMediaData::DataType::AUDIO
+        && data->dataType != QnAbstractMediaData::DataType::VIDEO)
+    {
+        return;
+    }
+
+    const auto& channelMap = (data->dataType == QnAbstractMediaData::DataType::AUDIO)
+        ? m_sourceMap[provider].audioChannelMap
+        : m_sourceMap[provider].videoChannelMap;
+
+    const auto itr = channelMap.find(data->channelNumber);
+    if (itr != channelMap.end())
+        data->channelNumber = itr->second;
+}
+
 void QnStreamMixer::handlePacket(QnAbstractMediaDataPtr& data)
 {
     QnMutexLocker lock(&m_mutex);
-    uintptr_t provider = reinterpret_cast<uintptr_t>(data->dataProvider);
-    auto originalChannel = data->channelNumber;
-
-    if (m_sourceMap.contains(provider))
-    {
-        decltype(QnProviderChannelInfo::videoChannelMap)* channelMap;
-
-        if(data->dataType == QnAbstractMediaData::DataType::AUDIO)
-            channelMap = &m_sourceMap[provider].audioChannelMap;
-        else
-            channelMap = &m_sourceMap[provider].videoChannelMap;
-
-        if (channelMap->count(originalChannel))
-        {
-            auto mapping = channelMap->at(originalChannel);
-            bool isFirstIteration = true;
-            QnAbstractMediaDataPtr dataToPush = data;
-
-            for (const auto& mappedChannel: mapping)
-            {
-                if (!isFirstIteration)
-                    dataToPush.reset(dataToPush->clone());
-
-                dataToPush->channelNumber = mappedChannel;
-                dataToPush->dataProvider = m_user;
-
-                m_buffer->pushData(dataToPush);
-                isFirstIteration = false;
-            }
-        }
-    }
+    data->dataProvider = m_user;
+    m_buffer->pushData(data);
 }
 
 int QnStreamMixer::channelCount(QnAbstractMediaData::DataType dataType) const
@@ -324,17 +296,8 @@ int QnStreamMixer::channelCount(QnAbstractMediaData::DataType dataType) const
             ? providerInfo.videoChannelMap
             : providerInfo.audioChannelMap;
 
-        for (const auto& entry : channelMap)
-        {
-            std::set<quint32> temp;
-            const auto& providerMappedChannels = entry.second;
-            std::set_union(
-                mappedChannels.cbegin(), mappedChannels.cend(),
-                providerMappedChannels.cbegin(), providerMappedChannels.cend(),
-                std::inserter(temp, temp.end()));
-
-            mappedChannels = std::move(temp);
-        }
+        for (const auto& entry: channelMap)
+            mappedChannels.insert(entry.second);
     }
     return (int) mappedChannels.size();
 }

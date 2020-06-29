@@ -33,7 +33,7 @@ void LibContext::setRefCountableRegistry(IRefCountableRegistry* refCountableRegi
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (!NX_KIT_ASSERT(!m_refCountableRegistry,
-        nx::kit::utils::format("LibContext refCountableRegistry has already been set.")))
+        "LibContext refCountableRegistry has already been set."))
     {
         return;
     }

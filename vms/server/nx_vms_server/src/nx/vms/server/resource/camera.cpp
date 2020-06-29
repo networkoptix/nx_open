@@ -859,6 +859,26 @@ bool Camera::fixMulticastParametersIfNeeded(
     return somethingIsFixed;
 }
 
+QnCameraUserAttributePool::ScopedLock Camera::userAttributies() const
+{
+    const auto id = getRole() == nx::vms::server::resource::Camera::Role::subchannel
+        ? getParentId() : getId();
+    return QnCameraUserAttributePool::ScopedLock(userAttributesPool(), id);
+}
+
+void Camera::issueOccured()
+{
+    if (getRole() == nx::vms::server::resource::Camera::Role::subchannel)
+    {
+        if (const auto& parent = getParentResource().dynamicCast<QnVirtualCameraResource>())
+            parent->issueOccured();
+    }
+    else
+    {
+        base_type::issueOccured();
+    }
+}
+
 std::optional<QJsonObject> Camera::deviceAgentSettingsModel(const QnUuid& engineId) const
 {
     const auto manifest = deviceAgentManifest(engineId);

@@ -527,6 +527,9 @@ void CameraSettingsDialog::done(int result)
 
 void CameraSettingsDialog::showEvent(QShowEvent* event)
 {
+    // Load state into tabs in case the state was changed outside current client process.
+    d->resetChanges();
+
     base_type::showEvent(event);
     d->previewManager->refreshSelectedCamera();
 }

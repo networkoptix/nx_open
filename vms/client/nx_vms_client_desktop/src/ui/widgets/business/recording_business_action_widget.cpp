@@ -11,6 +11,8 @@
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+#include <utils/common/delayed.h>
+
 static constexpr int kMsecPerSecond = 1000;
 
 using namespace nx::vms::client::desktop;
@@ -95,7 +97,12 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
         ui->fpsSpinBox->setEnabled(maxFps > 0);
         ui->fpsSpinBox->setMaximum(maxFps);
         if (ui->fpsSpinBox->value() == 0 && maxFps > 0)
+        {
             ui->fpsSpinBox->setValue(maxFps);
+
+            // We have to update model too.
+            executeLater([this]{ paramsChanged(); }, this);
+        }
         ui->fpsSpinBox->setMinimum(maxFps > 0 ? 1 : 0);
     }
 

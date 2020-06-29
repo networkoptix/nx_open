@@ -51,61 +51,61 @@
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
+      <translation>
+        <numerusform>בייט(ים)</numerusform>
+        <numerusform>בייט(ים)</numerusform>
+        <numerusform>בייט(ים)</numerusform>
+        <numerusform>בייטים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
+      <translation>
+        <numerusform>קילובייט</numerusform>
+        <numerusform>קילובייטים</numerusform>
+        <numerusform>קילובייטים</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
+      <translation>
+        <numerusform>Megabyte</numerusform>
+        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
+      <translation>
+        <numerusform>ג'יגה-בייט</numerusform>
+        <numerusform>ג'יגה-בייט</numerusform>
+        <numerusform>ג'יגה-בייט</numerusform>
+        <numerusform>ג'יגה-בייט</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
+      <translation>
+        <numerusform>טרה-בייט</numerusform>
+        <numerusform>טרה-בייט</numerusform>
+        <numerusform>טרה-בייט</numerusform>
+        <numerusform>טרה-בייט</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
+      <translation>
+        <numerusform>פטאבייט</numerusform>
+        <numerusform>פטאבייט</numerusform>
+        <numerusform>פטאבייט</numerusform>
+        <numerusform>פטאבייט</numerusform>
       </translation>
     </message>
   </context>
@@ -1093,7 +1093,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>קידוד וידאו נדרש.</translation>
     </message>
   </context>
   <context>
@@ -1920,27 +1920,27 @@
     </message>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>זמזם</translation>
     </message>
     <message>
       <source>Archive Backup Finished</source>
-      <translation type="unfinished">Archive Backup Finished</translation>
+      <translation>גיבוי הארכיון הסתיים</translation>
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation type="unfinished">PoE over Budget</translation>
+      <translation>קיבולת PoE </translation>
     </message>
     <message>
       <source>Fan Error</source>
-      <translation type="unfinished">Fan Error</translation>
+      <translation>תקלה במאוורר</translation>
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation type="unfinished">PoE over budget at %1</translation>
+      <translation>קיבולת PoE על 1%</translation>
     </message>
     <message>
       <source>Fan error at %1</source>
-      <translation type="unfinished">Fan error at %1</translation>
+      <translation>שגיאת במאוורר ב %1</translation>
     </message>
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
@@ -1949,11 +1949,11 @@
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation type="unfinished">Show desktop notification</translation>
+      <translation>הצג התראה בשולחן העבודה</translation>
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation type="unfinished">Send mobile notification</translation>
+      <translation>שלח התראה בדחיפה לטלפון</translation>
     </message>
     <message>
       <source>Consumption</source>
@@ -1973,11 +1973,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation type="unfinished">RTP error in primary stream (%1)</translation>
+      <translation>שגיאת RTP בזרם ראשי (%1)</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
+      <translation>שגיאת RTP בזרם משני (%1)</translation>
     </message>
   </context>
   <context>

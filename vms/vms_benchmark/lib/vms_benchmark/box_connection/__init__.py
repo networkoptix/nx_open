@@ -10,6 +10,8 @@ ini_box_get_file_content_timeout_s: int
 
 
 class BoxConnection:
+    connection_type_name = 'UNDEFINED_CONNECTION_TYPE'
+
     class BoxConnectionResult:
         def __init__(self, return_code, message=None, command=None):
             self.message = message

@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Limitar taxa de quadros para economizar CPU</translation>
     </message>
   </context>
   <context>
@@ -315,7 +315,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>no dia seguinte</translation>
     </message>
   </context>
   <context>
@@ -503,7 +503,7 @@
     <message>
       <location/>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>Usar servidor de origem de evento</translation>
     </message>
   </context>
   <context>
@@ -678,12 +678,12 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Porta de Mídia Personalizada</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Confiar no timestamp da câmera</translation>
     </message>
     <message>
       <location/>
@@ -703,7 +703,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Pré-definições de câmera nativas não serão disponíveis.</translation>
     </message>
     <message>
       <location/>
@@ -718,7 +718,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Detectar movimento durante a importação de arquivo</translation>
     </message>
   </context>
   <context>
@@ -1065,7 +1065,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Dica</translation>
     </message>
     <message>
       <location/>
@@ -1110,7 +1110,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Adicionar Dispositivos</translation>
     </message>
     <message>
       <location/>
@@ -1128,12 +1128,12 @@
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>Não concordo</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>Concordo</translation>
     </message>
   </context>
   <context>
@@ -1269,7 +1269,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Proteger com senha</translation>
     </message>
     <message>
       <location/>
@@ -1633,7 +1633,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Tamanho mínimo da grade</translation>
     </message>
   </context>
   <context>
@@ -1699,7 +1699,7 @@
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>DN Admin ou CN</translation>
     </message>
   </context>
   <context>
@@ -1984,7 +1984,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>Verificar atualização</translation>
     </message>
     <message>
       <location/>
@@ -2009,7 +2009,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download e instalação</translation>
     </message>
     <message>
       <location/>
@@ -2024,7 +2024,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Configurações Avançadas de Atualização</translation>
     </message>
     <message>
       <location/>
@@ -2037,12 +2037,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>Mostrar todos os layouts</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Selecionar Layouts</translation>
     </message>
   </context>
   <context>
@@ -2055,7 +2055,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nova Câmera Virtual...</translation>
     </message>
   </context>
   <context>
@@ -2081,7 +2081,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
       <source>Sign in</source>
-      <translation type="unfinished">Sign in</translation>
+      <translation>Iniciar sessão</translation>
     </message>
     <message>
       <location/>
@@ -2091,7 +2091,7 @@
     <message>
       <location/>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Usuário</translation>
     </message>
   </context>
   <context>
@@ -2142,17 +2142,17 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Nível:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>ERRO</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>AVISO</translation>
     </message>
     <message>
       <location/>
@@ -2165,7 +2165,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
       <source>Attention! Power limit exceeded</source>
-      <translation type="unfinished">Attention! Power limit exceeded</translation>
+      <translation>Atenção! Limite de potência excedido</translation>
     </message>
   </context>
   <context>
@@ -2280,42 +2280,42 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Para</translation>
     </message>
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>Configurações de idioma</translation>
     </message>
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>Conteúdo das notificações personalizadas</translation>
     </message>
     <message>
       <location/>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Cabeçalho</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>O título de notificação padrão será usado se deixado vazio</translation>
     </message>
     <message>
       <location/>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Corpo</translation>
     </message>
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>O texto padrão será usado se este campo estiver vazio</translation>
     </message>
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Adicionar nome do dispositivo de origem no corpo</translation>
     </message>
   </context>
   <context>
@@ -2357,7 +2357,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Reiniciar para a versão atualizada quando pronto</translation>
     </message>
   </context>
   <context>
@@ -2709,7 +2709,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>Arraste qualquer imagem ou arquivo de vídeo para a janela do aplicativo para reproduzi-los</translation>
     </message>
   </context>
   <context>
@@ -2813,12 +2813,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation>Exibir marca d'água com nome do utilizador sobre o vídeo</translation>
+      <translation>Exibir marca d&apos;água com nome do utilizador sobre o vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation>Visualização de marca d'água</translation>
+      <translation>Visualização de marca d&apos;água</translation>
     </message>
     <message>
       <location/>
@@ -2828,7 +2828,7 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>Duração da sessão limite</translation>
     </message>
   </context>
   <context>
@@ -3081,7 +3081,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Previsão base de dados gravados durante</translation>
     </message>
   </context>
   <context>
@@ -3129,12 +3129,12 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>Os dados do Analytics continuarão a ser armazenados no armazenamento desabilitado.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>A gravação para o local de armazenamento desativado será interrompida. No entanto, a exclusão de filmagens desatualizadas continuará.</translation>
     </message>
     <message>
       <location/>
@@ -3144,7 +3144,7 @@
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Os dados do Analytics podem ocupar grandes quantidades de espaço. Recomendamos escolher outro local para ele em vez da partição do sistema.</translation>
     </message>
   </context>
   <context>
@@ -3226,7 +3226,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation type="unfinished">Custom language for mobile notifications</translation>
+      <translation>Idioma personalizado para notificações móveis</translation>
     </message>
   </context>
   <context>
@@ -3262,17 +3262,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>Sincronizar a hora com a Internet</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Horário do VMS</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>Não sincronize o tempo entre os servidores</translation>
     </message>
   </context>
   <context>
@@ -3380,7 +3380,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Detectar movimento</translation>
     </message>
   </context>
   <context>
@@ -3398,7 +3398,7 @@
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>Ignorar fuso horário em arquivos enviados</translation>
     </message>
   </context>
   <context>

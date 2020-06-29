@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>จำกัด อัตราเฟรมเพื่อประสิทธิภาพที่ดีของ CPU</translation>
     </message>
   </context>
   <context>
@@ -503,7 +503,7 @@
     <message>
       <location/>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>ใช้เซิร์ฟเวอร์ต้นทางของเหตุการณ์</translation>
     </message>
   </context>
   <context>
@@ -2081,7 +2081,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
       <source>Sign in</source>
-      <translation type="unfinished">Sign in</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
     <message>
       <location/>
@@ -2165,7 +2165,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
       <source>Attention! Power limit exceeded</source>
-      <translation type="unfinished">Attention! Power limit exceeded</translation>
+      <translation>สาเหตุ: เกินขีด จำกัด พลังงาน</translation>
     </message>
   </context>
   <context>
@@ -2285,37 +2285,37 @@
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>การตั้งค่าภาษา</translation>
     </message>
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>เนื้อหาการแจ้งเตือนที่กำหนดเอง</translation>
     </message>
     <message>
       <location/>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>หัวข้อ</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>ชื่อการแจ้งเตือนเริ่มต้นจะถูกใช้งานหากปล่อยว่างไว้</translation>
     </message>
     <message>
       <location/>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>เนื้อความ</translation>
     </message>
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>ข้อความเริ่มต้นจะถูกใช้หากฟิลด์นี้ว่างเปล่า</translation>
     </message>
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>เพิ่มชื่ออุปกรณ์ต้นทางในเนื้อหา</translation>
     </message>
   </context>
   <context>
@@ -3226,7 +3226,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation type="unfinished">Custom language for mobile notifications</translation>
+      <translation>ภาษาที่กำหนดเองสำหรับการแจ้งเตือนมือถือ</translation>
     </message>
   </context>
   <context>
@@ -3398,7 +3398,7 @@
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>ยกเว้นเขตเวลาในไฟล์ที่อัปโหลด</translation>
     </message>
   </context>
   <context>

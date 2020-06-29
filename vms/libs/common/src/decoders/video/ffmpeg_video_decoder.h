@@ -70,6 +70,8 @@ public:
     */
     virtual unsigned int getDecoderCaps() const override;
     virtual void setSpeed( float newValue ) override;
+
+    int getLastDecodeResult() const { return m_lastDecodeResult; }
 private:
     static AVCodec* findCodec(AVCodecID codecId);
 
@@ -129,6 +131,7 @@ private:
     bool m_useMtDecoding;
     bool m_needRecreate;
     nx::metrics::Storage* m_metrics = nullptr;
+    int m_lastDecodeResult = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

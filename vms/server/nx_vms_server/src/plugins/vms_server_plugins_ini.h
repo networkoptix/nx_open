@@ -83,28 +83,28 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "below. Otherwise debug-level message is written into the logs and a Plugin Diagnostic\n"
         "event is triggered.");
 
-    NX_INI_INT(5, manifestSdkMethodTimeoutS,
+    NX_INI_INT(30, manifestSdkMethodTimeoutS,
         "Maximum duration of the `*::manifest` method execution in seconds.");
 
-    NX_INI_INT(10, setSettingsSdkMethodTimeoutS,
+    NX_INI_INT(30, setSettingsSdkMethodTimeoutS,
         "Maximum duration of the `*::setSettings` method execution in seconds.");
 
-    NX_INI_INT(10, pluginSideSettingsSdkMethodTimeoutS,
+    NX_INI_INT(30, pluginSideSettingsSdkMethodTimeoutS,
         "Maximum duration of the `*::pluginSideSettings` method execution in seconds.");
 
     NX_INI_INT(1, setHandlerSdkMethodTimeoutS,
         "Maximum duration of the `*::setHandler` method execution in seconds.");
 
-    NX_INI_INT(1, createEngineSdkMethodTimeoutS,
+    NX_INI_INT(30, createEngineSdkMethodTimeoutS,
         "Maximum duration of the `IPlugin::createEngine` method execution in seconds.");
 
     NX_INI_INT(1, setEngineInfoSdkMethodTimeoutS,
         "Maximum duration of the `IEngine::setEngineInfo` method execution in seconds.");
 
-    NX_INI_INT(1, isCompatibleSdkMethodTimeoutS,
+    NX_INI_INT(3, isCompatibleSdkMethodTimeoutS,
         "Maximum duration of the `IEngine::isCompatible` method execution in seconds.");
 
-    NX_INI_INT(10, obtainDeviceAgentSdkMethodTimeoutS,
+    NX_INI_INT(30, obtainDeviceAgentSdkMethodTimeoutS,
         "Maximum duration of the `IEngine::obtainDeviceAgent` method execution in seconds.");
 
     NX_INI_INT(30, executeActionSdkMethodTimeoutS,

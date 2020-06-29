@@ -5,11 +5,6 @@
 
 # Transform the variables for the migration simplicity.
 # TODO: #GDM Replace old variables with new ones.
-set(build_nxtool OFF)
-if(customization.nxtool.enabled)
-    set(build_nxtool ON)
-endif()
-
 set(build_paxton OFF)
 if(customization.paxton.enabled)
     set(build_paxton ON)

@@ -984,15 +984,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>หน้า...</translation>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>ปักหมุด</translation>
     </message>
   </context>
   <context>
@@ -1255,7 +1255,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>หากต้องการรายงานปัญหาโปรดติดต่อ %1</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1303,7 +1303,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>หากต้องการเปิดใช้งานรหัสใบอนุญาตด้วยตนเองโปรดติดต่อ %1</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1315,11 +1315,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>หากต้องการรายงานปัญหาโปรดติดต่อฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณ:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>หากต้องการรายงานปัญหาโปรดติดต่อฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณ:</translation>
     </message>
   </context>
   <context>
@@ -1350,7 +1350,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>โปรดลองอีกครั้งในภายหลัง</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1385,27 +1385,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>ในการรับรหัสใบอนุญาตที่ถูกต้องโปรดติดต่อ %1</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>หากพบปัญหาโปรดติดต่อฝ่ายบริการลูกค้า</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>กรุณาติดต่อ %1</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>หากต้องการรายงานปัญหาโปรดติดต่อฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณ:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>หากต้องการรายงานปัญหาโปรดติดต่อฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณ:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>กรุณาติดต่อการสนับสนุนภูมิภาค / ใบอนุญาตของคุณ:</translation>
     </message>
   </context>
   <context>
@@ -1625,7 +1625,7 @@ to view more bookmarks</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>คุณแน่ใจหรือว่าต้องการออกจากหน้านี้ การเปลี่ยนแปลงที่คุณทำอาจไม่ถูกบันทึก</translation>
     </message>
   </context>
   <context>
@@ -1660,7 +1660,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>การสนับสนุนระดับภูมิภาค / สิทธิ์ใช้งาน</translation>
     </message>
   </context>
   <context>
@@ -1725,7 +1725,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>คำเตือน! นี่เป็นตัวเลือกทดลองที่ช่วยประหยัด CPU แต่อาจส่งผลต่อภาพเคลื่อนไหว</translation>
     </message>
   </context>
   <context>
@@ -2233,33 +2233,33 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>เซิร์ฟเวอร์ต้นทาง</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>แหล่งที่มาของกล้อง</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>แหล่งที่มาและ%n เพิ่มกล้องมากขึ้น</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>เลือกอุปกรณ์อย่างน้อยหนึ่ง</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>เลือกอย่างน้อยหนึ่งกล้อง</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>เลือกเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>เซิร์ฟเวอร์ต้นทางและ %1</translation>
     </message>
   </context>
   <context>
@@ -2389,7 +2389,7 @@ to view more bookmarks</source>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>เซิร์ฟเวอร์ที่รองรับ buzzer</translation>
     </message>
   </context>
   <context>
@@ -2798,8 +2798,8 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n จาก %1 ผู้ใช้ที่เลือกไม่ใช่ผู้ใช้ %2 คนและจะไม่ได้รับการแจ้งเตือนมือถือ</numerusform>
       </translation>
     </message>
   </context>
@@ -3160,7 +3160,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>ไม่สามารถตรวจจับความละเอียดในการจับภาพได้</translation>
     </message>
   </context>
   <context>
@@ -3437,7 +3437,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>เซิร์ฟเวอร์ที่รองรับการวิเคราะห์ต่าง ๆ</translation>
     </message>
   </context>
   <context>
@@ -3770,7 +3770,7 @@ to %1</source>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>อนุญาตให้ใช้หน้าจอ</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
@@ -3782,7 +3782,7 @@ to %1</source>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>การยกเลิกการทำงานที่เหลืออยู่</translation>
     </message>
   </context>
   <context>
@@ -3916,8 +3916,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>การยกเลิกการทำงานที่เหลืออยู่</numerusform>
       </translation>
     </message>
   </context>
@@ -3941,16 +3941,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>ในการรับไฟล์รหัสการเปิดใช้งานโปรดส่งรหัสสิทธิ์ใช้งานและรหัสฮาร์ดแวร์ไปที่ %1</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>โปรดส่งรหัสสิทธิ์ใช้งานและรหัสฮาร์ดแวร์ไปยังฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณเพื่อรับไฟล์รหัสเปิดใช้งาน</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>โปรดส่งรหัสสิทธิ์ใช้งานและรหัสฮาร์ดแวร์ไปยังฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณเพื่อรับไฟล์รหัสเปิดใช้งาน</translation>
     </message>
   </context>
   <context>
@@ -4503,7 +4503,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>เซิร์ฟเวอร์ที่รองรับการตรวจสอบ PoE</translation>
     </message>
   </context>
   <context>
@@ -5223,7 +5223,7 @@ to %1</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5720,11 +5720,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>เซิร์ฟเวอร์ไม่พร้อมใช้งาน</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>ขณะนี้</translation>
     </message>
   </context>
   <context>
@@ -5791,23 +5791,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optical</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>ปรับเปลี่ยน</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>เครือข่าย</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6592,7 +6592,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -6643,7 +6643,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>ไม่สามารถรับทราบเหตุการณ์ในกล้องที่นำออก</translation>
     </message>
   </context>
   <context>
@@ -7443,8 +7443,8 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n ค่า</numerusform>
       </translation>
     </message>
   </context>
@@ -8124,7 +8124,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>จำเป็นต้องมีการแปลงรหัสวิดีโอ</translation>
     </message>
   </context>
   <context>
@@ -8329,11 +8329,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>%1$s ต้องการใช้ชื่อผู้ใช้และรหัสผ่าน</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>เลือกโฟลเดอร์ที่จะอัปโหลด</translation>
     </message>
   </context>
   <context>
@@ -8427,7 +8427,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>ID นี้ถูกใช้ไปแล้วในระบบ ใช้ปุ่มสร้างเพื่อค้นหารหัสฟรี</translation>
     </message>
   </context>
   <context>
@@ -8793,7 +8793,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>ไม่สามารถตรวจสอบการอัปเดตบนอินเทอร์เน็ต</translation>
     </message>
   </context>
   <context>
@@ -8859,7 +8859,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
   </context>
   <context>
@@ -8962,31 +8962,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>การติดตั้งการอัปเดตล้มเหลว</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>ตัดการเชื่อมต่อแล้ว</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>เชื่อมต่อแล้ว</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>Power</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>ไม่คาดฝัน</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>ว่างเปล่า</translation>
     </message>
     <message>
       <source>Port</source>
@@ -8998,7 +8998,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>ปริมาณการใช้</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9006,16 +9006,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>Power</translation>
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>อุปกรณ์ที่ไม่รู้จัก</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>อุปกรณ์ที่ไม่รู้จัก %1</translation>
     </message>
   </context>
   <context>
@@ -9034,23 +9034,23 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>ระบบไม่ได้เชื่อมต่อกับ %1การแจ้งเตือนบนมือถือใช้งานได้เฉพาะเมื่อระบบเชื่อมต่อกับ %1</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>การตั้งค่าของ %1$s</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
+      <translation>
+        <numerusform>%n สัญลักษณ์มากกว่า</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
+      <translation>
+        <numerusform>%n สัญลักษณ์มากกว่า</numerusform>
       </translation>
     </message>
   </context>
@@ -9185,7 +9185,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>เข้ารหัสวิดีโอปริมาณการใช้งานไคลเอนต์เซิร์ฟเวอร์เท่านั้น</translation>
     </message>
   </context>
   <context>
@@ -9198,7 +9198,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>ไม่มีเซิร์ฟเวอร์ที่เข้ากันได้</translation>
     </message>
   </context>
   <context>
@@ -9623,7 +9623,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>จำเป็นต้องมีการแปลงรหัส รีสตาร์ทเซสชันการส่งออกแล้ว</translation>
     </message>
   </context>
   <context>
@@ -9830,12 +9830,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>โปรดทำตามขั้นตอนต่อไปนี้เพื่อปิดการใช้งานใบอนุญาต</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>โปรดทราบว่าคีย์ใบอนุญาตแต่ละใบอาจถูกปิดการใช้งานสูงสุด %n ครั้ง</numerusform>
       </translation>
     </message>
   </context>
@@ -10125,7 +10125,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>บันทึกไฟล์เป็น </translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10133,15 +10133,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>ไม่สามารถบันทึกไฟล์</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>%1 โฟลเดอร์ถูกบล็อกเพื่อการเขียน</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>กำลังดาวน์โหลดไฟล์</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10149,15 +10149,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>หยุดดาวน์โหลดไฟล์หรือไม่</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>ไฟล์ดาวน์โหลดเสร็จเรียบร้อย</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>ไฟล์ดาวน์โหลดล้มเหลว</translation>
     </message>
   </context>
 </TS>

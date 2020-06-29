@@ -11,6 +11,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
 namespace network {
@@ -28,11 +29,6 @@ class TcpTunnel:
     public ::testing::Test
 {
 public:
-    TcpTunnel()
-    {
-        init();
-    }
-
     ~TcpTunnel()
     {
         if (m_tunnel)
@@ -42,7 +38,10 @@ public:
     std::unique_ptr<DirectTcpEndpointTunnel> makeTunnel(
         aio::AbstractAioThread* aioThread, std::string sessionId)
     {
-        auto socket = std::make_unique<TCPSocket>(AF_INET);
+        const auto ipVersion = m_testServer->serverAddress().address.isPureIpV6()
+            ? AF_INET6 : AF_INET;
+
+        auto socket = std::make_unique<TCPSocket>(ipVersion);
         if (!socket->connect(m_testServer->serverAddress(), nx::network::kNoTimeout) ||
             !socket->setNonBlockingMode(true))
         {
@@ -64,7 +63,21 @@ public:
             [this](SystemError::ErrorCode code) { m_tunnelClosedPromise.set_value(code); });
 
         m_tunnel->start();
-        expectingTunnelFunctionsSuccessfully();
+    }
+
+    void givenOpenedTcpTunnelToRemotePeerOverIpv6()
+    {
+        startIpv6Server();
+
+        givenOpenedTcpTunnelToRemotePeer();
+    }
+
+    void whenRequestNewConnection()
+    {
+        m_tunnel->establishNewConnection(
+            kNoTimeout,
+            SocketAttributes(),
+            [this](auto&&... args) { saveConnectResult(std::forward<decltype(args)>(args)...); });
     }
 
     void whenRemotePeerHasDisappeared()
@@ -72,7 +85,16 @@ public:
         m_testServer.reset();
     }
 
-    void expectingTunnelFunctionsSuccessfully()
+    void thenConnectionIsEstablished()
+    {
+        m_lastConnectResult = m_connectResults.pop();
+
+        ASSERT_EQ(SystemError::noError, m_lastConnectResult.resultCode);
+        ASSERT_NE(nullptr, m_lastConnectResult.connection);
+        ASSERT_TRUE(m_lastConnectResult.stillValid);
+    }
+
+    void assertTunnelWorks()
     {
         openNewConnection(
             [](
@@ -98,14 +120,37 @@ protected:
     }
 
 private:
+    struct ConnectResult
+    {
+        SystemError::ErrorCode resultCode = SystemError::noError;
+        std::unique_ptr<AbstractStreamSocket> connection;
+        bool stillValid = false;
+    };
+
     std::unique_ptr<nx::network::http::TestHttpServer> m_testServer;
     std::unique_ptr<DirectTcpEndpointTunnel> m_tunnel;
     utils::promise<SystemError::ErrorCode> m_tunnelClosedPromise;
+    nx::utils::SyncQueue<ConnectResult> m_connectResults;
+    ConnectResult m_lastConnectResult;
 
-    void init()
+    virtual void SetUp() override
+    {
+        startIpv4Server();
+    }
+
+    void startIpv4Server()
     {
         m_testServer = std::make_unique<nx::network::http::TestHttpServer>();
         ASSERT_TRUE(m_testServer->bindAndListen());
+    }
+
+    void startIpv6Server()
+    {
+        m_testServer = std::make_unique<nx::network::http::TestHttpServer>(
+            std::make_unique<TCPServerSocket>(AF_INET6));
+
+        ASSERT_TRUE(m_testServer->bindAndListen(SocketAddress::anyPrivateAddressV6))
+            << SystemError::getLastOSErrorText().toStdString();
     }
 
     template<typename OnConnectedHandler>
@@ -127,6 +172,14 @@ private:
                 connectedPromise.set_value();
             });
         connectedPromise.get_future().wait();
+    }
+
+    void saveConnectResult(
+        SystemError::ErrorCode resultCode,
+        std::unique_ptr<AbstractStreamSocket> connection,
+        bool stillValid)
+    {
+        m_connectResults.push({resultCode, std::move(connection), stillValid});
     }
 };
 
@@ -161,6 +214,20 @@ TEST_F(TcpTunnel, DISABLED_tunnel_is_broken_when_target_peer_disappears)
     givenOpenedTcpTunnelToRemotePeer();
     whenRemotePeerHasDisappeared();
     expectingTunnelClosure(SystemError::connectionReset);
+}
+
+TEST_F(TcpTunnel, connection_can_be_established)
+{
+    givenOpenedTcpTunnelToRemotePeer();
+    whenRequestNewConnection();
+    thenConnectionIsEstablished();
+}
+
+TEST_F(TcpTunnel, tunnel_over_ipv6_is_supported)
+{
+    givenOpenedTcpTunnelToRemotePeerOverIpv6();
+    whenRequestNewConnection();
+    thenConnectionIsEstablished();
 }
 
 } // namespace test

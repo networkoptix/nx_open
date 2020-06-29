@@ -20,7 +20,11 @@ DirectTcpEndpointTunnel::DirectTcpEndpointTunnel(
     :
     AbstractOutgoingTunnelConnection(aioThread),
     m_connectSessionId(std::move(connectSessionId)),
-    m_targetEndpoint(std::move(targetEndpoint))/*,
+    m_targetEndpoint(std::move(targetEndpoint)),
+    m_targetEndpointIpVersion(
+        m_targetEndpoint.address.isPureIpV6()
+        ? AF_INET6
+        : SocketFactory::tcpClientIpVersion())/*,
     m_controlConnection(std::move(connection))*/
 {
     if (aioThread && m_controlConnection)
@@ -47,7 +51,9 @@ void DirectTcpEndpointTunnel::stopWhileInAioThread()
 
 void DirectTcpEndpointTunnel::start()
 {
-    NX_VERBOSE(this, lm("Start %1 control connection").arg(m_controlConnection ? "with" : "without"));
+    NX_VERBOSE(this, "cross-nat %1. Starting TCP tunnel to %2 (ip v%3) %4 control connection",
+        m_connectSessionId, m_targetEndpoint, m_targetEndpointIpVersion,
+        m_controlConnection ? "with" : "without");
 
     if (!m_controlConnection)
         return;
@@ -61,12 +67,13 @@ void DirectTcpEndpointTunnel::start()
         {
             if (code == SystemError::noError && bytesRead == 0)
             {
-                NX_DEBUG(this, lm("Control connection has been closed by remote peer"));
+                NX_DEBUG(this, "cross-nat %1. Control connection has been closed by remote peer",
+                    m_connectSessionId);
             }
             else
             {
-                NX_DEBUG(this, lm("Unexpected read event on control connection (size=%1): %2").args(
-                    bytesRead, SystemError::toString(code)));
+                NX_DEBUG(this, "cross-nat %1. Unexpected read event on control connection (size=%2): %3",
+                    m_connectSessionId, bytesRead, SystemError::toString(code));
             }
 
             m_controlConnection.reset();
@@ -112,8 +119,12 @@ void DirectTcpEndpointTunnel::startConnection(
     std::list<ConnectionContext>::iterator connectionContextIter,
     std::chrono::milliseconds timeout)
 {
+    using namespace std::placeholders;
+
+    NX_VERBOSE(this, "cross-nat %1. Opening new connection", m_connectSessionId);
+
     connectionContextIter->tcpSocket =
-        std::make_unique<TCPSocket>(SocketFactory::tcpClientIpVersion());
+        std::make_unique<TCPSocket>(m_targetEndpointIpVersion);
     connectionContextIter->tcpSocket->bindToAioThread(getAioThread());
     if (!connectionContextIter->tcpSocket->setNonBlockingMode(true) ||
         !connectionContextIter->tcpSocket->setSendTimeout(timeout.count()))
@@ -126,7 +137,6 @@ void DirectTcpEndpointTunnel::startConnection(
         return;
     }
 
-    using namespace std::placeholders;
     connectionContextIter->tcpSocket->connectAsync(
         m_targetEndpoint,
         std::bind(&DirectTcpEndpointTunnel::onConnectDone, this, _1, connectionContextIter));
@@ -156,6 +166,9 @@ void DirectTcpEndpointTunnel::reportConnectResult(
     std::unique_ptr<AbstractStreamSocket> tcpSocket,
     bool stillValid)
 {
+    NX_VERBOSE(this, "cross-nat %1. New connection to %2 completed. %3. Tunnel valid: %4",
+        m_connectSessionId, m_targetEndpoint, SystemError::toString(sysErrorCode), stillValid);
+
     auto context = std::move(*connectionContextIter);
     {
         QnMutexLocker lk(&m_mutex);
