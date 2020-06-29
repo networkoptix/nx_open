@@ -325,6 +325,30 @@ std::string Engine::manifestString() const
                                 "defaultValue": false
                             },
                             {
+                                "type": "DoubleSpinBox",
+                                "caption": "Size of the side of the counter bounding box",
+                                "name": ")json" + kCounterBoundingBoxSideSizeSetting + R"json(",
+                                "defaultValue": 0.0,
+                                "minValue": 0.0,
+                                "maxValue": 1.0
+                            },
+                            {
+                                "type": "DoubleSpinBox",
+                                "caption": "Counter bounding box X-Offset",
+                                "name": ")json" + kCounterXOffsetSetting + R"json(",
+                                "defaultValue": 0.0,
+                                "minValue": 0.0,
+                                "maxValue": 1.0
+                            },
+                            {
+                                "type": "DoubleSpinBox",
+                                "caption": "Counter bounding box Y-Offset",
+                                "name": ")json" + kCounterYOffsetSetting + R"json(",
+                                "defaultValue": 0.0,
+                                "minValue": 0.0,
+                                "maxValue": 1.0
+                            },
+                            {
                                 "type": "SpinBox",
                                 "name": ")json" + kBlinkingObjectPeriodMsSetting + R"json(",
                                 "caption": "Generate 1-frame BlinkingObject every N ms (if not 0)",

@@ -85,6 +85,9 @@ const std::string kGenerateBicyclesSetting{"generateBicycles"};
 const std::string kGenerateStonesSetting{"generateStones"};
 const std::string kGenerateFixedObjectSetting{"generateFixedObject"};
 const std::string kGenerateCounterSetting{"generateCounter"};
+const std::string kCounterBoundingBoxSideSizeSetting{"counterBoundingBoxSideSize"};
+const std::string kCounterXOffsetSetting{"counterXOffset"};
+const std::string kCounterYOffsetSetting{"counterYOffset"};
 
 const std::string kBlinkingObjectPeriodMsSetting{"blinkingObjectPeriodMs"};
 const std::string kBlinkingObjectInDedicatedPacketSetting{"blinkingObjectInDedicatedPacket"};

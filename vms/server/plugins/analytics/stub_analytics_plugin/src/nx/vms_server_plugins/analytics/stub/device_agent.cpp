@@ -684,8 +684,20 @@ void DeviceAgent::addCounterIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPac
     static const Uuid trackId = UuidHelper::randomUuid();
     objectMetadata->setTypeId(kCounterObjectType);
     objectMetadata->setTrackId(trackId);
-    objectMetadata->setBoundingBox(Rect(0.05F, 0.05F, 0.001F, 0.001F));
 
+    const float realXOffset =
+        clamp(m_deviceAgentSettings.counterBoundingBoxXOffset.load(), 0.0F, 1.0F);
+
+    const float realYOffset =
+        clamp(m_deviceAgentSettings.counterBoundingBoxYOffset.load(), 0.0F, 1.0F);
+
+    const float realWidth =
+        clamp(m_deviceAgentSettings.counterBoundingBoxSideSize.load(), 0.0F, 1.0F - realXOffset);
+
+    const float realHeight =
+        clamp(m_deviceAgentSettings.counterBoundingBoxSideSize.load(), 0.0F, 1.0F - realYOffset);
+
+    objectMetadata->setBoundingBox(Rect(realXOffset, realYOffset, realWidth, realHeight));
     objectMetadata->addAttribute(makePtr<Attribute>(
         IAttribute::Type::number,
         "counterValue",
@@ -892,14 +904,18 @@ void DeviceAgent::dumpSomeFrameBytes(
 
 void DeviceAgent::parseSettings()
 {
-    auto assignIntegerSetting =
+    auto assignNumericSetting =
         [this](
             const std::string& parameterName,
             auto target,
             std::function<void()> onChange = nullptr)
         {
             using namespace nx::kit::utils;
-            int result = 0;
+            using SettingType =
+                std::conditional_t<
+                    std::is_floating_point<decltype(target->load())>::value, float, int>;
+
+            SettingType result{};
             const auto parameterValueString = settingValue(parameterName);
             if (fromString(parameterValueString, &result))
             {
@@ -930,7 +946,7 @@ void DeviceAgent::parseSettings()
     m_deviceAgentSettings.generateFixedObject = toBool(settingValue(kGenerateFixedObjectSetting));
     m_deviceAgentSettings.generateCounter = toBool(settingValue(kGenerateCounterSetting));
 
-    assignIntegerSetting(kBlinkingObjectPeriodMsSetting,
+    assignNumericSetting(kBlinkingObjectPeriodMsSetting,
         &m_deviceAgentSettings.blinkingObjectPeriodMs);
 
     m_deviceAgentSettings.blinkingObjectInDedicatedPacket =
@@ -941,26 +957,38 @@ void DeviceAgent::parseSettings()
         settingValue(kThrowPluginDiagnosticEventsFromDeviceAgentSetting));
     m_deviceAgentSettings.leakFrames = toBool(settingValue(kLeakFramesSetting));
 
-    assignIntegerSetting(
+    assignNumericSetting(
         kGenerateObjectsEveryNFramesSetting,
         &m_deviceAgentSettings.generateObjectsEveryNFrames);
 
-    assignIntegerSetting(
+    assignNumericSetting(
         kNumberOfObjectsToGenerateSetting,
         &m_deviceAgentSettings.numberOfObjectsToGenerate);
 
-    assignIntegerSetting(
+    assignNumericSetting(
         kAdditionalFrameProcessingDelayMsSetting,
         &m_deviceAgentSettings.additionalFrameProcessingDelayMs);
 
-    assignIntegerSetting(
+    assignNumericSetting(
         kOverallMetadataDelayMsSetting,
         &m_deviceAgentSettings.overallMetadataDelayMs,
         [this]() { cleanUpTimestampQueue(); });
 
-    assignIntegerSetting(
+    assignNumericSetting(
         kGeneratePreviewAfterNFramesSetting,
         &m_deviceAgentSettings.numberOfFramesBeforePreviewGeneration);
+
+    assignNumericSetting(
+        kCounterBoundingBoxSideSizeSetting,
+        &m_deviceAgentSettings.counterBoundingBoxSideSize);
+
+    assignNumericSetting(
+        kCounterXOffsetSetting,
+        &m_deviceAgentSettings.counterBoundingBoxXOffset);
+
+    assignNumericSetting(
+        kCounterYOffsetSetting,
+        &m_deviceAgentSettings.counterBoundingBoxYOffset);
 }
 
 void DeviceAgent::updateObjectGenerationParameters()
