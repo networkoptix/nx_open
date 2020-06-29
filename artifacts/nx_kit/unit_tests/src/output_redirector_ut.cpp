@@ -9,7 +9,7 @@
 #else
     #undef __STRICT_ANSI__ //< Enable fileno() in <stdio.h> on Cygwin/MinGW.
     #include <stdio.h>
-    
+
     #include <unistd.h>
 #endif
 #include <fstream>
@@ -100,6 +100,20 @@ TEST(outputRedirector, check)
     stdoutLogStream.close();
     stderrLogStream.close();
 
-    ASSERT_STREQ("stdout is redirected to this file\nstdout test\ncout test\n", stdoutLogContent);
-    ASSERT_STREQ("stderr is redirected to this file\nstderr test\ncerr test\n", stderrLogContent);
+    std::ostringstream stdoutLogExpectedContent;
+    stdoutLogExpectedContent << "stdout of "
+    << nx::kit::utils::toString(outputRedirectorTest.processName) << " is "
+        << "redirected to this file ("
+        << nx::kit::utils::toString(outputRedirectorTest.stdoutFilePath) << ")\n"
+        << "stdout test\ncout test\n";
+
+    std::ostringstream stderrLogExpectedContent;
+    stderrLogExpectedContent << "stderr of "
+        << nx::kit::utils::toString(outputRedirectorTest.processName) << " is "
+        << "redirected to this file ("
+        << nx::kit::utils::toString(outputRedirectorTest.stderrFilePath) << ")\n"
+        << "stderr test\ncerr test\n";
+
+    ASSERT_STREQ(stdoutLogExpectedContent.str(), stdoutLogContent);
+    ASSERT_STREQ(stderrLogExpectedContent.str(), stderrLogContent);
 }
