@@ -1158,7 +1158,7 @@ def _connect_to_box(conf, ini):
 
     try:
         start_time_s = time.time()
-        box.sh('true', throw_timeout_exception=True)
+        box.sh('true', throw_exception_on_error=True)
         command_execution_duration_ms = int((time.time() - start_time_s) * 1000)
         if connection_type == BoxConnection.ConnectionType.TELNET:
             if command_execution_duration_ms > ini['boxTelnetConnectionWarningThresholdMs']:
@@ -1304,7 +1304,7 @@ def _clear_storages(box, storages: List[Storage], conf):
             f"'{storage.url}/hi_quality' "
             f"'{storage.url}/low_quality' "
             f"'{storage.url}/'*_media.nxdb",
-            timeout_s=conf['archiveDeletingTimeoutSeconds'], su=True, throw_timeout_exception=True)
+            timeout_s=conf['archiveDeletingTimeoutSeconds'], su=True, throw_exception_on_error=True)
     report('Server video archives deleted.')
 
 
