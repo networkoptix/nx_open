@@ -40,7 +40,7 @@ DeviceAgent::DeviceAgent(Engine* engine, const std::string& id): m_engine(engine
 }
 
 void DeviceAgent::doSetSettings(
-    Result<const IStringMap*>* /*outResult*/, const IStringMap* settings)
+    Result<const ISettingsResponse*>* /*outResult*/, const IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received  settings:";
     NX_OUTPUT << "{";

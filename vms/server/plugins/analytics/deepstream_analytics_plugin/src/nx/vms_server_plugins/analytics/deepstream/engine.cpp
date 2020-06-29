@@ -75,7 +75,7 @@ void Engine::setEngineInfo(const IEngineInfo* /*engineInfo*/)
 }
 
 void Engine::doSetSettings(
-    Result<const IStringMap*>* /*outResult*/, const IStringMap* settings)
+    Result<const ISettingsResponse*>* /*outResult*/, const IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received " << libContext().name() << " settings:";
     NX_OUTPUT << "{";
