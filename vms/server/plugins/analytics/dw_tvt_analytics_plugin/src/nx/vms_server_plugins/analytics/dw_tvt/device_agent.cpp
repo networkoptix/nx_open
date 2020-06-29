@@ -570,7 +570,7 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 }
 
 void DeviceAgent::doSetSettings(
-    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
+    Result<const ISettingsResponse*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }

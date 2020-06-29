@@ -82,7 +82,8 @@ void Engine::setEngineInfo(const IEngineInfo* engineInfo)
     logUtils.setPrintPrefix(makePrintPrefix(engineInfo));
 }
 
-void Engine::doSetSettings(Result<const IStringMap*>* outResult, const IStringMap* settings)
+void Engine::doSetSettings(
+    Result<const ISettingsResponse*>* outResult, const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
         *outResult = error(ErrorCode::invalidParams, "Unable to convert the input string map");

@@ -99,7 +99,10 @@ protected:
      * Should perform any required (re)initialization. Called even if the settings model is empty.
      * @return Error messages per setting (if any), as in IDeviceAgent::setSettings().
      */
-    virtual nx::sdk::Result<const nx::sdk::IStringMap*> settingsReceived() { return nullptr; }
+    virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived()
+    {
+        return nullptr;
+    }
 
     /**
      * Provides access to the DeviceAgent settings stored by the Server for the particular Device.
@@ -124,7 +127,7 @@ public:
 protected:
     virtual void doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket) override;
     virtual void doSetSettings(
-        Result<const IStringMap*>* outResult, const IStringMap* settings) override;
+        Result<const ISettingsResponse*>* outResult, const IStringMap* settings) override;
     virtual void getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const override;
     virtual void getManifest(Result<const IString*>* outResult) const override;
 

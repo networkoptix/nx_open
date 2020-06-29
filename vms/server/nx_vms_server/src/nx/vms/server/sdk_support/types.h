@@ -6,15 +6,22 @@
 #include <QtCore/QMap>
 #include <QtCore/QJsonObject>
 
+#include <nx/utils/uuid.h>
+#include <nx/vms/server/sdk_support/error.h>
+
 namespace nx::vms::server::sdk_support {
 
-using ErrorMap = QMap<QString, QString>;
-using SettingMap = QJsonObject;
+using SettingsErrors = QMap<QString, QString>;
+using SettingsValues = QJsonObject;
+using SettingsModel = QJsonObject;
+using SettingsModelId = QnUuid;
 
-struct SettingsResponse
+struct SdkSettingsResponse
 {
-    SettingMap settingValues;
-    ErrorMap errors;
+    std::optional<SettingsValues> values;
+    SettingsErrors errors;
+    std::optional<SettingsModel> model;
+    Error sdkError;
 };
 
 struct MetadataTypes

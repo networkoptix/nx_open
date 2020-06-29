@@ -7,7 +7,9 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     Capability,
     (nx::vms::api::analytics::DeviceAgentManifest::Capability::noCapabilities, "noCapabilities")
     (nx::vms::api::analytics::DeviceAgentManifest::Capability::disableStreamSelection,
-        "disableStreamSelection"))
+        "disableStreamSelection")
+    (nx::vms::api::analytics::DeviceAgentManifest::Capability::doNotSaveSettingsValuesToProperty,
+        "doNotSaveSettingsValuesToProperty"))
 
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::DeviceAgentManifest::Capability,
     (numeric)(debug))
@@ -17,7 +19,9 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     Capabilities,
     (nx::vms::api::analytics::DeviceAgentManifest::Capability::noCapabilities, "noCapabilities")
     (nx::vms::api::analytics::DeviceAgentManifest::Capability::disableStreamSelection,
-        "disableStreamSelection"))
+        "disableStreamSelection")
+    (nx::vms::api::analytics::DeviceAgentManifest::Capability::doNotSaveSettingsValuesToProperty,
+        "doNotSaveSettingsValuesToProperty"))
 
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::DeviceAgentManifest::Capabilities,
     (numeric)(debug))

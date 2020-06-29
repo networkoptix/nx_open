@@ -231,9 +231,13 @@ void AnalyticsSettingsManager::Private::loadResponseData(
 {
     auto& data = dataByAgentIdRef(id);
 
-    const bool modelChanged = (data.model != response.settingsModel);
+    const bool modelChanged =
+        (data.model != response.settingsModel || data.modelId != response.settingsModelId);
     if (modelChanged)
+    {
         data.model = response.settingsModel;
+        data.modelId = response.settingsModelId;
+    }
 
     const bool valuesChanged = (data.values != response.settingsValues);
     if (valuesChanged)
@@ -335,6 +339,7 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
             device,
             engine,
             settings,
+            d->dataByAgentId(agentId).modelId,
             [this, agentId](
                 bool success,
                 rest::Handle requestId,

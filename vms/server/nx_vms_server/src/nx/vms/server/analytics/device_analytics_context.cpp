@@ -40,29 +40,6 @@ static bool isAliveStatus(Qn::ResourceStatus status)
     return status == Qn::ResourceStatus::Online || status == Qn::ResourceStatus::Recording;
 }
 
-static std::optional<QJsonObject> mergeWithDbAndDefaultSettings(
-    const resource::CameraPtr& device,
-    const resource::AnalyticsEngineResourcePtr& engine,
-    const QJsonObject& settingsFromUser)
-{
-    const auto engineManifest = engine->manifest();
-    interactive_settings::JsonEngine jsonEngine;
-
-    const std::optional<QJsonObject> deviceAgentSettingsModel =
-        device->deviceAgentSettingsModel(engine->getId());
-
-    if (!NX_ASSERT(deviceAgentSettingsModel))
-        return std::nullopt;
-
-    jsonEngine.loadModelFromJsonObject(*deviceAgentSettingsModel);
-
-    const auto settingsFromProperty = device->deviceAgentSettingsValues(engine->getId());
-    jsonEngine.applyValues(settingsFromProperty);
-    jsonEngine.applyValues(settingsFromUser);
-
-    return jsonEngine.values();
-}
-
 DeviceAnalyticsContext::DeviceAnalyticsContext(
     QnMediaServerModule* serverModule,
     const resource::CameraPtr& device)
@@ -128,11 +105,7 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
         }
 
         if (deviceIsAlive)
-        {
-            const auto engineId = engine->getId();
-            binding->startAnalytics(
-                prepareSettings(engineId, m_device->deviceAgentSettingsValues(engineId)));
-        }
+            binding->startAnalytics();
     }
 
     updateStreamProviderRequirements();
@@ -149,166 +122,53 @@ void DeviceAnalyticsContext::removeEngine(const resource::AnalyticsEngineResourc
 }
 
 void DeviceAnalyticsContext::setMetadataSinks(MetadataSinkSet metadataSinks)
-{
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_metadataSinks = std::move(metadataSinks);
+{    
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_metadataSinks = std::move(metadataSinks);
 
-        for (auto& [_, binding]: m_bindings)
-            binding->setMetadataSinks(m_metadataSinks);
-    }
+    for (auto& [_, binding]: m_bindings)
+        binding->setMetadataSinks(m_metadataSinks);
 }
 
-void DeviceAnalyticsContext::setSettingsValues(const QString& engineId, const QJsonObject& settings)
+SettingsResponse DeviceAnalyticsContext::setSettings(
+    const QString& engineId, const SetSettingsRequest& settings)
 {
-    QnUuid analyticsEngineId(engineId);
-    const QJsonObject effectiveSettings = prepareSettings(analyticsEngineId, settings);
-    m_device->setDeviceAgentSettingsValues(analyticsEngineId, effectiveSettings);
-
     const std::shared_ptr<DeviceAnalyticsBinding> binding =
-        analyticsBindingSafe(analyticsEngineId);
-
-    if (!binding)
-        return;
-
-    binding->setSettings(effectiveSettings);
-}
-
-QJsonObject DeviceAnalyticsContext::prepareSettings(
-    const QnUuid& engineId,
-    const QJsonObject& settings)
-{
-    using namespace nx::sdk;
-    const auto engine = serverModule()
-        ->resourcePool()
-        ->getResourceById<nx::vms::server::resource::AnalyticsEngineResource>(engineId)
-        .dynamicCast<resource::AnalyticsEngineResource>();
-
-    if (!engine)
-    {
-        NX_WARNING(this,
-            "Unable to access the Engine with id %1 while preparing settings", engineId);
-        return {};
-    }
-
-    std::optional<QJsonObject> effectiveSettings;
-    if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
-    {
-        NX_WARNING(this, "Trying to load settings for a DeviceAgent from the file. "
-            "Device: %1 (%2), Engine: %3 (%4)",
-            m_device->getUserDefinedName(),
-            m_device->getId(),
-            engine->getName(),
-            engine->getId());
-
-        effectiveSettings = loadSettingsFromFile(engine);
-    }
-
-    if (!effectiveSettings)
-        effectiveSettings = mergeWithDbAndDefaultSettings(m_device, engine, settings);
-
-    if (!NX_ASSERT(effectiveSettings, "Device: %1 (%2), Engine: %3 (%4)",
-        m_device->getUserDefinedName(), m_device->getId(),
-        engine->getName(), engine->getId()))
-    {
-        return {};
-    }
-
-    return *effectiveSettings;
-}
-
-std::optional<QJsonObject> DeviceAnalyticsContext::loadSettingsFromFile(
-    const resource::AnalyticsEngineResourcePtr& engine) const
-{
-    using namespace nx::vms::server::sdk_support;
-
-    std::optional<QJsonObject> result = loadSettingsFromSpecificFile(
-        engine,
-        FilenameGenerationOption::engineSpecific | FilenameGenerationOption::deviceSpecific);
-
-    if (result)
-        return result;
-
-    result = loadSettingsFromSpecificFile(engine, FilenameGenerationOption::deviceSpecific);
-    if (result)
-        return result;
-
-    result = loadSettingsFromSpecificFile(engine, FilenameGenerationOption::engineSpecific);
-    if (result)
-        return result;
-
-    return loadSettingsFromSpecificFile(engine, FilenameGenerationOptions());
-}
-
-std::optional<QJsonObject> DeviceAnalyticsContext::loadSettingsFromSpecificFile(
-    const resource::AnalyticsEngineResourcePtr& engine,
-    sdk_support::FilenameGenerationOptions filenameGenerationOptions) const
-{
-    const QString settingsFilename = sdk_support::debugFileAbsolutePath(
-        pluginsIni().analyticsSettingsSubstitutePath,
-        sdk_support::baseNameOfFileToDumpOrLoadData(
-            engine->plugin().dynamicCast<resource::AnalyticsPluginResource>(),
-            engine,
-            m_device,
-            filenameGenerationOptions)) + "_settings.json";
-
-    std::optional<QString> settingsString = sdk_support::loadStringFromFile(
-        nx::utils::log::Tag(typeid(this)),
-        settingsFilename);
-
-    if (!settingsString)
-        return std::nullopt;
-
-    return sdk_support::toQJsonObject(*settingsString);
-}
-
-std::optional<Settings> DeviceAnalyticsContext::getSettings(const QString& engineId) const
-{
-    const QnUuid analyticsEngineId(engineId);
-    const auto engine = serverModule()
-        ->resourcePool()
-        ->getResourceById<resource::AnalyticsEngineResource>(analyticsEngineId);
-
-    if (!engine)
-    {
-        NX_WARNING(this,
-            "Unable to access the Engine %1 while getting a DeviceAgent settings",
-            analyticsEngineId);
-
-        return {};
-    }
-
-    interactive_settings::JsonEngine jsonEngine;
-    const std::optional<QJsonObject> deviceAgentSettingsModel = m_device->deviceAgentSettingsModel(
-        QnUuid::fromStringSafe(engineId));
-
-    if (!deviceAgentSettingsModel)
-    {
-        NX_WARNING(this,
-            "Unable to access DeviceAgent settings model for the Device %1 (%2), Engine %1 (%2)",
-            m_device->getUserDefinedName(), m_device->getId(),
-            engine->getName(), engine->getId());
-
-        return {};
-    }
-
-    jsonEngine.loadModelFromJsonObject(*deviceAgentSettingsModel);
-    jsonEngine.applyValues(m_device->deviceAgentSettingsValues(analyticsEngineId));
-
-    const std::shared_ptr<DeviceAnalyticsBinding> binding =
-        analyticsBindingSafe(analyticsEngineId);
+        analyticsBindingSafe(QnUuid(engineId));
 
     if (!binding)
     {
-        NX_DEBUG(this, "No DeviceAnalyticsBinding for the Device %1 and the Engine %2",
+        NX_DEBUG(this,
+            "Setting DeviceAgent settings: DeviceAgent is not available for the "
+            "Device %1 and the Engine %2",
             m_device, engineId);
 
-        return Settings{jsonEngine.serializeModel(), jsonEngine.values()};
+        return SettingsResponse(
+            SettingsResponse::Error::Code::sdkObjectIsNotAccessible,
+            "Unable to find DeviceAgent");
     }
 
-    const QJsonObject pluginSideSettings = binding->getSettings();
-    jsonEngine.applyStringValues(pluginSideSettings);
-    return Settings{jsonEngine.serializeModel(), jsonEngine.values()};
+    return binding->setSettings(settings);
+}
+
+SettingsResponse DeviceAnalyticsContext::getSettings(const QString& engineId) const
+{
+    const std::shared_ptr<DeviceAnalyticsBinding> binding =
+        analyticsBindingSafe(QnUuid(engineId));
+
+    if (!binding)
+    {
+        NX_DEBUG(this,
+            "Getting DeviceAgent settings: DeviceAgent is not available for the "
+            "Device %1 and the Engine %2",
+            m_device, engineId);
+
+        return SettingsResponse(
+            SettingsResponse::Error::Code::sdkObjectIsNotAccessible,
+            "Unable to find DeviceAgent");
+    }
+
+    return binding->getSettings();
 }
 
 std::map<QnUuid, bool> DeviceAnalyticsContext::bindingStatuses() const
@@ -506,8 +366,7 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
         if (isAlive)
         {
             NX_DEBUG(this, "Restarting Analytics, Device %1, Engine id: %2", device, engineId);
-            binding->restartAnalytics(
-                prepareSettings(engineId, m_device->deviceAgentSettingsValues(engineId)));
+            binding->restartAnalytics();
         }
         else
         {

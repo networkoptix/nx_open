@@ -6,7 +6,8 @@
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/sdk_support/result_holder.h>
-#include <nx/vms/server/interactive_settings/json_engine.h>
+
+#include <nx/vms/server/analytics/settings_engine_wrapper.h>
 #include <nx/vms/server/analytics/wrappers/engine.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
@@ -19,7 +20,10 @@
 
 namespace nx::vms::server::resource {
 
+using namespace nx::vms::api::analytics;
 using namespace nx::vms::server::analytics;
+
+static const QString kSettingsModelProperty("settingsModel");
 
 template<typename T>
 using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
@@ -40,70 +44,286 @@ wrappers::EnginePtr AnalyticsEngineResource::sdkEngine() const
     return m_sdkEngine;
 }
 
-QJsonObject AnalyticsEngineResource::settingsValues() const
+SettingsResponse AnalyticsEngineResource::getSettings()
 {
-    const QJsonObject& settingsFromProperty = QJsonDocument::fromJson(
-        getProperty(kSettingsValuesProperty).toUtf8()).object();
-
-    auto parentPluginManifest = pluginManifest();
-    if (!parentPluginManifest)
-        return settingsFromProperty;
-
-    interactive_settings::JsonEngine jsonEngine;
-    jsonEngine.loadModelFromJsonObject(parentPluginManifest->engineSettingsModel);
-    jsonEngine.applyValues(settingsFromProperty);
-
-    if (m_sdkEngine)
+    if (!m_sdkEngine)
     {
-        const auto pluginSideSettings = m_sdkEngine->pluginSideSettings();
-        if (pluginSideSettings)
-            jsonEngine.applyStringValues(pluginSideSettings->settingValues);
+        NX_WARNING(this, "Getting settings, unable to access the SDK Engine object, Engine %1",
+            toSharedPointer(this));
+
+        return SettingsResponse(
+            SettingsResponse::Error::Code::sdkObjectIsNotAccessible,
+            "Engine is not accessible");
     }
 
-    return jsonEngine.values();
-}
+    const std::optional<sdk_support::SdkSettingsResponse> sdkSettingsResponse =
+        m_sdkEngine->pluginSideSettings();
 
-void AnalyticsEngineResource::setSettingsValues(const QJsonObject& values)
-{
-    const QJsonObject& settingsFromProperty = QJsonDocument::fromJson(
-        getProperty(kSettingsValuesProperty).toUtf8()).object();
-
-    auto parentPluginManifest = pluginManifest();
-    if (!NX_ASSERT(parentPluginManifest, lm("Engine: %1 (%2)").args(getName(), getId())))
-        return; //< TODO: Consider making this method returning bool or some kind of error.
-
-    interactive_settings::JsonEngine jsonEngine;
-    jsonEngine.loadModelFromJsonObject(parentPluginManifest->engineSettingsModel);
-    jsonEngine.applyValues(settingsFromProperty);
-    jsonEngine.applyValues(values);
-
-    setProperty(kSettingsValuesProperty, QString::fromUtf8(QJsonDocument(values).toJson()));
-}
-
-bool AnalyticsEngineResource::sendSettingsToSdkEngine()
-{
-    auto engine = sdkEngine();
-    if (!NX_ASSERT(engine, lm("Engine: %1 (%2)").args(getName(), getId())))
-        return false;
-
-    NX_DEBUG(this, "Sending settings to the Engine %1 (%2)", getName(), getId());
-
-    std::optional<QJsonObject> effectiveSettings;
-    if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
+    if (!sdkSettingsResponse)
     {
-        NX_WARNING(this, "Trying to load settings for the Engine %1 (%2) from a file as per %3",
-            getName(), getId(), pluginsIni().iniFile());
+        NX_DEBUG(this, "Unable to obtain an SDK settings response, Engine: %1",
+            toSharedPointer(this));
 
-        effectiveSettings = loadSettingsFromFile();
+        return SettingsResponse(SettingsResponse::Error::Code::unableToObtainSettingsResponse);
     }
 
-    if (!effectiveSettings)
-        effectiveSettings = settingsValues();
+    const SettingsContext settingsContext = updateSettingsContext(
+        currentSettingsContext(), api::analytics::SettingsValues(), *sdkSettingsResponse);
 
-    if (!NX_ASSERT(effectiveSettings, lm("Engine %1 (%2)").args(getName(), getId())))
-        return false;
+    return prepareSettingsResponse(settingsContext, *sdkSettingsResponse);
+}
 
-    return engine->setSettings(*effectiveSettings).has_value();
+SettingsResponse AnalyticsEngineResource::setSettings(const SetSettingsRequest& settingsRequest)
+{
+    NX_DEBUG(this, "Got set settings request, Engine: %1", toSharedPointer(this));
+    return setSettingsInternal(settingsRequest, /*isInitialSettings*/ false);
+}
+
+analytics::SettingsResponse AnalyticsEngineResource::setSettings()
+{
+    SetSettingsRequest setSettingsRequest;
+    setSettingsRequest.values = storedSettingsValues();
+    setSettingsRequest.modelId = calculateModelId(storedSettingsModel());
+
+    NX_DEBUG(this, "Setting settings, taking stored values, Engine: %1", toSharedPointer(this));
+
+    return setSettingsInternal(setSettingsRequest, /*isInitialSettings*/ false);
+}
+
+SettingsContext AnalyticsEngineResource::currentSettingsContext() const
+{
+    SettingsContext settingsContext;
+    settingsContext.model = storedSettingsModel();
+    settingsContext.modelId = calculateModelId(settingsContext.model);
+    settingsContext.values = storedSettingsValues();
+
+    NX_DEBUG(this, "Current settings context, model: %1, model id: %2, values: %3, Engine: %4",
+        settingsContext.model, settingsContext.modelId, settingsContext.values,
+        toSharedPointer(this));
+
+    return settingsContext;
+}
+
+SettingsContext AnalyticsEngineResource::updateSettingsContext(
+    const SettingsContext& settingsContext,
+    const api::analytics::SettingsValues& requestValues,
+    const sdk_support::SdkSettingsResponse& sdkSettingsResponse)
+{
+    NX_DEBUG(this, "Updating settings context, current settings model: %1, "
+        "current settings model id: %2, settings values from the request: %3, "
+        "settings model from the SDK response: %4, settings values from the SDK response: %5 "
+        "Device: %6",
+         settingsContext.model, settingsContext.modelId, requestValues,
+         (sdkSettingsResponse.model ? toString(*sdkSettingsResponse.model) : "<null>"),
+         (sdkSettingsResponse.values ? toString(*sdkSettingsResponse.values) : "<null>"),
+         toSharedPointer(this));
+
+    SettingsContext result = settingsContext;
+    if (sdkSettingsResponse.model)
+    {
+        NX_DEBUG(this,
+            "Updating settings context, updating current settings model from the SDK response, "
+            "Engine: %1",
+            toSharedPointer(this));
+
+        result.model = *sdkSettingsResponse.model;
+    }
+
+    result.modelId = calculateModelId(result.model);
+
+    analytics::SettingsEngineWrapper settingsEngine(
+        serverModule()->eventConnector(), toSharedPointer(this));
+
+    settingsEngine.loadModelFromJsonObject(result.model);
+
+    // Applying current settings values.
+    settingsEngine.applyValues(settingsContext.values);
+
+    // Applying values from the settings request.
+    settingsEngine.applyValues(requestValues);
+
+    // Overriding values with ones from the SDK response (if any).
+    if (sdkSettingsResponse.values)
+    {
+        NX_DEBUG(this,
+            "Updating settings context, applying settings values from the SDK response, "
+            "Engine: %1",
+            toSharedPointer(this));
+
+        settingsEngine.applyStringValues(*sdkSettingsResponse.values);
+    }
+
+    result.values = settingsEngine.values();
+
+    NX_DEBUG(this,
+        "Updating settings context, resulting settings values: %1, Engine: %2",
+        result.values, toSharedPointer(this));
+
+    setSettingsModel(result.model);
+    setSettingsValues(result.values);
+
+    saveProperties();
+
+    return result;
+}
+
+api::analytics::SettingsValues AnalyticsEngineResource::prepareSettings(
+    const SettingsContext& settingsContext,
+    const api::analytics::SettingsValues& settingsValues) const
+{
+    NX_DEBUG(this,
+        "Preparing settings, settings values: %1, settings values from "
+        "the current settings context %2, settings model from the current settings context: %3, "
+        "Engine %4",
+        settingsValues, settingsContext.values, settingsContext.model, toSharedPointer(this));
+
+    // TODO: handle settings engine errors.
+    analytics::SettingsEngineWrapper settingsEngine(
+        serverModule()->eventConnector(), toSharedPointer(this));
+    settingsEngine.loadModelFromJsonObject(settingsContext.model);
+    settingsEngine.applyValues(settingsContext.values);
+    settingsEngine.applyValues(settingsValues);
+
+    const api::analytics::SettingsValues result = settingsEngine.values();
+    NX_DEBUG(this, "Preparing settings, resulting values: %1, Engine: %2",
+        result, toSharedPointer(this));
+
+    return result;
+}
+
+SettingsResponse AnalyticsEngineResource::prepareSettingsResponse(
+    const SettingsContext& settingsContext,
+    const sdk_support::SdkSettingsResponse& sdkSettingsResponse) const
+{
+    SettingsResponse result;
+
+    analytics::SettingsEngineWrapper settingsEngine(
+        serverModule()->eventConnector(), toSharedPointer(this));
+    settingsEngine.loadModelFromJsonObject(settingsContext.model);
+
+    result.model = settingsEngine.serializeModel();
+    result.modelId = settingsContext.modelId;
+    result.values = settingsContext.values;
+    result.errors = sdkSettingsResponse.errors;
+
+    // TODO: stringify SDK error code
+    if (!sdkSettingsResponse.sdkError.isOk())
+    {
+        NX_DEBUG(this,
+            "The SDK response contains an SDK error: %1, message: %2, Engine: %3",
+            sdkSettingsResponse.sdkError.errorCode, sdkSettingsResponse.sdkError.errorMessage,
+            toSharedPointer(this));
+
+        result.error = SettingsResponse::Error(
+            SettingsResponse::Error::Code::sdkError,
+            sdkSettingsResponse.sdkError.errorMessage);
+    }
+
+    NX_DEBUG(this,
+        "Resulting settings response, settings model: %1, settings model id: %2, "
+        "settings values: %3, settings errors: %4, Engine: %5",
+        result.model, result.modelId, result.values, result.errors, toSharedPointer(this));
+
+    return result;
+}
+
+api::analytics::SettingsValues AnalyticsEngineResource::storedSettingsValues() const
+{
+    return QJsonDocument::fromJson(getProperty(kSettingsValuesProperty).toUtf8()).object();
+}
+
+api::analytics::SettingsModel AnalyticsEngineResource::storedSettingsModel() const
+{
+    const QString settingsModelString = getProperty(kSettingsModelProperty);
+    if (!settingsModelString.isEmpty())
+    {
+        NX_DEBUG(this, "Settings model from the property: %1, Engine: %2",
+            settingsModelString, toSharedPointer(this));
+
+        bool success = false;
+        sdk_support::SettingsModel deserializedSettingsModel;
+
+        deserializedSettingsModel = QJson::deserialized(
+            settingsModelString.toUtf8(), api::analytics::SettingsModel(), &success);
+
+        if (success)
+            return deserializedSettingsModel;
+
+        NX_DEBUG(this, "Unable to deserialize the settings model from property, Engine: %1",
+            toSharedPointer(this));
+    }
+
+    std::optional<PluginManifest> parentPluginManifest = pluginManifest();
+    if (!NX_ASSERT(parentPluginManifest))
+        api::analytics::SettingsModel();
+
+     return parentPluginManifest->engineSettingsModel;
+}
+
+void AnalyticsEngineResource::setSettingsValues(
+    const api::analytics::SettingsValues& settingsValues)
+{
+    NX_DEBUG(this, "Saving settings values to property, values: %1, Engine: %2",
+        settingsValues, toSharedPointer(this));
+
+    setProperty(
+        kSettingsValuesProperty,
+        QString::fromUtf8(QJsonDocument(settingsValues).toJson()));
+}
+
+void AnalyticsEngineResource::setSettingsModel(const api::analytics::SettingsModel& settingsModel)
+{
+    NX_DEBUG(this, "Saving settings model to property, model: %1, Engine: %2",
+        settingsModel, toSharedPointer(this));
+
+    setProperty(kSettingsModelProperty, QString::fromUtf8(QJsonDocument(settingsModel).toJson()));
+}
+
+analytics::SettingsResponse AnalyticsEngineResource::setSettingsInternal(
+    const analytics::SetSettingsRequest& settingsRequest,
+    bool isInitialSettings)
+{
+    NX_DEBUG(this,
+        "Setting settings, settings values: %1, settings model id: %2, isInitialSettings: %3, "
+        "Engine: %5",
+        settingsRequest.values, settingsRequest.modelId, isInitialSettings, toSharedPointer(this));
+
+    if (!m_sdkEngine)
+    {
+        NX_DEBUG(this, "Settings settings, unable to access the SDK Engine, %1",
+            toSharedPointer(this));
+
+        return SettingsResponse::Error(
+            SettingsResponse::Error::Code::sdkObjectIsNotAccessible,
+            "Engine is not accessible");
+    }
+
+    SettingsContext settingsContext = currentSettingsContext();
+    #if 0 //< Enable this section when the Engine settings dialog supports modelId
+        if ((settingsContext.modelId != settingsRequest.modelId) && !isInitialSettings)
+            return SettingsResponse::Error(SettingsResponse::Error::Code::wrongSettingsModel);
+    #endif
+
+    const std::optional<sdk_support::SdkSettingsResponse> sdkSettingsResponse =
+        m_sdkEngine->setSettings(
+            isInitialSettings
+                ? settingsRequest.values
+                : prepareSettings(settingsContext, settingsRequest.values));
+
+    if (!sdkSettingsResponse)
+    {
+        NX_DEBUG(this, "Setting settings, unable to obtain an SDK settings response, Engine %1",
+            toSharedPointer(this));
+
+        return SettingsResponse(SettingsResponse::Error::Code::unableToObtainSettingsResponse);
+    }
+
+    settingsContext = updateSettingsContext(
+        settingsContext,
+        settingsRequest.values,
+        *sdkSettingsResponse);
+
+    return prepareSettingsResponse(settingsContext, *sdkSettingsResponse);
 }
 
 std::optional<nx::vms::api::analytics::PluginManifest>
@@ -133,12 +353,20 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     m_handler = nx::sdk::makePtr<analytics::EngineHandler>(serverModule(), getId());
     m_sdkEngine->setHandler(m_handler);
 
-    if (!sendSettingsToSdkEngine())
+    SetSettingsRequest initialSettingsRequest;
+    initialSettingsRequest.values = storedSettingsValues();
+
+    const analytics::SettingsResponse settingsResponse =
+        setSettingsInternal(initialSettingsRequest, /*isInitialSettings*/ true);
+
+    if (!settingsResponse.error.isOk())
         return CameraDiagnostics::InternalServerErrorResult("Unable to send settings to Engine");
 
     const auto manifest = m_sdkEngine->manifest();
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't obtain Engine Manifest");
+
+    // Send engine settings.
 
     auto parentPlugin = plugin().dynamicCast<resource::AnalyticsPluginResource>();
     if (!parentPlugin)
@@ -163,38 +391,6 @@ QString AnalyticsEngineResource::libName() const
         return QString();
 
     return m_sdkEngine->libName();
-}
-
-std::optional<QJsonObject> AnalyticsEngineResource::loadSettingsFromFile() const
-{
-    const auto loadSettings =
-        [this](sdk_support::FilenameGenerationOptions filenameGenerationOptions)
-            -> std::optional<QJsonObject>
-        {
-            const QString settingsFilename = sdk_support::debugFileAbsolutePath(
-                pluginsIni().analyticsSettingsSubstitutePath,
-                sdk_support::baseNameOfFileToDumpOrLoadData(
-                    plugin().dynamicCast<resource::AnalyticsPluginResource>(),
-                    toSharedPointer(this),
-                    QnVirtualCameraResourcePtr(),
-                    filenameGenerationOptions)) + "_settings.json";
-
-            std::optional<QString> settingsString = sdk_support::loadStringFromFile(
-                nx::utils::log::Tag(typeid(this)),
-                settingsFilename);
-
-            if (!settingsString)
-                return std::nullopt;
-
-            return sdk_support::toQJsonObject(*settingsString);
-        };
-
-    const std::optional<QJsonObject> result = loadSettings(
-        sdk_support::FilenameGenerationOption::engineSpecific);
-    if (result)
-        return result;
-
-    return loadSettings(sdk_support::FilenameGenerationOptions());
 }
 
 } // nx::vms::server::resource

@@ -25,8 +25,10 @@
 #include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/helpers/settings_response.h>
 
 #include "utils.h"
+#include "settings_model.h"
 #include "stub_analytics_plugin_ini.h"
 
 #include "objects/bicycle.h"
@@ -230,13 +232,31 @@ std::string DeviceAgent::manifestString() const
 })json";
 }
 
-Result<const IStringMap*> DeviceAgent::settingsReceived()
+Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 {
+    const auto settingsResponse = new sdk::SettingsResponse();
+
+    const std::string settingsModel = settingValue(kSettingsModelSettings);
+    if (settingsModel == kAlternativeSettingsModelOption)
+    {
+        settingsResponse->setModel(kAlternativeSettingsModel);
+    }
+    else if (settingsModel == kRegularSettingsModelOption)
+    {
+        const std::string languagePart = (settingValue(kCitySelector) == kGermanOption)
+            ? kGermanCitiesPart
+            : kEnglishCitiesPart;
+
+        settingsResponse->setModel(kRegularSettingsModelPart1
+            + languagePart
+            + kRegularSettingsModelPart2);
+    }
+
     parseSettings();
     updateObjectGenerationParameters();
     updateEventGenerationParameters();
 
-    return nullptr;
+    return settingsResponse;
 }
 
 /** @param func Name of the caller for logging; supply __func__. */

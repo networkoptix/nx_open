@@ -22,6 +22,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 #include <nx/vms/server/analytics/types.h>
+#include <nx/vms/server/analytics/settings.h>
 #include <nx/vms/server/analytics/stream_requirements.h>
 #include <nx/vms/server/analytics/device_agent_handler.h>
 #include <nx/vms/server/analytics/stream_data_receptor.h>
@@ -41,7 +42,7 @@ class DeviceAnalyticsBinding:
 public:
     DeviceAnalyticsBinding(
         QnMediaServerModule* serverModule,
-        QnVirtualCameraResourcePtr device,
+        nx::vms::server::resource::CameraPtr device,
         nx::vms::server::resource::AnalyticsEngineResourcePtr engine);
 
     virtual ~DeviceAnalyticsBinding() override;
@@ -50,15 +51,15 @@ public:
 
     void setMaxQueueDuration(std::chrono::microseconds value);
 
-    bool startAnalytics(const QJsonObject& settings);
+    bool startAnalytics();
     void stopAnalytics();
-    bool restartAnalytics(const QJsonObject& settings);
+    bool restartAnalytics();
     bool updateNeededMetadataTypes();
 
     bool hasAliveDeviceAgent() const;
 
-    QJsonObject getSettings() const;
-    void setSettings(const QJsonObject& settings);
+    SettingsResponse getSettings() const;
+    SettingsResponse setSettings(const SetSettingsRequest& settings);
 
     void setMetadataSinks(MetadataSinkSet metadataSinks);
     bool isStreamConsumer() const;
@@ -74,7 +75,7 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
 private:
-    bool startAnalyticsUnsafe(const QJsonObject& settings);
+    bool startAnalyticsUnsafe();
     void stopAnalyticsUnsafe();
 
     wrappers::DeviceAgentPtr createDeviceAgentUnsafe();
@@ -86,7 +87,9 @@ private:
 
     sdk_support::MetadataTypes neededMetadataTypes() const;
 
-    void setSettingsInternal(const QJsonObject& settings);
+    SettingsResponse setSettingsInternal(
+        const SetSettingsRequest& settingsRequest,
+        bool isInitialSettings);
 
     void logIncomingFrame(sdk::Ptr<sdk::analytics::IDataPacket> frame);
 
@@ -98,15 +101,31 @@ private:
 
     void notifySettingsMaybeChanged() const;
 
+    void initializeSettingsContext() const;
+
+    SettingsContext updateSettingsContext(
+        const api::analytics::SettingsValues& requestValues,
+        const sdk_support::SdkSettingsResponse& sdkSettingsResponse) const;
+
+    api::analytics::SettingsValues prepareSettings(
+        const SettingsContext& settingsContext,
+        const api::analytics::SettingsValues& settings) const;
+
+    SettingsResponse prepareSettingsResponse(
+        const SettingsContext& settingsContext,
+        const sdk_support::SdkSettingsResponse& sdkSettingsResponse) const;
+
 private:
     struct DeviceAgentContext
     {
         nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> handler;
         wrappers::DeviceAgentPtr deviceAgent;
+
+        mutable SettingsContext settingsContext;
     };
 
     mutable QnMutex m_mutex;
-    QnVirtualCameraResourcePtr m_device;
+    nx::vms::server::resource::CameraPtr m_device;
     nx::vms::server::resource::AnalyticsEngineResourcePtr m_engine;
     DeviceAgentContext m_deviceAgentContext;
 

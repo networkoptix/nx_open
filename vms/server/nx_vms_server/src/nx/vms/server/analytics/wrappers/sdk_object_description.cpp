@@ -2,16 +2,16 @@
 
 #include <nx/vms/server/sdk_support/file_utils.h>
 
+#include <nx/vms/server/resource/camera.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
-#include <core/resource/camera_resource.h>
 
 namespace nx::vms::server::analytics::wrappers {
 
 SdkObjectDescription::SdkObjectDescription(
     resource::AnalyticsPluginResourcePtr plugin,
     resource::AnalyticsEngineResourcePtr engine,
-    QnVirtualCameraResourcePtr device)
+    resource::CameraPtr device)
     :
     m_plugin(plugin),
     m_engine(engine),
@@ -34,7 +34,7 @@ resource::AnalyticsEngineResourcePtr SdkObjectDescription::engine() const
     return m_engine;
 }
 
-QnVirtualCameraResourcePtr SdkObjectDescription::device() const
+resource::CameraPtr SdkObjectDescription::device() const
 {
     return m_device;
 }

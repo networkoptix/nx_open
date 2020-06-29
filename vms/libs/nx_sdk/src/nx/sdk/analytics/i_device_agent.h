@@ -60,10 +60,10 @@ public:
      *     should contain null if no errors occurred.
      */
     protected: virtual void doSetSettings(
-        Result<const IStringMap*>* outResult, const IStringMap* settings) = 0;
-    public: Result<const IStringMap*> setSettings(const IStringMap* settings)
+        Result<const ISettingsResponse*>* outResult, const IStringMap* settings) = 0;
+    public: Result<const ISettingsResponse*> setSettings(const IStringMap* settings)
     {
-        Result<const IStringMap*> result;
+        Result<const ISettingsResponse*> result;
         doSetSettings(&result, settings);
         return result;
     }

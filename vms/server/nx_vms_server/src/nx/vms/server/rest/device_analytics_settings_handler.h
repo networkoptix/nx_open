@@ -7,8 +7,7 @@
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <rest/server/json_rest_handler.h>
 #include <nx/vms/server/server_module_aware.h>
-
-namespace nx::vms::server::analytics { class Manager; }
+#include <nx/vms/server/analytics/settings.h>
 
 namespace nx::vms::server::rest {
 
@@ -33,8 +32,8 @@ private:
     CommonRequestEntities extractCommonRequestEntities(
         const std::map<QString, QString>& parameters) const;
 
-    JsonRestResponse makeSettingsResponse(
-        const nx::vms::server::analytics::Manager* analyticsManager,
+    JsonRestResponse makeApiResponse(
+        const nx::vms::server::analytics::SettingsResponse& analyticsManager,
         const CommonRequestEntities& commonRequestEntities) const;
 };
 

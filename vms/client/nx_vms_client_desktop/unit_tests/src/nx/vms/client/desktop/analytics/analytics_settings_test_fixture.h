@@ -34,6 +34,7 @@ public:
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
+        const QnUuid& settingsModelId,
         AnalyticsSettingsCallback callback) override;
 
     bool requestWasSent(const DeviceAgentId& agentId) const;

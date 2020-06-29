@@ -267,7 +267,7 @@ void AnalyticsSettingsWidget::Private::refreshSettingsValues(const QnUuid& engin
             [this, engineId](
                 bool success,
                 rest::Handle requestId,
-                const nx::vms::api::analytics::SettingsResponse& result)
+                const nx::vms::api::analytics::EngineSettingsResponse& result)
             {
                 if (!pendingRefreshRequests.removeOne(requestId))
                     return;
@@ -277,7 +277,7 @@ void AnalyticsSettingsWidget::Private::refreshSettingsValues(const QnUuid& engin
                 if (!success)
                     return;
 
-                settingsValuesByEngineId[engineId] = SettingsValues{result.values, false};
+                settingsValuesByEngineId[engineId] = SettingsValues{result.settingsValues, false};
                 emit settingsValuesChanged(engineId);
             }),
         thread());
@@ -314,7 +314,7 @@ void AnalyticsSettingsWidget::Private::applySettingsValues()
                 [this, engineId = it.key()](
                     bool success,
                     rest::Handle requestId,
-                    const nx::vms::api::analytics::SettingsResponse& result)
+                    const nx::vms::api::analytics::EngineSettingsResponse& result)
                 {
                     if (!pendingApplyRequests.removeOne(requestId))
                         return;
@@ -324,7 +324,8 @@ void AnalyticsSettingsWidget::Private::applySettingsValues()
                     if (!success)
                         return;
 
-                    settingsValuesByEngineId[engineId] = SettingsValues{result.values, false};
+                    settingsValuesByEngineId[engineId] =
+                        SettingsValues{result.settingsValues, false};
                     emit settingsValuesChanged(engineId);
                 }),
             thread());

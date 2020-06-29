@@ -15,13 +15,13 @@ public:
     SdkObjectDescription(
         resource::AnalyticsPluginResourcePtr plugin,
         resource::AnalyticsEngineResourcePtr engine = resource::AnalyticsEngineResourcePtr(),
-        QnVirtualCameraResourcePtr device = QnVirtualCameraResourcePtr());
+        resource::CameraPtr device = QnVirtualCameraResourcePtr());
 
     SdkObjectDescription(QString libraryName);
 
     resource::AnalyticsPluginResourcePtr plugin() const;
     resource::AnalyticsEngineResourcePtr engine() const;
-    QnVirtualCameraResourcePtr device() const;
+    resource::CameraPtr device() const;
 
     SdkObjectType sdkObjectType() const;
 
@@ -32,7 +32,7 @@ public:
 private:
     const resource::AnalyticsPluginResourcePtr m_plugin;
     const resource::AnalyticsEngineResourcePtr m_engine;
-    const QnVirtualCameraResourcePtr m_device;
+    const resource::CameraPtr m_device;
     const QString m_libraryName;
 };
 

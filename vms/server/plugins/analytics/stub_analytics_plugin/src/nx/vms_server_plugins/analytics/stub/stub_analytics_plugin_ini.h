@@ -46,6 +46,9 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(0, keepObjectBoundingBoxRotation,
         "If set, Engine will declare the corresponding capability in the manifest.");
+
+    NX_INI_FLAG(0, usePluginAsSettingsOrigin,
+        "If set, Engine will declare the corresponding capability in the manifest.");
 };
 
 inline Ini& ini()

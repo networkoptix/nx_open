@@ -7,6 +7,7 @@
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_string_list.h>
+#include <nx/sdk/i_settings_response.h>
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
@@ -84,7 +85,7 @@ template<typename Map>
 sdk::Ptr<const sdk::IStringMap> toSdkStringMap(const Map& stringMap)
 {
     auto sdkStringMapPtr = sdk::makePtr<nx::sdk::StringMap>();
-    for (const auto&[key, value] : nx::utils::constKeyValueRange(stringMap))
+    for (const auto& [key, value]: nx::utils::constKeyValueRange(stringMap))
         sdkStringMapPtr->setItem(toString(key).toStdString(), toString(value).toStdString());
 
     return sdkStringMapPtr;
@@ -132,5 +133,11 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> avPixelF
     AVPixelFormat avPixelFormat);
 
 AVPixelFormat apiToAvPixelFormat(nx::vms::api::analytics::PixelFormat pixelFormat);
+
+//-------------------------------------------------------------------------------------------------
+// Settings utils
+
+sdk_support::SdkSettingsResponse toSdkSettingsResponse(
+    const ResultHolder<const sdk::ISettingsResponse*>& settingsRepsonse);
 
 } // namespace nx::vms::server::sdk_support

@@ -2,13 +2,13 @@
 
 #include <media_server/media_server_module.h>
 #include <plugins/vms_server_plugins_ini.h>
-#include <core/resource/camera_resource.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log_level.h>
 #include <nx/fusion/model_functions.h>
 
+#include <nx/vms/server/resource/camera.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/server/analytics/wrappers/settings_processor.h>
@@ -26,7 +26,7 @@ using namespace nx::vms::event;
 DeviceAgent::DeviceAgent(
     QnMediaServerModule* serverModule,
     QWeakPointer<resource::AnalyticsEngineResource> engineResource,
-    QWeakPointer<QnVirtualCameraResource> device,
+    QWeakPointer<resource::Camera> device,
     sdk::Ptr<sdk::analytics::IDeviceAgent> sdkDeviceAgent,
     QString libraryName)
     :
@@ -144,7 +144,7 @@ resource::AnalyticsPluginResourcePtr DeviceAgent::pluginResource() const
     return engineResource->plugin().dynamicCast<resource::AnalyticsPluginResource>();
 }
 
-QnVirtualCameraResourcePtr DeviceAgent::device() const
+resource::CameraPtr DeviceAgent::device() const
 {
     return m_device;
 }

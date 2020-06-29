@@ -5,9 +5,14 @@
 namespace nx {
 namespace sdk {
 
-SettingsResponse::SettingsResponse(Ptr<StringMap> values, Ptr<StringMap> errors):
+SettingsResponse::SettingsResponse(
+    Ptr<StringMap> values,
+    Ptr<StringMap> errors,
+    Ptr<String> model)
+    :
     m_values(values),
-    m_errors(errors)
+    m_errors(errors),
+    m_model(model)
 {
 }
 
@@ -25,6 +30,14 @@ IStringMap* SettingsResponse::getErrors() const
         m_errors->addRef();
 
     return m_errors.get();
+}
+
+IString* SettingsResponse::getModel() const
+{
+    if (m_model)
+        m_model->addRef();
+
+    return m_model.get();
 }
 
 void SettingsResponse::setValue(std::string key, std::string value)
@@ -51,6 +64,17 @@ void SettingsResponse::setValues(Ptr<StringMap> values)
 void SettingsResponse::setErrors(Ptr<StringMap> errors)
 {
     m_errors = errors;
+}
+
+void SettingsResponse::setModel(Ptr<String> model)
+{
+    m_model = model;
+}
+
+void SettingsResponse::setModel(std::string model)
+{
+    if (!m_model)
+        m_model = makePtr<String>(model);
 }
 
 } // namespace sdk

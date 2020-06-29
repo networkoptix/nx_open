@@ -22,21 +22,14 @@ using namespace nx::network;
 
 namespace {
 
-JsonRestResponse makeSettingsResponse(
-    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
+JsonRestResponse makeSettingsResponse(const analytics::SettingsResponse& settingsResponse)
 {
-    nx::vms::api::analytics::SettingsResponse response;
-    response.values = engine->settingsValues();
+    nx::vms::api::analytics::EngineSettingsResponse response;
 
-    const auto parentPlugin = engine->plugin();
-    if (!NX_ASSERT(parentPlugin))
-    {
-        return makeResponse(
-            QnRestResult::Error::InternalServerError,
-            lm("Unable to access the parent Plugin of the Engine, %1").args(engine));
-    }
-
-    response.model = parentPlugin->manifest().engineSettingsModel;
+    response.settingsValues = settingsResponse.values;
+    response.settingsModel = settingsResponse.model;
+    response.settingsModelId = settingsResponse.modelId;
+    response.settingsErrors = analytics::toJsonObject(settingsResponse.errors);
 
     JsonRestResponse result(http::StatusCode::ok);
     result.json.setReply(response);
@@ -70,7 +63,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executeGet(const JsonRestReques
             lm("Unable to find analytics engine with id %1").args(engineId));
     }
 
-    return makeSettingsResponse(engine);
+    return makeSettingsResponse(engine->getSettings());
 }
 
 JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
@@ -86,7 +79,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
     }
 
     bool success = false;
-    const auto& settings = QJson::deserialized(body, QJsonObject(), &success);
+    const auto& settingsRequest = QJson::deserialized(body, QJsonObject(), &success);
     if (!success)
     {
         const QString message("Unable to deserialize request");
@@ -103,10 +96,11 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
             lm("Unable to find analytics engine with id %1").args(engineId));
     }
 
-    engine->setSettingsValues(settings);
-    engine->saveProperties();
+    analytics::SetSettingsRequest setSettingsRequest;
+    setSettingsRequest.modelId = QnUuid(settingsRequest["settingsModelId"].toString());
+    setSettingsRequest.values = settingsRequest["settingsValues"].toObject();
 
-    return makeSettingsResponse(engine);
+    return makeSettingsResponse(engine->setSettings(setSettingsRequest));
 }
 
 } // namespace nx::vms::server::rest

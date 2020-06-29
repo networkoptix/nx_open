@@ -49,7 +49,7 @@ protected:
      * Should perform any required (re)initialization. Called even if the settings model is empty.
      * @return Error messages per setting (if any), as in IEngine::setSettings().
      */
-    virtual Result<const IStringMap*> settingsReceived() { return nullptr; }
+    virtual Result<const ISettingsResponse*> settingsReceived() { return nullptr; }
 
     /**
      * Provides access to the Engine global settings stored by the Server.
@@ -105,7 +105,7 @@ public:
 
 protected:
     virtual void doSetSettings(
-        Result<const IStringMap*>* outResult, const IStringMap* settings) override;
+        Result<const ISettingsResponse*>* outResult, const IStringMap* settings) override;
 
     virtual void getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const override;
 

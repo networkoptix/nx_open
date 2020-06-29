@@ -13,6 +13,7 @@
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/error.h>
+#include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/i_utility_provider.h>
@@ -123,14 +124,14 @@ static void testEngineSettings(IEngine* engine)
 
     {
         // Test assigning empty settings.
-        const RefCountableResultHolder<const IStringMap*> result{
+        const RefCountableResultHolder<const ISettingsResponse*> result{
             engine->setSettings(makePtr<StringMap>().get())};
         ASSERT_TRUE(result.isOk());
     }
 
     {
         // Test assigning some settings
-        const RefCountableResultHolder<const IStringMap*> result{
+        const RefCountableResultHolder<const ISettingsResponse*> result{
             engine->setSettings(settings.get())};
         ASSERT_TRUE(result.isOk());
     }
@@ -144,14 +145,14 @@ static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
 
     {
         // Test assigning empty settings.
-        const RefCountableResultHolder<const IStringMap*> result{
+        const RefCountableResultHolder<const ISettingsResponse*> result{
             deviceAgent->setSettings(makePtr<StringMap>().get())};
         ASSERT_TRUE(result.isOk());
     }
 
     {
         // Test assigning some settings.
-        const RefCountableResultHolder<const IStringMap*> result{
+        const RefCountableResultHolder<const ISettingsResponse*> result{
             deviceAgent->setSettings(settings.get())};
         ASSERT_TRUE(result.isOk());
     }

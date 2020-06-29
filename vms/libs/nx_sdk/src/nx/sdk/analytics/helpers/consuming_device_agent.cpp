@@ -170,7 +170,7 @@ void ConsumingDeviceAgent::getManifest(Result<const IString*>* outResult) const
 }
 
 void ConsumingDeviceAgent::doSetSettings(
-    Result<const IStringMap*>* outResult, const IStringMap* settings)
+    Result<const ISettingsResponse*>* outResult, const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
         *outResult = error(ErrorCode::invalidParams, "Settings are invalid");

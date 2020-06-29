@@ -4,7 +4,7 @@
 
 #include <media_server/media_server_module.h>
 
-#include <core/resource/camera_resource.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/helpers/uuid_helper.h>
@@ -72,7 +72,7 @@ SdkObjectDescription Engine::sdkObjectDescription() const
     if (!NX_ASSERT(pluginResource))
         return SdkObjectDescription();
 
-    return SdkObjectDescription(pluginResource, engineResource, QnVirtualCameraResourcePtr());
+    return SdkObjectDescription(pluginResource, engineResource, resource::CameraPtr());
 }
 
 void Engine::setEngineInfo(Ptr<const IEngineInfo> engineInfo)
@@ -88,7 +88,7 @@ void Engine::setEngineInfo(Ptr<const IEngineInfo> engineInfo)
     engine->setEngineInfo(engineInfo.get());
 }
 
-bool Engine::isCompatible(QnVirtualCameraResourcePtr device) const
+bool Engine::isCompatible(resource::CameraPtr device) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -112,7 +112,7 @@ bool Engine::isCompatible(QnVirtualCameraResourcePtr device) const
     return engine->isCompatible(deviceInfo.get());
 }
 
-wrappers::DeviceAgentPtr Engine::obtainDeviceAgent(QnVirtualCameraResourcePtr device)
+wrappers::DeviceAgentPtr Engine::obtainDeviceAgent(resource::CameraPtr device)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 

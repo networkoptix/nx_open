@@ -57,6 +57,7 @@ namespace resource {
 
 class Camera;
 using CameraPtr = QnSharedResourcePointer<Camera>;
+using CameraList = QnSharedResourcePointerList<Camera>;
 
 class AnalyticsPluginResource;
 using AnalyticsPluginResourcePtr = QnSharedResourcePointer<AnalyticsPluginResource>;

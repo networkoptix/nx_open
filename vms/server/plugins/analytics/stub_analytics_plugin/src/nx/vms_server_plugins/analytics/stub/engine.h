@@ -37,7 +37,7 @@ public:
 protected:
     virtual std::string manifestString() const override;
 
-    virtual nx::sdk::Result<const nx::sdk::IStringMap*> settingsReceived() override;
+    virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
 protected:
     virtual void doObtainDeviceAgent(
@@ -66,6 +66,7 @@ private:
     std::atomic<bool> m_terminated{false};
     std::atomic<bool> m_needToThrowPluginDiagnosticEvents{false};
     std::atomic<bool> m_disableStreamSelection{false};
+    std::atomic<bool> m_usePluginAsSettingsOriginForDeviceAgents{false};
 
     std::string m_pluginHomeDir; /**< Can be empty. */
     std::string m_capabilities;
@@ -73,38 +74,6 @@ private:
     bool m_needUncompressedVideoFrames = false;
     PixelFormat m_pixelFormat = PixelFormat::yuv420;
 };
-
-const std::string kGenerateEventsSetting{"generateEvents"};
-const std::string kMotionVisualizationObjectType{"nx.stub.motionVisualization"};
-
-const std::string kGenerateCarsSetting{"generateCars"};
-const std::string kGenerateTrucksSetting{"generateTrucks"};
-const std::string kGeneratePedestriansSetting{"generatePedestrians"};
-const std::string kGenerateHumanFacesSetting{"generateHumanFaces"};
-const std::string kGenerateBicyclesSetting{"generateBicycles"};
-const std::string kGenerateStonesSetting{"generateStones"};
-const std::string kGenerateFixedObjectSetting{"generateFixedObject"};
-const std::string kGenerateCounterSetting{"generateCounter"};
-const std::string kCounterBoundingBoxSideSizeSetting{"counterBoundingBoxSideSize"};
-const std::string kCounterXOffsetSetting{"counterXOffset"};
-const std::string kCounterYOffsetSetting{"counterYOffset"};
-
-const std::string kBlinkingObjectPeriodMsSetting{"blinkingObjectPeriodMs"};
-const std::string kBlinkingObjectInDedicatedPacketSetting{"blinkingObjectInDedicatedPacket"};
-
-const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFrames"};
-const std::string kNumberOfObjectsToGenerateSetting{"numberOfObjectsToGenerate"};
-const std::string kGeneratePreviewPacketSetting{"generatePreviewPacket"};
-const std::string kGeneratePreviewAfterNFramesSetting("generatePreviewAfterNFrames");
-const std::string kThrowPluginDiagnosticEventsFromDeviceAgentSetting{
-    "throwPluginDiagnosticEventsFromDeviceAgent"};
-
-const std::string kThrowPluginDiagnosticEventsFromEngineSetting{
-    "throwPluginDiagnosticEventsFromDeviceAgent"};
-const std::string kDisableStreamSelectionSetting{"disableStreamSelection"};
-const std::string kLeakFramesSetting{"leakFrames"};
-const std::string kAdditionalFrameProcessingDelayMsSetting{"additionalFrameProcessingDelayMs"};
-const std::string kOverallMetadataDelayMsSetting{"overallMetadataDelayMs"};
 
 } // namespace stub
 } // namespace analytics

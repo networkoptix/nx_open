@@ -31,12 +31,15 @@ struct NX_VMS_API DeviceAnalyticsSettingsRequest
      * Name-value map with setting values, using JSON types corresponding to each setting type.
      */
     QJsonObject settingsValues;
+
+    QnUuid settingsModelId;
 };
 #define nx_vms_api_analytics_DeviceAnalyticsSettingsRequest_Fields \
     (deviceId) \
     (analyticsEngineId) \
     (analyzedStreamIndex) \
-    (settingsValues)
+    (settingsValues) \
+    (settingsModelId)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAnalyticsSettingsRequest, (json)(eq), NX_VMS_API)
 
@@ -63,12 +66,18 @@ struct NX_VMS_API DeviceAnalyticsSettingsResponse
      * Model of settings containing setting names, types and value restrictions.
      */
     QJsonObject settingsModel;
+
+    QJsonObject settingsErrors;
+
+    QnUuid settingsModelId;
 };
 #define nx_vms_api_analytics_DeviceAnalyticsSettingsResponse_Fields \
     (analyzedStreamIndex) \
     (disableStreamSelection) \
     (settingsValues) \
-    (settingsModel)
+    (settingsModel) \
+    (settingsErrors) \
+    (settingsModelId)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAnalyticsSettingsResponse, (json)(eq), NX_VMS_API)
 

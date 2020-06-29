@@ -17,6 +17,7 @@
 #include <nx/vms/server/analytics/types.h>
 #include <nx/vms/server/analytics/settings.h>
 #include <nx/vms/server/metrics/plugin_resource_binding_info_provider.h>
+#include <nx/vms/server/sdk_support/types.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/fusion/serialization/json.h>
@@ -58,14 +59,18 @@ public:
         const QnUuid& deviceId,
         nx::vms::api::StreamIndex streamIndex);
 
-    void setSettings(const QString& deviceId,
+    SettingsResponse setSettings(
+        const QString& deviceId,
         const QString& engineId,
-        const QJsonObject& deviceAgentSettings);
+        const SetSettingsRequest& settings);
 
-    std::optional<Settings> getSettings(const QString& deviceId, const QString& engineId) const;
+    SettingsResponse getSettings(
+        const QString& deviceId, const QString& engineId) const;
 
-    void setSettings(const QString& engineId, const QJsonObject& engineSettings);
-    QJsonObject getSettings(const QString& engineId) const;
+    SettingsResponse setSettings(
+        const QString& engineId, const SetSettingsRequest& settings);
+
+    SettingsResponse getSettings(const QString& engineId) const;
 
 public slots:
     void initExistingResources();
@@ -76,18 +81,18 @@ private:
     QSharedPointer<DeviceAnalyticsContext> deviceAnalyticsContextUnsafe(
         const QnUuid& deviceId) const;
     QSharedPointer<DeviceAnalyticsContext> deviceAnalyticsContextUnsafe(
-        const QnVirtualCameraResourcePtr& device) const;
+        const resource::CameraPtr& device) const;
 
-    void at_deviceAdded(const QnVirtualCameraResourcePtr& device);
-    void at_deviceRemoved(const QnVirtualCameraResourcePtr& device);
-    void at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device);
+    void at_deviceAdded(const resource::CameraPtr& device);
+    void at_deviceRemoved(const resource::CameraPtr& device);
+    void at_deviceParentIdChanged(const resource::CameraPtr& device);
 
     void at_deviceUserEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& device);
 
     void at_deviceStatusChanged(const QnResourcePtr& deviceResource);
 
-    void handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device);
-    void handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& device);
+    void handleDeviceArrivalToServer(const resource::CameraPtr& device);
+    void handleDeviceRemovalFromServer(const resource::CameraPtr& device);
 
     void at_engineAdded(const AnalyticsEngineResourcePtr& engine);
     void at_engineRemoved(const AnalyticsEngineResourcePtr& engine);
@@ -102,14 +107,14 @@ private:
     QWeakPointer<ProxyStreamDataReceptor> mediaSourceUnsafe(const QnUuid& deviceId) const;
 
     nx::vms::server::resource::AnalyticsEngineResourceList localEngines() const;
-    QnVirtualCameraResourceList localDevices() const;
-    bool isLocalDevice(const QnVirtualCameraResourcePtr& device) const;
+    resource::CameraList localDevices() const;
+    bool isLocalDevice(const resource::CameraPtr& device) const;
 
-    QSet<QnUuid> compatibleEngineIds(const QnVirtualCameraResourcePtr& device) const;
+    QSet<QnUuid> compatibleEngineIds(const resource::CameraPtr& device) const;
 
-    void updateCompatibilityWithEngines(const QnVirtualCameraResourcePtr& device);
+    void updateCompatibilityWithEngines(const resource::CameraPtr& device);
     void updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& engine);
-    void updateEnabledAnalyticsEngines(const QnVirtualCameraResourcePtr& device);
+    void updateEnabledAnalyticsEngines(const resource::CameraPtr& device);
 
 private:
     mutable nx::Mutex m_mutex;

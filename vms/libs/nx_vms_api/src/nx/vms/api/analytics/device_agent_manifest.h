@@ -22,6 +22,7 @@ struct NX_VMS_API DeviceAgentManifest
     {
         noCapabilities = 0,
         disableStreamSelection = 1 << 0,
+        doNotSaveSettingsValuesToProperty = 1 << 31, //< Properietary flag.
     };
     Q_DECLARE_FLAGS(Capabilities, Capability);
 

@@ -26,6 +26,8 @@
 
 static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
 
+static const QString kDeviceAgentSettingsModelsProperty("deviceAgentSettingsModels");
+
 namespace nx {
 namespace vms::server {
 namespace resource {
