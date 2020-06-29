@@ -46,9 +46,9 @@ static const std::string kAlternativeSettingsModelOption = "alternative";
 
 static const std::string kSettingsModelSettings = "settingsModelComboBox";
 
-static const std::string kLanguageSelector = "languageSelectorSettings";
+static const std::string kCitySelector = "languageSelectorSettings";
 static const std::string kEnglishOption = "English";
-static const std::string kGermanOption = "Deutsch";
+static const std::string kGermanOption = "German";
 
 static const std::string kAlternativeSettingsModel =
     /*suppress newline*/ 1 + (const char*) R"json("
@@ -277,8 +277,8 @@ static const std::string kRegularSettingsModelPart1 = /*suppress newline*/ 1 + R
                 },
                 {
                     "type": "ComboBox",
-                    "name": ")json" + kLanguageSelector + R"json(",
-                    "caption": "Language",
+                    "name": ")json" + kCitySelector + R"json(",
+                    "caption": "Cities",
                     "defaultValue": "English",
                     "range": [
                         ")json" + kEnglishOption + R"json(",
@@ -286,30 +286,30 @@ static const std::string kRegularSettingsModelPart1 = /*suppress newline*/ 1 + R
                 ]
                 },)json";
 
-static const std::string kEnglishLanguagePart = /*suppress newline*/ 1 + R"json(
+static const std::string kEnglishCitiesPart = /*suppress newline*/ 1 + R"json(
                 {
                     "type": "RadioButtonGroup",
                     "name": "testEnglishRadioButtonGroup",
                     "caption": "Choose one",
                     "description": "Choose one option",
-                    "defaultValue": "Yes",
+                    "defaultValue": "London",
                     "range": [
-                        "Yes",
-                        "No"
+                        "London",
+                        "Liverpool"
                     ]
                 },)json";
 
-static const std::string kGermanLanguagePart = /*suppress newline*/ 1 + R"json(
+static const std::string kGermanCitiesPart = /*suppress newline*/ 1 + R"json(
                 {
                     "type": "RadioButtonGroup",
                     "name": "testGermanRadioButtonGroup",
                     "caption": "Choose one",
                     "description": "Choose one option",
-                    "defaultValue": "Ja",
+                    "defaultValue": "Berlin",
                     "range": [
-                        "Ja",
-                        "Nein",
-                        "Doch"
+                        "Berlin",
+                        "Nuremberg",
+                        "Leipzig"
                     ]
                 },)json";
 
@@ -415,7 +415,7 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                 }
             ]
         }
-    ],
+    ],)json" R"json(
     "sections": [
         {
             "type": "Section",
@@ -516,7 +516,7 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     ]
                 }
             ]
-        },)json" R"json(
+        },
         {
             "type": "Section",
             "caption": "ROI",

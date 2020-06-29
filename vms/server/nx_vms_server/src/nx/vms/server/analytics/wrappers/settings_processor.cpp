@@ -130,8 +130,8 @@ sdk_support::SdkSettingsResponse SettingsProcessor::mergeLegacySettingsResponses
     sdk_support::SdkSettingsResponse first,
     const sdk_support::SdkSettingsResponse& second)
 {
-    // This method is used only for 4.0 plugins that are unable to return values and the model
-    // from setSettings.
+    // This method is used only for 4.0 plugins that are unable to return the values and the model
+    // from setSettings().
 
     if (!second.sdkError.isOk())
         first.sdkError = second.sdkError;

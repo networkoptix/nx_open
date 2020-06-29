@@ -18,9 +18,9 @@ using SettingsModelId = QnUuid;
 
 struct SdkSettingsResponse
 {
-    std::optional<SettingsValues> values = std::nullopt;
+    std::optional<SettingsValues> values;
     SettingsErrors errors;
-    std::optional<SettingsModel> model = std::nullopt;
+    std::optional<SettingsModel> model;
     Error sdkError;
 };
 

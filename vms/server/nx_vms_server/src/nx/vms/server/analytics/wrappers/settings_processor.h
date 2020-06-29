@@ -24,7 +24,7 @@ namespace nx::vms::server::analytics::wrappers {
 
 class SettingsProcessor
 {
-    using SettingsResponseHolder = const sdk_support::ResultHolder<const sdk::ISettingsResponse*>;
+    using SettingsResponseHolder = sdk_support::ResultHolder<const sdk::ISettingsResponse*>;
     using SettingsResponseFetcher = std::function<SettingsResponseHolder()>;
 
 public:

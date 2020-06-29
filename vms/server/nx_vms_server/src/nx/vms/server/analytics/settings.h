@@ -57,6 +57,7 @@ struct SettingsContext
     QnUuid modelId;
     api::analytics::SettingsModel model;
     api::analytics::SettingsValues values;
+    bool saveSettingsValuesToProperty = true;
 };
 
 QnUuid calculateModelId(const api::analytics::SettingsModel& settingsModel);

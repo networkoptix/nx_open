@@ -101,10 +101,9 @@ private:
 
     void notifySettingsMaybeChanged() const;
 
-    SettingsContext currentSettingsContext() const;
+    void initializeSettingsContext() const;
 
     SettingsContext updateSettingsContext(
-        const SettingsContext& currentSettingsContext,
         const api::analytics::SettingsValues& requestValues,
         const sdk_support::SdkSettingsResponse& sdkSettingsResponse) const;
 
@@ -121,7 +120,8 @@ private:
     {
         nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> handler;
         wrappers::DeviceAgentPtr deviceAgent;
-        mutable std::optional<api::analytics::SettingsModel> settingsModel;
+
+        mutable SettingsContext settingsContext;
     };
 
     mutable QnMutex m_mutex;

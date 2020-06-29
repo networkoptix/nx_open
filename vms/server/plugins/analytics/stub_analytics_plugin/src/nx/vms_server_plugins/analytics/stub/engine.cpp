@@ -277,7 +277,7 @@ std::string Engine::manifestString() const
     ],
     "deviceAgentSettingsModel": )json"
         + kRegularSettingsModelPart1
-        + kEnglishLanguagePart
+        + kEnglishCitiesPart
         + kRegularSettingsModelPart2 + R"json(
 }
 )json";

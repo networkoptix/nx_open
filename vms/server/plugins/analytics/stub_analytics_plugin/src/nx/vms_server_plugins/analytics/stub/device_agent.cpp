@@ -243,9 +243,9 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
     }
     else if (settingsModel == kRegularSettingsModelOption)
     {
-        const std::string languagePart = (settingValue(kLanguageSelector) == kGermanOption)
-            ? kGermanLanguagePart
-            : kEnglishLanguagePart;
+        const std::string languagePart = (settingValue(kCitySelector) == kGermanOption)
+            ? kGermanCitiesPart
+            : kEnglishCitiesPart;
 
         settingsResponse->setModel(kRegularSettingsModelPart1
             + languagePart
