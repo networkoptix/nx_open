@@ -9,6 +9,8 @@ from vms_benchmark import exceptions, box_connection
 from vms_benchmark.box_connection import BoxConnection
 
 class BoxConnectionSSH(BoxConnection):
+    connection_type_name = 'SSH'
+
     def __init__(self, host, port, login, password, ssh_key):
         self.host = host
         target = f"{login}@{host}" if login else host

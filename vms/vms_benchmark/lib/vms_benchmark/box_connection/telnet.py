@@ -10,6 +10,8 @@ from vms_benchmark import exceptions, box_connection
 from vms_benchmark.box_connection import BoxConnection
 
 class BoxConnectionTelnet(BoxConnection):
+    connection_type_name = 'Telnet'
+
     def __init__(self, host, port, login, password):
         if not password or not login:
             raise exceptions.BoxCommandError(

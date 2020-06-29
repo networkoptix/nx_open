@@ -1037,7 +1037,7 @@ def _obtain_box_platform(box, linux_distribution):
         f"    IP address: {box.ip}\n"
         f"    Network adapter name: {box.eth_name}\n"
         f"    Network adapter bandwidth: {(box.eth_speed + ' Mbps') if box.eth_speed else 'Unknown'}\n"
-        f"    SSH user is{'' if box.is_root else ' not'} root.\n"
+        f"    {box.connection_type_name} user is{'' if box.is_root else ' not'} root.\n"
         f"    Linux distribution name: {linux_distribution.name}\n"
         f"    Linux distribution version: {linux_distribution.version}\n"
         f"    Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}\n"
