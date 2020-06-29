@@ -72,7 +72,12 @@ static void redirectOutput(FILE* stream, const char* streamName, const std::stri
         return;
     }
 
-    fprintf(stream, "%s is redirected to this file\n", streamName);
+    const std::string processName = nx::kit::utils::getProcessName();
+
+    fprintf(stream, "%s of %s is redirected to this file (%s)\n",
+        streamName,
+        nx::kit::utils::toString(processName).c_str(),
+        nx::kit::utils::toString(filename).c_str());
 }
 
 static bool fileExists(const std::string& filePath)
