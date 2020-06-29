@@ -2,8 +2,6 @@
 
 #include "ini_config.h"
 
-#include "utils.h"
-
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -12,6 +10,8 @@
 #include <sstream>
 #include <string>
 #include <unordered_set>
+
+#include "utils.h"
 
 namespace nx {
 namespace kit {
@@ -29,11 +29,6 @@ namespace {
 //-------------------------------------------------------------------------------------------------
 // Utils
 
-static bool fileExists(const char* filename)
-{
-    return static_cast<bool>(std::ifstream(filename));
-}
-
 static bool isWhitespace(char c)
 {
     // NOTE: Chars 128..255 should be treated as non-whitespace, thus, isprint() will not do.
@@ -46,49 +41,52 @@ static void skipWhitespace(const char** const pp)
         ++(*pp);
 }
 
-template<typename T>
-std::string defaultValueToString(const T& value)
-{
-    std::ostringstream os;
-    os << value;
-    return os.str();
-}
+namespace {
 
-/**
- * @param outName Set to an empty string if the line is empty or comment.
- * @return Whether no errors occurred.
- */
-static bool parseNameValue(const char* const s, std::string* outName, std::string* outValue)
+struct ParsedNameValue
 {
-    const char* p = s;
+    std::string name; //< Empty if the line must be ignored.
+    std::string value;
+    std::string error; //< Empty on success.
+};
+
+} // namespace
+
+static ParsedNameValue parseNameValue(const std::string& lineStr)
+{
+    ParsedNameValue result;
+
+    const char* p = lineStr.c_str();
 
     skipWhitespace(&p);
-    *outName = "";
-    while (*p != '\0' && *p != '=' && *p != '#' && !isWhitespace(*p))
-        *outName += *(p++);
     if (*p == '\0' || *p == '#') //< Empty or comment line.
-        return true;
+        return result;
+    while (*p != '\0' && *p != '=' && !isWhitespace(*p))
+        result.name += *(p++);
+    if (result.name.empty())
+    {
+        result.error = "The name part (before \"=\") is empty.";
+        return result;
+    }
     skipWhitespace(&p);
 
     if (*(p++) != '=')
-        return false;
+    {
+        result.error = "Missing \"=\" after the name " + result.name + ".";
+        return result;
+    }
     skipWhitespace(&p);
 
-    *outValue = "";
     while (*p != '\0')
-        *outValue += *(p++);
+        result.value += *(p++);
 
-    // Trim trailing spaces in the value.
-    int i = (int) outValue->size() - 1;
-    while (i >= 0 && isWhitespace((*outValue)[i]))
+    // Trim trailing whitespace in the value.
+    int i = (int) result.value.size() - 1;
+    while (i >= 0 && isWhitespace(result.value[i]))
         --i;
-    *outValue = outValue->substr(0, (unsigned long) (i + 1));
+    result.value = result.value.substr(0, i + 1);
 
-    // If the value is quoted, unquote.
-    if (outValue->size() >= 2 && (*outValue)[0] == '"' && (*outValue)[outValue->size() - 1] == '"')
-        *outValue = outValue->substr(1, outValue->size() - 2);
-
-    return true;
+    return result;
 }
 
 static std::string getEnv(const char* envVar)
@@ -182,15 +180,14 @@ struct AbstractParam
     void printValueLine(
         std::ostream* output,
         const Value& value,
-        const char* valueNameSeparator,
         const char* error,
-        bool eqDefault) const
+        bool equalsDefault) const
     {
         if (output)
         {
             std::stringstream s;
-            s << ((error[0] != '\0') ? "  ! " : (eqDefault ? "    " : "  * "));
-            s << value << valueNameSeparator << name << error << "\n";
+            s << ((error[0] != '\0') ? "  ! " : (equalsDefault ? "    " : "  * "));
+            s << name << "=" << nx::kit::utils::toString(value) << error << "\n";
             *output << s.str(); //< Output in one piece to minimize multi-threaded races.
         }
     }
@@ -216,7 +213,11 @@ struct Param: AbstractParam
 
     virtual ~Param() override {};
     virtual bool reload(const std::string* value, std::ostream* output) override;
-    virtual std::string defaultValueStr() const override;
+
+    virtual std::string defaultValueStr() const override
+    {
+        return nx::kit::utils::toString(defaultValue);
+    }
 
     /**
      * Specializations may report and fix invalid default values.
@@ -240,41 +241,10 @@ bool Param<Value>::reload(const std::string* value, std::ostream* output)
     if (value && !value->empty()) //< Existing but empty values are treated as default.
     {
         if (!nx::kit::utils::fromString(*value, pValue))
-            error = " [invalid value]";
+            error = " [invalid value in file]";
     }
-    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
+    printValueLine(output, *pValue, error, *pValue == defaultValue);
     return oldValue != *pValue;
-}
-
-template<typename Value>
-std::string Param<Value>::defaultValueStr() const
-{
-    return defaultValueToString(defaultValue);
-}
-
-template<>
-bool Param<bool>::reload(const std::string* value, std::ostream* output)
-{
-    const bool oldValue = *pValue;
-    *pValue = defaultValue;
-    const char* error = "";
-    if (value && !value->empty()) //< Existing but empty bool values are treated as default.
-    {
-        if (*value == "true" || *value == "True" || *value == "TRUE" || *value == "1")
-            *pValue = true;
-        else if (*value == "false" || *value == "False" || *value == "FALSE" || *value == "0")
-            *pValue = false;
-        else
-            error = " [invalid value]";
-    }
-    printValueLine(output, *pValue ? "1" : "0", " ", error, *pValue == defaultValue);
-    return oldValue != *pValue;
-}
-
-template<>
-std::string Param<bool>::defaultValueStr() const
-{
-    return defaultValue ? "1" : "0";
 }
 
 template<>
@@ -291,7 +261,7 @@ const char* Param<const char*>::validateDefaultValue(
             if (output)
             {
                 *output << "INTERNAL ERROR: Invalid char with code "
-                    << (int) (unsigned char) *p << " in default value of " << paramName
+                    << (int) (unsigned char) *p << " in the default value of " << paramName
                     << " in " << iniFile << "." << std::endl;
             }
         }
@@ -304,26 +274,41 @@ template<>
 bool Param<const char*>::reload(const std::string* value, std::ostream* output)
 {
     const std::string oldValue = *pValue ? *pValue : "";
+
     if (*pValue != defaultValue)
     {
         free(const_cast<char*>(*pValue));
         *pValue = defaultValue;
     }
+
+    std::string error;
     if (value) //< Exists in .ini file, and can be empty: copy all chars to *pValue.
     {
-        *pValue = (char*) malloc(value->size() + 1);
-        memcpy(const_cast<char*>(*pValue), value->c_str(), value->size() + 1);
+        std::string str;
+        if ((*value)[0] == '"')
+            str = nx::kit::utils::decodeEscapedString(*value, &error);
+        else
+            str = *value;
+
+        if (str.find('\0') != std::string::npos) //< `str` contains '\0' in the middle.
+            error = "'\\0' found in the value.";
+
+        if (error.empty())
+        {
+            *pValue = (char*) malloc(str.size() + 1);
+            memcpy(const_cast<char*>(*pValue), str.c_str(), str.size() + 1);
+        }
+        else
+        {
+            if (output)
+                *output << "  ERROR in the value of " << name << ": " << error << "\n";
+        }
     }
+
     const std::string newValue{*pValue ? *pValue : ""};
-    printValueLine(output, "\"" + newValue + "\"", " = ", /*error*/ "",
+    printValueLine(output, newValue, error.empty() ? "" : " [invalid value in file]",
         newValue == (defaultValue ? defaultValue : ""));
     return oldValue != newValue;
-}
-
-template<>
-std::string Param<const char*>::defaultValueStr() const
-{
-    return std::string("\"") + defaultValue + "\"";
 }
 
 template<>
@@ -464,19 +449,17 @@ bool IniConfig::Impl::parseIniFile(std::ostream* output, bool* outputIsNeeded)
     if (!file.good())
         return true;
 
-    int line = 0;
     std::string lineStr;
+    int line = 0;
     while (std::getline(file, lineStr))
     {
         ++line;
-
-        std::string name;
-        std::string value;
-        if (!parseNameValue(lineStr.c_str(), &name, &value))
+        const ParsedNameValue parsed = parseNameValue(lineStr);
+        if (!parsed.error.empty())
         {
             if (output)
             {
-                *output << iniFile << " ERROR: Cannot parse line " << line
+                *output << iniFile << " ERROR: " << parsed.error << " Line " << line
                     << ", file " << iniFilePath() << std::endl;
                 if (outputIsNeeded != nullptr)
                     *outputIsNeeded = true;
@@ -484,8 +467,8 @@ bool IniConfig::Impl::parseIniFile(std::ostream* output, bool* outputIsNeeded)
             continue;
         }
 
-        if (!name.empty())
-            m_iniMap[name] = value;
+        if (!parsed.name.empty())
+            m_iniMap[parsed.name] = parsed.value;
     }
 
     return line > 0;
@@ -547,7 +530,7 @@ void IniConfig::Impl::reload()
     if (!isEnabled())
         return;
 
-    const bool iniFileExists = fileExists(iniFilePath());
+    const bool iniFileExists = nx::kit::utils::fileExists(iniFilePath());
     if (iniFileExists)
         m_iniFileEverExisted = true;
     if (!m_firstTimeReload && !m_iniFileEverExisted)
