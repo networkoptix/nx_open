@@ -2,11 +2,28 @@
 
 #include "utils/media/sse_helper.h"
 #include "utils/math/math.h"
+#include <nx/utils/log/log_main.h>
+
+extern "C" {
+#ifdef WIN32
+#   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#endif
+#include <libavutil/pixdesc.h>
+#include <libswscale/swscale.h>
+#include <libavutil/imgutils.h>
+#ifdef WIN32
+#   undef AVPixFmtDescriptor
+#endif
+};
 
 #if !defined(__arm__) && !defined(__aarch64__)
 
+namespace {
+
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x000000ff, 0x000000ff);
+
+static const nx::utils::log::Tag kLogTag(QLatin1String("QnFrameScaler"));
 
 void downscalePlate_factor2_sse2_intr(
     unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
@@ -190,108 +207,78 @@ void downscalePlate_factor8_sse41_intr(
 
 #endif // !defined(__arm__)
 
+template <auto scalerFunc>
+void downscalePlanes(
+    const AVPixFmtDescriptor* descriptor,
+    const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst,
+    const int croppedWidth)
+{
+    for (int i = 0; i < QnFfmpegHelper::planeCount(descriptor) && src->data[i]; ++i)
+    {
+        int width = croppedWidth;
+        int height = src->height;
+        quint8 fillerColor = 0x00;
+        if (QnFfmpegHelper::isChromaPlane(i, descriptor))
+        {
+            width >>= descriptor->log2_chroma_w;
+            height >>= descriptor->log2_chroma_h;
+            fillerColor = 0x80;
+        }
+        scalerFunc(dst->data[i], dst->linesize[i], src->data[i], width, src->linesize[i], height, fillerColor);
+    }
+}
+
+} // namespace
+
 void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, DownscaleFactor factor)
 {
-    int src_width = src->width;
-    int src_height = src->height;
-
-    const int chroma_h_factor = (src->format == AV_PIX_FMT_YUV420P || src->format == AV_PIX_FMT_YUV422P) ? 2 : 1;
-    const int chroma_v_factor = (src->format == AV_PIX_FMT_YUV420P) ? 2 : 1;
+    const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat)src->format);
+    if (!descriptor)
+    {
+        NX_WARNING(kLogTag, "Unsupported pixel format: %1", dst->format);
+        return;
+    }
 
     // after downscale chroma_width must be divisible by 4 ( opengl requirements )
-    const int mod_w = chroma_h_factor*factor*4;
-    if ((src_width%mod_w) != 0)
-        src_width = src_width/mod_w*mod_w;
+    const int mod_w = (1 << descriptor->log2_chroma_w) * factor * 4;
+    const int croppedWidth = qPower2Floor(src->width, mod_w);
 
-    int scaledWidth = src_width/factor;
-    int scaledHeight = src_height/factor;
+    const int scaledWidth = croppedWidth / factor;
+    const int scaledHeight = src->height / factor;
 
     if (scaledWidth != dst->width || scaledHeight != dst->height || src->format != dst->format || dst->isExternalData())
         dst->reallocate(scaledWidth, scaledHeight, src->format);
 
-    int src_yu_h = src_height/chroma_v_factor;
-
-    if (factor == factor_1) 
+    switch(factor)
     {
-        int yu_h = src_height/chroma_v_factor;
-        for (int i = 0; i < src_height; ++i) 
-            memcpy(dst->data[0] + i * dst->linesize[0], src->data[0] + i * src->linesize[0], src_width);
-        for (int i = 0; i < yu_h; ++i)
-            memcpy(dst->data[1] + i * dst->linesize[1], src->data[1] + i * src->linesize[1], src_width/chroma_h_factor);
-        for (int i = 0; i < yu_h; ++i)
-            memcpy(dst->data[2] + i * dst->linesize[2], src->data[2] + i * src->linesize[2], src_width/chroma_h_factor);
-    }
-    else if (factor == factor_2)
-    {
-                // perfomance test block
-                // last test result: sandy bridge 4.3Ghz. SSE faster than c code at 4-4.5 times for 1920x1080 source
-        /*
-        QTime t1;
-                t1.start();
-                volatile int g = 0;
-                for (int i = 0; i < 10000; ++i)
-                {
-            downscalePlate_factor8_sse41_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0);
-                        //downscalePlate_factor2_sse(dst->data[0], src_width/2,   src->data[0], src_width, src->linesize[0], src_height);
-                        //downscalePlate_factor2_sse(dst->data[1], src_width/chroma_h_factor/2, src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
-                        //downscalePlate_factor2_sse(dst->data[2], src_width/chroma_h_factor/2, src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
-                        g+=i;
-                }
-                int e1 = t1.elapsed();
-
-                QTime t2;
-                t2.start();
-                for (int i = 0; i < 10000; ++i)
-                {
-            downscalePlate_factor8_sse(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height);
-                        //downscalePlate_factor2(dst->data[0], src->data[0], src_width, src->linesize[0], src_height);
-                        //downscalePlate_factor2(dst->data[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
-                        //downscalePlate_factor2(dst->data[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
-                        g+=i;
-                }
-                int e2 = t2.elapsed();
-                */
-        if (useSSE2()) {
-            downscalePlate_factor2_sse2_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0x00);
-            downscalePlate_factor2_sse2_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
-            downscalePlate_factor2_sse2_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
-        } else {
-            downscalePlate_factor2(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height);
-            downscalePlate_factor2(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
-            downscalePlate_factor2(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
-        }
-    }
-    else if(factor == factor_4)
-    {
-        if (useSSSE3()) {
-            downscalePlate_factor4_ssse3_intr(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height, 0);
-            downscalePlate_factor4_ssse3_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
-            downscalePlate_factor4_ssse3_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
-        } else {
-            downscalePlate_factor4(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height);
-            downscalePlate_factor4(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
-            downscalePlate_factor4(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
-        }
-    }
-    else if(factor == factor_8)
-    {
-        if (useSSE41()) {
-            downscalePlate_factor8_sse41_intr(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height, 0);
-            downscalePlate_factor8_sse41_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
-            downscalePlate_factor8_sse41_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
-        } else {
-            downscalePlate_factor8(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height);
-            downscalePlate_factor8(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
-            downscalePlate_factor8(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
-        }
-    }
-    else 
-    {
-        NX_ASSERT(false);
+        case factor_1:
+            dst->copyDataOnlyFrom(src);
+            break;
+        case factor_2:
+            if (useSSE2())
+                downscalePlanes<downscalePlate_factor2_sse2_intr>(descriptor, src, dst, croppedWidth);
+            else
+                downscalePlanes<downscalePlate_factor2>(descriptor, src, dst, croppedWidth);
+            break;
+        case factor_4:
+            if (useSSSE3())
+                downscalePlanes<downscalePlate_factor4_ssse3_intr>(descriptor, src, dst, croppedWidth);
+            else
+                downscalePlanes<downscalePlate_factor4>(descriptor, src, dst, croppedWidth);
+            break;
+        case factor_8:
+            if (useSSE41())
+                downscalePlanes<downscalePlate_factor8_sse41_intr>(descriptor, src, dst, croppedWidth);
+            else
+                downscalePlanes<downscalePlate_factor8>(descriptor, src, dst, croppedWidth);
+            break;
+        default:
+            NX_ASSERT(false, "Unsupported scale factor");
     }
 }
 
-void QnFrameScaler::downscalePlate_factor2(unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height)
+void QnFrameScaler::downscalePlate_factor2(
+    unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height, quint8 /*filler*/)
 {
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src + src_stride;
@@ -316,7 +303,8 @@ void QnFrameScaler::downscalePlate_factor2(unsigned char* dst, int dstStride, co
     }
 }
 
-void QnFrameScaler::downscalePlate_factor4(unsigned char* dst,  int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height)
+void QnFrameScaler::downscalePlate_factor4(
+    unsigned char* dst,  int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height, quint8 /*filler*/)
 {
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src + 3*src_stride;
@@ -342,7 +330,8 @@ void QnFrameScaler::downscalePlate_factor4(unsigned char* dst,  int dstStride, c
 }
 
 
-void QnFrameScaler::downscalePlate_factor8(unsigned char* dst,  int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height)
+void QnFrameScaler::downscalePlate_factor8(
+    unsigned char* dst,  int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height, quint8 /*filler*/)
 {
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src + 7*src_stride;
