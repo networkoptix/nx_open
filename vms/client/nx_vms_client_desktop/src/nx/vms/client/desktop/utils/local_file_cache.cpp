@@ -6,6 +6,16 @@
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+/** Check if file is stored in the application data. Such files must not be copied elsewhere. */
+bool isResourceFile(const QString& filename)
+{
+    return filename.startsWith(":/") || filename.startsWith("qrc://");
+}
+
+} // namespace
+
 LocalFileCache::LocalFileCache(QObject* parent):
     base_type(parent)
 {
@@ -17,6 +27,9 @@ LocalFileCache::~LocalFileCache()
 
 QString LocalFileCache::getFullPath(const QString& filename) const
 {
+    if (isResourceFile(filename))
+        return filename;
+
     QString cachedName = filename;
     if (QDir::isAbsolutePath(filename))
         cachedName = ServerImageCache::cachedImageFilename(filename);
@@ -57,6 +70,13 @@ void LocalFileCache::downloadFile(const QString& filename)
     if (filename.isEmpty())
     {
         emit fileDownloaded(filename, OperationResult::invalidOperation);
+        return;
+    }
+
+    if (isResourceFile(filename))
+    {
+        NX_ASSERT(QFileInfo(filename).exists());
+        emit fileDownloaded(filename, OperationResult::ok);
         return;
     }
 
