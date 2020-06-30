@@ -528,9 +528,7 @@ void PluginManager::loadPlugin(
     // Flag DeepBindHint forces plugin (the loaded side) to use its functions instead of the same
     // named functions of the Server (the loading side). In Linux it is not so by default.
     QLibrary::LoadHints hints = lib->loadHints();
-    #if !(defined(__SANITIZE_ADDRESS__) || (defined(__clang__) && __has_feature(address_sanitizer)))
-        hints |= QLibrary::DeepBindHint;
-    #endif
+    hints |= QLibrary::DeepBindHint;
     lib->setLoadHints(hints);
 
     if (!lib->load())
