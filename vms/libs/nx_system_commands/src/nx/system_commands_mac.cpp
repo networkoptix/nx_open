@@ -1,6 +1,4 @@
 #include "system_commands.h"
-#include <QtCore/QDir>
-#include <QtCore/QString>
 
 namespace nx {
 

@@ -1,7 +1,9 @@
-set(nx_system_commands_private_libs Qt5::Core nx_kit)
+set(nx_system_commands_private_libs nx_kit)
 
-if (LINUX)
+if(LINUX)
     add_definitions(-DNX_CUSTOMIZATION_NAME=${customization.companyId})
+elseif(WIN32)
+    list(APPEND nx_system_commands_private_libs Qt5::Core)
 endif()
 
 nx_add_target(nx_system_commands LIBRARY LIBRARY_TYPE STATIC
