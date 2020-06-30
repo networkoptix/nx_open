@@ -53,7 +53,6 @@ if(NOT targetDevice MATCHES "edge1")
     nx_enable_camera_vendor_old(arecont)
     nx_enable_camera_vendor_old(dlink)
     nx_enable_camera_vendor_old(droid)
-    nx_enable_camera_vendor_old(test_camera)
     nx_enable_camera_vendor_old(stardot)
     nx_enable_camera_vendor(iqinvision)
     nx_enable_camera_vendor_old(isd)
@@ -68,6 +67,7 @@ if(NOT targetDevice MATCHES "edge1")
 endif()
 
 nx_enable_camera_vendor(wearable)
+nx_enable_camera_vendor_old(test_camera)
 
 # TODO: nx_vms_server uses MDNS unconditionally, so disabling this macro always leads to build
 # failure.

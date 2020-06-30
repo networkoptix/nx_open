@@ -85,6 +85,10 @@ void QnMediaServerResourceSearchers::initialize()
         registerSearcher(new QnWearableCameraResourceSearcher(serverModule()));
     #endif
 
+    #if defined(ENABLE_TEST_CAMERA)
+        registerSearcher(new QnTestCameraResourceSearcher((serverModule())));
+    #endif
+
     if (!nx::utils::AppInfo::isEdgeServer())
     {
         #if defined(ENABLE_ARECONT)
@@ -92,9 +96,6 @@ void QnMediaServerResourceSearchers::initialize()
         #endif
         #if defined(ENABLE_DLINK)
             registerSearcher(new QnPlDlinkResourceSearcher(serverModule()));
-        #endif
-        #if defined(ENABLE_TEST_CAMERA)
-            registerSearcher(new QnTestCameraResourceSearcher((serverModule())));
         #endif
         #if defined(ENABLE_AXIS)
             registerSearcher(new QnPlAxisResourceSearcher(serverModule()));
