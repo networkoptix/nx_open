@@ -577,7 +577,11 @@ int getMacFromEth0(char MAC_str[MAC_ADDR_LEN], char** host)
     if (ioctl(s, SIOCGIFHWADDR, &ifr) == -1)
         return -1;
     for (int i = 0; i < HWADDR_len; i++)
-        sprintf(&MAC_str[i * 3], "%02X-", ((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+    {
+        char buffer[4];
+        sprintf(buffer, "%02X-", ((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+        memmove(&MAC_str[i * 3], buffer, 3);
+    }
     MAC_str[MAC_ADDR_LEN - 1] = 0;
 
     //reading interface IP

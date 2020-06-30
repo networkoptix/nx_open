@@ -51,61 +51,61 @@
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Bytů</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
-        <numerusform>Byte(s)</numerusform>
+      <translation>
+        <numerusform>Bajt(ů)</numerusform>
+        <numerusform>Bajt(ů)</numerusform>
+        <numerusform>Bajt(ů)</numerusform>
+        <numerusform>Bajt(ů)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobajtů</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
+      <translation>
+        <numerusform>Kilobajt(ů)</numerusform>
+        <numerusform>Kilobajt(ů)</numerusform>
+        <numerusform>Kilobajt(ů)</numerusform>
+        <numerusform>Kilobajt(ů)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabajtů</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
+      <translation>
+        <numerusform>Megabajt(ů)</numerusform>
+        <numerusform>Megabajt(ů)</numerusform>
+        <numerusform>Megabajt(ů)</numerusform>
+        <numerusform>Megabajt(ů)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabajtů</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
+      <translation>
+        <numerusform>Gigabajt(ů)</numerusform>
+        <numerusform>Gigabajt(ů)</numerusform>
+        <numerusform>Gigabajt(ů)</numerusform>
+        <numerusform>Gigabajt(ů)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabajtů</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
+      <translation>
+        <numerusform>Terabajt(ů)</numerusform>
+        <numerusform>Terabajt(ů)</numerusform>
+        <numerusform>Terabajt(ů)</numerusform>
+        <numerusform>Terabajt(ů)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabajtů</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
+      <translation>
+        <numerusform>Petabajt(ů)</numerusform>
+        <numerusform>Petabajt(ů)</numerusform>
+        <numerusform>Petabajt(ů)</numerusform>
+        <numerusform>Petabajt(ů)</numerusform>
       </translation>
     </message>
   </context>
@@ -715,11 +715,11 @@
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -815,11 +815,11 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -991,20 +991,20 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n I/O Modul</numerusform>
+        <numerusform>%n I/O Moduly</numerusform>
+        <numerusform>%n I / O modulů</numerusform>
+        <numerusform>%n I / O modulů</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n I/O moduly</numerusform>
+        <numerusform>%n I/O moduly</numerusform>
+        <numerusform>%n I/O moduly</numerusform>
+        <numerusform>%n I/O moduly</numerusform>
       </translation>
     </message>
     <message numerus="yes">

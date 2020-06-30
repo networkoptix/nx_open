@@ -38,7 +38,7 @@ public:
 
 protected:
     virtual void doSetSettings(
-        nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
         const nx::sdk::IStringMap* settings) override;
     virtual void getPluginSideSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
@@ -59,7 +59,7 @@ private:
 
 private:
     nx::sdk::analytics::Plugin* const m_plugin;
-    
+
     mutable std::vector<ObjectClassDescription> m_objectClassDescritions;
     mutable std::string m_manifest;
     nx::sdk::analytics::IDeviceAgent* m_deviceAgent = nullptr;
