@@ -5,15 +5,7 @@
 #include <nx/utils/log/log_main.h>
 
 extern "C" {
-#ifdef WIN32
-#   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
-#endif
 #include <libavutil/pixdesc.h>
-#include <libswscale/swscale.h>
-#include <libavutil/imgutils.h>
-#ifdef WIN32
-#   undef AVPixFmtDescriptor
-#endif
 };
 
 #if !defined(__arm__) && !defined(__aarch64__)
