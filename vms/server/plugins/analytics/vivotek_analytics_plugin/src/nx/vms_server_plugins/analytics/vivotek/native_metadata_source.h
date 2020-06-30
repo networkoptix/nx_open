@@ -6,12 +6,12 @@
 #include <nx/utils/url.h>
 
 #include <QtCore/QFlags>
-#include <QtCore/QJsonValue>
 #include <QtCore/QSet>
 #include <QtCore/QString>
 
 #include "camera_vca_parameter_api.h"
 #include "websocket.h"
+#include "json_utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -28,7 +28,7 @@ class NativeMetadataSource
 {
 public:
     cf::future<cf::unit> open(const nx::utils::Url& url, NativeMetadataTypes types);
-    cf::future<QJsonValue> read();
+    cf::future<JsonValue> read();
     void close();
 
 private:

@@ -67,8 +67,7 @@ DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
             url.setPassword(deviceInfo->password());
             url.setPath("");
             return url;
-        }()),
-    m_features(CameraFeatures::fetchFrom(m_url))
+        }())
 {
 }
 
@@ -76,16 +75,14 @@ void DeviceAgent::doSetSettings(Result<const ISettingsResponse*>* outResult, con
 {
     try
     {
-        auto response = makePtr<SettingsResponse>();
-
-        CameraSettings settings(m_features);
+        CameraSettings settings;
 
         settings.parseFromServer(*values);
+
         settings.storeTo(m_url);
+        settings.fetchFrom(m_url);
 
-        response->setErrors(settings.getErrorMessages());
-
-        *outResult = response.releasePtr();
+        *outResult = settings.serializeToServer().releasePtr();
     }
     catch (const Exception& exception)
     {
@@ -106,7 +103,7 @@ void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* outRes
 
     try
     {
-        CameraSettings settings(m_features);
+        CameraSettings settings;
 
         settings.fetchFrom(m_url);
 
@@ -114,9 +111,7 @@ void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* outRes
         self.updateAvailableMetadataTypes(settings);
         self.refreshMetadataStreaming();
 
-        auto values = settings.serializeToServer();
-        auto errorMessages = settings.getErrorMessages();
-        *outResult = new SettingsResponse(std::move(values), std::move(errorMessages));
+        *outResult = settings.serializeToServer().releasePtr();
     }
     catch (const Exception& exception)
     {
@@ -139,9 +134,6 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 
                     for (const auto& objectType: kObjectTypes)
                     {
-                        if (!objectType.isSupported(m_features))
-                            continue;
-
                         types.push_back(QJsonObject{
                             {"id", objectType.id},
                             {"name", objectType.prettyName},
@@ -157,9 +149,6 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 
                     for (const auto& eventType: kEventTypes)
                     {
-                        if (!eventType.isSupported(m_features))
-                            continue;
-
                         QJsonObject type = {
                             {"id", eventType.id},
                             {"name", eventType.prettyName},
@@ -173,7 +162,6 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
                     return types;
                 }(),
             },
-            {"deviceAgentSettingsModel", CameraSettings::getModelForManifest(m_features)},
         };
 
         *outResult = new sdk::String(serializeJson(manifest).toStdString());
@@ -239,20 +227,22 @@ void DeviceAgent::emitDiagnostic(
 void DeviceAgent::updateAvailableMetadataTypes(const CameraSettings& settings)
 {
     m_availableMetadataTypes = NoNativeMetadataTypes;
-    if (const auto& vca = settings.vca)
+
+    for (const auto& objectType: kObjectTypes)
     {
-        if (const auto& enabled = vca->enabled; enabled.hasValue() && enabled.value())
+        if (objectType.isAvailable(settings))
         {
             m_availableMetadataTypes |= ObjectNativeMetadataType;
+            break;
+        }
+    }
 
-            for (auto const& eventType: kEventTypes)
-            {
-                if (eventType.isSupported(m_features))
-                {
-                    m_availableMetadataTypes |= EventNativeMetadataType;
-                    break;
-                }
-            }
+    for (auto const& eventType: kEventTypes)
+    {
+        if (eventType.isAvailable(settings))
+        {
+            m_availableMetadataTypes |= EventNativeMetadataType;
+            break;
         }
     }
 }

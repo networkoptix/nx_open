@@ -51,7 +51,7 @@ Rect parseBoundingBox(const QString& path, const QJsonArray& pos2d)
     for (int i = 0; i < pos2d.count(); ++i)
     {
         const auto point = CameraVcaParameterApi::parsePoint(
-            get<QJsonObject>(path, pos2d, i), NX_FMT("%1[%2]", path, i));
+            get<QJsonObject>(path, pos2d, i), extendJsonPath(path, i));
 
         min.x = std::min(min.x, point.x);
         min.y = std::min(min.y, point.y);

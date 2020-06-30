@@ -65,7 +65,6 @@ private:
     const std::unique_ptr<nx::network::aio::BasicPollable> m_basicPollable;
     const nx::sdk::LogUtils m_logUtils;
     const nx::utils::Url m_url; //< `http://username:password@host:port` only
-    const CameraFeatures m_features;
 
     nx::sdk::Ptr<IHandler> m_handler;
 

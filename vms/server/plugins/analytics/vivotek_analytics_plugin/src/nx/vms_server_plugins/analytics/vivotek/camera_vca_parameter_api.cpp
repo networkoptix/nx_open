@@ -26,7 +26,7 @@ CameraVcaParameterApi::CameraVcaParameterApi(Url url):
 {
 }
 
-cf::future<QJsonValue> CameraVcaParameterApi::fetch(const QString& scope)
+cf::future<JsonValue> CameraVcaParameterApi::fetch(const QString& scope)
 {
     auto url = m_url;
     url.setPath(NX_FMT("/VCA/%1", scope));
@@ -78,7 +78,7 @@ Point CameraVcaParameterApi::parsePoint(const QJsonValue& json, const QString& p
         {
             return CameraVcaParameterApi::parseCoordinate(
                 get<QJsonValue>(path, json, key),
-                NX_FMT("%1.%2", path, key));
+                extendJsonPath(path, key));
         };
 
     return Point(parseCoordinate("x"), parseCoordinate("y"));

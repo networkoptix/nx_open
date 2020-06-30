@@ -5,7 +5,7 @@
 
 #include <QtCore/QString>
 
-#include "camera_features.h"
+#include "camera_settings.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -15,7 +15,7 @@ struct EventType
     QString id;
     QString prettyName;
     bool isProlonged = false;
-    std::function<bool(const CameraFeatures& features)> isSupported =
+    std::function<bool(const CameraSettings& settings)> isAvailable =
         [](const auto&) { return true; };
 };
 

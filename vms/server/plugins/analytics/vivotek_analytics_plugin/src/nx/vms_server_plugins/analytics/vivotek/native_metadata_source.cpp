@@ -4,7 +4,6 @@
 
 #include <QtCore/QStringList>
 
-#include "json_utils.h"
 #include "exception.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -32,7 +31,7 @@ cf::future<cf::unit> NativeMetadataSource::open(const Url& url, NativeMetadataTy
         .then(addExceptionContextAndRethrow("Failed to open native metadata source"));
 }
 
-cf::future<QJsonValue> NativeMetadataSource::read()
+cf::future<JsonValue> NativeMetadataSource::read()
 {
     return m_webSocket.read()
         .then_unwrap(NX_WRAP_FUNC_TO_LAMBDA(parseJson))

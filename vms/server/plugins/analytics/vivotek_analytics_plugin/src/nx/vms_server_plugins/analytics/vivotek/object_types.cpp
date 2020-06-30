@@ -10,7 +10,11 @@ const std::vector<ObjectType> kObjectTypes =
             type.nativeId = "Human";
             type.id = "nx.vivotek.Human";
             type.prettyName = "Human";
-            type.isSupported = [](auto& features) { return !!features.vca; };
+            type.isAvailable =
+                [](const auto& settings) {
+                    const auto& vca = settings.vca;
+                    return vca && vca->enabled.value.value_or(false);
+                };
         }
         return types;
     }();
