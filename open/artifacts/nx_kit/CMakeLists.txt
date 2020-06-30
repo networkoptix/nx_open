@@ -52,13 +52,13 @@ target_include_directories(nx_kit PUBLIC src)
 
 set(NX_KIT_API_IMPORT_MACRO "")
 set(NX_KIT_API_EXPORT_MACRO "")
-if(WIN32)
-    if (nxKitLibraryType STREQUAL "SHARED")
+if (nxKitLibraryType STREQUAL "SHARED")
+    if(WIN32)
         set(NX_KIT_API_IMPORT_MACRO "__declspec(dllimport)")
         set(NX_KIT_API_EXPORT_MACRO "__declspec(dllexport)")
+    else()
+        set(NX_KIT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
     endif()
-else()
-    set(NX_KIT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
 endif()
 
 target_compile_definitions(nx_kit
