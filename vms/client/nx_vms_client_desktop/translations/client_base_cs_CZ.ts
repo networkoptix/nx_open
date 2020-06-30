@@ -4768,7 +4768,7 @@ to %1</source>
         <numerusform>about %n minutes</numerusform>
         <numerusform>about %n minutes</numerusform>
         <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+        <numerusform>asi %n minuty</numerusform>
       </translation>
     </message>
   </context>
