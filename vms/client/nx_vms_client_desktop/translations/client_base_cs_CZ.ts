@@ -1692,21 +1692,21 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Podrobnosti pro %n relací z %1</numerusform>
         <numerusform>Podrobnosti pro %n relací z %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+        <numerusform>Podrobnosti pro %n relací z %1</numerusform>
+        <numerusform>Podrobnosti pro %n relací z %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Podrobnosti pro %n kameru z %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+        <numerusform>Podrobnosti pro %n kameru z %1</numerusform>
+        <numerusform>Podrobnosti pro %n kameru z %1</numerusform>
+        <numerusform>Podrobnosti pro %n kameru z %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1854,11 +1854,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n akce</numerusform>
         <numerusform>%n akcí</numerusform>
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+        <numerusform>%n akcí</numerusform>
+        <numerusform>%n akcí</numerusform>
       </translation>
     </message>
     <message>
@@ -3146,21 +3146,21 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Deník událostí pro období od %1 do %2 - %n nalezených událostí</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Protokol událostí pro období od %1 do %2 - %n nalezené události</numerusform>
+        <numerusform>Protokol událostí pro období od %1 do %2 - %n nalezené události</numerusform>
+        <numerusform>Protokol událostí pro období od %1 do %2 - %n nalezené události</numerusform>
+        <numerusform>Protokol událostí pro období od %1 do %2 - %n nalezené události</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Deník událostí na %1 - %n nalezených událostí</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Protokol událostí pro %1 - %n událost</numerusform>
+        <numerusform>Protokol událostí pro %1 - %n událost</numerusform>
+        <numerusform>Protokol událostí pro %1 - %n událost</numerusform>
+        <numerusform>Protokol událostí pro %1 - %n událost</numerusform>
       </translation>
     </message>
   </context>
@@ -3246,11 +3246,11 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 (%n kamery)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+        <numerusform>%1 (%n kamery)</numerusform>
+        <numerusform>%1 (%n kamery)</numerusform>
+        <numerusform>%1 (%n kamery)</numerusform>
       </translation>
     </message>
   </context>
@@ -4659,7 +4659,7 @@ to %1</source>
         <numerusform>asi %n minut</numerusform>
         <numerusform>asi %n minuty</numerusform>
         <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+        <numerusform>asi %n minuty</numerusform>
       </translation>
     </message>
   </context>
@@ -7140,11 +7140,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery.</numerusform>
         <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery.</numerusform>
+        <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery.</numerusform>
       </translation>
     </message>
     <message>
@@ -7405,11 +7405,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
+        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
+        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
       </translation>
     </message>
   </context>
@@ -7690,11 +7690,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n objektů</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+        <numerusform>%n objektů</numerusform>
+        <numerusform>%n objektů</numerusform>
+        <numerusform>%n objektů</numerusform>
       </translation>
     </message>
   </context>
@@ -8253,11 +8253,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>Přidává se %n zařízení. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
       </translation>
     </message>
     <message>
@@ -8574,20 +8574,20 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n nový</numerusform>
         <numerusform>%n nové</numerusform>
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+        <numerusform>%n nové</numerusform>
+        <numerusform>%n nové</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Celkem %n zařízení</numerusform>
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+        <numerusform>Celkem %n zařízení</numerusform>
+        <numerusform>Celkem %n zařízení</numerusform>
+        <numerusform>Celkem %n zařízení</numerusform>
       </translation>
     </message>
   </context>
@@ -8842,11 +8842,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
+        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
+        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
       </translation>
     </message>
     <message>
@@ -9548,11 +9548,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>E-mailová adresa není nastavena pro %n uživatelů</numerusform>
         <numerusform>Emailová adresa není nastavena pro %n uživatele</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+        <numerusform>E-mailová adresa není nastavena pro %n uživatelů</numerusform>
+        <numerusform>E-mailová adresa není nastavena pro %n uživatelů</numerusform>
       </translation>
     </message>
     <message>
@@ -9573,11 +9573,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
+        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
+        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
       </translation>
     </message>
     <message>
@@ -10211,11 +10211,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nepodařilo se změnit heslo na %n z %1 kamer</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+        <numerusform>Nepodařilo se změnit heslo na %n z %1 kamer</numerusform>
+        <numerusform>Nepodařilo se změnit heslo na %n z %1 kamer</numerusform>
+        <numerusform>Nepodařilo se změnit heslo na %n z %1 kamer</numerusform>
       </translation>
     </message>
     <message>

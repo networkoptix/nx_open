@@ -612,11 +612,11 @@
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Bezplatné licence</numerusform>
-        <numerusform>%n Bezplatné licence</numerusform>
-        <numerusform>%n Bezplatné licence</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -712,11 +712,11 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n%1 Bezplatné licence</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
+        <numerusform>%n bezplatných licencí</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -895,20 +895,20 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O Modul</numerusform>
         <numerusform>%n I/O Moduly</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I / O modulů</numerusform>
+        <numerusform>%n I / O modulů</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O moduly</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O moduly</numerusform>
+        <numerusform>%n I/O moduly</numerusform>
+        <numerusform>%n I/O moduly</numerusform>
       </translation>
     </message>
     <message numerus="yes">
