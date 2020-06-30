@@ -33,7 +33,7 @@ protected:
 private:
     QnPlVmax480ResourcePtr m_networkRes;
 
-    VMaxStreamFetcher* m_maxStream = nullptr;
+    std::shared_ptr<VMaxStreamFetcher> m_maxStream;
     bool m_opened = false;
     QElapsedTimer m_lastMediaTimer;
     //QnVMax480ConnectionProcessor* m_processor;

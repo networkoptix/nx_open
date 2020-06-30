@@ -42,7 +42,7 @@ private:
     qint64 seekInternal(qint64 time, bool findIFrame);
     void reconnect();
 private:
-    VMaxStreamFetcher* m_maxStream;
+    std::shared_ptr<VMaxStreamFetcher> m_maxStream;
     QnPlVmax480ResourcePtr m_res;
     bool m_needStop;
     bool m_reverseMode;

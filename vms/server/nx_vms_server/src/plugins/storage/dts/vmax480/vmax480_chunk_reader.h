@@ -41,7 +41,7 @@ private:
     bool m_firstRange;
     QnTimePeriod m_archiveRange;
     QElapsedTimer m_waitTimer;
-    VMaxStreamFetcher* m_streamFetcher;
+    std::shared_ptr<VMaxStreamFetcher> m_streamFetcher;
     QnPlVmax480Resource* m_vmaxResource;
     bool m_gotAllData;
 };

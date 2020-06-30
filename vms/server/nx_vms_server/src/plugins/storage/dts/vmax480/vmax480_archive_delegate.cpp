@@ -15,7 +15,6 @@ static const int EMPTY_PACKET_REPEAT_INTERVAL = 100;
 
 QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(const QnResourcePtr& res):
     QnAbstractArchiveDelegate(),
-    m_maxStream(NULL),
     m_needStop(false),
     m_reverseMode(false),
     m_thumbnailsMode(false),
@@ -51,7 +50,7 @@ bool QnVMax480ArchiveDelegate::open(const QnResourcePtr&, AbstractArchiveIntegri
 
     qDebug() << "before vmaxConnect";
 
-    if (m_maxStream == 0)
+    if (!m_maxStream)
         m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res.data(), false);
     int consumerCount = 0;
     m_isOpened = m_maxStream->registerConsumer(this, &consumerCount, !m_thumbnailsMode, !m_thumbnailsMode);
@@ -103,9 +102,7 @@ void QnVMax480ArchiveDelegate::close()
         m_maxStream->unregisterConsumer(this);
         m_isOpened = false;
     }
-    if (m_maxStream)
-        VMaxStreamFetcher::freeInstance(m_groupId, m_res.data(), false);
-    m_maxStream = 0;
+    m_maxStream.reset();
 }
 
 qint64 QnVMax480ArchiveDelegate::startTime() const
