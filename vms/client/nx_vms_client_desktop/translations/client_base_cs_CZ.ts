@@ -4655,11 +4655,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>asi %n minut</numerusform>
         <numerusform>asi %n minuty</numerusform>
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>asi %n minuty</numerusform>
+        <numerusform>asi %n minut</numerusform>
+        <numerusform>asi %n minut</numerusform>
       </translation>
     </message>
   </context>

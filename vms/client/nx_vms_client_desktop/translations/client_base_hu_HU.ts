@@ -985,7 +985,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Oldal...</translation>
     </message>
   </context>
   <context>
@@ -2971,7 +2971,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Nem sikerült észlelni a rögzítési felbontást</translation>
     </message>
   </context>
   <context>
@@ -5757,23 +5757,23 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>RAM</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optikai</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>csere</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>hálózat</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>unknown</source>
@@ -6478,7 +6478,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <name>QnWebPage</name>
     <message>
       <source>DOWNLOADING&lt;br&gt;STARTED</source>
-      <translation type="unfinished">DOWNLOADING&lt;br&gt;STARTED</translation>
+      <translation>&lt;br&gt;letöltés indult</translation>
     </message>
   </context>
   <context>
@@ -6623,7 +6623,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Nem sikerült nyugtázni az eseményt az eltávolított kamerán.</translation>
     </message>
   </context>
   <context>
@@ -7478,7 +7478,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Ismeretlen sáv</translation>
     </message>
   </context>
   <context>
@@ -7811,11 +7811,11 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>A mozgásérzékelés le van tiltva, az összes ütemterv: &quot;Motion&quot; és &quot;Motion + Lo-Res&quot; &quot;Mindig&quot;értékre változik</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>A kettős streaming le van tiltva, az összes ütemterv-bejegyzés &quot;Motion + Lo-Res&quot; &quot;változik mindig&quot;</translation>
     </message>
   </context>
   <context>
@@ -8059,7 +8059,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Kérjük, tekintse át és fogadja el a %1 t a folytatáshoz</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
@@ -8562,7 +8562,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Felépítmény nem található</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
@@ -8611,9 +8611,9 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>Hiányzik az ügyfél és a %n szerver frissítési csomagja</numerusform>
+        <numerusform>Hiányzik a frissítőcsomag a klienshez és az %n szerverhez</numerusform>
       </translation>
     </message>
     <message>
@@ -8630,11 +8630,11 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>Az operációs rendszer egyes összetevői már nem támogatottak. Távolítsa el őket a rendszerből, vagy frissítse operációs rendszerüket egy támogatott verzióra.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>A kliens operációs rendszer verzióját már nem támogatjuk. Kérjük, frissítse annak operációs rendszerét egy támogatott verzióra.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
@@ -8738,7 +8738,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>Másik felépítmény kijelölése</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8790,7 +8790,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>Néhány szerver offline állapotba került. Kérjük, várjon, amíg online lesz.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -9169,7 +9169,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>a plugin rossz eredményt adott</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
@@ -9980,10 +9980,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>Az elemzési adatbázist csak egy helyi meghajtón kell tárolni, és nagy helyet foglalhat el.
+Miután kiválasztotta az elemzési adatok tárolására szolgáló helyet, nem változtatható meg könnyen a meglévő adatok elvesztése nélkül. Javasoljuk, hogy gondosan válassza ki a helyet, és kerülje a rendszerpartíció használatát, mivel ez súlyos rendszerhibákat okozhat.
+Alapértelmezés szerint az elemzési adatokat a %1tárolják.
+Kiválaszthat egy másik tárolási helyet a Kiszolgálóbeállítások párbeszédpanel &quot;Tárhelykezelés&quot; lapján.</translation>
     </message>
   </context>
   <context>
@@ -10057,7 +10057,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Fájl mentése más néven...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10065,15 +10065,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>A fájl mentése sikertelen</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>%1 mappa írása blokkolva van.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Fájlok letöltése...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10081,15 +10081,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Megállítja a fájlok letöltését?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Fájl letöltve</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>A fájl letöltése sikertelen</translation>
     </message>
   </context>
 </TS>

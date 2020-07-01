@@ -143,7 +143,7 @@
         "newSystemError": "A rendszerek nem egyesíthetők. Távoli rendszer nincs beállítva.",
         "safeMode": "A rendszerek nem egyesíthetők. Távoli rendszer csökkentett módban fut.",
         "configError": "A rendszerek nem egyesíthetők. Valamelyik rendszer csökkentett módban futhat.",
-        "cloudError": "Cannot merge Systems. Dependent System is connected to cloud. You need to disconnect it first.",
+        "cloudError": "A rendszerek nem egyesíthetők. Valamelyik rendszer felhőre csatlakozik. Szüntesse meg a felhőkapcsolatot.",
         "cloudBothError": "A rendszerek nem egyesíthetők. Mindkét rendszer felhőre csatlakozik. Szüntesse meg a felhőkapcsolatot.",
         "cloudHostConflict": "A rendszerek nem egyesíthetők, mert a szerverek más felhőszolgáltatót használnak",
         "licenceError": "Figyelem! Starter licenccet használó rendszerek összevonására készül. Rendszerenként egy Starter licenc engedélyezett, így a második licenc deaktiválva lesz. Folytatja?",
