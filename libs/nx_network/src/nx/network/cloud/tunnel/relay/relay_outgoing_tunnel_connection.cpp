@@ -1,6 +1,7 @@
 #include "relay_outgoing_tunnel_connection.h"
 
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "api/relay_api_client_factory.h"
@@ -95,8 +96,16 @@ void OutgoingTunnelConnection::establishNewConnection(
                 // the connection error itself.
                 m_activeRequests.back()->timer.start(
                     timeout * 2,
-                    std::bind(&OutgoingTunnelConnection::onConnectionOpened, this,
-                        nx::cloud::relay::api::ResultCode::timedOut, nullptr, requestIter));
+                    [this, requestIter, timeout]()
+                    {
+                        NX_VERBOSE(this, "Relay session %1. Relay client failed to respond in %2",
+                            m_relaySessionId, timeout * 2);
+
+                        onConnectionOpened(
+                            nx::cloud::relay::api::ResultCode::timedOut,
+                            nullptr,
+                            requestIter);
+                    });
             }
 
             m_activeRequests.back()->relayClient = std::move(relayClient);
@@ -144,6 +153,9 @@ void OutgoingTunnelConnection::onConnectionOpened(
     std::unique_ptr<AbstractStreamSocket> connection,
     std::list<std::unique_ptr<RequestContext>>::iterator requestIter)
 {
+    NX_VERBOSE(this, "Relay session %1. Connection completed with result %2",
+        m_relaySessionId, resultCode);
+
     auto requestContext = std::move(*requestIter);
     m_activeRequests.erase(requestIter);
 

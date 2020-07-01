@@ -41,6 +41,8 @@ const Response& GetPostTunnelClient::response() const
 
 void GetPostTunnelClient::openDownChannel()
 {
+    NX_VERBOSE(this, "%1. Opening down channel", m_tunnelUrl);
+
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
     m_httpClient->setAdditionalHeaders(customHeaders());
     if (m_timeout)
@@ -60,7 +62,14 @@ void GetPostTunnelClient::openDownChannel()
 void GetPostTunnelClient::onDownChannelOpened()
 {
     if (!m_httpClient->hasRequestSucceeded())
+    {
+        NX_VERBOSE(this, "%1. Open down channel failed with %2",
+            m_tunnelUrl,
+            m_httpClient->response() ? m_httpClient->response()->statusLine.toString() : "I/O error");
         return cleanUpFailedTunnel();
+    }
+
+    NX_VERBOSE(this, "%1. Open down channel succeeded", m_tunnelUrl);
 
     m_connection = m_httpClient->takeSocket();
     m_openTunnelResponse = std::move(*m_httpClient->response());
@@ -72,6 +81,8 @@ void GetPostTunnelClient::onDownChannelOpened()
 void GetPostTunnelClient::openUpChannel()
 {
     using namespace std::placeholders;
+
+    NX_VERBOSE(this, "%1. Opening up channel", m_tunnelUrl);
 
     const auto openUpChannelRequest = prepareOpenUpChannelRequest();
 
@@ -100,6 +111,9 @@ void GetPostTunnelClient::handleOpenUpTunnelResult(
     SystemError::ErrorCode systemErrorCode,
     std::size_t /*bytesTransferred*/)
 {
+    NX_VERBOSE(this, "%1. Open up channel completed with result %2",
+        m_tunnelUrl, SystemError::toString(systemErrorCode));
+
     if (systemErrorCode != SystemError::noError)
         return reportFailure(OpenTunnelResult(systemErrorCode));
 
