@@ -52,7 +52,7 @@
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
       <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
+        <numerusform> Bájt</numerusform>
         <numerusform>Byte(s)</numerusform>
       </translation>
     </message>
@@ -60,7 +60,7 @@
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
       <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilobájt</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
       </translation>
     </message>
@@ -68,7 +68,7 @@
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
       <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megabájt</numerusform>
         <numerusform>Megabyte(s)</numerusform>
       </translation>
     </message>
@@ -76,7 +76,7 @@
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
       <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigabájt</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
       </translation>
     </message>
@@ -84,7 +84,7 @@
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
       <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Terabájt</numerusform>
         <numerusform>Terabyte(s)</numerusform>
       </translation>
     </message>
@@ -92,7 +92,7 @@
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
       <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petabájt</numerusform>
         <numerusform>Petabyte(s)</numerusform>
       </translation>
     </message>
@@ -1013,7 +1013,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Videokódolás szükséges.</translation>
     </message>
   </context>
   <context>
@@ -1800,44 +1800,45 @@
     </message>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>Berregő</translation>
     </message>
     <message>
       <source>Archive Backup Finished</source>
-      <translation type="unfinished">Archive Backup Finished</translation>
+      <translation>Az archívum biztonsági mentése kész</translation>
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation type="unfinished">PoE over Budget</translation>
+      <translation>PoE a "Budget" felett
+</translation>
     </message>
     <message>
       <source>Fan Error</source>
-      <translation type="unfinished">Fan Error</translation>
+      <translation>Ventilátor hiba</translation>
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation type="unfinished">PoE over budget at %1</translation>
+      <translation>PoE a "Budget" felett %1</translation>
     </message>
     <message>
       <source>Fan error at %1</source>
-      <translation type="unfinished">Fan error at %1</translation>
+      <translation>Ventilátor hiba %1</translation>
     </message>
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Reason: Power limit exceeded (%1)</translation>
+      <translation>Ok: Túllépte a teljesítménykorlátot (%1)</translation>
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation type="unfinished">Show desktop notification</translation>
+      <translation>Az asztali értesítés megjelenítése</translation>
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation type="unfinished">Send mobile notification</translation>
+      <translation>Küldjön mobil értesítést</translation>
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Fogyasztás</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
@@ -1853,11 +1854,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation type="unfinished">RTP error in primary stream (%1)</translation>
+      <translation>RTP hiba az elsődleges adatfolyamban (%1)</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
+      <translation>RTP hiba a másodlagos adatfolyamban (%1)</translation>
     </message>
   </context>
   <context>

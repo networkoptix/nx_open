@@ -985,15 +985,15 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Oldal...</translation>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>Csatlakozás ehhez a szerverhez</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Pin</translation>
     </message>
   </context>
   <context>
@@ -1258,7 +1258,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>A probléma bejelentéséhez kérjük, vegye fel a kapcsolatot a %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1306,7 +1306,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>A licenckulcs manuális aktiválásához vegye fel a kapcsolatot a %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1318,11 +1318,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>A probléma bejelentéséhez kérjük, vegye fel a kapcsolatot a helyi támogatással:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>A licenckulcs manuális aktiválásához kérjük, forduljon a támogatási osztályhoz:</translation>
     </message>
   </context>
   <context>
@@ -1357,7 +1357,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Kérjük, próbálja meg később.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1394,27 +1394,27 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Érvényes licenckulcs megszerzéséhez kérjük, vegye fel a kapcsolatot a %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Ha a probléma továbbra is fennáll, forduljon a %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Kérjük, vegye fel a kapcsolatot a %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Érvényes licenckulcs beszerzéséhez kérjük forduljon a támogatási osztályhoz:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Ha a probléma továbbra is fennáll, kérjük, forduljon az ügyfélszolgálathoz:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Kérjük, vegye fel a kapcsolatot a helyi támogatással:</translation>
     </message>
   </context>
   <context>
@@ -1640,7 +1640,7 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Biztosan el akarja hagyni ezt az oldalt? Előfordulhat, hogy az elvégzett módosításokat nem menti el.</translation>
     </message>
   </context>
   <context>
@@ -1675,7 +1675,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Helyi / Licenctámogatás</translation>
     </message>
   </context>
   <context>
@@ -1741,7 +1741,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Figyelem! Ez egy kísérleti lehetőség, amely CPU teljesítményt szabadíthat fel, de befolyásolhatja az animációt.</translation>
     </message>
   </context>
   <context>
@@ -2262,34 +2262,34 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Forrás szerver</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Forrás kamera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Forrás és még %n kamera</numerusform>
+        <numerusform>Forrás és még %n kamera</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Válasszon legalább egy eszközt</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Válasszon legalább egy kamerát</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Válasszon szervert</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Forrás szerver és %1</translation>
     </message>
   </context>
   <context>
@@ -2419,7 +2419,7 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>A szirénát támogató szerverek</translation>
     </message>
   </context>
   <context>
@@ -2836,9 +2836,9 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>Az %1 kiválasztott felhasználó közül %n nem %2 felhasználó, és nem fognak mobil értesítéseket kapni.</numerusform>
+        <numerusform>Az %1 kiválasztott felhasználó közül %n nem %2 felhasználó, és nem fognak mobil értesítéseket kapni.</numerusform>
       </translation>
     </message>
   </context>
@@ -3199,7 +3199,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Nem sikerült észlelni a rögzítési felbontást</translation>
     </message>
   </context>
   <context>
@@ -3483,7 +3483,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>A ventilátorok diagnosztikáját támogató szerverek</translation>
     </message>
   </context>
   <context>
@@ -3829,7 +3829,7 @@ to %1</source>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Deaktiválások fennmaradnak</translation>
     </message>
   </context>
   <context>
@@ -3968,9 +3968,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>%n deaktiválás maradt.</numerusform>
+        <numerusform>%n deaktiválás maradt.</numerusform>
       </translation>
     </message>
   </context>
@@ -3994,16 +3994,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Az aktivációs kulcs fájl megszerzéséhez kérjük, küldje el a mellékelt licenckulcsot és hardver azonosítót %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Kérjük, küldje el a mellékelt licenckulcsot és hardver-azonosítót a regionális / licenc támogatáshoz, hogy megkapja az Aktiváló kulcs fájlt.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Kérjük, küldje el a mellékelt licenckulcsot és hardver-azonosítót a regionális / licenc támogatáshoz, hogy megkapja az Aktiváló kulcs fájlt.</translation>
     </message>
   </context>
   <context>
@@ -4557,7 +4557,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Szerverek, amelyek támogatják a PoE monitorozást</translation>
     </message>
   </context>
   <context>
@@ -5290,7 +5290,7 @@ to %1</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
   </context>
   <context>
@@ -5789,11 +5789,11 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation type="unfinished">Server is unavailable.</translation>
+      <translation>A szerver nem elérhető.</translation>
     </message>
     <message>
       <source>now</source>
-      <translation type="unfinished">now</translation>
+      <translation>most</translation>
     </message>
   </context>
   <context>
@@ -5860,23 +5860,23 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>RAM</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optikai</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>csere</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>hálózat</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6664,7 +6664,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>Nem sikerült kapcsolódni a szerverhez</translation>
     </message>
   </context>
   <context>
@@ -6715,7 +6715,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Nem sikerült nyugtázni az eseményt az eltávolított kamerán.</translation>
     </message>
   </context>
   <context>
@@ -7549,7 +7549,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message numerus="yes">
       <source>+%n values</source>
       <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
+        <numerusform>+%n értékek</numerusform>
         <numerusform>+%n values</numerusform>
       </translation>
     </message>
@@ -7562,7 +7562,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Ismeretlen sáv</translation>
     </message>
   </context>
   <context>
@@ -7895,11 +7895,11 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>A mozgásérzékelés le van tiltva, az összes ütemterv: &quot;Motion&quot; és &quot;Motion + Lo-Res&quot; &quot;Mindig&quot;értékre változik</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>A kettős streaming le van tiltva, az összes ütemterv-bejegyzés &quot;Motion + Lo-Res&quot; &quot;változik mindig&quot;</translation>
     </message>
   </context>
   <context>
@@ -8143,7 +8143,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Kérjük, tekintse át és fogadja el a %1 t a folytatáshoz</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
@@ -8245,7 +8245,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Videokódolás szükséges.</translation>
     </message>
   </context>
   <context>
@@ -8452,11 +8452,11 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>A %1 proxy felhasználónevet és jelszót igényel.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Válassza ki a feltöltendő mappát</translation>
     </message>
   </context>
   <context>
@@ -8550,7 +8550,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
+      <translation>Ezt az azonosítót már használják a rendszerben. Használja a Generálás gombot egy ingyenes azonosító megtalálásához.</translation>
     </message>
   </context>
   <context>
@@ -8661,7 +8661,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Felépítmény nem található</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
@@ -8710,9 +8710,9 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>Hiányzik az ügyfél és a %n szerver frissítési csomagja</numerusform>
+        <numerusform>Hiányzik a frissítőcsomag a klienshez és az %n szerverhez</numerusform>
       </translation>
     </message>
     <message>
@@ -8729,11 +8729,11 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>Az operációs rendszer egyes összetevői már nem támogatottak. Távolítsa el őket a rendszerből, vagy frissítse operációs rendszerüket egy támogatott verzióra.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>A kliens operációs rendszer verzióját már nem támogatjuk. Kérjük, frissítse annak operációs rendszerét egy támogatott verzióra.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
@@ -8837,7 +8837,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>Másik felépítmény kijelölése</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8889,7 +8889,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>Néhány szerver offline állapotba került. Kérjük, várjon, amíg online lesz.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8983,7 +8983,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>Bejelentkezés</translation>
     </message>
   </context>
   <context>
@@ -9086,31 +9086,31 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>A frissítés telepítése sikertelen.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>Lecsatlakozva</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>Csatlakozva</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>Megtáplált</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>Váratlan</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>Üres</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9122,7 +9122,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Fogyasztás</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9130,7 +9130,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>Tápellátás</translation>
     </message>
     <message>
       <source>Unknown device</source>
@@ -9361,7 +9361,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>a plugin rossz eredményt adott</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
@@ -10191,10 +10191,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>Az elemzési adatbázist csak egy helyi meghajtón kell tárolni, és nagy helyet foglalhat el.
+Miután kiválasztotta az elemzési adatok tárolására szolgáló helyet, nem változtatható meg könnyen a meglévő adatok elvesztése nélkül. Javasoljuk, hogy gondosan válassza ki a helyet, és kerülje a rendszerpartíció használatát, mivel ez súlyos rendszerhibákat okozhat.
+Alapértelmezés szerint az elemzési adatokat a %1tárolják.
+Kiválaszthat egy másik tárolási helyet a Kiszolgálóbeállítások párbeszédpanel &quot;Tárhelykezelés&quot; lapján.</translation>
     </message>
   </context>
   <context>
@@ -10268,7 +10268,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Fájl mentése más néven...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10276,15 +10276,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>A fájl mentése sikertelen</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>%1 mappa írása blokkolva van.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Fájlok letöltése...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -10292,15 +10292,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Megállítja a fájlok letöltését?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Fájl letöltve</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>A fájl letöltése sikertelen</translation>
     </message>
   </context>
 </TS>

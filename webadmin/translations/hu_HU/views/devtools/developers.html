@@ -4,46 +4,43 @@
         <h2>Fejlesztői eszközök</h2>
         <p>
             Van valami ötlete a fejlesztői eszközök javításával kapcsolatban vagy csak szeretne megvitatni valamit?
-            Want to ask a question, or find more information about integrating?
+            Szeretne kérdést feltenni, vagy további információt találni az integrációról?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Developer forum</a></p>
-        <p ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Development knowledge base</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Fejlesztői fórum</a></p>
+        <p ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Fejlesztési tudásbázis</a></p>
     </div>
 
     <div>
         <h3>Általános esemény generátor</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party systems to a System
-            which can be used to trigger System actions in the Events & Rules engine.
-            The Generic Event Generator is a tool which helps developers and integrators build
-            and test HTTP Generic Event calls.
+            Az általános esemény egy olyan módszer, amellyel eseményeket küldhet harmadik féltől származó rendszerektől a
+            rendszerbe, s amely meghatározható a rendszerműveletek indítására az Események és szabályok menüben.
+            A Általános Esemény Generátor egy olyan eszköz, amely segít a fejlesztőknek és az integrátoroknak a
+            verzió felépítésében és a HTTP általános eseményhívások tesztelésében.
         </p>
         <p><a href="#/developers/events">Általános esemény generátor</a></p>
     </div>
     <div>
         <h3>Szerver API</h3>
         <p>
-            A REST API that gives developers the ability to access almost every system feature available in the regular
-            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
-            out of System, generate events, create rules, control PTZ cameras, and more.
+            Lehetőséget biztosít a fejlesztőknekminden a hagyományos kliensben elérhető jellemző hozzáféréséhez: rendszer források (szerverek, kamerák, felhasználók, engedélyek), élő és rögzített videók lekérésére, események létrehozására, szabályok írására, PTZ kamerák vezérlésére, stb.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation and tools for testing API calls<br>
-            <a href="#/developers/changelog">API Changelog</a>
-            - a list of breaking changes in API since the last release<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
-            - a full list of available Server API calls<br>
+            <a href="#/developers/api"><b>API teszteszköz (új)</b></a>
+            - interaktív dokumentáció eszközökkel API hívások teszteléséhez<br>
+            <a href="#/developers/changelog">API változáslog</a>
+            - változások listája az API-ban<br>
+            <a id="api-doc" href="api.xml" target="_blank">API dokumentáció</a><br>
         </p>
 
     </div>
     <div>
         <h3>Kamera részletek panel</h3>
         <p>
-            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
+            További fejlesztőbarát információkat jelenít meg a kamerákhoz a Web admin felületen:
         </p>
         <ul>
-            <li>Kamera ID</li>
+            <li>Kamera azonosítója</li>
             <li>Link az össze elérhető videó streamhez</li>
             <li>Közvetlen videó exportálás a böngészőből</li>
         </ul>
@@ -56,10 +53,9 @@
     <div>
         <h3>Video Source SDK</h3>
         <p>
-            The Video Source SDK provides the ability to integrate almost any live or recorded video source (IP Cameras,
-            NVRs, DVRs, etc) into System and makes it possible to create methods for discovering, displaying, analyzing
-            and recording video. It also allows integrating I/O ports and devices, as well as pulling motion detection
-            information from 3rd party devices.
+            A Video Source SDK lehetővé teszi, hogy integráljon szinte bármilyen élő vagy rögzített videót (IP kamerák,
+            NVR, DVR, stb.) a rendszerhez, és lehetővé tegye, hogy létrehozzon módszereket a felderítésre, bemutatásra, elemzésre
+            és videofelvételre. Ezenkívül lehetővé teszi az I / O portok és eszközök integrálását, valamint a mozgás érzékelés információt a harmadik féltől.
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >sDK megszerzése</a></p>
     </div>
@@ -67,10 +63,10 @@
     <div>
         <h3>Tároló SDK</h3>
         <p>
-            The Storage SDK allows developers to read from or write to any storage location: local, remote, and even
-            cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file
-            exist, delete file, list of files in the folder, etc. The Storage SDK contains an example for using an FTP
-            server as a storage location.
+            A Storage SDK lehetővé teszi a fejlesztők számára, hogy bármely tárolóhelyről olvassanak vagy írhassanak: helyi, távoli és akár
+            felhőből is. Tároló bővítmény létrehozásához olyan standard funkciók végrehajtása szükséges, mint például: I / O adatfolyam, ha létezik
+            fájl, törölje a fájlt, a mappában lévő fájlok listáját stb. A Storage SDK példát tartalmaz egy FTP
+            szerver tárhelyként történő használatára.
         </p>
         <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >sDK megszerzése</a></p>
     </div>

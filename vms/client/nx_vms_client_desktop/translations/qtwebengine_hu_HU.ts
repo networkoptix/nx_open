@@ -5,99 +5,99 @@
     <name>DownloadInterruptReason</name>
     <message>
       <source>Unknown reason or not interrupted</source>
-      <translation type="unfinished">Unknown reason or not interrupted</translation>
+      <translation>Ismeretlen ok vagy nincs megszakítva</translation>
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation type="unfinished">General file operation failure</translation>
+      <translation>Általános fájlkezelési hiba</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
-      <translation type="unfinished">The file cannot be written locally, due to access restrictions</translation>
+      <translation>A fájlt nem lehet helyben írni, a hozzáférési korlátozások miatt</translation>
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
-      <translation type="unfinished">Insufficient space on the target drive</translation>
+      <translation>Nem elegendő hely a célmeghajtón</translation>
     </message>
     <message>
       <source>The directory or file name is too long</source>
-      <translation type="unfinished">The directory or file name is too long</translation>
+      <translation>A könyvtár vagy a fájlnév túl hosszú</translation>
     </message>
     <message>
       <source>The file size exceeds the file system limitation</source>
-      <translation type="unfinished">The file size exceeds the file system limitation</translation>
+      <translation>A fájlméret meghaladja a fájlrendszer korlátozását</translation>
     </message>
     <message>
       <source>The file is infected with a virus</source>
-      <translation type="unfinished">The file is infected with a virus</translation>
+      <translation>A fájlt vírus fertőzte meg</translation>
     </message>
     <message>
       <source>Temporary problem (for example file in use, or too many open files)</source>
-      <translation type="unfinished">Temporary problem (for example file in use, or too many open files)</translation>
+      <translation>Ideiglenes probléma (például használt fájl, vagy túl sok nyitott fájl)</translation>
     </message>
     <message>
       <source>The file was blocked due to local policy</source>
-      <translation type="unfinished">The file was blocked due to local policy</translation>
+      <translation>A fájlt a helyi házirend miatt blokkoltuk</translation>
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>
-      <translation type="unfinished">Checking the safety of the download failed due to unexpected reasons</translation>
+      <translation>A letöltés biztonságának ellenőrzése váratlan okok miatt sikertelen</translation>
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
-      <translation type="unfinished">File seek past the end of a file (resuming previously interrupted download)</translation>
+      <translation>Fájlkeresés a fájl végén (folytatja a korábban megszakított letöltést)</translation>
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
-      <translation type="unfinished">The partial file did not match the expected hash</translation>
+      <translation>A részleges fájl nem felelt meg a várt kivonatnak</translation>
     </message>
     <message>
       <source>General network failure</source>
-      <translation type="unfinished">General network failure</translation>
+      <translation>Általános hálózati hiba</translation>
     </message>
     <message>
       <source>The network operation has timed out</source>
-      <translation type="unfinished">The network operation has timed out</translation>
+      <translation>A hálózati művelet lejárt</translation>
     </message>
     <message>
       <source>The network connection has been terminated</source>
-      <translation type="unfinished">The network connection has been terminated</translation>
+      <translation>A hálózati kapcsolat megszakadt</translation>
     </message>
     <message>
       <source>The server has gone down</source>
-      <translation type="unfinished">The server has gone down</translation>
+      <translation>A szerver leállt</translation>
     </message>
     <message>
       <source>The network request was invalid (for example, the URL or scheme is invalid)</source>
-      <translation type="unfinished">The network request was invalid (for example, the URL or scheme is invalid)</translation>
+      <translation>A hálózati kérés érvénytelen (például az URL vagy a séma érvénytelen)</translation>
     </message>
     <message>
       <source>General server failure</source>
-      <translation type="unfinished">General server failure</translation>
+      <translation>Általános szerverhiba</translation>
     </message>
     <message>
       <source>The server does not have the requested data</source>
-      <translation type="unfinished">The server does not have the requested data</translation>
+      <translation>A szerver nem rendelkezik a kért adatokkal</translation>
     </message>
     <message>
       <source>The server did not authorize access to the resource</source>
-      <translation type="unfinished">The server did not authorize access to the resource</translation>
+      <translation>A szerver nem engedélyezte az erőforráshoz való hozzáférést</translation>
     </message>
     <message>
       <source>A problem with the server certificate occurred</source>
-      <translation type="unfinished">A problem with the server certificate occurred</translation>
+      <translation>Probléma merült fel a szerver tanúsítvánnyal</translation>
     </message>
     <message>
       <source>Access forbidden by the server</source>
-      <translation type="unfinished">Access forbidden by the server</translation>
+      <translation>A szerver tiltja a hozzáférést</translation>
     </message>
     <message>
       <source>Unexpected server response</source>
-      <translation type="unfinished">Unexpected server response</translation>
+      <translation>Nem várt kiszolgálóhiba</translation>
     </message>
     <message>
       <source>Download canceled by the user</source>
-      <translation type="unfinished">Download canceled by the user</translation>
+      <translation>A letöltést a felhasználó törölte</translation>
     </message>
   </context>
   <context>
@@ -108,15 +108,15 @@
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>A Cache újratöltése és kihagyása</translation>
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>Link megnyitása új ablakban</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Váltás a lejátszásra / szünetre</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
@@ -124,59 +124,59 @@
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>Lap bezárása</translation>
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Kiválasztás törlése</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>Félkövér</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>Dőlt</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>Aláhúzott</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>Áthúzott</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>Igazítás balra</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>Középre igazítás</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>Igazítás jobbra</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>Sorkizárt</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>Behúzás</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>Befejezés</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>Beszúrás és rendezett lista</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>Beszúrás és rendezetlen lista</translation>
     </message>
   </context>
   <context>
@@ -187,11 +187,11 @@
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>A Cache újratöltése és kihagyása</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Váltás a lejátszásra / szünetre</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
@@ -199,31 +199,31 @@
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>Lap bezárása</translation>
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Kiválasztás törlése</translation>
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>Link megnyitása új ablakban</translation>
     </message>
     <message>
       <source>Open link in new background tab</source>
-      <translation type="unfinished">Open link in new background tab</translation>
+      <translation>Megnyitás új lapon a háttérben</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>Félkövér</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>Dőlt</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>Aláhúzott</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
@@ -393,7 +393,7 @@
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation>Enter username and password for &quot;%1&quot; at %2://%3</translation>
+      <translation>Írja be a felhasználónevet és a jelszót a &quot;%1&quot; -hez %2: //%3</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>

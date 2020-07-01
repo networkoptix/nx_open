@@ -77,8 +77,8 @@
         "emailSignature": "E-mail aláírás",
         "emailSupportEmail": "Ügyfélszolgálati e-mail",
         "enableEdgeRecording": "Edge rögzítés engedélyezése",
-        "webSocketEnabled": "Enable WEB sockets",
-        "maxP2pAllClientsSizeBytes": "Maximum buffer size to send p2p data to all clients",
+        "webSocketEnabled": "WEB socket engedélyezése",
+        "maxP2pAllClientsSizeBytes": "A maximális pufferméret a p2p-adatok küldéséhez az összes ügyfél számára",
         "eventLogPeriodDays": "Eseménynapló időszak (nap)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP kereső bázis",
@@ -87,7 +87,7 @@
         "localSystemId": "Helyirendszer ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Maximális különbség a szinkronizált és az internetes idő között (milisec)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Maximális különbség a szinkronizált és avhelyi idő között (milisec)",
-        "maxP2pQueueSizeBytes": "Max P2P queue size (bytes)",
+        "maxP2pQueueSizeBytes": "A P2P sor maximális mérete (byte)",
         "maxRecordQueueSizeBytes": "Max. rekord sorméret (bájt)",
         "maxRecordQueueSizeElements": "Max. rekord sorméret (elem)",
         "maxRemoteArchiveSynchronizationThreads": "Rögzített videók távoli szinkronizálása max. szála",
@@ -116,8 +116,8 @@
         "timeSynchronizationEnabled": "Időszinkronizálás engedélyezve",
         "primaryTimeServer": "Elsődleges időszinkronizáló szerver",
         "osTimeChangeCheckPeriodMs": "OS időváltozási ellenőrzési időszak",
-        "syncTimeExchangePeriod": "Sync time synchronization interval for network requests",
-        "syncTimeEpsilon": "Sync time epsilon. New value is not applied if time detla less than epsilon",
+        "syncTimeExchangePeriod": "A hálózati kérések szinkronizálási időszaka",
+        "syncTimeEpsilon": "Epsilon szinkronizálása. Az új értéket nem alkalmazzák, ha az idla detla-nál kisebb, mint epsilon",
         "maxWearableArchiveSynchronizationThreads": "Max hordozható kamera archív szinkronszálak",
         "updateNotificationsEnabled": "Frissítések értesítései engedélyezve",
         "upnpPortMappingEnabled": "Az UPNP port hozzárendelés engedélyezve",
@@ -130,12 +130,12 @@
         "maxWebMTranscoders": "A WEBM kapcsolatok maximális száma a szerveren. A Chrome egyszerre 2 kapcsolatot nyit meg, majd bezárja az elsőt. Tehát javasoljuk, hogy ezen a paraméternél állítson be >= 2 értéket.",
         "maxEventLogRecords": "Az adatbázisban tárolható maximális eseménynapló-nyilvántartások. A nem törölt rekordok valódi mennyisége akár 20% -kal is magasabb lehet, mint a megadott érték.",
         "forceLiveCacheForPrimaryStream": "Az elsődleges stream képkockáinak gyorsítótárazása. Értékek: \"igen\" - mindig engedélyezve (sok RAM-ot használhat), \"nem\" - mindig letiltva, kivéve, ha a lejátszás megköveteli (pl. HLS), \"auto\" - hasonlóan a \"nem\" -hez, de bekapcsolva, amikor javítja a felhasználói élmény (pl. amikor egy Analytics plugin működik a kamerán).",
-        "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "additionalLocalFsTypes": "További fájlrendszer-típusok, amelyeket mérlegelni kell annak eldöntésekor, hogy egy adott partíció alkalmas-e szerver tárolónak. A fájlrendszer neveinek vesszővel elválasztott listája elvárt, ahogy azok a / proc / mounts fájlban felsorolódjnak.",
+        "rtspBufferSizeKb": "Szerveroldali RTSP pufferméret KB-ban. A nagyobb érték lehetővé teszi a hatékonyabb internet kihasználását magas menetidő késéssel, de lelassítja az automatikus minőségváltást és az RTSP-re való reagálást."
     },
     "info": {
         "tabs": {
-            "graphs": "Graphs",
+            "graphs": "Grafikonok",
             "storage": "Tároló",
             "log": "Napló"
         }
@@ -149,7 +149,7 @@
         "newSystemError": "A rendszerek nem egyesíthetők. Távoli rendszer nincs beállítva.",
         "safeMode": "A rendszerek nem egyesíthetők. Távoli rendszer csökkentett módban fut.",
         "configError": "A rendszerek nem egyesíthetők. Valamelyik rendszer csökkentett módban futhat.",
-        "cloudError": "Cannot merge Systems. Dependent System is connected to cloud. You need to disconnect it first.",
+        "cloudError": "A rendszerek nem egyesíthetők. Valamelyik rendszer felhőre csatlakozik. Szüntesse meg a felhőkapcsolatot.",
         "cloudBothError": "A rendszerek nem egyesíthetők. Mindkét rendszer felhőre csatlakozik. Szüntesse meg a felhőkapcsolatot.",
         "cloudHostConflict": "A rendszerek nem egyesíthetők, mert a szerverek más felhőszolgáltatót használnak",
         "licenceError": "Figyelem! Starter licenccet használó rendszerek összevonására készül. Rendszerenként egy Starter licenc engedélyezett, így a második licenc deaktiválva lesz. Folytatja?",
