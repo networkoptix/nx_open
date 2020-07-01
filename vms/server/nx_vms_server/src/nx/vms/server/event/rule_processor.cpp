@@ -401,22 +401,22 @@ bool RuleProcessor::fixActionTimeFields(const vms::event::AbstractActionPtr& act
     }
 
     const bool isProlonged = action->getParams().durationMs <= 0;
-    if (isProlonged && updateProlongedActionStartTime(action))
+    if (!isProlonged || action->getToggleState() == vms::api::EventState::undefined)
+        return true;
+
+    if (updateProlongedActionStartTime(action))
         return false; //< Do not process event until it's finished.
 
     qint64 startTimeUsec = action->getRuntimeParams().eventTimestampUsec;
-    if (isProlonged && !popProlongedActionStartTime(action, startTimeUsec))
+    if (!popProlongedActionStartTime(action, startTimeUsec))
     {
         NX_ASSERT(false, "Something went wrong");
         return false; //< Do not process event at all.
     }
 
-    if (isProlonged)
-    {
-        const auto endTimeUsec = action->getRuntimeParams().eventTimestampUsec;
-        action->getParams().durationMs = (endTimeUsec - startTimeUsec) / 1000;
-        action->getRuntimeParams().eventTimestampUsec = startTimeUsec;
-    }
+    const auto endTimeUsec = action->getRuntimeParams().eventTimestampUsec;
+    action->getParams().durationMs = (endTimeUsec - startTimeUsec) / 1000;
+    action->getRuntimeParams().eventTimestampUsec = startTimeUsec;
 
     return true;
 }
