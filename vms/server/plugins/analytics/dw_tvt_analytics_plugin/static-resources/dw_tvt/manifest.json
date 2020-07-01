@@ -8,8 +8,10 @@
         "TD-9542E3",
         "TD-9543E3",
         "TD-9544E3",
-        "TD-9545E3",
-
+        "TD-9545E3"
+    ],
+    "partlySupportedCameraModels":
+    [
         "DWC-MB94Wi28T",
         "DWC-MB94Wi36T",
         "DWC-MV94Wi28T",
@@ -79,6 +81,7 @@
             "flags": "stateDependent",
             "internalName": "AOIENTRY",
             "alarmName": "aoientryAlarm",
+            "restricted": true,
             "group": 1
         },
         {
@@ -87,6 +90,7 @@
             "flags": "stateDependent",
             "internalName": "AOILEAVE",
             "alarmName": "aoileaveAlarm",
+            "restricted": true,
             "group": 1
         },
         {
@@ -95,11 +99,11 @@
             "flags": "stateDependent",
             "internalName": "PASSLINECOUNT",
             "alarmName": "passlinecountAlarm",
+            "restricted": true,
             "group": 1
         }
     ],
-    "ignoredEventTypes":
-    [
+    "ignoredEventTypes": [
         {
             "id": "nx.dw_tvt.SENSOR",
             "name": "Sensor Alarm",

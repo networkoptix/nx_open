@@ -109,10 +109,13 @@ DeviceAgent::DeviceAgent(
     m_auth.setPassword(deviceInfo->password());
 
     nx::vms::api::analytics::DeviceAgentManifest typedCameraManifest;
-    for (const auto& eventType: typedManifest.eventTypes)
-    {
-        typedCameraManifest.supportedEventTypeIds.push_back(eventType.id);
-    }
+
+    typedCameraManifest.supportedEventTypeIds =
+        typedManifest.eventTypeIdListForModel(deviceInfo->model());
+
+    typedCameraManifest.capabilities.setFlag(
+        nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
+
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
     NX_URL_PRINT << "DW TVT DeviceAgent created";

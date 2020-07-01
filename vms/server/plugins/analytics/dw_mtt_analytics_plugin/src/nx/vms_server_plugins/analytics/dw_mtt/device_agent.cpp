@@ -90,6 +90,10 @@ DeviceAgent::DeviceAgent(
     {
         typedCameraManifest.supportedEventTypeIds.push_back(eventType.id);
     }
+
+    typedCameraManifest.capabilities.setFlag(
+        nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
+
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
     NX_URL_PRINT << "DW MTT DeviceAgent created";

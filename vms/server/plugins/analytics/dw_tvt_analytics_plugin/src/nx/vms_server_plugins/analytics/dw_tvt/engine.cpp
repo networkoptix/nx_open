@@ -135,7 +135,7 @@ static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*
 {
     "id": "nx.dw_tvt",
     "name": "DW TVT analytics plugin",
-    "description": "Supports built-in analytics on Digital Watchdog TVT cameras (TD-9xxxE3 series)",
+    "description": "Supports built-in analytics on Digital Watchdog TVT cameras (TD-9xxxE3 series and DWC-Mx94Wixxx series)",
     "version": "1.0.0"
 }
 )json";
