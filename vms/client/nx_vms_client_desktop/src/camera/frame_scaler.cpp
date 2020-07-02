@@ -6,7 +6,7 @@
 
 extern "C" {
 #include <libavutil/pixdesc.h>
-};
+} // extern "C"
 
 #if !defined(__arm__) && !defined(__aarch64__)
 
@@ -14,8 +14,6 @@ namespace {
 
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x000000ff, 0x000000ff);
-
-static const nx::utils::log::Tag kLogTag(QLatin1String("QnFrameScaler"));
 
 void downscalePlate_factor2_sse2_intr(
     unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
@@ -227,7 +225,7 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
     const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat)src->format);
     if (!descriptor)
     {
-        NX_WARNING(kLogTag, "Unsupported pixel format: %1", dst->format);
+        NX_WARNING(NX_SCOPE_TAG, "Unsupported pixel format: %1", dst->format);
         return;
     }
 
