@@ -49,6 +49,11 @@ public:
         bool isLive);
 
     QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
+
+    /*
+     * Stop all stream fetcher. This call is an optional and used for optimization
+     * to reduce media server stopping time.
+    */
     static void pleaseStopAll();
 
 public:

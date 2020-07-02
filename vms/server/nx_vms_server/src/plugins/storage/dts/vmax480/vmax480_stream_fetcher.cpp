@@ -493,7 +493,7 @@ std::shared_ptr<VMaxStreamFetcher> VMaxStreamFetcher::getInstance(
         weakRef = strongRef;
     }
 
-    // cleanup weak refs
+    // Cleanup weak refs.
     for (auto itr = m_instances.begin(); itr != m_instances.end();)
     {
         if (!itr.value().lock())
