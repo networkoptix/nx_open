@@ -3163,6 +3163,11 @@ struct VcaParserFromCamera
         parse(static_cast<std::vector<Point>*>(value), json);
     }
 
+    void parse(Line* value, const JsonValue& json) const
+    {
+        parse(static_cast<std::vector<Point>*>(value), json);
+    }
+
     void parse(Vca::IntrusionDetection::Direction* value, const JsonValue& json) const
     {
         const auto serializedValue = json.to<QString>();
@@ -3172,6 +3177,22 @@ struct VcaParserFromCamera
             *value = Vca::IntrusionDetection::Direction::inToOut;
         else
             throw Exception("Failed to parse intrusion detection direction: %1", serializedValue);
+    }
+
+    void parse(Vca::LineCrossingDetection::Direction* value, const JsonValue& json) const
+    {
+        const auto serializedValue = json.to<QString>();
+        if (serializedValue == "Any")
+            *value = Vca::LineCrossingDetection::Direction::any;
+        else if (serializedValue == "Out")
+            *value = Vca::LineCrossingDetection::Direction::leftToRight;
+        else if (serializedValue == "In")
+            *value = Vca::LineCrossingDetection::Direction::rightToLeft;
+        else
+        {
+            throw Exception("Failed to parse line corssing detection direction: %1",
+                serializedValue);
+        }
     }
 
     template <typename Value>
@@ -3243,6 +3264,12 @@ struct VcaParserFromCamera
         parse(&rule->direction, jsonRule["WalkingDirection"]);
     }
 
+    void parse(Vca::LineCrossingDetection::Rule* rule, const JsonValue& jsonRule) const
+    {
+        parse(&rule->line, jsonRule["Line"][0]);
+        parse(&rule->direction, jsonRule["Direction"]);
+    }
+
     template <typename Detection>
     void parseDetection(Detection* detection, const QString& functionName) const
     {
@@ -3294,6 +3321,7 @@ struct VcaParserFromCamera
         parseDetection(&vca->crowdDetection, "CrowdDetection");
         parseDetection(&vca->loiteringDetection, "LoiteringDetection");
         parseDetection(&vca->intrusionDetection, "IntrusionDetection");
+        parseDetection(&vca->lineCrossingDetection, "LineCrossingDetection");
     }
 };
 
@@ -3372,6 +3400,12 @@ struct VcaSerializerToCamera
     }
 
     template <typename Json, typename Key>
+    void serializeValue(Json* json, const Key& key, const Line& value)
+    {
+        serializeValue(json, key, static_cast<const std::vector<Point>&>(value));
+    }
+
+    template <typename Json, typename Key>
     void serializeValue(Json* json, const Key& key,
        Vca::IntrusionDetection::Direction value)
     {
@@ -3385,6 +3419,27 @@ struct VcaSerializerToCamera
                 return;
             default:
                 NX_ASSERT(false, "Unknown intrusion detection direction value: %1", (int) value);
+        }
+    }
+
+    template <typename Json, typename Key>
+    void serializeValue(Json* json, const Key& key,
+       Vca::LineCrossingDetection::Direction value)
+    {
+        switch (value)
+        {
+            case Vca::LineCrossingDetection::Direction::any:
+                (*json)[key] = "Any";
+                return;
+            case Vca::LineCrossingDetection::Direction::leftToRight:
+                (*json)[key] = "Out";
+                return;
+            case Vca::LineCrossingDetection::Direction::rightToLeft:
+                (*json)[key] = "In";
+                return;
+            default:
+                NX_ASSERT(false, "Unknown line crossing detection direction value: %1",
+                    (int) value);
         }
     }
 
@@ -3418,7 +3473,22 @@ struct VcaSerializerToCamera
         field.push_back(JsonValue::Null);
         serialize(&field, 0, entry);
         if (field[0].isArray())
+        {
             (*jsonRule)["Field"] = field;
+            jsonRule->remove("Field3D");
+        }
+    }
+
+    void serializeLine(JsonObject* jsonRule, CameraSettings::Entry<Line>* entry)
+    {
+        JsonArray line;
+        line.push_back(JsonValue::Null);
+        serialize(&line, 0, entry);
+        if (line[0].isArray())
+        {
+            (*jsonRule)["Line"] = line;
+            jsonRule->remove("Line3D");
+        }
     }
 
     void serialize(Vca::Installation* installation)
@@ -3498,6 +3568,17 @@ struct VcaSerializerToCamera
         return true;
     }
 
+    bool serialize(JsonObject* jsonRule, Vca::LineCrossingDetection::Rule* rule)
+    {
+        if (!rule->line.value)
+            return false;
+
+        serializeLine(jsonRule, &rule->line);
+        serialize(jsonRule, "Direction", &rule->direction);
+        
+        return true;
+    }
+
     template <typename Detection>
     void serializeDetection(Detection* detection, const QString& functionName)
     {
@@ -3527,8 +3608,6 @@ struct VcaSerializerToCamera
 
             jsonRule["RuleName"] = rule.name;
             jsonRule["EventName"] = rule.name;
-
-            jsonRule.remove("Field3D");
 
             if (serialize(&jsonRule, &rule))
                 jsonRules[rule.name] = jsonRule;
@@ -3567,6 +3646,7 @@ struct VcaSerializerToCamera
         serializeDetection(&vca->crowdDetection, "CrowdDetection");
         serializeDetection(&vca->loiteringDetection, "LoiteringDetection");
         serializeDetection(&vca->intrusionDetection, "IntrusionDetection");
+        serializeDetection(&vca->lineCrossingDetection, "LineCrossingDetection");
     }
 };
 
@@ -3657,6 +3737,8 @@ const QString kVcaLoiteringDetectionMinDuration = "Vca.LoiteringDetection#.MinDu
 const QString kVcaIntrusionDetectionRegion = "Vca.IntrusionDetection#.Region";
 const QString kVcaIntrusionDetectionDirection = "Vca.IntrusionDetection#.Direction";
 
+const QString kVcaLineCrossingDetectionLine = "Vca.LineCrossingDetection#.Line";
+
 QString replicateName(QString name, std::size_t i)
 {
     name.replace("#", "%1");
@@ -3675,7 +3757,7 @@ struct ParserFromServer
 {
     const IStringMap& values;
 
-    std::map<QString, std::vector<std::function<void(const QString)>>> errorSetterGroups;
+    std::map<QString, std::vector<std::function<void(const QString&)>>> errorSetterGroups{};
 
     template <typename Value>
     void noteName(const QString& name, CameraSettings::Entry<Value> *entry)
@@ -3717,6 +3799,34 @@ struct ParserFromServer
             throw Exception("Failed to parse intrusion detection direction: %1", serializedValue);
     }
 
+    void parse(CameraSettings::Vca::LineCrossingDetection::Direction* value,
+        const QString& serializedValue)
+    {
+        if (serializedValue == "absent")
+            *value = CameraSettings::Vca::LineCrossingDetection::Direction::any;
+        else if (serializedValue == "right")
+            *value = CameraSettings::Vca::LineCrossingDetection::Direction::leftToRight;
+        else if (serializedValue == "left")
+            *value = CameraSettings::Vca::LineCrossingDetection::Direction::rightToLeft;
+        else
+        {
+            throw Exception("Failed to parse line crossing detection direction: %1",
+                serializedValue);
+        }
+    }
+
+    void parsePoints(std::vector<Point>* points, const JsonArray& jsonPoints)
+    {
+        points->clear();
+        for (int i = 0; i < jsonPoints.count(); ++i)
+        {
+            const auto jsonPoint = jsonPoints[i];
+            points->emplace_back(
+                jsonPoint.at(0).to<double>(),
+                jsonPoint.at(1).to<double>());
+        }
+    }
+
     void parse(std::optional<Polygon>* value, const QString& serializedValue, QString* label)
     {
         const auto json = parseJson(serializedValue.toUtf8()).to<JsonObject>();
@@ -3725,21 +3835,40 @@ struct ParserFromServer
 
         if (const auto figure = json["figure"]; figure.isObject())
         {
-            value->emplace();
-            const auto points = figure["points"].to<JsonArray>();
-            for (int i = 0; i < points.count(); ++i)
-            {
-                const auto point = points[i];
-                (*value)->emplace_back(
-                    point.at(0).to<double>(),
-                    point.at(1).to<double>());
-            }
+            parsePoints(&value->emplace(), figure["points"].to<JsonArray>());
 
             if (label)
             {
                 json["label"].to(label);
                 if (label->isEmpty())
                     throw Exception("Empty name");
+            }
+        }
+    }
+
+    void parse(std::optional<Line>* value, const QString& serializedValue, QString* label,
+        CameraSettings::Entry<CameraSettings::Vca::LineCrossingDetection::Direction>* direction)
+    {
+        const auto json = parseJson(serializedValue.toUtf8()).to<JsonObject>();
+        if (json.isEmpty())
+            return;
+
+        if (const auto figure = json["figure"]; figure.isObject())
+        {
+            parsePoints(&value->emplace(), figure["points"].to<JsonArray>());
+
+            json["label"].to(label);
+            if (label->isEmpty())
+                throw Exception("Empty name");
+
+            try
+            {
+                parse(&direction->value.emplace(), figure["direction"].to<QString>());
+            }
+            catch (const std::exception& exception)
+            {
+                direction->value = std::nullopt;
+                direction->error = exception.what();
             }
         }
     }
@@ -3825,6 +3954,20 @@ struct ParserFromServer
         }
     }
 
+    void parse(CameraSettings::Vca::LineCrossingDetection* detection)
+    {
+        auto& rules = detection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+
+            parse(&rule.line, replicateName(kVcaLineCrossingDetectionLine, i),
+                &rule.name, &rule.direction);
+
+            noteName(rule.name, &rule.line);
+        }
+    }
+
     void parse(CameraSettings::Vca* vca)
     {
         parse(&vca->enabled, kVcaEnabled);
@@ -3836,6 +3979,7 @@ struct ParserFromServer
         parse(&vca->crowdDetection.emplace());
         parse(&vca->loiteringDetection.emplace());
         parse(&vca->intrusionDetection.emplace());
+        parse(&vca->lineCrossingDetection.emplace());
 
         for (auto& [name, errorSetters]: errorSetterGroups)
         {
@@ -3900,6 +4044,31 @@ struct SerializerToServer
         }
     }
 
+    QString serialize(CameraSettings::Vca::LineCrossingDetection::Direction value) const
+    {
+        switch (value)
+        {
+            case CameraSettings::Vca::LineCrossingDetection::Direction::any:
+                return "absent";
+            case CameraSettings::Vca::LineCrossingDetection::Direction::leftToRight:
+                return "right";
+            case CameraSettings::Vca::LineCrossingDetection::Direction::rightToLeft:
+                return "left";
+            default:
+                NX_ASSERT(false, "Unknown line crossing detection direction value: %1", (int) value);
+                return "";
+        }
+    }
+
+    JsonArray serializePoints(const std::vector<Point>& points) const
+    {
+        JsonArray jsonPoints;
+        for (const auto& point: points)
+            jsonPoints.push_back(JsonArray{point.x, point.y});
+
+        return jsonPoints;
+    }
+
     std::optional<QString> serialize(
         const std::optional<Polygon>& value, const QString& label) const
     {
@@ -3911,12 +4080,33 @@ struct SerializerToServer
                     if (!value)
                         return QJsonValue::Null;
 
-                    QJsonArray points;
-                    for (const auto& point: *value)
-                        points.push_back(QJsonArray{point.x, point.y});
+                    return QJsonObject{
+                        {"points", serializePoints(*value)},
+                    };
+                }(),
+            },
+        });
+    }
+
+    std::optional<QString> serialize(
+        const std::optional<Line>& value, const QString& label,
+        const CameraSettings::Entry<CameraSettings::Vca::LineCrossingDetection::Direction>&
+            direction) const
+    {
+        return serializeJson(QJsonObject{
+            {"label", label},
+            {"figure",
+                [&]() -> QJsonValue
+                {
+                    if (!value)
+                        return QJsonValue::Null;
+
+                    if (direction.error)
+                        throw Exception(*direction.error);
 
                     return QJsonObject{
-                        {"points", points},
+                        {"direction", serialize(*direction.value)},
+                        {"points", serializePoints(*value)},
                     };
                 }(),
             },
@@ -3948,7 +4138,7 @@ struct SerializerToServer
         }
         catch (const std::exception& exception)
         {
-            error.emplace(exception.what());
+            error = exception.what();
         }
 
         if (entry.error)
@@ -4007,6 +4197,18 @@ struct SerializerToServer
         }
     }
 
+    void serialize(const CameraSettings::Vca::LineCrossingDetection& detection) const
+    {
+        const auto& rules = detection.rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            const auto& rule = rules[i];
+
+            serialize(replicateName(kVcaLineCrossingDetectionLine, i),
+                rule.line, rule.name, rule.direction);
+        }
+    }
+
     void serialize(const CameraSettings::Vca& vca) const
     {
         serialize(kVcaEnabled, vca.enabled);
@@ -4018,6 +4220,8 @@ struct SerializerToServer
         if (const auto& detection = vca.loiteringDetection)
             serialize(*detection);
         if (const auto& detection = vca.intrusionDetection)
+            serialize(*detection);
+        if (const auto& detection = vca.lineCrossingDetection)
             serialize(*detection);
     }
 
@@ -4162,7 +4366,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::LoiteringDetection& detect
                 {"count", (int) detection.rules.size()},
                 {"template", QJsonObject{
                     {"type", "GroupBox"},
-                    {"caption", "Rule #"},
+                    {"caption", "#"},
                     {"filledCheckItems", QJsonArray{kVcaLoiteringDetectionRegion}},
                     {"items", QJsonArray{
                         QJsonObject{
@@ -4202,7 +4406,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::IntrusionDetection& detect
                 {"count", (int) detection.rules.size()},
                 {"template", QJsonObject{
                     {"type", "GroupBox"},
-                    {"caption", "Rule #"},
+                    {"caption", "#"},
                     {"filledCheckItems", QJsonArray{kVcaIntrusionDetectionRegion}},
                     {"items", QJsonArray{
                         QJsonObject{
@@ -4225,6 +4429,36 @@ QJsonObject serializeModel(const CameraSettings::Vca::IntrusionDetection& detect
                                 {"OutToIn", "From outside to inside"},
                                 {"InToOut", "From inside to outside"},
                             }},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
+QJsonObject serializeModel(const CameraSettings::Vca::LineCrossingDetection& detection)
+{
+    return QJsonObject{
+        {"name", "Vca.LineCrossingDetection"},
+        {"type", "Section"},
+        {"caption", "Line Crossing Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) detection.rules.size()},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "#"},
+                    {"filledCheckItems", QJsonArray{kVcaLineCrossingDetectionLine}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", kVcaLineCrossingDetectionLine},
+                            {"type", "LineFigure"},
+                            {"caption", "Line"},
+                            {"minPoints", 3},
+                            {"maxPoints", 3},
                         },
                     }},
                 }},
@@ -4278,12 +4512,8 @@ QJsonObject serializeModel(const CameraSettings::Vca& vca)
                     sections.push_back(serializeModel(*detection));
                 if (const auto& detection = vca.intrusionDetection)
                     sections.push_back(serializeModel(*detection));
-
-                //serializeModel(vca ? vca->lineCrossingDetection : std::nullopt),
-                //serializeModel(vca ? vca->missingObjectDetection : std::nullopt),
-                //serializeModel(vca ? vca->unattendedObjectDetection : std::nullopt),
-                //serializeModel(vca ? vca->faceDetection : std::nullopt),
-                //serializeModel(vca ? vca->runningDetection : std::nullopt),
+                if (const auto& detection = vca.lineCrossingDetection)
+                    sections.push_back(serializeModel(*detection));
 
                 return sections;
             }(),
@@ -4336,56 +4566,10 @@ CameraSettings::Vca::IntrusionDetection::IntrusionDetection():
 {
 }
 
-//CameraSettings::CameraSettings(const CameraFeatures& features)
-//{
-//    if (features.vca)
-//    {
-//        vca.emplace();
-//
-//        vca->installation.exclusions.resize(kMaxExclusionCount);
-//
-//        if (features.vca->crowdDetection)
-//        {
-//            auto& crowdDetection = vca->crowdDetection.emplace();
-//            crowdDetection.rules.resize(kMaxDetectionRuleCount);
-//        }
-//        if (features.vca->loiteringDetection)
-//        {
-//            auto& loiteringDetection = vca->loiteringDetection.emplace();
-//            loiteringDetection.rules.resize(kMaxDetectionRuleCount);
-//        }
-//        if (features.vca->intrusionDetection)
-//        {
-//            auto& intrusionDetection = vca->intrusionDetection.emplace();
-//            intrusionDetection.rules.resize(kMaxDetectionRuleCount);
-//        }
-//        if (features.vca->lineCrossingDetection)
-//        {
-//            auto& lineCrossingDetection = vca->lineCrossingDetection.emplace();
-//            lineCrossingDetection.rules.resize(kMaxDetectionRuleCount);
-//        }
-//        if (features.vca->missingObjectDetection)
-//        {
-//            auto& missingObjectDetection = vca->missingObjectDetection.emplace();
-//            missingObjectDetection.rules.resize(kMaxDetectionRuleCount);
-//        }
-//        if (features.vca->unattendedObjectDetection)
-//        {
-//            auto& unattendedObjectDetection = vca->unattendedObjectDetection.emplace();
-//            unattendedObjectDetection.rules.resize(kMaxDetectionRuleCount);
-//        }
-//        if (features.vca->faceDetection)
-//        {
-//            auto& faceDetection = vca->faceDetection.emplace();
-//            faceDetection.rules.resize(kMaxDetectionRuleCount);
-//        }
-//        if (features.vca->runningDetection)
-//        {
-//            auto& runningDetection = vca->runningDetection.emplace();
-//            runningDetection.rules.resize(kMaxDetectionRuleCount);
-//        }
-//    }
-//}
+CameraSettings::Vca::LineCrossingDetection::LineCrossingDetection():
+    rules(kMaxDetectionRuleCount)
+{
+}
 
 void CameraSettings::fetchFrom(const Url& cameraUrl)
 {

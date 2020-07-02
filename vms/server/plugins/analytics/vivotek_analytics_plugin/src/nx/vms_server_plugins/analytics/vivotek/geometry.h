@@ -12,4 +12,10 @@ struct Polygon: std::vector<nx::sdk::analytics::Point>
     using std::vector<nx::sdk::analytics::Point>::operator=;
 };
 
+struct Line: std::vector<nx::sdk::analytics::Point>
+{
+    using std::vector<nx::sdk::analytics::Point>::vector;
+    using std::vector<nx::sdk::analytics::Point>::operator=;
+};
+
 } // namespace nx::vms_server_plugins::analytics::vivotek

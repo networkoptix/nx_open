@@ -18,40 +18,40 @@ const std::vector<EventType> kEventTypes =
                     return vca && vca->crowdDetection;
                 };
         }
-        //{
-        //    auto& type = types.emplace_back();
-        //    type.nativeId = "LoiteringDetection";
-        //    type.id = "nx.vivotek.Loitering";
-        //    type.prettyName = "Loitering";
-        //    type.isProlonged = true;
-        //    type.isAvailable =
-        //        [](const auto& settings) {
-        //            const auto& vca = settings.vca;
-        //            return vca && vca->loiteringDetection;
-        //        };
-        //}
-        //{
-        //    auto& type = types.emplace_back();
-        //    type.nativeId = "IntrusionDetection";
-        //    type.id = "nx.vivotek.Intrusion";
-        //    type.prettyName = "Intrusion";
-        //    type.isAvailable =
-        //        [](const auto& settings) {
-        //            const auto& vca = settings.vca;
-        //            return vca && vca->intrusionDetection;
-        //        };
-        //}
-        //{
-        //    auto& type = types.emplace_back();
-        //    type.nativeId = "LineCrossingDetection";
-        //    type.id = "nx.vivotek.LineCrossing";
-        //    type.prettyName = "Line Crossing";
-        //    type.isAvailable =
-        //        [](const auto& settings) {
-        //            const auto& vca = settings.vca;
-        //            return vca && vca->lineCrossingDetection;
-        //        };
-        //}
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "LoiteringDetection";
+            type.id = "nx.vivotek.Loitering";
+            type.prettyName = "Loitering";
+            type.isProlonged = true;
+            type.isAvailable =
+                [](const auto& settings) {
+                    const auto& vca = settings.vca;
+                    return vca && vca->loiteringDetection;
+                };
+        }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "IntrusionDetection";
+            type.id = "nx.vivotek.Intrusion";
+            type.prettyName = "Intrusion";
+            type.isAvailable =
+                [](const auto& settings) {
+                    const auto& vca = settings.vca;
+                    return vca && vca->intrusionDetection;
+                };
+        }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "LineCrossingDetection";
+            type.id = "nx.vivotek.LineCrossing";
+            type.prettyName = "Line Crossing";
+            type.isAvailable =
+                [](const auto& settings) {
+                    const auto& vca = settings.vca;
+                    return vca && vca->lineCrossingDetection;
+                };
+        }
         //{
         //    auto& type = types.emplace_back();
         //    type.nativeId = "MissingObjectDetection";

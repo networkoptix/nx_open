@@ -97,15 +97,26 @@ public:
         };
         std::optional<IntrusionDetection> intrusionDetection;
 
-        //struct LineCrossingDetection
-        //{
-        //    struct Rule
-        //    {
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.LineCrossingDetection.Rule#, Line, NamedLine) line;
-        //    };
-        //    std::vector<Rule> rules;
-        //};
-        //std::optional<LineCrossingDetection> lineCrossingDetection;
+        struct LineCrossingDetection
+        {
+            enum class Direction
+            {
+                any,
+                leftToRight,
+                rightToLeft,
+            };
+
+            struct Rule
+            {
+                QString name;
+                Entry<Line> line;
+                Entry<Direction> direction;
+            };
+            std::vector<Rule> rules;
+            
+            LineCrossingDetection();
+        };
+        std::optional<LineCrossingDetection> lineCrossingDetection;
 
         //struct MissingObjectDetection
         //{
