@@ -300,6 +300,14 @@ bool LdapSession::connect()
         return false;
     }
 #elif defined(Q_OS_LINUX)
+    // NOTE: Ignore LDAP server cert check (see: VMS-18724).
+    int require_cert = LDAP_OPT_X_TLS_NEVER;
+    if (int rc = ldap_set_option(NULL, LDAP_OPT_X_TLS_REQUIRE_CERT, &require_cert);
+        rc != LDAP_OPT_SUCCESS)
+    {
+        NX_VERBOSE(this, "Failed to disable certs check: %1", LdapErrorStr(rc));
+    }
+
     if (ldap_initialize(&m_ld, QSTOCW(uri.toString())) != LDAP_SUCCESS)
     {
         m_lastErrorCode = LdapGetLastError();
@@ -308,16 +316,14 @@ bool LdapSession::connect()
 #endif
 
     int desired_version = LDAP_VERSION3;
-    int rc = ldap_set_option(m_ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
-    if (rc != 0)
+    if (int rc = ldap_set_option(m_ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version); rc != 0)
     {
         m_lastErrorCode = rc;
         return false;
     }
 
     // NOTE: Chasing referrals doesn't work with paging controls, see: VMS-15694.
-    rc = ldap_set_option(m_ld, LDAP_OPT_REFERRALS, LDAP_OPT_OFF);
-    if (rc != 0)
+    if (int rc = ldap_set_option(m_ld, LDAP_OPT_REFERRALS, LDAP_OPT_OFF); rc != 0)
     {
         m_lastErrorCode = rc;
         return false;
@@ -326,8 +332,7 @@ bool LdapSession::connect()
     if (m_settings.searchTimeoutS > 0)
     {
         NX_VERBOSE(this, "Set time limit and timeout to %1 seconds", m_settings.searchTimeoutS);
-        rc = ldap_set_option(m_ld, LDAP_OPT_TIMELIMIT, &m_settings.searchTimeoutS);
-        if (rc != 0)
+        if (int rc = ldap_set_option(m_ld, LDAP_OPT_TIMELIMIT, &m_settings.searchTimeoutS); rc != 0)
         {
             m_lastErrorCode = rc;
             return false;
@@ -341,8 +346,8 @@ bool LdapSession::connect()
         ldap_set_option(m_ld, LDAP_OPT_SERVER_CERTIFICATE, &VerifyServerCertificate);
     }
 
-    rc = ldap_connect(m_ld, NULL); // Need to connect before SASL bind!
-    if (rc != 0)
+    // Need to connect before SASL bind!
+    if (int rc = ldap_connect(m_ld, NULL); rc != 0)
     {
         m_lastErrorCode = rc;
         return false;
