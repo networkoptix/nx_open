@@ -376,7 +376,7 @@ private:
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
         m_modeButton->setGeometry(QRectF(left + xStep - yStep * 1.5, 3.0 * size));
 
-        if (nx::vms::client::desktop::ini().oldPtzAimOverlay)
+        if (nx::vms::client::desktop::ini().oldPtzAimOverlay || m_modeButton->isVisibleTo(this))
         {
 
             m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));

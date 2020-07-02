@@ -614,7 +614,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         const bool hasFocus = data.hasCapabilities(Ptz::ContinuousFocusCapability);
         const bool hasAutoFocus = data.traits.contains(Ptz::ManualAutoFocusPtzTrait);
         const bool hasViewportMode = data.hasCapabilities(Ptz::ViewportPtzCapability);
-        const bool showManipulator = canMove && ini().oldPtzAimOverlay;
+        const bool showManipulator = canMove && (ini().oldPtzAimOverlay || isFisheye);
 
         overlayWidget->manipulatorWidget()->setVisible(showManipulator);
         overlayWidget->zoomInButton()->setVisible(hasZoom);
@@ -622,7 +622,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         overlayWidget->focusInButton()->setVisible(hasFocus);
         overlayWidget->focusOutButton()->setVisible(hasFocus);
 
-        if (hasViewportMode)
+        if (hasViewportMode && !isFisheye)
             overlayWidget->setCursor(Qt::CrossCursor);
         else if (canMove && !showManipulator )
             overlayWidget->setCursor(Qt::SizeAllCursor);
@@ -1019,7 +1019,8 @@ void PtzInstrument::startDrag(DragInfo* info)
 
             ensureElementsWidget();
 
-            if (ini().oldPtzAimOverlay)
+            if (ini().oldPtzAimOverlay ||
+                m_dataByWidget.value(target()).hasCapabilities(Ptz::VirtualPtzCapability))
             {
                 opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
             }
@@ -1085,7 +1086,8 @@ void PtzInstrument::dragMove(DragInfo* info)
 
             ensureElementsWidget();
 
-            if (ini().oldPtzAimOverlay)
+            if (ini().oldPtzAimOverlay
+                || m_dataByWidget.value(target()).hasCapabilities(Ptz::VirtualPtzCapability))
             {
                 auto arrowItem = elementsWidget()->arrowItem();
                 arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()),
