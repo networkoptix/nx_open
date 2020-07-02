@@ -3220,6 +3220,12 @@ struct VcaParserFromCamera
         parse(&rule->exitDelay, jsonRule["LeaveDelay"]);
     }
 
+    void parse(Vca::LoiteringDetection::Rule* rule, const JsonValue& jsonRule) const
+    {
+        parse(&rule->region, jsonRule["Field"][0]);
+        parse(&rule->minDuration, jsonRule["StayTime"]);
+    }
+
     template <typename Detection>
     void parseDetection(Detection* detection, const QString& functionName) const
     {
@@ -3269,6 +3275,7 @@ struct VcaParserFromCamera
         parse(&vca->installation);
 
         parseDetection(&vca->crowdDetection, "CrowdDetection");
+        parseDetection(&vca->loiteringDetection, "LoiteringDetection");
     }
 };
 
@@ -3370,6 +3377,15 @@ struct VcaSerializerToCamera
         }
     }
 
+    void serializeField(JsonObject* jsonRule, CameraSettings::Entry<Polygon>* entry)
+    {
+        JsonArray field;
+        field.push_back(JsonValue::Null);
+        serialize(&field, 0, entry);
+        if (field[0].isArray())
+            (*jsonRule)["Field"] = field;
+    }
+
     void serialize(Vca::Installation* installation)
     {
         if (auto& height = installation->height; height.value)
@@ -3417,15 +3433,21 @@ struct VcaSerializerToCamera
         if (!rule->region.value)
             return false;
 
-        JsonArray field;
-        field.push_back(JsonValue::Null);
-        serialize(&field, 0, &rule->region);
-        if (field[0].isArray())
-            (*jsonRule)["Field"] = field;
-
+        serializeField(jsonRule, &rule->region);
         serialize(jsonRule, "PeopleNumber", &rule->minPersonCount);
         serialize(jsonRule, "EnterDelay", &rule->entranceDelay);
         serialize(jsonRule, "LeaveDelay", &rule->exitDelay);
+        
+        return true;
+    }
+
+    bool serialize(JsonObject* jsonRule, Vca::LoiteringDetection::Rule* rule)
+    {
+        if (!rule->region.value)
+            return false;
+
+        serializeField(jsonRule, &rule->region);
+        serialize(jsonRule, "StayTime", &rule->minDuration);
         
         return true;
     }
@@ -3462,10 +3484,10 @@ struct VcaSerializerToCamera
 
             jsonRule.remove("Field3D");
 
-            if (!serialize(&jsonRule, &rule))
-                continue;
-
-            jsonRules[rule.name] = jsonRule;
+            if (serialize(&jsonRule, &rule))
+                jsonRules[rule.name] = jsonRule;
+            else
+                jsonRules.remove(rule.name);
         }
 
         if (jsonRules.isEmpty())
@@ -3497,6 +3519,7 @@ struct VcaSerializerToCamera
         serialize(&vca->installation);
 
         serializeDetection(&vca->crowdDetection, "CrowdDetection");
+        serializeDetection(&vca->loiteringDetection, "LoiteringDetection");
     }
 };
 
@@ -3580,6 +3603,9 @@ const QString kVcaCrowdDetectionRegion = "Vca.CrowdDetection#.Region";
 const QString kVcaCrowdDetectionMinPersonCount = "Vca.CrowdDetection#.MinPersonCount";
 const QString kVcaCrowdDetectionEntranceDelay = "Vca.CrowdDetection#.EntranceDelay";
 const QString kVcaCrowdDetectionExitDelay = "Vca.CrowdDetection#.ExitDelay";
+
+const QString kVcaLoiteringDetectionRegion = "Vca.LoiteringDetection#.Region";
+const QString kVcaLoiteringDetectionMinDuration = "Vca.LoiteringDetection#.MinDuration";
 
 QString replicateName(QString name, std::size_t i)
 {
@@ -3710,6 +3736,19 @@ struct ParserFromServer
         checkDuplicateNames(&rules, &CameraSettings::Vca::CrowdDetection::Rule::region);
     }
 
+    void parse(CameraSettings::Vca::LoiteringDetection* detection) const
+    {
+        auto& rules = detection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+
+            parse(&rule.region, replicateName(kVcaLoiteringDetectionRegion, i), &rule.name);
+            parse(&rule.minDuration, replicateName(kVcaLoiteringDetectionMinDuration, i));
+        }
+        checkDuplicateNames(&rules, &CameraSettings::Vca::LoiteringDetection::Rule::region);
+    }
+
     void parse(CameraSettings::Vca* vca) const
     {
         parse(&vca->enabled, kVcaEnabled);
@@ -3717,6 +3756,7 @@ struct ParserFromServer
         parse(&vca->installation);
 
         parse(&vca->crowdDetection.emplace());
+        parse(&vca->loiteringDetection.emplace());
     }
 
     void parse(CameraSettings* settings) const
@@ -3840,6 +3880,18 @@ struct SerializerToServer
         }
     }
 
+    void serialize(const CameraSettings::Vca::LoiteringDetection& detection) const
+    {
+        const auto& rules = detection.rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            const auto& rule = rules[i];
+
+            serialize(replicateName(kVcaLoiteringDetectionRegion, i), rule.region, rule.name);
+            serialize(replicateName(kVcaLoiteringDetectionMinDuration, i), rule.minDuration);
+        }
+    }
+
     void serialize(const CameraSettings::Vca& vca) const
     {
         serialize(kVcaEnabled, vca.enabled);
@@ -3847,6 +3899,8 @@ struct SerializerToServer
         serialize(vca.installation);
 
         if (const auto& detection = vca.crowdDetection)
+            serialize(*detection);
+        if (const auto& detection = vca.loiteringDetection)
             serialize(*detection);
     }
 
@@ -3978,6 +4032,46 @@ QJsonObject serializeModel(const CameraSettings::Vca::CrowdDetection& detection)
     };
 }
 
+QJsonObject serializeModel(const CameraSettings::Vca::LoiteringDetection& detection)
+{
+    return QJsonObject{
+        {"name", "Vca.LoiteringDetection"},
+        {"type", "Section"},
+        {"caption", "Loitering Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) detection.rules.size()},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{kVcaLoiteringDetectionRegion}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", kVcaLoiteringDetectionRegion},
+                            {"type", "PolygonFigure"},
+                            {"caption", "Region"},
+                            {"minPoints", kMinRegionVertices},
+                            {"maxPoints", kMaxRegionVertices},
+                        },
+                        QJsonObject{
+                            {"name", kVcaLoiteringDetectionMinDuration},
+                            {"type", "SpinBox"},
+                            {"minValue", 0},
+                            {"maxValue", 999},
+                            {"defaultValue", 5},
+                            {"caption", "Minimum duration (s)"},
+                            {"description", "The event is only generated if a person stays in the"
+                                            " area for at least this long"},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
 QJsonObject serializeModel(const CameraSettings::Vca& vca)
 {
     return QJsonObject{
@@ -3991,8 +4085,8 @@ QJsonObject serializeModel(const CameraSettings::Vca& vca)
 
                 items.push_back(QJsonObject{
                     {"name", kVcaEnabled},
-                    {"caption", "Enabled"},
                     {"type", "SwitchButton"},
+                    {"caption", "Enabled"},
                 });
                 if (vca.enabled.value.value_or(false))
                 {
@@ -4018,6 +4112,8 @@ QJsonObject serializeModel(const CameraSettings::Vca& vca)
                 QJsonArray sections;
 
                 if (const auto& detection = vca.crowdDetection)
+                    sections.push_back(serializeModel(*detection));
+                if (const auto& detection = vca.loiteringDetection)
                     sections.push_back(serializeModel(*detection));
 
                 //serializeModel(vca ? vca->loiteringDetection : std::nullopt),
@@ -4065,6 +4161,11 @@ CameraSettings::Vca::Installation::Installation():
 }
 
 CameraSettings::Vca::CrowdDetection::CrowdDetection():
+    rules(kMaxDetectionRuleCount)
+{
+}
+
+CameraSettings::Vca::LoiteringDetection::LoiteringDetection():
     rules(kMaxDetectionRuleCount)
 {
 }

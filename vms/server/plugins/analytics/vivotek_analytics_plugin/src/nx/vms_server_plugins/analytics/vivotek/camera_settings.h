@@ -61,17 +61,20 @@ public:
         };
         std::optional<CrowdDetection> crowdDetection;
 
-        //struct LoiteringDetection
-        //{
-        //    struct Rule
-        //    {
-        //        Entry<QString> name;
-        //        ErrorOr<Polygon> region;
-        //        ErrorOr<int> minDuration;
-        //    };
-        //    std::vector<Rule> rules;
-        //};
-        //std::optional<LoiteringDetection> loiteringDetection;
+        struct LoiteringDetection
+        {
+            struct Rule
+            {
+                QString name;
+                Entry<Polygon> region;
+
+                Entry<int> minDuration;
+            };
+            std::vector<Rule> rules;
+
+            LoiteringDetection();
+        };
+        std::optional<LoiteringDetection> loiteringDetection;
 
         //struct IntrusionDetection
         //{
