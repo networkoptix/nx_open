@@ -346,7 +346,9 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(
 
         if(!resource->getUniqueId().isEmpty())
         {
-            resource->fetchChannelCount();
+            const bool limitedByEncoders = resource->resourceData().value<bool>(
+                "channelsLimitedByEncoders", true);
+            resource->fetchChannelCount(limitedByEncoders);
             if (resource->getMaxChannels() > 1)
                 setupResourceGroupIfNeed(resource, resource->getPhysicalId());
             resList << resource;
