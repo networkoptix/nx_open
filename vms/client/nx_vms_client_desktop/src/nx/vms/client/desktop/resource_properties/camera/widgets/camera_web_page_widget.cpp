@@ -510,7 +510,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
     const auto currentServerUrl = commonModule()->currentUrl();
 
     const auto targetUrl = nx::network::url::Builder()
-        .setScheme(nx::network::http::kUrlSchemeName)
+        .setScheme(currentServerUrl.scheme())
         .setHost(getNonLocalAddress(currentServerUrl.host()))
         .setPort(currentServerUrl.port())
         .setPath(state.singleCameraProperties.settingsUrlPath).toUrl().toQUrl();
