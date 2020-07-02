@@ -52,18 +52,18 @@ const std::vector<EventType> kEventTypes =
                     return vca && vca->lineCrossingDetection;
                 };
         }
-        //{
-        //    auto& type = types.emplace_back();
-        //    type.nativeId = "MissingObjectDetection";
-        //    type.id = "nx.vivotek.MissingObject";
-        //    type.prettyName = "Missing Object";
-        //    type.isProlonged = true;
-        //    type.isAvailable =
-        //        [](const auto& settings) {
-        //            const auto& vca = settings.vca;
-        //            return vca && vca->missingObjectDetection;
-        //        };
-        //}
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "MissingObjectDetection";
+            type.id = "nx.vivotek.MissingObject";
+            type.prettyName = "Missing Object";
+            type.isProlonged = true;
+            type.isAvailable =
+                [](const auto& settings) {
+                    const auto& vca = settings.vca;
+                    return vca && vca->missingObjectDetection;
+                };
+        }
         //{
         //    auto& type = types.emplace_back();
         //    type.nativeId = "UnattendedObjectDetection";

@@ -216,6 +216,11 @@ void JsonValue::to(int* value) const
     *value = roundedDoubleValue;
 }
 
+void JsonValue::to(float* value) const
+{
+    *value = to<double>();
+}
+
 void JsonValue::to(double* value) const
 {
     if (!isDouble())

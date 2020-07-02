@@ -118,28 +118,22 @@ public:
         };
         std::optional<LineCrossingDetection> lineCrossingDetection;
 
-        //struct MissingObjectDetection
-        //{
-        //    struct Rule
-        //    {
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.MissingObjectDetection.Rule#, Region,
-        //            NamedPolygon) region;
+        struct MissingObjectDetection
+        {
+            struct Rule
+            {
+                QString name;
+                Entry<Polygon> region;
 
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.MissingObjectDetection.Rule#, MinSize,
-        //            nx::sdk::analytics::Rect) minSize;
+                Entry<SizeConstraints> sizeConstraints;
+                Entry<int> minDuration;
+                Entry<bool> requiresHumanInvolvement;
+            };
+            std::vector<Rule> rules;
 
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.MissingObjectDetection.Rule#, MaxSize,
-        //            nx::sdk::analytics::Rect) maxSize;
-
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.MissingObjectDetection.Rule#, Delay, int) delay;
-
-        //        NX_CAMERA_SETTINGS_ENTRY(
-        //            Vca.MissingObjectDetection.Rule#, RequiresHumanInvolvement,
-        //            bool) requiresHumanInvolvement;
-        //    };
-        //    std::vector<Rule> rules;
-        //};
-        //std::optional<MissingObjectDetection> missingObjectDetection;
+            MissingObjectDetection();
+        };
+        std::optional<MissingObjectDetection> missingObjectDetection;
 
         //struct UnattendedObjectDetection
         //{

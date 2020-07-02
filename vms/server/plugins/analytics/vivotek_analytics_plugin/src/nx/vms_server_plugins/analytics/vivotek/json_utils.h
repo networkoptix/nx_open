@@ -255,6 +255,7 @@ struct JsonValue: QJsonValue
 
     void to(bool* value) const;
     void to(int* value) const;
+    void to(float* value) const;
     void to(double* value) const;
     void to(QString* value) const;
     void to(JsonObject* value) const;
