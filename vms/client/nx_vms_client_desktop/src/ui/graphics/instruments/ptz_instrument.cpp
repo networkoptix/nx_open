@@ -1061,6 +1061,7 @@ void PtzInstrument::dragMove(DragInfo* info)
         return;
     }
 
+    using nx::core::ptz::Vector;
     switch (m_movement)
     {
         case ContinuousMovement:
@@ -1068,21 +1069,21 @@ void PtzInstrument::dragMove(DragInfo* info)
             if (m_externalPtzDirections != 0)
                 break;
 
-            QPointF mouseItemPos = info->mouseItemPos();
-            QPointF itemCenter = target()->rect().center();
+            QPointF currentPos = info->mouseItemPos();
+            const QPointF startPos = info->mousePressItemPos();
 
             if (!(m_movementOrientations & Qt::Horizontal))
-                mouseItemPos.setX(itemCenter.x());
+                currentPos.setX(startPos.x());
             if (!(m_movementOrientations & Qt::Vertical))
-                mouseItemPos.setY(itemCenter.y());
+                currentPos.setY(startPos.y());
 
-            QPointF delta = mouseItemPos - itemCenter;
-            QSizeF size = target()->size();
-            qreal scale = qMax(size.width(), size.height()) / 2.0;
-            QPointF speed(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0));
+            const QPointF delta = currentPos - startPos;
+            const QSizeF size = target()->size();
+            const qreal scale = qMax(size.width(), size.height()) / 2.0;
+            const QPointF speed(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0));
 
-            qreal speedMagnitude = Geometry::length(speed);
-            qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
+            const qreal speedMagnitude = Geometry::length(speed);
+            const qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
 
             ensureElementsWidget();
 
@@ -1091,22 +1092,22 @@ void PtzInstrument::dragMove(DragInfo* info)
             {
                 auto arrowItem = elementsWidget()->arrowItem();
                 arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()),
-                    elementsWidget()->mapFromItem(target(), mouseItemPos));
+                    elementsWidget()->mapFromItem(target(), currentPos));
                 arrowItem->setSize(QSizeF(arrowSize, arrowSize));
             }
             else
             {
                 elementsWidget()->newArrowItem()->setDirection((
-                    elementsWidget()->mapFromItem(target(), info->mouseItemPos())
+                    elementsWidget()->mapFromItem(target(), currentPos)
                         - elementsWidget()->newArrowItem()->pos()) / 2.0);
             }
 
             if (m_movementFilter)
-                m_movementFilter->updateFilteringSpeed(nx::core::ptz::Vector(speed));
+                m_movementFilter->updateFilteringSpeed(Vector(speed));
             else
-                ptzMove(target(), nx::core::ptz::Vector(speed));
+                ptzMove(target(), Vector(speed));
 
-             break;
+            break;
         }
 
         case ViewportMovement:
@@ -1118,16 +1119,16 @@ void PtzInstrument::dragMove(DragInfo* info)
         case VirtualMovement:
         {
             const QPointF mouseItemPos = info->mouseItemPos();
-            QPointF delta = mouseItemPos - info->lastMouseItemPos();
+            const QPointF delta = mouseItemPos - info->lastMouseItemPos();
 
-            qreal scale = target()->size().width() / 2.0;
-            QPointF shift(delta.x() / scale, -delta.y() / scale);
+            const qreal scale = target()->size().width() / 2.0;
+            const QPointF shift(delta.x() / scale, -delta.y() / scale);
 
-            nx::core::ptz::Vector position;
+            Vector position;
             target()->ptzController()->getPosition(Qn::LogicalPtzCoordinateSpace, &position);
 
-            qreal speed = 0.5 * position.zoom;
-            nx::core::ptz::Vector positionDelta(shift.x() * speed, shift.y() * speed, 0.0, 0.0);
+            const qreal speed = 0.5 * position.zoom;
+            const Vector positionDelta(shift.x() * speed, shift.y() * speed, 0.0, 0.0);
             target()->ptzController()->absoluteMove(
                 Qn::LogicalPtzCoordinateSpace,
                 position + positionDelta,
