@@ -3163,6 +3163,17 @@ struct VcaParserFromCamera
         parse(static_cast<std::vector<Point>*>(value), json);
     }
 
+    void parse(Vca::IntrusionDetection::Direction* value, const JsonValue& json) const
+    {
+        const auto serializedValue = json.to<QString>();
+        if (serializedValue == "OutToIn")
+            *value = Vca::IntrusionDetection::Direction::outToIn;
+        else if (serializedValue == "InToOut")
+            *value = Vca::IntrusionDetection::Direction::inToOut;
+        else
+            throw Exception("Failed to parse intrusion detection direction: %1", serializedValue);
+    }
+
     template <typename Value>
     void parse(Value* value, const JsonValue& json) const
     {
@@ -3226,6 +3237,12 @@ struct VcaParserFromCamera
         parse(&rule->minDuration, jsonRule["StayTime"]);
     }
 
+    void parse(Vca::IntrusionDetection::Rule* rule, const JsonValue& jsonRule) const
+    {
+        parse(&rule->region, jsonRule["Field"][0]);
+        parse(&rule->direction, jsonRule["WalkingDirection"]);
+    }
+
     template <typename Detection>
     void parseDetection(Detection* detection, const QString& functionName) const
     {
@@ -3276,6 +3293,7 @@ struct VcaParserFromCamera
 
         parseDetection(&vca->crowdDetection, "CrowdDetection");
         parseDetection(&vca->loiteringDetection, "LoiteringDetection");
+        parseDetection(&vca->intrusionDetection, "IntrusionDetection");
     }
 };
 
@@ -3351,6 +3369,23 @@ struct VcaSerializerToCamera
     void serializeValue(Json* json, const Key& key, const Polygon& value)
     {
         serializeValue(json, key, static_cast<const std::vector<Point>&>(value));
+    }
+
+    template <typename Json, typename Key>
+    void serializeValue(Json* json, const Key& key,
+       Vca::IntrusionDetection::Direction value)
+    {
+        switch (value)
+        {
+            case Vca::IntrusionDetection::Direction::outToIn:
+                (*json)[key] = "OutToIn";
+                return;
+            case Vca::IntrusionDetection::Direction::inToOut:
+                (*json)[key] = "InToOut";
+                return;
+            default:
+                NX_ASSERT(false, "Unknown intrusion detection direction value: %1", (int) value);
+        }
     }
 
     template <typename Json, typename Key, typename Value>
@@ -3452,6 +3487,17 @@ struct VcaSerializerToCamera
         return true;
     }
 
+    bool serialize(JsonObject* jsonRule, Vca::IntrusionDetection::Rule* rule)
+    {
+        if (!rule->region.value)
+            return false;
+
+        serializeField(jsonRule, &rule->region);
+        serialize(jsonRule, "WalkingDirection", &rule->direction);
+        
+        return true;
+    }
+
     template <typename Detection>
     void serializeDetection(Detection* detection, const QString& functionName)
     {
@@ -3520,6 +3566,7 @@ struct VcaSerializerToCamera
 
         serializeDetection(&vca->crowdDetection, "CrowdDetection");
         serializeDetection(&vca->loiteringDetection, "LoiteringDetection");
+        serializeDetection(&vca->intrusionDetection, "IntrusionDetection");
     }
 };
 
@@ -3607,6 +3654,9 @@ const QString kVcaCrowdDetectionExitDelay = "Vca.CrowdDetection#.ExitDelay";
 const QString kVcaLoiteringDetectionRegion = "Vca.LoiteringDetection#.Region";
 const QString kVcaLoiteringDetectionMinDuration = "Vca.LoiteringDetection#.MinDuration";
 
+const QString kVcaIntrusionDetectionRegion = "Vca.IntrusionDetection#.Region";
+const QString kVcaIntrusionDetectionDirection = "Vca.IntrusionDetection#.Direction";
+
 QString replicateName(QString name, std::size_t i)
 {
     name.replace("#", "%1");
@@ -3659,6 +3709,17 @@ struct ParserFromServer
     void parse(int* value, const QString& serializedValue) const
     {
         *value = toInt(serializedValue);
+    }
+
+    void parse(CameraSettings::Vca::IntrusionDetection::Direction* value,
+        const QString& serializedValue) const
+    {
+        if (serializedValue == "OutToIn")
+            *value = CameraSettings::Vca::IntrusionDetection::Direction::outToIn;
+        else if (serializedValue == "InToOut")
+            *value = CameraSettings::Vca::IntrusionDetection::Direction::inToOut;
+        else
+            throw Exception("Failed to parse intrusion detection direction: %1", serializedValue);
     }
 
     void parse(std::optional<Polygon>* value, const QString& serializedValue, QString* label) const
@@ -3749,6 +3810,19 @@ struct ParserFromServer
         checkDuplicateNames(&rules, &CameraSettings::Vca::LoiteringDetection::Rule::region);
     }
 
+    void parse(CameraSettings::Vca::IntrusionDetection* detection) const
+    {
+        auto& rules = detection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+
+            parse(&rule.region, replicateName(kVcaIntrusionDetectionRegion, i), &rule.name);
+            parse(&rule.direction, replicateName(kVcaIntrusionDetectionDirection, i));
+        }
+        checkDuplicateNames(&rules, &CameraSettings::Vca::IntrusionDetection::Rule::region);
+    }
+
     void parse(CameraSettings::Vca* vca) const
     {
         parse(&vca->enabled, kVcaEnabled);
@@ -3757,6 +3831,7 @@ struct ParserFromServer
 
         parse(&vca->crowdDetection.emplace());
         parse(&vca->loiteringDetection.emplace());
+        parse(&vca->intrusionDetection.emplace());
     }
 
     void parse(CameraSettings* settings) const
@@ -3795,6 +3870,20 @@ struct SerializerToServer
     QString serialize(int value) const
     {
         return QString::number(value);
+    }
+
+    QString serialize(CameraSettings::Vca::IntrusionDetection::Direction value) const
+    {
+        switch (value)
+        {
+            case CameraSettings::Vca::IntrusionDetection::Direction::outToIn:
+                return "OutToIn";
+            case CameraSettings::Vca::IntrusionDetection::Direction::inToOut:
+                return "InToOut";
+            default:
+                NX_ASSERT(false, "Unknown intrusion detection direction value: %1", (int) value);
+                return "";
+        }
     }
 
     std::optional<QString> serialize(
@@ -3892,6 +3981,18 @@ struct SerializerToServer
         }
     }
 
+    void serialize(const CameraSettings::Vca::IntrusionDetection& detection) const
+    {
+        const auto& rules = detection.rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            const auto& rule = rules[i];
+
+            serialize(replicateName(kVcaIntrusionDetectionRegion, i), rule.region, rule.name);
+            serialize(replicateName(kVcaIntrusionDetectionDirection, i), rule.direction);
+        }
+    }
+
     void serialize(const CameraSettings::Vca& vca) const
     {
         serialize(kVcaEnabled, vca.enabled);
@@ -3901,6 +4002,8 @@ struct SerializerToServer
         if (const auto& detection = vca.crowdDetection)
             serialize(*detection);
         if (const auto& detection = vca.loiteringDetection)
+            serialize(*detection);
+        if (const auto& detection = vca.intrusionDetection)
             serialize(*detection);
     }
 
@@ -4072,6 +4175,50 @@ QJsonObject serializeModel(const CameraSettings::Vca::LoiteringDetection& detect
     };
 }
 
+QJsonObject serializeModel(const CameraSettings::Vca::IntrusionDetection& detection)
+{
+    return QJsonObject{
+        {"name", "Vca.IntrusionDetection"},
+        {"type", "Section"},
+        {"caption", "Intrusion Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) detection.rules.size()},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{kVcaIntrusionDetectionRegion}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", kVcaIntrusionDetectionRegion},
+                            {"type", "PolygonFigure"},
+                            {"caption", "Region"},
+                            {"minPoints", kMinRegionVertices},
+                            {"maxPoints", kMaxRegionVertices},
+                        },
+                        QJsonObject{
+                            {"name", kVcaIntrusionDetectionDirection},
+                            {"type", "ComboBox"},
+                            {"caption", "Direction"},
+                            {"description", "Movement direction which causes the event"},
+                            {"range", QJsonArray{
+                                "OutToIn",
+                                "InToOut",
+                            }},
+                            {"itemCaptions", QJsonObject{
+                                {"OutToIn", "From outside to inside"},
+                                {"InToOut", "From inside to outside"},
+                            }},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
 QJsonObject serializeModel(const CameraSettings::Vca& vca)
 {
     return QJsonObject{
@@ -4115,9 +4262,9 @@ QJsonObject serializeModel(const CameraSettings::Vca& vca)
                     sections.push_back(serializeModel(*detection));
                 if (const auto& detection = vca.loiteringDetection)
                     sections.push_back(serializeModel(*detection));
+                if (const auto& detection = vca.intrusionDetection)
+                    sections.push_back(serializeModel(*detection));
 
-                //serializeModel(vca ? vca->loiteringDetection : std::nullopt),
-                //serializeModel(vca ? vca->intrusionDetection : std::nullopt),
                 //serializeModel(vca ? vca->lineCrossingDetection : std::nullopt),
                 //serializeModel(vca ? vca->missingObjectDetection : std::nullopt),
                 //serializeModel(vca ? vca->unattendedObjectDetection : std::nullopt),
@@ -4166,6 +4313,11 @@ CameraSettings::Vca::CrowdDetection::CrowdDetection():
 }
 
 CameraSettings::Vca::LoiteringDetection::LoiteringDetection():
+    rules(kMaxDetectionRuleCount)
+{
+}
+
+CameraSettings::Vca::IntrusionDetection::IntrusionDetection():
     rules(kMaxDetectionRuleCount)
 {
 }

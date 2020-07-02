@@ -76,16 +76,26 @@ public:
         };
         std::optional<LoiteringDetection> loiteringDetection;
 
-        //struct IntrusionDetection
-        //{
-        //    struct Rule
-        //    {
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.IntrusionDetection.Rule#, Region, NamedPolygon) region;
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.IntrusionDetection.Rule#, Inverted, bool) inverted;
-        //    };
-        //    std::vector<Rule> rules;
-        //};
-        //std::optional<IntrusionDetection> intrusionDetection;
+        struct IntrusionDetection
+        {
+            enum class Direction
+            {
+                outToIn,
+                inToOut,
+            };
+
+            struct Rule
+            {
+                QString name;
+                Entry<Polygon> region;
+
+                Entry<Direction> direction;
+            };
+            std::vector<Rule> rules;
+
+            IntrusionDetection();
+        };
+        std::optional<IntrusionDetection> intrusionDetection;
 
         //struct LineCrossingDetection
         //{
