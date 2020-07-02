@@ -43,8 +43,6 @@ protected:
         const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities) override;
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
 
-    virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true) override;
-
 private:
     CameraDiagnostics::Result fetchChannelCapabilities(
         Qn::ConnectionRole role,

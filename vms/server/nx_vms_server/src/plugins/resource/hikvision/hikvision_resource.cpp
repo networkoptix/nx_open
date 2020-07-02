@@ -368,11 +368,6 @@ ProtocolStates HikvisionResource::tryToEnableIntegrationProtocols(
     return supportedProtocols;
 }
 
-CameraDiagnostics::Result HikvisionResource::fetchChannelCount(bool /*limitedByEncoders*/)
-{
-    return base_type::fetchChannelCount(/*limitedByEncoders*/ false);
-}
-
 int HikvisionResource::streamApiChannel() const
 {
     if (resourceData().value<bool>(lit("extractHikvisionChannelFromVideoSource"), false))

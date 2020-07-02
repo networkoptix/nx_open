@@ -335,7 +335,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(
         const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true);
+    CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true);
 
     virtual CameraDiagnostics::Result sendVideoEncoderToCameraEx(
         onvifXsd__VideoEncoderConfiguration& encoder,
