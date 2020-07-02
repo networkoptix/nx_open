@@ -112,20 +112,24 @@ class BoxConnectionSSH(BoxConnection):
         if ssh_executable_path.stem == 'plink':
             error_message = run.stderr.decode().strip().lower()
             if run.returncode == 0:  # Yes, exit status is 0 if access has been denied.
-                if error_message == 'access denied':
-                    raise exceptions.BoxCommandError("SSH auth failed, check credentials")
+                if error_message.endswith('access denied'):
+                    raise exceptions.BoxCommandError(
+                            "SSH authentication failed, check credentials in vms_benchmark.conf.")
             if run.returncode == 1:
-                if error_message == 'fatal error: network error: connection timed out':
+                if error_message.endswith('fatal error: network error: connection timed out'):
                     raise exceptions.BoxCommandError(
                         "Connection timed out, "
                         "check boxHostnameOrIp configuration setting and "
                         "make sure that the box address is accessible")
-                if error_message == 'fatal error: network error: connection refused':
+                if error_message.endswith('fatal error: network error: connection refused'):
                     raise exceptions.BoxCommandError(
                         "Cannot connect via SSH, "
                         "check that SSH service is running "
                         "on port specified in boxSshPort .conf setting (22 by default)")
         else:
+            if run.returncode == 5:  # sshpass manpage: "5      Invalid/incorrect password"
+                raise exceptions.BoxCommandError(
+                        "SSH authentication failed, check credentials in vms_benchmark.conf.")
             if run.returncode == 255:
                 if throw_exception_on_error:
                     raise exceptions.BoxCommandError(message=run.stderr.decode('UTF-8').rstrip())
