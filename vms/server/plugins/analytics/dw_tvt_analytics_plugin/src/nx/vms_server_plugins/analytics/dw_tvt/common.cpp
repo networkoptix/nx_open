@@ -6,7 +6,7 @@ namespace nx::vms_server_plugins::analytics::dw_tvt {
 
 namespace {
 
-bool containsSuperString(const QList<QString>& container, const QString& item) noexcept
+bool containsAsSubstringAtBeginning(const QList<QString>& container, const QString& item) noexcept
 {
     const auto modelIt = std::find_if(container.cbegin(), container.cend(),
         [&item](const auto& supportedModel)
@@ -26,12 +26,12 @@ bool EngineManifest::supportsModelCompletely(const QString& model) const noexcep
         // No explicit camera model lists => any camera model is completely supported.
         return true;
     }
-    return containsSuperString(supportedCameraModels, model);
+    return containsAsSubstringAtBeginning(supportedCameraModels, model);
 }
 
 bool EngineManifest::supportsModelPartly(const QString& model) const noexcept
 {
-    return containsSuperString(partlySupportedCameraModels, model);
+    return containsAsSubstringAtBeginning(partlySupportedCameraModels, model);
 }
 
 bool EngineManifest::supportsModel(const QString& model) const noexcept

@@ -15,7 +15,7 @@ struct EventType: nx::vms::api::analytics::EventType
     // DWTVT-camera event type name (this name is sent by DWTVT-camera tcp notification server).
     QString internalName;
     QString alarmName;
-    bool restricted = false;
+    bool restricted = false; //< Partially supported camera models ignore restricted event types.
     int group = 0;
 };
 #define DwTvtEventType_Fields EventType_Fields(internalName)(alarmName)(restricted)(group)
