@@ -266,5 +266,23 @@
         <resource name = "20975" public = "20365"/>
         <resource name = "12975" public = "12375"/>
         <resource name = "12976" public = "12375"/>
+        <resource name = "10856" public = "10655"/>
+        <resource name = "8476" public = "08CPD-118"/>
+        <resource name = "5426" public = "05CLD-100"/>
+        <resource name = "5456" public = "05CLD-100"/>
+        <resource name = "20476" public = "20CPD-118"/>
+        <resource name = "16856" public ="ArecontVision_Duo,ArecontVision_Abstract,ArecontVision_H264">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "3840"/>
+                <param name = "MaxSensorHeight" default_value = "2160"/>
+                <param name = "MaxFPS" default_value = "15"/>
+            </params>
+        </resource>
+        <resource name = "4856" public = "4655">
+            <params>
+                <param name = "MaxFPS" default_value = "30"/>
+            </params>
+        </resource>
+        <resource name = "5756" public = "05CLD-100"/>
     </oem>
 </resources>
