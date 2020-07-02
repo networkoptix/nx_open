@@ -963,6 +963,7 @@
                         dataType="Enumeration"/>
                 <param id="image/camera/SSNRMode"
                         name="SSNR Mode"
+                        aux="groupLead=ssnr"
                         dataType="Enumeration"/>
                 <param id="image/camera/SSNRLevel"
                         name="SSNR Level"
