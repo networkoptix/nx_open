@@ -47,6 +47,7 @@ public:
         zoomIn = 0x10,
         zoomOut = 0x20
     };
+    Q_FLAG(DirectionFlag) //< For lexical debug output.
     Q_DECLARE_FLAGS(DirectionFlags, DirectionFlag)
 
     void toggleContinuousPtz(DirectionFlag direction, bool on);

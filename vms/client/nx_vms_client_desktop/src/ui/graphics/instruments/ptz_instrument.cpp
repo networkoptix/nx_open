@@ -3,6 +3,7 @@
 
 #include <chrono>
 
+#include <QtCore/QMetaEnum>
 #include <QtCore/QVariant>
 
 #include <QtWidgets/QGraphicsSceneMouseEvent>
@@ -1340,6 +1341,10 @@ void PtzInstrument::toggleContinuousPtz(DirectionFlag direction, bool on)
     const auto widget = qobject_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
     if (!widget || m_externalPtzDirections.testFlag(direction) == on)
         return;
+
+    NX_VERBOSE(this, "Toggle continuous PTZ: %1 %2",
+        QMetaEnum::fromType<DirectionFlag>().valueToKey(int(direction)),
+        on ? "on" : "off");
 
     setTarget(widget);
 
