@@ -89,7 +89,6 @@ public:
 
     static int getDefaultFrameSize(AVCodecContext* context);
 
-
     /**
      * @return Whether the plane with the specified index is a chroma plane.
      */
