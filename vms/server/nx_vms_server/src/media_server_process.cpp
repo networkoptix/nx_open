@@ -5313,7 +5313,7 @@ void MediaServerProcess::run()
     loadResourceParamsData();
     if (!loadResourcesFromDatabase())
     {
-        NX_DEBUG(this, "Cancel futher Server iniatialization because database data is not loaded");
+        NX_DEBUG(this, "Cancel further Server initialization because database data is not loaded");
         return;
     }
 
