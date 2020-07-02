@@ -16,7 +16,7 @@ namespace utils {
  * @param mediaServer If not null, then status of this server is reset to Online. TODO Refactor out.
  * @param needToStop Periodically checked. If returns true, then execution is halted and function returns.
  */
-void loadResourcesFromEcs(
+bool loadResourcesFromEcs(
     QnCommonModule* commonModule,
     ec2::AbstractECConnectionPtr ec2Connection,
     QnCommonMessageProcessor* messageProcessor,

@@ -5037,11 +5037,11 @@ void MediaServerProcess::createTcpListener()
         useTwoSockets);
 }
 
-void MediaServerProcess::loadResourcesFromDatabase()
+bool MediaServerProcess::loadResourcesFromDatabase()
 {
     auto commonModule = serverModule()->commonModule();
 
-    nx::vms::utils::loadResourcesFromEcs(
+    return nx::vms::utils::loadResourcesFromEcs(
         commonModule,
         m_ec2Connection,
         commonModule->messageProcessor(),
@@ -5311,7 +5311,11 @@ void MediaServerProcess::run()
     initializeUpnpPortMapper();
 
     loadResourceParamsData();
-    loadResourcesFromDatabase();
+    if (!loadResourcesFromDatabase())
+    {
+        NX_DEBUG(this, "Cancel futher Sserver iniatialization because database data is not loaded");
+        return;
+    }
 
     m_serverMessageProcessor->startReceivingLocalNotifications(m_ec2Connection);
 
