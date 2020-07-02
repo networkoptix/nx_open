@@ -808,6 +808,7 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
             break;
 
         case Qt::Key_Plus:
+        case Qt::Key_Equal:
             m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::zoomIn, false);
             break;
 
