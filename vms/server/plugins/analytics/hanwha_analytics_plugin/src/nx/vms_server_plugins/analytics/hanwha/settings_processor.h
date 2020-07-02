@@ -72,7 +72,9 @@ public:
     void transferAndHoldSettingsFromDeviceToServer(nx::sdk::SettingsResponse* response);
 
     void transferAndHoldSettingsFromServerToDevice(
-        nx::sdk::StringMap* errorMap, const nx::sdk::IStringMap* sourceMap);
+        nx::sdk::StringMap* errorMap,
+        nx::sdk::StringMap* valueMap,
+        const nx::sdk::IStringMap* sourceMap);
 };
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

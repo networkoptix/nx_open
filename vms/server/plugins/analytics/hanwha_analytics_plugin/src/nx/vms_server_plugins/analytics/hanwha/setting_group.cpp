@@ -52,10 +52,22 @@ const char* SettingGroup::value(const nx::sdk::IStringMap* sourceMap, E keyIndex
 
 void SettingGroup::replenishErrorMap(nx::sdk::StringMap* errorMap, const std::string& reason) const
 {
-    for ( int i = 0; i < serverKeyCount; ++i)
-        errorMap->setItem(serverKeys[i], reason);
+    for (int i = 0; i < serverKeyCount; ++i)
+    {
+        const std::string key = this->key(i);
+        errorMap->setItem(key, reason);
+    }
 }
 
+void SettingGroup::replenishValueMap(
+    nx::sdk::StringMap* valueMap, const nx::sdk::IStringMap* sourceMap) const
+{
+    for (int i = 0; i < serverKeyCount; ++i)
+    {
+        const std::string key = this->key(i);
+        valueMap->setItem(key, sourceMap->value(key.c_str()));
+    }
+}
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 
@@ -253,6 +265,7 @@ void MotionDetectionIncludeArea::readFromDeviceReplyOrThrow(const nx::kit::Json&
         // No roi info found for current channel => *this should be set into default state.
         // Current SettingGroup is considered to be uninitialized.
         *this = MotionDetectionIncludeArea(this->nativeIndex());
+        initialized = true;
         return;
     }
 
@@ -322,6 +335,7 @@ void MotionDetectionExcludeArea::readFromDeviceReplyOrThrow(const nx::kit::Json&
     if (roiInfo == nx::kit::Json(this->deviceIndex()))
     {
         *this = MotionDetectionExcludeArea(this->nativeIndex());
+        initialized = true;
         return;
     }
 
@@ -867,6 +881,7 @@ void IvaLine::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, Frame
     if (lineInfo == nx::kit::Json())
     {
         *this = IvaLine(this->nativeIndex()); // reset value;
+        initialized = true;
         return;
     }
 
@@ -1026,6 +1041,7 @@ void IvaArea::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, Frame
     if (roiInfo == nx::kit::Json())
     {
         *this = IvaArea(this->nativeIndex()); // reset value;
+        initialized = true;
         return ;
     }
 
@@ -1145,6 +1161,7 @@ void IvaExcludeArea::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo
     if (roiInfo == nx::kit::Json())
     {
         *this = IvaExcludeArea(this->nativeIndex());
+        initialized = true;
         return;
     }
 
