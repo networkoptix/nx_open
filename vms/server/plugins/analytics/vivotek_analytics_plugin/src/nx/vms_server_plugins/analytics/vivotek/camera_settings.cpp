@@ -3675,28 +3675,23 @@ struct ParserFromServer
 {
     const IStringMap& values;
 
-    template <typename Rules, typename Rule, typename Value>
-    void checkDuplicateNames(Rules* rules, CameraSettings::Entry<Value> Rule::* entry) const
+    std::map<QString, std::vector<std::function<void(const QString)>>> errorSetterGroups;
+
+    template <typename Value>
+    void noteName(const QString& name, CameraSettings::Entry<Value> *entry)
     {
-        std::map<QString, std::vector<Rule*>> groupsByName;
-        for (auto& rule: *rules)
-        {
-            if ((rule.*entry).value)
-                groupsByName[rule.name].push_back(&rule);
-        }
+        if (!entry->value)
+            return;
 
-        for (auto& [name, group]: groupsByName)
-        {
-            if (group.size() == 1)
-                continue;
-
-            const QString error = NX_FMT("Duplicate name: %1", name);
-            for (auto* rule: group)
-                (rule->*entry).error = error;
-        }
+        errorSetterGroups[name].push_back(
+            [entry](const QString& error)
+            {
+                entry->value = std::nullopt;
+                entry->error = error;
+            });
     }
 
-    void parse(bool* value, const QString& serializedValue) const
+    void parse(bool* value, const QString& serializedValue)
     {
         if (serializedValue == "false")
             *value = false;
@@ -3706,13 +3701,13 @@ struct ParserFromServer
             throw Exception("Failed to parse boolean: %1", serializedValue);
     }
 
-    void parse(int* value, const QString& serializedValue) const
+    void parse(int* value, const QString& serializedValue)
     {
         *value = toInt(serializedValue);
     }
 
     void parse(CameraSettings::Vca::IntrusionDetection::Direction* value,
-        const QString& serializedValue) const
+        const QString& serializedValue)
     {
         if (serializedValue == "OutToIn")
             *value = CameraSettings::Vca::IntrusionDetection::Direction::outToIn;
@@ -3722,7 +3717,7 @@ struct ParserFromServer
             throw Exception("Failed to parse intrusion detection direction: %1", serializedValue);
     }
 
-    void parse(std::optional<Polygon>* value, const QString& serializedValue, QString* label) const
+    void parse(std::optional<Polygon>* value, const QString& serializedValue, QString* label)
     {
         const auto json = parseJson(serializedValue.toUtf8()).to<JsonObject>();
         if (json.isEmpty())
@@ -3741,20 +3736,24 @@ struct ParserFromServer
             }
 
             if (label)
+            {
                 json["label"].to(label);
+                if (label->isEmpty())
+                    throw Exception("Empty name");
+            }
         }
     }
 
     template <typename Value, typename... ExtraArgs>
     void parse(std::optional<Value>* entry, const QString& serializedValue,
-        const ExtraArgs&... extraArgs) const
+        const ExtraArgs&... extraArgs)
     {
         parse(&entry->emplace(), serializedValue, extraArgs...);
     }
 
     template <typename Value, typename... ExtraArgs>
     void parse(CameraSettings::Entry<Value>* entry, const QString& name,
-        const ExtraArgs&... extraArgs) const
+        const ExtraArgs&... extraArgs)
     {
         try
         {
@@ -3768,7 +3767,7 @@ struct ParserFromServer
         }
     }
 
-    void parse(CameraSettings::Vca::Installation* installation) const
+    void parse(CameraSettings::Vca::Installation* installation)
     {
         parse(&installation->height, kVcaInstallationHeight);
         parse(&installation->tiltAngle, kVcaInstallationTiltAngle);
@@ -3782,7 +3781,7 @@ struct ParserFromServer
         }
     }
 
-    void parse(CameraSettings::Vca::CrowdDetection* detection) const
+    void parse(CameraSettings::Vca::CrowdDetection* detection)
     {
         auto& rules = detection->rules;
         for (std::size_t i = 0; i < rules.size(); ++i)
@@ -3793,11 +3792,12 @@ struct ParserFromServer
             parse(&rule.minPersonCount, replicateName(kVcaCrowdDetectionMinPersonCount, i));
             parse(&rule.entranceDelay, replicateName(kVcaCrowdDetectionEntranceDelay, i));
             parse(&rule.exitDelay, replicateName(kVcaCrowdDetectionExitDelay, i));
+
+            noteName(rule.name, &rule.region);
         }
-        checkDuplicateNames(&rules, &CameraSettings::Vca::CrowdDetection::Rule::region);
     }
 
-    void parse(CameraSettings::Vca::LoiteringDetection* detection) const
+    void parse(CameraSettings::Vca::LoiteringDetection* detection)
     {
         auto& rules = detection->rules;
         for (std::size_t i = 0; i < rules.size(); ++i)
@@ -3806,11 +3806,12 @@ struct ParserFromServer
 
             parse(&rule.region, replicateName(kVcaLoiteringDetectionRegion, i), &rule.name);
             parse(&rule.minDuration, replicateName(kVcaLoiteringDetectionMinDuration, i));
+
+            noteName(rule.name, &rule.region);
         }
-        checkDuplicateNames(&rules, &CameraSettings::Vca::LoiteringDetection::Rule::region);
     }
 
-    void parse(CameraSettings::Vca::IntrusionDetection* detection) const
+    void parse(CameraSettings::Vca::IntrusionDetection* detection)
     {
         auto& rules = detection->rules;
         for (std::size_t i = 0; i < rules.size(); ++i)
@@ -3819,22 +3820,35 @@ struct ParserFromServer
 
             parse(&rule.region, replicateName(kVcaIntrusionDetectionRegion, i), &rule.name);
             parse(&rule.direction, replicateName(kVcaIntrusionDetectionDirection, i));
+
+            noteName(rule.name, &rule.region);
         }
-        checkDuplicateNames(&rules, &CameraSettings::Vca::IntrusionDetection::Rule::region);
     }
 
-    void parse(CameraSettings::Vca* vca) const
+    void parse(CameraSettings::Vca* vca)
     {
         parse(&vca->enabled, kVcaEnabled);
         parse(&vca->sensitivity, kVcaSensitivity);
         parse(&vca->installation);
 
+        errorSetterGroups.clear();
+
         parse(&vca->crowdDetection.emplace());
         parse(&vca->loiteringDetection.emplace());
         parse(&vca->intrusionDetection.emplace());
+
+        for (auto& [name, errorSetters]: errorSetterGroups)
+        {
+            if (errorSetters.size() == 1)
+                continue;
+
+            const QString error = NX_FMT("Duplicate name: %1", name);
+            for (const auto setError: errorSetters)
+                setError(error);
+        }
     }
 
-    void parse(CameraSettings* settings) const
+    void parse(CameraSettings* settings)
     {
         parse(&settings->vca.emplace());
     }
