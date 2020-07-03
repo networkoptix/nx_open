@@ -3263,6 +3263,18 @@ struct VcaParserFromCamera
         }
     }
 
+    void setRuleName(Vca::RunningDetection::Rule *rule, const QString& name) const
+    {
+        rule->name.value = name;
+        rule->name.error = std::nullopt;
+    }
+
+    template <typename Rule>
+    void setRuleName(Rule *rule, const QString& name) const
+    {
+        rule->name = name;
+    }
+
     void parse(Vca::CrowdDetection::Rule* rule, const JsonValue& jsonRule) const
     {
         parse(&rule->region, jsonRule["Field"][0]);
@@ -3310,6 +3322,13 @@ struct VcaParserFromCamera
         parse(&rule->region, jsonRule["Field"][0]);
     }
 
+    void parse(Vca::RunningDetection::Rule* rule, const JsonValue& jsonRule) const
+    {
+        parse(&rule->minPersonCount, jsonRule["PeopleNumber"]);
+        parse(&rule->minSpeed, jsonRule["SpeedLevel"]);
+        parse(&rule->minDuration, jsonRule["MinActivityDuration"]);
+    }
+
     template <typename Detection>
     void parseDetection(Detection* detection, const QString& functionName) const
     {
@@ -3327,7 +3346,7 @@ struct VcaParserFromCamera
 
             auto& rule = rules[i];
 
-            rule.name = ruleName;
+            setRuleName(&rule, ruleName);
             parse(&rule, jsonRules[ruleName]);
 
             ++i;
@@ -3365,6 +3384,7 @@ struct VcaParserFromCamera
         parseDetection(&vca->missingObjectDetection, "MissingObjectDetection");
         parseDetection(&vca->unattendedObjectDetection, "UnattendedObjectDetection");
         parseDetection(&vca->faceDetection, "FaceDetection");
+        parseDetection(&vca->runningDetection, "RunningDetection");
     }
 };
 
@@ -3598,86 +3618,83 @@ struct VcaSerializerToCamera
         }
     }
 
-    bool serialize(JsonObject* jsonRule, Vca::CrowdDetection::Rule* rule)
+    std::optional<QString> getRuleName(const Vca::LineCrossingDetection::Rule& rule)
     {
-        if (!rule->region.value)
-            return false;
+        if (!rule.line.value)
+            return std::nullopt;
 
+        return rule.name;
+    }
+
+    std::optional<QString> getRuleName(const Vca::RunningDetection::Rule& rule)
+    {
+        if (!rule.name.value || rule.name.value->isEmpty())
+            return std::nullopt;
+
+        return rule.name.value;
+    }
+
+    template <typename Rule>
+    std::optional<QString> getRuleName(const Rule& rule)
+    {
+        if (!rule.region.value)
+            return std::nullopt;
+
+        return rule.name;
+    }
+
+    void serialize(JsonObject* jsonRule, Vca::CrowdDetection::Rule* rule)
+    {
         serializeField(jsonRule, &rule->region);
         serialize(jsonRule, "PeopleNumber", &rule->minPersonCount);
         serialize(jsonRule, "EnterDelay", &rule->entranceDelay);
         serialize(jsonRule, "LeaveDelay", &rule->exitDelay);
-        
-        return true;
     }
 
-    bool serialize(JsonObject* jsonRule, Vca::LoiteringDetection::Rule* rule)
+    void serialize(JsonObject* jsonRule, Vca::LoiteringDetection::Rule* rule)
     {
-        if (!rule->region.value)
-            return false;
-
         serializeField(jsonRule, &rule->region);
         serialize(jsonRule, "StayTime", &rule->minDuration);
-        
-        return true;
     }
 
-    bool serialize(JsonObject* jsonRule, Vca::IntrusionDetection::Rule* rule)
+    void serialize(JsonObject* jsonRule, Vca::IntrusionDetection::Rule* rule)
     {
-        if (!rule->region.value)
-            return false;
-
         serializeField(jsonRule, &rule->region);
         serialize(jsonRule, "WalkingDirection", &rule->direction);
-        
-        return true;
     }
 
-    bool serialize(JsonObject* jsonRule, Vca::LineCrossingDetection::Rule* rule)
+    void serialize(JsonObject* jsonRule, Vca::LineCrossingDetection::Rule* rule)
     {
-        if (!rule->line.value)
-            return false;
-
         serializeLine(jsonRule, &rule->line);
         serialize(jsonRule, "Direction", &rule->direction);
-        
-        return true;
     }
 
-    bool serialize(JsonObject* jsonRule, Vca::MissingObjectDetection::Rule* rule)
+    void serialize(JsonObject* jsonRule, Vca::MissingObjectDetection::Rule* rule)
     {
-        if (!rule->region.value)
-            return false;
-
         serializeField(jsonRule, &rule->region);
         serialize(jsonRule, "AreaLimitation", &rule->sizeConstraints);
         serialize(jsonRule, "Duration", &rule->minDuration);
         serialize(jsonRule, "HumanFactor", &rule->requiresHumanInvolvement);
-        
-        return true;
     }
 
-    bool serialize(JsonObject* jsonRule, Vca::UnattendedObjectDetection::Rule* rule)
+    void serialize(JsonObject* jsonRule, Vca::UnattendedObjectDetection::Rule* rule)
     {
-        if (!rule->region.value)
-            return false;
-
         serializeField(jsonRule, &rule->region);
         serialize(jsonRule, "AreaLimitation", &rule->sizeConstraints);
         serialize(jsonRule, "Duration", &rule->minDuration);
         serialize(jsonRule, "HumanFactor", &rule->requiresHumanInvolvement);
-        
-        return true;
     }
 
-    bool serialize(JsonObject* jsonRule, Vca::FaceDetection::Rule* rule)
+    void serialize(JsonObject* jsonRule, Vca::FaceDetection::Rule* rule)
     {
-        if (!rule->region.value)
-            return false;
-
         serializeField(jsonRule, &rule->region);
-        
-        return true;
+    }
+
+    void serialize(JsonObject* jsonRule, Vca::RunningDetection::Rule* rule)
+    {
+        serialize(jsonRule, "PeopleNumber", &rule->minPersonCount);
+        serialize(jsonRule, "SpeedLevel", &rule->minSpeed);
+        serialize(jsonRule, "MinActivityDuration", &rule->minDuration);
     }
 
     template <typename Detection>
@@ -3694,7 +3711,7 @@ struct VcaSerializerToCamera
             if (std::none_of(rules.begin(), rules.end(),
                 [&](const auto& rule)
                 {
-                    return rule.name == ruleName;
+                    return getRuleName(rule) == ruleName;
                 }))
             {
                 jsonRules.remove(ruleName);
@@ -3703,17 +3720,20 @@ struct VcaSerializerToCamera
 
         for (auto& rule: rules)
         {
+            const auto ruleName = getRuleName(rule);
+            if (!ruleName)
+                continue;
+
             JsonObject jsonRule;
-            if (jsonRules.contains(rule.name) && jsonRules[rule.name].isObject())
-                jsonRules[rule.name].to(&jsonRule);
+            if (jsonRules.contains(*ruleName) && jsonRules[*ruleName].isObject())
+                jsonRules[*ruleName].to(&jsonRule);
 
-            jsonRule["RuleName"] = rule.name;
-            jsonRule["EventName"] = rule.name;
+            jsonRule["RuleName"] = *ruleName;
+            jsonRule["EventName"] = *ruleName;
 
-            if (serialize(&jsonRule, &rule))
-                jsonRules[rule.name] = jsonRule;
-            else
-                jsonRules.remove(rule.name);
+            serialize(&jsonRule, &rule);
+
+            jsonRules[*ruleName] = jsonRule;
         }
 
         if (jsonRules.isEmpty())
@@ -3751,6 +3771,7 @@ struct VcaSerializerToCamera
         serializeDetection(&vca->missingObjectDetection, "MissingObjectDetection");
         serializeDetection(&vca->unattendedObjectDetection, "UnattendedObjectDetection");
         serializeDetection(&vca->faceDetection, "FaceDetection");
+        serializeDetection(&vca->runningDetection, "RunningDetection");
     }
 };
 
@@ -3859,6 +3880,11 @@ const QString kVcaUnattendedObjectDetectionRequiresHumanInvolvement =
 
 const QString kVcaFaceDetectionRegion = "Vca.FaceDetection#.Region";
 
+const QString kVcaRunningDetectionName = "Vca.RunningDetection#.Name";
+const QString kVcaRunningDetectionMinPersonCount = "Vca.RunningDetection#.MinPersonCount";
+const QString kVcaRunningDetectionMinSpeed = "Vca.RunningDetection#.MinSpeed";
+const QString kVcaRunningDetectionMinDuration = "Vca.RunningDetection#.MinDuration";
+
 QString replicateName(QString name, std::size_t i)
 {
     name.replace("#", "%1");
@@ -3906,6 +3932,11 @@ struct ParserFromServer
     void parse(int* value, const QString& serializedValue)
     {
         *value = toInt(serializedValue);
+    }
+
+    void parse(QString* value, const QString& serializedValue)
+    {
+        *value = serializedValue;
     }
 
     void parse(CameraSettings::Vca::IntrusionDetection::Direction* value,
@@ -4158,6 +4189,25 @@ struct ParserFromServer
         }
     }
 
+    void parse(CameraSettings::Vca::RunningDetection* detection)
+    {
+        auto& rules = detection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+
+            parse(&rule.name, replicateName(kVcaRunningDetectionName, i));
+            parse(&rule.minPersonCount, replicateName(kVcaRunningDetectionMinPersonCount, i));
+            parse(&rule.minSpeed, replicateName(kVcaRunningDetectionMinSpeed, i));
+            parse(&rule.minDuration, replicateName(kVcaRunningDetectionMinDuration, i));
+
+            if (rule.name.value && rule.name.value->isEmpty())
+                rule.name.value = std::nullopt;
+
+            noteName(rule.name.value.value_or(""), &rule.name);
+        }
+    }
+
     void parse(CameraSettings::Vca* vca)
     {
         parse(&vca->enabled, kVcaEnabled);
@@ -4173,6 +4223,7 @@ struct ParserFromServer
         parse(&vca->missingObjectDetection.emplace());
         parse(&vca->unattendedObjectDetection.emplace());
         parse(&vca->faceDetection.emplace());
+        parse(&vca->runningDetection.emplace());
 
         for (auto& [name, errorSetters]: errorSetterGroups)
         {
@@ -4221,6 +4272,11 @@ struct SerializerToServer
     QString serialize(int value) const
     {
         return QString::number(value);
+    }
+
+    QString serialize(QString value) const
+    {
+        return value;
     }
 
     QString serialize(CameraSettings::Vca::IntrusionDetection::Direction value) const
@@ -4459,6 +4515,24 @@ struct SerializerToServer
         }
     }
 
+    void serialize(const CameraSettings::Vca::RunningDetection& detection) const
+    {
+        const auto& rules = detection.rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            const auto& rule = rules[i];
+
+            auto name = rule.name;
+            if (!name.value)
+                name.value = "";
+
+            serialize(replicateName(kVcaRunningDetectionName, i), name);
+            serialize(replicateName(kVcaRunningDetectionMinPersonCount, i), rule.minPersonCount);
+            serialize(replicateName(kVcaRunningDetectionMinSpeed, i), rule.minSpeed);
+            serialize(replicateName(kVcaRunningDetectionMinDuration, i), rule.minDuration);
+        }
+    }
+
     void serialize(const CameraSettings::Vca& vca) const
     {
         serialize(kVcaEnabled, vca.enabled);
@@ -4478,6 +4552,8 @@ struct SerializerToServer
         if (const auto& detection = vca.unattendedObjectDetection)
             serialize(*detection);
         if (const auto& detection = vca.faceDetection)
+            serialize(*detection);
+        if (const auto& detection = vca.runningDetection)
             serialize(*detection);
     }
 
@@ -4565,12 +4641,13 @@ QJsonObject serializeModel(const CameraSettings::Vca::CrowdDetection& detection)
                 {"count", (int) detection.rules.size()},
                 {"template", QJsonObject{
                     {"type", "GroupBox"},
-                    {"caption", "#"},
+                    {"caption", "Rule #"},
                     {"filledCheckItems", QJsonArray{kVcaCrowdDetectionRegion}},
                     {"items", QJsonArray{
                         QJsonObject{
                             {"name", kVcaCrowdDetectionRegion},
                             {"type", "PolygonFigure"},
+                            {"caption", "Name"},
                             {"minPoints", kMinRegionVertices},
                             {"maxPoints", kMaxRegionVertices},
                         },
@@ -4622,12 +4699,13 @@ QJsonObject serializeModel(const CameraSettings::Vca::LoiteringDetection& detect
                 {"count", (int) detection.rules.size()},
                 {"template", QJsonObject{
                     {"type", "GroupBox"},
-                    {"caption", "#"},
+                    {"caption", "Rule #"},
                     {"filledCheckItems", QJsonArray{kVcaLoiteringDetectionRegion}},
                     {"items", QJsonArray{
                         QJsonObject{
                             {"name", kVcaLoiteringDetectionRegion},
                             {"type", "PolygonFigure"},
+                            {"caption", "Name"},
                             {"minPoints", kMinRegionVertices},
                             {"maxPoints", kMaxRegionVertices},
                         },
@@ -4661,12 +4739,13 @@ QJsonObject serializeModel(const CameraSettings::Vca::IntrusionDetection& detect
                 {"count", (int) detection.rules.size()},
                 {"template", QJsonObject{
                     {"type", "GroupBox"},
-                    {"caption", "#"},
+                    {"caption", "Rule #"},
                     {"filledCheckItems", QJsonArray{kVcaIntrusionDetectionRegion}},
                     {"items", QJsonArray{
                         QJsonObject{
                             {"name", kVcaIntrusionDetectionRegion},
                             {"type", "PolygonFigure"},
+                            {"caption", "Name"},
                             {"minPoints", kMinRegionVertices},
                             {"maxPoints", kMaxRegionVertices},
                         },
@@ -4704,12 +4783,13 @@ QJsonObject serializeModel(const CameraSettings::Vca::LineCrossingDetection& det
                 {"count", (int) detection.rules.size()},
                 {"template", QJsonObject{
                     {"type", "GroupBox"},
-                    {"caption", "#"},
+                    {"caption", "Rule #"},
                     {"filledCheckItems", QJsonArray{kVcaLineCrossingDetectionLine}},
                     {"items", QJsonArray{
                         QJsonObject{
                             {"name", kVcaLineCrossingDetectionLine},
                             {"type", "LineFigure"},
+                            {"caption", "Name"},
                             {"minPoints", 3},
                             {"maxPoints", 3},
                         },
@@ -4733,12 +4813,13 @@ QJsonObject serializeModel(const CameraSettings::Vca::MissingObjectDetection& de
                 {"count", (int) detection.rules.size()},
                 {"template", QJsonObject{
                     {"type", "GroupBox"},
-                    {"caption", "#"},
+                    {"caption", "Rule #"},
                     {"filledCheckItems", QJsonArray{kVcaMissingObjectDetectionRegion}},
                     {"items", QJsonArray{
                         QJsonObject{
                             {"name", kVcaMissingObjectDetectionRegion},
                             {"type", "PolygonFigure"},
+                            {"caption", "Name"},
                             {"minPoints", kMinRegionVertices},
                             {"maxPoints", kMaxRegionVertices},
                         },
@@ -4784,12 +4865,13 @@ QJsonObject serializeModel(const CameraSettings::Vca::UnattendedObjectDetection&
                 {"count", (int) detection.rules.size()},
                 {"template", QJsonObject{
                     {"type", "GroupBox"},
-                    {"caption", "#"},
+                    {"caption", "Rule #"},
                     {"filledCheckItems", QJsonArray{kVcaUnattendedObjectDetectionRegion}},
                     {"items", QJsonArray{
                         QJsonObject{
                             {"name", kVcaUnattendedObjectDetectionRegion},
                             {"type", "PolygonFigure"},
+                            {"caption", "Name"},
                             {"minPoints", kMinRegionVertices},
                             {"maxPoints", kMaxRegionVertices},
                         },
@@ -4835,14 +4917,72 @@ QJsonObject serializeModel(const CameraSettings::Vca::FaceDetection& detection)
                 {"count", (int) detection.rules.size()},
                 {"template", QJsonObject{
                     {"type", "GroupBox"},
-                    {"caption", "#"},
+                    {"caption", "Rule #"},
                     {"filledCheckItems", QJsonArray{kVcaFaceDetectionRegion}},
                     {"items", QJsonArray{
                         QJsonObject{
                             {"name", kVcaFaceDetectionRegion},
                             {"type", "PolygonFigure"},
+                            {"caption", "Name"},
                             {"minPoints", kMinRegionVertices},
                             {"maxPoints", kMaxRegionVertices},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
+QJsonObject serializeModel(const CameraSettings::Vca::RunningDetection& detection)
+{
+    return QJsonObject{
+        {"name", "Vca.RunningDetection"},
+        {"type", "Section"},
+        {"caption", "Running Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) detection.rules.size()},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "Rule #"},
+                    {"filledCheckItems", QJsonArray{kVcaRunningDetectionName}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", kVcaRunningDetectionName},
+                            {"type", "TextField"},
+                            {"caption", "Name"},
+                        },
+                        QJsonObject{
+                            {"name", kVcaRunningDetectionMinPersonCount},
+                            {"type", "SpinBox"},
+                            {"minValue", 1},
+                            {"maxValue", 3},
+                            {"caption", "Minimum person count"},
+                            {"description", "The event is only generated if there is at least"
+                                            " this many people running simultaneously"},
+                        },
+                        QJsonObject{
+                            {"name", kVcaRunningDetectionMinSpeed},
+                            {"type", "SpinBox"},
+                            {"minValue", 1},
+                            {"maxValue", 6},
+                            {"defaultValue", 3},
+                            {"caption", "Minimum speed"},
+                            {"description", "The event is only generated if people run at least"
+                                            " this fast"},
+                        },
+                        QJsonObject{
+                            {"name", kVcaRunningDetectionMinDuration},
+                            {"type", "SpinBox"},
+                            {"minValue", 0},
+                            {"maxValue", 999},
+                            {"defaultValue", 1},
+                            {"caption", "Minimum duration (s)"},
+                            {"description", "The event is only generated if people are running"
+                                            " run for at least this long"},
                         },
                     }},
                 }},
@@ -4903,6 +5043,8 @@ QJsonObject serializeModel(const CameraSettings::Vca& vca)
                 if (const auto& detection = vca.unattendedObjectDetection)
                     sections.push_back(serializeModel(*detection));
                 if (const auto& detection = vca.faceDetection)
+                    sections.push_back(serializeModel(*detection));
+                if (const auto& detection = vca.runningDetection)
                     sections.push_back(serializeModel(*detection));
 
                 return sections;
@@ -4972,6 +5114,11 @@ CameraSettings::Vca::UnattendedObjectDetection::UnattendedObjectDetection():
 }
 
 CameraSettings::Vca::FaceDetection::FaceDetection():
+    rules(kMaxDetectionRuleCount)
+{
+}
+
+CameraSettings::Vca::RunningDetection::RunningDetection():
     rules(kMaxDetectionRuleCount)
 {
 }

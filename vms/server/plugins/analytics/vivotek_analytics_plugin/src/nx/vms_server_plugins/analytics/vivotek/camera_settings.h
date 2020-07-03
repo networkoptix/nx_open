@@ -165,18 +165,20 @@ public:
         };
         std::optional<FaceDetection> faceDetection;
 
-        //struct RunningDetection
-        //{
-        //    struct Rule
-        //    {
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.RunningDetection.Rule#, Name, QString) name;
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.RunningDetection.Rule#, MinCount, int) minCount;
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.RunningDetection.Rule#, MinSpeed, int) minSpeed;
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.RunningDetection.Rule#, Delay, int) delay;
-        //    };
-        //    std::vector<Rule> rules;
-        //};
-        //std::optional<RunningDetection> runningDetection;
+        struct RunningDetection
+        {
+            struct Rule
+            {
+                Entry<QString> name;
+                Entry<int> minPersonCount;
+                Entry<int> minSpeed;
+                Entry<int> minDuration;
+            };
+            std::vector<Rule> rules;
+
+            RunningDetection();
+        };
+        std::optional<RunningDetection> runningDetection;
     };
     std::optional<Vca> vca;
 

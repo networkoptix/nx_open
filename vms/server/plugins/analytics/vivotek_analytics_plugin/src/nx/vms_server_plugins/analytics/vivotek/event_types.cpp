@@ -88,18 +88,18 @@ const std::vector<EventType> kEventTypes =
                     return vca && vca->faceDetection;
                 };
         }
-        //{
-        //    auto& type = types.emplace_back();
-        //    type.nativeId = "RunningDetection";
-        //    type.id = "nx.vivotek.Running";
-        //    type.prettyName = "Running";
-        //    type.isProlonged = true;
-        //    type.isAvailable =
-        //        [](const auto& settings) {
-        //            const auto& vca = settings.vca;
-        //            return vca && vca->runningDetection;
-        //        };
-        //}
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "RunningDetection";
+            type.id = "nx.vivotek.Running";
+            type.prettyName = "Running";
+            type.isProlonged = true;
+            type.isAvailable =
+                [](const auto& settings) {
+                    const auto& vca = settings.vca;
+                    return vca && vca->runningDetection;
+                };
+        }
         types.shrink_to_fit();
         return types;
     }();
